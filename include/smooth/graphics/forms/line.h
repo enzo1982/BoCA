@@ -1,0 +1,46 @@
+ /* The smooth Class Library
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of "The Artistic License, Version 2.0".
+  *
+  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#ifndef _H_OBJSMOOTH_LINE_
+#define _H_OBJSMOOTH_LINE_
+
+namespace smooth
+{
+	namespace GUI
+	{
+		class Line;
+	};
+};
+
+#include "form.h"
+#include "point.h"
+
+namespace smooth
+{
+	namespace GUI
+	{
+		class SMOOTHAPI Line : public Form
+		{
+			public:
+				Int		 sx;
+				Int		 sy;
+				Int		 ex;
+				Int		 ey;
+
+						 Line()						{ sx = 0; sy = 0; ex = 0; ey = 0; }
+						 Line(const Point &iStart, const Point &iEnd)	{ sx = iStart.x; sy = iStart.y; ex = iEnd.x; ey = iEnd.y; }
+
+				Bool operator	 ==(const Line &) const;
+				Bool operator	 !=(const Line &) const;
+		};
+	};
+};
+
+#endif

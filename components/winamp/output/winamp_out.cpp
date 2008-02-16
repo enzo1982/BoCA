@@ -1,0 +1,100 @@
+ /* BoCA - BonkEnc Component Architecture
+  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the "GNU General Public License".
+  *
+  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#include <smooth.h>
+#include <smooth/dll.h>
+
+#include "winamp_out.h"
+#include "config.h"
+#include "dllinterface.h"
+
+const String &BoCA::WinampOut::GetComponentSpecs()
+{
+	static String	 componentSpecs = "		\
+							\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+	  <component>					\
+	    <name>Winamp Output Plug-In Adapter</name>	\
+	    <version>1.0</version>			\
+	    <id>winamp-out</id>				\
+	    <type>output</type>				\
+	  </component>					\
+							\
+	";
+
+	return componentSpecs;
+}
+
+ConfigureWinampOut	*configLayer = NIL;
+
+Void smooth::AttachDLL(Void *instance)
+{
+	LoadWinampDLLs();
+
+	configLayer = new ConfigureWinampOut();
+}
+
+Void smooth::DetachDLL()
+{
+	Object::DeleteObject(configLayer);
+
+	FreeWinampDLLs();
+}
+
+BoCA::WinampOut::WinampOut()
+{
+}
+
+BoCA::WinampOut::~WinampOut()
+{
+}
+
+Bool BoCA::WinampOut::Activate()
+{
+	plugin = winamp_out_modules.GetNth(Config::Get()->GetIntValue("WinampOut", "OutputPlugin", 0));
+
+	return (plugin->Open(format.rate, format.channels, 16, 0, 0) >= 0);
+}
+
+Bool BoCA::WinampOut::Deactivate()
+{
+	plugin->Close();
+
+	return True;
+}
+
+Int BoCA::WinampOut::WriteData(Buffer<UnsignedByte> &data, Int size)
+{
+	plugin->Write((char *) (UnsignedByte *) data, size);
+
+	return size;
+}
+
+ConfigLayer *BoCA::WinampOut::GetConfigurationLayer()
+{
+	return configLayer;
+}
+
+Int BoCA::WinampOut::CanWrite()
+{
+	return plugin->CanWrite();
+}
+
+Int BoCA::WinampOut::SetPause(Bool pause)
+{
+	plugin->Pause(pause);
+
+	return Success();
+}
+
+Bool BoCA::WinampOut::IsPlaying()
+{
+	return plugin->IsPlaying();
+}
