@@ -38,8 +38,8 @@ namespace smooth
 
 				ListEntry			*AddEntry(const String &);
 
-				Int				 AddEntry(ListEntry *);
-				Int				 RemoveEntry(ListEntry *);
+				Int				 Add(Widget *);
+				Int				 Remove(Widget *);
 
 				Int				 RemoveAllEntries();
 

@@ -54,6 +54,9 @@ namespace smooth
 				Bool				 IsSelected();
 			signals:
 				static Signal2<Void, Int, Int>	 internalOnSelectEntry;
+
+				Signal0<Void>			 onSelect;
+				Signal0<Void>			 onDeselect;
 			slots:
 				Void				 InitDrag();
 

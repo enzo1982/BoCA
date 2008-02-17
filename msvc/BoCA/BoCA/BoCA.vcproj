@@ -250,6 +250,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\runtime\src\common\configlayer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\src\common\i18n.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\runtime\src\common\picture.cpp"
 					>
 				</File>
@@ -376,6 +384,14 @@
 					>
 					<File
 						RelativePath="..\..\..\include\boca\common\config.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\include\boca\common\configlayer.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\include\boca\common\i18n.h"
 						>
 					</File>
 					<File

@@ -149,6 +149,9 @@
 #include "smooth/gui/widgets/multi/menu/micromenu.h"
 #include "smooth/gui/widgets/multi/menu/popupmenu.h"
 
+#include "smooth/gui/widgets/multi/tree/tree.h"
+#include "smooth/gui/widgets/multi/tree/treeview.h"
+
 #include "smooth/gui/widgets/special/cursor.h"
 #include "smooth/gui/widgets/special/dragcontrol.h"
 #include "smooth/gui/widgets/special/droparea.h"
