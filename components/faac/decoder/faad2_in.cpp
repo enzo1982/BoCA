@@ -347,13 +347,8 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	        	if ((frameInfo.error == 0) && (frameInfo.samples > 0) && (samples != NIL))
 			{
-				backBuffer.Resize(samplesRead * 2);
-
-				memcpy(backBuffer, samplesBuffer, samplesRead * 2);
-
 				samplesBuffer.Resize((samplesRead + frameInfo.samples) * 2);
 
-				memcpy(samplesBuffer, backBuffer, samplesRead * 2);
 				memcpy(samplesBuffer + samplesRead * 2, samples, frameInfo.samples * 2);
 
 				samplesRead += frameInfo.samples;
@@ -386,16 +381,9 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 		        if ((frameInfo.error == 0) && (frameInfo.samples > 0) && (samples != NIL))
 			{
-				unsigned char	*buffer = new unsigned char [samplesRead * 2];
-
-				memcpy(buffer, samplesBuffer, samplesRead * 2);
-
 				samplesBuffer.Resize((samplesRead + frameInfo.samples) * 2);
 
-				memcpy(samplesBuffer, buffer, samplesRead * 2);
 				memcpy(samplesBuffer + samplesRead * 2, samples, frameInfo.samples * 2);
-
-				delete [] buffer;
 
 				samplesRead += frameInfo.samples;
 			}

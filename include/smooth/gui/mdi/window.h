@@ -37,6 +37,8 @@ namespace smooth
 
 								 Window(const String &, const Point &, const Size &);
 					virtual			~Window();
+
+					virtual Bool		 IsTypeCompatible(Int) const;
 			};
 		};
 	};

@@ -15,8 +15,6 @@
 #include "../buffer.h"
 #include "../../threads/rwlock.h"
 
-#include <memory.h>
-
 namespace smooth
 {
 	template <class s> class ArrayBackend
@@ -30,9 +28,8 @@ namespace smooth
 			mutable Int		 lastAccessedEntry;
 
 			Buffer<ArrayEntry<s> *>	 entries;
-			Buffer<ArrayEntry<s> *>	 buffer;
 
-			mutable Threads::RWLock	 lock;
+			mutable Threads::RWLock	*lock;
 
 			Bool IndexAvailable(Int index) const
 			{
@@ -46,16 +43,16 @@ namespace smooth
 			{
 				if (nOfEntries == 0) return -1;
 
-				lock.LockForRead();
+				LockForRead();
 
 				if (lastAccessedEntry + 1 < nOfEntries)
 				{
-					if (entries[lastAccessedEntry + 1]->GetIndex() == index) { lock.Release(); return ++lastAccessedEntry; }
+					if (entries[lastAccessedEntry + 1]->GetIndex() == index) { Unlock(); return ++lastAccessedEntry; }
 				}
 
 				if (lastAccessedEntry > 0)
 				{
-					if (entries[lastAccessedEntry - 1]->GetIndex() == index) { lock.Release(); return --lastAccessedEntry; }
+					if (entries[lastAccessedEntry - 1]->GetIndex() == index) { Unlock(); return --lastAccessedEntry; }
 				}
 
 				for (Int i = 0; i < nOfEntries; i++)
@@ -64,13 +61,13 @@ namespace smooth
 					{
 						lastAccessedEntry = i;
 
-						lock.Release();
+						Unlock();
 
 						return lastAccessedEntry;
 					}
 				}
 
-				lock.Release();
+				Unlock();
 
 				return -1;
 			}
@@ -80,11 +77,15 @@ namespace smooth
 			{
 				nOfEntries	  = 0;
 				lastAccessedEntry = 0;
+
+				lock = NIL;
 			}
 
 			virtual	~ArrayBackend()
 			{
 				RemoveAll();
+
+				if (lock != NIL) delete lock;
 			}
 
 			Int Add(const s &value)
@@ -99,20 +100,11 @@ namespace smooth
 			{
 				if (!IndexAvailable(index)) return False;
 
-				lock.LockForWrite();
+				LockForWrite();
 
 				if (greatestIndex < index) greatestIndex = index;
 
-				if (entries.Size() == nOfEntries)
-				{
-					buffer.Resize(nOfEntries);
-
-					memcpy(buffer, entries, nOfEntries * sizeof(ArrayEntry<s> *));
-
-					entries.Resize(nOfEntries + 100);
-
-					memcpy(entries, buffer, nOfEntries * sizeof(ArrayEntry<s> *));
-				}
+				if (entries.Size() == nOfEntries) entries.Resize(nOfEntries + 10);
 
 				ArrayEntry<s>	*entry = new ArrayEntry<s>(value);
 
@@ -120,7 +112,7 @@ namespace smooth
 
 				entries[nOfEntries++] = entry;
 
-				lock.Release();
+				Unlock();
 
 				return True;
 			}
@@ -146,31 +138,19 @@ namespace smooth
 				else					 return -1;
 			}
 
-			Bool InsertAtPos(Int position, const s &value, Int index)
+			Bool InsertAtPos(Int position, const s &value, Int index) 
 			{
 				if (nOfEntries < position && position >= 0) return False;
 
 				if (!IndexAvailable(index)) return False;
 
-				lock.LockForWrite();
+				LockForWrite();
 
 				if (greatestIndex < index) greatestIndex = index;
 
-				if (entries.Size() == nOfEntries)
-				{
-					buffer.Resize(nOfEntries);
+				if (entries.Size() == nOfEntries) entries.Resize(nOfEntries + 10);
 
-					memcpy(buffer, entries, nOfEntries * sizeof(ArrayEntry<s> *));
-
-					entries.Resize(nOfEntries + 100);
-
-					memcpy(entries, buffer, nOfEntries * sizeof(ArrayEntry<s> *));
-				}
-
-				buffer.Resize(nOfEntries - position);
-
-				memcpy(buffer, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s> *));
-				memcpy(entries + position + 1, buffer, (nOfEntries - position) * sizeof(ArrayEntry<s> *));
+				memmove(entries + position + 1, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s> *));
 
 				ArrayEntry<s>	*entry = new ArrayEntry<s>(value);
 
@@ -180,7 +160,7 @@ namespace smooth
 
 				nOfEntries++;
 
-				lock.Release();
+				Unlock();
 
 				return True;
 			}
@@ -194,25 +174,22 @@ namespace smooth
 			{
 				if (nOfEntries <= n || n < 0) return False;
 
-				lock.LockForWrite();
+				LockForWrite();
 
 				delete entries[n];
 
-				buffer.Resize(nOfEntries - n - 1);
-
-				memcpy(buffer, entries + n + 1, (nOfEntries - n - 1) * sizeof(ArrayEntry<s> *));
-				memcpy(entries + n, buffer, (nOfEntries - n - 1) * sizeof(ArrayEntry<s> *));
+				memmove(entries + n, entries + n + 1, (nOfEntries - n - 1) * sizeof(ArrayEntry<s> *));
 
 				nOfEntries--;
 
-				lock.Release();
+				Unlock();
 
 				return True;
 			}
 
 			Bool RemoveAll()
 			{
-				lock.LockForWrite();
+				LockForWrite();
 
 				for (Int i = 0; i < nOfEntries; i++) delete entries[i];
 
@@ -221,7 +198,7 @@ namespace smooth
 
 				lastAccessedEntry	= 0;
 
-				lock.Release();
+				Unlock();
 
 				return True;
 			}
@@ -325,17 +302,23 @@ namespace smooth
 
 			Int LockForRead() const
 			{
-				return lock.LockForRead();
+				if (lock == NIL) lock = new Threads::RWLock();
+
+				return lock->LockForRead();
 			}
 
 			Int LockForWrite() const
 			{
-				return lock.LockForWrite();
+				if (lock == NIL) lock = new Threads::RWLock();
+
+				return lock->LockForWrite();
 			}
 
 			Int Unlock() const
 			{
-				return lock.Release();
+				if (lock == NIL) return 0;
+
+				return lock->Release();
 			}
 	};
 };

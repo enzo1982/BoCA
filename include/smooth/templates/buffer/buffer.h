@@ -82,7 +82,6 @@ namespace smooth
 				return True;
 			}
 
-
 			Bool Zero()
 			{
 				if (memory == NIL) return True;
@@ -106,7 +105,6 @@ namespace smooth
 
 				return True;
 			}
-
 
 			t &operator	 [](const int n)	{ return memory[n]; }
 			t &operator	 [](const Int n)	{ return (*this)[(int) n]; }

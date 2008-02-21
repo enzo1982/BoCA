@@ -159,13 +159,8 @@ Bool BoCA::VorbisOut::Activate()
 
 		if (result == 0) break;
 
-		backBuffer.Resize(dataLength);
-
-		memcpy(backBuffer, dataBuffer, dataLength);
-
 		dataBuffer.Resize(dataLength + og.header_len + og.body_len);
 
-		memcpy(dataBuffer, backBuffer, dataLength);
 		memcpy(((unsigned char *) dataBuffer) + dataLength, og.header, og.header_len);
 		memcpy(((unsigned char *) dataBuffer) + dataLength + og.header_len, og.body, og.body_len);
 
@@ -200,13 +195,8 @@ Bool BoCA::VorbisOut::Deactivate()
 
 				if (result == 0) break;
 
-				backBuffer.Resize(dataLength);
-
-				memcpy(backBuffer, dataBuffer, dataLength);
-
 				dataBuffer.Resize(dataLength + og.header_len + og.body_len);
 
-				memcpy(dataBuffer, backBuffer, dataLength);
 				memcpy(((unsigned char *) dataBuffer) + dataLength, og.header, og.header_len);
 				memcpy(((unsigned char *) dataBuffer) + dataLength + og.header_len, og.body, og.body_len);
 
@@ -302,13 +292,8 @@ Int BoCA::VorbisOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 				if (result == 0) break;
 
-				backBuffer.Resize(dataLength);
-
-				memcpy(backBuffer, dataBuffer, dataLength);
-
 				dataBuffer.Resize(dataLength + og.header_len + og.body_len);
 
-				memcpy(dataBuffer, backBuffer, dataLength);
 				memcpy(((unsigned char *) dataBuffer) + dataLength, og.header, og.header_len);
 				memcpy(((unsigned char *) dataBuffer) + dataLength + og.header_len, og.body, og.body_len);
 

@@ -49,6 +49,8 @@ namespace smooth
 			private:
 				Int				 order;
 			protected:
+				static Array<Window *, Void *>	 windows;
+
 				WindowBackend			*backend;
 
 				Int				 stay;
@@ -145,6 +147,9 @@ namespace smooth
 
 				virtual Surface			*GetDrawSurface() const;
 				Void				*GetSystemWindow() const;
+
+				static Int			 GetNOfWindows()			{ return windows.Length(); }
+				static Window			*GetNthWindow(Int n)			{ return windows.GetNth(n); }
 
 				static Window			*GetWindow(Void *);
 

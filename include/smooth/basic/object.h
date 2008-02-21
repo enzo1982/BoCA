@@ -45,13 +45,13 @@ namespace smooth
 			static Int			 nextObjectHandle;
 
 			static Array<Object *, Void *>	 objects;
+			static Array<Object *, Void *>	 deleteable;
 
 			static System::Timer		*cleanupTimer;
 
 			Int				 handle;
 			String				 name;
 
-			Bool				 deleteObject;
 			mutable Int			 isObjectInUse;
 
 			Int				 refCount;
@@ -96,7 +96,6 @@ namespace smooth
 			virtual inline Bool		 IsTypeCompatible(Int objType) const	{ return (objType == classID); }
 
 			Bool				 IsObjectInUse() const			{ return isObjectInUse > 0; }
-			Bool				 IsObjectDeletable() const		{ return deleteObject; }
 		slots:
 			static Void			 ObjectCleanup();
 	};

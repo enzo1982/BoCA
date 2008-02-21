@@ -221,16 +221,9 @@ FLAC__StreamDecoderWriteStatus BoCA::FLACStreamDecoderWriteCallback(const FLAC__
 
 	filter->samplesBufferMutex->Lock();
 
-	static Buffer<signed int>	 backBuffer;
-	Int				 oSize = filter->samplesBuffer.Size();
-
-	backBuffer.Resize(oSize);
-
-	memcpy(backBuffer, filter->samplesBuffer, oSize * 4);
+	Int	 oSize = filter->samplesBuffer.Size();
 
 	filter->samplesBuffer.Resize(oSize + frame->header.blocksize * filter->format.channels);
-
-	memcpy(filter->samplesBuffer, backBuffer, oSize * 4);
 
 	for (Int i = 0; i < (signed) frame->header.blocksize; i++)
 	{

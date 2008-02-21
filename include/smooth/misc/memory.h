@@ -28,6 +28,9 @@ namespace smooth
 					 Memory(Int);
 					~Memory();
 
+			/* Resize the allocated memory area keeping
+			 * already existing contents.
+			 */
 			Bool		 Resize(Int);
 
 			operator	 void *() const;

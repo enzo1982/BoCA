@@ -28,7 +28,6 @@ namespace BoCA
 			vorbis_block		 vb;
 
 			Buffer<unsigned char>	 dataBuffer;
-			Buffer<unsigned char>	 backBuffer;
 			Buffer<unsigned short>	 samplesBuffer;
 		public:
 			static const String	&GetComponentSpecs();

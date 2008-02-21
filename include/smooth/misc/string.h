@@ -31,7 +31,6 @@ namespace smooth
 
 			Buffer<wchar_t>		 wBuffer;
 			Buffer<wchar_t>		 wString;
-			mutable Int		 stringSize;
 
 			static char		*inputFormat;
 			static char		*outputFormat;
