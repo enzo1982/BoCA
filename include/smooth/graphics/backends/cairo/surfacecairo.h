@@ -31,6 +31,8 @@ namespace smooth
 
 		class SurfaceCairo : public SurfaceBackend
 		{
+			private:
+				static Int			 surfaceDPI;
 			protected:
 #ifdef __WIN32__
 				HWND				 window;
@@ -70,6 +72,8 @@ namespace smooth
 				Int				 EndPaint();
 
 				Void				*GetSystemSurface() const;
+
+				Int				 GetSurfaceDPI() const;
 
 				Int				 SetPixel(const Point &, const Color &);
 

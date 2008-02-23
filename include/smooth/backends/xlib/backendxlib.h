@@ -32,15 +32,15 @@ namespace smooth
 		class BackendXLib : public Backend
 		{
 			private:
-				Display	*display;
+				static Display	*display;
 			public:
-					 BackendXLib();
-				virtual	~BackendXLib();
+						 BackendXLib();
+				virtual		~BackendXLib();
 
-				Int	 Init();
-				Int	 Deinit();
+				Int		 Init();
+				Int		 Deinit();
 
-				Display	*GetDisplay();
+				static Display	*GetDisplay();
 		};
 	};
 };

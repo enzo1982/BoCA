@@ -15,6 +15,8 @@
 #include "../buffer.h"
 #include "../../threads/rwlock.h"
 
+#include <memory.h>
+
 namespace smooth
 {
 	template <class s> class ArrayBackend
