@@ -17,21 +17,26 @@
 
 const String &BoCA::FLACOut::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>FLAC Audio Encoder</name>		\
-	    <version>1.0</version>			\
-	    <id>flac-out</id>				\
-	    <type>encoder</type>			\
-	    <format>					\
-	      <name>FLAC Audio</name>			\
-	      <extension>flac</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (flacdll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>FLAC Audio Encoder</name>		\
+		    <version>1.0</version>			\
+		    <id>flac-out</id>				\
+		    <type>encoder</type>			\
+		    <format>					\
+		      <name>FLAC Audio</name>			\
+		      <extension>flac</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }

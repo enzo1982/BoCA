@@ -98,4 +98,6 @@ Bool LoadVorbisDLL()
 Void FreeVorbisDLL()
 {
 	Object::DeleteObject(vorbisdll);
+
+	vorbisdll = NIL;
 }

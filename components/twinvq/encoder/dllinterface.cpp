@@ -52,4 +52,6 @@ Bool LoadTwinVQDLL()
 Void FreeTwinVQDLL()
 {
 	Object::DeleteObject(twinvqdll);
+
+	twinvqdll = NIL;
 }

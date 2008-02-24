@@ -21,3 +21,26 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace)
 {
 	QuickMessage(String(message).Replace("%1", replace), "Error", MB_OK, IDI_HAND);
 }
+
+String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
+{
+	String	 rVal	= fileName;
+	Int	 lastBs	= -1;
+
+	/* Replace Unicode characters in input file name
+	 */
+	for (Int i = 0; i < rVal.Length(); i++)
+	{
+		if (rVal[i] > 255)	rVal[i] = '#';
+		if (rVal[i] == '\\')	lastBs = i;
+	}
+
+	String	 tempDir = S::System::System::GetTempDirectory();
+
+	for (Int j = lastBs + 1; j < rVal.Length(); j++)
+	{
+		tempDir[tempDir.Length()] = rVal[j];
+	}
+
+	return tempDir.Append(".temp");
+}

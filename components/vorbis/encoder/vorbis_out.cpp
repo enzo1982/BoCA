@@ -19,21 +19,26 @@
 
 const String &BoCA::VorbisOut::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Ogg Vorbis Encoder</name>		\
-	    <version>1.0</version>			\
-	    <id>vorbis-out</id>				\
-	    <type>encoder</type>			\
-	    <format>					\
-	      <name>Ogg Vorbis Audio</name>		\
-	      <extension>ogg</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (vorbisdll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>Ogg Vorbis Encoder</name>		\
+		    <version>1.0</version>			\
+		    <id>vorbis-out</id>				\
+		    <type>encoder</type>			\
+		    <format>					\
+		      <name>Ogg Vorbis Audio</name>		\
+		      <extension>ogg</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }

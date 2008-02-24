@@ -15,31 +15,51 @@
 #include "config.h"
 #include "dllinterface.h"
 
+using namespace smooth::IO;
+
 const String &BoCA::FAACOut::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>FAAC MP4/AAC Encoder</name>		\
-	    <version>1.0</version>			\
-	    <id>mp4-out</id>				\
-	    <type>encoder</type>			\
-	    <format>					\
-	      <name>MP4 Audio Files</name>		\
-	      <extension>m4a</extension>		\
-	      <extension>m4b</extension>		\
-	      <extension>m4r</extension>		\
-	      <extension>mp4</extension>		\
-	      <extension>3gp</extension>		\
-	    </format>					\
-	    <format>					\
-	      <name>Advanced Audio Files</name>		\
-	      <extension>aac</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (faacdll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>FAAC MP4/AAC Encoder</name>		\
+		    <version>1.0</version>			\
+		    <id>mp4-out</id>				\
+		    <type>encoder</type>			\
+								\
+		";
+
+		if (mp4v2dll != NIL)
+		{
+			componentSpecs.Append("			\
+								\
+			    <format>				\
+			      <name>MP4 Audio Files</name>	\
+			      <extension>m4a</extension>	\
+			      <extension>m4b</extension>	\
+			      <extension>m4r</extension>	\
+			      <extension>mp4</extension>	\
+			      <extension>3gp</extension>	\
+			    </format>				\
+								\
+			");
+		}
+
+		componentSpecs.Append("				\
+								\
+		    <format>					\
+		      <name>Advanced Audio Files</name>		\
+		      <extension>aac</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		");
+	}
 
 	return componentSpecs;
 }
@@ -83,16 +103,6 @@ Bool BoCA::FAACOut::Activate()
 
 	Config	*config = Config::Get();
 
-	if (config->enable_mp4)
-	{
-		if (GetTempFile(format.outfile) != format.outfile)
-		{
-			File	 mp4File(format.outfile);
-
-			mp4File.Delete();
-		}
-	}
-
 	unsigned long	 samplesSize	= 0;
 	unsigned long	 bufferSize	= 0;
 
@@ -103,16 +113,16 @@ Bool BoCA::FAACOut::Activate()
 
 	fConfig = ex_faacEncGetCurrentConfiguration(handle);
 
-	fConfig->mpegVersion	= config->enable_mp4 ? MPEG4 : config->GetIntValue("FAAC", "MPEGVersion", 0);
+	fConfig->mpegVersion	= config->GetIntValue("FAAC", "MP4Container", 1) ? MPEG4 : config->GetIntValue("FAAC", "MPEGVersion", 0);
 	fConfig->aacObjectType	= config->GetIntValue("FAAC", "AACType", 2);
 	fConfig->allowMidside	= config->GetIntValue("FAAC", "AllowJS", 1);
 	fConfig->useTns		= config->GetIntValue("FAAC", "UseTNS", 0);
 	fConfig->bandWidth	= config->GetIntValue("FAAC", "BandWidth", 16000);
 
-	if (config->enable_mp4) fConfig->outputFormat	= 0; // Raw AAC frame headers
+	if (config->GetIntValue("FAAC", "MP4Container", 1)) fConfig->outputFormat	= 0; // Raw AAC frame headers
 
-	if (config->GetIntValue("FAAC", "SetQuality", 1)) fConfig->quantqual	= config->GetIntValue("FAAC", "AACQuality", 100);
-	else						  fConfig->bitRate	= config->GetIntValue("FAAC", "Bitrate", 64) * 1000;
+	if (config->GetIntValue("FAAC", "SetQuality", 1))   fConfig->quantqual		= config->GetIntValue("FAAC", "AACQuality", 100);
+	else						    fConfig->bitRate		= config->GetIntValue("FAAC", "Bitrate", 64) * 1000;
 
 	if (format.bits == 8)	fConfig->inputFormat	= FAAC_INPUT_16BIT;
 	if (format.bits == 16)	fConfig->inputFormat	= FAAC_INPUT_16BIT;
@@ -121,9 +131,9 @@ Bool BoCA::FAACOut::Activate()
 
 	ex_faacEncSetConfiguration(handle, fConfig);
 
-	if (config->enable_mp4)
+	if (config->GetIntValue("FAAC", "MP4Container", 1))
 	{
-		mp4File		= ex_MP4CreateEx(GetTempFile(format.outfile), 0, 0, 1, 1, NIL, 0, NIL, 0);
+		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), 0, 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);	
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
@@ -143,7 +153,7 @@ Bool BoCA::FAACOut::Activate()
 
 	packageSize	= samplesSize * (format.bits / 8);
 
-	if (!config->enable_mp4)
+	if (!config->GetIntValue("FAAC", "MP4Container", 1))
 	{
 		if ((format.artist != NIL || format.title != NIL) && config->enable_id3v2 && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
 		{
@@ -167,7 +177,7 @@ Bool BoCA::FAACOut::Deactivate()
 	{
 		bytes = ex_faacEncEncode(handle, NULL, 0, outBuffer, outBuffer.Size());
 
-		if (config->enable_mp4)
+		if (config->GetIntValue("FAAC", "MP4Container", 1))
 		{
 			if (bytes > 0)
 			{
@@ -189,7 +199,7 @@ Bool BoCA::FAACOut::Deactivate()
 
 	ex_faacEncClose(handle);
 
-	if (config->enable_mp4)
+	if (config->GetIntValue("FAAC", "MP4Container", 1))
 	{
 		if (config->enable_mp4meta)
 		{
@@ -212,14 +222,24 @@ Bool BoCA::FAACOut::Deactivate()
 
 		ex_MP4Close(mp4File);
 
-		ex_MP4Optimize(GetTempFile(format.outfile), NIL, 0);
+		ex_MP4Optimize(Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), NIL, 0);
 
-		if (GetTempFile(format.outfile) != format.outfile)
+		/* Stream contents of created MP4 file to output driver
+		 */
+		InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), IS_READONLY);
+		Buffer<UnsignedByte>	 buffer(1024);
+		Int			 bytesLeft = in.Size();
+
+		while (bytesLeft)
 		{
-			File	 tempFile(GetTempFile(format.outfile));
+			driver->WriteData((UnsignedByte *) in.InputData(buffer, Math::Min(1024, bytesLeft)), Math::Min(1024, bytesLeft));
 
-			tempFile.Move(format.outfile);
+			bytesLeft -= Math::Min(1024, bytesLeft);
 		}
+
+		in.Close();
+
+		File(Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out")).Delete();
 	}
 
 	return True;
@@ -250,7 +270,7 @@ Int BoCA::FAACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 		bytes = ex_faacEncEncode(handle, (int32_t *) (unsigned char *) data, samplesRead, outBuffer, outBuffer.Size());
 	}
 
-	if (config->enable_mp4)
+	if (config->GetIntValue("FAAC", "MP4Container", 1))
 	{
 		if (bytes > 0)
 		{
@@ -274,27 +294,4 @@ Int BoCA::FAACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 ConfigLayer *BoCA::FAACOut::GetConfigurationLayer()
 {
 	return configLayer;
-}
-
-String BoCA::FAACOut::GetTempFile(const String &oFileName)
-{
-	String	 rVal	= oFileName;
-	Int	 lastBs	= -1;
-
-	for (Int i = 0; i < rVal.Length(); i++)
-	{
-		if (rVal[i] > 255)	rVal[i] = '#';
-		if (rVal[i] == '\\')	lastBs = i;
-	}
-
-	if (rVal == oFileName) return rVal;
-
-	String	 tempDir = S::System::System::GetTempDirectory();
-
-	for (Int j = lastBs + 1; j < rVal.Length(); j++)
-	{
-		tempDir[tempDir.Length()] = rVal[j];
-	}
-
-	return tempDir.Append(".out.temp");
 }

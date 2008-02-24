@@ -33,6 +33,14 @@ Bool BoCA::AS::EncoderComponent::SetAudioTrackInfo(const Track &track)
 	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
+String BoCA::AS::EncoderComponent::GetOutputFileExtension()
+{
+	String	 extension = specs->func_GetOutputFileExtension(component);
+
+	if (extension != NIL)	return extension;
+	else			return specs->formats.GetFirst()->GetExtensions().GetFirst();
+}
+
 Bool BoCA::AS::EncoderComponent::Activate()
 {
 	SetDriver(driver);

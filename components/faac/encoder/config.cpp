@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "config.h"
+#include "dllinterface.h"
 
 BoCA::ConfigureFAAC::ConfigureFAAC()
 {
@@ -95,7 +96,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	option_mp4		= new OptionBox("MP4", pos, size, &fileFormat, 1);
 	option_mp4->onAction.Connect(&ConfigureFAAC::SetFileFormat, this);
 
-	if (!config->enable_mp4)
+	if (mp4v2dll == NIL)
 	{
 		option_mp4->Deactivate();
 

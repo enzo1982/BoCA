@@ -83,6 +83,8 @@ namespace BoCA
 
 				bool		 (*func_SetAudioTrackInfo)(void *, const void *);
 
+				char		*(*func_GetOutputFileExtension)(void *);
+
 				bool		 (*func_Activate)(void *);
 				bool		 (*func_Deactivate)(void *);
 

@@ -18,22 +18,26 @@ using namespace smooth::IO;
 
 const String &BoCA::BonkIn::GetComponentSpecs()
 {
+	static String	 componentSpecs;
 
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Bonk Audio Decoder</name>		\
-	    <version>1.0</version>			\
-	    <id>bonk-in</id>				\
-	    <type>decoder</type>			\
-	    <format>					\
-	      <name>Bonk Audio Files</name>		\
-	      <extension>bonk</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	if (bonkdll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>Bonk Audio Decoder</name>		\
+		    <version>1.0</version>			\
+		    <id>bonk-in</id>				\
+		    <type>decoder</type>			\
+		    <format>					\
+		      <name>Bonk Audio Files</name>		\
+		      <extension>bonk</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }

@@ -12,6 +12,7 @@
 
 BoCA::CS::DecoderComponent::DecoderComponent()
 {
+	inBytes = 0;
 }
 
 BoCA::CS::DecoderComponent::~DecoderComponent()

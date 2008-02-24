@@ -68,6 +68,8 @@ Bool LoadFAAD2DLL()
 Void FreeFAAD2DLL()
 {
 	Object::DeleteObject(faad2dll);
+
+	faad2dll = NIL;
 }
 
 Bool LoadMP4v2DLL()
@@ -116,4 +118,6 @@ Bool LoadMP4v2DLL()
 Void FreeMP4v2DLL()
 {
 	Object::DeleteObject(mp4v2dll);
+
+	mp4v2dll = NIL;
 }

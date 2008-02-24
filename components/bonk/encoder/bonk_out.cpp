@@ -17,21 +17,26 @@
 
 const String &BoCA::BonkOut::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Bonk Audio Encoder</name>		\
-	    <version>1.0</version>			\
-	    <id>bonk-out</id>				\
-	    <type>encoder</type>			\
-	    <format>					\
-	      <name>Bonk Audio Files</name>		\
-	      <extension>bonk</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (bonkdll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>Bonk Audio Encoder</name>		\
+		    <version>1.0</version>			\
+		    <id>bonk-out</id>				\
+		    <type>encoder</type>			\
+		    <format>					\
+		      <name>Bonk Audio Files</name>		\
+		      <extension>bonk</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }

@@ -19,21 +19,26 @@ using namespace smooth::IO;
 const String &BoCA::LAMEIn::GetComponentSpecs()
 {
 
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>LAME MP3 Decoder</name>		\
-	    <version>1.0</version>			\
-	    <id>lame-in</id>				\
-	    <type>decoder</type>			\
-	    <format>					\
-	      <name>MPEG 1 Audio Layer 3</name>		\
-	      <extension>mp3</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (lamedll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>LAME MP3 Decoder</name>		\
+		    <version>1.0</version>			\
+		    <id>lame-in</id>				\
+		    <type>decoder</type>			\
+		    <format>					\
+		      <name>MPEG 1 Audio Layer 3</name>		\
+		      <extension>mp3</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }

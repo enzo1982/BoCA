@@ -40,4 +40,6 @@ Bool LoadBladeDLL()
 Void FreeBladeDLL()
 {
 	Object::DeleteObject(bladedll);
+
+	bladedll = NIL;
 }

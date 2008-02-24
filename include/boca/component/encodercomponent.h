@@ -32,6 +32,8 @@ namespace BoCA
 
 				virtual Bool	 SetAudioTrackInfo(const Track &);
 
+				virtual String	 GetOutputFileExtension();
+
 				virtual Bool	 Activate() = 0;
 				virtual Bool	 Deactivate() = 0;
 

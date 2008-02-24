@@ -24,3 +24,8 @@ Bool BoCA::CS::EncoderComponent::SetAudioTrackInfo(const Track &nFormat)
 
 	return True;
 }
+
+String BoCA::CS::EncoderComponent::GetOutputFileExtension()
+{
+	return NIL;
+}

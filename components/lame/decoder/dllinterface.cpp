@@ -40,4 +40,6 @@ Bool LoadLAMEDLL()
 Void FreeLAMEDLL()
 {
 	Object::DeleteObject(lamedll);
+
+	lamedll = NIL;
 }

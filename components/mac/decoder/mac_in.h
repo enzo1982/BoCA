@@ -9,45 +9,34 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
-#include "dllinterface.h"
+#include "mac/MACDll.h"
 
-BoCA_BEGIN_COMPONENT(FAACOut)
+BoCA_BEGIN_COMPONENT(MACIn)
 
 namespace BoCA
 {
-	class FAACOut : public CS::EncoderComponent
+	class MACIn : public CS::DecoderComponent
 	{
 		private:
-			MP4FileHandle		 mp4File;
-			faacEncHandle		 handle;
-			faacEncConfigurationPtr	 fConfig;
+			APE_DECOMPRESS_HANDLE	 hAPEDecompress;
 
-			Int			 mp4Track;
-			Int			 sampleId;
-
-			Int			 frameSize;
-
-			Int			 totalSamples;
-			Int			 encodedSamples;
-			Int			 delaySamples;
-
-			Buffer<unsigned char>	 outBuffer;
-			Buffer<int32_t>		 samplesBuffer;
+			Int			 blockId;
 		public:
 			static const String	&GetComponentSpecs();
 
-						 FAACOut();
-						~FAACOut();
+						 MACIn();
+						~MACIn();
+
+			Bool			 CanOpenStream(const String &);
+			Error			 GetStreamInfo(const String &, Track &);
 
 			Bool			 Activate();
 			Bool			 Deactivate();
 
-			Int			 WriteData(Buffer<UnsignedByte> &, Int);
-
-			ConfigLayer		*GetConfigurationLayer();
+			Int			 ReadData(Buffer<UnsignedByte> &, Int);
 	};
 };
 
-BoCA_DEFINE_ENCODER_COMPONENT(FAACOut)
+BoCA_DEFINE_DECODER_COMPONENT(MACIn)
 
-BoCA_END_COMPONENT(FAACOut)
+BoCA_END_COMPONENT(MACIn)

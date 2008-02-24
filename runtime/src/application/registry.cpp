@@ -47,9 +47,14 @@ BoCA::AS::Registry::Registry()
 		File		 file = files.GetNth(i);
 		ComponentSpecs	*specs = new ComponentSpecs();
 
-		specs->LoadFromFile(file);
-
-		componentSpecs.Add(specs);
+		if (specs->LoadFromFile(file))
+		{
+			componentSpecs.Add(specs);
+		}
+		else
+		{
+			delete specs;
+		}
 	}
 }
 

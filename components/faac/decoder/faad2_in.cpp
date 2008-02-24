@@ -24,30 +24,47 @@ using namespace smooth::IO;
 
 const String &BoCA::FAAD2In::GetComponentSpecs()
 {
+	static String	 componentSpecs;
 
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>FAAD2 MP4/AAC Decoder</name>		\
-	    <version>1.0</version>			\
-	    <id>faad2-in</id>				\
-	    <type>decoder</type>			\
-	    <format>					\
-	      <name>MP4 Audio Files</name>		\
-	      <extension>m4a</extension>		\
-	      <extension>m4b</extension>		\
-	      <extension>m4r</extension>		\
-	      <extension>mp4</extension>		\
-	      <extension>3gp</extension>		\
-	    </format>					\
-	    <format>					\
-	      <name>Advanced Audio Files</name>		\
-	      <extension>aac</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	if (faad2dll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>FAAD2 MP4/AAC Decoder</name>		\
+		    <version>1.0</version>			\
+		    <id>faad2-in</id>				\
+		    <type>decoder</type>			\
+								\
+		";
+
+		if (mp4v2dll != NIL)
+		{
+			componentSpecs.Append("			\
+								\
+			    <format>				\
+			      <name>MP4 Audio Files</name>	\
+			      <extension>m4a</extension>	\
+			      <extension>m4b</extension>	\
+			      <extension>m4r</extension>	\
+			      <extension>mp4</extension>	\
+			      <extension>3gp</extension>	\
+			    </format>				\
+								\
+			");
+		}
+
+		componentSpecs.Append("				\
+								\
+		    <format>					\
+		      <name>Advanced Audio Files</name>		\
+		      <extension>aac</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		");
+	}
 
 	return componentSpecs;
 }
@@ -68,33 +85,32 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 {
 	String	 lcURI = streamURI.ToLower();
 
-	return lcURI.EndsWith(".mp4") |
-	       lcURI.EndsWith(".m4a") |
-	       lcURI.EndsWith(".m4b") |
-	       lcURI.EndsWith(".m4r") |
-	       lcURI.EndsWith(".3gp") |
-	       lcURI.EndsWith(".aac");
+	if (mp4v2dll == NIL)	return lcURI.EndsWith(".aac");
+	else			return lcURI.EndsWith(".mp4") ||
+				       lcURI.EndsWith(".m4a") ||
+				       lcURI.EndsWith(".m4b") ||
+				       lcURI.EndsWith(".m4r") ||
+				       lcURI.EndsWith(".3gp") ||
+				       lcURI.EndsWith(".aac");
 }
 
 Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 {
 	if (!streamURI.ToLower().EndsWith(".aac"))
 	{
-		if (GetTempFile(streamURI) != streamURI)
-		{
-			File	 mp4File(streamURI);
-
-			mp4File.Copy(GetTempFile(streamURI));
-		}
-
-		InStream	*f_in = new InStream(STREAM_FILE, GetTempFile(streamURI), IS_READONLY);
-
-		format.fileSize	= f_in->Size();
+		format.fileSize	= File(streamURI).GetFileSize();
 		format.length	= -1;
 
-		delete f_in;
+		if (String::IsUnicode(streamURI))
+		{
+			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 
-		mp4File = ex_MP4Read(GetTempFile(streamURI), 0);
+			mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"), 0);
+		}
+		else
+		{
+			mp4File = ex_MP4Read(streamURI, 0);
+		}
 
 		char		*buffer		= NIL;
 		unsigned short	 trackNr	= 0;
@@ -144,11 +160,9 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 
 		ex_MP4Close(mp4File);
 
-		if (GetTempFile(streamURI) != streamURI)
+		if (String::IsUnicode(streamURI))
 		{
-			File	 tempFile(GetTempFile(streamURI));
-
-			tempFile.Delete();
+			File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
 		}
 	}
 	else
@@ -242,14 +256,17 @@ Bool BoCA::FAAD2In::Activate()
 {
 	if (!format.origFilename.ToLower().EndsWith(".aac"))
 	{
-		if (GetTempFile(format.origFilename) != format.origFilename)
+		if (String::IsUnicode(format.origFilename))
 		{
-			File	 mp4File(format.origFilename);
+			File(format.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"));
 
-			mp4File.Copy(GetTempFile(format.origFilename));
+			mp4File	= ex_MP4Read(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"), 0);
+		}
+		else
+		{
+			mp4File	= ex_MP4Read(format.origFilename, 0);
 		}
 
-		mp4File		= ex_MP4Read(GetTempFile(format.origFilename), 0);
 		mp4Track	= GetAudioTrack();
 
 		if (mp4Track == -1) return False;
@@ -308,11 +325,9 @@ Bool BoCA::FAAD2In::Deactivate()
 	{
 		ex_MP4Close(mp4File);
 
-		if (GetTempFile(format.origFilename) != format.origFilename)
+		if (String::IsUnicode(format.origFilename))
 		{
-			File	 tempFile(GetTempFile(format.origFilename));
-
-			tempFile.Delete();
+			File(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in")).Delete();
 		}
 	}
 
@@ -426,26 +441,3 @@ Int BoCA::FAAD2In::GetAudioTrack()
 
 	return -1;
 } 
-
-String BoCA::FAAD2In::GetTempFile(const String &oFileName)
-{
-	String	 rVal	= oFileName;
-	Int	 lastBs	= -1;
-
-	for (Int i = 0; i < rVal.Length(); i++)
-	{
-		if (rVal[i] > 255)	rVal[i] = '#';
-		if (rVal[i] == '\\')	lastBs = i;
-	}
-
-	if (rVal == oFileName) return rVal;
-
-	String	 tempDir = S::System::System::GetTempDirectory();
-
-	for (Int j = lastBs + 1; j < rVal.Length(); j++)
-	{
-		tempDir[tempDir.Length()] = rVal[j];
-	}
-
-	return tempDir.Append(".in.temp");
-}

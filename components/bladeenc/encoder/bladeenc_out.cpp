@@ -19,21 +19,26 @@
 
 const String &BoCA::BladeOut::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>BladeEnc MP3 Encoder</name>		\
-	    <version>1.0</version>			\
-	    <id>bladeenc-out</id>			\
-	    <type>encoder</type>			\
-	    <format>					\
-	      <name>MPEG 1 Audio Layer 3</name>		\
-	      <extension>mp3</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (bladedll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>BladeEnc MP3 Encoder</name>		\
+		    <version>1.0</version>			\
+		    <id>bladeenc-out</id>			\
+		    <type>encoder</type>			\
+		    <format>					\
+		      <name>MPEG 1 Audio Layer 3</name>		\
+		      <extension>mp3</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }

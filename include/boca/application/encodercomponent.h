@@ -28,6 +28,8 @@ namespace BoCA
 
 				Bool	 SetAudioTrackInfo(const Track &);
 
+				String	 GetOutputFileExtension();
+
 				Bool	 Activate();
 				Bool	 Deactivate();
 

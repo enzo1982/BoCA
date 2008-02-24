@@ -51,6 +51,7 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_GetStreamInfo(void *component, const char *file, void *track)	{ return ((BoCA::componentName *) component)->GetStreamInfo(file, *((BoCA::Track *) track)); }		\
 		BOCA_EXPORT void BoCA_##componentName##_SetInputFormat(void *component, const void *track)		{ ((BoCA::componentName *) component)->SetInputFormat(*((BoCA::Track *) track)); }			\
 		BOCA_EXPORT __int64 BoCA_##componentName##_GetInBytes(void *component)					{ return ((BoCA::componentName *) component)->GetInBytes(); }						\
+																												\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)					{ return ((BoCA::componentName *) component)->Activate(); }						\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)					{ return ((BoCA::componentName *) component)->Deactivate(); }						\
 		BOCA_EXPORT int BoCA_##componentName##_ReadData(void *component, void *buffer, int size)		{ return ((BoCA::componentName *) component)->ReadData(*((Buffer<UnsignedByte> *) buffer), size); }	\
@@ -62,6 +63,8 @@ using namespace smooth;
 #define BoCA_DEFINE_ENCODER_COMPONENT(componentName)										 												\
 	extern "C" {																										\
 		BOCA_EXPORT int BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)		{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }	\
+		BOCA_EXPORT char *BoCA_##componentName##_GetOutputFileExtension(void *component)			{ return ((BoCA::componentName *) component)->GetOutputFileExtension(); }				\
+																												\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)					{ return ((BoCA::componentName *) component)->Activate(); }						\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)					{ return ((BoCA::componentName *) component)->Deactivate(); }						\
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer, int size)		{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer), size); }	\
@@ -73,6 +76,7 @@ using namespace smooth;
 #define BoCA_DEFINE_OUTPUT_COMPONENT(componentName)										 												\
 	extern "C" {																										\
 		BOCA_EXPORT int BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)		{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }	\
+																												\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)					{ return ((BoCA::componentName *) component)->Activate(); }						\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)					{ return ((BoCA::componentName *) component)->Deactivate(); }						\
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer, int size)		{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer), size); }	\

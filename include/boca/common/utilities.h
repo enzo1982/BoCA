@@ -23,6 +23,8 @@ namespace BoCA
 		public:
 			static Void	 WarningMessage(const String &, const String & = NIL);
 			static Void	 ErrorMessage(const String &, const String & = NIL);
+
+			static String	 GetNonUnicodeTempFileName(const String &);
 	};
 };
 

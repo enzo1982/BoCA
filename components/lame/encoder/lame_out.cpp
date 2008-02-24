@@ -17,21 +17,26 @@
 
 const String &BoCA::LAMEOut::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>LAME MP3 Encoder</name>		\
-	    <version>1.0</version>			\
-	    <id>lame-out</id>				\
-	    <type>encoder</type>			\
-	    <format>					\
-	      <name>MPEG 1 Audio Layer 3</name>		\
-	      <extension>mp3</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (lamedll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>LAME MP3 Encoder</name>		\
+		    <version>1.0</version>			\
+		    <id>lame-out</id>				\
+		    <type>encoder</type>			\
+		    <format>					\
+		      <name>MPEG 1 Audio Layer 3</name>		\
+		      <extension>mp3</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }

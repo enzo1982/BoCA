@@ -24,21 +24,26 @@
 
 const String &BoCA::TwinVQOut::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>TwinVQ VQF Encoder</name>		\
-	    <version>1.0</version>			\
-	    <id>twinvq-out</id>				\
-	    <type>encoder</type>			\
-	    <format>					\
-	      <name>TwinVQ VQF Audio</name>		\
-	      <extension>tvq</extension>		\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (twinvqdll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>TwinVQ VQF Encoder</name>		\
+		    <version>1.0</version>			\
+		    <id>twinvq-out</id>				\
+		    <type>encoder</type>			\
+		    <format>					\
+		      <name>TwinVQ VQF Audio</name>		\
+		      <extension>tvq</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }

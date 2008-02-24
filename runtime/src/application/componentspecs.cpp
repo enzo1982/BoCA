@@ -55,20 +55,23 @@ Bool BoCA::AS::ComponentSpecs::LoadFromFile(const String &file)
 
 	func_SetAudioTrackInfo		= (bool (*)(void *, const void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetAudioTrackInfo"));
 
+	func_GetOutputFileExtension	= (char *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetOutputFileExtension"));
+
 	func_Activate			= (bool (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Activate"));
 	func_Deactivate			= (bool (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Deactivate"));
 
 	func_ReadData			= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
 	func_WriteData			= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
 
-	ParseXMLSpec();
-
-	return True;
+	return ParseXMLSpec();
 }
 
 Bool BoCA::AS::ComponentSpecs::ParseXMLSpec()
 {
 	String		 xml = String(func_GetComponentSpecs()).Trim();
+
+	if (xml == NIL) return False;
+
 	XML::Document	*document = new XML::Document();
 
 	document->ParseMemory((void *) (char *) xml, xml.Length());

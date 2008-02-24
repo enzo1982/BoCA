@@ -52,4 +52,6 @@ Bool LoadBonkDLL()
 Void FreeBonkDLL()
 {
 	Object::DeleteObject(bonkdll);
+
+	bonkdll = NIL;
 }

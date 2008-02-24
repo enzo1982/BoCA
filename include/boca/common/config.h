@@ -43,7 +43,6 @@ namespace BoCA
 			String		 lastAddedDir;
 			String		 lastAddedPattern;
 
-			Bool		 enable_mp4;
 			Bool		 enable_id3;
 			String		 enc_filePattern;
 			Bool		 enc_onTheFly;

@@ -112,4 +112,6 @@ Bool LoadFLACDLL()
 Void FreeFLACDLL()
 {
 	Object::DeleteObject(flacdll);
+
+	flacdll = NIL;
 }

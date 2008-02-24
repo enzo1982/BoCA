@@ -30,8 +30,6 @@ namespace BoCA
 			Buffer<unsigned char>		 backBuffer;
 
 			Int				 GetAudioTrack();
-
-			String				 GetTempFile(const String &);
 		public:
 			static const String		&GetComponentSpecs();
 
