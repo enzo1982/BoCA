@@ -50,6 +50,9 @@ namespace smooth
 
 				Int					 Open(const String &, const Point &, const Size &, Int);
 				Int					 Close();
+
+				Int					 Show();
+				Int					 Hide();
 		};
 	};
 };

@@ -18,6 +18,7 @@
 #define __SMOOTH__
 
 #include "smooth/definitions.h"
+#include "smooth/foreach.h"
 #include "smooth/init.h"
 #include "smooth/version.h"
 

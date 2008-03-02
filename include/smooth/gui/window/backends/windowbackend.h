@@ -22,6 +22,7 @@ namespace smooth
 #include "../../../misc/string.h"
 #include "../../../graphics/forms/point.h"
 #include "../../../graphics/forms/size.h"
+#include "../../../templates/signals.h"
 #include "../../../templates/callbacks.h"
 #include "../../../graphics/surface.h"
 
@@ -75,7 +76,17 @@ namespace smooth
 				virtual Int			 Maximize();
 				virtual Int			 Restore();
 			signals:
+				Callback0<Bool>			 doClose;
+
 				Callback3<Int, Int, Int, Int>	 onEvent;
+
+				Signal0<Void>			 onMinimize;
+				Signal0<Void>			 onMaximize;
+
+				Signal0<Void>			 onRestore;
+
+				Signal0<Void>			 onCreate;
+				Signal0<Void>			 onDestroy;
 		};
 	};
 };

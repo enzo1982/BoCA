@@ -62,6 +62,7 @@ namespace smooth
 				Size					 minSize;
 				Size					 maxSize;
 
+				Bool					 minimized;
 				Bool					 maximized;
 			public:
 									 WindowGDI(Void * = NIL);

@@ -12,192 +12,77 @@
 
 namespace smooth
 {
-	template <class returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_LIST> class SIGNALS_CALLBACK_CLASS_NAME : public Signal
+	template <class returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_LIST> class SIGNALS_CALLBACK_CLASS_NAME : public SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>
 	{
 		protected:
-			SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	*slotN;
-			SlotRBase0<returnTYPE>										*slot0;
+			/* FIXME: This is never used, but somehow smooth
+			 *	  does not work on Linux without it.
+			 */
+			SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	*dummy;
 		public:
-			SIGNALS_CALLBACK_CLASS_NAME()
-			{
-				slotN = NIL;
-				slot0 = NIL;
-			}
-
-			SIGNALS_CALLBACK_CLASS_NAME(const SIGNALS_CALLBACK_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &oSignal)
-			{
-				*this = oSignal;
-			}
-
-			virtual ~SIGNALS_CALLBACK_CLASS_NAME()
-			{
-				DisconnectAll();
-			}
-
-			SIGNALS_CALLBACK_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &operator =(const SIGNALS_CALLBACK_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &oSignal)
-			{
-				slotN = oSignal.slotN->Copy();
-				slot0 = oSignal.slot0->Copy();
-
-				parent = oSignal.parent;
-
-				return *this;
-			}
-
 			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
 			{
-				DisconnectAll();
+				SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::DisconnectAll();
 
-				slotN = new SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst);
-
-				return Success();
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Connect(proc, inst);
 			}
 
 			Int Connect(returnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
-				DisconnectAll();
+				SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::DisconnectAll();
 
-				slotN = new SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc);
-
-				return Success();
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Connect(proc);
 			}
 
 			Int Connect(SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
 			{
 				if ((Signal *) sig == (Signal *) this) return Error();
 
-				DisconnectAll();
+				SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::DisconnectAll();
 
-				slotN = new SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig);
-		
-				return Success();
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Connect(sig);
 			}
 
 			Int Connect(const returnTYPE value)
 			{
-				DisconnectAll();
+				SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::DisconnectAll();
 
-				slot0 = new SlotRValue0<returnTYPE>(value);
-
-				return Success();
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Connect(value);
 			}
 
 #ifndef SIGNALS_SIGNAL_ZERO
 			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
 			{
-				DisconnectAll();
+				SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::DisconnectAll();
 
-				slot0 = new SlotRClass0<oClassTYPE, returnTYPE>(proc, inst);
-
-				return Success();
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Connect(proc, inst);
 			}
 
 			Int Connect(returnTYPE (*proc)())
 			{
-				DisconnectAll();
+				SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::DisconnectAll();
 
-				slot0 = new SlotRGlobal0<returnTYPE>(proc);
-
-				return Success();
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Connect(proc);
 			}
 
 			Int Connect(SignalR0<returnTYPE> *sig)
 			{
 				if ((Signal *) sig == (Signal *) this) return Error();
 
-				DisconnectAll();
+				SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::DisconnectAll();
 
-				slot0 = new SlotRSignal0<returnTYPE>(sig);
-
-				return Success();
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Connect(sig);
 			}
 #endif
-
-			template <class classTYPE, class oClassTYPE> Int Disconnect(returnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
-			{
-				if ((*slotN) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst)) DisconnectAll();
-
-				return Success();
-			}
-
-			Int Disconnect(returnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
-			{
-				if ((*slotN) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc)) DisconnectAll();
-
-				return Success();
-			}
-
-			Int Disconnect(SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
-			{
-				if ((*slotN) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig)) DisconnectAll();
-
-				return Success();
-			}
-
-			Int Disconnect(const returnTYPE value)
-			{
-				if ((*slot0) == SlotRValue0<returnTYPE>(value)) DisconnectAll();
-
-				return Success();
-			}
-
-#ifndef SIGNALS_SIGNAL_ZERO
-			template <class classTYPE, class oClassTYPE> Int Disconnect(returnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
-			{
-				if ((*slot0) == SlotRClass0<oClassTYPE, returnTYPE>(proc, inst)) DisconnectAll();
-
-				return Success();
-			}
-
-			Int Disconnect(returnTYPE (*proc)())
-			{
-				if ((*slot0) == SlotRGlobal0<returnTYPE>(proc)) DisconnectAll();
-
-				return Success();
-			}
-
-			Int Disconnect(SignalR0<returnTYPE> *sig)
-			{
-				if ((*slot0) == SlotRSignal0<returnTYPE>(sig)) DisconnectAll();
-
-				return Success();
-			}
-#endif
-
-			Int DisconnectAll()
-			{
-				if (slotN != NIL) { delete slotN; slotN = NIL; }
-				if (slot0 != NIL) { delete slot0; slot0 = NIL; }
-
-				return Success();
-			}
 
 			returnTYPE Call(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
-				returnTYPE	 returnValue = NIL;
-
-				ProtectParent();
-
-				if (slotN != NIL)	returnValue = slotN->Emit(SIGNALS_ARGUMENT_PARAMETERS);
-				if (slot0 != NIL)	returnValue = slot0->Emit();
-
-				UnprotectParent();
-
-				return returnValue;
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Emit(SIGNALS_ARGUMENT_PARAMETERS);
 			}
 
 			returnTYPE CallUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
-				if (slotN != NIL)	return slotN->Emit(SIGNALS_ARGUMENT_PARAMETERS);
-				if (slot0 != NIL)	return slot0->Emit();
-
-				return NIL;
-			}
-
-			Int GetNOfConnectedSlots()
-			{
-				if (slotN != NIL || slot0 != NIL)	return 1;
-				else					return 0;
+				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::EmitUnprotected(SIGNALS_ARGUMENT_PARAMETERS);
 			}
 	};
 };

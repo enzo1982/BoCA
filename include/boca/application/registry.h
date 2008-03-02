@@ -22,8 +22,6 @@ namespace BoCA
 			private:
 				static Registry		*registry;
 
-				DynamicLoader		*bocaLib;
-
 				Array<ComponentSpecs *>	 componentSpecs;
 
 							 Registry();

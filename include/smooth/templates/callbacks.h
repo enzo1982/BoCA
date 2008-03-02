@@ -11,6 +11,7 @@
 #ifndef _H_OBJSMOOTH_CALLBACKS_INCLUDE_
 #define _H_OBJSMOOTH_CALLBACKS_INCLUDE_
 
+#include "signalsr.h"
 #include "slotsr.h"
 
 #define SIGNALS_SIGNAL_ZERO

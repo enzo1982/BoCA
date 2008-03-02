@@ -41,20 +41,29 @@ namespace BoCA
 
 				String		 componentName;
 
-				Bool		 ParseXMLSpec();
+				Bool		 ParseXMLSpec(const String &);
 			public:
+				String		 id;
+				Int		 type;
+
+				Int		 mode;
+
 				String		 name;
 				String		 version;
 
-				String		 id;
-				Int		 type;
+				String		 external_command;
+				String		 external_arguments;
+
+				String		 external_informat;
+				String		 external_outformat;
 
 				Array<Format *>	 formats;
 
 						 ComponentSpecs();
 						~ComponentSpecs();
 
-				Bool		 LoadFromFile(const String &);
+				Bool		 LoadFromDLL(const String &);
+				Bool		 LoadFromXML(const String &);
 
 				const char	*(*func_GetComponentSpecs)();
 
@@ -99,6 +108,10 @@ namespace BoCA
 	const Int	 COMPONENT_TYPE_OUTPUT		= 3;
 	const Int	 COMPONENT_TYPE_DSP		= 4;
 	const Int	 COMPONENT_TYPE_EXTENSION	= 5;
+
+	const Int	 INTERNAL			= 0;
+	const Int	 EXTERNAL_MODE_FILE		= 1;
+	const Int	 EXTERNAL_MODE_STDIO		= 2;
 };
 
 #endif

@@ -35,19 +35,33 @@ Bool BoCA::AS::Registry::Free()
 
 BoCA::AS::Registry::Registry()
 {
-	// Load the BoCA runtime library into memory first
-	bocaLib = new DynamicLoader("boca/boca.1.0.dll");
-
 	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("boca"));
 
-	const Array<File>	&files = dir.GetFilesByPattern("boca_*.dll");
+	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.dll");
 
-	for (Int i = 0; i < files.Length(); i++)
+	for (Int i = 0; i < dllFiles.Length(); i++)
 	{
-		File		 file = files.GetNth(i);
+		File		 file = dllFiles.GetNth(i);
 		ComponentSpecs	*specs = new ComponentSpecs();
 
-		if (specs->LoadFromFile(file))
+		if (specs->LoadFromDLL(file))
+		{
+			componentSpecs.Add(specs);
+		}
+		else
+		{
+			delete specs;
+		}
+	}
+
+	const Array<File>	&xmlFiles = dir.GetFilesByPattern("boca_*.xml");
+
+	for (Int i = 0; i < xmlFiles.Length(); i++)
+	{
+		File		 file = xmlFiles.GetNth(i);
+		ComponentSpecs	*specs = new ComponentSpecs();
+
+		if (specs->LoadFromXML(file))
 		{
 			componentSpecs.Add(specs);
 		}
@@ -64,8 +78,6 @@ BoCA::AS::Registry::~Registry()
 	{
 		delete componentSpecs.GetNth(i);
 	}
-
-	delete bocaLib;
 }
 
 Int BoCA::AS::Registry::GetNumberOfComponents()

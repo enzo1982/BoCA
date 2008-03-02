@@ -13,6 +13,8 @@
 BoCA::AS::ComponentSpecs::ComponentSpecs()
 {
 	library = NIL;
+
+	mode = INTERNAL;
 }
 
 BoCA::AS::ComponentSpecs::~ComponentSpecs()
@@ -20,7 +22,7 @@ BoCA::AS::ComponentSpecs::~ComponentSpecs()
 	if (library != NIL) delete library;
 }
 
-Bool BoCA::AS::ComponentSpecs::LoadFromFile(const String &file)
+Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 {
 	library = new DynamicLoader(file);
 
@@ -63,13 +65,21 @@ Bool BoCA::AS::ComponentSpecs::LoadFromFile(const String &file)
 	func_ReadData			= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
 	func_WriteData			= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
 
-	return ParseXMLSpec();
+	return ParseXMLSpec(String(func_GetComponentSpecs()).Trim());
 }
 
-Bool BoCA::AS::ComponentSpecs::ParseXMLSpec()
+Bool BoCA::AS::ComponentSpecs::LoadFromXML(const String &file)
 {
-	String		 xml = String(func_GetComponentSpecs()).Trim();
+	IO::InStream	 in(IO::STREAM_FILE, file, IO::IS_READONLY);
+	String		 xml = in.InputString(in.Size());
 
+	in.Close();
+
+	return ParseXMLSpec(xml);
+}
+
+Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
+{
 	if (xml == NIL) return False;
 
 	XML::Document	*document = new XML::Document();
@@ -107,6 +117,19 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec()
 			}
 
 			formats.Add(format);
+		}
+		else if (node->GetName() == "external")
+		{
+			for (Int j = 0; j < node->GetNOfNodes(); j++)
+			{
+				XML::Node	*node2 = node->GetNthNode(j);
+
+				if	(node2->GetName() == "command")	  external_command	= node2->GetContent();
+				else if (node2->GetName() == "arguments") external_arguments	= node2->GetContent();
+				else if (node2->GetName() == "informat")  external_informat	= node2->GetContent();
+				else if (node2->GetName() == "outformat") external_outformat	= node2->GetContent();
+				else if (node2->GetName() == "mode")	  mode			= node2->GetContent() == "file" ? EXTERNAL_MODE_FILE : EXTERNAL_MODE_STDIO;
+			}
 		}
 	}
 

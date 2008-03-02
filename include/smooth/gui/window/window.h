@@ -155,6 +155,14 @@ namespace smooth
 
 				virtual Int			 Add(Widget *);
 				virtual Int			 Remove(Widget *);
+			slots:
+				virtual Void			 OnCreate();
+				virtual Void			 OnDestroy();
+
+				virtual Void			 OnMinimize();
+				virtual Void			 OnMaximize();
+
+				virtual Void			 OnRestore();
 			signals:
 				Signal0<Void>			 onCreate;
 
@@ -162,7 +170,7 @@ namespace smooth
 				Signal0<Void>			 onPeek;
 				Signal3<Void, Int, Int, Int>	 onEvent;
 			callbacks:
-				Callback0<Bool>			 doQuit;
+				Callback0<Bool>			 doClose;
 		};
 	};
 };

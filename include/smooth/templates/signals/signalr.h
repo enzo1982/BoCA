@@ -36,12 +36,12 @@ namespace smooth
 			{
 				for (int i = 0; i < oSignal.slotsN.Length(); i++)
 				{
-					slotsN.Add(((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) oSignal.slotsN.GetNthEntry(i))->Copy());
+					slotsN.Add(((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) oSignal.slotsN.GetNth(i))->Copy());
 				}
 
 				for (int j = 0; j < oSignal.slots0.Length(); j++)
 				{
-					slots0.Add(((SlotRBase0<returnTYPE> *) oSignal.slots0.GetNthEntry(j))->Copy());
+					slots0.Add(((SlotRBase0<returnTYPE> *) oSignal.slots0.GetNth(j))->Copy());
 				}
 
 				parent = oSignal.parent;
