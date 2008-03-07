@@ -69,6 +69,8 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &format)
 	format.fileSize	= f_in->Size();
 	format.length	= -1;
 
+	SkipID3v2Tag(f_in);
+
 	Buffer<unsigned char>	 buffer(4096);
 
 	do
@@ -125,6 +127,12 @@ Bool BoCA::LAMEIn::Activate()
 {
 	ex_lame_decode_init();
 
+	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
+
+	SkipID3v2Tag(f_in);
+
+	delete f_in;
+
 	return True;
 }
 
@@ -158,4 +166,34 @@ Int BoCA::LAMEIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	}
 
 	return data.Size();
+}
+
+Bool BoCA::LAMEIn::SkipID3v2Tag(InStream *in)
+{
+	/* Check for an ID3v2 tag at the beginning of the
+	 * file and skip it if it exists as LAME may crash
+	 * on unsynchronized tags.
+	 */
+	if (in->InputString(3) == "ID3")
+	{
+		in->InputNumber(2); // ID3 version
+		in->InputNumber(1); // Flags
+
+		/* Read tag size as a 4 byte unsynchronized integer.
+		 */
+		Int	 tagSize = (in->InputNumber(1) << 21) +
+				   (in->InputNumber(1) << 14) +
+				   (in->InputNumber(1) <<  7) +
+				   (in->InputNumber(1)      );
+
+		in->RelSeek(tagSize);
+
+		inBytes += (tagSize + 10);
+	}
+	else
+	{
+		in->Seek(0);
+	}
+
+	return True;
 }

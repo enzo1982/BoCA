@@ -17,6 +17,8 @@ BoCA::Config::Config()
 	cdrip_autoRead_active	= False;
 	cdrip_timeout		= 0;
 
+	enable_id3		= False;
+
 	String	 programsDir = S::System::System::GetProgramFilesDirectory();
 
 	if (Application::GetApplicationDirectory().ToUpper().StartsWith(programsDir.ToUpper()))

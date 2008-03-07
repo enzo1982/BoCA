@@ -19,6 +19,8 @@ namespace BoCA
 		private:
 			Buffer<short>		 pcm_l;
 			Buffer<short>		 pcm_r;
+
+			Bool			 SkipID3v2Tag(IO::InStream *);
 		public:
 			static const String	&GetComponentSpecs();
 

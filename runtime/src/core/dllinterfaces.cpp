@@ -106,4 +106,6 @@ Bool BoCA::DLLInterfaces::LoadID3DLL()
 Void BoCA::DLLInterfaces::FreeID3DLL()
 {
 	Object::DeleteObject(id3dll);
+
+	id3dll = NIL;
 }

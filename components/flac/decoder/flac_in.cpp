@@ -79,7 +79,7 @@ Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &format)
 	format.order	= BYTE_INTEL;
 	format.fileSize	= f_in->Size();
 
-	infoFormat = new Track;
+	infoFormat = &format;
 	finished = False;
 
 	driver = ioDriver;
@@ -96,24 +96,6 @@ Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	delete f_in;
 	delete ioDriver;
-
-	format.length	= infoFormat->length;
-	format.bits	= infoFormat->bits;
-	format.channels	= infoFormat->channels;
-	format.rate	= infoFormat->rate;
-	format.artist	= infoFormat->artist;
-	format.title	= infoFormat->title;
-	format.album	= infoFormat->album;
-	format.genre	= infoFormat->genre;
-	format.year	= infoFormat->year;
-	format.track	= infoFormat->track;
-
-	for (Int i = 0; i < infoFormat->pictures.Length(); i++)
-	{
-		format.pictures.Add(infoFormat->pictures.GetNth(i));
-	}
-
-	delete infoFormat;
 
 	return Success();
 }

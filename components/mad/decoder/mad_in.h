@@ -36,6 +36,8 @@ namespace BoCA
 			Mutex			*samplesBufferMutex;
 			Thread			*decoderThread;
 
+			Bool			 SkipID3v2Tag(IO::InStream *);
+
 			Int			 ReadMAD(Bool);
 		public:
 			static const String	&GetComponentSpecs();

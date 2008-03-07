@@ -104,10 +104,14 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &format)
 	InStream	*f_in = new InStream(STREAM_DRIVER, ioDriver);
 
 	format.order	= BYTE_INTEL;
+	format.bits	= 16;
 	format.fileSize	= f_in->Size();
+	format.length	= -1;
 
-	infoFormat = new Track;
+	infoFormat = &format;
 	finished = False;
+
+	SkipID3v2Tag(f_in);
 
 	driver = ioDriver;
 
@@ -124,12 +128,13 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &format)
 	delete f_in;
 	delete ioDriver;
 
-	format.length	= infoFormat->length;
-	format.bits	= infoFormat->bits;
-	format.channels	= infoFormat->channels;
-	format.rate	= infoFormat->rate;
+	if (Config::Get()->enable_id3)
+	{
+		format.track = -1;
+		format.outfile = NIL;
 
-	delete infoFormat;
+		format.ParseID3V2Tag(streamURI);
+	}
 
 	return Success();
 }
@@ -137,6 +142,8 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &format)
 BoCA::MADIn::MADIn()
 {
 	packageSize = 0;
+
+	infoFormat = NIL;
 }
 
 BoCA::MADIn::~MADIn()
@@ -147,12 +154,16 @@ Bool BoCA::MADIn::Activate()
 {
 	finished = False;
 
+	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
+
+	SkipID3v2Tag(f_in);
+
+	delete f_in;
+
 	readDataMutex = new Mutex();
 	samplesBufferMutex = new Mutex();
 
 	readDataMutex->Lock();
-
-	infoFormat = new Track();
 
 	decoderThread = NonBlocking1<Bool>(&MADIn::ReadMAD, this).Call(True);
 
@@ -165,8 +176,6 @@ Bool BoCA::MADIn::Deactivate()
 
 	delete readDataMutex;
 	delete samplesBufferMutex;
-
-	delete infoFormat;
 
 	return True;
 }
@@ -194,6 +203,36 @@ Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	samplesBufferMutex->Release();
 
 	return size;
+}
+
+Bool BoCA::MADIn::SkipID3v2Tag(InStream *in)
+{
+	/* Check for an ID3v2 tag at the beginning of the
+	 * file and skip it if it exists as it might cause
+	 * problems if the tag is unsynchronized.
+	 */
+	if (in->InputString(3) == "ID3")
+	{
+		in->InputNumber(2); // ID3 version
+		in->InputNumber(1); // Flags
+
+		/* Read tag size as a 4 byte unsynchronized integer.
+		 */
+		Int	 tagSize = (in->InputNumber(1) << 21) +
+				   (in->InputNumber(1) << 14) +
+				   (in->InputNumber(1) <<  7) +
+				   (in->InputNumber(1)      );
+
+		in->RelSeek(tagSize);
+
+		inBytes += (tagSize + 10);
+	}
+	else
+	{
+		in->Seek(0);
+	}
+
+	return True;
 }
 
 Int BoCA::MADIn::ReadMAD(Bool readData)
@@ -263,10 +302,9 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header)
 {
 	MADIn	*filter = (MADIn *) client_data;
 
-	filter->infoFormat->bits	= 16;
-	filter->infoFormat->channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
-	filter->infoFormat->rate	= header->samplerate;
-	filter->infoFormat->length	= -1;
+	filter->infoFormat->channels	 = header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
+	filter->infoFormat->rate	 = header->samplerate;
+	filter->infoFormat->approxLength = filter->infoFormat->fileSize / (header->bitrate / 8) * filter->infoFormat->rate * filter->infoFormat->channels;
 
 	return MAD_FLOW_STOP;
 }

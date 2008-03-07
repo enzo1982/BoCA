@@ -18,7 +18,7 @@ Void smooth::AttachDLL(Void *instance)
 {
 	BoCA::Config::Get();
 
-	BoCA::DLLInterfaces::LoadID3DLL();
+	if (BoCA::DLLInterfaces::LoadID3DLL()) BoCA::Config::Get()->enable_id3 = True;
 }
 
 Void smooth::DetachDLL()

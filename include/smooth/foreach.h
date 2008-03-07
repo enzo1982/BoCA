@@ -13,18 +13,18 @@
 
 #include "definitions.h"
 
-namespace smooth
-{
-	SMOOTHAPI Void	 foreach_initIndex(const String &);
-	SMOOTHAPI Int	 foreach_indexValue(const String &);
-	SMOOTHAPI Void	 foreach_incIndex(const String &);
-}
+/* FIXME: The array argument is evaluated multiple times which
+ *         prevents us from passing rvalues, yet.
+ *
+ *         Try using iterators in the future to solve this problem.
+ */
+#define foreach(var, array)										\
+        if (Int _index_ = 0)    { }									\
+        else                    for (Int _break_ = 0; !_break_ && _index_ < array.Length(); --_break_)	\
+                                        for (var = array.GetNth(_index_++); ; ({ ++_break_; break; }) )
 
-#define foreach(type, var, array)					\
-        smooth::foreach_initIndex(#var);				\
-        for (type var;							\
-	     var = array.GetNth(smooth::foreach_indexValue(#var)),	\
-	     smooth::foreach_indexValue(#var) < array.Length();		\
-	     smooth::foreach_incIndex(#var))
+/* The forever macro is quite simple...
+ */
+#define forever for (;;)
 
 #endif
