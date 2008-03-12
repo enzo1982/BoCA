@@ -13,7 +13,7 @@ all:
 	cd lame/decoder && make
 	cd lame/encoder && make
 	cd mac/decoder && make
-#	cd mac/encoder && make
+	cd mac/encoder && make
 	cd mad/decoder && make
 #	cd speex/encoder && make
 	cd twinvq/encoder && make
@@ -38,7 +38,7 @@ clean:
 	cd lame/decoder && make clean
 	cd lame/encoder && make clean
 	cd mac/decoder && make clean
-#	cd mac/encoder && make clean
+	cd mac/encoder && make clean
 	cd mad/decoder && make clean
 #	cd speex/encoder && make clean
 	cd twinvq/encoder && make clean
