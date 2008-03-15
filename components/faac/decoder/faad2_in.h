@@ -30,6 +30,7 @@ namespace BoCA
 			Buffer<unsigned char>		 backBuffer;
 
 			Int				 GetAudioTrack();
+			Bool				 SyncOnAACHeader(IO::InStream *);
 		public:
 			static const String		&GetComponentSpecs();
 

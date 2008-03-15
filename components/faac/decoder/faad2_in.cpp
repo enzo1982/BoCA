@@ -146,8 +146,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 
 			ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (u_int8_t **) &esc_buffer, (u_int32_t *) &buffer_size);
 
-			ex_NeAACDecInit2(handle, (unsigned char *) esc_buffer, buffer_size,
- (unsigned long *) &format.rate, (unsigned char *) &format.channels);
+			ex_NeAACDecInit2(handle, (unsigned char *) esc_buffer, buffer_size, (unsigned long *) &format.rate, (unsigned char *) &format.channels);
 
 			format.length	= Math::Round(double(signed(ex_MP4GetTrackDuration(mp4File, mp4Track))) * format.channels * format.rate / double(signed(ex_MP4GetTrackTimeScale(mp4File, mp4Track))));
 			format.order	= BYTE_INTEL;
@@ -167,6 +166,23 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 	}
 	else
 	{
+		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+
+		format.order	= BYTE_INTEL;
+		format.bits	= 16;
+		format.fileSize	= f_in->Size();
+		format.length	= -1;
+
+		if (!SyncOnAACHeader(f_in))
+		{
+			delete f_in;
+
+			errorState = True;
+			errorString = "No AAC file.";
+
+			return Error();
+		}
+
 		handle	= ex_NeAACDecOpen();
 		fConfig	= ex_NeAACDecGetCurrentConfiguration(handle);
 
@@ -175,13 +191,6 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 		fConfig->outputFormat	= FAAD_FMT_16BIT;
 
 		ex_NeAACDecSetConfiguration(handle, fConfig);
-
-		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
-
-		format.order	= BYTE_INTEL;
-		format.bits	= 16;
-		format.fileSize	= f_in->Size();
-		format.length	= -1;
 
 		Int		 size = Math::Min(32768, format.fileSize);
 		unsigned char	*data = new unsigned char [size];
@@ -271,6 +280,14 @@ Bool BoCA::FAAD2In::Activate()
 
 		if (mp4Track == -1) return False;
 	}
+	else
+	{
+		InStream	*in = new InStream(STREAM_DRIVER, driver);
+
+		SyncOnAACHeader(in);
+
+		delete in;
+	}
 
 	handle	= ex_NeAACDecOpen();
 	fConfig	= ex_NeAACDecGetCurrentConfiguration(handle);
@@ -302,7 +319,7 @@ Bool BoCA::FAAD2In::Activate()
 		Int		 size = 4096;
 		unsigned char	*data = new unsigned char [size];
 
-		driver->ReadData(data, size);
+		size = driver->ReadData(data, size);
 
 		unsigned long	 rate;
 		unsigned char	 channels;
@@ -311,7 +328,7 @@ Bool BoCA::FAAD2In::Activate()
 
 		delete [] data;
 
-		driver->Seek(0);
+		driver->Seek(driver->GetPos() - size);
 	}
 
 	return True;
@@ -440,4 +457,49 @@ Int BoCA::FAAD2In::GetAudioTrack()
 	}
 
 	return -1;
-} 
+}
+
+Bool BoCA::FAAD2In::SyncOnAACHeader(InStream *in)
+{
+	in->Seek(0);
+
+	/* Try to sync on ADIF header
+	 */
+	for (Int n = 0; n < 1024; n++)
+	{
+		if (in->InputNumber(1) != 'A') continue;
+		if (in->InputNumber(1) != 'D') continue;
+		if (in->InputNumber(1) != 'I') continue;
+		if (in->InputNumber(1) != 'F') continue;
+
+		/* No ADIF magic word found in the first 1 kB.
+		 */
+		if (n == 1023) break;
+
+		in->RelSeek(-4);
+
+		return True;
+	}
+
+	in->Seek(0);
+
+	/* Try to sync on ADTS header
+	 */
+	for (Int n = 0; n < 1024; n++)
+	{
+		if (  in->InputNumber(1)	       != 0xFF) continue;
+		if ( (in->InputNumber(1) & 0xF6)       != 0xF0) continue;
+		if (((in->InputNumber(1) & 0x3C) >> 2) >=   12) continue;
+
+		/* No ADTS sync found in the first 1 kB;
+		 * probably not an AAC file.
+		 */
+		if (n == 1023) break;
+
+		in->RelSeek(-3);
+
+		return True;
+	}
+
+	return False;
+}
