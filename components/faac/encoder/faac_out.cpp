@@ -291,6 +291,14 @@ Int BoCA::FAACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 	return bytes;
 }
 
+String BoCA::FAACOut::GetOutputFileExtension()
+{
+	Config	*config = Config::Get();
+
+	if (config->GetIntValue("FAAC", "MP4Container", 1)) return "m4a";
+	else						    return "aac";
+}
+
 ConfigLayer *BoCA::FAACOut::GetConfigurationLayer()
 {
 	return configLayer;
