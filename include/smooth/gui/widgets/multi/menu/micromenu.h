@@ -46,6 +46,8 @@ namespace smooth
 				virtual Int		 RemoveEntry(MenuEntry *);
 
 				virtual Int		 RemoveAllEntries();
+
+				Rect			 GetVisibleArea() const;
 			signals:
 				Signal0<Void>		 onOpenPopupMenu;
 				Signal0<Void>		 onClosePopupMenu;

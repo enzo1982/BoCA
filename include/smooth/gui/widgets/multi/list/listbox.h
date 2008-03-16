@@ -57,6 +57,8 @@ namespace smooth
 
 				Int			 DragSelectedEntry(Bool);
 			accessors:
+				Rect			 GetVisibleArea() const;
+
 				Int			 GetNOfTabs() const								{ return header->GetNOfTabs(); }
 				Int			 GetNthTabOffset(Int n)	const							{ return header->GetNthTabOffset(n); }
 				Int			 GetNthTabWidth(Int n) const							{ return header->GetNthTabWidth(n); }

@@ -168,6 +168,8 @@ namespace smooth
 				virtual Int			 SetOrientation(Int);
 				virtual Int			 GetOrientation() const;
 
+				virtual Rect			 GetVisibleArea() const;
+
 				Int				 SetBackgroundColor(const Color &);
 				const Color			&GetBackgroundColor() const;
 				Bool				 IsBackgroundColorSet() const;

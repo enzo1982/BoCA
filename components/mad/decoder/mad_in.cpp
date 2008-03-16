@@ -182,7 +182,7 @@ Bool BoCA::MADIn::Deactivate()
 
 Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	if (size <= 0) return -1;
+	if (decoderThread->GetStatus() != THREAD_RUNNING) return -1;
 
 	readDataMutex->Release();
 

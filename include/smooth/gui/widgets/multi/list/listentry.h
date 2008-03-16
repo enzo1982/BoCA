@@ -42,8 +42,6 @@ namespace smooth
 								 ListEntry(const String &);
 				virtual				~ListEntry();
 
-				virtual Int			 Hide();
-
 				virtual Int			 Paint(Int);
 			accessors:
 				Int				 SetMark(Bool);
