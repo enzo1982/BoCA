@@ -173,6 +173,8 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 		format.fileSize	= f_in->Size();
 		format.length	= -1;
 
+		SkipID3v2Tag(f_in);
+
 		if (!SyncOnAACHeader(f_in))
 		{
 			delete f_in;
@@ -245,7 +247,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 			format.track = -1;
 			format.outfile = NIL;
 
-			format.ParseID3V2Tag(streamURI); 
+			format.ParseID3V2Tag(streamURI);
 		}
 	}
 
@@ -284,6 +286,7 @@ Bool BoCA::FAAD2In::Activate()
 	{
 		InStream	*in = new InStream(STREAM_DRIVER, driver);
 
+		SkipID3v2Tag(in);
 		SyncOnAACHeader(in);
 
 		delete in;
@@ -392,7 +395,7 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 	{
 		dataBuffer.Resize(size + backBuffer.Size());
 
-		driver->ReadData((unsigned char *) dataBuffer + backBuffer.Size(), size);
+		size = driver->ReadData((unsigned char *) dataBuffer + backBuffer.Size(), size);
 
 		if (backBuffer.Size() > 0)
 		{
@@ -422,7 +425,7 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 			bytesConsumed += frameInfo.bytesconsumed;
 
-			if ((size - bytesConsumed < bytesConsumed) && (inBytes % 6144) == 0) samples = NIL;
+			if ((size - bytesConsumed < bytesConsumed) && (driver->GetPos() < driver->GetSize())) samples = NIL;
 		}
 		while (samples != NIL);
 
@@ -434,7 +437,7 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 		}
 	}
 
-        if (samplesRead > 0)
+	if (samplesRead > 0)
 	{
 		data.Resize(samplesRead * 2);
 
@@ -459,9 +462,39 @@ Int BoCA::FAAD2In::GetAudioTrack()
 	return -1;
 }
 
+Bool BoCA::FAAD2In::SkipID3v2Tag(InStream *in)
+{
+	/* Check for an ID3v2 tag at the beginning of the
+	 * file and skip it if it exists as LAME may crash
+	 * on unsynchronized tags.
+	 */
+	if (in->InputString(3) == "ID3")
+	{
+		in->InputNumber(2); // ID3 version
+		in->InputNumber(1); // Flags
+
+		/* Read tag size as a 4 byte unsynchronized integer.
+		 */
+		Int	 tagSize = (in->InputNumber(1) << 21) +
+				   (in->InputNumber(1) << 14) +
+				   (in->InputNumber(1) <<  7) +
+				   (in->InputNumber(1)      );
+
+		in->RelSeek(tagSize);
+
+		inBytes += (tagSize + 10);
+	}
+	else
+	{
+		in->Seek(0);
+	}
+
+	return True;
+}
+
 Bool BoCA::FAAD2In::SyncOnAACHeader(InStream *in)
 {
-	in->Seek(0);
+	Int	 startPos = in->GetPos();
 
 	/* Try to sync on ADIF header
 	 */
@@ -478,10 +511,12 @@ Bool BoCA::FAAD2In::SyncOnAACHeader(InStream *in)
 
 		in->RelSeek(-4);
 
+		inBytes += n;
+
 		return True;
 	}
 
-	in->Seek(0);
+	in->Seek(startPos);
 
 	/* Try to sync on ADTS header
 	 */
@@ -497,6 +532,8 @@ Bool BoCA::FAAD2In::SyncOnAACHeader(InStream *in)
 		if (n == 1023) break;
 
 		in->RelSeek(-3);
+
+		inBytes += n;
 
 		return True;
 	}

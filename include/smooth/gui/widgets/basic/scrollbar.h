@@ -48,8 +48,10 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 			accessors:
+				/* Control page size for clicking outside of the slider.
+				 */
 				Int			 SetPageSize(UnsignedInt);
-				UnsignedInt		 GetPageSize();
+				UnsignedInt		 GetPageSize() const;
 			slots:
 				Void			 OnMouseClick(const Point &);
 				Void			 OnMouseClickTimer();

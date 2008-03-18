@@ -22,7 +22,7 @@ const String &BoCA::WaveIn::GetComponentSpecs()
 	    <name>Windows Wave File Decoder</name>	\
 	    <version>1.0</version>			\
 	    <id>wave-in</id>				\
-	    <type>decoder</type>				\
+	    <type>decoder</type>			\
 	    <format>					\
 	      <name>Windows Wave Files</name>		\
 	      <extension>wav</extension>		\
@@ -145,7 +145,7 @@ Int BoCA::WaveIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	data.Resize(size);
 
-	driver->ReadData(data, size);
+	size = driver->ReadData(data, size);
 
 	return size;
 }

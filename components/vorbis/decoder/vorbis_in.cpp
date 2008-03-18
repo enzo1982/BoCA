@@ -83,83 +83,86 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	ex_ogg_sync_wrote(&foy, size);
 
-	ex_ogg_sync_pageout(&foy, &fog);
-
-	ex_ogg_stream_init(&fos, ex_ogg_page_serialno(&fog)); 
-
-	ex_vorbis_info_init(&fvi);
-	ex_vorbis_comment_init(&fvc);
-
-	ex_ogg_stream_pagein(&fos, &fog);
-	ex_ogg_stream_packetout(&fos, &fop);
-
-	ex_vorbis_synthesis_headerin(&fvi, &fvc, &fop);
-
-	Int	 i = 0;
-
-	while (i < 2)
+	if (foy.data != NIL)
 	{
-		if (ex_ogg_sync_pageout(&foy, &fog) == 1)
+		ex_ogg_sync_pageout(&foy, &fog);
+
+		ex_ogg_stream_init(&fos, ex_ogg_page_serialno(&fog)); 
+
+		ex_vorbis_info_init(&fvi);
+		ex_vorbis_comment_init(&fvc);
+
+		ex_ogg_stream_pagein(&fos, &fog);
+		ex_ogg_stream_packetout(&fos, &fop);
+
+		ex_vorbis_synthesis_headerin(&fvi, &fvc, &fop);
+
+		Int	 i = 0;
+
+		while (i < 2)
 		{
-			ex_ogg_stream_pagein(&fos, &fog);
-
-			while (i < 2)
+			if (ex_ogg_sync_pageout(&foy, &fog) == 1)
 			{
-				if (ex_ogg_stream_packetout(&fos, &fop) == 0) break;
+				ex_ogg_stream_pagein(&fos, &fog);
 
-				ex_vorbis_synthesis_headerin(&fvi, &fvc, &fop); 
+				while (i < 2)
+				{
+					if (ex_ogg_stream_packetout(&fos, &fop) == 0) break;
 
-				i++;
+					ex_vorbis_synthesis_headerin(&fvi, &fvc, &fop); 
+
+					i++;
+				}
+			}
+			else
+			{
+				fbuffer = ex_ogg_sync_buffer(&foy, size);
+
+				f_in->InputData(fbuffer, size);
+
+				ex_ogg_sync_wrote(&foy, size);
 			}
 		}
-		else
+
+		format.rate = fvi.rate;
+		format.channels = fvi.channels;
+		format.length = -1;
+
+		Int	 bitrate = 0;
+
+		if (fvi.bitrate_nominal > 0)				 bitrate = fvi.bitrate_nominal;
+ 		else if (fvi.bitrate_lower > 0 && fvi.bitrate_upper > 0) bitrate = (fvi.bitrate_lower + fvi.bitrate_upper) / 2;
+
+		if (bitrate > 0) format.approxLength = format.fileSize / (bitrate / 8) * format.rate * format.channels;
+
+		if (fvc.comments > 0)
 		{
-			fbuffer = ex_ogg_sync_buffer(&foy, size);
+			format.track = -1;
+			format.outfile = NIL;
 
-			f_in->InputData(fbuffer, size);
+			char	*prevInFormat = String::SetInputFormat("UTF-8");
 
-			ex_ogg_sync_wrote(&foy, size);
-		}
-	}
+			for (Int j = 0; j < fvc.comments; j++)
+			{
+				String	 comment = String(fvc.user_comments[j]);
+				String	 id = String().CopyN(comment, comment.Find("=")).ToUpper();
 
-	format.rate = fvi.rate;
-	format.channels = fvi.channels;
-	format.length = -1;
+				if	(id == "TITLE")		format.title	= comment.Tail(comment.Length() - 6);
+				else if (id == "ARTIST")	format.artist	= comment.Tail(comment.Length() - 7);
+				else if (id == "ALBUM")		format.album	= comment.Tail(comment.Length() - 6);
+				else if (id == "GENRE")		format.genre	= comment.Tail(comment.Length() - 6);
+				else if (id == "DATE")		format.year	= comment.Tail(comment.Length() - 5).ToInt();
+				else if (id == "TRACKNUMBER")	format.track	= comment.Tail(comment.Length() - 12).ToInt();
+			}
 
-	Int	 bitrate = 0;
-
-	if (fvi.bitrate_nominal > 0)				 bitrate = fvi.bitrate_nominal;
- 	else if (fvi.bitrate_lower > 0 && fvi.bitrate_upper > 0) bitrate = (fvi.bitrate_lower + fvi.bitrate_upper) / 2;
-
-	if (bitrate > 0) format.approxLength = format.fileSize / (bitrate / 8) * format.rate * format.channels;
-
-	if (fvc.comments > 0)
-	{
-		format.track = -1;
-		format.outfile = NIL;
-
-		char	*prevInFormat = String::SetInputFormat("UTF-8");
-
-		for (Int j = 0; j < fvc.comments; j++)
-		{
-			String	 comment = String(fvc.user_comments[j]);
-			String	 id = String().CopyN(comment, comment.Find("=")).ToUpper();
-
-			if	(id == "TITLE")		format.title	= comment.Tail(comment.Length() - 6);
-			else if (id == "ARTIST")	format.artist	= comment.Tail(comment.Length() - 7);
-			else if (id == "ALBUM")		format.album	= comment.Tail(comment.Length() - 6);
-			else if (id == "GENRE")		format.genre	= comment.Tail(comment.Length() - 6);
-			else if (id == "DATE")		format.year	= comment.Tail(comment.Length() - 5).ToInt();
-			else if (id == "TRACKNUMBER")	format.track	= comment.Tail(comment.Length() - 12).ToInt();
+			String::SetInputFormat(prevInFormat);
 		}
 
-		String::SetInputFormat(prevInFormat);
+		ex_ogg_stream_clear(&fos);
+
+		ex_vorbis_comment_clear(&fvc);
+		ex_vorbis_info_clear(&fvi);
 	}
-
-	ex_ogg_stream_clear(&fos);
-
-	ex_vorbis_comment_clear(&fvc);
-	ex_vorbis_info_clear(&fvi);
 
 	ex_ogg_sync_clear(&foy);
 
@@ -260,7 +263,7 @@ Int BoCA::VorbisIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	buffer = ex_ogg_sync_buffer(&oy, size);
 
-	driver->ReadData((unsigned char *) buffer, size);
+	size = driver->ReadData((unsigned char *) buffer, size);
 
 	ex_ogg_sync_wrote(&oy, size);
 

@@ -16,6 +16,7 @@ all:
 	cd mac/encoder && make
 	cd mad/decoder && make
 #	cd speex/encoder && make
+#	cd twinvq/decoder && make
 	cd twinvq/encoder && make
 	cd voc/decoder && make
 	cd vorbis/decoder && make
@@ -41,6 +42,7 @@ clean:
 	cd mac/encoder && make clean
 	cd mad/decoder && make clean
 #	cd speex/encoder && make clean
+#	cd twinvq/decoder && make clean
 	cd twinvq/encoder && make clean
 	cd voc/decoder && make clean
 	cd vorbis/decoder && make clean

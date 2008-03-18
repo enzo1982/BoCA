@@ -45,6 +45,8 @@ namespace smooth
 				Int			 startValue;
 				Int 			 endValue;
 
+				UnsignedInt		 stepSize;
+
 				Hotspot			*arrow1Hotspot;
 				Hotspot			*arrow2Hotspot;
 			public:
@@ -59,6 +61,11 @@ namespace smooth
 
 				Int			 SetValue(Int);
 				Int			 GetValue();
+
+				/* Control step size for arrows and mouse wheel action.
+				 */
+				Int			 SetStepSize(UnsignedInt);
+				UnsignedInt		 GetStepSize() const;
 			signals:
 				Signal2<Void, Int, Int>	 onRangeChange;
 				Signal1<Void, Int>	 onValueChange;

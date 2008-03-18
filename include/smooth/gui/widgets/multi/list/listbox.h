@@ -43,6 +43,8 @@ namespace smooth
 				ListBoxHeader		*header;
 
 				Int			 visibleEntriesChecksum;
+
+				Int			 GetEntriesHeight() const;
 			public:
 				static const Int	 classID;
 

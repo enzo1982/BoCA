@@ -111,9 +111,11 @@ Bool BoCA::SunAuIn::Deactivate()
 
 Int BoCA::SunAuIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	if (driver->GetPos() == driver->GetSize()) return -1;
+
 	data.Resize(size);
 
-	driver->ReadData(data, size);
+	size = driver->ReadData(data, size);
 
 	return size;
 }
