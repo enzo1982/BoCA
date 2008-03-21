@@ -31,6 +31,7 @@ namespace BoCA
 				static Bool		 Free();
 
 				Int			 GetNumberOfComponents();
+				Int			 GetNumberOfComponentsOfType(Int);
 
 				const String		&GetComponentName(Int);
 				const String		&GetComponentVersion(Int);

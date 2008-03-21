@@ -133,7 +133,7 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &format)
 		format.track = -1;
 		format.outfile = NIL;
 
-		format.ParseID3V2Tag(streamURI);
+		format.ParseID3Tag(streamURI);
 	}
 
 	return Success();

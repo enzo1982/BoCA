@@ -12,6 +12,7 @@
 #include <smooth/dll.h>
 
 #include "mac_out.h"
+#include "config.h"
 #include "dllinterface.h"
 
 using namespace smooth::IO;
@@ -43,13 +44,19 @@ const String &BoCA::MACOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
+ConfigureMAC	*configLayer = NIL;
+
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadMACDLL();
+
+	configLayer = new ConfigureMAC();
 }
 
 Void smooth::DetachDLL()
 {
+	Object::DeleteObject(configLayer);
+
 	FreeMACDLL();
 }
 
@@ -83,7 +90,7 @@ Bool BoCA::MACOut::Activate()
 	waveFormat.wBitsPerSample	= format.bits;
 	waveFormat.cbSize		= 0;
 
-	ex_APECompress_Start(hAPECompress, Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, COMPRESSION_LEVEL_HIGH, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
+	ex_APECompress_Start(hAPECompress, Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (Config::Get()->GetIntValue("MAC", "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
 
 	return True;
 }
@@ -111,6 +118,14 @@ Bool BoCA::MACOut::Deactivate()
 
 	in.Close();
 
+	if ((format.artist != NIL || format.title != NIL) && Config::Get()->GetIntValue("MAC", "EnableTags", 1))
+	{
+		Buffer<unsigned char>	 tagBuffer;
+		Int			 size = format.RenderAPETag(tagBuffer);
+
+		driver->WriteData(tagBuffer, size);
+	}
+
 	File(Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out")).Delete();
 
  	return True;
@@ -123,4 +138,9 @@ Int BoCA::MACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 	ex_APECompress_AddData(hAPECompress, data, size);
 
 	return size;
+}
+
+ConfigLayer *BoCA::MACOut::GetConfigurationLayer()
+{
+	return configLayer;
 }

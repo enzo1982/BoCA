@@ -8,32 +8,27 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca.h>
-#include "mac/MACDll.h"
+#ifndef H_BOCA_TAG
+#define H_BOCA_TAG
 
-BoCA_BEGIN_COMPONENT(MACOut)
+#include <smooth.h>
+#include "../track.h"
+
+using namespace smooth;
 
 namespace BoCA
 {
-	class MACOut : public CS::EncoderComponent
+	class Tag
 	{
-		private:
-			APE_COMPRESS_HANDLE	 hAPECompress;
 		public:
-			static const String	&GetComponentSpecs();
+					 Tag();
+			virtual		~Tag();
 
-						 MACOut();
-						~MACOut();
+			virtual Int	 Render(const Track &, Buffer<UnsignedByte> &);
 
-			Bool			 Activate();
-			Bool			 Deactivate();
-
-			Int			 WriteData(Buffer<UnsignedByte> &, Int);
-
-			ConfigLayer		*GetConfigurationLayer();
+			virtual Int	 ParseBuffer(Buffer<UnsignedByte> &, Track *);
+			virtual Int	 ParseFile(const String &, Track *);
 	};
 };
 
-BoCA_DEFINE_ENCODER_COMPONENT(MACOut)
-
-BoCA_END_COMPONENT(MACOut)
+#endif

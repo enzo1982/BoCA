@@ -8,32 +8,36 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca.h>
-#include "mac/MACDll.h"
+#ifndef _H_MACCONFIG_
+#define _H_MACCONFIG_
 
-BoCA_BEGIN_COMPONENT(MACOut)
+#include <smooth.h>
+#include <boca.h>
+
+using namespace smooth;
+using namespace smooth::GUI;
+
+using namespace BoCA;
 
 namespace BoCA
 {
-	class MACOut : public CS::EncoderComponent
+	class ConfigureMAC : public ConfigLayer
 	{
 		private:
-			APE_COMPRESS_HANDLE	 hAPECompress;
+			GroupBox	*group_compression;
+			Text		*text_compression;
+			ComboBox	*combo_compression;
+
+			GroupBox	*group_tag;
+			CheckBox	*check_tag;
+
+			Bool		 enable_tags;
 		public:
-			static const String	&GetComponentSpecs();
+					 ConfigureMAC();
+					~ConfigureMAC();
 
-						 MACOut();
-						~MACOut();
-
-			Bool			 Activate();
-			Bool			 Deactivate();
-
-			Int			 WriteData(Buffer<UnsignedByte> &, Int);
-
-			ConfigLayer		*GetConfigurationLayer();
+			Int		 SaveSettings();
 	};
 };
 
-BoCA_DEFINE_ENCODER_COMPONENT(MACOut)
-
-BoCA_END_COMPONENT(MACOut)
+#endif

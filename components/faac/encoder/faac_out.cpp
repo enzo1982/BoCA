@@ -158,7 +158,7 @@ Bool BoCA::FAACOut::Activate()
 		if ((format.artist != NIL || format.title != NIL) && config->enable_id3v2 && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
 		{
 			Buffer<unsigned char>	 id3Buffer;
-			Int			 size = format.RenderID3Tag(2, id3Buffer);
+			Int			 size = format.RenderID3Tag(id3Buffer, 2);
 
 			driver->WriteData(id3Buffer, size);
 		}

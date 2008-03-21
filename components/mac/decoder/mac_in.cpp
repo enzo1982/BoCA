@@ -91,6 +91,10 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	format.fileSize	= File(streamURI).GetFileSize();
 
+	/* Parse APE tag if present.
+	 */
+	format.ParseAPETag(streamURI);
+
 	if (String::IsUnicode(streamURI))
 	{
 		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();

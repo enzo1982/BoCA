@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o mac_out.o
+OBJECTS	  = config.o dllinterface.o mac_out.o
 
 ## Do not change anything below this line. ##
 

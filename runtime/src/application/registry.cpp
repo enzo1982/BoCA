@@ -85,6 +85,18 @@ Int BoCA::AS::Registry::GetNumberOfComponents()
 	return componentSpecs.Length();
 }
 
+Int BoCA::AS::Registry::GetNumberOfComponentsOfType(Int type)
+{
+	Int	 number = 0;
+
+	for (Int i = 0; i < componentSpecs.Length(); i++)
+	{
+		if (componentSpecs.GetNth(i)->type == type) number++;
+	}
+
+	return number;
+}
+
 const String &BoCA::AS::Registry::GetComponentName(Int n)
 {
 	return componentSpecs.GetNth(n)->name;

@@ -290,7 +290,7 @@ Bool BoCA::LAMEOut::Activate()
 	if ((format.artist != NIL || format.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = format.RenderID3Tag(2, id3Buffer);
+		Int			 size = format.RenderID3Tag(id3Buffer, 2);
 
 		driver->WriteData(id3Buffer, size);
 	}
@@ -311,7 +311,7 @@ Bool BoCA::LAMEOut::Deactivate()
 	if ((format.artist != NIL || format.title != NIL) && config->enable_id3v1 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = format.RenderID3Tag(1, id3Buffer);
+		Int			 size = format.RenderID3Tag(id3Buffer, 1);
 
 		driver->WriteData(id3Buffer, size);
 	}

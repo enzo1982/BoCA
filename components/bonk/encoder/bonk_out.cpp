@@ -87,7 +87,7 @@ Bool BoCA::BonkOut::Activate()
 	if ((format.artist != NIL || format.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = format.RenderID3Tag(2, id3Buffer);
+		Int			 size = format.RenderID3Tag(id3Buffer, 2);
 
 		ex_bonk_encoder_set_id3_data(encoder, id3Buffer, size);
 	}

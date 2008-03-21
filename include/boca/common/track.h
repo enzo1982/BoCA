@@ -23,16 +23,6 @@ namespace BoCA
 {
 	class BOCA_DLL_EXPORT Track
 	{
-		private:
-			Bool		 ParseID3V2Tag(Void *);
-			String		 GetID3V2FrameString(Void *);
-
-			const String	&GetID3CategoryName(Int);
-
-			String		 GetTempFileName(const String &);
-
-			String		 CreateTempFile(const String &);
-			Bool		 RemoveTempFile(const String &);
 		public:
 		    // Audio format information:
 			Int		 channels;
@@ -87,10 +77,13 @@ namespace BoCA
 
 			Track &operator	 =(const Track &);
 
-			Int		 RenderID3Tag(Int, Buffer<unsigned char> &);
+			Int		 RenderID3Tag(Buffer<UnsignedByte> &, Int = 2);
+			Bool		 ParseID3Tag(Buffer<UnsignedByte> &);
+			Bool		 ParseID3Tag(const String &);
 
-			Bool		 ParseID3V2Tag(Buffer<unsigned char> &);
-			Bool		 ParseID3V2Tag(const String &);
+			Int		 RenderAPETag(Buffer<UnsignedByte> &);
+			Bool		 ParseAPETag(Buffer<UnsignedByte> &);
+			Bool		 ParseAPETag(const String &);
 	};
 };
 

@@ -19,16 +19,21 @@ using namespace smooth::IO;
 
 const String &BoCA::WinampIn::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Winamp Input Plug-In Adapter</name>	\
-	    <version>1.0</version>			\
-	    <id>winamp-in</id>				\
-	    <type>decoder</type>			\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (winamp_in_plugins.Length() > 0)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>Winamp Input Plug-In Adapter</name>	\
+		    <version>1.0</version>			\
+		    <id>winamp-in</id>				\
+		    <type>decoder</type>			\
+								\
+		";
+	}
 
 	for (Int i = 0; i < winamp_in_plugins.Length(); i++)
 	{
@@ -92,11 +97,14 @@ const String &BoCA::WinampIn::GetComponentSpecs()
 		}
 	}
 
-	componentSpecs.Append("				\
-							\
-	  </component>					\
-							\
-	");
+	if (winamp_in_plugins.Length() > 0)
+	{
+		componentSpecs.Append("				\
+								\
+		  </component>					\
+								\
+		");
+	}
 
 	return componentSpecs;
 }

@@ -17,17 +17,22 @@
 
 const String &BoCA::WinampOut::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Winamp Output Plug-In Adapter</name>	\
-	    <version>1.0</version>			\
-	    <id>winamp-out</id>				\
-	    <type>output</type>				\
-	  </component>					\
-							\
-	";
+	static String	 componentSpecs;
+
+	if (winamp_out_plugins.Length() > 0)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>Winamp Output Plug-In Adapter</name>	\
+		    <version>1.0</version>			\
+		    <id>winamp-out</id>				\
+		    <type>output</type>				\
+		  </component>					\
+								\
+		";
+	}
 
 	return componentSpecs;
 }
