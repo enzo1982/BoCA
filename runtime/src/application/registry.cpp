@@ -10,6 +10,7 @@
 
 #include <boca/application/registry.h>
 #include <boca/application/decodercomponent.h>
+#include <boca/application/decodercomponentexternal.h>
 #include <boca/application/encodercomponent.h>
 #include <boca/application/encodercomponentexternal.h>
 #include <boca/application/outputcomponent.h>
@@ -144,7 +145,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 		switch (specs->type)
 		{
 			case COMPONENT_TYPE_DECODER:
-				return new DecoderComponent(specs);
+				if (specs->mode == INTERNAL)	return new DecoderComponent(specs);
+				else				return new DecoderComponentExternal(specs);
 			case COMPONENT_TYPE_ENCODER:
 				if (specs->mode == INTERNAL)	return new EncoderComponent(specs);
 				else				return new EncoderComponentExternal(specs);

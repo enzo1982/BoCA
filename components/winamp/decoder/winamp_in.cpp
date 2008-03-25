@@ -199,7 +199,19 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &format)
 	plugin->outMod->GetOutputTime	= Out_GetOutputTime;
 	plugin->outMod->GetWrittenTime	= Out_GetWrittenTime;
 
-	plugin->Play(streamURI);
+	/* Copy the file and play the temporary copy
+	 * if the file name contains Unicode characters.
+	 */
+	if (String::IsUnicode(streamURI))
+	{
+		File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
+
+		plugin->Play(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
+	}
+	else
+	{
+		plugin->Play(streamURI);
+	}
 
 	get_more_samples = 1;
 
@@ -213,6 +225,13 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &format)
 	plugin->Stop();
 
 	delete plugin->outMod;
+
+	/* Remove temporary copy if necessary.
+	 */
+	if (String::IsUnicode(streamURI))
+	{
+		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
+	}
 
 	format.rate	= rate;
 	format.channels	= channels;
@@ -307,7 +326,19 @@ Bool BoCA::WinampIn::Activate()
 	plugin->outMod->GetOutputTime	= Out_GetOutputTime;
 	plugin->outMod->GetWrittenTime	= Out_GetWrittenTime;
 
-	plugin->Play(format.origFilename);
+	/* Copy the file and play the temporary copy
+	 * if the file name contains Unicode characters.
+	 */
+	if (String::IsUnicode(format.origFilename))
+	{
+		File(format.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"));
+
+		plugin->Play(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"));
+	}
+	else
+	{
+		plugin->Play(format.origFilename);
+	}
 
 	return True;
 }
@@ -317,6 +348,13 @@ Bool BoCA::WinampIn::Deactivate()
 	plugin->Stop();
 
 	delete plugin->outMod;
+
+	/* Remove temporary copy if necessary.
+	 */
+	if (String::IsUnicode(format.origFilename))
+	{
+		File(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in")).Delete();
+	}
 
 	return True;
 }

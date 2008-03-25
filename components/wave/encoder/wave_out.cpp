@@ -18,7 +18,7 @@ const String &BoCA::WaveOut::GetComponentSpecs()
 							\
 	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
 	  <component>					\
-	    <name>Windows Wave File Encoder</name>	\
+	    <name>Windows Wave File Output</name>	\
 	    <version>1.0</version>			\
 	    <id>wave-out</id>				\
 	    <type>encoder</type>			\

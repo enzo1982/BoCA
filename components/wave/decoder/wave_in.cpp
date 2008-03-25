@@ -19,7 +19,7 @@ const String &BoCA::WaveIn::GetComponentSpecs()
 							\
 	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
 	  <component>					\
-	    <name>Windows Wave File Decoder</name>	\
+	    <name>Windows Wave File Input</name>	\
 	    <version>1.0</version>			\
 	    <id>wave-in</id>				\
 	    <type>decoder</type>			\

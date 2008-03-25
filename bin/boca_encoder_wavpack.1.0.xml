@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component>
-  <name>WavPack Lossless Audio Compressor</name>
+  <name>WavPack Lossless Compressor</name>
   <version>1.0</version>
   <id>wv-out</id>
   <type>encoder</type>

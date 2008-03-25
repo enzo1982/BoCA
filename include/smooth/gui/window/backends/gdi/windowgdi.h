@@ -73,6 +73,8 @@ namespace smooth
 				Int					 Open(const String &, const Point &, const Size &, Int);
 				Int					 Close();
 
+				Int					 RequestClose();
+
 				Int					 SetTitle(const String &);
 				Int					 SetIcon(const Bitmap &);
 

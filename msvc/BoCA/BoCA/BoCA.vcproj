@@ -212,6 +212,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\..\runtime\src\application\decodercomponentexternal.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\runtime\src\application\encodercomponent.cpp"
 					>
 					<FileConfiguration
@@ -456,6 +460,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\include\boca\application\decodercomponent.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\include\boca\application\decodercomponentexternal.h"
 						>
 					</File>
 					<File

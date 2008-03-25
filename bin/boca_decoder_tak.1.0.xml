@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <name>Tom's Audiokompressor</name>
+  <version>1.0</version>
+  <id>tak-in</id>
+  <type>decoder</type>
+  <format>
+    <name>Tom's Audio</name>
+    <extension>tak</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/takc.exe</command>
+    <arguments>-d %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>
