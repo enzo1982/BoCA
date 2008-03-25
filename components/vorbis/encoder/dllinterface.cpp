@@ -40,7 +40,7 @@ DynamicLoader *vorbisdll	= NIL;
 
 Bool LoadVorbisDLL()
 {
-	vorbisdll = new DynamicLoader("encoders/OggVorbis");
+	vorbisdll = new DynamicLoader("codecs/OggVorbis");
 
 	ex_vorbis_info_init		= (VORBISINFOINIT) vorbisdll->GetFunctionAddress("vorbis_info_init");
 	ex_vorbis_encode_init		= (VORBISENCODEINIT) vorbisdll->GetFunctionAddress("vorbis_encode_init");

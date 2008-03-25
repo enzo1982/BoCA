@@ -109,19 +109,13 @@ const String &BoCA::WinampIn::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureWinampIn	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadWinampDLLs();
-
-	configLayer = new ConfigureWinampIn();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeWinampDLLs();
 }
 
@@ -261,6 +255,8 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &format)
 
 BoCA::WinampIn::WinampIn()
 {
+	configLayer		= NIL;
+
 	plugin			= NIL;
 
 	channels		= 0;
@@ -275,6 +271,7 @@ BoCA::WinampIn::WinampIn()
 
 BoCA::WinampIn::~WinampIn()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::WinampIn::Activate()
@@ -355,7 +352,19 @@ Int BoCA::WinampIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::WinampIn::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureWinampIn();
+
 	return configLayer;
+}
+
+Void BoCA::WinampIn::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }
 
 In_Module *BoCA::WinampIn::GetPluginForFile(const String &file)

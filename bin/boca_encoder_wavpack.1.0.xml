@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <name>WavPack Lossless Audio Compressor</name>
+  <version>1.0</version>
+  <id>wv-out</id>
+  <type>encoder</type>
+  <format>
+    <name>WavPack Files</name>
+    <extension>wv</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/wavpack.exe</command>
+    <arguments>%INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>

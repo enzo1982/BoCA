@@ -47,8 +47,8 @@ using namespace smooth;
 
 #define BoCA_DEFINE_DECODER_COMPONENT(componentName)										 												\
 	extern "C" {																										\
-		BOCA_EXPORT bool BoCA_##componentName##_CanOpenStream(void *component, const char *file)		{ return ((BoCA::componentName *) component)->CanOpenStream(file); }					\
-		BOCA_EXPORT int BoCA_##componentName##_GetStreamInfo(void *component, const char *file, void *track)	{ return ((BoCA::componentName *) component)->GetStreamInfo(file, *((BoCA::Track *) track)); }		\
+		BOCA_EXPORT bool BoCA_##componentName##_CanOpenStream(void *component, const wchar_t *file)		{ return ((BoCA::componentName *) component)->CanOpenStream(file); }					\
+		BOCA_EXPORT int BoCA_##componentName##_GetStreamInfo(void *component, const wchar_t *file, void *track)	{ return ((BoCA::componentName *) component)->GetStreamInfo(file, *((BoCA::Track *) track)); }		\
 		BOCA_EXPORT void BoCA_##componentName##_SetInputFormat(void *component, const void *track)		{ ((BoCA::componentName *) component)->SetInputFormat(*((BoCA::Track *) track)); }			\
 		BOCA_EXPORT __int64 BoCA_##componentName##_GetInBytes(void *component)					{ return ((BoCA::componentName *) component)->GetInBytes(); }						\
 																												\
@@ -95,6 +95,7 @@ using namespace smooth;
 		BOCA_EXPORT void *BoCA_##componentName##_Create()							{ return new BoCA::componentName(); }									\
 		BOCA_EXPORT bool BoCA_##componentName##_Delete(void *component)						{ delete ((BoCA::componentName *) component); return True; }						\
 		BOCA_EXPORT void *BoCA_##componentName##_GetConfigurationLayer(void *component)				{ return ((BoCA::componentName *) component)->GetConfigurationLayer(); }				\
+		BOCA_EXPORT void BoCA_##componentName##_FreeConfigurationLayer(void *component)				{ ((BoCA::componentName *) component)->FreeConfigurationLayer(); }					\
 		BOCA_EXPORT bool BoCA_##componentName##_GetErrorState(void *component)					{ return ((BoCA::componentName *) component)->GetErrorState(); }					\
 		BOCA_EXPORT const void *BoCA_##componentName##_GetErrorString(void *component)				{ return &((BoCA::componentName *) component)->GetErrorString(); }					\
 	}

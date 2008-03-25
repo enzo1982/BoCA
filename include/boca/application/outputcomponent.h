@@ -23,22 +23,22 @@ namespace BoCA
 		class BOCA_DLL_EXPORT OutputComponent : public Component, public IO::Filter
 		{
 			public:
-					 OutputComponent(ComponentSpecs *);
-					~OutputComponent();
+						 OutputComponent(ComponentSpecs *);
+				virtual		~OutputComponent();
 
-				Bool	 SetAudioTrackInfo(const Track &);
+				virtual Bool	 SetAudioTrackInfo(const Track &);
 
-				Bool	 Activate();
-				Bool	 Deactivate();
+				virtual Bool	 Activate();
+				virtual Bool	 Deactivate();
 
-				Int	 WriteData(Buffer<UnsignedByte> &buffer, Int size);
+				virtual Int	 WriteData(Buffer<UnsignedByte> &buffer, Int size);
 
-				Int	 GetPackageSize();
+				virtual Int	 GetPackageSize();
 
-				Int	 CanWrite();
+				virtual Int	 CanWrite();
 
-				Int	 SetPause(Bool);
-				Bool	 IsPlaying();
+				virtual Int	 SetPause(Bool);
+				virtual Bool	 IsPlaying();
 		};
 	};
 };

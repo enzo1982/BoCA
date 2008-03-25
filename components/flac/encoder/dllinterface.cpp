@@ -44,7 +44,7 @@ DynamicLoader *flacdll	= NIL;
 
 Bool LoadFLACDLL()
 {
-	flacdll = new DynamicLoader("encoders/FLAC");
+	flacdll = new DynamicLoader("codecs/FLAC");
 
 	ex_FLAC__stream_encoder_new						= (FLAC__STREAM_ENCODER_NEW) flacdll->GetFunctionAddress("FLAC__stream_encoder_new");
 	ex_FLAC__stream_encoder_delete						= (FLAC__STREAM_ENCODER_DELETE) flacdll->GetFunctionAddress("FLAC__stream_encoder_delete");

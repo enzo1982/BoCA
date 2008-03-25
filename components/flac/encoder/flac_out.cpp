@@ -41,19 +41,13 @@ const String &BoCA::FLACOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureFLAC	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadFLACDLL();
-
-	configLayer = new ConfigureFLAC();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeFLACDLL();
 }
 
@@ -66,10 +60,12 @@ namespace BoCA
 
 BoCA::FLACOut::FLACOut()
 {
+	configLayer = NIL;
 }
 
 BoCA::FLACOut::~FLACOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::FLACOut::Activate()
@@ -258,7 +254,19 @@ Int BoCA::FLACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::FLACOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureFLAC();
+
 	return configLayer;
+}
+
+Void BoCA::FLACOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }
 
 FLAC__StreamEncoderWriteStatus BoCA::FLACStreamEncoderWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)

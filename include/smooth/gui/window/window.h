@@ -135,6 +135,8 @@ namespace smooth
 
 				Bool				 IsVisible() const			{ if (IsMinimized()) return False; return Widget::IsVisible(); }
 
+				Bool				 IsBackgroundColorSet() const		{ return backgroundColorSet; }
+
 				Int				 Stay();
 				Int				 Close();
 

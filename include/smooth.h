@@ -139,6 +139,7 @@
 #include "smooth/gui/widgets/basic/titlebar.h"
 
 #include "smooth/gui/widgets/hotspot/hotspot.h"
+#include "smooth/gui/widgets/hotspot/independent.h"
 #include "smooth/gui/widgets/hotspot/simplebutton.h"
 
 #include "smooth/gui/widgets/multi/list/list.h"
@@ -151,7 +152,6 @@
 #include "smooth/gui/widgets/multi/menu/popupmenu.h"
 
 #include "smooth/gui/widgets/multi/tree/tree.h"
-#include "smooth/gui/widgets/multi/tree/treeview.h"
 
 #include "smooth/gui/widgets/special/cursor.h"
 #include "smooth/gui/widgets/special/dragcontrol.h"

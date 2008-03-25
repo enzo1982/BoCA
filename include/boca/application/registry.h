@@ -39,6 +39,8 @@ namespace BoCA
 				Int			 GetComponentType(Int);
 				const Array<Format *>	&GetComponentFormats(Int);
 
+				Bool			 ComponentExists(const String &);
+
 				Component		*CreateComponentByID(const String &);
 				Bool			 DeleteComponent(Component *);
 		};

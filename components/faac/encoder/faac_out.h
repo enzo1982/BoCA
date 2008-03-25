@@ -18,6 +18,8 @@ namespace BoCA
 	class FAACOut : public CS::EncoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			MP4FileHandle		 mp4File;
 			faacEncHandle		 handle;
 			faacEncConfigurationPtr	 fConfig;
@@ -47,6 +49,7 @@ namespace BoCA
 			String			 GetOutputFileExtension();
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 	};
 };
 

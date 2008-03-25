@@ -52,7 +52,7 @@ DynamicLoader *lamedll	= NIL;
 
 Bool LoadLAMEDLL()
 {
-	lamedll = new DynamicLoader("encoders/LAME");
+	lamedll = new DynamicLoader("codecs/LAME");
 
 	ex_lame_init				= (LAME_INIT) lamedll->GetFunctionAddress("lame_init");
 	ex_lame_set_preset			= (LAME_SET_PRESET) lamedll->GetFunctionAddress("lame_set_preset");

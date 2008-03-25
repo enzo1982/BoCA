@@ -24,7 +24,7 @@ DynamicLoader *bonkdll	= NIL;
 
 Bool LoadBonkDLL()
 {
-	bonkdll = new DynamicLoader("encoders/Bonk");
+	bonkdll = new DynamicLoader("codecs/Bonk");
 
 	ex_bonk_encoder_create			= (BONKENCODERCREATE) bonkdll->GetFunctionAddress("bonk_encoder_create");
 	ex_bonk_encoder_init			= (BONKENCODERINIT) bonkdll->GetFunctionAddress("bonk_encoder_init");

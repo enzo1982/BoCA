@@ -43,28 +43,24 @@ const String &BoCA::VorbisOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureVorbis	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadVorbisDLL();
-
-	configLayer = new ConfigureVorbis();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeVorbisDLL();
 }
 
 BoCA::VorbisOut::VorbisOut()
 {
+	configLayer = NIL;
 }
 
 BoCA::VorbisOut::~VorbisOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::VorbisOut::Activate()
@@ -318,5 +314,17 @@ Int BoCA::VorbisOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::VorbisOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureVorbis();
+
 	return configLayer;
+}
+
+Void BoCA::VorbisOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }

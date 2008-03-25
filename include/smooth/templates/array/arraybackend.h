@@ -87,7 +87,12 @@ namespace smooth
 			{
 				RemoveAll();
 
-				if (lock != NIL) delete lock;
+				if (lock != NIL)
+				{
+					delete lock;
+
+					lock = NIL;
+				}
 			}
 
 			Int Add(const s &value)

@@ -43,28 +43,24 @@ const String &BoCA::BladeOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureBladeEnc	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadBladeDLL();
-
-	configLayer = new ConfigureBladeEnc();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeBladeDLL();
 }
 
 BoCA::BladeOut::BladeOut()
 {
+	configLayer = NIL;
 }
 
 BoCA::BladeOut::~BladeOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::BladeOut::Activate()
@@ -179,5 +175,17 @@ Int BoCA::BladeOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::BladeOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureBladeEnc();
+
 	return configLayer;
+}
+
+Void BoCA::BladeOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }

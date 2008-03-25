@@ -42,7 +42,7 @@ DynamicLoader *mp4v2dll	= NIL;
 
 Bool LoadFAAD2DLL()
 {
-	faad2dll = new DynamicLoader("encoders/FAAD2");
+	faad2dll = new DynamicLoader("codecs/FAAD2");
 
 	ex_NeAACDecOpen				= (NEAACDECOPEN) faad2dll->GetFunctionAddress("NeAACDecOpen");
 	ex_NeAACDecInit				= (NEAACDECINIT) faad2dll->GetFunctionAddress("NeAACDecInit");
@@ -74,7 +74,7 @@ Void FreeFAAD2DLL()
 
 Bool LoadMP4v2DLL()
 {
-	mp4v2dll = new DynamicLoader("encoders/MP4v2");
+	mp4v2dll = new DynamicLoader("codecs/MP4v2");
 
 	ex_MP4Read			= (MP4READ) mp4v2dll->GetFunctionAddress("MP4Read");
 	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");

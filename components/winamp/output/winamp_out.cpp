@@ -37,28 +37,24 @@ const String &BoCA::WinampOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureWinampOut	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadWinampDLLs();
-
-	configLayer = new ConfigureWinampOut();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeWinampDLLs();
 }
 
 BoCA::WinampOut::WinampOut()
 {
+	configLayer = NIL;
 }
 
 BoCA::WinampOut::~WinampOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::WinampOut::Activate()
@@ -84,7 +80,19 @@ Int BoCA::WinampOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::WinampOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureWinampOut();
+
 	return configLayer;
+}
+
+Void BoCA::WinampOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }
 
 Int BoCA::WinampOut::CanWrite()

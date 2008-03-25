@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <name>Nero AAC Encoder</name>
+  <version>1.0</version>
+  <id>nero-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MP4 Audio Files</name>
+    <extension>m4a</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/neroAacEnc.exe</command>
+    <arguments>-if %INFILE -of %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>

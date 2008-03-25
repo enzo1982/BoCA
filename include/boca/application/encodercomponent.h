@@ -23,21 +23,21 @@ namespace BoCA
 		class BOCA_DLL_EXPORT EncoderComponent : public Component, public IO::Filter
 		{
 			public:
-					 EncoderComponent(ComponentSpecs *);
-					~EncoderComponent();
+						 EncoderComponent(ComponentSpecs *);
+				virtual 	~EncoderComponent();
 
-				Bool	 SetAudioTrackInfo(const Track &);
+				virtual Bool	 SetAudioTrackInfo(const Track &);
 
-				String	 GetOutputFileExtension();
+				virtual String	 GetOutputFileExtension();
 
-				Bool	 Activate();
-				Bool	 Deactivate();
+				virtual Bool	 Activate();
+				virtual Bool	 Deactivate();
 
-				Int	 WriteData(Buffer<UnsignedByte> &buffer, Int size);
+				virtual Int	 WriteData(Buffer<UnsignedByte> &buffer, Int size);
 
-				Int	 GetPackageSize();
+				virtual Int	 GetPackageSize();
 
-				Int	 SetDriver(IO::Driver *);
+				virtual Int	 SetDriver(IO::Driver *);
 
 		};
 	};

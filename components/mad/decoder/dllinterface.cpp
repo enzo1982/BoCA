@@ -19,7 +19,7 @@ DynamicLoader *maddll	= NIL;
 
 Bool LoadMADDLL()
 {
-	maddll = new DynamicLoader("encoders/MAD");
+	maddll = new DynamicLoader("codecs/MAD");
 
 	ex_mad_decoder_init	= (MAD_DECODER_INIT) maddll->GetFunctionAddress("mad_decoder_init");
 	ex_mad_decoder_run	= (MAD_DECODER_RUN) maddll->GetFunctionAddress("mad_decoder_run");

@@ -18,6 +18,8 @@ namespace BoCA
 	class BladeOut : public CS::EncoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			BE_CONFIG		 beConfig;
 			unsigned long		 handle;
 
@@ -35,6 +37,7 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 	};
 };
 

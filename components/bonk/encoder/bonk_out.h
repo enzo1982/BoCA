@@ -18,6 +18,8 @@ namespace BoCA
 	class BonkOut : public CS::EncoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			void			*encoder;
 
 			Buffer<signed short>	 samplesBuffer;
@@ -34,6 +36,7 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 	};
 };
 

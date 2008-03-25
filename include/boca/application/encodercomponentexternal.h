@@ -8,28 +8,38 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_COMPONENT
-#define H_BOCA_COMPONENT
-
-#include <smooth.h>
-#include "../common/configlayer.h"
-#include "../core/definitions.h"
-
-using namespace smooth;
-using namespace smooth::GUI;
+#include "encodercomponent.h"
 
 namespace BoCA
 {
-	namespace CS
+	namespace AS
 	{
-		abstract class BOCA_DLL_EXPORT Component
+		class EncoderComponentExternal : public EncoderComponent
 		{
+			private:
+				IO::OutStream		*out;
+
+				String			 wavFileName;
+				String			 encFileName;
+
+				Int			 nOfSamples;
 			protected:
 				Bool			 errorState;
 				String			 errorString;
+
+				Track			 format;
 			public:
-							 Component();
-				virtual			~Component();
+							 EncoderComponentExternal(ComponentSpecs *);
+				virtual			~EncoderComponentExternal();
+
+				virtual Bool		 SetAudioTrackInfo(const Track &);
+
+				virtual String		 GetOutputFileExtension();
+
+				virtual Bool		 Activate();
+				virtual Bool		 Deactivate();
+
+				virtual Int		 WriteData(Buffer<UnsignedByte> &, Int);
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 				virtual Void		 FreeConfigurationLayer();
@@ -39,5 +49,3 @@ namespace BoCA
 		};
 	};
 };
-
-#endif

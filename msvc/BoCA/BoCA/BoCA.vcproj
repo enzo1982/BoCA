@@ -234,6 +234,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\..\runtime\src\application\encodercomponentexternal.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\runtime\src\application\outputcomponent.cpp"
 					>
 				</File>
@@ -269,6 +273,22 @@
 					RelativePath="..\..\..\runtime\src\common\utilities.cpp"
 					>
 				</File>
+				<Filter
+					Name="tagging"
+					>
+					<File
+						RelativePath="..\..\..\runtime\src\common\tagging\tag.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\src\common\tagging\tagape.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\src\common\tagging\tagid3.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="component"
@@ -406,6 +426,22 @@
 						RelativePath="..\..\..\include\boca\common\utilities.h"
 						>
 					</File>
+					<Filter
+						Name="tagging"
+						>
+						<File
+							RelativePath="..\..\..\include\boca\common\tagging\tag.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\tagging\tagape.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\tagging\tagid3.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="application"
@@ -424,6 +460,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\include\boca\application\encodercomponent.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\include\boca\application\encodercomponentexternal.h"
 						>
 					</File>
 					<File

@@ -14,12 +14,12 @@ BoCA::AS::Component::Component(ComponentSpecs *iSpecs)
 {
 	specs = iSpecs;
 
-	component = specs->func_Create();
+	if (specs->mode == INTERNAL) component = specs->func_Create();
 }
 
 BoCA::AS::Component::~Component()
 {
-	specs->func_Delete(component);
+	if (specs->mode == INTERNAL) specs->func_Delete(component);
 }
 
 String BoCA::AS::Component::GetComponentSpecs()
@@ -55,6 +55,11 @@ const Array<BoCA::AS::Format *> &BoCA::AS::Component::GetFormats() const
 BoCA::ConfigLayer *BoCA::AS::Component::GetConfigurationLayer()
 {
 	return (ConfigLayer *) specs->func_GetConfigurationLayer(component);
+}
+
+Void BoCA::AS::Component::FreeConfigurationLayer()
+{
+	specs->func_FreeConfigurationLayer(component);
 }
 
 Bool BoCA::AS::Component::GetErrorState()

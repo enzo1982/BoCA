@@ -18,6 +18,8 @@ namespace BoCA
 	class WinampOut : public CS::OutputComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			Out_Module		*plugin;
 		public:
 			static const String	&GetComponentSpecs();
@@ -31,6 +33,7 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 
 			Int			 CanWrite();
 

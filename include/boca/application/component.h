@@ -30,7 +30,7 @@ namespace BoCA
 							 Component(ComponentSpecs *);
 				virtual			~Component();
 
-				String			 GetComponentSpecs();
+				virtual String		 GetComponentSpecs();
 
 				const String		&GetName() const;
 				const String		&GetVersion() const;
@@ -40,10 +40,11 @@ namespace BoCA
 
 				const Array<Format *>	&GetFormats() const;
 
-				ConfigLayer		*GetConfigurationLayer();
+				virtual ConfigLayer	*GetConfigurationLayer();
+				virtual Void		 FreeConfigurationLayer();
 
-				Bool			 GetErrorState();
-				const String		&GetErrorString();
+				virtual Bool		 GetErrorState();
+				virtual const String	&GetErrorString();
 		};
 	};
 };

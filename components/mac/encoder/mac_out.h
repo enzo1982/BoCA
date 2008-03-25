@@ -18,6 +18,8 @@ namespace BoCA
 	class MACOut : public CS::EncoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			APE_COMPRESS_HANDLE	 hAPECompress;
 		public:
 			static const String	&GetComponentSpecs();
@@ -31,6 +33,7 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 	};
 };
 

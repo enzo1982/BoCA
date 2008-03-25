@@ -18,6 +18,8 @@ namespace BoCA
 	class TwinVQOut : public CS::EncoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			headerInfo		 setupInfo;
 			encSpecificInfo		 encInfo;
 			INDEX			 index;
@@ -37,6 +39,7 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 	};
 };
 

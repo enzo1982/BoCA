@@ -41,28 +41,24 @@ const String &BoCA::BonkOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureBonk	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadBonkDLL();
-
-	configLayer = new ConfigureBonk();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeBonkDLL();
 }
 
 BoCA::BonkOut::BonkOut()
 {
+	configLayer = NIL;
 }
 
 BoCA::BonkOut::~BonkOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::BonkOut::Activate()
@@ -157,5 +153,17 @@ Int BoCA::BonkOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::BonkOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureBonk();
+
 	return configLayer;
+}
+
+Void BoCA::BonkOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }

@@ -57,9 +57,6 @@ namespace smooth
 				Surface				*nullSurface;
 				Surface				*drawSurface;
 
-				Color				 backgroundColor;
-				Bool				 backgroundColorSet;
-
 				Tooltip				*tooltip;
 				System::Timer			*tipTimer;
 
@@ -89,6 +86,9 @@ namespace smooth
 				String				 statusText;
 
 				Font				 font;
+
+				Color				 backgroundColor;
+				Bool				 backgroundColorSet;
 
 				Widget				*container;
 
@@ -172,7 +172,8 @@ namespace smooth
 
 				Int				 SetBackgroundColor(const Color &);
 				const Color			&GetBackgroundColor() const;
-				Bool				 IsBackgroundColorSet() const;
+
+				virtual Bool			 IsBackgroundColorSet() const;
 
 				Int				 SetX(Int nX)			{ return SetMetrics(Point(nX, pos.y), size); }
 				Int				 GetX() const			{ return pos.x; }

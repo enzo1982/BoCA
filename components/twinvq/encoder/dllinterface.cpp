@@ -24,7 +24,7 @@ DynamicLoader *twinvqdll	= NIL;
 
 Bool LoadTwinVQDLL()
 {
-	twinvqdll = new DynamicLoader("encoders/TVQenc");
+	twinvqdll = new DynamicLoader("codecs/TVQenc");
 
 	ex_TvqGetVersionID		= (TVQGETVERSIONID) twinvqdll->GetFunctionAddress("TvqGetVersionID");
 	ex_TvqEncInitialize		= (TVQENCINITIALIZE) twinvqdll->GetFunctionAddress("TvqEncInitialize");

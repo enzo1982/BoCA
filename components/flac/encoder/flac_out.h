@@ -22,6 +22,8 @@ namespace BoCA
 		friend FLAC__StreamEncoderTellStatus	 FLACStreamEncoderTellCallback(const FLAC__StreamEncoder *, FLAC__uint64 *, void *);
 
 		private:
+			ConfigLayer			*configLayer;
+
 			FLAC__StreamEncoder		*encoder;
 
 			Array<FLAC__StreamMetadata *>	 metadata;
@@ -40,6 +42,7 @@ namespace BoCA
 			Int				 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer			*GetConfigurationLayer();
+			Void				 FreeConfigurationLayer();
 	};
 };
 

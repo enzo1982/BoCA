@@ -23,23 +23,23 @@ namespace BoCA
 		class BOCA_DLL_EXPORT DecoderComponent : public Component, public IO::Filter
 		{
 			public:
-					 DecoderComponent(ComponentSpecs *);
-					~DecoderComponent();
+						 DecoderComponent(ComponentSpecs *);
+				virtual		~DecoderComponent();
 
-				Bool	 Activate();
-				Bool	 Deactivate();
+				virtual Bool	 Activate();
+				virtual Bool	 Deactivate();
 
-				Int	 ReadData(Buffer<UnsignedByte> &, Int);
+				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int);
 
-				Bool	 CanOpenStream(const String &);
-				Error	 GetStreamInfo(const String &, Track &);
+				virtual Bool	 CanOpenStream(const String &);
+				virtual Error	 GetStreamInfo(const String &, Track &);
 
-				Void	 SetInputFormat(const Track &);
+				virtual Void	 SetInputFormat(const Track &);
 
-				Int64	 GetInBytes();
+				virtual Int64	 GetInBytes();
 
-				Int	 GetPackageSize();
-				Int	 SetDriver(IO::Driver *);
+				virtual Int	 GetPackageSize();
+				virtual Int	 SetDriver(IO::Driver *);
 
 		};
 	};

@@ -31,7 +31,7 @@ String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
 	 */
 	for (Int i = 0; i < rVal.Length(); i++)
 	{
-		if (rVal[i] > 255)	rVal[i] = '#';
+		if (rVal[i] > 127)	rVal[i] = '#';
 		if (rVal[i] == '\\')	lastBs = i;
 	}
 

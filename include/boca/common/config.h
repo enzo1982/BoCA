@@ -26,6 +26,8 @@ namespace BoCA
 			 */
 			static Config	*instance;
 
+			Bool		 saveSettingsOnExit;
+
 					 Config();
 					~Config();
 
@@ -90,6 +92,8 @@ namespace BoCA
 
 			Bool		 LoadSettings();
 			Bool		 SaveSettings();
+
+			Void		 SetSaveSettingsOnExit(Bool);
 
 			/* Returns a new or existing instance of Config
 			 */

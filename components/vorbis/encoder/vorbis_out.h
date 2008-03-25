@@ -18,6 +18,8 @@ namespace BoCA
 	class VorbisOut : public CS::EncoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			ogg_stream_state	 os;
 			ogg_page		 og;
 			ogg_packet		 op;
@@ -41,6 +43,7 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 	};
 };
 

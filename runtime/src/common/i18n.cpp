@@ -12,17 +12,13 @@
 
 BoCA::I18n *BoCA::I18n::instance = NIL;
 
-BoCA::I18n::I18n()
+BoCA::I18n::I18n() : S::I18n::Translator("BonkEnc")
 {
-	i18n = new S::I18n::Translator("BonkEnc");
-	i18n->SetInternalLanguageInfo("English", "Robert Kausch <robert.kausch@bonkenc.org>", "http://www.bonkenc.org/", False);
-
-	i18n->ActivateLanguage("bonkenc_de.xml");
+	SetInternalLanguageInfo("English", "Robert Kausch <robert.kausch@bonkenc.org>", "http://www.bonkenc.org/", False);
 }
 
 BoCA::I18n::~I18n()
 {
-	delete i18n;
 }
 
 BoCA::I18n *BoCA::I18n::Get()
@@ -40,10 +36,7 @@ Void BoCA::I18n::Free()
 	if (instance != NIL)
 	{
 		delete instance;
-	}
-}
 
-const String &BoCA::I18n::TranslateString(const String &string)
-{
-	return i18n->TranslateString(string);
+		instance = NIL;
+	}
 }

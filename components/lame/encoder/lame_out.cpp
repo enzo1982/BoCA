@@ -41,28 +41,24 @@ const String &BoCA::LAMEOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureLAME	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadLAMEDLL();
-
-	configLayer = new ConfigureLAME();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeLAMEDLL();
 }
 
 BoCA::LAMEOut::LAMEOut()
 {
+	configLayer = NIL;
 }
 
 BoCA::LAMEOut::~LAMEOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::LAMEOut::Activate()
@@ -386,5 +382,17 @@ Int BoCA::LAMEOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::LAMEOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureLAME();
+
 	return configLayer;
+}
+
+Void BoCA::LAMEOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }

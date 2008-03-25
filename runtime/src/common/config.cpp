@@ -19,6 +19,8 @@ BoCA::Config::Config()
 
 	enable_id3		= False;
 
+	saveSettingsOnExit	= True;
+
 	String	 programsDir = S::System::System::GetProgramFilesDirectory();
 
 	if (Application::GetApplicationDirectory().ToUpper().StartsWith(programsDir.ToUpper()))
@@ -35,10 +37,14 @@ BoCA::Config::Config()
 	}
 
 	config = new Configuration(String(configDir).Append("boca\\boca.xml"), True);
+
+	LoadSettings();
 }
 
 BoCA::Config::~Config()
 {
+	if (saveSettingsOnExit) SaveSettings();
+
 	delete config;
 }
 
@@ -47,8 +53,6 @@ BoCA::Config *BoCA::Config::Get()
 	if (instance == NIL)
 	{
 		instance = new Config();
-
-		instance->LoadSettings();
 	}
 
 	return instance;
@@ -58,10 +62,15 @@ Void BoCA::Config::Free()
 {
 	if (instance != NIL)
 	{
-		instance->SaveSettings();
-
 		delete instance;
+
+		instance = NIL;
 	}
+}
+
+Void BoCA::Config::SetSaveSettingsOnExit(Bool nSaveSettingsOnExit)
+{
+	saveSettingsOnExit = nSaveSettingsOnExit;
 }
 
 Int BoCA::Config::SetIntValue(const String &section, const String &name, Int value)

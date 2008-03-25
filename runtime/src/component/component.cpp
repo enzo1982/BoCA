@@ -24,3 +24,7 @@ BoCA::ConfigLayer *BoCA::CS::Component::GetConfigurationLayer()
 {
 	return NIL;
 }
+
+Void BoCA::CS::Component::FreeConfigurationLayer()
+{
+}

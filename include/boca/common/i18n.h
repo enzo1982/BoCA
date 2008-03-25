@@ -18,27 +18,23 @@ using namespace smooth;
 
 namespace BoCA
 {
-	class BOCA_DLL_EXPORT I18n
+	class BOCA_DLL_EXPORT I18n : public smooth::I18n::Translator
 	{
 		private:
 			/* Singleton class, therefore private constructor/destructor
 			 */
-			static I18n		*instance;
+			static I18n	*instance;
 
-						 I18n();
-						~I18n();
-
-			S::I18n::Translator	*i18n;
+					 I18n();
+					~I18n();
 		public:
-			const String		&TranslateString(const String &);
- 
 			/* Returns a new or existing instance of I18n
 			 */
-			static I18n		*Get();
+			static I18n	*Get();
 
 			/* Destroys an existing instance of I18n
 			 */
-			static Void		 Free();
+			static Void	 Free();
 	};
 };
 

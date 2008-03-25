@@ -48,28 +48,24 @@ const String &BoCA::TwinVQOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureTwinVQ	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadTwinVQDLL();
-
-	configLayer = new ConfigureTwinVQ();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeTwinVQDLL();
 }
 
 BoCA::TwinVQOut::TwinVQOut()
 {
+	configLayer = NIL;
 }
 
 BoCA::TwinVQOut::~TwinVQOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::TwinVQOut::Activate()
@@ -213,5 +209,17 @@ Int BoCA::TwinVQOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::TwinVQOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureTwinVQ();
+
 	return configLayer;
+}
+
+Void BoCA::TwinVQOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }

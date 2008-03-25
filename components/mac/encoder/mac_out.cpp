@@ -44,30 +44,27 @@ const String &BoCA::MACOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureMAC	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadMACDLL();
-
-	configLayer = new ConfigureMAC();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeMACDLL();
 }
 
 
 BoCA::MACOut::MACOut()
 {
+	configLayer = NIL;
+
 	hAPECompress = NIL;
 }
 
 BoCA::MACOut::~MACOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::MACOut::Activate()
@@ -142,5 +139,17 @@ Int BoCA::MACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 ConfigLayer *BoCA::MACOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureMAC();
+
 	return configLayer;
+}
+
+Void BoCA::MACOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }

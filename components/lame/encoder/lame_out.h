@@ -18,6 +18,8 @@ namespace BoCA
 	class LAMEOut : public CS::EncoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			lame_global_flags	*lameFlags;
 
 			Buffer<unsigned char>	 outBuffer;
@@ -34,6 +36,7 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 	};
 };
 

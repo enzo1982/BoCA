@@ -20,7 +20,7 @@ DynamicLoader *bladedll	= NIL;
 
 Bool LoadBladeDLL()
 {
-	bladedll = new DynamicLoader("encoders/BladeEnc");
+	bladedll = new DynamicLoader("codecs/BladeEnc");
 
 	ex_beInitStream		= (BEINITSTREAM) bladedll->GetFunctionAddress("beInitStream");
 	ex_beEncodeChunk	= (BEENCODECHUNK) bladedll->GetFunctionAddress("beEncodeChunk");

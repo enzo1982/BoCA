@@ -18,6 +18,8 @@ namespace BoCA
 	class WinampIn : public CS::DecoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			In_Module		*plugin;
 
 			In_Module		*GetPluginForFile(const String &);
@@ -36,6 +38,7 @@ namespace BoCA
 			Int			 ReadData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
+			Void			 FreeConfigurationLayer();
 	};
 };
 

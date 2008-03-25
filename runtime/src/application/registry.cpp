@@ -11,6 +11,7 @@
 #include <boca/application/registry.h>
 #include <boca/application/decodercomponent.h>
 #include <boca/application/encodercomponent.h>
+#include <boca/application/encodercomponentexternal.h>
 #include <boca/application/outputcomponent.h>
 
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
@@ -122,18 +123,35 @@ const Array<BoCA::AS::Format *> &BoCA::AS::Registry::GetComponentFormats(Int n)
 	return componentSpecs.GetNth(n)->formats;
 }
 
+Bool BoCA::AS::Registry::ComponentExists(const String &id)
+{
+	for (Int i = 0; i < componentSpecs.Length(); i++)
+	{
+		if (GetComponentID(i) == id) return True;
+	}
+
+	return False;
+}
+
 BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 {
 	for (Int i = 0; i < componentSpecs.Length(); i++)
 	{
 		ComponentSpecs	*specs = componentSpecs.GetNth(i);
 
-		if (specs->id == id)
+		if (specs->id != id) continue;
+
+		switch (specs->type)
 		{
-			if	(specs->type == COMPONENT_TYPE_DECODER)	return new DecoderComponent(specs);
-			else if (specs->type == COMPONENT_TYPE_ENCODER)	return new EncoderComponent(specs);
-			else if (specs->type == COMPONENT_TYPE_OUTPUT)	return new OutputComponent(specs);
-			else						return new Component(specs);
+			case COMPONENT_TYPE_DECODER:
+				return new DecoderComponent(specs);
+			case COMPONENT_TYPE_ENCODER:
+				if (specs->mode == INTERNAL)	return new EncoderComponent(specs);
+				else				return new EncoderComponentExternal(specs);
+			case COMPONENT_TYPE_OUTPUT:
+				return new OutputComponent(specs);
+			default:
+				return new Component(specs);
 		}
 	}
 

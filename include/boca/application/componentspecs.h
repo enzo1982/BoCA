@@ -71,12 +71,13 @@ namespace BoCA
 				bool		 (*func_Delete)(void *);
 
 				void		*(*func_GetConfigurationLayer)(void *);
+				void		 (*func_FreeConfigurationLayer)(void *);
 
 				bool		 (*func_GetErrorState)(void *);
 				const void	*(*func_GetErrorString)(void *);
 
-				bool		 (*func_CanOpenStream)(void *, const char *);
-				int		 (*func_GetStreamInfo)(void *, const char *, void *);
+				bool		 (*func_CanOpenStream)(void *, const wchar_t *);
+				int		 (*func_GetStreamInfo)(void *, const wchar_t *, void *);
 				void		 (*func_SetInputFormat)(void *, const void *);
 
 				int		 (*func_GetPackageSize)(void *);

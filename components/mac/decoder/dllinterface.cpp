@@ -20,7 +20,7 @@ DynamicLoader *macdll	= NIL;
 
 Bool LoadMACDLL()
 {
-	macdll = new DynamicLoader("encoders/MACDll");
+	macdll = new DynamicLoader("codecs/MACDll");
 
 	ex_APEDecompress_Create		= (APEDECOMPRESS_CREATE) macdll->GetFunctionAddress("c_APEDecompress_Create");
 	ex_APEDecompress_Destroy	= (APEDECOMPRESS_DESTROY) macdll->GetFunctionAddress("c_APEDecompress_Destroy");

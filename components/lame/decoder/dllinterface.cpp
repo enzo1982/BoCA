@@ -20,7 +20,7 @@ DynamicLoader *lamedll	= NIL;
 
 Bool LoadLAMEDLL()
 {
-	lamedll = new DynamicLoader("encoders/LAME");
+	lamedll = new DynamicLoader("codecs/LAME");
 
 	ex_lame_decode_init			= (LAME_DECODE_INIT) lamedll->GetFunctionAddress("lame_decode_init");
 	ex_lame_decode_exit			= (LAME_DECODE_EXIT) lamedll->GetFunctionAddress("lame_decode_exit");

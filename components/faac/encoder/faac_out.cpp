@@ -29,7 +29,7 @@ const String &BoCA::FAACOut::GetComponentSpecs()
 		  <component>					\
 		    <name>FAAC MP4/AAC Encoder</name>		\
 		    <version>1.0</version>			\
-		    <id>mp4-out</id>				\
+		    <id>faac-out</id>				\
 		    <type>encoder</type>			\
 								\
 		";
@@ -64,30 +64,26 @@ const String &BoCA::FAACOut::GetComponentSpecs()
 	return componentSpecs;
 }
 
-ConfigureFAAC	*configLayer = NIL;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadFAACDLL();
 	LoadMP4v2DLL();
-
-	configLayer = new ConfigureFAAC();
 }
 
 Void smooth::DetachDLL()
 {
-	Object::DeleteObject(configLayer);
-
 	FreeFAACDLL();
 	FreeMP4v2DLL();
 }
 
 BoCA::FAACOut::FAACOut()
 {
+	configLayer = NIL;
 }
 
 BoCA::FAACOut::~FAACOut()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::FAACOut::Activate()
@@ -301,5 +297,17 @@ String BoCA::FAACOut::GetOutputFileExtension()
 
 ConfigLayer *BoCA::FAACOut::GetConfigurationLayer()
 {
+	if (configLayer == NIL) configLayer = new ConfigureFAAC();
+
 	return configLayer;
+}
+
+Void BoCA::FAACOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
 }
