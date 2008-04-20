@@ -33,15 +33,9 @@ const String &BoCA::MADIn::GetComponentSpecs()
 		    <id>mad-in</id>				\
 		    <type>decoder</type>			\
 		    <format>					\
-		      <name>MPEG 1 Audio Layer 1</name>		\
+		      <name>MPEG Audio Files</name>		\
 		      <extension>mp1</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>MPEG 1 Audio Layer 2</name>		\
 		      <extension>mp2</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>MPEG 1 Audio Layer 3</name>		\
 		      <extension>mp3</extension>		\
 		    </format>					\
 		  </component>					\

@@ -70,6 +70,7 @@ namespace smooth
 				Bool				 focussed;
 
 				Bool				 alwaysActive;
+				Bool				 independent;			// Makes a widget independent from its container; i.e. it can be painted and used even if it's located outside of the container
 				Bool				 tabstopCapable;
 
 				Bool				 mouseOver;
@@ -144,6 +145,9 @@ namespace smooth
 
 				Int				 SetAlwaysActive(Bool nValue)	{ alwaysActive = nValue; return Success(); }
 				Bool				 IsAlwaysActive() const		{ return alwaysActive; }
+
+				Int				 SetIndependent(Bool nValue)	{ independent = nValue; return Success(); }
+				Bool				 IsIndependent() const		{ return independent; }
 
 				Int				 SetTabstopCapable(Bool nValue)	{ tabstopCapable = nValue; return Success(); }
 				Bool				 IsTabstopCapable() const	{ return tabstopCapable; }

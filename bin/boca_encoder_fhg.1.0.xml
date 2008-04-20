@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>Fraunhofer IIS MP3 Surround Encoder</name>
+  <version>1.0</version>
+  <id>fhg-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MPEG Audio Layer 3</name>
+    <extension>mp3</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/mp3sEncoder.exe</command>
+    <arguments>-eof -if - -of %OUTFILE %OPTIONS</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <tag mode="prepend">ID3v2</tag>
+    <parameters>
+      <range name="Bitrate" argument="-br %VALUE" default="192000" enabled="true" step="4000">
+	<min alias="16 kbps">16000</min>
+	<max alias="320 kbps">320000</max>
+      </range>
+      <selection name="Encoding mode" argument="-m %VALUE" default="0">
+	<option alias="CBR">0</option>
+	<option alias="VBR highest quality">1</option>
+	<option alias="VBR high quality">2</option>
+	<option alias="VBR intermediate quality">3</option>
+	<option alias="VBR intermediate bitrate">4</option>
+	<option alias="VBR low bitrate">5</option>
+      </selection>
+      <selection name="Encoder quality" argument="-q %VALUE" default="0">
+	<option alias="Fast encoding">0</option>
+	<option alias="High quality">1</option>
+      </selection>
+      <switch name="Write VBRI header" argument="-vbri"/>
+      <switch name="Downmix to mono" argument="-mono"/>
+      <switch name="Use Original File Length" argument="-ofl" enabled="true"/>
+    </parameters>
+  </external>
+</component>

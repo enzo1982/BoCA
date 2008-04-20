@@ -21,7 +21,7 @@
 #define foreach(var, array)										\
         if (Int _index_ = 0)    { }									\
         else                    for (Int _break_ = 0; !_break_ && _index_ < array.Length(); --_break_)	\
-                                        for (var = array.GetNth(_index_++); ; ({ ++_break_; break; }) )
+				for (var = array.GetNth(_index_++); !_break_; ++_break_)
 
 /* The forever macro is quite simple...
  */

@@ -53,7 +53,7 @@ Int BoCA::TagAPE::RenderAPEHeader(Int tagSize, Int numItems, Buffer<UnsignedByte
 	out.OutputNumber(2000, 4);
 	out.OutputNumber(tagSize, 4);
 	out.OutputNumber(numItems, 4);
-	out.OutputNumber(0xE0000000, 4);
+	out.OutputNumber(0xA0000000, 4);
 	out.OutputNumber(0, 4);
 	out.OutputNumber(0, 4);
 
@@ -70,7 +70,7 @@ Int BoCA::TagAPE::RenderAPEFooter(Int tagSize, Int numItems, Buffer<UnsignedByte
 	out.OutputNumber(2000, 4);
 	out.OutputNumber(tagSize, 4);
 	out.OutputNumber(numItems, 4);
-	out.OutputNumber(0xC0000000, 4);
+	out.OutputNumber(0x80000000, 4);
 	out.OutputNumber(0, 4);
 	out.OutputNumber(0, 4);
 

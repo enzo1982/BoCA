@@ -56,6 +56,7 @@ typedef bool				(*MP4GETMETADATATRACK)				(MP4FileHandle, u_int16_t *, u_int16_t
 typedef u_int32_t			(*MP4GETNUMBEROFTRACKS)				(MP4FileHandle, const char *, u_int8_t);
 typedef MP4TrackId			(*MP4FINDTRACKID)				(MP4FileHandle, u_int16_t, const char *, u_int8_t);
 typedef const char *			(*MP4GETTRACKTYPE)				(MP4FileHandle, MP4TrackId);
+typedef u_int8_t			(*MP4GETTRACKAUDIOMPEG4TYPE)			(MP4FileHandle, MP4TrackId);
 typedef bool				(*MP4GETTRACKESCONFIGURATION)			(MP4FileHandle, MP4TrackId, u_int8_t **, u_int32_t *);
 typedef MP4Duration			(*MP4GETTRACKDURATION)				(MP4FileHandle, MP4TrackId);
 typedef u_int32_t			(*MP4GETTRACKTIMESCALE)				(MP4FileHandle, MP4TrackId);
@@ -75,6 +76,7 @@ extern MP4GETMETADATATRACK		 ex_MP4GetMetadataTrack;
 extern MP4GETNUMBEROFTRACKS		 ex_MP4GetNumberOfTracks;
 extern MP4FINDTRACKID			 ex_MP4FindTrackId;
 extern MP4GETTRACKTYPE			 ex_MP4GetTrackType;
+extern MP4GETTRACKAUDIOMPEG4TYPE	 ex_MP4GetTrackAudioMpeg4Type;
 extern MP4GETTRACKESCONFIGURATION	 ex_MP4GetTrackESConfiguration;
 extern MP4GETTRACKDURATION		 ex_MP4GetTrackDuration;
 extern MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale;

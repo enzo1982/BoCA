@@ -37,6 +37,7 @@ using namespace smooth;
 #include "boca/common/config.h"
 #include "boca/common/configlayer.h"
 #include "boca/common/i18n.h"
+#include "boca/common/protocol.h"
 #include "boca/common/track.h"
 #include "boca/common/utilities.h"
 

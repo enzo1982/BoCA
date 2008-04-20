@@ -10,9 +10,11 @@
 
 #include <boca/application/registry.h>
 #include <boca/application/decodercomponent.h>
-#include <boca/application/decodercomponentexternal.h>
 #include <boca/application/encodercomponent.h>
-#include <boca/application/encodercomponentexternal.h>
+#include <boca/application/external/decodercomponentfile.h>
+#include <boca/application/external/decodercomponentstdio.h>
+#include <boca/application/external/encodercomponentfile.h>
+#include <boca/application/external/encodercomponentstdio.h>
 #include <boca/application/outputcomponent.h>
 
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
@@ -76,10 +78,7 @@ BoCA::AS::Registry::Registry()
 
 BoCA::AS::Registry::~Registry()
 {
-	for (Int i = 0; i < componentSpecs.Length(); i++)
-	{
-		delete componentSpecs.GetNth(i);
-	}
+	foreach (ComponentSpecs *cs, componentSpecs) delete cs;
 }
 
 Int BoCA::AS::Registry::GetNumberOfComponents()
@@ -145,11 +144,13 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 		switch (specs->type)
 		{
 			case COMPONENT_TYPE_DECODER:
-				if (specs->mode == INTERNAL)	return new DecoderComponent(specs);
-				else				return new DecoderComponentExternal(specs);
+				if	(specs->mode == INTERNAL)	return new DecoderComponent(specs);
+				else if (specs->mode == EXTERNAL_FILE)	return new DecoderComponentExternalFile(specs);
+				else if (specs->mode == EXTERNAL_STDIO)	return new DecoderComponentExternalStdIO(specs);
 			case COMPONENT_TYPE_ENCODER:
-				if (specs->mode == INTERNAL)	return new EncoderComponent(specs);
-				else				return new EncoderComponentExternal(specs);
+				if	(specs->mode == INTERNAL)	return new EncoderComponent(specs);
+				else if (specs->mode == EXTERNAL_FILE)	return new EncoderComponentExternalFile(specs);
+				else if (specs->mode == EXTERNAL_STDIO)	return new EncoderComponentExternalStdIO(specs);
 			case COMPONENT_TYPE_OUTPUT:
 				return new OutputComponent(specs);
 			default:

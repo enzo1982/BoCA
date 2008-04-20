@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
 <component>
   <name>Shorten Lossless Encoder</name>
   <version>1.0</version>
@@ -9,8 +10,8 @@
     <extension>shn</extension>
   </format>
   <external>
-    <command>codecs/cmdline/shortn32.exe</command>
-    <arguments>%INFILE %OUTFILE</arguments>
+    <command>codecs/cmdline/shorten.exe</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>

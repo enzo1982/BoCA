@@ -45,7 +45,16 @@ Int BoCA::AS::DecoderComponent::SetDriver(IO::Driver *driver)
 
 Bool BoCA::AS::DecoderComponent::Activate()
 {
-	return specs->func_Activate(component);
+	SetDriver(driver);
+
+	if (specs->func_Activate(component))
+	{
+		packageSize = GetPackageSize();
+
+		return True;
+	}
+
+	return False;
 }
 
 Bool BoCA::AS::DecoderComponent::Deactivate()

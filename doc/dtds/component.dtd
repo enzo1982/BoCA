@@ -1,0 +1,54 @@
+<!-- BoCA component XML description DTD -->
+
+<!ENTITY % BoCA.Version "-//DTD BoCA 1.0 Draft//EN">
+
+<!ELEMENT component (name, version, id, type, format*, external?)>
+
+	<!ELEMENT name (#PCDATA)>
+	<!ELEMENT version (#PCDATA)>
+	<!ELEMENT id (#PCDATA)>
+	<!ELEMENT type (#PCDATA)>
+
+	<!ELEMENT format (name, extension+)>
+
+		<!ELEMENT extension (#PCDATA)>
+
+	<!ELEMENT external (command, arguments, mode, (informat?, outformat?), tag*, parameters?)>
+
+		<!ELEMENT command (#PCDATA)>
+		<!ELEMENT arguments (#PCDATA)>
+		<!ELEMENT mode (#PCDATA)>
+		<!ELEMENT informat (#PCDATA)>
+		<!ELEMENT outformat (#PCDATA)>
+
+		<!ELEMENT tag (#PCDATA)>
+		<!ATTLIST tag mode CDATA #REQUIRED>
+
+		<!ELEMENT parameters (switch | selection | range)*>
+
+			<!ELEMENT switch (#PCDATA)>
+			<!ATTLIST switch name	  CDATA	  #REQUIRED
+					 argument CDATA	  #REQUIRED
+					 enabled  NMTOKEN #IMPLIED>
+
+			<!ELEMENT selection (option+)>
+			<!ATTLIST selection name     CDATA   #REQUIRED
+					    argument CDATA   #REQUIRED
+					    enabled  NMTOKEN #IMPLIED
+					    default  NMTOKEN #IMPLIED>
+
+				<!ELEMENT option (#PCDATA)>
+				<!ATTLIST option alias CDATA #IMPLIED>
+
+			<!ELEMENT range (min, max)>
+			<!ATTLIST range name	 CDATA	 #REQUIRED
+					argument CDATA	 #REQUIRED
+					enabled	 NMTOKEN #IMPLIED
+					default	 NMTOKEN #IMPLIED
+					step	 NMTOKEN #IMPLIED>
+
+				<!ELEMENT min (#PCDATA)>
+				<!ATTLIST min alias CDATA #IMPLIED>
+
+				<!ELEMENT max (#PCDATA)>
+				<!ATTLIST max alias CDATA #IMPLIED>

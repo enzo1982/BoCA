@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
 <component>
   <name>WavPack Lossless Compressor</name>
   <version>1.0</version>
@@ -10,8 +11,13 @@
   </format>
   <external>
     <command>codecs/cmdline/wavpack.exe</command>
-    <arguments>%INFILE %OUTFILE</arguments>
-    <mode>file</mode>
+    <arguments>-i %OPTIONS - %OUTFILE</arguments>
+    <mode>stdio</mode>
     <informat>wave</informat>
+    <tag mode="append">APEv2</tag>
+    <parameters>
+      <switch name="High quality mode" argument="-h"/>
+      <switch name="Extra encode processing" argument="-x"/>
+    </parameters>
   </external>
 </component>

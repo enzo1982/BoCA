@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>LA Lossless Audio Encoder</name>
+  <version>1.0</version>
+  <id>la-out</id>
+  <type>encoder</type>
+  <format>
+    <name>LA Audio Files</name>
+    <extension>la</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/la.exe</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <tag mode="append">ID3v1</tag>
+    <parameters>
+      <switch name="High compression mode" argument="-high"/>
+      <switch name="Disable seeking" argument="-noseek"/>
+    </parameters>
+  </external>
+</component>

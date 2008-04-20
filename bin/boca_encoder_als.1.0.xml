@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>MPEG-4 Audio Lossless Encoder</name>
+  <version>1.0</version>
+  <id>als-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MPEG-4 ALS Files</name>
+    <extension>mp4</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/mp4als.exe</command>
+    <arguments>-MP4 %OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>

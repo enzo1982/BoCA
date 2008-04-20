@@ -44,7 +44,7 @@ const String &BoCA::FAAD2In::GetComponentSpecs()
 			componentSpecs.Append("			\
 								\
 			    <format>				\
-			      <name>MP4 Audio Files</name>	\
+			      <name>MPEG-4 Audio Files</name>	\
 			      <extension>m4a</extension>	\
 			      <extension>m4b</extension>	\
 			      <extension>m4r</extension>	\
@@ -83,15 +83,54 @@ Void smooth::DetachDLL()
 
 Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 {
-	String	 lcURI = streamURI.ToLower();
+	Bool	 isValidFile = False;
 
-	if (mp4v2dll == NIL)	return lcURI.EndsWith(".aac");
-	else			return lcURI.EndsWith(".mp4") ||
-				       lcURI.EndsWith(".m4a") ||
-				       lcURI.EndsWith(".m4b") ||
-				       lcURI.EndsWith(".m4r") ||
-				       lcURI.EndsWith(".3gp") ||
-				       lcURI.EndsWith(".aac");
+	if (mp4v2dll != NIL && !streamURI.ToLower().EndsWith(".aac"))
+	{
+		if (String::IsUnicode(streamURI))
+		{
+			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
+
+			mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"), 0);
+		}
+		else
+		{
+			mp4File = ex_MP4Read(streamURI, 0);
+		}
+
+		mp4Track = GetAudioTrack();
+
+		if (mp4Track >= 0)
+		{
+			Int	 type = ex_MP4GetTrackAudioMpeg4Type(mp4File, mp4Track);
+
+			if (type == MP4_MPEG4_AAC_MAIN_AUDIO_TYPE ||
+			    type == MP4_MPEG4_AAC_LC_AUDIO_TYPE	  ||
+			    type == MP4_MPEG4_AAC_SSR_AUDIO_TYPE  ||
+			    type == MP4_MPEG4_AAC_LTP_AUDIO_TYPE  ||
+			    type == MP4_MPEG4_AAC_HE_AUDIO_TYPE	  ||
+			    type == MP4_MPEG4_AAC_SCALABLE_AUDIO_TYPE) isValidFile = True;
+		}
+
+		ex_MP4Close(mp4File);
+
+		if (String::IsUnicode(streamURI))
+		{
+			File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
+		}
+	}
+	else
+	{
+		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+
+		SkipID3v2Tag(f_in);
+
+		isValidFile = SyncOnAACHeader(f_in);
+
+		delete f_in;
+	}
+
+	return isValidFile;;
 }
 
 Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
@@ -465,7 +504,7 @@ Int BoCA::FAAD2In::GetAudioTrack()
 Bool BoCA::FAAD2In::SkipID3v2Tag(InStream *in)
 {
 	/* Check for an ID3v2 tag at the beginning of the
-	 * file and skip it if it exists as LAME may crash
+	 * file and skip it if it exists as FAAD2 may crash
 	 * on unsynchronized tags.
 	 */
 	if (in->InputString(3) == "ID3")

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
 <component>
   <name>Musepack Audio Encoder</name>
   <version>1.0</version>
@@ -10,8 +11,15 @@
   </format>
   <external>
     <command>codecs/cmdline/mppenc.exe</command>
-    <arguments>%INFILE %OUTFILE</arguments>
-    <mode>file</mode>
+    <arguments>%OPTIONS - %OUTFILE</arguments>
+    <mode>stdio</mode>
     <informat>wave</informat>
+    <tag mode="append">APEv2</tag>
+    <parameters>
+      <range name="Quality" argument="--quality %VALUE" default="5">
+	<min alias="poor">0</min>
+	<max alias="excellent">10</max>
+      </range>
+    </parameters>
   </external>
 </component>

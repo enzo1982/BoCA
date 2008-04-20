@@ -28,6 +28,8 @@ namespace smooth
 	{
 		class SMOOTHAPI CheckBox : public Widget
 		{
+			private:
+				Bool			 dummyVariable;
 			protected:
 				Bool			*variable;
 				Bool			 state;
@@ -40,6 +42,9 @@ namespace smooth
 				virtual			~CheckBox();
 
 				virtual Int		 Paint(Int);
+			accessors:
+				Int			 SetChecked(Bool);
+				Bool			 IsChecked();
 			signals:
 				static Signal0<Void>	 internalCheckValues;
 			slots:

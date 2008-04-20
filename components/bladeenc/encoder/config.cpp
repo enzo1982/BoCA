@@ -144,6 +144,7 @@ Int BoCA::ConfigureBladeEnc::SaveSettings()
 
 	return Success();
 }
+
 Void BoCA::ConfigureBladeEnc::SetBitrate()
 {
 	text_bit->SetText(String::FromInt(GetBitrate()).Append(" kbit"));

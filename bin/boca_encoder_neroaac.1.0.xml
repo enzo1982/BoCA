@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
 <component>
   <name>Nero AAC Encoder</name>
   <version>1.0</version>
@@ -10,8 +11,17 @@
   </format>
   <external>
     <command>codecs/cmdline/neroAacEnc.exe</command>
-    <arguments>-if %INFILE -of %OUTFILE</arguments>
-    <mode>file</mode>
+    <arguments>-ignorelength -if - -of %OUTFILE %OPTIONS</arguments>
+    <mode>stdio</mode>
     <informat>wave</informat>
+    <parameters>
+      <switch name="Enable two-pass encoding" argument="-2pass"/>
+      <selection name="Encoding mode" argument="%VALUE">
+	<option alias="Auto"/>
+	<option alias="LC AAC">-lc</option>
+	<option alias="HE AAC">-he</option>
+	<option alias="HEv2 AAC">-hev2</option>
+      </selection>
+    </parameters>
   </external>
 </component>

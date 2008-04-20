@@ -32,6 +32,7 @@ MP4GETMETADATATRACK		 ex_MP4GetMetadataTrack			= NIL;
 MP4GETNUMBEROFTRACKS		 ex_MP4GetNumberOfTracks		= NIL;
 MP4FINDTRACKID			 ex_MP4FindTrackId			= NIL;
 MP4GETTRACKTYPE			 ex_MP4GetTrackType			= NIL;
+MP4GETTRACKAUDIOMPEG4TYPE	 ex_MP4GetTrackAudioMpeg4Type		= NIL;
 MP4GETTRACKESCONFIGURATION	 ex_MP4GetTrackESConfiguration		= NIL;
 MP4GETTRACKDURATION		 ex_MP4GetTrackDuration			= NIL;
 MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale		= NIL;
@@ -89,6 +90,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4GetNumberOfTracks		= (MP4GETNUMBEROFTRACKS) mp4v2dll->GetFunctionAddress("MP4GetNumberOfTracks");
 	ex_MP4FindTrackId		= (MP4FINDTRACKID) mp4v2dll->GetFunctionAddress("MP4FindTrackId");
 	ex_MP4GetTrackType		= (MP4GETTRACKTYPE) mp4v2dll->GetFunctionAddress("MP4GetTrackType");
+	ex_MP4GetTrackAudioMpeg4Type	= (MP4GETTRACKAUDIOMPEG4TYPE) mp4v2dll->GetFunctionAddress("MP4GetTrackAudioMpeg4Type");
 	ex_MP4GetTrackESConfiguration	= (MP4GETTRACKESCONFIGURATION) mp4v2dll->GetFunctionAddress("MP4GetTrackESConfiguration");
 	ex_MP4GetTrackDuration		= (MP4GETTRACKDURATION) mp4v2dll->GetFunctionAddress("MP4GetTrackDuration");
 	ex_MP4GetTrackTimeScale		= (MP4GETTRACKTIMESCALE) mp4v2dll->GetFunctionAddress("MP4GetTrackTimeScale");
@@ -107,6 +109,7 @@ Bool LoadMP4v2DLL()
 	    ex_MP4GetNumberOfTracks		== NIL ||
 	    ex_MP4FindTrackId			== NIL ||
 	    ex_MP4GetTrackType			== NIL ||
+	    ex_MP4GetTrackAudioMpeg4Type	== NIL ||
 	    ex_MP4GetTrackESConfiguration	== NIL ||
 	    ex_MP4GetTrackDuration		== NIL ||
 	    ex_MP4GetTrackTimeScale		== NIL ||

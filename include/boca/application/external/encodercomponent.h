@@ -8,7 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "encodercomponent.h"
+#ifndef H_BOCA_ENCODERCOMPONENTEXTERNAL
+#define H_BOCA_ENCODERCOMPONENTEXTERNAL
+
+#include "../encodercomponent.h"
 
 namespace BoCA
 {
@@ -17,12 +20,7 @@ namespace BoCA
 		class EncoderComponentExternal : public EncoderComponent
 		{
 			private:
-				IO::OutStream		*out;
-
-				String			 wavFileName;
-				String			 encFileName;
-
-				Int			 nOfSamples;
+				ConfigLayer		*configLayer;
 			protected:
 				Bool			 errorState;
 				String			 errorString;
@@ -32,14 +30,9 @@ namespace BoCA
 							 EncoderComponentExternal(ComponentSpecs *);
 				virtual			~EncoderComponentExternal();
 
-				virtual Bool		 SetAudioTrackInfo(const Track &);
+				virtual Bool		 SetAudioTrackInfo(const Track &nFormat)	{ format = nFormat; return True; }
 
 				virtual String		 GetOutputFileExtension();
-
-				virtual Bool		 Activate();
-				virtual Bool		 Deactivate();
-
-				virtual Int		 WriteData(Buffer<UnsignedByte> &, Int);
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 				virtual Void		 FreeConfigurationLayer();
@@ -49,3 +42,5 @@ namespace BoCA
 		};
 	};
 };
+
+#endif

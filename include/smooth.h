@@ -139,7 +139,6 @@
 #include "smooth/gui/widgets/basic/titlebar.h"
 
 #include "smooth/gui/widgets/hotspot/hotspot.h"
-#include "smooth/gui/widgets/hotspot/independent.h"
 #include "smooth/gui/widgets/hotspot/simplebutton.h"
 
 #include "smooth/gui/widgets/multi/list/list.h"

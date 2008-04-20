@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>TTA Lossless Audio Decoder</name>
+  <version>1.0</version>
+  <id>tta-in</id>
+  <type>decoder</type>
+  <format>
+    <name>TTA Audio Files</name>
+    <extension>tta</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/ttaenc.exe</command>
+    <arguments>-d %OPTIONS %INFILE -o -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+    <tag mode="prepend">ID3v2</tag>
+  </external>
+</component>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>Fraunhofer IIS MP3 Surround Decoder</name>
+  <version>1.0</version>
+  <id>fhg-in</id>
+  <type>decoder</type>
+  <format>
+    <name>MPEG Audio Layer 3</name>
+    <extension>mp3</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/mp3sDecoder.exe</command>
+    <arguments>-if %INFILE -of %OUTFILE %OPTIONS</arguments>
+    <mode>file</mode>
+    <outformat>wave</outformat>
+    <tag mode="prepend">ID3v2</tag>
+    <parameters>
+      <switch name="Discard surround information" argument="-classic"/>
+      <switch name="Use Original File Length" argument="-ofl" enabled="true"/>
+    </parameters>
+  </external>
+</component>

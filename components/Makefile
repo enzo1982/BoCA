@@ -6,6 +6,9 @@ all:
 	cd bladeenc/encoder && make
 	cd bonk/decoder && make
 	cd bonk/encoder && make
+	cd cdrip/decoder && make
+#	cd dvda/decoder && make
+	cd external/other && make
 	cd faac/decoder && make
 	cd faac/encoder && make
 	cd flac/decoder && make
@@ -32,6 +35,9 @@ clean:
 	cd bladeenc/encoder && make clean
 	cd bonk/decoder && make clean
 	cd bonk/encoder && make clean
+	cd cdrip/decoder && make clean
+#	cd dvda/decoder && make clean
+	cd external/other && make clean
 	cd faac/decoder && make clean
 	cd faac/encoder && make clean
 	cd flac/decoder && make clean

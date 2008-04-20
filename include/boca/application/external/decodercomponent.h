@@ -8,7 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "decodercomponent.h"
+#ifndef H_BOCA_DECODERCOMPONENTEXTERNAL
+#define H_BOCA_DECODERCOMPONENTEXTERNAL
+
+#include "../decodercomponent.h"
 
 namespace BoCA
 {
@@ -17,32 +20,26 @@ namespace BoCA
 		class DecoderComponentExternal : public DecoderComponent
 		{
 			private:
-				IO::InStream		*in;
-
-				String			 wavFileName;
+				ConfigLayer		*configLayer;
 			protected:
 				Bool			 errorState;
 				String			 errorString;
 
 				Track			 format;
+
+				Int64			 inBytes;
 			public:
 							 DecoderComponentExternal(ComponentSpecs *);
 				virtual			~DecoderComponentExternal();
 
 				virtual Bool		 CanOpenStream(const String &);
-				virtual Error		 GetStreamInfo(const String &, Track &);
 
-				virtual Void		 SetInputFormat(const Track &);
+				Void			 SetInputFormat(const Track &nFormat)	{ format = nFormat; }
 
-				virtual Int64		 GetInBytes();
+				Int64			 GetInBytes()				{ return inBytes; }
 
 				virtual Int		 GetPackageSize();
 				virtual Int		 SetDriver(IO::Driver *);
-
-				virtual Bool		 Activate();
-				virtual Bool		 Deactivate();
-
-				virtual Int		 ReadData(Buffer<UnsignedByte> &, Int);
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 				virtual Void		 FreeConfigurationLayer();
@@ -52,3 +49,5 @@ namespace BoCA
 		};
 	};
 };
+
+#endif

@@ -8,36 +8,22 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca/application/encodercomponentexternal.h>
+#include <boca/application/external/encodercomponentfile.h>
+#include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
 using namespace smooth::IO;
 
-BoCA::AS::EncoderComponentExternal::EncoderComponentExternal(ComponentSpecs *specs) : EncoderComponent(specs)
+BoCA::AS::EncoderComponentExternalFile::EncoderComponentExternalFile(ComponentSpecs *specs) : EncoderComponentExternal(specs)
 {
-	errorState	= False;
-	errorString	= "Unknown error";
-
 	out = NIL;
 }
 
-BoCA::AS::EncoderComponentExternal::~EncoderComponentExternal()
+BoCA::AS::EncoderComponentExternalFile::~EncoderComponentExternalFile()
 {
 }
 
-Bool BoCA::AS::EncoderComponentExternal::SetAudioTrackInfo(const Track &nFormat)
-{
-	format = nFormat;
-
-	return True;
-}
-
-String BoCA::AS::EncoderComponentExternal::GetOutputFileExtension()
-{
-	return specs->formats.GetFirst()->GetExtensions().GetFirst();
-}
-
-Bool BoCA::AS::EncoderComponentExternal::Activate()
+Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 {
 	/* Create temporary WAVE file
 	 */
@@ -69,7 +55,7 @@ Bool BoCA::AS::EncoderComponentExternal::Activate()
 	return True;
 }
 
-Bool BoCA::AS::EncoderComponentExternal::Deactivate()
+Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 {
 	/* Finalize and close the uncompressed temporary file
 	 */
@@ -95,7 +81,7 @@ Bool BoCA::AS::EncoderComponentExternal::Deactivate()
 	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	execInfo.lpVerb		= "open";
 	execInfo.lpFile		= specs->external_command;
-	execInfo.lpParameters	= String(specs->external_arguments).Replace("%INFILE", String("\"").Append(wavFileName).Append("\"")).Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""));
+	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(wavFileName).Append("\"")).Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""));
 	execInfo.lpDirectory	= Application::GetApplicationDirectory();
 	execInfo.nShow		= SW_HIDE;
 
@@ -113,6 +99,31 @@ Bool BoCA::AS::EncoderComponentExternal::Deactivate()
 	}
 	while (exitCode == STILL_ACTIVE);
 
+	File(wavFileName).Delete();
+
+	if (exitCode != 0) return False;
+
+	Config	*config = Config::Get();
+
+	/* Create tag if requested
+	 */
+	Buffer<UnsignedByte>	 tag;
+	Int			 tagSize = 0;
+
+	if (specs->external_tagmode != TAG_MODE_NONE && (format.artist != NIL || format.title != NIL))
+	{
+		if	(specs->external_tag == "ID3v1" && config->enable_id3v1 && config->enable_id3)	tagSize = format.RenderID3Tag(tag, 1);
+		else if (specs->external_tag == "ID3v2" && config->enable_id3v2 && config->enable_id3)	tagSize = format.RenderID3Tag(tag, 2);
+		else if (specs->external_tag == "APEv2")						tagSize = format.RenderAPETag(tag);
+	}
+
+	/* Prepend tag
+	 */
+	if (specs->external_tagmode == TAG_MODE_PREPEND)
+	{
+		driver->WriteData(tag, tagSize);
+	}
+
 	/* Stream contents of created file to output driver
 	 */
 	InStream		 in(STREAM_FILE, encFileName, IS_READONLY);
@@ -126,15 +137,21 @@ Bool BoCA::AS::EncoderComponentExternal::Deactivate()
 		bytesLeft -= Math::Min(1024, bytesLeft);
 	}
 
+	/* Append tag
+	 */
+	if (specs->external_tagmode == TAG_MODE_APPEND)
+	{
+		driver->WriteData(tag, tagSize);
+	}
+
 	in.Close();
 
-	File(wavFileName).Delete();
 	File(encFileName).Delete();
 
 	return True;
 }
 
-Int BoCA::AS::EncoderComponentExternal::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::AS::EncoderComponentExternalFile::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	/* Hand data over to the output file
 	 */
@@ -143,13 +160,4 @@ Int BoCA::AS::EncoderComponentExternal::WriteData(Buffer<UnsignedByte> &data, In
 	out->OutputData(data, size);
 
 	return size;
-}
-
-BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()
-{
-	return NIL;
-}
-
-Void BoCA::AS::EncoderComponentExternal::FreeConfigurationLayer()
-{
 }

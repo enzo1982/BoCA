@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>LA Lossless Audio Decoder</name>
+  <version>1.0</version>
+  <id>la-in</id>
+  <type>decoder</type>
+  <format>
+    <name>LA Audio Files</name>
+    <extension>la</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/la.exe</command>
+    <arguments>-cout %OPTIONS %INFILE</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+    <tag mode="append">ID3v1</tag>
+  </external>
+</component>

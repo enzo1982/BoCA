@@ -23,7 +23,7 @@ namespace BoCA
 	{
 		public:
 					 ConfigLayer();
-					~ConfigLayer();
+			virtual		~ConfigLayer();
 
 			virtual Int	 SaveSettings() = 0;
 	};
