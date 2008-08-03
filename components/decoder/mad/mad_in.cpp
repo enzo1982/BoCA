@@ -15,7 +15,7 @@
 
 #include "mad_in.h"
 #include "dllinterface.h"
-#include "dxhead.h"
+#include "xing/dxhead.h"
 
 using namespace smooth::IO;
 

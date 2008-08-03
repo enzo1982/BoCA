@@ -183,13 +183,17 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\decoder\mad\dxhead.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\components\decoder\mad\mad_in.cpp"
 				>
 			</File>
+			<Filter
+				Name="xing"
+				>
+				<File
+					RelativePath="..\..\..\components\decoder\mad\xing\dxhead.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -201,13 +205,17 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\decoder\mad\dxhead.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\components\decoder\mad\mad_in.h"
 				>
 			</File>
+			<Filter
+				Name="xing"
+				>
+				<File
+					RelativePath="..\..\..\components\decoder\mad\xing\dxhead.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Ressourcendateien"

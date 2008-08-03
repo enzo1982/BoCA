@@ -203,6 +203,11 @@ typedef unsigned int socklen_t;
 #define __STRING(expr) #expr
 #endif
 
+#ifdef _MSC_VER
+#define int32_t __int32
+#define uint32_t unsigned __int32
+#endif
+
 #ifndef HAVE_STRSEP
 #ifdef __cplusplus
 extern "C" {

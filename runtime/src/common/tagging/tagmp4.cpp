@@ -111,7 +111,7 @@ Int BoCA::TagMP4::Parse(const String &fileName, Track *track)
 		Picture	 picture;
 
 		unsigned char	*buffer	= NIL;
-		unsigned long	 size	= 0;
+		u_int32_t	 size	= 0;
 
 		ex_MP4GetMetadataCoverArt(mp4File, &buffer, &size, i);
 

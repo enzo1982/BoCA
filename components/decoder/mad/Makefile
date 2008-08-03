@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o dxhead.o mad_in.o
+OBJECTS	  = xing/dxhead.o dllinterface.o mad_in.o
 
 ## Do not change anything below this line. ##
 

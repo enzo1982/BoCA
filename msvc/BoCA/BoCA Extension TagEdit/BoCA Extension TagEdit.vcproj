@@ -186,6 +186,34 @@
 				RelativePath="..\..\..\components\extension\tagedit\tagedit.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\components\extension\tagedit\tagspec.cpp"
+				>
+			</File>
+			<Filter
+				Name="basic"
+				>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_basic.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="advanced"
+				>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_edit_number.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_edit_text.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_tag_advanced.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -200,6 +228,34 @@
 				RelativePath="..\..\..\components\extension\tagedit\tagedit.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\components\extension\tagedit\tagspec.h"
+				>
+			</File>
+			<Filter
+				Name="basic"
+				>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_basic.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="advanced"
+				>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_edit_number.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_edit_text.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_tag_advanced.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Ressourcendateien"
