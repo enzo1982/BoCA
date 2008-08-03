@@ -179,15 +179,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\components\lame\encoder\config.cpp"
+				RelativePath="..\..\..\components\encoder\lame\config.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\lame\encoder\dllinterface.cpp"
+				RelativePath="..\..\..\components\encoder\lame\dllinterface.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\lame\encoder\lame_out.cpp"
+				RelativePath="..\..\..\components\encoder\lame\lame_out.cpp"
 				>
 			</File>
 		</Filter>
@@ -197,15 +197,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\components\lame\encoder\config.h"
+				RelativePath="..\..\..\components\encoder\lame\config.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\lame\encoder\dllinterface.h"
+				RelativePath="..\..\..\components\encoder\lame\dllinterface.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\lame\encoder\lame_out.h"
+				RelativePath="..\..\..\components\encoder\lame\lame_out.h"
 				>
 			</File>
 		</Filter>

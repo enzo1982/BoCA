@@ -179,15 +179,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\components\bonk\encoder\bonk_out.cpp"
+				RelativePath="..\..\..\components\encoder\bonk\bonk_out.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\bonk\encoder\config.cpp"
+				RelativePath="..\..\..\components\encoder\bonk\config.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\bonk\encoder\dllinterface.cpp"
+				RelativePath="..\..\..\components\encoder\bonk\dllinterface.cpp"
 				>
 			</File>
 		</Filter>
@@ -197,15 +197,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\components\bonk\encoder\bonk_out.h"
+				RelativePath="..\..\..\components\encoder\bonk\bonk_out.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\bonk\encoder\config.h"
+				RelativePath="..\..\..\components\encoder\bonk\config.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\bonk\encoder\dllinterface.h"
+				RelativePath="..\..\..\components\encoder\bonk\dllinterface.h"
 				>
 			</File>
 		</Filter>

@@ -179,15 +179,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\components\winamp\output\config.cpp"
+				RelativePath="..\..\..\components\output\winamp\config.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\winamp\output\dllinterface.cpp"
+				RelativePath="..\..\..\components\output\winamp\dllinterface.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\winamp\output\winamp_out.cpp"
+				RelativePath="..\..\..\components\output\winamp\winamp_out.cpp"
 				>
 			</File>
 		</Filter>
@@ -197,15 +197,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\components\winamp\output\config.h"
+				RelativePath="..\..\..\components\output\winamp\config.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\winamp\output\dllinterface.h"
+				RelativePath="..\..\..\components\output\winamp\dllinterface.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\winamp\output\winamp_out.h"
+				RelativePath="..\..\..\components\output\winamp\winamp_out.h"
 				>
 			</File>
 		</Filter>

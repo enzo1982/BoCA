@@ -33,6 +33,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		if	((specs->external_tag == "ID3v1"  ||
 			  specs->external_tag == "ID3v2") &&
 			 Config::Get()->enable_id3)		format.ParseID3Tag(streamURI);
+		else if (specs->external_tag == "MP4Meta" &&
+			 Config::Get()->enable_mp4)		format.ParseMP4Meta(streamURI);
 		else if (specs->external_tag == "APEv2")	format.ParseAPETag(streamURI);
 	}
 
@@ -54,7 +56,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	startupInfo.cb		= sizeof(startupInfo);
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-	startupInfo.wShowWindow	= SW_HIDE;
+	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
 	startupInfo.hStdInput	= NIL;
 	startupInfo.hStdOutput	= wPipe;
 	startupInfo.hStdError	= NIL;

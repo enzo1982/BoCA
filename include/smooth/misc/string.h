@@ -129,6 +129,9 @@ namespace smooth
 			String			 ToLower() const;
 			String			 ToUpper() const;
 
+			const Array<String>	&Explode(const String &) const;
+			static String		 Implode(const Array<String> &, const String & = String());
+
 			wchar_t &operator	 [](const int);
 			wchar_t &operator	 [](const Int);
 

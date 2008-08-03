@@ -35,6 +35,8 @@ Int BoCA::TagAPE::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 	if (track.track			    >   0) { RenderAPEItem("Track", String::FromInt(track.track), buffer);     numItems++; }
 	if (track.year			    >   0) { RenderAPEItem("Year", String::FromInt(track.year), buffer);       numItems++; }
 	if (track.genre			   != NIL) { RenderAPEItem("Genre", track.genre, buffer);		       numItems++; }
+	if (track.label			   != NIL) { RenderAPEItem("Publisher", track.label, buffer);		       numItems++; }
+	if (track.isrc			   != NIL) { RenderAPEItem("ISRC", track.isrc, buffer);			       numItems++; }
 	if (currentConfig->default_comment != NIL) { RenderAPEItem("Comment", currentConfig->default_comment, buffer); numItems++; }
 
 	Int		 tagSize = buffer.Size();
@@ -94,7 +96,7 @@ Int BoCA::TagAPE::RenderAPEItem(const String &id, const String &value, Buffer<Un
 	return Success();
 }
 
-Int BoCA::TagAPE::ParseBuffer(Buffer<UnsignedByte> &buffer, Track *track)
+Int BoCA::TagAPE::Parse(Buffer<UnsignedByte> &buffer, Track *track)
 {
 	Int	 numItems = 0;
 	Int	 offset = 32;
@@ -113,18 +115,20 @@ Int BoCA::TagAPE::ParseBuffer(Buffer<UnsignedByte> &buffer, Track *track)
 
 		ParseAPEItem(buffer, offset, &id, &value);
 
-		if	(id == "Artist") track->artist	= value;
-		else if (id == "Title")	 track->title	= value;
-		else if (id == "Album")	 track->album	= value;
-		else if (id == "Track")	 track->track	= value.ToInt();
-		else if (id == "Year")	 track->year	= value.ToInt();
-		else if (id == "Genre")	 track->genre	= value;
+		if	(id == "Artist")    track->artist = value;
+		else if (id == "Title")	    track->title  = value;
+		else if (id == "Album")	    track->album  = value;
+		else if (id == "Track")	    track->track  = value.ToInt();
+		else if (id == "Year")	    track->year	  = value.ToInt();
+		else if (id == "Genre")	    track->genre  = value;
+		else if (id == "Publisher") track->label  = value;
+		else if (id == "ISRC")	    track->isrc	  = value;
 	}
 
 	return Success();
 }
 
-Int BoCA::TagAPE::ParseFile(const String &fileName, Track *track)
+Int BoCA::TagAPE::Parse(const String &fileName, Track *track)
 {
 	InStream		 in(STREAM_FILE, fileName, IS_READONLY);
 	Buffer<UnsignedByte>	 buffer(32);
@@ -139,7 +143,7 @@ Int BoCA::TagAPE::ParseFile(const String &fileName, Track *track)
 
 		in.InputData(buffer + 32, tagSize);
 
-		return ParseBuffer(buffer, track);
+		return Parse(buffer, track);
 	}
 
 	in.Seek(in.Size() - 32);
@@ -152,7 +156,7 @@ Int BoCA::TagAPE::ParseFile(const String &fileName, Track *track)
 		in.Seek(in.Size() - (tagSize + 32));
 		in.InputData(buffer, tagSize + 32);
 
-		return ParseBuffer(buffer, track);
+		return Parse(buffer, track);
 	}
 
 	return Error();

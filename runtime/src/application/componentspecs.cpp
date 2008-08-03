@@ -16,6 +16,7 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	library = NIL;
 
 	mode = INTERNAL;
+	debug = False;
 }
 
 BoCA::AS::ComponentSpecs::~ComponentSpecs()
@@ -75,6 +76,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_ReadData			= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
 	func_WriteData			= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
+
+	func_GetMainTabLayer		= (void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetMainTabLayer"));
 
 	return ParseXMLSpec(String(func_GetComponentSpecs()).Trim());
 }
@@ -136,9 +139,23 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 	{
 		XML::Node	*node = root->GetNthNode(i);
 
-		if	(node->GetName() == "name")	name	= node->GetContent();
-		else if (node->GetName() == "version")	version	= node->GetContent();
-		else if (node->GetName() == "id")	id	= node->GetContent();
+		if (node->GetName() == "name")
+		{
+			name = node->GetContent();
+		}
+		else if (node->GetName() == "id")
+		{
+			id = node->GetContent();
+		}
+		else if (node->GetName() == "version")
+		{
+			version = node->GetContent();
+
+			if (node->GetAttributeByName("debug") != NIL)
+			{
+				debug = (node->GetAttributeByName("debug")->GetContent() == "true");
+			}
+		}
 		else if (node->GetName() == "type")
 		{
 			if	(node->GetContent() == "decoder")	type = COMPONENT_TYPE_DECODER;
@@ -184,6 +201,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 					{
 						if	(node2->GetAttributeByName("mode")->GetContent() == "prepend")	external_tagmode = TAG_MODE_PREPEND;
 						else if (node2->GetAttributeByName("mode")->GetContent() == "append")	external_tagmode = TAG_MODE_APPEND;
+						else if (node2->GetAttributeByName("mode")->GetContent() == "other")	external_tagmode = TAG_MODE_OTHER;
 					}
 				}
 			}

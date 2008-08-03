@@ -103,6 +103,8 @@ namespace BoCA
 				String			 name;
 				String			 version;
 
+				Bool			 debug;
+
 				String			 external_command;
 				String			 external_arguments;
 
@@ -159,6 +161,8 @@ namespace BoCA
 
 				int			 (*func_ReadData)(void *, void *, int);
 				int			 (*func_WriteData)(void *, void *, int);
+
+				void			*(*func_GetMainTabLayer)(void *);
 		};
 	};
 
@@ -184,6 +188,7 @@ namespace BoCA
 	const Int	 TAG_MODE_NONE			= 0;
 	const Int	 TAG_MODE_PREPEND		= 1;
 	const Int	 TAG_MODE_APPEND		= 2;
+	const Int	 TAG_MODE_OTHER			= 3;
 };
 
 #endif

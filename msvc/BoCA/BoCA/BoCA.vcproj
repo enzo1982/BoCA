@@ -234,6 +234,28 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\..\runtime\src\application\extensioncomponent.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\..\..\runtime\src\application\outputcomponent.cpp"
 					>
 				</File>
@@ -374,6 +396,18 @@
 						RelativePath="..\..\..\runtime\src\common\tagging\tagid3.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\runtime\src\common\tagging\tagmp4.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="communication"
+					>
+					<File
+						RelativePath="..\..\..\runtime\src\common\communication\joblist.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -407,6 +441,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\runtime\src\component\encodercomponent.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\src\component\extensioncomponent.cpp"
 					>
 				</File>
 				<File
@@ -481,6 +519,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\include\boca\component\extensioncomponent.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\include\boca\component\outputcomponent.h"
 						>
 					</File>
@@ -531,6 +573,18 @@
 							RelativePath="..\..\..\include\boca\common\tagging\tagid3.h"
 							>
 						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\tagging\tagmp4.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="communication"
+						>
+						<File
+							RelativePath="..\..\..\include\boca\common\communication\joblist.h"
+							>
+						</File>
 					</Filter>
 				</Filter>
 				<Filter
@@ -550,6 +604,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\include\boca\application\encodercomponent.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\include\boca\application\extensioncomponent.h"
 						>
 					</File>
 					<File

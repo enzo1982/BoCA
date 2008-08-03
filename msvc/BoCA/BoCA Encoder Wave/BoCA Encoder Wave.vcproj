@@ -179,7 +179,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\components\wave\encoder\wave_out.cpp"
+				RelativePath="..\..\..\components\encoder\wave\wave_out.cpp"
 				>
 			</File>
 		</Filter>
@@ -189,7 +189,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\components\wave\encoder\wave_out.h"
+				RelativePath="..\..\..\components\encoder\wave\wave_out.h"
 				>
 			</File>
 		</Filter>

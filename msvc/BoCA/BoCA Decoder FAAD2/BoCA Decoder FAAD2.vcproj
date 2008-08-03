@@ -179,11 +179,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\components\faac\decoder\dllinterface.cpp"
+				RelativePath="..\..\..\components\decoder\faad2\dllinterface.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\faac\decoder\faad2_in.cpp"
+				RelativePath="..\..\..\components\decoder\faad2\faad2_in.cpp"
 				>
 			</File>
 		</Filter>
@@ -193,11 +193,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\components\faac\decoder\dllinterface.h"
+				RelativePath="..\..\..\components\decoder\faad2\dllinterface.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\faac\decoder\faad2_in.h"
+				RelativePath="..\..\..\components\decoder\faad2\faad2_in.h"
 				>
 			</File>
 		</Filter>

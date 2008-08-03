@@ -81,9 +81,18 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	execInfo.lpVerb		= "open";
 	execInfo.lpFile		= specs->external_command;
-	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(wavFileName).Append("\"")).Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""));
+	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+								   .Replace("%INFILE", String("\"").Append(wavFileName).Append("\""))
+								   .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))
+								   .Replace("%ARTIST", String("\"").Append((char *) format.artist).Append("\""))
+								   .Replace("%ALBUM", String("\"").Append((char *) format.album).Append("\""))
+								   .Replace("%TITLE", String("\"").Append((char *) format.title).Append("\""))
+								   .Replace("%TRACK", String("\"").Append(String::FromInt(format.track)).Append("\""))
+								   .Replace("%YEAR", String("\"").Append(String::FromInt(format.year)).Append("\""))
+								   .Replace("%GENRE", String("\"").Append((char *) format.genre).Append("\""));
+
 	execInfo.lpDirectory	= Application::GetApplicationDirectory();
-	execInfo.nShow		= SW_HIDE;
+	execInfo.nShow		= specs->debug ? SW_SHOW : SW_HIDE;
 
 	ShellExecuteExA(&execInfo);
 
@@ -114,6 +123,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	{
 		if	(specs->external_tag == "ID3v1" && config->enable_id3v1 && config->enable_id3)	tagSize = format.RenderID3Tag(tag, 1);
 		else if (specs->external_tag == "ID3v2" && config->enable_id3v2 && config->enable_id3)	tagSize = format.RenderID3Tag(tag, 2);
+		else if (specs->external_tag == "MP4Meta" && config->enable_mp4)				  format.RenderMP4Meta(encFileName);
 		else if (specs->external_tag == "APEv2")						tagSize = format.RenderAPETag(tag);
 	}
 

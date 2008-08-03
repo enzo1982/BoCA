@@ -15,6 +15,7 @@
 #include <boca/application/external/decodercomponentstdio.h>
 #include <boca/application/external/encodercomponentfile.h>
 #include <boca/application/external/encodercomponentstdio.h>
+#include <boca/application/extensioncomponent.h>
 #include <boca/application/outputcomponent.h>
 
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
@@ -151,6 +152,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 				if	(specs->mode == INTERNAL)	return new EncoderComponent(specs);
 				else if (specs->mode == EXTERNAL_FILE)	return new EncoderComponentExternalFile(specs);
 				else if (specs->mode == EXTERNAL_STDIO)	return new EncoderComponentExternalStdIO(specs);
+			case COMPONENT_TYPE_EXTENSION:
+				return new ExtensionComponent(specs);
 			case COMPONENT_TYPE_OUTPUT:
 				return new OutputComponent(specs);
 			default:

@@ -19,11 +19,13 @@ Void smooth::AttachDLL(Void *instance)
 	BoCA::Config::Get();
 
 	if (BoCA::DLLInterfaces::LoadID3DLL()) BoCA::Config::Get()->enable_id3 = True;
+	if (BoCA::DLLInterfaces::LoadMP4v2DLL()) BoCA::Config::Get()->enable_mp4 = True;
 }
 
 Void smooth::DetachDLL()
 {
 	BoCA::DLLInterfaces::FreeID3DLL();
+	BoCA::DLLInterfaces::FreeMP4v2DLL();
 
 	BoCA::Config::Free();
 }

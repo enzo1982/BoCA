@@ -21,6 +21,7 @@ using namespace smooth;
 # include "boca/component/component.h"
 # include "boca/component/decodercomponent.h"
 # include "boca/component/encodercomponent.h"
+# include "boca/component/extensioncomponent.h"
 # include "boca/component/outputcomponent.h"
 
 #else
@@ -30,6 +31,7 @@ using namespace smooth;
 # include "boca/application/componentspecs.h"
 # include "boca/application/decodercomponent.h"
 # include "boca/application/encodercomponent.h"
+# include "boca/application/extensioncomponent.h"
 # include "boca/application/outputcomponent.h"
 # include "boca/application/registry.h"
 #endif
@@ -40,6 +42,9 @@ using namespace smooth;
 #include "boca/common/protocol.h"
 #include "boca/common/track.h"
 #include "boca/common/utilities.h"
+
+#include "boca/common/communication/joblist.h"
+#include "boca/common/communication/menu.h"
 
 #define BoCA_BEGIN_COMPONENT(componentName)																							\
 	extern "C" {																										\
@@ -72,6 +77,11 @@ using namespace smooth;
 																												\
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)					{ return ((BoCA::componentName *) component)->GetPackageSize(); }					\
 		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)				{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }			\
+	}
+
+#define BoCA_DEFINE_EXTENSION_COMPONENT(componentName)										 												\
+	extern "C" {																										\
+		BOCA_EXPORT void *BoCA_##componentName##_GetMainTabLayer(void *component)				{ return ((BoCA::componentName *) component)->getMainTabLayer.Emit(); }						\
 	}
 
 #define BoCA_DEFINE_OUTPUT_COMPONENT(componentName)										 												\

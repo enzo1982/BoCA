@@ -25,9 +25,10 @@ namespace BoCA
 			virtual		~Tag();
 
 			virtual Int	 Render(const Track &, Buffer<UnsignedByte> &);
+			virtual Int	 Render(const Track &, const String &);
 
-			virtual Int	 ParseBuffer(Buffer<UnsignedByte> &, Track *);
-			virtual Int	 ParseFile(const String &, Track *);
+			virtual Int	 Parse(Buffer<UnsignedByte> &, Track *);
+			virtual Int	 Parse(const String &, Track *);
 	};
 };
 

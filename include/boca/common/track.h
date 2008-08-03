@@ -23,6 +23,10 @@ namespace BoCA
 {
 	class BOCA_DLL_EXPORT Track
 	{
+		private:
+			static Int	 nextTrackID;
+
+			Int		 trackID;
 		public:
 		    // Audio format information:
 			Int		 channels;
@@ -46,6 +50,9 @@ namespace BoCA
 			String		 genre;
 			Int		 year;
 			String		 comment;
+
+			String		 label;
+			String		 isrc;
 
 			String		 oArtist;
 			String		 oTitle;
@@ -84,6 +91,11 @@ namespace BoCA
 			Int		 RenderAPETag(Buffer<UnsignedByte> &);
 			Bool		 ParseAPETag(Buffer<UnsignedByte> &);
 			Bool		 ParseAPETag(const String &);
+
+			Bool		 RenderMP4Meta(const String &);
+			Bool		 ParseMP4Meta(const String &);
+		accessors:
+			Int		 GetTrackID() const				{ return trackID; }
 	};
 };
 

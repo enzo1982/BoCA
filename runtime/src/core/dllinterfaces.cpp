@@ -38,7 +38,31 @@ ID3FIELDGETASCII		 ex_ID3Field_GetASCII			= NIL;
 ID3FIELDSETUNICODE		 ex_ID3Field_SetUNICODE			= NIL;
 ID3FIELDGETUNICODE		 ex_ID3Field_GetUNICODE			= NIL;
 
-DynamicLoader *BoCA::DLLInterfaces::id3dll		= NIL;
+MP4READ				 ex_MP4Read				= NIL;
+MP4MODIFY			 ex_MP4Modify				= NIL;
+MP4CLOSE			 ex_MP4Close				= NIL;
+MP4FREE				 ex_MP4Free				= NIL;
+MP4OPTIMIZE			 ex_MP4Optimize				= NIL;
+MP4GETMETADATANAME		 ex_MP4GetMetadataName			= NIL;
+MP4GETMETADATAARTIST		 ex_MP4GetMetadataArtist		= NIL;
+MP4GETMETADATACOMMENT		 ex_MP4GetMetadataComment		= NIL;
+MP4GETMETADATAYEAR		 ex_MP4GetMetadataYear			= NIL;
+MP4GETMETADATAALBUM		 ex_MP4GetMetadataAlbum			= NIL;
+MP4GETMETADATAGENRE		 ex_MP4GetMetadataGenre			= NIL;
+MP4GETMETADATATRACK		 ex_MP4GetMetadataTrack			= NIL;
+MP4GETMETADATACOVERART		 ex_MP4GetMetadataCoverArt		= NIL;
+MP4GETMETADATACOVERARTCOUNT	 ex_MP4GetMetadataCoverArtCount		= NIL;
+MP4SETMETADATANAME		 ex_MP4SetMetadataName			= NIL;
+MP4SETMETADATAARTIST		 ex_MP4SetMetadataArtist		= NIL;
+MP4SETMETADATACOMMENT		 ex_MP4SetMetadataComment		= NIL;
+MP4SETMETADATAYEAR		 ex_MP4SetMetadataYear			= NIL;
+MP4SETMETADATAALBUM		 ex_MP4SetMetadataAlbum			= NIL;
+MP4SETMETADATAGENRE		 ex_MP4SetMetadataGenre			= NIL;
+MP4SETMETADATATRACK		 ex_MP4SetMetadataTrack			= NIL;
+MP4SETMETADATACOVERART		 ex_MP4SetMetadataCoverArt		= NIL;
+
+DynamicLoader *BoCA::DLLInterfaces::id3dll	= NIL;
+DynamicLoader *BoCA::DLLInterfaces::mp4v2dll	= NIL;
 
 Bool BoCA::DLLInterfaces::LoadID3DLL()
 {
@@ -108,4 +132,64 @@ Void BoCA::DLLInterfaces::FreeID3DLL()
 	Object::DeleteObject(id3dll);
 
 	id3dll = NIL;
+}
+
+Bool BoCA::DLLInterfaces::LoadMP4v2DLL()
+{
+	mp4v2dll = new DynamicLoader("codecs/MP4v2");
+
+	ex_MP4Read			= (MP4READ) mp4v2dll->GetFunctionAddress("MP4Read");
+	ex_MP4Modify			= (MP4MODIFY) mp4v2dll->GetFunctionAddress("MP4Modify");
+	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
+	ex_MP4Free			= (MP4FREE) mp4v2dll->GetFunctionAddress("MP4Free");
+	ex_MP4Optimize			= (MP4OPTIMIZE) mp4v2dll->GetFunctionAddress("MP4Optimize");
+	ex_MP4GetMetadataName		= (MP4GETMETADATANAME) mp4v2dll->GetFunctionAddress("MP4GetMetadataName");
+	ex_MP4GetMetadataArtist		= (MP4GETMETADATAARTIST) mp4v2dll->GetFunctionAddress("MP4GetMetadataArtist");
+	ex_MP4GetMetadataComment	= (MP4GETMETADATACOMMENT) mp4v2dll->GetFunctionAddress("MP4GetMetadataComment");
+	ex_MP4GetMetadataYear		= (MP4GETMETADATAYEAR) mp4v2dll->GetFunctionAddress("MP4GetMetadataYear");
+	ex_MP4GetMetadataAlbum		= (MP4GETMETADATAALBUM) mp4v2dll->GetFunctionAddress("MP4GetMetadataAlbum");
+	ex_MP4GetMetadataGenre		= (MP4GETMETADATAGENRE) mp4v2dll->GetFunctionAddress("MP4GetMetadataGenre");
+	ex_MP4GetMetadataTrack		= (MP4GETMETADATATRACK) mp4v2dll->GetFunctionAddress("MP4GetMetadataTrack");
+	ex_MP4GetMetadataCoverArt	= (MP4GETMETADATACOVERART) mp4v2dll->GetFunctionAddress("MP4GetMetadataCoverArt");
+	ex_MP4GetMetadataCoverArtCount	= (MP4GETMETADATACOVERARTCOUNT) mp4v2dll->GetFunctionAddress("MP4GetMetadataCoverArtCount");
+	ex_MP4SetMetadataName		= (MP4SETMETADATANAME) mp4v2dll->GetFunctionAddress("MP4SetMetadataName");
+	ex_MP4SetMetadataArtist		= (MP4SETMETADATAARTIST) mp4v2dll->GetFunctionAddress("MP4SetMetadataArtist");
+	ex_MP4SetMetadataComment	= (MP4SETMETADATACOMMENT) mp4v2dll->GetFunctionAddress("MP4SetMetadataComment");
+	ex_MP4SetMetadataYear		= (MP4SETMETADATAYEAR) mp4v2dll->GetFunctionAddress("MP4SetMetadataYear");
+	ex_MP4SetMetadataAlbum		= (MP4SETMETADATAALBUM) mp4v2dll->GetFunctionAddress("MP4SetMetadataAlbum");
+	ex_MP4SetMetadataGenre		= (MP4SETMETADATAGENRE) mp4v2dll->GetFunctionAddress("MP4SetMetadataGenre");
+	ex_MP4SetMetadataTrack		= (MP4SETMETADATATRACK) mp4v2dll->GetFunctionAddress("MP4SetMetadataTrack");
+	ex_MP4SetMetadataCoverArt	= (MP4SETMETADATACOVERART) mp4v2dll->GetFunctionAddress("MP4SetMetadataCoverArt");
+
+	if (ex_MP4Read				== NIL ||
+	    ex_MP4Modify			== NIL ||
+	    ex_MP4Close				== NIL ||
+	    ex_MP4Free				== NIL ||
+	    ex_MP4Optimize			== NIL ||
+	    ex_MP4GetMetadataName		== NIL ||
+	    ex_MP4GetMetadataArtist		== NIL ||
+	    ex_MP4GetMetadataComment		== NIL ||
+	    ex_MP4GetMetadataYear		== NIL ||
+	    ex_MP4GetMetadataAlbum		== NIL ||
+	    ex_MP4GetMetadataGenre		== NIL ||
+	    ex_MP4GetMetadataTrack		== NIL ||
+	    ex_MP4GetMetadataCoverArt		== NIL ||
+	    ex_MP4GetMetadataCoverArtCount	== NIL ||
+	    ex_MP4SetMetadataName		== NIL ||
+	    ex_MP4SetMetadataArtist		== NIL ||
+	    ex_MP4SetMetadataComment		== NIL ||
+	    ex_MP4SetMetadataYear		== NIL ||
+	    ex_MP4SetMetadataAlbum		== NIL ||
+	    ex_MP4SetMetadataGenre		== NIL ||
+	    ex_MP4SetMetadataTrack		== NIL ||
+	    ex_MP4SetMetadataCoverArt		== NIL) { FreeMP4v2DLL(); return False; }
+
+	return True;
+}
+
+Void BoCA::DLLInterfaces::FreeMP4v2DLL()
+{
+	Object::DeleteObject(mp4v2dll);
+
+	mp4v2dll = NIL;
 }

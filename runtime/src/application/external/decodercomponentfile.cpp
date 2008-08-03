@@ -32,6 +32,8 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		if	((specs->external_tag == "ID3v1"  ||
 			  specs->external_tag == "ID3v2") &&
 			 Config::Get()->enable_id3)		format.ParseID3Tag(streamURI);
+		else if (specs->external_tag == "MP4Meta" &&
+			 Config::Get()->enable_mp4)		format.ParseMP4Meta(streamURI);
 		else if (specs->external_tag == "APEv2")	format.ParseAPETag(streamURI);
 	}
 
@@ -176,7 +178,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 
 	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")).Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
 	execInfo.lpDirectory	= Application::GetApplicationDirectory();
-	execInfo.nShow		= SW_HIDE;
+	execInfo.nShow		= specs->debug ? SW_SHOW : SW_HIDE;
 
 	ShellExecuteExA(&execInfo);
 

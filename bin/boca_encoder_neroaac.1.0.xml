@@ -14,6 +14,7 @@
     <arguments>-ignorelength -if - -of %OUTFILE %OPTIONS</arguments>
     <mode>stdio</mode>
     <informat>wave</informat>
+    <tag mode="other">MP4Meta</tag>
     <parameters>
       <switch name="Enable two-pass encoding" argument="-2pass"/>
       <selection name="Encoding mode" argument="%VALUE">

@@ -45,7 +45,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 	startupInfo.cb		= sizeof(startupInfo);
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-	startupInfo.wShowWindow	= SW_HIDE;
+	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
 	startupInfo.hStdInput	= rPipe;
 	startupInfo.hStdOutput	= NIL;
 	startupInfo.hStdError	= NIL;
@@ -61,7 +61,16 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 	 */
 	File(encFileName).Delete();
 
-	CreateProcessA(NIL, String(specs->external_command).Append(" ").Append(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%OUTFILE", String("\"").Append(encFileName).Append("\"")), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))
+							      .Replace("%ARTIST", String("\"").Append((char *) format.artist).Append("\""))
+							      .Replace("%ALBUM", String("\"").Append((char *) format.album).Append("\""))
+							      .Replace("%TITLE", String("\"").Append((char *) format.title).Append("\""))
+							      .Replace("%TRACK", String("\"").Append(String::FromInt(format.track)).Append("\""))
+							      .Replace("%YEAR", String("\"").Append(String::FromInt(format.year)).Append("\""))
+							      .Replace("%GENRE", String("\"").Append((char *) format.genre).Append("\""));
+
+	CreateProcessA(NIL, String(specs->external_command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	hProcess = processInfo.hProcess;
 
@@ -126,6 +135,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 	{
 		if	(specs->external_tag == "ID3v1" && config->enable_id3v1 && config->enable_id3)	tagSize = format.RenderID3Tag(tag, 1);
 		else if (specs->external_tag == "ID3v2" && config->enable_id3v2 && config->enable_id3)	tagSize = format.RenderID3Tag(tag, 2);
+		else if (specs->external_tag == "MP4Meta" && config->enable_mp4)				  format.RenderMP4Meta(encFileName);
 		else if (specs->external_tag == "APEv2")						tagSize = format.RenderAPETag(tag);
 	}
 

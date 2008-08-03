@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
 <component>
-  <name>LA Lossless Audio Encoder</name>
+  <name>La Lossless Audio Encoder</name>
   <version>1.0</version>
   <id>la-out</id>
   <type>encoder</type>
   <format>
-    <name>LA Audio Files</name>
+    <name>La Audio Files</name>
     <extension>la</extension>
   </format>
   <external>

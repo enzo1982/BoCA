@@ -18,5 +18,6 @@
     <arguments>-x %OPTIONS %INFILE %OUTFILE</arguments>
     <mode>file</mode>
     <outformat>wave</outformat>
+    <tag mode="other">MP4Meta</tag>
   </external>
 </component>

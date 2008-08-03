@@ -18,6 +18,7 @@ BoCA::Config::Config()
 	cdrip_timeout		= 0;
 
 	enable_id3		= False;
+	enable_mp4		= False;
 
 	saveSettingsOnExit	= True;
 

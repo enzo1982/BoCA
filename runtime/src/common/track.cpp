@@ -11,9 +11,14 @@
 #include <boca/common/track.h>
 #include <boca/common/tagging/tagape.h>
 #include <boca/common/tagging/tagid3.h>
+#include <boca/common/tagging/tagmp4.h>
+
+Int BoCA::Track::nextTrackID = 0;
 
 BoCA::Track::Track()
 {
+	trackID		= nextTrackID++;
+
 	channels	= 0;
 	rate		= 0;
 	bits		= 0;
@@ -43,6 +48,8 @@ BoCA::Track::~Track()
 
 BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 {
+	trackID		= oTrack.trackID;
+
 	channels	= oTrack.channels;
 	rate		= oTrack.rate;
 	bits		= oTrack.bits;
@@ -103,14 +110,14 @@ Bool BoCA::Track::ParseID3Tag(Buffer<UnsignedByte> &buffer)
 {
 	TagID3	 tag;
 
-	return tag.ParseBuffer(buffer, this);
+	return tag.Parse(buffer, this);
 }
 
 Bool BoCA::Track::ParseID3Tag(const String &fileName)
 {
 	TagID3	 tag;
 
-	return tag.ParseFile(fileName, this);
+	return tag.Parse(fileName, this);
 }
 
 Int BoCA::Track::RenderAPETag(Buffer<UnsignedByte> &buffer)
@@ -124,12 +131,26 @@ Bool BoCA::Track::ParseAPETag(Buffer<UnsignedByte> &buffer)
 {
 	TagAPE	 tag;
 
-	return tag.ParseBuffer(buffer, this);
+	return tag.Parse(buffer, this);
 }
 
 Bool BoCA::Track::ParseAPETag(const String &fileName)
 {
 	TagAPE	 tag;
 
-	return tag.ParseFile(fileName, this);
+	return tag.Parse(fileName, this);
+}
+
+Bool BoCA::Track::RenderMP4Meta(const String &fileName)
+{
+	TagMP4	 tag;
+
+	return tag.Render(*this, fileName);
+}
+
+Bool BoCA::Track::ParseMP4Meta(const String &fileName)
+{
+	TagMP4	 tag;
+
+	return tag.Parse(fileName, this);
 }

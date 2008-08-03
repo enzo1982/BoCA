@@ -14,5 +14,9 @@
     <arguments>-MP4 %OPTIONS %INFILE %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
+    <!--
+      Disabled tags for now, because mp4als.exe cannot read tagged files.
+      <tag mode="other">MP4Meta</tag>
+    -->
   </external>
 </component>

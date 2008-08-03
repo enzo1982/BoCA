@@ -46,6 +46,8 @@ namespace BoCA
 			String		 lastAddedPattern;
 
 			Bool		 enable_id3;
+			Bool		 enable_mp4;
+
 			String		 enc_filePattern;
 			Bool		 enc_onTheFly;
 			Bool		 enc_keepWaves;

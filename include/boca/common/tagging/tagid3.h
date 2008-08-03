@@ -13,18 +13,21 @@
 
 #include <smooth.h>
 #include "tag.h"
+#include "../../core/dllinterfaces.h"
 
 using namespace smooth;
 
 namespace BoCA
 {
-	class TagID3
+	class TagID3 : public Tag
 	{
 		private:
 			Int		 version;
 
 			Int		 ParseID3Tag(Void *, Track *);
-			String		 GetID3V2FrameString(Void *);
+
+			String		 GetID3v2FrameString(ID3Frame *);
+			Int		 SetID3v2FrameString(ID3Frame *, const String &);
 
 			const String	&GetID3CategoryName(Int);
 
@@ -38,8 +41,8 @@ namespace BoCA
 
 			Int		 Render(const Track &, Buffer<UnsignedByte> &);
 
-			Int		 ParseBuffer(Buffer<UnsignedByte> &, Track *);
-			Int		 ParseFile(const String &, Track *);
+			Int		 Parse(Buffer<UnsignedByte> &, Track *);
+			Int		 Parse(const String &, Track *);
 		accessors:
 			Bool		 SetID3Version(Int nVersion)	{ if (version < 1 || version > 2) return False; version = nVersion; return True; }
 	};

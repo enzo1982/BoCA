@@ -36,7 +36,7 @@ namespace smooth
 	};
 };
 
-#define IOGetByte(x, y) (y > 3)  ? 0 : ((x >> (8 * y)) & 255)
-#define IOGetBit(x, y)  (y > 31) ? 0 : ((x >>      y ) & 1)
+#define IOGetByte(x, y) ((y) > 3)  ? 0 : (((x) >> (8 * (y))) & 255)
+#define IOGetBit(x, y)  ((y) > 31) ? 0 : (((x) >>      (y) ) & 1)
 
 #endif

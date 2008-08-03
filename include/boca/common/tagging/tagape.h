@@ -18,7 +18,7 @@ using namespace smooth;
 
 namespace BoCA
 {
-	class TagAPE
+	class TagAPE : public Tag
 	{
 		private:
 			Int		 RenderAPEHeader(Int, Int, Buffer<UnsignedByte> &);
@@ -35,8 +35,8 @@ namespace BoCA
 
 			Int		 Render(const Track &, Buffer<UnsignedByte> &);
 
-			Int		 ParseBuffer(Buffer<UnsignedByte> &, Track *);
-			Int		 ParseFile(const String &, Track *);
+			Int		 Parse(Buffer<UnsignedByte> &, Track *);
+			Int		 Parse(const String &, Track *);
 	};
 };
 
