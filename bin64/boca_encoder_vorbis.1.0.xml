@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>Ogg Vorbis Encoder</name>
+  <version>1.0</version>
+  <id>vorbiscmd-out</id>
+  <type>encoder</type>
+  <format>
+    <name>Ogg Vorbis Audio</name>
+    <extension>ogg</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/oggenc2.exe</command>
+    <arguments>%OPTIONS %INFILE -o %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="VBR quality" argument="--quality %VALUE" default="6">
+	<min alias="fastest">-2</min>
+	<max alias="best">10</max>
+      </range>
+      <range name="ABR bitrate" argument="--bitrate %VALUE" default="192">
+	<min alias="">32</min>
+	<max alias="kbps">320</max>
+      </range>
+    </parameters>
+  </external>
+</component>

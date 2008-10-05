@@ -1,0 +1,327 @@
+// <system_error> -*- C++ -*-
+
+// Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//
+// This file is part of the GNU ISO C++ Library.  This library is free
+// software; you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option)
+// any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this library; see the file COPYING.  If not, write to
+// the Free Software Foundation, 51 Franklin Street, Fifth Floor,
+// Boston, MA 02110-1301, USA.
+
+// As a special exception, you may use this file as part of a free software
+// library without restriction.  Specifically, if other files instantiate
+// templates or use macros or inline functions from this file, or you compile
+// this file and link it with other files to produce an executable, this
+// file does not by itself cause the resulting executable to be covered by
+// the GNU General Public License.  This exception does not however
+// invalidate any other reasons why the executable file might be covered by
+// the GNU General Public License.
+
+/** @file system_error
+ *  This is a Standard C++ Library header.
+ */
+
+#ifndef _GLIBCXX_SYSTEM_ERROR
+#define _GLIBCXX_SYSTEM_ERROR 1
+
+#pragma GCC system_header
+
+#ifndef __GXX_EXPERIMENTAL_CXX0X__
+# include <c++0x_warning.h>
+#else
+
+#include <bits/c++config.h>
+#include <bits/error_constants.h>
+#include <iosfwd>
+#include <stdexcept>
+
+_GLIBCXX_BEGIN_NAMESPACE(std)
+
+  class error_code;
+  class error_condition;
+  class error_category;
+  class system_error;
+
+  /// is_error_code_enum
+  template<typename _Tp>
+    struct is_error_code_enum : public false_type { };
+
+  template<> 
+    struct is_error_code_enum<posix_error::posix_errno>
+    : public true_type { };
+
+  /// is_error_condition_enum
+  template<typename _Tp>
+    struct is_error_condition_enum : public false_type { };
+
+  template<> 
+    struct is_error_condition_enum<posix_error::posix_errno>
+    : public true_type { };
+
+
+  /// error_category
+  struct error_category
+  {
+    error_category() { }
+
+    virtual const char* 
+    name() const = 0;
+
+    virtual string 
+    message(int) const = 0;
+
+    virtual error_condition
+    default_error_condition(int __i) const;
+
+    virtual bool 
+    equivalent(int __i, const error_condition& __cond) const;
+
+    virtual bool 
+    equivalent(const error_code& __code, int __i) const;
+
+    bool 
+    operator<(const error_category& __other) const
+    { return less<const error_category*>()(this, &__other); }
+
+    bool 
+    operator==(const error_category& __other) const
+    { return this == &__other; }
+
+    bool 
+    operator!=(const error_category& __other) const
+    { return this != &__other; }
+
+  private:
+    error_category(const error_category&);
+
+    error_category& 
+    operator=(const error_category&);
+  };
+
+  const error_category& get_posix_category();
+  const error_category& get_system_category();
+
+  static const error_category& system_category = get_system_category();
+  static const error_category& native_category = get_posix_category();
+
+  /// error_code
+  // Implementation-specific error identification
+  struct error_code
+  {
+    error_code()
+    : _M_value(0), _M_cat(&system_category) { }
+
+    error_code(int __v, const error_category& __cat)
+    : _M_value(__v), _M_cat(&__cat) { }
+
+    template<typename _ErrorCodeEnum>
+      error_code(_ErrorCodeEnum __e,
+      typename enable_if<is_error_code_enum<_ErrorCodeEnum>::value>::type* = 0)
+      : _M_value(__e), _M_cat(&system_category)
+      { }
+
+    void 
+    assign(int __v, const error_category& __cat)
+    {
+      _M_value = __v;
+      _M_cat = &__cat; 
+    }
+
+    void 
+    clear()
+    { 
+      _M_value = 0;
+      _M_cat = &system_category;
+    } 
+
+    template<typename _ErrorCodeEnum>
+      typename enable_if<is_error_code_enum<_ErrorCodeEnum>::value>::type&
+      operator=(_ErrorCodeEnum __e)
+      { _M_value = __e; }
+
+    int
+    value() const { return _M_value; }
+      
+    const error_category&  
+    category() const { return *_M_cat; }
+
+    error_condition 
+    default_error_condition() const;
+
+    string 
+    message() const
+    { return category().message(value()); }
+
+    // Safe bool idiom.
+    // explicit operator bool() const throw()
+    // { return _M_value != 0; }
+    typedef void (*__bool_type)();
+
+    static void __not_bool_type() { }
+
+    operator __bool_type() const
+    { return _M_value != 0 ? &__not_bool_type : false; }
+
+  private:
+    int            		_M_value;
+    const error_category* 	_M_cat;
+  };
+
+  error_code 
+  make_error_code(posix_error::posix_errno);
+
+  // 19.4.2.5 non-member functions
+  bool operator<(const error_code& lhs, const error_code& rhs);
+
+  template<typename charT, typename traits>
+    basic_ostream<charT,traits>&
+    operator<<(basic_ostream<charT, traits>& os, const error_code& __code);
+
+
+  /// error_condition
+  // Portable error identification
+  struct error_condition 
+  {
+    error_condition() : _M_value(0), _M_cat(system_category) { }
+
+    error_condition(int __v, const error_category& __cat)     
+    : _M_value(__v), _M_cat(__cat) { }
+
+    template<typename _ErrorEnum>
+      error_condition(typename enable_if<
+		      is_error_condition_enum<_ErrorEnum>::value,
+		      _ErrorEnum>::type __v)
+      : _M_value(__v), _M_cat(system_category) { }
+
+    void 
+    assign(int val, const error_category& cat);
+
+    template<typename _ErrorEnum>
+      error_condition&
+      operator=(typename enable_if<is_error_condition_enum<_ErrorEnum>::value,
+		                   _ErrorEnum>::type __v)
+      { _M_value = __v; }
+
+    void 
+    clear();
+
+    // 19.4.3.4 observers
+    int 
+    value() const { return _M_value; }
+
+    const error_category& 
+    category() const { return _M_cat; }
+
+    string 
+    message() const
+    { return category().message(value()); }
+
+    // Safe bool idiom.
+    // explicit operator bool() const throw()
+    // { return _M_value != 0; }
+    typedef void (*__bool_type)();
+
+    static void __not_bool_type() { }
+
+    operator __bool_type() const
+    { return _M_value != 0 ? &__not_bool_type : false; }
+
+  private:
+    int 			_M_value;
+    const error_category& 	_M_cat;
+  };
+
+  error_condition 
+  make_error_condition(posix_error::posix_errno);
+
+  // 19.4.3.5 non-member functions
+  inline bool 
+  operator<(const error_condition& lhs, const error_condition& rhs)
+  { 
+    bool __t1 = lhs.category() < rhs.category();
+    bool __t2 = lhs.category() == rhs.category() && lhs.value() < rhs.value();
+    return __t1 || __t2;
+  }
+
+  // 19.4.4 Comparison operators
+  inline bool 
+  operator==(const error_code& lhs, const error_code& rhs)
+  { return lhs.category() == rhs.category() && lhs.value() == rhs.value(); }
+
+  inline bool 
+  operator==(const error_code& lhs, const error_condition& rhs)
+  {
+    bool __t1 = lhs.category().equivalent(lhs.value(), rhs);
+    bool __t2 = rhs.category().equivalent(lhs, rhs.value());
+    return __t1 || __t2;
+  }
+
+  inline bool 
+  operator==(const error_condition& lhs, const error_code& rhs)
+  {
+    bool __t1 = rhs.category().equivalent(rhs.value(), lhs);
+    bool __t2 = lhs.category().equivalent(rhs, lhs.value());
+    return __t1 || __t2;
+  }
+
+  inline bool 
+  operator==(const error_condition& lhs, const error_condition& rhs)
+  { return lhs.category() == rhs.category() && lhs.value() == rhs.value(); }
+
+  inline bool 
+  operator!=(const error_code& lhs, const error_code& rhs)
+  { return !(lhs == rhs); }
+
+  inline bool 
+  operator!=(const error_code& lhs, const error_condition& rhs)
+  { return !(lhs == rhs); }
+
+  inline bool 
+  operator!=(const error_condition& lhs, const error_code& rhs)
+  { return !(lhs == rhs); }
+
+  inline bool 
+  operator!=(const error_condition& lhs, const error_condition& rhs)
+  { return !(lhs == rhs); }
+
+  /// Thrown to indicate error code of underlying system.
+  class system_error : public std::runtime_error
+  {
+  private:
+    error_code 	_M_code;
+
+  public:
+    system_error(error_code __ec = error_code())
+    : runtime_error(""), _M_code(__ec) { }
+
+    system_error(error_code __ec, const string& __what)
+    : runtime_error(__what), _M_code(__ec) { }
+
+    system_error(int __v, const error_category& __ecat)
+    : runtime_error(""), _M_code(error_code(__v, __ecat)) { }
+
+    system_error(int __v, const error_category& __ecat, const string& __what)
+    : runtime_error(__what), _M_code(error_code(__v, __ecat)) { }
+
+    virtual ~system_error() throw();
+
+    const error_code& 
+    code() const throw() { return _M_code; }
+  };
+
+_GLIBCXX_END_NAMESPACE
+
+#endif // __GXX_EXPERIMENTAL_CXX0X__
+
+#endif // _GLIBCXX_SYSTEM_ERROR
+

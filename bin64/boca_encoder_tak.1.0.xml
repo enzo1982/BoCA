@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>Tom's Audiokompressor</name>
+  <version>1.0</version>
+  <id>tak-out</id>
+  <type>encoder</type>
+  <format>
+    <name>Tom's Audio</name>
+    <extension>tak</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/takc.exe</command>
+    <arguments>-e -ihs %OPTIONS - %OUTFILE</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <tag mode="append">APEv2</tag>
+    <parameters>
+      <range name="Encoder preset" argument="-p%VALUE" default="2">
+	<min alias="fastest">0</min>
+	<max alias="strongest">5</max>
+      </range>
+      <selection name="Frame size limit" argument="-fsl%VALUE">
+	<option>512</option>
+	<option>1024</option>
+	<option>2048</option>
+	<option>4096</option>
+	<option>8192</option>
+	<option>16384</option>
+      </selection>
+      <range name="Seek table size" argument="-sts%VALUE" step="3">
+	<min>3</min>
+	<max>1440</max>
+      </range>
+    </parameters>
+  </external>
+</component>

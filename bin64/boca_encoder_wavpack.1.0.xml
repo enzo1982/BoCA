@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>WavPack Lossless Compressor</name>
+  <version>1.0</version>
+  <id>wv-out</id>
+  <type>encoder</type>
+  <format>
+    <name>WavPack Files</name>
+    <extension>wv</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/wavpack.exe</command>
+    <arguments>-i %OPTIONS - %OUTFILE</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <tag mode="append">APEv2</tag>
+    <parameters>
+      <switch name="High quality mode" argument="-h"/>
+      <switch name="Extra encode processing" argument="-x"/>
+    </parameters>
+  </external>
+</component>

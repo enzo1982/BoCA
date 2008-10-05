@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>TwoLAME MP2 Encoder</name>
+  <version>1.0</version>
+  <id>twolame-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MPEG Audio Layer 2</name>
+    <extension>mp2</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/twolame.exe</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>

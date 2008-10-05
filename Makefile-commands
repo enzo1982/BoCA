@@ -1,0 +1,42 @@
+########## BoCA commands makefile ##########
+
+CC = gcc
+CCOPTS = -g0 -Wall -ffast-math -D__BOCA_COMPONENT_BUILD__ -I$(BOCA_PATH)/include
+LD = gcc
+LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lboca -lstdc++ $(LIBS)
+
+ifneq ($(EXCEPTION),True)
+	CCOPTS += -fno-exceptions
+endif
+
+ifeq ($(BUILD_X64),True)
+	CCOPTS += -march=nocona
+
+	PACKER = mpress
+	PACKER_OPTS = -q
+else
+	CCOPTS += -march=i586 -Os
+
+	PACKER = upx
+	PACKER_OPTS = --best -q
+endif
+
+all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION).dll
+	$(ALLCMD1)
+	$(ALLCMD2)
+
+$(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION).dll : $(OBJECTS)
+	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+	strip --strip-all $@
+	$(PACKER) $(PACKER_OPTS) $@
+
+clean :
+	rm -f $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION).dll $(OBJECTS)
+	$(CLEANCMD1)
+	$(CLEANCMD2)
+
+.c.o:
+	$(CC) $(CCOPTS) -c $< -o $@
+
+.cpp.o:
+	$(CC) $(CCOPTS) -c $< -o $@

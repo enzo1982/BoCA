@@ -1,0 +1,9 @@
+########## BoCA directory makefile ##########
+
+ifeq ($(BUILD_X64),True)
+	BINDIR = bin64
+	LIBDIR = lib64
+else
+	BINDIR = bin
+	LIBDIR = lib
+endif
