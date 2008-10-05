@@ -30,7 +30,7 @@ namespace BoCA
 
 			Buffer<signed int>	 samplesBuffer;
 
-			Track			*infoFormat;
+			Track			*infoTrack;
 
 			Int			 numFrames;
 

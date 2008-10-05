@@ -70,6 +70,8 @@ BoCA::FLACOut::~FLACOut()
 
 Bool BoCA::FLACOut::Activate()
 {
+	const Format	&format = track.GetFormat();
+
 	if (format.channels > 2)
 	{
 		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
@@ -87,73 +89,78 @@ Bool BoCA::FLACOut::Activate()
 	{
 		char	*prevOutFormat = String::SetOutputFormat(config->vctag_encoding);
 
-		FLAC__StreamMetadata				*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
-		FLAC__StreamMetadata_VorbisComment_Entry	 comment;
-
-		metadata.Add(vorbiscomment);
-
-		if (config->default_comment != NIL)
+		if (track.artist != NIL || track.title != NIL)
 		{
-			ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&comment, "DESCRIPTION", config->default_comment);
-			ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, comment, false);
-		}
+			FLAC__StreamMetadata				*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
-		if (format.artist != NIL || format.title != NIL)
-		{
 			FLAC__StreamMetadata_VorbisComment_Entry	 artist;
 			FLAC__StreamMetadata_VorbisComment_Entry	 title;
 			FLAC__StreamMetadata_VorbisComment_Entry	 album;
 			FLAC__StreamMetadata_VorbisComment_Entry	 genre;
 			FLAC__StreamMetadata_VorbisComment_Entry	 date;
-			FLAC__StreamMetadata_VorbisComment_Entry	 track;
+			FLAC__StreamMetadata_VorbisComment_Entry	 trackno;
+			FLAC__StreamMetadata_VorbisComment_Entry	 comment;
 			FLAC__StreamMetadata_VorbisComment_Entry	 label;
 			FLAC__StreamMetadata_VorbisComment_Entry	 isrc;
 
-			if (format.artist != NIL)
+			metadata.Add(vorbiscomment);
+
+			if (track.artist != NIL)
 			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&artist, "ARTIST", format.artist);
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&artist, "ARTIST", track.artist);
 				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, artist, false);
 			}
 
-			if (format.title != NIL)
+			if (track.title != NIL)
 			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&title, "TITLE", format.title);
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&title, "TITLE", track.title);
 				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, title, false);
 			}
 
-			if (format.album != NIL)
+			if (track.album != NIL)
 			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&album, "ALBUM", format.album);
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&album, "ALBUM", track.album);
 				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, album, false);
 			}
 
-			if (format.genre != NIL)
+			if (track.genre != NIL)
 			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&genre, "GENRE", format.genre);
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&genre, "GENRE", track.genre);
 				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, genre, false);
 			}
 
-			if (format.year > 0)
+			if (track.year > 0)
 			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&date, "DATE", String::FromInt(format.year));
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&date, "DATE", String::FromInt(track.year));
 				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, date, false);
 			}
 
-			if (format.track > 0)
+			if (track.track > 0)
 			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&track, "TRACKNUMBER", String(format.track < 10 ? "0" : "").Append(String::FromInt(format.track)));
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, track, false);
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&trackno, "TRACKNUMBER", String(track.track < 10 ? "0" : "").Append(String::FromInt(track.track)));
+				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, trackno, false);
 			}
 
-			if (format.label != NIL)
+			if (track.comment != NIL && !config->replace_comments)
 			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&label, "ORGANIZATION", format.label);
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&comment, "COMMENT", track.comment);
+				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, comment, false);
+			}
+			else if (config->default_comment != NIL)
+			{
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&comment, "COMMENT", config->default_comment);
+				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, comment, false);
+			}
+
+			if (track.label != NIL)
+			{
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&label, "ORGANIZATION", track.label);
 				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, label, false);
 			}
 
-			if (format.isrc != NIL)
+			if (track.isrc != NIL)
 			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&isrc, "ISRC", format.isrc);
+				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&isrc, "ISRC", track.isrc);
 				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, isrc, false);
 			}
 		}
@@ -163,10 +170,10 @@ Bool BoCA::FLACOut::Activate()
 
 	if (config->copy_picture_tags)
 	{
-		for (Int i = 0; i < format.pictures.Length(); i++)
+		for (Int i = 0; i < track.pictures.Length(); i++)
 		{
 			FLAC__StreamMetadata	*picture = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_PICTURE);
-			const Picture		&picInfo = format.pictures.GetNth(i);
+			const Picture		&picInfo = track.pictures.GetNth(i);
 
 			metadata.Add(picture);
 
@@ -251,14 +258,16 @@ Int BoCA::FLACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	bytesWritten = 0;
 
+	const Format	&format = track.GetFormat();
+
 	buffer.Resize(size / (format.bits / 8));
 
 	for (Int i = 0; i < size / (format.bits / 8); i++)
 	{
-		if (format.bits == 8)		buffer[i] = data[i] - 128;
-		else if (format.bits == 16)	buffer[i] = ((Short *) (unsigned char *) data)[i];
-		else if (format.bits == 24)	buffer[i] = data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0);
-		else if (format.bits == 32)	buffer[i] = ((Int32 *) (unsigned char *) data)[i] / 256;
+		if	(format.bits ==  8) buffer[i] = data[i] - 128;
+		else if (format.bits == 16) buffer[i] = ((Short *) (unsigned char *) data)[i];
+		else if (format.bits == 24) buffer[i] = data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0);
+		else if (format.bits == 32) buffer[i] = ((Int32 *) (unsigned char *) data)[i] / 256;
 	}
 
 	ex_FLAC__stream_encoder_process_interleaved(encoder, buffer, size / (format.bits / 8) / format.channels);

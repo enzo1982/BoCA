@@ -57,7 +57,7 @@ Bool BoCA::BonkIn::CanOpenStream(const String &streamURI)
 	return streamURI.ToLower().EndsWith(".bonk");
 }
 
-Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*in		= new InStream(STREAM_FILE, streamURI, IS_READONLY);
 	unsigned int	 length		= 0;
@@ -65,18 +65,21 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &format)
 	int		 channels	= 0;
 	void		*decoder	= ex_bonk_decoder_create();
 
+	Format		&format		= track.GetFormat();
+
 	dataBuffer.Resize(16384);
 
 	in->InputData(dataBuffer, 16384);
 
 	ex_bonk_decoder_init(decoder, dataBuffer, 16384, &length, &rate, &channels);
 
-	format.length = length;
 	format.rate = rate;
 	format.channels = channels;
 	format.order = BYTE_INTEL;
 	format.bits = 16;
-	format.fileSize = in->Size();
+
+	track.length = length;
+	track.fileSize = in->Size();
 
 	unsigned char	*id3tag = NIL;
 	int		 id3tag_size = 0;
@@ -89,14 +92,14 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	if (id3tag_size > 0) 
 	{
-		format.track = -1;
-		format.outfile = NIL;
+		track.track = -1;
+		track.outfile = NIL;
 
 		Buffer<unsigned char>	 buffer(id3tag_size);
 
 		memcpy(buffer, id3tag, id3tag_size);
 
-		format.ParseID3Tag(buffer);
+		track.ParseID3Tag(buffer);
 	}
 
 	return Success();
@@ -147,5 +150,5 @@ Int BoCA::BonkIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	Int	 nSamples = ex_bonk_decoder_decode_packet(decoder, dataBuffer, size, (signed short *) (unsigned char *) data, data.Size());
 
-	return (nSamples == -1) ? 0 : nSamples * (format.bits / 8);
+	return (nSamples == -1) ? 0 : nSamples * (track.GetFormat().bits / 8);
 }

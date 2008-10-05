@@ -44,20 +44,22 @@ Bool BoCA::SunAuIn::CanOpenStream(const String &streamURI)
 	return (magic == 1684960046);
 }
 
-Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in	= new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
 	// TODO: Add more checking to this!
 
-	format.fileSize = f_in->Size();
+	Format	&format = track.GetFormat();
+
+	track.fileSize = f_in->Size();
 	format.order = BYTE_RAW;
 
 	// Read magic number and header size
 	for (Int i = 0; i < 8; i++)
 		f_in->InputNumber(1);
 
-	format.length = UnsignedInt32(f_in->InputNumberRaw(4));
+	track.length = UnsignedInt32(f_in->InputNumberRaw(4));
 	format.bits = UnsignedInt32(f_in->InputNumberRaw(4));
 
 	if	(format.bits == 2) format.bits = 8;
@@ -68,7 +70,7 @@ Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	if (!errorState)
 	{
-		format.length = format.length / (format.bits / 8);
+		track.length = track.length / (format.bits / 8);
 
 		format.rate = UnsignedInt32(f_in->InputNumberRaw(4));
 		format.channels = UnsignedInt32(f_in->InputNumberRaw(4));

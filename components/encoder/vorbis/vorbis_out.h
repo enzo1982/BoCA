@@ -29,8 +29,9 @@ namespace BoCA
 			vorbis_dsp_state	 vd;
 			vorbis_block		 vb;
 
-			Buffer<unsigned char>	 dataBuffer;
 			Buffer<unsigned short>	 samplesBuffer;
+
+			Int			 WriteOggPackets(Bool);
 		public:
 			static const String	&GetComponentSpecs();
 

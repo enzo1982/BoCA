@@ -172,10 +172,9 @@ Void BoCA::ConfigureVorbis::SetMode()
 
 Void BoCA::ConfigureVorbis::SetQuality()
 {
-	String	 txt = String::FromFloat(9 - ((double) quality) / 100);
+	String	 txt = String::FromFloat(((double) quality) / 10);
 
-	if (quality %  10 == 0) txt.Append(".0");
-	if (quality % 100 == 0) txt.Append(".0");
+	if (quality % 10 == 0) txt.Append(".0");
 
 	text_quality_value->SetText(txt);
 }

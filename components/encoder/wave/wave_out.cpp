@@ -47,8 +47,10 @@ Bool BoCA::WaveOut::Activate()
 	Buffer<unsigned char>	 buffer(44);
 	OutStream		*out = new OutStream(STREAM_BUFFER, buffer, 44);
 
+	const Format	&format = track.GetFormat();
+
 	out->OutputString("RIFF");
-	out->OutputNumber(format.length * (format.bits / 8) + 36, 4);
+	out->OutputNumber(track.length * (format.bits / 8) + 36, 4);
 	out->OutputString("WAVE");
 	out->OutputString("fmt ");
 
@@ -61,8 +63,7 @@ Bool BoCA::WaveOut::Activate()
 
 	out->OutputNumber(format.bits, 2);
 	out->OutputString("data");
-	out->OutputNumber(format.length * (format.bits / 8), 4);
-
+	out->OutputNumber(track.length * (format.bits / 8), 4);
 
 	delete out;
 
@@ -73,7 +74,7 @@ Bool BoCA::WaveOut::Activate()
 
 Bool BoCA::WaveOut::Deactivate()
 {
-	Int	 size = nOfSamples * (format.bits / 8) + 36;
+	Int	 size = nOfSamples * (track.GetFormat().bits / 8) + 36;
 
 	driver->Seek(4);
 	driver->WriteData((unsigned char *) &size, 4);
@@ -88,7 +89,7 @@ Bool BoCA::WaveOut::Deactivate()
 
 Int BoCA::WaveOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	nOfSamples += (size / (format.bits / 8));
+	nOfSamples += (size / (track.GetFormat().bits / 8));
 
 	return driver->WriteData(data, size);
 }

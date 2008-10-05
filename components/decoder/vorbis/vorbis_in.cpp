@@ -60,13 +60,15 @@ Bool BoCA::VorbisIn::CanOpenStream(const String &streamURI)
 	return streamURI.ToLower().EndsWith(".ogg");
 }
 
-Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
+	Format	&format = track.GetFormat();
+
 	format.order = BYTE_INTEL;
 	format.bits = 16;
-	format.fileSize = f_in->Size();
+	track.fileSize = f_in->Size();
 
 	ogg_sync_state		 foy;
 	ogg_stream_state	 fos;
@@ -78,7 +80,7 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	ex_ogg_sync_init(&foy);
 
-	Int	 size = Math::Min(4096, format.fileSize);
+	Int	 size = Math::Min(4096, track.fileSize);
 	char	*fbuffer = ex_ogg_sync_buffer(&foy, size);
 
 	f_in->InputData(fbuffer, size);
@@ -128,19 +130,19 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &format)
 
 		format.rate = fvi.rate;
 		format.channels = fvi.channels;
-		format.length = -1;
+		track.length = -1;
 
 		Int	 bitrate = 0;
 
 		if (fvi.bitrate_nominal > 0)				 bitrate = fvi.bitrate_nominal;
  		else if (fvi.bitrate_lower > 0 && fvi.bitrate_upper > 0) bitrate = (fvi.bitrate_lower + fvi.bitrate_upper) / 2;
 
-		if (bitrate > 0) format.approxLength = format.fileSize / (bitrate / 8) * format.rate * format.channels;
+		if (bitrate > 0) track.approxLength = track.fileSize / (bitrate / 8) * format.rate * format.channels;
 
 		if (fvc.comments > 0)
 		{
-			format.track = -1;
-			format.outfile = NIL;
+			track.track = -1;
+			track.outfile = NIL;
 
 			char	*prevInFormat = String::SetInputFormat("UTF-8");
 
@@ -149,14 +151,15 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &format)
 				String	 comment = String(fvc.user_comments[j]);
 				String	 id = String().CopyN(comment, comment.Find("=")).ToUpper();
 
-				if	(id == "TITLE")		format.title	= comment.Tail(comment.Length() - 6);
-				else if (id == "ARTIST")	format.artist	= comment.Tail(comment.Length() - 7);
-				else if (id == "ALBUM")		format.album	= comment.Tail(comment.Length() - 6);
-				else if (id == "GENRE")		format.genre	= comment.Tail(comment.Length() - 6);
-				else if (id == "DATE")		format.year	= comment.Tail(comment.Length() - 5).ToInt();
-				else if (id == "TRACKNUMBER")	format.track	= comment.Tail(comment.Length() - 12).ToInt();
-				else if (id == "ORGANIZATION")	format.label	= comment.Tail(comment.Length() - 13);
-				else if (id == "ISRC")		format.isrc	= comment.Tail(comment.Length() - 5);
+				if	(id == "TITLE")		track.title	= comment.Tail(comment.Length() - 6);
+				else if (id == "ARTIST")	track.artist	= comment.Tail(comment.Length() - 7);
+				else if (id == "ALBUM")		track.album	= comment.Tail(comment.Length() - 6);
+				else if (id == "GENRE")		track.genre	= comment.Tail(comment.Length() - 6);
+				else if (id == "DATE")		track.year	= comment.Tail(comment.Length() - 5).ToInt();
+				else if (id == "TRACKNUMBER")	track.track	= comment.Tail(comment.Length() - 12).ToInt();
+				else if (id == "COMMENT")	track.comment	= comment.Tail(comment.Length() - 8);
+				else if (id == "ORGANIZATION")	track.label	= comment.Tail(comment.Length() - 13);
+				else if (id == "ISRC")		track.isrc	= comment.Tail(comment.Length() - 5);
 			}
 
 			String::SetInputFormat(prevInFormat);

@@ -11,16 +11,16 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+using namespace smooth::IO;
+
 #include "twinvq_out.h"
 #include "config.h"
 #include "dllinterface.h"
 
+#include "twinvq/bfile_e.h"
 #include "twinvq/bstream_e.h"
-#include "twinvq/bstream_e.cxx"
 #include "twinvq/Chunk.h"
-#include "twinvq/Chunk.cxx"
 #include "twinvq/ChunkHelper.h"
-#include "twinvq/ChunkHelper.cxx"
 
 const String &BoCA::TwinVQOut::GetComponentSpecs()
 {
@@ -38,7 +38,7 @@ const String &BoCA::TwinVQOut::GetComponentSpecs()
 		    <type>encoder</type>			\
 		    <format>					\
 		      <name>TwinVQ VQF Audio</name>		\
-		      <extension>tvq</extension>		\
+		      <extension>vqf</extension>		\
 		    </format>					\
 		  </component>					\
 								\
@@ -71,6 +71,8 @@ BoCA::TwinVQOut::~TwinVQOut()
 Bool BoCA::TwinVQOut::Activate()
 {
 	Config	*config = Config::Get();
+
+	const Format	&format = track.GetFormat();
 
 	switch (format.rate)
 	{
@@ -120,6 +122,17 @@ Bool BoCA::TwinVQOut::Activate()
 	setupInfo.samplingRate = int(format.rate / 1000);
 	setupInfo.bitRate = config->GetIntValue("TwinVQ", "Bitrate", 48) * format.channels;
 
+	if (track.artist != NIL || track.title != NIL)
+	{
+		Config	*currentConfig = Config::Get();
+
+		if	(track.artist != NIL) strncpy(setupInfo.Auth, track.artist, Math::Min(track.artist.Length(), 1024));
+		if	(track.title  != NIL) strncpy(setupInfo.Name, track.title,  Math::Min(track.title.Length(),  1024));
+
+		if	(track.comment != NIL && !config->replace_comments) strncpy(setupInfo.Comt, track.comment,		    Math::Min(track.comment.Length(),		       1024));
+		else if (currentConfig->default_comment != NIL)		    strncpy(setupInfo.Comt, currentConfig->default_comment, Math::Min(currentConfig->default_comment.Length(), 1024));
+	}
+
 	encInfo.N_CAN_GLOBAL = config->GetIntValue("TwinVQ", "PreselectionCandidates", 32); // number of VQ pre-selection candidates
 
 	ex_TvqEncInitialize(&setupInfo, &encInfo, &index, 0);
@@ -128,54 +141,60 @@ Bool BoCA::TwinVQOut::Activate()
 
 	packageSize = samples_size * (format.bits / 8);
 
-	outBuffer.Resize(samples_size * (format.bits / 8));
 	frame.Resize(samples_size);
 
 	TvqInitBsWriter();
 
 	CChunkChunk	*twinChunk	= TvqCreateHeaderChunk(&setupInfo, "header_info");
-	OutStream	*d_out		= new OutStream(STREAM_BUFFER, outBuffer, outBuffer.Size());
 
-	TvqPutBsHeaderInfo(d_out, *twinChunk);
+	bfp = bopen(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), (char *) "wb");
 
-	d_out->Flush();
-
-	driver->WriteData(outBuffer, d_out->GetPos());
+	TvqPutBsHeaderInfo(bfp, *twinChunk);
 
 	delete twinChunk;
-	delete d_out;
 
-	return true;
+	return True;
 }
 
 Bool BoCA::TwinVQOut::Deactivate()
 {
-	OutStream	*d_out = new OutStream(STREAM_BUFFER, outBuffer, outBuffer.Size());
-
+	/* Flush TwinVQ buffers by writing two empty frames.
+	 */
 	frame.Zero();
 
 	ex_TvqEncodeFrame(frame, &index);
-	TvqWriteBsFrame(&index, d_out);
+	TvqWriteBsFrame(&index, bfp);
 
 	ex_TvqEncodeFrame(frame, &index);
-	TvqWriteBsFrame(&index, d_out);
-
-	TvqFinishBsOutput(d_out);
+	TvqWriteBsFrame(&index, bfp);
 
 	ex_TvqEncTerminate(&index);
 
-	d_out->Flush();
+	bclose(bfp);
 
-	driver->WriteData(outBuffer, d_out->GetPos());
+	/* Stream contents of created VQF file to output driver
+	 */
+	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READONLY);
+	Buffer<UnsignedByte>	 buffer(1024);
+	Int			 bytesLeft = in.Size();
 
-	delete d_out;
+	while (bytesLeft)
+	{
+		driver->WriteData((UnsignedByte *) in.InputData(buffer, Math::Min(1024, bytesLeft)), Math::Min(1024, bytesLeft));
 
-	return true;
+		bytesLeft -= Math::Min(1024, bytesLeft);
+	}
+
+	in.Close();
+
+	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+
+	return True;
 }
 
 Int BoCA::TwinVQOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	OutStream	*d_out = new OutStream(STREAM_BUFFER, outBuffer, outBuffer.Size());
+	const Format	&format = track.GetFormat();
 
 	samplesBuffer.Resize(size / (format.bits / 8));
 
@@ -196,13 +215,7 @@ Int BoCA::TwinVQOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 	}
 
 	ex_TvqEncodeFrame(frame, &index);
-	TvqWriteBsFrame(&index, d_out);
-
-	size = d_out->GetPos();
-
-	delete d_out;
-
-	driver->WriteData(outBuffer, size);
+	TvqWriteBsFrame(&index, bfp);
 
 	return size;
 }

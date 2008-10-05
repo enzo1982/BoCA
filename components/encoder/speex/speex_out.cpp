@@ -1,0 +1,240 @@
+ /* BoCA - BonkEnc Component Architecture
+  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the "GNU General Public License".
+  *
+  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#include <smooth.h>
+#include <smooth/dll.h>
+
+#include <time.h>
+
+#include "speex_out.h"
+#include "config.h"
+#include "dllinterface.h"
+
+const String &BoCA::SpeexOut::GetComponentSpecs()
+{
+	static String	 componentSpecs;
+
+	if (oggdll != NIL && speexdll != NIL)
+	{
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>Speex Speech Encoder</name>		\
+		    <version>1.0</version>			\
+		    <id>speex-out</id>				\
+		    <type>encoder</type>			\
+		    <format>					\
+		      <name>Speex Files</name>			\
+		      <extension>spx</extension>		\
+		    </format>					\
+		  </component>					\
+								\
+		";
+	}
+
+	return componentSpecs;
+}
+
+Void smooth::AttachDLL(Void *instance)
+{
+	LoadOggDLL();
+	LoadSpeexDLL();
+}
+
+Void smooth::DetachDLL()
+{
+	FreeOggDLL();
+	FreeSpeexDLL();
+}
+
+BoCA::SpeexOut::SpeexOut()
+{
+	configLayer = NIL;
+}
+
+BoCA::SpeexOut::~SpeexOut()
+{
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
+}
+
+Bool BoCA::SpeexOut::Activate()
+{
+	Config	*config = Config::Get();
+
+	const Format	&format = track.GetFormat();
+
+	srand(clock());
+
+	ex_ogg_stream_init(&os, rand());
+
+	SpeexHeader	 speex_header;
+
+	ex_speex_init_header(&speex_header, format.rate, format.channels, ex_speex_nb_mode);
+
+	encoder = ex_speex_encoder_init(ex_speex_nb_mode);
+
+	/* Get frame size
+	 */
+	spx_int32_t	 frame_size = 0;
+	spx_int32_t	 rate = format.rate;
+
+	ex_speex_encoder_ctl(encoder, SPEEX_GET_FRAME_SIZE, &frame_size);
+	ex_speex_encoder_ctl(encoder, SPEEX_SET_SAMPLING_RATE, &rate);
+
+	frameSize = frame_size;
+	packageSize = frame_size * (format.bits / 8) * format.channels;
+
+	/* Write Speex header
+	 */
+	ogg_packet	 header;
+	int		 bytes;
+
+	numPackets = 0;
+
+	header.packet	  = (unsigned char *) ex_speex_header_to_packet(&speex_header, &bytes);
+	header.bytes	  = bytes;
+	header.b_o_s	  = 1;
+	header.e_o_s	  = 0;
+	header.granulepos = 0;
+	header.packetno	  = numPackets++;
+
+	ex_ogg_stream_packetin(&os, &header);
+
+	free(header.packet);
+
+	/* Write Vorbis comment header
+	 */
+	Buffer<unsigned char>	 vcBuffer;
+
+	if (config->enable_vctags)
+	{
+		char	*speexVersion = NIL;
+
+		ex_speex_lib_ctl(SPEEX_LIB_GET_VERSION_STRING, &speexVersion);
+
+		track.RenderVorbisComment(vcBuffer, String("Encoded with Speex ").Append(speexVersion));
+	}
+
+	header.packet	  = vcBuffer;
+	header.bytes	  = vcBuffer.Size();
+	header.b_o_s	  = 0;
+	header.e_o_s	  = 0;
+	header.granulepos = 0;
+	header.packetno	  = numPackets++;
+
+	ex_ogg_stream_packetin(&os, &header);
+
+	WriteOggPackets(True);
+
+	ex_speex_bits_init(&bits);
+
+	return True;
+}
+
+Bool BoCA::SpeexOut::Deactivate()
+{
+	/* Write any remaining Ogg packets.
+	 */
+	WriteOggPackets(True);
+
+	ex_speex_bits_destroy(&bits);
+
+	ex_speex_encoder_destroy(encoder);
+
+	ex_ogg_stream_clear(&os);
+
+	return True;
+}
+
+Int BoCA::SpeexOut::WriteData(Buffer<UnsignedByte> &data, Int size)
+{
+	const Format	&format = track.GetFormat();
+
+	static Int	 totalSamples = 0;
+	Int		 samples = size / (format.bits / 8) / format.channels;
+
+	totalSamples += samples;
+
+	samplesBuffer.Resize(frameSize * format.channels);
+	samplesBuffer.Zero();
+
+	for (int i = 0; i < samples * format.channels; i++)
+	{
+		if	(format.bits ==  8) samplesBuffer[i] = (data[i] - 128) * 256;
+		else if (format.bits == 16) samplesBuffer[i] = ((spx_int16_t *) (unsigned char *) data)[i];
+		else if (format.bits == 24) samplesBuffer[i] = (spx_int16_t) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
+		else if (format.bits == 32) samplesBuffer[i] = (spx_int16_t) ((long *) (unsigned char *) data)[i] / 65536;
+	}
+
+	if (format.channels == 2) ex_speex_encode_stereo_int(samplesBuffer, frameSize, &bits);
+
+	ex_speex_encode_int(encoder, samplesBuffer, &bits);
+	ex_speex_bits_insert_terminator(&bits); 
+
+	Int	 dataLength = ex_speex_bits_nbytes(&bits);
+
+	dataBuffer.Resize(dataLength);
+
+	dataLength = ex_speex_bits_write(&bits, dataBuffer, dataLength);
+
+	op.packet     = (unsigned char *) (char *) dataBuffer;
+	op.bytes      = dataLength;
+	op.b_o_s      = 0;
+	op.e_o_s      = samples < frameSize ? 1 : 0;
+	op.granulepos = totalSamples;
+	op.packetno   = numPackets++;
+
+	ex_ogg_stream_packetin(&os, &op);
+
+	dataLength = WriteOggPackets(False);
+
+	ex_speex_bits_reset(&bits);
+
+	return dataLength;
+}
+
+Int BoCA::SpeexOut::WriteOggPackets(Bool flush)
+{
+	Int	 bytes = 0;
+
+	do
+	{
+		int	 result = 0;
+
+		if (flush) result = ex_ogg_stream_flush(&os, &og);
+		else	   result = ex_ogg_stream_pageout(&os, &og);
+
+		if (result == 0) break;
+
+		bytes += driver->WriteData(og.header, og.header_len);
+		bytes += driver->WriteData(og.body, og.body_len);
+	}
+	while (true);
+
+	return bytes;
+}
+
+ConfigLayer *BoCA::SpeexOut::GetConfigurationLayer()
+{
+	if (configLayer == NIL) configLayer = new ConfigureSpeex();
+
+	return configLayer;
+}
+
+Void BoCA::SpeexOut::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
+}

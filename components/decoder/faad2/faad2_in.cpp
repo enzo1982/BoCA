@@ -133,14 +133,16 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 	return isValidFile;;
 }
 
-Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 {
+	Format	&format = track.GetFormat();
+
 	if (!streamURI.ToLower().EndsWith(".aac"))
 	{
-		format.fileSize	= File(streamURI).GetFileSize();
-		format.length	= -1;
+		track.fileSize	= File(streamURI).GetFileSize();
+		track.length	= -1;
 
-		format.ParseMP4Meta(streamURI);
+		track.ParseMP4Meta(streamURI);
 
 		if (String::IsUnicode(streamURI))
 		{
@@ -173,7 +175,8 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 
 			ex_NeAACDecInit2(handle, (unsigned char *) esc_buffer, buffer_size, (unsigned long *) &format.rate, (unsigned char *) &format.channels);
 
-			format.length	= Math::Round(double(signed(ex_MP4GetTrackDuration(mp4File, mp4Track))) * format.channels * format.rate / double(signed(ex_MP4GetTrackTimeScale(mp4File, mp4Track))));
+			track.length	= Math::Round(double(signed(ex_MP4GetTrackDuration(mp4File, mp4Track))) * format.channels * format.rate / double(signed(ex_MP4GetTrackTimeScale(mp4File, mp4Track))));
+
 			format.order	= BYTE_INTEL;
 			format.bits	= 16;
 
@@ -195,8 +198,9 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 
 		format.order	= BYTE_INTEL;
 		format.bits	= 16;
-		format.fileSize	= f_in->Size();
-		format.length	= -1;
+
+		track.fileSize	= f_in->Size();
+		track.length	= -1;
 
 		SkipID3v2Tag(f_in);
 
@@ -219,7 +223,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 
 		ex_NeAACDecSetConfiguration(handle, fConfig);
 
-		Int		 size = Math::Min(32768, format.fileSize);
+		Int		 size = Math::Min(32768, track.fileSize);
 		unsigned char	*data = new unsigned char [size];
 
 		f_in->InputData((void *) data, size);
@@ -257,7 +261,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 		}
 		while (samples != NIL);
 
-		if (samplesRead > 0 && samplesBytes > 0) format.approxLength = samplesRead * (format.fileSize / samplesBytes);
+		if (samplesRead > 0 && samplesBytes > 0) track.approxLength = samplesRead * (track.fileSize / samplesBytes);
 
 		delete [] data;
 
@@ -269,10 +273,10 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &format)
 
 		if (Config::Get()->enable_id3)
 		{
-			format.track = -1;
-			format.outfile = NIL;
+			track.track = -1;
+			track.outfile = NIL;
 
-			format.ParseID3Tag(streamURI);
+			track.ParseID3Tag(streamURI);
 		}
 	}
 
@@ -290,17 +294,17 @@ BoCA::FAAD2In::~FAAD2In()
 
 Bool BoCA::FAAD2In::Activate()
 {
-	if (!format.origFilename.ToLower().EndsWith(".aac"))
+	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
-		if (String::IsUnicode(format.origFilename))
+		if (String::IsUnicode(track.origFilename))
 		{
-			File(format.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"));
+			File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
 
-			mp4File	= ex_MP4Read(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"), 0);
+			mp4File	= ex_MP4Read(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"), 0);
 		}
 		else
 		{
-			mp4File	= ex_MP4Read(format.origFilename, 0);
+			mp4File	= ex_MP4Read(track.origFilename, 0);
 		}
 
 		mp4Track	= GetAudioTrack();
@@ -326,7 +330,7 @@ Bool BoCA::FAAD2In::Activate()
 
 	ex_NeAACDecSetConfiguration(handle, fConfig);
 
-	if (!format.origFilename.ToLower().EndsWith(".aac"))
+	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
 		unsigned char	*buffer		= NIL;
 		unsigned long	 buffer_size	= 0;
@@ -366,13 +370,13 @@ Bool BoCA::FAAD2In::Deactivate()
 {
 	ex_NeAACDecClose(handle);
 
-	if (!format.origFilename.ToLower().EndsWith(".aac"))
+	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
 		ex_MP4Close(mp4File);
 
-		if (String::IsUnicode(format.origFilename))
+		if (String::IsUnicode(track.origFilename))
 		{
-			File(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in")).Delete();
+			File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
 		}
 	}
 
@@ -390,7 +394,7 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	samplesBuffer.Resize(0);
 
-	if (!format.origFilename.ToLower().EndsWith(".aac"))
+	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
 		do
 		{
@@ -414,7 +418,7 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 				samplesRead += frameInfo.samples;
 			}
 		}
-		while (samples != NIL && sampleId < ((format.length / 2048) * (double(inBytes) / format.fileSize)));
+		while (samples != NIL && sampleId < ((track.length / 2048) * (double(inBytes) / track.fileSize)));
 	}
 	else
 	{

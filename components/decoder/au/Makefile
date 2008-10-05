@@ -10,22 +10,16 @@ BOCA_PATH = ../../..
 # Enter object files here:
 OBJECTS	  = au_in.o
 
+# Enter additional library dependencies here
+LIBS	  =
+
+# Enter addition commands for targets all and clean here:
+ALLCMD1   =
+ALLCMD2   =
+CLEANCMD1 =
+CLEANCMD1 =
+
 ## Do not change anything below this line. ##
 
-CC = gcc
-CCOPTS = -march=i586 -Os -g0 -Wall -fno-exceptions -ffast-math -D__BOCA_COMPONENT_BUILD__ -I$(BOCA_PATH)/include
-LD = gcc
-LDOPTS = -L$(BOCA_PATH)/lib -lsmooth -lboca -lstdc++
-
-all : $(BOCA_PATH)/bin/boca_$(TYPE)_$(TARGET).$(VERSION).dll
-
-$(BOCA_PATH)/bin/boca_$(TYPE)_$(TARGET).$(VERSION).dll : $(OBJECTS)
-	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
-	strip --strip-all $@
-	upx --best -q $@
-
-clean :
-	rm -f $(BOCA_PATH)/bin/boca_$(TYPE)_$(TARGET).$(VERSION).dll $(OBJECTS)
-
-.cpp.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+include $(BOCA_PATH)/Makefile-directories
+include $(BOCA_PATH)/Makefile-commands

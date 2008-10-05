@@ -31,12 +31,21 @@ BoCA::LayerTagAdvanced::LayerTagAdvanced() : Layer("Advanced")
 	list_fields->AddTab("ID", 50);
 	list_fields->AddTab("Value");
 
+	/* This will later be assigned the editing
+	 * layer for the selected tag field type.
+	 */
+	layer_field	= NIL;
+
 	combo_type->SelectEntry("ID3v2");
 
 	Add(text_type);
 	Add(combo_type);
 
 	Add(list_fields);
+
+	/* Initially deactivate all input fields.
+	 */
+	OnSelectNone();
 
 	onChangeSize.Connect(&LayerTagAdvanced::OnChangeSize, this);
 }
@@ -57,12 +66,29 @@ BoCA::LayerTagAdvanced::~LayerTagAdvanced()
 
 	FreeTagTypes();
 }
+
 Void BoCA::LayerTagAdvanced::OnChangeSize(const Size &nSize)
 {
 	Rect	 clientRect = Rect(GetPosition(), GetSize());
 	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
 	list_fields->SetHeight(clientSize.cy - 42);
+}
+
+/* Called when a track is selected from the list.
+ * ----
+ */
+Void BoCA::LayerTagAdvanced::OnSelectTrack(const Track &track)
+{
+	list_fields->Activate();
+}
+
+/* Called when the last track is removed from the list.
+ * ----
+ */
+Void BoCA::LayerTagAdvanced::OnSelectNone()
+{
+	list_fields->Deactivate();
 }
 
 Void BoCA::LayerTagAdvanced::OnSelectTagType()

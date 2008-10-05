@@ -10,6 +10,8 @@ all:
 	cd lame && make
 	cd mac && make
 	cd mad && make
+	cd sndfile && make
+	cd twinvq && make
 	cd voc && make
 	cd vorbis && make
 	cd wave && make
@@ -25,6 +27,8 @@ clean:
 	cd lame && make clean
 	cd mac && make clean
 	cd mad && make clean
+	cd sndfile && make clean
+	cd twinvq && make clean
 	cd voc && make clean
 	cd vorbis && make clean
 	cd wave && make clean

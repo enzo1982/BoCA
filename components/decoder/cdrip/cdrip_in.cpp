@@ -72,10 +72,10 @@ Void smooth::AttachDLL(Void *instance)
 		error = ex_CR_Init(config->cdrip_ntscsi);
 	}
 
-/*	if	(error == CDEX_ACCESSDENIED)	Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
+	if	(error == CDEX_ACCESSDENIED)	BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
 	else if (error != CDEX_OK &&
-		 error != CDEX_NOCDROMDEVICES)	Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
-*/
+		 error != CDEX_NOCDROMDEVICES)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
+
 	if (error == CDEX_OK)
 	{
 		config->cdrip_numdrives = ex_CR_GetNumCDROM();
@@ -110,11 +110,14 @@ Bool BoCA::CDRipIn::CanOpenStream(const String &streamURI)
 	       lcURI.EndsWith(".cda");
 }
 
-Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	Config	*config = Config::Get();
 
-	format.isCDTrack	= True;
+	Format	&format = track.GetFormat();
+
+	track.isCDTrack	= True;
+
 	format.channels		= 2;
 	format.rate		= 44100;
 	format.bits		= 16;
@@ -200,13 +203,13 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	if (entryNumber == -1) return Error();
 
-	format.length	= (trackLength * 2352) / (format.bits / 8);
-	format.fileSize = trackLength * 2352;
+	track.length	= (trackLength * 2352) / (format.bits / 8);
+	track.fileSize = trackLength * 2352;
 
-	format.track	= trackNumber;
-	format.cdTrack	= trackNumber;
-	format.drive	= audiodrive;
-	format.outfile	= NIL;
+	track.track	= trackNumber;
+	track.cdTrack	= trackNumber;
+	track.drive	= audiodrive;
+	track.outfile	= NIL;
 
 	return Success();
 }
@@ -227,7 +230,7 @@ Bool BoCA::CDRipIn::Activate()
 	Int	 startSector = 0;
 	Int	 endSector = 0;
 
-	ex_CR_SetActiveCDROM(format.drive);
+	ex_CR_SetActiveCDROM(track.drive);
 	ex_CR_ReadToc();
 
 	Int	 numTocEntries = ex_CR_GetNumTocEntries();
@@ -241,7 +244,7 @@ Bool BoCA::CDRipIn::Activate()
 		startSector = entry.dwStartSector;
 		endSector = nextentry.dwStartSector;
 
-		if (!(entry.btFlag & CDROMDATAFLAG) && (entry.btTrackNumber == format.track))
+		if (!(entry.btFlag & CDROMDATAFLAG) && (entry.btTrackNumber == track.track))
 		{
 			entryNumber = i;
 
@@ -265,7 +268,7 @@ Bool BoCA::CDRipIn::Deactivate()
 
 Int BoCA::CDRipIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	if (inBytes >= format.fileSize)
+	if (inBytes >= track.fileSize)
 	{
 		CloseRipper();
 

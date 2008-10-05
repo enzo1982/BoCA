@@ -67,6 +67,8 @@ BoCA::VorbisOut::~VorbisOut()
 
 Bool BoCA::VorbisOut::Activate()
 {
+	const Format	&format = track.GetFormat();
+
 	if (format.channels > 2)
 	{
 		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
@@ -98,50 +100,19 @@ Bool BoCA::VorbisOut::Activate()
 	{
 		char	*prevOutFormat = String::SetOutputFormat(config->vctag_encoding);
 
-		if (config->default_comment != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "COMMENT", config->default_comment);
-
-		if (format.artist != NIL || format.title != NIL)
+		if (track.artist != NIL || track.title != NIL)
 		{
-			if (format.title != NIL)
-			{
-				ex_vorbis_comment_add_tag(&vc, (char *) "TITLE", format.title);
-			}
+			if	(track.title  != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "TITLE", track.title);
+			if	(track.artist != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "ARTIST", track.artist);
+			if	(track.album  != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "ALBUM", track.album);
+			if	(track.track   >   0) ex_vorbis_comment_add_tag(&vc, (char *) "TRACKNUMBER", String(track.track < 10 ? "0" : "").Append(String::FromInt(track.track)));
+			if	(track.year    >   0) ex_vorbis_comment_add_tag(&vc, (char *) "DATE", String::FromInt(track.year));
+			if	(track.genre  != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "GENRE", track.genre);
+			if	(track.label  != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "ORGANIZATION", track.label);
+			if	(track.isrc   != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "ISRC", track.isrc);
 
-			if (format.artist != NIL)
-			{
-				ex_vorbis_comment_add_tag(&vc, (char *) "ARTIST", format.artist);
-			}
-
-			if (format.album != NIL)
-			{
-				ex_vorbis_comment_add_tag(&vc, (char *) "ALBUM", format.album);
-			}
-
-			if (format.track > 0)
-			{
-				if (format.track < 10)	ex_vorbis_comment_add_tag(&vc, (char *) "TRACKNUMBER", String("0").Append(String::FromInt(format.track)));
-				else			ex_vorbis_comment_add_tag(&vc, (char *) "TRACKNUMBER", String::FromInt(format.track));
-			}
-
-			if (format.year > 0)
-			{
-				ex_vorbis_comment_add_tag(&vc, (char *) "DATE", String::FromInt(format.year));
-			}
-
-			if (format.genre != NIL)
-			{
-				ex_vorbis_comment_add_tag(&vc, (char *) "GENRE", format.genre);
-			}
-
-			if (format.label != NIL)
-			{
-				ex_vorbis_comment_add_tag(&vc, (char *) "ORGANIZATION", format.label);
-			}
-
-			if (format.isrc != NIL)
-			{
-				ex_vorbis_comment_add_tag(&vc, (char *) "ISRC", format.isrc);
-			}
+			if	(track.comment != NIL && !config->replace_comments) ex_vorbis_comment_add_tag(&vc, (char *) "COMMENT", track.comment);
+			else if (config->default_comment != NIL)		    ex_vorbis_comment_add_tag(&vc, (char *) "COMMENT", config->default_comment);
 		}
 
 		String::SetOutputFormat(prevOutFormat);
@@ -164,25 +135,7 @@ Bool BoCA::VorbisOut::Activate()
 	ex_ogg_stream_packetin(&os, &header_comm);
 	ex_ogg_stream_packetin(&os, &header_code);
 
-	int	 dataLength = 0;
-
-	do
-	{
-		int result = ex_ogg_stream_flush(&os, &og);
-
-		if (result == 0) break;
-
-		dataBuffer.Resize(dataLength + og.header_len + og.body_len);
-
-		memcpy(((unsigned char *) dataBuffer) + dataLength, og.header, og.header_len);
-		memcpy(((unsigned char *) dataBuffer) + dataLength + og.header_len, og.body, og.body_len);
-
-		dataLength += og.header_len;
-		dataLength += og.body_len;
-	}
-	while (true);
-
-	driver->WriteData(dataBuffer, dataLength);
+	WriteOggPackets(True);
 
 	return true;
 }
@@ -191,38 +144,18 @@ Bool BoCA::VorbisOut::Deactivate()
 {
 	ex_vorbis_analysis_wrote(&vd, 0);
 
-	int	 dataLength = 0;
-
 	while (ex_vorbis_analysis_blockout(&vd, &vb) == 1)
 	{
 		ex_vorbis_analysis(&vb, NULL);
 		ex_vorbis_bitrate_addblock(&vb);
 
-		while(ex_vorbis_bitrate_flushpacket(&vd, &op))
+		while (ex_vorbis_bitrate_flushpacket(&vd, &op))
 		{
 			ex_ogg_stream_packetin(&os, &op);
 
-			do
-			{
-				int	 result = ex_ogg_stream_pageout(&os, &og);
-
-				if (result == 0) break;
-
-				dataBuffer.Resize(dataLength + og.header_len + og.body_len);
-
-				memcpy(((unsigned char *) dataBuffer) + dataLength, og.header, og.header_len);
-				memcpy(((unsigned char *) dataBuffer) + dataLength + og.header_len, og.body, og.body_len);
-
-				dataLength += og.header_len;
-				dataLength += og.body_len;
-
-				if (ex_ogg_page_eos(&og)) break;
-			}
-			while (true);
+			WriteOggPackets(False);
 		}
 	}
-
-	driver->WriteData(dataBuffer, dataLength);
 
 	ex_ogg_stream_clear(&os);
 	ex_vorbis_block_clear(&vb);
@@ -235,56 +168,36 @@ Bool BoCA::VorbisOut::Deactivate()
 
 Int BoCA::VorbisOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
+	const Format	&format = track.GetFormat();
+
 	int	 dataLength = 0;
 	int	 samples_size = size / (format.bits / 8);
 
 	float	**buffer = ex_vorbis_analysis_buffer(&vd, samples_size / format.channels);
 
-	if (format.bits != 16)
+	samplesBuffer.Resize(samples_size);
+
+	for (int i = 0; i < samples_size; i++)
 	{
-		samplesBuffer.Resize(size / (format.bits / 8));
+		if	(format.bits ==  8) samplesBuffer[i] = (data[i] - 128) * 256;
+		else if (format.bits == 16) samplesBuffer[i] = ((unsigned short *) (unsigned char *) data)[i];
+		else if (format.bits == 24) samplesBuffer[i] = (int) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
+		else if (format.bits == 32) samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
+	}
 
-		for (int i = 0; i < size / (format.bits / 8); i++)
+	if (format.channels == 1)
+	{
+		for (int j = 0; j < samples_size; j++)
 		{
-			if (format.bits == 8)	samplesBuffer[i] = (data[i] - 128) * 256;
-			if (format.bits == 24)	samplesBuffer[i] = (int) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
-			if (format.bits == 32)	samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
-		}
-
-		if (format.channels == 1)
-		{
-			for (int j = 0; j < samples_size; j++)
-			{
-				buffer[0][j] = ((((signed char *) (unsigned short *) samplesBuffer)[j * 2 + 1] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[j * 2 + 0])) / 32768.f;
-			}
-		}
-
-		if (format.channels == 2)
-		{
-			for (int j = 0; j < samples_size / 2; j++)
-			{
-				buffer[0][j] = ((((signed char *) (unsigned short *) samplesBuffer)[j * 4 + 1] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[j * 4 + 0])) / 32768.f;
-				buffer[1][j] = ((((signed char *) (unsigned short *) samplesBuffer)[j * 4 + 3] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[j * 4 + 2])) / 32768.f;
-			}
+			buffer[0][j] = ((((signed char *) (unsigned short *) samplesBuffer)[j * 2 + 1] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[j * 2 + 0])) / 32768.f;
 		}
 	}
-	else
+	else if (format.channels == 2)
 	{
-		if (format.channels == 1)
+		for (int j = 0; j < samples_size / 2; j++)
 		{
-			for (int j = 0; j < samples_size; j++)
-			{
-				buffer[0][j] = ((((signed char *) (unsigned char *) data)[j * 2 + 1] << 8) | (0x00ff & ((signed char *) (unsigned char *) data)[j * 2 + 0])) / 32768.f;
-			}
-		}
-
-		if (format.channels == 2)
-		{
-			for (int j = 0; j < samples_size / 2; j++)
-			{
-				buffer[0][j] = ((((signed char *) (unsigned char *) data)[j * 4 + 1] << 8) | (0x00ff & ((signed char *) (unsigned char *) data)[j * 4 + 0])) / 32768.f;
-				buffer[1][j] = ((((signed char *) (unsigned char *) data)[j * 4 + 3] << 8) | (0x00ff & ((signed char *) (unsigned char *) data)[j * 4 + 2])) / 32768.f;
-			}
+			buffer[0][j] = ((((signed char *) (unsigned short *) samplesBuffer)[j * 4 + 1] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[j * 4 + 0])) / 32768.f;
+			buffer[1][j] = ((((signed char *) (unsigned short *) samplesBuffer)[j * 4 + 3] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[j * 4 + 2])) / 32768.f;
 		}
 	}
 
@@ -295,33 +208,36 @@ Int BoCA::VorbisOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 		ex_vorbis_analysis(&vb, NULL);
 		ex_vorbis_bitrate_addblock(&vb);
 
-		while(ex_vorbis_bitrate_flushpacket(&vd, &op))
+		while (ex_vorbis_bitrate_flushpacket(&vd, &op))
 		{
 			ex_ogg_stream_packetin(&os, &op);
 
-			do
-			{
-				int	 result = ex_ogg_stream_pageout(&os, &og);
-
-				if (result == 0) break;
-
-				dataBuffer.Resize(dataLength + og.header_len + og.body_len);
-
-				memcpy(((unsigned char *) dataBuffer) + dataLength, og.header, og.header_len);
-				memcpy(((unsigned char *) dataBuffer) + dataLength + og.header_len, og.body, og.body_len);
-
-				dataLength += og.header_len;
-				dataLength += og.body_len;
-
-				if (ex_ogg_page_eos(&og)) break;
-			}
-			while (true);
+			dataLength += WriteOggPackets(False);
 		}
 	}
 
-	driver->WriteData(dataBuffer, dataLength);
-
 	return dataLength;
+}
+
+Int BoCA::VorbisOut::WriteOggPackets(Bool flush)
+{
+	Int	 bytes = 0;
+
+	do
+	{
+		int	 result = 0;
+
+		if (flush) result = ex_ogg_stream_flush(&os, &og);
+		else	   result = ex_ogg_stream_pageout(&os, &og);
+
+		if (result == 0) break;
+
+		bytes += driver->WriteData(og.header, og.header_len);
+		bytes += driver->WriteData(og.body, og.body_len);
+	}
+	while (true);
+
+	return bytes;
 }
 
 ConfigLayer *BoCA::VorbisOut::GetConfigurationLayer()

@@ -23,9 +23,30 @@ namespace BoCA
 {
 	class LayerTagBasic : public Layer
 	{
+		private:
+			Text				*text_artist;
+			EditBox				*edit_artist;
+
+			Text				*text_title;
+			EditBox				*edit_title;
+
+			Text				*text_album;
+			EditBox				*edit_album;
+
+			Text				*text_comment;
+			MultiEdit			*edit_comment;
+
+			Track				 track;
+		signals:
+			Signal1<Void, const Track &>	 onModifyTrack;
+		slots:
+			Void				 OnSelectTrack(const Track &);
+			Void				 OnSelectNone();
+
+			Void				 OnModifyTrack();
 		public:
-				 LayerTagBasic();
-				~LayerTagBasic();
+							 LayerTagBasic();
+							~LayerTagBasic();
 	};
 };
 

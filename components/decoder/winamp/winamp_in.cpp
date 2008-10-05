@@ -159,12 +159,14 @@ Bool BoCA::WinampIn::CanOpenStream(const String &streamURI)
 	return (GetPluginForFile(streamURI) != NIL);
 }
 
-Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
+	Format	&format = track.GetFormat();
+
 	format.order	= BYTE_INTEL;
-	format.fileSize	= f_in->Size();
+	track.fileSize	= f_in->Size();
 
 	delete f_in;
 
@@ -237,7 +239,7 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &format)
 	format.channels	= channels;
 	format.bits	= bits;
 
-	format.length	= (Int) (Float(length_ms) * Float(rate * channels) / 1000.0);
+	track.length	= (Int) (Float(length_ms) * Float(rate * channels) / 1000.0);
 
 	String	 trackTitle = title;
 
@@ -255,18 +257,18 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &format)
 			{
 				artistComplete = (m += 3);
 
-				format.title = NIL;
+				track.title = NIL;
 			}
 
-			if (!artistComplete)	format.artist[m] = trackTitle[m];
-			else			format.title[m - artistComplete] = trackTitle[m];
+			if (!artistComplete)	track.artist[m] = trackTitle[m];
+			else			track.title[m - artistComplete] = trackTitle[m];
 		}
 	}
 
 	if (artistComplete == 0)
 	{
-		format.artist = NIL;
-		format.title = NIL;
+		track.artist = NIL;
+		track.title = NIL;
 	}
 
 	return Success();
@@ -295,7 +297,7 @@ BoCA::WinampIn::~WinampIn()
 
 Bool BoCA::WinampIn::Activate()
 {
-	plugin = GetPluginForFile(format.origFilename);
+	plugin = GetPluginForFile(track.origFilename);
 
 	plugin->SetInfo			= SetInfo;
 	plugin->VSASetInfo		= VSASetInfo;
@@ -329,15 +331,15 @@ Bool BoCA::WinampIn::Activate()
 	/* Copy the file and play the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
-	if (String::IsUnicode(format.origFilename))
+	if (String::IsUnicode(track.origFilename))
 	{
-		File(format.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"));
+		File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
 
-		plugin->Play(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"));
+		plugin->Play(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
 	}
 	else
 	{
-		plugin->Play(format.origFilename);
+		plugin->Play(track.origFilename);
 	}
 
 	return True;
@@ -351,9 +353,9 @@ Bool BoCA::WinampIn::Deactivate()
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(format.origFilename))
+	if (String::IsUnicode(track.origFilename))
 	{
-		File(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in")).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
 	}
 
 	return True;

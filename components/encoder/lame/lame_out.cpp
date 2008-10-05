@@ -67,6 +67,8 @@ Bool BoCA::LAMEOut::Activate()
 
 	int	 effrate;
 
+	const Format	&format = track.GetFormat();
+
 	if (config->GetIntValue("LAME", "Resample", -1) > 0)	effrate = config->GetIntValue("LAME", "Resample", -1);
 	else							effrate = format.rate;
 
@@ -282,10 +284,10 @@ Bool BoCA::LAMEOut::Activate()
 		return False;
 	}
 
-	if ((format.artist != NIL || format.title != NIL) && config->enable_id3v2 && config->enable_id3)
+	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = format.RenderID3Tag(id3Buffer, 2);
+		Int			 size = track.RenderID3Tag(id3Buffer, 2);
 
 		driver->WriteData(id3Buffer, size);
 	}
@@ -303,10 +305,10 @@ Bool BoCA::LAMEOut::Deactivate()
 
 	driver->WriteData(outBuffer, bytes);
 
-	if ((format.artist != NIL || format.title != NIL) && config->enable_id3v1 && config->enable_id3)
+	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v1 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = format.RenderID3Tag(id3Buffer, 1);
+		Int			 size = track.RenderID3Tag(id3Buffer, 1);
 
 		driver->WriteData(id3Buffer, size);
 	}
@@ -353,6 +355,8 @@ Int BoCA::LAMEOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 	unsigned long	 bytes = 0;
 
 	outBuffer.Resize(size + 7200);
+
+	const Format	&format = track.GetFormat();
 
 	if (format.bits != 16)
 	{

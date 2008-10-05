@@ -34,7 +34,7 @@ namespace BoCA
 
 			Buffer<signed int>	 samplesBuffer;
 
-			Track			*infoFormat;
+			Track			*infoTrack;
 
 			Mutex			*readDataMutex;
 			Mutex			*samplesBufferMutex;

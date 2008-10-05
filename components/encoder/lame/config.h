@@ -27,7 +27,6 @@ namespace BoCA
 			TabWidget	*reg_register;
 
 			Layer		*register_layer_basic;
-			Layer		*register_layer_vbr;
 			Layer		*register_layer_misc;
 			Layer		*register_layer_expert;
 			Layer		*register_layer_filtering;

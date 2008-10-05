@@ -1,7 +1,6 @@
 /* (c)Copyright 1996-2000 NTT Cyber Space Laboratories */
 /*                Released on 2000.05.22 by N. Iwakami */
 /*                Released on 2000.09.06 by N. Iwakami */
-/*          Ported to IOLib on 2002.08.25 by R. Kausch */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,45 +9,13 @@
 #include <sys/stat.h>
 #include <iostream>
 #include "twinvq.h"
+#include "bfile_e.h"
 #include "bstream_e.h"
 #include "tvqenc.h"
 #include "Chunk.h"
 #include "ChunkHelper.h"
 
-int	 bsptr = 0;
-char	 bsbuf = 0;
-
-int put_strm(int	 data,  /* input data */
-	     int	 nbits, /* number of bits */
-	     OutStream	*bfp)   /* bit file pointer */
-{
-	int	 rtflag = 0;
-
-	if ((0x1 << nbits) <= data) rtflag = 1;
-
-	for (int ibit = 0; ibit < nbits; ibit++)
-	{
-		bsbuf |= ((data >> (nbits - 1 - ibit)) & 1) << (BYTE_BITS - bsptr - 1);
-
-		if (++bsptr == 8)
-		{
-			bfp->OutputNumber(bsbuf, 1);
-
-			bsbuf = 0;
-			bsptr = 0;
-		}
-	}
-
-	return rtflag;
-}
-
-void TvqFinishBsOutput(OutStream *bfp)   /* bit file pointer */
-{
-	if (bsptr != 0)
-	{
-		put_strm(0, 8 - bsptr, bfp);
-	}
-}
+#include "../dllinterface.h"
 
 /*----------------------------------------------------------------------------*/
 /* bits and length table for interleaved VQ                                   */
@@ -74,20 +41,20 @@ static tvqConfInfo cf;
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
-void put_string (char *buf, int nbytes, OutStream *bfp)
+void put_string (char *buf, int nbytes, BFILE *bfp)
 {
 	while (nbytes--)
-		put_strm(*buf++, BYTE_BITS, bfp);
+		put_strm(*buf++, CHAR_BITS, bfp);
 	return;
 }
 
 static
-void put_string( std::string theString, OutStream *bfp )
+void put_string( std::string theString, BFILE *bfp )
 {
 	std::string::iterator it;
 
 	for ( it=theString.begin(); it!=theString.end(); it++ ) {
-		put_strm( *it, BYTE_BITS, bfp );
+		put_strm( *it, CHAR_BITS, bfp );
 	}
 
 	return;
@@ -99,15 +66,15 @@ void put_string( std::string theString, OutStream *bfp )
 /* Return:      (int) returns 1 when errors or 0                              */
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
-int ChunkWriteToFile( CChunk& twinChunk, OutStream *bfp )
+int ChunkWriteToFile( CChunk& twinChunk, BFILE *bfp )
 {
 	CChunk::CChunkData theData = twinChunk.GetData();
 	CChunk::CChunkData::iterator it;
 
 	put_string( twinChunk.GetID(), bfp ); // チャンクIDを記録
-	put_strm( twinChunk.GetSize(), BYTE_BITS * sizeof(unsigned long), bfp ); // チャンクサイズを記録
+	put_strm( twinChunk.GetSize(), CHAR_BITS * sizeof(unsigned long), bfp ); // チャンクサイズを記録
 	for ( it=theData.begin(); it!=theData.end(); it++ ) {					// チャンクデータを記録
-		put_strm( *it, BYTE_BITS, bfp );
+		put_strm( *it, CHAR_BITS, bfp );
 	}
 
 	return 0;
@@ -119,7 +86,7 @@ int ChunkWriteToFile( CChunk& twinChunk, OutStream *bfp )
 /* Return:      none                                                          */
 /* Access:      external                                                      */
 /*============================================================================*/
-void TvqPutBsHeaderInfo(OutStream *bfp,
+void TvqPutBsHeaderInfo(BFILE *bfp,
 						CChunkChunk& twinChunk)
 {
 
@@ -159,7 +126,7 @@ int PutVQInfo(tvqConfInfoSubBlock *cfg,
 			  int   bits1[],
 			  int   variable_side_bits,
 			  INDEX *index,
-			  OutStream *bfp)
+			  BFILE *bfp)
 {
 	int idiv;
 	int bitcount = 0;
@@ -190,7 +157,7 @@ int PutVQInfo(tvqConfInfoSubBlock *cfg,
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
-int PutBseInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, OutStream *bfp )
+int PutBseInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, BFILE *bfp )
 {
 	int i_sup, isf, idiv, itmp;
 	int bitcount = 0;
@@ -225,7 +192,7 @@ int PutBseInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, OutStre
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
-int PutGainInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, OutStream *bfp )
+int PutGainInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, BFILE *bfp )
 {
 	int i_sup, isf, iptop;
 	int bitcount = 0;
@@ -253,7 +220,7 @@ int PutGainInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, OutStr
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
-int PutLspInfo( tvqConfInfo *cf, INDEX *index, OutStream *bfp )
+int PutLspInfo( tvqConfInfo *cf, INDEX *index, BFILE *bfp )
 {
 	int i_sup, itmp;
 	int bitcount = 0;
@@ -284,7 +251,7 @@ int PutLspInfo( tvqConfInfo *cf, INDEX *index, OutStream *bfp )
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
-int PutPpcInfo( tvqConfInfo *cf, INDEX *index, OutStream *bfp )
+int PutPpcInfo( tvqConfInfo *cf, INDEX *index, BFILE *bfp )
 {
 	int i_sup, idiv;
 	int bitcount = 0;
@@ -318,7 +285,7 @@ int PutPpcInfo( tvqConfInfo *cf, INDEX *index, OutStream *bfp )
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
-int PutEbcInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, OutStream *bfp )
+int PutEbcInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, BFILE *bfp )
 {
 	int i_sup, isf, itmp;
 	int bitcount = 0;
@@ -343,7 +310,8 @@ int PutEbcInfo( tvqConfInfo *cf, tvqConfInfoSubBlock *cfg, INDEX *index, OutStre
 /* Return:      none                                                          */
 /* Access:      external                                                      */
 /*============================================================================*/
-void TvqWriteBsFrame(INDEX *index, OutStream *bfp)        /* Input:  Data file pointer */
+void TvqWriteBsFrame(INDEX  *index,
+					 BFILE	*bfp)        /* Input:  Data file pointer */
 {
 	/*--- Initialization ---*/
 	int bitcount = 0;

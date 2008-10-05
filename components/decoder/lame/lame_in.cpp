@@ -58,16 +58,18 @@ Bool BoCA::LAMEIn::CanOpenStream(const String &streamURI)
 	return streamURI.ToLower().EndsWith(".mp3");
 }
 
-Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	ex_lame_decode_init();
 
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
+	Format	&format = track.GetFormat();
+
 	format.order	= BYTE_INTEL;
 	format.bits	= 16;
-	format.fileSize	= f_in->Size();
-	format.length	= -1;
+	track.fileSize	= f_in->Size();
+	track.length	= -1;
 
 	SkipID3v2Tag(f_in);
 
@@ -91,8 +93,8 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &format)
 			format.channels	= mp3data.stereo;
 			format.rate	= mp3data.samplerate;
 
-			if	(mp3data.nsamp	 > 0) format.length = mp3data.nsamp * format.channels;
-			else if (mp3data.bitrate > 0) format.approxLength = format.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate * format.channels;
+			if	(mp3data.nsamp	 > 0) track.length = mp3data.nsamp * format.channels;
+			else if (mp3data.bitrate > 0) track.approxLength = track.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate * format.channels;
 
 			break;
 		}
@@ -105,10 +107,10 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	if (Config::Get()->enable_id3)
 	{
-		format.track = -1;
-		format.outfile = NIL;
+		track.track = -1;
+		track.outfile = NIL;
 
-		format.ParseID3Tag(streamURI);
+		track.ParseID3Tag(streamURI);
 	}
 
 	return Success();
@@ -158,7 +160,7 @@ Int BoCA::LAMEIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	Int	 nSamples = ex_lame_decode(data, size, pcm_l, pcm_r);
 
-	data.Resize(nSamples * format.channels * (format.bits / 8));
+	data.Resize(nSamples * track.GetFormat().channels * (track.GetFormat().bits / 8));
 
 	for (Int i = 0; i < nSamples; i++)
 	{

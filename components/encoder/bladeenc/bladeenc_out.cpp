@@ -65,6 +65,8 @@ BoCA::BladeOut::~BladeOut()
 
 Bool BoCA::BladeOut::Activate()
 {
+	const Format	&format = track.GetFormat();
+
 	if (format.rate != 32000 && format.rate != 44100 && format.rate != 48000)
 	{
 		Utilities::ErrorMessage("Bad sampling rate! BladeEnc supports only 32, 44.1 or 48kHz.");
@@ -114,10 +116,10 @@ Bool BoCA::BladeOut::Activate()
 
 	packageSize = samplesSize * (format.bits / 8);
 
-	if ((format.artist != NIL || format.title != NIL) && config->enable_id3v2 && config->enable_id3)
+	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = format.RenderID3Tag(id3Buffer, 2);
+		Int			 size = track.RenderID3Tag(id3Buffer, 2);
 
 		driver->WriteData(id3Buffer, size);
 	}
@@ -137,10 +139,10 @@ Bool BoCA::BladeOut::Deactivate()
 
 	ex_beCloseStream(handle);
 
-	if ((format.artist != NIL || format.title != NIL) && config->enable_id3v1 && config->enable_id3)
+	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v1 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = format.RenderID3Tag(id3Buffer, 1);
+		Int			 size = track.RenderID3Tag(id3Buffer, 1);
 
 		driver->WriteData(id3Buffer, size);
 	}
@@ -152,13 +154,15 @@ Int BoCA::BladeOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	unsigned long	 bytes = 0;
 
+	const Format	&format = track.GetFormat();
+
 	if (format.bits != 16)
 	{
 		for (int i = 0; i < size / (format.bits / 8); i++)
 		{
-			if (format.bits == 8)	samplesBuffer[i] = (data[i] - 128) * 256;
-			if (format.bits == 24)	samplesBuffer[i] = (int) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
-			if (format.bits == 32)	samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
+			if (format.bits ==  8) samplesBuffer[i] = (data[i] - 128) * 256;
+			if (format.bits == 24) samplesBuffer[i] = (int) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
+			if (format.bits == 32) samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
 		}
 
 		ex_beEncodeChunk(handle, size / (format.bits / 8), samplesBuffer, outBuffer, &bytes);

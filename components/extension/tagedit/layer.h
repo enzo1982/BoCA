@@ -19,30 +19,39 @@ using namespace smooth::GUI;
 
 using namespace BoCA;
 
+#include "basic/layer_tag_basic.h"
+#include "advanced/layer_tag_advanced.h"
+
 namespace BoCA
 {
 	class LayerTags : public Layer
 	{
 		private:
-			Array<const Track *>	 tracks;
+			Array<Track>			 tracks;
 
-			Text			*text_tracks;
-			ListBox			*list_tracks;
+			Text				*text_tracks;
+			ListBox				*list_tracks;
 
-			TabWidget		*tab_mode;
+			TabWidget			*tab_mode;
 
-			Layer			*layer_basic;
-			Layer			*layer_advanced;
+			LayerTagBasic			*layer_basic;
+			LayerTagAdvanced		*layer_advanced;
+		signals:
+			Signal1<Void, const Track &>	 onSelectTrack;
+			Signal0<Void>			 onSelectNone;
 		slots:
-			Void			 OnApplicationAddTrack(const Track &);
-			Void			 OnApplicationModifyTrack(const Track &);
-			Void			 OnApplicationRemoveTrack(const Track &);
-			Void			 OnApplicationSelectTrack(const Track &);
+			Void				 OnApplicationAddTrack(const Track &);
+			Void				 OnApplicationModifyTrack(const Track &);
+			Void				 OnApplicationRemoveTrack(const Track &);
+			Void				 OnApplicationSelectTrack(const Track &);
 
-			Void			 OnChangeSize(const Size &);
+			Void				 OnSelectTrack();
+			Void				 OnModifyTrack(const Track &);
+
+			Void				 OnChangeSize(const Size &);
 		public:
-						 LayerTags();
-						~LayerTags();
+							 LayerTags();
+							~LayerTags();
 	};
 };
 

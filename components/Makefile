@@ -2,6 +2,7 @@
 
 all:
 	cd decoder && make
+	cd dsp && make
 	cd encoder && make
 	cd extension && make
 	cd other && make
@@ -9,6 +10,7 @@ all:
 
 clean:
 	cd decoder && make clean
+	cd dsp && make clean
 	cd encoder && make clean
 	cd extension && make clean
 	cd other && make clean

@@ -63,6 +63,8 @@ BoCA::BonkOut::~BonkOut()
 
 Bool BoCA::BonkOut::Activate()
 {
+	const Format	&format = track.GetFormat();
+
 	if (format.channels > 2)
 	{
 		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
@@ -80,16 +82,16 @@ Bool BoCA::BonkOut::Activate()
 
 	encoder	= ex_bonk_encoder_create();
 
-	if ((format.artist != NIL || format.title != NIL) && config->enable_id3v2 && config->enable_id3)
+	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = format.RenderID3Tag(id3Buffer, 2);
+		Int			 size = track.RenderID3Tag(id3Buffer, 2);
 
 		ex_bonk_encoder_set_id3_data(encoder, id3Buffer, size);
 	}
 
 	ex_bonk_encoder_init(encoder,
-		(unsigned int) Math::Max(format.length, 0), format.rate, format.channels,
+		(unsigned int) Math::Max(track.length, 0), format.rate, format.channels,
 		config->GetIntValue("Bonk", "Lossless", 0), config->GetIntValue("Bonk", "JointStereo", 0),
 		config->GetIntValue("Bonk", "Predictor", 32), config->GetIntValue("Bonk", "Lossless", 0) ? 1 : config->GetIntValue("Bonk", "Downsampling", 2),
 		int(1024.0 * format.rate / 44100),
@@ -111,7 +113,7 @@ Bool BoCA::BonkOut::Deactivate()
 
 	driver->WriteData(dataBuffer, bytes);
 
-	if (format.length == -1)
+	if (track.length == -1)
 	{
 		int	 sample_count = ex_bonk_encoder_get_sample_count(encoder);
 
@@ -127,6 +129,8 @@ Bool BoCA::BonkOut::Deactivate()
 Int BoCA::BonkOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	int	 bytes = 0;
+
+	const Format	&format = track.GetFormat();
 
 	if (format.bits != 16)
 	{

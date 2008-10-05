@@ -71,15 +71,17 @@ Bool BoCA::FLACIn::CanOpenStream(const String &streamURI)
 	return streamURI.ToLower().EndsWith(".flac");
 }
 
-Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READONLY);
 	InStream	*f_in = new InStream(STREAM_DRIVER, ioDriver);
 
-	format.order	= BYTE_INTEL;
-	format.fileSize	= f_in->Size();
+	Format	&format = track.GetFormat();
 
-	infoFormat = &format;
+	format.order	= BYTE_INTEL;
+	track.fileSize	= f_in->Size();
+
+	infoTrack = &track;
 	finished = False;
 
 	driver = ioDriver;
@@ -118,7 +120,7 @@ Bool BoCA::FLACIn::Activate()
 
 	readDataMutex->Lock();
 
-	infoFormat = new Track();
+	infoTrack = new Track();
 
 	decoderThread = NonBlocking1<Bool>(&FLACIn::ReadFLAC, this).Call(True);
 
@@ -132,7 +134,7 @@ Bool BoCA::FLACIn::Deactivate()
 	delete readDataMutex;
 	delete samplesBufferMutex;
 
-	delete infoFormat;
+	delete infoTrack;
 
 	return True;
 }
@@ -149,15 +151,15 @@ Int BoCA::FLACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	samplesBufferMutex->Lock();
 
-	size = samplesBuffer.Size() * (format.bits / 8);
+	size = samplesBuffer.Size() * (track.GetFormat().bits / 8);
 
 	data.Resize(size);
 
 	for (Int i = 0; i < samplesBuffer.Size(); i++)
 	{
-		if	(format.bits == 8)  data[i] = samplesBuffer[i] + 128;
-		else if (format.bits == 16) ((Short *) (unsigned char *) data)[i] = samplesBuffer[i];
-		else if (format.bits == 24) { data[3 * i] = samplesBuffer[i] & 255; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 255; data[3 * i + 2] = (samplesBuffer[i] >> 16) & 255; }
+		if	(track.GetFormat().bits ==  8) data[i] = samplesBuffer[i] + 128;
+		else if (track.GetFormat().bits == 16) ((Short *) (unsigned char *) data)[i] = samplesBuffer[i];
+		else if (track.GetFormat().bits == 24) { data[3 * i] = samplesBuffer[i] & 255; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 255; data[3 * i + 2] = (samplesBuffer[i] >> 16) & 255; }
 	}
 
 	samplesBuffer.Resize(0);
@@ -210,13 +212,13 @@ FLAC__StreamDecoderWriteStatus BoCA::FLACStreamDecoderWriteCallback(const FLAC__
 
 	Int	 oSize = filter->samplesBuffer.Size();
 
-	filter->samplesBuffer.Resize(oSize + frame->header.blocksize * filter->format.channels);
+	filter->samplesBuffer.Resize(oSize + frame->header.blocksize * filter->track.GetFormat().channels);
 
 	for (Int i = 0; i < (signed) frame->header.blocksize; i++)
 	{
-		for (Int j = 0; j < filter->format.channels; j++)
+		for (Int j = 0; j < filter->track.GetFormat().channels; j++)
 		{
-			filter->samplesBuffer[oSize + i * filter->format.channels + j] = buffer[j][i];
+			filter->samplesBuffer[oSize + i * filter->track.GetFormat().channels + j] = buffer[j][i];
 		}
 	}
 
@@ -265,17 +267,17 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO)
 	{
-		filter->infoFormat->bits	= metadata->data.stream_info.bits_per_sample;
-		filter->infoFormat->channels	= metadata->data.stream_info.channels;
-		filter->infoFormat->rate	= metadata->data.stream_info.sample_rate;
-		filter->infoFormat->length	= metadata->data.stream_info.total_samples * filter->infoFormat->channels;
+		filter->infoTrack->GetFormat().bits	= metadata->data.stream_info.bits_per_sample;
+		filter->infoTrack->GetFormat().channels	= metadata->data.stream_info.channels;
+		filter->infoTrack->GetFormat().rate	= metadata->data.stream_info.sample_rate;
+		filter->infoTrack->length		= metadata->data.stream_info.total_samples * filter->infoTrack->GetFormat().channels;
 	}
 	else if (metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT)
 	{
 		if (metadata->data.vorbis_comment.num_comments > 0)
 		{
-			filter->infoFormat->track = -1;
-			filter->infoFormat->outfile = NIL;
+			filter->infoTrack->track = -1;
+			filter->infoTrack->outfile = NIL;
 
 			char	*prevInFormat = String::SetInputFormat("UTF-8");
 
@@ -284,14 +286,15 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 				String	 comment = String((char *) metadata->data.vorbis_comment.comments[j].entry);
 				String	 id = String().CopyN(comment, comment.Find("=")).ToUpper();
 
-				if	(id == "TITLE")		filter->infoFormat->title  = comment.Tail(comment.Length() - 6);
-				else if (id == "ARTIST")	filter->infoFormat->artist = comment.Tail(comment.Length() - 7);
-				else if (id == "ALBUM")		filter->infoFormat->album  = comment.Tail(comment.Length() - 6);
-				else if (id == "GENRE")		filter->infoFormat->genre  = comment.Tail(comment.Length() - 6);
-				else if (id == "DATE")		filter->infoFormat->year   = comment.Tail(comment.Length() - 5).ToInt();
-				else if (id == "TRACKNUMBER")	filter->infoFormat->track  = comment.Tail(comment.Length() - 12).ToInt();
-				else if (id == "ORGANIZATION")	filter->infoFormat->label  = comment.Tail(comment.Length() - 13);
-				else if (id == "ISRC")		filter->infoFormat->isrc   = comment.Tail(comment.Length() - 5);
+				if	(id == "TITLE")		filter->infoTrack->title   = comment.Tail(comment.Length() - 6);
+				else if (id == "ARTIST")	filter->infoTrack->artist  = comment.Tail(comment.Length() - 7);
+				else if (id == "ALBUM")		filter->infoTrack->album   = comment.Tail(comment.Length() - 6);
+				else if (id == "GENRE")		filter->infoTrack->genre   = comment.Tail(comment.Length() - 6);
+				else if (id == "DATE")		filter->infoTrack->year    = comment.Tail(comment.Length() - 5).ToInt();
+				else if (id == "TRACKNUMBER")	filter->infoTrack->track   = comment.Tail(comment.Length() - 12).ToInt();
+				else if (id == "COMMENT")	filter->infoTrack->comment = comment.Tail(comment.Length() - 8);
+				else if (id == "ORGANIZATION")	filter->infoTrack->label   = comment.Tail(comment.Length() - 13);
+				else if (id == "ISRC")		filter->infoTrack->isrc    = comment.Tail(comment.Length() - 5);
 			}
 
 			String::SetInputFormat(prevInFormat);
@@ -313,7 +316,7 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 		memset(picture.data, 0, picture.data.Size());
 		memcpy(picture.data, metadata->data.picture.data, picture.data.Size());
 
-		filter->infoFormat->pictures.Add(picture);
+		filter->infoTrack->pictures.Add(picture);
 	}
 }
 

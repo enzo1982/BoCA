@@ -9,13 +9,12 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "layer.h"
-#include "basic/layer_tag_basic.h"
-#include "advanced/layer_tag_advanced.h"
 
 BoCA::LayerTags::LayerTags() : Layer("Tags")
 {
 	text_tracks	= new Text("List of tracks:", Point(7, 5));
 	list_tracks	= new ListBox(Point(7, 24), Size(100, 150));
+	list_tracks->onSelectEntry.Connect(&LayerTags::OnSelectTrack, this);
 	list_tracks->AddTab(I18n::Get()->TranslateString("Title"));
 	list_tracks->AddTab(I18n::Get()->TranslateString("Track"), 50, OR_RIGHT);
 	list_tracks->AddTab(I18n::Get()->TranslateString("Length"), 80, OR_RIGHT);
@@ -24,6 +23,8 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	tab_mode	= new TabWidget(Point(7, 182), Size(300, 200));
 
 	layer_basic	= new LayerTagBasic();
+	layer_basic->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
+
 	layer_advanced	= new LayerTagAdvanced();
 
 	tab_mode->Add(layer_basic);
@@ -35,6 +36,12 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	Add(tab_mode);
 
 	onChangeSize.Connect(&LayerTags::OnChangeSize, this);
+
+	onSelectTrack.Connect(&LayerTagBasic::OnSelectTrack, layer_basic);
+	onSelectNone.Connect(&LayerTagBasic::OnSelectNone, layer_basic);
+
+	onSelectTrack.Connect(&LayerTagAdvanced::OnSelectTrack, layer_advanced);
+	onSelectNone.Connect(&LayerTagAdvanced::OnSelectNone, layer_advanced);
 
 	JobList::Get()->onApplicationAddTrack.Connect(&LayerTags::OnApplicationAddTrack, this);
 	JobList::Get()->onApplicationModifyTrack.Connect(&LayerTags::OnApplicationModifyTrack, this);
@@ -58,6 +65,9 @@ BoCA::LayerTags::~LayerTags()
 	DeleteObject(layer_advanced);
 }
 
+/* Called when component canvas size changes.
+ * ----
+ */
 Void BoCA::LayerTags::OnChangeSize(const Size &nSize)
 {
 	Rect	 clientRect = Rect(GetPosition(), GetSize());
@@ -67,6 +77,34 @@ Void BoCA::LayerTags::OnChangeSize(const Size &nSize)
 	tab_mode->SetSize(Size(clientSize.cx - 15, clientSize.cy - 190));
 }
 
+/* Called when a list entry is selected.
+ * ----
+ * Finds the corresponding track and emits onSelectTrack.
+ */
+Void BoCA::LayerTags::OnSelectTrack()
+{
+	const Track	&track = tracks.GetNth(list_tracks->GetSelectedEntryNumber());
+
+	onSelectTrack.Emit(track);
+
+	JobList::Get()->onComponentSelectTrack.Emit(track);
+}
+
+/* Called when a list entry is modified.
+ * ----
+ * Finds the corresponding track and updates it accordingly.
+ */
+Void BoCA::LayerTags::OnModifyTrack(const Track &track)
+{
+	OnApplicationModifyTrack(track);
+
+	JobList::Get()->onComponentModifyTrack.Emit(track);
+}
+
+/* Called when a track is added to the application joblist.
+ * ----
+ * Adds entries to tracks and list_tracks.
+ */
 Void BoCA::LayerTags::OnApplicationAddTrack(const Track &track)
 {
 	String	 jlEntry;
@@ -76,9 +114,13 @@ Void BoCA::LayerTags::OnApplicationAddTrack(const Track &track)
 
 	jlEntry.Append(track.track > 0 ? (track.track < 10 ? String("0").Append(String::FromInt(track.track)) : String::FromInt(track.track)) : String("")).Append("\t").Append(track.lengthString).Append("\t").Append(track.fileSizeString);
 
-	tracks.Add(&track, list_tracks->AddEntry(jlEntry)->GetHandle());
+	tracks.Add(track, list_tracks->AddEntry(jlEntry)->GetHandle());
 }
 
+/* Called when a track is modified by the application.
+ * ----
+ * Modifies our corresponding entry accordingly.
+ */
 Void BoCA::LayerTags::OnApplicationModifyTrack(const Track &track)
 {
 	String	 jlEntry;
@@ -90,20 +132,30 @@ Void BoCA::LayerTags::OnApplicationModifyTrack(const Track &track)
 
 	for (Int i = 0; i < list_tracks->Length(); i++)
 	{
-		if (tracks.Get(list_tracks->GetNthEntry(i)->GetHandle())->GetTrackID() == track.GetTrackID())
+		if (tracks.Get(list_tracks->GetNthEntry(i)->GetHandle()).GetTrackID() == track.GetTrackID())
 		{
 			list_tracks->GetNthEntry(i)->SetText(jlEntry);
+
+			tracks.GetReference(list_tracks->GetNthEntry(i)->GetHandle()) = track;
+
+			/* Emit onSelectTrack to let edit layer update its input fields.
+			 */
+			if (list_tracks->GetSelectedEntryNumber() == i) onSelectTrack.Emit(track);
 
 			break;
 		}
 	}
 }
 
+/* Called when a track is removed from the application joblist.
+ * ----
+ * Removes our corresponding entry from tracks and list_tracks.
+ */
 Void BoCA::LayerTags::OnApplicationRemoveTrack(const Track &track)
 {
 	for (Int i = 0; i < list_tracks->Length(); i++)
 	{
-		if (tracks.Get(list_tracks->GetNthEntry(i)->GetHandle())->GetTrackID() == track.GetTrackID())
+		if (tracks.Get(list_tracks->GetNthEntry(i)->GetHandle()).GetTrackID() == track.GetTrackID())
 		{
 			tracks.Remove(list_tracks->GetNthEntry(i)->GetHandle());
 
@@ -112,15 +164,21 @@ Void BoCA::LayerTags::OnApplicationRemoveTrack(const Track &track)
 			break;
 		}
 	}
+
+	if (list_tracks->Length() == 0) onSelectNone.Emit();
 }
 
+/* Called when a track is selected in the application joblist.
+ * ----
+ * Finds and selects the corresponding entry in our track list.
+ */
 Void BoCA::LayerTags::OnApplicationSelectTrack(const Track &track)
 {
 	for (Int i = 0; i < list_tracks->Length(); i++)
 	{
-		if (tracks.Get(list_tracks->GetNthEntry(i)->GetHandle())->GetTrackID() == track.GetTrackID())
+		if (tracks.Get(list_tracks->GetNthEntry(i)->GetHandle()).GetTrackID() == track.GetTrackID())
 		{
-			list_tracks->SelectNthEntry(i);
+			if (list_tracks->GetSelectedEntryNumber() != i) list_tracks->SelectNthEntry(i);
 
 			break;
 		}

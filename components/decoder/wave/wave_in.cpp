@@ -44,11 +44,13 @@ Bool BoCA::WaveIn::CanOpenStream(const String &streamURI)
 	return (magic == 1179011410);
 }
 
-Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
-	format.fileSize	= f_in->Size();
+	Format	&format = track.GetFormat();
+
+	track.fileSize	= f_in->Size();
 	format.order	= BYTE_INTEL;
 
 	// Read RIFF chunk
@@ -83,7 +85,7 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &format)
 		}
 		else if (chunk == "data")
 		{
-			format.length	= (unsigned long) cSize / (format.bits / 8);
+			track.length	= (unsigned long) cSize / (format.bits / 8);
 		}
 		else
 		{

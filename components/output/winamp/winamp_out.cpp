@@ -61,7 +61,7 @@ Bool BoCA::WinampOut::Activate()
 {
 	plugin = winamp_out_modules.GetNth(Config::Get()->GetIntValue("WinampOut", "OutputPlugin", 0));
 
-	return (plugin->Open(format.rate, format.channels, 16, 0, 0) >= 0);
+	return (plugin->Open(track.GetFormat().rate, track.GetFormat().channels, track.GetFormat().bits, 0, 0) >= 0);
 }
 
 Bool BoCA::WinampOut::Deactivate()

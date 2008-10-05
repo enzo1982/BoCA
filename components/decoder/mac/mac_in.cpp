@@ -61,7 +61,7 @@ Bool BoCA::MACIn::CanOpenStream(const String &streamURI)
 	       lcURI.EndsWith(".mac");
 }
 
-Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	int			 nRetVal = 0;
 	APE_DECOMPRESS_HANDLE	 hAPEDecompress = NIL;
@@ -79,21 +79,23 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	if (hAPEDecompress == NIL) return Error();
 
+	Format	&format = track.GetFormat();
+
 	format.order	= BYTE_INTEL;
 	format.bits	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BITS_PER_SAMPLE, 0, 0);
 
 	format.channels	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_CHANNELS, 0, 0);
 	format.rate	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_SAMPLE_RATE, 0, 0);
 
-	format.length	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0) * format.channels;
+	track.length	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0) * format.channels;
 
 	ex_APEDecompress_Destroy(hAPEDecompress);
 
-	format.fileSize	= File(streamURI).GetFileSize();
+	track.fileSize	= File(streamURI).GetFileSize();
 
 	/* Parse APE tag if present.
 	 */
-	format.ParseAPETag(streamURI);
+	track.ParseAPETag(streamURI);
 
 	if (String::IsUnicode(streamURI))
 	{
@@ -118,15 +120,15 @@ Bool BoCA::MACIn::Activate()
 {
 	int	 nRetVal = 0;
 
-	if (String::IsUnicode(format.origFilename))
+	if (String::IsUnicode(track.origFilename))
 	{
-		File(format.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"));
+		File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
 
-		hAPEDecompress = ex_APEDecompress_Create(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in"), &nRetVal);
+		hAPEDecompress = ex_APEDecompress_Create(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"), &nRetVal);
 	}
 	else
 	{
-		hAPEDecompress = ex_APEDecompress_Create(format.origFilename, &nRetVal);
+		hAPEDecompress = ex_APEDecompress_Create(track.origFilename, &nRetVal);
 	}
 
 	blockId = 0;
@@ -138,9 +140,9 @@ Bool BoCA::MACIn::Deactivate()
 {
 	ex_APEDecompress_Destroy(hAPEDecompress);
 
-	if (String::IsUnicode(format.origFilename))
+	if (String::IsUnicode(track.origFilename))
 	{
-		File(Utilities::GetNonUnicodeTempFileName(format.origFilename).Append(".in")).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
 	}
 
 	return True;
@@ -168,7 +170,7 @@ Int BoCA::MACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 		nTotalBlocksRetrieved += nBlocksRetrieved;
 		blockId += nBlocksRetrieved;
 	}
-	while (nBlocksRetrieved > 0 && blockId < (nTotalBlocks * (double(inBytes) / format.fileSize)));
+	while (nBlocksRetrieved > 0 && blockId < (nTotalBlocks * (double(inBytes) / track.fileSize)));
 
 	return nTotalBlocksRetrieved * nBlockAlign;
 }

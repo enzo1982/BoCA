@@ -71,6 +71,8 @@ Bool BoCA::MACOut::Activate()
 {
 	int	 nRetVal = 0;
 
+	const Format	&format = track.GetFormat();
+
 	/* Create encoder and retrieve handle.
 	 */
 	hAPECompress = ex_APECompress_Create(&nRetVal);
@@ -87,7 +89,7 @@ Bool BoCA::MACOut::Activate()
 	waveFormat.wBitsPerSample	= format.bits;
 	waveFormat.cbSize		= 0;
 
-	ex_APECompress_Start(hAPECompress, Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (Config::Get()->GetIntValue("MAC", "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
+	ex_APECompress_Start(hAPECompress, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (Config::Get()->GetIntValue("MAC", "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
 
 	return True;
 }
@@ -102,7 +104,7 @@ Bool BoCA::MACOut::Deactivate()
 
 	/* Stream contents of created APE file to output driver
 	 */
-	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), IS_READONLY);
+	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READONLY);
 	Buffer<UnsignedByte>	 buffer(1024);
 	Int			 bytesLeft = in.Size();
 
@@ -115,15 +117,15 @@ Bool BoCA::MACOut::Deactivate()
 
 	in.Close();
 
-	if ((format.artist != NIL || format.title != NIL) && Config::Get()->GetIntValue("MAC", "EnableTags", 1))
+	if ((track.artist != NIL || track.title != NIL) && Config::Get()->GetIntValue("MAC", "EnableTags", 1))
 	{
 		Buffer<unsigned char>	 tagBuffer;
-		Int			 size = format.RenderAPETag(tagBuffer);
+		Int			 size = track.RenderAPETag(tagBuffer);
 
 		driver->WriteData(tagBuffer, size);
 	}
 
-	File(Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out")).Delete();
+	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
 
  	return True;
 }

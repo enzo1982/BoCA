@@ -45,13 +45,15 @@ Bool BoCA::AIFFIn::CanOpenStream(const String &streamURI)
 	return (magic == 1297239878);
 }
 
-Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
 	// TODO: Add more checking to this!
 
-	format.fileSize = f_in->Size();
+	Format	&format = track.GetFormat();
+
+	track.fileSize = f_in->Size();
 	format.order = BYTE_RAW;
 
 	// Read magic number
@@ -73,7 +75,7 @@ Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &format)
 	for (Int l = 0; l < 10; l++)
 		f_in->InputNumber(1);
 
-	format.length = UnsignedInt32(f_in->InputNumberRaw(4) - 8) / (format.bits / 8);
+	track.length = UnsignedInt32(f_in->InputNumberRaw(4) - 8) / (format.bits / 8);
 
 	delete f_in;
 

@@ -93,17 +93,19 @@ Bool BoCA::MADIn::CanOpenStream(const String &streamURI)
 	       lcURI.EndsWith(".mp3");
 }
 
-Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READONLY);
 	InStream	*f_in = new InStream(STREAM_DRIVER, ioDriver);
 
+	Format	&format = track.GetFormat();
+
 	format.order	= BYTE_INTEL;
 	format.bits	= 16;
-	format.fileSize	= f_in->Size();
-	format.length	= -1;
+	track.fileSize	= f_in->Size();
+	track.length	= -1;
 
-	infoFormat = &format;
+	infoTrack = &track;
 	finished = False;
 
 	SkipID3v2Tag(f_in);
@@ -126,10 +128,10 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &format)
 
 	if (Config::Get()->enable_id3)
 	{
-		format.track = -1;
-		format.outfile = NIL;
+		track.track = -1;
+		track.outfile = NIL;
 
-		format.ParseID3Tag(streamURI);
+		track.ParseID3Tag(streamURI);
 	}
 
 	return Success();
@@ -139,7 +141,7 @@ BoCA::MADIn::MADIn()
 {
 	packageSize = 0;
 
-	infoFormat = NIL;
+	infoTrack = NIL;
 	numFrames = 0;
 }
 
@@ -189,7 +191,7 @@ Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	samplesBufferMutex->Lock();
 
-	size = samplesBuffer.Size() * (format.bits / 8);
+	size = samplesBuffer.Size() * (track.GetFormat().bits / 8);
 
 	data.Resize(size);
 
@@ -306,13 +308,13 @@ mad_flow BoCA::MADOutputCallback(void *client_data, const mad_header *header, ma
 
 	Int	 oSize = filter->samplesBuffer.Size();
 
-	filter->samplesBuffer.Resize(oSize + pcm->length * filter->format.channels);
+	filter->samplesBuffer.Resize(oSize + pcm->length * filter->track.GetFormat().channels);
 
 	for (Int i = 0; i < (signed) pcm->length; i++)
 	{
-		for (Int j = 0; j < filter->format.channels; j++)
+		for (Int j = 0; j < filter->track.GetFormat().channels; j++)
 		{
-			filter->samplesBuffer[oSize + i * filter->format.channels + j] = pcm->samples[j][i];
+			filter->samplesBuffer[oSize + i * filter->track.GetFormat().channels + j] = pcm->samples[j][i];
 		}
 	}
 
@@ -325,9 +327,9 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header)
 {
 	MADIn	*filter = (MADIn *) client_data;
 
-	filter->infoFormat->channels	 = header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
-	filter->infoFormat->rate	 = header->samplerate;
-	filter->infoFormat->approxLength = filter->infoFormat->fileSize / (header->bitrate / 8) * filter->infoFormat->rate * filter->infoFormat->channels;
+	filter->infoTrack->GetFormat().channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
+	filter->infoTrack->GetFormat().rate	= header->samplerate;
+	filter->infoTrack->approxLength		= filter->infoTrack->fileSize / (header->bitrate / 8) * filter->infoTrack->GetFormat().rate * filter->infoTrack->GetFormat().channels;
 
 	/* If we previously found a Xing header,
 	 * we can compute the exact duration from
@@ -335,7 +337,7 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header)
 	 */
 	if (filter->numFrames > 0)
 	{
-		filter->infoFormat->length = filter->numFrames * Math::Round((Float) header->duration.fraction / MAD_TIMER_RESOLUTION * filter->infoFormat->rate) * filter->infoFormat->channels;
+		filter->infoTrack->length = filter->numFrames * Math::Round((Float) header->duration.fraction / MAD_TIMER_RESOLUTION * filter->infoTrack->GetFormat().rate) * filter->infoTrack->GetFormat().channels;
 	}
 
 	return MAD_FLOW_STOP;

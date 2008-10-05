@@ -41,6 +41,9 @@ namespace BoCA
 						 LayerTagAdvanced();
 						~LayerTagAdvanced();
 		slots:
+			Void			 OnSelectTrack(const Track &);
+			Void			 OnSelectNone();
+
 			Void			 OnSelectTagType();
 			Void			 OnSelectField();
 

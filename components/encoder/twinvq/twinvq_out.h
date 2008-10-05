@@ -11,6 +11,8 @@
 #include <boca.h>
 #include "dllinterface.h"
 
+#include "twinvq/bfile_e.h"
+
 BoCA_BEGIN_COMPONENT(TwinVQOut)
 
 namespace BoCA
@@ -24,7 +26,8 @@ namespace BoCA
 			encSpecificInfo		 encInfo;
 			INDEX			 index;
 
-			Buffer<unsigned char>	 outBuffer;
+			BFILE			*bfp;
+
 			Buffer<signed short>	 samplesBuffer;
 			Buffer<float>		 frame;
 		public:

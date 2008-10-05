@@ -44,13 +44,15 @@ Bool BoCA::VocIn::CanOpenStream(const String &streamURI)
 	return (magic == 1634038339);
 }
 
-Error BoCA::VocIn::GetStreamInfo(const String &streamURI, Track &format)
+Error BoCA::VocIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
 	// TODO: Add more checking to this!
 
-	format.fileSize = f_in->Size();
+	Format	&format = track.GetFormat();
+
+	track.fileSize = f_in->Size();
 	format.order = BYTE_INTEL;
 
 	// Read magic number
@@ -60,7 +62,7 @@ Error BoCA::VocIn::GetStreamInfo(const String &streamURI, Track &format)
 	format.bits = UnsignedInt8(f_in->InputNumber(1));
 	format.channels = UnsignedInt8(f_in->InputNumber(1));
 
-	format.length = (format.fileSize - 42 - 4 * Int((format.fileSize - 42) / 7340032)) / (format.bits / 8);
+	track.length = (track.fileSize - 42 - 4 * Int((track.fileSize - 42) / 7340032)) / (format.bits / 8);
 
 	delete f_in;
 

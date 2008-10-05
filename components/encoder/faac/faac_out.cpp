@@ -88,6 +88,8 @@ BoCA::FAACOut::~FAACOut()
 
 Bool BoCA::FAACOut::Activate()
 {
+	const Format	&format = track.GetFormat();
+
 	if (format.channels > 2)
 	{
 		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
@@ -129,7 +131,7 @@ Bool BoCA::FAACOut::Activate()
 
 	if (config->GetIntValue("FAAC", "MP4Container", 1))
 	{
-		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), 0, 0, 1, 1, NIL, 0, NIL, 0);
+		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), 0, 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);	
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
@@ -151,10 +153,10 @@ Bool BoCA::FAACOut::Activate()
 
 	if (!config->GetIntValue("FAAC", "MP4Container", 1))
 	{
-		if ((format.artist != NIL || format.title != NIL) && config->enable_id3v2 && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
+		if ((track.artist != NIL || track.title != NIL) && config->enable_id3v2 && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
 		{
 			Buffer<unsigned char>	 id3Buffer;
-			Int			 size = format.RenderID3Tag(id3Buffer, 2);
+			Int			 size = track.RenderID3Tag(id3Buffer, 2);
 
 			driver->WriteData(id3Buffer, size);
 		}
@@ -201,12 +203,12 @@ Bool BoCA::FAACOut::Deactivate()
 
 		if (config->enable_mp4meta)
 		{
-			if (format.artist != NIL || format.title != NIL) format.RenderMP4Meta(Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"));
+			if (track.artist != NIL || track.title != NIL) track.RenderMP4Meta(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
 		}
 
 		/* Stream contents of created MP4 file to output driver
 		 */
-		InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out"), IS_READONLY);
+		InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READONLY);
 		Buffer<UnsignedByte>	 buffer(1024);
 		Int			 bytesLeft = in.Size();
 
@@ -219,7 +221,7 @@ Bool BoCA::FAACOut::Deactivate()
 
 		in.Close();
 
-		File(Utilities::GetNonUnicodeTempFileName(format.outfile).Append(".out")).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
 	}
 
 	return True;
@@ -228,6 +230,8 @@ Bool BoCA::FAACOut::Deactivate()
 Int BoCA::FAACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	Config	*config = Config::Get();
+
+	const Format	&format = track.GetFormat();
 
 	unsigned long	 bytes = 0;
 	Int		 samplesRead = size / (format.bits / 8);
