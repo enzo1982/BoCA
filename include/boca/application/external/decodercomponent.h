@@ -25,7 +25,7 @@ namespace BoCA
 				Bool			 errorState;
 				String			 errorString;
 
-				Track			 format;
+				Track			 track;
 
 				Int64			 inBytes;
 			public:
@@ -34,7 +34,7 @@ namespace BoCA
 
 				virtual Bool		 CanOpenStream(const String &);
 
-				Void			 SetInputFormat(const Track &nFormat)	{ format = nFormat; }
+				Bool			 SetAudioTrackInfo(const Track &nTrack)	{ track = nTrack;  return True; }
 
 				Int64			 GetInBytes()				{ return inBytes; }
 
@@ -44,8 +44,8 @@ namespace BoCA
 				virtual ConfigLayer	*GetConfigurationLayer();
 				virtual Void		 FreeConfigurationLayer();
 
-				Bool			 GetErrorState()	{ return errorState; }
-				const String		&GetErrorString()	{ return errorString; }
+				Bool			 GetErrorState()			{ return errorState; }
+				const String		&GetErrorString()			{ return errorString; }
 		};
 	};
 };

@@ -29,6 +29,7 @@ namespace smooth
 		{
 			public:
 						 ImageLoaderPCI(const String &);
+						 ImageLoaderPCI(const Buffer<UnsignedByte> &);
 						~ImageLoaderPCI();
 
 				const Bitmap	&Load();

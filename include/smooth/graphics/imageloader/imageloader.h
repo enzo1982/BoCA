@@ -25,19 +25,29 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Int	 IMAGE_FORMAT_PCI	= 0;
+		const Int	 IMAGE_FORMAT_PNG	= 1;
+		const Int	 IMAGE_FORMAT_JPEG	= 2;
+
 		abstract class SMOOTHAPI ImageLoader
 		{
 			protected:
 				String			 fileName;
+				Buffer<UnsignedByte>	 buffer;
+
+				Bool			 gotFileName;
+				Bool			 gotBuffer;
 
 				Bitmap			 bitmap;
 			public:
 							 ImageLoader(const String &);
+							 ImageLoader(const Buffer<UnsignedByte> &);
 				virtual			~ImageLoader();
 
 				virtual const Bitmap	&Load() = 0;
 
 				static Bitmap		 Load(const String &);
+				static Bitmap		 Load(const Buffer<UnsignedByte> &, Int);
 		};
 	};
 };

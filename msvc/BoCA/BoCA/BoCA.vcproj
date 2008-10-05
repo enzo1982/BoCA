@@ -182,15 +182,63 @@
 				Name="application"
 				>
 				<File
-					RelativePath="..\..\..\runtime\src\application\component.cpp"
+					RelativePath="..\..\..\runtime\application\component.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\application\componentspecs.cpp"
+					RelativePath="..\..\..\runtime\application\componentspecs.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\application\decodercomponent.cpp"
+					RelativePath="..\..\..\runtime\application\decodercomponent.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)2.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)2.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\application\dspcomponent.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\application\encodercomponent.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)2.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)2.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\application\extensioncomponent.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -212,62 +260,18 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\application\encodercomponent.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\runtime\src\application\extensioncomponent.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\runtime\src\application\outputcomponent.cpp"
+					RelativePath="..\..\..\runtime\application\outputcomponent.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\application\registry.cpp"
+					RelativePath="..\..\..\runtime\application\registry.cpp"
 					>
 				</File>
 				<Filter
 					Name="external"
 					>
 					<File
-						RelativePath="..\..\..\runtime\src\application\external\configlayer.cpp"
+						RelativePath="..\..\..\runtime\application\external\configlayer.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -289,15 +293,15 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\application\external\decodercomponent.cpp"
+						RelativePath="..\..\..\runtime\application\external\decodercomponent.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)2.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -305,29 +309,29 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)2.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
 							/>
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\application\external\decodercomponentfile.cpp"
+						RelativePath="..\..\..\runtime\application\external\decodercomponentfile.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\application\external\decodercomponentstdio.cpp"
+						RelativePath="..\..\..\runtime\application\external\decodercomponentstdio.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\application\external\encodercomponent.cpp"
+						RelativePath="..\..\..\runtime\application\external\encodercomponent.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)2.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -335,17 +339,17 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)2.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
 							/>
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\application\external\encodercomponentfile.cpp"
+						RelativePath="..\..\..\runtime\application\external\encodercomponentfile.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\application\external\encodercomponentstdio.cpp"
+						RelativePath="..\..\..\runtime\application\external\encodercomponentstdio.cpp"
 						>
 					</File>
 				</Filter>
@@ -354,50 +358,58 @@
 				Name="common"
 				>
 				<File
-					RelativePath="..\..\..\runtime\src\common\config.cpp"
+					RelativePath="..\..\..\runtime\common\config.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\common\configlayer.cpp"
+					RelativePath="..\..\..\runtime\common\configlayer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\common\i18n.cpp"
+					RelativePath="..\..\..\runtime\common\format.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\common\picture.cpp"
+					RelativePath="..\..\..\runtime\common\i18n.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\common\protocol.cpp"
+					RelativePath="..\..\..\runtime\common\picture.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\common\track.cpp"
+					RelativePath="..\..\..\runtime\common\protocol.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\common\utilities.cpp"
+					RelativePath="..\..\..\runtime\common\track.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\common\utilities.cpp"
 					>
 				</File>
 				<Filter
 					Name="tagging"
 					>
 					<File
-						RelativePath="..\..\..\runtime\src\common\tagging\tag.cpp"
+						RelativePath="..\..\..\runtime\common\tagging\tag.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\common\tagging\tagape.cpp"
+						RelativePath="..\..\..\runtime\common\tagging\tagape.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\common\tagging\tagid3.cpp"
+						RelativePath="..\..\..\runtime\common\tagging\tagid3.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\src\common\tagging\tagmp4.cpp"
+						RelativePath="..\..\..\runtime\common\tagging\tagmp4.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\tagging\tagvorbis.cpp"
 						>
 					</File>
 				</Filter>
@@ -405,7 +417,11 @@
 					Name="communication"
 					>
 					<File
-						RelativePath="..\..\..\runtime\src\common\communication\joblist.cpp"
+						RelativePath="..\..\..\runtime\common\communication\joblist.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\communication\menu.cpp"
 						>
 					</File>
 				</Filter>
@@ -414,7 +430,7 @@
 				Name="component"
 				>
 				<File
-					RelativePath="..\..\..\runtime\src\component\component.cpp"
+					RelativePath="..\..\..\runtime\component\component.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -436,19 +452,41 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\component\decodercomponent.cpp"
+					RelativePath="..\..\..\runtime\component\decodercomponent.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\component\encodercomponent.cpp"
+					RelativePath="..\..\..\runtime\component\dspcomponent.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\component\encodercomponent.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\component\extensioncomponent.cpp"
+					RelativePath="..\..\..\runtime\component\extensioncomponent.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\component\outputcomponent.cpp"
+					RelativePath="..\..\..\runtime\component\outputcomponent.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -474,11 +512,11 @@
 				Name="core"
 				>
 				<File
-					RelativePath="..\..\..\runtime\src\core\dllinterfaces.cpp"
+					RelativePath="..\..\..\runtime\core\dllinterfaces.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\src\core\main.cpp"
+					RelativePath="..\..\..\runtime\core\main.cpp"
 					>
 				</File>
 			</Filter>
@@ -575,6 +613,10 @@
 						</File>
 						<File
 							RelativePath="..\..\..\include\boca\common\tagging\tagmp4.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\tagging\tagvorbis.h"
 							>
 						</File>
 					</Filter>

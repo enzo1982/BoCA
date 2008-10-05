@@ -25,7 +25,7 @@ namespace BoCA
 		abstract class BOCA_DLL_EXPORT OutputComponent : public Component, public IO::Filter
 		{
 			protected:
-				Track		 format;
+				Track		 track;
 			public:
 						 OutputComponent();
 				virtual		~OutputComponent();

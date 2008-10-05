@@ -37,7 +37,6 @@ namespace smooth
 			static GUI::Color	 DividerDarkColor;
 			static GUI::Color	 TextColor;
 			static GUI::Color	 GrayTextColor;
-			static GUI::Color	 ShadowColor;
 			static GUI::Color	 GradientStartColor;
 			static GUI::Color	 GradientEndColor;
 			static GUI::Color	 GradientTextColor;

@@ -34,23 +34,24 @@ namespace smooth
 			private:
 				static Int			 surfaceDPI;
 			protected:
+				Size				 allocSize;
 #ifdef __WIN32__
 				HWND				 window;
-#else
-				Window				 window;
-#endif
-				Size				 allocSize;
-
-#ifdef __WIN32__
-				Array<HDC>			 cDc_contexts;
-				Array<HBITMAP>			 cDc_bitmaps;
-				Array<Rect *, Void *>		 cDc_rects;
-
 				HDC				 gdi_dc;
+
+				Array<HDC>			 paint_contexts;
+				Array<HBITMAP>			 paint_bitmaps;
 #else
 				Display				*display;
 				Visual				*visual;
+
+				Window				 window;
+				XWindowAttributes		 windowAttributes;
+
+				Array<Pixmap>			 paint_bitmaps;
 #endif
+				Array<Rect *, Void *>		 paint_rects;
+
 				cairo_surface_t			*surface;
 				cairo_t				*context;
 

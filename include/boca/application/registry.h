@@ -20,29 +20,29 @@ namespace BoCA
 		class BOCA_DLL_EXPORT Registry
 		{
 			private:
-				static Registry		*registry;
+				static Registry			*registry;
 
-				Array<ComponentSpecs *>	 componentSpecs;
+				Array<ComponentSpecs *>		 componentSpecs;
 
-							 Registry();
-							~Registry();
+								 Registry();
+								~Registry();
 			public:
-				static Registry		&Get();
-				static Bool		 Free();
+				static Registry			&Get();
+				static Bool			 Free();
 
-				Int			 GetNumberOfComponents();
-				Int			 GetNumberOfComponentsOfType(Int);
+				Int				 GetNumberOfComponents();
+				Int				 GetNumberOfComponentsOfType(Int);
 
-				const String		&GetComponentName(Int);
-				const String		&GetComponentVersion(Int);
-				const String		&GetComponentID(Int);
-				Int			 GetComponentType(Int);
-				const Array<Format *>	&GetComponentFormats(Int);
+				const String			&GetComponentName(Int);
+				const String			&GetComponentVersion(Int);
+				const String			&GetComponentID(Int);
+				Int				 GetComponentType(Int);
+				const Array<FileFormat *>	&GetComponentFormats(Int);
 
-				Bool			 ComponentExists(const String &);
+				Bool				 ComponentExists(const String &);
 
-				Component		*CreateComponentByID(const String &);
-				Bool			 DeleteComponent(Component *);
+				Component			*CreateComponentByID(const String &);
+				Bool				 DeleteComponent(Component *);
 		};
 	};
 };

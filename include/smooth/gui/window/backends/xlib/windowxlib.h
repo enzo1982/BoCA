@@ -51,8 +51,12 @@ namespace smooth
 				Int					 Open(const String &, const Point &, const Size &, Int);
 				Int					 Close();
 
+				Int					 SetTitle(const String &);
+
 				Int					 Show();
 				Int					 Hide();
+
+				Int					 SetMetrics(const Point &, const Size &);
 		};
 	};
 };

@@ -25,12 +25,13 @@ namespace BoCA
 				Bool			 errorState;
 				String			 errorString;
 
-				Track			 format;
+				Track			 track;
+				Format			 format;
 			public:
 							 EncoderComponentExternal(ComponentSpecs *);
 				virtual			~EncoderComponentExternal();
 
-				virtual Bool		 SetAudioTrackInfo(const Track &nFormat)	{ format = nFormat; return True; }
+				virtual Bool		 SetAudioTrackInfo(const Track &nTrack)	{ track = nTrack; format = nTrack.GetFormat(); return True; }
 
 				virtual String		 GetOutputFileExtension();
 

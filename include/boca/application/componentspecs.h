@@ -21,7 +21,7 @@ namespace BoCA
 {
 	namespace AS
 	{
-		class BOCA_DLL_EXPORT Format
+		class BOCA_DLL_EXPORT FileFormat
 		{
 			private:
 				String			 name;
@@ -116,7 +116,7 @@ namespace BoCA
 
 				Array<Parameter *>	 external_parameters;
 
-				Array<Format *>		 formats;
+				Array<FileFormat *>	 formats;
 
 							 ComponentSpecs();
 							~ComponentSpecs();
@@ -139,7 +139,6 @@ namespace BoCA
 
 				bool			 (*func_CanOpenStream)(void *, const wchar_t *);
 				int			 (*func_GetStreamInfo)(void *, const wchar_t *, void *);
-				void			 (*func_SetInputFormat)(void *, const void *);
 
 				int			 (*func_GetPackageSize)(void *);
 
@@ -153,6 +152,7 @@ namespace BoCA
 				bool			 (*func_IsPlaying)(void *);
 
 				bool			 (*func_SetAudioTrackInfo)(void *, const void *);
+				void			 (*func_GetFormatInfo)(void *, void *);
 
 				char			*(*func_GetOutputFileExtension)(void *);
 
@@ -161,6 +161,9 @@ namespace BoCA
 
 				int			 (*func_ReadData)(void *, void *, int);
 				int			 (*func_WriteData)(void *, void *, int);
+				int			 (*func_TransformData)(void *, void *, int);
+
+				int			 (*func_Flush)(void *, void *);
 
 				void			*(*func_GetMainTabLayer)(void *);
 		};

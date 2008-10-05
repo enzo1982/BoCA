@@ -29,6 +29,8 @@ namespace smooth
 
 			inline Int	 GetIndex() const		{ return index; }
 			Bool		 SetIndex(Int nIndex)		{ index = nIndex; return True; }
+
+			inline s	&GetValueReference()		{ return value; }
 	};
 };
 

@@ -1,47 +1,57 @@
 ########## BoCA CDK makefile ##########
 
-VERSION	   = 1.0
+# Change these variables to fit your project:
+TARGET	  = boca
+TYPE	  = runtime
+VERSION	  = 1.0
 
-SRCDIR	   = src
-INCLUDEDIR = ../include
-LIBDIR	   = ../lib
-BINDIR	   = ../bin
-OBJECTSDIR = objects
+BOCA_PATH = ..
 
-OBJECTS	   = $(OBJECTSDIR)/application/external/configlayer.o $(OBJECTSDIR)/application/external/decodercomponent.o $(OBJECTSDIR)/application/external/decodercomponentfile.o $(OBJECTSDIR)/application/external/decodercomponentstdio.o $(OBJECTSDIR)/application/external/encodercomponent.o $(OBJECTSDIR)/application/external/encodercomponentfile.o $(OBJECTSDIR)/application/external/encodercomponentstdio.o $(OBJECTSDIR)/application/component.o $(OBJECTSDIR)/application/componentspecs.o $(OBJECTSDIR)/application/decodercomponent.o $(OBJECTSDIR)/application/encodercomponent.o $(OBJECTSDIR)/application/extensioncomponent.o $(OBJECTSDIR)/application/outputcomponent.o $(OBJECTSDIR)/application/registry.o $(OBJECTSDIR)/common/communication/joblist.o $(OBJECTSDIR)/common/communication/menu.o $(OBJECTSDIR)/common/tagging/tag.o $(OBJECTSDIR)/common/tagging/tagape.o $(OBJECTSDIR)/common/tagging/tagid3.o $(OBJECTSDIR)/common/tagging/tagmp4.o $(OBJECTSDIR)/common/config.o $(OBJECTSDIR)/common/configlayer.o $(OBJECTSDIR)/common/i18n.o $(OBJECTSDIR)/common/picture.o $(OBJECTSDIR)/common/protocol.o $(OBJECTSDIR)/common/track.o $(OBJECTSDIR)/common/utilities.o $(OBJECTSDIR)/component/component.o $(OBJECTSDIR)/component/decodercomponent.o $(OBJECTSDIR)/component/encodercomponent.o $(OBJECTSDIR)/component/extensioncomponent.o $(OBJECTSDIR)/component/outputcomponent.o $(OBJECTSDIR)/core/dllinterfaces.o $(OBJECTSDIR)/core/main.o
+# Enter object files here:
+OBJECTS	  = application/external/configlayer.o application/external/decodercomponent.o application/external/decodercomponentfile.o application/external/decodercomponentstdio.o application/external/encodercomponent.o application/external/encodercomponentfile.o application/external/encodercomponentstdio.o application/component.o application/componentspecs.o application/decodercomponent.o application/dspcomponent.o application/encodercomponent.o application/extensioncomponent.o application/outputcomponent.o application/registry.o common/communication/joblist.o common/communication/menu.o common/tagging/tag.o common/tagging/tagape.o common/tagging/tagid3.o common/tagging/tagmp4.o common/tagging/tagvorbis.o common/config.o common/configlayer.o common/format.o common/i18n.o common/picture.o common/protocol.o common/track.o common/utilities.o component/component.o component/decodercomponent.o component/dspcomponent.o component/encodercomponent.o component/extensioncomponent.o component/outputcomponent.o core/dllinterfaces.o core/main.o
+
+# Enter additional library dependencies here
+LIBS	  =
+
+# Enter addition commands for targets all and clean here:
+ALLCMD1   =
+ALLCMD2   =
+CLEANCMD1 =
+CLEANCMD1 =
+
+## Do not change anything below this line. ##
+
+include $(BOCA_PATH)/Makefile-directories
 
 CC = gcc
-CCOPTS = -march=i586 -Os -g0 -Wall -fno-exceptions -ffast-math -D__BOCA_CDK_BUILD__ -DID3LIB_LINKOPTION=LINKOPTION_USE_DYNAMIC -I$(INCLUDEDIR)
+CCOPTS = -g0 -Wall -fno-exceptions -ffast-math -D__BOCA_CDK_BUILD__ -DID3LIB_LINKOPTION=LINKOPTION_USE_DYNAMIC -I$(BOCA_PATH)/include
 LD = gcc
-LDOPTS = -L$(LIBDIR) -lsmooth -lstdc++
+LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
 
-all : $(BINDIR)/boca.$(VERSION).dll
+ifeq ($(BUILD_X64),True)
+	CCOPTS += -march=nocona
 
-$(BINDIR)/boca.$(VERSION).dll : $(OBJECTS)
-	$(LD) --shared -o $(BINDIR)/boca.$(VERSION).dll $(OBJECTS) -Xlinker --out-implib -Xlinker $(LIBDIR)/libboca.a $(LDOPTS)
-	strip --strip-all $(BINDIR)/boca.$(VERSION).dll
-	upx --best -q $(BINDIR)/boca.$(VERSION).dll
+	PACKER = mpress
+	PACKER_OPTS = -q
+else
+	CCOPTS += -march=i586 -Os
+
+	PACKER = upx
+	PACKER_OPTS = --best -q
+endif
+
+all : $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION).dll
+
+$(BOCA_PATH)/$(BINDIR)/boca.$(VERSION).dll : $(OBJECTS)
+	$(LD) --shared -o $@ $(OBJECTS) -Xlinker --out-implib -Xlinker $(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
+	strip --strip-all $@
+	$(PACKER) $(PACKER_OPTS) $@
 
 clean :
-	rm -f $(BINDIR)/boca.$(VERSION).dll $(LIBDIR)/libboca.a $(OBJECTS)
+	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION).dll $(BOCA_PATH)/$(LIBDIR)/libboca.a $(OBJECTS)
 
-$(OBJECTSDIR)/application/%.o: $(SRCDIR)/application/%.cpp
+.c.o:
 	$(CC) $(CCOPTS) -c $< -o $@
 
-$(OBJECTSDIR)/application/external/%.o: $(SRCDIR)/application/external/%.cpp
-	$(CC) $(CCOPTS) -c $< -o $@
-
-$(OBJECTSDIR)/common/%.o: $(SRCDIR)/common/%.cpp
-	$(CC) $(CCOPTS) -c $< -o $@
-
-$(OBJECTSDIR)/common/communication/%.o: $(SRCDIR)/common/communication/%.cpp
-	$(CC) $(CCOPTS) -c $< -o $@
-
-$(OBJECTSDIR)/common/tagging/%.o: $(SRCDIR)/common/tagging/%.cpp
-	$(CC) $(CCOPTS) -c $< -o $@
-
-$(OBJECTSDIR)/component/%.o: $(SRCDIR)/component/%.cpp
-	$(CC) $(CCOPTS) -c $< -o $@
-
-$(OBJECTSDIR)/core/%.o: $(SRCDIR)/core/%.cpp
+.cpp.o:
 	$(CC) $(CCOPTS) -c $< -o $@

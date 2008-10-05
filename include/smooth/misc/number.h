@@ -38,7 +38,7 @@ namespace smooth
 
 			String			 ToIntString() const;
 			String			 ToFloatString() const;
-			String			 ToHexString(Int = 1) const;
+			String			 ToHexString(Int = -1) const;
 
 			operator		 Int64 () const;
 			operator		 Float () const;

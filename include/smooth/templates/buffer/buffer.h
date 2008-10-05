@@ -49,7 +49,7 @@ namespace smooth
 				memory		= oBuffer.memory;
 
 				size		= oBuffer.size;
-				allocated	= oBuffer.allocated;
+				allocated	= -1;
 			}
 
 			~Buffer()
@@ -64,6 +64,12 @@ namespace smooth
 
 			Bool Resize(Int nSize)
 			{
+				/* Check if this is actually our memory.
+				 */
+				if (allocated == -1) return False;
+
+				/* Let's see if we really need to reallocate.
+				 */
 				if (nSize > allocated)
 				{
 					if (memory != NIL) memory_manager->Resize(nSize * sizeof(t));
@@ -93,6 +99,12 @@ namespace smooth
 
 			Bool Free()
 			{
+				/* Check if this is actually our memory.
+				 */
+				if (allocated == -1) return False;
+
+				/* Nothing to free?
+				 */
 				if (memory == NIL) return True;
 
 				delete memory_manager;

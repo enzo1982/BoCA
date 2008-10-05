@@ -36,7 +36,6 @@ namespace BoCA
 				virtual Int	 WriteData(Buffer<UnsignedByte> &buffer, Int size);
 
 				virtual Int	 GetPackageSize();
-
 				virtual Int	 SetDriver(IO::Driver *);
 
 		};

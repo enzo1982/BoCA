@@ -25,24 +25,24 @@ namespace BoCA
 		abstract class BOCA_DLL_EXPORT DecoderComponent : public Component, public IO::Filter
 		{
 			protected:
-				Track		 format;
+				Track		 track;
 
 				Int64		 inBytes;
 			public:
 						 DecoderComponent();
 				virtual		~DecoderComponent();
 
+				virtual Bool	 CanOpenStream(const String &) = 0;
+				virtual Error	 GetStreamInfo(const String &, Track &) = 0;
+
+				virtual Bool	 SetAudioTrackInfo(const Track &);
+
+				Int64		 GetInBytes() { return inBytes; }
+
 				virtual Bool	 Activate() = 0;
 				virtual Bool	 Deactivate() = 0;
 
 				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int) = 0;
-
-				virtual Bool	 CanOpenStream(const String &) = 0;
-				virtual Error	 GetStreamInfo(const String &, Track &) = 0;
-
-				Void		 SetInputFormat(const Track &nFormat)	{ format = nFormat; }
-
-				Int64		 GetInBytes()				{ return inBytes; }
 		};
 	};
 };

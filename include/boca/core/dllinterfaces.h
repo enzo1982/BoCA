@@ -15,6 +15,7 @@
 
 #include "3rdparty/id3.h"
 #include "3rdparty/mp4/mp4.h"
+#include "3rdparty/vorbis/vorbisenc.h"
 
 using namespace smooth;
 using namespace smooth::System;
@@ -26,17 +27,21 @@ namespace BoCA
 		private:
 			static DynamicLoader	*id3dll;
 			static DynamicLoader	*mp4v2dll;
+			static DynamicLoader	*oggdll;
 		public:
 			static Bool		 LoadID3DLL();
 			static Void		 FreeID3DLL();
 
 			static Bool		 LoadMP4v2DLL();
 			static Void		 FreeMP4v2DLL();
+
+			static Bool		 LoadOggDLL();
+			static Void		 FreeOggDLL();
 	};
 };
 
-// ID3Lib DLL API
-
+	/* ID3Lib DLL API
+	 */
 	typedef ID3Tag *			(*ID3TAGNEW)			();
 	typedef void				(*ID3TAGDELETE)			(ID3Tag *);
 	typedef void				(*ID3TAGSETPADDING)		(ID3Tag *, bool);
@@ -93,8 +98,8 @@ namespace BoCA
 	extern ID3FIELDSETUNICODE		 ex_ID3Field_SetUNICODE;
 	extern ID3FIELDGETUNICODE		 ex_ID3Field_GetUNICODE;
 
-// MP4v2 DLL API
-
+	/* MP4v2 DLL API
+	 */
 	typedef MP4FileHandle			(*MP4READ)			(const char *, u_int32_t);
 	typedef MP4FileHandle			(*MP4MODIFY)			(const char *, u_int32_t, u_int32_t);
 	typedef bool				(*MP4CLOSE)			(MP4FileHandle);
@@ -140,5 +145,27 @@ namespace BoCA
 	extern MP4SETMETADATAGENRE		 ex_MP4SetMetadataGenre;
 	extern MP4SETMETADATATRACK		 ex_MP4SetMetadataTrack;
 	extern MP4SETMETADATACOVERART		 ex_MP4SetMetadataCoverArt;
+
+	/* Ogg DLL API
+	 */
+	typedef int				(*OGGSTREAMINIT)		 (ogg_stream_state *, int);
+	typedef int				(*OGGSTREAMPACKETIN)		 (ogg_stream_state *, ogg_packet *);
+	typedef int				(*OGGSTREAMFLUSH)		 (ogg_stream_state *, ogg_page *);
+	typedef int				(*OGGSTREAMCLEAR)		 (ogg_stream_state *);
+	typedef int				(*OGGSYNCINIT)			 (ogg_sync_state *);
+	typedef char *				(*OGGSYNCBUFFER)		 (ogg_sync_state *, int);
+	typedef int				(*OGGSYNCWROTE)			 (ogg_sync_state *, int);
+	typedef int				(*OGGSYNCPAGEOUT)		 (ogg_sync_state *, ogg_page *);
+	typedef int				(*OGGSYNCCLEAR)			 (ogg_sync_state *);
+
+	extern OGGSTREAMINIT			 ex_ogg_stream_init;
+	extern OGGSTREAMPACKETIN		 ex_ogg_stream_packetin;
+	extern OGGSTREAMFLUSH			 ex_ogg_stream_flush;
+	extern OGGSTREAMCLEAR			 ex_ogg_stream_clear;
+	extern OGGSYNCINIT			 ex_ogg_sync_init;
+	extern OGGSYNCBUFFER			 ex_ogg_sync_buffer;
+	extern OGGSYNCWROTE			 ex_ogg_sync_wrote;
+	extern OGGSYNCPAGEOUT			 ex_ogg_sync_pageout;
+	extern OGGSYNCCLEAR			 ex_ogg_sync_clear;
 
 #endif

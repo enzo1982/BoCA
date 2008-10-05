@@ -23,28 +23,28 @@ namespace BoCA
 		abstract class BOCA_DLL_EXPORT Component
 		{
 			protected:
-				ComponentSpecs		*specs;
+				ComponentSpecs			*specs;
 
-				void			*component;
+				void				*component;
 			public:
-							 Component(ComponentSpecs *);
-				virtual			~Component();
+								 Component(ComponentSpecs *);
+				virtual				~Component();
 
-				virtual String		 GetComponentSpecs();
+				virtual String			 GetComponentSpecs();
 
-				const String		&GetName() const;
-				const String		&GetVersion() const;
+				const String			&GetName() const;
+				const String			&GetVersion() const;
 
-				const String		&GetID() const;
-				Int			 GetType() const;
+				const String			&GetID() const;
+				Int				 GetType() const;
 
-				const Array<Format *>	&GetFormats() const;
+				const Array<FileFormat *>	&GetFormats() const;
 
-				virtual ConfigLayer	*GetConfigurationLayer();
-				virtual Void		 FreeConfigurationLayer();
+				virtual ConfigLayer		*GetConfigurationLayer();
+				virtual Void			 FreeConfigurationLayer();
 
-				virtual Bool		 GetErrorState();
-				virtual const String	&GetErrorString();
+				virtual Bool			 GetErrorState();
+				virtual const String		&GetErrorString();
 		};
 	};
 };

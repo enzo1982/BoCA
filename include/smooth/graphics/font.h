@@ -76,7 +76,7 @@ namespace smooth
 				Int		 GetStyle() const;
 
 				Int		 GetTextSizeX(const String &) const;
-				Int		 GetTextSizeY(const String &) const;
+				Int		 GetTextSizeY(const String & = "*") const;
 		};
 	};
 };

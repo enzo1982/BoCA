@@ -13,11 +13,9 @@
 
 #include <smooth.h>
 #include "picture.h"
+#include "format.h"
 
 using namespace smooth;
-
-const int	 BYTE_INTEL	= 0;
-const int	 BYTE_RAW	= 1;
 
 namespace BoCA
 {
@@ -27,22 +25,25 @@ namespace BoCA
 			static Int	 nextTrackID;
 
 			Int		 trackID;
+		protected:
+			/* Audio format information:
+			 */
+			Format		 format;
 		public:
-		    // Audio format information:
-			Int		 channels;
-			Int		 rate;
-			Int		 bits;
+			/* Length and file size information:
+			 */
 			Int64		 length;
 			Int64		 approxLength;
 			Int64		 fileSize;
-			Int		 order;
 
-		    // CD track information:
+			/* CD track information:
+			 */
 			Bool		 isCDTrack;
 			Int		 drive;
 			Int		 cdTrack;
 
-		    // Title information:
+			/* Title information:
+			 */
 			String		 artist;
 			String		 title;
 			String		 album;
@@ -59,10 +60,12 @@ namespace BoCA
 			String		 oAlbum;
 			String		 oGenre;
 
-		    // Attached pictures:
+			/* Attached pictures:
+			 */
 			Array<Picture>	 pictures;
 
-		    // CDDB information:
+			/* CDDB information:
+			 */
 			Int		 offset;
 			String		 discid;
 			String		 category;
@@ -71,7 +74,8 @@ namespace BoCA
 			String		 discComment;
 			String		 playorder;
 
-		    // Other information:
+			/* Other information:
+			 */
 			String		 fileSizeString;
 			String		 lengthString;
 
@@ -79,10 +83,15 @@ namespace BoCA
 			String		 origFilename;
 
 					 Track();
+					 Track(int);
 					 Track(const Track &);
-					~Track();
+			virtual		~Track();
 
+			Track &operator	 =(const int);
 			Track &operator	 =(const Track &);
+
+			Bool operator	 ==(const int) const;
+			Bool operator	 !=(const int) const;
 
 			Int		 RenderID3Tag(Buffer<UnsignedByte> &, Int = 2);
 			Bool		 ParseID3Tag(Buffer<UnsignedByte> &);
@@ -94,8 +103,15 @@ namespace BoCA
 
 			Bool		 RenderMP4Meta(const String &);
 			Bool		 ParseMP4Meta(const String &);
+
+			Int		 RenderVorbisComment(Buffer<UnsignedByte> &, const String & = "BoCA Tagging API");
+			Bool		 ParseVorbisComment(const String &);
 		accessors:
 			Int		 GetTrackID() const				{ return trackID; }
+
+			Void		 SetFormat(const Format &nFormat)		{ format = nFormat; }
+			Format		&GetFormat()					{ return format; }
+			const Format	&GetFormat() const				{ return format; }
 	};
 };
 

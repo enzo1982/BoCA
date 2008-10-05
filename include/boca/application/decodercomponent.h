@@ -26,17 +26,17 @@ namespace BoCA
 						 DecoderComponent(ComponentSpecs *);
 				virtual		~DecoderComponent();
 
-				virtual Bool	 Activate();
-				virtual Bool	 Deactivate();
-
-				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int);
+				virtual Bool	 SetAudioTrackInfo(const Track &);
 
 				virtual Bool	 CanOpenStream(const String &);
 				virtual Error	 GetStreamInfo(const String &, Track &);
 
-				virtual Void	 SetInputFormat(const Track &);
-
 				virtual Int64	 GetInBytes();
+
+				virtual Bool	 Activate();
+				virtual Bool	 Deactivate();
+
+				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int);
 
 				virtual Int	 GetPackageSize();
 				virtual Int	 SetDriver(IO::Driver *);

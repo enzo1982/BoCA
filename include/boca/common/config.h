@@ -47,6 +47,7 @@ namespace BoCA
 
 			Bool		 enable_id3;
 			Bool		 enable_mp4;
+			Bool		 enable_ogg;
 
 			String		 enc_filePattern;
 			Bool		 enc_onTheFly;
@@ -64,6 +65,7 @@ namespace BoCA
 			String		 vctag_encoding;
 			String		 mp4meta_encoding;
 			String		 default_comment;
+			Bool		 replace_comments;
 			Bool		 copy_picture_tags;
 
 			Array<String>	 cdrip_drives;

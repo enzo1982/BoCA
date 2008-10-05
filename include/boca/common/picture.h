@@ -21,7 +21,7 @@ namespace BoCA
 	class BOCA_DLL_EXPORT Picture
 	{
 		public:
-						 Picture(Int = 0);
+						 Picture(int = 0);
 						 Picture(const Picture &);
 						~Picture();
 

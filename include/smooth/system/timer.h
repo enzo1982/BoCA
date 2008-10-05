@@ -35,6 +35,7 @@ namespace smooth
 			private:
 				TimerBackend		*backend;
 
+				Int			 interval;
 				Int			 status;
 			public:
 				static const Int	 classID;
@@ -49,6 +50,7 @@ namespace smooth
 			accessors:
 				Int			 GetID() const;
 
+				Int			 GetInterval() const;
 				Int			 GetStatus() const;
 			signals:
 				Signal0<Void>		 onInterval;

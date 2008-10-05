@@ -48,6 +48,9 @@ namespace smooth
 				Bool			 SetSystemBitmap(Void *);
 				Void			*GetSystemBitmap() const;
 
+				Bool			 SetPixel(const Point &, const Color &);
+				Color			 GetPixel(const Point &) const;
+
 				BitmapBackend &operator	 =(const BitmapBackend &);
 
 				Bool operator		 ==(const int) const;

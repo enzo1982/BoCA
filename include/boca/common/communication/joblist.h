@@ -37,11 +37,22 @@ namespace BoCA
 			 */
 			static Void			 Free();
 		signals:
+			/* Signals fired by application to notify components of
+			 * joblist related actions.
+			 */
 			Signal1<Void, const Track &>	 onApplicationAddTrack;
 			Signal1<Void, const Track &>	 onApplicationModifyTrack;
 			Signal1<Void, const Track &>	 onApplicationRemoveTrack;
 			Signal1<Void, const Track &>	 onApplicationSelectTrack;
 
+			/* Signals fired by components to notify application of
+			 * joblist related actions.
+			 *
+			 * Component developers must be aware that the application
+			 * will confirm the signal by firing the corresponding
+			 * application signal. Components must not fire the component
+			 * signal again in that case.
+			 */
 			Signal1<Void, const Track &>	 onComponentAddTrack;
 			Signal1<Void, const Track &>	 onComponentModifyTrack;
 			Signal1<Void, const Track &>	 onComponentRemoveTrack;
