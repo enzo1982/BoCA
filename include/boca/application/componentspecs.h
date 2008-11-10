@@ -166,6 +166,7 @@ namespace BoCA
 				int			 (*func_Flush)(void *, void *);
 
 				void			*(*func_GetMainTabLayer)(void *);
+				void			*(*func_GetStatusBarLayer)(void *);
 		};
 	};
 

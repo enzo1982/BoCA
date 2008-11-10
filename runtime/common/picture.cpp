@@ -10,6 +10,8 @@
 
 #include <boca/common/picture.h>
 
+using namespace smooth::IO;
+
 BoCA::Picture::Picture(int nil)
 {
 	type = 0;
@@ -35,4 +37,39 @@ BoCA::Picture &BoCA::Picture::operator =(const Picture &oPicture)
 	memcpy(data, oPicture.data, data.Size());
 
 	return *this;
+}
+
+Int BoCA::Picture::LoadFromFile(const String &fileName)
+{
+	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
+
+	type = 0x03; // Cover (front)
+	mime = fileName.EndsWith(".png") ? "image/png" : "image/jpg";
+	data.Resize(in.Size());
+
+	in.InputData(data, in.Size());
+
+	return Success();
+}
+
+Int BoCA::Picture::SaveToFile(const String &fileName) const
+{
+	OutStream	 out(STREAM_FILE, String(fileName).Append(mime == "image/png" ? ".png" : ".jpg"), OS_OVERWRITE);
+
+	out.OutputData(data, data.Size());
+
+	return Success();
+}
+
+const Bitmap &BoCA::Picture::GetBitmap() const
+{
+	static Bitmap	 bitmap;
+	Int		 format = -1;
+
+	if	(mime == "image/jpg") format = IMAGE_FORMAT_JPEG;
+	else if	(mime == "image/png") format = IMAGE_FORMAT_PNG;
+
+	bitmap = ImageLoader::Load(data, format);
+
+	return bitmap;
 }

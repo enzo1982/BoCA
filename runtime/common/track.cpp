@@ -82,6 +82,8 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 	oAlbum		= oTrack.oAlbum;
 	oGenre		= oTrack.oGenre;
 
+	pictures.RemoveAll();
+
 	for (Int i = 0; i < oTrack.pictures.Length(); i++)
 	{
 		pictures.Add(oTrack.pictures.GetNth(i));

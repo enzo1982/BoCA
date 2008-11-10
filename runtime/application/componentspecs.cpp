@@ -81,6 +81,7 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_Flush			= (int (*)(void *, void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Flush"));
 
 	func_GetMainTabLayer		= (void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetMainTabLayer"));
+	func_GetStatusBarLayer		= (void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStatusBarLayer"));
 
 	return ParseXMLSpec(String(func_GetComponentSpecs()).Trim());
 }

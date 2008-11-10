@@ -28,6 +28,7 @@ namespace BoCA
 				virtual			~ExtensionComponent();
 			signals:
 				SignalR0<Layer *>	 getMainTabLayer;
+				SignalR0<Layer *>	 getStatusBarLayer;
 		};
 	};
 };

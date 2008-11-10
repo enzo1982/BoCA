@@ -29,13 +29,6 @@ BoCA::ConfigureWinampOut::ConfigureWinampOut()
 	list_output->onSelectEntry.Connect(&ConfigureWinampOut::SelectOutputPlugin, this);
 	list_output->onMarkEntry.Connect(&ConfigureWinampOut::SelectOutputPlugin, this);
 
-	for (Int l = 0; l < winamp_out_modules.Length(); l++)
-	{
-		ListEntry	*entry = list_output->AddEntry(winamp_out_modules.GetNth(l)->description);
-
-		if (l == config->GetIntValue("WinampOut", "OutputPlugin", 0)) entry->SetMark(True);
-	}
-
 	pos.x	+= 433;
 	size.cx	= 0;
 	size.cy	= 0;
@@ -49,6 +42,13 @@ BoCA::ConfigureWinampOut::ConfigureWinampOut()
 	button_output_about	= new Button(i18n->TranslateString("About"), NIL, pos, size);
 	button_output_about->onAction.Connect(&ConfigureWinampOut::AboutOutputPlugin, this);
 	button_output_about->Deactivate();
+
+	for (Int l = 0; l < winamp_out_modules.Length(); l++)
+	{
+		ListEntry	*entry = list_output->AddEntry(winamp_out_modules.GetNth(l)->description);
+
+		if (l == config->GetIntValue("WinampOut", "OutputPlugin", 0)) entry->SetMark(True);
+	}
 
 	Add(list_output);
 	Add(button_output);
@@ -78,6 +78,8 @@ Int BoCA::ConfigureWinampOut::SaveSettings()
 
 Void BoCA::ConfigureWinampOut::SelectOutputPlugin()
 {
+	if (list_output->GetSelectedEntry() == NIL) return;
+
 	button_output->Activate();
 	button_output_about->Activate();
 

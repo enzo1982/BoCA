@@ -157,7 +157,6 @@ Void BoCA::LayerTagAdvanced::OnSelectField()
 Int BoCA::LayerTagAdvanced::LoadTagTypes()
 {
 	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("tagging"));
-
 	const Array<File>	&files = dir.GetFilesByPattern("tag_*.xml");
 
 	for (Int i = 0; i < files.Length(); i++)

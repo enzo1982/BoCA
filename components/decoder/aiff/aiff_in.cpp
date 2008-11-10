@@ -14,7 +14,6 @@ using namespace smooth::IO;
 
 const String &BoCA::AIFFIn::GetComponentSpecs()
 {
-
 	static String	 componentSpecs = "		\
 							\
 	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\

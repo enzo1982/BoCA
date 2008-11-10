@@ -152,6 +152,9 @@
 
 #include "smooth/gui/widgets/multi/tree/tree.h"
 
+#include "smooth/gui/widgets/multi/image/imagebox.h"
+#include "smooth/gui/widgets/multi/image/imageentry.h"
+
 #include "smooth/gui/widgets/special/cursor.h"
 #include "smooth/gui/widgets/special/dragcontrol.h"
 #include "smooth/gui/widgets/special/droparea.h"

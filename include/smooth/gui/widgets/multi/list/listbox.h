@@ -58,6 +58,8 @@ namespace smooth
 				Int			 RemoveAllTabs()								{ return header->RemoveAllTabs(); }
 
 				Int			 DragSelectedEntry(Bool);
+
+				virtual String		 ToString() const								{ return "a ListBox"; }
 			accessors:
 				Rect			 GetVisibleArea() const;
 

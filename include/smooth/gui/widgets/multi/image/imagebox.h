@@ -8,53 +8,46 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_COMBOBOX_
-#define _H_OBJSMOOTH_COMBOBOX_
+#ifndef _H_OBJSMOOTH_IMAGEBOX_
+#define _H_OBJSMOOTH_IMAGEBOX_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class ComboBox;
-		class ToolWindow;
-		class ListBox;
-		class Hotspot;
+		class ImageBox;
+		class Scrollbar;
 	};
 };
 
-#include "list.h"
+#include "../list/list.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 CB_NORMAL	= 0;
-		const Int	 CB_HOTSPOTONLY	= 1;
-
-		class SMOOTHAPI ComboBox : public List
+		class SMOOTHAPI ImageBox : public List
 		{
 			private:
-				ToolWindow		*toolWindow;
-				ListBox			*listBox;
+				Scrollbar		*scrollbar;
+				Int			 scrollbarPos;
 
-				ListEntry		*prevSelectedEntry;
-			protected:
-				Hotspot			*hotspot;
-				Hotspot			*buttonHotspot;
+				Int			 visibleEntriesChecksum;
+
+				Int			 GetEntriesWidth() const;
 			public:
 				static const Int	 classID;
 
-							 ComboBox(const Point &, const Size &);
-				virtual			~ComboBox();
+							 ImageBox(const Point &, const Size &);
+				virtual			~ImageBox();
 
 				virtual Int		 Paint(Int);
 
-				virtual String		 ToString() const		{ return "a ComboBox"; }
+				virtual String		 ToString() const				{ return "an ImageBox"; }
+			accessors:
+				Rect			 GetVisibleArea() const;
 			slots:
-				Void			 OpenListBox();
-				Void			 CloseListBox();
-
-				Void			 OnSelectEntry(ListEntry *);
+				Void			 OnScrollbarValueChange();
 				Void			 OnChangeSize(const Size &);
 		};
 	};

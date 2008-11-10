@@ -18,7 +18,6 @@ using namespace smooth::IO;
 
 const String &BoCA::VorbisIn::GetComponentSpecs()
 {
-
 	static String	 componentSpecs;
 
 	if (oggdll != NIL && vorbisdll != NIL)

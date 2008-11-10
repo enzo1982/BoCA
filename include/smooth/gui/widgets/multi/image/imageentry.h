@@ -8,53 +8,41 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_COMBOBOX_
-#define _H_OBJSMOOTH_COMBOBOX_
+#ifndef _H_OBJSMOOTH_IMAGEENTRY_
+#define _H_OBJSMOOTH_IMAGEENTRY_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class ComboBox;
-		class ToolWindow;
-		class ListBox;
-		class Hotspot;
+		class Image;
+		class ImageEntry;
 	};
 };
 
-#include "list.h"
+#include "../list/list.h"
+#include "../list/listentry.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 CB_NORMAL	= 0;
-		const Int	 CB_HOTSPOTONLY	= 1;
-
-		class SMOOTHAPI ComboBox : public List
+		class SMOOTHAPI ImageEntry : public ListEntry
 		{
-			private:
-				ToolWindow		*toolWindow;
-				ListBox			*listBox;
-
-				ListEntry		*prevSelectedEntry;
 			protected:
-				Hotspot			*hotspot;
-				Hotspot			*buttonHotspot;
+				Image			*image;
 			public:
 				static const Int	 classID;
 
-							 ComboBox(const Point &, const Size &);
-				virtual			~ComboBox();
+							 ImageEntry(const Bitmap &, const Size &);
+				virtual			~ImageEntry();
 
 				virtual Int		 Paint(Int);
 
-				virtual String		 ToString() const		{ return "a ComboBox"; }
-			slots:
-				Void			 OpenListBox();
-				Void			 CloseListBox();
+				virtual Bool		 IsTypeCompatible(Int) const;
 
-				Void			 OnSelectEntry(ListEntry *);
+				virtual String		 ToString() const				{ return "an ImageEntry"; }
+			slots:
 				Void			 OnChangeSize(const Size &);
 		};
 	};

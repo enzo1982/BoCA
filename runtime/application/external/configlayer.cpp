@@ -207,6 +207,10 @@ GroupBox *BoCA::AS::ConfigLayerExternal::GetParameterGroupBox(const String &name
 
 String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 {
+	/* Still initializing?
+	 */
+	if (list_parameters->Length() < specs->external_parameters.Length()) return NIL;
+
 	String	 arguments;
 
 	for (Int i = 0; i < specs->external_parameters.Length(); i++)
@@ -225,18 +229,26 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 			case PARAMETER_TYPE_SELECTION:
 				{
 					GroupBox	*group = GetParameterGroupBox(param->GetName());
-					ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
 
-					arguments.Append(String(param->GetArgument()).Replace("%VALUE", param->GetOptions().GetNth(selection->GetSelectedEntryNumber())->GetValue())).Append(" ");
+					if (group != NIL)
+					{
+						ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
+
+						arguments.Append(String(param->GetArgument()).Replace("%VALUE", param->GetOptions().GetNth(selection->GetSelectedEntryNumber())->GetValue())).Append(" ");
+					}
 				}
 
 				break;
 			case PARAMETER_TYPE_RANGE:
 				{
 					GroupBox	*group = GetParameterGroupBox(param->GetName());
-					Slider		*range = (Slider *) group->GetNthObject(0);
 
-					arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromInt(range->GetValue() * param->GetStepSize()))).Append(" ");
+					if (group != NIL)
+					{
+						Slider		*range = (Slider *) group->GetNthObject(0);
+
+						arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromInt(range->GetValue() * param->GetStepSize()))).Append(" ");
+					}
 				}
 
 				break;

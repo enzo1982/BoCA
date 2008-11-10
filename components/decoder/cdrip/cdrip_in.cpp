@@ -19,7 +19,6 @@ using namespace smooth::IO;
 
 const String &BoCA::CDRipIn::GetComponentSpecs()
 {
-
 	static String	 componentSpecs;
 
 	if (cdripdll != NIL && Config::Get()->cdrip_numdrives >= 1)

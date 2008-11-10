@@ -36,7 +36,12 @@ namespace BoCA
 			Text				*text_comment;
 			MultiEdit			*edit_comment;
 
+			Image				*image_cover;
+
 			Track				 track;
+
+			Void				 LoadCoverImage();
+			Void				 FreeCoverImage();
 		signals:
 			Signal1<Void, const Track &>	 onModifyTrack;
 		slots:

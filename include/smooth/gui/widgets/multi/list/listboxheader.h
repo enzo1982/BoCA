@@ -47,6 +47,8 @@ namespace smooth
 				Int			 AddTab(const String &, Int, Int);
 
 				Int			 RemoveAllTabs();
+
+				virtual String		 ToString() const		{ return "a ListBoxHeader"; }
 			accessors:
 				Int			 GetNOfTabs() const;
 				Int			 GetNthTabOffset(Int) const;

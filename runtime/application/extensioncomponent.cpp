@@ -13,6 +13,7 @@
 BoCA::AS::ExtensionComponent::ExtensionComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
 {
 	getMainTabLayer.Connect(&ExtensionComponent::GetMainTabLayer, this);
+	getStatusBarLayer.Connect(&ExtensionComponent::GetStatusBarLayer, this);
 }
 
 BoCA::AS::ExtensionComponent::~ExtensionComponent()
@@ -22,4 +23,9 @@ BoCA::AS::ExtensionComponent::~ExtensionComponent()
 Layer *BoCA::AS::ExtensionComponent::GetMainTabLayer()
 {
 	return (Layer *) specs->func_GetMainTabLayer(component);
+}
+
+Layer *BoCA::AS::ExtensionComponent::GetStatusBarLayer()
+{
+	return (Layer *) specs->func_GetStatusBarLayer(component);
 }

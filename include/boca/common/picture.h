@@ -15,22 +15,29 @@
 #include "../core/definitions.h"
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 namespace BoCA
 {
 	class BOCA_DLL_EXPORT Picture
 	{
 		public:
+
+			Int			 type;
+			String			 mime;
+			String			 description;
+			Buffer<unsigned char>	 data;
+
 						 Picture(int = 0);
 						 Picture(const Picture &);
 						~Picture();
 
 			Picture &operator	 =(const Picture &);
 
-			Int			 type;
-			String			 mime;
-			String			 description;
-			Buffer<unsigned char>	 data;
+			Int			 LoadFromFile(const String &);
+			Int			 SaveToFile(const String &) const;
+
+			const Bitmap		&GetBitmap() const;
 	};
 };
 

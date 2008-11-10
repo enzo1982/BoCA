@@ -42,6 +42,10 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 	Add(text_comment);
 	Add(edit_comment);
 
+	image_cover	= new Image(NIL, Point(400, 7), Size(200, 200));
+
+	Add(image_cover);
+
 	/* Initially deactivate all input fields.
 	 */
 	OnSelectNone();
@@ -57,6 +61,22 @@ BoCA::LayerTagBasic::~LayerTagBasic()
 	DeleteObject(edit_album);
 	DeleteObject(text_comment);
 	DeleteObject(edit_comment);
+
+	DeleteObject(image_cover);
+}
+
+Void BoCA::LayerTagBasic::LoadCoverImage()
+{
+	if (track.pictures.Length() == 0) return;
+
+	const Picture	&cover = track.pictures.GetFirst();
+
+	image_cover->SetBitmap(cover.GetBitmap());
+}
+
+Void BoCA::LayerTagBasic::FreeCoverImage()
+{
+	image_cover->SetBitmap(NIL);
 }
 
 /* Called when a track is selected from the list.
@@ -76,6 +96,9 @@ Void BoCA::LayerTagBasic::OnSelectTrack(const Track &nTrack)
 	edit_title->SetText(track.title);
 	edit_album->SetText(track.album);
 	edit_comment->SetText(track.comment);
+
+	FreeCoverImage();
+	LoadCoverImage();
 }
 
 /* Called when the last track is removed from the list.
@@ -93,6 +116,8 @@ Void BoCA::LayerTagBasic::OnSelectNone()
 	edit_title->Deactivate();
 	edit_album->Deactivate();
 	edit_comment->Deactivate();
+
+	FreeCoverImage();
 }
 
 /* Called when a track is modified.

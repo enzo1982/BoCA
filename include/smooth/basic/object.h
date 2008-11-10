@@ -63,6 +63,11 @@ namespace smooth
 
 			Int				 EnterProtectedRegion() const		{ return ++isObjectInUse; }
 			Int				 LeaveProtectedRegion() const		{ return --isObjectInUse; }
+
+			/* Called by DeleteObject when an object is
+			 * prepared for deletion.
+			 */
+			virtual Void			 EnqueueForDeletion()			{ }
 		public:
 			static const Int		 classID;
 

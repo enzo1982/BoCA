@@ -8,30 +8,25 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_EXTENSIONCOMPONENT
-#define H_BOCA_EXTENSIONCOMPONENT
+#include <boca.h>
+#include "layer.h"
 
-#include "component.h"
-
-using namespace smooth::GUI;
+BoCA_BEGIN_COMPONENT(LengthStatus)
 
 namespace BoCA
 {
-	namespace AS
+	class LengthStatus : public CS::ExtensionComponent
 	{
-		class BOCA_DLL_EXPORT ExtensionComponent : public Component
-		{
-			private:
-				Layer			*GetMainTabLayer();
-				Layer			*GetStatusBarLayer();
-			public:
-							 ExtensionComponent(ComponentSpecs *);
-				virtual			~ExtensionComponent();
-			signals:
-				SignalR0<Layer *>	 getMainTabLayer;
-				SignalR0<Layer *>	 getStatusBarLayer;
-		};
+		private:
+			LayerLengthStatus	*statusBarLayer;
+		public:
+			static const String	&GetComponentSpecs();
+
+						 LengthStatus();
+						~LengthStatus();
 	};
 };
 
-#endif
+BoCA_DEFINE_EXTENSION_COMPONENT(LengthStatus)
+
+BoCA_END_COMPONENT(LengthStatus)

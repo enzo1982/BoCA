@@ -50,7 +50,7 @@ typedef void *			(*SPEEXENCODERINIT)		(const SpeexMode *);
 typedef void			(*SPEEXENCODERDESTROY)		(void *);
 typedef int			(*SPEEXENCODERCTL)		(void *, int, void *);
 typedef int			(*SPEEXENCODEINT)		(void *, spx_int16_t *, SpeexBits *);
-typedef void			(*SPEEXENCODESTEREOINT)		(spx_int16_t *, int, SpeexBits *); 
+typedef void			(*SPEEXENCODESTEREOINT)		(spx_int16_t *, int, SpeexBits *);
 typedef void			(*SPEEXINITHEADER)		(SpeexHeader *, int, int, const struct SpeexMode *);
 typedef char *			(*SPEEXHEADERTOPACKET)		(SpeexHeader *, int *);
 typedef int			(*SPEEXLIBCTL)			(int, void *);

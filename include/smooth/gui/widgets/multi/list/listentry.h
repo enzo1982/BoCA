@@ -43,6 +43,8 @@ namespace smooth
 				virtual				~ListEntry();
 
 				virtual Int			 Paint(Int);
+
+				virtual String			 ToString() const		{ return "a ListEntry"; }
 			accessors:
 				Int				 SetMark(Bool);
 				Bool				 IsMarked();

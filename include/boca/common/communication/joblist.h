@@ -45,6 +45,9 @@ namespace BoCA
 			Signal1<Void, const Track &>	 onApplicationRemoveTrack;
 			Signal1<Void, const Track &>	 onApplicationSelectTrack;
 
+			Signal1<Void, const Track &>	 onApplicationMarkTrack;
+			Signal1<Void, const Track &>	 onApplicationUnmarkTrack;
+
 			/* Signals fired by components to notify application of
 			 * joblist related actions.
 			 *

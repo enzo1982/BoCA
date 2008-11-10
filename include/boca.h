@@ -97,6 +97,7 @@ using namespace smooth;
 #define BoCA_DEFINE_EXTENSION_COMPONENT(componentName)										 												\
 	extern "C" {																										\
 		BOCA_EXPORT void *BoCA_##componentName##_GetMainTabLayer(void *component)				{ return ((BoCA::componentName *) component)->getMainTabLayer.Emit(); }					\
+		BOCA_EXPORT void *BoCA_##componentName##_GetStatusBarLayer(void *component)				{ return ((BoCA::componentName *) component)->getStatusBarLayer.Emit(); }				\
 	}
 
 #define BoCA_DEFINE_OUTPUT_COMPONENT(componentName)										 												\

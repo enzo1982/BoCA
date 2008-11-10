@@ -1,14 +1,14 @@
 ########## BoCA component makefile ##########
 
 # Change these variables to fit your project:
-TARGET	  = vorbis
-TYPE	  = decoder
+TARGET	  = statustime
+TYPE	  = extension
 VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o vorbis_in.o
+OBJECTS	  = layer.o lengthdisplay.o lengthstatus.o
 
 # Enter additional library dependencies here
 LIBS	  =

@@ -17,6 +17,7 @@ namespace smooth
 	{
 		class Titlebar;
 		class Hotspot;
+		class Shortcut;
 	};
 };
 
@@ -42,6 +43,8 @@ namespace smooth
 				Hotspot			*closeHotspot;
 
 				Hotspot			*dragHotspot;
+
+				Shortcut		*closeShortcut;
 			public:
 				static const Int	 classID;
 

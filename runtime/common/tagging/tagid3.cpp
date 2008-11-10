@@ -183,6 +183,9 @@ Int BoCA::TagID3::ParseID3Tag(Void *tag, Track *track)
 				ex_ID3Field_GetASCII(field, abuffer, tbufsize);
 
 				picture.mime.ImportFrom("ISO-8859-1", abuffer);
+
+				if	(picture.mime.ToLower() == "jpeg" || picture.mime.ToLower() == "jpg") picture.mime = "image/jpeg";
+				else if (picture.mime.ToLower() == "png")				      picture.mime = "image/png";
 			}
 
 			field = ex_ID3Frame_GetField(frame, ID3FN_PICTURETYPE);

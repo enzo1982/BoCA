@@ -101,6 +101,8 @@ namespace smooth
 
 				Void				 ActivateTooltip();
 				Void				 DeactivateTooltip();
+
+				virtual Void			 EnqueueForDeletion();
 			public:
 				static const Int		 classID;
 
@@ -138,6 +140,8 @@ namespace smooth
 
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
+
+				virtual String			 ToString() const		{ return "a Widget"; }
 			accessors:
 				virtual Bool			 IsRegistered() const		{ return registered; }
 				virtual Bool			 IsVisible() const		{ if (!registered) return visible; if (!visible) return False; return container->IsVisible(); }
@@ -246,6 +250,8 @@ namespace smooth
 
 				Signal1<Void, Widget *>		 onRegister;
 				Signal1<Void, Widget *>		 onUnregister;
+
+				Signal0<Void>			 onEnqueueForDeletion;
 			slots:
 				Bool				 DefaultHitTest(const Point &);
 

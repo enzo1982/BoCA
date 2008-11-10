@@ -18,7 +18,6 @@ using namespace smooth::IO;
 
 const String &BoCA::LAMEIn::GetComponentSpecs()
 {
-
 	static String	 componentSpecs;
 
 	if (lamedll != NIL)

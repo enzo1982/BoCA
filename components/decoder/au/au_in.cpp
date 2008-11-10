@@ -14,7 +14,6 @@ using namespace smooth::IO;
 
 const String &BoCA::SunAuIn::GetComponentSpecs()
 {
-
 	static String	 componentSpecs = "		\
 							\
 	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\

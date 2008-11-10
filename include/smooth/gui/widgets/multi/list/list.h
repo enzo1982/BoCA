@@ -44,6 +44,8 @@ namespace smooth
 				Int				 RemoveAllEntries();
 
 				Int				 SwitchEntries(Int, Int);
+
+				virtual String			 ToString() const		{ return "a List"; }
 			accessors:
 				Int				 Length() const;
 				ListEntry			*GetNthEntry(Int) const;

@@ -8,30 +8,21 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_EXTENSIONCOMPONENT
-#define H_BOCA_EXTENSIONCOMPONENT
-
-#include "component.h"
-
-using namespace smooth::GUI;
+#include <boca.h>
 
 namespace BoCA
 {
-	namespace AS
+	class LengthDisplay : public Widget
 	{
-		class BOCA_DLL_EXPORT ExtensionComponent : public Component
-		{
-			private:
-				Layer			*GetMainTabLayer();
-				Layer			*GetStatusBarLayer();
-			public:
-							 ExtensionComponent(ComponentSpecs *);
-				virtual			~ExtensionComponent();
-			signals:
-				SignalR0<Layer *>	 getMainTabLayer;
-				SignalR0<Layer *>	 getStatusBarLayer;
-		};
+		private:
+			Bitmap	 bitmap;
+			Text	*text_length;
+		public:
+			Int	 Paint(Int);
+
+				 LengthDisplay(const Bitmap &);
+				~LengthDisplay();
+		accessors:
+			Int	 SetText(const String &);
 	};
 };
-
-#endif

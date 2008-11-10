@@ -45,16 +45,23 @@ namespace smooth
 
 			Buffer(const Buffer<t> &oBuffer)
 			{
-				memory_manager	= oBuffer.memory_manager;
-				memory		= oBuffer.memory;
-
-				size		= oBuffer.size;
-				allocated	= -1;
+				*this = oBuffer;
 			}
 
 			~Buffer()
 			{
 				Free();
+			}
+
+			Buffer<t> &operator =(const Buffer<t> &oBuffer)
+			{
+				memory_manager	= oBuffer.memory_manager;
+				memory		= oBuffer.memory;
+
+				size		= oBuffer.size;
+				allocated	= -1;
+
+				return *this;
 			}
 
 			Int Size() const

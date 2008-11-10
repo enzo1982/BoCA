@@ -54,6 +54,8 @@ namespace smooth
 
 				Int			 SetBitmap(const Bitmap &);
 				const Bitmap		&GetBitmap() const;
+			slots:
+				Void			 InternalOnDeletePopup();
 		};
 	};
 };
