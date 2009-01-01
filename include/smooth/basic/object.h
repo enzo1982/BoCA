@@ -52,6 +52,7 @@ namespace smooth
 			Int				 handle;
 			String				 name;
 
+			Bool				 isDeleteable;
 			mutable Int			 isObjectInUse;
 
 			Int				 refCount;

@@ -307,7 +307,7 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 		picture.type = metadata->data.picture.type;
 		picture.mime = metadata->data.picture.mime_type;
 
-		if	(picture.mime.ToLower() == "jpeg" || picture.mime.ToLower() == "jpg") picture.mime = "image/jpg";
+		if	(picture.mime.ToLower() == "jpeg" || picture.mime.ToLower() == "jpg") picture.mime = "image/jpeg";
 		else if (picture.mime.ToLower() == "png")				      picture.mime = "image/png";
 
 		picture.description.ImportFrom("UTF-8", (char *) metadata->data.picture.description);

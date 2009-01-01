@@ -54,9 +54,7 @@ typedef void			(*SPEEXENCODESTEREOINT)		(spx_int16_t *, int, SpeexBits *);
 typedef void			(*SPEEXINITHEADER)		(SpeexHeader *, int, int, const struct SpeexMode *);
 typedef char *			(*SPEEXHEADERTOPACKET)		(SpeexHeader *, int *);
 typedef int			(*SPEEXLIBCTL)			(int, void *);
-typedef const SpeexMode		(*SPEEXNBMODE)			;
-typedef const SpeexMode		(*SPEEXWBMODE)			;
-typedef const SpeexMode		(*SPEEXUWBMODE)			;
+typedef const SpeexMode *	(*SPEEXLIBGETMODE)		(int);
 
 extern SPEEXBITSINIT		 ex_speex_bits_init;
 extern SPEEXBITSDESTROY		 ex_speex_bits_destroy;
@@ -72,6 +70,4 @@ extern SPEEXENCODESTEREOINT	 ex_speex_encode_stereo_int;
 extern SPEEXINITHEADER		 ex_speex_init_header;
 extern SPEEXHEADERTOPACKET	 ex_speex_header_to_packet;
 extern SPEEXLIBCTL		 ex_speex_lib_ctl;
-extern SPEEXNBMODE		 ex_speex_nb_mode;
-extern SPEEXWBMODE		 ex_speex_wb_mode;
-extern SPEEXUWBMODE		 ex_speex_uwb_mode;
+extern SPEEXLIBGETMODE		 ex_speex_lib_get_mode;

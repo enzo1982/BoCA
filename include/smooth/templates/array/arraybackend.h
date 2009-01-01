@@ -14,6 +14,7 @@
 #include "arrayentry.h"
 #include "../buffer.h"
 #include "../../threads/rwlock.h"
+#include "../../misc/math.h"
 
 #include <memory.h>
 
@@ -47,15 +48,9 @@ namespace smooth
 
 				LockForRead();
 
-				if (lastAccessedEntry + 1 < nOfEntries)
-				{
-					if (entries[lastAccessedEntry + 1]->GetIndex() == index) { Unlock(); return ++lastAccessedEntry; }
-				}
-
-				if (lastAccessedEntry > 0)
-				{
-					if (entries[lastAccessedEntry - 1]->GetIndex() == index) { Unlock(); return --lastAccessedEntry; }
-				}
+				if	(lastAccessedEntry < nOfEntries				  && entries[lastAccessedEntry    ]->GetIndex() == index) { Unlock(); return   lastAccessedEntry; }
+				else if (lastAccessedEntry > 0 && lastAccessedEntry <= nOfEntries && entries[lastAccessedEntry - 1]->GetIndex() == index) { Unlock(); return --lastAccessedEntry; }
+				else if (lastAccessedEntry + 1 < nOfEntries			  && entries[lastAccessedEntry + 1]->GetIndex() == index) { Unlock(); return ++lastAccessedEntry; }
 
 				for (Int i = 0; i < nOfEntries; i++)
 				{
@@ -78,6 +73,8 @@ namespace smooth
 			ArrayBackend()
 			{
 				nOfEntries	  = 0;
+				greatestIndex	  = 0;
+
 				lastAccessedEntry = 0;
 
 				lock = NIL;
@@ -97,7 +94,7 @@ namespace smooth
 
 			Int Add(const s &value)
 			{
-				Int	 index = ++greatestIndex;
+				Int	 index = greatestIndex + 1;
 
 				if (Add(value, index))	return index;
 				else			return -1;
@@ -111,7 +108,7 @@ namespace smooth
 
 				if (greatestIndex < index) greatestIndex = index;
 
-				if (entries.Size() == nOfEntries) entries.Resize(nOfEntries + 10);
+				if (entries.Size() == nOfEntries) entries.Resize(Math::Max(8, nOfEntries * 2));
 
 				ArrayEntry<s>	*entry = new ArrayEntry<s>(value);
 
@@ -155,7 +152,7 @@ namespace smooth
 
 				if (greatestIndex < index) greatestIndex = index;
 
-				if (entries.Size() == nOfEntries) entries.Resize(nOfEntries + 10);
+				if (entries.Size() == nOfEntries) entries.Resize(Math::Max(8, nOfEntries * 2));
 
 				memmove(entries + position + 1, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s> *));
 
@@ -174,6 +171,8 @@ namespace smooth
 
 			Bool Remove(Int index)
 			{
+				if (index > greatestIndex) return False;
+
 				return RemoveNth(GetEntryNumberByIndex(index));
 			}
 
@@ -196,6 +195,8 @@ namespace smooth
 
 			Bool RemoveAll()
 			{
+				if (nOfEntries == 0) return True;
+
 				LockForWrite();
 
 				for (Int i = 0; i < nOfEntries; i++) delete entries[i];
@@ -324,21 +325,21 @@ namespace smooth
 				return nOfEntries;
 			}
 
-			Int LockForRead() const
+			inline Int LockForRead() const
 			{
 				if (lock == NIL) lock = new Threads::RWLock();
 
 				return lock->LockForRead();
 			}
 
-			Int LockForWrite() const
+			inline Int LockForWrite() const
 			{
 				if (lock == NIL) lock = new Threads::RWLock();
 
 				return lock->LockForWrite();
 			}
 
-			Int Unlock() const
+			inline Int Unlock() const
 			{
 				if (lock == NIL) return 0;
 

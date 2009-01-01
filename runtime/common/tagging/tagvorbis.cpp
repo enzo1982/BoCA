@@ -74,6 +74,40 @@ Int BoCA::TagVorbis::RenderTagItem(const String &id, const String &value, Buffer
 	return Success();
 }
 
+Int BoCA::TagVorbis::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
+{
+	InStream	 in(STREAM_BUFFER, buffer, buffer.Size());
+
+	/* Skip vendor string.
+	 */
+	in.InputString(in.InputNumber(4));
+
+	/* Parse individual comment items.
+	 */
+	Int	 numItems = in.InputNumber(4);
+
+	for (Int i = 0; i < numItems; i++)
+	{
+		Int	 length = in.InputNumber(4);
+		String	 comment = in.InputString(length);
+
+		String	 id = comment.Head(comment.Find("="));
+		String	 value = comment.Tail(comment.Length() - comment.Find("=") - 1);
+
+		if	(id == "ARTIST")       track->artist  = value;
+		else if (id == "TITLE")	       track->title   = value;
+		else if (id == "ALBUM")	       track->album   = value;
+		else if (id == "TRACKNUMBER")  track->track   = value.ToInt();
+		else if (id == "DATE")	       track->year    = value.ToInt();
+		else if (id == "GENRE")	       track->genre   = value;
+		else if (id == "COMMENT")      track->comment = value;
+		else if (id == "ORGANIZATION") track->label   = value;
+		else if (id == "ISRC")	       track->isrc    = value;
+	}
+
+	return Success();
+}
+
 Int BoCA::TagVorbis::Parse(const String &fileName, Track *track)
 {
 	InStream	 in(STREAM_FILE, fileName, IS_READONLY);

@@ -127,7 +127,7 @@ Int BoCA::Track::RenderID3Tag(Buffer<UnsignedByte> &buffer, Int version)
 	return tag.Render(*this, buffer);
 }
 
-Bool BoCA::Track::ParseID3Tag(Buffer<UnsignedByte> &buffer)
+Bool BoCA::Track::ParseID3Tag(const Buffer<UnsignedByte> &buffer)
 {
 	TagID3	 tag;
 
@@ -148,7 +148,7 @@ Int BoCA::Track::RenderAPETag(Buffer<UnsignedByte> &buffer)
 	return tag.Render(*this, buffer);
 }
 
-Bool BoCA::Track::ParseAPETag(Buffer<UnsignedByte> &buffer)
+Bool BoCA::Track::ParseAPETag(const Buffer<UnsignedByte> &buffer)
 {
 	TagAPE	 tag;
 
@@ -181,6 +181,13 @@ Int BoCA::Track::RenderVorbisComment(Buffer<UnsignedByte> &buffer, const String 
 	TagVorbis	 tag;
 
 	return tag.Render(*this, buffer, vendorString);
+}
+
+Bool BoCA::Track::ParseVorbisComment(const Buffer<UnsignedByte> &buffer)
+{
+	TagVorbis	 tag;
+
+	return tag.Parse(buffer, this);
 }
 
 Bool BoCA::Track::ParseVorbisComment(const String &fileName)

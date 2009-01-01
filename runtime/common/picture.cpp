@@ -44,7 +44,7 @@ Int BoCA::Picture::LoadFromFile(const String &fileName)
 	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
 
 	type = 0x03; // Cover (front)
-	mime = fileName.EndsWith(".png") ? "image/png" : "image/jpg";
+	mime = fileName.EndsWith(".png") ? "image/png" : "image/jpeg";
 	data.Resize(in.Size());
 
 	in.InputData(data, in.Size());
@@ -66,8 +66,8 @@ const Bitmap &BoCA::Picture::GetBitmap() const
 	static Bitmap	 bitmap;
 	Int		 format = -1;
 
-	if	(mime == "image/jpg") format = IMAGE_FORMAT_JPEG;
-	else if	(mime == "image/png") format = IMAGE_FORMAT_PNG;
+	if	(mime == "image/jpeg" || mime == "image/jpg") format = IMAGE_FORMAT_JPEG;
+	else if	(mime == "image/png")			      format = IMAGE_FORMAT_PNG;
 
 	bitmap = ImageLoader::Load(data, format);
 

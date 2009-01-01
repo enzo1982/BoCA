@@ -10,6 +10,13 @@
 
 #include "dllinterface.h"
 
+OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
+OGGSTREAMPACKETIN		 ex_ogg_stream_packetin			= NIL;
+OGGSTREAMFLUSH			 ex_ogg_stream_flush			= NIL;
+OGGSTREAMPAGEOUT		 ex_ogg_stream_pageout			= NIL;
+OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
+OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
+
 VORBISINFOINIT			 ex_vorbis_info_init			= NIL;
 VORBISENCODEINIT		 ex_vorbis_encode_init			= NIL;
 VORBISENCODEINITVBR		 ex_vorbis_encode_init_vbr		= NIL;
@@ -28,13 +35,6 @@ VORBISBLOCKCLEAR		 ex_vorbis_block_clear			= NIL;
 VORBISDSPCLEAR			 ex_vorbis_dsp_clear			= NIL;
 VORBISCOMMENTCLEAR		 ex_vorbis_comment_clear		= NIL;
 VORBISINFOCLEAR			 ex_vorbis_info_clear			= NIL;
-
-OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
-OGGSTREAMPACKETIN		 ex_ogg_stream_packetin			= NIL;
-OGGSTREAMFLUSH			 ex_ogg_stream_flush			= NIL;
-OGGSTREAMPAGEOUT		 ex_ogg_stream_pageout			= NIL;
-OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
-OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
 
 DynamicLoader *oggdll		= NIL;
 DynamicLoader *vorbisdll	= NIL;

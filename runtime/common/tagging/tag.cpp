@@ -28,7 +28,7 @@ Int BoCA::Tag::Render(const Track &track, const String &fileName)
 	return Error();
 }
 
-Int BoCA::Tag::Parse(Buffer<UnsignedByte> &buffer, Track *track)
+Int BoCA::Tag::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 {
 	return Error();
 }

@@ -11,7 +11,14 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <boca/application/registry.h>
+
 #include <boca/common/config.h>
+#include <boca/common/i18n.h>
+
+#include <boca/common/communication/joblist.h>
+#include <boca/common/communication/menu.h>
+
 #include <boca/core/dllinterfaces.h>
 
 Void smooth::AttachDLL(Void *instance)
@@ -29,5 +36,11 @@ Void smooth::DetachDLL()
 	BoCA::DLLInterfaces::FreeMP4v2DLL();
 	BoCA::DLLInterfaces::FreeOggDLL();
 
+	BoCA::AS::Registry::Free();
+
+	BoCA::JobList::Free();
+	BoCA::Menu::Free();
+
+	BoCA::I18n::Free();
 	BoCA::Config::Free();
 }

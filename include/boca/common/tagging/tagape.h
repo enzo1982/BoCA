@@ -25,9 +25,9 @@ namespace BoCA
 			Int		 RenderAPEFooter(Int, Int, Buffer<UnsignedByte> &);
 			Int		 RenderAPEItem(const String &, const String &, Buffer<UnsignedByte> &);
 
-			Bool		 ParseAPEHeader(Buffer<UnsignedByte> &, Int *, Int *);
-			Bool		 ParseAPEFooter(Buffer<UnsignedByte> &, Int *, Int *);
-			Bool		 ParseAPEItem(Buffer<UnsignedByte> &, Int &, String *, String *);
+			Bool		 ParseAPEHeader(const Buffer<UnsignedByte> &, Int *, Int *);
+			Bool		 ParseAPEFooter(const Buffer<UnsignedByte> &, Int *, Int *);
+			Bool		 ParseAPEItem(const Buffer<UnsignedByte> &, Int &, String *, String *);
 
 		public:
 					 TagAPE();
@@ -35,7 +35,7 @@ namespace BoCA
 
 			Int		 Render(const Track &, Buffer<UnsignedByte> &);
 
-			Int		 Parse(Buffer<UnsignedByte> &, Track *);
+			Int		 Parse(const Buffer<UnsignedByte> &, Track *);
 			Int		 Parse(const String &, Track *);
 	};
 };

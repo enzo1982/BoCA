@@ -61,118 +61,107 @@ Bool BoCA::VorbisIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	 in(STREAM_FILE, streamURI, IS_READONLY);
 
 	Format	&format = track.GetFormat();
 
 	format.order = BYTE_INTEL;
 	format.bits = 16;
-	track.fileSize = f_in->Size();
+	track.fileSize = in.Size();
 
-	ogg_sync_state		 foy;
-	ogg_stream_state	 fos;
-	ogg_page		 fog;
-	ogg_packet		 fop;
+	ex_ogg_sync_init(&oy);
 
-	vorbis_info		 fvi;
-	vorbis_comment		 fvc;
+	Bool	 initialized = False;
+	Bool	 done = False;
+	Int	 packetNum = 0;
 
-	ex_ogg_sync_init(&foy);
-
-	Int	 size = Math::Min(4096, track.fileSize);
-	char	*fbuffer = ex_ogg_sync_buffer(&foy, size);
-
-	f_in->InputData(fbuffer, size);
-
-	ex_ogg_sync_wrote(&foy, size);
-
-	if (foy.data != NIL)
+	while (!done)
 	{
-		ex_ogg_sync_pageout(&foy, &fog);
+		Int	 size = Math::Min(4096, track.fileSize - in.GetPos());
 
-		ex_ogg_stream_init(&fos, ex_ogg_page_serialno(&fog)); 
+		buffer = ex_ogg_sync_buffer(&oy, size);
 
-		ex_vorbis_info_init(&fvi);
-		ex_vorbis_comment_init(&fvc);
+		in.InputData(buffer, size);
 
-		ex_ogg_stream_pagein(&fos, &fog);
-		ex_ogg_stream_packetout(&fos, &fop);
+		ex_ogg_sync_wrote(&oy, size);
 
-		ex_vorbis_synthesis_headerin(&fvi, &fvc, &fop);
-
-		Int	 i = 0;
-
-		while (i < 2)
+		while (ex_ogg_sync_pageout(&oy, &og) == 1 && !done)
 		{
-			if (ex_ogg_sync_pageout(&foy, &fog) == 1)
+			if (!initialized)
 			{
-				ex_ogg_stream_pagein(&fos, &fog);
+				ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
 
-				while (i < 2)
+				ex_vorbis_info_init(&vi);
+				ex_vorbis_comment_init(&vc);
+
+				initialized = True;
+			}
+
+			ex_ogg_stream_pagein(&os, &og);
+
+			while (ex_ogg_stream_packetout(&os, &op) == 1 && !done)
+			{
+				ex_vorbis_synthesis_headerin(&vi, &vc, &op);
+
+				if (packetNum == 0)
 				{
-					if (ex_ogg_stream_packetout(&fos, &fop) == 0) break;
+					format.rate = vi.rate;
+					format.channels = vi.channels;
+					track.length = -1;
 
-					ex_vorbis_synthesis_headerin(&fvi, &fvc, &fop); 
+					Int	 bitrate = 0;
 
-					i++;
+					if	(vi.bitrate_nominal > 0)		       bitrate = vi.bitrate_nominal;
+			 		else if (vi.bitrate_lower > 0 && vi.bitrate_upper > 0) bitrate = (vi.bitrate_lower + vi.bitrate_upper) / 2;
+
+					if (bitrate > 0) track.approxLength = track.fileSize / (bitrate / 8) * format.rate * format.channels;
 				}
-			}
-			else
-			{
-				fbuffer = ex_ogg_sync_buffer(&foy, size);
 
-				f_in->InputData(fbuffer, size);
+				if (packetNum == 1)
+				{
+					if (vc.comments > 0)
+					{
+						track.track = -1;
+						track.outfile = NIL;
 
-				ex_ogg_sync_wrote(&foy, size);
+						char	*prevInFormat = String::SetInputFormat("UTF-8");
+
+						for (Int j = 0; j < vc.comments; j++)
+						{
+							String	 comment = String(vc.user_comments[j]);
+							String	 id = String().CopyN(comment, comment.Find("=")).ToUpper();
+
+							if	(id == "TITLE")		track.title	= comment.Tail(comment.Length() - 6);
+							else if (id == "ARTIST")	track.artist	= comment.Tail(comment.Length() - 7);
+							else if (id == "ALBUM")		track.album	= comment.Tail(comment.Length() - 6);
+							else if (id == "GENRE")		track.genre	= comment.Tail(comment.Length() - 6);
+							else if (id == "DATE")		track.year	= comment.Tail(comment.Length() - 5).ToInt();
+							else if (id == "TRACKNUMBER")	track.track	= comment.Tail(comment.Length() - 12).ToInt();
+							else if (id == "COMMENT")	track.comment	= comment.Tail(comment.Length() - 8);
+							else if (id == "ORGANIZATION")	track.label	= comment.Tail(comment.Length() - 13);
+							else if (id == "ISRC")		track.isrc	= comment.Tail(comment.Length() - 5);
+						}
+
+						String::SetInputFormat(prevInFormat);
+					}
+				}
+
+				if (packetNum >= 2) done = True;
+
+				packetNum++;
 			}
 		}
-
-		format.rate = fvi.rate;
-		format.channels = fvi.channels;
-		track.length = -1;
-
-		Int	 bitrate = 0;
-
-		if (fvi.bitrate_nominal > 0)				 bitrate = fvi.bitrate_nominal;
- 		else if (fvi.bitrate_lower > 0 && fvi.bitrate_upper > 0) bitrate = (fvi.bitrate_lower + fvi.bitrate_upper) / 2;
-
-		if (bitrate > 0) track.approxLength = track.fileSize / (bitrate / 8) * format.rate * format.channels;
-
-		if (fvc.comments > 0)
-		{
-			track.track = -1;
-			track.outfile = NIL;
-
-			char	*prevInFormat = String::SetInputFormat("UTF-8");
-
-			for (Int j = 0; j < fvc.comments; j++)
-			{
-				String	 comment = String(fvc.user_comments[j]);
-				String	 id = String().CopyN(comment, comment.Find("=")).ToUpper();
-
-				if	(id == "TITLE")		track.title	= comment.Tail(comment.Length() - 6);
-				else if (id == "ARTIST")	track.artist	= comment.Tail(comment.Length() - 7);
-				else if (id == "ALBUM")		track.album	= comment.Tail(comment.Length() - 6);
-				else if (id == "GENRE")		track.genre	= comment.Tail(comment.Length() - 6);
-				else if (id == "DATE")		track.year	= comment.Tail(comment.Length() - 5).ToInt();
-				else if (id == "TRACKNUMBER")	track.track	= comment.Tail(comment.Length() - 12).ToInt();
-				else if (id == "COMMENT")	track.comment	= comment.Tail(comment.Length() - 8);
-				else if (id == "ORGANIZATION")	track.label	= comment.Tail(comment.Length() - 13);
-				else if (id == "ISRC")		track.isrc	= comment.Tail(comment.Length() - 5);
-			}
-
-			String::SetInputFormat(prevInFormat);
-		}
-
-		ex_ogg_stream_clear(&fos);
-
-		ex_vorbis_comment_clear(&fvc);
-		ex_vorbis_info_clear(&fvi);
 	}
 
-	ex_ogg_sync_clear(&foy);
+	if (initialized)
+	{
+		ex_vorbis_comment_clear(&vc);
+		ex_vorbis_info_clear(&vi);
 
-	delete f_in;
+		ex_ogg_stream_clear(&os);
+	}
+
+	ex_ogg_sync_clear(&oy);
 
 	return Success();
 }
@@ -190,54 +179,44 @@ Bool BoCA::VorbisIn::Activate()
 {
 	ex_ogg_sync_init(&oy);
 
-	Int	 size = 4096;
+	Bool	 initialized = False;
+	Bool	 done = False;
+	Int	 packetNum = 0;
 
-	inBytes += size;
-
-	buffer = ex_ogg_sync_buffer(&oy, size);
-
-	driver->ReadData((unsigned char *) buffer, size);
-
-	ex_ogg_sync_wrote(&oy, size);
-
-	ex_ogg_sync_pageout(&oy, &og);
-
-	ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og)); 
-
-	ex_vorbis_info_init(&vi);
-	ex_vorbis_comment_init(&vc);
-
-	ex_ogg_stream_pagein(&os, &og);
-	ex_ogg_stream_packetout(&os, &op);
-
-	ex_vorbis_synthesis_headerin(&vi, &vc, &op);
-
-	int	 i = 0;
-
-	while (i < 2)
+	while (!done)
 	{
-		if (ex_ogg_sync_pageout(&oy, &og) == 1)
+		Int	 size = 4096;
+
+		buffer = ex_ogg_sync_buffer(&oy, size);
+
+		size = driver->ReadData((unsigned char *) buffer, 4096);
+
+		inBytes += size;
+
+		ex_ogg_sync_wrote(&oy, size);
+
+		while (ex_ogg_sync_pageout(&oy, &og) == 1 && !done)
 		{
+			if (!initialized)
+			{
+				ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+
+				ex_vorbis_info_init(&vi);
+				ex_vorbis_comment_init(&vc);
+
+				initialized = True;
+			}
+
 			ex_ogg_stream_pagein(&os, &og);
 
-			while (i < 2)
+			while (ex_ogg_stream_packetout(&os, &op) == 1 && !done)
 			{
-				if (ex_ogg_stream_packetout(&os, &op) == 0) break;
+				ex_vorbis_synthesis_headerin(&vi, &vc, &op);
 
-				ex_vorbis_synthesis_headerin(&vi, &vc, &op); 
+				if (packetNum >= 2) done = True;
 
-				i++;
+				packetNum++;
 			}
-		}
-		else
-		{
-			inBytes += size;
-
-			buffer = ex_ogg_sync_buffer(&oy, size);
-
-			driver->ReadData((unsigned char *) buffer, size);
-
-			ex_ogg_sync_wrote(&oy, size);
 		}
 	}
 
@@ -265,11 +244,11 @@ Int BoCA::VorbisIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (size <= 0) return -1;
 
-	inBytes += size;
-
 	buffer = ex_ogg_sync_buffer(&oy, size);
 
 	size = driver->ReadData((unsigned char *) buffer, size);
+
+	inBytes += size;
 
 	ex_ogg_sync_wrote(&oy, size);
 
@@ -277,19 +256,15 @@ Int BoCA::VorbisIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	Int	 dataBufferLen = 0;
 
-	while (true)
+	while (ex_ogg_sync_pageout(&oy, &og) == 1)
 	{
-		short	 convbuffer[6144];
-		int	 convsize = 6144 / vi.channels;
-
-		if (ex_ogg_sync_pageout(&oy, &og) == 0) break;
+		static short	 convbuffer[6144];
+		static int	 convsize = 6144 / vi.channels;
 
 		ex_ogg_stream_pagein(&os, &og);
 
-		while (true)
+		while (ex_ogg_stream_packetout(&os, &op) == 1)
 		{
-			if (ex_ogg_stream_packetout(&os, &op) == 0) break;
-
 			float  **pcm;
 			int	 samples;
 

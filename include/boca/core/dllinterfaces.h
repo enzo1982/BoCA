@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -46,7 +46,6 @@ namespace BoCA
 	typedef void				(*ID3TAGDELETE)			(ID3Tag *);
 	typedef void				(*ID3TAGSETPADDING)		(ID3Tag *, bool);
 	typedef void				(*ID3TAGADDFRAME)		(ID3Tag *, const ID3Frame *);
-	typedef size_t				(*ID3TAGLINK)			(ID3Tag *, const char *);
 	typedef size_t				(*ID3TAGNUMFRAMES)		(ID3Tag *);
 	typedef ID3Frame *			(*ID3TAGFINDFRAMEWITHID)	(const ID3Tag *, ID3_FrameID);
 	typedef size_t				(*ID3TAGPARSEBUFFER)		(ID3Tag *tag, const uchar *buffer, size_t bytes);
@@ -74,7 +73,6 @@ namespace BoCA
 	extern ID3TAGDELETE			 ex_ID3Tag_Delete;
 	extern ID3TAGSETPADDING			 ex_ID3Tag_SetPadding;
 	extern ID3TAGADDFRAME			 ex_ID3Tag_AddFrame;
-	extern ID3TAGLINK			 ex_ID3Tag_Link;
 	extern ID3TAGNUMFRAMES			 ex_ID3Tag_NumFrames;
 	extern ID3TAGFINDFRAMEWITHID		 ex_ID3Tag_FindFrameWithID;
 	extern ID3TAGPARSEBUFFER		 ex_ID3Tag_ParseBuffer;

@@ -125,13 +125,13 @@ namespace smooth
 				return True;
 			}
 
-			t &operator	 [](const int n)	{ return memory[n]; }
-			t &operator	 [](const Int n)	{ return (*this)[(int) n]; }
+			inline t &operator	 [](const int n)	{ return memory[n]; }
+			inline t &operator	 [](const Int n)	{ return (*this)[(int) n]; }
 
-			t operator	 [](const int n) const	{ return memory[n]; }
-			t operator	 [](const Int n) const	{ return (*this)[(int) n]; }
+			inline t operator	 [](const int n) const	{ return memory[n]; }
+			inline t operator	 [](const Int n) const	{ return (*this)[(int) n]; }
 
-			operator	 t *() const		{ return memory; }
+			inline operator		 t *() const		{ return memory; }
 	};
 };
 

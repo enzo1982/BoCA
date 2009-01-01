@@ -27,7 +27,7 @@ namespace BoCA
 			virtual Int	 Render(const Track &, Buffer<UnsignedByte> &);
 			virtual Int	 Render(const Track &, const String &);
 
-			virtual Int	 Parse(Buffer<UnsignedByte> &, Track *);
+			virtual Int	 Parse(const Buffer<UnsignedByte> &, Track *);
 			virtual Int	 Parse(const String &, Track *);
 	};
 };

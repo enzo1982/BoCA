@@ -12,6 +12,7 @@
 
 BoCA::ConfigureExternal::ConfigureExternal()
 {
+	SetSize(Size(100, 100));
 }
 
 BoCA::ConfigureExternal::~ConfigureExternal()

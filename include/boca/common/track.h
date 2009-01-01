@@ -94,17 +94,18 @@ namespace BoCA
 			Bool operator	 !=(const int) const;
 
 			Int		 RenderID3Tag(Buffer<UnsignedByte> &, Int = 2);
-			Bool		 ParseID3Tag(Buffer<UnsignedByte> &);
+			Bool		 ParseID3Tag(const Buffer<UnsignedByte> &);
 			Bool		 ParseID3Tag(const String &);
 
 			Int		 RenderAPETag(Buffer<UnsignedByte> &);
-			Bool		 ParseAPETag(Buffer<UnsignedByte> &);
+			Bool		 ParseAPETag(const Buffer<UnsignedByte> &);
 			Bool		 ParseAPETag(const String &);
 
 			Bool		 RenderMP4Meta(const String &);
 			Bool		 ParseMP4Meta(const String &);
 
 			Int		 RenderVorbisComment(Buffer<UnsignedByte> &, const String & = "BoCA Tagging API");
+			Bool		 ParseVorbisComment(const Buffer<UnsignedByte> &);
 			Bool		 ParseVorbisComment(const String &);
 		accessors:
 			Int		 GetTrackID() const				{ return trackID; }

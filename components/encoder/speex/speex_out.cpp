@@ -67,19 +67,69 @@ BoCA::SpeexOut::~SpeexOut()
 
 Bool BoCA::SpeexOut::Activate()
 {
-	Config	*config = Config::Get();
-
+	Config		*config = Config::Get();
 	const Format	&format = track.GetFormat();
 
 	srand(clock());
 
 	ex_ogg_stream_init(&os, rand());
 
+	Int	 modeID = config->GetIntValue("Speex", "Mode", -1);
+
+	if (modeID == -1)
+	{
+		/* Automatically select Speex mode
+		 * depending on sampling rate.
+		 */
+		if	(format.rate <= 12500) modeID = SPEEX_MODEID_NB;
+		else if	(format.rate <= 25000) modeID = SPEEX_MODEID_WB;
+		else			       modeID = SPEEX_MODEID_UWB;
+	}
+
 	SpeexHeader	 speex_header;
 
-	ex_speex_init_header(&speex_header, format.rate, format.channels, ex_speex_nb_mode);
+	ex_speex_init_header(&speex_header, format.rate, format.channels, ex_speex_lib_get_mode(modeID));
 
-	encoder = ex_speex_encoder_init(ex_speex_nb_mode);
+	encoder = ex_speex_encoder_init(ex_speex_lib_get_mode(modeID));
+
+	/* Set options
+	 */
+	spx_int32_t	 vbr = config->GetIntValue("Speex", "VBR", 0);
+	spx_int32_t	 abr = config->GetIntValue("Speex", "ABR", -16) * 1000;
+	spx_int32_t	 complexity = config->GetIntValue("Speex", "Complexity", 3);
+
+	ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR, &vbr);
+	ex_speex_encoder_ctl(encoder, SPEEX_SET_COMPLEXITY, &complexity);
+
+	if (abr > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_ABR, &abr);
+
+	if (vbr)
+	{
+		float		 vbrq = config->GetIntValue("Speex", "VBRQuality", 80) / 10;
+		spx_int32_t	 vbrmax = config->GetIntValue("Speex", "VBRMaxBitrate", -48) * 1000;
+
+		ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR_QUALITY, &vbrq);
+
+		if (vbrmax > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR_MAX_BITRATE, &vbrmax);
+	}
+	else
+	{
+		spx_int32_t	 quality = config->GetIntValue("Speex", "Quality", 8);
+		spx_int32_t	 bitrate = config->GetIntValue("Speex", "Bitrate", -16) * 1000;
+		spx_int32_t	 vad = config->GetIntValue("Speex", "VAD", 0);
+
+		if (quality > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_QUALITY, &quality);
+		if (bitrate > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_BITRATE, &bitrate);
+
+		ex_speex_encoder_ctl(encoder, SPEEX_SET_VAD, &vad);
+	}
+
+	if (vbr || abr > 0 || config->GetIntValue("Speex", "VAD", 0))
+	{
+		spx_int32_t	 dtx = config->GetIntValue("Speex", "DTX", 0);
+
+		ex_speex_encoder_ctl(encoder, SPEEX_SET_DTX, &dtx);
+	}
 
 	/* Get frame size
 	 */

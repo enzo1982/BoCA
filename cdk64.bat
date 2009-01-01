@@ -8,6 +8,6 @@ set LIBRARY_PATH=%CDK_INSTALL_PATH%/system64/lib
 set BUILD_X64=True
 
 echo BonkEnc Component Development Kit v1.1 Beta 1 (x64)
-echo Copyright (C) 2001-2008 Robert Kausch
+echo Copyright (C) 2001-2009 Robert Kausch
 
 bash

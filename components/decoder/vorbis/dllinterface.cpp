@@ -11,11 +11,8 @@
 #include "dllinterface.h"
 
 OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
-OGGSTREAMPACKETIN		 ex_ogg_stream_packetin			= NIL;
 OGGSTREAMPACKETOUT		 ex_ogg_stream_packetout		= NIL;
-OGGSTREAMFLUSH			 ex_ogg_stream_flush			= NIL;
 OGGSTREAMPAGEIN			 ex_ogg_stream_pagein			= NIL;
-OGGSTREAMPAGEOUT		 ex_ogg_stream_pageout			= NIL;
 OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
 OGGPAGESERIALNO			 ex_ogg_page_serialno			= NIL;
 OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
@@ -56,11 +53,8 @@ Bool LoadOggDLL()
 	oggdll = new DynamicLoader("codecs/Ogg");
 
 	ex_ogg_stream_init		= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
-	ex_ogg_stream_packetin		= (OGGSTREAMPACKETIN) oggdll->GetFunctionAddress("ogg_stream_packetin");
 	ex_ogg_stream_packetout		= (OGGSTREAMPACKETOUT) oggdll->GetFunctionAddress("ogg_stream_packetout");
-	ex_ogg_stream_flush		= (OGGSTREAMFLUSH) oggdll->GetFunctionAddress("ogg_stream_flush");
 	ex_ogg_stream_pagein		= (OGGSTREAMPAGEIN) oggdll->GetFunctionAddress("ogg_stream_pagein");
-	ex_ogg_stream_pageout		= (OGGSTREAMPAGEOUT) oggdll->GetFunctionAddress("ogg_stream_pageout");
 	ex_ogg_page_eos			= (OGGPAGEEOS) oggdll->GetFunctionAddress("ogg_page_eos");
 	ex_ogg_page_serialno		= (OGGPAGESERIALNO) oggdll->GetFunctionAddress("ogg_page_serialno");
 	ex_ogg_stream_clear		= (OGGSTREAMCLEAR) oggdll->GetFunctionAddress("ogg_stream_clear");
@@ -71,11 +65,8 @@ Bool LoadOggDLL()
 	ex_ogg_sync_clear		= (OGGSYNCCLEAR) oggdll->GetFunctionAddress("ogg_sync_clear");
 
 	if (ex_ogg_stream_init			== NIL ||
-	    ex_ogg_stream_packetin		== NIL ||
 	    ex_ogg_stream_packetout		== NIL ||
-	    ex_ogg_stream_flush			== NIL ||
 	    ex_ogg_stream_pagein		== NIL ||
-	    ex_ogg_stream_pageout		== NIL ||
 	    ex_ogg_page_eos			== NIL ||
 	    ex_ogg_page_serialno		== NIL ||
 	    ex_ogg_stream_clear			== NIL ||

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,7 +14,6 @@ ID3TAGNEW			 ex_ID3Tag_New				= NIL;
 ID3TAGDELETE			 ex_ID3Tag_Delete			= NIL;
 ID3TAGSETPADDING		 ex_ID3Tag_SetPadding			= NIL;
 ID3TAGADDFRAME			 ex_ID3Tag_AddFrame			= NIL;
-ID3TAGLINK			 ex_ID3Tag_Link				= NIL;
 ID3TAGNUMFRAMES			 ex_ID3Tag_NumFrames			= NIL;
 ID3TAGFINDFRAMEWITHID		 ex_ID3Tag_FindFrameWithID		= NIL;
 ID3TAGPARSEBUFFER		 ex_ID3Tag_ParseBuffer			= NIL;
@@ -83,7 +82,6 @@ Bool BoCA::DLLInterfaces::LoadID3DLL()
 	ex_ID3Tag_Delete		= (ID3TAGDELETE) id3dll->GetFunctionAddress("ID3Tag_Delete");
 	ex_ID3Tag_SetPadding		= (ID3TAGSETPADDING) id3dll->GetFunctionAddress("ID3Tag_SetPadding");
 	ex_ID3Tag_AddFrame		= (ID3TAGADDFRAME) id3dll->GetFunctionAddress("ID3Tag_AddFrame");
-	ex_ID3Tag_Link			= (ID3TAGLINK) id3dll->GetFunctionAddress("ID3Tag_Link");
 	ex_ID3Tag_NumFrames		= (ID3TAGNUMFRAMES) id3dll->GetFunctionAddress("ID3Tag_NumFrames");
 	ex_ID3Tag_FindFrameWithID	= (ID3TAGFINDFRAMEWITHID) id3dll->GetFunctionAddress("ID3Tag_FindFrameWithID");
 	ex_ID3Tag_ParseBuffer		= (ID3TAGPARSEBUFFER) id3dll->GetFunctionAddress("ID3Tag_ParseBuffer");
@@ -111,7 +109,6 @@ Bool BoCA::DLLInterfaces::LoadID3DLL()
 	    ex_ID3Tag_Delete			== NIL ||
 	    ex_ID3Tag_SetPadding		== NIL ||
 	    ex_ID3Tag_AddFrame			== NIL ||
-	    ex_ID3Tag_Link			== NIL ||
 	    ex_ID3Tag_NumFrames			== NIL ||
 	    ex_ID3Tag_FindFrameWithID		== NIL ||
 	    ex_ID3Tag_ParseBuffer		== NIL ||

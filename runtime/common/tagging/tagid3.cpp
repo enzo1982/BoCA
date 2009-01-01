@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -102,7 +102,7 @@ Int BoCA::TagID3::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 	return size;
 }
 
-Int BoCA::TagID3::Parse(Buffer<UnsignedByte> &buffer, Track *track)
+Int BoCA::TagID3::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 {
 	ID3Tag		*tag = ex_ID3Tag_New();
 
@@ -117,17 +117,68 @@ Int BoCA::TagID3::Parse(Buffer<UnsignedByte> &buffer, Track *track)
 
 Int BoCA::TagID3::Parse(const String &fileName, Track *track)
 {
-	ID3Tag	*tag = ex_ID3Tag_New();
+	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
 
-	ex_ID3Tag_Link(tag, CreateTempFile(fileName));
+	/* Look for ID3v2 tag.
+	 */
+	if (in.InputString(3) == "ID3" && in.InputNumber(1) <= 4)
+	{
+		/* Skip minor version and flags.
+		 */
+		in.InputNumber(1);
+		in.InputNumber(1);
 
-	RemoveTempFile(fileName);
+		/* Read tag size as a 4 byte unsynchronized integer.
+		 */
+		Int	 tagSize = (in.InputNumber(1) << 21) +
+				   (in.InputNumber(1) << 14) +
+				   (in.InputNumber(1) <<  7) +
+				   (in.InputNumber(1)      );
 
-	Int	 retVal = ParseID3Tag(tag, track);
+		in.Seek(0);
 
-	ex_ID3Tag_Delete(tag);
+		Buffer<UnsignedByte>	 buffer(tagSize + 10);
 
-	return retVal;
+		in.InputData(buffer, buffer.Size());
+
+		return Parse(buffer, track);
+	}
+
+	in.Seek(in.Size() - 128);
+
+	/* Look for ID3v1 tag.
+	 */
+	if (in.InputString(3) == "TAG")
+	{
+		char	*prevInFormat = String::SetInputFormat("ISO-8859-1");
+
+		track->title	= in.InputString(30);
+		track->artist	= in.InputString(30);
+		track->album	= in.InputString(30);
+		track->year	= in.InputString(4).ToInt();
+		track->comment	= in.InputString(28);
+
+		if (in.InputNumber(1) == 0)
+		{
+			Int	 n = in.InputNumber(1);
+
+			if (n > 0) track->track = n;
+		}
+		else
+		{
+			in.RelSeek(-29);
+
+			track->comment = in.InputString(30);
+		}
+
+		track->genre	= GetID3CategoryName(in.InputNumber(1));
+
+		String::SetInputFormat(prevInFormat);
+
+		return Success();
+	}
+
+	return Error();
 }
 
 Int BoCA::TagID3::ParseID3Tag(Void *tag, Track *track)
@@ -268,7 +319,7 @@ String BoCA::TagID3::GetID3v2FrameString(ID3Frame *frame)
 			{
 				ex_ID3Field_GetASCII(field, abuffer, tbufsize);
 
-				if (encoding == ID3TE_ISO8859_1)	result.ImportFrom("ISO-8859-1", abuffer);
+				if	(encoding == ID3TE_ISO8859_1)	result.ImportFrom("ISO-8859-1", abuffer);
 				else if (encoding == ID3TE_UTF8)	result.ImportFrom("UTF-8", abuffer);
 			}
 		}
@@ -348,66 +399,4 @@ const String &BoCA::TagID3::GetID3CategoryName(Int id)
 
 	if (id < 0 || id > 147) return empty;
 	else			return array[id];
-}
-
-String BoCA::TagID3::GetTempFileName(const String &oFileName)
-{
-	String	 rVal	= oFileName;
-	Int	 lastBs	= -1;
-
-	for (Int i = 0; i < rVal.Length(); i++)
-	{
-		if (rVal[i] > 255)	rVal[i] = '#';
-		if (rVal[i] == '\\')	lastBs = i;
-	}
-
-	if (rVal == oFileName) return rVal;
-
-	String	 tempDir = S::System::System::GetTempDirectory();
-
-	for (Int j = lastBs + 1; j < rVal.Length(); j++)
-	{
-		tempDir[tempDir.Length()] = rVal[j];
-	}
-
-	return tempDir.Append(".out.temp");
-}
-
-String BoCA::TagID3::CreateTempFile(const String &oFileName)
-{
-	String		 tempFileName = GetTempFileName(oFileName);
-
-	if (tempFileName == oFileName) return oFileName;
-
-	IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, oFileName, IO::IS_READONLY);
-	IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, tempFileName, IO::OS_OVERWRITE);
-
-	Buffer<unsigned char>	 buffer;
-
-	buffer.Resize(1024);
-
-	Int	 bytesleft = in->Size();
-
-	while (bytesleft > 0)
-	{
-		out->OutputData(in->InputData(buffer, Math::Min(1024, bytesleft)), Math::Min(1024, bytesleft));
-
-		bytesleft -= 1024;
-	}
-
-	delete in;
-	delete out;
-
-	return tempFileName;
-}
-
-Bool BoCA::TagID3::RemoveTempFile(const String &oFileName)
-{
-	String		 tempFileName = GetTempFileName(oFileName);
-
-	if (tempFileName == oFileName) return True;
-
-	File(tempFileName).Delete();
-
-	return True;
 }

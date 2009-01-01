@@ -98,7 +98,7 @@ Int BoCA::TagAPE::RenderAPEItem(const String &id, const String &value, Buffer<Un
 	return Success();
 }
 
-Int BoCA::TagAPE::Parse(Buffer<UnsignedByte> &buffer, Track *track)
+Int BoCA::TagAPE::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 {
 	Int	 numItems = 0;
 	Int	 offset = 32;
@@ -165,7 +165,7 @@ Int BoCA::TagAPE::Parse(const String &fileName, Track *track)
 	return Error();
 }
 
-Bool BoCA::TagAPE::ParseAPEHeader(Buffer<UnsignedByte> &buffer, Int *tagSize, Int *numItems)
+Bool BoCA::TagAPE::ParseAPEHeader(const Buffer<UnsignedByte> &buffer, Int *tagSize, Int *numItems)
 {
 	InStream	 in(STREAM_BUFFER, buffer, 32);
 
@@ -181,7 +181,7 @@ Bool BoCA::TagAPE::ParseAPEHeader(Buffer<UnsignedByte> &buffer, Int *tagSize, In
 	return True;
 }
 
-Bool BoCA::TagAPE::ParseAPEFooter(Buffer<UnsignedByte> &buffer, Int *tagSize, Int *numItems)
+Bool BoCA::TagAPE::ParseAPEFooter(const Buffer<UnsignedByte> &buffer, Int *tagSize, Int *numItems)
 {
 	InStream	 in(STREAM_BUFFER, buffer + buffer.Size() - 32, 32);
 
@@ -197,7 +197,7 @@ Bool BoCA::TagAPE::ParseAPEFooter(Buffer<UnsignedByte> &buffer, Int *tagSize, In
 	return True;
 }
 
-Bool BoCA::TagAPE::ParseAPEItem(Buffer<UnsignedByte> &buffer, Int &offset, String *id, String *value)
+Bool BoCA::TagAPE::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &offset, String *id, String *value)
 {
 	InStream	 in(STREAM_BUFFER, buffer + offset, buffer.Size() - offset - 32);
 

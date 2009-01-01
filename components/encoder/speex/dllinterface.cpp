@@ -10,6 +10,13 @@
 
 #include "dllinterface.h"
 
+OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
+OGGSTREAMPACKETIN		 ex_ogg_stream_packetin			= NIL;
+OGGSTREAMFLUSH			 ex_ogg_stream_flush			= NIL;
+OGGSTREAMPAGEOUT		 ex_ogg_stream_pageout			= NIL;
+OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
+OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
+
 SPEEXBITSINIT			 ex_speex_bits_init			= NIL;
 SPEEXBITSDESTROY		 ex_speex_bits_destroy			= NIL;
 SPEEXBITSRESET			 ex_speex_bits_reset			= NIL;
@@ -24,16 +31,7 @@ SPEEXENCODESTEREOINT		 ex_speex_encode_stereo_int		= NIL;
 SPEEXINITHEADER			 ex_speex_init_header			= NIL;
 SPEEXHEADERTOPACKET		 ex_speex_header_to_packet		= NIL;
 SPEEXLIBCTL			 ex_speex_lib_ctl			= NIL;
-SPEEXNBMODE			 ex_speex_nb_mode			= NIL;
-SPEEXWBMODE			 ex_speex_wb_mode			= NIL;
-SPEEXUWBMODE			 ex_speex_uwb_mode			= NIL;
-
-OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
-OGGSTREAMPACKETIN		 ex_ogg_stream_packetin			= NIL;
-OGGSTREAMFLUSH			 ex_ogg_stream_flush			= NIL;
-OGGSTREAMPAGEOUT		 ex_ogg_stream_pageout			= NIL;
-OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
-OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
+SPEEXLIBGETMODE			 ex_speex_lib_get_mode			= NIL;
 
 DynamicLoader *oggdll	= NIL;
 DynamicLoader *speexdll	= NIL;
@@ -84,9 +82,7 @@ Bool LoadSpeexDLL()
 	ex_speex_init_header		= (SPEEXINITHEADER) speexdll->GetFunctionAddress("speex_init_header");
 	ex_speex_header_to_packet	= (SPEEXHEADERTOPACKET) speexdll->GetFunctionAddress("speex_header_to_packet");
 	ex_speex_lib_ctl		= (SPEEXLIBCTL) speexdll->GetFunctionAddress("speex_lib_ctl");
-	ex_speex_nb_mode		= (SPEEXNBMODE) speexdll->GetFunctionAddress("speex_nb_mode");
-	ex_speex_wb_mode		= (SPEEXWBMODE) speexdll->GetFunctionAddress("speex_wb_mode");
-	ex_speex_uwb_mode		= (SPEEXUWBMODE) speexdll->GetFunctionAddress("speex_uwb_mode");
+	ex_speex_lib_get_mode		= (SPEEXLIBGETMODE) speexdll->GetFunctionAddress("speex_lib_get_mode");
 
 	if (ex_speex_bits_init			== NIL ||
 	    ex_speex_bits_destroy		== NIL ||
@@ -102,9 +98,7 @@ Bool LoadSpeexDLL()
 	    ex_speex_init_header		== NIL ||
 	    ex_speex_header_to_packet		== NIL ||
 	    ex_speex_lib_ctl			== NIL ||
-	    ex_speex_nb_mode			== NIL ||
-	    ex_speex_wb_mode			== NIL ||
-	    ex_speex_uwb_mode			== NIL) { FreeSpeexDLL(); return False; }
+	    ex_speex_lib_get_mode		== NIL) { FreeSpeexDLL(); return False; }
 
 	return True;
 }

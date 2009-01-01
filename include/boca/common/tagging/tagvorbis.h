@@ -29,6 +29,7 @@ namespace BoCA
 
 			Int		 Render(const Track &, Buffer<UnsignedByte> &, const String &);
 
+			Int		 Parse(const Buffer<UnsignedByte> &, Track *);
 			Int		 Parse(const String &, Track *);
 	};
 };

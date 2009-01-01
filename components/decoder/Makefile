@@ -11,6 +11,7 @@ all:
 	cd mac && make
 	cd mad && make
 	cd sndfile && make
+	cd speex && make
 	cd twinvq && make
 	cd voc && make
 	cd vorbis && make
@@ -28,6 +29,7 @@ clean:
 	cd mac && make clean
 	cd mad && make clean
 	cd sndfile && make clean
+	cd speex && make clean
 	cd twinvq && make clean
 	cd voc && make clean
 	cd vorbis && make clean

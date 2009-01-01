@@ -30,18 +30,13 @@ namespace BoCA
 			Int		 SetID3v2FrameString(ID3Frame *, const String &);
 
 			const String	&GetID3CategoryName(Int);
-
-			String		 GetTempFileName(const String &);
-
-			String		 CreateTempFile(const String &);
-			Bool		 RemoveTempFile(const String &);
 		public:
 					 TagID3();
 					~TagID3();
 
 			Int		 Render(const Track &, Buffer<UnsignedByte> &);
 
-			Int		 Parse(Buffer<UnsignedByte> &, Track *);
+			Int		 Parse(const Buffer<UnsignedByte> &, Track *);
 			Int		 Parse(const String &, Track *);
 		accessors:
 			Bool		 SetID3Version(Int nVersion)	{ if (version < 1 || version > 2) return False; version = nVersion; return True; }
