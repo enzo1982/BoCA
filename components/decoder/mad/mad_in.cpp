@@ -250,6 +250,8 @@ Bool BoCA::MADIn::ReadXingTag(InStream *in)
 
 	XHEADDATA		 data;
 
+	data.toc = NIL;
+
 	if (GetXingHeader(&data, buffer))
 	{
 		numFrames = data.frames;

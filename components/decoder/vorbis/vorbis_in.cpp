@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -119,31 +119,11 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 
 				if (packetNum == 1)
 				{
-					if (vc.comments > 0)
-					{
-						track.track = -1;
-						track.outfile = NIL;
+					Buffer<UnsignedByte>	 buffer(op.bytes - 7);
 
-						char	*prevInFormat = String::SetInputFormat("UTF-8");
+					memcpy(buffer, op.packet + 7, op.bytes - 7);
 
-						for (Int j = 0; j < vc.comments; j++)
-						{
-							String	 comment = String(vc.user_comments[j]);
-							String	 id = String().CopyN(comment, comment.Find("=")).ToUpper();
-
-							if	(id == "TITLE")		track.title	= comment.Tail(comment.Length() - 6);
-							else if (id == "ARTIST")	track.artist	= comment.Tail(comment.Length() - 7);
-							else if (id == "ALBUM")		track.album	= comment.Tail(comment.Length() - 6);
-							else if (id == "GENRE")		track.genre	= comment.Tail(comment.Length() - 6);
-							else if (id == "DATE")		track.year	= comment.Tail(comment.Length() - 5).ToInt();
-							else if (id == "TRACKNUMBER")	track.track	= comment.Tail(comment.Length() - 12).ToInt();
-							else if (id == "COMMENT")	track.comment	= comment.Tail(comment.Length() - 8);
-							else if (id == "ORGANIZATION")	track.label	= comment.Tail(comment.Length() - 13);
-							else if (id == "ISRC")		track.isrc	= comment.Tail(comment.Length() - 5);
-						}
-
-						String::SetInputFormat(prevInFormat);
-					}
+					track.ParseVorbisComment(buffer);
 				}
 
 				if (packetNum >= 2) done = True;

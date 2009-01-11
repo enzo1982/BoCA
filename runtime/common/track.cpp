@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -57,6 +57,8 @@ BoCA::Track &BoCA::Track::operator =(const int nil)
 
 BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 {
+	if (&oTrack == this) return *this;
+
 	trackID		= oTrack.trackID;
 
 	format		= oTrack.format;
@@ -84,9 +86,9 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 
 	pictures.RemoveAll();
 
-	for (Int i = 0; i < oTrack.pictures.Length(); i++)
+	foreach (const Picture &picture, oTrack.pictures)
 	{
-		pictures.Add(oTrack.pictures.GetNth(i));
+		pictures.Add(picture);
 	}
 
 	offset		= oTrack.offset;
@@ -188,11 +190,4 @@ Bool BoCA::Track::ParseVorbisComment(const Buffer<UnsignedByte> &buffer)
 	TagVorbis	 tag;
 
 	return tag.Parse(buffer, this);
-}
-
-Bool BoCA::Track::ParseVorbisComment(const String &fileName)
-{
-	TagVorbis	 tag;
-
-	return tag.Parse(fileName, this);
 }

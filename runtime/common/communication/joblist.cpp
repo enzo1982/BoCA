@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,6 +14,7 @@ BoCA::JobList *BoCA::JobList::instance = NIL;
 
 BoCA::JobList::JobList()
 {
+	locked = False;
 }
 
 BoCA::JobList::~JobList()
@@ -38,4 +39,27 @@ Void BoCA::JobList::Free()
 
 		instance = NIL;
 	}
+}
+
+Int BoCA::JobList::Lock()
+{
+	if (IsLocked()) return Error();
+
+	locked = True;
+
+	return Success();
+}
+
+Int BoCA::JobList::Unlock()
+{
+	if (!IsLocked()) return Error();
+
+	locked = False;
+
+	return Success();
+}
+
+Bool BoCA::JobList::IsLocked()
+{
+	return locked;
 }

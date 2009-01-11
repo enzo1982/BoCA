@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -24,35 +24,61 @@ BoCA::TagVorbis::~TagVorbis()
 
 Int BoCA::TagVorbis::Render(const Track &track, Buffer<UnsignedByte> &buffer, const String &vendorString)
 {
-	Config		*currentConfig = Config::Get();
+	Config	*currentConfig = Config::Get();
+	char	*prevOutFormat = String::SetOutputFormat("UTF-8");
 
-	buffer.Resize(4 + strlen(vendorString.ConvertTo("UTF-8")) + 4);
+	buffer.Resize(4 + strlen(vendorString) + 4);
 
-	Int		 numItems = 0;
+	Int	 numItems = 0;
 
-	if	(track.artist != NIL) { RenderTagItem("ARTIST", track.artist, buffer);			    numItems++; }
-	if	(track.title  != NIL) { RenderTagItem("TITLE", track.title, buffer);			    numItems++; }
-	if	(track.album  != NIL) { RenderTagItem("ALBUM", track.album, buffer);			    numItems++; }
-	if	(track.track   >   0) { RenderTagItem("TRACKNUMBER", String::FromInt(track.track), buffer); numItems++; }
-	if	(track.year    >   0) { RenderTagItem("DATE", String::FromInt(track.year), buffer);	    numItems++; }
-	if	(track.genre  != NIL) { RenderTagItem("GENRE", track.genre, buffer);			    numItems++; }
-	if	(track.label  != NIL) { RenderTagItem("ORGANIZATION", track.label, buffer);		    numItems++; }
-	if	(track.isrc   != NIL) { RenderTagItem("ISRC", track.isrc, buffer);			    numItems++; }
+	if	(track.artist != NIL) { RenderTagItem("ARTIST", track.artist, buffer);				    numItems++; }
+	if	(track.title  != NIL) { RenderTagItem("TITLE", track.title, buffer);				    numItems++; }
+	if	(track.album  != NIL) { RenderTagItem("ALBUM", track.album, buffer);				    numItems++; }
+	if	(track.track   >   0) { RenderTagItem("TRACKNUMBER", String(track.track < 10 ? "0" : "")
+								    .Append(String::FromInt(track.track)), buffer); numItems++; }
+	if	(track.year    >   0) { RenderTagItem("DATE", String::FromInt(track.year), buffer);		    numItems++; }
+	if	(track.genre  != NIL) { RenderTagItem("GENRE", track.genre, buffer);				    numItems++; }
+	if	(track.label  != NIL) { RenderTagItem("ORGANIZATION", track.label, buffer);			    numItems++; }
+	if	(track.isrc   != NIL) { RenderTagItem("ISRC", track.isrc, buffer);				    numItems++; }
 
 	if	(track.comment != NIL && !currentConfig->replace_comments) { RenderTagItem("COMMENT", track.comment, buffer);		       numItems++; }
-	else if (currentConfig->default_comment != NIL)			   { RenderTagItem("COMMENT", currentConfig->default_comment, buffer); numItems++; }
+	else if (currentConfig->default_comment != NIL && numItems > 0)	   { RenderTagItem("COMMENT", currentConfig->default_comment, buffer); numItems++; }
+
+	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1) && currentConfig->GetIntValue("Settings", "WriteVorbisCoverArt", 0))
+	{
+		/* This is an unofficial way to store cover art in Vorbis
+		 * comments. It is used by some existing software.
+		 *
+		 * Copy only the first picture. It's not clear if any other
+		 * software can handle multiple pictures in Vorbis comments.
+		 */
+		if (track.pictures.Length() > 0)
+		{
+			const Picture		&picInfo = track.pictures.GetFirst();
+			Buffer<UnsignedByte>	 picBuffer(picInfo.data.Size());
+
+			memcpy(picBuffer, picInfo.data, picInfo.data.Size());
+
+			RenderTagItem("COVERARTMIME", picInfo.mime, buffer);
+			RenderTagItem("COVERART", Encoding::Base64(picBuffer).Encode(), buffer);
+
+			numItems += 2;
+		}
+	}
 
 	RenderTagHeader(vendorString, numItems, buffer);
+
+	String::SetOutputFormat(prevOutFormat);
 
 	return buffer.Size();
 }
 
 Int BoCA::TagVorbis::RenderTagHeader(const String &vendorString, Int numItems, Buffer<UnsignedByte> &buffer)
 {
-	OutStream	 out(STREAM_BUFFER, buffer, 4 + strlen(vendorString.ConvertTo("UTF-8")) + 4);
+	OutStream	 out(STREAM_BUFFER, buffer, 4 + strlen(vendorString) + 4);
 
-	out.OutputNumber(strlen(vendorString.ConvertTo("UTF-8")), 4);
-	out.OutputString(vendorString.ConvertTo("UTF-8"));
+	out.OutputNumber(strlen(vendorString), 4);
+	out.OutputString(vendorString);
 	out.OutputNumber(numItems, 4);
 
 	return Success();
@@ -60,7 +86,7 @@ Int BoCA::TagVorbis::RenderTagHeader(const String &vendorString, Int numItems, B
 
 Int BoCA::TagVorbis::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
 {
-	Int		 size = id.Length() + strlen(value.ConvertTo("UTF-8")) + 5;
+	Int		 size = id.Length() + strlen(value) + 5;
 
 	buffer.Resize(buffer.Size() + size);
 
@@ -69,18 +95,19 @@ Int BoCA::TagVorbis::RenderTagItem(const String &id, const String &value, Buffer
 	out.OutputNumber(size - 4, 4);
 	out.OutputString(id);
 	out.OutputNumber('=', 1);
-	out.OutputString(value.ConvertTo("UTF-8"));
+	out.OutputString(value);
 
 	return Success();
 }
 
 Int BoCA::TagVorbis::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 {
+	char		*prevInFormat = String::SetInputFormat("UTF-8");
 	InStream	 in(STREAM_BUFFER, buffer, buffer.Size());
 
 	/* Skip vendor string.
 	 */
-	in.InputString(in.InputNumber(4));
+	in.RelSeek(in.InputNumber(4));
 
 	/* Parse individual comment items.
 	 */
@@ -103,31 +130,28 @@ Int BoCA::TagVorbis::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 		else if (id == "COMMENT")      track->comment = value;
 		else if (id == "ORGANIZATION") track->label   = value;
 		else if (id == "ISRC")	       track->isrc    = value;
+		else if (id == "COVERART")
+		{
+			/* This is an unofficial way to store cover art in Vorbis
+			 * comments. It is used by some existing software.
+			 */
+			Picture	 picture;
+
+			Encoding::Base64(picture.data).Decode(value);
+
+			if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+			else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
+				 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
+				 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
+				 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+
+			picture.type = 0;
+
+			track->pictures.Add(picture);
+		}
 	}
+
+	String::SetInputFormat(prevInFormat);
 
 	return Success();
-}
-
-Int BoCA::TagVorbis::Parse(const String &fileName, Track *track)
-{
-	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
-
-	ogg_sync_state	 oy;
-
-	ex_ogg_sync_init(&oy);
-
-	Int	 size = Math::Min(4096, in.Size());
-	char	*fbuffer = ex_ogg_sync_buffer(&oy, size);
-
-	in.InputData(fbuffer, size);
-
-	ex_ogg_sync_wrote(&oy, size);
-
-	if (oy.data != NIL)
-	{
-	}
-
-	ex_ogg_sync_clear(&oy);
-
-	return Error();
 }

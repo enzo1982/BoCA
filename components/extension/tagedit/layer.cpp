@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,7 +20,8 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	list_tracks->AddTab(I18n::Get()->TranslateString("Length"), 80, OR_RIGHT);
 	list_tracks->AddTab(I18n::Get()->TranslateString("Size"), 80, OR_RIGHT);
 
-	tab_mode	= new TabWidget(Point(7, 182), Size(300, 200));
+	tab_mode	= new TabWidget(Point(7, 288), Size(300, 280));
+	tab_mode->SetOrientation(OR_LOWERLEFT);
 
 	layer_basic	= new LayerTagBasic();
 	layer_basic->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
@@ -73,8 +74,8 @@ Void BoCA::LayerTags::OnChangeSize(const Size &nSize)
 	Rect	 clientRect = Rect(GetPosition(), GetSize());
 	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
-	list_tracks->SetWidth(clientSize.cx - 15);
-	tab_mode->SetSize(Size(clientSize.cx - 15, clientSize.cy - 190));
+	list_tracks->SetSize(Size(clientSize.cx - 15, clientSize.cy - 320));
+	tab_mode->SetWidth(clientSize.cx - 15);
 }
 
 /* Called when a list entry is selected.
@@ -96,8 +97,6 @@ Void BoCA::LayerTags::OnSelectTrack()
  */
 Void BoCA::LayerTags::OnModifyTrack(const Track &track)
 {
-	OnApplicationModifyTrack(track);
-
 	JobList::Get()->onComponentModifyTrack.Emit(track);
 }
 

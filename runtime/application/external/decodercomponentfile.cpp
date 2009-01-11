@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,11 +29,10 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	 */
 	if (specs->external_tagmode != TAG_MODE_NONE)
 	{
-		if	((specs->external_tag == "ID3v1"  ||
-			  specs->external_tag == "ID3v2")	 && Config::Get()->enable_id3)	track.ParseID3Tag(streamURI);
-		else if ( specs->external_tag == "MP4Metadata"	 && Config::Get()->enable_mp4)	track.ParseMP4Meta(streamURI);
-		else if ( specs->external_tag == "APEv2")					track.ParseAPETag(streamURI);
-		else if ( specs->external_tag == "VorbisComment" && Config::Get()->enable_ogg)	track.ParseVorbisComment(streamURI);
+		if	((specs->external_tag == "ID3v1" ||
+			  specs->external_tag == "ID3v2")      && Config::Get()->enable_id3) track.ParseID3Tag(streamURI);
+		else if ( specs->external_tag == "MP4Metadata" && Config::Get()->enable_mp4) track.ParseMP4Meta(streamURI);
+		else if ( specs->external_tag == "APEv2")				     track.ParseAPETag(streamURI);
 	}
 
 	/* Create temporary WAVE file

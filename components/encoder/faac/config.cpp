@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,9 +13,6 @@
 
 BoCA::ConfigureFAAC::ConfigureFAAC()
 {
-	Point	 pos;
-	Size	 size;
-
 	Config	*config = Config::Get();
 
 	mpegVersion	= config->GetIntValue("FAAC", "MPEGVersion", 0);
@@ -30,70 +27,34 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	I18n	*i18n = I18n::Get();
 
-	pos.x = 7;
-	pos.y = 7;
-	size.cx = 525;
-	size.cy = 208;
-
-	tabwidget		= new TabWidget(pos, size);
+	tabwidget		= new TabWidget(Point(7, 7), Size(525, 208));
 
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 
-	pos.x = 135;
-	pos.y = 11;
-	size.cx = 120;
-	size.cy = 65;
+	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), Point(135, 11), Size(120, 65));
 
-	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), pos, size);
-
-	pos.x += 10;
-	pos.y += 13;
-	size.cx = 99;
-	size.cy = 0;
-
-	option_version_mpeg2	= new OptionBox("MPEG 2", pos, size, &mpegVersion, 1);
+	option_version_mpeg2	= new OptionBox("MPEG 2", Point(10, 13), Size(99, 0), &mpegVersion, 1);
 	option_version_mpeg2->onAction.Connect(&ConfigureFAAC::SetMPEGVersion, this);
 
-	pos.y += 25;
-
-	option_version_mpeg4	= new OptionBox("MPEG 4", pos, size, &mpegVersion, 0);
+	option_version_mpeg4	= new OptionBox("MPEG 4", Point(10, 38), Size(99, 0), &mpegVersion, 0);
 	option_version_mpeg4->onAction.Connect(&ConfigureFAAC::SetMPEGVersion, this);
 
-	pos.x = 7;
-	pos.y = 88;
-	size.cx = 120;
-	size.cy = 90;
+	group_version->Add(option_version_mpeg2);
+	group_version->Add(option_version_mpeg4);
 
-	group_aactype		= new GroupBox(i18n->TranslateString("AAC object type"), pos, size);
+	group_aactype		= new GroupBox(i18n->TranslateString("AAC object type"), Point(7, 88), Size(120, 90));
 
-	pos.x += 10;
-	pos.y += 13;
-	size.cx = 99;
-	size.cy = 0;
+	option_aactype_main	= new OptionBox("MAIN", Point(10, 13), Size(99, 0), &aacType, 1);
+	option_aactype_low	= new OptionBox("LOW", Point(10, 38), Size(99, 0), &aacType, 2);
+	option_aactype_ltp	= new OptionBox("LTP", Point(10, 63), Size(99, 0), &aacType, 4);
 
-	option_aactype_main	= new OptionBox("MAIN", pos, size, &aacType, 1);
+	group_aactype->Add(option_aactype_main);
+	group_aactype->Add(option_aactype_low);
+	group_aactype->Add(option_aactype_ltp);
 
-	pos.y += 25;
+	group_mp4		= new GroupBox(i18n->TranslateString("File format"), Point(7, 11), Size(120, 65));
 
-	option_aactype_low	= new OptionBox("LOW", pos, size, &aacType, 2);
-
-	pos.y += 25;
-
-	option_aactype_ltp	= new OptionBox("LTP", pos, size, &aacType, 4);
-
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 120;
-	size.cy = 65;
-
-	group_mp4		= new GroupBox(i18n->TranslateString("File format"), pos, size);
-
-	pos.x += 10;
-	pos.y += 13;
-	size.cx = 99;
-	size.cy = 0;
-
-	option_mp4		= new OptionBox("MP4", pos, size, &fileFormat, 1);
+	option_mp4		= new OptionBox("MP4", Point(10, 13), Size(99, 0), &fileFormat, 1);
 	option_mp4->onAction.Connect(&ConfigureFAAC::SetFileFormat, this);
 
 	if (mp4v2dll == NIL)
@@ -103,150 +64,86 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 		fileFormat = 0;
 	}
 
-	pos.y += 25;
-
-	option_aac		= new OptionBox("AAC", pos, size, &fileFormat, 0);
+	option_aac		= new OptionBox("AAC", Point(10, 38), Size(99, 0), &fileFormat, 0);
 	option_aac->onAction.Connect(&ConfigureFAAC::SetFileFormat, this);
 
-	pos.x = 135;
-	pos.y = 88;
-	size.cx = 279;
-	size.cy = 90;
+	group_mp4->Add(option_mp4);
+	group_mp4->Add(option_aac);
 
-	group_id3v2		= new GroupBox(i18n->TranslateString("Info tags"), pos, size);
+	group_id3v2		= new GroupBox(i18n->TranslateString("Info tags"), Point(135, 88), Size(279, 90));
 
-	pos.x += 10;
-	pos.y += 13;
-	size.cx = 200;
-	size.cy = 0;
-
-	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), pos, size, &allowID3);
+	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
 	check_id3v2->SetWidth(check_id3v2->textSize.cx + 20);
 
-	pos.y += 25;
-
-	text_note		= new Text(i18n->TranslateString("Note:"), pos);
-
-	pos.x += text_note->textSize.cx + 2;
-
-	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), pos);
+	text_note		= new Text(i18n->TranslateString("Note:"), Point(10, 38));
+	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->textSize.cx + 12, 38));
 
 	group_id3v2->SetWidth(text_note->textSize.cx + text_id3v2->textSize.cx + 22);
 
+	group_id3v2->Add(check_id3v2);
+	group_id3v2->Add(text_note);
+	group_id3v2->Add(text_id3v2);
+
 	layer_quality		= new Layer(i18n->TranslateString("Quality"));
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 320;
-	size.cy = 65;
+	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate / Quality"), Point(7, 11), Size(320, 65));
 
-	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate / Quality"), pos, size);
-
-	pos.x += 10;
-	pos.y += 13;
-	size.cx = 150;
-	size.cy = 0;
-
-	option_bitrate		= new OptionBox(i18n->TranslateString("Bitrate per channel:"), pos, size, &setQuality, 0);
+	option_bitrate		= new OptionBox(i18n->TranslateString("Bitrate per channel:"), Point(10, 13), Size(150, 0), &setQuality, 0);
 	option_bitrate->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
 	option_bitrate->SetWidth(option_bitrate->textSize.cx + 19);
 
-	pos.x += (option_bitrate->GetWidth() + 9);
-	size.cx = 227 - option_bitrate->GetWidth();
-	size.cy = 0;
-
-	slider_bitrate		= new Slider(pos, size, OR_HORZ, &bitrate, 8, 256);
+	slider_bitrate		= new Slider(Point(option_bitrate->GetWidth() + 19, 13), Size(227 - option_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 8, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureFAAC::SetBitrate, this);
 
-	pos.x += (size.cx + 8);
-	pos.y -= 1;
-	size.cx = 25;
-
-	edit_bitrate		= new EditBox("", pos, size, 3);
+	edit_bitrate		= new EditBox("", Point(254, 12), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureFAAC::SetBitrateByEditBox, this);
 
-	pos.x += 32;
-	pos.y += 3;
+	text_bitrate_kbps	= new Text("kbps", Point(286, 15));
 
-	text_bitrate_kbps	= new Text("kbps", pos);
-
-	pos.x = 17;
-	pos.y += 23;
-	size.cx = 150;
-	size.cy = 0;
-
-	option_quality		= new OptionBox(i18n->TranslateString("Set quality:"), pos, size, &setQuality, 1);
+	option_quality		= new OptionBox(i18n->TranslateString("Set quality:"), Point(10, 38), Size(150, 0), &setQuality, 1);
 	option_quality->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
 	option_quality->SetWidth(option_bitrate->textSize.cx + 19);
 
-	pos.x += (option_quality->GetWidth() + 9);
-	size.cx = 227 - option_quality->GetWidth();
-	size.cy = 0;
-
-	slider_quality		= new Slider(pos, size, OR_HORZ, &aacQuality, 10, 500);
+	slider_quality		= new Slider(Point(option_quality->GetWidth() + 19, 38), Size(227 - option_quality->GetWidth(), 0), OR_HORZ, &aacQuality, 10, 500);
 	slider_quality->onValueChange.Connect(&ConfigureFAAC::SetQuality, this);
 
-	pos.x += (size.cx + 8);
-	pos.y -= 1;
-	size.cx = 25;
-
-	edit_quality		= new EditBox("", pos, size, 3);
+	edit_quality		= new EditBox("", Point(254, 37), Size(25, 0), 3);
 	edit_quality->SetFlags(EDB_NUMERIC);
 	edit_quality->onInput.Connect(&ConfigureFAAC::SetQualityByEditBox, this);
 
-	pos.x += 32;
-	pos.y += 3;
+	text_quality_percent	= new Text("%", Point(286, 40));
 
-	text_quality_percent	= new Text("%", pos);
+	group_bitrate->Add(option_bitrate);
+	group_bitrate->Add(slider_bitrate);
+	group_bitrate->Add(edit_bitrate);
+	group_bitrate->Add(text_bitrate_kbps);
+	group_bitrate->Add(option_quality);
+	group_bitrate->Add(slider_quality);
+	group_bitrate->Add(edit_quality);
+	group_bitrate->Add(text_quality_percent);
 
-	pos.x = 335;
-	pos.y = 11;
-	size.cx = 179;
-	size.cy = 42;
+	group_js		= new GroupBox(i18n->TranslateString("Stereo mode"), Point(335, 11), Size(179, 42));
 
-	group_js		= new GroupBox(i18n->TranslateString("Stereo mode"), pos, size);
+	check_js		= new CheckBox(i18n->TranslateString("Allow Joint Stereo"), Point(10, 13), Size(158, 0), &allowjs);
 
-	pos.x += 10;
-	pos.y += 13;
-	size.cx = 158;
-	size.cy = 0;
+	group_js->Add(check_js);
 
-	check_js		= new CheckBox(i18n->TranslateString("Allow Joint Stereo"), pos, size, &allowjs);
+	group_tns		= new GroupBox(i18n->TranslateString("Temporal Noise Shaping"), Point(335, 65), Size(179, 42));
 
-	pos.x = 335;
-	pos.y = 65;
-	size.cx = 179;
-	size.cy = 42;
+	check_tns		= new CheckBox(i18n->TranslateString("Use Temporal Noise Shaping"), Point(10, 13), Size(158, 0), &usetns);
 
-	group_tns		= new GroupBox(i18n->TranslateString("Temporal Noise Shaping"), pos, size);
+	group_tns->Add(check_tns);
 
-	pos.x += 10;
-	pos.y += 13;
-	size.cx = 158;
-	size.cy = 0;
+	group_bandwidth		= new GroupBox(i18n->TranslateString("Maximum bandwidth"), Point(7, 88), Size(320, 43));
 
-	check_tns		= new CheckBox(i18n->TranslateString("Use Temporal Noise Shaping"), pos, size, &usetns);
+	text_bandwidth		= new Text(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz):"), Point(11, 15));
 
-	pos.x = 7;
-	pos.y = 88;
-	size.cx = 320;
-	size.cy = 43;
-
-	group_bandwidth		= new GroupBox(i18n->TranslateString("Maximum bandwidth"), pos, size);
-
-	pos.x += 11;
-	pos.y += 15;
-
-	text_bandwidth		= new Text(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz):"), pos);
-
-	pos.x += (text_bandwidth->textSize.cx + 8);
-	pos.y -= 3;
-	size.cx = 291 - text_bandwidth->textSize.cx;
-	size.cy = 0;
-
-	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue("FAAC", "BandWidth", 16000)), pos, size, 5);
+	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue("FAAC", "BandWidth", 16000)), Point(text_bandwidth->textSize.cx + 19, 12), Size(291 - text_bandwidth->textSize.cx, 0), 5);
 	edit_bandwidth->SetFlags(EDB_NUMERIC);
+
+	group_bandwidth->Add(text_bandwidth);
+	group_bandwidth->Add(edit_bandwidth);
 
 	SetBitrate();
 	SetQuality();
@@ -261,36 +158,14 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	tabwidget->Add(layer_format);
 
 	layer_format->Add(group_version);
-	layer_format->Add(option_version_mpeg2);
-	layer_format->Add(option_version_mpeg4);
 	layer_format->Add(group_aactype);
-	layer_format->Add(option_aactype_main);
-	layer_format->Add(option_aactype_low);
-	layer_format->Add(option_aactype_ltp);
 	layer_format->Add(group_mp4);
-	layer_format->Add(option_mp4);
-	layer_format->Add(option_aac);
 	layer_format->Add(group_id3v2);
-	layer_format->Add(check_id3v2);
-	layer_format->Add(text_note);
-	layer_format->Add(text_id3v2);
 
 	layer_quality->Add(group_bitrate);
-	layer_quality->Add(option_bitrate);
-	layer_quality->Add(slider_bitrate);
-	layer_quality->Add(edit_bitrate);
-	layer_quality->Add(text_bitrate_kbps);
-	layer_quality->Add(option_quality);
-	layer_quality->Add(slider_quality);
-	layer_quality->Add(edit_quality);
-	layer_quality->Add(text_quality_percent);
 	layer_quality->Add(group_js);
-	layer_quality->Add(check_js);
 	layer_quality->Add(group_tns);
-	layer_quality->Add(check_tns);
 	layer_quality->Add(group_bandwidth);
-	layer_quality->Add(text_bandwidth);
-	layer_quality->Add(edit_bandwidth);
 
 	SetSize(Size(539, 222));
 }
@@ -402,13 +277,7 @@ Void BoCA::ConfigureFAAC::SetFileFormat()
 	if (fileFormat == 1)	// MP4 container
 	{
 		group_version->Deactivate();
-		option_version_mpeg2->Deactivate();
-		option_version_mpeg4->Deactivate();
-
 		group_id3v2->Deactivate();
-		check_id3v2->Deactivate();
-		text_id3v2->Deactivate();
-		text_note->Deactivate();
 
 		option_aactype_ltp->Activate();
 
@@ -422,13 +291,7 @@ Void BoCA::ConfigureFAAC::SetFileFormat()
 	else			// raw AAC file format
 	{
 		group_version->Activate();
-		option_version_mpeg2->Activate();
-		option_version_mpeg4->Activate();
-
 		group_id3v2->Activate();
-		check_id3v2->Activate();
-		text_id3v2->Activate();
-		text_note->Activate();
 
 		if (mpegVersion == 1) // MPEG2
 		{

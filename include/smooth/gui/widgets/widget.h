@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,6 +20,7 @@ namespace smooth
 
 		class Tooltip;
 		class PopupMenu;
+		class Layer;
 
 		class Surface;
 	};
@@ -83,8 +84,10 @@ namespace smooth
 				Int				 orientation;
 
 				String				 text;
-				String				 tooltipText;
 				String				 statusText;
+
+				String				 tooltipText;
+				Layer				*tooltipLayer;
 
 				Font				 font;
 
@@ -166,6 +169,9 @@ namespace smooth
 
 				virtual Int			 SetTooltipText(const String &);
 				virtual const String		&GetTooltipText() const;
+
+				virtual Int			 SetTooltipLayer(Layer *);
+				virtual Layer			*GetTooltipLayer() const;
 
 				virtual Int			 SetStatusText(const String &);
 				virtual const String		&GetStatusText() const;

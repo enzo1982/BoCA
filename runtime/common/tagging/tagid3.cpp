@@ -44,7 +44,7 @@ Int BoCA::TagID3::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 	if	(track.comment != NIL && !currentConfig->replace_comments) { frames.Add(ex_ID3Frame_NewID(ID3FID_COMMENT)); SetID3v2FrameString(frames.GetLast(), track.comment);		   ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 	else if (currentConfig->default_comment != NIL)			   { frames.Add(ex_ID3Frame_NewID(ID3FID_COMMENT)); SetID3v2FrameString(frames.GetLast(), currentConfig->default_comment); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 
-	if (currentConfig->copy_picture_tags)
+	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1))
 	{
 		String		 leBOM;
 
@@ -64,17 +64,16 @@ Int BoCA::TagID3::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 
 		char		*prevOutFormat = String::SetOutputFormat(encString);
 
-		for (Int i = 0; i < track.pictures.Length(); i++)
+		foreach (const Picture &picInfo, track.pictures)
 		{
 			ID3Frame	*frame_picture = ex_ID3Frame_NewID(ID3FID_PICTURE);
-			const Picture	&picInfo = track.pictures.GetNth(i);
 
 			ex_ID3Field_SetINT(ex_ID3Frame_GetField(frame_picture, ID3FN_TEXTENC), encoding);
 			ex_ID3Field_SetEncoding(ex_ID3Frame_GetField(frame_picture, ID3FN_DESCRIPTION), encoding);
 
-			if (encoding == ID3TE_UTF16)		ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField(frame_picture, ID3FN_DESCRIPTION), (unicode_t *) String(leBOM).Append(picInfo.description).ConvertTo("UTF-16LE"));
-			else if (encoding == ID3TE_UTF16BE)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField(frame_picture, ID3FN_DESCRIPTION), (unicode_t *) picInfo.description.ConvertTo("UTF-16BE"));
-			else					ex_ID3Field_SetASCII(ex_ID3Frame_GetField(frame_picture, ID3FN_DESCRIPTION), picInfo.description);
+			if	(encoding == ID3TE_UTF16)   ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField(frame_picture, ID3FN_DESCRIPTION), (unicode_t *) String(leBOM).Append(picInfo.description).ConvertTo("UTF-16LE"));
+			else if (encoding == ID3TE_UTF16BE) ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField(frame_picture, ID3FN_DESCRIPTION), (unicode_t *) picInfo.description.ConvertTo("UTF-16BE"));
+			else				    ex_ID3Field_SetASCII(ex_ID3Frame_GetField(frame_picture, ID3FN_DESCRIPTION), picInfo.description);
 
 			ex_ID3Field_SetASCII(ex_ID3Frame_GetField(frame_picture, ID3FN_MIMETYPE), picInfo.mime.ConvertTo("ISO-8859-1"));
 			ex_ID3Field_SetINT(ex_ID3Frame_GetField(frame_picture, ID3FN_PICTURETYPE), picInfo.type);
@@ -282,13 +281,16 @@ Int BoCA::TagID3::ParseID3Tag(Void *tag, Track *track)
 			{
 				picture.data.Resize(ex_ID3Field_Size(field));
 
-				ex_ID3Field_GetBINARY(field, picture.data, picture.data.Size());
+				if (picture.data.Size() > 16 && picture.data[0] != 0 && picture.data[1] != 0)
+				{
+					ex_ID3Field_GetBINARY(field, picture.data, picture.data.Size());
+
+					track->pictures.Add(picture);
+				}
 			}
 
 			delete [] abuffer;
 			delete [] wbuffer;
-
-			track->pictures.Add(picture);
 		}
 	}
 

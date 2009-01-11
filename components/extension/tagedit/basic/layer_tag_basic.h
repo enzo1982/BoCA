@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -24,6 +24,8 @@ namespace BoCA
 	class LayerTagBasic : public Layer
 	{
 		private:
+			GroupBox			*group_info;
+
 			Text				*text_artist;
 			EditBox				*edit_artist;
 
@@ -36,15 +38,30 @@ namespace BoCA
 			Text				*text_comment;
 			MultiEdit			*edit_comment;
 
-			Image				*image_cover;
+			GroupBox			*group_cover;
+
+			ImageBox			*image_covers;
+			Image				*image_cover_big;
+
+			Button				*button_cover_load;
+			Button				*button_cover_remove;
+
+			ComboBox			*combo_cover_type;
 
 			Track				 track;
 
-			Void				 LoadCoverImage();
-			Void				 FreeCoverImage();
+			Void				 LoadCoverImages();
+			Void				 FreeCoverImages();
 		signals:
 			Signal1<Void, const Track &>	 onModifyTrack;
 		slots:
+			Void				 OnChangeSize(const Size &);
+
+			Void				 LoadCover();
+			Void				 RemoveCover();
+
+			Void				 SelectCover(ListEntry *);
+
 			Void				 OnSelectTrack(const Track &);
 			Void				 OnSelectNone();
 

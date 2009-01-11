@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -86,24 +86,24 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 					{
 						if (option->GetType() == OPTION_TYPE_MIN)
 						{
-							min	 = option->GetValue().ToInt() / param->GetStepSize();
+							min	 = option->GetValue().ToFloat() / param->GetStepSize();
 							minAlias = option->GetAlias();
 						}
 
 						if (option->GetType() == OPTION_TYPE_MAX)
 						{
-							max	 = option->GetValue().ToInt() / param->GetStepSize();
+							max	 = option->GetValue().ToFloat() / param->GetStepSize();
 							maxAlias = option->GetAlias();
 						}
 					}
 
 					GroupBox	*group = new GroupBox(param->GetName(), Point(6, 100), Size(250, 50));
 					Slider		*range = new Slider(Point(10, 11), Size(210, 0), OR_HORZ, NIL, min, max);
-					Text		*value = new Text(String::FromInt(max * param->GetStepSize()), Point(230, 13));
+					Text		*value = new Text(String::FromFloat(max * param->GetStepSize()).Append(param->GetStepSize() < 1 ? ".0" : ""), Point(230, 13));
 
 					range->SetWidth(222 - value->textSize.cx);
 
-					range->SetValue(config->GetIntValue(specs->id, param->GetName(), param->GetDefault().ToInt()) / param->GetStepSize());
+					range->SetValue(config->GetIntValue(specs->id, param->GetName(), param->GetDefault().ToFloat() / param->GetStepSize()));
 
 					range->onValueChange.Connect(&ConfigLayerExternal::OnSliderValueChange, this);
 					range->onValueChange.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
@@ -185,7 +185,7 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 					Slider		*range = (Slider *) group->GetNthObject(0);
 
 					config->SetIntValue(specs->id, String("Set ").Append(param->GetName()), entry->IsMarked() ? 1 : 0);
-					config->SetIntValue(specs->id, param->GetName(), range->GetValue() * param->GetStepSize());
+					config->SetIntValue(specs->id, param->GetName(), range->GetValue());
 				}
 
 				break;
@@ -247,7 +247,7 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 					{
 						Slider		*range = (Slider *) group->GetNthObject(0);
 
-						arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromInt(range->GetValue() * param->GetStepSize()))).Append(" ");
+						arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromFloat(range->GetValue() * param->GetStepSize()))).Append(" ");
 					}
 				}
 
@@ -287,7 +287,7 @@ Void BoCA::AS::ConfigLayerExternal::OnSliderValueChange()
 					Slider		*range = (Slider *) group->GetNthObject(0);
 					Text		*value = (Text *) group->GetNthObject(1);
 
-					value->SetText(String::FromInt(range->GetValue() * param->GetStepSize()));
+					value->SetText(String::FromFloat(range->GetValue() * param->GetStepSize()).Append(param->GetStepSize() < 1 && range->GetValue() % 10 == 0 ? ".0" : ""));
 					value->SetPosition(Point(240 - value->textSize.cx, 13));
 				}
 

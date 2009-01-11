@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,6 +16,8 @@
 #include "vorbis_out.h"
 #include "config.h"
 #include "dllinterface.h"
+
+using namespace smooth::IO;
 
 const String &BoCA::VorbisOut::GetComponentSpecs()
 {
@@ -95,29 +97,6 @@ Bool BoCA::VorbisOut::Activate()
 	}
 
 	ex_vorbis_comment_init(&vc);
-
-	if (config->enable_vctags)
-	{
-		char	*prevOutFormat = String::SetOutputFormat(config->vctag_encoding);
-
-		if (track.artist != NIL || track.title != NIL)
-		{
-			if	(track.title  != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "TITLE", track.title);
-			if	(track.artist != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "ARTIST", track.artist);
-			if	(track.album  != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "ALBUM", track.album);
-			if	(track.track   >   0) ex_vorbis_comment_add_tag(&vc, (char *) "TRACKNUMBER", String(track.track < 10 ? "0" : "").Append(String::FromInt(track.track)));
-			if	(track.year    >   0) ex_vorbis_comment_add_tag(&vc, (char *) "DATE", String::FromInt(track.year));
-			if	(track.genre  != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "GENRE", track.genre);
-			if	(track.label  != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "ORGANIZATION", track.label);
-			if	(track.isrc   != NIL) ex_vorbis_comment_add_tag(&vc, (char *) "ISRC", track.isrc);
-
-			if	(track.comment != NIL && !config->replace_comments) ex_vorbis_comment_add_tag(&vc, (char *) "COMMENT", track.comment);
-			else if (config->default_comment != NIL)		    ex_vorbis_comment_add_tag(&vc, (char *) "COMMENT", config->default_comment);
-		}
-
-		String::SetOutputFormat(prevOutFormat);
-	}
-
 	ex_vorbis_analysis_init(&vd, &vi);
 	ex_vorbis_block_init(&vd, &vb);
 
@@ -132,7 +111,36 @@ Bool BoCA::VorbisOut::Activate()
 
 	ex_ogg_stream_packetin(&os, &header); /* automatically placed in its own page */
 
-	ex_ogg_stream_packetin(&os, &header_comm);
+	/* Write Vorbis comment header
+	 */
+	{
+		/* Read vendor string.
+		 */
+		InStream	 in(STREAM_BUFFER, header_comm.packet + 7, header_comm.bytes - 7);
+		String		 vendor = in.InputString(in.InputNumber(4));
+
+		Buffer<unsigned char>	 vcBuffer;
+
+		/* Render actual Vorbis comment tag.
+		 *
+		 * An empty tag containing only the vendor string
+		 * is rendered if Vorbis comments are disabled.
+		 */
+		if ((track.artist != NIL || track.title != NIL) && config->enable_vctags) track.RenderVorbisComment(vcBuffer, vendor);
+		else									  Track().RenderVorbisComment(vcBuffer, vendor);
+
+		vcBuffer.Resize(vcBuffer.Size() + 8);
+
+		memmove(vcBuffer + 7, vcBuffer, vcBuffer.Size() - 8);
+		memcpy(vcBuffer + 1, "vorbis", 6);
+		vcBuffer[0] = 3;
+		vcBuffer[vcBuffer.Size() - 1] = 1;
+
+		ogg_packet	 header_comm2 = { vcBuffer, vcBuffer.Size(), 0, 0, 0, 1 };
+
+		ex_ogg_stream_packetin(&os, &header_comm2);
+	}
+
 	ex_ogg_stream_packetin(&os, &header_code);
 
 	WriteOggPackets(True);

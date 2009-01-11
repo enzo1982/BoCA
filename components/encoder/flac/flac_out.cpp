@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,6 +14,8 @@
 #include "flac_out.h"
 #include "config.h"
 #include "dllinterface.h"
+
+using namespace smooth::IO;
 
 const String &BoCA::FLACOut::GetComponentSpecs()
 {
@@ -85,90 +87,46 @@ Bool BoCA::FLACOut::Activate()
 
 	encoder = ex_FLAC__stream_encoder_new();
 
-	if (config->enable_vctags)
+	Buffer<unsigned char>	 vcBuffer;
+
+	if ((track.artist != NIL || track.title != NIL) && config->enable_vctags)
 	{
-		char	*prevOutFormat = String::SetOutputFormat(config->vctag_encoding);
+		FLAC__StreamMetadata	*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
-		if (track.artist != NIL || track.title != NIL)
+		metadata.Add(vorbiscomment);
+
+		/* Disable writing cover art to Vorbis comment tags for FLAC files.
+		 */
+		Bool	 writeVorbisCoverArt = config->GetIntValue("Settings", "WriteVorbisCoverArt", 0);
+
+		if (writeVorbisCoverArt) config->SetIntValue("Settings", "WriteVorbisCoverArt", 0);
+
+		track.RenderVorbisComment(vcBuffer, *ex_FLAC__VENDOR_STRING);
+
+		if (writeVorbisCoverArt) config->SetIntValue("Settings", "WriteVorbisCoverArt", 1);
+
+		/* Process output comment tag and add it to FLAC metadata.
+		 */
+		InStream	in(STREAM_BUFFER, vcBuffer, vcBuffer.Size());
+
+		in.RelSeek(in.InputNumber(4));
+
+		Int	 numComments = in.InputNumber(4);
+
+		ex_FLAC__metadata_object_vorbiscomment_resize_comments(vorbiscomment, numComments);
+
+		for (Int i = 0; i < numComments; i++)
 		{
-			FLAC__StreamMetadata				*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
+			vorbiscomment->data.vorbis_comment.comments[i].length = in.InputNumber(4);
+			vorbiscomment->data.vorbis_comment.comments[i].entry = vcBuffer + in.GetPos();
 
-			FLAC__StreamMetadata_VorbisComment_Entry	 artist;
-			FLAC__StreamMetadata_VorbisComment_Entry	 title;
-			FLAC__StreamMetadata_VorbisComment_Entry	 album;
-			FLAC__StreamMetadata_VorbisComment_Entry	 genre;
-			FLAC__StreamMetadata_VorbisComment_Entry	 date;
-			FLAC__StreamMetadata_VorbisComment_Entry	 trackno;
-			FLAC__StreamMetadata_VorbisComment_Entry	 comment;
-			FLAC__StreamMetadata_VorbisComment_Entry	 label;
-			FLAC__StreamMetadata_VorbisComment_Entry	 isrc;
-
-			metadata.Add(vorbiscomment);
-
-			if (track.artist != NIL)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&artist, "ARTIST", track.artist);
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, artist, false);
-			}
-
-			if (track.title != NIL)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&title, "TITLE", track.title);
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, title, false);
-			}
-
-			if (track.album != NIL)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&album, "ALBUM", track.album);
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, album, false);
-			}
-
-			if (track.genre != NIL)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&genre, "GENRE", track.genre);
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, genre, false);
-			}
-
-			if (track.year > 0)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&date, "DATE", String::FromInt(track.year));
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, date, false);
-			}
-
-			if (track.track > 0)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&trackno, "TRACKNUMBER", String(track.track < 10 ? "0" : "").Append(String::FromInt(track.track)));
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, trackno, false);
-			}
-
-			if (track.comment != NIL && !config->replace_comments)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&comment, "COMMENT", track.comment);
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, comment, false);
-			}
-			else if (config->default_comment != NIL)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&comment, "COMMENT", config->default_comment);
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, comment, false);
-			}
-
-			if (track.label != NIL)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&label, "ORGANIZATION", track.label);
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, label, false);
-			}
-
-			if (track.isrc != NIL)
-			{
-				ex_FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&isrc, "ISRC", track.isrc);
-				ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, isrc, false);
-			}
+			in.RelSeek(vorbiscomment->data.vorbis_comment.comments[i].length);
 		}
 
-		String::SetOutputFormat(prevOutFormat);
+		vorbiscomment->length = vcBuffer.Size();
 	}
 
-	if (config->copy_picture_tags)
+	if (config->GetIntValue("Settings", "CopyPictureTags", 1))
 	{
 		for (Int i = 0; i < track.pictures.Length(); i++)
 		{

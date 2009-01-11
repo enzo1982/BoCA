@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -142,45 +142,39 @@ Bool BoCA::SpeexOut::Activate()
 	frameSize = frame_size;
 	packageSize = frame_size * (format.bits / 8) * format.channels;
 
-	/* Write Speex header
-	 */
-	ogg_packet	 header;
-	int		 bytes;
-
 	numPackets = 0;
 
-	header.packet	  = (unsigned char *) ex_speex_header_to_packet(&speex_header, &bytes);
-	header.bytes	  = bytes;
-	header.b_o_s	  = 1;
-	header.e_o_s	  = 0;
-	header.granulepos = 0;
-	header.packetno	  = numPackets++;
+	/* Write Speex header
+	 */
+	int		 bytes;
+	unsigned char	*buffer = (unsigned char *) ex_speex_header_to_packet(&speex_header, &bytes);
+	ogg_packet	 header = { buffer, bytes, 1, 0, 0, numPackets++ };
 
 	ex_ogg_stream_packetin(&os, &header);
 
-	free(header.packet);
+	free(buffer);
 
 	/* Write Vorbis comment header
 	 */
-	Buffer<unsigned char>	 vcBuffer;
-
-	if (config->enable_vctags)
 	{
 		char	*speexVersion = NIL;
 
 		ex_speex_lib_ctl(SPEEX_LIB_GET_VERSION_STRING, &speexVersion);
 
-		track.RenderVorbisComment(vcBuffer, String("Encoded with Speex ").Append(speexVersion));
+		Buffer<unsigned char>	 vcBuffer;
+
+		/* Render actual Vorbis comment tag.
+		 *
+		 * An empty tag containing only the vendor string
+		 * is rendered if Vorbis comments are disabled.
+		 */
+		if ((track.artist != NIL || track.title != NIL) && config->enable_vctags) track.RenderVorbisComment(vcBuffer, String("Encoded with Speex ").Append(speexVersion));
+		else									  Track().RenderVorbisComment(vcBuffer, String("Encoded with Speex ").Append(speexVersion));
+
+		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, numPackets++ };
+
+		ex_ogg_stream_packetin(&os, &header_comm);
 	}
-
-	header.packet	  = vcBuffer;
-	header.bytes	  = vcBuffer.Size();
-	header.b_o_s	  = 0;
-	header.e_o_s	  = 0;
-	header.granulepos = 0;
-	header.packetno	  = numPackets++;
-
-	ex_ogg_stream_packetin(&os, &header);
 
 	WriteOggPackets(True);
 

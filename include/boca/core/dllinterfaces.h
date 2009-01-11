@@ -14,7 +14,7 @@
 #include <smooth.h>
 
 #include "3rdparty/id3.h"
-#include "3rdparty/mp4/mp4.h"
+#include "3rdparty/mp4v2/mp4v2.h"
 #include "3rdparty/vorbis/vorbisenc.h"
 
 using namespace smooth;
@@ -98,28 +98,28 @@ namespace BoCA
 
 	/* MP4v2 DLL API
 	 */
-	typedef MP4FileHandle			(*MP4READ)			(const char *, u_int32_t);
-	typedef MP4FileHandle			(*MP4MODIFY)			(const char *, u_int32_t, u_int32_t);
+	typedef MP4FileHandle			(*MP4READ)			(const char *, uint32_t);
+	typedef MP4FileHandle			(*MP4MODIFY)			(const char *, uint32_t, uint32_t);
 	typedef bool				(*MP4CLOSE)			(MP4FileHandle);
 	typedef void				(*MP4FREE)			(void *);
-	typedef bool				(*MP4OPTIMIZE)			(const char *, const char *, u_int32_t);
+	typedef bool				(*MP4OPTIMIZE)			(const char *, const char *, uint32_t);
 	typedef bool				(*MP4GETMETADATANAME)		(MP4FileHandle, char **);
 	typedef bool				(*MP4GETMETADATAARTIST)		(MP4FileHandle, char **);
 	typedef bool				(*MP4GETMETADATACOMMENT)	(MP4FileHandle, char **);
 	typedef bool				(*MP4GETMETADATAYEAR)		(MP4FileHandle, char **);
 	typedef bool				(*MP4GETMETADATAALBUM)		(MP4FileHandle, char **);
 	typedef bool				(*MP4GETMETADATAGENRE)		(MP4FileHandle, char **);
-	typedef bool				(*MP4GETMETADATATRACK)		(MP4FileHandle, u_int16_t *, u_int16_t *);
-	typedef bool				(*MP4GETMETADATACOVERART)	(MP4FileHandle, u_int8_t **, u_int32_t *, uint32_t);
-	typedef u_int32_t			(*MP4GETMETADATACOVERARTCOUNT)	(MP4FileHandle);
+	typedef bool				(*MP4GETMETADATATRACK)		(MP4FileHandle, uint16_t *, uint16_t *);
+	typedef bool				(*MP4GETMETADATACOVERART)	(MP4FileHandle, uint8_t **, uint32_t *, uint32_t);
+	typedef uint32_t			(*MP4GETMETADATACOVERARTCOUNT)	(MP4FileHandle);
 	typedef bool				(*MP4SETMETADATANAME)		(MP4FileHandle, const char *);
 	typedef bool				(*MP4SETMETADATAARTIST)		(MP4FileHandle, const char *);
 	typedef bool				(*MP4SETMETADATACOMMENT)	(MP4FileHandle, const char *);
 	typedef bool				(*MP4SETMETADATAYEAR)		(MP4FileHandle, const char *);
 	typedef bool				(*MP4SETMETADATAALBUM)		(MP4FileHandle, const char *);
 	typedef bool				(*MP4SETMETADATAGENRE)		(MP4FileHandle, const char *);
-	typedef bool				(*MP4SETMETADATATRACK)		(MP4FileHandle, u_int16_t, u_int16_t);
-	typedef bool				(*MP4SETMETADATACOVERART)	(MP4FileHandle, u_int8_t *, u_int32_t);
+	typedef bool				(*MP4SETMETADATATRACK)		(MP4FileHandle, uint16_t, uint16_t);
+	typedef bool				(*MP4SETMETADATACOVERART)	(MP4FileHandle, uint8_t *, uint32_t);
 
 	extern MP4READ				 ex_MP4Read;
 	extern MP4MODIFY			 ex_MP4Modify;

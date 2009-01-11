@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -238,8 +238,7 @@ const S::Int SM_KEYDOWN			= 1035;
 const S::Int SM_KEYUP			= 1036;
 const S::Int SM_CHAR			= 1037;
 
-const S::Int SM_EXECUTEPEEK		= 1534;
-const S::Int SM_TIMER			= 1535;
+const S::Int SM_TIMER			= 1534;
 
 const S::Int OR_HORZ			= 1;
 const S::Int OR_VERT			= 2;

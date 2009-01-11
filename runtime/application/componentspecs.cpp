@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -120,7 +120,7 @@ String BoCA::AS::ComponentSpecs::GetExternalArgumentsString()
 			case PARAMETER_TYPE_RANGE:
 				if (!config->GetIntValue(id, String("Set ").Append(param->GetName()), param->GetEnabled())) continue;
 
-				arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromInt(config->GetIntValue(id, param->GetName(), param->GetDefault().ToInt())))).Append(" ");
+				arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromFloat(config->GetIntValue(id, param->GetName(), param->GetDefault().ToFloat() / param->GetStepSize()) * param->GetStepSize()))).Append(" ");
 
 				break;
 		}
@@ -274,8 +274,8 @@ Bool BoCA::AS::ComponentSpecs::ParseExternalParameters(XML::Node *root)
 
 				if (node->GetAttributeByName("default") != NIL) parameter->SetDefault(node->GetAttributeByName("default")->GetContent());
 
-				if (node->GetAttributeByName("step") != NIL) parameter->SetStepSize(node->GetAttributeByName("step")->GetContent().ToInt());
-				else					     parameter->SetStepSize(1);
+				if (node->GetAttributeByName("step") != NIL) parameter->SetStepSize(node->GetAttributeByName("step")->GetContent().ToFloat());
+				else					     parameter->SetStepSize(1.0);
 
 				for (Int j = 0; j < node->GetNOfNodes(); j++)
 				{

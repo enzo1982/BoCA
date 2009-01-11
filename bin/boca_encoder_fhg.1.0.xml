@@ -16,9 +16,9 @@
     <informat>wave</informat>
     <tag mode="prepend">ID3v2</tag>
     <parameters>
-      <range name="Bitrate" argument="-br %VALUE" default="192000" enabled="true" step="4000">
-	<min alias="16 kbps">16000</min>
-	<max alias="320 kbps">320000</max>
+      <range name="Bitrate" argument="-br %VALUE000" default="192" enabled="true" step="4">
+	<min alias="16 kbps">16</min>
+	<max alias="320 kbps">320</max>
       </range>
       <selection name="Encoding mode" argument="-m %VALUE" default="0">
 	<option alias="CBR">0</option>

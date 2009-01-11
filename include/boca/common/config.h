@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -38,7 +38,8 @@ namespace BoCA
 			Bool		 firstStart;
 
 			String		 language;
-
+			Bool		 languageChanged;
+ 
 			Bool		 writeToInputDir;
 			Bool		 allowOverwrite;
 
@@ -66,7 +67,6 @@ namespace BoCA
 			String		 mp4meta_encoding;
 			String		 default_comment;
 			Bool		 replace_comments;
-			Bool		 copy_picture_tags;
 
 			Array<String>	 cdrip_drives;
 			Int		 cdrip_numdrives;

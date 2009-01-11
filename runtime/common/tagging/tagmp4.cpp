@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -52,7 +52,7 @@ Int BoCA::TagMP4::Render(const Track &track, const String &fileName)
 	if	(track.comment != NIL && !currentConfig->replace_comments) ex_MP4SetMetadataComment(mp4File, track.comment);
 	else if (currentConfig->default_comment != NIL)			   ex_MP4SetMetadataComment(mp4File, currentConfig->default_comment);
 
-	if (currentConfig->copy_picture_tags)
+	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1))
 	{
 		/* Copy only the first picture. The MP4v2 API doesn't
 		 * currently support multiple pictures in a file.
@@ -69,11 +69,15 @@ Int BoCA::TagMP4::Render(const Track &track, const String &fileName)
 
 	ex_MP4Close(mp4File);
 
-	ex_MP4Optimize(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"), NIL, 0);
-
 	if (String::IsUnicode(fileName))
 	{
+		ex_MP4Optimize(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"), NIL, 0);
+
 		File(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag")).Delete();
+	}
+	else
+	{
+		ex_MP4Optimize(fileName, NIL, 0);
 	}
 
 	return Success();
@@ -105,7 +109,7 @@ Int BoCA::TagMP4::Parse(const String &fileName, Track *track)
 	if (ex_MP4GetMetadataYear(mp4File, &buffer))						{ track->year = String(buffer).ToInt(); ex_MP4Free(buffer); }
 	if (ex_MP4GetMetadataAlbum(mp4File, &buffer))						{ track->album = buffer; ex_MP4Free(buffer); }
 	if (ex_MP4GetMetadataGenre(mp4File, &buffer))						{ track->genre = buffer; ex_MP4Free(buffer); }
-	if (ex_MP4GetMetadataTrack(mp4File, (u_int16_t *) &trackNr, (u_int16_t *) &nOfTracks))	{ track->track = trackNr; }
+	if (ex_MP4GetMetadataTrack(mp4File, (uint16_t *) &trackNr, (uint16_t *) &nOfTracks))	{ track->track = trackNr; }
 	if (ex_MP4GetMetadataComment(mp4File, &buffer))						{ track->comment = buffer; ex_MP4Free(buffer); }
 
 	for (UnsignedInt i = 0; i < ex_MP4GetMetadataCoverArtCount(mp4File); i++)
@@ -113,7 +117,7 @@ Int BoCA::TagMP4::Parse(const String &fileName, Track *track)
 		Picture	 picture;
 
 		unsigned char	*buffer	= NIL;
-		u_int32_t	 size	= 0;
+		uint32_t	 size	= 0;
 
 		ex_MP4GetMetadataCoverArt(mp4File, &buffer, &size, i);
 

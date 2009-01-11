@@ -22,6 +22,7 @@ namespace smooth
 
 #include "../list/list.h"
 #include "../list/listentry.h"
+#include "../../../../graphics/bitmap.h"
 
 namespace smooth
 {

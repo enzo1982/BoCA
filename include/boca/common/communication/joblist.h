@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -28,6 +28,8 @@ namespace BoCA
 
 							 JobList();
 							~JobList();
+
+			Bool				 locked;
 		public:
 			/* Returns a new or existing instance of JobList
 			 */
@@ -36,6 +38,11 @@ namespace BoCA
 			/* Destroys an existing instance of JobList
 			 */
 			static Void			 Free();
+
+			Int				 Lock();
+			Int				 Unlock();
+		accessors:
+			Bool				 IsLocked();
 		signals:
 			/* Signals fired by application to notify components of
 			 * joblist related actions.

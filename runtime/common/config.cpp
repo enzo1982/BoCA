@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,6 +14,8 @@ BoCA::Config *BoCA::Config::instance = NIL;
 
 BoCA::Config::Config()
 {
+	languageChanged		= False;
+
 	cdrip_autoRead_active	= False;
 	cdrip_timeout		= 0;
 
@@ -122,7 +124,6 @@ Bool BoCA::Config::LoadSettings()
 	mp4meta_encoding			= config->GetStringValue("Settings", "MP4MetadataEncoding", "UTF-8");
 	default_comment				= config->GetStringValue("Settings", "DefaultComment", String("BonkEnc Audio Encoder <http://www.bonkenc.org/>"));
 	replace_comments			= config->GetIntValue("Settings", "ReplaceComments", 0);
-	copy_picture_tags			= config->GetIntValue("Settings", "CopyPictureTags", 1);
 
 	cdrip_activedrive			= config->GetIntValue("CDRip", "ActiveCDROM", 0);
 	cdrip_debuglevel			= config->GetIntValue("CDRip", "DebugCDRip", 0);
@@ -169,7 +170,6 @@ Bool BoCA::Config::SaveSettings()
 	config->SetStringValue("Settings", "MP4MetadataEncoding", mp4meta_encoding);
 	config->SetStringValue("Settings", "DefaultComment", default_comment);
 	config->SetIntValue("Settings", "ReplaceComments", replace_comments);
-	config->SetIntValue("Settings", "CopyPictureTags", copy_picture_tags);
 
 	config->SetIntValue("CDRip", "ActiveCDROM", cdrip_activedrive);
 	config->SetIntValue("CDRip", "DebugCDRip", cdrip_debuglevel);

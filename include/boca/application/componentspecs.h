@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -58,7 +58,7 @@ namespace BoCA
 				String			 name;
 				String			 argument;
 				Bool			 enabled;
-				Int			 stepSize;
+				Float			 stepSize;
 				String			 defaultValue;
 				Array<Option *>		 options;
 			public:
@@ -74,8 +74,8 @@ namespace BoCA
 				Bool			 GetEnabled()				{ return enabled; }
 				Void			 SetEnabled(Bool nEnabled)		{ enabled = nEnabled; }
 
-				Int			 GetStepSize()				{ return stepSize; }
-				Void			 SetStepSize(Int nStepSize)		{ stepSize = nStepSize; }
+				Float			 GetStepSize()				{ return stepSize; }
+				Void			 SetStepSize(Float nStepSize)		{ stepSize = nStepSize; }
 
 				const String		&GetDefault()				{ return defaultValue; }
 				Void			 SetDefault(const String &nDefault)	{ defaultValue = nDefault; }

@@ -8,29 +8,25 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_TAG_VORBIS
-#define H_BOCA_TAG_VORBIS
+#include <boca.h>
+#include "layer.h"
 
-#include <smooth.h>
-#include "tag.h"
-
-using namespace smooth;
+BoCA_BEGIN_COMPONENT(Protocols)
 
 namespace BoCA
 {
-	class TagVorbis : public Tag
+	class Protocols : public CS::ExtensionComponent
 	{
 		private:
-			Int		 RenderTagHeader(const String &, Int, Buffer<UnsignedByte> &);
-			Int		 RenderTagItem(const String &, const String &, Buffer<UnsignedByte> &);
+			LayerProtocols		*mainTabLayer;
 		public:
-					 TagVorbis();
-					~TagVorbis();
+			static const String	&GetComponentSpecs();
 
-			Int		 Render(const Track &, Buffer<UnsignedByte> &, const String &);
-
-			Int		 Parse(const Buffer<UnsignedByte> &, Track *);
+						 Protocols();
+						~Protocols();
 	};
 };
 
-#endif
+BoCA_DEFINE_EXTENSION_COMPONENT(Protocols)
+
+BoCA_END_COMPONENT(Protocols)

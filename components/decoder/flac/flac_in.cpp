@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -279,25 +279,21 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 			filter->infoTrack->track = -1;
 			filter->infoTrack->outfile = NIL;
 
-			char	*prevInFormat = String::SetInputFormat("UTF-8");
+			Buffer<UnsignedByte>	 vcBuffer(metadata->length);
+			OutStream		 out(STREAM_BUFFER, vcBuffer, vcBuffer.Size());
 
-			for (Int j = 0; j < (signed) metadata->data.vorbis_comment.num_comments; j++)
+			out.OutputNumber(metadata->data.vorbis_comment.vendor_string.length, 4);
+			out.OutputData(metadata->data.vorbis_comment.vendor_string.entry, metadata->data.vorbis_comment.vendor_string.length);
+
+			out.OutputNumber(metadata->data.vorbis_comment.num_comments, 4);
+
+			for (UnsignedInt i = 0; i < metadata->data.vorbis_comment.num_comments; i++)
 			{
-				String	 comment = String((char *) metadata->data.vorbis_comment.comments[j].entry);
-				String	 id = String().CopyN(comment, comment.Find("=")).ToUpper();
-
-				if	(id == "TITLE")		filter->infoTrack->title   = comment.Tail(comment.Length() - 6);
-				else if (id == "ARTIST")	filter->infoTrack->artist  = comment.Tail(comment.Length() - 7);
-				else if (id == "ALBUM")		filter->infoTrack->album   = comment.Tail(comment.Length() - 6);
-				else if (id == "GENRE")		filter->infoTrack->genre   = comment.Tail(comment.Length() - 6);
-				else if (id == "DATE")		filter->infoTrack->year    = comment.Tail(comment.Length() - 5).ToInt();
-				else if (id == "TRACKNUMBER")	filter->infoTrack->track   = comment.Tail(comment.Length() - 12).ToInt();
-				else if (id == "COMMENT")	filter->infoTrack->comment = comment.Tail(comment.Length() - 8);
-				else if (id == "ORGANIZATION")	filter->infoTrack->label   = comment.Tail(comment.Length() - 13);
-				else if (id == "ISRC")		filter->infoTrack->isrc    = comment.Tail(comment.Length() - 5);
+				out.OutputNumber(metadata->data.vorbis_comment.comments[i].length, 4);
+				out.OutputData(metadata->data.vorbis_comment.comments[i].entry, metadata->data.vorbis_comment.comments[i].length);			
 			}
 
-			String::SetInputFormat(prevInFormat);
+			filter->infoTrack->ParseVorbisComment(vcBuffer);
 		}
 	}
 	else if (metadata->type == FLAC__METADATA_TYPE_PICTURE)
