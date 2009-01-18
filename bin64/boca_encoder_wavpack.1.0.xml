@@ -11,13 +11,24 @@
   </format>
   <external>
     <command>codecs/cmdline/wavpack.exe</command>
-    <arguments>-i %OPTIONS - %OUTFILE</arguments>
+    <arguments>-i -m %OPTIONS - %OUTFILE</arguments>
     <mode>stdio</mode>
     <informat>wave</informat>
     <tag mode="append">APEv2</tag>
     <parameters>
-      <switch name="High quality mode" argument="-h"/>
-      <switch name="Extra encode processing" argument="-x"/>
+      <range name="Enable hybrid compression" argument="-b%VALUE" default="256" step="8">
+	<min alias="64 kbps">64</min>
+	<max alias="720 kbps">720</max>
+      </range>
+      <selection name="Compression mode" argument="%VALUE" default="-h">
+	<option alias="Fast">-f</option>
+	<option alias="High quality">-h</option>
+	<option alias="Very high quality">-hh</option>
+      </selection>
+      <range name="Extra encode processing" argument="-x%VALUE" default="1">
+	<min alias="faster">1</min>
+	<max alias="better">6</max>
+      </range>
     </parameters>
   </external>
 </component>

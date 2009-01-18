@@ -114,6 +114,7 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 	Config	*config = Config::Get();
 
 	Format	&format = track.GetFormat();
+	Info	&info = track.GetInfo();
 
 	track.isCDTrack	= True;
 
@@ -124,6 +125,7 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Int	 trackNumber = 0;
 	Int	 trackLength = 0;
+	Int	 numAudioTracks = 0;
 	Int	 audiodrive = 0;
 
 	if (streamURI.StartsWith("cdda://"))
@@ -202,13 +204,47 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (entryNumber == -1) return Error();
 
-	track.length	= (trackLength * 2352) / (format.bits / 8);
-	track.fileSize = trackLength * 2352;
+	for (Int i = 0; i < numTocEntries; i++)
+	{
+		TOCENTRY	 entry = ex_CR_GetTocEntry(i);
 
-	track.track	= trackNumber;
+		if (!(entry.btFlag & CDROMDATAFLAG)) numAudioTracks++;
+	}
+
+	track.length	= (trackLength * 2352) / (format.bits / 8);
+	track.fileSize	= trackLength * 2352;
+
 	track.cdTrack	= trackNumber;
 	track.drive	= audiodrive;
 	track.outfile	= NIL;
+
+	info.track	= trackNumber;
+	info.numTracks	= numAudioTracks;
+	info.disc	= 1;
+	info.numDiscs	= 1;
+
+	/* Fill MCDI data.
+	 */
+	{
+		info.mcdi.Resize(4 + 8 * numTocEntries + 8);
+
+		((short *) (UnsignedByte *) info.mcdi)[0] = htons(info.mcdi.Size() - 2);
+
+		info.mcdi[2] = 1;
+		info.mcdi[3] = numTocEntries;
+
+		for (Int i = 0; i <= numTocEntries; i++)
+		{
+			TOCENTRY	 entry = ex_CR_GetTocEntry(i);
+
+			info.mcdi[4 + 8 * i + 0] = 0;
+			info.mcdi[4 + 8 * i + 1] = entry.btFlag;
+			info.mcdi[4 + 8 * i + 2] = entry.btTrackNumber;
+			info.mcdi[4 + 8 * i + 3] = 0;
+
+			((unsigned long *) (UnsignedByte *) info.mcdi)[1 + 2 * i + 1] = htonl(entry.dwStartSector);
+		}
+	}
 
 	return Success();
 }

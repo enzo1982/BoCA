@@ -28,6 +28,7 @@ Int BoCA::TagMP4::Render(const Track &track, const String &fileName)
 	Config		*currentConfig = Config::Get();
 
 	MP4FileHandle	 mp4File;
+	const Info	&info = track.GetInfo();
 
 	if (String::IsUnicode(fileName))
 	{
@@ -42,15 +43,15 @@ Int BoCA::TagMP4::Render(const Track &track, const String &fileName)
 
 	char	*prevOutFormat = String::SetOutputFormat(currentConfig->mp4meta_encoding);
 
-	if	(track.artist != NIL) ex_MP4SetMetadataArtist(mp4File, track.artist);
-	if	(track.title  != NIL) ex_MP4SetMetadataName(mp4File, track.title);
-	if	(track.album  != NIL) ex_MP4SetMetadataAlbum(mp4File, track.album);
-	if	(track.track   >   0) ex_MP4SetMetadataTrack(mp4File, track.track, 0);
-	if	(track.year    >   0) ex_MP4SetMetadataYear(mp4File, String::FromInt(track.year));
-	if	(track.genre  != NIL) ex_MP4SetMetadataGenre(mp4File, track.genre);
+	if	(info.artist != NIL) ex_MP4SetMetadataArtist(mp4File, info.artist);
+	if	(info.title  != NIL) ex_MP4SetMetadataName(mp4File, info.title);
+	if	(info.album  != NIL) ex_MP4SetMetadataAlbum(mp4File, info.album);
+	if	(info.track   >   0) ex_MP4SetMetadataTrack(mp4File, info.track, 0);
+	if	(info.year    >   0) ex_MP4SetMetadataYear(mp4File, String::FromInt(info.year));
+	if	(info.genre  != NIL) ex_MP4SetMetadataGenre(mp4File, info.genre);
 
-	if	(track.comment != NIL && !currentConfig->replace_comments) ex_MP4SetMetadataComment(mp4File, track.comment);
-	else if (currentConfig->default_comment != NIL)			   ex_MP4SetMetadataComment(mp4File, currentConfig->default_comment);
+	if	(info.comment != NIL && !currentConfig->replace_comments) ex_MP4SetMetadataComment(mp4File, info.comment);
+	else if (currentConfig->default_comment != NIL)			  ex_MP4SetMetadataComment(mp4File, currentConfig->default_comment);
 
 	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1))
 	{
@@ -86,6 +87,7 @@ Int BoCA::TagMP4::Render(const Track &track, const String &fileName)
 Int BoCA::TagMP4::Parse(const String &fileName, Track *track)
 {
 	MP4FileHandle	 mp4File;
+	Info		&info = track->GetInfo();
 
 	if (String::IsUnicode(fileName))
 	{
@@ -104,13 +106,13 @@ Int BoCA::TagMP4::Parse(const String &fileName, Track *track)
 
 	char	*prevInFormat = String::SetInputFormat("UTF-8");
 
-	if (ex_MP4GetMetadataName(mp4File, &buffer))						{ track->title = buffer; ex_MP4Free(buffer); }
-	if (ex_MP4GetMetadataArtist(mp4File, &buffer))						{ track->artist = buffer; ex_MP4Free(buffer); }
-	if (ex_MP4GetMetadataYear(mp4File, &buffer))						{ track->year = String(buffer).ToInt(); ex_MP4Free(buffer); }
-	if (ex_MP4GetMetadataAlbum(mp4File, &buffer))						{ track->album = buffer; ex_MP4Free(buffer); }
-	if (ex_MP4GetMetadataGenre(mp4File, &buffer))						{ track->genre = buffer; ex_MP4Free(buffer); }
-	if (ex_MP4GetMetadataTrack(mp4File, (uint16_t *) &trackNr, (uint16_t *) &nOfTracks))	{ track->track = trackNr; }
-	if (ex_MP4GetMetadataComment(mp4File, &buffer))						{ track->comment = buffer; ex_MP4Free(buffer); }
+	if (ex_MP4GetMetadataName(mp4File, &buffer))						{ info.title = buffer; ex_MP4Free(buffer); }
+	if (ex_MP4GetMetadataArtist(mp4File, &buffer))						{ info.artist = buffer; ex_MP4Free(buffer); }
+	if (ex_MP4GetMetadataYear(mp4File, &buffer))						{ info.year = String(buffer).ToInt(); ex_MP4Free(buffer); }
+	if (ex_MP4GetMetadataAlbum(mp4File, &buffer))						{ info.album = buffer; ex_MP4Free(buffer); }
+	if (ex_MP4GetMetadataGenre(mp4File, &buffer))						{ info.genre = buffer; ex_MP4Free(buffer); }
+	if (ex_MP4GetMetadataTrack(mp4File, (uint16_t *) &trackNr, (uint16_t *) &nOfTracks))	{ info.track = trackNr; }
+	if (ex_MP4GetMetadataComment(mp4File, &buffer))						{ info.comment = buffer; ex_MP4Free(buffer); }
 
 	for (UnsignedInt i = 0; i < ex_MP4GetMetadataCoverArtCount(mp4File); i++)
 	{

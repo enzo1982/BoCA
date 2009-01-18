@@ -190,6 +190,10 @@
 				RelativePath="..\..\..\components\extension\tagedit\tagspec.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\components\extension\tagedit\utilities.cpp"
+				>
+			</File>
 			<Filter
 				Name="basic"
 				>
@@ -230,6 +234,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\components\extension\tagedit\tagspec.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\components\extension\tagedit\utilities.h"
 				>
 			</File>
 			<Filter

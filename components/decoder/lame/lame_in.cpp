@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -104,13 +104,7 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_lame_decode_exit();
 
-	if (Config::Get()->enable_id3)
-	{
-		track.track = -1;
-		track.outfile = NIL;
-
-		track.ParseID3Tag(streamURI);
-	}
+	if (Config::Get()->enable_id3) track.ParseID3Tag(streamURI);
 
 	return Success();
 }

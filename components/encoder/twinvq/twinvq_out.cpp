@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -73,6 +73,7 @@ Bool BoCA::TwinVQOut::Activate()
 	Config	*config = Config::Get();
 
 	const Format	&format = track.GetFormat();
+	const Info	&info = track.GetInfo();
 
 	switch (format.rate)
 	{
@@ -122,15 +123,15 @@ Bool BoCA::TwinVQOut::Activate()
 	setupInfo.samplingRate = int(format.rate / 1000);
 	setupInfo.bitRate = config->GetIntValue("TwinVQ", "Bitrate", 48) * format.channels;
 
-	if (track.artist != NIL || track.title != NIL)
+	if (info.artist != NIL || info.title != NIL)
 	{
 		Config	*currentConfig = Config::Get();
 
-		if	(track.artist != NIL) strncpy(setupInfo.Auth, track.artist, Math::Min(track.artist.Length(), 1024));
-		if	(track.title  != NIL) strncpy(setupInfo.Name, track.title,  Math::Min(track.title.Length(),  1024));
+		if	(info.artist != NIL) strncpy(setupInfo.Auth, info.artist, Math::Min(info.artist.Length(), 1024));
+		if	(info.title  != NIL) strncpy(setupInfo.Name, info.title,  Math::Min(info.title.Length(),  1024));
 
-		if	(track.comment != NIL && !config->replace_comments) strncpy(setupInfo.Comt, track.comment,		    Math::Min(track.comment.Length(),		       1024));
-		else if (currentConfig->default_comment != NIL)		    strncpy(setupInfo.Comt, currentConfig->default_comment, Math::Min(currentConfig->default_comment.Length(), 1024));
+		if	(info.comment != NIL && !config->replace_comments) strncpy(setupInfo.Comt, info.comment,		   Math::Min(info.comment.Length(),		      1024));
+		else if (currentConfig->default_comment != NIL)		   strncpy(setupInfo.Comt, currentConfig->default_comment, Math::Min(currentConfig->default_comment.Length(), 1024));
 	}
 
 	encInfo.N_CAN_GLOBAL = config->GetIntValue("TwinVQ", "PreselectionCandidates", 32); // number of VQ pre-selection candidates

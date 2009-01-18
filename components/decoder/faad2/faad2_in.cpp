@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -175,7 +175,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_NeAACDecInit2(handle, (unsigned char *) esc_buffer, buffer_size, (unsigned long *) &format.rate, (unsigned char *) &format.channels);
 
-			track.length	= Math::Round(double(signed(ex_MP4GetTrackDuration(mp4File, mp4Track))) * format.channels * format.rate / double(signed(ex_MP4GetTrackTimeScale(mp4File, mp4Track))));
+			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) / ex_MP4GetTrackTimeScale(mp4File, mp4Track) * format.channels * format.rate);
 
 			format.order	= BYTE_INTEL;
 			format.bits	= 16;
@@ -271,13 +271,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (errorState) return Error();
 
-		if (Config::Get()->enable_id3)
-		{
-			track.track = -1;
-			track.outfile = NIL;
-
-			track.ParseID3Tag(streamURI);
-		}
+		if (Config::Get()->enable_id3) track.ParseID3Tag(streamURI);
 	}
 
 	return Success();

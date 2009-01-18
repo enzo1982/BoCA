@@ -73,6 +73,7 @@ BoCA::FLACOut::~FLACOut()
 Bool BoCA::FLACOut::Activate()
 {
 	const Format	&format = track.GetFormat();
+	const Info	&info = track.GetInfo();
 
 	if (format.channels > 2)
 	{
@@ -89,7 +90,7 @@ Bool BoCA::FLACOut::Activate()
 
 	Buffer<unsigned char>	 vcBuffer;
 
-	if ((track.artist != NIL || track.title != NIL) && config->enable_vctags)
+	if ((info.artist != NIL || info.title != NIL) && config->enable_vctags)
 	{
 		FLAC__StreamMetadata	*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 

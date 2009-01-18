@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = cdrip_in.o dllinterface.o
 
 # Enter additional library dependencies here
-LIBS	  =
+LIBS	  = -lws2_32
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

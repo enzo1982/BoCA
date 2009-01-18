@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca/common/track.h>
+#include <boca/common/track/track.h>
 #include <boca/common/tagging/tagape.h>
 #include <boca/common/tagging/tagid3.h>
 #include <boca/common/tagging/tagmp4.h>
@@ -29,9 +29,6 @@ BoCA::Track::Track()
 	drive		= -1;
 	discid		= 0;
 	cdTrack		= -1;
-
-	track		= -1;
-	year		= -1;
 }
 
 BoCA::Track::Track(int nil)
@@ -63,6 +60,9 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 
 	format		= oTrack.format;
 
+	info		= oTrack.info;
+	originalInfo	= oTrack.originalInfo;
+
 	length		= oTrack.length;
 	approxLength	= oTrack.approxLength;
 	fileSize	= oTrack.fileSize;
@@ -70,19 +70,6 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 	isCDTrack	= oTrack.isCDTrack;
 	drive		= oTrack.drive;
 	cdTrack		= oTrack.cdTrack;
-
-	artist		= oTrack.artist;
-	title		= oTrack.title;
-	album		= oTrack.album;
-	track		= oTrack.track;
-	genre		= oTrack.genre;
-	year		= oTrack.year;
-	comment		= oTrack.comment;
-
-	oArtist		= oTrack.oArtist;
-	oTitle		= oTrack.oTitle;
-	oAlbum		= oTrack.oAlbum;
-	oGenre		= oTrack.oGenre;
 
 	pictures.RemoveAll();
 

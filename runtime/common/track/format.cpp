@@ -8,28 +8,16 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_TAG
-#define H_BOCA_TAG
+#include <boca/common/track/format.h>
 
-#include <smooth.h>
-#include "../track/track.h"
-
-using namespace smooth;
-
-namespace BoCA
+BoCA::Format::Format()
 {
-	class Tag
-	{
-		public:
-					 Tag();
-			virtual		~Tag();
+	channels	= 0;
+	rate		= 0;
+	bits		= 0;
+	order		= BYTE_INTEL;
+}
 
-			virtual Int	 Render(const Track &, Buffer<UnsignedByte> &);
-			virtual Int	 Render(const Track &, const String &);
-
-			virtual Int	 Parse(const Buffer<UnsignedByte> &, Track *);
-			virtual Int	 Parse(const String &, Track *);
-	};
-};
-
-#endif
+BoCA::Format::~Format()
+{
+}

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -64,6 +64,7 @@ BoCA::BonkOut::~BonkOut()
 Bool BoCA::BonkOut::Activate()
 {
 	const Format	&format = track.GetFormat();
+	const Info	&info = track.GetInfo();
 
 	if (format.channels > 2)
 	{
@@ -82,7 +83,7 @@ Bool BoCA::BonkOut::Activate()
 
 	encoder	= ex_bonk_encoder_create();
 
-	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v2 && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
 		Int			 size = track.RenderID3Tag(id3Buffer, 2);

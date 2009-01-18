@@ -14,6 +14,7 @@
 #include <smooth.h>
 #include "picture.h"
 #include "format.h"
+#include "info.h"
 
 using namespace smooth;
 
@@ -29,6 +30,11 @@ namespace BoCA
 			/* Audio format information:
 			 */
 			Format		 format;
+
+			/* Title information:
+			 */
+			Info		 info;
+			Info		 originalInfo;
 		public:
 			/* Length and file size information:
 			 */
@@ -41,24 +47,6 @@ namespace BoCA
 			Bool		 isCDTrack;
 			Int		 drive;
 			Int		 cdTrack;
-
-			/* Title information:
-			 */
-			String		 artist;
-			String		 title;
-			String		 album;
-			Int		 track;
-			String		 genre;
-			Int		 year;
-			String		 comment;
-
-			String		 label;
-			String		 isrc;
-
-			String		 oArtist;
-			String		 oTitle;
-			String		 oAlbum;
-			String		 oGenre;
 
 			/* Attached pictures:
 			 */
@@ -112,6 +100,14 @@ namespace BoCA
 			Void		 SetFormat(const Format &nFormat)		{ format = nFormat; }
 			Format		&GetFormat()					{ return format; }
 			const Format	&GetFormat() const				{ return format; }
+
+			Void		 SetInfo(const Info &nInfo)			{ info = nInfo; }
+			Info		&GetInfo()					{ return info; }
+			const Info	&GetInfo() const				{ return info; }
+
+			Void		 SetOriginalInfo(const Info &nOriginalInfo)	{ originalInfo = nOriginalInfo; }
+			Info		&GetOriginalInfo()				{ return originalInfo; }
+			const Info	&GetOriginalInfo() const			{ return originalInfo; }
 	};
 };
 

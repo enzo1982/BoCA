@@ -106,12 +106,13 @@ Void BoCA::LayerTags::OnModifyTrack(const Track &track)
  */
 Void BoCA::LayerTags::OnApplicationAddTrack(const Track &track)
 {
-	String	 jlEntry;
+	const Info	&info = track.GetInfo();
+	String		 jlEntry;
 
-	if (track.artist == NIL && track.title == NIL)	jlEntry = String(track.origFilename).Append("\t");
-	else						jlEntry = String(track.artist.Length() > 0 ? track.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(track.title.Length() > 0 ? track.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
+	if (info.artist == NIL && info.title == NIL) jlEntry = String(track.origFilename).Append("\t");
+	else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
 
-	jlEntry.Append(track.track > 0 ? (track.track < 10 ? String("0").Append(String::FromInt(track.track)) : String::FromInt(track.track)) : String("")).Append("\t").Append(track.lengthString).Append("\t").Append(track.fileSizeString);
+	jlEntry.Append(info.track > 0 ? (info.track < 10 ? String("0").Append(String::FromInt(info.track)) : String::FromInt(info.track)) : String("")).Append("\t").Append(track.lengthString).Append("\t").Append(track.fileSizeString);
 
 	tracks.Add(track, list_tracks->AddEntry(jlEntry)->GetHandle());
 }
@@ -122,12 +123,13 @@ Void BoCA::LayerTags::OnApplicationAddTrack(const Track &track)
  */
 Void BoCA::LayerTags::OnApplicationModifyTrack(const Track &track)
 {
-	String	 jlEntry;
+	const Info	&info = track.GetInfo();
+	String		 jlEntry;
 
-	if (track.artist == NIL && track.title == NIL)	jlEntry = String(track.origFilename).Append("\t");
-	else						jlEntry = String(track.artist.Length() > 0 ? track.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(track.title.Length() > 0 ? track.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
+	if (info.artist == NIL && info.title == NIL) jlEntry = String(track.origFilename).Append("\t");
+	else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
 
-	jlEntry.Append(track.track > 0 ? (track.track < 10 ? String("0").Append(String::FromInt(track.track)) : String::FromInt(track.track)) : String("")).Append("\t").Append(track.lengthString).Append("\t").Append(track.fileSizeString);
+	jlEntry.Append(info.track > 0 ? (info.track < 10 ? String("0").Append(String::FromInt(info.track)) : String::FromInt(info.track)) : String("")).Append("\t").Append(track.lengthString).Append("\t").Append(track.fileSizeString);
 
 	for (Int i = 0; i < list_tracks->Length(); i++)
 	{

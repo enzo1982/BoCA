@@ -35,18 +35,39 @@ namespace BoCA
 			Text				*text_album;
 			EditBox				*edit_album;
 
+			Text				*text_genre;
+			EditBox				*edit_genre;
+			ListBox				*list_genre;
+
+			Text				*text_year;
+			EditBox				*edit_year;
+
+			Text				*text_track;
+			EditBox				*edit_track;
+			Text				*text_ntracks;
+			EditBox				*edit_ntracks;
+
+			Text				*text_disc;
+			EditBox				*edit_disc;
+			Text				*text_ndiscs;
+			EditBox				*edit_ndiscs;
+
 			Text				*text_comment;
 			MultiEdit			*edit_comment;
 
 			GroupBox			*group_cover;
 
+			Text				*text_covers;
 			ImageBox			*image_covers;
-			Image				*image_cover_big;
 
 			Button				*button_cover_load;
 			Button				*button_cover_remove;
 
+			Text				*text_cover_type;
 			ComboBox			*combo_cover_type;
+
+			Text				*text_cover_desc;
+			MultiEdit			*edit_cover_desc;
 
 			Track				 track;
 

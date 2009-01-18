@@ -77,6 +77,8 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	ZeroMemory(&execInfo, sizeof(execInfo));
 
+	const Info		&info = track.GetInfo();
+
 	execInfo.cbSize		= sizeof(execInfo);
 	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	execInfo.lpVerb		= "open";
@@ -84,12 +86,12 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
 								   .Replace("%INFILE", String("\"").Append(wavFileName).Append("\""))
 								   .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))
-								   .Replace("%ARTIST", String("\"").Append((char *) track.artist).Append("\""))
-								   .Replace("%ALBUM", String("\"").Append((char *) track.album).Append("\""))
-								   .Replace("%TITLE", String("\"").Append((char *) track.title).Append("\""))
-								   .Replace("%TRACK", String("\"").Append(String::FromInt(track.track)).Append("\""))
-								   .Replace("%YEAR", String("\"").Append(String::FromInt(track.year)).Append("\""))
-								   .Replace("%GENRE", String("\"").Append((char *) track.genre).Append("\""));
+								   .Replace("%ARTIST", String("\"").Append((char *) info.artist).Append("\""))
+								   .Replace("%ALBUM", String("\"").Append((char *) info.album).Append("\""))
+								   .Replace("%TITLE", String("\"").Append((char *) info.title).Append("\""))
+								   .Replace("%TRACK", String("\"").Append(String::FromInt(info.track)).Append("\""))
+								   .Replace("%YEAR", String("\"").Append(String::FromInt(info.year)).Append("\""))
+								   .Replace("%GENRE", String("\"").Append((char *) info.genre).Append("\""));
 
 	execInfo.lpDirectory	= Application::GetApplicationDirectory();
 	execInfo.nShow		= specs->debug ? SW_SHOW : SW_HIDE;
@@ -119,7 +121,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	Buffer<UnsignedByte>	 tag;
 	Int			 tagSize = 0;
 
-	if (specs->external_tagmode != TAG_MODE_NONE && (track.artist != NIL || track.title != NIL))
+	if (specs->external_tagmode != TAG_MODE_NONE && (info.artist != NIL || info.title != NIL))
 	{
 		if	(specs->external_tag == "ID3v1" && config->enable_id3v1 && config->enable_id3)	tagSize = track.RenderID3Tag(tag, 1);
 		else if (specs->external_tag == "ID3v2" && config->enable_id3v2 && config->enable_id3)	tagSize = track.RenderID3Tag(tag, 2);

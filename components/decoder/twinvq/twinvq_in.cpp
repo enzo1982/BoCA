@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -135,6 +135,7 @@ Error BoCA::TwinVQIn::GetStreamInfo(const String &streamURI, Track &track)
 	ex_TvqInitialize(&setupInfo, &index, 0);
 
 	Format	&format = track.GetFormat();
+	Info	&info = track.GetInfo();
 
 	format.order		= BYTE_INTEL;
 	format.bits		= 16;
@@ -145,9 +146,9 @@ Error BoCA::TwinVQIn::GetStreamInfo(const String &streamURI, Track &track)
 	track.length		= -1;
 	track.approxLength	= track.fileSize / (ex_TvqGetBitRate() * 1000 / 8) * format.rate * format.channels;
 
-	track.artist		= setupInfo.Auth;
-	track.title		= setupInfo.Name;
-	track.comment		= setupInfo.Comt;
+	info.artist		= setupInfo.Auth;
+	info.title		= setupInfo.Name;
+	info.comment		= setupInfo.Comt;
 
 	ex_TvqTerminate(&index);
 

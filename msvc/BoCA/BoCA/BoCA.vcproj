@@ -366,23 +366,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\common\format.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\runtime\common\i18n.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\runtime\common\picture.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\runtime\common\protocol.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\runtime\common\track.cpp"
 					>
 				</File>
 				<File
@@ -423,6 +411,80 @@
 					<File
 						RelativePath="..\..\..\runtime\common\communication\menu.cpp"
 						>
+					</File>
+				</Filter>
+				<Filter
+					Name="track"
+					>
+					<File
+						RelativePath="..\..\..\runtime\common\track\format.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\track\info.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\track\picture.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\track\track.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
 					</File>
 				</Filter>
 			</Filter>
@@ -581,15 +643,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\include\boca\common\picture.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\include\boca\common\protocol.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\include\boca\common\track.h"
 						>
 					</File>
 					<File
@@ -625,6 +679,26 @@
 						>
 						<File
 							RelativePath="..\..\..\include\boca\common\communication\joblist.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="track"
+						>
+						<File
+							RelativePath="..\..\..\include\boca\common\track\format.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\track\info.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\track\picture.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\track\track.h"
 							>
 						</File>
 					</Filter>

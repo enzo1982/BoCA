@@ -23,24 +23,42 @@ BoCA::TagAPE::~TagAPE()
 
 Int BoCA::TagAPE::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 {
-	Config	*currentConfig = Config::Get();
-	char	*prevOutFormat = String::SetOutputFormat("UTF-8");
+	Config		*currentConfig = Config::Get();
+	char		*prevOutFormat = String::SetOutputFormat("UTF-8");
+
+	const Info	&info = track.GetInfo();
 
 	buffer.Resize(32);
 
-	Int	 numItems = 0;
+	Int		 numItems = 0;
 
-	if	(track.artist != NIL) { RenderAPEItem("Artist", track.artist, buffer);		      numItems++; }
-	if	(track.title  != NIL) { RenderAPEItem("Title", track.title, buffer);		      numItems++; }
-	if	(track.album  != NIL) { RenderAPEItem("Album", track.album, buffer);		      numItems++; }
-	if	(track.track   >   0) { RenderAPEItem("Track", String::FromInt(track.track), buffer); numItems++; }
-	if	(track.year    >   0) { RenderAPEItem("Year", String::FromInt(track.year), buffer);   numItems++; }
-	if	(track.genre  != NIL) { RenderAPEItem("Genre", track.genre, buffer);		      numItems++; }
-	if	(track.label  != NIL) { RenderAPEItem("Publisher", track.label, buffer);	      numItems++; }
-	if	(track.isrc   != NIL) { RenderAPEItem("ISRC", track.isrc, buffer);		      numItems++; }
+	if	(info.artist != NIL) { RenderAPEItem("Artist", info.artist, buffer);			    numItems++; }
+	if	(info.title  != NIL) { RenderAPEItem("Title", info.title, buffer);			    numItems++; }
+	if	(info.album  != NIL) { RenderAPEItem("Album", info.album, buffer);			    numItems++; }
+	if	(info.track   >   0) { RenderAPEItem("Track", String(info.track < 10 ? "0" : "")
+							     .Append(String::FromInt(info.track)), buffer); numItems++; }
+	if	(info.year    >   0) { RenderAPEItem("Year", String::FromInt(info.year), buffer);	    numItems++; }
+	if	(info.genre  != NIL) { RenderAPEItem("Genre", info.genre, buffer);			    numItems++; }
+	if	(info.label  != NIL) { RenderAPEItem("Publisher", info.label, buffer);			    numItems++; }
+	if	(info.isrc   != NIL) { RenderAPEItem("ISRC", info.isrc, buffer);			    numItems++; }
 
-	if	(track.comment != NIL && !currentConfig->replace_comments) { RenderAPEItem("Comment", track.comment, buffer);		       numItems++; }
-	else if (currentConfig->default_comment != NIL && numItems > 0)	   { RenderAPEItem("Comment", currentConfig->default_comment, buffer); numItems++; }
+	if	(info.comment != NIL && !currentConfig->replace_comments) { RenderAPEItem("Comment", info.comment, buffer);		      numItems++; }
+	else if (currentConfig->default_comment != NIL && numItems > 0)	  { RenderAPEItem("Comment", currentConfig->default_comment, buffer); numItems++; }
+
+	if (currentConfig->GetIntValue("Settings", "PreserveReplayGain", 1))
+	{
+		if (info.track_gain != NIL && info.track_peak != NIL)
+		{
+			{ RenderAPEItem("replaygain_track_gain", info.track_gain, buffer); numItems++; }
+			{ RenderAPEItem("replaygain_track_peak", info.track_peak, buffer); numItems++; }
+		}
+
+		if (info.album_gain != NIL && info.album_peak != NIL)
+		{
+			{ RenderAPEItem("replaygain_album_gain", info.album_gain, buffer); numItems++; }
+			{ RenderAPEItem("replaygain_album_peak", info.album_peak, buffer); numItems++; }
+		}
+	}
 
 	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1) && currentConfig->GetIntValue("Settings", "WriteAPEv2CoverArt", 0))
 	{
@@ -157,7 +175,9 @@ Int BoCA::TagAPE::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 		if (!ParseAPEFooter(buffer, NIL, &numItems)) return Error();
 	}
 
-	char		*prevInFormat = String::SetInputFormat("UTF-8");
+	char	*prevInFormat = String::SetInputFormat("UTF-8");
+
+	Info	&info = track->GetInfo();
 
 	for (Int i = 0; i < numItems; i++)
 	{
@@ -169,15 +189,22 @@ Int BoCA::TagAPE::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 
 		if (id == "!Binary") ParseAPEBinaryItem(buffer, offset, &id, item);
 
-		if	(id == "Artist")    track->artist  = value;
-		else if (id == "Title")	    track->title   = value;
-		else if (id == "Album")	    track->album   = value;
-		else if (id == "Track")	    track->track   = value.ToInt();
-		else if (id == "Year")	    track->year	   = value.ToInt();
-		else if (id == "Genre")	    track->genre   = value;
-		else if (id == "Comment")   track->comment = value;
-		else if (id == "Publisher") track->label   = value;
-		else if (id == "ISRC")	    track->isrc	   = value;
+		if	(id == "Artist")    info.artist  = value;
+		else if (id == "Title")	    info.title   = value;
+		else if (id == "Album")	    info.album   = value;
+		else if (id == "Track")	    info.track   = value.ToInt();
+		else if (id == "Year")	    info.year	 = value.ToInt();
+		else if (id == "Genre")	    info.genre   = value;
+		else if (id == "Comment")   info.comment = value;
+		else if (id == "Publisher") info.label   = value;
+		else if (id == "ISRC")	    info.isrc	 = value;
+		else if (id.StartsWith("replaygain"))
+		{
+			if	(id == "replaygain_track_gain") info.track_gain = value;
+			else if (id == "replaygain_track_peak") info.track_peak = value;
+			else if (id == "replaygain_album_gain") info.album_gain = value;
+			else if (id == "replaygain_album_peak") info.album_peak = value;
+		}
 		else if (id.StartsWith("Cover Art"))
 		{
 			Picture	 picture;

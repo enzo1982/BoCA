@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -164,6 +164,7 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
 	Format	&format = track.GetFormat();
+	Info	&info = track.GetInfo();
 
 	format.order	= BYTE_INTEL;
 	track.fileSize	= f_in->Size();
@@ -257,18 +258,18 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 			{
 				artistComplete = (m += 3);
 
-				track.title = NIL;
+				info.title = NIL;
 			}
 
-			if (!artistComplete)	track.artist[m] = trackTitle[m];
-			else			track.title[m - artistComplete] = trackTitle[m];
+			if (!artistComplete)	info.artist[m] = trackTitle[m];
+			else			info.title[m - artistComplete] = trackTitle[m];
 		}
 	}
 
 	if (artistComplete == 0)
 	{
-		track.artist = NIL;
-		track.title = NIL;
+		info.artist = NIL;
+		info.title = NIL;
 	}
 
 	return Success();

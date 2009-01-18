@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -66,6 +66,7 @@ BoCA::BladeOut::~BladeOut()
 Bool BoCA::BladeOut::Activate()
 {
 	const Format	&format = track.GetFormat();
+	const Info	&info = track.GetInfo();
 
 	if (format.rate != 32000 && format.rate != 44100 && format.rate != 48000)
 	{
@@ -116,7 +117,7 @@ Bool BoCA::BladeOut::Activate()
 
 	packageSize = samplesSize * (format.bits / 8);
 
-	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v2 && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
 		Int			 size = track.RenderID3Tag(id3Buffer, 2);
@@ -129,7 +130,8 @@ Bool BoCA::BladeOut::Activate()
 
 Bool BoCA::BladeOut::Deactivate()
 {
-	Config	*config = Config::Get();
+	Config		*config = Config::Get();
+	const Info	&info = track.GetInfo();
 
 	unsigned long	 bytes = 0;
 
@@ -139,7 +141,7 @@ Bool BoCA::BladeOut::Deactivate()
 
 	ex_beCloseStream(handle);
 
-	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v1 && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v1 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
 		Int			 size = track.RenderID3Tag(id3Buffer, 1);

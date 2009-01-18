@@ -1,0 +1,166 @@
+ /* BonkEnc Audio Encoder
+  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the "GNU General Public License".
+  *
+  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#include "utilities.h"
+
+Void BoCA::TagUtilities::FillGenreList(List *list)
+{
+	list->AddEntry("");
+	list->AddEntry("A Cappella");
+	list->AddEntry("Acid");
+	list->AddEntry("Acid Jazz");
+	list->AddEntry("Acid Punk");
+	list->AddEntry("Acoustic");
+	list->AddEntry("Alt. Rock");
+	list->AddEntry("Alternative");
+	list->AddEntry("Ambient");
+	list->AddEntry("Anime");
+	list->AddEntry("Avantgarde");
+	list->AddEntry("Ballad");
+	list->AddEntry("Bass");
+	list->AddEntry("Beat");
+	list->AddEntry("Bebob");
+	list->AddEntry("Big Band");
+	list->AddEntry("Black Metal");
+	list->AddEntry("Bluegrass");
+	list->AddEntry("Blues");
+	list->AddEntry("Booty Bass");
+	list->AddEntry("BritPop");
+	list->AddEntry("Cabaret");
+	list->AddEntry("Celtic");
+	list->AddEntry("Chamber Music");
+	list->AddEntry("Chanson");
+	list->AddEntry("Chorus");
+	list->AddEntry("Christian Gangsta Rap");
+	list->AddEntry("Christian Rap");
+	list->AddEntry("Christian Rock");
+	list->AddEntry("Classic Rock");
+	list->AddEntry("Classical");
+	list->AddEntry("Club");
+	list->AddEntry("Club-House");
+	list->AddEntry("Comedy");
+	list->AddEntry("Contemporary Christian");
+	list->AddEntry("Country");
+	list->AddEntry("Cover");
+	list->AddEntry("Crossover");
+	list->AddEntry("Cult");
+	list->AddEntry("Dance");
+	list->AddEntry("Dance Hall");
+	list->AddEntry("Darkwave");
+	list->AddEntry("Death Metal");
+	list->AddEntry("Disco");
+	list->AddEntry("Dream");
+	list->AddEntry("Drum & Bass");
+	list->AddEntry("Drum Solo");
+	list->AddEntry("Duet");
+	list->AddEntry("Easy Listening");
+	list->AddEntry("Electronic");
+	list->AddEntry("Ethnic");
+	list->AddEntry("Eurodance");
+	list->AddEntry("Euro-House");
+	list->AddEntry("Euro-Techno");
+	list->AddEntry("Fast-Fusion");
+	list->AddEntry("Folk");
+	list->AddEntry("Folk/Rock");
+	list->AddEntry("Folklore");
+	list->AddEntry("Freestyle");
+	list->AddEntry("Funk");
+	list->AddEntry("Fusion");
+	list->AddEntry("Game");
+	list->AddEntry("Gangsta Rap");
+	list->AddEntry("Goa");
+	list->AddEntry("Gospel");
+	list->AddEntry("Gothic");
+	list->AddEntry("Gothic Rock");
+	list->AddEntry("Grunge");
+	list->AddEntry("Hard Rock");
+	list->AddEntry("Hardcore");
+	list->AddEntry("Heavy Metal");
+	list->AddEntry("Hip-Hop");
+	list->AddEntry("House");
+	list->AddEntry("Humour");
+	list->AddEntry("Indie");
+	list->AddEntry("Industrial");
+	list->AddEntry("Instrumental");
+	list->AddEntry("Instrumental Pop");
+	list->AddEntry("Instrumental Rock");
+	list->AddEntry("Jazz");
+	list->AddEntry("Jazz+Funk");
+	list->AddEntry("JPop");
+	list->AddEntry("Jungle");
+	list->AddEntry("Latin");
+	list->AddEntry("Lo-Fi");
+	list->AddEntry("Meditative");
+	list->AddEntry("Merengue");
+	list->AddEntry("Metal");
+	list->AddEntry("Musical");
+	list->AddEntry("National Folk");
+	list->AddEntry("Native American");
+	list->AddEntry("Negerpunk");
+	list->AddEntry("New Age");
+	list->AddEntry("New Wave");
+	list->AddEntry("Noise");
+	list->AddEntry("Oldies");
+	list->AddEntry("Opera");
+	list->AddEntry("Other");
+	list->AddEntry("Polka");
+	list->AddEntry("Polsk Punk");
+	list->AddEntry("Pop");
+	list->AddEntry("Pop/Funk");
+	list->AddEntry("Pop-Folk");
+	list->AddEntry("Porn Groove");
+	list->AddEntry("Power Ballad");
+	list->AddEntry("Pranks");
+	list->AddEntry("Primus");
+	list->AddEntry("Progressive Rock");
+	list->AddEntry("Psychedelic");
+	list->AddEntry("Psychedelic Rock");
+	list->AddEntry("Punk");
+	list->AddEntry("Punk Rock");
+	list->AddEntry("R&B");
+	list->AddEntry("Rap");
+	list->AddEntry("Rave");
+	list->AddEntry("Reggae");
+	list->AddEntry("Remix");
+	list->AddEntry("Retro");
+	list->AddEntry("Revival");
+	list->AddEntry("Rhythmic Soul");
+	list->AddEntry("Rock");
+	list->AddEntry("Rock & Roll");
+	list->AddEntry("Salsa");
+	list->AddEntry("Samba");
+	list->AddEntry("Satire");
+	list->AddEntry("Showtunes");
+	list->AddEntry("Ska");
+	list->AddEntry("Slow Jam");
+	list->AddEntry("Slow Rock");
+	list->AddEntry("Sonata");
+	list->AddEntry("Soul");
+	list->AddEntry("Sound Clip");
+	list->AddEntry("Soundtrack");
+	list->AddEntry("Southern Rock");
+	list->AddEntry("Space");
+	list->AddEntry("Speech");
+	list->AddEntry("Swing");
+	list->AddEntry("Symphonic Rock");
+	list->AddEntry("Symphony");
+	list->AddEntry("Synthpop");
+	list->AddEntry("Tango");
+	list->AddEntry("Techno");
+	list->AddEntry("Techno-Industrial");
+	list->AddEntry("Terror");
+	list->AddEntry("Thrash-Metal");
+	list->AddEntry("Top 40");
+	list->AddEntry("Trailer");
+	list->AddEntry("Trance");
+	list->AddEntry("Tribal");
+	list->AddEntry("Trip-Hop");
+	list->AddEntry("Vocal");
+}

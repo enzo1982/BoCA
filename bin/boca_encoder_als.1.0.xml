@@ -18,5 +18,19 @@
       Disabled tags for now, because mp4als.exe cannot read tagged files.
       <tag mode="other">MP4Metadata</tag>
     -->
+    <parameters>
+      <switch name="Adaptive prediction order" argument="-a"/>
+      <range name="Prediction order" argument="-o%VALUE" default="10">
+	<min alias="min">0</min>
+	<max alias="max">128</max>
+      </range>
+      <switch name="Use BGMC residual codes" argument="-b"/>
+      <range name="Block switching level" argument="-g%VALUE" default="0">
+	<min alias="off">0</min>
+	<max alias="max">5</max>
+      </range>
+      <switch name="Idependent stereo coding" argument="-i"/>
+      <switch name="Use long term prediction" argument="-p"/>
+    </parameters>
   </external>
 </component>

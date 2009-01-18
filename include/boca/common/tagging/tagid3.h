@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -22,12 +22,14 @@ namespace BoCA
 	class TagID3 : public Tag
 	{
 		private:
+			static String	 dummyString;
+
 			Int		 version;
 
 			Int		 ParseID3Tag(Void *, Track *);
 
-			String		 GetID3v2FrameString(ID3Frame *);
-			Int		 SetID3v2FrameString(ID3Frame *, const String &);
+			String		 GetID3v2FrameString(ID3Frame *, String & = dummyString);
+			Int		 SetID3v2FrameString(ID3Frame *, const String &, const String & = NIL);
 
 			const String	&GetID3CategoryName(Int);
 		public:

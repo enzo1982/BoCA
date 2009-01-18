@@ -13,7 +13,7 @@
 
 #include <smooth.h>
 #include "../../core/definitions.h"
-#include "../track.h"
+#include "../track/track.h"
 
 using namespace smooth;
 

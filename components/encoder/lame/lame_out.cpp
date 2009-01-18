@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -68,6 +68,7 @@ Bool BoCA::LAMEOut::Activate()
 	int	 effrate;
 
 	const Format	&format = track.GetFormat();
+	const Info	&info = track.GetInfo();
 
 	if (config->GetIntValue("LAME", "Resample", -1) > 0)	effrate = config->GetIntValue("LAME", "Resample", -1);
 	else							effrate = format.rate;
@@ -284,7 +285,7 @@ Bool BoCA::LAMEOut::Activate()
 		return False;
 	}
 
-	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v2 && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
 		Int			 size = track.RenderID3Tag(id3Buffer, 2);
@@ -299,13 +300,14 @@ Bool BoCA::LAMEOut::Activate()
 
 Bool BoCA::LAMEOut::Deactivate()
 {
-	Config	*config = Config::Get();
+	Config		*config = Config::Get();
+	const Info	&info = track.GetInfo();
 
 	unsigned long	 bytes = ex_lame_encode_flush(lameFlags, outBuffer, outBuffer.Size());
 
 	driver->WriteData(outBuffer, bytes);
 
-	if ((track.artist != NIL || track.title != NIL) && config->enable_id3v1 && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v1 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
 		Int			 size = track.RenderID3Tag(id3Buffer, 1);

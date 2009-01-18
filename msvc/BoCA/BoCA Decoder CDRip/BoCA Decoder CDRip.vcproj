@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="smooth.lib boca.1.0.lib"
+				AdditionalDependencies="smooth.lib boca.1.0.lib ws2_32.lib"
 				OutputFile="$(OutDir)\boca_decoder_cdrip.1.0.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../../../smooth/msvc/smooth/Debug;../debug"

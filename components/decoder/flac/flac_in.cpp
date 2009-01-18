@@ -276,9 +276,6 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 	{
 		if (metadata->data.vorbis_comment.num_comments > 0)
 		{
-			filter->infoTrack->track = -1;
-			filter->infoTrack->outfile = NIL;
-
 			Buffer<UnsignedByte>	 vcBuffer(metadata->length);
 			OutStream		 out(STREAM_BUFFER, vcBuffer, vcBuffer.Size());
 

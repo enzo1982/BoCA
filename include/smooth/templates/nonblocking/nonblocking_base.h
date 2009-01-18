@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,9 +19,21 @@ namespace smooth
 		public:
 			static Int CleanUp()
 			{
-				for (Int i = 0; i < callers.Length(); i++) delete callers.GetNth(i);
+				/* Delete all callers that have finished their work.
+				 */
+				for (Int i = 0; i < callers.Length(); i++)
+				{
+					Caller	*caller = callers.GetNth(i);
 
-				callers.RemoveAll();
+					if (!caller->IsActive())
+					{
+						delete callers.GetNth(i);
+
+						callers.RemoveNth(i);
+
+						i--;
+					}
+				}
 
 				return Success();
 			}

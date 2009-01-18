@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -42,8 +42,9 @@ using namespace smooth;
 #include "boca/common/configlayer.h"
 #include "boca/common/i18n.h"
 #include "boca/common/protocol.h"
-#include "boca/common/track.h"
 #include "boca/common/utilities.h"
+
+#include "boca/common/track/track.h"
 
 #include "boca/common/communication/joblist.h"
 #include "boca/common/communication/menu.h"

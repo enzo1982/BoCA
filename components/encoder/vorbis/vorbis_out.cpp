@@ -70,6 +70,7 @@ BoCA::VorbisOut::~VorbisOut()
 Bool BoCA::VorbisOut::Activate()
 {
 	const Format	&format = track.GetFormat();
+	const Info	&info = track.GetInfo();
 
 	if (format.channels > 2)
 	{
@@ -126,8 +127,8 @@ Bool BoCA::VorbisOut::Activate()
 		 * An empty tag containing only the vendor string
 		 * is rendered if Vorbis comments are disabled.
 		 */
-		if ((track.artist != NIL || track.title != NIL) && config->enable_vctags) track.RenderVorbisComment(vcBuffer, vendor);
-		else									  Track().RenderVorbisComment(vcBuffer, vendor);
+		if ((info.artist != NIL || info.title != NIL) && config->enable_vctags) track.RenderVorbisComment(vcBuffer, vendor);
+		else									Track().RenderVorbisComment(vcBuffer, vendor);
 
 		vcBuffer.Resize(vcBuffer.Size() + 8);
 

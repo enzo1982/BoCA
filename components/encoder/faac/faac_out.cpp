@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -89,6 +89,7 @@ BoCA::FAACOut::~FAACOut()
 Bool BoCA::FAACOut::Activate()
 {
 	const Format	&format = track.GetFormat();
+	const Info	&info = track.GetInfo();
 
 	if (format.channels > 2)
 	{
@@ -153,7 +154,7 @@ Bool BoCA::FAACOut::Activate()
 
 	if (!config->GetIntValue("FAAC", "MP4Container", 1))
 	{
-		if ((track.artist != NIL || track.title != NIL) && config->enable_id3v2 && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
+		if ((info.artist != NIL || info.title != NIL) && config->enable_id3v2 && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
 		{
 			Buffer<unsigned char>	 id3Buffer;
 			Int			 size = track.RenderID3Tag(id3Buffer, 2);
@@ -167,7 +168,8 @@ Bool BoCA::FAACOut::Activate()
 
 Bool BoCA::FAACOut::Deactivate()
 {
-	Config	*config = Config::Get();
+	Config		*config = Config::Get();
+	const Info	&info = track.GetInfo();
 
 	unsigned long	 bytes = 0;
 
@@ -203,7 +205,7 @@ Bool BoCA::FAACOut::Deactivate()
 
 		if (config->enable_mp4meta)
 		{
-			if (track.artist != NIL || track.title != NIL) track.RenderMP4Meta(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
+			if (info.artist != NIL || info.title != NIL) track.RenderMP4Meta(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
 		}
 
 		/* Stream contents of created MP4 file to output driver

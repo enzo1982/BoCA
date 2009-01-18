@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -145,6 +145,8 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 				format.bits = 8;
 				break;
 			case SF_FORMAT_PCM_24:
+				format.bits = 24;
+				break;
 			case SF_FORMAT_PCM_32:
 				format.bits = 32;
 				break;
@@ -155,10 +157,12 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		track.length	= sinfo.frames * sinfo.channels;
 
-		track.artist	= ex_sf_get_string(sndf, SF_STR_ARTIST);
-		track.title	= ex_sf_get_string(sndf, SF_STR_TITLE);
-		track.year	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_DATE));
-		track.comment	= ex_sf_get_string(sndf, SF_STR_COMMENT);
+		Info	&info = track.GetInfo();
+
+		info.artist	= ex_sf_get_string(sndf, SF_STR_ARTIST);
+		info.title	= ex_sf_get_string(sndf, SF_STR_TITLE);
+		info.year	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_DATE));
+		info.comment	= ex_sf_get_string(sndf, SF_STR_COMMENT);
 
 		ex_sf_close(sndf);
 	}
@@ -221,6 +225,21 @@ Int BoCA::SndFileIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	else if	(track.GetFormat().bits == 16)
 	{
 		size = ex_sf_read_short(sndf, (short *) (UnsignedByte *) data, size / 2) * 2;
+	}
+	else if (track.GetFormat().bits == 24)
+	{
+		Buffer<int>	 buffer(size / 2);
+
+		size = ex_sf_read_int(sndf, buffer, size / 2) * 3;
+
+		data.Resize(size);
+
+		for (Int i = 0; i < size / 3; i++)
+		{
+			data[i * 3 + 0] = (buffer[i] >>  8) & 0xFF;
+			data[i * 3 + 1] = (buffer[i] >> 16) & 0xFF;
+			data[i * 3 + 2] = (buffer[i] >> 24) & 0xFF;
+		}
 	}
 	else if (track.GetFormat().bits == 32)
 	{
