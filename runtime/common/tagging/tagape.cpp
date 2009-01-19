@@ -32,15 +32,31 @@ Int BoCA::TagAPE::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 
 	Int		 numItems = 0;
 
-	if	(info.artist != NIL) { RenderAPEItem("Artist", info.artist, buffer);			    numItems++; }
-	if	(info.title  != NIL) { RenderAPEItem("Title", info.title, buffer);			    numItems++; }
-	if	(info.album  != NIL) { RenderAPEItem("Album", info.album, buffer);			    numItems++; }
-	if	(info.track   >   0) { RenderAPEItem("Track", String(info.track < 10 ? "0" : "")
-							     .Append(String::FromInt(info.track)), buffer); numItems++; }
-	if	(info.year    >   0) { RenderAPEItem("Year", String::FromInt(info.year), buffer);	    numItems++; }
-	if	(info.genre  != NIL) { RenderAPEItem("Genre", info.genre, buffer);			    numItems++; }
-	if	(info.label  != NIL) { RenderAPEItem("Publisher", info.label, buffer);			    numItems++; }
-	if	(info.isrc   != NIL) { RenderAPEItem("ISRC", info.isrc, buffer);			    numItems++; }
+	if (info.artist != NIL) { RenderAPEItem("Artist", info.artist, buffer);		     numItems++; }
+	if (info.title  != NIL) { RenderAPEItem("Title", info.title, buffer);		     numItems++; }
+	if (info.album  != NIL) { RenderAPEItem("Album", info.album, buffer);		     numItems++; }
+	if (info.year    >   0) { RenderAPEItem("Year", String::FromInt(info.year), buffer); numItems++; }
+	if (info.genre  != NIL) { RenderAPEItem("Genre", info.genre, buffer);		     numItems++; }
+	if (info.label  != NIL) { RenderAPEItem("Publisher", info.label, buffer);	     numItems++; }
+	if (info.isrc   != NIL) { RenderAPEItem("ISRC", info.isrc, buffer);		     numItems++; }
+
+	if (info.track > 0)
+	{
+		String	 trackString = String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track));
+
+		if (info.numTracks > 0) trackString.Append("/").Append(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks));
+
+		{ RenderAPEItem("Track", trackString, buffer); numItems++; }
+	}
+
+	if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
+	{
+		String	 discString = String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc));
+
+		if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs));
+
+		{ RenderAPEItem("Disc", discString, buffer); numItems++; }
+	}
 
 	if	(info.comment != NIL && !currentConfig->replace_comments) { RenderAPEItem("Comment", info.comment, buffer);		      numItems++; }
 	else if (currentConfig->default_comment != NIL && numItems > 0)	  { RenderAPEItem("Comment", currentConfig->default_comment, buffer); numItems++; }
@@ -192,12 +208,23 @@ Int BoCA::TagAPE::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 		if	(id == "Artist")    info.artist  = value;
 		else if (id == "Title")	    info.title   = value;
 		else if (id == "Album")	    info.album   = value;
-		else if (id == "Track")	    info.track   = value.ToInt();
 		else if (id == "Year")	    info.year	 = value.ToInt();
 		else if (id == "Genre")	    info.genre   = value;
 		else if (id == "Comment")   info.comment = value;
 		else if (id == "Publisher") info.label   = value;
 		else if (id == "ISRC")	    info.isrc	 = value;
+		else if (id == "Track")
+		{
+			info.track = value.ToInt();
+
+			if (value.Find("/") >= 0) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
+		}
+		else if (id == "Disc")
+		{
+			info.disc = value.ToInt();
+
+			if (value.Find("/") >= 0) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
+		}
 		else if (id.StartsWith("replaygain"))
 		{
 			if	(id == "replaygain_track_gain") info.track_gain = value;

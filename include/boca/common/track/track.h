@@ -81,9 +81,13 @@ namespace BoCA
 			Bool operator	 ==(const int) const;
 			Bool operator	 !=(const int) const;
 
-			Int		 RenderID3Tag(Buffer<UnsignedByte> &, Int = 2);
-			Bool		 ParseID3Tag(const Buffer<UnsignedByte> &);
-			Bool		 ParseID3Tag(const String &);
+			Int		 RenderID3v1Tag(Buffer<UnsignedByte> &);
+			Bool		 ParseID3v1Tag(const Buffer<UnsignedByte> &);
+			Bool		 ParseID3v1Tag(const String &);
+
+			Int		 RenderID3v2Tag(Buffer<UnsignedByte> &);
+			Bool		 ParseID3v2Tag(const Buffer<UnsignedByte> &);
+			Bool		 ParseID3v2Tag(const String &);
 
 			Int		 RenderAPETag(Buffer<UnsignedByte> &);
 			Bool		 ParseAPETag(const Buffer<UnsignedByte> &);

@@ -16,7 +16,8 @@
 
 using namespace smooth::IO;
 
-/* AAC object types */
+/* AAC object types
+ */
 #define MAIN 1
 #define LOW  2
 #define SSR  3
@@ -271,7 +272,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (errorState) return Error();
 
-		if (Config::Get()->enable_id3) track.ParseID3Tag(streamURI);
+		if (Config::Get()->enable_id3) track.ParseID3v2Tag(streamURI);
 	}
 
 	return Success();

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -123,8 +123,8 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	if (specs->external_tagmode != TAG_MODE_NONE && (info.artist != NIL || info.title != NIL))
 	{
-		if	(specs->external_tag == "ID3v1" && config->enable_id3v1 && config->enable_id3)	tagSize = track.RenderID3Tag(tag, 1);
-		else if (specs->external_tag == "ID3v2" && config->enable_id3v2 && config->enable_id3)	tagSize = track.RenderID3Tag(tag, 2);
+		if	(specs->external_tag == "ID3v1" && config->enable_id3v1 && config->enable_id3)	tagSize = track.RenderID3v1Tag(tag);
+		else if (specs->external_tag == "ID3v2" && config->enable_id3v2 && config->enable_id3)	tagSize = track.RenderID3v2Tag(tag);
 		else if (specs->external_tag == "MP4Metadata" && config->enable_mp4)			track.RenderMP4Meta(encFileName);
 		else if (specs->external_tag == "APEv2")						tagSize = track.RenderAPETag(tag);
 	}

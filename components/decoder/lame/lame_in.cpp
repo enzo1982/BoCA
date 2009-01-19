@@ -104,7 +104,11 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_lame_decode_exit();
 
-	if (Config::Get()->enable_id3) track.ParseID3Tag(streamURI);
+	if (Config::Get()->enable_id3)
+	{
+		if (track.ParseID3v2Tag(streamURI) != Success())
+		    track.ParseID3v1Tag(streamURI);
+	}
 
 	return Success();
 }

@@ -120,7 +120,7 @@ Bool BoCA::BladeOut::Activate()
 	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v2 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = track.RenderID3Tag(id3Buffer, 2);
+		Int			 size = track.RenderID3v2Tag(id3Buffer);
 
 		driver->WriteData(id3Buffer, size);
 	}
@@ -144,7 +144,7 @@ Bool BoCA::BladeOut::Deactivate()
 	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v1 && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = track.RenderID3Tag(id3Buffer, 1);
+		Int			 size = track.RenderID3v1Tag(id3Buffer);
 
 		driver->WriteData(id3Buffer, size);
 	}

@@ -96,7 +96,7 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		memcpy(buffer, id3tag, id3tag_size);
 
-		track.ParseID3Tag(buffer);
+		track.ParseID3v2Tag(buffer);
 	}
 
 	return Success();

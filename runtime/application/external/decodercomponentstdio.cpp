@@ -30,10 +30,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	 */
 	if (specs->external_tagmode != TAG_MODE_NONE)
 	{
-		if	((specs->external_tag == "ID3v1" ||
-			  specs->external_tag == "ID3v2")      && Config::Get()->enable_id3) track.ParseID3Tag(streamURI);
-		else if ( specs->external_tag == "MP4Metadata" && Config::Get()->enable_mp4) track.ParseMP4Meta(streamURI);
-		else if ( specs->external_tag == "APEv2")				     track.ParseAPETag(streamURI);
+		if	(specs->external_tag == "ID3v1"	      && Config::Get()->enable_id3) track.ParseID3v1Tag(streamURI);
+		else if (specs->external_tag == "ID3v2"	      && Config::Get()->enable_id3) track.ParseID3v2Tag(streamURI);
+		else if (specs->external_tag == "MP4Metadata" && Config::Get()->enable_mp4) track.ParseMP4Meta(streamURI);
+		else if (specs->external_tag == "APEv2")				    track.ParseAPETag(streamURI);
 	}
 
 	SECURITY_ATTRIBUTES	 secAttr;

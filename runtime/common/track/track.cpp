@@ -10,7 +10,8 @@
 
 #include <boca/common/track/track.h>
 #include <boca/common/tagging/tagape.h>
-#include <boca/common/tagging/tagid3.h>
+#include <boca/common/tagging/tagid3v1.h>
+#include <boca/common/tagging/tagid3v2.h>
 #include <boca/common/tagging/tagmp4.h>
 #include <boca/common/tagging/tagvorbis.h>
 
@@ -107,74 +108,67 @@ S::Bool BoCA::Track::operator !=(const int nil) const
 	else		   return True;
 }
 
-Int BoCA::Track::RenderID3Tag(Buffer<UnsignedByte> &buffer, Int version)
+Int BoCA::Track::RenderID3v1Tag(Buffer<UnsignedByte> &buffer)
 {
-	TagID3	 tag;
-
-	tag.SetID3Version(version);
-
-	return tag.Render(*this, buffer);
+	return TagID3v1().Render(*this, buffer);
 }
 
-Bool BoCA::Track::ParseID3Tag(const Buffer<UnsignedByte> &buffer)
+Bool BoCA::Track::ParseID3v1Tag(const Buffer<UnsignedByte> &buffer)
 {
-	TagID3	 tag;
-
-	return tag.Parse(buffer, this);
+	return TagID3v1().Parse(buffer, this);
 }
 
-Bool BoCA::Track::ParseID3Tag(const String &fileName)
+Bool BoCA::Track::ParseID3v1Tag(const String &fileName)
 {
-	TagID3	 tag;
+	return TagID3v1().Parse(fileName, this);
+}
 
-	return tag.Parse(fileName, this);
+Int BoCA::Track::RenderID3v2Tag(Buffer<UnsignedByte> &buffer)
+{
+	return TagID3v2().Render(*this, buffer);
+}
+
+Bool BoCA::Track::ParseID3v2Tag(const Buffer<UnsignedByte> &buffer)
+{
+	return TagID3v2().Parse(buffer, this);
+}
+
+Bool BoCA::Track::ParseID3v2Tag(const String &fileName)
+{
+	return TagID3v2().Parse(fileName, this);
 }
 
 Int BoCA::Track::RenderAPETag(Buffer<UnsignedByte> &buffer)
 {
-	TagAPE	 tag;
-
-	return tag.Render(*this, buffer);
+	return TagAPE().Render(*this, buffer);
 }
 
 Bool BoCA::Track::ParseAPETag(const Buffer<UnsignedByte> &buffer)
 {
-	TagAPE	 tag;
-
-	return tag.Parse(buffer, this);
+	return TagAPE().Parse(buffer, this);
 }
 
 Bool BoCA::Track::ParseAPETag(const String &fileName)
 {
-	TagAPE	 tag;
-
-	return tag.Parse(fileName, this);
+	return TagAPE().Parse(fileName, this);
 }
 
 Bool BoCA::Track::RenderMP4Meta(const String &fileName)
 {
-	TagMP4	 tag;
-
-	return tag.Render(*this, fileName);
+	return TagMP4().Render(*this, fileName);
 }
 
 Bool BoCA::Track::ParseMP4Meta(const String &fileName)
 {
-	TagMP4	 tag;
-
-	return tag.Parse(fileName, this);
+	return TagMP4().Parse(fileName, this);
 }
 
 Int BoCA::Track::RenderVorbisComment(Buffer<UnsignedByte> &buffer, const String &vendorString)
 {
-	TagVorbis	 tag;
-
-	return tag.Render(*this, buffer, vendorString);
+	return TagVorbis().Render(*this, buffer, vendorString);
 }
 
 Bool BoCA::Track::ParseVorbisComment(const Buffer<UnsignedByte> &buffer)
 {
-	TagVorbis	 tag;
-
-	return tag.Parse(buffer, this);
+	return TagVorbis().Parse(buffer, this);
 }
