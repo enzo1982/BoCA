@@ -18,7 +18,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 {
 	I18n	*i18n = I18n::Get();
 
-	group_info		= new GroupBox("Title info", Point(7, 10), Size(400, 240));
+	group_info		= new GroupBox("Title info", Point(7, 10), Size(400, 178));
 
 	text_artist		= new Text(String(i18n->TranslateString("Artist")).Append(":"), Point(9, 13));
 	text_title		= new Text(String(i18n->TranslateString("Title")).Append(":"), text_artist->GetPosition() + Point(0, 27));
@@ -28,26 +28,26 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 
 	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_artist->textSize.cx, text_genre->textSize.cx), text_title->textSize.cx), Math::Max(text_album->textSize.cx, text_comment->textSize.cx));
 
-	edit_artist		= new EditBox("", text_artist->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_artist		= new EditBox(NIL, text_artist->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
 	edit_artist->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	edit_title		= new EditBox("", text_title->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_title		= new EditBox(NIL, text_title->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
 	edit_title->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	edit_album		= new EditBox("", text_album->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_album		= new EditBox(NIL, text_album->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
 	edit_album->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
 	list_genre		= new ListBox(Point(), Size());
 	TagUtilities::FillGenreList(list_genre);
 
-	edit_genre		= new EditBox("", text_genre->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_genre		= new EditBox(NIL, text_genre->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
 	edit_genre->SetDropDownList(list_genre);
 	edit_genre->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	edit_comment		= new MultiEdit("", text_comment->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 50));
+	edit_comment		= new MultiEdit(NIL, text_comment->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 50));
 	edit_comment->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	edit_ntracks		= new EditBox("", Point(28, text_title->GetY() - 3), Size(18, 0), 2);
+	edit_ntracks		= new EditBox(NIL, Point(28, text_title->GetY() - 3), Size(18, 0), 2);
 	edit_ntracks->SetOrientation(OR_UPPERRIGHT);
 	edit_ntracks->SetFlags(EDB_NUMERIC);
 	edit_ntracks->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -55,7 +55,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 	text_ntracks		= new Text("/", edit_ntracks->GetPosition() + Point(10, 3));
 	text_ntracks->SetOrientation(OR_UPPERRIGHT);
 
-	edit_track		= new EditBox("", edit_ntracks->GetPosition() + Point(32, 0), Size(18, 0), 2);
+	edit_track		= new EditBox(NIL, edit_ntracks->GetPosition() + Point(32, 0), Size(18, 0), 2);
 	edit_track->SetOrientation(OR_UPPERRIGHT);
 	edit_track->SetFlags(EDB_NUMERIC);
 	edit_track->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -63,7 +63,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 	text_track		= new Text(String(i18n->TranslateString("Track")).Append(":"), edit_track->GetPosition() + Point(35, 3));
 	text_track->SetOrientation(OR_UPPERRIGHT);
 
-	edit_ndiscs		= new EditBox("", Point(28, text_album->GetY() - 3), Size(18, 0), 2);
+	edit_ndiscs		= new EditBox(NIL, Point(28, text_album->GetY() - 3), Size(18, 0), 2);
 	edit_ndiscs->SetOrientation(OR_UPPERRIGHT);
 	edit_ndiscs->SetFlags(EDB_NUMERIC);
 	edit_ndiscs->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -71,7 +71,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 	text_ndiscs		= new Text("/", edit_ndiscs->GetPosition() + Point(10, 3));
 	text_ndiscs->SetOrientation(OR_UPPERRIGHT);
 
-	edit_disc		= new EditBox("", edit_ndiscs->GetPosition() + Point(32, 0), Size(18, 0), 2);
+	edit_disc		= new EditBox(NIL, edit_ndiscs->GetPosition() + Point(32, 0), Size(18, 0), 2);
 	edit_disc->SetOrientation(OR_UPPERRIGHT);
 	edit_disc->SetFlags(EDB_NUMERIC);
 	edit_disc->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -79,7 +79,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 	text_disc		= new Text(String(i18n->TranslateString("Disc")).Append(":"), edit_disc->GetPosition() + Point(30, 3));
 	text_disc->SetOrientation(OR_UPPERRIGHT);
 
-	edit_year		= new EditBox("", Point(60, text_genre->GetY() - 3), Size(50, 0), 4);
+	edit_year		= new EditBox(NIL, Point(60, text_genre->GetY() - 3), Size(50, 0), 4);
 	edit_year->SetOrientation(OR_UPPERRIGHT);
 	edit_year->SetFlags(EDB_NUMERIC);
 	edit_year->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -114,7 +114,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 	group_info->Add(text_year);
 	group_info->Add(edit_year);
 
-	group_cover		= new GroupBox("Cover art", Point(415, 10), Size(400, 240));
+	group_cover		= new GroupBox("Cover art", Point(415, 10), Size(400, 178));
 
 	text_covers		= new Text(String(i18n->TranslateString("Covers")).Append(":"), Point(9, 13));
 	text_cover_type		= new Text(String(i18n->TranslateString("Type")).Append(":"), Point(9, 94));
@@ -149,7 +149,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
 	combo_cover_type->AddEntry("Publisher/Studio logotype");
 	combo_cover_type->onSelectEntry.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	edit_cover_desc		= new MultiEdit("", text_cover_desc->GetPosition() + Point(maxTextSize3 + 7, -3), Size(300, 50));
+	edit_cover_desc		= new MultiEdit(NIL, text_cover_desc->GetPosition() + Point(maxTextSize3 + 7, -3), Size(300, 50));
 	edit_cover_desc->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
 	button_cover_load	= new Button("Load", NIL, Point(89, 9), Size(0, 0));
@@ -323,7 +323,7 @@ Void BoCA::LayerTagBasic::RemoveCover()
 	onModifyTrack.Emit(track);
 
 	combo_cover_type->SelectNthEntry(0);
-	edit_cover_desc->SetText("");
+	edit_cover_desc->SetText(NIL);
 
 	button_cover_remove->Deactivate();
 	text_cover_type->Deactivate();
@@ -401,21 +401,21 @@ Void BoCA::LayerTagBasic::OnSelectNone()
 
 	combo_cover_type->onSelectEntry.Disconnect(&LayerTagBasic::OnModifyTrack, this);
 
-	edit_artist->SetText("");
-	edit_title->SetText("");
-	edit_album->SetText("");
-	edit_genre->SetText("");
-	edit_year->SetText("");
-	edit_comment->SetText("");
+	edit_artist->SetText(NIL);
+	edit_title->SetText(NIL);
+	edit_album->SetText(NIL);
+	edit_genre->SetText(NIL);
+	edit_year->SetText(NIL);
+	edit_comment->SetText(NIL);
 
-	edit_track->SetText("");
-	edit_ntracks->SetText("");
+	edit_track->SetText(NIL);
+	edit_ntracks->SetText(NIL);
 
-	edit_disc->SetText("");
-	edit_ndiscs->SetText("");
+	edit_disc->SetText(NIL);
+	edit_ndiscs->SetText(NIL);
 
 	combo_cover_type->SelectNthEntry(0);
-	edit_cover_desc->SetText("");
+	edit_cover_desc->SetText(NIL);
 
 	group_info->Deactivate();
 	group_cover->Deactivate();

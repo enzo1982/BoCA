@@ -119,7 +119,7 @@ Bool BoCA::MACOut::Deactivate()
 
 	const Info	&info = track.GetInfo();
 
-	if ((info.artist != NIL || info.title != NIL) && Config::Get()->GetIntValue("MAC", "EnableTags", 1))
+	if ((info.artist != NIL || info.title != NIL) && Config::Get()->GetIntValue("Tags", "EnableAPEv2", True))
 	{
 		Buffer<unsigned char>	 tagBuffer;
 		Int			 size = track.RenderAPETag(tagBuffer);

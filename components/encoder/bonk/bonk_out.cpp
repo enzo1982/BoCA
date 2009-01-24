@@ -83,7 +83,7 @@ Bool BoCA::BonkOut::Activate()
 
 	encoder	= ex_bonk_encoder_create();
 
-	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v2 && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
 		Int			 size = track.RenderID3v2Tag(id3Buffer);

@@ -90,7 +90,7 @@ Bool BoCA::FLACOut::Activate()
 
 	Buffer<unsigned char>	 vcBuffer;
 
-	if ((info.artist != NIL || info.title != NIL) && config->enable_vctags)
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True))
 	{
 		FLAC__StreamMetadata	*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
@@ -98,13 +98,13 @@ Bool BoCA::FLACOut::Activate()
 
 		/* Disable writing cover art to Vorbis comment tags for FLAC files.
 		 */
-		Bool	 writeVorbisCoverArt = config->GetIntValue("Settings", "WriteVorbisCoverArt", 0);
+		Bool	 writeVorbisCoverArt = config->GetIntValue("Tags", "WriteCoverArtVorbisComment", False);
 
-		if (writeVorbisCoverArt) config->SetIntValue("Settings", "WriteVorbisCoverArt", 0);
+		if (writeVorbisCoverArt) config->SetIntValue("Tags", "WriteCoverArtVorbisComment", False);
 
 		track.RenderVorbisComment(vcBuffer, *ex_FLAC__VENDOR_STRING);
 
-		if (writeVorbisCoverArt) config->SetIntValue("Settings", "WriteVorbisCoverArt", 1);
+		if (writeVorbisCoverArt) config->SetIntValue("Tags", "WriteCoverArtVorbisComment", True);
 
 		/* Process output comment tag and add it to FLAC metadata.
 		 */
@@ -127,7 +127,7 @@ Bool BoCA::FLACOut::Activate()
 		vorbiscomment->length = vcBuffer.Size();
 	}
 
-	if (config->GetIntValue("Settings", "CopyPictureTags", 1))
+	if (config->GetIntValue("Tags", "WriteCoverArt", True))
 	{
 		for (Int i = 0; i < track.pictures.Length(); i++)
 		{

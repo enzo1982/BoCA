@@ -50,10 +50,14 @@ namespace BoCA
 			String			 album_gain;
 			String			 album_peak;
 
-			/* CD-ROM table of contents
+			/* CD-ROM table of contents:
 			 */
 			Buffer<UnsignedByte>	 mcdi;
 			String			 offsets;
+
+			/* Array of additional fields:
+			 */
+			Array<String>		 other;
 
 			/* Class constructors / destructor:
 			 */

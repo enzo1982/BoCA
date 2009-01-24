@@ -114,17 +114,6 @@ Bool BoCA::Config::LoadSettings()
 	writeToInputDir				= config->GetIntValue("Settings", "WriteToInputDirectory", 0);
 	allowOverwrite				= config->GetIntValue("Settings", "AllowOverwriteSource", 0);
 
-	enable_id3v1				= config->GetIntValue("Settings", "EnableID3V1", 0);
-	enable_id3v2				= config->GetIntValue("Settings", "EnableID3V2", 1);
-	enable_vctags				= config->GetIntValue("Settings", "EnableVorbisCommentTags", 1);
-	enable_mp4meta				= config->GetIntValue("Settings", "EnableMP4Metadata", 1);
-	id3v1_encoding				= config->GetStringValue("Settings", "ID3V1Encoding", "ISO-8859-1");
-	id3v2_encoding				= config->GetStringValue("Settings", "ID3V2Encoding", "UTF-16LE");
-	vctag_encoding				= config->GetStringValue("Settings", "VorbisCommentTagEncoding", "UTF-8");
-	mp4meta_encoding			= config->GetStringValue("Settings", "MP4MetadataEncoding", "UTF-8");
-	default_comment				= config->GetStringValue("Settings", "DefaultComment", String("BonkEnc Audio Encoder <http://www.bonkenc.org/>"));
-	replace_comments			= config->GetIntValue("Settings", "ReplaceComments", 0);
-
 	cdrip_activedrive			= config->GetIntValue("CDRip", "ActiveCDROM", 0);
 	cdrip_debuglevel			= config->GetIntValue("CDRip", "DebugCDRip", 0);
 	cdrip_paranoia				= config->GetIntValue("CDRip", "CDParanoia", 0);
@@ -133,13 +122,6 @@ Bool BoCA::Config::LoadSettings()
 	cdrip_detectC2Errors			= config->GetIntValue("CDRip", "DetectC2Errors", 1);
 	cdrip_jitter				= config->GetIntValue("CDRip", "JitterCorrection", 0);
 	cdrip_swapchannels			= config->GetIntValue("CDRip", "SwapChannels", 0);
-	cdrip_locktray				= config->GetIntValue("CDRip", "LockTray", 1);
-	cdrip_read_cdtext			= config->GetIntValue("CDRip", "ReadCDText", 1);
-	cdrip_read_cdplayerini			= config->GetIntValue("CDRip", "ReadCDPlayerIni", 1);
-	cdrip_ntscsi				= config->GetIntValue("CDRip", "UseNTSCSI", 1);
-	cdrip_autoRead				= config->GetIntValue("CDRip", "AutoReadContents", 1);
-	cdrip_autoRip				= config->GetIntValue("CDRip", "AutoRip", 0);
-	cdrip_autoEject				= config->GetIntValue("CDRip", "EjectAfterRipping", 0);
 	cdrip_numdrives				= 0;
 
 	return True;
@@ -160,17 +142,6 @@ Bool BoCA::Config::SaveSettings()
 	config->SetIntValue("Settings", "WriteToInputDirectory", writeToInputDir);
 	config->SetIntValue("Settings", "AllowOverwriteSource", allowOverwrite);
 
-	config->SetIntValue("Settings", "EnableID3V1", enable_id3v1);
-	config->SetIntValue("Settings", "EnableID3V2", enable_id3v2);
-	config->SetIntValue("Settings", "EnableVorbisCommentTags", enable_vctags);
-	config->SetIntValue("Settings", "EnableMP4Metadata", enable_mp4meta);
-	config->SetStringValue("Settings", "ID3V1Encoding", id3v1_encoding);
-	config->SetStringValue("Settings", "ID3V2Encoding", id3v2_encoding);
-	config->SetStringValue("Settings", "VorbisCommentTagEncoding", vctag_encoding);
-	config->SetStringValue("Settings", "MP4MetadataEncoding", mp4meta_encoding);
-	config->SetStringValue("Settings", "DefaultComment", default_comment);
-	config->SetIntValue("Settings", "ReplaceComments", replace_comments);
-
 	config->SetIntValue("CDRip", "ActiveCDROM", cdrip_activedrive);
 	config->SetIntValue("CDRip", "DebugCDRip", cdrip_debuglevel);
 	config->SetIntValue("CDRip", "CDParanoia", cdrip_paranoia);
@@ -179,13 +150,6 @@ Bool BoCA::Config::SaveSettings()
 	config->SetIntValue("CDRip", "DetectC2Errors", cdrip_detectC2Errors);
 	config->SetIntValue("CDRip", "JitterCorrection", cdrip_jitter);
 	config->SetIntValue("CDRip", "SwapChannels", cdrip_swapchannels);
-	config->SetIntValue("CDRip", "LockTray", cdrip_locktray);
-	config->SetIntValue("CDRip", "ReadCDText", cdrip_read_cdtext);
-	config->SetIntValue("CDRip", "ReadCDPlayerIni", cdrip_read_cdplayerini);
-	config->SetIntValue("CDRip", "UseNTSCSI", cdrip_ntscsi);
- 	config->SetIntValue("CDRip", "AutoReadContents", cdrip_autoRead);
- 	config->SetIntValue("CDRip", "AutoRip", cdrip_autoRip);
-	config->SetIntValue("CDRip", "EjectAfterRipping", cdrip_autoEject);
 
 	config->Save();
 

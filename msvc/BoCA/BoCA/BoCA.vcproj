@@ -389,7 +389,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\common\tagging\tagid3.cpp"
+						RelativePath="..\..\..\runtime\common\tagging\tagid3v1.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\tagging\tagid3v2.cpp"
 						>
 					</File>
 					<File
@@ -662,7 +666,11 @@
 							>
 						</File>
 						<File
-							RelativePath="..\..\..\include\boca\common\tagging\tagid3.h"
+							RelativePath="..\..\..\include\boca\common\tagging\tagid3v1.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\tagging\tagid3v2.h"
 							>
 						</File>
 						<File

@@ -61,6 +61,13 @@ BoCA::Info &BoCA::Info::operator =(const Info &oInfo)
 
 	offsets		= oInfo.offsets;
 
+	other.RemoveAll();
+
+	foreach (const String &string, oInfo.other)
+	{
+		other.Add(string);
+	}
+
 	return *this;
 }
 

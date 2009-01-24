@@ -25,7 +25,7 @@ BoCA::TagVorbis::~TagVorbis()
 Int BoCA::TagVorbis::Render(const Track &track, Buffer<UnsignedByte> &buffer, const String &vendorString)
 {
 	Config	*currentConfig = Config::Get();
-	char	*prevOutFormat = String::SetOutputFormat("UTF-8");
+	char	*prevOutFormat = currentConfig->GetStringValue("Tags", "VorbisCommentEncoding", "UTF-8");
 
 	const Info	&info = track.GetInfo();
 
@@ -43,10 +43,10 @@ Int BoCA::TagVorbis::Render(const Track &track, Buffer<UnsignedByte> &buffer, co
 	if	(info.label  != NIL) { RenderTagItem("ORGANIZATION", info.label, buffer);			  numItems++; }
 	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);				  numItems++; }
 
-	if	(info.comment != NIL && !currentConfig->replace_comments) { RenderTagItem("COMMENT", info.comment, buffer);		      numItems++; }
-	else if (currentConfig->default_comment != NIL && numItems > 0)	  { RenderTagItem("COMMENT", currentConfig->default_comment, buffer); numItems++; }
+	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderTagItem("COMMENT", info.comment, buffer);						  numItems++; }
+	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderTagItem("COMMENT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
 
-	if (currentConfig->GetIntValue("Settings", "PreserveReplayGain", 1))
+	if (currentConfig->GetIntValue("Tags", "PreserveReplayGain", True))
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
 		{
@@ -61,7 +61,7 @@ Int BoCA::TagVorbis::Render(const Track &track, Buffer<UnsignedByte> &buffer, co
 		}
 	}
 
-	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1) && currentConfig->GetIntValue("Settings", "WriteVorbisCoverArt", 0))
+	if (currentConfig->GetIntValue("Tags", "WriteCoverArt", True) && currentConfig->GetIntValue("Tags", "WriteCoverArtVorbisComment", False))
 	{
 		/* This is an unofficial way to store cover art in Vorbis
 		 * comments. It is used by some existing software.

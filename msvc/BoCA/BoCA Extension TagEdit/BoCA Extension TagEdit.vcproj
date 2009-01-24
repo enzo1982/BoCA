@@ -201,6 +201,10 @@
 					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_basic.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_details.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="advanced"
@@ -245,6 +249,10 @@
 				>
 				<File
 					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_basic.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_details.h"
 					>
 				</File>
 			</Filter>

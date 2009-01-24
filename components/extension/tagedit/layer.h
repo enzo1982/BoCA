@@ -20,6 +20,8 @@ using namespace smooth::GUI;
 using namespace BoCA;
 
 #include "basic/layer_tag_basic.h"
+#include "basic/layer_tag_details.h"
+
 #include "advanced/layer_tag_advanced.h"
 
 namespace BoCA
@@ -35,6 +37,8 @@ namespace BoCA
 			TabWidget			*tab_mode;
 
 			LayerTagBasic			*layer_basic;
+			LayerTagDetails			*layer_details;
+
 			LayerTagAdvanced		*layer_advanced;
 		signals:
 			Signal1<Void, const Track &>	 onSelectTrack;

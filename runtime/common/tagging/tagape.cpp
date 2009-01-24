@@ -24,7 +24,7 @@ BoCA::TagAPE::~TagAPE()
 Int BoCA::TagAPE::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 {
 	Config		*currentConfig = Config::Get();
-	char		*prevOutFormat = String::SetOutputFormat("UTF-8");
+	char		*prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "APEv2Encoding", "UTF-8"));
 
 	const Info	&info = track.GetInfo();
 
@@ -58,10 +58,10 @@ Int BoCA::TagAPE::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 		{ RenderAPEItem("Disc", discString, buffer); numItems++; }
 	}
 
-	if	(info.comment != NIL && !currentConfig->replace_comments) { RenderAPEItem("Comment", info.comment, buffer);		      numItems++; }
-	else if (currentConfig->default_comment != NIL && numItems > 0)	  { RenderAPEItem("Comment", currentConfig->default_comment, buffer); numItems++; }
+	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderAPEItem("Comment", info.comment, buffer);						  numItems++; }
+	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderAPEItem("Comment", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
 
-	if (currentConfig->GetIntValue("Settings", "PreserveReplayGain", 1))
+	if (currentConfig->GetIntValue("Tags", "PreserveReplayGain", True))
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
 		{
@@ -76,7 +76,7 @@ Int BoCA::TagAPE::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 		}
 	}
 
-	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1) && currentConfig->GetIntValue("Settings", "WriteAPEv2CoverArt", 0))
+	if (currentConfig->GetIntValue("Tags", "WriteCoverArt", True) && currentConfig->GetIntValue("Tags", "WriteCoverArtAPEv2", True))
 	{
 		foreach (const Picture &picInfo, track.pictures)
 		{

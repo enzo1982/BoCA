@@ -45,6 +45,8 @@ BoCA::TagID3v1::~TagID3v1()
 
 Int BoCA::TagID3v1::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 {
+	Config		*currentConfig = Config::Get();
+
 	buffer.Resize(128);
 
 	OutStream	 out(STREAM_BUFFER, buffer, buffer.Size());
@@ -52,7 +54,7 @@ Int BoCA::TagID3v1::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 	out.OutputString("TAG");
 
 	const Info	&info = track.GetInfo();
-	char		*prevOutFormat = String::SetOutputFormat(Config::Get()->id3v1_encoding);
+	char		*prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "ID3v1Encoding", "ISO-8859-1"));
 
 	{ out.OutputString(info.title.Head(Math::Min(30, info.title.Length())));   for (Int i = 0; i < 30 - info.title.Length(); i++) out.OutputNumber(0, 1); }
 	{ out.OutputString(info.artist.Head(Math::Min(30, info.artist.Length()))); for (Int i = 0; i < 30 - info.artist.Length(); i++) out.OutputNumber(0, 1); }
@@ -60,16 +62,21 @@ Int BoCA::TagID3v1::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 
 	{ out.OutputString(String().FillN('0', 4 - String::FromInt(info.year).Length())); out.OutputString(String::FromInt(info.year).Tail(Math::Min(4, String::FromInt(info.year).Length()))); }
 
+	String		 comment;
+
+	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	comment = info.comment;
+	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				comment = currentConfig->GetStringValue("Tags", "DefaultComment", NIL);
+
 	if (info.track > 0)
 	{
-		{ out.OutputString(info.comment.Head(Math::Min(28, info.comment.Length()))); for (Int i = 0; i < 28 - info.comment.Length(); i++) out.OutputNumber(0, 1); }
+		{ out.OutputString(comment.Head(Math::Min(28, comment.Length()))); for (Int i = 0; i < 28 - comment.Length(); i++) out.OutputNumber(0, 1); }
 
 		out.OutputNumber(0, 1);
 		out.OutputNumber(info.track, 1);
 	}
 	else
 	{
-		{ out.OutputString(info.comment.Head(Math::Min(30, info.comment.Length()))); for (Int i = 0; i < 30 - info.comment.Length(); i++) out.OutputNumber(0, 1); }
+		{ out.OutputString(comment.Head(Math::Min(30, comment.Length()))); for (Int i = 0; i < 30 - comment.Length(); i++) out.OutputNumber(0, 1); }
 	}
 
 	out.OutputNumber(GetID3CategoryID(info.genre), 1);

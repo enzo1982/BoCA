@@ -15,8 +15,6 @@ BoCA::ConfigureMAC::ConfigureMAC()
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
 
-	enable_tags = config->GetIntValue("MAC", "EnableTags", 1);
-
 	group_compression	= new GroupBox(i18n->TranslateString("Compression"), Point(7, 11), Size(203, 39));
 
 	text_compression	= new Text(i18n->TranslateString("Compression mode:"), Point(9, 13));
@@ -32,16 +30,9 @@ BoCA::ConfigureMAC::ConfigureMAC()
 	group_compression->Add(text_compression);
 	group_compression->Add(combo_compression);
 
-	group_tag		= new GroupBox(i18n->TranslateString("Tags"), Point(7, 59), Size(203, 39));
-
-	check_tag		= new CheckBox(i18n->TranslateString("Write APE tags"), Point(10, 12), Size(183, 0), &enable_tags);
-
-	group_tag->Add(check_tag);
-
 	Add(group_compression);
-	Add(group_tag);
 
-	SetSize(Size(217, 108));
+	SetSize(Size(217, 57));
 }
 
 BoCA::ConfigureMAC::~ConfigureMAC()
@@ -49,8 +40,6 @@ BoCA::ConfigureMAC::~ConfigureMAC()
 	DeleteObject(group_compression);
 	DeleteObject(text_compression);
 	DeleteObject(combo_compression);
-	DeleteObject(group_tag);
-	DeleteObject(check_tag);
 }
 
 Int BoCA::ConfigureMAC::SaveSettings()
@@ -58,7 +47,6 @@ Int BoCA::ConfigureMAC::SaveSettings()
 	Config	*config = Config::Get();
 
 	config->SetIntValue("MAC", "CompressionMode", combo_compression->GetSelectedEntryNumber());
-	config->SetIntValue("MAC", "EnableTags", enable_tags);
 
 	return Success();
 }

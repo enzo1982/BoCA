@@ -58,17 +58,17 @@ Void smooth::AttachDLL(Void *instance)
 
 	GetVersionExA(&vInfo);
 
-	if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->cdrip_ntscsi = False;
+	if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->SetIntValue("CDRip", "UseNTSCSI", False);
 
-	error = ex_CR_Init(config->cdrip_ntscsi);
+	error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
 
 	if (error != CDEX_OK		 && 
 	    error != CDEX_ACCESSDENIED	 &&
 	    vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
 	{
-		config->cdrip_ntscsi = !config->cdrip_ntscsi;
+		config->SetIntValue("CDRip", "UseNTSCSI", !config->GetIntValue("CDRip", "UseNTSCSI", True));
 
-		error = ex_CR_Init(config->cdrip_ntscsi);
+		error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
 	}
 
 	if	(error == CDEX_ACCESSDENIED)	BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
@@ -100,6 +100,12 @@ Void smooth::DetachDLL()
 
 	FreeCDRipDLL();
 }
+
+BoCA::CDPlayerIni	 BoCA::CDRipIn::cdPlayer;
+Int			 BoCA::CDRipIn::cdPlayerDiscID	= -1;
+
+BoCA::CDText		 BoCA::CDRipIn::cdText;
+Int			 BoCA::CDRipIn::cdTextDiscID	= -1;
 
 Bool BoCA::CDRipIn::CanOpenStream(const String &streamURI)
 {
@@ -223,6 +229,28 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 	info.disc	= 1;
 	info.numDiscs	= 1;
 
+	/* Read CDText and cdplayer.ini
+	 */
+	{
+		Int	 discid = ComputeDiscID();
+
+		if (config->GetIntValue("CDRip", "ReadCDText", True)	  && cdTextDiscID   != discid) { cdText.ReadCDText();   cdTextDiscID   = discid; }
+		if (config->GetIntValue("CDRip", "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(); cdPlayerDiscID = discid; }
+
+		if (config->GetIntValue("CDRip", "ReadCDText", True) && cdText.GetCDText().Get(trackNumber) != NIL)
+		{
+			info.artist = cdText.GetCDText().Get(0);
+			info.title  = cdText.GetCDText().Get(trackNumber);
+			info.album  = cdText.GetCDText().Get(100);
+		}
+		else if (config->GetIntValue("CDRip", "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().Get(trackNumber) != NIL)
+		{
+			info.artist = cdPlayer.GetCDInfo().Get(0);
+			info.title  = cdPlayer.GetCDInfo().Get(trackNumber);
+			info.album  = cdPlayer.GetCDInfo().Get(100);
+		}
+	}
+
 	/* Fill MCDI data.
 	 */
 	{
@@ -243,6 +271,23 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 			info.mcdi[4 + 8 * i + 3] = 0;
 
 			((unsigned long *) (UnsignedByte *) info.mcdi)[1 + 2 * i + 1] = htonl(entry.dwStartSector);
+		}
+	}
+
+	/* Read ISRC if requested.
+	 */
+	if (config->GetIntValue("CDRip", "ReadISRC", 0))
+	{
+		ISRC	 data;
+
+		ex_CR_ReadAndGetISRC(&data, track.cdTrack);
+
+		/* Check if the ISRC is valid.
+		 */
+		if (data.isrc[0] >= 'A' && data.isrc[0] <= 'Z' &&
+		    data.isrc[1] >= 'A' && data.isrc[1] <= 'Z')
+		{
+			info.isrc = data.isrc;
 		}
 	}
 
@@ -356,7 +401,7 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 
 		ex_CR_SetCDROMParameters(&params);
 
-		if (config->cdrip_locktray) ex_CR_LockCD(true);
+		if (config->GetIntValue("CDRip", "LockTray", True)) ex_CR_LockCD(True);
 
 		ex_CR_OpenRipper(&dataBufferSize, startSector, endSector);
 
@@ -372,10 +417,40 @@ Bool BoCA::CDRipIn::CloseRipper()
 	{
 		ex_CR_CloseRipper();
 
-		if (Config::Get()->cdrip_locktray) ex_CR_LockCD(false);
+		if (Config::Get()->GetIntValue("CDRip", "LockTray", True)) ex_CR_LockCD(False);
 
 		ripperOpen = False;
 	}
 
 	return True;
+}
+
+int cddb_sum(int n)
+{
+	int	 ret = 0;
+
+	while (n > 0)
+	{
+		ret = ret + (n % 10);
+		n = n / 10;
+	}
+
+	return ret;
+}
+
+Int BoCA::CDRipIn::ComputeDiscID()
+{
+	Int	 numTocEntries = ex_CR_GetNumTocEntries();
+	Int	 n = 0;
+
+	for (Int i = 0; i < numTocEntries; i++)
+	{
+		Int	 offset = ex_CR_GetTocEntry(i).dwStartSector + 150;
+
+		n += cddb_sum(offset / 75);
+	}
+
+	Int	 t = ex_CR_GetTocEntry(numTocEntries).dwStartSector / 75 - ex_CR_GetTocEntry(0).dwStartSector / 75;
+
+	return ((n % 0xff) << 24 | t << 8 | numTocEntries);
 }

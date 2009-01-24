@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -10,24 +10,25 @@
 
 #include "dllinterface.h"
 
-CR_INIT				 ex_CR_Init				= NIL;
-CR_DEINIT			 ex_CR_DeInit				= NIL;
-CR_READTOC			 ex_CR_ReadToc				= NIL;
-CR_GETNUMTOCENTRIES		 ex_CR_GetNumTocEntries			= NIL;
-CR_GETTOCENTRY			 ex_CR_GetTocEntry			= NIL;
-CR_OPENRIPPER			 ex_CR_OpenRipper			= NIL;
-CR_CLOSERIPPER			 ex_CR_CloseRipper			= NIL;
-CR_RIPCHUNK			 ex_CR_RipChunk				= NIL;
-CR_GETNUMCDROM			 ex_CR_GetNumCDROM			= NIL;
-CR_GETACTIVECDROM		 ex_CR_GetActiveCDROM			= NIL;
-CR_SETACTIVECDROM		 ex_CR_SetActiveCDROM			= NIL;
-CR_GETCDROMPARAMETERS		 ex_CR_GetCDROMParameters		= NIL;
-CR_SETCDROMPARAMETERS		 ex_CR_SetCDROMParameters		= NIL;
-CR_GETNUMBEROFJITTERERRORS	 ex_CR_GetNumberOfJitterErrors		= NIL;
-CR_GETNUMBEROFC2ERRORS		 ex_CR_GetNumberOfC2Errors		= NIL;
-CR_LOCKCD			 ex_CR_LockCD				= NIL;
-CR_EJECTCD			 ex_CR_EjectCD				= NIL;
-CR_READCDTEXT			 ex_CR_ReadCDText			= NIL;
+CR_INIT				 ex_CR_Init			= NIL;
+CR_DEINIT			 ex_CR_DeInit			= NIL;
+CR_READTOC			 ex_CR_ReadToc			= NIL;
+CR_GETNUMTOCENTRIES		 ex_CR_GetNumTocEntries		= NIL;
+CR_GETTOCENTRY			 ex_CR_GetTocEntry		= NIL;
+CR_OPENRIPPER			 ex_CR_OpenRipper		= NIL;
+CR_CLOSERIPPER			 ex_CR_CloseRipper		= NIL;
+CR_RIPCHUNK			 ex_CR_RipChunk			= NIL;
+CR_GETNUMCDROM			 ex_CR_GetNumCDROM		= NIL;
+CR_GETACTIVECDROM		 ex_CR_GetActiveCDROM		= NIL;
+CR_SETACTIVECDROM		 ex_CR_SetActiveCDROM		= NIL;
+CR_GETCDROMPARAMETERS		 ex_CR_GetCDROMParameters	= NIL;
+CR_SETCDROMPARAMETERS		 ex_CR_SetCDROMParameters	= NIL;
+CR_GETNUMBEROFJITTERERRORS	 ex_CR_GetNumberOfJitterErrors	= NIL;
+CR_GETNUMBEROFC2ERRORS		 ex_CR_GetNumberOfC2Errors	= NIL;
+CR_LOCKCD			 ex_CR_LockCD			= NIL;
+CR_EJECTCD			 ex_CR_EjectCD			= NIL;
+CR_READCDTEXT			 ex_CR_ReadCDText		= NIL;
+CR_READANDGETISRC		 ex_CR_ReadAndGetISRC		= NIL;
 
 DynamicLoader *cdripdll	= NIL;
 
@@ -53,6 +54,7 @@ Bool LoadCDRipDLL()
 	ex_CR_LockCD			= (CR_LOCKCD) cdripdll->GetFunctionAddress("CR_LockCD");
 	ex_CR_EjectCD			= (CR_EJECTCD) cdripdll->GetFunctionAddress("CR_EjectCD");
 	ex_CR_ReadCDText		= (CR_READCDTEXT) cdripdll->GetFunctionAddress("CR_ReadCDText");
+	ex_CR_ReadAndGetISRC		= (CR_READANDGETISRC) cdripdll->GetFunctionAddress("CR_ReadAndGetISRC");
 
 	if (ex_CR_Init				== NIL ||
 	    ex_CR_DeInit			== NIL ||
@@ -71,7 +73,8 @@ Bool LoadCDRipDLL()
 	    ex_CR_GetNumberOfC2Errors		== NIL ||
 	    ex_CR_LockCD			== NIL ||
 	    ex_CR_EjectCD			== NIL ||
-	    ex_CR_ReadCDText			== NIL) { FreeCDRipDLL(); return False; }
+	    ex_CR_ReadCDText			== NIL ||
+	    ex_CR_ReadAndGetISRC		== NIL) { FreeCDRipDLL(); return False; }
 
 	return True;
 }

@@ -8,34 +8,25 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca/common/communication/menu.h>
+#include <smooth.h>
 
-BoCA::Menu *BoCA::Menu::instance = NIL;
+using namespace smooth;
 
-BoCA::Menu::Menu()
+namespace BoCA
 {
-}
-
-BoCA::Menu::~Menu()
-{
-}
-
-BoCA::Menu *BoCA::Menu::Get()
-{
-	if (instance == NIL)
+	class CDPlayerIni
 	{
-		instance = new Menu();
-	}
+		private:
+			Array<String>		 cdInfo;
 
-	return instance;
-}
+			String			 DiscIDToString(Int);
+		public:
+						 CDPlayerIni();
+						~CDPlayerIni();
 
-Void BoCA::Menu::Free()
-{
-	if (instance != NIL)
-	{
-		delete instance;
+			Int			 ReadCDInfo();
+			Int			 ClearCDInfo();
 
-		instance = NIL;
-	}
-}
+			const Array<String>	&GetCDInfo();
+	};
+};

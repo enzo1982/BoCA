@@ -127,8 +127,8 @@ Bool BoCA::VorbisOut::Activate()
 		 * An empty tag containing only the vendor string
 		 * is rendered if Vorbis comments are disabled.
 		 */
-		if ((info.artist != NIL || info.title != NIL) && config->enable_vctags) track.RenderVorbisComment(vcBuffer, vendor);
-		else									Track().RenderVorbisComment(vcBuffer, vendor);
+		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True)) track.RenderVorbisComment(vcBuffer, vendor);
+		else													   Track().RenderVorbisComment(vcBuffer, vendor);
 
 		vcBuffer.Resize(vcBuffer.Size() + 8);
 

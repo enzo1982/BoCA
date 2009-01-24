@@ -13,6 +13,17 @@
 
 using namespace smooth::IO;
 
+const char *INFO_BAND		= (char *) "Band/orchestra/accompaniment";
+const char *INFO_PERFORMER	= (char *) "Conductor/performer refinement";
+const char *INFO_REMIX		= (char *) "Interpreted, remixed or otherwise modified by";
+const char *INFO_COMPOSER	= (char *) "Composer";
+const char *INFO_LYRICIST	= (char *) "Lyricist/Text writer";
+
+const char *INFO_ORIG_ARTIST	= (char *) "Original artist(s)/performer(s)";
+const char *INFO_ORIG_ALBUM	= (char *) "Original album/movie/show title";
+const char *INFO_ORIG_LYRICIST	= (char *) "Original lyricist(s)/text writer(s)";
+const char *INFO_ORIG_YEAR	= (char *) "Original release year";
+
 const String	 BoCA::TagID3v2::genres[148] =
       { "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz",
 	"Metal", "New Age", "Oldies", "Other", "Pop", "R&B", "Rap", "Reggae", "Rock", "Techno",
@@ -82,12 +93,30 @@ Int BoCA::TagID3v2::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 		{ frames.Add(ex_ID3Frame_NewID(ID3FID_PARTINSET)); SetFrameString(frames.GetLast(), discString); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 	}
 
-	if	(info.comment != NIL && !currentConfig->replace_comments) { frames.Add(ex_ID3Frame_NewID(ID3FID_COMMENT)); SetFrameString(frames.GetLast(), info.comment);		     ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-	else if (currentConfig->default_comment != NIL)			  { frames.Add(ex_ID3Frame_NewID(ID3FID_COMMENT)); SetFrameString(frames.GetLast(), currentConfig->default_comment); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ frames.Add(ex_ID3Frame_NewID(ID3FID_COMMENT)); SetFrameString(frames.GetLast(), info.comment);						 ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				{ frames.Add(ex_ID3Frame_NewID(ID3FID_COMMENT)); SetFrameString(frames.GetLast(), currentConfig->GetStringValue("Tags", "DefaultComment", NIL)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+
+	/* Save other text info.
+	 */
+	for (Int i = 0; i < info.other.Length(); i++)
+	{
+		String	 value = info.other.GetNth(i);
+
+		if	(value.StartsWith(String(INFO_BAND).Append(":")))	   { frames.Add(ex_ID3Frame_NewID(ID3FID_BAND));	 SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_PERFORMER).Append(":")))	   { frames.Add(ex_ID3Frame_NewID(ID3FID_CONDUCTOR));	 SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_REMIX).Append(":")))	   { frames.Add(ex_ID3Frame_NewID(ID3FID_MIXARTIST));	 SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	   { frames.Add(ex_ID3Frame_NewID(ID3FID_COMPOSER));	 SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   { frames.Add(ex_ID3Frame_NewID(ID3FID_LYRICIST));	 SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+
+		else if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))   { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGARTIST));	 SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))    { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGALBUM));	 SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_ORIG_LYRICIST).Append(":"))) { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGLYRICIST)); SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_ORIG_YEAR).Append(":")))	   { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGYEAR));	 SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+	}
 
 	/* Save Replay Gain info.
 	 */
-	if (currentConfig->GetIntValue("Settings", "PreserveReplayGain", 1))
+	if (currentConfig->GetIntValue("Tags", "PreserveReplayGain", True))
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
 		{
@@ -104,7 +133,7 @@ Int BoCA::TagID3v2::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 
 	/* Save CD table of contents.
 	 */
-	if (currentConfig->GetIntValue("Settings", "SaveMCDI", 1))
+	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
 	{
 		if (info.mcdi.Size() > 0)
 		{
@@ -120,7 +149,7 @@ Int BoCA::TagID3v2::Render(const Track &track, Buffer<UnsignedByte> &buffer)
 
 	/* Save cover art.
 	 */
-	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1))
+	if (currentConfig->GetIntValue("Tags", "WriteCoverArt", True) && currentConfig->GetIntValue("Tags", "WriteCoverArtID3v2", True))
 	{
 		foreach (const Picture &picInfo, track.pictures)
 		{
@@ -166,13 +195,25 @@ Int BoCA::TagID3v2::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 	{
 		ID3Frame	*frame = ex_ID3TagIterator_GetNext(iterator);
 
-		if	(ex_ID3Frame_GetID(frame) == ID3FID_LEADARTIST)	info.artist	= GetFrameString(frame);
-		else if (ex_ID3Frame_GetID(frame) == ID3FID_TITLE)	info.title	= GetFrameString(frame);
-		else if (ex_ID3Frame_GetID(frame) == ID3FID_ALBUM)	info.album	= GetFrameString(frame);
-		else if (ex_ID3Frame_GetID(frame) == ID3FID_YEAR)	info.year	= GetFrameString(frame).ToInt();
-		else if (ex_ID3Frame_GetID(frame) == ID3FID_COMMENT)	info.comment	= GetFrameString(frame);
-		else if (ex_ID3Frame_GetID(frame) == ID3FID_PUBLISHER)	info.label	= GetFrameString(frame);
-		else if (ex_ID3Frame_GetID(frame) == ID3FID_ISRC)	info.isrc	= GetFrameString(frame);
+		if	(ex_ID3Frame_GetID(frame) == ID3FID_LEADARTIST)	  info.artist	= GetFrameString(frame);
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_TITLE)	  info.title	= GetFrameString(frame);
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_ALBUM)	  info.album	= GetFrameString(frame);
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_YEAR)	  info.year	= GetFrameString(frame).ToInt();
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_COMMENT)	  info.comment	= GetFrameString(frame);
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_PUBLISHER)	  info.label	= GetFrameString(frame);
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_ISRC)	  info.isrc	= GetFrameString(frame);
+
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_BAND)	  info.other.Add(String(INFO_BAND).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_CONDUCTOR)	  info.other.Add(String(INFO_PERFORMER).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_MIXARTIST)	  info.other.Add(String(INFO_REMIX).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_COMPOSER)	  info.other.Add(String(INFO_COMPOSER).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_LYRICIST)	  info.other.Add(String(INFO_LYRICIST).Append(":").Append(GetFrameString(frame)));
+
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_ORIGARTIST)	  info.other.Add(String(INFO_ORIG_ARTIST).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_ORIGALBUM)	  info.other.Add(String(INFO_ORIG_ALBUM).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_ORIGLYRICIST) info.other.Add(String(INFO_ORIG_LYRICIST).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_ORIGYEAR)	  info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append(GetFrameString(frame)));
+
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_TRACKNUM)
 		{
 			String	 trackString = GetFrameString(frame);
@@ -403,7 +444,7 @@ Int BoCA::TagID3v2::SetFrameString(ID3Frame *frame, const String &text, const St
 	leBOM[0] = 0xFEFF;
 
 	ID3_TextEnc	 encoding = ID3TE_NONE;
-	String		 encString = Config::Get()->id3v2_encoding;
+	String		 encString = Config::Get()->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
 
 	if	(encString == "UTF-8")		encoding = ID3TE_UTF8;
 	else if (encString == "ISO-8859-1")	encoding = ID3TE_ISO8859_1;

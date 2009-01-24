@@ -130,8 +130,8 @@ Bool BoCA::TwinVQOut::Activate()
 		if	(info.artist != NIL) strncpy(setupInfo.Auth, info.artist, Math::Min(info.artist.Length(), 1024));
 		if	(info.title  != NIL) strncpy(setupInfo.Name, info.title,  Math::Min(info.title.Length(),  1024));
 
-		if	(info.comment != NIL && !config->replace_comments) strncpy(setupInfo.Comt, info.comment,		   Math::Min(info.comment.Length(),		      1024));
-		else if (currentConfig->default_comment != NIL)		   strncpy(setupInfo.Comt, currentConfig->default_comment, Math::Min(currentConfig->default_comment.Length(), 1024));
+		if	(info.comment != NIL && !config->GetIntValue("Tags", "ReplaceExistingComments", False)) strncpy(setupInfo.Comt, info.comment,						      Math::Min(info.comment.Length(),						       1024));
+		else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)			strncpy(setupInfo.Comt, currentConfig->GetStringValue("Tags", "DefaultComment", NIL), Math::Min(currentConfig->GetStringValue("Tags", "DefaultComment", NIL).Length(), 1024));
 	}
 
 	encInfo.N_CAN_GLOBAL = config->GetIntValue("TwinVQ", "PreselectionCandidates", 32); // number of VQ pre-selection candidates

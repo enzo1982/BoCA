@@ -10,6 +10,9 @@
 
 #include <boca.h>
 
+#include "info/cdtext.h"
+#include "info/cdplayerini.h"
+
 BoCA_BEGIN_COMPONENT(CDRipIn)
 
 namespace BoCA
@@ -17,9 +20,17 @@ namespace BoCA
 	class CDRipIn : public CS::DecoderComponent
 	{
 		private:
+			static CDText		 cdText;
+			static Int		 cdTextDiscID;
+
+			static CDPlayerIni	 cdPlayer;
+			static Int		 cdPlayerDiscID;
+
 			Bool			 ripperOpen;
 
 			Int			 dataBufferSize;
+
+			Int			 ComputeDiscID();
 
 			Bool			 OpenRipper(Int, Int);
 			Bool			 CloseRipper();

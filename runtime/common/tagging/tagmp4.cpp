@@ -41,7 +41,7 @@ Int BoCA::TagMP4::Render(const Track &track, const String &fileName)
 		mp4File = ex_MP4Modify(fileName, 0, 0);
 	}
 
-	char	*prevOutFormat = String::SetOutputFormat(currentConfig->mp4meta_encoding);
+	char	*prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "MP4MetadataEncoding", "UTF-8"));
 
 	if	(info.artist != NIL) ex_MP4SetMetadataArtist(mp4File, info.artist);
 	if	(info.title  != NIL) ex_MP4SetMetadataName(mp4File, info.title);
@@ -50,10 +50,10 @@ Int BoCA::TagMP4::Render(const Track &track, const String &fileName)
 	if	(info.year    >   0) ex_MP4SetMetadataYear(mp4File, String::FromInt(info.year));
 	if	(info.genre  != NIL) ex_MP4SetMetadataGenre(mp4File, info.genre);
 
-	if	(info.comment != NIL && !currentConfig->replace_comments) ex_MP4SetMetadataComment(mp4File, info.comment);
-	else if (currentConfig->default_comment != NIL)			  ex_MP4SetMetadataComment(mp4File, currentConfig->default_comment);
+	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	ex_MP4SetMetadataComment(mp4File, info.comment);
+	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				ex_MP4SetMetadataComment(mp4File, currentConfig->GetStringValue("Tags", "DefaultComment", NIL));
 
-	if (currentConfig->GetIntValue("Settings", "CopyPictureTags", 1))
+	if (currentConfig->GetIntValue("Tags", "WriteCoverArt", True) && currentConfig->GetIntValue("Tags", "WriteCoverArtMP4Metadata", True))
 	{
 		/* Copy only the first picture. The MP4v2 API doesn't
 		 * currently support multiple pictures in a file.

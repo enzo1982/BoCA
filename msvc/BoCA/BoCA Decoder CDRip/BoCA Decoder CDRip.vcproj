@@ -186,6 +186,18 @@
 				RelativePath="..\..\..\components\decoder\cdrip\dllinterface.cpp"
 				>
 			</File>
+			<Filter
+				Name="info"
+				>
+				<File
+					RelativePath="..\..\..\components\decoder\cdrip\info\cdplayerini.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\decoder\cdrip\info\cdtext.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -200,6 +212,18 @@
 				RelativePath="..\..\..\components\decoder\cdrip\dllinterface.h"
 				>
 			</File>
+			<Filter
+				Name="info"
+				>
+				<File
+					RelativePath="..\..\..\components\decoder\cdrip\info\cdplayerini.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\decoder\cdrip\info\cdtext.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Ressourcendateien"

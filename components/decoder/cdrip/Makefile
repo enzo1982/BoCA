@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = cdrip_in.o dllinterface.o
+OBJECTS	  = cdrip_in.o dllinterface.o info/cdplayerini.o info/cdtext.o
 
 # Enter additional library dependencies here
 LIBS	  = -lws2_32

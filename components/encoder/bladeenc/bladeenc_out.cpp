@@ -117,7 +117,7 @@ Bool BoCA::BladeOut::Activate()
 
 	packageSize = samplesSize * (format.bits / 8);
 
-	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v2 && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
 		Int			 size = track.RenderID3v2Tag(id3Buffer);
@@ -141,7 +141,7 @@ Bool BoCA::BladeOut::Deactivate()
 
 	ex_beCloseStream(handle);
 
-	if ((info.artist != NIL || info.title != NIL) && config->enable_id3v1 && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v1", False) && config->enable_id3)
 	{
 		Buffer<unsigned char>	 id3Buffer;
 		Int			 size = track.RenderID3v1Tag(id3Buffer);

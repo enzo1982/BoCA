@@ -26,9 +26,14 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	layer_basic	= new LayerTagBasic();
 	layer_basic->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
 
-	layer_advanced	= new LayerTagAdvanced();
+	layer_details	= new LayerTagDetails();
+	layer_details->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
 
 	tab_mode->Add(layer_basic);
+	tab_mode->Add(layer_details);
+
+	layer_advanced	= new LayerTagAdvanced();
+
 	tab_mode->Add(layer_advanced);
 
 	Add(text_tracks);
@@ -40,6 +45,9 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 
 	onSelectTrack.Connect(&LayerTagBasic::OnSelectTrack, layer_basic);
 	onSelectNone.Connect(&LayerTagBasic::OnSelectNone, layer_basic);
+
+	onSelectTrack.Connect(&LayerTagDetails::OnSelectTrack, layer_details);
+	onSelectNone.Connect(&LayerTagDetails::OnSelectNone, layer_details);
 
 	onSelectTrack.Connect(&LayerTagAdvanced::OnSelectTrack, layer_advanced);
 	onSelectNone.Connect(&LayerTagAdvanced::OnSelectNone, layer_advanced);
@@ -63,6 +71,8 @@ BoCA::LayerTags::~LayerTags()
 	DeleteObject(tab_mode);
 
 	DeleteObject(layer_basic);
+	DeleteObject(layer_details);
+
 	DeleteObject(layer_advanced);
 }
 

@@ -154,7 +154,7 @@ Bool BoCA::FAACOut::Activate()
 
 	if (!config->GetIntValue("FAAC", "MP4Container", 1))
 	{
-		if ((info.artist != NIL || info.title != NIL) && config->enable_id3v2 && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
+		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
 		{
 			Buffer<unsigned char>	 id3Buffer;
 			Int			 size = track.RenderID3v2Tag(id3Buffer);
@@ -203,7 +203,7 @@ Bool BoCA::FAACOut::Deactivate()
 	{
 		ex_MP4Close(mp4File);
 
-		if (config->enable_mp4meta)
+		if (config->GetIntValue("Tags", "EnableMP4Metadata", True))
 		{
 			if (info.artist != NIL || info.title != NIL) track.RenderMP4Meta(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
 		}
