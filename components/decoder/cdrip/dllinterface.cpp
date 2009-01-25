@@ -19,14 +19,10 @@ CR_OPENRIPPER			 ex_CR_OpenRipper		= NIL;
 CR_CLOSERIPPER			 ex_CR_CloseRipper		= NIL;
 CR_RIPCHUNK			 ex_CR_RipChunk			= NIL;
 CR_GETNUMCDROM			 ex_CR_GetNumCDROM		= NIL;
-CR_GETACTIVECDROM		 ex_CR_GetActiveCDROM		= NIL;
 CR_SETACTIVECDROM		 ex_CR_SetActiveCDROM		= NIL;
 CR_GETCDROMPARAMETERS		 ex_CR_GetCDROMParameters	= NIL;
 CR_SETCDROMPARAMETERS		 ex_CR_SetCDROMParameters	= NIL;
-CR_GETNUMBEROFJITTERERRORS	 ex_CR_GetNumberOfJitterErrors	= NIL;
-CR_GETNUMBEROFC2ERRORS		 ex_CR_GetNumberOfC2Errors	= NIL;
 CR_LOCKCD			 ex_CR_LockCD			= NIL;
-CR_EJECTCD			 ex_CR_EjectCD			= NIL;
 CR_READCDTEXT			 ex_CR_ReadCDText		= NIL;
 CR_READANDGETISRC		 ex_CR_ReadAndGetISRC		= NIL;
 
@@ -45,14 +41,10 @@ Bool LoadCDRipDLL()
 	ex_CR_CloseRipper		= (CR_CLOSERIPPER) cdripdll->GetFunctionAddress("CR_CloseRipper");
 	ex_CR_RipChunk			= (CR_RIPCHUNK) cdripdll->GetFunctionAddress("CR_RipChunk");
 	ex_CR_GetNumCDROM		= (CR_GETNUMCDROM) cdripdll->GetFunctionAddress("CR_GetNumCDROM");
-	ex_CR_GetActiveCDROM		= (CR_GETACTIVECDROM) cdripdll->GetFunctionAddress("CR_GetActiveCDROM");
 	ex_CR_SetActiveCDROM		= (CR_SETACTIVECDROM) cdripdll->GetFunctionAddress("CR_SetActiveCDROM");
 	ex_CR_GetCDROMParameters	= (CR_GETCDROMPARAMETERS) cdripdll->GetFunctionAddress("CR_GetCDROMParameters");
 	ex_CR_SetCDROMParameters	= (CR_SETCDROMPARAMETERS) cdripdll->GetFunctionAddress("CR_SetCDROMParameters");
-	ex_CR_GetNumberOfJitterErrors	= (CR_GETNUMBEROFJITTERERRORS) cdripdll->GetFunctionAddress("CR_GetNumberOfJitterErrors");
-	ex_CR_GetNumberOfC2Errors	= (CR_GETNUMBEROFC2ERRORS) cdripdll->GetFunctionAddress("CR_GetNumberOfC2Errors");
 	ex_CR_LockCD			= (CR_LOCKCD) cdripdll->GetFunctionAddress("CR_LockCD");
-	ex_CR_EjectCD			= (CR_EJECTCD) cdripdll->GetFunctionAddress("CR_EjectCD");
 	ex_CR_ReadCDText		= (CR_READCDTEXT) cdripdll->GetFunctionAddress("CR_ReadCDText");
 	ex_CR_ReadAndGetISRC		= (CR_READANDGETISRC) cdripdll->GetFunctionAddress("CR_ReadAndGetISRC");
 
@@ -65,14 +57,10 @@ Bool LoadCDRipDLL()
 	    ex_CR_CloseRipper			== NIL ||
 	    ex_CR_RipChunk			== NIL ||
 	    ex_CR_GetNumCDROM			== NIL ||
-	    ex_CR_GetActiveCDROM		== NIL ||
 	    ex_CR_SetActiveCDROM		== NIL ||
 	    ex_CR_GetCDROMParameters		== NIL ||
 	    ex_CR_SetCDROMParameters		== NIL ||
-	    ex_CR_GetNumberOfJitterErrors	== NIL ||
-	    ex_CR_GetNumberOfC2Errors		== NIL ||
 	    ex_CR_LockCD			== NIL ||
-	    ex_CR_EjectCD			== NIL ||
 	    ex_CR_ReadCDText			== NIL ||
 	    ex_CR_ReadAndGetISRC		== NIL) { FreeCDRipDLL(); return False; }
 

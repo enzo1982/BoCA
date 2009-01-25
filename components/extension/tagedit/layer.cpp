@@ -20,7 +20,7 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	list_tracks->AddTab(I18n::Get()->TranslateString("Length"), 80, OR_RIGHT);
 	list_tracks->AddTab(I18n::Get()->TranslateString("Size"), 80, OR_RIGHT);
 
-	tab_mode	= new TabWidget(Point(7, 288), Size(300, 280));
+	tab_mode	= new TabWidget(Point(7, 226), Size(300, 218));
 	tab_mode->SetOrientation(OR_LOWERLEFT);
 
 	layer_basic	= new LayerTagBasic();
@@ -29,12 +29,16 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	layer_details	= new LayerTagDetails();
 	layer_details->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
 
+	layer_other	= new LayerTagOther();
+	layer_other->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
+
 	tab_mode->Add(layer_basic);
 	tab_mode->Add(layer_details);
+	tab_mode->Add(layer_other);
 
 	layer_advanced	= new LayerTagAdvanced();
 
-	tab_mode->Add(layer_advanced);
+//	tab_mode->Add(layer_advanced);
 
 	Add(text_tracks);
 	Add(list_tracks);
@@ -49,8 +53,11 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	onSelectTrack.Connect(&LayerTagDetails::OnSelectTrack, layer_details);
 	onSelectNone.Connect(&LayerTagDetails::OnSelectNone, layer_details);
 
-	onSelectTrack.Connect(&LayerTagAdvanced::OnSelectTrack, layer_advanced);
-	onSelectNone.Connect(&LayerTagAdvanced::OnSelectNone, layer_advanced);
+	onSelectTrack.Connect(&LayerTagOther::OnSelectTrack, layer_other);
+	onSelectNone.Connect(&LayerTagOther::OnSelectNone, layer_other);
+
+//	onSelectTrack.Connect(&LayerTagAdvanced::OnSelectTrack, layer_advanced);
+//	onSelectNone.Connect(&LayerTagAdvanced::OnSelectNone, layer_advanced);
 
 	JobList::Get()->onApplicationAddTrack.Connect(&LayerTags::OnApplicationAddTrack, this);
 	JobList::Get()->onApplicationModifyTrack.Connect(&LayerTags::OnApplicationModifyTrack, this);
@@ -72,6 +79,7 @@ BoCA::LayerTags::~LayerTags()
 
 	DeleteObject(layer_basic);
 	DeleteObject(layer_details);
+	DeleteObject(layer_other);
 
 	DeleteObject(layer_advanced);
 }
@@ -84,7 +92,7 @@ Void BoCA::LayerTags::OnChangeSize(const Size &nSize)
 	Rect	 clientRect = Rect(GetPosition(), GetSize());
 	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
-	list_tracks->SetSize(Size(clientSize.cx - 15, clientSize.cy - 320));
+	list_tracks->SetSize(Size(clientSize.cx - 15, clientSize.cy - 258));
 	tab_mode->SetWidth(clientSize.cx - 15);
 }
 
@@ -176,7 +184,7 @@ Void BoCA::LayerTags::OnApplicationRemoveTrack(const Track &track)
 		}
 	}
 
-	if (list_tracks->Length() == 0) onSelectNone.Emit();
+	if (list_tracks->GetSelectedEntry() == NIL || list_tracks->Length() == 0) onSelectNone.Emit();
 }
 
 /* Called when a track is selected in the application joblist.

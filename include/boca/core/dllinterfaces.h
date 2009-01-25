@@ -15,7 +15,7 @@
 
 #include "3rdparty/id3.h"
 #include "3rdparty/mp4v2/mp4v2.h"
-#include "3rdparty/vorbis/vorbisenc.h"
+#include "3rdparty/ogg/ogg.h"
 
 using namespace smooth;
 using namespace smooth::System;

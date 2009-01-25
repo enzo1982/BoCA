@@ -14,11 +14,11 @@
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
-BoCA::LayerTagBasic::LayerTagBasic() : Layer("Basic")
+BoCA::LayerTagBasic::LayerTagBasic() : Layer("Info")
 {
 	I18n	*i18n = I18n::Get();
 
-	group_info		= new GroupBox("Title info", Point(7, 10), Size(400, 178));
+	group_info		= new GroupBox("Title information", Point(7, 10), Size(400, 178));
 
 	text_artist		= new Text(String(i18n->TranslateString("Artist")).Append(":"), Point(9, 13));
 	text_title		= new Text(String(i18n->TranslateString("Title")).Append(":"), text_artist->GetPosition() + Point(0, 27));

@@ -1,6 +1,6 @@
  /* CDRip Ripping Library
   * Copyright (C) 1999-2002 Albert L. Faber
-  * Portions Copyright (C) 2002-2006 Robert Kausch <robert.kausch@cdrip.org>
+  * Portions Copyright (C) 2002-2009 Robert Kausch <robert.kausch@cdrip.org>
   *  
   * This program is free software; you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by

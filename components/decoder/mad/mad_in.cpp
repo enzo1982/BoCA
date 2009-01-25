@@ -128,8 +128,8 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (Config::Get()->enable_id3)
 	{
-		if (track.ParseID3v2Tag(streamURI) != Success())
-		    track.ParseID3v1Tag(streamURI);
+		if (!track.ParseID3v2Tag(streamURI))
+		     track.ParseID3v1Tag(streamURI);
 	}
 
 	return Success();

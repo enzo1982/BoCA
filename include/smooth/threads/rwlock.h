@@ -35,6 +35,8 @@ namespace smooth
 				Bool			 writeLocked;
 				Int			 readLocks;
 
+				Mutex			*readLockMutex;
+
 				Mutex			*exclusiveAccessMutex;
 				Semaphore		*sharedAccessSemaphore;
 			public:

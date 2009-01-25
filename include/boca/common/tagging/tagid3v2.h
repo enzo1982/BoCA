@@ -28,6 +28,9 @@ namespace BoCA
 			String			 GetFrameString(ID3Frame *, String & = dummyString);
 			Int			 SetFrameString(ID3Frame *, const String &, const String & = NIL);
 
+			String			 GetFrameURL(ID3Frame *);
+			Int			 SetFrameURL(ID3Frame *, const String &);
+
 			const String		&GetID3CategoryName(Int);
 		public:
 						 TagID3v2();

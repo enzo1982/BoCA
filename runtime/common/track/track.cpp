@@ -115,12 +115,12 @@ Int BoCA::Track::RenderID3v1Tag(Buffer<UnsignedByte> &buffer)
 
 Bool BoCA::Track::ParseID3v1Tag(const Buffer<UnsignedByte> &buffer)
 {
-	return TagID3v1().Parse(buffer, this);
+	return TagID3v1().Parse(buffer, this) == Success();
 }
 
 Bool BoCA::Track::ParseID3v1Tag(const String &fileName)
 {
-	return TagID3v1().Parse(fileName, this);
+	return TagID3v1().Parse(fileName, this) == Success();
 }
 
 Int BoCA::Track::RenderID3v2Tag(Buffer<UnsignedByte> &buffer)
@@ -130,12 +130,12 @@ Int BoCA::Track::RenderID3v2Tag(Buffer<UnsignedByte> &buffer)
 
 Bool BoCA::Track::ParseID3v2Tag(const Buffer<UnsignedByte> &buffer)
 {
-	return TagID3v2().Parse(buffer, this);
+	return TagID3v2().Parse(buffer, this) == Success();
 }
 
 Bool BoCA::Track::ParseID3v2Tag(const String &fileName)
 {
-	return TagID3v2().Parse(fileName, this);
+	return TagID3v2().Parse(fileName, this) == Success();
 }
 
 Int BoCA::Track::RenderAPETag(Buffer<UnsignedByte> &buffer)
@@ -145,22 +145,22 @@ Int BoCA::Track::RenderAPETag(Buffer<UnsignedByte> &buffer)
 
 Bool BoCA::Track::ParseAPETag(const Buffer<UnsignedByte> &buffer)
 {
-	return TagAPE().Parse(buffer, this);
+	return TagAPE().Parse(buffer, this) == Success();
 }
 
 Bool BoCA::Track::ParseAPETag(const String &fileName)
 {
-	return TagAPE().Parse(fileName, this);
+	return TagAPE().Parse(fileName, this) == Success();
 }
 
 Bool BoCA::Track::RenderMP4Meta(const String &fileName)
 {
-	return TagMP4().Render(*this, fileName);
+	return TagMP4().Render(*this, fileName) == Success();
 }
 
 Bool BoCA::Track::ParseMP4Meta(const String &fileName)
 {
-	return TagMP4().Parse(fileName, this);
+	return TagMP4().Parse(fileName, this) == Success();
 }
 
 Int BoCA::Track::RenderVorbisComment(Buffer<UnsignedByte> &buffer, const String &vendorString)
@@ -170,5 +170,5 @@ Int BoCA::Track::RenderVorbisComment(Buffer<UnsignedByte> &buffer, const String 
 
 Bool BoCA::Track::ParseVorbisComment(const Buffer<UnsignedByte> &buffer)
 {
-	return TagVorbis().Parse(buffer, this);
+	return TagVorbis().Parse(buffer, this) == Success();
 }

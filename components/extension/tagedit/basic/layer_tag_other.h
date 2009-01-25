@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_TAGEDIT_LAYER_TAG_DETAILS_
-#define _H_TAGEDIT_LAYER_TAG_DETAILS_
+#ifndef _H_TAGEDIT_LAYER_TAG_OTHER_
+#define _H_TAGEDIT_LAYER_TAG_OTHER_
 
 #include <smooth.h>
 #include <boca.h>
@@ -21,33 +21,42 @@ using namespace BoCA;
 
 namespace BoCA
 {
-	class LayerTagDetails : public Layer
+	class LayerTagOther : public Layer
 	{
 		private:
-			GroupBox			*group_details;
+			GroupBox			*group_original;
 
-			Text				*text_band;
-			EditBox				*edit_band;
+			Text				*text_oartist;
+			EditBox				*edit_oartist;
 
-			Text				*text_conductor;
-			EditBox				*edit_conductor;
+			Text				*text_oalbum;
+			EditBox				*edit_oalbum;
 
-			Text				*text_remix;
-			EditBox				*edit_remix;
+			Text				*text_otextwriter;
+			EditBox				*edit_otextwriter;
 
-			Text				*text_composer;
-			EditBox				*edit_composer;
+			Text				*text_oyear;
+			EditBox				*edit_oyear;
 
-			Text				*text_textwriter;
-			EditBox				*edit_textwriter;
+			GroupBox			*group_web;
 
-			GroupBox			*group_publisher;
+			Text				*text_wartist;
+			EditBox				*edit_wartist;
 
-			Text				*text_publisher;
-			EditBox				*edit_publisher;
+			Text				*text_wpublisher;
+			EditBox				*edit_wpublisher;
 
-			Text				*text_isrc;
-			EditBox				*edit_isrc;
+			Text				*text_wradio;
+			EditBox				*edit_wradio;
+
+			Text				*text_wsource;
+			EditBox				*edit_wsource;
+
+			Text				*text_wcopyright;
+			EditBox				*edit_wcopyright;
+
+			Text				*text_wcommercial;
+			EditBox				*edit_wcommercial;
 
 			Track				 track;
 		signals:
@@ -60,8 +69,8 @@ namespace BoCA
 
 			Void				 OnModifyTrack();
 		public:
-							 LayerTagDetails();
-							~LayerTagDetails();
+							 LayerTagOther();
+							~LayerTagOther();
 	};
 };
 
