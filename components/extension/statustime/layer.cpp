@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -27,6 +27,8 @@ BoCA::LayerLengthStatus::LayerLengthStatus()
 	JobList::Get()->onApplicationRemoveTrack.Connect(&LayerLengthStatus::OnApplicationRemoveTrack, this);
 	JobList::Get()->onApplicationMarkTrack.Connect(&LayerLengthStatus::OnApplicationMarkTrack, this);
 	JobList::Get()->onApplicationUnmarkTrack.Connect(&LayerLengthStatus::OnApplicationUnmarkTrack, this);
+
+	JobList::Get()->onApplicationRemoveAllTracks.Connect(&LayerLengthStatus::OnApplicationRemoveAllTracks, this);
 }
 
 BoCA::LayerLengthStatus::~LayerLengthStatus()
@@ -35,6 +37,8 @@ BoCA::LayerLengthStatus::~LayerLengthStatus()
 	JobList::Get()->onApplicationRemoveTrack.Disconnect(&LayerLengthStatus::OnApplicationRemoveTrack, this);
 	JobList::Get()->onApplicationMarkTrack.Disconnect(&LayerLengthStatus::OnApplicationMarkTrack, this);
 	JobList::Get()->onApplicationUnmarkTrack.Disconnect(&LayerLengthStatus::OnApplicationUnmarkTrack, this);
+
+	JobList::Get()->onApplicationRemoveAllTracks.Disconnect(&LayerLengthStatus::OnApplicationRemoveAllTracks, this);
 
 	DeleteObject(display_selected);
 	DeleteObject(display_unselected);
@@ -186,6 +190,19 @@ Void BoCA::LayerLengthStatus::OnApplicationUnmarkTrack(const Track &track)
 			break;
 		}
 	}
+
+	UpdateLengthDisplays();
+}
+
+/* Called when all track are removed from the application joblist at once.
+ * ----
+ * Clears all internal arrays.
+ */
+Void BoCA::LayerLengthStatus::OnApplicationRemoveAllTracks()
+{
+	tracks.RemoveAll();
+	tracks_selected.RemoveAll();
+	tracks_unselected.RemoveAll();
 
 	UpdateLengthDisplays();
 }

@@ -52,6 +52,8 @@ namespace BoCA
 			Signal1<Void, const Track &>	 onApplicationRemoveTrack;
 			Signal1<Void, const Track &>	 onApplicationSelectTrack;
 
+			Signal0<Void>			 onApplicationRemoveAllTracks;
+
 			Signal1<Void, const Track &>	 onApplicationMarkTrack;
 			Signal1<Void, const Track &>	 onApplicationUnmarkTrack;
 

@@ -51,6 +51,8 @@ namespace BoCA
 			Void				 OnApplicationRemoveTrack(const Track &);
 			Void				 OnApplicationSelectTrack(const Track &);
 
+			Void				 OnApplicationRemoveAllTracks();
+
 			Void				 OnSelectTrack();
 			Void				 OnModifyTrack(const Track &);
 

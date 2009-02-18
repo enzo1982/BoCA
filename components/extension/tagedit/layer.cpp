@@ -63,6 +63,8 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	JobList::Get()->onApplicationModifyTrack.Connect(&LayerTags::OnApplicationModifyTrack, this);
 	JobList::Get()->onApplicationRemoveTrack.Connect(&LayerTags::OnApplicationRemoveTrack, this);
 	JobList::Get()->onApplicationSelectTrack.Connect(&LayerTags::OnApplicationSelectTrack, this);
+
+	JobList::Get()->onApplicationRemoveAllTracks.Connect(&LayerTags::OnApplicationRemoveAllTracks, this);
 }
 
 BoCA::LayerTags::~LayerTags()
@@ -71,6 +73,8 @@ BoCA::LayerTags::~LayerTags()
 	JobList::Get()->onApplicationModifyTrack.Disconnect(&LayerTags::OnApplicationModifyTrack, this);
 	JobList::Get()->onApplicationRemoveTrack.Disconnect(&LayerTags::OnApplicationRemoveTrack, this);
 	JobList::Get()->onApplicationSelectTrack.Disconnect(&LayerTags::OnApplicationSelectTrack, this);
+
+	JobList::Get()->onApplicationRemoveAllTracks.Disconnect(&LayerTags::OnApplicationRemoveAllTracks, this);
 
 	DeleteObject(text_tracks);
 	DeleteObject(list_tracks);
@@ -202,4 +206,17 @@ Void BoCA::LayerTags::OnApplicationSelectTrack(const Track &track)
 			break;
 		}
 	}
+}
+
+/* Called when all tracks are removed from the application joblist at once.
+ * ----
+ * Clears tracks and list_tracks.
+ */
+Void BoCA::LayerTags::OnApplicationRemoveAllTracks()
+{
+	tracks.RemoveAll();
+
+	list_tracks->RemoveAllEntries();
+
+	onSelectNone.Emit();
 }

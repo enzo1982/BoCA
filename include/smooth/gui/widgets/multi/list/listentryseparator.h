@@ -8,36 +8,36 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_POPUPMENU_ENTRY_OPTION_
-#define _H_OBJSMOOTH_POPUPMENU_ENTRY_OPTION_
+#ifndef _H_OBJSMOOTH_LISTENTRYSEPARATOR_
+#define _H_OBJSMOOTH_LISTENTRYSEPARATOR_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class PopupMenuEntryOption;
+		class ListEntrySeparator;
 	};
 };
 
-#include "popupmenuentry.h"
+#include "listentry.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI PopupMenuEntryOption : public PopupMenuEntry
+		class SMOOTHAPI ListEntrySeparator : public ListEntry
 		{
 			public:
 				static const Int	 classID;
 
-							 PopupMenuEntryOption(const String &, Int *, Int);
-				virtual			~PopupMenuEntryOption();
+							 ListEntrySeparator();
+				virtual			~ListEntrySeparator();
 
 				virtual Int		 Paint(Int);
 
+				virtual String		 ToString() const	{ return "a ListEntrySeparator"; }
+
 				virtual Bool		 IsTypeCompatible(Int) const;
-			slots:
-				Void			 OnClickEntry();
 		};
 	};
 };

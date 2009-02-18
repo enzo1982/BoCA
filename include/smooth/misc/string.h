@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -77,6 +77,10 @@ namespace smooth
 			Int			 Find(const char *) const;
 			Int			 Find(const wchar_t *) const;
 			Int			 Find(const String &) const;
+
+			Int			 FindLast(const char *) const;
+			Int			 FindLast(const wchar_t *) const;
+			Int			 FindLast(const String &) const;
 
 			String			&Replace(const char *, const char *);
 			String			&Replace(const wchar_t *, const wchar_t *);

@@ -141,7 +141,7 @@ Bool BoCA::FLACIn::Deactivate()
 
 Int BoCA::FLACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	if (decoderThread->GetStatus() != THREAD_RUNNING) return -1;
+	if (decoderThread->GetStatus() != THREAD_RUNNING && samplesBuffer.Size() <= 0) return -1;
 
 	readDataMutex->Release();
 
