@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,7 +14,6 @@
 #include "arrayentry.h"
 #include "../buffer.h"
 #include "../../threads/rwlock.h"
-#include "../../misc/math.h"
 
 #include <memory.h>
 
@@ -108,7 +107,7 @@ namespace smooth
 
 				if (greatestIndex < index) greatestIndex = index;
 
-				if (entries.Size() == nOfEntries) entries.Resize(Math::Max(8, nOfEntries * 2));
+				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 2 ? 8 : nOfEntries * 2);
 
 				ArrayEntry<s>	*entry = new ArrayEntry<s>(value);
 
@@ -152,7 +151,7 @@ namespace smooth
 
 				if (greatestIndex < index) greatestIndex = index;
 
-				if (entries.Size() == nOfEntries) entries.Resize(Math::Max(8, nOfEntries * 2));
+				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 2 ? 8 : nOfEntries * 2);
 
 				memmove(entries + position + 1, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s> *));
 

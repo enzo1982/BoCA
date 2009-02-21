@@ -69,6 +69,11 @@ namespace BoCA
 			Signal1<Void, const Track &>	 onComponentModifyTrack;
 			Signal1<Void, const Track &>	 onComponentRemoveTrack;
 			Signal1<Void, const Track &>	 onComponentSelectTrack;
+
+			/* Callbacks that can be called by components to request
+			 * the corresponding action to be performed.
+			 */
+			Callback0<Bool>			 doRemoveAllTracks;
 	};
 };
 
