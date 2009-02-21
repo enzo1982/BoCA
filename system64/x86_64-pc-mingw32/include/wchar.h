@@ -50,9 +50,16 @@ extern "C" {
 #ifdef _WIN64
   _CRTIMP FILE *__cdecl __iob_func(void);
 #else
+#ifdef _MSVCRT_
+extern FILE _iob[];	/* A pointer to an array of FILE */
+#define __iob_func()	(_iob)
+#else
 extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
 #define __iob_func()	(*_imp___iob)
+#define _iob __iob_func()
 #endif
+#endif
+
 #define _iob __iob_func()
 #endif
 
@@ -78,7 +85,8 @@ extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
     wchar_t name[260];
   };
 
-#if _INTEGRAL_MAX_BITS >= 64
+/* #if _INTEGRAL_MAX_BITS >= 64 */
+
   struct _wfinddata32i64_t {
     unsigned attrib;
     __time32_t time_create;
@@ -105,7 +113,7 @@ extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
     __int64 size;
     wchar_t name[260];
   };
-#endif
+/* #endif */
 
 #ifdef _USE_32BIT_TIME_T
 #define _wfinddata_t _wfinddata32_t
@@ -148,12 +156,20 @@ extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
 
 #ifndef __PCTYPE_FUNC
 #define __PCTYPE_FUNC __pctype_func()
+#ifdef _MSVCRT_
+#define __pctype_func() (_pctype)
+#else
 #define __pctype_func() (*_imp___pctype)
+#endif
 #endif
 
 #ifndef _pctype
+#ifdef _MSVCRT_
+  extern unsigned short *_pctype;
+#else
   extern unsigned short **_imp___pctype;
 #define _pctype (*_imp___pctype)
+#endif
 #endif
 #endif
 #endif
@@ -162,15 +178,27 @@ extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
 #define _CRT_WCTYPEDATA_DEFINED
 #ifndef _CTYPE_DISABLE_MACROS
 #ifndef _wctype
+#ifdef _MSVCRT_
+  extern unsigned short *_wctype;
+#else
   extern unsigned short **_imp___wctype;
 #define _wctype (*_imp___wctype)
 #endif
+#endif
 
+#ifdef _MSVCRT_
+#define __pwctype_func() (_pwctype)
+#else
 #define __pwctype_func() (*_imp___pwctype)
+#endif
 
 #ifndef _pwctype
+#ifdef _MSVCRT_
+  extern unsigned short *_pwctype;
+#else
   extern unsigned short **_imp___pwctype;
 #define _pwctype (*_imp___pwctype)
+#endif
 #endif
 
 #endif

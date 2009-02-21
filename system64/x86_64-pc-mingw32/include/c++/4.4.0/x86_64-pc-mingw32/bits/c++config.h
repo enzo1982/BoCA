@@ -37,7 +37,7 @@
 #define _GLIBCXX_CXX_CONFIG_H 1
 
 // The current version of the C++ library in compressed ISO date format.
-#define __GLIBCXX__ 20080812 
+#define __GLIBCXX__ 20090110 
 
 // Macros for visibility.
 // _GLIBCXX_HAVE_ATTRIBUTE_VISIBILITY
@@ -271,6 +271,34 @@ namespace std
 # define _GLIBCXX_WEAK_DEFINITION
 #endif
 
+// Assert.
+// Avoid the use of assert, because we're trying to keep the <cassert>
+// include out of the mix.
+#if !defined(_GLIBCXX_DEBUG) && !defined(_GLIBCXX_PARALLEL)
+#define __glibcxx_assert(_Condition)
+#else
+_GLIBCXX_BEGIN_NAMESPACE(std)
+  // Avoid the use of assert, because we're trying to keep the <cassert>
+  // include out of the mix.
+  inline void
+  __replacement_assert(const char* __file, int __line, 
+		       const char* __function, const char* __condition)
+  {
+    __builtin_printf("%s:%d: %s: Assertion '%s' failed.\n", __file, __line,
+		     __function, __condition);
+    __builtin_abort();
+  }
+_GLIBCXX_END_NAMESPACE
+
+#define __glibcxx_assert(_Condition)                               	\
+  do 								        \
+  {							      		\
+    if (! (_Condition))                                                 \
+      std::__replacement_assert(__FILE__, __LINE__, 			\
+				__PRETTY_FUNCTION__, #_Condition);	\
+  } while (false)
+#endif
+
 // The remainder of the prewritten config is automatic; all the
 // user hooks are listed above.
 
@@ -306,6 +334,9 @@ namespace std
 
 /* Define to 1 if you have the `asinl' function. */
 /* #undef _GLIBCXX_HAVE_ASINL */
+
+/* Define to 1 if the target assembler supports .symver directive. */
+/* #undef _GLIBCXX_HAVE_AS_SYMVER_DIRECTIVE */
 
 /* Define to 1 if you have the `atan2f' function. */
 /* #undef _GLIBCXX_HAVE_ATAN2F */
@@ -654,7 +685,7 @@ namespace std
 /* #undef _GLIBCXX_HAVE_SYS_FILIO_H */
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
-/* #undef _GLIBCXX_HAVE_SYS_IOCTL_H */
+#define _GLIBCXX_HAVE_SYS_IOCTL_H 1
 
 /* Define to 1 if you have the <sys/ipc.h> header file. */
 /* #undef _GLIBCXX_HAVE_SYS_IPC_H */
@@ -666,7 +697,7 @@ namespace std
 /* #undef _GLIBCXX_HAVE_SYS_MACHINE_H */
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-/* #undef _GLIBCXX_HAVE_SYS_PARAM_H */
+#define _GLIBCXX_HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
 /* #undef _GLIBCXX_HAVE_SYS_RESOURCE_H */
@@ -678,7 +709,7 @@ namespace std
 #define _GLIBCXX_HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/time.h> header file. */
-/* #undef _GLIBCXX_HAVE_SYS_TIME_H */
+#define _GLIBCXX_HAVE_SYS_TIME_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define _GLIBCXX_HAVE_SYS_TYPES_H 1
@@ -690,7 +721,7 @@ namespace std
 /* #undef _GLIBCXX_HAVE_S_IFREG */
 
 /* Define if S_IFREG is available in <sys/stat.h>. */
-/* #undef _GLIBCXX_HAVE_S_ISREG */
+#define _GLIBCXX_HAVE_S_ISREG 1
 
 /* Define to 1 if you have the `tanf' function. */
 /* #undef _GLIBCXX_HAVE_TANF */
@@ -706,6 +737,9 @@ namespace std
 
 /* Define to 1 if you have the <tgmath.h> header file. */
 #define _GLIBCXX_HAVE_TGMATH_H 1
+
+/* Define to 1 if you have the <time.h> header file. */
+#define _GLIBCXX_HAVE_TIME_H 1
 
 /* Define to 1 if the target supports thread-local storage. */
 /* #undef _GLIBCXX_HAVE_TLS */
@@ -926,48 +960,6 @@ namespace std
 /* Define to 1 if you have the `_tanl' function. */
 /* #undef _GLIBCXX_HAVE__TANL */
 
-/* Define if the compiler/host combination has __builtin_abs. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_ABS */
-
-/* Define if the compiler/host combination has __builtin_cos. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_COS */
-
-/* Define if the compiler/host combination has __builtin_cosf. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_COSF */
-
-/* Define if the compiler/host combination has __builtin_cosl. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_COSL */
-
-/* Define if the compiler/host combination has __builtin_fabs. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_FABS */
-
-/* Define if the compiler/host combination has __builtin_fabsf. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_FABSF */
-
-/* Define if the compiler/host combination has __builtin_fabsl. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_FABSL */
-
-/* Define if the compiler/host combination has __builtin_labs. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_LABS */
-
-/* Define if the compiler/host combination has __builtin_sin. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_SIN */
-
-/* Define if the compiler/host combination has __builtin_sinf. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_SINF */
-
-/* Define if the compiler/host combination has __builtin_sinl. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_SINL */
-
-/* Define if the compiler/host combination has __builtin_sqrt. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_SQRT */
-
-/* Define if the compiler/host combination has __builtin_sqrtf. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_SQRTF */
-
-/* Define if the compiler/host combination has __builtin_sqrtl. */
-/* #undef _GLIBCXX_HAVE___BUILTIN_SQRTL */
-
 /* Define to 1 if you have the `__signbit' function. */
 #define _GLIBCXX_HAVE___SIGNBIT 1
 
@@ -1026,14 +1018,25 @@ namespace std
 /* Define if builtin atomic operations for bool are supported on this host. */
 #define _GLIBCXX_ATOMIC_BUILTINS_1 1
 
+/* Define if builtin atomic operations for short are supported on this host.
+   */
+#define _GLIBCXX_ATOMIC_BUILTINS_2 1
+
 /* Define if builtin atomic operations for int are supported on this host. */
 #define _GLIBCXX_ATOMIC_BUILTINS_4 1
+
+/* Define if builtin atomic operations for long long are supported on this
+   host. */
+#define _GLIBCXX_ATOMIC_BUILTINS_8 1
 
 /* Define to use concept checking code from the boost libraries. */
 /* #undef _GLIBCXX_CONCEPT_CHECKS */
 
 /* Define if a fully dynamic basic_string is wanted. */
 /* #undef _GLIBCXX_FULLY_DYNAMIC_STRING */
+
+/* Define if gthreads library is available. */
+/* #undef _GLIBCXX_HAS_GTHREADS */
 
 /* Define to 1 if a full hosted library is built, or 0 if freestanding. */
 #define _GLIBCXX_HOSTED 1
@@ -1093,6 +1096,10 @@ namespace std
    <tr1/cinttypes> in namespace std::tr1. */
 #define _GLIBCXX_USE_C99_INTTYPES_TR1 1
 
+/* Define if wchar_t C99 functions in <inttypes.h> should be imported in
+   <tr1/cinttypes> in namespace std::tr1. */
+#define _GLIBCXX_USE_C99_INTTYPES_WCHAR_T_TR1 1
+
 /* Define if C99 functions or macros in <math.h> should be imported in <cmath>
    in namespace std. */
 /* #undef _GLIBCXX_USE_C99_MATH */
@@ -1112,7 +1119,7 @@ namespace std
 /* #undef _GLIBCXX_USE_CLOCK_REALTIME */
 
 /* Defined if gettimeofday is available. */
-/* #undef _GLIBCXX_USE_GETTIMEOFDAY */
+#define _GLIBCXX_USE_GETTIMEOFDAY 1
 
 /* Define if LFS support is available. */
 /* #undef _GLIBCXX_USE_LFS */
@@ -1120,15 +1127,15 @@ namespace std
 /* Define if code specialized for long long should be used. */
 #define _GLIBCXX_USE_LONG_LONG 1
 
+/* Defined if nanosleep is available. */
+/* #undef _GLIBCXX_USE_NANOSLEEP */
+
 /* Define if NLS translations are to be used. */
 /* #undef _GLIBCXX_USE_NLS */
 
-/* Define if dev/random and dev/urandom are available for the random_device of
-   TR1 (Chapter 5.1). */
+/* Define if /dev/random and /dev/urandom are available for the random_device
+   of TR1 (Chapter 5.1). */
 /* #undef _GLIBCXX_USE_RANDOM_TR1 */
-
-/* Define if standard layout types are supported in C++200x. */
-/* #undef _GLIBCXX_USE_STANDARD_LAYOUT */
 
 /* Define if code specialized for wchar_t should be used. */
 #define _GLIBCXX_USE_WCHAR_T 1

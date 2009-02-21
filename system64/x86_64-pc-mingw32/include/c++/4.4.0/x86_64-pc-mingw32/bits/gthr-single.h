@@ -216,7 +216,7 @@ __gthread_active_p (void)
 }
 
 static inline int 
-__gthread_once (__gthread_once_t *once _GLIBCXX_UNUSED, void (*func) () _GLIBCXX_UNUSED)
+__gthread_once (__gthread_once_t *once _GLIBCXX_UNUSED, void (*func) (void) _GLIBCXX_UNUSED)
 {
   return 0;
 }

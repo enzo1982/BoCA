@@ -1,6 +1,6 @@
 // Specific definitions for mingw32 platform  -*- C++ -*-
 
-// Copyright (C) 2007 Free Software Foundation, Inc.
+// Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
 // software; you can redistribute it and/or modify it under the
@@ -41,10 +41,9 @@
 
 _GLIBCXX_BEGIN_NAMESPACE(std)
 
-namespace posix_error {
 // Most of the commented-out error codes are socket-related and could be
 // replaced by Winsock WSA-prefixed equivalents.
-  enum posix_errno
+  enum class errc
     {
 //    address_family_not_supported = 		EAFNOSUPPORT,
 //    address_in_use = 				EADDRINUSE,
@@ -120,13 +119,11 @@ namespace posix_error {
 //    timed_out = 				ETIMEDOUT,
       too_many_files_open_in_system = 		ENFILE,
       too_many_files_open = 			EMFILE,
-      too_many_links = 				EMLINK,
- //   too_many_synbolic_link_levels = 		ELOOP,
+      too_many_links = 				EMLINK
+ //   too_many_symbolic_link_levels = 		ELOOP,
  //   value_too_large = 			EOVERFLOW,
- //   wrong_protocol_type = 			EPROTOTYPE,
-      no_posix_equivalent = 1L << 16
+ //   wrong_protocol_type = 			EPROTOTYPE
    };
-}
 
 _GLIBCXX_END_NAMESPACE
 

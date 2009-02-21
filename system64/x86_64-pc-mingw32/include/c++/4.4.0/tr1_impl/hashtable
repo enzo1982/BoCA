@@ -149,6 +149,8 @@ _GLIBCXX_BEGIN_NAMESPACE_TR1
       // hasher, if present, comes from _Hash_code_base.
       typedef typename _Allocator::difference_type        difference_type;
       typedef typename _Allocator::size_type              size_type;
+      typedef typename _Allocator::pointer                pointer;
+      typedef typename _Allocator::const_pointer          const_pointer;
       typedef typename _Allocator::reference              reference;
       typedef typename _Allocator::const_reference        const_reference;
       
@@ -294,7 +296,7 @@ _GLIBCXX_BEGIN_NAMESPACE_TR1
 
       size_type
       max_size() const
-      { return _M_get_Value_allocator().max_size(); }
+      { return _M_node_allocator.max_size(); }
 
       // Observers
       key_equal
@@ -482,7 +484,11 @@ _GLIBCXX_BEGIN_NAMESPACE_TR1
       _Node* __n = _M_node_allocator.allocate(1);
       try
 	{
+#ifdef _GLIBCXX_INCLUDE_AS_CXX0X
+	  _M_node_allocator.construct(__n, __v);
+#else
 	  _M_get_Value_allocator().construct(&__n->_M_v, __v);
+#endif
 	  __n->_M_next = 0;
 	  return __n;
 	}
@@ -502,7 +508,11 @@ _GLIBCXX_BEGIN_NAMESPACE_TR1
 	       _H1, _H2, _Hash, _RehashPolicy, __chc, __cit, __uk>::
     _M_deallocate_node(_Node* __n)
     {
+#ifdef _GLIBCXX_INCLUDE_AS_CXX0X
+      _M_node_allocator.destroy(__n);
+#else
       _M_get_Value_allocator().destroy(&__n->_M_v);
+#endif
       _M_node_allocator.deallocate(__n, 1);
     }
 

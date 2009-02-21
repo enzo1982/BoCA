@@ -1,6 +1,6 @@
 // C++ includes used for precompiling extensions -*- C++ -*-
 
-// Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+// Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
 // software; you can redistribute it and/or modify it under the
@@ -37,8 +37,10 @@
 #include <ext/array_allocator.h>
 #include <ext/atomicity.h>
 #include <ext/bitmap_allocator.h>
+#include <ext/cast.h>
 #include <ext/concurrence.h>
 #include <ext/debug_allocator.h>
+#include <ext/extptr_allocator.h>
 #include <ext/functional>
 #include <ext/iterator>
 #include <ext/malloc_allocator.h>
@@ -47,6 +49,7 @@
 #include <ext/new_allocator.h>
 #include <ext/numeric>
 #include <ext/pod_char_traits.h>
+#include <ext/pointer.h>
 #include <ext/pool_allocator.h>
 #include <ext/rb_tree>
 #include <ext/rope>

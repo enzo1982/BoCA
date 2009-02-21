@@ -40,32 +40,26 @@
 # include <c++0x_warning.h>
 #else
 
+#include <chrono>
 #include <mutex> // unique_lock
+
+#if defined(_GLIBCXX_HAS_GTHREADS) && defined(_GLIBCXX_USE_C99_STDINT_TR1)
 
 namespace std 
 {
-  namespace chrono
-  {
-    template<typename _Rep, typename _Period>
-      struct duration;
-
-    template<typename _Clock, typename _Duration>
-      struct time_point;
-  }
-
   /// condition_variable
   class condition_variable
   {
-  public:
+    typedef chrono::system_clock __clock_t;
 
-#if __GTHREAD_HAS_COND
-    typedef __gthread_cond_t native_handle_type;
-#else
-    typedef int native_handle_type;
-#endif
+  public:
+    typedef __gthread_cond_t* native_handle_type;
 
     condition_variable();
     ~condition_variable();
+
+    condition_variable(const condition_variable&) = delete;
+    condition_variable& operator=(const condition_variable&) = delete;
 
     void 
     notify_one();
@@ -84,35 +78,82 @@ namespace std
 	  wait(__lock);
       }
   
-    template<typename _Clock, typename _Duration>
+    template<typename _Duration>
       bool 
-      wait_until(unique_lock<mutex>& __lock, 
-		 const chrono::time_point<_Clock, _Duration>& __atime);
+      wait_until(unique_lock<mutex>& __lock,
+		 const chrono::time_point<__clock_t, _Duration>& __atime)
+      { return __wait_until_impl(__lock, __atime); }
+
+    template<typename _Clock, typename _Duration>
+      bool
+      wait_until(unique_lock<mutex>& __lock,
+		 const chrono::time_point<_Clock, _Duration>& __atime)
+      {
+	// DR 887 - Sync unknown clock to known clock.
+	typename _Clock::time_point __c_entry = _Clock::now();
+	__clock_t::time_point __s_entry = __clock_t::now();
+	chrono::nanoseconds __delta = __atime - __c_entry;	
+	__clock_t::time_point __s_atime = __s_entry + __delta;
+
+	return __wait_until_impl(__lock, __s_atime);
+      }
 
     template<typename _Clock, typename _Duration, typename _Predicate>
       bool
       wait_until(unique_lock<mutex>& __lock,
 		 const chrono::time_point<_Clock, _Duration>& __atime,
-		 _Predicate __p);
+		 _Predicate __p)
+      {
+	while(!__p())
+	  if(!wait_until(__lock, __atime))
+	    return __p();
+	
+	return true;
+      }
 
     template<typename _Rep, typename _Period>
       bool
       wait_for(unique_lock<mutex>& __lock,
-	       const chrono::duration<_Rep, _Period>& __rtime);
+	       const chrono::duration<_Rep, _Period>& __rtime)
+      { return wait_until(__lock, __clock_t::now() + __rtime); }
 
     template<typename _Rep, typename _Period, typename _Predicate>
       bool
       wait_for(unique_lock<mutex>& __lock,
 	       const chrono::duration<_Rep, _Period>& __rtime,
-	       _Predicate __p);
+	       _Predicate __p)
+      { return wait_until(__lock, __clock_t::now() + __rtime, std::move(__p)); }
 
     native_handle_type 
-    native_handle() { return _M_cond; }
+    native_handle() 
+    { return &_M_cond; }
 
   private:
-    native_handle_type	_M_cond;
-    condition_variable(const condition_variable&);
-    condition_variable& operator=(const condition_variable&);
+    __gthread_cond_t _M_cond;
+    mutex _M_internal_mutex;
+
+    template<typename _Clock, typename _Duration>
+      bool
+      __wait_until_impl(unique_lock<mutex>& __lock,
+			const chrono::time_point<_Clock, _Duration>& __atime)
+      {
+	chrono::time_point<__clock_t, chrono::seconds> __s =
+          chrono::time_point_cast<chrono::seconds>(__atime);
+	
+	chrono::nanoseconds __ns =
+          chrono::duration_cast<chrono::nanoseconds>(__atime - __s);
+	
+        __gthread_time_t __ts =
+          {
+            static_cast<std::time_t>(__s.time_since_epoch().count()),
+            static_cast<long>(__ns.count())
+          };
+	
+        __gthread_cond_timedwait(&_M_cond, __lock.mutex()->native_handle(),
+                                 &__ts);
+	
+        return _Clock::now() < __atime;
+      }
   };
 
   /// condition_variable_any
@@ -120,14 +161,13 @@ namespace std
   class condition_variable_any
   {
   public:
-#if __GTHREAD_HAS_COND
-    typedef __gthread_cond_t native_handle_type;
-#else
-    typedef int native_handle_type;
-#endif
+    typedef __gthread_cond_t* native_handle_type;
 
     condition_variable_any();
     ~condition_variable_any();
+    
+    condition_variable_any(const condition_variable_any&) = delete;
+    condition_variable_any& operator=(const condition_variable_any&) = delete;
 
     void 
     notify_one();
@@ -166,15 +206,15 @@ namespace std
 	       const chrono::duration<_Rep, _Period>& __rtime, _Predicate __p);
 
     native_handle_type 
-    native_handle() { return _M_cond; }
+    native_handle()
+    { return &_M_cond; }
 
   private:
-    native_handle_type	_M_cond;
-    condition_variable_any(const condition_variable_any&);
-    condition_variable_any& operator=(const condition_variable_any&);
+    __gthread_cond_t _M_cond;
   };
-
 }
+
+#endif // _GLIBCXX_HAS_GTHREADS && _GLIBCXX_USE_C99_STDINT_TR1
 
 #endif // __GXX_EXPERIMENTAL_CXX0X__
 

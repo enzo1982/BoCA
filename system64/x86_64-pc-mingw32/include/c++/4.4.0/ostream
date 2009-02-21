@@ -45,10 +45,6 @@
 #include <ios>
 #include <bits/ostream_insert.h>
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-# include <system_error>
-#endif
-
 _GLIBCXX_BEGIN_NAMESPACE(std)
 
   // [27.6.2.1] Template class basic_ostream
@@ -379,10 +375,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
    *
    *  Objects of this class are created before all of the standard
    *  inserters are run.  It is responsible for "exception-safe prefix and
-   *  suffix operations."  Additional actions may be added by the
-   *  implementation, and we list them in
-   *  http://gcc.gnu.org/onlinedocs/libstdc++/17_intro/howto.html#5
-   *  under [27.6] notes.
+   *  suffix operations." 
   */
   template <typename _CharT, typename _Traits>
     class basic_ostream<_CharT, _Traits>::sentry
@@ -534,13 +527,6 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
     operator<<(basic_ostream<char, _Traits>& __out, const unsigned char* __s)
     { return (__out << reinterpret_cast<const char*>(__s)); }
   //@}
-
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-  template<typename _CharT, typename _Traits>
-    inline basic_ostream<_CharT, _Traits>&
-    operator<<(basic_ostream<_CharT, _Traits>& __out, const error_code& __e)
-    { return (__out << __e.category().name() << ':' << __e.value()); }
-#endif
 
   // [27.6.2.7] standard basic_ostream manipulators
   /**

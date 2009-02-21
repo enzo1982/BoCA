@@ -12,7 +12,7 @@
 #define MINGW64_VERSION	1.0
 #define MINGW64_VERSION_MAJOR	1
 #define MINGW64_VERSION_MINOR	0
-#define MINGW64_VERSION_STATE	"alpha"
+#define MINGW64_VERSION_STATE	"beta"
 #endif
 
 #ifdef _WIN64
@@ -120,6 +120,12 @@ limitations in handling dllimport attribute.  */
 #define __MINGW_ATTRIB_DEPRECATED
 #endif /* GNUC >= 3.1 */
 
+#if  __MINGW_GNUC_PREREQ (3, 3)
+#define __MINGW_NOTHROW __attribute__ ((__nothrow__))
+#else
+#define __MINGW_NOTHROW
+#endif
+
 #ifndef __MSVCRT_VERSION__
 /*  High byte is the major version, low byte is the minor. */
 # define __MSVCRT_VERSION__ 0x0700
@@ -142,9 +148,7 @@ limitations in handling dllimport attribute.  */
 #define __int32 int
 #define __int64 long long
 #ifdef _WIN64
-
 typedef int __int128 __attribute__ ((mode (TI)));
-
 #endif
 
 #define __ptr32
@@ -376,7 +380,6 @@ extern "C" {
 
 #ifndef _ERRCODE_DEFINED
 #define _ERRCODE_DEFINED
-  typedef int errcode;
   typedef int errno_t;
 #endif
 
@@ -419,14 +422,6 @@ extern "C" {
 
 #ifndef _CRT_ALIGN
 #define _CRT_ALIGN(x) __attribute__ ((aligned(x)))
-#endif
-
-#ifndef _CRTNOALIAS
-#define _CRTNOALIAS
-#endif
-
-#ifndef _CRTRESTRICT
-#define _CRTRESTRICT
 #endif
 
 #ifndef __CRTDECL
@@ -490,8 +485,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#define __crt_typefix(ctype)
 
 #ifndef _CRT_UNUSED
 #define _CRT_UNUSED(x) (void)x

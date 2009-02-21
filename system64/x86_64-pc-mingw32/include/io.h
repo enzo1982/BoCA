@@ -35,7 +35,7 @@ _CRTIMP char* __cdecl _getcwd (char*, int);
     char name[260];
   };
 
-#if _INTEGRAL_MAX_BITS >= 64
+/*#if _INTEGRAL_MAX_BITS >= 64*/
 
   struct _finddata32i64_t {
     unsigned attrib;
@@ -63,7 +63,7 @@ _CRTIMP char* __cdecl _getcwd (char*, int);
     __int64 size;
     char name[260];
   };
-#endif
+/* #endif */
 
 #ifdef _USE_32BIT_TIME_T
 #define _finddata_t _finddata32_t
@@ -102,7 +102,7 @@ _CRTIMP char* __cdecl _getcwd (char*, int);
     wchar_t name[260];
   };
 
-#if _INTEGRAL_MAX_BITS >= 64
+/* #if _INTEGRAL_MAX_BITS >= 64 */
 
   struct _wfinddata32i64_t {
     unsigned attrib;
@@ -130,7 +130,7 @@ _CRTIMP char* __cdecl _getcwd (char*, int);
     __int64 size;
     wchar_t name[260];
   };
-#endif
+/* #endif */
 
 #ifdef _USE_32BIT_TIME_T
 #define _wfinddata_t _wfinddata32_t
@@ -389,7 +389,9 @@ extern "C" {
 
 /* Misc stuff */
 char *getlogin(void);
+#ifdef __USE_MINGW_ALARM
 unsigned int alarm(unsigned int seconds);
+#endif
 
 #ifdef __USE_MINGW_ACCESS
 /*  Old versions of MSVCRT access() just ignored X_OK, while the version

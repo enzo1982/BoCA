@@ -1,7 +1,7 @@
 // Locale support -*- C++ -*-
 
 // Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-// 2006, 2007
+// 2006, 2007, 2008
 // Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
@@ -94,8 +94,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
     {
       static void
       _S_pad(ios_base& __io, _CharT __fill, _CharT* __news,
-	     const _CharT* __olds, const streamsize __newlen,
-	     const streamsize __oldlen);
+	     const _CharT* __olds, streamsize __newlen, streamsize __oldlen);
     };
 
   // Used by both numeric and monetary facets.
@@ -1161,48 +1160,9 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
       }
 
     private:
-
-      void _M_widen_init() const
-      {
-	char __tmp[sizeof(_M_widen)];
-	for (size_t __i = 0; __i < sizeof(_M_widen); ++__i)
-	  __tmp[__i] = __i;
-	do_widen(__tmp, __tmp + sizeof(__tmp), _M_widen);
-
-	_M_widen_ok = 1;
-	// Set _M_widen_ok to 2 if memcpy can't be used.
-	if (__builtin_memcmp(__tmp, _M_widen, sizeof(_M_widen)))
-	  _M_widen_ok = 2;
-      }
-
-      // Fill in the narrowing cache and flag whether all values are
-      // valid or not.  _M_narrow_ok is set to 2 if memcpy can't
-      // be used.
-      void _M_narrow_init() const
-      {
-	char __tmp[sizeof(_M_narrow)];
-	for (size_t __i = 0; __i < sizeof(_M_narrow); ++__i)
-	  __tmp[__i] = __i;
-	do_narrow(__tmp, __tmp + sizeof(__tmp), 0, _M_narrow);
-
-	_M_narrow_ok = 1;
-	if (__builtin_memcmp(__tmp, _M_narrow, sizeof(_M_narrow)))
-	  _M_narrow_ok = 2;
-	else
-	  {
-	    // Deal with the special case of zero: renarrow with a
-	    // different default and compare.
-	    char __c;
-	    do_narrow(__tmp, __tmp + 1, 1, &__c);
-	    if (__c == 1)
-	      _M_narrow_ok = 2;
-	  }
-      }
+      void _M_narrow_init() const;
+      void _M_widen_init() const;
     };
-
-  template<>
-    const ctype<char>&
-    use_facet<ctype<char> >(const locale& __loc);
 
 #ifdef _GLIBCXX_USE_WCHAR_T
   // 22.2.1.3  ctype<wchar_t> specialization
@@ -1505,10 +1465,6 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
       void
       _M_initialize_ctype();
     };
-
-  template<>
-    const ctype<wchar_t>&
-    use_facet<ctype<wchar_t> >(const locale& __loc);
 #endif //_GLIBCXX_USE_WCHAR_T
 
   /// class ctype_byname [22.2.1.2].
@@ -2148,12 +2104,12 @@ _GLIBCXX_BEGIN_LDBL_NAMESPACE
 
       iter_type
       _M_extract_float(iter_type, iter_type, ios_base&, ios_base::iostate&,
-		       string& __xtrc) const;
+		       string&) const;
 
       template<typename _ValueT>
         iter_type
         _M_extract_int(iter_type, iter_type, ios_base&, ios_base::iostate&,
-		       _ValueT& __v) const;
+		       _ValueT&) const;
 
       template<typename _CharT2>
       typename __gnu_cxx::__enable_if<__is_char<_CharT2>::__value, int>::__type
@@ -2211,30 +2167,36 @@ _GLIBCXX_BEGIN_LDBL_NAMESPACE
       virtual iter_type
       do_get(iter_type, iter_type, ios_base&, ios_base::iostate&, bool&) const;
 
+      virtual iter_type
+      do_get(iter_type __beg, iter_type __end, ios_base& __io,
+	     ios_base::iostate& __err, long& __v) const
+      { return _M_extract_int(__beg, __end, __io, __err, __v); }
 
       virtual iter_type
-      do_get(iter_type, iter_type, ios_base&, ios_base::iostate&, long&) const;
+      do_get(iter_type __beg, iter_type __end, ios_base& __io,
+	     ios_base::iostate& __err, unsigned short& __v) const
+      { return _M_extract_int(__beg, __end, __io, __err, __v); }
 
       virtual iter_type
-      do_get(iter_type, iter_type, ios_base&, ios_base::iostate& __err,
-	      unsigned short&) const;
+      do_get(iter_type __beg, iter_type __end, ios_base& __io,
+	     ios_base::iostate& __err, unsigned int& __v) const
+      { return _M_extract_int(__beg, __end, __io, __err, __v); }
 
       virtual iter_type
-      do_get(iter_type, iter_type, ios_base&, ios_base::iostate& __err,
-	     unsigned int&) const;
-
-      virtual iter_type
-      do_get(iter_type, iter_type, ios_base&, ios_base::iostate& __err,
-	     unsigned long&) const;
+      do_get(iter_type __beg, iter_type __end, ios_base& __io,
+	     ios_base::iostate& __err, unsigned long& __v) const
+      { return _M_extract_int(__beg, __end, __io, __err, __v); }
 
 #ifdef _GLIBCXX_USE_LONG_LONG
       virtual iter_type
-      do_get(iter_type, iter_type, ios_base&, ios_base::iostate& __err,
-	     long long&) const;
+      do_get(iter_type __beg, iter_type __end, ios_base& __io,
+	     ios_base::iostate& __err, long long& __v) const
+      { return _M_extract_int(__beg, __end, __io, __err, __v); }	
 
       virtual iter_type
-      do_get(iter_type, iter_type, ios_base&, ios_base::iostate& __err,
-	     unsigned long long&) const;
+      do_get(iter_type __beg, iter_type __end, ios_base& __io,
+	     ios_base::iostate& __err, unsigned long long& __v) const
+      { return _M_extract_int(__beg, __end, __io, __err, __v); }
 #endif
 
       virtual iter_type
@@ -2505,17 +2467,24 @@ _GLIBCXX_BEGIN_LDBL_NAMESPACE
       do_put(iter_type, ios_base&, char_type __fill, bool __v) const;
 
       virtual iter_type
-      do_put(iter_type, ios_base&, char_type __fill, long __v) const;
+      do_put(iter_type __s, ios_base& __io, char_type __fill, long __v) const
+      { return _M_insert_int(__s, __io, __fill, __v); }	
 
       virtual iter_type
-      do_put(iter_type, ios_base&, char_type __fill, unsigned long) const;
+      do_put(iter_type __s, ios_base& __io, char_type __fill,
+	     unsigned long __v) const
+      { return _M_insert_int(__s, __io, __fill, __v); }
 
 #ifdef _GLIBCXX_USE_LONG_LONG
       virtual iter_type
-      do_put(iter_type, ios_base&, char_type __fill, long long __v) const;
+      do_put(iter_type __s, ios_base& __io, char_type __fill,
+	     long long __v) const
+      { return _M_insert_int(__s, __io, __fill, __v); }
 
       virtual iter_type
-      do_put(iter_type, ios_base&, char_type __fill, unsigned long long) const;
+      do_put(iter_type __s, ios_base& __io, char_type __fill,
+	     unsigned long long __v) const
+      { return _M_insert_int(__s, __io, __fill, __v); }
 #endif
 
       virtual iter_type

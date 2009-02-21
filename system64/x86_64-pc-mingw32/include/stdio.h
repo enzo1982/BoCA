@@ -94,10 +94,15 @@ extern "C" {
 #ifdef _WIN64
   _CRTIMP FILE *__cdecl __iob_func(void);
 #else
+#ifdef _MSVCRT_
+extern FILE _iob[];	/* A pointer to an array of FILE */
+#define __iob_func()	(_iob)
+#else
 extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
 #define __iob_func()	(*_imp___iob)
-#endif
 #define _iob __iob_func()
+#endif
+#endif
 #endif
 
 #ifndef _FPOS_T_DEFINED
@@ -272,7 +277,7 @@ extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
   #endif
   _CRTIMP int __cdecl _vscprintf(const char *_Format,va_list _ArgList);
   _CRTIMP int __cdecl _set_printf_count_output(int _Value);
-  _CRTIMP int __cdecl _get_printf_count_output();
+  _CRTIMP int __cdecl _get_printf_count_output(void);
 
 #ifndef _WSTDIO_DEFINED
 

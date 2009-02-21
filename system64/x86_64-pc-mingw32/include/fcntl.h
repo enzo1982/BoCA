@@ -22,6 +22,7 @@
 #define _O_WTEXT 0x10000
 #define _O_U16TEXT 0x20000
 #define _O_U8TEXT 0x40000
+#define _O_ACCMODE (_O_RDONLY|_O_WRONLY|_O_RDWR)
 
 #define _O_RAW _O_BINARY
 #define _O_NOINHERIT 0x0080
@@ -46,5 +47,6 @@
 #define O_NOINHERIT _O_NOINHERIT
 #define O_SEQUENTIAL _O_SEQUENTIAL
 #define O_RANDOM _O_RANDOM
+#define O_ACCMODE _O_ACCMODE
 #endif
 #endif

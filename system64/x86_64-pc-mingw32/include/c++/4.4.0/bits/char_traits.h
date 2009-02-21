@@ -87,7 +87,7 @@ _GLIBCXX_BEGIN_NAMESPACE(__gnu_cxx)
    *  may not be specialized for fundamental types, but classes in
    *  namespace __gnu_cxx may be.
    *
-   *  See http://gcc.gnu.org/onlinedocs/libstdc++/21_strings/howto.html#5
+   *  See http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt05ch13s03.html
    *  for advice on how to make use of this class for "unusual" character
    *  types. Also, check out include/ext/pod_char_traits.h.  
    */
@@ -228,7 +228,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
    *  __gnu_cxx::char_traits, it is possible to achieve a more
    *  appropriate definition by specializing __gnu_cxx::char_traits.
    *
-   *  See http://gcc.gnu.org/onlinedocs/libstdc++/21_strings/howto.html#5
+   *  See http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt05ch13s03.html
    *  for advice on how to make use of this class for "unusual" character
    *  types. Also, check out include/ext/pod_char_traits.h.
   */
@@ -298,7 +298,8 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
       { return __c1 == __c2; }
 
       static int_type
-      eof() { return static_cast<int_type>(_CHAR_TRAITS_EOF); }
+      eof()
+      { return static_cast<int_type>(_CHAR_TRAITS_EOF); }
 
       static int_type
       not_eof(const int_type& __c)
@@ -354,17 +355,20 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
       { return wmemset(__s, __a, __n); }
 
       static char_type
-      to_char_type(const int_type& __c) { return char_type(__c); }
+      to_char_type(const int_type& __c)
+      { return char_type(__c); }
 
       static int_type
-      to_int_type(const char_type& __c) { return int_type(__c); }
+      to_int_type(const char_type& __c)
+      { return int_type(__c); }
 
       static bool
       eq_int_type(const int_type& __c1, const int_type& __c2)
       { return __c1 == __c2; }
 
       static int_type
-      eof() { return static_cast<int_type>(WEOF); }
+      eof()
+      { return static_cast<int_type>(WEOF); }
 
       static int_type
       not_eof(const int_type& __c)
@@ -374,6 +378,203 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
 
 _GLIBCXX_END_NAMESPACE
 
+#if (defined(__GXX_EXPERIMENTAL_CXX0X__) \
+     && defined(_GLIBCXX_USE_C99_STDINT_TR1))
+
+#include <cstdint>
+
+_GLIBCXX_BEGIN_NAMESPACE(std)
+
+  template<>
+    struct char_traits<char16_t>
+    {
+      typedef char16_t          char_type;
+      typedef uint_least16_t    int_type;
+      typedef streamoff         off_type;
+      typedef u16streampos      pos_type;
+      typedef mbstate_t         state_type;
+
+      static void
+      assign(char_type& __c1, const char_type& __c2)
+      { __c1 = __c2; }
+
+      static bool
+      eq(const char_type& __c1, const char_type& __c2)
+      { return __c1 == __c2; }
+
+      static bool
+      lt(const char_type& __c1, const char_type& __c2)
+      { return __c1 < __c2; }
+
+      static int
+      compare(const char_type* __s1, const char_type* __s2, size_t __n)
+      {
+	for (size_t __i = 0; __i < __n; ++__i)
+	  if (lt(__s1[__i], __s2[__i]))
+	    return -1;
+	  else if (lt(__s2[__i], __s1[__i]))
+	    return 1;
+	return 0;
+      }
+
+      static size_t
+      length(const char_type* __s)
+      {
+	size_t __i = 0;
+	while (!eq(__s[__i], char_type()))
+	  ++__i;
+	return __i;
+      }
+
+      static const char_type*
+      find(const char_type* __s, size_t __n, const char_type& __a)
+      {
+	for (size_t __i = 0; __i < __n; ++__i)
+	  if (eq(__s[__i], __a))
+	    return __s + __i;
+	return 0;
+      }
+
+      static char_type*
+      move(char_type* __s1, const char_type* __s2, size_t __n)
+      {
+	return (static_cast<char_type*>
+		(__builtin_memmove(__s1, __s2, __n * sizeof(char_type))));
+      }
+
+      static char_type*
+      copy(char_type* __s1, const char_type* __s2, size_t __n)
+      {
+	return (static_cast<char_type*>
+		(__builtin_memcpy(__s1, __s2, __n * sizeof(char_type))));
+      }
+
+      static char_type*
+      assign(char_type* __s, size_t __n, char_type __a)
+      {
+	for (size_t __i = 0; __i < __n; ++__i)
+	  assign(__s[__i], __a);
+	return __s;
+      }
+
+      static char_type
+      to_char_type(const int_type& __c)
+      { return char_type(__c); }
+
+      static int_type
+      to_int_type(const char_type& __c)
+      { return int_type(__c); }
+
+      static bool
+      eq_int_type(const int_type& __c1, const int_type& __c2)
+      { return __c1 == __c2; }
+
+      static int_type
+      eof()
+      { return static_cast<int_type>(-1); }
+
+      static int_type
+      not_eof(const int_type& __c)
+      { return eq_int_type(__c, eof()) ? 0 : __c; }
+    };
+
+  template<>
+    struct char_traits<char32_t>
+    {
+      typedef char32_t          char_type;
+      typedef uint_least32_t    int_type;
+      typedef streamoff         off_type;
+      typedef u32streampos      pos_type;
+      typedef mbstate_t         state_type;
+
+      static void
+      assign(char_type& __c1, const char_type& __c2)
+      { __c1 = __c2; }
+
+      static bool
+      eq(const char_type& __c1, const char_type& __c2)
+      { return __c1 == __c2; }
+
+      static bool
+      lt(const char_type& __c1, const char_type& __c2)
+      { return __c1 < __c2; }
+
+      static int
+      compare(const char_type* __s1, const char_type* __s2, size_t __n)
+      {
+	for (size_t __i = 0; __i < __n; ++__i)
+	  if (lt(__s1[__i], __s2[__i]))
+	    return -1;
+	  else if (lt(__s2[__i], __s1[__i]))
+	    return 1;
+	return 0;
+      }
+
+      static size_t
+      length(const char_type* __s)
+      {
+	size_t __i = 0;
+	while (!eq(__s[__i], char_type()))
+	  ++__i;
+	return __i;
+      }
+
+      static const char_type*
+      find(const char_type* __s, size_t __n, const char_type& __a)
+      {
+	for (size_t __i = 0; __i < __n; ++__i)
+	  if (eq(__s[__i], __a))
+	    return __s + __i;
+	return 0;
+      }
+
+      static char_type*
+      move(char_type* __s1, const char_type* __s2, size_t __n)
+      {
+	return (static_cast<char_type*>
+		(__builtin_memmove(__s1, __s2, __n * sizeof(char_type))));
+      }
+
+      static char_type*
+      copy(char_type* __s1, const char_type* __s2, size_t __n)
+      { 
+	return (static_cast<char_type*>
+		(__builtin_memcpy(__s1, __s2, __n * sizeof(char_type))));
+      }
+
+      static char_type*
+      assign(char_type* __s, size_t __n, char_type __a)
+      {
+	for (size_t __i = 0; __i < __n; ++__i)
+	  assign(__s[__i], __a);
+	return __s;
+      }
+
+      static char_type
+      to_char_type(const int_type& __c)
+      { return char_type(__c); }
+
+      static int_type
+      to_int_type(const char_type& __c)
+      { return int_type(__c); }
+
+      static bool
+      eq_int_type(const int_type& __c1, const int_type& __c2)
+      { return __c1 == __c2; }
+
+      static int_type
+      eof()
+      { return static_cast<int_type>(-1); }
+
+      static int_type
+      not_eof(const int_type& __c)
+      { return eq_int_type(__c, eof()) ? 0 : __c; }
+    };
+
+_GLIBCXX_END_NAMESPACE
+
+#endif 
+
 #undef _CHAR_TRAITS_EOF
 
-#endif
+#endif // _CHAR_TRAITS_H
