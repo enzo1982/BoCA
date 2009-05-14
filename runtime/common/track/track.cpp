@@ -96,16 +96,60 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 	return *this;
 }
 
-S::Bool BoCA::Track::operator ==(const int nil) const
+Bool BoCA::Track::operator ==(const int nil) const
 {
 	if (trackID == -1) return True;
 	else		   return False;
 }
 
-S::Bool BoCA::Track::operator !=(const int nil) const
+Bool BoCA::Track::operator !=(const int nil) const
 {
 	if (trackID == -1) return False;
 	else		   return True;
+}
+
+Bool BoCA::Track::LoadCoverArtFiles()
+{
+	if (isCDTrack) return False;
+
+	Directory		 directory = File(origFilename).GetFilePath();
+	const Array<File>	&jpgFiles = directory.GetFilesByPattern("*.jpg");
+
+	foreach (File file, jpgFiles) LoadCoverArtFile(file);
+
+	const Array<File>	&jpegFiles = directory.GetFilesByPattern("*.jpeg");
+
+	foreach (File file, jpegFiles) LoadCoverArtFile(file);
+
+	const Array<File>	&pngFiles = directory.GetFilesByPattern("*.png");
+
+	foreach (File file, pngFiles) LoadCoverArtFile(file);
+
+	return True;
+}
+
+Bool BoCA::Track::LoadCoverArtFile(const String &file)
+{
+	Picture	 picture;
+
+	picture.LoadFromFile(file);
+
+	/* Check if the cover art is already in our list.
+	 */
+	for (Int i = 0; i < pictures.Length(); i++)
+	{
+		if (pictures.GetNthReference(i).data.Size() != picture.data.Size()) continue;
+
+		if (memcmp(pictures.GetNthReference(i).data, picture.data, picture.data.Size()) == 0) return True;
+	}
+
+	if	(file.Find("front") >= 0) picture.type = 0x03; // Cover (front)
+	else if (file.Find("back")  >= 0) picture.type = 0x04; // Cover (back)
+	else if (file.Find("disc")  >= 0) picture.type = 0x06; // Media
+
+	pictures.Add(picture);
+
+	return True;
 }
 
 Int BoCA::Track::RenderID3v1Tag(Buffer<UnsignedByte> &buffer)

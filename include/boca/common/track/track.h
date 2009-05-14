@@ -81,6 +81,9 @@ namespace BoCA
 			Bool operator	 ==(const int) const;
 			Bool operator	 !=(const int) const;
 
+			Bool		 LoadCoverArtFiles();
+			Bool		 LoadCoverArtFile(const String &);
+
 			Int		 RenderID3v1Tag(Buffer<UnsignedByte> &);
 			Bool		 ParseID3v1Tag(const Buffer<UnsignedByte> &);
 			Bool		 ParseID3v1Tag(const String &);

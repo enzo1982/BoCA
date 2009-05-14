@@ -133,11 +133,11 @@ Int BoCA::TagVorbis::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 
 	for (Int i = 0; i < numItems; i++)
 	{
-		Int	 length = in.InputNumber(4);
+		Int	 length	 = in.InputNumber(4);
 		String	 comment = in.InputString(length);
 
-		String	 id = comment.Head(comment.Find("="));
-		String	 value = comment.Tail(comment.Length() - comment.Find("=") - 1);
+		String	 id	 = comment.Head(comment.Find("=")).ToUpper();
+		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1);
 
 		if	(id == "ARTIST")       info.artist  = value;
 		else if (id == "TITLE")	       info.title   = value;
@@ -148,12 +148,12 @@ Int BoCA::TagVorbis::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 		else if (id == "COMMENT")      info.comment = value;
 		else if (id == "ORGANIZATION") info.label   = value;
 		else if (id == "ISRC")	       info.isrc    = value;
-		else if (id.StartsWith("replaygain"))
+		else if (id.StartsWith("REPLAYGAIN"))
 		{
-			if	(id == "replaygain_track_gain") info.track_gain = value;
-			else if (id == "replaygain_track_peak") info.track_peak = value;
-			else if (id == "replaygain_album_gain") info.album_gain = value;
-			else if (id == "replaygain_album_peak") info.album_peak = value;
+			if	(id == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;
+			else if (id == "REPLAYGAIN_TRACK_PEAK") info.track_peak = value;
+			else if (id == "REPLAYGAIN_ALBUM_GAIN") info.album_gain = value;
+			else if (id == "REPLAYGAIN_ALBUM_PEAK") info.album_peak = value;
 		}
 		else if (id == "COVERART")
 		{

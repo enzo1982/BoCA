@@ -203,36 +203,38 @@ Int BoCA::TagAPE::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 
 		ParseAPEItem(buffer, offset, &id, &value);
 
-		if (id == "!Binary") ParseAPEBinaryItem(buffer, offset, &id, item);
+		id = id.ToUpper();
 
-		if	(id == "Artist")    info.artist  = value;
-		else if (id == "Title")	    info.title   = value;
-		else if (id == "Album")	    info.album   = value;
-		else if (id == "Year")	    info.year	 = value.ToInt();
-		else if (id == "Genre")	    info.genre   = value;
-		else if (id == "Comment")   info.comment = value;
-		else if (id == "Publisher") info.label   = value;
+		if (id == "!BINARY") ParseAPEBinaryItem(buffer, offset, &id, item);
+
+		if	(id == "ARTIST")    info.artist  = value;
+		else if (id == "TITLE")	    info.title   = value;
+		else if (id == "ALBUM")	    info.album   = value;
+		else if (id == "YEAR")	    info.year	 = value.ToInt();
+		else if (id == "GENRE")	    info.genre   = value;
+		else if (id == "COMMENT")   info.comment = value;
+		else if (id == "PUBLISHER") info.label   = value;
 		else if (id == "ISRC")	    info.isrc	 = value;
-		else if (id == "Track")
+		else if (id == "TRACK")
 		{
 			info.track = value.ToInt();
 
 			if (value.Find("/") >= 0) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 		}
-		else if (id == "Disc")
+		else if (id == "DISC")
 		{
 			info.disc = value.ToInt();
 
 			if (value.Find("/") >= 0) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 		}
-		else if (id.StartsWith("replaygain"))
+		else if (id.StartsWith("REPLAYGAIN"))
 		{
-			if	(id == "replaygain_track_gain") info.track_gain = value;
-			else if (id == "replaygain_track_peak") info.track_peak = value;
-			else if (id == "replaygain_album_gain") info.album_gain = value;
-			else if (id == "replaygain_album_peak") info.album_peak = value;
+			if	(id == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;
+			else if (id == "REPLAYGAIN_TRACK_PEAK") info.track_peak = value;
+			else if (id == "REPLAYGAIN_ALBUM_GAIN") info.album_gain = value;
+			else if (id == "REPLAYGAIN_ALBUM_PEAK") info.album_peak = value;
 		}
-		else if (id.StartsWith("Cover Art"))
+		else if (id.StartsWith("COVER ART"))
 		{
 			Picture	 picture;
 
@@ -257,8 +259,8 @@ Int BoCA::TagAPE::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 				 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
 				 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
 
-			if	(id.EndsWith("(front)")) picture.type = 3;
-			else if (id.EndsWith("(back)"))	 picture.type = 4;
+			if	(id.EndsWith("(FRONT)")) picture.type = 3;
+			else if (id.EndsWith("(BACK)"))	 picture.type = 4;
 			else				 picture.type = 0;
 
 			track->pictures.Add(picture);

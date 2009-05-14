@@ -31,19 +31,30 @@ namespace BoCA
 	{
 		private:
 			Array<Track>			 tracks;
-
-			Text				*text_tracks;
-			ListBox				*list_tracks;
+			Array<Track>			 albums;
 
 			TabWidget			*tab_mode;
+
+			Layer				*layer_tracks;
+			Layer				*layer_albums;
+			Layer				*layer_files;
+
+			ListBox				*list_tracks;
+			ListBox				*list_albums;
+			ListBox				*list_files;
+
+			TabWidget			*tab_editor;
 
 			LayerTagBasic			*layer_basic;
 			LayerTagDetails			*layer_details;
 			LayerTagOther			*layer_other;
 
 			LayerTagAdvanced		*layer_advanced;
+
+			Void				 UpdateAlbumList();
 		signals:
 			Signal1<Void, const Track &>	 onSelectTrack;
+			Signal1<Void, const Track &>	 onSelectAlbum;
 			Signal0<Void>			 onSelectNone;
 		slots:
 			Void				 OnApplicationAddTrack(const Track &);
@@ -55,6 +66,8 @@ namespace BoCA
 
 			Void				 OnSelectTrack();
 			Void				 OnModifyTrack(const Track &);
+
+			Void				 OnSelectAlbum();
 
 			Void				 OnChangeSize(const Size &);
 		public:

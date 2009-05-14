@@ -45,7 +45,7 @@ all : $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION).dll
 $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION).dll : $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) -Xlinker --out-implib -Xlinker $(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
 	strip --strip-all $@
-	$(PACKER) $(PACKER_OPTS) $@
+#	$(PACKER) $(PACKER_OPTS) $@
 
 clean :
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION).dll $(BOCA_PATH)/$(LIBDIR)/libboca.a $(OBJECTS)
