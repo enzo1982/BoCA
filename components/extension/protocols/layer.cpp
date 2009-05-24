@@ -110,7 +110,6 @@ Void BoCA::LayerProtocols::SelectProtocol()
 Void BoCA::LayerProtocols::ShowDetails()
 {
 // TODO: Implement error detail view
-#ifdef __WIN32__
+
 	Dialogs::QuickMessage("Not implemented, yet!", "Error", MB_OK, IDI_HAND);
-#endif
 }

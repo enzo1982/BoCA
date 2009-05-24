@@ -14,16 +14,12 @@ using namespace smooth::GUI::Dialogs;
 
 Void BoCA::Utilities::WarningMessage(const String &message, const String &replace)
 {
-#ifdef __WIN32__
 	QuickMessage(String(message).Replace("%1", replace), "Warning", MB_OK, IDI_EXCLAMATION);
-#endif
 }
 
 Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace)
 {
-#ifdef __WIN32__
 	QuickMessage(String(message).Replace("%1", replace), "Error", MB_OK, IDI_HAND);
-#endif
 }
 
 String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
