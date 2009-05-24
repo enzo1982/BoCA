@@ -83,7 +83,7 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		mp3data_struct	 mp3data;
 
-		ZeroMemory(&mp3data, sizeof(mp3data));
+		memset(&mp3data, 0, sizeof(mp3data));
 
 		Int	 nSamples = ex_lame_decode_headers(buffer, buffer.Size(), pcm_l, pcm_r, &mp3data);
 

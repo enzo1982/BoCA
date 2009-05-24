@@ -13,9 +13,15 @@
 
 #include <smooth.h>
 
-#include "3rdparty/id3.h"
-#include "3rdparty/mp4v2/mp4v2.h"
-#include "3rdparty/ogg/ogg.h"
+#ifdef __WIN32__
+#	include "3rdparty/id3.h"
+#	include "3rdparty/mp4v2/mp4v2.h"
+#	include "3rdparty/ogg/ogg.h"
+#else
+#	include <id3.h>
+#	include <mp4.h>
+#	include <ogg/ogg.h>
+#endif
 
 using namespace smooth;
 using namespace smooth::System;

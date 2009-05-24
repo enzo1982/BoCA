@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -540,7 +540,7 @@ Void BoCA::ConfigureFLAC::SetQLPSearch()
 
 Void BoCA::ConfigureFLAC::SetQLPPrecision()
 {
-	Font	 font = text_qlp_precision_value->GetFont();
+	GUI::Font	 font = text_qlp_precision_value->GetFont();
 
 	if (qlp_coeff_precision >= 16)	font.SetColor(Color(255, 0, 0));
 	else				font.SetColor(Color(0, 0, 0));

@@ -12,6 +12,7 @@
 #include <smooth/dll.h>
 
 #include <time.h>
+#include <stdlib.h>
 
 #include "speex_out.h"
 #include "config.h"

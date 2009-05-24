@@ -118,7 +118,7 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	decoderThread = NonBlocking1<Bool>(&MADIn::ReadMAD, this).Call(False);
 
-	while (decoderThread->GetStatus() == THREAD_RUNNING) Sleep(10);
+	while (decoderThread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(10);
 
 	delete readDataMutex;
 	delete samplesBufferMutex;
@@ -183,7 +183,7 @@ Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	readDataMutex->Release();
 
-	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) Sleep(10);
+	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) S::System::System::Sleep(10);
 
 	readDataMutex->Lock();
 

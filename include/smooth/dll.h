@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,6 +21,7 @@ using namespace smooth;
 
 extern "C"
 {
+#if defined __WIN32__ && !defined __WINE__
 	BOOL WINAPI DllMain(HINSTANCE shInstance, DWORD reason, LPVOID reserved)
 	{
 		switch (reason)
@@ -58,6 +59,31 @@ extern "C"
 
 		return true;
 	}
+#else
+	static __attribute__((__constructor__)) void processAttach()
+	{
+		Init();
+
+		if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
+		{
+			Free();
+
+			return;
+		}
+
+		GUI::Application::GetStartupDirectory();
+		GUI::Application::GetApplicationDirectory();
+
+		AttachDLL(NIL);
+	}
+
+	static __attribute__((__destructor__)) void processDetach()
+	{
+		DetachDLL();
+
+		Free();
+	}
+#endif
 }
 
 #endif

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,12 +14,16 @@ using namespace smooth::GUI::Dialogs;
 
 Void BoCA::Utilities::WarningMessage(const String &message, const String &replace)
 {
+#ifdef __WIN32__
 	QuickMessage(String(message).Replace("%1", replace), "Warning", MB_OK, IDI_EXCLAMATION);
+#endif
 }
 
 Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace)
 {
+#ifdef __WIN32__
 	QuickMessage(String(message).Replace("%1", replace), "Error", MB_OK, IDI_HAND);
+#endif
 }
 
 String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)

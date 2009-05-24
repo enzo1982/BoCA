@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -10,10 +10,17 @@
 
 #include <smooth.h>
 
-#include "ogg/ogg.h"
-#include "speex/speex.h"
-#include "speex/speex_header.h"
-#include "speex/speex_stereo.h"
+#ifdef __WIN32__
+#	include "ogg/ogg.h"
+#	include "speex/speex.h"
+#	include "speex/speex_header.h"
+#	include "speex/speex_stereo.h"
+#else
+#	include <ogg/ogg.h>
+#	include <speex/speex.h>
+#	include <speex/speex_header.h>
+#	include <speex/speex_stereo.h>
+#endif
 
 using namespace smooth;
 using namespace smooth::System;

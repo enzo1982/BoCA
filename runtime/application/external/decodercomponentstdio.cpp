@@ -100,7 +100,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	track.fileSize	= File(streamURI).GetFileSize();
 	format.order	= BYTE_INTEL;
 
-	// Read RIFF chunk
+	/* Read RIFF chunk
+	 */
 	if (in->InputString(4) != "RIFF") { errorState = True; errorString = "Unknown file type"; }
 
 	in->RelSeek(4);
@@ -111,7 +112,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	do
 	{
-		// Read next chunk
+		/* Read next chunk
+		 */
 		chunk = in->InputString(4);
 
 		Int	 cSize = in->InputNumber(4);
@@ -127,7 +129,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 			format.bits	= (unsigned short) in->InputNumber(2);
 
-			// Skip rest of chunk
+			/* Skip rest of chunk
+			 */
 			in->RelSeek(cSize - 16);
 		}
 		else if (chunk == "data")
@@ -139,7 +142,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		}
 		else
 		{
-			// Skip chunk
+			/* Skip chunk
+			 */
 			in->RelSeek(cSize);
 		}
 	}

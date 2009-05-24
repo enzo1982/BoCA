@@ -14,9 +14,6 @@
 #include "sndfile_in.h"
 #include "dllinterface.h"
 
-#include <io.h>
-#include <fcntl.h>
-
 using namespace smooth::IO;
 
 const String &BoCA::SndFileIn::GetComponentSpecs()
@@ -101,38 +98,46 @@ Void smooth::DetachDLL()
 
 Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 {
-	if (Setup::enableUnicode) file = _wopen(streamURI, O_RDONLY | O_BINARY);
-	else			  file = open(streamURI, O_RDONLY | O_BINARY);
+#ifdef __WIN32__
+	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
+	else			  file = fopen(streamURI, "rb");
+#else
+	file = fopen(streamURI.ConvertTo("UTF-8"), "r+b");
+#endif
 
 	SF_INFO	 sinfo;
 
-	ZeroMemory(&sinfo, sizeof(SF_INFO));
+	memset(&sinfo, 0, sizeof(SF_INFO));
 
-	sndf = ex_sf_open_fd(file, SFM_READ, &sinfo, False);
+	sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
 	if (sndf != NIL) ex_sf_close(sndf);
 
-	_close(file);
+	fclose(file);
 
 	return (sndf != NIL);
 }
 
 Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	if (Setup::enableUnicode) file = _wopen(streamURI, O_RDONLY | O_BINARY);
-	else			  file = open(streamURI, O_RDONLY | O_BINARY);
+#ifdef __WIN32__
+	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
+	else			  file = fopen(streamURI, "rb");
+#else
+	file = fopen(streamURI.ConvertTo("UTF-8"), "r+b");
+#endif
 
 	SF_INFO	 sinfo;
 
-	ZeroMemory(&sinfo, sizeof(SF_INFO));
+	memset(&sinfo, 0, sizeof(SF_INFO));
 
-	sndf = ex_sf_open_fd(file, SFM_READ, &sinfo, False);
+	sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
 	if (sndf != NIL)
 	{
 		Format	&format = track.GetFormat();
 
-		track.fileSize = _lseeki64(file, 0, SEEK_END);
+		track.fileSize	= fseek(file, 0, SEEK_END);
 		format.order	= BYTE_INTEL;
 
 		format.channels	= sinfo.channels;
@@ -169,7 +174,7 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (sndf == NIL) { errorState = True; errorString = "Unsupported audio format"; }
 
-	_close(file);
+	fclose(file);
 
 	if (errorState)	return Error();
 	else		return Success();
@@ -189,14 +194,18 @@ BoCA::SndFileIn::~SndFileIn()
 
 Bool BoCA::SndFileIn::Activate()
 {
-	if (Setup::enableUnicode) file = _wopen(track.origFilename, O_RDONLY | O_BINARY);
-	else			  file = open(track.origFilename, O_RDONLY | O_BINARY);
+#ifdef __WIN32__
+	if (Setup::enableUnicode) file = _wfopen(track.origFilename, L"rb");
+	else			  file = fopen(track.origFilename, "rb");
+#else
+	file = fopen(track.origFilename.ConvertTo("UTF-8"), "r+b");
+#endif
 
 	SF_INFO	 sinfo;
 
-	ZeroMemory(&sinfo, sizeof(SF_INFO));
+	memset(&sinfo, 0, sizeof(SF_INFO));
 
-	sndf = ex_sf_open_fd(file, SFM_READ, &sinfo, False);
+	sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
 	return True;
 }
@@ -205,7 +214,7 @@ Bool BoCA::SndFileIn::Deactivate()
 {
 	ex_sf_close(sndf);
 
-	_close(file);
+	fclose(file);
 
 	return True;
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,6 +41,8 @@ namespace smooth
 
 				Surface				*nullSurface;
 				Surface				*drawSurface;
+
+				Rect				 updateRect;
 			public:
 				static Int			 SetBackend(WindowBackend *(*)());
 
@@ -77,6 +79,8 @@ namespace smooth
 
 				virtual Int			 Maximize();
 				virtual Int			 Restore();
+			accessors:
+				const Rect			&GetUpdateRect();
 			signals:
 				Callback0<Bool>			 doClose;
 

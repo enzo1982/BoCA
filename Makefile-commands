@@ -21,17 +21,23 @@ else
 	PACKER_OPTS = --best -q
 endif
 
-all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION).dll
+ifeq ($(BUILD_WIN32),True)
+	DLLEXT = .dll
+else
+	DLLEXT = .so
+endif
+
+all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT)
 	$(ALLCMD1)
 	$(ALLCMD2)
 
-$(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION).dll : $(OBJECTS)
+$(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) : $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
 	strip --strip-all $@
 #	$(PACKER) $(PACKER_OPTS) $@
 
 clean :
-	rm -f $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION).dll $(OBJECTS)
+	rm -f $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) $(OBJECTS)
 	$(CLEANCMD1)
 	$(CLEANCMD2)
 

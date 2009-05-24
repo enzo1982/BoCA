@@ -11,10 +11,14 @@
 #include <boca/application/registry.h>
 #include <boca/application/decodercomponent.h>
 #include <boca/application/encodercomponent.h>
-#include <boca/application/external/decodercomponentfile.h>
-#include <boca/application/external/decodercomponentstdio.h>
-#include <boca/application/external/encodercomponentfile.h>
-#include <boca/application/external/encodercomponentstdio.h>
+
+#ifdef __WIN32__
+#	include <boca/application/external/decodercomponentfile.h>
+#	include <boca/application/external/decodercomponentstdio.h>
+#	include <boca/application/external/encodercomponentfile.h>
+#	include <boca/application/external/encodercomponentstdio.h>
+#endif
+
 #include <boca/application/dspcomponent.h>
 #include <boca/application/extensioncomponent.h>
 #include <boca/application/outputcomponent.h>
@@ -43,7 +47,11 @@ BoCA::AS::Registry::Registry()
 {
 	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("boca"));
 
+#ifdef __WIN32__
 	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.dll");
+#else
+	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.so");
+#endif
 
 	for (Int i = 0; i < dllFiles.Length(); i++)
 	{
@@ -147,12 +155,18 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 		{
 			case COMPONENT_TYPE_DECODER:
 				if	(specs->mode == INTERNAL)	return new DecoderComponent(specs);
+#ifdef __WIN32__
 				else if (specs->mode == EXTERNAL_FILE)	return new DecoderComponentExternalFile(specs);
 				else if (specs->mode == EXTERNAL_STDIO)	return new DecoderComponentExternalStdIO(specs);
+#endif
+				break;
 			case COMPONENT_TYPE_ENCODER:
 				if	(specs->mode == INTERNAL)	return new EncoderComponent(specs);
+#ifdef __WIN32__
 				else if (specs->mode == EXTERNAL_FILE)	return new EncoderComponentExternalFile(specs);
 				else if (specs->mode == EXTERNAL_STDIO)	return new EncoderComponentExternalStdIO(specs);
+#endif
+				break;
 			case COMPONENT_TYPE_DSP:
 				return new DSPComponent(specs);
 			case COMPONENT_TYPE_EXTENSION:
