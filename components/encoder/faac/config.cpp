@@ -24,6 +24,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	aacQuality	= config->GetIntValue("FAAC", "AACQuality", 100);
 	allowID3	= config->GetIntValue("FAAC", "AllowID3v2", 0);
 	fileFormat	= config->GetIntValue("FAAC", "MP4Container", 1);
+	fileExtension	= config->GetIntValue("FAAC", "MP4FileExtension", 0);
 
 	I18n	*i18n = I18n::Get();
 
@@ -69,6 +70,18 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	group_mp4->Add(option_mp4);
 	group_mp4->Add(option_aac);
+
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(263, 11), Size(120, 65));
+
+	option_extension_m4a	= new OptionBox(".m4a", Point(10, 13), Size(46, 0), &fileExtension, 0);
+	option_extension_m4b	= new OptionBox(".m4b", Point(10, 38), Size(46, 0), &fileExtension, 1);
+	option_extension_m4r	= new OptionBox(".m4r", Point(64, 13), Size(46, 0), &fileExtension, 2);
+	option_extension_mp4	= new OptionBox(".mp4", Point(64, 38), Size(46, 0), &fileExtension, 3);
+
+	group_extension->Add(option_extension_m4a);
+	group_extension->Add(option_extension_m4b);
+	group_extension->Add(option_extension_m4r);
+	group_extension->Add(option_extension_mp4);
 
 	group_id3v2		= new GroupBox(i18n->TranslateString("Info tags"), Point(135, 88), Size(279, 90));
 
@@ -160,6 +173,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	layer_format->Add(group_version);
 	layer_format->Add(group_aactype);
 	layer_format->Add(group_mp4);
+	layer_format->Add(group_extension);
 	layer_format->Add(group_id3v2);
 
 	layer_quality->Add(group_bitrate);
@@ -186,6 +200,11 @@ BoCA::ConfigureFAAC::~ConfigureFAAC()
 	DeleteObject(group_mp4);
 	DeleteObject(option_mp4);
 	DeleteObject(option_aac);
+	DeleteObject(group_extension);
+	DeleteObject(option_extension_m4a);
+	DeleteObject(option_extension_m4b);
+	DeleteObject(option_extension_m4r);
+	DeleteObject(option_extension_mp4);
 	DeleteObject(group_id3v2);
 	DeleteObject(check_id3v2);
 	DeleteObject(text_note);
@@ -229,6 +248,7 @@ Int BoCA::ConfigureFAAC::SaveSettings()
 	config->SetIntValue("FAAC", "AACQuality", aacQuality);
 	config->SetIntValue("FAAC", "AllowID3v2", allowID3);
 	config->SetIntValue("FAAC", "MP4Container", fileFormat);
+	config->SetIntValue("FAAC", "MP4FileExtension", fileExtension);
 
 	return Success();
 }
@@ -279,6 +299,8 @@ Void BoCA::ConfigureFAAC::SetFileFormat()
 		group_version->Deactivate();
 		group_id3v2->Deactivate();
 
+		group_extension->Activate();
+
 		option_aactype_ltp->Activate();
 
 		if (mpegVersion == 1) // MPEG2
@@ -292,6 +314,8 @@ Void BoCA::ConfigureFAAC::SetFileFormat()
 	{
 		group_version->Activate();
 		group_id3v2->Activate();
+
+		group_extension->Deactivate();
 
 		if (mpegVersion == 1) // MPEG2
 		{

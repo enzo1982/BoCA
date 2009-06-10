@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -25,28 +25,52 @@ namespace BoCA
 	{
 		private:
 			GroupBox	*group_mode;
-			GroupBox	*group_mode2;
 			OptionBox	*option_mode_vbr;
 			OptionBox	*option_mode_abr;
+
+			GroupBox	*group_quality;
 			Slider		*slider_quality;
 			Text		*text_quality;
 			Text		*text_quality_value;
-			Slider		*slider_abr;
-			Text		*text_abr;
-			EditBox		*edit_abr;
-			Text		*text_abr_kbps;
 
-			Layer		*layer_vbr;
-			Layer		*layer_abr;
+			GroupBox	*group_bitrate;
+			CheckBox	*check_abrmin;
+			Slider		*slider_abrmin;
+			EditBox		*edit_abrmin;
+			Text		*text_abrmin_kbps;
+			CheckBox	*check_abrnom;
+			Slider		*slider_abrnom;
+			EditBox		*edit_abrnom;
+			Text		*text_abrnom_kbps;
+			CheckBox	*check_abrmax;
+			Slider		*slider_abrmax;
+			EditBox		*edit_abrmax;
+			Text		*text_abrmax_kbps;
 
-			Int		 quality;
-			Int		 abr;
 			Int		 mode;
+			Int		 quality;
+			Int		 abrMin;
+			Int		 abrNom;
+			Int		 abrMax;
+
+			Bool		 setABRMin;
+			Bool		 setABRNom;
+			Bool		 setABRMax;
 		slots:
 			Void		 SetMode();
 			Void		 SetQuality();
-			Void		 SetBitrate();
-			Void		 SetBitrateByEditBox();
+
+			Void		 ToggleABRMin();
+			Void		 SetABRMin();
+			Void		 SetABRMinByEditBox();
+
+			Void		 ToggleABRNom();
+			Void		 SetABRNom();
+			Void		 SetABRNomByEditBox();
+
+			Void		 ToggleABRMax();
+			Void		 SetABRMax();
+			Void		 SetABRMaxByEditBox();
 		public:
 					 ConfigureVorbis();
 					~ConfigureVorbis();

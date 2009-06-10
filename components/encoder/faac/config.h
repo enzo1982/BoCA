@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -46,6 +46,12 @@ namespace BoCA
 			OptionBox	*option_mp4;
 			OptionBox	*option_aac;
 
+			GroupBox	*group_extension;
+			OptionBox	*option_extension_m4a;
+			OptionBox	*option_extension_m4b;
+			OptionBox	*option_extension_m4r;
+			OptionBox	*option_extension_mp4;
+
 			Layer		*layer_quality;
 
 			GroupBox	*group_bitrate;
@@ -77,6 +83,7 @@ namespace BoCA
 			Int		 aacQuality;
 			Bool		 allowID3;
 			Int		 fileFormat;
+			Int		 fileExtension;
 		slots:
 			Void		 SetMPEGVersion();
 			Void		 SetBitrate();

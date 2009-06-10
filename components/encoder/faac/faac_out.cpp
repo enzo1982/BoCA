@@ -281,8 +281,19 @@ String BoCA::FAACOut::GetOutputFileExtension()
 {
 	Config	*config = Config::Get();
 
-	if (config->GetIntValue("FAAC", "MP4Container", 1)) return "m4a";
-	else						    return "aac";
+	if (config->GetIntValue("FAAC", "MP4Container", 1))
+	{
+		switch (config->GetIntValue("FAAC", "MP4FileExtension", 0))
+		{
+			default:
+			case  0: return "m4a";
+			case  1: return "m4b";
+			case  2: return "m4r";
+			case  3: return "mp4";
+		}
+	}
+
+	return "aac";
 }
 
 ConfigLayer *BoCA::FAACOut::GetConfigurationLayer()

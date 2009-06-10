@@ -94,7 +94,9 @@ Bool BoCA::VorbisOut::Activate()
 			ex_vorbis_encode_init_vbr(&vi, format.channels, format.rate, ((double) config->GetIntValue("Vorbis", "Quality", 60)) / 100);
 			break;
 		case 1:
-			ex_vorbis_encode_init(&vi, format.channels, format.rate, -1, config->GetIntValue("Vorbis", "Bitrate", 192) * 1000, -1);
+			ex_vorbis_encode_init(&vi, format.channels, format.rate, config->GetIntValue("Vorbis", "SetMinBitrate", False) ? config->GetIntValue("Vorbis", "MinBitrate",  32) * 1000 : -1,
+										 config->GetIntValue("Vorbis", "SetBitrate",    True)  ? config->GetIntValue("Vorbis", "Bitrate",    192) * 1000 : -1,
+										 config->GetIntValue("Vorbis", "SetMaxBitrate", False) ? config->GetIntValue("Vorbis", "MaxBitrate", 320) * 1000 : -1);
 			break;
 	}
 

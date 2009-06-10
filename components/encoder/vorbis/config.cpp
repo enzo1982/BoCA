@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,136 +12,159 @@
 
 BoCA::ConfigureVorbis::ConfigureVorbis()
 {
-	Point	 pos;
-	Size	 size;
-
 	Config	*config = Config::Get();
 
 	mode		= config->GetIntValue("Vorbis", "Mode", 0);
 	quality		= config->GetIntValue("Vorbis", "Quality", 60);
-	abr		= config->GetIntValue("Vorbis", "Bitrate", 192);
+	setABRMin	= config->GetIntValue("Vorbis", "SetMinBitrate", False);
+	abrMin		= config->GetIntValue("Vorbis", "MinBitrate", 32);
+	setABRNom	= config->GetIntValue("Vorbis", "SetBitrate", True);
+	abrNom		= config->GetIntValue("Vorbis", "Bitrate", 192);
+	setABRMax	= config->GetIntValue("Vorbis", "SetMaxBitrate", False);
+	abrMax		= config->GetIntValue("Vorbis", "MaxBitrate", 320);
 
 	I18n	*i18n = I18n::Get();
 
-	layer_vbr	= new Layer();
-	layer_abr	= new Layer();
+	group_mode		= new GroupBox(i18n->TranslateString("Encoding Mode"), Point(7, 11), Size(344, 40));
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 344;
-	size.cy = 43;
-
-	group_mode		= new GroupBox(i18n->TranslateString("Encoding Mode"), pos, size);
-
-	size.cy = 84;
-
-	group_mode2		= new GroupBox(i18n->TranslateString("Encoding Mode"), pos, size);
-
-	pos.x = 17;
-	pos.y = 24;
-	size.cx = 157;
-	size.cy = 0;
-
-	option_mode_vbr		= new OptionBox(String("VBR (").Append(i18n->TranslateString("Variable Bitrate")).Append(")"), pos, size, &mode, 0);
+	option_mode_vbr		= new OptionBox(String("VBR (").Append(i18n->TranslateString("Variable Bitrate")).Append(")"), Point(10, 13), Size(158, 0), &mode, 0);
 	option_mode_vbr->onAction.Connect(&ConfigureVorbis::SetMode, this);
 
-	pos.x += 166;
-
-	option_mode_abr		= new OptionBox(String("ABR (").Append(i18n->TranslateString("Average Bitrate")).Append(")"), pos, size, &mode, 1);
+	option_mode_abr		= new OptionBox(String("ABR (").Append(i18n->TranslateString("Average Bitrate")).Append(")"), Point(176, 13), Size(158, 0), &mode, 1);
 	option_mode_abr->onAction.Connect(&ConfigureVorbis::SetMode, this);
 
-	pos.x = 19;
-	pos.y += 43;
+	group_mode->Add(option_mode_vbr);
+	group_mode->Add(option_mode_abr);
 
-	text_quality		= new Text(String(i18n->TranslateString("Quality")).Append(":"), pos);
+	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 63), Size(344, 42));
 
-	pos.x += (text_quality->textSize.cx + 8);
-	pos.y -= 2;
-	size.cx = 283 - text_quality->textSize.cx;
+	text_quality		= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(10, 16));
 
-	slider_quality		= new Slider(pos, size, OR_HORZ, &quality, -20, 100);
+	slider_quality		= new Slider(Point(text_quality->textSize.cx + 18, 14), Size(289 - text_quality->textSize.cx, 0), OR_HORZ, &quality, -20, 100);
 	slider_quality->onValueChange.Connect(&ConfigureVorbis::SetQuality, this);
 
-	pos.x += (size.cx + 7);
-	pos.y += 2;
+	text_quality_value	= new Text("", Point(313, 16));
 
-	text_quality_value	= new Text("", pos);
+	group_quality->Add(text_quality);
+	group_quality->Add(slider_quality);
+	group_quality->Add(text_quality_value);
 
-	pos.x = 19;
+	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 63), Size(344, 96));
 
-	text_abr		= new Text(String(i18n->TranslateString("Average Bitrate")).Append(":"), pos);
+	check_abrmin		= new CheckBox(String(i18n->TranslateString("Minimum bitrate")).Append(":"), Point(10, 14), Size(), &setABRMin);
+	check_abrmin->onAction.Connect(&ConfigureVorbis::ToggleABRMin, this);
 
-	pos.x += (text_abr->textSize.cx + 8);
-	pos.y -= 2;
-	size.cx = 248 - text_abr->textSize.cx;
+	slider_abrmin		= new Slider(Point(38, 14), Size(228, 0), OR_HORZ, &abrMin, 32, 320);
+	slider_abrmin->onValueChange.Connect(&ConfigureVorbis::SetABRMin, this);
 
-	slider_abr		= new Slider(pos, size, OR_HORZ, &abr, 45, 500);
-	slider_abr->onValueChange.Connect(&ConfigureVorbis::SetBitrate, this);
+	edit_abrmin		= new EditBox("", Point(279, 13), Size(25, 0), 3);
+	edit_abrmin->SetFlags(EDB_NUMERIC);
+	edit_abrmin->onInput.Connect(&ConfigureVorbis::SetABRMinByEditBox, this);
 
-	pos.x += (size.cx + 8);
-	pos.y -= 1;
-	size.cx = 25;
+	text_abrmin_kbps	= new Text("kbps", Point(311, 16));
 
-	edit_abr		= new EditBox("", pos, size, 3);
-	edit_abr->SetFlags(EDB_NUMERIC);
-	edit_abr->onInput.Connect(&ConfigureVorbis::SetBitrateByEditBox, this);
+	check_abrnom		= new CheckBox(String(i18n->TranslateString("Average bitrate")).Append(":"), Point(10, 41), Size(), &setABRNom);
+	check_abrnom->onAction.Connect(&ConfigureVorbis::ToggleABRNom, this);
 
-	pos.x += 32;
-	pos.y += 3;
+	slider_abrnom		= new Slider(Point(38, 41), Size(228, 0), OR_HORZ, &abrNom, 32, 320);
+	slider_abrnom->onValueChange.Connect(&ConfigureVorbis::SetABRNom, this);
 
-	text_abr_kbps		= new Text("kbps", pos);
+	edit_abrnom		= new EditBox("", Point(279, 40), Size(25, 0), 3);
+	edit_abrnom->SetFlags(EDB_NUMERIC);
+	edit_abrnom->onInput.Connect(&ConfigureVorbis::SetABRNomByEditBox, this);
+
+	text_abrnom_kbps	= new Text("kbps", Point(311, 43));
+
+	check_abrmax		= new CheckBox(String(i18n->TranslateString("Maximum bitrate")).Append(":"), Point(10, 68), Size(), &setABRMax);
+	check_abrmax->onAction.Connect(&ConfigureVorbis::ToggleABRMax, this);
+
+	slider_abrmax		= new Slider(Point(38, 68), Size(228, 0), OR_HORZ, &abrMax, 32, 320);
+	slider_abrmax->onValueChange.Connect(&ConfigureVorbis::SetABRMax, this);
+
+	edit_abrmax		= new EditBox("", Point(279, 67), Size(25, 0), 3);
+	edit_abrmax->SetFlags(EDB_NUMERIC);
+	edit_abrmax->onInput.Connect(&ConfigureVorbis::SetABRMaxByEditBox, this);
+
+	text_abrmax_kbps	= new Text("kbps", Point(311, 70));
+
+	Int	 maxTextSize = Math::Max(Math::Max(check_abrmin->textSize.cx, check_abrnom->textSize.cx), check_abrmax->textSize.cx);
+
+	check_abrmin->SetWidth(maxTextSize + 20);
+	check_abrnom->SetWidth(maxTextSize + 20);
+	check_abrmax->SetWidth(maxTextSize + 20);
+
+	slider_abrmin->SetX(maxTextSize + 38);
+	slider_abrnom->SetX(maxTextSize + 38);
+	slider_abrmax->SetX(maxTextSize + 38);
+
+	slider_abrmin->SetWidth(233 - maxTextSize);
+	slider_abrnom->SetWidth(233 - maxTextSize);
+	slider_abrmax->SetWidth(233 - maxTextSize);
+
+	group_bitrate->Add(check_abrmin);
+	group_bitrate->Add(slider_abrmin);
+	group_bitrate->Add(edit_abrmin);
+	group_bitrate->Add(text_abrmin_kbps);
+	group_bitrate->Add(check_abrnom);
+	group_bitrate->Add(slider_abrnom);
+	group_bitrate->Add(edit_abrnom);
+	group_bitrate->Add(text_abrnom_kbps);
+	group_bitrate->Add(check_abrmax);
+	group_bitrate->Add(slider_abrmax);
+	group_bitrate->Add(edit_abrmax);
+	group_bitrate->Add(text_abrmax_kbps);
 
 	SetQuality();
-	SetBitrate();
+
+	ToggleABRMin();
+	ToggleABRNom();
+	ToggleABRMax();
+
+	SetABRMin();
+	SetABRNom();
+	SetABRMax();
 
 	Add(group_mode);
-	Add(group_mode2);
-	Add(option_mode_vbr);
-	Add(option_mode_abr);
-
-	layer_vbr->Add(slider_quality);
-	layer_vbr->Add(text_quality);
-	layer_vbr->Add(text_quality_value);
-
-	layer_abr->Add(slider_abr);
-	layer_abr->Add(text_abr);
-	layer_abr->Add(edit_abr);
-	layer_abr->Add(text_abr_kbps);
-
-	Add(layer_vbr);
-	Add(layer_abr);
+	Add(group_quality);
+	Add(group_bitrate);
 
 	switch (mode)
 	{
 		case 0:
-			layer_abr->Hide();
+			group_bitrate->Hide();
 			break;
 		case 1:
-			layer_vbr->Hide();
+			group_quality->Hide();
 			break;
 	}
 
-	SetSize(Size(358, 102));
+	SetSize(Size(358, 166));
 }
 
 BoCA::ConfigureVorbis::~ConfigureVorbis()
 {
-	DeleteObject(layer_abr);
-	DeleteObject(layer_vbr);
-
 	DeleteObject(group_mode);
-	DeleteObject(group_mode2);
 	DeleteObject(option_mode_abr);
 	DeleteObject(option_mode_vbr);
 
+	DeleteObject(group_quality);
 	DeleteObject(slider_quality);
 	DeleteObject(text_quality);
 	DeleteObject(text_quality_value);
 
-	DeleteObject(slider_abr);
-	DeleteObject(text_abr);
-	DeleteObject(edit_abr);
-	DeleteObject(text_abr_kbps);
+	DeleteObject(group_bitrate);
+	DeleteObject(check_abrmin);
+	DeleteObject(slider_abrmin);
+	DeleteObject(edit_abrmin);
+	DeleteObject(text_abrmin_kbps);
+	DeleteObject(check_abrnom);
+	DeleteObject(slider_abrnom);
+	DeleteObject(edit_abrnom);
+	DeleteObject(text_abrnom_kbps);
+	DeleteObject(check_abrmax);
+	DeleteObject(slider_abrmax);
+	DeleteObject(edit_abrmax);
+	DeleteObject(text_abrmax_kbps);
 }
 
 Int BoCA::ConfigureVorbis::SaveSettings()
@@ -150,7 +173,12 @@ Int BoCA::ConfigureVorbis::SaveSettings()
 
 	config->SetIntValue("Vorbis", "Mode", mode);
 	config->SetIntValue("Vorbis", "Quality", quality);
-	config->SetIntValue("Vorbis", "Bitrate", abr);
+	config->SetIntValue("Vorbis", "SetMinBitrate", setABRMin);
+	config->SetIntValue("Vorbis", "MinBitrate", abrMin);
+	config->SetIntValue("Vorbis", "SetBitrate", setABRNom);
+	config->SetIntValue("Vorbis", "Bitrate", abrNom);
+	config->SetIntValue("Vorbis", "SetMaxBitrate", setABRMax);
+	config->SetIntValue("Vorbis", "MaxBitrate", abrMax);
 
 	return Success();
 }
@@ -160,12 +188,12 @@ Void BoCA::ConfigureVorbis::SetMode()
 	switch (mode)
 	{
 		case 0:
-			layer_abr->Hide();
-			layer_vbr->Show();
+			group_bitrate->Hide();
+			group_quality->Show();
 			break;
 		case 1:
-			layer_vbr->Hide();
-			layer_abr->Show();
+			group_quality->Hide();
+			group_bitrate->Show();
 			break;
 	}
 }
@@ -179,12 +207,50 @@ Void BoCA::ConfigureVorbis::SetQuality()
 	text_quality_value->SetText(txt);
 }
 
-Void BoCA::ConfigureVorbis::SetBitrate()
+Void BoCA::ConfigureVorbis::ToggleABRMin()
 {
-	edit_abr->SetText(String::FromInt(abr));
+	if (!setABRMin) { edit_abrmin->Deactivate(); slider_abrmin->Deactivate(); }
+	else		{ edit_abrmin->Activate();   slider_abrmin->Activate();	  }
 }
 
-Void BoCA::ConfigureVorbis::SetBitrateByEditBox()
+Void BoCA::ConfigureVorbis::SetABRMin()
 {
-	slider_abr->SetValue(edit_abr->GetText().ToInt());
+	edit_abrmin->SetText(String::FromInt(abrMin));
+}
+
+Void BoCA::ConfigureVorbis::SetABRMinByEditBox()
+{
+	slider_abrmin->SetValue(edit_abrmin->GetText().ToInt());
+}
+
+Void BoCA::ConfigureVorbis::ToggleABRNom()
+{
+	if (!setABRNom) { edit_abrnom->Deactivate(); slider_abrnom->Deactivate(); }
+	else		{ edit_abrnom->Activate();   slider_abrnom->Activate();	  }
+}
+
+Void BoCA::ConfigureVorbis::SetABRNom()
+{
+	edit_abrnom->SetText(String::FromInt(abrNom));
+}
+
+Void BoCA::ConfigureVorbis::SetABRNomByEditBox()
+{
+	slider_abrnom->SetValue(edit_abrnom->GetText().ToInt());
+}
+
+Void BoCA::ConfigureVorbis::ToggleABRMax()
+{
+	if (!setABRMax) { edit_abrmax->Deactivate(); slider_abrmax->Deactivate(); }
+	else		{ edit_abrmax->Activate();   slider_abrmax->Activate();	  }
+}
+
+Void BoCA::ConfigureVorbis::SetABRMax()
+{
+	edit_abrmax->SetText(String::FromInt(abrMax));
+}
+
+Void BoCA::ConfigureVorbis::SetABRMaxByEditBox()
+{
+	slider_abrmax->SetValue(edit_abrmax->GetText().ToInt());
 }

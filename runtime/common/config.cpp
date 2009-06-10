@@ -31,7 +31,7 @@ BoCA::Config::Config()
 	{
 		configDir = S::System::System::GetApplicationDataDirectory();
 
-		if (configDir != "") configDir.Append("BonkEnc\\");
+		if (configDir != "") configDir.Append("BonkEnc").Append(Directory::GetDirectoryDelimiter());
 
 		Directory(configDir).Create();
 	}
@@ -40,7 +40,7 @@ BoCA::Config::Config()
 		configDir = Application::GetApplicationDirectory();
 	}
 
-	config = new Configuration(String(configDir).Append("boca\\boca.xml"), True);
+	config = new Configuration(String(configDir).Append("boca").Append(Directory::GetDirectoryDelimiter()).Append("boca.xml"), True);
 
 	LoadSettings();
 }

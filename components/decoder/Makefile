@@ -24,6 +24,7 @@ endif
 	cd wave && make
 ifeq ($(BUILD_WIN32),True)
 	cd winamp && make
+	cd wma && make
 endif
 
 clean:
@@ -48,4 +49,5 @@ endif
 	cd wave && make clean
 ifeq ($(BUILD_WIN32),True)
 	cd winamp && make clean
+	cd wma && make clean
 endif

@@ -17,6 +17,9 @@ ifeq ($(BUILD_WIN32),True)
 endif
 	cd vorbis && make
 	cd wave && make
+ifeq ($(BUILD_WIN32),True)
+	cd wma && make
+endif
 
 clean:
 ifeq ($(BUILD_WIN32),True)
@@ -33,3 +36,6 @@ ifeq ($(BUILD_WIN32),True)
 endif
 	cd vorbis && make clean
 	cd wave && make clean
+ifeq ($(BUILD_WIN32),True)
+	cd wma && make clean
+endif
