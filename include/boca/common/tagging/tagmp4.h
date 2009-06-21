@@ -18,7 +18,7 @@ using namespace smooth;
 
 namespace BoCA
 {
-	class TagMP4 : public Tag
+	class BOCA_DLL_EXPORT TagMP4 : public Tag
 	{
 		public:
 					 TagMP4();
@@ -27,6 +27,8 @@ namespace BoCA
 			Int		 Render(const Track &, const String &);
 
 			Int		 Parse(const String &, Track *);
+
+			Int		 Update(const String &, const Track &);
 	};
 };
 

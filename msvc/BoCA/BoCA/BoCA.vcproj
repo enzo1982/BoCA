@@ -404,6 +404,10 @@
 						RelativePath="..\..\..\runtime\common\tagging\tagvorbis.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\tagging\tagwma.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="communication"
@@ -679,6 +683,10 @@
 						</File>
 						<File
 							RelativePath="..\..\..\include\boca\common\tagging\tagvorbis.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\tagging\tagwma.h"
 							>
 						</File>
 					</Filter>

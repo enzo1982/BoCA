@@ -401,3 +401,123 @@ Bool BoCA::TagAPE::ParseAPEBinaryItem(const Buffer<UnsignedByte> &buffer, Int &o
 
 	return True;
 }
+
+Int BoCA::TagAPE::Update(const String &fileName, const Track &track)
+{
+	InStream		 in(STREAM_FILE, fileName, IS_READONLY);
+	Buffer<UnsignedByte>	 buffer(32);
+
+	in.InputData(buffer, 32);
+
+	Int	 tagSize = 0;
+
+	/* Check for APEv2 tag at the beginning of the file.
+	 */
+	if (ParseAPEHeader(buffer, &tagSize, NIL))
+	{
+		/* Copy to temporary file.
+		 */
+		in.RelSeek(tagSize);
+
+		String		 tempFile = String(fileName).Append(".bonkenc.temp");
+		OutStream	 out(STREAM_FILE, tempFile, OS_APPEND);
+
+		if (out.GetLastError() == IO_ERROR_OK)
+		{
+			Buffer<UnsignedByte>	 buffer;
+
+			tagSize = Render(track, buffer);
+
+			out.OutputData(buffer, tagSize);
+
+			buffer.Resize(1024);
+
+			for (Int i = in.GetPos(); i < in.Size(); i += buffer.Size())
+			{
+				Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
+
+				out.OutputData(in.InputData(buffer, bytes), bytes);
+			}
+
+			in.Close();
+			out.Close();
+
+			File(fileName).Delete();
+			File(tempFile).Move(fileName);
+
+			return Success();
+		}
+
+		return Error();
+	}
+
+	in.Seek(in.Size() - 32);
+	in.InputData(buffer, 32);
+
+	/* Check for APEv2 tag at the end of the file.
+	 */
+	if (ParseAPEFooter(buffer, &tagSize, NIL))
+	{
+		/* Check if this tag also has a header.
+		 */
+		in.RelSeek(-12);
+
+		if (in.InputNumber(4) & 0x80000000) tagSize += 32;
+
+		/* Copy to temporary file.
+		 */
+		in.Seek(0);
+
+		String		 tempFile = String(fileName).Append(".bonkenc.temp");
+		OutStream	 out(STREAM_FILE, tempFile, OS_APPEND);
+
+		if (out.GetLastError() == IO_ERROR_OK)
+		{
+			Buffer<UnsignedByte>	 buffer;
+
+			buffer.Resize(1024);
+
+			for (Int i = tagSize; i < in.Size(); i += buffer.Size())
+			{
+				Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
+
+				out.OutputData(in.InputData(buffer, bytes), bytes);
+			}
+
+			buffer.Resize(0);
+
+			tagSize = Render(track, buffer);
+
+			out.OutputData(buffer, tagSize);
+
+			in.Close();
+			out.Close();
+
+			File(fileName).Delete();
+			File(tempFile).Move(fileName);
+
+			return Success();
+		}
+
+		return Error();
+	}
+
+	in.Close();
+
+	OutStream	 out(STREAM_FILE, fileName, OS_APPEND);
+
+	/* Append new APEv2 tag.
+	 */
+	if (out.GetLastError() == IO_ERROR_OK)
+	{
+		Buffer<UnsignedByte>	 buffer;
+
+		tagSize = Render(track, buffer);
+
+		out.OutputData(buffer, tagSize);
+
+		return Success();
+	}
+
+	return Error();
+}

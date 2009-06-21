@@ -18,7 +18,7 @@ using namespace smooth;
 
 namespace BoCA
 {
-	class TagVorbis : public Tag
+	class BOCA_DLL_EXPORT TagVorbis : public Tag
 	{
 		private:
 			Int		 RenderTagHeader(const String &, Int, Buffer<UnsignedByte> &);
@@ -27,7 +27,7 @@ namespace BoCA
 					 TagVorbis();
 					~TagVorbis();
 
-			Int		 Render(const Track &, Buffer<UnsignedByte> &, const String &);
+			Int		 Render(const Track &, Buffer<UnsignedByte> &, const String & = "BoCA Tagging API");
 
 			Int		 Parse(const Buffer<UnsignedByte> &, Track *);
 	};

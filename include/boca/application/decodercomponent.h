@@ -29,7 +29,9 @@ namespace BoCA
 				virtual Bool	 SetAudioTrackInfo(const Track &);
 
 				virtual Bool	 CanOpenStream(const String &);
+
 				virtual Error	 GetStreamInfo(const String &, Track &);
+				virtual Error	 UpdateStreamInfo(const String &, const Track &);
 
 				virtual Int64	 GetInBytes();
 

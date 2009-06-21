@@ -44,6 +44,13 @@ Bool BoCA::AS::DecoderComponentExternal::CanOpenStream(const String &streamURI)
 	return False;
 }
 
+Error BoCA::AS::DecoderComponentExternal::UpdateStreamInfo(const String &streamURI, Track &track)
+{
+/* ToDo: Implement metadata updates.
+ */
+	return Error();
+}
+
 Int BoCA::AS::DecoderComponentExternal::GetPackageSize()
 {
 	return packageSize;

@@ -13,23 +13,22 @@
 
 #include <smooth.h>
 #include "tag.h"
-#include "../../core/dllinterfaces.h"
 
 using namespace smooth;
 
 namespace BoCA
 {
-	class TagID3v2 : public Tag
+	class BOCA_DLL_EXPORT TagID3v2 : public Tag
 	{
 		private:
 			static const String	 genres[148];
 			static String		 dummyString;
 
-			String			 GetFrameString(ID3Frame *, String & = dummyString);
-			Int			 SetFrameString(ID3Frame *, const String &, const String & = NIL);
+			String			 GetFrameString(Void *, String & = dummyString);
+			Int			 SetFrameString(Void *, const String &, const String & = NIL);
 
-			String			 GetFrameURL(ID3Frame *);
-			Int			 SetFrameURL(ID3Frame *, const String &);
+			String			 GetFrameURL(Void *);
+			Int			 SetFrameURL(Void *, const String &);
 
 			const String		&GetID3CategoryName(Int);
 		public:
@@ -40,6 +39,9 @@ namespace BoCA
 
 			Int			 Parse(const Buffer<UnsignedByte> &, Track *);
 			Int			 Parse(const String &, Track *);
+
+			Int			 Update(const String &, const Track &);
+
 	};
 };
 

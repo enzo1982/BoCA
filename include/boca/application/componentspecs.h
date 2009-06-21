@@ -138,7 +138,9 @@ namespace BoCA
 				const void		*(*func_GetErrorString)(void *);
 
 				bool			 (*func_CanOpenStream)(void *, const wchar_t *);
+
 				int			 (*func_GetStreamInfo)(void *, const wchar_t *, void *);
+				int			 (*func_UpdateStreamInfo)(void *, const wchar_t *, const void *);
 
 				int			 (*func_GetPackageSize)(void *);
 

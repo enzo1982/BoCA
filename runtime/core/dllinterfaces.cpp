@@ -59,6 +59,14 @@ MP4SETMETADATAALBUM		 ex_MP4SetMetadataAlbum			= NIL;
 MP4SETMETADATAGENRE		 ex_MP4SetMetadataGenre			= NIL;
 MP4SETMETADATATRACK		 ex_MP4SetMetadataTrack			= NIL;
 MP4SETMETADATACOVERART		 ex_MP4SetMetadataCoverArt		= NIL;
+MP4DELETEMETADATANAME		 ex_MP4DeleteMetadataName		= NIL;
+MP4DELETEMETADATAARTIST		 ex_MP4DeleteMetadataArtist		= NIL;
+MP4DELETEMETADATACOMMENT	 ex_MP4DeleteMetadataComment		= NIL;
+MP4DELETEMETADATAYEAR		 ex_MP4DeleteMetadataYear		= NIL;
+MP4DELETEMETADATAALBUM		 ex_MP4DeleteMetadataAlbum		= NIL;
+MP4DELETEMETADATAGENRE		 ex_MP4DeleteMetadataGenre		= NIL;
+MP4DELETEMETADATATRACK		 ex_MP4DeleteMetadataTrack		= NIL;
+MP4DELETEMETADATACOVERART	 ex_MP4DeleteMetadataCoverArt		= NIL;
 
 OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
 OGGSTREAMPACKETIN		 ex_ogg_stream_packetin			= NIL;
@@ -70,9 +78,14 @@ OGGSYNCWROTE			 ex_ogg_sync_wrote			= NIL;
 OGGSYNCPAGEOUT			 ex_ogg_sync_pageout			= NIL;
 OGGSYNCCLEAR			 ex_ogg_sync_clear			= NIL;
 
+#ifdef __WIN32__
+	WMCREATEEDITOR		 ex_WMCreateEditor			= NIL;
+#endif
+
 DynamicLoader *BoCA::DLLInterfaces::id3dll	= NIL;
 DynamicLoader *BoCA::DLLInterfaces::mp4v2dll	= NIL;
 DynamicLoader *BoCA::DLLInterfaces::oggdll	= NIL;
+DynamicLoader *BoCA::DLLInterfaces::wmvcoredll	= NIL;
 
 Bool BoCA::DLLInterfaces::LoadID3DLL()
 {
@@ -168,6 +181,14 @@ Bool BoCA::DLLInterfaces::LoadMP4v2DLL()
 	ex_MP4SetMetadataGenre		= (MP4SETMETADATAGENRE) mp4v2dll->GetFunctionAddress("MP4SetMetadataGenre");
 	ex_MP4SetMetadataTrack		= (MP4SETMETADATATRACK) mp4v2dll->GetFunctionAddress("MP4SetMetadataTrack");
 	ex_MP4SetMetadataCoverArt	= (MP4SETMETADATACOVERART) mp4v2dll->GetFunctionAddress("MP4SetMetadataCoverArt");
+	ex_MP4DeleteMetadataName	= (MP4DELETEMETADATANAME) mp4v2dll->GetFunctionAddress("MP4DeleteMetadataName");
+	ex_MP4DeleteMetadataArtist	= (MP4DELETEMETADATAARTIST) mp4v2dll->GetFunctionAddress("MP4DeleteMetadataArtist");
+	ex_MP4DeleteMetadataComment	= (MP4DELETEMETADATACOMMENT) mp4v2dll->GetFunctionAddress("MP4DeleteMetadataComment");
+	ex_MP4DeleteMetadataYear	= (MP4DELETEMETADATAYEAR) mp4v2dll->GetFunctionAddress("MP4DeleteMetadataYear");
+	ex_MP4DeleteMetadataAlbum	= (MP4DELETEMETADATAALBUM) mp4v2dll->GetFunctionAddress("MP4DeleteMetadataAlbum");
+	ex_MP4DeleteMetadataGenre	= (MP4DELETEMETADATAGENRE) mp4v2dll->GetFunctionAddress("MP4DeleteMetadataGenre");
+	ex_MP4DeleteMetadataTrack	= (MP4DELETEMETADATATRACK) mp4v2dll->GetFunctionAddress("MP4DeleteMetadataTrack");
+	ex_MP4DeleteMetadataCoverArt	= (MP4DELETEMETADATACOVERART) mp4v2dll->GetFunctionAddress("MP4DeleteMetadataCoverArt");
 
 	if (ex_MP4Read				== NIL ||
 	    ex_MP4Modify			== NIL ||
@@ -190,7 +211,15 @@ Bool BoCA::DLLInterfaces::LoadMP4v2DLL()
 	    ex_MP4SetMetadataAlbum		== NIL ||
 	    ex_MP4SetMetadataGenre		== NIL ||
 	    ex_MP4SetMetadataTrack		== NIL ||
-	    ex_MP4SetMetadataCoverArt		== NIL) { FreeMP4v2DLL(); return False; }
+	    ex_MP4SetMetadataCoverArt		== NIL ||
+	    ex_MP4DeleteMetadataName		== NIL ||
+	    ex_MP4DeleteMetadataArtist		== NIL ||
+	    ex_MP4DeleteMetadataComment		== NIL ||
+	    ex_MP4DeleteMetadataYear		== NIL ||
+	    ex_MP4DeleteMetadataAlbum		== NIL ||
+	    ex_MP4DeleteMetadataGenre		== NIL ||
+	    ex_MP4DeleteMetadataTrack		== NIL ||
+	    ex_MP4DeleteMetadataCoverArt	== NIL) { FreeMP4v2DLL(); return False; }
 
 	return True;
 }
@@ -234,4 +263,28 @@ Void BoCA::DLLInterfaces::FreeOggDLL()
 	Object::DeleteObject(oggdll);
 
 	oggdll = NIL;
+}
+
+Bool BoCA::DLLInterfaces::LoadWMVCoreDLL()
+{
+#ifdef __WIN32__
+	wmvcoredll = new DynamicLoader("WMVCore");
+
+	ex_WMCreateEditor		= (WMCREATEEDITOR) wmvcoredll->GetFunctionAddress("WMCreateEditor");
+
+	if (ex_WMCreateEditor			== NIL) { FreeWMVCoreDLL(); return False; }
+
+	return True;
+#else
+	return False;
+#endif
+}
+
+Void BoCA::DLLInterfaces::FreeWMVCoreDLL()
+{
+#ifdef __WIN32__
+	Object::DeleteObject(wmvcoredll);
+
+	wmvcoredll = NIL;
+#endif
 }

@@ -12,6 +12,11 @@
 #include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
+#include <boca/common/tagging/tagid3v1.h>
+#include <boca/common/tagging/tagid3v2.h>
+#include <boca/common/tagging/tagmp4.h>
+#include <boca/common/tagging/tagape.h>
+
 #include <smooth/io/drivers/driver_win32.h>
 
 using namespace smooth::IO;
@@ -30,10 +35,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	 */
 	if (specs->external_tagmode != TAG_MODE_NONE)
 	{
-		if	(specs->external_tag == "ID3v1"	      && Config::Get()->enable_id3) track.ParseID3v1Tag(streamURI);
-		else if (specs->external_tag == "ID3v2"	      && Config::Get()->enable_id3) track.ParseID3v2Tag(streamURI);
-		else if (specs->external_tag == "MP4Metadata" && Config::Get()->enable_mp4) track.ParseMP4Meta(streamURI);
-		else if (specs->external_tag == "APEv2")				    track.ParseAPETag(streamURI);
+		if	(specs->external_tag == "ID3v1"	      && Config::Get()->enable_id3) TagID3v1().Parse(streamURI, &track);
+		else if (specs->external_tag == "ID3v2"	      && Config::Get()->enable_id3) TagID3v2().Parse(streamURI, &track);
+		else if (specs->external_tag == "MP4Metadata" && Config::Get()->enable_mp4) TagMP4().Parse(streamURI, &track);
+		else if (specs->external_tag == "APEv2")				    TagAPE().Parse(streamURI, &track);
 	}
 
 	SECURITY_ATTRIBUTES	 secAttr;

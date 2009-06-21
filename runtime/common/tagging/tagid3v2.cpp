@@ -10,26 +10,9 @@
 
 #include <boca/common/tagging/tagid3v2.h>
 #include <boca/common/config.h>
+#include <boca/core/dllinterfaces.h>
 
 using namespace smooth::IO;
-
-const char *INFO_BAND		= (char *) "Band/orchestra/accompaniment";
-const char *INFO_PERFORMER	= (char *) "Conductor/performer refinement";
-const char *INFO_REMIX		= (char *) "Interpreted, remixed or otherwise modified by";
-const char *INFO_COMPOSER	= (char *) "Composer";
-const char *INFO_LYRICIST	= (char *) "Lyricist/Text writer";
-
-const char *INFO_ORIG_ARTIST	= (char *) "Original artist(s)/performer(s)";
-const char *INFO_ORIG_ALBUM	= (char *) "Original album/movie/show title";
-const char *INFO_ORIG_LYRICIST	= (char *) "Original lyricist(s)/text writer(s)";
-const char *INFO_ORIG_YEAR	= (char *) "Original release year";
-
-const char *INFO_WEB_ARTIST	= (char *) "Official artist webpage";
-const char *INFO_WEB_PUBLISHER	= (char *) "Official publisher webpage";
-const char *INFO_WEB_RADIO	= (char *) "Official radio webpage";
-const char *INFO_WEB_SOURCE	= (char *) "Official audio source webpage";
-const char *INFO_WEB_COPYRIGHT	= (char *) "Copyright information webpage";
-const char *INFO_WEB_COMMERCIAL	= (char *) "Commercial information  webpage";
 
 const String	 BoCA::TagID3v2::genres[148] =
       { "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz",
@@ -355,12 +338,9 @@ Int BoCA::TagID3v2::Parse(const Buffer<UnsignedByte> &buffer, Track *track)
 			{
 				picture.data.Resize(ex_ID3Field_Size(field));
 
-				if (picture.data.Size() > 16 && picture.data[0] != 0 && picture.data[1] != 0)
-				{
-					ex_ID3Field_GetBINARY(field, picture.data, picture.data.Size());
+				ex_ID3Field_GetBINARY(field, picture.data, picture.data.Size());
 
-					track->pictures.Add(picture);
-				}
+				if (picture.data.Size() > 16 && picture.data[0] != 0 && picture.data[1] != 0) track->pictures.Add(picture);
 			}
 		}
 	}
@@ -404,9 +384,66 @@ Int BoCA::TagID3v2::Parse(const String &fileName, Track *track)
 	return Error();
 }
 
-String BoCA::TagID3v2::GetFrameString(ID3Frame *frame, String &description)
+Int BoCA::TagID3v2::Update(const String &fileName, const Track &track)
 {
-	ID3Field	*field = ex_ID3Frame_GetField(frame, ID3FN_TEXTENC);
+	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
+
+	/* Look for ID3v2 tag.
+	 */
+	if (in.InputString(3) == "ID3" && in.InputNumber(1) <= 4)
+	{
+		/* Skip minor version and flags.
+		 */
+		in.InputNumber(1);
+		in.InputNumber(1);
+
+		/* Read tag size as a 4 byte unsynchronized integer.
+		 */
+		Int	 tagSize = (in.InputNumber(1) << 21) +
+				   (in.InputNumber(1) << 14) +
+				   (in.InputNumber(1) <<  7) +
+				   (in.InputNumber(1)      );
+
+		/* Skip the tag.
+		 */
+		in.RelSeek(tagSize);
+
+		String		 tempFile = String(fileName).Append(".bonkenc.temp");
+		OutStream	 out(STREAM_FILE, tempFile, OS_APPEND);
+
+		if (out.GetLastError() == IO_ERROR_OK)
+		{
+			Buffer<UnsignedByte>	 buffer;
+
+			tagSize = Render(track, buffer);
+
+			out.OutputData(buffer, tagSize);
+
+			buffer.Resize(1024);
+
+			for (Int i = in.GetPos(); i < in.Size(); i += buffer.Size())
+			{
+				Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
+
+				out.OutputData(in.InputData(buffer, bytes), bytes);
+			}
+
+			in.Close();
+			out.Close();
+
+			File(fileName).Delete();
+			File(tempFile).Move(fileName);
+
+			return Success();
+		}
+	}
+
+	return Error();
+}
+
+String BoCA::TagID3v2::GetFrameString(Void *frame, String &description)
+{
+	ID3Field	*field = ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXTENC);
 	String		 result;
 
 	if (field != NIL)
@@ -421,7 +458,7 @@ String BoCA::TagID3v2::GetFrameString(ID3Frame *frame, String &description)
 
 		if (encoding == ID3TE_ISO8859_1 || encoding == ID3TE_UTF8)
 		{
-			if ((field = ex_ID3Frame_GetField(frame, ID3FN_TEXT)) != NIL)
+			if ((field = ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXT)) != NIL)
 			{
 				ex_ID3Field_GetASCII(field, aBuffer, aBuffer.Size());
 
@@ -429,7 +466,7 @@ String BoCA::TagID3v2::GetFrameString(ID3Frame *frame, String &description)
 				else if (encoding == ID3TE_UTF8)	result.ImportFrom("UTF-8", aBuffer);
 			}
 
-			if ((field = ex_ID3Frame_GetField(frame, ID3FN_DESCRIPTION)) != NIL)
+			if ((field = ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_DESCRIPTION)) != NIL)
 			{
 				ex_ID3Field_GetASCII(field, aBuffer, aBuffer.Size());
 
@@ -439,14 +476,14 @@ String BoCA::TagID3v2::GetFrameString(ID3Frame *frame, String &description)
 		}
 		else if (encoding == ID3TE_UTF16 || encoding == ID3TE_UTF16BE)
 		{
-			if ((field = ex_ID3Frame_GetField(frame, ID3FN_TEXT)) != NIL)
+			if ((field = ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXT)) != NIL)
 			{
 				ex_ID3Field_GetUNICODE(field, (unicode_t *) (wchar_t *) wBuffer, wBuffer.Size());
 
 				result.ImportFrom("UTF-16BE", (char *) (wchar_t *) wBuffer);
 			}
 
-			if ((field = ex_ID3Frame_GetField(frame, ID3FN_DESCRIPTION)) != NIL)
+			if ((field = ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_DESCRIPTION)) != NIL)
 			{
 				ex_ID3Field_GetUNICODE(field, (unicode_t *) (wchar_t *) wBuffer, wBuffer.Size());
 
@@ -458,7 +495,7 @@ String BoCA::TagID3v2::GetFrameString(ID3Frame *frame, String &description)
 	return result;
 }
 
-Int BoCA::TagID3v2::SetFrameString(ID3Frame *frame, const String &text, const String &description)
+Int BoCA::TagID3v2::SetFrameString(Void *frame, const String &text, const String &description)
 {
 	String		 leBOM;
 
@@ -478,24 +515,24 @@ Int BoCA::TagID3v2::SetFrameString(ID3Frame *frame, const String &text, const St
 
 	char		*prevOutFormat = String::SetOutputFormat(encString);
 
-	ex_ID3Field_SetINT(ex_ID3Frame_GetField(frame, ID3FN_TEXTENC), encoding);
+	ex_ID3Field_SetINT(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXTENC), encoding);
 
 	if (text != NIL)
 	{
-		ex_ID3Field_SetEncoding(ex_ID3Frame_GetField(frame, ID3FN_TEXT), encoding);
+		ex_ID3Field_SetEncoding(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXT), encoding);
 
-		if	(encoding == ID3TE_UTF16)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField(frame, ID3FN_TEXT), (unicode_t *) String(leBOM).Append(text).ConvertTo("UTF-16LE"));
-		else if (encoding == ID3TE_UTF16BE)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField(frame, ID3FN_TEXT), (unicode_t *) text.ConvertTo("UTF-16BE"));
-		else					ex_ID3Field_SetASCII(ex_ID3Frame_GetField(frame, ID3FN_TEXT), text);
+		if	(encoding == ID3TE_UTF16)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXT), (unicode_t *) String(leBOM).Append(text).ConvertTo("UTF-16LE"));
+		else if (encoding == ID3TE_UTF16BE)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXT), (unicode_t *) text.ConvertTo("UTF-16BE"));
+		else					ex_ID3Field_SetASCII(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXT), text);
 	}
 
 	if (description != NIL)
 	{
-		ex_ID3Field_SetEncoding(ex_ID3Frame_GetField(frame, ID3FN_DESCRIPTION), encoding);
+		ex_ID3Field_SetEncoding(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_DESCRIPTION), encoding);
 
-		if	(encoding == ID3TE_UTF16)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField(frame, ID3FN_DESCRIPTION), (unicode_t *) String(leBOM).Append(description).ConvertTo("UTF-16LE"));
-		else if (encoding == ID3TE_UTF16BE)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField(frame, ID3FN_DESCRIPTION), (unicode_t *) description.ConvertTo("UTF-16BE"));
-		else					ex_ID3Field_SetASCII(ex_ID3Frame_GetField(frame, ID3FN_DESCRIPTION), description);
+		if	(encoding == ID3TE_UTF16)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_DESCRIPTION), (unicode_t *) String(leBOM).Append(description).ConvertTo("UTF-16LE"));
+		else if (encoding == ID3TE_UTF16BE)	ex_ID3Field_SetUNICODE(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_DESCRIPTION), (unicode_t *) description.ConvertTo("UTF-16BE"));
+		else					ex_ID3Field_SetASCII(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_DESCRIPTION), description);
 	}
 
 	String::SetOutputFormat(prevOutFormat);
@@ -503,9 +540,9 @@ Int BoCA::TagID3v2::SetFrameString(ID3Frame *frame, const String &text, const St
 	return Success();
 }
 
-String BoCA::TagID3v2::GetFrameURL(ID3Frame *frame)
+String BoCA::TagID3v2::GetFrameURL(Void *frame)
 {
-	ID3Field	*field = ex_ID3Frame_GetField(frame, ID3FN_URL);
+	ID3Field	*field = ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_URL);
 	String		 result;
 
 	if (field != NIL)
@@ -522,11 +559,11 @@ String BoCA::TagID3v2::GetFrameURL(ID3Frame *frame)
 	return result;
 }
 
-Int BoCA::TagID3v2::SetFrameURL(ID3Frame *frame, const String &url)
+Int BoCA::TagID3v2::SetFrameURL(Void *frame, const String &url)
 {
 	if (url != NIL)
 	{
-		ex_ID3Field_SetASCII(ex_ID3Frame_GetField(frame, ID3FN_URL), url);
+		ex_ID3Field_SetASCII(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_URL), url);
 	}
 
 	return Success();

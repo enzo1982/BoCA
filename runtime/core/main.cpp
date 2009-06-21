@@ -25,9 +25,10 @@ Void smooth::AttachDLL(Void *instance)
 {
 	BoCA::Config::Get();
 
-	if (BoCA::DLLInterfaces::LoadID3DLL())	 BoCA::Config::Get()->enable_id3 = True;
-	if (BoCA::DLLInterfaces::LoadMP4v2DLL()) BoCA::Config::Get()->enable_mp4 = True;
-	if (BoCA::DLLInterfaces::LoadOggDLL())	 BoCA::Config::Get()->enable_ogg = True;
+	if (BoCA::DLLInterfaces::LoadID3DLL())	   BoCA::Config::Get()->enable_id3 = True;
+	if (BoCA::DLLInterfaces::LoadMP4v2DLL())   BoCA::Config::Get()->enable_mp4 = True;
+	if (BoCA::DLLInterfaces::LoadOggDLL())	   BoCA::Config::Get()->enable_ogg = True;
+	if (BoCA::DLLInterfaces::LoadWMVCoreDLL()) BoCA::Config::Get()->enable_wma = True;
 }
 
 Void smooth::DetachDLL()
@@ -35,6 +36,7 @@ Void smooth::DetachDLL()
 	BoCA::DLLInterfaces::FreeID3DLL();
 	BoCA::DLLInterfaces::FreeMP4v2DLL();
 	BoCA::DLLInterfaces::FreeOggDLL();
+	BoCA::DLLInterfaces::FreeWMVCoreDLL();
 
 	BoCA::AS::Registry::Free();
 

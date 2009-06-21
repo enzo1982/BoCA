@@ -57,6 +57,8 @@ namespace smooth
 
 				Signal0<Void>			 onSelect;
 				Signal0<Void>			 onDeselect;
+
+				Signal1<Void, Bool>		 onToggleMark;
 			slots:
 				Void				 InitDrag();
 

@@ -74,7 +74,7 @@ Int BoCA::TagMP4::Render(const Track &track, const String &fileName)
 	{
 		ex_MP4Optimize(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"), NIL, 0);
 
-		File(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag")).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag")).Move(fileName);
 	}
 	else
 	{
@@ -148,6 +148,49 @@ Int BoCA::TagMP4::Parse(const String &fileName, Track *track)
 	if (String::IsUnicode(fileName))
 	{
 		File(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag")).Delete();
+	}
+
+	return Success();
+}
+
+Int BoCA::TagMP4::Update(const String &fileName, const Track &track)
+{
+	MP4FileHandle	 mp4File;
+
+	if (String::IsUnicode(fileName))
+	{
+		File(fileName).Copy(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"));
+
+		mp4File = ex_MP4Modify(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"), 0, 0);
+	}
+	else
+	{
+		mp4File = ex_MP4Modify(fileName, 0, 0);
+	}
+
+	/* Remove metadata first.
+	 */
+	ex_MP4DeleteMetadataArtist(mp4File);
+	ex_MP4DeleteMetadataName(mp4File);
+	ex_MP4DeleteMetadataAlbum(mp4File);
+	ex_MP4DeleteMetadataTrack(mp4File);
+	ex_MP4DeleteMetadataYear(mp4File);
+	ex_MP4DeleteMetadataGenre(mp4File);
+	ex_MP4DeleteMetadataComment(mp4File);
+	ex_MP4DeleteMetadataCoverArt(mp4File);
+
+	ex_MP4Close(mp4File);
+
+	if (String::IsUnicode(fileName))
+	{
+		Render(track, Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"));
+
+		File(fileName).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag")).Move(fileName);
+	}
+	else
+	{
+		Render(track, fileName);
 	}
 
 	return Success();

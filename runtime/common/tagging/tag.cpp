@@ -37,3 +37,13 @@ Int BoCA::Tag::Parse(const String &fileName, Track *track)
 {
 	return Error();
 }
+
+Int BoCA::Tag::Update(Buffer<UnsignedByte> &buffer, const Track &track)
+{
+	return Error();
+}
+
+Int BoCA::Tag::Update(const String &fileName, const Track &track)
+{
+	return Error();
+}

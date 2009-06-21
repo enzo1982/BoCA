@@ -17,6 +17,7 @@
 #	include "3rdparty/id3.h"
 #	include "3rdparty/mp4v2/mp4v2.h"
 #	include "3rdparty/ogg/ogg.h"
+#	include "3rdparty/wmsdk/wmsdk.h"
 #else
 #	include <id3.h>
 #	include <mp4.h>
@@ -34,6 +35,7 @@ namespace BoCA
 			static DynamicLoader	*id3dll;
 			static DynamicLoader	*mp4v2dll;
 			static DynamicLoader	*oggdll;
+			static DynamicLoader	*wmvcoredll;
 		public:
 			static Bool		 LoadID3DLL();
 			static Void		 FreeID3DLL();
@@ -43,6 +45,9 @@ namespace BoCA
 
 			static Bool		 LoadOggDLL();
 			static Void		 FreeOggDLL();
+
+			static Bool		 LoadWMVCoreDLL();
+			static Void		 FreeWMVCoreDLL();
 	};
 };
 
@@ -126,6 +131,14 @@ namespace BoCA
 	typedef bool				(*MP4SETMETADATAGENRE)		(MP4FileHandle, const char *);
 	typedef bool				(*MP4SETMETADATATRACK)		(MP4FileHandle, uint16_t, uint16_t);
 	typedef bool				(*MP4SETMETADATACOVERART)	(MP4FileHandle, uint8_t *, uint32_t);
+	typedef bool				(*MP4DELETEMETADATANAME)	(MP4FileHandle);
+	typedef bool				(*MP4DELETEMETADATAARTIST)	(MP4FileHandle);
+	typedef bool				(*MP4DELETEMETADATACOMMENT)	(MP4FileHandle);
+	typedef bool				(*MP4DELETEMETADATAYEAR)	(MP4FileHandle);
+	typedef bool				(*MP4DELETEMETADATAALBUM)	(MP4FileHandle);
+	typedef bool				(*MP4DELETEMETADATAGENRE)	(MP4FileHandle);
+	typedef bool				(*MP4DELETEMETADATATRACK)	(MP4FileHandle);
+	typedef bool				(*MP4DELETEMETADATACOVERART)	(MP4FileHandle);
 
 	extern MP4READ				 ex_MP4Read;
 	extern MP4MODIFY			 ex_MP4Modify;
@@ -149,6 +162,14 @@ namespace BoCA
 	extern MP4SETMETADATAGENRE		 ex_MP4SetMetadataGenre;
 	extern MP4SETMETADATATRACK		 ex_MP4SetMetadataTrack;
 	extern MP4SETMETADATACOVERART		 ex_MP4SetMetadataCoverArt;
+	extern MP4DELETEMETADATANAME		 ex_MP4DeleteMetadataName;
+	extern MP4DELETEMETADATAARTIST		 ex_MP4DeleteMetadataArtist;
+	extern MP4DELETEMETADATACOMMENT		 ex_MP4DeleteMetadataComment;
+	extern MP4DELETEMETADATAYEAR		 ex_MP4DeleteMetadataYear;
+	extern MP4DELETEMETADATAALBUM		 ex_MP4DeleteMetadataAlbum;
+	extern MP4DELETEMETADATAGENRE		 ex_MP4DeleteMetadataGenre;
+	extern MP4DELETEMETADATATRACK		 ex_MP4DeleteMetadataTrack;
+	extern MP4DELETEMETADATACOVERART	 ex_MP4DeleteMetadataCoverArt;
 
 	/* Ogg DLL API
 	 */
@@ -171,5 +192,13 @@ namespace BoCA
 	extern OGGSYNCWROTE			 ex_ogg_sync_wrote;
 	extern OGGSYNCPAGEOUT			 ex_ogg_sync_pageout;
 	extern OGGSYNCCLEAR			 ex_ogg_sync_clear;
+
+	/* WMVCore DLL API
+	 */
+#ifdef __WIN32__
+	typedef HRESULT				(STDMETHODCALLTYPE *WMCREATEEDITOR)	(IWMMetadataEditor **);
+
+	extern WMCREATEEDITOR			 ex_WMCreateEditor;
+#endif
 
 #endif

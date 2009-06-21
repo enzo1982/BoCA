@@ -37,6 +37,8 @@ namespace smooth
 
 							~Directory();
 
+			Directory &operator		 =(const Directory &);
+
 			const String			&GetDirectoryName() const;
 			const String			&GetDirectoryPath() const;
 

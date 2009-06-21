@@ -41,47 +41,49 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	componentName = BoCA_GetComponentName();
 
-	func_GetComponentSpecs		= (const char *(*)())				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetComponentSpecs"));
+	func_GetComponentSpecs		= (const char *(*)())					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetComponentSpecs"));
 
-	func_Create			= (void *(*)())					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Create"));
-	func_Delete			= (bool (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Delete"));
+	func_Create			= (void *(*)())						library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Create"));
+	func_Delete			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Delete"));
 
-	func_GetConfigurationLayer	= (void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetConfigurationLayer"));
-	func_FreeConfigurationLayer	= (void (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_FreeConfigurationLayer"));
+	func_GetConfigurationLayer	= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetConfigurationLayer"));
+	func_FreeConfigurationLayer	= (void (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_FreeConfigurationLayer"));
 
-	func_GetErrorState		= (bool (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorState"));
-	func_GetErrorString		= (const void *(*)(void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorString"));
+	func_GetErrorState		= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorState"));
+	func_GetErrorString		= (const void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorString"));
 
-	func_CanOpenStream		= (bool (*)(void *, const wchar_t *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanOpenStream"));
-	func_GetStreamInfo		= (int (*)(void *, const wchar_t *, void *))	library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStreamInfo"));
+	func_CanOpenStream		= (bool (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanOpenStream"));
 
-	func_GetPackageSize		= (int (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetPackageSize"));
+	func_GetStreamInfo		= (int (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStreamInfo"));
+	func_UpdateStreamInfo		= (int (*)(void *, const wchar_t *, const void *))	library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_UpdateStreamInfo"));
 
-	func_SetDriver			= (int (*)(void *, void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetDriver"));
+	func_GetPackageSize		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetPackageSize"));
 
-	func_GetInBytes			= (__int64 (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetInBytes"));
+	func_SetDriver			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetDriver"));
 
-	func_CanWrite			= (int (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanWrite"));
+	func_GetInBytes			= (__int64 (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetInBytes"));
 
-	func_SetPause			= (int (*)(void *, bool))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetPause"));
-	func_IsPlaying			= (bool (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsPlaying"));
+	func_CanWrite			= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanWrite"));
 
-	func_SetAudioTrackInfo		= (bool (*)(void *, const void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetAudioTrackInfo"));
-	func_GetFormatInfo		= (void (*)(void *, void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetFormatInfo"));
+	func_SetPause			= (int (*)(void *, bool))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetPause"));
+	func_IsPlaying			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsPlaying"));
 
-	func_GetOutputFileExtension	= (char *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetOutputFileExtension"));
+	func_SetAudioTrackInfo		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetAudioTrackInfo"));
+	func_GetFormatInfo		= (void (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetFormatInfo"));
 
-	func_Activate			= (bool (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Activate"));
-	func_Deactivate			= (bool (*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Deactivate"));
+	func_GetOutputFileExtension	= (char *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetOutputFileExtension"));
 
-	func_ReadData			= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
-	func_WriteData			= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
-	func_TransformData		= (int (*)(void *, void *, int))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_TransformData"));
+	func_Activate			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Activate"));
+	func_Deactivate			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Deactivate"));
 
-	func_Flush			= (int (*)(void *, void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Flush"));
+	func_ReadData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
+	func_WriteData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
+	func_TransformData		= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_TransformData"));
 
-	func_GetMainTabLayer		= (void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetMainTabLayer"));
-	func_GetStatusBarLayer		= (void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStatusBarLayer"));
+	func_Flush			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Flush"));
+
+	func_GetMainTabLayer		= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetMainTabLayer"));
+	func_GetStatusBarLayer		= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStatusBarLayer"));
 
 	return ParseXMLSpec(String(func_GetComponentSpecs()).Trim());
 }

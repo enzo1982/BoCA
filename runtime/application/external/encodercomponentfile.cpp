@@ -12,6 +12,11 @@
 #include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
+#include <boca/common/tagging/tagid3v1.h>
+#include <boca/common/tagging/tagid3v2.h>
+#include <boca/common/tagging/tagmp4.h>
+#include <boca/common/tagging/tagape.h>
+
 using namespace smooth::IO;
 
 BoCA::AS::EncoderComponentExternalFile::EncoderComponentExternalFile(ComponentSpecs *specs) : EncoderComponentExternal(specs)
@@ -123,10 +128,10 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	if (specs->external_tagmode != TAG_MODE_NONE && (info.artist != NIL || info.title != NIL))
 	{
-		if	(specs->external_tag == "ID3v1"	      && config->GetIntValue("Tags", "EnableID3v1", False)	&& config->enable_id3)	tagSize = track.RenderID3v1Tag(tag);
-		else if (specs->external_tag == "ID3v2"	      && config->GetIntValue("Tags", "EnableID3v2", True)	&& config->enable_id3)	tagSize = track.RenderID3v2Tag(tag);
-		else if (specs->external_tag == "MP4Metadata" && config->GetIntValue("Tags", "EnableMP4Metadata", True) && config->enable_mp4)	track.RenderMP4Meta(encFileName);
-		else if (specs->external_tag == "APEv2"	      && config->GetIntValue("Tags", "EnableAPEv2", True))				tagSize = track.RenderAPETag(tag);
+		if	(specs->external_tag == "ID3v1"	      && config->GetIntValue("Tags", "EnableID3v1", False)	&& config->enable_id3)	tagSize = TagID3v1().Render(track, tag);
+		else if (specs->external_tag == "ID3v2"	      && config->GetIntValue("Tags", "EnableID3v2", True)	&& config->enable_id3)	tagSize = TagID3v2().Render(track, tag);
+		else if (specs->external_tag == "MP4Metadata" && config->GetIntValue("Tags", "EnableMP4Metadata", True) && config->enable_mp4)		  TagMP4().Render(track, encFileName);
+		else if (specs->external_tag == "APEv2"	      && config->GetIntValue("Tags", "EnableAPEv2", True))				tagSize = TagAPE().Render(track, tag);
 	}
 
 	/* Prepend tag

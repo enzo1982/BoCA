@@ -18,7 +18,7 @@ using namespace smooth;
 
 namespace BoCA
 {
-	class TagID3v1 : public Tag
+	class BOCA_DLL_EXPORT TagID3v1 : public Tag
 	{
 		private:
 			static const String	 genres[148];
@@ -33,6 +33,8 @@ namespace BoCA
 
 			Int			 Parse(const Buffer<UnsignedByte> &, Track *);
 			Int			 Parse(const String &, Track *);
+
+			Int			 Update(const String &, const Track &);
 	};
 };
 

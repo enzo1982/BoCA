@@ -63,8 +63,13 @@ namespace smooth
 				Int				 GetSelectedEntryNumber() const	{ return list.GetSelectedEntryNumber(); }
 			signals:
 				Signal1<Void, ListEntry *>	 onSelectEntry;
+
+				Signal0<Void>			 onOpen;
+				Signal0<Void>			 onClose;
 			slots:
 				Void				 OnChangeSize(const Size &);
+
+				Void				 OnToggleMark(Bool);
 
 				Void				 OnSelectEntry(Int, Int);
 

@@ -22,6 +22,7 @@ BoCA::Config::Config()
 	enable_id3		= False;
 	enable_mp4		= False;
 	enable_ogg		= False;
+	enable_wma		= False;
 
 	saveSettingsOnExit	= True;
 

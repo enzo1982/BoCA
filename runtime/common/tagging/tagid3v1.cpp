@@ -143,6 +143,35 @@ Int BoCA::TagID3v1::Parse(const String &fileName, Track *track)
 	return Parse(buffer, track);
 }
 
+Int BoCA::TagID3v1::Update(const String &fileName, const Track &track)
+{
+	Int		 offset = 0;
+	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
+
+	in.Seek(in.Size() - 128);
+
+	if (in.InputString(3) == "TAG") offset = -128;
+
+	in.Close();
+
+	OutStream	 out(STREAM_FILE, fileName, OS_APPEND);
+
+	if (out.GetLastError() == IO_ERROR_OK)
+	{
+		out.RelSeek(offset);
+
+		Buffer<UnsignedByte>	 buffer(128);
+
+		Render(track, buffer);
+
+		out.OutputData(buffer, 128);
+
+		return Success();
+	}
+
+	return Error();
+}
+
 const String &BoCA::TagID3v1::GetID3CategoryName(Int id)
 {
 	static const String	 empty;

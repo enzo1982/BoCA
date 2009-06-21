@@ -18,7 +18,7 @@ using namespace smooth;
 
 namespace BoCA
 {
-	class Tag
+	class BOCA_DLL_EXPORT Tag
 	{
 		public:
 					 Tag();
@@ -29,6 +29,9 @@ namespace BoCA
 
 			virtual Int	 Parse(const Buffer<UnsignedByte> &, Track *);
 			virtual Int	 Parse(const String &, Track *);
+
+			virtual Int	 Update(Buffer<UnsignedByte> &, const Track &);
+			virtual Int	 Update(const String &, const Track &);
 	};
 };
 

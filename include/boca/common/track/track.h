@@ -83,24 +83,6 @@ namespace BoCA
 
 			Bool		 LoadCoverArtFiles();
 			Bool		 LoadCoverArtFile(const String &);
-
-			Int		 RenderID3v1Tag(Buffer<UnsignedByte> &);
-			Bool		 ParseID3v1Tag(const Buffer<UnsignedByte> &);
-			Bool		 ParseID3v1Tag(const String &);
-
-			Int		 RenderID3v2Tag(Buffer<UnsignedByte> &);
-			Bool		 ParseID3v2Tag(const Buffer<UnsignedByte> &);
-			Bool		 ParseID3v2Tag(const String &);
-
-			Int		 RenderAPETag(Buffer<UnsignedByte> &);
-			Bool		 ParseAPETag(const Buffer<UnsignedByte> &);
-			Bool		 ParseAPETag(const String &);
-
-			Bool		 RenderMP4Meta(const String &);
-			Bool		 ParseMP4Meta(const String &);
-
-			Int		 RenderVorbisComment(Buffer<UnsignedByte> &, const String & = "BoCA Tagging API");
-			Bool		 ParseVorbisComment(const Buffer<UnsignedByte> &);
 		accessors:
 			Int		 GetTrackID() const				{ return trackID; }
 

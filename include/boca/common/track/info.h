@@ -18,6 +18,24 @@ using namespace smooth;
 
 namespace BoCA
 {
+	const char * const INFO_BAND		= (char *) "Band/orchestra/accompaniment";
+	const char * const INFO_PERFORMER	= (char *) "Conductor/performer refinement";
+	const char * const INFO_REMIX		= (char *) "Interpreted, remixed or otherwise modified by";
+	const char * const INFO_COMPOSER	= (char *) "Composer";
+	const char * const INFO_LYRICIST	= (char *) "Lyricist/Text writer";
+
+	const char * const INFO_ORIG_ARTIST	= (char *) "Original artist(s)/performer(s)";
+	const char * const INFO_ORIG_ALBUM	= (char *) "Original album/movie/show title";
+	const char * const INFO_ORIG_LYRICIST	= (char *) "Original lyricist(s)/text writer(s)";
+	const char * const INFO_ORIG_YEAR	= (char *) "Original release year";
+
+	const char * const INFO_WEB_ARTIST	= (char *) "Official artist webpage";
+	const char * const INFO_WEB_PUBLISHER	= (char *) "Official publisher webpage";
+	const char * const INFO_WEB_RADIO	= (char *) "Official radio webpage";
+	const char * const INFO_WEB_SOURCE	= (char *) "Official audio source webpage";
+	const char * const INFO_WEB_COPYRIGHT	= (char *) "Copyright information webpage";
+	const char * const INFO_WEB_COMMERCIAL	= (char *) "Commercial information  webpage";
+
 	class BOCA_DLL_EXPORT Info
 	{
 		public:

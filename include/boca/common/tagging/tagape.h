@@ -18,7 +18,7 @@ using namespace smooth;
 
 namespace BoCA
 {
-	class TagAPE : public Tag
+	class BOCA_DLL_EXPORT TagAPE : public Tag
 	{
 		private:
 			Int		 RenderAPEHeader(Int, Int, Buffer<UnsignedByte> &);
@@ -38,6 +38,8 @@ namespace BoCA
 
 			Int		 Parse(const Buffer<UnsignedByte> &, Track *);
 			Int		 Parse(const String &, Track *);
+
+			Int		 Update(const String &, const Track &);
 	};
 };
 

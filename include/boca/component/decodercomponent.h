@@ -33,7 +33,9 @@ namespace BoCA
 				virtual		~DecoderComponent();
 
 				virtual Bool	 CanOpenStream(const String &) = 0;
+
 				virtual Error	 GetStreamInfo(const String &, Track &) = 0;
+				virtual Error	 UpdateStreamInfo(const String &, const Track &);
 
 				virtual Bool	 SetAudioTrackInfo(const Track &);
 

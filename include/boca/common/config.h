@@ -49,6 +49,7 @@ namespace BoCA
 			Bool		 enable_id3;
 			Bool		 enable_mp4;
 			Bool		 enable_ogg;
+			Bool		 enable_wma;
 
 			String		 enc_filePattern;
 			Bool		 enc_onTheFly;
