@@ -123,7 +123,7 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 
 					memcpy(buffer, op.packet + 7, op.bytes - 7);
 
-					track.ParseVorbisComment(buffer);
+					TagVorbis().Parse(buffer, &track);
 				}
 
 				if (packetNum >= 2) done = True;

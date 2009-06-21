@@ -117,7 +117,7 @@ Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 
 					memcpy(buffer, op.packet, op.bytes);
 
-					track.ParseVorbisComment(buffer);
+					TagVorbis().Parse(buffer, &track);
 				}
 
 				if (packetNum >= 1) done = True;

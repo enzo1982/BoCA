@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -95,11 +95,23 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Parse APE tag if present.
 	 */
-	track.ParseAPETag(streamURI);
+	TagAPE().Parse(streamURI, &track);
 
 	if (String::IsUnicode(streamURI))
 	{
 		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
+	}
+
+	return Success();
+}
+
+Error BoCA::MACIn::UpdateStreamInfo(const String &streamURI, const Track &track)
+{
+	Config	*config = Config::Get();
+
+	if (config->GetIntValue("Tags", "EnableAPEv2", True))
+	{
+		return TagAPE().Update(streamURI, track);
 	}
 
 	return Success();

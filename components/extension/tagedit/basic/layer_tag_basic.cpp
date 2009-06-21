@@ -152,7 +152,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Info")
 	edit_cover_desc		= new MultiEdit(NIL, text_cover_desc->GetPosition() + Point(maxTextSize3 + 7, -3), Size(300, 50));
 	edit_cover_desc->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	button_cover_load	= new Button("Load", NIL, Point(89, 9), Size(0, 0));
+	button_cover_load	= new Button("Add", NIL, Point(89, 9), Size(0, 0));
 	button_cover_load->SetOrientation(OR_UPPERRIGHT);
 	button_cover_load->onAction.Connect(&LayerTagBasic::LoadCover, this);
 

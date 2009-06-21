@@ -152,26 +152,6 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		hr = m_pReader->QueryInterface(IID_IWMHeaderInfo, (void **) &pHeaderInfo);
 
-		Info	&info = track.GetInfo();
-
-		/* Get attribute "Title"
-		 */
-		hr = GetHeaderAttribute(pHeaderInfo, g_wszWMTitle, &pbValue);
-
-		if (!FAILED(hr) && pbValue != NIL) { info.title = (LPWSTR) pbValue; delete [] pbValue; }
-
-		/* Get attribute "Author"
-		 */
-		hr = GetHeaderAttribute(pHeaderInfo, g_wszWMAuthor, &pbValue);
-
-		if (!FAILED(hr) && pbValue != NIL) { info.artist = (LPWSTR) pbValue; delete [] pbValue; }
-
-		/* Get attribute "Copyright"
-		 */
-		hr = GetHeaderAttribute(pHeaderInfo, g_wszWMCopyright, &pbValue);
-
-		if (!FAILED(hr) && pbValue != NIL) { info.label = (LPWSTR) pbValue; delete [] pbValue; }
-
 		/* Get attribute "Duration"
 		 */
 		hr = GetHeaderAttribute(pHeaderInfo, g_wszWMDuration, &pbValue);
@@ -196,8 +176,22 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 	m_pReader->Release();
 	readerCallback->Release();
 
+	if (!errorState) TagWMA().Parse(streamURI, &track);
+
 	if (errorState)	return Error();
 	else		return Success();
+}
+
+Error BoCA::WMAIn::UpdateStreamInfo(const String &streamURI, const Track &track)
+{
+	Config	*config = Config::Get();
+
+	if (config->GetIntValue("Tags", "EnableWMAMetadata", True))
+	{
+		return TagWMA().Update(streamURI, track);
+	}
+
+	return Success();
 }
 
 BoCA::WMAIn::WMAIn()

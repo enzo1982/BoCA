@@ -170,8 +170,8 @@ Bool BoCA::SpeexOut::Activate()
 		 * An empty tag containing only the vendor string
 		 * is rendered if Vorbis comments are disabled.
 		 */
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True)) track.RenderVorbisComment(vcBuffer, String("Encoded with Speex ").Append(speexVersion));
-		else													   Track().RenderVorbisComment(vcBuffer, String("Encoded with Speex ").Append(speexVersion));
+		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True)) TagVorbis().Render(track, vcBuffer, String("Encoded with Speex ").Append(speexVersion));
+		else													   TagVorbis().Render(Track(), vcBuffer, String("Encoded with Speex ").Append(speexVersion));
 
 		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, numPackets++ };
 

@@ -102,7 +102,7 @@ Bool BoCA::FLACOut::Activate()
 
 		if (writeVorbisCoverArt) config->SetIntValue("Tags", "WriteCoverArtVorbisComment", False);
 
-		track.RenderVorbisComment(vcBuffer, *ex_FLAC__VENDOR_STRING);
+		TagVorbis().Render(track, vcBuffer, *ex_FLAC__VENDOR_STRING);
 
 		if (writeVorbisCoverArt) config->SetIntValue("Tags", "WriteCoverArtVorbisComment", True);
 

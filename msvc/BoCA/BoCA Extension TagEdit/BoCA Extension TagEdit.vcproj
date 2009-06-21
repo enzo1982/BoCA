@@ -226,6 +226,34 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="chooser"
+				>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_albums.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_files.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_files_tree.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_files_utilities.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_tracks.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -277,6 +305,34 @@
 				</File>
 				<File
 					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_tag_advanced.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="chooser"
+				>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_albums.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_files.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_files_tree.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_files_utilities.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_tracks.h"
 					>
 				</File>
 			</Filter>

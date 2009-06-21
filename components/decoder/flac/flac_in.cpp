@@ -290,7 +290,7 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 				out.OutputData(metadata->data.vorbis_comment.comments[i].entry, metadata->data.vorbis_comment.comments[i].length);			
 			}
 
-			filter->infoTrack->ParseVorbisComment(vcBuffer);
+			TagVorbis().Parse(vcBuffer, filter->infoTrack);
 		}
 	}
 	else if (metadata->type == FLAC__METADATA_TYPE_PICTURE)

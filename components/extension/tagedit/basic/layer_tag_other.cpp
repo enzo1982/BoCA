@@ -14,18 +14,6 @@
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
-const char *INFO_ORIG_ARTIST	= (char *) "Original artist(s)/performer(s)";
-const char *INFO_ORIG_ALBUM	= (char *) "Original album/movie/show title";
-const char *INFO_ORIG_LYRICIST	= (char *) "Original lyricist(s)/text writer(s)";
-const char *INFO_ORIG_YEAR	= (char *) "Original release year";
-
-const char *INFO_WEB_ARTIST	= (char *) "Official artist webpage";
-const char *INFO_WEB_PUBLISHER	= (char *) "Official publisher webpage";
-const char *INFO_WEB_RADIO	= (char *) "Official radio webpage";
-const char *INFO_WEB_SOURCE	= (char *) "Official audio source webpage";
-const char *INFO_WEB_COPYRIGHT	= (char *) "Copyright information webpage";
-const char *INFO_WEB_COMMERCIAL	= (char *) "Commercial information  webpage";
-
 BoCA::LayerTagOther::LayerTagOther() : Layer("Other")
 {
 	I18n	*i18n = I18n::Get();

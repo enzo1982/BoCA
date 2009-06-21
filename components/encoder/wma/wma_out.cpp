@@ -132,26 +132,6 @@ Bool BoCA::WMAOut::Activate()
 
 	pCodecInfo->Release();
 
-	const Info	&info = track.GetInfo();
-	IWMHeaderInfo3	*pHeaderInfo = NIL;
-
-	hr = m_pWriter->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
-
-	if (info.artist != NIL || info.title != NIL)
-	{
-		if	(info.artist != NIL) hr = pHeaderInfo->AddAttribute(0, g_wszWMAuthor,	   NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) info.artist,		      wcslen(info.artist)		  * 2 + 2);
-		if	(info.title  != NIL) hr = pHeaderInfo->AddAttribute(0, g_wszWMTitle,	   NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) info.title,		      wcslen(info.title)		  * 2 + 2);
-		if	(info.album  != NIL) hr = pHeaderInfo->AddAttribute(0, g_wszWMAlbumTitle,  NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) info.album,		      wcslen(info.album)		  * 2 + 2);
-		if	(info.year    >   0) hr = pHeaderInfo->AddAttribute(0, g_wszWMYear,	   NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) String::FromInt(info.year),  wcslen(String::FromInt(info.year))  * 2 + 2);
-		if	(info.genre  != NIL) hr = pHeaderInfo->AddAttribute(0, g_wszWMGenre,	   NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) info.genre,		      wcslen(info.genre)		  * 2 + 2);
-		if	(info.track   >   0) hr = pHeaderInfo->AddAttribute(0, g_wszWMTrackNumber, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) String::FromInt(info.track), wcslen(String::FromInt(info.track)) * 2 + 2);
-
-		if	(info.comment != NIL && !config->GetIntValue("Tags", "ReplaceExistingComments", False)) hr = pHeaderInfo->AddAttribute(0, g_wszWMDescription, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) info.comment, wcslen(info.comment) * 2 + 2);
-		else if (config->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				hr = pHeaderInfo->AddAttribute(0, g_wszWMDescription, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) config->GetStringValue("Tags", "DefaultComment", NIL), wcslen(config->GetStringValue("Tags", "DefaultComment", NIL)) * 2 + 2);
-	}
-
-	pHeaderInfo->Release();
-
 	hr = m_pWriter->BeginWriting();
 
 	return True;
@@ -159,6 +139,8 @@ Bool BoCA::WMAOut::Activate()
 
 Bool BoCA::WMAOut::Deactivate()
 {
+	Config	*config = Config::Get();
+
 	HRESULT	 hr = S_OK;
 
 	hr = m_pWriter->Flush();
@@ -176,6 +158,15 @@ Bool BoCA::WMAOut::Deactivate()
 
 	m_pWriterAdvanced->Release();
 	m_pWriter->Release();
+
+	/* Write metadata to file
+	 */
+	if (config->GetIntValue("Tags", "EnableWMAMetadata", True))
+	{
+		const Info	&info = track.GetInfo();
+
+		if (info.artist != NIL || info.title != NIL) TagWMA().Render(track, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
+	}
 
 	/* Stream contents of created WMA file to output driver
 	 */

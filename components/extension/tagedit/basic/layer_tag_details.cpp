@@ -14,12 +14,6 @@
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
-const char *INFO_BAND		= (char *) "Band/orchestra/accompaniment";
-const char *INFO_PERFORMER	= (char *) "Conductor/performer refinement";
-const char *INFO_REMIX		= (char *) "Interpreted, remixed or otherwise modified by";
-const char *INFO_COMPOSER	= (char *) "Composer";
-const char *INFO_LYRICIST	= (char *) "Lyricist/Text writer";
-
 BoCA::LayerTagDetails::LayerTagDetails() : Layer("Details")
 {
 	I18n	*i18n = I18n::Get();

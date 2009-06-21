@@ -143,7 +143,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
 
-		track.ParseMP4Meta(streamURI);
+		TagMP4().Parse(streamURI, &track);
 
 		if (String::IsUnicode(streamURI))
 		{
@@ -272,7 +272,29 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (errorState) return Error();
 
-		if (Config::Get()->enable_id3) track.ParseID3v2Tag(streamURI);
+		if (Config::Get()->enable_id3) TagID3v2().Parse(streamURI, &track);
+	}
+
+	return Success();
+}
+
+Error BoCA::FAAD2In::UpdateStreamInfo(const String &streamURI, const Track &track)
+{
+	Config	*config = Config::Get();
+
+	if (!streamURI.ToLower().EndsWith(".aac"))
+	{
+		if (config->GetIntValue("Tags", "EnableMP4Metadata", True))
+		{
+			return TagMP4().Update(streamURI, track);
+		}
+	}
+	else
+	{
+		if (config->enable_id3 && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", 0))
+		{
+			return TagID3v2().Update(streamURI, track);
+		}
 	}
 
 	return Success();

@@ -128,8 +128,27 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (Config::Get()->enable_id3)
 	{
-		if (!track.ParseID3v2Tag(streamURI))
-		     track.ParseID3v1Tag(streamURI);
+		if (TagID3v2().Parse(streamURI, &track) != Success())
+		    TagID3v1().Parse(streamURI, &track);
+	}
+
+	return Success();
+}
+
+Error BoCA::MADIn::UpdateStreamInfo(const String &streamURI, const Track &track)
+{
+	Config	*config = Config::Get();
+
+	if (!config->enable_id3) return Error();
+
+	if (config->GetIntValue("Tags", "EnableID3v2", True))
+	{
+		if (TagID3v2().Update(streamURI, track) != Success()) return Error();
+	}
+
+	if (config->GetIntValue("Tags", "EnableID3v1", False))
+	{
+		if (TagID3v1().Update(streamURI, track) != Success()) return Error();
 	}
 
 	return Success();

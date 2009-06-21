@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_TAGEDIT_LAYER_
-#define _H_TAGEDIT_LAYER_
+#ifndef _H_TAGEDIT_CHOOSER_
+#define _H_TAGEDIT_CHOOSER_
 
 #include <smooth.h>
 #include <boca.h>
@@ -19,41 +19,19 @@ using namespace smooth::GUI;
 
 using namespace BoCA;
 
-#include "basic/layer_tag_basic.h"
-#include "basic/layer_tag_details.h"
-#include "basic/layer_tag_other.h"
-
-#include "advanced/layer_tag_advanced.h"
-
-#include "chooser/chooser.h"
-
 namespace BoCA
 {
-	class LayerTags : public Layer
+	class Chooser : public Layer
 	{
-		private:
-			TabWidget			*tab_mode;
-
-			Array<Chooser *>		 choosers;
-
-			TabWidget			*tab_editor;
-
-			LayerTagBasic			*layer_basic;
-			LayerTagDetails			*layer_details;
-			LayerTagOther			*layer_other;
-
-			LayerTagAdvanced		*layer_advanced;
+		public:
+							 Chooser(const String &);
+			virtual				~Chooser();
 		signals:
 			Signal1<Void, const Track &>	 onSelectTrack;
 			Signal1<Void, const Track &>	 onSelectAlbum;
 			Signal0<Void>			 onSelectNone;
 		slots:
-			Void				 OnModifyTrack(const Track &);
-
-			Void				 OnChangeSize(const Size &);
-		public:
-							 LayerTags();
-							~LayerTags();
+			virtual Void			 OnModifyTrack(const Track &);
 	};
 };
 

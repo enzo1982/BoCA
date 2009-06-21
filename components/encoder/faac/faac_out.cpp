@@ -157,7 +157,7 @@ Bool BoCA::FAACOut::Activate()
 		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
 		{
 			Buffer<unsigned char>	 id3Buffer;
-			Int			 size = track.RenderID3v2Tag(id3Buffer);
+			Int			 size = TagID3v2().Render(track, id3Buffer);
 
 			driver->WriteData(id3Buffer, size);
 		}
@@ -169,7 +169,6 @@ Bool BoCA::FAACOut::Activate()
 Bool BoCA::FAACOut::Deactivate()
 {
 	Config		*config = Config::Get();
-	const Info	&info = track.GetInfo();
 
 	unsigned long	 bytes = 0;
 
@@ -203,9 +202,13 @@ Bool BoCA::FAACOut::Deactivate()
 	{
 		ex_MP4Close(mp4File);
 
+		/* Write metadata to file
+		 */
 		if (config->GetIntValue("Tags", "EnableMP4Metadata", True))
 		{
-			if (info.artist != NIL || info.title != NIL) track.RenderMP4Meta(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
+			const Info	&info = track.GetInfo();
+
+			if (info.artist != NIL || info.title != NIL) TagMP4().Render(track, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
 		}
 
 		/* Stream contents of created MP4 file to output driver

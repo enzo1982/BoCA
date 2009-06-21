@@ -122,7 +122,7 @@ Bool BoCA::MACOut::Deactivate()
 	if ((info.artist != NIL || info.title != NIL) && Config::Get()->GetIntValue("Tags", "EnableAPEv2", True))
 	{
 		Buffer<unsigned char>	 tagBuffer;
-		Int			 size = track.RenderAPETag(tagBuffer);
+		Int			 size = TagAPE().Render(track, tagBuffer);
 
 		driver->WriteData(tagBuffer, size);
 	}
