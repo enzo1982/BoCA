@@ -29,41 +29,43 @@ const String &BoCA::FAAD2In::GetComponentSpecs()
 
 	if (faad2dll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>FAAD2 MP4/AAC Decoder</name>		\
-		    <version>1.0</version>			\
-		    <id>faad2-in</id>				\
-		    <type>decoder</type>			\
-								\
+		componentSpecs = "					\
+									\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+		  <component>						\
+		    <name>FAAD2 MP4/AAC Decoder</name>			\
+		    <version>1.0</version>				\
+		    <id>faad2-in</id>					\
+		    <type>decoder</type>				\
+									\
 		";
 
 		if (mp4v2dll != NIL)
 		{
-			componentSpecs.Append("			\
-								\
-			    <format>				\
-			      <name>MPEG-4 Audio Files</name>	\
-			      <extension>m4a</extension>	\
-			      <extension>m4b</extension>	\
-			      <extension>m4r</extension>	\
-			      <extension>mp4</extension>	\
-			      <extension>3gp</extension>	\
-			    </format>				\
-								\
+			componentSpecs.Append("				\
+									\
+			    <format>					\
+			      <name>MPEG-4 Audio Files</name>		\
+			      <extension>m4a</extension>		\
+			      <extension>m4b</extension>		\
+			      <extension>m4r</extension>		\
+			      <extension>mp4</extension>		\
+			      <extension>3gp</extension>		\
+			      <tag mode=\"other\">MP4Metadata</tag>	\
+			    </format>					\
+									\
 			");
 		}
 
-		componentSpecs.Append("				\
-								\
-		    <format>					\
-		      <name>Advanced Audio Files</name>		\
-		      <extension>aac</extension>		\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs.Append("					\
+									\
+		    <format>						\
+		      <name>Advanced Audio Files</name>			\
+		      <extension>aac</extension>			\
+		      <tag mode=\"prepend\">ID3v2</tag>			\
+		    </format>						\
+		  </component>						\
+									\
 		");
 	}
 
@@ -143,8 +145,6 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
 
-		TagMP4().Parse(streamURI, &track);
-
 		if (String::IsUnicode(streamURI))
 		{
 			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
@@ -172,7 +172,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 			unsigned char	*esc_buffer	= NIL;
 			unsigned long	 buffer_size	= 0;
 
-			ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (u_int8_t **) &esc_buffer, (u_int32_t *) &buffer_size);
+			ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (uint8_t **) &esc_buffer, (uint32_t *) &buffer_size);
 
 			ex_NeAACDecInit2(handle, (unsigned char *) esc_buffer, buffer_size, (unsigned long *) &format.rate, (unsigned char *) &format.channels);
 
@@ -187,6 +187,20 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 		}
 
 		ex_MP4Close(mp4File);
+
+		if (!errorState)
+		{
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("mp4-tag");
+
+			if (tagger != NIL)
+			{
+				if (String::IsUnicode(streamURI)) tagger->ParseStreamInfo(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"), track);
+				else				  tagger->ParseStreamInfo(streamURI, track);
+
+				boca.DeleteComponent(tagger);
+			}
+		}
 
 		if (String::IsUnicode(streamURI))
 		{
@@ -272,28 +286,14 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (errorState) return Error();
 
-		if (Config::Get()->enable_id3) TagID3v2().Parse(streamURI, &track);
-	}
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v2-tag");
 
-	return Success();
-}
-
-Error BoCA::FAAD2In::UpdateStreamInfo(const String &streamURI, const Track &track)
-{
-	Config	*config = Config::Get();
-
-	if (!streamURI.ToLower().EndsWith(".aac"))
-	{
-		if (config->GetIntValue("Tags", "EnableMP4Metadata", True))
+		if (tagger != NIL)
 		{
-			return TagMP4().Update(streamURI, track);
-		}
-	}
-	else
-	{
-		if (config->enable_id3 && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", 0))
-		{
-			return TagID3v2().Update(streamURI, track);
+			tagger->ParseStreamInfo(streamURI, track);
+
+			boca.DeleteComponent(tagger);
 		}
 	}
 
@@ -352,7 +352,7 @@ Bool BoCA::FAAD2In::Activate()
 		unsigned char	*buffer		= NIL;
 		unsigned long	 buffer_size	= 0;
 
-		ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (u_int8_t **) &buffer, (u_int32_t *) &buffer_size);
+		ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (uint8_t **) &buffer, (uint32_t *) &buffer_size);
 
 		unsigned long	 rate;
 		unsigned char	 channels;
@@ -418,7 +418,7 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 			unsigned char	*buffer		= NIL;
 			unsigned long	 buffer_size	= 0;
 
-			ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (u_int8_t **) &buffer, (u_int32_t *) &buffer_size, NIL, NIL, NIL, NIL);
+			ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &buffer_size, NIL, NIL, NIL, NIL);
 
 			NeAACDecFrameInfo frameInfo;
 

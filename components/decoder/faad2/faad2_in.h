@@ -40,9 +40,7 @@ namespace BoCA
 							~FAAD2In();
 
 			Bool				 CanOpenStream(const String &);
-
 			Error				 GetStreamInfo(const String &, Track &);
-			Error				 UpdateStreamInfo(const String &, const Track &);
 
 			Bool				 Activate();
 			Bool				 Deactivate();

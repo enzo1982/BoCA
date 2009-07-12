@@ -23,41 +23,43 @@ const String &BoCA::FAACOut::GetComponentSpecs()
 
 	if (faacdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>FAAC MP4/AAC Encoder</name>		\
-		    <version>1.0</version>			\
-		    <id>faac-out</id>				\
-		    <type>encoder</type>			\
-								\
+		componentSpecs = "					\
+									\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+		  <component>						\
+		    <name>FAAC MP4/AAC Encoder</name>			\
+		    <version>1.0</version>				\
+		    <id>faac-out</id>					\
+		    <type>encoder</type>				\
+									\
 		";
 
 		if (mp4v2dll != NIL)
 		{
-			componentSpecs.Append("			\
-								\
-			    <format>				\
-			      <name>MP4 Audio Files</name>	\
-			      <extension>m4a</extension>	\
-			      <extension>m4b</extension>	\
-			      <extension>m4r</extension>	\
-			      <extension>mp4</extension>	\
-			      <extension>3gp</extension>	\
-			    </format>				\
-								\
+			componentSpecs.Append("				\
+									\
+			    <format>					\
+			      <name>MP4 Audio Files</name>		\
+			      <extension>m4a</extension>		\
+			      <extension>m4b</extension>		\
+			      <extension>m4r</extension>		\
+			      <extension>mp4</extension>		\
+			      <extension>3gp</extension>		\
+			      <tag mode=\"other\">MP4Metadata</tag>	\
+			    </format>					\
+									\
 			");
 		}
 
-		componentSpecs.Append("				\
-								\
-		    <format>					\
-		      <name>Advanced Audio Files</name>		\
-		      <extension>aac</extension>		\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs.Append("					\
+									\
+		    <format>						\
+		      <name>Advanced Audio Files</name>			\
+		      <extension>aac</extension>			\
+		      <tag mode=\"prepend\">ID3v2</tag>			\
+		    </format>						\
+		  </component>						\
+									\
 		");
 	}
 
@@ -141,7 +143,7 @@ Bool BoCA::FAACOut::Activate()
 
 		ex_faacEncGetDecoderSpecificInfo(handle, &buffer, &bufferSize);
 
-		ex_MP4SetTrackESConfiguration(mp4File, mp4Track, (u_int8_t *) buffer, bufferSize);
+		ex_MP4SetTrackESConfiguration(mp4File, mp4Track, (uint8_t *) buffer, bufferSize);
 
 		frameSize	= samplesSize / format.channels;
 
@@ -154,12 +156,21 @@ Bool BoCA::FAACOut::Activate()
 
 	if (!config->GetIntValue("FAAC", "MP4Container", 1))
 	{
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->enable_id3 && config->GetIntValue("FAAC", "AllowID3v2", 0))
+		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", 0))
 		{
-			Buffer<unsigned char>	 id3Buffer;
-			Int			 size = TagID3v2().Render(track, id3Buffer);
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v2-tag");
 
-			driver->WriteData(id3Buffer, size);
+			if (tagger != NIL)
+			{
+				Buffer<unsigned char>	 id3Buffer;
+
+				tagger->RenderBuffer(id3Buffer, track);
+
+				driver->WriteData(id3Buffer, id3Buffer.Size());
+
+				boca.DeleteComponent(tagger);
+			}
 		}
 	}
 
@@ -184,7 +195,7 @@ Bool BoCA::FAACOut::Deactivate()
 				MP4Duration	 dur		= samplesLeft > frameSize ? frameSize : samplesLeft;
 				MP4Duration	 ofs		= encodedSamples > 0 ? 0 : delaySamples;
 
-				ex_MP4WriteSample(mp4File, mp4Track, (u_int8_t *) (unsigned char *) outBuffer, bytes, dur, ofs, true);
+				ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, dur, ofs, true);
 
 				encodedSamples += dur;
 			}
@@ -208,7 +219,18 @@ Bool BoCA::FAACOut::Deactivate()
 		{
 			const Info	&info = track.GetInfo();
 
-			if (info.artist != NIL || info.title != NIL) TagMP4().Render(track, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
+			if (info.artist != NIL || info.title != NIL)
+			{
+				AS::Registry		&boca = AS::Registry::Get();
+				AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("mp4-tag");
+
+				if (tagger != NIL)
+				{
+					tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
+
+					boca.DeleteComponent(tagger);
+				}
+			}
 		}
 
 		/* Stream contents of created MP4 file to output driver
@@ -267,7 +289,7 @@ Int BoCA::FAACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 			MP4Duration	 dur		= samplesLeft > frameSize ? frameSize : samplesLeft;
 			MP4Duration	 ofs		= encodedSamples > 0 ? 0 : delaySamples;
 
-			ex_MP4WriteSample(mp4File, mp4Track, (u_int8_t *) (unsigned char *) outBuffer, bytes, dur, ofs, true);
+			ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, dur, ofs, true);
 
 			encodedSamples += dur;
 		}

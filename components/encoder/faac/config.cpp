@@ -46,7 +46,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	group_aactype		= new GroupBox(i18n->TranslateString("AAC object type"), Point(7, 88), Size(120, 90));
 
 	option_aactype_main	= new OptionBox("MAIN", Point(10, 13), Size(99, 0), &aacType, 1);
-	option_aactype_low	= new OptionBox("LOW", Point(10, 38), Size(99, 0), &aacType, 2);
+	option_aactype_low	= new OptionBox("LC", Point(10, 38), Size(99, 0), &aacType, 2);
 	option_aactype_ltp	= new OptionBox("LTP", Point(10, 63), Size(99, 0), &aacType, 4);
 
 	group_aactype->Add(option_aactype_main);

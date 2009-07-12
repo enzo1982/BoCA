@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,7 +11,7 @@
 #include <smooth.h>
 
 #include "faad2/neaacdec.h"
-#include "mp4/mp4.h"
+#include "mp4v2/mp4v2.h"
 
 using namespace smooth;
 using namespace smooth::System;
@@ -43,17 +43,17 @@ extern NEAACDECDECODE			 ex_NeAACDecDecode;
 extern NEAACDECCLOSE			 ex_NeAACDecClose;
 extern NEAACDECGETERRORMESSAGE		 ex_NeAACDecGetErrorMessage;
 
-typedef MP4FileHandle			(*MP4READ)					(const char *, u_int32_t);
+typedef MP4FileHandle			(*MP4READ)					(const char *, uint32_t);
 typedef bool				(*MP4CLOSE)					(MP4FileHandle);
 typedef void				(*MP4FREE)					(void *);
-typedef u_int32_t			(*MP4GETNUMBEROFTRACKS)				(MP4FileHandle, const char *, u_int8_t);
-typedef MP4TrackId			(*MP4FINDTRACKID)				(MP4FileHandle, u_int16_t, const char *, u_int8_t);
+typedef uint32_t			(*MP4GETNUMBEROFTRACKS)				(MP4FileHandle, const char *, uint8_t);
+typedef MP4TrackId			(*MP4FINDTRACKID)				(MP4FileHandle, uint16_t, const char *, uint8_t);
 typedef const char *			(*MP4GETTRACKTYPE)				(MP4FileHandle, MP4TrackId);
-typedef u_int8_t			(*MP4GETTRACKAUDIOMPEG4TYPE)			(MP4FileHandle, MP4TrackId);
-typedef bool				(*MP4GETTRACKESCONFIGURATION)			(MP4FileHandle, MP4TrackId, u_int8_t **, u_int32_t *);
+typedef uint8_t				(*MP4GETTRACKAUDIOMPEG4TYPE)			(MP4FileHandle, MP4TrackId);
+typedef bool				(*MP4GETTRACKESCONFIGURATION)			(MP4FileHandle, MP4TrackId, uint8_t **, uint32_t *);
 typedef MP4Duration			(*MP4GETTRACKDURATION)				(MP4FileHandle, MP4TrackId);
-typedef u_int32_t			(*MP4GETTRACKTIMESCALE)				(MP4FileHandle, MP4TrackId);
-typedef bool				(*MP4READSAMPLE)				(MP4FileHandle, MP4TrackId, MP4SampleId, u_int8_t **, u_int32_t *, MP4Timestamp *, MP4Duration *,
+typedef uint32_t			(*MP4GETTRACKTIMESCALE)				(MP4FileHandle, MP4TrackId);
+typedef bool				(*MP4READSAMPLE)				(MP4FileHandle, MP4TrackId, MP4SampleId, uint8_t **, uint32_t *, MP4Timestamp *, MP4Duration *,
  MP4Duration *, bool *);
 
 extern MP4READ				 ex_MP4Read;

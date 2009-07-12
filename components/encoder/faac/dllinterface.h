@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,7 +11,7 @@
 #include <smooth.h>
 
 #include "faac/faac.h"
-#include "mp4/mp4.h"
+#include "mp4v2/mp4v2.h"
 
 using namespace smooth;
 using namespace smooth::System;
@@ -39,12 +39,12 @@ extern FAACENCGETDECODERSPECIFICINFO	 ex_faacEncGetDecoderSpecificInfo;
 extern FAACENCENCODE			 ex_faacEncEncode;
 extern FAACENCCLOSE			 ex_faacEncClose;
 
-typedef MP4FileHandle			(*MP4CREATEEX)					(const char *, u_int32_t, u_int32_t, int, int, char *, u_int32_t, char **, u_int32_t);
+typedef MP4FileHandle			(*MP4CREATEEX)					(const char *, uint32_t, uint32_t, int, int, char *, uint32_t, char **, uint32_t);
 typedef bool				(*MP4CLOSE)					(MP4FileHandle);
-typedef bool				(*MP4SETTRACKESCONFIGURATION)			(MP4FileHandle, MP4TrackId, const u_int8_t *, u_int32_t);
-typedef void				(*MP4SETAUDIOPROFILELEVEL)			(MP4FileHandle, u_int8_t);
-typedef MP4TrackId			(*MP4ADDAUDIOTRACK)				(MP4FileHandle, u_int32_t, MP4Duration, u_int8_t);
-typedef bool				(*MP4WRITESAMPLE)				(MP4FileHandle, MP4TrackId, const u_int8_t *, u_int32_t, MP4Duration,
+typedef bool				(*MP4SETTRACKESCONFIGURATION)			(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t);
+typedef void				(*MP4SETAUDIOPROFILELEVEL)			(MP4FileHandle, uint8_t);
+typedef MP4TrackId			(*MP4ADDAUDIOTRACK)				(MP4FileHandle, uint32_t, MP4Duration, uint8_t);
+typedef bool				(*MP4WRITESAMPLE)				(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t, MP4Duration,
  MP4Duration, bool);
 
 extern MP4CREATEEX			 ex_MP4CreateEx;
