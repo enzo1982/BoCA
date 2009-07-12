@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -22,6 +22,7 @@
 #include <boca/application/dspcomponent.h>
 #include <boca/application/extensioncomponent.h>
 #include <boca/application/outputcomponent.h>
+#include <boca/application/taggercomponent.h>
 
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
 
@@ -173,6 +174,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 				return new ExtensionComponent(specs);
 			case COMPONENT_TYPE_OUTPUT:
 				return new OutputComponent(specs);
+			case COMPONENT_TYPE_TAGGER:
+				return new TaggerComponent(specs);
 			default:
 				return new Component(specs);
 		}

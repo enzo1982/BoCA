@@ -53,8 +53,16 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_GetErrorString		= (const void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorString"));
 
 	func_CanOpenStream		= (bool (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanOpenStream"));
-
 	func_GetStreamInfo		= (int (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStreamInfo"));
+
+	func_SetVendorString		= (void (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetVendorString"));
+
+	func_ParseBuffer		= (int (*)(void *, const void *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ParseBuffer"));
+	func_ParseStreamInfo		= (int (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ParseStreamInfo"));
+
+	func_RenderBuffer		= (int (*)(void *, void *, const void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_RenderBuffer"));
+	func_RenderStreamInfo		= (int (*)(void *, const wchar_t *, const void *))	library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_RenderStreamInfo"));
+
 	func_UpdateStreamInfo		= (int (*)(void *, const wchar_t *, const void *))	library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_UpdateStreamInfo"));
 
 	func_GetPackageSize		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetPackageSize"));
@@ -169,11 +177,14 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			else if (node->GetContent() == "output")	type = COMPONENT_TYPE_OUTPUT;
 			else if (node->GetContent() == "dsp")		type = COMPONENT_TYPE_DSP;
 			else if (node->GetContent() == "extension")	type = COMPONENT_TYPE_EXTENSION;
+			else if (node->GetContent() == "tagger")	type = COMPONENT_TYPE_TAGGER;
 			else						type = COMPONENT_TYPE_UNKNOWN;
 		}
 		else if (node->GetName() == "format")
 		{
 			FileFormat	*format = new FileFormat();
+
+			format->SetTagMode(TAG_MODE_NONE);
 
 			for (Int j = 0; j < node->GetNOfNodes(); j++)
 			{
@@ -181,14 +192,23 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 				if	(node2->GetName() == "name")	  format->SetName(node2->GetContent());
 				else if (node2->GetName() == "extension") format->AddExtension(node2->GetContent());
+				else if (node2->GetName() == "tag")
+				{
+					format->SetTagType(node2->GetContent());
+
+					if (node2->GetAttributeByName("mode") != NIL)
+					{
+						if	(node2->GetAttributeByName("mode")->GetContent() == "prepend")	format->SetTagMode(TAG_MODE_PREPEND);
+						else if (node2->GetAttributeByName("mode")->GetContent() == "append")	format->SetTagMode(TAG_MODE_APPEND);
+						else if (node2->GetAttributeByName("mode")->GetContent() == "other")	format->SetTagMode(TAG_MODE_OTHER);
+					}
+				}
 			}
 
 			formats.Add(format);
 		}
 		else if (node->GetName() == "external")
 		{
-			external_tagmode = TAG_MODE_NONE;
-
 			for (Int j = 0; j < node->GetNOfNodes(); j++)
 			{
 				XML::Node	*node2 = node->GetNthNode(j);
@@ -199,17 +219,6 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				else if (node2->GetName() == "outformat")	external_outformat	= node2->GetContent();
 				else if (node2->GetName() == "mode")		mode			= node2->GetContent() == "file" ? EXTERNAL_FILE : EXTERNAL_STDIO;
 				else if (node2->GetName() == "parameters")	ParseExternalParameters(node2);
-				else if (node2->GetName() == "tag")
-				{
-					external_tag	 = node2->GetContent();
-
-					if (node2->GetAttributeByName("mode") != NIL)
-					{
-						if	(node2->GetAttributeByName("mode")->GetContent() == "prepend")	external_tagmode = TAG_MODE_PREPEND;
-						else if (node2->GetAttributeByName("mode")->GetContent() == "append")	external_tagmode = TAG_MODE_APPEND;
-						else if (node2->GetAttributeByName("mode")->GetContent() == "other")	external_tagmode = TAG_MODE_OTHER;
-					}
-				}
 			}
 		}
 	}

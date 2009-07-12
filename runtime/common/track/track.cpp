@@ -9,6 +9,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca/common/track/track.h>
+#include <boca/common/config.h>
+#include <boca/common/i18n.h>
 
 Int BoCA::Track::nextTrackID = 0;
 
@@ -107,18 +109,21 @@ Bool BoCA::Track::LoadCoverArtFiles()
 {
 	if (isCDTrack) return False;
 
-	Directory		 directory = File(origFilename).GetFilePath();
-	const Array<File>	&jpgFiles = directory.GetFilesByPattern("*.jpg");
+	if (Config::Get()->GetIntValue("Tags", "CoverArtReadFromFiles", True))
+	{
+		Directory		 directory = File(origFilename).GetFilePath();
+		const Array<File>	&jpgFiles = directory.GetFilesByPattern("*.jpg");
 
-	foreach (File file, jpgFiles) LoadCoverArtFile(file);
+		foreach (File file, jpgFiles) LoadCoverArtFile(file);
 
-	const Array<File>	&jpegFiles = directory.GetFilesByPattern("*.jpeg");
+		const Array<File>	&jpegFiles = directory.GetFilesByPattern("*.jpeg");
 
-	foreach (File file, jpegFiles) LoadCoverArtFile(file);
+		foreach (File file, jpegFiles) LoadCoverArtFile(file);
 
-	const Array<File>	&pngFiles = directory.GetFilesByPattern("*.png");
+		const Array<File>	&pngFiles = directory.GetFilesByPattern("*.png");
 
-	foreach (File file, pngFiles) LoadCoverArtFile(file);
+		foreach (File file, pngFiles) LoadCoverArtFile(file);
+	}
 
 	return True;
 }
@@ -143,6 +148,50 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 	else if (file.Find("disc")  >= 0) picture.type = 0x06; // Media
 
 	pictures.Add(picture);
+
+	return True;
+}
+
+Bool BoCA::Track::SaveCoverArtFiles(const String &directory)
+{
+	if (Config::Get()->GetIntValue("Tags", "CoverArtWriteToFiles", False))
+	{
+		foreach (Picture picture, pictures)
+		{
+			String	 fileName = Config::Get()->GetStringValue("Tags", "CoverArtFilenamePattern", "<artist> - <album>\\<type>");
+
+			switch (picture.type)
+			{
+				case  0: fileName.Replace("<type>", "other");		break;
+				case  1: fileName.Replace("<type>", "icon");		break;
+				case  2: fileName.Replace("<type>", "othericon");	break;
+				case  3: fileName.Replace("<type>", "front");		break;
+				case  4: fileName.Replace("<type>", "back");		break;
+				case  5: fileName.Replace("<type>", "leaflet");		break;
+				case  6: fileName.Replace("<type>", "disc");		break;
+				case  7: fileName.Replace("<type>", "leadartist");	break;
+				case  8: fileName.Replace("<type>", "artist");		break;
+				case  9: fileName.Replace("<type>", "conductor");	break;
+				case 10: fileName.Replace("<type>", "band");		break;
+				case 11: fileName.Replace("<type>", "composer");	break;
+				case 12: fileName.Replace("<type>", "writer");		break;
+				case 13: fileName.Replace("<type>", "location");	break;
+				case 14: fileName.Replace("<type>", "recording");	break;
+				case 15: fileName.Replace("<type>", "performing");	break;
+				case 16: fileName.Replace("<type>", "video");		break;
+				case 17: fileName.Replace("<type>", "fish");		break;
+				case 18: fileName.Replace("<type>", "illustration");	break;
+				case 19: fileName.Replace("<type>", "artistlogo");	break;
+				case 20: fileName.Replace("<type>", "publisherlogo");	break;
+				default: fileName.Replace("<type>", "unknown");		break;
+			}
+
+			fileName.Replace("<artist>", info.artist.Length() > 0 ? info.artist : BoCA::I18n::Get()->TranslateString("unknown artist"));
+			fileName.Replace("<album>", info.album.Length() > 0 ? info.album : BoCA::I18n::Get()->TranslateString("unknown album"));
+
+			picture.SaveToFile(String(directory).Append(Directory::GetDirectoryDelimiter()).Append(fileName));
+		}
+	}
 
 	return True;
 }

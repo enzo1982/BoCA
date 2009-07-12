@@ -19,11 +19,6 @@ BoCA::Config::Config()
 	cdrip_autoRead_active	= False;
 	cdrip_timeout		= 0;
 
-	enable_id3		= False;
-	enable_mp4		= False;
-	enable_ogg		= False;
-	enable_wma		= False;
-
 	saveSettingsOnExit	= True;
 
 	String	 programsDir = S::System::System::GetProgramFilesDirectory();

@@ -12,10 +12,8 @@
 #include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
-#include <boca/common/tagging/tagid3v1.h>
-#include <boca/common/tagging/tagid3v2.h>
-#include <boca/common/tagging/tagmp4.h>
-#include <boca/common/tagging/tagape.h>
+#include <boca/application/registry.h>
+#include <boca/application/taggercomponent.h>
 
 #include <smooth/io/drivers/driver_win32.h>
 
@@ -133,26 +131,43 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 	Config	*config = Config::Get();
 
+	/* Get tagging mode and type
+	 */
+	Int	 tagMode = specs->formats.GetFirst()->GetTagMode();
+	String	 tagType = specs->formats.GetFirst()->GetTagType();
+
 	/* Create tag if requested
 	 */
 	Buffer<UnsignedByte>	 tag;
-	Int			 tagSize = 0;
 
 	const Info		&info = track.GetInfo();
 
-	if (specs->external_tagmode != TAG_MODE_NONE && (info.artist != NIL || info.title != NIL))
+	if (tagMode != TAG_MODE_NONE && (info.artist != NIL || info.title != NIL))
 	{
-		if	(specs->external_tag == "ID3v1"	      && config->GetIntValue("Tags", "EnableID3v1", False)	&& config->enable_id3)	tagSize = TagID3v1().Render(track, tag);
-		else if (specs->external_tag == "ID3v2"	      && config->GetIntValue("Tags", "EnableID3v2", True)	&& config->enable_id3)	tagSize = TagID3v2().Render(track, tag);
-		else if (specs->external_tag == "MP4Metadata" && config->GetIntValue("Tags", "EnableMP4Metadata", True) && config->enable_mp4)		  TagMP4().Render(track, encFileName);
-		else if (specs->external_tag == "APEv2"	      && config->GetIntValue("Tags", "EnableAPEv2", True))				tagSize = TagAPE().Render(track, tag);
+		String			 taggerID;
+
+		if	(tagType == "ID3v1"	  && config->GetIntValue("Tags", "EnableID3v1", False))	     taggerID = "id3v1-tag";
+		else if	(tagType == "ID3v2"	  && config->GetIntValue("Tags", "EnableID3v2", True))	     taggerID = "id3v2-tag";
+		else if	(tagType == "APEv2"	  && config->GetIntValue("Tags", "EnableAPEv2", True))	     taggerID = "apev2-tag";
+		else if (tagType == "MP4Metadata" && config->GetIntValue("Tags", "EnableMP4Metadata", True)) taggerID = "mp4-tag";
+
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID(taggerID);
+
+		if (tagger != NIL)
+		{
+			if (tagMode == TAG_MODE_OTHER)	tagger->RenderStreamInfo(encFileName, track);
+			else				tagger->RenderBuffer(tag, track);
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
 	/* Prepend tag
 	 */
-	if (specs->external_tagmode == TAG_MODE_PREPEND)
+	if (tagMode == TAG_MODE_PREPEND)
 	{
-		driver->WriteData(tag, tagSize);
+		driver->WriteData(tag, tag.Size());
 	}
 
 	/* Stream contents of created file to output driver
@@ -170,9 +185,9 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 	/* Append tag
 	 */
-	if (specs->external_tagmode == TAG_MODE_APPEND)
+	if (tagMode == TAG_MODE_APPEND)
 	{
-		driver->WriteData(tag, tagSize);
+		driver->WriteData(tag, tag.Size());
 	}
 
 	in.Close();

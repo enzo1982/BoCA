@@ -43,11 +43,6 @@ Error BoCA::AS::DecoderComponent::GetStreamInfo(const String &file, Track &track
 	return specs->func_GetStreamInfo(component, file, &track);
 }
 
-Error BoCA::AS::DecoderComponent::UpdateStreamInfo(const String &file, const Track &track)
-{
-	return specs->func_UpdateStreamInfo(component, file, &track);
-}
-
 Bool BoCA::AS::DecoderComponent::Activate()
 {
 	SetDriver(driver);

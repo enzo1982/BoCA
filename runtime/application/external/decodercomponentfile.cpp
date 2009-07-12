@@ -12,10 +12,8 @@
 #include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
-#include <boca/common/tagging/tagid3v1.h>
-#include <boca/common/tagging/tagid3v2.h>
-#include <boca/common/tagging/tagmp4.h>
-#include <boca/common/tagging/tagape.h>
+#include <boca/application/registry.h>
+#include <boca/application/taggercomponent.h>
 
 using namespace smooth::IO;
 
@@ -30,14 +28,47 @@ BoCA::AS::DecoderComponentExternalFile::~DecoderComponentExternalFile()
 
 Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &streamURI, Track &track)
 {
+	/* Get tagging mode and type
+	 */
+	Int	 tagMode = TAG_MODE_NONE;
+	String	 tagType;
+
+	String	 lcURI = streamURI.ToLower();
+
+	for (Int i = 0; i < specs->formats.Length(); i++)
+	{
+		FileFormat	*format = specs->formats.GetNth(i);
+
+		for (Int j = 0; j < format->GetExtensions().Length(); j++)
+		{
+			if (lcURI.EndsWith(String(".").Append(format->GetExtensions().GetNth(j))))
+			{
+				tagMode = format->GetTagMode();
+				tagType = format->GetTagType();
+			}
+		}
+	}
+
 	/* Read tag if requested
 	 */
-	if (specs->external_tagmode != TAG_MODE_NONE)
+	if (tagMode != TAG_MODE_NONE)
 	{
-		if	(specs->external_tag == "ID3v1"	      && Config::Get()->enable_id3) TagID3v1().Parse(streamURI, &track);
-		else if (specs->external_tag == "ID3v2"	      && Config::Get()->enable_id3) TagID3v2().Parse(streamURI, &track);
-		else if (specs->external_tag == "MP4Metadata" && Config::Get()->enable_mp4) TagMP4().Parse(streamURI, &track);
-		else if (specs->external_tag == "APEv2")				    TagAPE().Parse(streamURI, &track);
+		String			 taggerID;
+
+		if	(tagType == "ID3v1")		taggerID = "id3v1-tag";
+		else if	(tagType == "ID3v2")		taggerID = "id3v2-tag";
+		else if	(tagType == "APEv2")		taggerID = "apev2-tag";
+		else if (tagType == "MP4Metadata")	taggerID = "mp4-tag";
+
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID(taggerID);
+
+		if (tagger != NIL)
+		{
+			tagger->ParseStreamInfo(streamURI, track);
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
 	/* Create temporary WAVE file

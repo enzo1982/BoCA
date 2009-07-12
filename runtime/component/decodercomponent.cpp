@@ -25,8 +25,3 @@ Bool BoCA::CS::DecoderComponent::SetAudioTrackInfo(const Track &nTrack)
 
 	return True;
 }
-
-Error BoCA::CS::DecoderComponent::UpdateStreamInfo(const String &file, const Track &track)
-{
-	return Error();
-}
