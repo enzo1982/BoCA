@@ -105,9 +105,15 @@
 
 #include "smooth/gui/application/application.h"
 
+#ifdef __WIN32__
+#	include "smooth/gui/dialogs/directory/dirdlg_win32.h"
+#	include "smooth/gui/dialogs/file/filedlg_win32.h"
+#else
+#	include "smooth/gui/dialogs/directory/dirdlg_gtk.h"
+#	include "smooth/gui/dialogs/file/filedlg_gtk.h"
+#endif
+
 #include "smooth/gui/dialogs/colordlg.h"
-#include "smooth/gui/dialogs/dirdlg.h"
-#include "smooth/gui/dialogs/filedlg.h"
 #include "smooth/gui/dialogs/fontdlg.h"
 #include "smooth/gui/dialogs/messagebox.h"
 #include "smooth/gui/dialogs/splashscreen.h"

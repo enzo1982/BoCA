@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_DIRDLG_
-#define _H_OBJSMOOTH_DIRDLG_
+#ifndef _H_OBJSMOOTH_FILEDLG_GTK_
+#define _H_OBJSMOOTH_FILEDLG_GTK_
 
 namespace smooth
 {
@@ -17,12 +17,12 @@ namespace smooth
 	{
 		namespace Dialogs
 		{
-			class DirSelection;
+			class FileSelection;
 		};
 	};
 };
 
-#include "dialog.h"
+#include "filedlg.h"
 
 namespace smooth
 {
@@ -30,18 +30,10 @@ namespace smooth
 	{
 		namespace Dialogs
 		{
-			class SMOOTHAPI DirSelection : public Dialog
+			class SMOOTHAPI FileSelection : public FileSelectionBase
 			{
-				private:
-					String		 directory;
 				public:
-							 DirSelection();
-					virtual		~DirSelection();
-
 					const Error	&ShowDialog();
-				accessors:
-					Int		 SetDirName(const String &);
-					const String	&GetDirName();
 			};
 		};
 	};

@@ -8,41 +8,41 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_DIVIDER_
-#define _H_OBJSMOOTH_DIVIDER_
+#ifndef _H_OBJSMOOTH_DIRDLG_
+#define _H_OBJSMOOTH_DIRDLG_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Divider;
+		namespace Dialogs
+		{
+			class DirSelectionBase;
+		};
 	};
 };
 
-#include "../widget.h"
+#include "../dialog.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Divider : public Widget
+		namespace Dialogs
 		{
-			protected:
-				Int			 position;
+			abstract class SMOOTHAPI DirSelectionBase : public Dialog
+			{
+				protected:
+					String			 directory;
+				public:
+								 DirSelectionBase();
+					virtual			~DirSelectionBase();
 
-				Rect			 GetDividerRect() const;
-			public:
-				static const Int	 classID;
-
-							 Divider(Int, Int = OR_HORZ | OR_TOP);
-				virtual			~Divider();
-
-				virtual Int		 Paint(Int);
-
-				virtual Bool		 IsAffected(const Rect &) const;
-			accessors:
-				Int			 SetPos(Int);
-				Int			 GetPos() const;
+					virtual const Error	&ShowDialog() = 0;
+				accessors:
+					Int			 SetDirName(const String &);
+					const String		&GetDirName();
+			};
 		};
 	};
 };

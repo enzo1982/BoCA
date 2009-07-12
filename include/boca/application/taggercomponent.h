@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_AS_OUTPUTCOMPONENT
-#define H_BOCA_AS_OUTPUTCOMPONENT
+#ifndef H_BOCA_AS_TAGGERCOMPONENT
+#define H_BOCA_AS_TAGGERCOMPONENT
 
 #include "component.h"
 #include "../common/track/track.h"
@@ -20,25 +20,21 @@ namespace BoCA
 {
 	namespace AS
 	{
-		class BOCA_DLL_EXPORT OutputComponent : public Component, public IO::Filter
+		class BOCA_DLL_EXPORT TaggerComponent : public Component
 		{
 			public:
-						 OutputComponent(ComponentSpecs *);
-				virtual		~OutputComponent();
+						 TaggerComponent(ComponentSpecs *);
+				virtual		~TaggerComponent();
 
-				virtual Bool	 SetAudioTrackInfo(const Track &);
+				virtual Void	 SetVendorString(const String &);
 
-				virtual Bool	 Activate();
-				virtual Bool	 Deactivate();
+				virtual Error	 ParseBuffer(const Buffer<UnsignedByte> &, Track &);
+				virtual Error	 ParseStreamInfo(const String &, Track &);
 
-				virtual Int	 WriteData(Buffer<UnsignedByte> &buffer, Int size);
+				virtual Error	 RenderBuffer(Buffer<UnsignedByte> &, const Track &);
+				virtual Error	 RenderStreamInfo(const String &, const Track &);
 
-				virtual Int	 GetPackageSize();
-
-				virtual Int	 CanWrite();
-
-				virtual Int	 SetPause(Bool);
-				virtual Bool	 IsPlaying();
+				virtual Error	 UpdateStreamInfo(const String &, const Track &);
 		};
 	};
 };

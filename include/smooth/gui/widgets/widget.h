@@ -122,7 +122,7 @@ namespace smooth
 				virtual Int			 Add(Widget *);
 				virtual Int			 Remove(Widget *);
 
-				Window				*GetContainerWindow();
+				Window				*GetContainerWindow() const;
 				virtual Surface			*GetDrawSurface() const;
 
 				Int				 SetContainer(Widget *);

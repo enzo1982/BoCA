@@ -26,12 +26,21 @@ namespace BoCA
 			private:
 				String			 name;
 				Array<String>		 extensions;
+
+				String			 tagType;
+				Int			 tagMode;
 			public:
 				const String		&GetName()				{ return name; }
 				Void			 SetName(const String &nName)		{ name = nName; }
 
 				const Array<String>	&GetExtensions()			{ return extensions; }
 				Void			 AddExtension(const String &nExt)	{ extensions.Add(nExt); }
+
+				const String		&GetTagType()				{ return tagType; }
+				Void			 SetTagType(const String &nTagType)	{ tagType = nTagType; }
+
+				Int			 GetTagMode()				{ return tagMode; }
+				Void			 SetTagMode(Int nTagMode)		{ tagMode = nTagMode; }
 		};
 
 		class BOCA_DLL_EXPORT Option
@@ -111,9 +120,6 @@ namespace BoCA
 				String			 external_informat;
 				String			 external_outformat;
 
-				String			 external_tag;
-				Int			 external_tagmode;
-
 				Array<Parameter *>	 external_parameters;
 
 				Array<FileFormat *>	 formats;
@@ -138,8 +144,16 @@ namespace BoCA
 				const void		*(*func_GetErrorString)(void *);
 
 				bool			 (*func_CanOpenStream)(void *, const wchar_t *);
-
 				int			 (*func_GetStreamInfo)(void *, const wchar_t *, void *);
+
+				void			 (*func_SetVendorString)(void *, const wchar_t *);
+
+				int			 (*func_ParseBuffer)(void *, const void *, void *);
+				int			 (*func_ParseStreamInfo)(void *, const wchar_t *, void *);
+
+				int			 (*func_RenderBuffer)(void *, void *, const void *);
+				int			 (*func_RenderStreamInfo)(void *, const wchar_t *, const void *);
+
 				int			 (*func_UpdateStreamInfo)(void *, const wchar_t *, const void *);
 
 				int			 (*func_GetPackageSize)(void *);
@@ -183,9 +197,10 @@ namespace BoCA
 	const Int	 COMPONENT_TYPE_UNKNOWN		= 0;
 	const Int	 COMPONENT_TYPE_DECODER		= 1;
 	const Int	 COMPONENT_TYPE_ENCODER		= 2;
-	const Int	 COMPONENT_TYPE_OUTPUT		= 3;
-	const Int	 COMPONENT_TYPE_DSP		= 4;
-	const Int	 COMPONENT_TYPE_EXTENSION	= 5;
+	const Int	 COMPONENT_TYPE_TAGGER		= 3;
+	const Int	 COMPONENT_TYPE_EXTENSION	= 4;
+	const Int	 COMPONENT_TYPE_DSP		= 5;
+	const Int	 COMPONENT_TYPE_OUTPUT		= 6;
 
 	const Int	 INTERNAL			= 0;
 	const Int	 EXTERNAL_FILE			= 1;

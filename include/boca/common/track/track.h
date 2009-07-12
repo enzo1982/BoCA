@@ -83,6 +83,8 @@ namespace BoCA
 
 			Bool		 LoadCoverArtFiles();
 			Bool		 LoadCoverArtFile(const String &);
+
+			Bool		 SaveCoverArtFiles(const String &);
 		accessors:
 			Int		 GetTrackID() const				{ return trackID; }
 

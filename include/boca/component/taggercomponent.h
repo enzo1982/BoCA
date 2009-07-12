@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_DECODERCOMPONENT
-#define H_BOCA_DECODERCOMPONENT
+#ifndef H_BOCA_TAGGERCOMPONENT
+#define H_BOCA_TAGGERCOMPONENT
 
 #include <smooth.h>
 
@@ -22,27 +22,23 @@ namespace BoCA
 {
 	namespace CS
 	{
-		abstract class BOCA_DLL_EXPORT DecoderComponent : public Component, public IO::Filter
+		abstract class BOCA_DLL_EXPORT TaggerComponent : public Component
 		{
 			protected:
-				Track		 track;
-
-				Int64		 inBytes;
+				String		 vendorString;
 			public:
-						 DecoderComponent();
-				virtual		~DecoderComponent();
+						 TaggerComponent();
+				virtual		~TaggerComponent();
 
-				virtual Bool	 CanOpenStream(const String &) = 0;
-				virtual Error	 GetStreamInfo(const String &, Track &) = 0;
+				virtual Void	 SetVendorString(const String &);
 
-				virtual Bool	 SetAudioTrackInfo(const Track &);
+				virtual Error	 ParseBuffer(const Buffer<UnsignedByte> &, Track &);
+				virtual Error	 ParseStreamInfo(const String &, Track &);
 
-				Int64		 GetInBytes() { return inBytes; }
+				virtual Error	 RenderBuffer(Buffer<UnsignedByte> &, const Track &);
+				virtual Error	 RenderStreamInfo(const String &, const Track &);
 
-				virtual Bool	 Activate() = 0;
-				virtual Bool	 Deactivate() = 0;
-
-				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int) = 0;
+				virtual Error	 UpdateStreamInfo(const String &, const Track &);
 		};
 	};
 };

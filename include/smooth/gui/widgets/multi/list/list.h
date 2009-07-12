@@ -50,15 +50,17 @@ namespace smooth
 				virtual String			 ToString() const		{ return "a List"; }
 			accessors:
 				Int				 Length() const;
+
+				ListEntry			*GetSelectedEntry() const;
+				ListEntry			*GetEntry(const String &) const;
 				ListEntry			*GetNthEntry(Int) const;
 
-				Int				 SelectEntry(ListEntry *);
-				ListEntry			*GetSelectedEntry() const;
-
-				Int				 SelectNthEntry(Int);
 				Int				 GetSelectedEntryNumber() const;
+				Int				 GetEntryNumber(const String &) const;
 
+				Int				 SelectEntry(ListEntry *);
 				Int				 SelectEntry(const String &);
+				Int				 SelectNthEntry(Int);
 			signals:
 				Signal1<Void, ListEntry *>	 onSelectEntry;
 				Signal1<Void, ListEntry *>	 onMarkEntry;

@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_DECODERCOMPONENT
-#define H_BOCA_DECODERCOMPONENT
+#ifndef H_BOCA_AS_DECODERCOMPONENT
+#define H_BOCA_AS_DECODERCOMPONENT
 
 #include "component.h"
 #include "../common/track/track.h"
@@ -29,9 +29,7 @@ namespace BoCA
 				virtual Bool	 SetAudioTrackInfo(const Track &);
 
 				virtual Bool	 CanOpenStream(const String &);
-
 				virtual Error	 GetStreamInfo(const String &, Track &);
-				virtual Error	 UpdateStreamInfo(const String &, const Track &);
 
 				virtual Int64	 GetInBytes();
 
