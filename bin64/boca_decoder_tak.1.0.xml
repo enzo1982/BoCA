@@ -8,12 +8,12 @@
   <format>
     <name>Tom's Audio</name>
     <extension>tak</extension>
+    <tag mode="append">APEv2</tag>
   </format>
   <external>
     <command>codecs/cmdline/takc.exe</command>
     <arguments>-d %OPTIONS %INFILE -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
-    <tag mode="append">APEv2</tag>
   </external>
 </component>

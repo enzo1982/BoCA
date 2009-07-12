@@ -8,13 +8,13 @@
   <format>
     <name>OptimFROG Files</name>
     <extension>ofr</extension>
+    <tag mode="append">APEv2</tag>
   </format>
   <external>
     <command>codecs/cmdline/ofr.exe</command>
     <arguments>--encode %OPTIONS %INFILE --output %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
-    <tag mode="append">APEv2</tag>
     <parameters>
       <selection name="Encoding mode" argument="--mode %VALUE" default="normal">
 	<option alias="Fast">fast</option>

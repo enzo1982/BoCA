@@ -8,13 +8,13 @@
   <format>
     <name>Speex Files</name>
     <extension>spx</extension>
+    <tag mode="other">VorbisComment</tag>
   </format>
   <external>
     <command>codecs/cmdline/speexdec.exe</command>
     <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
     <mode>file</mode>
     <outformat>wave</outformat>
-    <tag mode="other">VorbisComment</tag>
     <parameters>
       <switch name="Disable perceptual enhancements" argument="--no-enh"/>
       <selection name="Force decoding mode" argument="%VALUE">

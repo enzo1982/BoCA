@@ -8,13 +8,13 @@
   <format>
     <name>Speex Files</name>
     <extension>spx</extension>
+    <tag mode="other">VorbisComment</tag>
   </format>
   <external>
     <command>codecs/cmdline/speexenc.exe</command>
     <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
-    <tag mode="other">VorbisComment</tag>
     <parameters>
       <range name="Encoding quality" argument="--quality %VALUE" default="8">
 	<min alias="fastest">0</min>

@@ -8,16 +8,16 @@
   <format>
     <name>MPEG-4 ALS Files</name>
     <extension>mp4</extension>
+    <!--
+      Disabled tags for now, because mp4als.exe cannot read tagged files.
+      <tag mode="other">MP4Metadata</tag>
+    -->
   </format>
   <external>
     <command>codecs/cmdline/mp4als.exe</command>
     <arguments>-MP4 %OPTIONS %INFILE %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
-    <!--
-      Disabled tags for now, because mp4als.exe cannot read tagged files.
-      <tag mode="other">MP4Metadata</tag>
-    -->
     <parameters>
       <switch name="Adaptive prediction order" argument="-a"/>
       <range name="Prediction order" argument="-o%VALUE" default="10">

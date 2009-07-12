@@ -8,13 +8,13 @@
   <format>
     <name>WavPack Files</name>
     <extension>wv</extension>
+    <tag mode="append">APEv2</tag>
   </format>
   <external>
     <command>codecs/cmdline/wavpack.exe</command>
     <arguments>-i -m %OPTIONS - %OUTFILE</arguments>
     <mode>stdio</mode>
     <informat>wave</informat>
-    <tag mode="append">APEv2</tag>
     <parameters>
       <range name="Enable hybrid compression" argument="-b%VALUE" default="256" step="8">
 	<min alias="64 kbps">64</min>

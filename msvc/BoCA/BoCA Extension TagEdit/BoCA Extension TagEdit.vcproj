@@ -195,34 +195,38 @@
 				>
 			</File>
 			<Filter
-				Name="basic"
+				Name="editor"
 				>
 				<File
-					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_basic.cpp"
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_details.cpp"
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_advanced.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_other.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="advanced"
-				>
-				<File
-					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_edit_number.cpp"
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_advanced_number.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_edit_text.cpp"
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_advanced_text.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_tag_advanced.cpp"
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_basic.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_basic_cover.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_details.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_other.cpp"
 					>
 				</File>
 			</Filter>
@@ -277,38 +281,6 @@
 				>
 			</File>
 			<Filter
-				Name="basic"
-				>
-				<File
-					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_basic.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_details.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\components\extension\tagedit\basic\layer_tag_other.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="advanced"
-				>
-				<File
-					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_edit_number.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_edit_text.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\components\extension\tagedit\advanced\layer_tag_advanced.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="chooser"
 				>
 				<File
@@ -333,6 +305,42 @@
 				</File>
 				<File
 					RelativePath="..\..\..\components\extension\tagedit\chooser\chooser_tracks.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="editor"
+				>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_advanced.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_advanced_number.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_advanced_text.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_basic.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_basic_cover.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_details.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\components\extension\tagedit\editor\editor_other.h"
 					>
 				</File>
 			</Filter>

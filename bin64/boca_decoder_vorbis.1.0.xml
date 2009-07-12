@@ -8,6 +8,7 @@
   <format>
     <name>Ogg Vorbis Audio</name>
     <extension>ogg</extension>
+    <tag mode="other">VorbisComment</tag>
   </format>
   <external>
     <command>codecs/cmdline/oggdec.exe</command>

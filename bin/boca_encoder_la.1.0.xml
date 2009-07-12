@@ -8,13 +8,13 @@
   <format>
     <name>La Audio Files</name>
     <extension>la</extension>
+    <tag mode="append">ID3v1</tag>
   </format>
   <external>
     <command>codecs/cmdline/la.exe</command>
     <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
-    <tag mode="append">ID3v1</tag>
     <parameters>
       <switch name="High compression mode" argument="-high"/>
       <switch name="Disable seeking" argument="-noseek"/>

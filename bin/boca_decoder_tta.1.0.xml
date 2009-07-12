@@ -8,12 +8,12 @@
   <format>
     <name>TTA Audio Files</name>
     <extension>tta</extension>
+    <tag mode="prepend">ID3v2</tag>
   </format>
   <external>
     <command>codecs/cmdline/ttaenc.exe</command>
     <arguments>-d %OPTIONS %INFILE -o -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
-    <tag mode="prepend">ID3v2</tag>
   </external>
 </component>

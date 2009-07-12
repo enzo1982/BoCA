@@ -1,7 +1,7 @@
 ########## BoCA commands makefile ##########
 
 CC = gcc
-CCOPTS = -g0 -Wall -ffast-math -D__BOCA_COMPONENT_BUILD__ -I$(BOCA_PATH)/include
+CCOPTS = -g0 -Wall -ffast-math -D__BOCA_COMPONENT_BUILD__ $(DEFINE) -I$(BOCA_PATH)/include
 LD = gcc
 LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lboca -lstdc++ $(LIBS)
 

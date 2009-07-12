@@ -8,13 +8,13 @@
   <format>
     <name>MP4 Audio Files</name>
     <extension>m4a</extension>
+    <tag mode="other">MP4Metadata</tag>
   </format>
   <external>
     <command>codecs/cmdline/neroAacEnc.exe</command>
     <arguments>-ignorelength -if - -of %OUTFILE %OPTIONS</arguments>
     <mode>stdio</mode>
     <informat>wave</informat>
-    <tag mode="other">MP4Metadata</tag>
     <parameters>
       <selection name="Encoding mode" argument="%VALUE">
 	<option alias="Auto"/>
