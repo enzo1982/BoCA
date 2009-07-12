@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -8,11 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "layer_tag_advanced.h"
-#include "layer_edit_text.h"
-#include "layer_edit_number.h"
+#include "editor_advanced.h"
+#include "editor_advanced_text.h"
+#include "editor_advanced_number.h"
 
-BoCA::LayerTagAdvanced::LayerTagAdvanced() : Layer("Advanced")
+BoCA::LayerTagAdvanced::LayerTagAdvanced() : Editor("Advanced")
 {
 	LoadTagTypes();
 

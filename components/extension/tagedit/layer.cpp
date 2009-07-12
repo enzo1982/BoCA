@@ -14,12 +14,21 @@
 #include "chooser/chooser_albums.h"
 #include "chooser/chooser_files.h"
 
+#include "editor/editor_basic.h"
+#include "editor/editor_details.h"
+#include "editor/editor_other.h"
+
+#include "editor/editor_advanced.h"
+
 BoCA::LayerTags::LayerTags() : Layer("Tags")
 {
 	tab_mode	= new TabWidget(Point(7, 7), Size(100, 150));
 
 	choosers.Add(new ChooserTracks());
-	choosers.Add(new ChooserAlbums());
+
+/* ToDo: Add album chooser once it's ready.
+ */
+//	choosers.Add(new ChooserAlbums());
 	choosers.Add(new ChooserFiles());
 
 	foreach (Chooser *chooser, choosers)
@@ -34,57 +43,37 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 	tab_editor	= new TabWidget(Point(7, 226), Size(300, 218));
 	tab_editor->SetOrientation(OR_LOWERLEFT);
 
-	layer_basic	= new LayerTagBasic();
-	layer_basic->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
+	editors.Add(new LayerTagBasic());
+	editors.Add(new LayerTagDetails());
+	editors.Add(new LayerTagOther());
 
-	layer_details	= new LayerTagDetails();
-	layer_details->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
+/* ToDo: Add advanced editor once it's ready.
+ */
+//	editors.Add(new LayerTagAdvanced());
 
-	layer_other	= new LayerTagOther();
-	layer_other->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
+	foreach (Editor *editor, editors)
+	{
+		editor->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
 
-	tab_editor->Add(layer_basic);
-	tab_editor->Add(layer_details);
-	tab_editor->Add(layer_other);
+		onSelectTrack.Connect(&Editor::OnSelectTrack, editor);
+		onSelectNone.Connect(&Editor::OnSelectNone, editor);
 
-	layer_advanced	= new LayerTagAdvanced();
-
-	tab_editor->Add(layer_advanced);
+		tab_editor->Add(editor);
+	}
 
 	Add(tab_mode);
 	Add(tab_editor);
 
 	onChangeSize.Connect(&LayerTags::OnChangeSize, this);
-
-	onSelectTrack.Connect(&LayerTagBasic::OnSelectTrack, layer_basic);
-	onSelectNone.Connect(&LayerTagBasic::OnSelectNone, layer_basic);
-
-	onSelectTrack.Connect(&LayerTagDetails::OnSelectTrack, layer_details);
-	onSelectNone.Connect(&LayerTagDetails::OnSelectNone, layer_details);
-
-	onSelectTrack.Connect(&LayerTagOther::OnSelectTrack, layer_other);
-	onSelectNone.Connect(&LayerTagOther::OnSelectNone, layer_other);
-
-	onSelectTrack.Connect(&LayerTagAdvanced::OnSelectTrack, layer_advanced);
-	onSelectNone.Connect(&LayerTagAdvanced::OnSelectNone, layer_advanced);
 }
 
 BoCA::LayerTags::~LayerTags()
 {
+	foreach (Chooser *chooser, choosers) DeleteObject(chooser);
+	foreach (Editor *editor,   editors)  DeleteObject(editor);
+
 	DeleteObject(tab_mode);
-
-	foreach (Chooser *chooser, choosers)
-	{
-		DeleteObject(chooser);
-	}
-
 	DeleteObject(tab_editor);
-
-	DeleteObject(layer_basic);
-	DeleteObject(layer_details);
-	DeleteObject(layer_other);
-
-	DeleteObject(layer_advanced);
 }
 
 /* Called when component canvas size changes.

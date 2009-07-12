@@ -19,9 +19,11 @@ using namespace smooth::GUI;
 
 using namespace BoCA;
 
+#include "editor.h"
+
 namespace BoCA
 {
-	class LayerTagDetails : public Layer
+	class LayerTagDetails : public Editor
 	{
 		private:
 			GroupBox			*group_details;
@@ -50,8 +52,6 @@ namespace BoCA
 			EditBox				*edit_isrc;
 
 			Track				 track;
-		signals:
-			Signal1<Void, const Track &>	 onModifyTrack;
 		slots:
 			Void				 OnChangeSize(const Size &);
 

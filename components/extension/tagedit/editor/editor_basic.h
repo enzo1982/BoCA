@@ -19,9 +19,11 @@ using namespace smooth::GUI;
 
 using namespace BoCA;
 
+#include "editor.h"
+
 namespace BoCA
 {
-	class LayerTagBasic : public Layer
+	class LayerTagBasic : public Editor
 	{
 		private:
 			GroupBox			*group_info;
@@ -60,7 +62,7 @@ namespace BoCA
 			Text				*text_covers;
 			ImageBox			*image_covers;
 
-			Button				*button_cover_load;
+			Button				*button_cover_add;
 			Button				*button_cover_remove;
 
 			Text				*text_cover_type;
@@ -73,15 +75,14 @@ namespace BoCA
 
 			Void				 LoadCoverImages();
 			Void				 FreeCoverImages();
-		signals:
-			Signal1<Void, const Track &>	 onModifyTrack;
 		slots:
 			Void				 OnChangeSize(const Size &);
 
-			Void				 LoadCover();
+			Void				 AddCover();
 			Void				 RemoveCover();
 
 			Void				 SelectCover(ListEntry *);
+			Void				 DisplayCover();
 
 			Void				 OnSelectTrack(const Track &);
 			Void				 OnSelectNone();

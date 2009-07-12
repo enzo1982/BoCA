@@ -8,13 +8,13 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "layer_tag_details.h"
+#include "editor_details.h"
 #include "../utilities.h"
 
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
-BoCA::LayerTagDetails::LayerTagDetails() : Layer("Details")
+BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 {
 	I18n	*i18n = I18n::Get();
 

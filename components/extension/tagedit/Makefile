@@ -8,9 +8,12 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = advanced/layer_edit_number.o advanced/layer_edit_text.o advanced/layer_tag_advanced.o basic/layer_tag_basic.o basic/layer_tag_details.o basic/layer_tag_other.o chooser/chooser.o chooser/chooser_albums.o chooser/chooser_files.o chooser/chooser_files_tree.o chooser/chooser_files_utilities.o chooser/chooser_tracks.o layer.o tagedit.o tagspec.o utilities.o
+OBJECTS	  = chooser/chooser.o chooser/chooser_albums.o chooser/chooser_files.o chooser/chooser_files_tree.o chooser/chooser_files_utilities.o chooser/chooser_tracks.o editor/editor.o editor/editor_advanced_number.o editor/editor_advanced_text.o editor/editor_advanced.o editor/editor_basic.o editor/editor_basic_cover.o editor/editor_details.o editor/editor_other.o layer.o tagedit.o tagspec.o utilities.o
 
-# Enter additional library dependencies here
+# Enter additional defines here:
+DEFINE	  =
+
+# Enter additional library dependencies here:
 LIBS	  =
 
 # Enter addition commands for targets all and clean here:

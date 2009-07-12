@@ -8,26 +8,20 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_TAGEDIT_CHOOSER_FILES_UTILITIES_
-#define _H_TAGEDIT_CHOOSER_FILES_UTILITIES_
+#include "editor.h"
 
-#include <smooth.h>
-#include <boca.h>
-
-using namespace smooth;
-using namespace smooth::GUI;
-
-using namespace BoCA;
-using namespace BoCA::AS;
-
-namespace BoCA
+BoCA::Editor::Editor(const String &title) : Layer(title)
 {
-	class ChooserFilesUtilities
-	{
-		public:
-			static DecoderComponent	*CreateDecoderComponent(const String &);
-			static TaggerComponent	*CreateTaggerComponent(const String &);
-	};
-};
+}
 
-#endif
+BoCA::Editor::~Editor()
+{
+}
+
+Void BoCA::Editor::OnSelectTrack(const Track &track)
+{
+}
+
+Void BoCA::Editor::OnSelectNone()
+{
+}

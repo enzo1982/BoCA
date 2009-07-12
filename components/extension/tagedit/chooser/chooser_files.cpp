@@ -8,10 +8,6 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-/* Undefine this in order to use BoCA application classes.
- */
-#undef __BOCA_COMPONENT_BUILD__
-
 #include <boca.h>
 
 #include "chooser_files.h"
@@ -21,6 +17,8 @@
 BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 {
 	list_directories= new ListBox(Point(7,7), Size(150, 150));
+
+	div_split	= new Divider(160, OR_VERT);
 
 	edit_directory	= new EditBox(NIL, Point(165, 7), Size(100, 0));
 	edit_directory->Deactivate();
@@ -74,6 +72,8 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 
 	Add(list_directories);
 
+	Add(div_split);
+
 	Add(edit_directory);
 	Add(list_files);
 	Add(text_nofiles);
@@ -91,6 +91,8 @@ BoCA::ChooserFiles::~ChooserFiles()
 	foreach (Tree *tree, trees) DeleteObject(tree);
 
 	DeleteObject(list_directories);
+
+	DeleteObject(div_split);
 
 	DeleteObject(edit_directory);
 	DeleteObject(list_files);
@@ -127,9 +129,7 @@ Void BoCA::ChooserFiles::OnSelectDirectory(const Directory &directory)
 
 	if (modified.Length() > 0)
 	{
-/* ToDo: Ask the user if he wants to save
- *	 changes in open files.
- */
+		if (IDYES == Dialogs::QuickMessage("There are unsaved files in this directory. Would you like to save them now?", "Save changes", MB_YESNO, IDI_QUESTION)) OnSaveAll();
 	}
 
 	edit_directory->SetText(String(directory).Append(Directory::GetDirectoryDelimiter()));
@@ -306,13 +306,48 @@ Void BoCA::ChooserFiles::OnSaveAll()
 
 Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 {
-	DecoderComponent	*decoder = ChooserFilesUtilities::CreateDecoderComponent(track.origFilename);
+	Config	*config = Config::Get();
 
-	Error	 error = decoder->UpdateStreamInfo(track.origFilename, track);
-	String	 errorString = decoder->GetErrorString();
+	Int	 error = Error();
+	String	 errorString = "Unknown error";
+
+	/* Get tagging mode and type
+	 */
+	DecoderComponent	*decoder = ChooserFilesUtilities::CreateDecoderComponent(track.origFilename);
+	FileFormat		*format = decoder->GetFormats().GetFirst();
+
+	Int	 tagMode = format->GetTagMode();
+	String	 tagType = format->GetTagType();
 
 	Registry::Get().DeleteComponent(decoder);
 
+	/* Update tag.
+	 */
+	if (tagMode != TAG_MODE_NONE)
+	{
+		String		 taggerID;
+
+		if	(tagType == "ID3v1"	   && config->GetIntValue("Tags", "EnableID3v1", False))       taggerID = "id3v1-tag";
+		else if	(tagType == "ID3v2"	   && config->GetIntValue("Tags", "EnableID3v2", True))	       taggerID = "id3v2-tag";
+		else if	(tagType == "APEv2"	   && config->GetIntValue("Tags", "EnableAPEv2", True))	       taggerID = "apev2-tag";
+		else if (tagType == "MP4Metadata"  && config->GetIntValue("Tags", "EnableMP4Metadata", True))  taggerID = "mp4-tag";
+		else if (tagType == "FLACMetadata" && config->GetIntValue("Tags", "EnableFLACMetadata", True)) taggerID = "flac-tag";
+		else if (tagType == "WMAMetadata"  && config->GetIntValue("Tags", "EnableWMAMetadata", True))  taggerID = "wma-tag";
+
+		Registry	&boca = AS::Registry::Get();
+		TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID(taggerID);
+
+		if (tagger != NIL)
+		{
+			error = tagger->UpdateStreamInfo(track.origFilename, track);
+			errorString = tagger->GetErrorString();
+
+			boca.DeleteComponent(tagger);
+		}
+	}
+
+	/* Check for error.
+	 */
 	if (error == Error())
 	{
 		Utilities::ErrorMessage(String(BoCA::I18n::Get()->TranslateString("Unable to update tag: %1\n\nError: %2")).Replace("%1", track.origFilename).Replace("%2", BoCA::I18n::Get()->TranslateString(errorString)));

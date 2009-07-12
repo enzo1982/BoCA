@@ -8,25 +8,31 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_TAGEDIT_CHOOSER_FILES_UTILITIES_
-#define _H_TAGEDIT_CHOOSER_FILES_UTILITIES_
+#ifndef _H_TAGEDIT_COVER_DISPLAY_
+#define _H_TAGEDIT_COVER_DISPLAY_
 
 #include <smooth.h>
 #include <boca.h>
 
 using namespace smooth;
 using namespace smooth::GUI;
-
-using namespace BoCA;
-using namespace BoCA::AS;
+using namespace smooth::GUI::Dialogs;
 
 namespace BoCA
 {
-	class ChooserFilesUtilities
+	class CoverDisplay : public Dialog
 	{
+		private:
+			GUI::Window	*window;
+
+			Image		*image_cover;
 		public:
-			static DecoderComponent	*CreateDecoderComponent(const String &);
-			static TaggerComponent	*CreateTaggerComponent(const String &);
+					 CoverDisplay(const Bitmap &);
+					~CoverDisplay();
+
+			const Error	&ShowDialog();
+		slots:
+			Void		 Close();
 	};
 };
 

@@ -35,6 +35,8 @@ namespace BoCA
 
 			ListBox		*list_directories;
 
+			Divider		*div_split;
+
 			EditBox		*edit_directory;
 			ListBox		*list_files;
 			Text		*text_nofiles;

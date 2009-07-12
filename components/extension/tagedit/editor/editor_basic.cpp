@@ -8,13 +8,15 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "layer_tag_basic.h"
+#include "editor_basic.h"
+#include "editor_basic_cover.h"
+
 #include "../utilities.h"
 
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
-BoCA::LayerTagBasic::LayerTagBasic() : Layer("Info")
+BoCA::LayerTagBasic::LayerTagBasic() : Editor("Info")
 {
 	I18n	*i18n = I18n::Get();
 
@@ -152,11 +154,11 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Info")
 	edit_cover_desc		= new MultiEdit(NIL, text_cover_desc->GetPosition() + Point(maxTextSize3 + 7, -3), Size(300, 50));
 	edit_cover_desc->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	button_cover_load	= new Button("Add", NIL, Point(89, 9), Size(0, 0));
-	button_cover_load->SetOrientation(OR_UPPERRIGHT);
-	button_cover_load->onAction.Connect(&LayerTagBasic::LoadCover, this);
+	button_cover_add	= new Button("Add", NIL, Point(89, 9), Size(0, 0));
+	button_cover_add->SetOrientation(OR_UPPERRIGHT);
+	button_cover_add->onAction.Connect(&LayerTagBasic::AddCover, this);
 
-	button_cover_remove	= new Button("Remove", NIL, button_cover_load->GetPosition() + Point(0, 28), Size(0, 0));
+	button_cover_remove	= new Button("Remove", NIL, button_cover_add->GetPosition() + Point(0, 28), Size(0, 0));
 	button_cover_remove->SetOrientation(OR_UPPERRIGHT);
 	button_cover_remove->Deactivate();
 	button_cover_remove->onAction.Connect(&LayerTagBasic::RemoveCover, this);
@@ -167,7 +169,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Layer("Info")
 	group_cover->Add(combo_cover_type);
 	group_cover->Add(text_cover_desc);
 	group_cover->Add(edit_cover_desc);
-	group_cover->Add(button_cover_load);
+	group_cover->Add(button_cover_add);
 	group_cover->Add(button_cover_remove);
 
 	Add(group_info);
@@ -212,7 +214,7 @@ BoCA::LayerTagBasic::~LayerTagBasic()
 	DeleteObject(combo_cover_type);
 	DeleteObject(text_cover_desc);
 	DeleteObject(edit_cover_desc);
-	DeleteObject(button_cover_load);
+	DeleteObject(button_cover_add);
 	DeleteObject(button_cover_remove);
 }
 
@@ -250,6 +252,8 @@ Void BoCA::LayerTagBasic::LoadCoverImages()
 	{
 		ImageEntry	*entry = new ImageEntry(cover.GetBitmap(), Size(70, 70));
 
+		entry->onLeftButtonDoubleClick.Connect(&LayerTagBasic::DisplayCover, this);
+
 		image_covers->Add(entry);
 	}
 }
@@ -266,7 +270,7 @@ Void BoCA::LayerTagBasic::FreeCoverImages()
 	}
 }
 
-Void BoCA::LayerTagBasic::LoadCover()
+Void BoCA::LayerTagBasic::AddCover()
 {
 	FileSelection	*dialog = new FileSelection();
 
@@ -283,6 +287,8 @@ Void BoCA::LayerTagBasic::LoadCover()
 	{
 		String		 file = dialog->GetFileName();
 		ImageEntry	*entry = new ImageEntry(ImageLoader::Load(file), Size(70, 70));
+
+		entry->onLeftButtonDoubleClick.Connect(&LayerTagBasic::DisplayCover, this);
 
 		image_covers->Add(entry);
 
@@ -349,6 +355,16 @@ Void BoCA::LayerTagBasic::SelectCover(ListEntry *entry)
 	edit_cover_desc->SetText(picture.description);
 
 	combo_cover_type->onSelectEntry.Connect(&LayerTagBasic::OnModifyTrack, this);
+}
+
+Void BoCA::LayerTagBasic::DisplayCover()
+{
+	Int		 index = image_covers->GetSelectedEntryNumber();
+	const Picture	&picture = track.pictures.GetNth(index);
+
+	CoverDisplay	 coverDisplay(picture.GetBitmap());
+
+	coverDisplay.ShowDialog();
 }
 
 /* Called when a track is selected from the list.
