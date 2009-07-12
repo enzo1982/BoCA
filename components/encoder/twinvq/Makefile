@@ -10,7 +10,10 @@ BOCA_PATH = ../../..
 # Enter object files here:
 OBJECTS	  = twinvq/bfile.o twinvq/bfile_e.o twinvq/bstream_e.o twinvq/Chunk.o twinvq/ChunkHelper.o config.o dllinterface.o twinvq_out.o
 
-# Enter additional library dependencies here
+# Enter additional defines here:
+DEFINE	  =
+
+# Enter additional library dependencies here:
 LIBS	  =
 
 # Enter addition commands for targets all and clean here:

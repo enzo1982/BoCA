@@ -24,6 +24,8 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	useVBRSetting = useVBR;
 	use2PassSetting = use2Pass;
 
+	quality = config->GetIntValue("WMA", "Quality", 90) / 5;
+
 	/* Init the Microsoft COM library.
 	 */
 	CoInitialize(NIL);
@@ -74,11 +76,20 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	group_settings		= new GroupBox(i18n->TranslateString("Codec settings"), Point(7, 195), Size(386, 67));
 
 	check_vbr_setting	= new CheckBox(i18n->TranslateString("Use VBR encoding"), Point(10, 14), Size(180, 0), &useVBRSetting);
+	check_vbr_setting->onAction.Connect(&ConfigureWMAEnc::OnToggleVBRSetting, this);
 	check_2pass_setting	= new CheckBox(i18n->TranslateString("Use 2-pass encoding"), Point(10, 40), Size(180, 0), &use2PassSetting);
+	check_2pass_setting->onAction.Connect(&ConfigureWMAEnc::OnToggle2PassSetting, this);
 
-	text_bitrate		= new Text(String(i18n->TranslateString("Target bitrate")).Append(":"), Point(197, 16));
+	text_quality		= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(197, 16));
 
-	combo_bitrate		= new ComboBox(Point(204 + text_bitrate->textSize.cx, 13), Size(142 - text_bitrate->textSize.cx, 0));
+	slider_quality		= new Slider(Point(204 + text_quality->textSize.cx, 13), Size(142 - text_quality->textSize.cx, 0), OR_HORZ, &quality, 0, 20);
+	slider_quality->onValueChange.Connect(&ConfigureWMAEnc::OnSetQuality, this);
+
+	text_quality_value	= new Text(String::FromInt(quality * 5), Point(353, 16));
+
+	text_bitrate		= new Text(String(i18n->TranslateString("Target bitrate")).Append(":"), Point(197, 42));
+
+	combo_bitrate		= new ComboBox(Point(204 + text_bitrate->textSize.cx, 39), Size(142 - text_bitrate->textSize.cx, 0));
 	combo_bitrate->AddEntry("32");
 	combo_bitrate->AddEntry("48");
 	combo_bitrate->AddEntry("64");
@@ -89,10 +100,13 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	combo_bitrate->AddEntry("192");
 	combo_bitrate->SelectEntry(String::FromInt(config->GetIntValue("WMA", "Bitrate", 128)));
 
-	text_bitrate_kbps	= new Text("kbps", Point(353, 16));
+	text_bitrate_kbps	= new Text("kbps", Point(353, 42));
 
 	group_settings->Add(check_vbr_setting);
 	group_settings->Add(check_2pass_setting);
+	group_settings->Add(text_quality);
+	group_settings->Add(slider_quality);
+	group_settings->Add(text_quality_value);
 	group_settings->Add(text_bitrate);
 	group_settings->Add(combo_bitrate);
 	group_settings->Add(text_bitrate_kbps);
@@ -110,6 +124,9 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 
 	OnToggleCodec();
 	OnToggleFormat();
+
+	OnToggleVBRSetting();
+	OnToggle2PassSetting();
 
 	/* ToDo: Implement 2-pass encoding.
 	 *
@@ -137,6 +154,9 @@ BoCA::ConfigureWMAEnc::~ConfigureWMAEnc()
 	DeleteObject(group_settings);
 	DeleteObject(check_vbr_setting);
 	DeleteObject(check_2pass_setting);
+	DeleteObject(text_quality);
+	DeleteObject(slider_quality);
+	DeleteObject(text_quality_value);
 	DeleteObject(text_bitrate);
 	DeleteObject(combo_bitrate);
 	DeleteObject(text_bitrate_kbps);
@@ -170,6 +190,7 @@ Int BoCA::ConfigureWMAEnc::SaveSettings()
 	}
 
 	config->SetIntValue("WMA", "Bitrate", combo_bitrate->GetSelectedEntry()->GetText().ToInt());
+	config->SetIntValue("WMA", "Quality", quality * 5);
 
 	return Success();
 }
@@ -375,8 +396,17 @@ Void BoCA::ConfigureWMAEnc::OnSelectCodec()
 
 	codecInfo->Release();
 
+	if ( (supportVBR1Pass || supportVBR2Pass) &&
+	    !(supportCBR1Pass || supportCBR2Pass)) { useVBR = True; useVBRSetting = True; }
+
+	if (!(supportVBR1Pass || supportVBR2Pass) &&
+	     (supportCBR1Pass || supportCBR2Pass)) { useVBR = False; useVBRSetting = False; }
+
 	OnToggleVBR();
 	OnToggle2Pass();
+
+	OnToggleVBRSetting();
+	OnToggle2PassSetting();
 
 	if ((supportVBR1Pass || supportVBR2Pass) &&
 	    (supportCBR1Pass || supportCBR2Pass)) check_vbr_setting->Activate();
@@ -450,4 +480,37 @@ Void BoCA::ConfigureWMAEnc::OnToggle2Pass()
 	}
 
 	FillFormatComboBox();
+}
+
+Void BoCA::ConfigureWMAEnc::OnToggleVBRSetting()
+{
+	if (useVBRSetting)
+	{
+		text_bitrate->Deactivate();
+		combo_bitrate->Deactivate();
+		text_bitrate_kbps->Deactivate();
+
+		text_quality->Activate();
+		slider_quality->Activate();
+		text_quality_value->Activate();
+	}
+	else
+	{
+		text_bitrate->Activate();
+		combo_bitrate->Activate();
+		text_bitrate_kbps->Activate();
+
+		text_quality->Deactivate();
+		slider_quality->Deactivate();
+		text_quality_value->Deactivate();
+	}
+}
+
+Void BoCA::ConfigureWMAEnc::OnToggle2PassSetting()
+{
+}
+
+Void BoCA::ConfigureWMAEnc::OnSetQuality()
+{
+	text_quality_value->SetText(String::FromInt(quality * 5));
 }

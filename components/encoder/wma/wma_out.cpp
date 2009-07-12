@@ -34,6 +34,7 @@ const String &BoCA::WMAOut::GetComponentSpecs()
 		    <format>					\
 		      <name>Windows Media Audio</name>		\
 		      <extension>wma</extension>		\
+		      <tag mode=\"other\">WMAMetadata</tag>	\
 		    </format>					\
 		  </component>					\
 								\
@@ -117,7 +118,7 @@ Bool BoCA::WMAOut::Activate()
 	}
 	else
 	{
-		m_pStreamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue("WMA", "Codec", 0), track.GetFormat(), config->GetIntValue("WMA", "Bitrate", 128) * 1000);
+		m_pStreamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue("WMA", "Codec", 0), track.GetFormat());
 	}
 
 	hr = m_pStreamConfig->SetStreamNumber(1);
@@ -128,17 +129,41 @@ Bool BoCA::WMAOut::Activate()
 
 	hr = m_pWriter->SetProfile(m_pProfile);
 
-	SetInputFormat(m_pWriter, track.GetFormat());
+	if (SetInputFormat(m_pWriter, track.GetFormat()) == False) errorState = True;
 
 	pCodecInfo->Release();
 
-	hr = m_pWriter->BeginWriting();
+	if (!errorState)
+	{
+		hr = m_pWriter->BeginWriting();
+	}
+	else
+	{
+		m_pStreamConfig->Release();
 
-	return True;
+		m_pProfile->Release();
+		m_pProfileManager->Release();
+
+		m_pWriterFileSink->Release();
+
+		m_pWriterAdvanced->Release();
+		m_pWriter->Release();
+
+		errorString = "Could not initialize encoder.";
+	}
+
+	return !errorState;
 }
 
 Bool BoCA::WMAOut::Deactivate()
 {
+	if (errorState)
+	{
+		File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+
+		return True;
+	}
+
 	Config	*config = Config::Get();
 
 	HRESULT	 hr = S_OK;
@@ -165,7 +190,18 @@ Bool BoCA::WMAOut::Deactivate()
 	{
 		const Info	&info = track.GetInfo();
 
-		if (info.artist != NIL || info.title != NIL) TagWMA().Render(track, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
+		if (info.artist != NIL || info.title != NIL)
+		{
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("wma-tag");
+
+			if (tagger != NIL)
+			{
+				tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
+
+				boca.DeleteComponent(tagger);
+			}
+		}
 	}
 
 	/* Stream contents of created WMA file to output driver
@@ -236,7 +272,7 @@ Void BoCA::WMAOut::FreeConfigurationLayer()
 /* This method will return the format best matching
  * our requirements for a specified codec.
  */
-IWMStreamConfig *BoCA::WMAOut::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWORD codecIndex, const Format &format, Int bitrate)
+IWMStreamConfig *BoCA::WMAOut::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWORD codecIndex, const Format &format)
 {
 	Config	*config = Config::Get();
 
@@ -298,7 +334,13 @@ IWMStreamConfig *BoCA::WMAOut::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWO
 
 	IWMStreamConfig	*result = NIL;
 
+	Int		 targetBitrate = config->GetIntValue("WMA", "Bitrate", 128) * 1000;
+	Int		 targetQuality = config->GetIntValue("WMA", "Quality", 90);
+
+	Bool		 useVBR = (supportVBR && config->GetIntValue("WMA", "EnableVBR", True));
+
 	DWORD		 bestMatchBitrate	= 100000000;
+	DWORD		 bestMatchQuality	= 100000000;
 	DWORD		 bestMatchSampleRate	= 100000000;
 	DWORD		 bestMatchBits		= 100000000;
 	DWORD		 bestMatchChannels	= 100000000;
@@ -316,6 +358,7 @@ IWMStreamConfig *BoCA::WMAOut::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWO
 		hr = pStreamConfig->QueryInterface(IID_IWMMediaProps, (void **) &pMediaProps);
 
 		DWORD		 formatBitrate = 0;
+		DWORD		 formatQuality = 0;
 
 		hr = pStreamConfig->GetBitrate(&formatBitrate);
 
@@ -333,6 +376,8 @@ IWMStreamConfig *BoCA::WMAOut::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWO
 			Bool		 newBestMatch = False;
 			WAVEFORMATEX	*waveFormat = (WAVEFORMATEX *) mediaType->pbFormat;
 
+			formatQuality = waveFormat->nAvgBytesPerSec & 255;
+
 			if	(Math::Abs(Int(waveFormat->nChannels	  - format.channels))	      < Math::Abs(Int(bestMatchChannels	  - format.channels))) newBestMatch = True;
 			else if (Math::Abs(Int(waveFormat->nChannels	  - format.channels))	     == Math::Abs(Int(bestMatchChannels	  - format.channels)) &&
 				 Math::Abs(Int(waveFormat->nSamplesPerSec - (Unsigned) format.rate))  < Math::Abs(Int(bestMatchSampleRate - (Unsigned) format.rate))) newBestMatch = True;
@@ -342,22 +387,21 @@ IWMStreamConfig *BoCA::WMAOut::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWO
 			else if (Math::Abs(Int(waveFormat->nChannels	  - format.channels))	     == Math::Abs(Int(bestMatchChannels	  - format.channels)) &&
 				 Math::Abs(Int(waveFormat->nSamplesPerSec - (Unsigned) format.rate)) == Math::Abs(Int(bestMatchSampleRate - (Unsigned) format.rate)) &&
 				 Math::Abs(Int(waveFormat->wBitsPerSample - format.bits))	     == Math::Abs(Int(bestMatchBits	  - format.bits)) &&
-				 Math::Abs(Int(formatBitrate		  - bitrate))		      < Math::Abs(Int(bestMatchBitrate	  - bitrate))) newBestMatch = True;
+				 ((!useVBR && Math::Abs(Int(formatBitrate - targetBitrate))	      < Math::Abs(Int(bestMatchBitrate	  - targetBitrate))) ||
+				  ( useVBR && Math::Abs(Int(formatQuality - targetQuality))	      < Math::Abs(Int(bestMatchQuality	  - targetQuality))))) newBestMatch = True;
 
 			if (newBestMatch)
 			{
-				if (Math::Abs(Int(formatBitrate - bitrate)) < Math::Abs(Int(bestMatchBitrate - bitrate)))
-				{
-					if (result != NIL) result->Release();
+				if (result != NIL) result->Release();
 
-					result = pStreamConfig;
-					result->AddRef();
+				result = pStreamConfig;
+				result->AddRef();
 
-					bestMatchChannels	= waveFormat->nChannels;
-					bestMatchBits		= waveFormat->wBitsPerSample;
-					bestMatchSampleRate	= waveFormat->nSamplesPerSec;
-					bestMatchBitrate	= formatBitrate;
-				}
+				bestMatchChannels	= waveFormat->nChannels;
+				bestMatchBits		= waveFormat->wBitsPerSample;
+				bestMatchSampleRate	= waveFormat->nSamplesPerSec;
+				bestMatchBitrate	= formatBitrate;
+				bestMatchQuality	= formatQuality;
 			}
 		}
 

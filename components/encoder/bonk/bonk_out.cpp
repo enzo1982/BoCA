@@ -83,12 +83,21 @@ Bool BoCA::BonkOut::Activate()
 
 	encoder	= ex_bonk_encoder_create();
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
 	{
-		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = TagID3v2().Render(track, id3Buffer);
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v2-tag");
 
-		ex_bonk_encoder_set_id3_data(encoder, id3Buffer, size);
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->RenderBuffer(id3Buffer, track);
+
+			ex_bonk_encoder_set_id3_data(encoder, id3Buffer, id3Buffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
 	ex_bonk_encoder_init(encoder,

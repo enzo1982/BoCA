@@ -34,6 +34,7 @@ const String &BoCA::MACIn::GetComponentSpecs()
 		      <name>Monkey's Audio</name>		\
 		      <extension>ape</extension>		\
 		      <extension>mac</extension>		\
+		      <tag mode=\"append\">APEv2</tag>		\
 		    </format>					\
 		  </component>					\
 								\
@@ -95,23 +96,19 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Parse APE tag if present.
 	 */
-	TagAPE().Parse(streamURI, &track);
+	AS::Registry		&boca = AS::Registry::Get();
+	AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("apev2-tag");
+
+	if (tagger != NIL)
+	{
+		tagger->ParseStreamInfo(streamURI, track);
+
+		boca.DeleteComponent(tagger);
+	}
 
 	if (String::IsUnicode(streamURI))
 	{
 		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
-	}
-
-	return Success();
-}
-
-Error BoCA::MACIn::UpdateStreamInfo(const String &streamURI, const Track &track)
-{
-	Config	*config = Config::Get();
-
-	if (config->GetIntValue("Tags", "EnableAPEv2", True))
-	{
-		return TagAPE().Update(streamURI, track);
 	}
 
 	return Success();

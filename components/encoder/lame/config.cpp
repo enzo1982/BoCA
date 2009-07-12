@@ -79,14 +79,9 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	basic_combo_preset	= new ComboBox(pos, size);
 	basic_combo_preset->AddEntry(i18n->TranslateString("Custom settings"));
-	basic_combo_preset->AddEntry(i18n->TranslateString("Medium"));
-	basic_combo_preset->AddEntry(i18n->TranslateString("Standard"));
-	basic_combo_preset->AddEntry(i18n->TranslateString("Extreme"));
-	basic_combo_preset->AddEntry(i18n->TranslateString("Insane"));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Medium, Fast"));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Standard, Fast"));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Extreme, Fast"));
-	basic_combo_preset->AddEntry("R3Mix");
 	basic_combo_preset->AddEntry("ABR");
 	basic_combo_preset->SelectNthEntry(preset);
 	basic_combo_preset->onSelectEntry.Connect(&ConfigureLAME::SetPreset, this);

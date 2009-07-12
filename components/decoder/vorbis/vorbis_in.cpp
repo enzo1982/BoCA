@@ -33,6 +33,7 @@ const String &BoCA::VorbisIn::GetComponentSpecs()
 		    <format>					\
 		      <name>Ogg Vorbis Audio</name>		\
 		      <extension>ogg</extension>		\
+		      <tag mode=\"other\">VorbisComment</tag>	\
 		    </format>					\
 		  </component>					\
 								\
@@ -123,7 +124,15 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 
 					memcpy(buffer, op.packet + 7, op.bytes - 7);
 
-					TagVorbis().Parse(buffer, &track);
+					AS::Registry		&boca = AS::Registry::Get();
+					AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("vorbis-tag");
+
+					if (tagger != NIL)
+					{
+						tagger->ParseBuffer(buffer, track);
+
+						boca.DeleteComponent(tagger);
+					}
 				}
 
 				if (packetNum >= 2) done = True;

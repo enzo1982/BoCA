@@ -396,7 +396,8 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 		params.bJitterCorrection	= config->cdrip_jitter;
 		params.bDetectJitterErrors	= config->cdrip_detectJitterErrors;
 		params.bDetectC2Errors		= config->cdrip_detectC2Errors;
-		params.bEnableMultiRead		= true;
+		params.nSpeed			= config->GetIntValue("CDRip", "RippingSpeed", 0);
+		params.bEnableMultiRead		= True;
 		params.nMultiReadCount		= 2;
 
 		ex_CR_SetCDROMParameters(&params);

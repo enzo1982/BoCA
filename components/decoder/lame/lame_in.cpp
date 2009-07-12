@@ -33,6 +33,7 @@ const String &BoCA::LAMEIn::GetComponentSpecs()
 		    <format>					\
 		      <name>MPEG 1 Audio Layer 3</name>		\
 		      <extension>mp3</extension>		\
+		      <tag mode=\"prepend\">ID3v2</tag>		\
 		    </format>					\
 		  </component>					\
 								\
@@ -104,29 +105,31 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_lame_decode_exit();
 
-	if (Config::Get()->enable_id3)
+	if (!errorState)
 	{
-		if (TagID3v2().Parse(streamURI, &track) != Success())
-		    TagID3v1().Parse(streamURI, &track);
-	}
+		Bool			 foundTag = False;
 
-	return Success();
-}
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v2-tag");
 
-Error BoCA::LAMEIn::UpdateStreamInfo(const String &streamURI, const Track &track)
-{
-	Config	*config = Config::Get();
+		if (tagger != NIL)
+		{
+			if (tagger->ParseStreamInfo(streamURI, track) == Success()) foundTag = True;
 
-	if (!config->enable_id3) return Error();
+			boca.DeleteComponent(tagger);
+		}
 
-	if (config->GetIntValue("Tags", "EnableID3v2", True))
-	{
-		if (TagID3v2().Update(streamURI, track) != Success()) return Error();
-	}
+		if (!foundTag)
+		{
+			tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v1-tag");
 
-	if (config->GetIntValue("Tags", "EnableID3v1", False))
-	{
-		if (TagID3v1().Update(streamURI, track) != Success()) return Error();
+			if (tagger != NIL)
+			{
+				tagger->ParseStreamInfo(streamURI, track);
+
+				boca.DeleteComponent(tagger);
+			}
+		}
 	}
 
 	return Success();

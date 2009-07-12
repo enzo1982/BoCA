@@ -8,9 +8,12 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = flac_in.o dllinterface.o
+OBJECTS	  = dllinterface.o flac_in.o
 
-# Enter additional library dependencies here
+# Enter additional defines here:
+DEFINE	  =
+
+# Enter additional library dependencies here:
 LIBS	  =
 
 # Enter addition commands for targets all and clean here:

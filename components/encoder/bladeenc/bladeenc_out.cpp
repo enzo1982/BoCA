@@ -34,6 +34,7 @@ const String &BoCA::BladeOut::GetComponentSpecs()
 		    <format>					\
 		      <name>MPEG 1 Audio Layer 3</name>		\
 		      <extension>mp3</extension>		\
+		      <tag mode=\"prepend\">ID3v2</tag>		\
 		    </format>					\
 		  </component>					\
 								\
@@ -117,12 +118,21 @@ Bool BoCA::BladeOut::Activate()
 
 	packageSize = samplesSize * (format.bits / 8);
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
 	{
-		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = TagID3v2().Render(track, id3Buffer);
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v2-tag");
 
-		driver->WriteData(id3Buffer, size);
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->RenderBuffer(id3Buffer, track);
+
+			driver->WriteData(id3Buffer, id3Buffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
 	return True;
@@ -141,12 +151,21 @@ Bool BoCA::BladeOut::Deactivate()
 
 	ex_beCloseStream(handle);
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v1", False) && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
-		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = TagID3v1().Render(track, id3Buffer);
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v1-tag");
 
-		driver->WriteData(id3Buffer, size);
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->RenderBuffer(id3Buffer, track);
+
+			driver->WriteData(id3Buffer, id3Buffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
 	return True;

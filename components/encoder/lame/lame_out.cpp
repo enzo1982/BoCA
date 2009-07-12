@@ -32,6 +32,7 @@ const String &BoCA::LAMEOut::GetComponentSpecs()
 		    <format>					\
 		      <name>MPEG 1 Audio Layer 3</name>		\
 		      <extension>mp3</extension>		\
+		      <tag mode=\"prepend\">ID3v2</tag>		\
 		    </format>					\
 		  </component>					\
 								\
@@ -250,30 +251,15 @@ Bool BoCA::LAMEOut::Activate()
 
 			break;
 		case 1:
-			ex_lame_set_preset(lameFlags, MEDIUM);
-			break;
-		case 2:
-			ex_lame_set_preset(lameFlags, STANDARD);
-			break;
-		case 3:
-			ex_lame_set_preset(lameFlags, EXTREME);
-			break;
-		case 4:
-			ex_lame_set_preset(lameFlags, INSANE);
-			break;
-		case 5:
 			ex_lame_set_preset(lameFlags, MEDIUM_FAST);
 			break;
-		case 6:
+		case 2:
 			ex_lame_set_preset(lameFlags, STANDARD_FAST);
 			break;
-		case 7:
+		case 3:
 			ex_lame_set_preset(lameFlags, EXTREME_FAST);
 			break;
-		case 8:
-			ex_lame_set_preset(lameFlags, R3MIX);
-			break;
-		case 9:
+		case 4:
 			ex_lame_set_preset(lameFlags, config->GetIntValue("LAME", "ABRBitrate", 192));
 			break;
 	}
@@ -285,12 +271,25 @@ Bool BoCA::LAMEOut::Activate()
 		return False;
 	}
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->enable_id3)
-	{
-		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = TagID3v2().Render(track, id3Buffer);
+	dataOffset = 0;
 
-		driver->WriteData(id3Buffer, size);
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v2-tag");
+
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->RenderBuffer(id3Buffer, track);
+
+			driver->WriteData(id3Buffer, id3Buffer.Size());
+
+			boca.DeleteComponent(tagger);
+
+			dataOffset = id3Buffer.Size();
+		}
 	}
 
 	ex_lame_set_bWriteVbrTag(lameFlags, 1);
@@ -307,44 +306,32 @@ Bool BoCA::LAMEOut::Deactivate()
 
 	driver->WriteData(outBuffer, bytes);
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v1", False) && config->enable_id3)
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
-		Buffer<unsigned char>	 id3Buffer;
-		Int			 size = TagID3v1().Render(track, id3Buffer);
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v1-tag");
 
-		driver->WriteData(id3Buffer, size);
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->RenderBuffer(id3Buffer, track);
+
+			driver->WriteData(id3Buffer, id3Buffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
+	/* Write Xing header if VBR.
+	 */
 	if (ex_lame_get_VBR(lameFlags) != vbr_off)
 	{
-		String	 tempFile = S::System::System::GetTempDirectory().Append("xing.tmp");
+		Buffer<unsigned char>	 buffer(2880);	// Maximum frame size
+		Int			 bytes = ex_lame_get_lametag_frame(lameFlags, buffer, buffer.Size());
 
-		FILE	*f_out = fopen(tempFile, "w+b");
-
-		if (f_out != NIL)
-		{
-			Buffer<unsigned char>	 buffer(driver->GetSize());
-
-			driver->Seek(0);
-			driver->ReadData(buffer, buffer.Size());
-
-			fwrite(buffer, 1, buffer.Size(), f_out);
-
-			ex_lame_mp3_tags_fid(lameFlags, f_out);
-
-			buffer.Resize(ftell(f_out));
-
-			fseek(f_out, 0, SEEK_SET);
-
-			fread((void *) buffer, 1, buffer.Size(), f_out);
-
-			driver->Seek(0);
-			driver->WriteData(buffer, buffer.Size());
-
-			fclose(f_out);
-
-			File(tempFile).Delete();
-		}
+		driver->Seek(dataOffset);
+		driver->WriteData(buffer, bytes);
 	}
 
 	ex_lame_close(lameFlags);

@@ -34,7 +34,7 @@ namespace BoCA
 
 			Buffer<signed short>	 samplesBuffer;
 
-			IWMStreamConfig		*GetBestCodecFormat(IWMCodecInfo3 *, DWORD, const Format &, Int);
+			IWMStreamConfig		*GetBestCodecFormat(IWMCodecInfo3 *, DWORD, const Format &);
 
 			Bool			 SetInputFormat(IWMWriter *, const Format &);
 		public:

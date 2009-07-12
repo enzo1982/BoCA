@@ -10,7 +10,10 @@ BOCA_PATH = ../../..
 # Enter object files here:
 OBJECTS	  = dllinterface.o wma_in.o wma_reader.o
 
-# Enter additional library dependencies here
+# Enter additional defines here:
+DEFINE	  =
+
+# Enter additional library dependencies here:
 LIBS	  = -lole32 -luuid -Xlinker --enable-stdcall-fixup
 
 # Enter addition commands for targets all and clean here:

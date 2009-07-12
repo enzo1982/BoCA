@@ -34,6 +34,7 @@ const String &BoCA::FLACOut::GetComponentSpecs()
 		    <format>					\
 		      <name>FLAC Audio</name>			\
 		      <extension>flac</extension>		\
+		      <tag mode=\"other\">FLACMetadata</tag>	\
 		    </format>					\
 		  </component>					\
 								\
@@ -98,13 +99,23 @@ Bool BoCA::FLACOut::Activate()
 
 		/* Disable writing cover art to Vorbis comment tags for FLAC files.
 		 */
-		Bool	 writeVorbisCoverArt = config->GetIntValue("Tags", "WriteCoverArtVorbisComment", False);
+		Bool	 writeVorbisCoverArt = config->GetIntValue("Tags", "CoverArtWriteToVorbisComment", False);
 
-		if (writeVorbisCoverArt) config->SetIntValue("Tags", "WriteCoverArtVorbisComment", False);
+		if (writeVorbisCoverArt) config->SetIntValue("Tags", "CoverArtWriteToVorbisComment", False);
 
-		TagVorbis().Render(track, vcBuffer, *ex_FLAC__VENDOR_STRING);
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("vorbis-tag");
 
-		if (writeVorbisCoverArt) config->SetIntValue("Tags", "WriteCoverArtVorbisComment", True);
+		if (tagger != NIL)
+		{
+			tagger->SetVendorString(*ex_FLAC__VENDOR_STRING);
+
+			tagger->RenderBuffer(vcBuffer, track);
+
+			boca.DeleteComponent(tagger);
+		}
+
+		if (writeVorbisCoverArt) config->SetIntValue("Tags", "CoverArtWriteToVorbisComment", True);
 
 		/* Process output comment tag and add it to FLAC metadata.
 		 */
@@ -127,7 +138,7 @@ Bool BoCA::FLACOut::Activate()
 		vorbiscomment->length = vcBuffer.Size();
 	}
 
-	if (config->GetIntValue("Tags", "WriteCoverArt", True))
+	if (config->GetIntValue("Tags", "CoverArtWriteToTags", True))
 	{
 		for (Int i = 0; i < track.pictures.Length(); i++)
 		{

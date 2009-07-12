@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -54,7 +54,7 @@ typedef int				(*LAME_ENCODE_BUFFER)			(lame_global_flags *, const short int [],
 typedef int				(*LAME_ENCODE_BUFFER_INTERLEAVED)	(lame_global_flags *, short int [], int, unsigned char *, int);
 typedef int				(*LAME_ENCODE_FLUSH)			(lame_global_flags *, unsigned char *, int);
 typedef char *				(*GET_LAME_SHORT_VERSION)		();
-typedef void				(*LAME_MP3_TAGS_FID)			(lame_global_flags *, FILE *);
+typedef size_t				(*LAME_GET_LAMETAG_FRAME)		(lame_global_flags *, unsigned char *, size_t);
 typedef int				(*LAME_SET_BWRITEVBRTAG)		(lame_global_flags *, int);
 
 extern LAME_INIT			 ex_lame_init;
@@ -91,5 +91,5 @@ extern LAME_ENCODE_BUFFER		 ex_lame_encode_buffer;
 extern LAME_ENCODE_BUFFER_INTERLEAVED	 ex_lame_encode_buffer_interleaved;
 extern LAME_ENCODE_FLUSH		 ex_lame_encode_flush;
 extern GET_LAME_SHORT_VERSION		 ex_get_lame_short_version;
-extern LAME_MP3_TAGS_FID		 ex_lame_mp3_tags_fid;
+extern LAME_GET_LAMETAG_FRAME		 ex_lame_get_lametag_frame;
 extern LAME_SET_BWRITEVBRTAG		 ex_lame_set_bWriteVbrTag;

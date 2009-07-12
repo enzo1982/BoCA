@@ -35,6 +35,7 @@ const String &BoCA::MACOut::GetComponentSpecs()
 		      <name>Monkey's Audio</name>		\
 		      <extension>ape</extension>		\
 		      <extension>mac</extension>		\
+		      <tag mode=\"append\">APEv2</tag>		\
 		    </format>					\
 		  </component>					\
 								\
@@ -121,10 +122,19 @@ Bool BoCA::MACOut::Deactivate()
 
 	if ((info.artist != NIL || info.title != NIL) && Config::Get()->GetIntValue("Tags", "EnableAPEv2", True))
 	{
-		Buffer<unsigned char>	 tagBuffer;
-		Int			 size = TagAPE().Render(track, tagBuffer);
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("apev2-tag");
 
-		driver->WriteData(tagBuffer, size);
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 tagBuffer;
+
+			tagger->RenderBuffer(tagBuffer, track);
+
+			driver->WriteData(tagBuffer, tagBuffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
 	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();

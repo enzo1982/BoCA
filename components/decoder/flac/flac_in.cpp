@@ -35,6 +35,7 @@ const String &BoCA::FLACIn::GetComponentSpecs()
 		    <format>					\
 		      <name>FLAC Audio Files</name>		\
 		      <extension>flac</extension>		\
+		      <tag mode=\"other\">FLACMetadata</tag>	\
 		    </format>					\
 		  </component>					\
 								\
@@ -290,10 +291,18 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 				out.OutputData(metadata->data.vorbis_comment.comments[i].entry, metadata->data.vorbis_comment.comments[i].length);			
 			}
 
-			TagVorbis().Parse(vcBuffer, filter->infoTrack);
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("vorbis-tag");
+
+			if (tagger != NIL)
+			{
+				tagger->ParseBuffer(vcBuffer, *filter->infoTrack);
+
+				boca.DeleteComponent(tagger);
+			}
 		}
 	}
-	else if (metadata->type == FLAC__METADATA_TYPE_PICTURE)
+	else if (metadata->type == FLAC__METADATA_TYPE_PICTURE && Config::Get()->GetIntValue("Tags", "CoverArtReadFromTags", True))
 	{
 		Picture	 picture;
 

@@ -35,6 +35,7 @@ const String &BoCA::SpeexOut::GetComponentSpecs()
 		    <format>					\
 		      <name>Speex Files</name>			\
 		      <extension>spx</extension>		\
+		      <tag mode=\"other\">VorbisComment</tag>	\
 		    </format>					\
 		  </component>					\
 								\
@@ -170,8 +171,18 @@ Bool BoCA::SpeexOut::Activate()
 		 * An empty tag containing only the vendor string
 		 * is rendered if Vorbis comments are disabled.
 		 */
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True)) TagVorbis().Render(track, vcBuffer, String("Encoded with Speex ").Append(speexVersion));
-		else													   TagVorbis().Render(Track(), vcBuffer, String("Encoded with Speex ").Append(speexVersion));
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("vorbis-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->SetVendorString(String("Encoded with Speex ").Append(speexVersion));
+
+			if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True)) tagger->RenderBuffer(vcBuffer, track);
+			else													   tagger->RenderBuffer(vcBuffer, Track());
+
+			boca.DeleteComponent(tagger);
+		}
 
 		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, numPackets++ };
 

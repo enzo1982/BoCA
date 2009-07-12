@@ -43,6 +43,9 @@ namespace BoCA
 			GroupBox		*group_settings;
 			CheckBox		*check_vbr_setting;
 			CheckBox		*check_2pass_setting;
+			Text			*text_quality;
+			Slider			*slider_quality;
+			Text			*text_quality_value;
 			Text			*text_bitrate;
 			ComboBox		*combo_bitrate;
 			Text			*text_bitrate_kbps;
@@ -61,6 +64,8 @@ namespace BoCA
 			Bool			 useVBRSetting;
 			Bool			 use2PassSetting;
 
+			Int			 quality;
+
 			Void			 FillCodecComboBox();
 			Void			 FillFormatComboBox();
 		public:
@@ -76,6 +81,11 @@ namespace BoCA
 
 			Void			 OnToggleVBR();
 			Void			 OnToggle2Pass();
+
+			Void			 OnToggleVBRSetting();
+			Void			 OnToggle2PassSetting();
+
+			Void			 OnSetQuality();
 	};
 };
 

@@ -33,6 +33,7 @@ const String &BoCA::WMAIn::GetComponentSpecs()
 		    <format>					\
 		      <name>Windows Media Audio Files</name>	\
 		      <extension>wma</extension>		\
+		      <tag mode=\"other\">WMAMetadata</tag>	\
 		    </format>					\
 		  </component>					\
 								\
@@ -176,22 +177,21 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 	m_pReader->Release();
 	readerCallback->Release();
 
-	if (!errorState) TagWMA().Parse(streamURI, &track);
+	if (!errorState)
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("wma-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->ParseStreamInfo(streamURI, track);
+
+			boca.DeleteComponent(tagger);
+		}
+	}
 
 	if (errorState)	return Error();
 	else		return Success();
-}
-
-Error BoCA::WMAIn::UpdateStreamInfo(const String &streamURI, const Track &track)
-{
-	Config	*config = Config::Get();
-
-	if (config->GetIntValue("Tags", "EnableWMAMetadata", True))
-	{
-		return TagWMA().Update(streamURI, track);
-	}
-
-	return Success();
 }
 
 BoCA::WMAIn::WMAIn()

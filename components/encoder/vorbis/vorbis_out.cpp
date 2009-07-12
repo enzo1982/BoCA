@@ -37,6 +37,7 @@ const String &BoCA::VorbisOut::GetComponentSpecs()
 		    <format>					\
 		      <name>Ogg Vorbis Audio</name>		\
 		      <extension>ogg</extension>		\
+		      <tag mode=\"other\">VorbisComment</tag>	\
 		    </format>					\
 		  </component>					\
 								\
@@ -130,8 +131,18 @@ Bool BoCA::VorbisOut::Activate()
 		 * An empty tag containing only the vendor string
 		 * is rendered if Vorbis comments are disabled.
 		 */
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True)) TagVorbis().Render(track, vcBuffer, vendor);
-		else													   TagVorbis().Render(Track(), vcBuffer, vendor);
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("vorbis-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->SetVendorString(vendor);
+
+			if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True)) tagger->RenderBuffer(vcBuffer, track);
+			else													   tagger->RenderBuffer(vcBuffer, Track());
+
+			boca.DeleteComponent(tagger);
+		}
 
 		vcBuffer.Resize(vcBuffer.Size() + 8);
 

@@ -86,18 +86,26 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_bonk_decoder_get_id3_data(decoder, &id3tag, &id3tag_size);
 
-	ex_bonk_decoder_close(decoder);
-
-	delete in;
-
 	if (id3tag_size > 0) 
 	{
 		Buffer<unsigned char>	 buffer(id3tag_size);
 
 		memcpy(buffer, id3tag, id3tag_size);
 
-		TagID3v2().Parse(buffer, &track);
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("id3v2-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->ParseBuffer(buffer, track);
+
+			boca.DeleteComponent(tagger);
+		}
 	}
+
+	ex_bonk_decoder_close(decoder);
+
+	delete in;
 
 	return Success();
 }

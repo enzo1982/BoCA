@@ -7,6 +7,7 @@ all:
 	cd extension && make
 	cd other && make
 	cd output && make
+	cd tagger && make
 
 clean:
 	cd decoder && make clean
@@ -15,3 +16,4 @@ clean:
 	cd extension && make clean
 	cd other && make clean
 	cd output && make clean
+	cd tagger && make clean
