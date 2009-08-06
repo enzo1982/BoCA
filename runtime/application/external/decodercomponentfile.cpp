@@ -122,6 +122,20 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		File(encFileName).Delete();
 	}
 
+	/* Check if anything went wrong
+	 */
+	if (exitCode != 0)
+	{
+		/* Remove temporary WAVE file
+		 */
+		File(wavFileName).Delete();
+
+		errorState = True;
+		errorString = String("Decoder returned exit code ").Append(String::FromInt(exitCode)).Append(".");
+
+		return Error();
+	}
+
 	/* Open decoded WAVE file and read header
 	 */
 	in = new InStream(STREAM_FILE, wavFileName, IS_READONLY);
@@ -241,7 +255,16 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 		File(encFileName).Delete();
 	}
 
-	if (exitCode != 0) return False;
+	/* Check if anything went wrong
+	 */
+	if (exitCode != 0)
+	{
+		/* Remove temporary WAVE file
+		 */
+		File(wavFileName).Delete();
+
+		return False;
+	}
 
 	/* Open decoded WAVE file and skip the header
 	 */

@@ -213,7 +213,15 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		File(encFileName).Delete();
 	}
 
-	if (exitCode != 0) return Error();
+	/* Check if anything went wrong
+	 */
+	if (exitCode != 0)
+	{
+		errorState = True;
+		errorString = String("Decoder returned exit code ").Append(String::FromInt(exitCode)).Append(".");
+
+		return Error();
+	}
 
 	if (errorState) return Error();
 

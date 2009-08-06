@@ -388,32 +388,32 @@ Error BoCA::WMATag::UpdateStreamInfo(const String &fileName, const Track &track)
 			{
 				String	 nameStr = name;
 
-				if (name == g_wszWMAuthor		||
-				    name == g_wszWMTitle		||
-				    name == g_wszWMAlbumTitle		||
-				    name == g_wszWMYear			||
-				    name == g_wszWMGenre		||
-				    name == g_wszWMDescription		||
-				    name == g_wszWMPublisher		||
-				    name == g_wszWMISRC			||
+				if (nameStr == g_wszWMAuthor			||
+				    nameStr == g_wszWMTitle			||
+				    nameStr == g_wszWMAlbumTitle		||
+				    nameStr == g_wszWMYear			||
+				    nameStr == g_wszWMGenre			||
+				    nameStr == g_wszWMDescription		||
+				    nameStr == g_wszWMPublisher			||
+				    nameStr == g_wszWMISRC			||
 
-				    name == g_wszWMConductor		||
-				    name == g_wszWMComposer		||
-				    name == g_wszWMWriter		||
+				    nameStr == g_wszWMConductor			||
+				    nameStr == g_wszWMComposer			||
+				    nameStr == g_wszWMWriter			||
 
-				    name == g_wszWMOriginalArtist	||
-				    name == g_wszWMOriginalAlbumTitle	||
-				    name == g_wszWMOriginalLyricist	||
-				    name == g_wszWMOriginalReleaseYear	||
+				    nameStr == g_wszWMOriginalArtist		||
+				    nameStr == g_wszWMOriginalAlbumTitle	||
+				    nameStr == g_wszWMOriginalLyricist		||
+				    nameStr == g_wszWMOriginalReleaseYear	||
 
-				    name == g_wszWMAuthorURL		||
-				    name == g_wszWMAudioSourceURL	||
-				    name == g_wszWMCopyrightURL		||
+				    nameStr == g_wszWMAuthorURL			||
+				    nameStr == g_wszWMAudioSourceURL		||
+				    nameStr == g_wszWMCopyrightURL		||
 
-				    name == g_wszWMTrackNumber		||
-				    name == g_wszWMPartOfSet		||
-				    name == g_wszWMMCDI			||
-				    name == g_wszWMPicture) hr = pHeaderInfo->DeleteAttribute(0, indices[i]);
+				    nameStr == g_wszWMTrackNumber		||
+				    nameStr == g_wszWMPartOfSet			||
+				    nameStr == g_wszWMMCDI			||
+				    nameStr == g_wszWMPicture) hr = pHeaderInfo->DeleteAttribute(0, indices[i]);
 			}
 
 			delete [] name;

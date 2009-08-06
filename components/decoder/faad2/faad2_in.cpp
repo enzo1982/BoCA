@@ -176,7 +176,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_NeAACDecInit2(handle, (unsigned char *) esc_buffer, buffer_size, (unsigned long *) &format.rate, (unsigned char *) &format.channels);
 
-			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) / ex_MP4GetTrackTimeScale(mp4File, mp4Track) * format.channels * format.rate);
+			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * format.channels * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
 
 			format.order	= BYTE_INTEL;
 			format.bits	= 16;

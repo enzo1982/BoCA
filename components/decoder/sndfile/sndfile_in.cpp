@@ -120,6 +120,8 @@ Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 {
+	track.fileSize	= File(streamURI).GetFileSize();
+
 #ifdef __WIN32__
 	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
 	else			  file = fopen(streamURI, "rb");

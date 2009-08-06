@@ -18,7 +18,8 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 {
 	list_directories= new ListBox(Point(7,7), Size(150, 150));
 
-	div_split	= new Divider(160, OR_VERT);
+	div_split	= new Divider(160, OR_VERT | DIV_MOVABLE);
+	div_split->onDrag.Connect(&ChooserFiles::OnDragDivider, this);
 
 	edit_directory	= new EditBox(NIL, Point(165, 7), Size(100, 0));
 	edit_directory->Deactivate();
@@ -112,9 +113,51 @@ Void BoCA::ChooserFiles::OnChangeSize(const Size &nSize)
 
 	list_directories->SetHeight(clientSize.cy - 15);
 
-	edit_directory->SetWidth(clientSize.cx - 158 - 15);
-	list_files->SetSize(Size(clientSize.cx - 158 - 15, clientSize.cy - 72));
+	edit_directory->SetWidth(clientSize.cx - edit_directory->GetX() - 8);
+	list_files->SetSize(Size(clientSize.cx - list_files->GetX() - 8, clientSize.cy - 72));
 	text_nofiles->SetPosition(list_files->GetPosition() + Point((list_files->GetWidth() - text_nofiles->textSize.cx) / 2, (list_files->GetHeight() - text_nofiles->textSize.cy) / 2));
+}
+
+/* Called when the splitting divider is dragged with the mouse.
+ * ----
+ */
+Void BoCA::ChooserFiles::OnDragDivider(Int pos)
+{
+	Rect	 clientRect = Rect(GetRealPosition(), GetSize());
+	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+
+	if (pos > clientSize.cx - 300) pos = clientSize.cx - 300;
+	if (pos <		  150) pos =		     150;
+
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(clientRect);
+
+	div_split->Hide();
+	list_directories->Hide();
+	edit_directory->Hide();
+	list_files->Hide();
+
+	list_directories->SetWidth(pos - 10);
+
+	edit_directory->SetWidth(clientSize.cx - pos - 13);
+	edit_directory->SetX(pos + 5);
+
+	list_files->SetWidth(clientSize.cx - pos - 13);
+	list_files->SetX(pos + 5);
+
+	div_split->SetPos(pos);
+
+	text_nofiles->SetPosition(list_files->GetPosition() + Point((list_files->GetWidth() - text_nofiles->textSize.cx) / 2, (list_files->GetHeight() - text_nofiles->textSize.cy) / 2));
+
+	div_split->Show();
+	list_directories->Show();
+	edit_directory->Show();
+	list_files->Show();
+
+	if (text_nofiles->IsVisible()) text_nofiles->Paint(SP_PAINT);
+
+	surface->EndPaint();
 }
 
 /* Called when a directory entry is selected.
@@ -343,6 +386,11 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 			errorString = tagger->GetErrorString();
 
 			boca.DeleteComponent(tagger);
+		}
+		else
+		{
+			error = Error();
+			errorString = "Not implemented";
 		}
 	}
 

@@ -280,12 +280,13 @@ Error BoCA::MP4Tag::UpdateStreamInfo(const String &fileName, const Track &track)
 	ex_MP4TagsSetGenreType(mp4Tags, NIL);
 	ex_MP4TagsSetComments(mp4Tags, NIL);
 
-	for (UnsignedInt i = mp4Tags->artworkCount - 1; i >= 0; i--)
+	for (Int i = mp4Tags->artworkCount - 1; i >= 0; i--)
 	{
 		ex_MP4TagsRemoveArtwork(mp4Tags, i);
 	}
 
 	ex_MP4TagsStore(mp4Tags, mp4File);
+
 	ex_MP4TagsFree(mp4Tags);
 
 	ex_MP4Close(mp4File);

@@ -430,6 +430,8 @@ Error BoCA::ID3v2Tag::UpdateStreamInfo(const String &fileName, const Track &trac
 {
 	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
 
+	Int	 tagSize = 0;
+
 	/* Look for ID3v2 tag.
 	 */
 	if (in.InputString(3) == "ID3" && in.InputNumber(1) <= 4)
@@ -441,43 +443,45 @@ Error BoCA::ID3v2Tag::UpdateStreamInfo(const String &fileName, const Track &trac
 
 		/* Read tag size as a 4 byte unsynchronized integer.
 		 */
-		Int	 tagSize = (in.InputNumber(1) << 21) +
-				   (in.InputNumber(1) << 14) +
-				   (in.InputNumber(1) <<  7) +
-				   (in.InputNumber(1)      );
+		tagSize = (in.InputNumber(1) << 21) +
+			  (in.InputNumber(1) << 14) +
+			  (in.InputNumber(1) <<  7) +
+			  (in.InputNumber(1)      );
 
 		/* Skip the tag.
 		 */
 		in.RelSeek(tagSize);
+	}
 
-		String		 tempFile = String(fileName).Append(".bonkenc.temp");
-		OutStream	 out(STREAM_FILE, tempFile, OS_APPEND);
+	/* Copy to temporary file and write tag.
+	 */
+	String		 tempFile = String(fileName).Append(".bonkenc.temp");
+	OutStream	 out(STREAM_FILE, tempFile, OS_APPEND);
 
-		if (out.GetLastError() == IO_ERROR_OK)
+	if (out.GetLastError() == IO_ERROR_OK)
+	{
+		Buffer<UnsignedByte>	 buffer;
+
+		RenderBuffer(buffer, track);
+
+		out.OutputData(buffer, buffer.Size());
+
+		buffer.Resize(1024);
+
+		for (Int i = in.GetPos(); i < in.Size(); i += buffer.Size())
 		{
-			Buffer<UnsignedByte>	 buffer;
+			Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
 
-			tagSize = RenderBuffer(buffer, track);
-
-			out.OutputData(buffer, tagSize);
-
-			buffer.Resize(1024);
-
-			for (Int i = in.GetPos(); i < in.Size(); i += buffer.Size())
-			{
-				Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
-
-				out.OutputData(in.InputData(buffer, bytes), bytes);
-			}
-
-			in.Close();
-			out.Close();
-
-			File(fileName).Delete();
-			File(tempFile).Move(fileName);
-
-			return Success();
+			out.OutputData(in.InputData(buffer, bytes), bytes);
 		}
+
+		in.Close();
+		out.Close();
+
+		File(fileName).Delete();
+		File(tempFile).Move(fileName);
+
+		return Success();
 	}
 
 	return Error();

@@ -34,7 +34,6 @@
 	<min>12 kbps</min>
 	<max>424 kbps</max>
       </range>
-      <switch name="Enable two-pass encoding" argument="-2pass"/>
     </parameters>
   </external>
 </component>

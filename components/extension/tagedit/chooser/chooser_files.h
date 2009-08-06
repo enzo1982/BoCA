@@ -49,6 +49,7 @@ namespace BoCA
 			Void		 GetSupportedFileExtensions();
 		slots:
 			Void		 OnChangeSize(const Size &);
+			Void		 OnDragDivider(Int);
 
 			Void		 OnSelectDirectory(const Directory &);
 			Void		 OnSelectFile(ListEntry *);

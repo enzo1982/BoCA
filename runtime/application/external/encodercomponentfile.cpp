@@ -115,7 +115,16 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	File(wavFileName).Delete();
 
-	if (exitCode != 0) return False;
+	/* Check if anything went wrong
+	 */
+	if (exitCode != 0)
+	{
+		/* Remove output file
+		 */
+		File(encFileName).Delete();
+
+		return False;
+	}
 
 	Config	*config = Config::Get();
 

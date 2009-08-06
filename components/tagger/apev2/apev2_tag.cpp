@@ -451,9 +451,9 @@ Error BoCA::APETag::UpdateStreamInfo(const String &fileName, const Track &track)
 		{
 			Buffer<UnsignedByte>	 buffer;
 
-			tagSize = RenderBuffer(buffer, track);
+			RenderBuffer(buffer, track);
 
-			out.OutputData(buffer, tagSize);
+			out.OutputData(buffer, buffer.Size());
 
 			buffer.Resize(1024);
 
@@ -511,9 +511,9 @@ Error BoCA::APETag::UpdateStreamInfo(const String &fileName, const Track &track)
 
 			buffer.Resize(0);
 
-			tagSize = RenderBuffer(buffer, track);
+			RenderBuffer(buffer, track);
 
-			out.OutputData(buffer, tagSize);
+			out.OutputData(buffer, buffer.Size());
 
 			in.Close();
 			out.Close();
@@ -537,9 +537,9 @@ Error BoCA::APETag::UpdateStreamInfo(const String &fileName, const Track &track)
 	{
 		Buffer<UnsignedByte>	 buffer;
 
-		tagSize = RenderBuffer(buffer, track);
+		RenderBuffer(buffer, track);
 
-		out.OutputData(buffer, tagSize);
+		out.OutputData(buffer, buffer.Size());
 
 		return Success();
 	}

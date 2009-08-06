@@ -20,17 +20,27 @@ namespace smooth
 };
 
 #include "../widget.h"
+#include "../hotspot/hotspot.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
+		const Int DIV_MOVABLE	= 32768;
+
 		class SMOOTHAPI Divider : public Widget
 		{
+			private:
+				Bool			 dragging;
+
+				Int			 startPos;
+				Point			 startMousePos;
 			protected:
 				Int			 position;
 
-				Rect			 GetDividerRect() const;
+				Hotspot			*dragHotspot;
+
+				Void			 UpdateMetrics();
 			public:
 				static const Int	 classID;
 
@@ -38,11 +48,18 @@ namespace smooth
 				virtual			~Divider();
 
 				virtual Int		 Paint(Int);
-
-				virtual Bool		 IsAffected(const Rect &) const;
 			accessors:
 				Int			 SetPos(Int);
 				Int			 GetPos() const;
+			slots:
+				Void			 OnMouseOver();
+				Void			 OnMouseOut();
+
+				Void			 OnMouseDragStart(const Point &);
+				Void			 OnMouseDrag(const Point &);
+				Void			 OnMouseDragEnd(const Point &);
+			signals:
+				Signal1<Void, Int>	 onDrag;
 		};
 	};
 };

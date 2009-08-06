@@ -18,7 +18,7 @@
     <parameters>
       <range name="Encoder preset" argument="-p%VALUE" default="2">
 	<min alias="fastest">0</min>
-	<max alias="strongest">5</max>
+	<max alias="strongest">4</max>
       </range>
       <selection name="Frame size limit" argument="-fsl%VALUE">
 	<option>512</option>
@@ -28,10 +28,7 @@
 	<option>8192</option>
 	<option>16384</option>
       </selection>
-      <range name="Seek table size" argument="-sts%VALUE" step="3">
-	<min>3</min>
-	<max>1440</max>
-      </range>
+      <switch name="Add MD5 checksum" argument="-md5"/>
     </parameters>
   </external>
 </component>

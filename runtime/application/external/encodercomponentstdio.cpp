@@ -127,7 +127,16 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 	}
 	while (exitCode == STILL_ACTIVE);
 
-	if (exitCode != 0) return False;
+	/* Check if anything went wrong
+	 */
+	if (exitCode != 0)
+	{
+		/* Remove output file
+		 */
+		File(encFileName).Delete();
+
+		return False;
+	}
 
 	Config	*config = Config::Get();
 
