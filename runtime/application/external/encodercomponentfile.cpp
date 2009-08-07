@@ -117,7 +117,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	/* Check if anything went wrong
 	 */
-	if (exitCode != 0)
+	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		/* Remove output file
 		 */

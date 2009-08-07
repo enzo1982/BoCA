@@ -17,6 +17,8 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 
 	mode = INTERNAL;
 	debug = False;
+
+	external_ignoreExitCode = False;
 }
 
 BoCA::AS::ComponentSpecs::~ComponentSpecs()
@@ -213,12 +215,20 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			{
 				XML::Node	*node2 = node->GetNthNode(j);
 
-				if	(node2->GetName() == "command")		external_command	= node2->GetContent();
-				else if (node2->GetName() == "arguments")	external_arguments	= node2->GetContent();
-				else if (node2->GetName() == "informat")	external_informat	= node2->GetContent();
-				else if (node2->GetName() == "outformat")	external_outformat	= node2->GetContent();
-				else if (node2->GetName() == "mode")		mode			= node2->GetContent() == "file" ? EXTERNAL_FILE : EXTERNAL_STDIO;
-				else if (node2->GetName() == "parameters")	ParseExternalParameters(node2);
+				if (node2->GetName() == "command")
+				{
+					external_command = node2->GetContent();
+
+					if (node2->GetAttributeByName("ignoreExitCode") != NIL)
+					{
+						external_ignoreExitCode = (node2->GetAttributeByName("ignoreExitCode")->GetContent() == "true");
+					}
+				}
+				else if (node2->GetName() == "arguments")  external_arguments	= node2->GetContent();
+				else if (node2->GetName() == "informat")   external_informat	= node2->GetContent();
+				else if (node2->GetName() == "outformat")  external_outformat	= node2->GetContent();
+				else if (node2->GetName() == "mode")	   mode			= node2->GetContent() == "file" ? EXTERNAL_FILE : EXTERNAL_STDIO;
+				else if (node2->GetName() == "parameters") ParseExternalParameters(node2);
 			}
 		}
 	}

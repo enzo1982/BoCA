@@ -215,7 +215,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Check if anything went wrong
 	 */
-	if (exitCode != 0)
+	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		errorState = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt(exitCode)).Append(".");
@@ -318,7 +318,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 		File(encFileName).Delete();
 	}
 
-	if (exitCode != 0) return False;
+	if (!specs->external_ignoreExitCode && exitCode != 0) return False;
 
 	return True;
 }

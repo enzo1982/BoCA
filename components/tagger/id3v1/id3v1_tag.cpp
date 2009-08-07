@@ -194,17 +194,17 @@ Error BoCA::ID3v1Tag::UpdateStreamInfo(const String &fileName, const Track &trac
 	return Error();
 }
 
-const String &BoCA::ID3v1Tag::GetID3CategoryName(Int id)
+const String &BoCA::ID3v1Tag::GetID3CategoryName(UnsignedInt id)
 {
 	static const String	 empty;
 
-	if (id < 0 || id > 147) return empty;
-	else			return genres[id];
+	if (id > 147) return empty;
+	else	      return genres[id];
 }
 
-Int BoCA::ID3v1Tag::GetID3CategoryID(const String &name)
+UnsignedInt BoCA::ID3v1Tag::GetID3CategoryID(const String &name)
 {
-	for (Int i = 0; i < 148; i++)
+	for (UnsignedInt i = 0; i < 148; i++)
 	{
 		if (genres[i] == name) return i;
 	}

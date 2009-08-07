@@ -115,6 +115,8 @@ namespace BoCA
 				Bool			 debug;
 
 				String			 external_command;
+				Bool			 external_ignoreExitCode;
+
 				String			 external_arguments;
 
 				String			 external_informat;

@@ -19,8 +19,8 @@ namespace BoCA
 		private:
 			static const String	 genres[148];
 
-			const String		&GetID3CategoryName(Int);
-			Int			 GetID3CategoryID(const String &);
+			const String		&GetID3CategoryName(UnsignedInt);
+			UnsignedInt		 GetID3CategoryID(const String &);
 		public:
 			static const String	&GetComponentSpecs();
 

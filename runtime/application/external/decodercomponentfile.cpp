@@ -124,7 +124,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 	/* Check if anything went wrong
 	 */
-	if (exitCode != 0)
+	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		/* Remove temporary WAVE file
 		 */
@@ -257,7 +257,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 
 	/* Check if anything went wrong
 	 */
-	if (exitCode != 0)
+	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		/* Remove temporary WAVE file
 		 */

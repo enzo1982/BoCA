@@ -26,7 +26,7 @@ namespace BoCA
 			String			 GetFrameURL(Void *);
 			Int			 SetFrameURL(Void *, const String &);
 
-			const String		&GetID3CategoryName(Int);
+			const String		&GetID3CategoryName(UnsignedInt);
 		public:
 			static const String	&GetComponentSpecs();
 

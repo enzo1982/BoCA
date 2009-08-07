@@ -615,10 +615,10 @@ Int BoCA::ID3v2Tag::SetFrameURL(Void *frame, const String &url)
 	return Success();
 }
 
-const String &BoCA::ID3v2Tag::GetID3CategoryName(Int id)
+const String &BoCA::ID3v2Tag::GetID3CategoryName(UnsignedInt id)
 {
 	static const String	 empty;
 
-	if (id < 0 || id > 147) return empty;
-	else			return genres[id];
+	if (id > 147) return empty;
+	else	      return genres[id];
 }

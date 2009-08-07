@@ -5,24 +5,29 @@
 <!ELEMENT component (name, version, id, type, format*, external?)>
 
 	<!ELEMENT name (#PCDATA)>
+
 	<!ELEMENT version (#PCDATA)>
+	<!ATTLIST version debug CDATA #IMPLIED>
+
 	<!ELEMENT id (#PCDATA)>
 	<!ELEMENT type (#PCDATA)>
 
-	<!ELEMENT format (name, extension+)>
+	<!ELEMENT format (name, extension+, tag*)>
 
 		<!ELEMENT extension (#PCDATA)>
 
-	<!ELEMENT external (command, arguments, mode, (informat?, outformat?), tag*, parameters?)>
+		<!ELEMENT tag (#PCDATA)>
+		<!ATTLIST tag mode CDATA #REQUIRED>
+
+	<!ELEMENT external (command, arguments, mode, (informat?, outformat?), parameters?)>
 
 		<!ELEMENT command (#PCDATA)>
+		<!ATTLIST command ignoreExitCode CDATA #IMPLIED>
+
 		<!ELEMENT arguments (#PCDATA)>
 		<!ELEMENT mode (#PCDATA)>
 		<!ELEMENT informat (#PCDATA)>
 		<!ELEMENT outformat (#PCDATA)>
-
-		<!ELEMENT tag (#PCDATA)>
-		<!ATTLIST tag mode CDATA #REQUIRED>
 
 		<!ELEMENT parameters (switch | selection | range)*>
 

@@ -306,10 +306,10 @@ Error BoCA::MP4Tag::UpdateStreamInfo(const String &fileName, const Track &track)
 	return Success();
 }
 
-const String &BoCA::MP4Tag::GetID3CategoryName(Int id)
+const String &BoCA::MP4Tag::GetID3CategoryName(UnsignedInt id)
 {
 	static const String	 empty;
 
-	if (id < 0 || id > 147) return empty;
-	else			return genres[id];
+	if (id > 147) return empty;
+	else	      return genres[id];
 }
