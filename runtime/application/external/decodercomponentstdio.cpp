@@ -325,14 +325,6 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	/* Check if external decoder still exists.
-	 */
-	unsigned long	 exitCode = 0;
-
-	GetExitCodeProcess(hProcess, &exitCode);
-
-	if (exitCode != STILL_ACTIVE) return -1;
-
 	/* Hand data over from the input file
 	 */
 	size = 6144;
