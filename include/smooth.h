@@ -12,10 +12,10 @@
 #error Either none or both of UNICODE and _UNICODE must be defined to compile SMOOTH applications!
 #endif
 
-#ifndef _H_OBJSMOOTH__
-#define _H_OBJSMOOTH__
+#ifndef H_OBJSMOOTH
+#define H_OBJSMOOTH
 
-#define __SMOOTH__
+#define SMOOTH
 
 #include "smooth/definitions.h"
 #include "smooth/foreach.h"

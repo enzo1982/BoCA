@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,8 +10,8 @@
 
 #include "../definitions.h"
 
-#ifndef _H_OBJSMOOTH_ERROR_SUCCESS_
-#define _H_OBJSMOOTH_ERROR_SUCCESS_
+#ifndef H_OBJSMOOTH_ERROR_SUCCESS
+#define H_OBJSMOOTH_ERROR_SUCCESS
 
 namespace smooth
 {

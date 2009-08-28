@@ -15,7 +15,7 @@
 
 using namespace smooth;
 
-#if defined __BOCA_COMPONENT_BUILD__
+#if defined BOCA_COMPONENT_BUILD
 # define BOCA_EXPORT __declspec (dllexport)
 
 # include "boca/component/component.h"

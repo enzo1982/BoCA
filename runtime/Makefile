@@ -28,7 +28,7 @@ CLEANCMD1 =
 include $(BOCA_PATH)/Makefile-directories
 
 CC = gcc
-CCOPTS = -g0 -Wall -fno-exceptions -ffast-math -D__BOCA_CDK_BUILD__ -I$(BOCA_PATH)/include
+CCOPTS = -g0 -Wall -fno-exceptions -ffast-math -DBOCA_CDK_BUILD -I$(BOCA_PATH)/include
 LD = gcc
 LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
 

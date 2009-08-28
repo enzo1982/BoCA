@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,8 +11,8 @@
  /* This code is derived from the RSA Data Security,
   * Inc. MD5 Message-Digest Algorithm. */
 
-#ifndef _H_OBJSMOOTH_MD5_
-#define _H_OBJSMOOTH_MD5_
+#ifndef H_OBJSMOOTH_MD5
+#define H_OBJSMOOTH_MD5
 
 namespace smooth
 {

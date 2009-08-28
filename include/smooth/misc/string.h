@@ -10,8 +10,8 @@
 
 #include "../definitions.h"
 
-#ifndef _H_OBJSMOOTH_STRING_
-#define _H_OBJSMOOTH_STRING_
+#ifndef H_OBJSMOOTH_STRING
+#define H_OBJSMOOTH_STRING
 
 namespace smooth
 {

@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_DEFS_
-#define _H_OBJSMOOTH_DEFS_
+#ifndef H_OBJSMOOTH_DEFS
+#define H_OBJSMOOTH_DEFS
 
 #ifdef __GNUC__
 #	ifndef __int64
@@ -18,7 +18,7 @@
 #endif
 
 #if defined __WIN32__
-#	if defined __SMOOTH_DLL__ && !defined WIN32_LEAN_AND_MEAN
+#	if defined SMOOTH_DLL && !defined WIN32_LEAN_AND_MEAN
 #		define WIN32_LEAN_AND_MEAN
 #	endif
 
@@ -26,26 +26,26 @@
 #	include <windows.h>
 #	include <wchar.h>
 
-#	if defined __SMOOTH_DLL__
+#	if defined SMOOTH_DLL
 #		define SMOOTHAPI __declspec (dllexport)
 #		define SMOOTHVAR extern __declspec (dllexport)
-#	elif defined __SMOOTH_PLUGIN_DLL__ && defined __SMOOTH_STATIC__
+#	elif defined SMOOTH_PLUGIN_DLL && defined SMOOTH_STATIC
 #		define SMOOTHAPI
 #		define SMOOTHVAR extern
 
 #		define SMOOTH_PLUGIN_API __declspec (dllexport)
 #		define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
 
-#		define __SMOOTH_DLL__
-#	elif defined __SMOOTH_STATIC__
+#		define SMOOTH_DLL
+#	elif defined SMOOTH_STATIC
 #		define SMOOTHAPI
 #		define SMOOTHVAR extern
 
 #		define SMOOTH_PLUGIN_API __declspec (dllimport)
 #		define SMOOTH_PLUGIN_VAR __declspec (dllimport)
 
-#		define __SMOOTH_DLL__
-#	elif defined __SMOOTH_PLUGIN_DLL__
+#		define SMOOTH_DLL
+#	elif defined SMOOTH_PLUGIN_DLL
 #		define SMOOTHAPI __declspec (dllimport)
 #		define SMOOTHVAR __declspec (dllimport)
 
@@ -65,7 +65,7 @@
 #elif defined __WINE__
 #	define __WIN32__
 
-#	if defined __SMOOTH_DLL__ && !defined WIN32_LEAN_AND_MEAN
+#	if defined SMOOTH_DLL && !defined WIN32_LEAN_AND_MEAN
 #		define WIN32_LEAN_AND_MEAN
 #	endif
 
@@ -169,7 +169,7 @@
 #	define VK_F24	  XK_F24
 #endif
 
-#if defined __SMOOTH_DLL__
+#if defined SMOOTH_DLL
 #	include <lisa.h>
 #endif
 
