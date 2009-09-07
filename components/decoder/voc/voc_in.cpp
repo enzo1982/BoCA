@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -114,14 +114,9 @@ Int BoCA::VocIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 			outSize = size - 4;
 
-			backBuffer.Resize(outSize);
-
-			memcpy(backBuffer, data, bytesLeft);
-			memcpy((unsigned char *) backBuffer + bytesLeft, (unsigned char *) data + bytesLeft + 4, size - bytesLeft - 4);
+			memmove((unsigned char *) data + bytesLeft, (unsigned char *) data + bytesLeft + 4, size - bytesLeft - 4);
 
 			data.Resize(outSize);
-
-			memcpy(data, backBuffer, outSize);
 
 			bytesLeft = newBytesLeft - (size - bytesLeft - 4);
 		}

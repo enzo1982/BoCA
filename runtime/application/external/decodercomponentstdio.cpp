@@ -198,13 +198,14 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	 */
 	unsigned long	 exitCode = 0;
 
-	do
+	while (True)
 	{
-		Sleep(100);
-
 		GetExitCodeProcess(hProcess, &exitCode);
+
+		if (exitCode != STILL_ACTIVE) break;
+
+		S::System::System::Sleep(10);
 	}
-	while (exitCode == STILL_ACTIVE);
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -303,13 +304,14 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 	 */
 	unsigned long	 exitCode = 0;
 
-	do
+	while (True)
 	{
-		Sleep(100);
-
 		GetExitCodeProcess(hProcess, &exitCode);
+
+		if (exitCode != STILL_ACTIVE) break;
+
+		S::System::System::Sleep(10);
 	}
-	while (exitCode == STILL_ACTIVE);
 
 	/* Remove temporary copy if necessary.
 	 */

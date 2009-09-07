@@ -107,13 +107,14 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	 */
 	unsigned long	 exitCode = 0;
 
-	do
+	while (True)
 	{
-		Sleep(100);
-
 		GetExitCodeProcess(execInfo.hProcess, &exitCode);
+
+		if (exitCode != STILL_ACTIVE) break;
+
+		S::System::System::Sleep(10);
 	}
-	while (exitCode == STILL_ACTIVE);
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -240,13 +241,14 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	 */
 	unsigned long	 exitCode = 0;
 
-	do
+	while (True)
 	{
-		Sleep(100);
-
 		GetExitCodeProcess(execInfo.hProcess, &exitCode);
+
+		if (exitCode != STILL_ACTIVE) break;
+
+		S::System::System::Sleep(10);
 	}
-	while (exitCode == STILL_ACTIVE);
 
 	/* Remove temporary copy if necessary.
 	 */

@@ -102,11 +102,7 @@ Bool BoCA::Config::LoadSettings()
 	enc_filePattern				= config->GetStringValue("Settings", "EncoderFilenamePattern", "<artist> - <title>");
 	enc_onTheFly				= config->GetIntValue("Settings", "EncodeOnTheFly", 1);
 	enc_keepWaves				= config->GetIntValue("Settings", "KeepWaveFiles", 0);
-	playlist_useEncOutdir			= config->GetIntValue("Settings", "PlaylistUseEncOutDir", 1);
-	playlist_filePattern			= config->GetStringValue("Settings", "PlaylistFilenamePattern", "<artist> - <album>");
 	useUnicodeNames				= config->GetIntValue("Settings", "UseUnicodeFilenames", 1);
-	lastAddedDir				= config->GetStringValue("Settings", "LastAddedDir", "");
-	lastAddedPattern			= config->GetStringValue("Settings", "LastAddedPattern", "");
 	writeToInputDir				= config->GetIntValue("Settings", "WriteToInputDirectory", 0);
 	allowOverwrite				= config->GetIntValue("Settings", "AllowOverwriteSource", 0);
 
@@ -130,11 +126,7 @@ Bool BoCA::Config::SaveSettings()
 	config->SetStringValue("Settings", "EncoderFilenamePattern", enc_filePattern);
 	config->SetIntValue("Settings", "EncodeOnTheFly", enc_onTheFly);
 	config->SetIntValue("Settings", "KeepWaveFiles", enc_keepWaves);
-	config->SetIntValue("Settings", "PlaylistUseEncOutDir", playlist_useEncOutdir);
-	config->SetStringValue("Settings", "PlaylistFilenamePattern", playlist_filePattern);
 	config->SetIntValue("Settings", "UseUnicodeFilenames", useUnicodeNames);
-	config->SetStringValue("Settings", "LastAddedDir", lastAddedDir);
-	config->SetStringValue("Settings", "LastAddedPattern", lastAddedPattern);
 	config->SetIntValue("Settings", "WriteToInputDirectory", writeToInputDir);
 	config->SetIntValue("Settings", "AllowOverwriteSource", allowOverwrite);
 

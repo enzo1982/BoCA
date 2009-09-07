@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -152,7 +152,7 @@ Bool BoCA::WaveOutOut::Deactivate()
 
 	LeaveCriticalSection(&sync);
 
-	while (thread->GetStatus() == THREAD_RUNNING) Sleep(1);
+	while (thread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(0);
 
 	if (hEvent) CloseHandle(hEvent);
 
@@ -234,7 +234,7 @@ Int BoCA::WaveOutOut::SetPause(Bool pause)
 
 	LeaveCriticalSection(&sync);
 
-	while (paused != newpause) Sleep(1);
+	while (paused != newpause) S::System::System::Sleep(0);
 
 	return Success();
 }

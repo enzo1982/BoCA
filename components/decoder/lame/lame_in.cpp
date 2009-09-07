@@ -178,12 +178,13 @@ Int BoCA::LAMEIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	pcm_r.Resize(size * 64);
 
 	Int	 nSamples = ex_lame_decode(data, size, pcm_l, pcm_r);
+	Format	&format = track.GetFormat();
 
-	data.Resize(nSamples * track.GetFormat().channels * (track.GetFormat().bits / 8));
+	data.Resize(nSamples * format.channels * (format.bits / 8));
 
 	for (Int i = 0; i < nSamples; i++)
 	{
-		for (Int j = 0; j < 2; j++) ((short *) (unsigned char *) data)[2 * i + j] = (j == 0) ? pcm_l[i] : pcm_r[i];
+		for (Int j = 0; j < format.channels; j++) ((short *) (unsigned char *) data)[format.channels * i + j] = (j == 0) ? pcm_l[i] : pcm_r[i];
 	}
 
 	return data.Size();

@@ -92,7 +92,7 @@ Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	decoderThread = NonBlocking1<Bool>(&FLACIn::ReadFLAC, this).Call(False);
 
-	while (decoderThread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(10);
+	while (decoderThread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(0);
 
 	delete readDataMutex;
 	delete samplesBufferMutex;
@@ -146,7 +146,7 @@ Int BoCA::FLACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	readDataMutex->Release();
 
-	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) S::System::System::Sleep(10);
+	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
 
 	readDataMutex->Lock();
 

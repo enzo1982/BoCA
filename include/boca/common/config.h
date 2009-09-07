@@ -43,14 +43,9 @@ namespace BoCA
 			Bool		 writeToInputDir;
 			Bool		 allowOverwrite;
 
-			String		 lastAddedDir;
-			String		 lastAddedPattern;
-
 			String		 enc_filePattern;
 			Bool		 enc_onTheFly;
 			Bool		 enc_keepWaves;
-			Bool		 playlist_useEncOutdir;
-			String		 playlist_filePattern;
 			Bool		 useUnicodeNames;
 
 			Array<String>	 cdrip_drives;

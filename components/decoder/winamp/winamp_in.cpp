@@ -218,7 +218,7 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	get_more_samples = 1;
 
-	while (rate == 0) Sleep(10);
+	while (rate == 0) S::System::System::Sleep(0);
 
 	int	 length_ms;
 	char	*title = new char [1024];
@@ -377,7 +377,7 @@ Int BoCA::WinampIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 			else			break;
 		}
 
-		Sleep(10);
+		S::System::System::Sleep(0);
 	}
 
 	get_more_samples = 0;

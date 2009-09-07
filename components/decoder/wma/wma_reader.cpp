@@ -175,7 +175,7 @@ HRESULT BoCA::WMAReader::OnSample(DWORD dwOutputNum, QWORD cnsSampleTime, QWORD 
 	 */
 	hr = pSample->GetBufferAndLength( &pData, &cbData );
 
-	while (IsActive() && samplesBuffer->Size() >= 131072) S::System::System::Sleep(10);
+	while (IsActive() && samplesBuffer->Size() >= 131072) S::System::System::Sleep(0);
 
 	/* Copy the sample to the sample buffer.
 	 */

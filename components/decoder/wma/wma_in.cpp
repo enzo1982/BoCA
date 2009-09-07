@@ -310,7 +310,7 @@ Int BoCA::WMAIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (!readerCallback->IsActive() && samplesBuffer.Size() <= 0) return -1;
 
-	while (readerCallback->IsActive() && samplesBuffer.Size() <= 0) S::System::System::Sleep(10);
+	while (readerCallback->IsActive() && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
 
 	/* Copy any data from the sample buffer.
 	 */

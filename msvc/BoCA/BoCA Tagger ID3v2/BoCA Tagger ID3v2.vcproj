@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="BoCA Decoder LAME"
-	ProjectGUID="{D1938112-BD2F-4AA9-9497-8BEFF05F8E86}"
-	RootNamespace="BoCADecoderLAME"
+	Name="BoCA Tagger ID3v2"
+	ProjectGUID="{493708D6-4311-46B3-A58C-ED3C6A0513E7}"
+	RootNamespace="BoCATaggerID3v2"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -41,12 +41,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../include"
-				PreprocessorDefinitions="WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;UNICODE;_UNICODE;BOCA_COMPONENT_BUILD"
+				PreprocessorDefinitions="WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;UNICODE;_UNICODE;BOCA_COMPONENT_BUILD;ID3LIB_LINKOPTION=LINKOPTION_USE_DYNAMIC"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				WarningLevel="1"
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
@@ -62,7 +62,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="smooth.lib boca.1.0.lib"
-				OutputFile="$(OutDir)\boca_decoder_lame.1.0.dll"
+				OutputFile="$(OutDir)\boca_tagger_id3v2.1.0.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../../../smooth/msvc/smooth/Debug;../debug"
 				GenerateDebugInformation="true"
@@ -119,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;BOCADECODERLAME_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;BOCATAGGERID3V2_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -179,11 +179,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\components\decoder\lame\dllinterface.cpp"
+				RelativePath="..\..\..\components\tagger\id3v2\dllinterface.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\decoder\lame\lame_in.cpp"
+				RelativePath="..\..\..\components\tagger\id3v2\id3v2_tag.cpp"
 				>
 			</File>
 		</Filter>
@@ -193,11 +193,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\components\decoder\lame\dllinterface.h"
+				RelativePath="..\..\..\components\tagger\id3v2\dllinterface.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\components\decoder\lame\lame_in.h"
+				RelativePath="..\..\..\components\tagger\id3v2\id3v2_tag.h"
 				>
 			</File>
 		</Filter>
