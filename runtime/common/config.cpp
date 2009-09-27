@@ -99,7 +99,7 @@ Bool BoCA::Config::LoadSettings()
 
 	firstStart				= config->GetIntValue("Settings", "FirstStart", 1);
 	language				= config->GetStringValue("Settings", "Language", "");
-	enc_filePattern				= config->GetStringValue("Settings", "EncoderFilenamePattern", "<artist> - <title>");
+	enc_filePattern				= config->GetStringValue("Settings", "EncoderFilenamePattern", "<artist> - <album>\\<artist> - <album> - <track> - <title>");
 	enc_onTheFly				= config->GetIntValue("Settings", "EncodeOnTheFly", 1);
 	enc_keepWaves				= config->GetIntValue("Settings", "KeepWaveFiles", 0);
 	useUnicodeNames				= config->GetIntValue("Settings", "UseUnicodeFilenames", 1);
@@ -115,6 +115,28 @@ Bool BoCA::Config::LoadSettings()
 	cdrip_jitter				= config->GetIntValue("CDRip", "JitterCorrection", 0);
 	cdrip_swapchannels			= config->GetIntValue("CDRip", "SwapChannels", 0);
 	cdrip_numdrives				= 0;
+
+	enable_auto_cddb			= config->GetIntValue("freedb", "AutoCDDBQueries", 1);
+	enable_overwrite_cdtext			= config->GetIntValue("freedb", "OverwriteCDText", 1);
+	enable_cddb_cache			= config->GetIntValue("freedb", "EnableCDDBCache", 1);
+	enable_local_cddb			= config->GetIntValue("freedb", "EnableLocalCDDB", 0);
+	freedb_dir				= config->GetStringValue("freedb", "Directory", "freedb\\");
+	enable_remote_cddb			= config->GetIntValue("freedb", "EnableRemoteCDDB", 1);
+	freedb_server				= config->GetStringValue("freedb", "Server", "freedb.freedb.org");
+	freedb_mode				= config->GetIntValue("freedb", "Mode", 0);
+	freedb_cddbp_port			= config->GetIntValue("freedb", "CDDBPPort", 8880);
+	freedb_http_port			= 80;
+	freedb_query_path			= config->GetStringValue("freedb", "QueryPath", "/~cddb/cddb.cgi");
+	freedb_submit_path			= config->GetStringValue("freedb", "SubmitPath", "/~cddb/submit.cgi");
+	freedb_email				= config->GetStringValue("freedb", "eMail", "cddb@bonkenc.org");
+	freedb_proxy_mode			= config->GetIntValue("freedb", "ProxyMode", 0);
+	freedb_proxy				= config->GetStringValue("freedb", "Proxy", "localhost");
+	freedb_proxy_port			= config->GetIntValue("freedb", "ProxyPort", 1080);
+	freedb_proxy_user			= config->GetStringValue("freedb", "ProxyUserName", NIL);
+	freedb_proxy_password			= config->GetStringValue("freedb", "ProxyPassword", NIL);
+	update_joblist				= config->GetIntValue("freedb", "UpdateJoblistOnSubmit", 1);
+
+	if (!freedb_dir.EndsWith(Directory::GetDirectoryDelimiter())) freedb_dir.Append(Directory::GetDirectoryDelimiter());
 
 	return True;
 }
@@ -138,6 +160,25 @@ Bool BoCA::Config::SaveSettings()
 	config->SetIntValue("CDRip", "DetectC2Errors", cdrip_detectC2Errors);
 	config->SetIntValue("CDRip", "JitterCorrection", cdrip_jitter);
 	config->SetIntValue("CDRip", "SwapChannels", cdrip_swapchannels);
+
+	config->SetIntValue("freedb", "AutoCDDBQueries", enable_auto_cddb);
+	config->SetIntValue("freedb", "OverwriteCDText", enable_overwrite_cdtext);
+	config->SetIntValue("freedb", "EnableCDDBCache", enable_cddb_cache);
+	config->SetIntValue("freedb", "EnableLocalCDDB", enable_local_cddb);
+	config->SetStringValue("freedb", "Directory", freedb_dir);
+	config->SetIntValue("freedb", "EnableRemoteCDDB", enable_remote_cddb);
+	config->SetStringValue("freedb", "Server", freedb_server);
+	config->SetIntValue("freedb", "Mode", freedb_mode);
+	config->SetIntValue("freedb", "CDDBPPort", freedb_cddbp_port);
+	config->SetStringValue("freedb", "QueryPath", freedb_query_path);
+	config->SetStringValue("freedb", "SubmitPath", freedb_submit_path);
+	config->SetStringValue("freedb", "eMail", freedb_email);
+	config->SetIntValue("freedb", "ProxyMode", freedb_proxy_mode);
+	config->SetStringValue("freedb", "Proxy", freedb_proxy);
+	config->SetIntValue("freedb", "ProxyPort", freedb_proxy_port);
+	config->SetStringValue("freedb", "ProxyUserName", freedb_proxy_user);
+	config->SetStringValue("freedb", "ProxyPassword", freedb_proxy_password);
+	config->SetIntValue("freedb", "UpdateJoblistOnSubmit", update_joblist);
 
 	config->Save();
 

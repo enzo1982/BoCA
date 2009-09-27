@@ -430,8 +430,6 @@ Error BoCA::ID3v2Tag::UpdateStreamInfo(const String &fileName, const Track &trac
 {
 	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
 
-	Int	 tagSize = 0;
-
 	/* Look for ID3v2 tag.
 	 */
 	if (in.InputString(3) == "ID3" && in.InputNumber(1) <= 4)
@@ -443,10 +441,10 @@ Error BoCA::ID3v2Tag::UpdateStreamInfo(const String &fileName, const Track &trac
 
 		/* Read tag size as a 4 byte unsynchronized integer.
 		 */
-		tagSize = (in.InputNumber(1) << 21) +
-			  (in.InputNumber(1) << 14) +
-			  (in.InputNumber(1) <<  7) +
-			  (in.InputNumber(1)      );
+		Int	 tagSize = (in.InputNumber(1) << 21) +
+				   (in.InputNumber(1) << 14) +
+				   (in.InputNumber(1) <<  7) +
+				   (in.InputNumber(1)      );
 
 		/* Skip the tag.
 		 */

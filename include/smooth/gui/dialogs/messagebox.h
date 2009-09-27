@@ -68,6 +68,8 @@ namespace smooth
 				private:
 					static Int		 nOfMessageBoxes;
 
+					static Bool		 defaultRightToLeft;
+
 					Int			 lines;
 					String			 line[256];
 					wchar_t			*msgicon;
@@ -101,7 +103,13 @@ namespace smooth
 
 					const Error		&ShowDialog();
 				accessors:
-					Int			 GetButtonCode();
+					Int			 GetButtonCode() const;
+
+					Void			 SetRightToLeft(Bool);
+					Bool			 IsRightToLeft() const;
+
+					static Void		 SetDefaultRightToLeft(Bool);
+					static Bool		 IsDefaultRightToLeft();
 			};
 
 			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, char *);

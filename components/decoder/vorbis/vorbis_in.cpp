@@ -157,6 +157,8 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::VorbisIn::VorbisIn()
 {
+	buffer = NIL;
+
 	packageSize = 0;
 }
 

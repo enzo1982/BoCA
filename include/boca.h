@@ -49,6 +49,7 @@ using namespace smooth;
 
 #include "boca/common/communication/joblist.h"
 #include "boca/common/communication/menu.h"
+#include "boca/common/communication/settings.h"
 
 #define BoCA_BEGIN_COMPONENT(componentName)																													\
 	extern "C" {																																\

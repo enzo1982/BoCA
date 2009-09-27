@@ -50,6 +50,17 @@ namespace smooth
 				Int				 maxScrollPos;
 
 				Array<Int>			 lineIndices;
+
+				Bool				 ContainsRTLCharacters(const String &) const;
+
+				Int				 GetDisplayCursorPositionFromLogical(Int) const;
+
+				Int				 GetDisplayCursorPositionFromLogical(const String &, Int) const;
+				Int				 GetLogicalCursorPositionFromDisplay(const String &, Int) const;
+
+				Int				 GetDisplayCursorPositionFromVisual(const String &, Int) const;
+
+				Int				 GetVisualCursorPositionFromLogical(const String &, Int) const;
 			protected:
 				Int				 maxSize;
 
@@ -74,10 +85,10 @@ namespace smooth
 				Int				 Scroll(Int);
 			accessors:
 				Int				 SetCursorPos(Int);
-				Int				 GetCursorPos();
+				Int				 GetCursorPos() const;
 
 				Int				 SetMaxSize(Int);
-				Int				 GetMaxSize();
+				Int				 GetMaxSize() const;
 
 				virtual Int			 SetText(const String &);
 			signals:

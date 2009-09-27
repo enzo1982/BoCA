@@ -211,13 +211,13 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 	{
 		for (UnsignedInt i = 0; i < mp4Tags->artworkCount; i++)
 		{
-			Picture	 picture;
-
 			unsigned char	*buffer	= (unsigned char *) mp4Tags->artwork[i].data;
 			uint32_t	 size	= mp4Tags->artwork[i].size;
 
 			if (size > 0)
 			{
+				Picture	 picture;
+
 				picture.data.Resize(size);
 
 				memcpy(picture.data, buffer, size);

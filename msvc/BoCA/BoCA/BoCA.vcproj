@@ -392,6 +392,10 @@
 						RelativePath="..\..\..\runtime\common\communication\menu.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\communication\settings.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="track"
@@ -653,6 +657,14 @@
 						>
 						<File
 							RelativePath="..\..\..\include\boca\common\communication\joblist.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\communication\menu.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\communication\settings.h"
 							>
 						</File>
 					</Filter>

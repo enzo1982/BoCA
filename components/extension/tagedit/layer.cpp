@@ -28,7 +28,7 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 
 /* ToDo: Add album chooser once it's ready.
  */
-//	choosers.Add(new ChooserAlbums());
+	choosers.Add(new ChooserAlbums());
 	choosers.Add(new ChooserFiles());
 
 	foreach (Chooser *chooser, choosers)
@@ -49,7 +49,7 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 
 /* ToDo: Add advanced editor once it's ready.
  */
-//	editors.Add(new LayerTagAdvanced());
+	editors.Add(new LayerTagAdvanced());
 
 	foreach (Editor *editor, editors)
 	{

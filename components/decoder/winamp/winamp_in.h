@@ -11,14 +11,28 @@
 #include <boca.h>
 #include "dllinterface.h"
 
+using namespace smooth::Threads;
+
 BoCA_BEGIN_COMPONENT(WinampIn)
 
 namespace BoCA
 {
 	class WinampIn : public CS::DecoderComponent
 	{
+		friend int	 dsp_dosamples(short int *, int, int, int, int);
+		friend void	 VSASetInfo(int, int);
+		friend int	 Out_Open(int, int, int, int, int);
+		friend int	 Out_CanWrite();
+		friend int	 Out_Write(char *, int);
+
 		private:
 			ConfigLayer		*configLayer;
+
+			Buffer<Byte>		 samplesBuffer;
+			Mutex			*samplesBufferMutex;
+			Int64			 samplesDone;
+
+			Track			*infoTrack;
 
 			In_Module		*plugin;
 

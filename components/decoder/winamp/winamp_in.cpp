@@ -11,6 +11,8 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <time.h>
+
 #include "winamp_in.h"
 #include "config.h"
 #include "dllinterface.h"
@@ -119,40 +121,35 @@ Void smooth::DetachDLL()
 	FreeWinampDLLs();
 }
 
-int		 channels		= 0;
-int		 rate			= 0;
-int		 bits			= 16;
+namespace BoCA
+{
+	WinampIn	*filter = NIL;
 
-int		 get_more_samples	= 0;
-int		 n_samples		= 0;
-Buffer<char>	 sampleBuffer;
+	void		 SetInfo(int, int, int, int);
+	void		 VSASetInfo(int, int);
+	void		 VSAAddPCMData(void *, int, int, int);
+	int		 VSAGetMode(int *, int *);
+	void		 VSAAdd(void *, int);
+	void		 SAVSAInit(int, int);
+	void		 SAVSADeInit();
+	void		 SAAddPCMData(void *, int, int, int);
+	int		 SAGetMode();
+	void		 SAAdd(void *, int, int);
+	int		 dsp_isactive();
+	int		 dsp_dosamples(short int *, int, int, int, int);
 
-void		 SetInfo(int, int, int, int);
-void		 VSASetInfo(int, int);
-void		 VSAAddPCMData(void *, int, int, int);
-int		 VSAGetMode(int *, int *);
-void		 VSAAdd(void *, int);
-void		 SAVSAInit(int, int);
-void		 SAVSADeInit();
-void		 SAAddPCMData(void *, int, int, int);
-int		 SAGetMode();
-void		 SAAdd(void *, int, int);
-int		 dsp_isactive();
-int		 dsp_dosamples(short int *, int, int, int, int);
-void		 SetVolume(int);
-void		 SetPan(int);
-
-int		 Out_Open(int, int, int, int, int);
-void		 Out_Close();
-void		 Out_Flush(int);
-int		 Out_Write(char *, int);
-int		 Out_CanWrite();
-int		 Out_IsPlaying();
-int		 Out_Pause(int);
-void		 Out_SetVolume(int);
-void		 Out_SetPan(int);
-int		 Out_GetOutputTime();
-int		 Out_GetWrittenTime();
+	int		 Out_Open(int, int, int, int, int);
+	void		 Out_Close();
+	void		 Out_Flush(int);
+	int		 Out_Write(char *, int);
+	int		 Out_CanWrite();
+	int		 Out_IsPlaying();
+	int		 Out_Pause(int);
+	void		 Out_SetVolume(int);
+	void		 Out_SetPan(int);
+	int		 Out_GetOutputTime();
+	int		 Out_GetWrittenTime();
+};
 
 Bool BoCA::WinampIn::CanOpenStream(const String &streamURI)
 {
@@ -168,9 +165,12 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	format.order	= BYTE_INTEL;
 	track.fileSize	= f_in->Size();
+	track.length	= -1;
 
 	delete f_in;
 
+	/* Get the correct plugin and set callback functions.
+	 */
 	plugin = GetPluginForFile(streamURI);
 
 	plugin->SetInfo			= SetInfo;
@@ -185,8 +185,6 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 	plugin->SAAdd			= SAAdd;
 	plugin->dsp_isactive		= dsp_isactive;
 	plugin->dsp_dosamples		= dsp_dosamples;
-	plugin->SetVolume		= SetVolume;
-	plugin->SetPan			= SetPan;
 
 	plugin->outMod			= new Out_Module();
 
@@ -202,6 +200,13 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 	plugin->outMod->GetOutputTime	= Out_GetOutputTime;
 	plugin->outMod->GetWrittenTime	= Out_GetWrittenTime;
 
+	/* Create and setup mutex.
+	 */
+	samplesBufferMutex = new Mutex();
+
+	filter = this;
+	infoTrack = &track;
+
 	/* Copy the file and play the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
@@ -216,11 +221,11 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 		plugin->Play(streamURI);
 	}
 
-	get_more_samples = 1;
+	Int	 start = clock();
 
-	while (rate == 0) S::System::System::Sleep(0);
+	while (clock() - start < CLOCKS_PER_SEC && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
 
-	int	 length_ms;
+	int	 length_ms = -1;
 	char	*title = new char [1024];
 
 	plugin->GetFileInfo(NIL, title, &length_ms);
@@ -228,6 +233,7 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 	plugin->Stop();
 
 	delete plugin->outMod;
+	delete samplesBufferMutex;
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -236,11 +242,7 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
 	}
 
-	format.rate	= rate;
-	format.channels	= channels;
-	format.bits	= bits;
-
-	track.length	= (Int) (Float(length_ms) * Float(rate * channels) / 1000.0);
+	track.approxLength = (Int) (Float(length_ms) * Float(format.rate * format.channels) / 1000.0);
 
 	String	 trackTitle = title;
 
@@ -248,7 +250,8 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Int	 artistComplete = 0;
 
-	if (trackTitle != streamURI)
+	if (trackTitle.Find(File(				      streamURI ).GetFileName()) == -1 &&
+	    trackTitle.Find(File(Utilities::GetNonUnicodeTempFileName(streamURI)).GetFileName()) == -1)
 	{
 		for (Int m = 0; m < trackTitle.Length(); m++)
 		{
@@ -272,23 +275,32 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 		info.title = NIL;
 	}
 
+	/* Return an error if we didn't get useful format data.
+	 */
+	if (format.rate	    == 0 ||
+	    format.channels == 0 ||
+	    format.bits	    == 0)
+	{
+		errorState = True;
+
+		return Error();
+	}
+
 	return Success();
 }
 
 BoCA::WinampIn::WinampIn()
 {
-	configLayer		= NIL;
+	configLayer	   = NIL;
 
-	plugin			= NIL;
+	packageSize	   = 0;
 
-	channels		= 0;
-	rate			= 0;
-	bits			= 16;
+	infoTrack	   = NIL;
+	plugin		   = NIL;
 
-	get_more_samples	= 0;
-	n_samples		= 0;
+	samplesBufferMutex = NIL;
 
-	packageSize		= 0;
+	samplesDone	   = 0;
 }
 
 BoCA::WinampIn::~WinampIn()
@@ -298,6 +310,8 @@ BoCA::WinampIn::~WinampIn()
 
 Bool BoCA::WinampIn::Activate()
 {
+	/* Get the correct plugin and set callback functions.
+	 */
 	plugin = GetPluginForFile(track.origFilename);
 
 	plugin->SetInfo			= SetInfo;
@@ -312,8 +326,6 @@ Bool BoCA::WinampIn::Activate()
 	plugin->SAAdd			= SAAdd;
 	plugin->dsp_isactive		= dsp_isactive;
 	plugin->dsp_dosamples		= dsp_dosamples;
-	plugin->SetVolume		= SetVolume;
-	plugin->SetPan			= SetPan;
 
 	plugin->outMod			= new Out_Module();
 
@@ -328,6 +340,13 @@ Bool BoCA::WinampIn::Activate()
 	plugin->outMod->SetPan		= Out_SetPan;
 	plugin->outMod->GetOutputTime	= Out_GetOutputTime;
 	plugin->outMod->GetWrittenTime	= Out_GetWrittenTime;
+
+	/* Create and setup mutex.
+	 */
+	samplesBufferMutex = new Mutex();
+	samplesBufferMutex->Lock();
+
+	filter = this;
 
 	/* Copy the file and play the temporary copy
 	 * if the file name contains Unicode characters.
@@ -348,9 +367,12 @@ Bool BoCA::WinampIn::Activate()
 
 Bool BoCA::WinampIn::Deactivate()
 {
+	samplesBufferMutex->Release();
+
 	plugin->Stop();
 
 	delete plugin->outMod;
+	delete samplesBufferMutex;
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -364,31 +386,30 @@ Bool BoCA::WinampIn::Deactivate()
 
 Int BoCA::WinampIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	get_more_samples	= 32768;
-	n_samples		= 0;
+	samplesBufferMutex->Release();
 
-	Int	 count = 0;
+	Int	 start = clock();
 
-	while (get_more_samples > 0)
-	{
-		if (++count == 10)
-		{
-			if (n_samples == 0)	return -1;
-			else			break;
-		}
+	while (clock() - start < CLOCKS_PER_SEC && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
 
-		S::System::System::Sleep(0);
-	}
+	samplesBufferMutex->Lock();
 
-	get_more_samples = 0;
-
-	size = n_samples * (bits / 8) * channels;
+	size = samplesBuffer.Size();
 
 	data.Resize(size);
 
-	memcpy(data, sampleBuffer, size);
+	memcpy(data, samplesBuffer, size);
 
-	return size;
+	samplesBuffer.Resize(0);
+
+	/* Set inBytes to a value that reflects
+	 * our approximate position in the file.
+	 */
+	samplesDone += size / (track.GetFormat().bits / 8);
+	inBytes = track.fileSize * samplesDone / track.approxLength;
+
+	if (size == 0)	return -1;
+	else		return size;
 }
 
 ConfigLayer *BoCA::WinampIn::GetConfigurationLayer()
@@ -416,7 +437,7 @@ In_Module *BoCA::WinampIn::GetPluginForFile(const String &file)
 	{
 		Int		 n = 1;
 
-		for (Int j = 0; true; j++)
+		for (Int j = 0; True; j++)
 		{
 			String	 value = winamp_in_modules.GetNth(i)->FileExtensions + j;
 
@@ -439,7 +460,7 @@ In_Module *BoCA::WinampIn::GetPluginForFile(const String &file)
 						}
 
 						m++;
-						o = m;
+						o = m + 1;
 						extension = "";
 					}
 				}
@@ -457,131 +478,123 @@ In_Module *BoCA::WinampIn::GetPluginForFile(const String &file)
 	return plugin;
 }
 
-void SetInfo(int bitrate, int srate, int stereo, int synched)
+void BoCA::SetInfo(int bitrate, int srate, int stereo, int synched)
 {
 }
 
-void VSASetInfo(int nch, int srate)
-{
-	/* Some plugins pass the sampling rate as the first   *
-	 * parameter, so we just assume that the larger value *
-	 * is the sampling rate, the other is the number of   *
-	 * channels.					      */
-
-	channels	= Math::Min((Int) nch, srate);
-	rate		= Math::Max((Int) nch, srate);
-}
-
-void VSAAddPCMData(void *PCMData, int nch, int bps, int timestamp)
+void BoCA::VSASetInfo(int nch, int srate)
 {
 }
 
-int VSAGetMode(int *specNch, int *waveNch)
+void BoCA::VSAAddPCMData(void *PCMData, int nch, int bps, int timestamp)
+{
+}
+
+int BoCA::VSAGetMode(int *specNch, int *waveNch)
 {
 	return 0;
 }
 
-void VSAAdd(void *data, int timestamp)
+void BoCA::VSAAdd(void *data, int timestamp)
 {
 }
 
-void SAVSAInit(int latency, int srate)
+void BoCA::SAVSAInit(int latency, int srate)
 {
 }
 
-void SAVSADeInit()
+void BoCA::SAVSADeInit()
 {
 }
 
-void SAAddPCMData(void *PCMData, int nch, int bps, int timestamp)
+void BoCA::SAAddPCMData(void *PCMData, int nch, int bps, int timestamp)
 {
 }
 
-int SAGetMode()
+int BoCA::SAGetMode()
 {
 	return 0;
 }
 
-void SAAdd(void *data, int timestamp, int csa)
+void BoCA::SAAdd(void *data, int timestamp, int csa)
 {
 }
 
-int dsp_isactive()
+int BoCA::dsp_isactive()
 {
-	return get_more_samples;
+	return false;
 }
 
-int dsp_dosamples(short int *samples, int numsamples, int bps, int nch, int srate)
+int BoCA::dsp_dosamples(short int *samples, int numsamples, int bps, int nch, int srate)
 {
-	if (n_samples == 0) sampleBuffer.Resize(32768 * (bps / 8) * nch);
-
-	memcpy(sampleBuffer + n_samples * (bps / 8) * nch, samples, numsamples * (bps / 8) * nch);
-
-	get_more_samples -= numsamples;
-	n_samples	 += numsamples;
-
-	if (get_more_samples <= 8192) get_more_samples = 0;
-
 	return numsamples;
 }
 
-void SetVolume(int vol)
+int BoCA::Out_Open(int samplerate, int numchannels, int bitspersamp, int bufferlenms, int prebufferms)
+{
+	if (filter->infoTrack == NIL) return 0;
+
+	Format	&format = filter->infoTrack->GetFormat();
+
+	format.channels	= numchannels;
+	format.rate	= samplerate;
+	format.bits	= bitspersamp;
+
+	return 0;
+}
+
+void BoCA::Out_Close()
 {
 }
 
-void SetPan(int pan)
+void BoCA::Out_Flush(int t)
 {
 }
 
-int Out_Open(int samplerate, int numchannels, int bitspersamp, int bufferlenms, int prebufferms)
+int BoCA::Out_Write(char *buf, int len)
 {
-	bits = bitspersamp;
+	filter->samplesBufferMutex->Lock();
 
-	return 25;
+	Int	 oSize = filter->samplesBuffer.Size();
+
+	filter->samplesBuffer.Resize(oSize + len);
+
+	memcpy(filter->samplesBuffer + oSize, buf, len);
+
+	filter->samplesBufferMutex->Release();
+
+	return 0;
 }
 
-void Out_Close()
+int BoCA::Out_CanWrite()
 {
+	return Math::Max(0, 32768 - filter->samplesBuffer.Size());
 }
 
-void Out_Flush(int t)
+int BoCA::Out_IsPlaying()
 {
+	return true;
 }
 
-int Out_Write(char *buf, int len)
+int BoCA::Out_Pause(int pause)
 {
 	return 0;
 }
 
-int Out_CanWrite()
+void BoCA::Out_SetVolume(int vol)
 {
-	return get_more_samples;
 }
 
-int Out_IsPlaying()
+void BoCA::Out_SetPan(int pan)
 {
-	return 1;
 }
 
-int Out_Pause(int pause)
+int BoCA::Out_GetOutputTime()
 {
 	return 0;
 }
 
-void Out_SetVolume(int vol)
-{
-}
-
-void Out_SetPan(int pan)
-{
-}
-
-int Out_GetOutputTime()
-{
-	return 0;
-}
-
-int Out_GetWrittenTime()
+int BoCA::Out_GetWrittenTime()
 {
 	return 0;
 }

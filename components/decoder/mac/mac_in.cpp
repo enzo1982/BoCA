@@ -69,9 +69,9 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (String::IsUnicode(streamURI))
 	{
-		File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
+		File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in.ape"));
 
-		hAPEDecompress = ex_APEDecompress_Create(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"), &nRetVal);
+		hAPEDecompress = ex_APEDecompress_Create(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in.ape"), &nRetVal);
 	}
 	else
 	{
@@ -108,7 +108,7 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (String::IsUnicode(streamURI))
 	{
-		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in.ape")).Delete();
 	}
 
 	return Success();
@@ -131,9 +131,9 @@ Bool BoCA::MACIn::Activate()
 
 	if (String::IsUnicode(track.origFilename))
 	{
-		File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
+		File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in.ape"));
 
-		hAPEDecompress = ex_APEDecompress_Create(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"), &nRetVal);
+		hAPEDecompress = ex_APEDecompress_Create(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in.ape"), &nRetVal);
 	}
 	else
 	{
@@ -151,7 +151,7 @@ Bool BoCA::MACIn::Deactivate()
 
 	if (String::IsUnicode(track.origFilename))
 	{
-		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in.ape")).Delete();
 	}
 
 	return True;
