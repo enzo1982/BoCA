@@ -323,16 +323,13 @@ Bool BoCA::LAMEOut::Deactivate()
 		}
 	}
 
-	/* Write Xing header if VBR.
+	/* Write Xing or Info header.
 	 */
-	if (ex_lame_get_VBR(lameFlags) != vbr_off)
-	{
-		Buffer<unsigned char>	 buffer(2880);	// Maximum frame size
-		Int			 bytes = ex_lame_get_lametag_frame(lameFlags, buffer, buffer.Size());
+	Buffer<unsigned char>	 buffer(2880);	// Maximum frame size
+	Int			 size = ex_lame_get_lametag_frame(lameFlags, buffer, buffer.Size());
 
-		driver->Seek(dataOffset);
-		driver->WriteData(buffer, bytes);
-	}
+	driver->Seek(dataOffset);
+	driver->WriteData(buffer, size);
 
 	ex_lame_close(lameFlags);
 

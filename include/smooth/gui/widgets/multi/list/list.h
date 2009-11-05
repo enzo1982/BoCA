@@ -64,6 +64,8 @@ namespace smooth
 			signals:
 				Signal1<Void, ListEntry *>	 onSelectEntry;
 				Signal1<Void, ListEntry *>	 onMarkEntry;
+
+				Signal0<Void>			 onChangeEntryOrder;
 		};
 	};
 };

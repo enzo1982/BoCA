@@ -34,14 +34,8 @@ LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_X64),True)
 	CCOPTS += -march=nocona
-
-	PACKER = mpress
-	PACKER_OPTS = -q
 else
 	CCOPTS += -march=i586 -Os
-
-	PACKER = upx
-	PACKER_OPTS = --best -q
 endif
 
 ifeq ($(BUILD_WIN32),True)
@@ -59,10 +53,10 @@ ifeq ($(BUILD_WIN32),True)
 	$(LD) --shared -o $@ $(OBJECTS) -Xlinker --out-implib -Xlinker $(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
 else
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
-	ln $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT) $(BOCA_PATH)/$(LIBDIR)/libboca.so
+	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca.so
+	ln -s $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT) $(BOCA_PATH)/$(LIBDIR)/libboca.so
 endif
 	strip --strip-all $@
-#	$(PACKER) $(PACKER_OPTS) $@
 
 clean :
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT) $(BOCA_PATH)/$(LIBDIR)/libboca.a $(OBJECTS)

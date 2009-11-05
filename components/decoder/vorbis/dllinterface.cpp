@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -8,7 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
+
+using namespace BoCA;
 
 OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
 OGGSTREAMPACKETOUT		 ex_ogg_stream_packetout		= NIL;
@@ -45,7 +48,7 @@ VORBISDSPCLEAR			 ex_vorbis_dsp_clear			= NIL;
 VORBISCOMMENTCLEAR		 ex_vorbis_comment_clear		= NIL;
 VORBISINFOCLEAR			 ex_vorbis_info_clear			= NIL;
 
-DynamicLoader *oggdll	= NIL;
+DynamicLoader *oggdll		= NIL;
 DynamicLoader *vorbisdll	= NIL;
 
 Bool LoadOggDLL()
@@ -88,7 +91,9 @@ Void FreeOggDLL()
 
 Bool LoadVorbisDLL()
 {
-	vorbisdll = new DynamicLoader("codecs/Vorbis");
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
+	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) vorbisdll = new DynamicLoader("codecs/Vorbis-OpenMP");
+	else						 vorbisdll = new DynamicLoader("codecs/Vorbis");
 
 	ex_vorbis_info_init		= (VORBISINFOINIT) vorbisdll->GetFunctionAddress("vorbis_info_init");
 	ex_vorbis_comment_init		= (VORBISCOMMENTINIT) vorbisdll->GetFunctionAddress("vorbis_comment_init");

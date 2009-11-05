@@ -11,6 +11,10 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#ifndef __WIN32__
+#  include <stdlib.h>
+#endif
+
 #include <boca/application/registry.h>
 
 #include <boca/common/config.h>
@@ -25,7 +29,14 @@ Void smooth::AttachDLL(Void *instance)
 
 	/* Set number of threads for OpenMP optimized encoders.
 	 */
-	if (config->GetIntValue("OpenMP", "NumThreads", 0) > 0) SetEnvironmentVariableA("OMP_NUM_THREADS", String::FromInt(config->GetIntValue("OpenMP", "NumThreads", 0)));
+	if (config->GetIntValue("OpenMP", "NumThreads", 0) > 0)
+	{
+#ifdef __WIN32__
+		SetEnvironmentVariableA("OMP_NUM_THREADS", String::FromInt(config->GetIntValue("OpenMP", "NumThreads", 0)));
+#else
+		setenv("OMP_NUM_THREADS", String::FromInt(config->GetIntValue("OpenMP", "NumThreads", 0)), True);
+#endif
+	}
 }
 
 Void smooth::DetachDLL()

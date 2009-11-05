@@ -11,14 +11,8 @@ endif
 
 ifeq ($(BUILD_X64),True)
 	CCOPTS += -march=nocona
-
-	PACKER = mpress
-	PACKER_OPTS = -q
 else
 	CCOPTS += -march=i586 -Os
-
-	PACKER = upx
-	PACKER_OPTS = --best -q
 endif
 
 ifeq ($(BUILD_WIN32),True)
@@ -34,7 +28,6 @@ all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT)
 $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) : $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
 	strip --strip-all $@
-#	$(PACKER) $(PACKER_OPTS) $@
 
 clean :
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) $(OBJECTS)

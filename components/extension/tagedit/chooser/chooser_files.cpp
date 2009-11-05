@@ -30,7 +30,7 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 	list_files->onSelectEntry.Connect(&ChooserFiles::OnSelectFile, this);
 
 	text_nofiles	= new Text("no audio files found", Point());
-	text_nofiles->SetFont(Font(Font::Default, 12, Font::Bold, 0, Setup::GrayTextColor));
+	text_nofiles->SetFont(GUI::Font(GUI::Font::Default, 12, GUI::Font::Bold, 0, Setup::GrayTextColor));
 
 	btn_save	= new Button("Save", NIL, Point(176, 30), Size());
 	btn_save->SetOrientation(OR_LOWERRIGHT);
@@ -273,7 +273,7 @@ Void BoCA::ChooserFiles::OnModifyTrack(const Track &track)
 	{
 		if (tracks.GetNth(i).GetTrackID() == track.GetTrackID())
 		{
-			Font	 font = list_files->GetNthEntry(tracks.GetNthIndex(i))->GetFont();
+			GUI::Font	 font = list_files->GetNthEntry(tracks.GetNthIndex(i))->GetFont();
 
 			font.SetColor(Color(0, 0, 255));
 
@@ -306,7 +306,7 @@ Void BoCA::ChooserFiles::OnSave()
 
 	if (SaveFileTag(tracks.Get(i)) != Success()) return;
 
-	Font	 font = list_files->GetNthEntry(i)->GetFont();
+	GUI::Font	 font = list_files->GetNthEntry(i)->GetFont();
 
 	font.SetColor(Color(0, 0, 0));
 
@@ -333,7 +333,7 @@ Void BoCA::ChooserFiles::OnSaveAll()
 
 		if (SaveFileTag(tracks.Get(i)) != Success()) { failed++; continue; }
 
-		Font	 font = list_files->GetNthEntry(i)->GetFont();
+		GUI::Font	 font = list_files->GetNthEntry(i)->GetFont();
 
 		font.SetColor(Color(0, 0, 0));
 

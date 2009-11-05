@@ -53,6 +53,7 @@
 #include "smooth/types/void.h"
 
 #include "smooth/system/console.h"
+#include "smooth/system/cpu.h"
 #include "smooth/system/dynamicloader.h"
 #include "smooth/system/multimonitor.h"
 #include "smooth/system/system.h"

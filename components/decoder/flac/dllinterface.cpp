@@ -8,7 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
+
+using namespace BoCA;
 
 FLAC__STREAM_DECODER_NEW				 ex_FLAC__stream_decoder_new				= NIL;
 FLAC__STREAM_DECODER_DELETE				 ex_FLAC__stream_decoder_delete				= NIL;
@@ -48,7 +51,9 @@ DynamicLoader *flacdll	= NIL;
 
 Bool LoadFLACDLL()
 {
-	flacdll = new DynamicLoader("codecs/FLAC");
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
+	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) flacdll = new DynamicLoader("codecs/FLAC-OpenMP");
+	else						 flacdll = new DynamicLoader("codecs/FLAC");
 
 	ex_FLAC__stream_decoder_new				= (FLAC__STREAM_DECODER_NEW) flacdll->GetFunctionAddress("FLAC__stream_decoder_new");
 	ex_FLAC__stream_decoder_delete				= (FLAC__STREAM_DECODER_DELETE) flacdll->GetFunctionAddress("FLAC__stream_decoder_delete");

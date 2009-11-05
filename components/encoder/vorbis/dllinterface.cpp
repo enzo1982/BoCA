@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -8,7 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
+
+using namespace BoCA;
 
 OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
 OGGSTREAMPACKETIN		 ex_ogg_stream_packetin			= NIL;
@@ -69,7 +72,10 @@ Void FreeOggDLL()
 
 Bool LoadVorbisDLL()
 {
-	vorbisdll = new DynamicLoader("codecs/Vorbis");
+
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
+	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) vorbisdll = new DynamicLoader("codecs/Vorbis-OpenMP");
+	else						 vorbisdll = new DynamicLoader("codecs/Vorbis");
 
 	ex_vorbis_info_init		= (VORBISINFOINIT) vorbisdll->GetFunctionAddress("vorbis_info_init");
 	ex_vorbis_encode_init		= (VORBISENCODEINIT) vorbisdll->GetFunctionAddress("vorbis_encode_init");

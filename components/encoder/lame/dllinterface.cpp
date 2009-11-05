@@ -8,7 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
+
+using namespace BoCA;
 
 LAME_INIT			 ex_lame_init				= NIL;
 LAME_SET_PRESET			 ex_lame_set_preset			= NIL;
@@ -30,7 +33,6 @@ LAME_SET_HIGHPASSWIDTH		 ex_lame_set_highpasswidth		= NIL;
 LAME_SET_MODE			 ex_lame_set_mode			= NIL;
 LAME_SET_FORCE_MS		 ex_lame_set_force_ms			= NIL;
 LAME_CLOSE			 ex_lame_close				= NIL;
-LAME_GET_VBR			 ex_lame_get_VBR			= NIL;
 LAME_SET_VBR			 ex_lame_set_VBR			= NIL;
 LAME_SET_VBR_QUALITY		 ex_lame_set_VBR_quality		= NIL;
 LAME_SET_VBR_MEAN_BITRATE_KBPS	 ex_lame_set_VBR_mean_bitrate_kbps	= NIL;
@@ -51,7 +53,9 @@ DynamicLoader *lamedll	= NIL;
 
 Bool LoadLAMEDLL()
 {
-	lamedll = new DynamicLoader("codecs/LAME");
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
+	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) lamedll = new DynamicLoader("codecs/LAME-OpenMP");
+	else						 lamedll = new DynamicLoader("codecs/LAME");
 
 	ex_lame_init				= (LAME_INIT) lamedll->GetFunctionAddress("lame_init");
 	ex_lame_set_preset			= (LAME_SET_PRESET) lamedll->GetFunctionAddress("lame_set_preset");
@@ -73,7 +77,6 @@ Bool LoadLAMEDLL()
 	ex_lame_set_mode			= (LAME_SET_MODE) lamedll->GetFunctionAddress("lame_set_mode");
 	ex_lame_set_force_ms			= (LAME_SET_FORCE_MS) lamedll->GetFunctionAddress("lame_set_force_ms");
 	ex_lame_close				= (LAME_CLOSE) lamedll->GetFunctionAddress("lame_close");
-	ex_lame_get_VBR				= (LAME_GET_VBR) lamedll->GetFunctionAddress("lame_get_VBR");
 	ex_lame_set_VBR				= (LAME_SET_VBR) lamedll->GetFunctionAddress("lame_set_VBR");
 	ex_lame_set_VBR_quality			= (LAME_SET_VBR_QUALITY) lamedll->GetFunctionAddress("lame_set_VBR_quality");
 	ex_lame_set_VBR_mean_bitrate_kbps	= (LAME_SET_VBR_MEAN_BITRATE_KBPS) lamedll->GetFunctionAddress("lame_set_VBR_mean_bitrate_kbps");
@@ -110,7 +113,6 @@ Bool LoadLAMEDLL()
 	    ex_lame_set_mode			== NIL ||
 	    ex_lame_set_force_ms		== NIL ||
 	    ex_lame_close			== NIL ||
-	    ex_lame_get_VBR			== NIL ||
 	    ex_lame_set_VBR			== NIL ||
 	    ex_lame_set_VBR_quality		== NIL ||
 	    ex_lame_set_VBR_mean_bitrate_kbps	== NIL ||

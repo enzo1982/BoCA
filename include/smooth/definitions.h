@@ -238,6 +238,8 @@ const S::Int SM_KEYDOWN			= 1035;
 const S::Int SM_KEYUP			= 1036;
 const S::Int SM_CHAR			= 1037;
 
+const S::Int SM_WINDOWMETRICS		= 1038;
+
 const S::Int SM_TIMER			= 1534;
 
 const S::Int OR_HORZ			= 1;

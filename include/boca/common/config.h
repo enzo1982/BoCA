@@ -37,16 +37,29 @@ namespace BoCA
 
 			Bool		 firstStart;
 
+			Point		 wndPos;
+			Size		 wndSize;
+			Bool		 maximized;
+
 			String		 language;
 			Bool		 languageChanged;
  
-			Bool		 writeToInputDir;
-			Bool		 allowOverwrite;
+			Bool		 showTitleInfo;
+			Bool		 showTooltips;
 
+			String		 encoderID;
+			String		 enc_outdir;
 			String		 enc_filePattern;
 			Bool		 enc_onTheFly;
 			Bool		 enc_keepWaves;
+
+			Bool		 encodeToSingleFile;
 			Bool		 useUnicodeNames;
+
+			Bool		 writeToInputDir;
+			Bool		 allowOverwrite;
+
+			Bool		 checkUpdatesAtStartup;
 
 			Array<String>	 cdrip_drives;
 			Int		 cdrip_numdrives;

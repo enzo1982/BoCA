@@ -97,6 +97,8 @@ Bool BoCA::BonkOut::Activate()
 			ex_bonk_encoder_set_id3_data(encoder, id3Buffer, id3Buffer.Size());
 
 			boca.DeleteComponent(tagger);
+
+			dataBuffer.Resize(dataBuffer.Size() + id3Buffer.Size());
 		}
 	}
 

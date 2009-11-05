@@ -16,13 +16,6 @@
 
 using namespace smooth::IO;
 
-/* AAC object types
- */
-#define MAIN 1
-#define LOW  2
-#define SSR  3
-#define LTP  4
-
 const String &BoCA::FAAD2In::GetComponentSpecs()
 {
 	static String	 componentSpecs;
@@ -164,7 +157,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 			fConfig	= ex_NeAACDecGetCurrentConfiguration(handle);
 
 			fConfig->defSampleRate	= 44100;
-			fConfig->defObjectType	= LOW;
+			fConfig->defObjectType	= LC;
 			fConfig->outputFormat	= FAAD_FMT_16BIT;
 
 			ex_NeAACDecSetConfiguration(handle, fConfig);
@@ -233,7 +226,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 		fConfig	= ex_NeAACDecGetCurrentConfiguration(handle);
 
 		fConfig->defSampleRate	= 44100;
-		fConfig->defObjectType	= LOW;
+		fConfig->defObjectType	= LC;
 		fConfig->outputFormat	= FAAD_FMT_16BIT;
 
 		ex_NeAACDecSetConfiguration(handle, fConfig);
@@ -342,7 +335,7 @@ Bool BoCA::FAAD2In::Activate()
 	fConfig	= ex_NeAACDecGetCurrentConfiguration(handle);
 
 	fConfig->defSampleRate	= 44100;
-	fConfig->defObjectType	= LOW;
+	fConfig->defObjectType	= LC;
 	fConfig->outputFormat	= FAAD_FMT_16BIT;
 
 	ex_NeAACDecSetConfiguration(handle, fConfig);

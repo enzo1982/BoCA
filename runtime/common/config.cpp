@@ -97,46 +97,66 @@ Bool BoCA::Config::LoadSettings()
 {
 	String	 personalDir = S::System::System::GetPersonalFilesDirectory();
 
-	firstStart				= config->GetIntValue("Settings", "FirstStart", 1);
-	language				= config->GetStringValue("Settings", "Language", "");
-	enc_filePattern				= config->GetStringValue("Settings", "EncoderFilenamePattern", "<artist> - <album>\\<artist> - <album> - <track> - <title>");
-	enc_onTheFly				= config->GetIntValue("Settings", "EncodeOnTheFly", 1);
-	enc_keepWaves				= config->GetIntValue("Settings", "KeepWaveFiles", 0);
-	useUnicodeNames				= config->GetIntValue("Settings", "UseUnicodeFilenames", 1);
-	writeToInputDir				= config->GetIntValue("Settings", "WriteToInputDirectory", 0);
-	allowOverwrite				= config->GetIntValue("Settings", "AllowOverwriteSource", 0);
+#ifdef __WIN32__
+	if (!personalDir.EndsWith(Directory::GetDirectoryDelimiter())) personalDir.Append(Directory::GetDirectoryDelimiter());
 
-	cdrip_activedrive			= config->GetIntValue("CDRip", "ActiveCDROM", 0);
-	cdrip_debuglevel			= config->GetIntValue("CDRip", "DebugCDRip", 0);
-	cdrip_paranoia				= config->GetIntValue("CDRip", "CDParanoia", 0);
-	cdrip_paranoia_mode			= config->GetIntValue("CDRip", "CDParanoiaMode", 3);
-	cdrip_detectJitterErrors		= config->GetIntValue("CDRip", "DetectJitterErrors", 1);
-	cdrip_detectC2Errors			= config->GetIntValue("CDRip", "DetectC2Errors", 1);
-	cdrip_jitter				= config->GetIntValue("CDRip", "JitterCorrection", 0);
-	cdrip_swapchannels			= config->GetIntValue("CDRip", "SwapChannels", 0);
-	cdrip_numdrives				= 0;
+	personalDir.Append("My Music");
+#endif
 
-	enable_auto_cddb			= config->GetIntValue("freedb", "AutoCDDBQueries", 1);
-	enable_overwrite_cdtext			= config->GetIntValue("freedb", "OverwriteCDText", 1);
-	enable_cddb_cache			= config->GetIntValue("freedb", "EnableCDDBCache", 1);
-	enable_local_cddb			= config->GetIntValue("freedb", "EnableLocalCDDB", 0);
-	freedb_dir				= config->GetStringValue("freedb", "Directory", "freedb\\");
-	enable_remote_cddb			= config->GetIntValue("freedb", "EnableRemoteCDDB", 1);
-	freedb_server				= config->GetStringValue("freedb", "Server", "freedb.freedb.org");
-	freedb_mode				= config->GetIntValue("freedb", "Mode", 0);
-	freedb_cddbp_port			= config->GetIntValue("freedb", "CDDBPPort", 8880);
-	freedb_http_port			= 80;
-	freedb_query_path			= config->GetStringValue("freedb", "QueryPath", "/~cddb/cddb.cgi");
-	freedb_submit_path			= config->GetStringValue("freedb", "SubmitPath", "/~cddb/submit.cgi");
-	freedb_email				= config->GetStringValue("freedb", "eMail", "cddb@bonkenc.org");
-	freedb_proxy_mode			= config->GetIntValue("freedb", "ProxyMode", 0);
-	freedb_proxy				= config->GetStringValue("freedb", "Proxy", "localhost");
-	freedb_proxy_port			= config->GetIntValue("freedb", "ProxyPort", 1080);
-	freedb_proxy_user			= config->GetStringValue("freedb", "ProxyUserName", NIL);
-	freedb_proxy_password			= config->GetStringValue("freedb", "ProxyPassword", NIL);
-	update_joblist				= config->GetIntValue("freedb", "UpdateJoblistOnSubmit", 1);
+	firstStart			= config->GetIntValue("Settings", "FirstStart", 1);
+	language			= config->GetStringValue("Settings", "Language", "");
+	wndPos.x			= config->GetIntValue("Settings", "WindowPosX", 100);
+	wndPos.y			= config->GetIntValue("Settings", "WindowPosY", 100);
+	wndSize.cx			= config->GetIntValue("Settings", "WindowSizeX", 800);
+	wndSize.cy			= config->GetIntValue("Settings", "WindowSizeY", 600);
+	maximized			= config->GetIntValue("Settings", "WindowMaximized", 0);
+	showTitleInfo			= config->GetIntValue("Settings", "ShowTitleInfo", 1);
+	showTooltips			= config->GetIntValue("Settings", "ShowTooltips", 1);
+	encoderID			= config->GetStringValue("Settings", "Encoder", "wave-out");
+	enc_outdir			= config->GetStringValue("Settings", "EncoderOutDir", personalDir);
+	enc_filePattern			= config->GetStringValue("Settings", "EncoderFilenamePattern", "<artist> - <album>\\<artist> - <album> - <track> - <title>");
+	enc_onTheFly			= config->GetIntValue("Settings", "EncodeOnTheFly", 1);
+	enc_keepWaves			= config->GetIntValue("Settings", "KeepWaveFiles", 0);
+	useUnicodeNames			= config->GetIntValue("Settings", "UseUnicodeFilenames", 1);
+	writeToInputDir			= config->GetIntValue("Settings", "WriteToInputDirectory", 0);
+	allowOverwrite			= config->GetIntValue("Settings", "AllowOverwriteSource", 0);
+	encodeToSingleFile		= config->GetIntValue("Settings", "EncodeToSingleFile", 0);
+	checkUpdatesAtStartup		= config->GetIntValue("Settings", "CheckUpdatesAtStartup", 1);
 
+	cdrip_activedrive		= config->GetIntValue("CDRip", "ActiveCDROM", 0);
+	cdrip_debuglevel		= config->GetIntValue("CDRip", "DebugCDRip", 0);
+	cdrip_paranoia			= config->GetIntValue("CDRip", "CDParanoia", 0);
+	cdrip_paranoia_mode		= config->GetIntValue("CDRip", "CDParanoiaMode", 3);
+	cdrip_detectJitterErrors	= config->GetIntValue("CDRip", "DetectJitterErrors", 1);
+	cdrip_detectC2Errors		= config->GetIntValue("CDRip", "DetectC2Errors", 1);
+	cdrip_jitter			= config->GetIntValue("CDRip", "JitterCorrection", 0);
+	cdrip_swapchannels		= config->GetIntValue("CDRip", "SwapChannels", 0);
+	cdrip_numdrives			= 0;
+
+	enable_auto_cddb		= config->GetIntValue("freedb", "AutoCDDBQueries", 1);
+	enable_overwrite_cdtext		= config->GetIntValue("freedb", "OverwriteCDText", 1);
+	enable_cddb_cache		= config->GetIntValue("freedb", "EnableCDDBCache", 1);
+	enable_local_cddb		= config->GetIntValue("freedb", "EnableLocalCDDB", 0);
+	freedb_dir			= config->GetStringValue("freedb", "Directory", "freedb\\");
+	enable_remote_cddb		= config->GetIntValue("freedb", "EnableRemoteCDDB", 1);
+	freedb_server			= config->GetStringValue("freedb", "Server", "freedb.freedb.org");
+	freedb_mode			= config->GetIntValue("freedb", "Mode", 0);
+	freedb_cddbp_port		= config->GetIntValue("freedb", "CDDBPPort", 8880);
+	freedb_http_port		= 80;
+	freedb_query_path		= config->GetStringValue("freedb", "QueryPath", "/~cddb/cddb.cgi");
+	freedb_submit_path		= config->GetStringValue("freedb", "SubmitPath", "/~cddb/submit.cgi");
+	freedb_email			= config->GetStringValue("freedb", "eMail", "cddb@bonkenc.org");
+	freedb_proxy_mode		= config->GetIntValue("freedb", "ProxyMode", 0);
+	freedb_proxy			= config->GetStringValue("freedb", "Proxy", "localhost");
+	freedb_proxy_port		= config->GetIntValue("freedb", "ProxyPort", 1080);
+	freedb_proxy_user		= config->GetStringValue("freedb", "ProxyUserName", NIL);
+	freedb_proxy_password		= config->GetStringValue("freedb", "ProxyPassword", NIL);
+	update_joblist			= config->GetIntValue("freedb", "UpdateJoblistOnSubmit", 1);
+
+	if (!enc_outdir.EndsWith(Directory::GetDirectoryDelimiter())) enc_outdir.Append(Directory::GetDirectoryDelimiter());
 	if (!freedb_dir.EndsWith(Directory::GetDirectoryDelimiter())) freedb_dir.Append(Directory::GetDirectoryDelimiter());
+
+	if (encodeToSingleFile && !enc_onTheFly) enc_onTheFly = True;
 
 	return True;
 }
@@ -145,12 +165,23 @@ Bool BoCA::Config::SaveSettings()
 {
 	config->SetIntValue("Settings", "FirstStart", 0);
 	config->SetStringValue("Settings", "Language", language);
+	config->SetIntValue("Settings", "WindowPosX", wndPos.x);
+	config->SetIntValue("Settings", "WindowPosY", wndPos.y);
+	config->SetIntValue("Settings", "WindowSizeX", wndSize.cx);
+	config->SetIntValue("Settings", "WindowSizeY", wndSize.cy);
+	config->SetIntValue("Settings", "WindowMaximized", maximized);
+	config->SetIntValue("Settings", "ShowTitleInfo", showTitleInfo);
+	config->SetIntValue("Settings", "ShowTooltips", showTooltips);
+	config->SetStringValue("Settings", "Encoder", encoderID);
+	config->SetStringValue("Settings", "EncoderOutDir", enc_outdir);
 	config->SetStringValue("Settings", "EncoderFilenamePattern", enc_filePattern);
 	config->SetIntValue("Settings", "EncodeOnTheFly", enc_onTheFly);
 	config->SetIntValue("Settings", "KeepWaveFiles", enc_keepWaves);
 	config->SetIntValue("Settings", "UseUnicodeFilenames", useUnicodeNames);
 	config->SetIntValue("Settings", "WriteToInputDirectory", writeToInputDir);
 	config->SetIntValue("Settings", "AllowOverwriteSource", allowOverwrite);
+	config->SetIntValue("Settings", "EncodeToSingleFile", encodeToSingleFile);
+	config->SetIntValue("Settings", "CheckUpdatesAtStartup", checkUpdatesAtStartup);
 
 	config->SetIntValue("CDRip", "ActiveCDROM", cdrip_activedrive);
 	config->SetIntValue("CDRip", "DebugCDRip", cdrip_debuglevel);

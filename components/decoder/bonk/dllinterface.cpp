@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -8,7 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
+
+using namespace BoCA;
 
 BONKDECODERCREATE		 ex_bonk_decoder_create			= NIL;
 BONKDECODERINIT			 ex_bonk_decoder_init			= NIL;
@@ -24,7 +27,9 @@ DynamicLoader *bonkdll	= NIL;
 
 Bool LoadBonkDLL()
 {
-	bonkdll = new DynamicLoader("codecs/Bonk");
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
+	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) bonkdll = new DynamicLoader("codecs/Bonk-OpenMP");
+	else						 bonkdll = new DynamicLoader("codecs/Bonk");
 
 	ex_bonk_decoder_create			= (BONKDECODERCREATE) bonkdll->GetFunctionAddress("bonk_decoder_create");
 	ex_bonk_decoder_init			= (BONKDECODERINIT) bonkdll->GetFunctionAddress("bonk_decoder_init");

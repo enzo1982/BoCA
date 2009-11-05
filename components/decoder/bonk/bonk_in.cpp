@@ -67,11 +67,13 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Format		&format		= track.GetFormat();
 
-	dataBuffer.Resize(16384);
+	int		 bytes = Math::Min(in->Size(), 524288);
 
-	in->InputData(dataBuffer, 16384);
+	dataBuffer.Resize(bytes);
 
-	ex_bonk_decoder_init(decoder, dataBuffer, 16384, &length, &rate, &channels);
+	in->InputData(dataBuffer, bytes);
+
+	ex_bonk_decoder_init(decoder, dataBuffer, bytes, &length, &rate, &channels);
 
 	format.rate = rate;
 	format.channels = channels;
@@ -129,11 +131,13 @@ Bool BoCA::BonkIn::Activate()
 
 	decoder = ex_bonk_decoder_create();
 
-	dataBuffer.Resize(16384);
+	int		 bytes = Math::Min(driver->GetSize(), 524288);
 
-	driver->ReadData(dataBuffer, 16384);
+	dataBuffer.Resize(bytes);
 
-	ex_bonk_decoder_init(decoder, dataBuffer, 16384, &length, &rate, &channels);
+	driver->ReadData(dataBuffer, bytes);
+
+	ex_bonk_decoder_init(decoder, dataBuffer, bytes, &length, &rate, &channels);
 
 	return True;
 }

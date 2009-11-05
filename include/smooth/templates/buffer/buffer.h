@@ -48,7 +48,7 @@ namespace smooth
 				*this = oBuffer;
 			}
 
-			~Buffer()
+			virtual ~Buffer()
 			{
 				Free();
 			}

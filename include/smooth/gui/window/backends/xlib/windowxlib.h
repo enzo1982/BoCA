@@ -39,6 +39,9 @@ namespace smooth
 
 				Window					 wnd;
 				Window					 oldwnd;
+
+				Point					 pos;
+				Size					 size;
 			public:
 									 WindowXLib(Void * = NIL);
 									~WindowXLib();

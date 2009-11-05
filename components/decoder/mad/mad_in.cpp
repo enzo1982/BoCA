@@ -62,7 +62,7 @@ namespace BoCA
 {
 	mad_flow	 MADInputCallback(void *, mad_stream *);
 	mad_flow	 MADOutputCallback(void *, const mad_header *, mad_pcm *);
-	mad_flow	 MADHeaderCallback(void *, const mad_header *);
+	mad_flow	 MADHeaderCallback(void *, const mad_header *, mad_pcm *);
 	mad_flow	 MADErrorCallback(void *, mad_stream *, mad_frame *);
 
 	/* FIXME: This is the scaling function included in the MAD
@@ -285,7 +285,7 @@ Bool BoCA::MADIn::ReadXingTag(InStream *in)
 Int BoCA::MADIn::ReadMAD(Bool readData)
 {
 	if (readData)	ex_mad_decoder_init(&decoder, this, &MADInputCallback, NIL, NIL, &MADOutputCallback, &MADErrorCallback, NIL);
-	else		ex_mad_decoder_init(&decoder, this, &MADInputCallback, &MADHeaderCallback, NIL, &MADOutputCallback, &MADErrorCallback, NIL);
+	else		ex_mad_decoder_init(&decoder, this, &MADInputCallback, NIL, NIL, &MADHeaderCallback, &MADErrorCallback, NIL);
 
 	ex_mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
 
@@ -345,7 +345,7 @@ mad_flow BoCA::MADOutputCallback(void *client_data, const mad_header *header, ma
 	return MAD_FLOW_CONTINUE;
 }
 
-mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header)
+mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, mad_pcm *pcm)
 {
 	MADIn	*filter = (MADIn *) client_data;
 
