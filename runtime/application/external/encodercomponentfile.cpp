@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -85,7 +85,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	execInfo.cbSize		= sizeof(execInfo);
 	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	execInfo.lpVerb		= "open";
-	execInfo.lpFile		= specs->external_command;
+	execInfo.lpFile		= String(specs->external_command).Replace("/", "\\");
 	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
 								   .Replace("%INFILE", String("\"").Append(wavFileName).Append("\""))
 								   .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))
@@ -148,7 +148,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 		else if (tagType == "MP4Metadata" && config->GetIntValue("Tags", "EnableMP4Metadata", True)) taggerID = "mp4-tag";
 
 		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID(taggerID);
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
 
 		if (tagger != NIL)
 		{

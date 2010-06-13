@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -23,9 +23,14 @@ DynamicLoader *lamedll	= NIL;
 
 Bool LoadLAMEDLL()
 {
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
-	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) lamedll = new DynamicLoader("codecs/LAME-OpenMP");
-	else						 lamedll = new DynamicLoader("codecs/LAME");
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
+	{
+		lamedll = new DynamicLoader("codecs/LAME-OpenMP");
+
+		if (lamedll->GetSystemModuleHandle() == NIL) FreeLAMEDLL();
+	}
+
+	if (lamedll == NIL) lamedll = new DynamicLoader("codecs/LAME");
 
 	ex_lame_decode_init			= (LAME_DECODE_INIT) lamedll->GetFunctionAddress("lame_decode_init");
 	ex_lame_decode_exit			= (LAME_DECODE_EXIT) lamedll->GetFunctionAddress("lame_decode_exit");

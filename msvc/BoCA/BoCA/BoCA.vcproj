@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="BoCA"
 	ProjectGUID="{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}"
 	RootNamespace="BoCA"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -47,7 +48,6 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="1"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -61,12 +61,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="smooth.lib"
+				AdditionalDependencies="smooth.lib ws2_32.lib"
 				OutputFile="$(OutDir)\boca.1.0.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../../../smooth/msvc/smooth/Debug"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -86,9 +88,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -142,6 +141,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -161,9 +162,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -210,6 +208,10 @@
 							XMLDocumentationFileName="$(IntDir)\$(InputName)2.xdc"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\application\deviceinfocomponent.cpp"
+					>
 				</File>
 				<File
 					RelativePath="..\..\..\runtime\application\dspcomponent.cpp"
@@ -398,77 +400,31 @@
 					</File>
 				</Filter>
 				<Filter
-					Name="track"
+					Name="metadata"
 					>
 					<File
-						RelativePath="..\..\..\runtime\common\track\format.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\..\..\runtime\common\track\info.cpp"
+						RelativePath="..\..\..\runtime\common\metadata\device.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\common\track\picture.cpp"
+						RelativePath="..\..\..\runtime\common\metadata\format.cpp"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\common\track\track.cpp"
+						RelativePath="..\..\..\runtime\common\metadata\info.cpp"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\$(InputName)1.obj"
-								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-							/>
-						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\metadata\mcdi.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\metadata\picture.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\metadata\track.cpp"
+						>
 					</File>
 				</Filter>
 			</Filter>
@@ -500,6 +456,28 @@
 				<File
 					RelativePath="..\..\..\runtime\component\decodercomponent.cpp"
 					>
+				</File>
+				<File
+					RelativePath="..\..\..\runtime\component\deviceinfocomponent.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\..\runtime\component\dspcomponent.cpp"
@@ -613,6 +591,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\include\boca\component\deviceinfocomponent.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\include\boca\component\encodercomponent.h"
 						>
 					</File>
@@ -669,22 +651,30 @@
 						</File>
 					</Filter>
 					<Filter
-						Name="track"
+						Name="metadata"
 						>
 						<File
-							RelativePath="..\..\..\include\boca\common\track\format.h"
+							RelativePath="..\..\..\include\boca\common\metadata\device.h"
 							>
 						</File>
 						<File
-							RelativePath="..\..\..\include\boca\common\track\info.h"
+							RelativePath="..\..\..\include\boca\common\metadata\format.h"
 							>
 						</File>
 						<File
-							RelativePath="..\..\..\include\boca\common\track\picture.h"
+							RelativePath="..\..\..\include\boca\common\metadata\info.h"
 							>
 						</File>
 						<File
-							RelativePath="..\..\..\include\boca\common\track\track.h"
+							RelativePath="..\..\..\include\boca\common\metadata\mcdi.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\metadata\picture.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\metadata\track.h"
 							>
 						</File>
 					</Filter>
@@ -702,6 +692,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\include\boca\application\decodercomponent.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\include\boca\application\deviceinfocomponent.h"
 						>
 					</File>
 					<File

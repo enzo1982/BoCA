@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,16 +16,23 @@ using namespace smooth::IO;
 
 const String &BoCA::VorbisTag::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Vorbis Comment Tagger</name>		\
-	    <version>1.0</version>			\
-	    <id>vorbis-tag</id>				\
-	    <type>tagger</type>				\
-	  </component>					\
-							\
+	static String	 componentSpecs = "			\
+								\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+	  <component>						\
+	    <name>Vorbis Comment Tagger</name>			\
+	    <version>1.0</version>				\
+	    <id>vorbis-tag</id>					\
+	    <type>tagger</type>					\
+	    <tagformat>						\
+	      <name>Vorbis Comment</name>			\
+	      <coverart supported=\"true\" default=\"false\"/>	\
+	      <encodings>					\
+		<encoding>UTF-8</encoding>			\
+	      </encodings>					\
+	    </tagformat>					\
+	  </component>						\
+								\
 	";
 
 	return componentSpecs;
@@ -63,6 +70,17 @@ Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &t
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderTagItem("COMMENT", info.comment, buffer);						  numItems++; }
 	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderTagItem("COMMENT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
 
+	/* Save other text info.
+	 */
+	for (Int i = 0; i < info.other.Length(); i++)
+	{
+		String	 value = info.other.GetNth(i);
+
+		if (value.StartsWith(String(INFO_CONDUCTOR).Append(":"))) { RenderTagItem("PERFORMER", value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+	}
+
+	/* Save Replay Gain info.
+	 */
 	if (currentConfig->GetIntValue("Tags", "PreserveReplayGain", True))
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
@@ -78,6 +96,8 @@ Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &t
 		}
 	}
 
+	/* Save cover art.
+	 */
 	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToVorbisComment", False))
 	{
 		/* This is an unofficial way to store cover art in Vorbis
@@ -167,6 +187,9 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 		else if (id == "COMMENT")      info.comment = value;
 		else if (id == "ORGANIZATION") info.label   = value;
 		else if (id == "ISRC")	       info.isrc    = value;
+
+		else if (id == "PERFORMER")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
+
 		else if (id.StartsWith("REPLAYGAIN"))
 		{
 			if	(id == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;

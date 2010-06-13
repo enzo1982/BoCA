@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -36,6 +36,13 @@ const String &BoCA::MP4Tag::GetComponentSpecs()
 		      <extension>mp4</extension>		\
 		      <extension>3gp</extension>		\
 		    </format>					\
+		    <tagformat>					\
+		      <name>MP4 Metadata</name>			\
+		      <coverart supported=\"true\"/>		\
+		      <encodings>				\
+			<encoding>UTF-8</encoding>		\
+		      </encodings>				\
+		    </tagformat>				\
 		  </component>					\
 								\
 		";
@@ -131,6 +138,17 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	ex_MP4TagsSetComments(mp4Tags, info.comment);
 	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				ex_MP4TagsSetComments(mp4Tags, currentConfig->GetStringValue("Tags", "DefaultComment", NIL));
 
+	/* Save other text info.
+	 */
+	for (Int i = 0; i < info.other.Length(); i++)
+	{
+		String	 value = info.other.GetNth(i);
+
+		if (value.StartsWith(String(INFO_COMPOSER).Append(":"))) ex_MP4TagsSetComposer(mp4Tags, value.Tail(value.Length() - value.Find(":") - 1));
+	}
+
+	/* Save cover art.
+	 */
 	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToMP4Metadata", True))
 	{
 		foreach (const Picture &picInfo, track.pictures)
@@ -186,14 +204,16 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 
 	char	*prevInFormat = String::SetInputFormat("UTF-8");
 
-	if	(mp4Tags->name	      != NIL) info.title   = mp4Tags->name;
-	if	(mp4Tags->artist      != NIL) info.artist  = mp4Tags->artist;
-	if	(mp4Tags->releaseDate != NIL) info.year    = String(mp4Tags->releaseDate).ToInt();
-	if	(mp4Tags->album	      != NIL) info.album   = mp4Tags->album;
-	if	(mp4Tags->comments    != NIL) info.comment = mp4Tags->comments;
+	if	(mp4Tags->name	      != NIL) info.title    = mp4Tags->name;
+	if	(mp4Tags->artist      != NIL) info.artist   = mp4Tags->artist;
+	if	(mp4Tags->releaseDate != NIL) info.year     = String(mp4Tags->releaseDate).ToInt();
+	if	(mp4Tags->album	      != NIL) info.album    = mp4Tags->album;
+	if	(mp4Tags->comments    != NIL) info.comment  = mp4Tags->comments;
 
-	if	(mp4Tags->genre	      != NIL) info.genre   = mp4Tags->genre;
-	else if (mp4Tags->genreType   != NIL) info.genre   = GetID3CategoryName(*mp4Tags->genreType - 1);
+	if	(mp4Tags->composer    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(mp4Tags->composer));
+
+	if	(mp4Tags->genre	      != NIL) info.genre    = mp4Tags->genre;
+	else if (mp4Tags->genreType   != NIL) info.genre    = GetID3CategoryName(*mp4Tags->genreType - 1);
 
 	if (mp4Tags->track != NIL)
 	{

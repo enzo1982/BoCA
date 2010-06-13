@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -25,6 +25,7 @@ const String &BoCA::WaveIn::GetComponentSpecs()
 	    <format>					\
 	      <name>Windows Wave Files</name>		\
 	      <extension>wav</extension>		\
+	      <tag mode=\"other\">RIFFMetadata</tag>	\
 	    </format>					\
 	  </component>					\
 							\
@@ -52,7 +53,8 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 	track.fileSize	= f_in->Size();
 	format.order	= BYTE_INTEL;
 
-	// Read RIFF chunk
+	/* Read RIFF chunk.
+	 */
 	if (f_in->InputString(4) != "RIFF") { errorState = True; errorString = "Unknown file type"; }
 
 	f_in->RelSeek(4);
@@ -61,9 +63,12 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	String		 chunk;
 
-	do
+	while (!errorState && chunk != "data")
 	{
-		// Read next chunk
+		if (f_in->GetPos() >= f_in->Size()) break;
+
+		/* Read next chunk.
+		 */
 		chunk = f_in->InputString(4);
 
 		Int	 cSize = f_in->InputNumber(4);
@@ -79,7 +84,8 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 
 			format.bits	= (unsigned short) f_in->InputNumber(2);
 
-			// Skip rest of chunk
+			/* Skip rest of chunk.
+			 */
 			f_in->RelSeek(cSize - 16);
 		}
 		else if (chunk == "data")
@@ -88,13 +94,26 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 		}
 		else
 		{
-			// Skip chunk
+			/* Skip chunk.
+			 */
 			f_in->RelSeek(cSize);
 		}
 	}
-	while (!errorState && chunk != "data");
 
 	delete f_in;
+
+	if (!errorState)
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->ParseStreamInfo(streamURI, track);
+
+			boca.DeleteComponent(tagger);
+		}
+	}
 
 	if (errorState)	return Error();
 	else		return Success();
@@ -119,7 +138,8 @@ Bool BoCA::WaveIn::Activate()
 
 	do
 	{
-		// Read next chunk
+		/* Read next chunk
+		 */
 		chunk = in->InputString(4);
 
 		Int	 cSize = in->InputNumber(4);

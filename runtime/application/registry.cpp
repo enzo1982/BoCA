@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -19,6 +19,7 @@
 #	include <boca/application/external/encodercomponentstdio.h>
 #endif
 
+#include <boca/application/deviceinfocomponent.h>
 #include <boca/application/dspcomponent.h>
 #include <boca/application/extensioncomponent.h>
 #include <boca/application/outputcomponent.h>
@@ -134,6 +135,11 @@ const Array<BoCA::AS::FileFormat *> &BoCA::AS::Registry::GetComponentFormats(Int
 	return componentSpecs.GetNth(n)->formats;
 }
 
+const Array<BoCA::AS::TagFormat *> &BoCA::AS::Registry::GetComponentTagFormats(Int n)
+{
+	return componentSpecs.GetNth(n)->tag_formats;
+}
+
 Bool BoCA::AS::Registry::ComponentExists(const String &id)
 {
 	for (Int i = 0; i < componentSpecs.Length(); i++)
@@ -168,6 +174,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 				else if (specs->mode == EXTERNAL_STDIO)	return new EncoderComponentExternalStdIO(specs);
 #endif
 				break;
+			case COMPONENT_TYPE_DEVICEINFO:
+				return new DeviceInfoComponent(specs);
 			case COMPONENT_TYPE_DSP:
 				return new DSPComponent(specs);
 			case COMPONENT_TYPE_EXTENSION:

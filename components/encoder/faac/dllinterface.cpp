@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,9 +32,14 @@ DynamicLoader *mp4v2dll	= NIL;
 
 Bool LoadFAACDLL()
 {
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
-	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) faacdll = new DynamicLoader("codecs/FAAC-OpenMP");
-	else						 faacdll = new DynamicLoader("codecs/FAAC");
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
+	{
+		faacdll = new DynamicLoader("codecs/FAAC-OpenMP");
+
+		if (faacdll->GetSystemModuleHandle() == NIL) FreeFAACDLL();
+	}
+
+	if (faacdll == NIL) faacdll = new DynamicLoader("codecs/FAAC");
 
 	ex_faacEncOpen				= (FAACENCOPEN) faacdll->GetFunctionAddress("faacEncOpen");
 	ex_faacEncGetCurrentConfiguration	= (FAACENCGETCURRENTCONFIGURATION) faacdll->GetFunctionAddress("faacEncGetCurrentConfiguration");

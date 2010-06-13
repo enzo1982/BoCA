@@ -2,7 +2,7 @@
 
 <!ENTITY % BoCA.Version "-//DTD BoCA 1.0 Draft//EN">
 
-<!ELEMENT component (name, version, id, type, format*, external?)>
+<!ELEMENT component (name, version, id, type, format*, tagformat*, external?)>
 
 	<!ELEMENT name (#PCDATA)>
 
@@ -18,6 +18,19 @@
 
 		<!ELEMENT tag (#PCDATA)>
 		<!ATTLIST tag mode CDATA #REQUIRED>
+
+	<!ELEMENT tagformat (name, coverart?, encodings?)>
+	<!ATTLIST tagformat default NMTOKEN #IMPLIED>
+
+		<!ELEMENT coverart (#PCDATA)>
+		<!ATTLIST coverart supported NMTOKEN #IMPLIED
+				   default   NMTOKEN #IMPLIED>
+
+		<!ELEMENT encodings (encoding*)>
+		<!ATTLIST encodings free NMTOKEN #IMPLIED>
+
+			<!ELEMENT encoding (#PCDATA)>
+			<!ATTLIST encoding default NMTOKEN #IMPLIED>
 
 	<!ELEMENT external (command, arguments, mode, (informat?, outformat?), parameters?)>
 

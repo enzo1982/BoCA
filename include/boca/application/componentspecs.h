@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -41,6 +41,42 @@ namespace BoCA
 
 				Int			 GetTagMode()				{ return tagMode; }
 				Void			 SetTagMode(Int nTagMode)		{ tagMode = nTagMode; }
+		};
+
+		class BOCA_DLL_EXPORT TagFormat
+		{
+			private:
+				String			 name;
+				Bool			 defaultEnabled;
+
+				Bool			 supportsCoverArt;
+				Bool			 coverArtDefault;
+
+				Bool			 supportsFreeEncoding;
+
+				Array<String>		 encodings;
+				String			 defaultEncoding;
+			public:
+				const String		&GetName()				{ return name; }
+				Void			 SetName(const String &nName)		{ name = nName; }
+
+				Bool			 IsDefault()				{ return defaultEnabled; }
+				Void			 SetDefault(Bool nDefault)		{ defaultEnabled = nDefault; }
+
+				Bool			 IsCoverArtSupported()			{ return supportsCoverArt; }
+				Void			 SetCoverArtSupported(Bool nCoverArt)	{ supportsCoverArt = nCoverArt; }
+
+				Bool			 IsCoverArtDefault()			{ return coverArtDefault; }
+				Void			 SetCoverArtDefault(Bool nCoverArt)	{ coverArtDefault = nCoverArt; }
+				
+				Bool			 IsFreeEncodingSupported()		{ return supportsFreeEncoding; }
+				Void			 SetFreeEncodingSupported(Bool nAnyEnc)	{ supportsFreeEncoding = nAnyEnc; }
+
+				const Array<String>	&GetEncodings()				{ return encodings; }
+				Void			 AddEncoding(const String &nEnc)	{ encodings.Add(nEnc); }
+
+				const String		&GetDefaultEncoding()			{ return defaultEncoding; }
+				Void			 SetDefaultEncoding(const String &nDE)	{ defaultEncoding = nDE; }
 		};
 
 		class BOCA_DLL_EXPORT Option
@@ -125,6 +161,7 @@ namespace BoCA
 				Array<Parameter *>	 external_parameters;
 
 				Array<FileFormat *>	 formats;
+				Array<TagFormat *>	 tag_formats;
 
 							 ComponentSpecs();
 							~ComponentSpecs();
@@ -185,6 +222,15 @@ namespace BoCA
 
 				void			*(*func_GetMainTabLayer)(void *);
 				void			*(*func_GetStatusBarLayer)(void *);
+
+				int			 (*func_GetNumberOfDevices)(void *);
+				const void		*(*func_GetNthDeviceInfo)(void *, int);
+
+				bool			 (*func_OpenNthDeviceTray)(void *, int);
+				bool			 (*func_CloseNthDeviceTray)(void *, int);
+
+				const void		*(*func_GetNthDeviceTrackList)(void *, int);
+				const void		*(*func_GetNthDeviceMCDI)(void *, int);
 		};
 	};
 
@@ -203,6 +249,7 @@ namespace BoCA
 	const Int	 COMPONENT_TYPE_EXTENSION	= 4;
 	const Int	 COMPONENT_TYPE_DSP		= 5;
 	const Int	 COMPONENT_TYPE_OUTPUT		= 6;
+	const Int	 COMPONENT_TYPE_DEVICEINFO	= 7;
 
 	const Int	 INTERNAL			= 0;
 	const Int	 EXTERNAL_FILE			= 1;

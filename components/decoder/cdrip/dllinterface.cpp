@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,6 +12,7 @@
 
 CR_INIT				 ex_CR_Init			= NIL;
 CR_DEINIT			 ex_CR_DeInit			= NIL;
+CR_ISINITIALIZED		 ex_CR_IsInitialized		= NIL;
 CR_READTOC			 ex_CR_ReadToc			= NIL;
 CR_GETNUMTOCENTRIES		 ex_CR_GetNumTocEntries		= NIL;
 CR_GETTOCENTRY			 ex_CR_GetTocEntry		= NIL;
@@ -34,6 +35,7 @@ Bool LoadCDRipDLL()
 
 	ex_CR_Init			= (CR_INIT) cdripdll->GetFunctionAddress("CR_Init");
 	ex_CR_DeInit			= (CR_DEINIT) cdripdll->GetFunctionAddress("CR_DeInit");
+	ex_CR_IsInitialized		= (CR_ISINITIALIZED) cdripdll->GetFunctionAddress("CR_IsInitialized");
 	ex_CR_ReadToc			= (CR_READTOC) cdripdll->GetFunctionAddress("CR_ReadToc");
 	ex_CR_GetNumTocEntries		= (CR_GETNUMTOCENTRIES) cdripdll->GetFunctionAddress("CR_GetNumTocEntries");
 	ex_CR_GetTocEntry		= (CR_GETTOCENTRY) cdripdll->GetFunctionAddress("CR_GetTocEntry");
@@ -50,6 +52,7 @@ Bool LoadCDRipDLL()
 
 	if (ex_CR_Init				== NIL ||
 	    ex_CR_DeInit			== NIL ||
+	    ex_CR_IsInitialized			== NIL ||
 	    ex_CR_ReadToc			== NIL ||
 	    ex_CR_GetNumTocEntries		== NIL ||
 	    ex_CR_GetTocEntry			== NIL ||

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -168,8 +168,6 @@ Bool BoCA::WMAOut::Deactivate()
 
 	HRESULT	 hr = S_OK;
 
-	hr = m_pWriter->Flush();
-
 	hr = m_pWriter->EndWriting();
 
 	hr = m_pWriterAdvanced->RemoveSink(m_pWriterFileSink);
@@ -193,7 +191,7 @@ Bool BoCA::WMAOut::Deactivate()
 		if (info.artist != NIL || info.title != NIL)
 		{
 			AS::Registry		&boca = AS::Registry::Get();
-			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("wma-tag");
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("wma-tag");
 
 			if (tagger != NIL)
 			{

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,6 +21,7 @@ using namespace smooth;
 # include "boca/component/component.h"
 # include "boca/component/decodercomponent.h"
 # include "boca/component/encodercomponent.h"
+# include "boca/component/deviceinfocomponent.h"
 # include "boca/component/dspcomponent.h"
 # include "boca/component/extensioncomponent.h"
 # include "boca/component/outputcomponent.h"
@@ -33,6 +34,7 @@ using namespace smooth;
 #include "boca/application/componentspecs.h"
 #include "boca/application/decodercomponent.h"
 #include "boca/application/encodercomponent.h"
+#include "boca/application/deviceinfocomponent.h"
 #include "boca/application/dspcomponent.h"
 #include "boca/application/extensioncomponent.h"
 #include "boca/application/outputcomponent.h"
@@ -45,7 +47,9 @@ using namespace smooth;
 #include "boca/common/protocol.h"
 #include "boca/common/utilities.h"
 
-#include "boca/common/track/track.h"
+#include "boca/common/metadata/device.h"
+#include "boca/common/metadata/mcdi.h"
+#include "boca/common/metadata/track.h"
 
 #include "boca/common/communication/joblist.h"
 #include "boca/common/communication/menu.h"
@@ -74,6 +78,7 @@ using namespace smooth;
 #define BoCA_DEFINE_ENCODER_COMPONENT(componentName)											 																	\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
+																																		\
 		BOCA_EXPORT char *BoCA_##componentName##_GetOutputFileExtension(void *component)					{ return ((BoCA::componentName *) component)->GetOutputFileExtension(); }								\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
@@ -82,6 +87,18 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
 		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)						{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
+	}
+
+#define BoCA_DEFINE_DEVICEINFO_COMPONENT(componentName)											 																	\
+	extern "C" {																																\
+		BOCA_EXPORT int BoCA_##componentName##_GetNumberOfDevices(void *component)						{ return ((BoCA::componentName *) component)->GetNumberOfDevices(); }									\
+		BOCA_EXPORT const void *BoCA_##componentName##_GetNthDeviceInfo(void *component, int n)					{ return &((BoCA::componentName *) component)->GetNthDeviceInfo(n); }									\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_OpenNthDeviceTray(void *component, int n)					{ return ((BoCA::componentName *) component)->OpenNthDeviceTray(n); }									\
+		BOCA_EXPORT bool BoCA_##componentName##_CloseNthDeviceTray(void *component, int n)					{ return ((BoCA::componentName *) component)->CloseNthDeviceTray(n); }									\
+																																		\
+		BOCA_EXPORT const void *BoCA_##componentName##_GetNthDeviceTrackList(void *component, int n)				{ return &((BoCA::componentName *) component)->GetNthDeviceTrackList(n); }								\
+		BOCA_EXPORT const void *BoCA_##componentName##_GetNthDeviceMCDI(void *component, int n)					{ return &((BoCA::componentName *) component)->GetNthDeviceMCDI(n); }									\
 	}
 
 #define BoCA_DEFINE_DSP_COMPONENT(componentName)											 																	\

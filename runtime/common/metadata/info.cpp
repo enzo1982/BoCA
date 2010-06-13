@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -8,9 +8,9 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca/common/track/info.h>
+#include <boca/common/metadata/info.h>
 
-BoCA::Info::Info()
+BoCA::Info::Info() : mcdi(Buffer<UnsignedByte>())
 {
 	year		= -1;
 
@@ -21,7 +21,7 @@ BoCA::Info::Info()
 	numDiscs	= -1;
 }
 
-BoCA::Info::Info(const Info &oInfo)
+BoCA::Info::Info(const Info &oInfo) : mcdi(Buffer<UnsignedByte>())
 {
 	*this = oInfo;
 }
@@ -55,10 +55,7 @@ BoCA::Info &BoCA::Info::operator =(const Info &oInfo)
 	album_gain	= oInfo.album_gain;
 	album_peak	= oInfo.album_peak;
 
-	mcdi.Resize(oInfo.mcdi.Size());
-
-	memcpy(mcdi, oInfo.mcdi, mcdi.Size());
-
+	mcdi		= oInfo.mcdi;
 	offsets		= oInfo.offsets;
 
 	other.RemoveAll();

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -347,6 +347,16 @@ Void BoCA::ChooserFiles::OnSaveAll()
 	if (modified.Length() == 0) btn_saveall->Deactivate();
 }
 
+/* Called when the currently selected entry needs to be selected again.
+ * ----
+ */
+Void BoCA::ChooserFiles::ReselectEntry()
+{
+	if (list_files->GetSelectedEntry() == NIL) return;
+
+	OnSelectFile(list_files->GetSelectedEntry());
+}
+
 Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 {
 	Config	*config = Config::Get();
@@ -376,9 +386,10 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 		else if (tagType == "MP4Metadata"  && config->GetIntValue("Tags", "EnableMP4Metadata", True))  taggerID = "mp4-tag";
 		else if (tagType == "FLACMetadata" && config->GetIntValue("Tags", "EnableFLACMetadata", True)) taggerID = "flac-tag";
 		else if (tagType == "WMAMetadata"  && config->GetIntValue("Tags", "EnableWMAMetadata", True))  taggerID = "wma-tag";
+		else if (tagType == "RIFFMetadata" && config->GetIntValue("Tags", "EnableRIFFMetadata", True)) taggerID = "riff-tag";
 
 		Registry	&boca = AS::Registry::Get();
-		TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID(taggerID);
+		TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
 
 		if (tagger != NIL)
 		{

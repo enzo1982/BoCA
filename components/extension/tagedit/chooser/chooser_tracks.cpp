@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -62,7 +62,7 @@ Void BoCA::ChooserTracks::OnSelectTrack()
 {
 	const Track	&track = tracks.GetNth(list_tracks->GetSelectedEntryNumber());
 
-	onSelectTrack.Emit(track);
+	if (IsActiveChooser()) onSelectTrack.Emit(track);
 
 	JobList::Get()->onComponentSelectTrack.Emit(track);
 }
@@ -90,25 +90,25 @@ Void BoCA::ChooserTracks::OnApplicationAddTrack(const Track &track)
  */
 Void BoCA::ChooserTracks::OnApplicationModifyTrack(const Track &track)
 {
-	const Info	&info = track.GetInfo();
-	String		 jlEntry;
-
-	if (info.artist == NIL && info.title == NIL) jlEntry = String(track.origFilename).Append("\t");
-	else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
-
-	jlEntry.Append(info.track > 0 ? (info.track < 10 ? String("0").Append(String::FromInt(info.track)) : String::FromInt(info.track)) : String("")).Append("\t").Append(track.lengthString).Append("\t").Append(track.fileSizeString);
-
 	for (Int i = 0; i < list_tracks->Length(); i++)
 	{
 		if (tracks.Get(list_tracks->GetNthEntry(i)->GetHandle()).GetTrackID() == track.GetTrackID())
 		{
+			const Info	&info = track.GetInfo();
+			String		 jlEntry;
+
+			if (info.artist == NIL && info.title == NIL) jlEntry = String(track.origFilename).Append("\t");
+			else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
+
+			jlEntry.Append(info.track > 0 ? (info.track < 10 ? String("0").Append(String::FromInt(info.track)) : String::FromInt(info.track)) : String("")).Append("\t").Append(track.lengthString).Append("\t").Append(track.fileSizeString);
+
 			list_tracks->GetNthEntry(i)->SetText(jlEntry);
 
 			tracks.GetReference(list_tracks->GetNthEntry(i)->GetHandle()) = track;
 
 			/* Emit onSelectTrack to let edit layer update its input fields.
 			 */
-			if (list_tracks->GetSelectedEntryNumber() == i) onSelectTrack.Emit(track);
+			if (IsActiveChooser() && list_tracks->GetSelectedEntryNumber() == i) onSelectTrack.Emit(track);
 
 			break;
 		}
@@ -133,7 +133,7 @@ Void BoCA::ChooserTracks::OnApplicationRemoveTrack(const Track &track)
 		}
 	}
 
-	if (list_tracks->GetSelectedEntry() == NIL || list_tracks->Length() == 0) onSelectNone.Emit();
+	if (IsActiveChooser() && (list_tracks->GetSelectedEntry() == NIL || list_tracks->Length() == 0)) onSelectNone.Emit();
 }
 
 /* Called when a track is selected in the application joblist.
@@ -163,5 +163,15 @@ Void BoCA::ChooserTracks::OnApplicationRemoveAllTracks()
 
 	list_tracks->RemoveAllEntries();
 
-	onSelectNone.Emit();
+	if (IsActiveChooser()) onSelectNone.Emit();
+}
+
+/* Called when the currently selected entry needs to be selected again.
+ * ----
+ */
+Void BoCA::ChooserTracks::ReselectEntry()
+{
+	if (list_tracks->GetSelectedEntry() == NIL) return;
+
+	OnSelectTrack();
 }

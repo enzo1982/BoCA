@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -159,7 +159,10 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (!FAILED(hr) && pbValue != NIL)
 		{
-			track.length = *(QWORD *) pbValue * track.GetFormat().rate * track.GetFormat().channels / 10000000;
+			/* Set approxLength, because WMA duration is not always 100% accurate.
+			 */
+			track.length = -1;
+			track.approxLength = *(QWORD *) pbValue * track.GetFormat().rate * track.GetFormat().channels / 10000000;
 
 			delete [] pbValue;
 		}
@@ -180,7 +183,7 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 	if (!errorState)
 	{
 		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("wma-tag");
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("wma-tag");
 
 		if (tagger != NIL)
 		{
@@ -323,6 +326,10 @@ Int BoCA::WMAIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	samplesBuffer.Resize(0);
 
 	samplesBufferMutex.Release();
+
+	/* Update inBytes to indicate progress.
+	 */
+	inBytes += track.fileSize * data.Size() / (track.approxLength * (track.GetFormat().bits / 8));
 
 	return data.Size();
 }

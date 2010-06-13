@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,6 +29,13 @@ const String &BoCA::APETag::GetComponentSpecs()
 	      <extension>ape</extension>		\
 	      <extension>mac</extension>		\
 	    </format>					\
+	    <tagformat>					\
+	      <name>APEv2</name>			\
+	      <coverart supported=\"true\"/>		\
+	      <encodings>				\
+		<encoding>UTF-8</encoding>		\
+	      </encodings>				\
+	    </tagformat>				\
 	  </component>					\
 							\
 	";
@@ -84,6 +91,20 @@ Error BoCA::APETag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &trac
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderAPEItem("Comment", info.comment, buffer);						  numItems++; }
 	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderAPEItem("Comment", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
 
+	/* Save other text info.
+	 */
+	for (Int i = 0; i < info.other.Length(); i++)
+	{
+		String	 value = info.other.GetNth(i);
+
+		if	(value.StartsWith(String(INFO_SUBTITLE).Append(":")))  { RenderAPEItem("Subtitle",  value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+
+		else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":"))) { RenderAPEItem("Conductor", value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))  { RenderAPEItem("Composer",  value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+	}
+
+	/* Save Replay Gain info.
+	 */
 	if (currentConfig->GetIntValue("Tags", "PreserveReplayGain", True))
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
@@ -99,6 +120,8 @@ Error BoCA::APETag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &trac
 		}
 	}
 
+	/* Save cover art.
+	 */
 	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToAPEv2", True))
 	{
 		foreach (const Picture &picInfo, track.pictures)
@@ -240,6 +263,12 @@ Error BoCA::APETag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track
 		else if (id == "COMMENT")   info.comment = value;
 		else if (id == "PUBLISHER") info.label   = value;
 		else if (id == "ISRC")	    info.isrc	 = value;
+
+		else if (id == "SUBTITLE")  info.other.Add(String(INFO_SUBTITLE).Append(":").Append(value));
+
+		else if (id == "CONDUCTOR") info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
+		else if (id == "COMPOSER")  info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
+
 		else if (id == "TRACK")
 		{
 			info.track = value.ToInt();

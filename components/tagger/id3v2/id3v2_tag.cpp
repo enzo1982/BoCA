@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -22,20 +22,30 @@ const String &BoCA::ID3v2Tag::GetComponentSpecs()
 
 	if (id3dll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>ID3v2 Tagger</name>			\
-		    <version>1.0</version>			\
-		    <id>id3v2-tag</id>				\
-		    <type>tagger</type>				\
-		    <format>					\
-		      <name>MPEG 1 Audio Layer 3</name>		\
-		      <extension>mp3</extension>		\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "					\
+									\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+		  <component>						\
+		    <name>ID3v2 Tagger</name>				\
+		    <version>1.0</version>				\
+		    <id>id3v2-tag</id>					\
+		    <type>tagger</type>					\
+		    <format>						\
+		      <name>MPEG 1 Audio Layer 3</name>			\
+		      <extension>mp3</extension>			\
+		    </format>						\
+		    <tagformat>						\
+		      <name>ID3v2</name>				\
+		      <coverart supported=\"true\"/>			\
+	              <encodings free=\"true\">				\
+			<encoding>ISO-8859-1</encoding>			\
+			<encoding>UTF-8</encoding>			\
+			<encoding default=\"true\">UTF-16LE</encoding>	\
+			<encoding>UTF-16BE</encoding>			\
+		      </encodings>					\
+		    </tagformat>					\
+		  </component>						\
+									\
 		";
 	}
 
@@ -130,8 +140,11 @@ Error BoCA::ID3v2Tag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tr
 	{
 		String	 value = info.other.GetNth(i);
 
-		if	(value.StartsWith(String(INFO_BAND).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_BAND));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_PERFORMER).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_CONDUCTOR));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		if	(value.StartsWith(String(INFO_CONTENTGROUP).Append(":")))   { frames.Add(ex_ID3Frame_NewID(ID3FID_CONTENTGROUP));	SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_SUBTITLE).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_SUBTITLE));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+
+		else if	(value.StartsWith(String(INFO_BAND).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_BAND));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_CONDUCTOR));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 		else if	(value.StartsWith(String(INFO_REMIX).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_MIXARTIST));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_COMPOSER));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_LYRICIST));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
@@ -140,6 +153,12 @@ Error BoCA::ID3v2Tag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tr
 		else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))     { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGALBUM));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 		else if	(value.StartsWith(String(INFO_ORIG_LYRICIST).Append(":")))  { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGLYRICIST));	SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 		else if	(value.StartsWith(String(INFO_ORIG_YEAR).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGYEAR));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+
+		else if	(value.StartsWith(String(INFO_BPM).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_BPM));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_INITIALKEY).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_INITIALKEY));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+
+		else if	(value.StartsWith(String(INFO_RADIOSTATION).Append(":")))   { frames.Add(ex_ID3Frame_NewID(ID3FID_NETRADIOSTATION));	SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(value.StartsWith(String(INFO_RADIOOWNER).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_NETRADIOOWNER));	SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 
 		else if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWARTIST));		SetFrameURL(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1));    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 		else if	(value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")))  { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWPUBLISHER));	SetFrameURL(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1));    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
@@ -170,11 +189,11 @@ Error BoCA::ID3v2Tag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tr
 	 */
 	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
 	{
-		if (info.mcdi.Size() > 0)
+		if (info.mcdi.GetData().Size() > 0)
 		{
 			ID3Frame	*frame_mcdi = ex_ID3Frame_NewID(ID3FID_CDID);
 
-			ex_ID3Field_SetBINARY(ex_ID3Frame_GetField(frame_mcdi, ID3FN_DATA), info.mcdi, info.mcdi.Size());
+			ex_ID3Field_SetBINARY(ex_ID3Frame_GetField(frame_mcdi, ID3FN_DATA), info.mcdi.GetData(), info.mcdi.GetData().Size());
 
 			ex_ID3Tag_AddFrame(tag, frame_mcdi);
 
@@ -242,8 +261,11 @@ Error BoCA::ID3v2Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_PUBLISHER)		info.label	= GetFrameString(frame);
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_ISRC)		info.isrc	= GetFrameString(frame);
 
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_CONTENTGROUP)	info.other.Add(String(INFO_CONTENTGROUP).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_SUBTITLE)		info.other.Add(String(INFO_SUBTITLE).Append(":").Append(GetFrameString(frame)));
+
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_BAND)		info.other.Add(String(INFO_BAND).Append(":").Append(GetFrameString(frame)));
-		else if (ex_ID3Frame_GetID(frame) == ID3FID_CONDUCTOR)		info.other.Add(String(INFO_PERFORMER).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_CONDUCTOR)		info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(GetFrameString(frame)));
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_MIXARTIST)		info.other.Add(String(INFO_REMIX).Append(":").Append(GetFrameString(frame)));
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_COMPOSER)		info.other.Add(String(INFO_COMPOSER).Append(":").Append(GetFrameString(frame)));
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_LYRICIST)		info.other.Add(String(INFO_LYRICIST).Append(":").Append(GetFrameString(frame)));
@@ -252,6 +274,12 @@ Error BoCA::ID3v2Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_ORIGALBUM)		info.other.Add(String(INFO_ORIG_ALBUM).Append(":").Append(GetFrameString(frame)));
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_ORIGLYRICIST)	info.other.Add(String(INFO_ORIG_LYRICIST).Append(":").Append(GetFrameString(frame)));
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_ORIGYEAR)		info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append(GetFrameString(frame)));
+
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_BPM)		info.other.Add(String(INFO_BPM).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_INITIALKEY)		info.other.Add(String(INFO_INITIALKEY).Append(":").Append(GetFrameString(frame)));
+
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_NETRADIOSTATION)	info.other.Add(String(INFO_RADIOSTATION).Append(":").Append(GetFrameString(frame)));
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_NETRADIOOWNER)	info.other.Add(String(INFO_RADIOOWNER).Append(":").Append(GetFrameString(frame)));
 
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_WWWARTIST)		info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append(GetFrameURL(frame)));
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_WWWPUBLISHER)	info.other.Add(String(INFO_WEB_PUBLISHER).Append(":").Append(GetFrameURL(frame)));
@@ -329,9 +357,7 @@ Error BoCA::ID3v2Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 				{
 					/* Found a binary MCDI field.
 					 */
-					info.mcdi.Resize(mcdi.Size());
-
-					memcpy(info.mcdi, mcdi, mcdi.Size());
+					info.mcdi.SetData(mcdi);
 				}
 				else
 				{

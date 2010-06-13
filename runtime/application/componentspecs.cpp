@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -95,6 +95,15 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_GetMainTabLayer		= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetMainTabLayer"));
 	func_GetStatusBarLayer		= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStatusBarLayer"));
 
+	func_GetNumberOfDevices		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfDevices"));
+	func_GetNthDeviceInfo		= (const void *(*)(void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNthDeviceInfo"));
+
+	func_OpenNthDeviceTray		= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_OpenNthDeviceTray"));
+	func_CloseNthDeviceTray		= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CloseNthDeviceTray"));
+
+	func_GetNthDeviceTrackList	= (const void *(*)(void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNthDeviceTrackList"));
+	func_GetNthDeviceMCDI		= (const void *(*)(void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNthDeviceMCDI"));
+
 	return ParseXMLSpec(String(func_GetComponentSpecs()).Trim());
 }
 
@@ -177,6 +186,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			if	(node->GetContent() == "decoder")	type = COMPONENT_TYPE_DECODER;
 			else if (node->GetContent() == "encoder")	type = COMPONENT_TYPE_ENCODER;
 			else if (node->GetContent() == "output")	type = COMPONENT_TYPE_OUTPUT;
+			else if (node->GetContent() == "deviceinfo")	type = COMPONENT_TYPE_DEVICEINFO;
 			else if (node->GetContent() == "dsp")		type = COMPONENT_TYPE_DSP;
 			else if (node->GetContent() == "extension")	type = COMPONENT_TYPE_EXTENSION;
 			else if (node->GetContent() == "tagger")	type = COMPONENT_TYPE_TAGGER;
@@ -208,6 +218,54 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			}
 
 			formats.Add(format);
+		}
+		else if (node->GetName() == "tagformat")
+		{
+			TagFormat	*format = new TagFormat();
+
+			format->SetDefault(True);
+
+			format->SetCoverArtSupported(False);
+			format->SetCoverArtDefault(True);
+
+			format->SetFreeEncodingSupported(False);
+
+			if (node->GetAttributeByName("default") != NIL) format->SetDefault(node->GetAttributeByName("default")->GetContent() == "true");
+
+			for (Int j = 0; j < node->GetNOfNodes(); j++)
+			{
+				XML::Node	*node2 = node->GetNthNode(j);
+
+				if	(node2->GetName() == "name")	 format->SetName(node2->GetContent());
+				else if	(node2->GetName() == "coverart")
+				{
+					if (node2->GetAttributeByName("supported") != NIL) format->SetCoverArtSupported(node2->GetAttributeByName("supported")->GetContent() == "true");
+					if (node2->GetAttributeByName("default")   != NIL) format->SetCoverArtDefault(node2->GetAttributeByName("default")->GetContent() == "true");
+				}
+				else if (node2->GetName() == "encodings")
+				{
+					if (node2->GetAttributeByName("free") != NIL) format->SetFreeEncodingSupported(node2->GetAttributeByName("free")->GetContent() == "true");
+
+					for (Int k = 0; k < node2->GetNOfNodes(); k++)
+					{
+						XML::Node	*node3 = node2->GetNthNode(k);
+						
+						if (node3->GetName() == "encoding")
+						{
+							format->AddEncoding(node3->GetContent());
+
+							if (format->GetEncodings().Length() == 1) format->SetDefaultEncoding(node3->GetContent());
+
+							if (node3->GetAttributeByName("default") != NIL)
+							{
+								if (node3->GetAttributeByName("default")->GetContent() == "true") format->SetDefaultEncoding(node3->GetContent());
+							}
+						}
+					}
+				}
+			}
+
+			tag_formats.Add(format);
 		}
 		else if (node->GetName() == "external")
 		{

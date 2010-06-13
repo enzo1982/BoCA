@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -51,9 +51,14 @@ DynamicLoader *flacdll	= NIL;
 
 Bool LoadFLACDLL()
 {
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
-	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) flacdll = new DynamicLoader("codecs/FLAC-OpenMP");
-	else						 flacdll = new DynamicLoader("codecs/FLAC");
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
+	{
+		flacdll = new DynamicLoader("codecs/FLAC-OpenMP");
+
+		if (flacdll->GetSystemModuleHandle() == NIL) FreeFLACDLL();
+	}
+
+	if (flacdll == NIL) flacdll = new DynamicLoader("codecs/FLAC");
 
 	ex_FLAC__stream_decoder_new				= (FLAC__STREAM_DECODER_NEW) flacdll->GetFunctionAddress("FLAC__stream_decoder_new");
 	ex_FLAC__stream_decoder_delete				= (FLAC__STREAM_DECODER_DELETE) flacdll->GetFunctionAddress("FLAC__stream_decoder_delete");

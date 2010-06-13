@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -33,6 +33,7 @@ const String &BoCA::SndFileIn::GetComponentSpecs()
 		    <format>					\
 		      <name>Windows Wave Files</name>		\
 		      <extension>wav</extension>		\
+		      <tag mode=\"other\">RIFFMetadata</tag>	\
 		    </format>					\
 		    <format>					\
 		      <name>Apple Audio Files</name>		\
@@ -175,6 +176,19 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 	if (sndf == NIL) { errorState = True; errorString = "Unsupported audio format"; }
 
 	fclose(file);
+
+	if (!errorState)
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->ParseStreamInfo(streamURI, track);
+
+			boca.DeleteComponent(tagger);
+		}
+	}
 
 	if (errorState)	return Error();
 	else		return Success();

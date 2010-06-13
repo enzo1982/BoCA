@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,21 +27,26 @@ namespace smooth
 	{
 		class SMOOTHAPI TabWidget : public Widget
 		{
+			protected:
+				const Widget			*selectedTab;
 			public:
-				static const Int	 classID;
+				static const Int		 classID;
 
-							 TabWidget(const Point &, const Size &);
-				virtual			~TabWidget();
+								 TabWidget(const Point &, const Size &);
+				virtual				~TabWidget();
 
-				virtual Int		 Paint(Int);
-				virtual Int		 Process(Int, Int, Int);
+				virtual Int			 Paint(Int);
+				virtual Int			 Process(Int, Int, Int);
 
-				virtual Int		 Add(Widget *);
-				virtual Int		 Remove(Widget *);
+				virtual Int			 Add(Widget *);
+				virtual Int			 Remove(Widget *);
 
-				Int			 SelectTab(Int);
+				Int				 SelectTab(const Widget *);
+				const Widget			*GetSelectedTab();
+			signals:
+				Signal1<Void, const Widget *>	 onSelectTab;
 			slots:
-				Void			 OnChangeSize(const Size &);
+				Void				 OnChangeSize(const Size &);
 		};
 	};
 };

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -61,7 +61,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		else if (tagType == "MP4Metadata")	taggerID = "mp4-tag";
 
 		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID(taggerID);
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
 
 		if (tagger != NIL)
 		{
@@ -85,7 +85,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	execInfo.cbSize		= sizeof(execInfo);
 	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	execInfo.lpVerb		= "open";
-	execInfo.lpFile		= specs->external_command;
+	execInfo.lpFile		= String(specs->external_command).Replace("/", "\\");
 
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.

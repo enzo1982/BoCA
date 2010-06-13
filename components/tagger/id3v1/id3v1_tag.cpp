@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,20 +16,30 @@ using namespace smooth::IO;
 
 const String &BoCA::ID3v1Tag::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>ID3v1 Tagger</name>			\
-	    <version>1.0</version>			\
-	    <id>id3v1-tag</id>				\
-	    <type>tagger</type>				\
-	    <format>					\
-	      <name>MPEG 1 Audio Layer 3</name>		\
-	      <extension>mp3</extension>		\
-	    </format>					\
-	  </component>					\
-							\
+	static String	 componentSpecs = "				\
+									\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+	  <component>							\
+	    <name>ID3v1 Tagger</name>					\
+	    <version>1.0</version>					\
+	    <id>id3v1-tag</id>						\
+	    <type>tagger</type>						\
+	    <format>							\
+	      <name>MPEG 1 Audio Layer 3</name>				\
+	      <extension>mp3</extension>				\
+	    </format>							\
+	    <tagformat default=\"false\">				\
+	      <name>ID3v1</name>					\
+              <encodings free=\"true\">					\
+		<encoding default=\"true\">ISO-8859-1</encoding>	\
+		<encoding>ISO-8859-2</encoding>				\
+		<encoding>ISO-8859-5</encoding>				\
+		<encoding>ISO-8859-7</encoding>				\
+		<encoding>CP1251</encoding>				\
+	      </encodings>						\
+	    </tagformat>						\
+	  </component>							\
+									\
 	";
 
 	return componentSpecs;

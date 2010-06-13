@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -34,6 +34,13 @@ const String &BoCA::FLACTag::GetComponentSpecs()
 		      <name>FLAC Audio Files</name>		\
 		      <extension>flac</extension>		\
 		    </format>					\
+		    <tagformat>					\
+		      <name>FLAC Metadata</name>		\
+		      <coverart supported=\"true\"/>		\
+		      <encodings>				\
+			<encoding>UTF-8</encoding>		\
+		      </encodings>				\
+		    </tagformat>				\
 		  </component>					\
 								\
 		";
@@ -108,7 +115,7 @@ Error BoCA::FLACTag::UpdateStreamInfo(const String &streamURI, const Track &trac
 		if (writeVorbisCoverArt) config->SetIntValue("Tags", "CoverArtWriteToVorbisComment", False);
 
 		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) AS::Registry::Get().CreateComponentByID("vorbis-tag");
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("vorbis-tag");
 
 		if (tagger != NIL)
 		{

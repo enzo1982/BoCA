@@ -181,7 +181,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	Add(group_options);
 	Add(group_complexity);
 
-	SetSize(Size(380, 243));
+	SetSize(Size(380, 242));
 }
 
 BoCA::ConfigureSpeex::~ConfigureSpeex()

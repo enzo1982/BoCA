@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -23,11 +23,9 @@
 BoCA::LayerTags::LayerTags() : Layer("Tags")
 {
 	tab_mode	= new TabWidget(Point(7, 7), Size(100, 150));
+	tab_mode->onSelectTab.Connect(&LayerTags::OnSelectTab, this);
 
 	choosers.Add(new ChooserTracks());
-
-/* ToDo: Add album chooser once it's ready.
- */
 	choosers.Add(new ChooserAlbums());
 	choosers.Add(new ChooserFiles());
 
@@ -56,6 +54,7 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 		editor->onModifyTrack.Connect(&LayerTags::OnModifyTrack, this);
 
 		onSelectTrack.Connect(&Editor::OnSelectTrack, editor);
+		onSelectAlbum.Connect(&Editor::OnSelectAlbum, editor);
 		onSelectNone.Connect(&Editor::OnSelectNone, editor);
 
 		tab_editor->Add(editor);
@@ -89,16 +88,27 @@ Void BoCA::LayerTags::OnChangeSize(const Size &nSize)
 	tab_editor->SetWidth(clientSize.cx - 15);
 }
 
+/* Called when a different chooser tab is selected.
+ * ----
+ * Finds the correct chooser and reselects the correct entry.
+ */
+Void BoCA::LayerTags::OnSelectTab(const Widget *widget)
+{
+	onSelectNone.Emit();
+
+	foreach (Chooser *chooser, choosers)
+	{
+		if (chooser == widget) chooser->ReselectEntry();
+	}
+}
+
 /* Called when a list entry is modified.
  * ----
- * Finds the corresponding track and updates it accordingly.
+ * Passes the track on to the active chooser.
  */
 Void BoCA::LayerTags::OnModifyTrack(const Track &track)
 {
 	JobList::Get()->onComponentModifyTrack.Emit(track);
 
-	foreach (Chooser *chooser, choosers)
-	{
-		chooser->OnModifyTrack(track);
-	}
+	((Chooser *) tab_mode->GetSelectedTab())->OnModifyTrack(track);
 }

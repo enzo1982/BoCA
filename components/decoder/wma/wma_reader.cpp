@@ -122,6 +122,8 @@ HRESULT BoCA::WMAReader::OnStatus(WMT_STATUS status, HRESULT hr, WMT_ATTR_DATATY
 			break;
 
 		case WMT_EOF:
+			active = False;
+
 			m_fEOF = true;
 
 			break;

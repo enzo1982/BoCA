@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -91,9 +91,14 @@ Void FreeOggDLL()
 
 Bool LoadVorbisDLL()
 {
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) &&
-	    CPU().GetNumCores() >= 2 && CPU().HasSSE3()) vorbisdll = new DynamicLoader("codecs/Vorbis-OpenMP");
-	else						 vorbisdll = new DynamicLoader("codecs/Vorbis");
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
+	{
+		vorbisdll = new DynamicLoader("codecs/Vorbis-OpenMP");
+
+		if (vorbisdll->GetSystemModuleHandle() == NIL) FreeVorbisDLL();
+	}
+
+	if (vorbisdll == NIL) vorbisdll = new DynamicLoader("codecs/Vorbis");
 
 	ex_vorbis_info_init		= (VORBISINFOINIT) vorbisdll->GetFunctionAddress("vorbis_info_init");
 	ex_vorbis_comment_init		= (VORBISCOMMENTINIT) vorbisdll->GetFunctionAddress("vorbis_comment_init");

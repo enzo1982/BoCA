@@ -47,15 +47,9 @@ Int BoCA::CDPlayerIni::ReadCDInfo()
 
 	String	 discIDString = DiscIDToString(discID);
 
-	for (Int j = 0; j < discIDString.Length(); j++)
-	{
-		if (discIDString[0] == '0')
-		{
-			for (Int k = 0; k < 7 - j; k++) discIDString[k] = discIDString[k + 1];
-
-			discIDString[7 - j] = 0;
-		}
-	}
+	/* Strip leading zeroes.
+	 */
+	while (discIDString.StartsWith("0")) discIDString = discIDString.Tail(discIDString.Length() - 1);
 
 	/* Open cdplayer.ini
 	 */

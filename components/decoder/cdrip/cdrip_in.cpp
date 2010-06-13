@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,6 +13,7 @@
 
 #include "cdrip_in.h"
 #include "paranoia/cdda_paranoia.h"
+#include "config.h"
 #include "dllinterface.h"
 
 using namespace smooth::IO;
@@ -21,7 +22,7 @@ const String &BoCA::CDRipIn::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (cdripdll != NIL && Config::Get()->cdrip_numdrives >= 1)
+	if (cdripdll != NIL && ex_CR_GetNumCDROM() >= 1)
 	{
 		componentSpecs = "				\
 								\
@@ -43,60 +44,55 @@ const String &BoCA::CDRipIn::GetComponentSpecs()
 	return componentSpecs;
 }
 
+static Bool	 initializedCDRip = False;
+
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadCDRipDLL();
 
 	if (cdripdll == NIL) return;
 
-	BoCA::Config	*config = BoCA::Config::Get();
-
-	Long		 error = CDEX_OK;
-	OSVERSIONINFOA	 vInfo;
-
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-	GetVersionExA(&vInfo);
-
-	if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->SetIntValue("CDRip", "UseNTSCSI", False);
-
-	error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
-
-	if (error != CDEX_OK		 && 
-	    error != CDEX_ACCESSDENIED	 &&
-	    vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
+	if (!ex_CR_IsInitialized())
 	{
-		config->SetIntValue("CDRip", "UseNTSCSI", !config->GetIntValue("CDRip", "UseNTSCSI", True));
+		BoCA::Config	*config = BoCA::Config::Get();
+
+		Long		 error = CDEX_OK;
+		OSVERSIONINFOA	 vInfo;
+
+		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+		GetVersionExA(&vInfo);
+
+		if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->SetIntValue("CDRip", "UseNTSCSI", False);
 
 		error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
-	}
 
-	if	(error == CDEX_ACCESSDENIED)	BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
-	else if (error != CDEX_OK &&
-		 error != CDEX_NOCDROMDEVICES)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
-
-	if (error == CDEX_OK)
-	{
-		config->cdrip_numdrives = ex_CR_GetNumCDROM();
-
-		for (int i = 0; i < config->cdrip_numdrives; i++)
+		if (error != CDEX_OK		 && 
+		    error != CDEX_ACCESSDENIED	 &&
+		    vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
 		{
-			ex_CR_SetActiveCDROM(i);
+			config->SetIntValue("CDRip", "UseNTSCSI", !config->GetIntValue("CDRip", "UseNTSCSI", True));
 
-			CDROMPARAMS	 params;
-
-			ex_CR_GetCDROMParameters(&params);
-
-			config->cdrip_drives.Add(params.lpszCDROMID);
+			error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
 		}
 
+		if	(error == CDEX_ACCESSDENIED)	BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
+		else if (error != CDEX_OK &&
+			 error != CDEX_NOCDROMDEVICES)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
+
+		if (error == CDEX_OK) config->cdrip_numdrives = ex_CR_GetNumCDROM();
+
 		if (config->cdrip_numdrives <= config->cdrip_activedrive) config->cdrip_activedrive = 0;
+
+		initializedCDRip = True;
 	}
 }
 
 Void smooth::DetachDLL()
 {
-	if (cdripdll != NIL) ex_CR_DeInit();
+	if (cdripdll == NIL) return;
+
+	if (initializedCDRip) ex_CR_DeInit();
 
 	FreeCDRipDLL();
 }
@@ -117,6 +113,11 @@ Bool BoCA::CDRipIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 {
+	AS::Registry		&boca = AS::Registry::Get();
+	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdrip-info");
+
+	if (component == NIL) return Error();
+
 	Config	*config = Config::Get();
 
 	Format	&format = track.GetFormat();
@@ -131,7 +132,6 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Int	 trackNumber = 0;
 	Int	 trackLength = 0;
-	Int	 numAudioTracks = 0;
 	Int	 audiodrive = 0;
 
 	if (streamURI.StartsWith("cdda://"))
@@ -141,34 +141,34 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 	}
 	else if (streamURI.EndsWith(".cda"))
 	{
-		InStream	*in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
-
-		in->Seek(22);
-
-		trackNumber = in->InputNumber(2);
-
-		in->Seek(32);
-
-		trackLength = in->InputNumber(4);
-
-		delete in;
-
-		for (audiodrive = 0; audiodrive < config->cdrip_numdrives; audiodrive++)
+		/* Find track number and length.
+		 */
 		{
-			Bool	 done = False;
+			InStream	*in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
 
-			ex_CR_SetActiveCDROM(audiodrive);
-			ex_CR_ReadToc();
+			in->Seek(22);
 
-			Int	 numTocEntries = ex_CR_GetNumTocEntries();
+			trackNumber = in->InputNumber(2);
 
-			for (Int j = 0; j < numTocEntries; j++)
+			in->Seek(32);
+
+			trackLength = in->InputNumber(4);
+
+			delete in;
+		}
+
+		for (audiodrive = 0; audiodrive < component->GetNumberOfDevices(); audiodrive++)
+		{
+			Bool		 done = False;
+			const MCDI	&mcdi = component->GetNthDeviceMCDI(audiodrive);
+
+			for (Int i = 0; i < mcdi.GetNumberOfEntries(); i++)
 			{
-				TOCENTRY	 entry = ex_CR_GetTocEntry(j);
-				TOCENTRY	 nextentry = ex_CR_GetTocEntry(j + 1);
-				Int		 length = nextentry.dwStartSector - entry.dwStartSector;
+				if (mcdi.GetNthEntryType(i) != ENTRY_AUDIO) continue;
 
-				if (!(entry.btFlag & CDROMDATAFLAG) && entry.btTrackNumber == trackNumber && length == trackLength)
+				Int	 length = mcdi.GetNthEntryOffset(i + 1) - mcdi.GetNthEntryOffset(i);
+
+				if (length == trackLength && mcdi.GetNthEntryTrackNumber(i) == trackNumber)
 				{
 					done = True;
 
@@ -182,25 +182,26 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (trackNumber == 0) return Error();
 
-	ex_CR_SetActiveCDROM(audiodrive);
-	ex_CR_ReadToc();
+	/* Fill MCDI data.
+	 */
+	info.mcdi = component->GetNthDeviceMCDI(audiodrive);
 
-	Int	 numTocEntries = ex_CR_GetNumTocEntries();
 	Int	 entryNumber = -1;
 
-	for (Int i = 0; i < numTocEntries; i++)
+	for (Int i = 0; i < info.mcdi.GetNumberOfEntries(); i++)
 	{
-		TOCENTRY	 entry = ex_CR_GetTocEntry(i);
-		TOCENTRY	 nextentry = ex_CR_GetTocEntry(i + 1);
+		trackLength = info.mcdi.GetNthEntryOffset(i + 1) - info.mcdi.GetNthEntryOffset(i);
 
-		trackLength = nextentry.dwStartSector - entry.dwStartSector;
-
-		if ((i > 0) && (entry.btFlag != nextentry.btFlag) && (nextentry.btTrackNumber != 0xAA))
+		/* Strip 11250 sectors off of the track length if
+		 * we are the last audio track before a new session.
+		 */
+		if ((i > 0 && info.mcdi.GetNthEntryType(i) != info.mcdi.GetNthEntryType(i + 1) && info.mcdi.GetNthEntryTrackNumber(i + 1) != 0xAA) ||
+		    (i < info.mcdi.GetNumberOfEntries() - 1 && info.mcdi.GetNthEntryOffset(i + 2) - info.mcdi.GetNthEntryType(i + 1) <= 0))
 		{
 			trackLength -= 11250;
 		}
 
-		if (!(entry.btFlag & CDROMDATAFLAG) && (entry.btTrackNumber == trackNumber))
+		if (info.mcdi.GetNthEntryType(i) == ENTRY_AUDIO && info.mcdi.GetNthEntryTrackNumber(i) == trackNumber)
 		{
 			entryNumber = i;
 
@@ -210,13 +211,6 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (entryNumber == -1) return Error();
 
-	for (Int i = 0; i < numTocEntries; i++)
-	{
-		TOCENTRY	 entry = ex_CR_GetTocEntry(i);
-
-		if (!(entry.btFlag & CDROMDATAFLAG)) numAudioTracks++;
-	}
-
 	track.length	= (trackLength * 2352) / (format.bits / 8);
 	track.fileSize	= trackLength * 2352;
 
@@ -225,9 +219,13 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 	track.outfile	= NIL;
 
 	info.track	= trackNumber;
-	info.numTracks	= numAudioTracks;
+	info.numTracks	= info.mcdi.GetNumberOfAudioTracks();
 	info.disc	= 1;
 	info.numDiscs	= 1;
+
+	/* Delete DeviceInfo component.
+	 */
+	boca.DeleteComponent(component);
 
 	/* Read CDText and cdplayer.ini
 	 */
@@ -248,29 +246,6 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 			info.artist = cdPlayer.GetCDInfo().Get(0);
 			info.title  = cdPlayer.GetCDInfo().Get(trackNumber);
 			info.album  = cdPlayer.GetCDInfo().Get(100);
-		}
-	}
-
-	/* Fill MCDI data.
-	 */
-	{
-		info.mcdi.Resize(4 + 8 * numTocEntries + 8);
-
-		((short *) (UnsignedByte *) info.mcdi)[0] = htons(info.mcdi.Size() - 2);
-
-		info.mcdi[2] = 1;
-		info.mcdi[3] = numTocEntries;
-
-		for (Int i = 0; i <= numTocEntries; i++)
-		{
-			TOCENTRY	 entry = ex_CR_GetTocEntry(i);
-
-			info.mcdi[4 + 8 * i + 0] = 0;
-			info.mcdi[4 + 8 * i + 1] = entry.btFlag;
-			info.mcdi[4 + 8 * i + 2] = entry.btTrackNumber;
-			info.mcdi[4 + 8 * i + 3] = 0;
-
-			((unsigned long *) (UnsignedByte *) info.mcdi)[1 + 2 * i + 1] = htonl(entry.dwStartSector);
 		}
 	}
 
@@ -296,13 +271,15 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::CDRipIn::CDRipIn()
 {
-	packageSize	= 0;
+	configLayer	= NIL;
 
+	packageSize	= 0;
 	ripperOpen	= False;
 }
 
 BoCA::CDRipIn::~CDRipIn()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::CDRipIn::Activate()
@@ -386,7 +363,7 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 			case 2:
 				nParanoiaMode &= ~(PARANOIA_MODE_SCRATCH | PARANOIA_MODE_REPAIR);
 				break;
-		}	
+		}
  
 		ex_CR_GetCDROMParameters(&params);
 
@@ -397,8 +374,12 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 		params.bDetectJitterErrors	= config->cdrip_detectJitterErrors;
 		params.bDetectC2Errors		= config->cdrip_detectC2Errors;
 		params.nSpeed			= config->GetIntValue("CDRip", "RippingSpeed", 0);
-		params.bEnableMultiRead		= True;
-		params.nMultiReadCount		= 2;
+		params.bEnableMultiRead		= False;
+		params.nMultiReadCount		= 0;
+
+		/* Set maximum speed if no limit is requested.
+		 */
+		if (params.nSpeed == 0) params.nSpeed = 64;
 
 		ex_CR_SetCDROMParameters(&params);
 
@@ -426,7 +407,24 @@ Bool BoCA::CDRipIn::CloseRipper()
 	return True;
 }
 
-int cddb_sum(int n)
+ConfigLayer *BoCA::CDRipIn::GetConfigurationLayer()
+{
+	if (configLayer == NIL) configLayer = new ConfigureCDRip();
+
+	return configLayer;
+}
+
+Void BoCA::CDRipIn::FreeConfigurationLayer()
+{
+	if (configLayer != NIL)
+	{
+		delete configLayer;
+
+		configLayer = NIL;
+	}
+}
+
+static int cddb_sum(int n)
 {
 	int	 ret = 0;
 

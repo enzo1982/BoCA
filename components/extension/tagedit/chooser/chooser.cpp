@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -15,6 +15,18 @@ BoCA::Chooser::Chooser(const String &title) : Layer(title)
 }
 
 BoCA::Chooser::~Chooser()
+{
+}
+
+Bool BoCA::Chooser::IsActiveChooser()
+{
+	if (!IsRegistered())					   return False;
+	if (GetContainer()->GetObjectType() != TabWidget::classID) return False;
+
+	return ((TabWidget *) GetContainer())->GetSelectedTab() == this;
+}
+
+Void BoCA::Chooser::ReselectEntry()
 {
 }
 

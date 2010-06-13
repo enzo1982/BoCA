@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -31,20 +31,28 @@ namespace BoCA
 
 			ListBox		*list_albums;
 
+			Bool		 dontUpdateAlbumList;
+
 			Void		 UpdateAlbumList();
+
+			Bool		 IsAlbumIdentical(const Track &, const Track &);
 		slots:
 			Void		 OnApplicationAddTrack(const Track &);
 			Void		 OnApplicationModifyTrack(const Track &);
 			Void		 OnApplicationRemoveTrack(const Track &);
+			Void		 OnApplicationSelectTrack(const Track &);
 
 			Void		 OnApplicationRemoveAllTracks();
 
 			Void		 OnSelectAlbum();
+			Void		 OnModifyTrack(const Track &);
 
 			Void		 OnChangeSize(const Size &);
 		public:
 					 ChooserAlbums();
 					~ChooserAlbums();
+
+			Void		 ReselectEntry();
 	};
 };
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,6 +32,13 @@ const String &BoCA::WMATag::GetComponentSpecs()
 		      <name>Windows Media Audio Files</name>	\
 		      <extension>wma</extension>		\
 		    </format>					\
+		    <tagformat>					\
+		      <name>WMA Metadata</name>			\
+		      <coverart supported=\"true\"/>		\
+		      <encodings>				\
+			<encoding>UTF-16LE</encoding>		\
+		      </encodings>				\
+		    </tagformat>				\
 		  </component>					\
 								\
 		";
@@ -118,27 +125,36 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 		{
 			String	 value = info.other.GetNth(i);
 
-			if	(value.StartsWith(String(INFO_PERFORMER).Append(":")))	   RenderWMAItem(g_wszWMConductor,	     value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	   RenderWMAItem(g_wszWMComposer,	     value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   RenderWMAItem(g_wszWMWriter,		     value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			if	(value.StartsWith(String(INFO_CONTENTGROUP).Append(":")))  RenderWMAItem(g_wszWMContentGroupDescription, value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_SUBTITLE).Append(":")))	   RenderWMAItem(g_wszWMSubTitle,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
 
-			else if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))   RenderWMAItem(g_wszWMOriginalArtist,	     value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))    RenderWMAItem(g_wszWMOriginalAlbumTitle,  value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_ORIG_LYRICIST).Append(":"))) RenderWMAItem(g_wszWMOriginalLyricist,    value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_ORIG_YEAR).Append(":")))	   RenderWMAItem(g_wszWMOriginalReleaseYear, value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":")))	   RenderWMAItem(g_wszWMConductor,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	   RenderWMAItem(g_wszWMComposer,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   RenderWMAItem(g_wszWMWriter,			 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
 
-			else if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	   RenderWMAItem(g_wszWMAuthorURL,	     value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	   RenderWMAItem(g_wszWMAudioSourceURL,	     value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":"))) RenderWMAItem(g_wszWMCopyrightURL,	     value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))   RenderWMAItem(g_wszWMOriginalArtist,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))    RenderWMAItem(g_wszWMOriginalAlbumTitle,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_ORIG_LYRICIST).Append(":"))) RenderWMAItem(g_wszWMOriginalLyricist,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_ORIG_YEAR).Append(":")))	   RenderWMAItem(g_wszWMOriginalReleaseYear,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+
+			else if	(value.StartsWith(String(INFO_BPM).Append(":")))	   RenderWMAItem(g_wszWMBeatsPerMinute,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_INITIALKEY).Append(":")))	   RenderWMAItem(g_wszWMInitialKey,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+
+			else if	(value.StartsWith(String(INFO_RADIOSTATION).Append(":")))  RenderWMAItem(g_wszWMRadioStationName,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_RADIOOWNER).Append(":")))	   RenderWMAItem(g_wszWMRadioStationOwner,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+
+			else if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	   RenderWMAItem(g_wszWMAuthorURL,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	   RenderWMAItem(g_wszWMAudioSourceURL,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":"))) RenderWMAItem(g_wszWMCopyrightURL,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
 		}
 
 		/* Save CD table of contents.
 		 */
 		if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
 		{
-			if (info.mcdi.Size() > 0)
+			if (info.mcdi.GetData().Size() > 0)
 			{
-				RenderWMABinaryItem(g_wszWMMCDI, info.mcdi, pHeaderInfo);
+				RenderWMABinaryItem(g_wszWMMCDI, info.mcdi.GetData(), pHeaderInfo);
 			}
 		}
 
@@ -238,27 +254,36 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 
 			hr = pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, NIL, NIL, pbValue, &cbLength);
 
-			if	(String(name) == g_wszWMAuthor)			info.artist  = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMTitle)			info.title   = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMAlbumTitle)		info.album   = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMYear)			info.year    = String((LPWSTR) pbValue).ToInt();
-			else if (String(name) == g_wszWMGenre)			info.genre   = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMDescription)		info.comment = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMPublisher)		info.label   = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMISRC)			info.isrc    = (LPWSTR) pbValue;
+			if	(String(name) == g_wszWMAuthor)			 info.artist  = (LPWSTR) pbValue;
+			else if (String(name) == g_wszWMTitle)			 info.title   = (LPWSTR) pbValue;
+			else if (String(name) == g_wszWMAlbumTitle)		 info.album   = (LPWSTR) pbValue;
+			else if (String(name) == g_wszWMYear)			 info.year    = String((LPWSTR) pbValue).ToInt();
+			else if (String(name) == g_wszWMGenre)			 info.genre   = (LPWSTR) pbValue;
+			else if (String(name) == g_wszWMDescription)		 info.comment = (LPWSTR) pbValue;
+			else if (String(name) == g_wszWMPublisher)		 info.label   = (LPWSTR) pbValue;
+			else if (String(name) == g_wszWMISRC)			 info.isrc    = (LPWSTR) pbValue;
 
-			else if (String(name) == g_wszWMConductor)		info.other.Add(String(INFO_PERFORMER).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMComposer)		info.other.Add(String(INFO_COMPOSER).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMWriter)			info.other.Add(String(INFO_LYRICIST).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMContentGroupDescription) info.other.Add(String(INFO_CONTENTGROUP).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMSubTitle)		 info.other.Add(String(INFO_SUBTITLE).Append(":").Append((LPWSTR) pbValue));
 
-			else if (String(name) == g_wszWMOriginalArtist)		info.other.Add(String(INFO_ORIG_ARTIST).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMOriginalAlbumTitle)	info.other.Add(String(INFO_ORIG_ALBUM).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMOriginalLyricist)	info.other.Add(String(INFO_ORIG_LYRICIST).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMOriginalReleaseYear)	info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMConductor)		 info.other.Add(String(INFO_CONDUCTOR).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMComposer)		 info.other.Add(String(INFO_COMPOSER).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMWriter)			 info.other.Add(String(INFO_LYRICIST).Append(":").Append((LPWSTR) pbValue));
 
-			else if (String(name) == g_wszWMAuthorURL)		info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMAudioSourceURL)		info.other.Add(String(INFO_WEB_SOURCE).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMCopyrightURL)		info.other.Add(String(INFO_WEB_COPYRIGHT).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMOriginalArtist)		 info.other.Add(String(INFO_ORIG_ARTIST).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.other.Add(String(INFO_ORIG_ALBUM).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMOriginalLyricist)	 info.other.Add(String(INFO_ORIG_LYRICIST).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMOriginalReleaseYear)	 info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append((LPWSTR) pbValue));
+
+			else if (String(name) == g_wszWMBeatsPerMinute)		 info.other.Add(String(INFO_BPM).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMInitialKey)		 info.other.Add(String(INFO_INITIALKEY).Append(":").Append((LPWSTR) pbValue));
+
+			else if (String(name) == g_wszWMRadioStationName)	 info.other.Add(String(INFO_RADIOSTATION).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMRadioStationOwner)	 info.other.Add(String(INFO_RADIOOWNER).Append(":").Append((LPWSTR) pbValue));
+
+			else if (String(name) == g_wszWMAuthorURL)		 info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMAudioSourceURL)		 info.other.Add(String(INFO_WEB_SOURCE).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMCopyrightURL)		 info.other.Add(String(INFO_WEB_COPYRIGHT).Append(":").Append((LPWSTR) pbValue));
 
 			else if (String(name) == g_wszWMTrackNumber)
 			{
@@ -292,9 +317,11 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 				{
 					/* Found a binary MCDI field.
 					 */
-					info.mcdi.Resize(cbLength);
+					Buffer<UnsignedByte>	 mcdi(cbLength);
 
-					memcpy(info.mcdi, pbValue, cbLength);
+					memcpy(mcdi, pbValue, cbLength);
+
+					info.mcdi.SetData(mcdi);
 				}
 				else
 				{

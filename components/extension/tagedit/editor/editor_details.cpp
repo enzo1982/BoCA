@@ -159,7 +159,7 @@ Void BoCA::LayerTagDetails::OnSelectTrack(const Track &nTrack)
 		String	 value = info.other.GetNth(i);
 
 		if	(value.StartsWith(String(INFO_BAND).Append(":")))	   { edit_band->SetText(value.Tail(value.Length() - value.Find(":") - 1));	  }
-		else if	(value.StartsWith(String(INFO_PERFORMER).Append(":")))	   { edit_conductor->SetText(value.Tail(value.Length() - value.Find(":") - 1));   }
+		else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":")))	   { edit_conductor->SetText(value.Tail(value.Length() - value.Find(":") - 1));   }
 		else if	(value.StartsWith(String(INFO_REMIX).Append(":")))	   { edit_remix->SetText(value.Tail(value.Length() - value.Find(":") - 1));	  }
 		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	   { edit_composer->SetText(value.Tail(value.Length() - value.Find(":") - 1));	  }
 		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   { edit_textwriter->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
@@ -210,14 +210,14 @@ Void BoCA::LayerTagDetails::OnModifyTrack()
 		String	 value = info.other.GetNth(i);
 
 		if	(value.StartsWith(String(INFO_BAND).Append(":")))	   { if (edit_band->GetText()	     != NIL) { info.other.SetNth(i, String(INFO_BAND).Append(":").Append(edit_band->GetText()));		 modified_band		= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_PERFORMER).Append(":")))	   { if (edit_conductor->GetText()   != NIL) { info.other.SetNth(i, String(INFO_PERFORMER).Append(":").Append(edit_conductor->GetText()));	 modified_conductor	= True; } else { info.other.RemoveNth(i); } }
+		else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":")))	   { if (edit_conductor->GetText()   != NIL) { info.other.SetNth(i, String(INFO_CONDUCTOR).Append(":").Append(edit_conductor->GetText()));	 modified_conductor	= True; } else { info.other.RemoveNth(i); } }
 		else if	(value.StartsWith(String(INFO_REMIX).Append(":")))	   { if (edit_remix->GetText()	     != NIL) { info.other.SetNth(i, String(INFO_REMIX).Append(":").Append(edit_remix->GetText()));		 modified_remix		= True; } else { info.other.RemoveNth(i); } }
 		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	   { if (edit_composer->GetText()    != NIL) { info.other.SetNth(i, String(INFO_COMPOSER).Append(":").Append(edit_composer->GetText()));	 modified_composer	= True; } else { info.other.RemoveNth(i); } }
 		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   { if (edit_textwriter->GetText()  != NIL) { info.other.SetNth(i, String(INFO_LYRICIST).Append(":").Append(edit_textwriter->GetText()));	 modified_textwriter	= True; } else { info.other.RemoveNth(i); } }
 	}
 
 	if	(!modified_band	       && edit_band->GetText()	      != NIL) info.other.Add(String(INFO_BAND).Append(":").Append(edit_band->GetText()));
-	else if	(!modified_conductor   && edit_conductor->GetText()   != NIL) info.other.Add(String(INFO_PERFORMER).Append(":").Append(edit_conductor->GetText()));
+	else if	(!modified_conductor   && edit_conductor->GetText()   != NIL) info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(edit_conductor->GetText()));
 	else if	(!modified_remix       && edit_remix->GetText()	      != NIL) info.other.Add(String(INFO_REMIX).Append(":").Append(edit_remix->GetText()));
 	else if	(!modified_composer    && edit_composer->GetText()    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(edit_composer->GetText()));
 	else if	(!modified_textwriter  && edit_textwriter->GetText()  != NIL) info.other.Add(String(INFO_LYRICIST).Append(":").Append(edit_textwriter->GetText()));
