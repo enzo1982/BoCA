@@ -1228,6 +1228,7 @@ extern "C" {
 #define LVN_SETDISPINFOW	(LVN_FIRST-78)
 #define LVN_KEYDOWN	(LVN_FIRST-55)
 #if (_WIN32_IE >= 0x0400)
+#define LVN_MARQUEEBEGIN  (LVN_FIRST-56)
 #define LVN_GETINFOTIPA	(LVN_FIRST-57)
 #define LVN_GETINFOTIPW	(LVN_FIRST-58)
 #define LVKF_ALT	0x0001
@@ -2855,6 +2856,13 @@ typedef REBARBANDINFOW const *LPCREBARBANDINFOW;
 #define REBARBANDINFOA_V3_SIZE CCSIZEOF_STRUCT(REBARBANDINFOA,wID)
 #define REBARBANDINFOW_V3_SIZE CCSIZEOF_STRUCT(REBARBANDINFOW, wID)
 #if (_WIN32_IE >= 0x0300)
+typedef struct tagNMLVODSTATECHANGE {
+  NMHDR hdr;
+  int iFrom;
+  int iTo;
+  UINT uNewState;
+  UINT uOldState;
+} NMLVODSTATECHANGE, *LPNMLVODSTATECHANGE;
 typedef struct tagIMAGELISTDRAWPARAMS {
 	DWORD cbSize;
 	HIMAGELIST himl;
@@ -2977,6 +2985,9 @@ void WINAPI DrawInsert(HWND,HWND,int);
 void WINAPI DrawStatusTextA(HDC,LPRECT,LPCSTR,UINT);
 void WINAPI DrawStatusTextW(HDC,LPRECT,LPCWSTR,UINT);
 void WINAPI GetEffectiveClientRect(HWND,LPRECT,LPINT);
+#if (_WIN32_IE >= 0x0500)
+LANGID WINAPI GetMUILanguage(VOID);
+#endif
 #define Header_GetItemCount(w) (int)SNDMSG((w),HDM_GETITEMCOUNT,0,0)
 #define Header_InsertItem(w,i,phdi) (int)SNDMSG((w),HDM_INSERTITEM,(WPARAM)(int)(i),(LPARAM)(const HD_ITEM*)(phdi))
 #define Header_DeleteItem(w,i) (BOOL)SNDMSG((w),HDM_DELETEITEM,(WPARAM)(int)(i),0)
@@ -3082,6 +3093,9 @@ HIMAGELIST WINAPI ImageList_Duplicate(HIMAGELIST himl);
 void WINAPI InitCommonControls(void);
 #if (_WIN32_IE >= 0x0300)
 BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
+#endif
+#if (_WIN32_IE >= 0x0500)
+VOID WINAPI InitMUILanguage(LANGID);
 #endif
 int WINAPI LBItemFromPt(HWND,POINT,BOOL);
 #define ListView_GetBkColor(w) (COLORREF)SNDMSG((w),LVM_GETBKCOLOR,0,0)

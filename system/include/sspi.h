@@ -4,9 +4,13 @@
 #pragma GCC system_header
 #endif
 
+#include <ntsecapi.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <subauth.h>
 
 #define SECPKG_CRED_INBOUND 1
 #define SECPKG_CRED_OUTBOUND 2
@@ -56,6 +60,8 @@ extern "C" {
 #define UNISP_NAME_A "Microsoft Unified Security Protocol Provider"
 #define UNISP_NAME_W L"Microsoft Unified Security Protocol Provider"
 #define SECBUFFER_VERSION 0
+
+typedef UNICODE_STRING SECURITY_STRING, *PSECURITY_STRING;
 
 typedef struct _SecHandle {
 	ULONG_PTR dwLower;
@@ -176,6 +182,7 @@ typedef SECURITY_STATUS (WINAPI *MAKE_SIGNATURE_FN)(PCtxtHandle,ULONG,PSecBuffer
 typedef SECURITY_STATUS (WINAPI *VERIFY_SIGNATURE_FN)(PCtxtHandle,PSecBufferDesc,ULONG,PULONG);
 typedef SECURITY_STATUS (WINAPI *FREE_CONTEXT_BUFFER_FN)(PVOID);
 typedef SECURITY_STATUS (WINAPI *QUERY_SECURITY_PACKAGE_INFO_FN_A)(SEC_CHAR*,PSecPkgInfoA*);
+typedef SECURITY_STATUS (WINAPI *QUERY_SECURITY_CONTEXT_TOKEN_FN)(PCtxtHandle,HANDLE*);
 typedef SECURITY_STATUS (WINAPI *QUERY_SECURITY_PACKAGE_INFO_FN_W)(SEC_WCHAR*,PSecPkgInfoW*);
 typedef SECURITY_STATUS (WINAPI *ENCRYPT_MESSAGE_FN)(PCtxtHandle,ULONG,PSecBufferDesc,ULONG);
 typedef SECURITY_STATUS (WINAPI *DECRYPT_MESSAGE_FN)(PCtxtHandle,PSecBufferDesc,ULONG,PULONG);
@@ -190,7 +197,7 @@ typedef struct _SECURITY_FUNCTION_TABLEW {
 	ACQUIRE_CREDENTIALS_HANDLE_FN_W AcquireCredentialsHandleW;
 	FREE_CREDENTIALS_HANDLE_FN FreeCredentialsHandle;
 	void SEC_FAR* Reserved2;
-	INITIALIZE_SECURITY_CONTEXT_FN_A InitializeSecurityContextA;
+	INITIALIZE_SECURITY_CONTEXT_FN_W InitializeSecurityContextW;
 	ACCEPT_SECURITY_CONTEXT_FN AcceptSecurityContext;
 	COMPLETE_AUTH_TOKEN_FN CompleteAuthToken;
 	DELETE_SECURITY_CONTEXT_FN DeleteSecurityContext;
@@ -201,14 +208,14 @@ typedef struct _SECURITY_FUNCTION_TABLEW {
 	MAKE_SIGNATURE_FN MakeSignature;
 	VERIFY_SIGNATURE_FN VerifySignature;
 	FREE_CONTEXT_BUFFER_FN FreeContextBuffer;
-	QUERY_SECURITY_PACKAGE_INFO_FN_A QuerySecurityPackageInfoA;
+	QUERY_SECURITY_PACKAGE_INFO_FN_W QuerySecurityPackageInfoW;
 	void SEC_FAR* Reserved3;
 	void SEC_FAR* Reserved4;
-        void SEC_FAR* Unknown1;
-        void SEC_FAR* Unknown2;
-        void SEC_FAR* Unknown3;
-        void SEC_FAR* Unknown4;
-        void SEC_FAR* Unknown5;
+        void SEC_FAR* Reserved5;
+        void SEC_FAR* Reserved6;
+        void SEC_FAR* Reserved7;
+        void SEC_FAR* Reserved8;
+        QUERY_SECURITY_CONTEXT_TOKEN_FN QuerySecurityContextToken;
         ENCRYPT_MESSAGE_FN EncryptMessage;
         DECRYPT_MESSAGE_FN DecryptMessage;
 } SecurityFunctionTableW, *PSecurityFunctionTableW;

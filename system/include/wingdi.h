@@ -358,6 +358,8 @@ extern "C" {
 #define OUT_RASTER_PRECIS	6
 #define OUT_TT_ONLY_PRECIS	7
 #define OUT_OUTLINE_PRECIS	8
+/* http://www.pinvoke.net/default.aspx/Structures/LOGFONT.html */
+#define OUT_PS_ONLY_PRECIS      10
 #define CLIP_DEFAULT_PRECIS	0
 #define CLIP_CHARACTER_PRECIS	1
 #define CLIP_STROKE_PRECIS	2
@@ -370,6 +372,9 @@ extern "C" {
 #define PROOF_QUALITY	2
 #define NONANTIALIASED_QUALITY 3
 #define ANTIALIASED_QUALITY 4
+#if _WIN32_WINNT >= 0x0500
+#define CLEARTYPE_QUALITY 5
+#endif
 #define DEFAULT_PITCH	0
 #define FIXED_PITCH	1
 #define VARIABLE_PITCH	2
@@ -1317,6 +1322,15 @@ extern "C" {
 #define DISPLAY_DEVICE_MODESPRUNED         0x08000000
 
 #if (_WIN32_WINNT >= 0x0500)
+#define NTM_NONNEGATIVE_AC  0x00010000
+#define NTM_PS_OPENTYPE     0x00020000
+#define NTM_TT_OPENTYPE     0x00040000
+#define NTM_MULTIPLEMASTER  0x00080000
+#define NTM_TYPE1           0x00100000
+#define NTM_DSIG            0x00200000
+#endif
+
+#if (_WIN32_WINNT >= 0x0500)
 #define GGI_MARK_NONEXISTING_GLYPHS 1
 #endif
 
@@ -1491,9 +1505,11 @@ typedef struct _devicemodeA {
       short dmDefaultSource; 
       short dmPrintQuality; 
     } DUMMYSTRUCTNAME;
-    POINTL dmPosition;
-    DWORD  dmDisplayOrientation;
-    DWORD  dmDisplayFixedOutput;
+    _ANONYMOUS_STRUCT struct {
+      POINTL dmPosition;
+      DWORD  dmDisplayOrientation;
+      DWORD  dmDisplayFixedOutput;
+    } DUMMYSTRUCTNAME2;
   } DUMMYUNIONNAME;
 
   short  dmColor; 
@@ -1542,9 +1558,11 @@ typedef struct _devicemodeW {
       short dmDefaultSource; 
       short dmPrintQuality; 
     } DUMMYSTRUCTNAME;
-    POINTL dmPosition;
-    DWORD  dmDisplayOrientation;
-    DWORD  dmDisplayFixedOutput;
+    _ANONYMOUS_STRUCT struct {
+      POINTL dmPosition;
+      DWORD  dmDisplayOrientation;
+      DWORD  dmDisplayFixedOutput;
+    } DUMMYSTRUCTNAME2;
   } DUMMYUNIONNAME;
 
   short  dmColor; 
@@ -2643,7 +2661,7 @@ typedef struct _DISPLAY_DEVICEW {
 
 typedef BOOL (CALLBACK *ABORTPROC)(HDC,int);
 typedef int (CALLBACK *MFENUMPROC)(HDC,HANDLETABLE*,METARECORD*,int,LPARAM);
-typedef int (CALLBACK *ENHMFENUMPROC)(HDC,HANDLETABLE*,ENHMETARECORD*,int,LPARAM);
+typedef int (CALLBACK *ENHMFENUMPROC)(HDC,HANDLETABLE*,const ENHMETARECORD*,int,LPARAM);
 typedef int (CALLBACK *OLDFONTENUMPROCA)(const LOGFONTA*,const TEXTMETRICA*,DWORD,LPARAM);
 typedef int (CALLBACK *OLDFONTENUMPROCW)(const LOGFONTW*,const TEXTMETRICW*,DWORD,LPARAM);
 typedef OLDFONTENUMPROCA FONTENUMPROCA;
@@ -2881,6 +2899,9 @@ WINGDIAPI BOOL WINAPI GetTextExtentExPointA(HDC,LPCSTR,int,int,LPINT,LPINT,LPSIZ
 WINGDIAPI BOOL WINAPI GetTextExtentExPointW( HDC,LPCWSTR,int,int,LPINT,LPINT,LPSIZE );
 WINGDIAPI BOOL WINAPI GetTextExtentPointA(HDC,LPCSTR,int,LPSIZE);
 WINGDIAPI BOOL WINAPI GetTextExtentPointW(HDC,LPCWSTR,int,LPSIZE);
+#if (_WIN32_WINNT >= 0x0500)
+WINGDIAPI BOOL WINAPI GetTextExtentExPointI(HDC, LPWORD, int, int, LPINT, LPINT, LPSIZE);
+#endif
 #ifdef _WIN32_WCE
 extern BOOL GetTextExtentPoint32A(HDC,LPCSTR,int,LPSIZE);
 extern BOOL GetTextExtentPoint32W( HDC,LPCWSTR,int,LPSIZE);

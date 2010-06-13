@@ -173,7 +173,7 @@ struct in6_addr {
 
 /* These are GLIBC names */ 
 #define s6_addr16	_S6_un._S6_u16
-#define s6_addr32	_S6_un._S6_u16
+#define s6_addr32	_S6_un._S6_u32
 
 /* These are used in some MS code */
 #define in_addr6	in6_addr
@@ -275,7 +275,7 @@ struct ipv6_mreq {
 	struct in6_addr ipv6mr_multiaddr;
 	unsigned int    ipv6mr_interface;
 };
-typedef struct ipv6_mreq IPV6_MREG;
+typedef struct ipv6_mreq IPV6_MREQ;
 
 struct in6_pktinfo {
 	IN6_ADDR ipi6_addr;

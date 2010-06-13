@@ -3828,7 +3828,7 @@ KeGetCurrentIrql(
  *   VOID)
  */
 #define KeGetCurrentProcessorNumber() \
-  ((ULONG)KeGetCurrentKPCR()->ProcessorNumber)
+  ((ULONG)KeGetCurrentKPCR()->Number)
 
 
 #if  __USE_NTOSKRNL__
@@ -3842,13 +3842,13 @@ NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedIncrement(
-  /*IN*/ PLONG  VOLATILE  Addend);
+  /*IN*/ LONG VOLATILE *Addend);
 
 NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedDecrement(
-  /*IN*/ PLONG  VOLATILE  Addend);
+  /*IN*/ LONG VOLATILE *Addend);
 
 NTOSAPI
 LONG
@@ -4895,6 +4895,10 @@ DDKAPI
 RtlStringFromGUID( 
   /*IN*/ REFGUID  Guid, 
   /*OUT*/ PUNICODE_STRING  GuidString);
+
+#define RtlStringCbCopyA(dst, dst_len, src) strncpy(dst, src, dst_len)
+#define RtlStringCbPrintfA(args...) snprintf(args)
+#define RtlStringCbVPrintfA(args...) vsnprintf(args)
 
 NTOSAPI
 BOOLEAN
@@ -7350,6 +7354,11 @@ KeEnterCriticalRegion(
 #define KeFlushIoBuffers(_Mdl, _ReadOperation, _DmaOperation)
 
 NTOSAPI
+VOID
+DDKAPI
+KeFlushQueuedDpcs(VOID);
+
+NTOSAPI
 PRKTHREAD
 DDKAPI
 KeGetCurrentThread(
@@ -7448,6 +7457,8 @@ VOID
 DDKAPI
 KeLeaveCriticalRegion(
   VOID);
+
+#define KeMemoryBarrier() asm("mfence;")
 
 NTOSAPI
 NTSTATUS
@@ -7719,38 +7730,18 @@ KeWaitForSingleObject(
   /*IN*/ BOOLEAN  Alertable,
   /*IN*/ PLARGE_INTEGER  Timeout  /*OPTIONAL*/);
 
-#if defined(_X86_)
-
 NTOSAPI
 VOID
-FASTCALL
-KfLowerIrql(
-  /*IN*/ KIRQL  NewIrql);
-
-NTOSAPI
-KIRQL
-FASTCALL
-KfRaiseIrql(
-  /*IN*/ KIRQL  NewIrql);
-
-#define KeLowerIrql(a) KfLowerIrql(a)
-#define KeRaiseIrql(a,b) *(b) = KfRaiseIrql(a)
-
-#else
+DDKAPI
+KeRaiseIrql(
+  /*IN*/ KIRQL new_irql,
+  /*OUT*/ PKIRQL old_irql);
 
 NTOSAPI
 VOID
 DDKAPI
 KeLowerIrql(
-  /*IN*/ KIRQL  NewIrql);
-
-NTOSAPI
-KIRQL
-DDKAPI
-KeRaiseIrql(
-  /*IN*/ KIRQL  NewIrql);
-
-#endif
+  /*IN*/ KIRQL irql);
 
 NTOSAPI
 KIRQL
@@ -8585,6 +8576,13 @@ NtQueryInformationProcess(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtCancelTimer(
+  /*IN*/ HANDLE  TimerHandle,
+  /*OUT*/ PBOOLEAN  CurrentState  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwCancelTimer(
   /*IN*/ HANDLE  TimerHandle,
   /*OUT*/ PBOOLEAN  CurrentState  /*OPTIONAL*/);
@@ -8600,6 +8598,14 @@ NTSTATUS
 DDKAPI
 ZwClose(
   /*IN*/ HANDLE  Handle);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtCreateDirectoryObject(
+  /*OUT*/ PHANDLE  DirectoryHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
 NTOSAPI
 NTSTATUS
@@ -8632,6 +8638,22 @@ ZwCreateEvent(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtCreateFile(
+  /*OUT*/ PHANDLE  FileHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ PLARGE_INTEGER  AllocationSize  /*OPTIONAL*/,
+  /*IN*/ ULONG  FileAttributes,
+  /*IN*/ ULONG  ShareAccess,
+  /*IN*/ ULONG  CreateDisposition,
+  /*IN*/ ULONG  CreateOptions,
+  /*IN*/ PVOID  EaBuffer  /*OPTIONAL*/,
+  /*IN*/ ULONG  EaLength);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwCreateFile(
   /*OUT*/ PHANDLE  FileHandle,
   /*IN*/ ACCESS_MASK  DesiredAccess,
@@ -8648,6 +8670,18 @@ ZwCreateFile(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtCreateKey(
+  /*OUT*/ PHANDLE  KeyHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes,
+  /*IN*/ ULONG  TitleIndex,
+  /*IN*/ PUNICODE_STRING  Class  /*OPTIONAL*/,
+  /*IN*/ ULONG  CreateOptions,
+  /*OUT*/ PULONG  Disposition  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwCreateKey(
   /*OUT*/ PHANDLE  KeyHandle,
   /*IN*/ ACCESS_MASK  DesiredAccess,
@@ -8656,6 +8690,15 @@ ZwCreateKey(
   /*IN*/ PUNICODE_STRING  Class  /*OPTIONAL*/,
   /*IN*/ ULONG  CreateOptions,
   /*OUT*/ PULONG  Disposition  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtCreateTimer(
+  /*OUT*/ PHANDLE  TimerHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes  /*OPTIONAL*/,
+  /*IN*/ TIMER_TYPE  TimerType);
 
 NTOSAPI
 NTSTATUS
@@ -8669,8 +8712,21 @@ ZwCreateTimer(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtDeleteKey(
+  /*IN*/ HANDLE  KeyHandle);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwDeleteKey(
   /*IN*/ HANDLE  KeyHandle);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtDeleteValueKey(
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ PUNICODE_STRING  ValueName);
 
 NTOSAPI
 NTSTATUS
@@ -8712,11 +8768,33 @@ ZwDeviceIoControlFile(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtEnumerateKey(
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ ULONG  Index,
+  /*IN*/ KEY_INFORMATION_CLASS  KeyInformationClass,
+  /*OUT*/ PVOID  KeyInformation,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ResultLength);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwEnumerateKey(
   /*IN*/ HANDLE  KeyHandle,
   /*IN*/ ULONG  Index,
   /*IN*/ KEY_INFORMATION_CLASS  KeyInformationClass,
   /*OUT*/ PVOID  KeyInformation,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ResultLength);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtEnumerateValueKey(
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ ULONG  Index,
+  /*IN*/ KEY_VALUE_INFORMATION_CLASS  KeyValueInformationClass,
+  /*OUT*/ PVOID  KeyValueInformation,
   /*IN*/ ULONG  Length,
   /*OUT*/ PULONG  ResultLength);
 
@@ -8734,8 +8812,20 @@ ZwEnumerateValueKey(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtFlushKey(
+  /*IN*/ HANDLE  KeyHandle);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwFlushKey(
   /*IN*/ HANDLE  KeyHandle);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtMakeTemporaryObject(
+  /*IN*/ HANDLE  Handle);
 
 NTOSAPI
 NTSTATUS
@@ -8798,8 +8888,24 @@ ZwOpenFile(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtOpenKey(
+  /*OUT*/ PHANDLE  KeyHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwOpenKey(
   /*OUT*/ PHANDLE  KeyHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtOpenSection(
+  /*OUT*/ PHANDLE  SectionHandle,
   /*IN*/ ACCESS_MASK  DesiredAccess,
   /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
@@ -8814,8 +8920,24 @@ ZwOpenSection(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtOpenSymbolicLinkObject(
+  /*OUT*/ PHANDLE  LinkHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwOpenSymbolicLinkObject(
   /*OUT*/ PHANDLE  LinkHandle,
+  /*IN*/ ACCESS_MASK  DesiredAccess,
+  /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtOpenTimer(
+  /*OUT*/ PHANDLE  TimerHandle,
   /*IN*/ ACCESS_MASK  DesiredAccess,
   /*IN*/ POBJECT_ATTRIBUTES  ObjectAttributes);
 
@@ -8830,12 +8952,32 @@ ZwOpenTimer(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtQueryInformationFile(
+  /*IN*/ HANDLE  FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*OUT*/ PVOID  FileInformation,
+  /*IN*/ ULONG  Length,
+  /*IN*/ FILE_INFORMATION_CLASS  FileInformationClass);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwQueryInformationFile(
   /*IN*/ HANDLE  FileHandle,
   /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
   /*OUT*/ PVOID  FileInformation,
   /*IN*/ ULONG  Length,
   /*IN*/ FILE_INFORMATION_CLASS  FileInformationClass);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtQueryKey(
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ KEY_INFORMATION_CLASS  KeyInformationClass,
+  /*OUT*/ PVOID  KeyInformation,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ResultLength);
 
 NTOSAPI
 NTSTATUS
@@ -8850,10 +8992,29 @@ ZwQueryKey(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtQuerySymbolicLinkObject(
+  /*IN*/ HANDLE  LinkHandle,
+  /*IN OUT*/ PUNICODE_STRING  LinkTarget,
+  /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwQuerySymbolicLinkObject(
   /*IN*/ HANDLE  LinkHandle,
   /*IN OUT*/ PUNICODE_STRING  LinkTarget,
   /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtQueryValueKey(
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ PUNICODE_STRING  ValueName,
+  /*IN*/ KEY_VALUE_INFORMATION_CLASS  KeyValueInformationClass,
+  /*OUT*/ PVOID  KeyValueInformation,
+  /*IN*/ ULONG  Length,
+  /*OUT*/ PULONG  ResultLength);
 
 NTOSAPI
 NTSTATUS
@@ -8911,12 +9072,31 @@ ZwSetEvent(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtSetInformationFile(
+  /*IN*/ HANDLE  FileHandle,
+  /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
+  /*IN*/ PVOID  FileInformation,
+  /*IN*/ ULONG  Length,
+  /*IN*/ FILE_INFORMATION_CLASS  FileInformationClass);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwSetInformationFile(
   /*IN*/ HANDLE  FileHandle,
   /*OUT*/ PIO_STATUS_BLOCK  IoStatusBlock,
   /*IN*/ PVOID  FileInformation,
   /*IN*/ ULONG  Length,
   /*IN*/ FILE_INFORMATION_CLASS  FileInformationClass);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtSetInformationThread(
+  /*IN*/ HANDLE  ThreadHandle,
+  /*IN*/ THREADINFOCLASS  ThreadInformationClass,
+  /*IN*/ PVOID  ThreadInformation,
+  /*IN*/ ULONG  ThreadInformationLength);
 
 NTOSAPI
 NTSTATUS
@@ -8930,6 +9110,18 @@ ZwSetInformationThread(
 NTOSAPI
 NTSTATUS
 DDKAPI
+NtSetTimer(
+  /*IN*/ HANDLE  TimerHandle,
+  /*IN*/ PLARGE_INTEGER  DueTime,
+  /*IN*/ PTIMER_APC_ROUTINE  TimerApcRoutine  /*OPTIONAL*/,
+  /*IN*/ PVOID  TimerContext  /*OPTIONAL*/,
+  /*IN*/ BOOLEAN  WakeTimer,
+  /*IN*/ LONG  Period  /*OPTIONAL*/,
+  /*OUT*/ PBOOLEAN  PreviousState  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
 ZwSetTimer(
   /*IN*/ HANDLE  TimerHandle,
   /*IN*/ PLARGE_INTEGER  DueTime,
@@ -8938,6 +9130,17 @@ ZwSetTimer(
   /*IN*/ BOOLEAN  WakeTimer,
   /*IN*/ LONG  Period  /*OPTIONAL*/,
   /*OUT*/ PBOOLEAN  PreviousState  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtSetValueKey(
+  /*IN*/ HANDLE  KeyHandle,
+  /*IN*/ PUNICODE_STRING  ValueName,
+  /*IN*/ ULONG  TitleIndex  /*OPTIONAL*/,
+  /*IN*/ ULONG  Type,
+  /*IN*/ PVOID  Data,
+  /*IN*/ ULONG  DataSize);
 
 NTOSAPI
 NTSTATUS
