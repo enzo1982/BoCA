@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -26,12 +26,17 @@ namespace BoCA
 			 */
 			static Config	*instance;
 
-			Bool		 saveSettingsOnExit;
-
 					 Config();
 					~Config();
 
 			Configuration	*config;
+
+			Array<String>	 persistentIntIDs;
+			Array<Int *>	 persistentIntValues;
+
+			Bool		 saveSettingsOnExit;
+
+			Int		 FindPersistentIntValueIndex(const String &, const String &);
 		public:
 			String		 configDir;
 
@@ -50,14 +55,6 @@ namespace BoCA
 			String		 encoderID;
 			String		 enc_outdir;
 			String		 enc_filePattern;
-			Bool		 enc_onTheFly;
-			Bool		 enc_keepWaves;
-
-			Bool		 encodeToSingleFile;
-			Bool		 useUnicodeNames;
-
-			Bool		 writeToInputDir;
-			Bool		 allowOverwrite;
 
 			Bool		 checkUpdatesAtStartup;
 
@@ -99,6 +96,8 @@ namespace BoCA
 
 			Int		 GetIntValue(const String &, const String &, Int = 0);
 			String		 GetStringValue(const String &, const String &, const String & = NIL);
+
+			Int		&GetPersistentIntValue(const String &, const String &, Int = 0);
 
 			Bool		 LoadSettings();
 			Bool		 SaveSettings();

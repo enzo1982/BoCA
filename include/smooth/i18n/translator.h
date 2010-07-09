@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,20 +29,27 @@ namespace smooth
 		class SMOOTHAPI Translator
 		{
 			private:
-				Int				 internal;
 				String				 appPrefix;
 
-				Array<Language *, Void *>	 languages;
 				Language			*activeLanguage;
 
 				Int				 GetSupportedLanguages();
+			protected:
+				Array<Language *, Void *>	 languages;
+
 				Int				 LoadDoc(XML::Document *, Language *);
 			public:
-								 Translator(const String &, Bool = False);
-								~Translator();
+								 Translator(const String &);
+				virtual				~Translator();
 
 				Int				 SetInternalLanguageInfo(const String &, const String &, const String &, Bool);
+				Int				 SelectUserDefaultLanguage();
+				
+				Int				 ActivateLanguage(const String &);
+				const String			&TranslateString(const String &);
 
+				static Translator		*defaultTranslator;
+			accessors:
 				Int				 GetNOfLanguages() const;
 
 				const String			&GetNthLanguageName(Int) const;
@@ -58,11 +65,6 @@ namespace smooth
 				const String			&GetActiveLanguageEncoding() const;
 				const String			&GetActiveLanguageURL() const;
 				Bool				 IsActiveLanguageRightToLeft() const;
-
-				Int				 ActivateLanguage(const String &);
-				const String			&TranslateString(const String &);
-
-				static Translator		*defaultTranslator;
 		};
 	};
 };

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -46,8 +46,13 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	group_aactype		= new GroupBox(i18n->TranslateString("AAC object type"), Point(7, 88), Size(120, 90));
 
 	option_aactype_main	= new OptionBox("MAIN", Point(10, 13), Size(99, 0), &aacType, 1);
+	option_aactype_main->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
+
 	option_aactype_low	= new OptionBox("LC", Point(10, 38), Size(99, 0), &aacType, 2);
+	option_aactype_low->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
+
 	option_aactype_ltp	= new OptionBox("LTP", Point(10, 63), Size(99, 0), &aacType, 4);
+	option_aactype_ltp->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
 
 	group_aactype->Add(option_aactype_main);
 	group_aactype->Add(option_aactype_low);
@@ -269,6 +274,18 @@ Void BoCA::ConfigureFAAC::SetMPEGVersion()
 		}
 
 		option_aactype_ltp->Deactivate();
+	}
+}
+
+Void BoCA::ConfigureFAAC::SetObjectType()
+{
+	if (aacType == 4) // LTP
+	{
+		option_version_mpeg2->Deactivate();
+	}
+	else
+	{
+		option_version_mpeg2->Activate();
 	}
 }
 

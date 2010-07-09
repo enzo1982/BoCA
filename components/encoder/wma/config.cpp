@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -118,7 +118,8 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	FillCodecComboBox();
 
 	combo_codec->onSelectEntry.Connect(&ConfigureWMAEnc::OnSelectCodec, this);
-	combo_codec->SelectNthEntry(config->GetIntValue("WMA", "Codec", 0));
+
+	if (config->GetIntValue("WMA", "Codec", -1) >= 0) combo_codec->SelectNthEntry(config->GetIntValue("WMA", "Codec", -1));
 
 	combo_format->SelectNthEntry(config->GetIntValue("WMA", "CodecFormat", 0));
 
@@ -221,6 +222,10 @@ Void BoCA::ConfigureWMAEnc::FillCodecComboBox()
 		hr = codecInfo->GetCodecName(WMMEDIATYPE_Audio, i, name, &nameLen);
 
 		combo_codec->AddEntry(name);
+
+		if ( String(name).Contains("Windows Media Audio") &&
+		    !String(name).Contains("Voice") &&
+		    !String(name).Contains("Lossless")) combo_codec->SelectNthEntry(i);
 
 		delete [] name;
 	}

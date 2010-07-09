@@ -108,17 +108,17 @@ Bool BoCA::WMAOut::Activate()
 		DWORD	 oneValue = 1;
 		DWORD	 twoValue = 2;
 
-		if (config->GetIntValue("WMA", "EnableVBR", True))    hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", 0), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &trueValue,  sizeof(BOOL));
-		else						      hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", 0), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &falseValue, sizeof(BOOL));
+		if (config->GetIntValue("WMA", "EnableVBR", True))    hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &trueValue,  sizeof(BOOL));
+		else						      hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &falseValue, sizeof(BOOL));
 
-		if (config->GetIntValue("WMA", "Enable2Pass", False)) hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", 0), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &twoValue, sizeof(DWORD));
-		else						      hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", 0), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
+		if (config->GetIntValue("WMA", "Enable2Pass", False)) hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &twoValue, sizeof(DWORD));
+		else						      hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
 
-		hr = pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", 0), config->GetIntValue("WMA", "CodecFormat", 0), &m_pStreamConfig);
+		hr = pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), config->GetIntValue("WMA", "CodecFormat", 0), &m_pStreamConfig);
 	}
 	else
 	{
-		m_pStreamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue("WMA", "Codec", 0), track.GetFormat());
+		m_pStreamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue("WMA", "Codec", -1), track.GetFormat());
 	}
 
 	hr = m_pStreamConfig->SetStreamNumber(1);
