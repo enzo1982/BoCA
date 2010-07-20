@@ -84,9 +84,6 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 	discComment	= oTrack.discComment;
 	playorder	= oTrack.playorder;
 
-	fileSizeString	= oTrack.fileSizeString;
-	lengthString	= oTrack.lengthString;
-
 	outfile		= oTrack.outfile;
 	origFilename	= oTrack.origFilename;
 
@@ -103,6 +100,27 @@ Bool BoCA::Track::operator !=(const int nil) const
 {
 	if (trackID == -1) return False;
 	else		   return True;
+}
+
+String BoCA::Track::GetLengthString() const
+{
+	String	 lengthString;
+
+	if	(length >= 0)	    lengthString = String::FromInt(Math::Floor(length / (format.rate * format.channels) / 60)).Append(":").Append((length / (format.rate * format.channels) % 60) < 10 ? "0" : NIL).Append(String::FromInt(length / (format.rate * format.channels) % 60));
+	else if (approxLength >= 0) lengthString = String("~ ").Append(String::FromInt(Math::Floor(approxLength / (format.rate * format.channels) / 60)).Append(":").Append((approxLength / (format.rate * format.channels) % 60) < 10 ? "0" : NIL).Append(String::FromInt(approxLength / (format.rate * format.channels) % 60)));
+	else			    lengthString = "?";
+
+	wchar_t	 sign[2] = { 0x2248, 0 };
+
+	if (Setup::enableUnicode) lengthString.Replace("~", sign);
+
+	return lengthString;
+}
+
+String BoCA::Track::GetFileSizeString() const
+{
+	if (fileSize > 0) return S::I18n::Number::GetLocalizedNumberString(fileSize);
+	else		  return "?";
 }
 
 Bool BoCA::Track::LoadCoverArtFiles()

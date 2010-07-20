@@ -45,9 +45,11 @@ namespace smooth
 					String			 proxyUser;
 					String			 proxyPass;
 
-					Array<Parameter>	 fields;
-					Array<Parameter>	 parameters;
+					Array<Parameter>	 requestFields;
+					Array<Parameter>	 requestParameters;
 					Buffer<UnsignedByte>	 requestBuffer;
+
+					Array<Parameter>	 responseFields;
 
 					String			 content;
 
@@ -77,6 +79,8 @@ namespace smooth
 					Int			 SetProxy(const String &, Int);				// Set proxy host name and port
 					Int			 SetProxyMode(Int);					// Set proxy mode
 					Int			 SetProxyAuth(const String &, const String &);		// Set user name and password for proxy
+
+					String			 GetResponseHeaderField(const String &);
 
 					Int			 DownloadToFile(const String &);
 			};

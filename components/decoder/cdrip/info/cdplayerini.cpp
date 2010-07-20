@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -53,7 +53,7 @@ Int BoCA::CDPlayerIni::ReadCDInfo()
 
 	/* Open cdplayer.ini
 	 */
-	InStream	*in = new InStream(STREAM_FILE, S::System::System::GetWindowsRootDirectory().Append("cdplayer.ini"), IS_READONLY);
+	InStream	*in = new InStream(STREAM_FILE, S::System::System::GetWindowsRootDirectory().Append("cdplayer.ini"), IS_READ);
 	String		 idString = String("[").Append(discIDString).Append("]");
 	String		 result;
 

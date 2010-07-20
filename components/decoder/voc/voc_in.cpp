@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -35,7 +35,7 @@ const String &BoCA::VocIn::GetComponentSpecs()
 
 Bool BoCA::VocIn::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
 	Int		 magic = f_in->InputNumber(4);
 
 	delete f_in;
@@ -45,7 +45,7 @@ Bool BoCA::VocIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::VocIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 	// TODO: Add more checking to this!
 

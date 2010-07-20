@@ -55,7 +55,7 @@ Void smooth::DetachDLL()
 
 Bool BoCA::WMAIn::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
 	Int		 magic = f_in->InputNumber(4);
 
 	delete f_in;
@@ -65,7 +65,7 @@ Bool BoCA::WMAIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 	track.fileSize	= f_in->Size();
 

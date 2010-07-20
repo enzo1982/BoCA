@@ -109,7 +109,7 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 Bool BoCA::AS::ComponentSpecs::LoadFromXML(const String &file)
 {
-	IO::InStream	 in(IO::STREAM_FILE, file, IO::IS_READONLY);
+	IO::InStream	 in(IO::STREAM_FILE, file, IO::IS_READ);
 	String		 xml = in.InputString(in.Size());
 
 	in.Close();

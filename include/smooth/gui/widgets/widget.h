@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -149,6 +149,9 @@ namespace smooth
 				virtual Bool			 IsRegistered() const		{ return registered; }
 				virtual Bool			 IsVisible() const		{ if (!registered) return visible; if (!visible) return False; return container->IsVisible(); }
 				virtual Bool			 IsActive() const		{ if (!registered) return active; if (!active) return False; if (alwaysActive) return True; return container->IsActive(); }
+
+				Int				 SetVisibleDirect(Bool nValue)	{ visible = nValue; return Success(); }
+				Bool				 IsVisibleDirect() const	{ return visible; }
 
 				Int				 SetAlwaysActive(Bool nValue)	{ alwaysActive = nValue; return Success(); }
 				Bool				 IsAlwaysActive() const		{ return alwaysActive; }

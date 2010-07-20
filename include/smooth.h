@@ -87,6 +87,7 @@
 
 #include "smooth/graphics/imageloader/imageloader.h"
 
+#include "smooth/i18n/charsetdetector.h"
 #include "smooth/i18n/number.h"
 #include "smooth/i18n/translator.h"
 

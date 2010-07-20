@@ -64,7 +64,7 @@ Bool BoCA::SpeexIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	 in(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 	Format		&format = track.GetFormat();
 
 	format.order = BYTE_INTEL;

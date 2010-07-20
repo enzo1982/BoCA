@@ -204,13 +204,15 @@ Bool BoCA::WMAOut::Deactivate()
 
 	/* Stream contents of created WMA file to output driver
 	 */
-	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READONLY);
+	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
 	Int			 bytesLeft = in.Size();
 
 	while (bytesLeft)
 	{
-		driver->WriteData((UnsignedByte *) in.InputData(buffer, Math::Min(1024, bytesLeft)), Math::Min(1024, bytesLeft));
+		in.InputData(buffer, Math::Min(1024, bytesLeft));
+
+		driver->WriteData(buffer, Math::Min(1024, bytesLeft));
 
 		bytesLeft -= Math::Min(1024, bytesLeft);
 	}

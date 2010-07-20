@@ -164,7 +164,7 @@ Error BoCA::ID3v1Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 
 Error BoCA::ID3v1Tag::ParseStreamInfo(const String &fileName, Track &track)
 {
-	InStream		 in(STREAM_FILE, fileName, IS_READONLY);
+	InStream		 in(STREAM_FILE, fileName, IS_READ);
 	Buffer<UnsignedByte>	 buffer(128);
 
 	/* Copy tag to buffer and parse it.
@@ -178,7 +178,7 @@ Error BoCA::ID3v1Tag::ParseStreamInfo(const String &fileName, Track &track)
 Error BoCA::ID3v1Tag::UpdateStreamInfo(const String &fileName, const Track &track)
 {
 	Int		 offset = 0;
-	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
 
 	in.Seek(in.Size() - 128);
 

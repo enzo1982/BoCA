@@ -87,6 +87,8 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 
 BoCA::ChooserFiles::~ChooserFiles()
 {
+	ChooserFilesTree::onSelectDirectory.Disconnect(&ChooserFiles::OnSelectDirectory, this);
+
 	list_files->RemoveAllEntries();
 
 	foreach (Tree *tree, trees) DeleteObject(tree);

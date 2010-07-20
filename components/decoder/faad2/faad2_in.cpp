@@ -117,7 +117,7 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 	}
 	else
 	{
-		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 		SkipID3v2Tag(f_in);
 
@@ -202,7 +202,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 	}
 	else
 	{
-		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 		format.order	= BYTE_INTEL;
 		format.bits	= 16;

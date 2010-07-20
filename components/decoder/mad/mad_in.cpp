@@ -96,13 +96,9 @@ Bool BoCA::MADIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READONLY);
+	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READ);
 	InStream	*f_in = new InStream(STREAM_DRIVER, ioDriver);
 
-	Format	&format = track.GetFormat();
-
-	format.order	= BYTE_INTEL;
-	format.bits	= 16;
 	track.fileSize	= f_in->Size();
 	track.length	= -1;
 
@@ -329,14 +325,15 @@ mad_flow BoCA::MADOutputCallback(void *client_data, const mad_header *header, ma
 	filter->samplesBufferMutex->Lock();
 
 	Int	 oSize = filter->samplesBuffer.Size();
+	Int	 channels = header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
 
-	filter->samplesBuffer.Resize(oSize + pcm->length * filter->track.GetFormat().channels);
+	filter->samplesBuffer.Resize(oSize + pcm->length * channels);
 
 	for (Int i = 0; i < (signed) pcm->length; i++)
 	{
-		for (Int j = 0; j < filter->track.GetFormat().channels; j++)
+		for (Int j = 0; j < channels; j++)
 		{
-			filter->samplesBuffer[oSize + i * filter->track.GetFormat().channels + j] = pcm->samples[j][i];
+			filter->samplesBuffer[oSize + i * channels + j] = pcm->samples[j][i];
 		}
 	}
 
@@ -349,6 +346,8 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, ma
 {
 	MADIn	*filter = (MADIn *) client_data;
 
+	filter->infoTrack->GetFormat().bits	= 16;
+	filter->infoTrack->GetFormat().order	= BYTE_INTEL;
 	filter->infoTrack->GetFormat().channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
 	filter->infoTrack->GetFormat().rate	= header->samplerate;
 	filter->infoTrack->approxLength		= filter->infoTrack->fileSize / (header->bitrate / 8) * filter->infoTrack->GetFormat().rate * filter->infoTrack->GetFormat().channels;

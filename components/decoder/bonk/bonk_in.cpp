@@ -59,7 +59,7 @@ Bool BoCA::BonkIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*in		= new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	*in		= new InStream(STREAM_FILE, streamURI, IS_READ);
 	unsigned int	 length		= 0;
 	unsigned int	 rate		= 0;
 	int		 channels	= 0;

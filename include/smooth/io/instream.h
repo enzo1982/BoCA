@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,8 +31,8 @@ namespace smooth
 {
 	namespace IO
 	{
-		const Int	 IS_NORMAL	= 2;
-		const Int	 IS_READONLY	= 3;
+		const Int	 IS_READ	= 2;
+		const Int	 IS_WRITE	= 4;
 
 		class SMOOTHAPI InStream : public Stream
 		{
@@ -45,6 +45,13 @@ namespace smooth
 
 				Bool			 ReadData		();
 			public:
+							 InStream		(Int, Driver *);
+							 InStream		(Int, const String &, Int = IS_READ);
+							 InStream		(Int, FILE *);
+							 InStream		(Int, Void *, Long);
+							 InStream		(Int, OutStream *);
+				virtual			~InStream		();
+
 				Long			 InputNumber		(Int);
 				Long			 InputNumberRaw		(Int);
 				Long			 InputNumberPDP		(Int);
@@ -52,7 +59,7 @@ namespace smooth
 
 				String			 InputString		(Int);
 				String			 InputLine		();
-				Void			*InputData		(Void *, Int);
+				Int			 InputData		(Void *, Int);
 
 				Bool			 SetPackageSize		(Int);
 
@@ -63,13 +70,6 @@ namespace smooth
 
 				Bool			 Seek			(Int64);
 				Bool			 RelSeek		(Int64);
-
-							 InStream		(Int, Driver *);
-							 InStream		(Int, const String &, Int = IS_NORMAL);
-							 InStream		(Int, FILE *);
-							 InStream		(Int, Void *, Long);
-							 InStream		(Int, OutStream *);
-							~InStream		();
 		};
 	};
 };

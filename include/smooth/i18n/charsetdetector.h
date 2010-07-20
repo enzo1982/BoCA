@@ -8,40 +8,22 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_MUTEXPOSIX
-#define H_OBJSMOOTH_MUTEXPOSIX
+#ifndef H_OBJSMOOTH_I18N_CHARSET_DETECTOR
+#define H_OBJSMOOTH_I18N_CHARSET_DETECTOR
+
+#include "../definitions.h"
 
 namespace smooth
 {
-	namespace Threads
+	namespace I18n
 	{
-		class MutexPOSIX;
-	};
-};
-
-#include "../mutexbackend.h"
-
-#include <pthread.h>
-
-namespace smooth
-{
-	namespace Threads
-	{
-		const Int	 MUTEX_POSIX	= 1;
-
-		class MutexPOSIX : public MutexBackend
+		class SMOOTHAPI CharsetDetector
 		{
-			protected:
-				pthread_mutex_t	*mutex;
-				Bool		 myMutex;
 			public:
-						 MutexPOSIX(Void * = NIL);
-						~MutexPOSIX();
+						 CharsetDetector();
+				virtual		~CharsetDetector();
 
-				Void		*GetSystemMutex() const;
-
-				Int		 Lock();
-				Int		 Release();
+				String		 DetectCharset(const char *);
 		};
 	};
 };

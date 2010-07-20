@@ -144,7 +144,7 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 		/* Find track number and length.
 		 */
 		{
-			InStream	*in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+			InStream	*in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 			in->Seek(22);
 

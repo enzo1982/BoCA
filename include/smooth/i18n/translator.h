@@ -19,7 +19,6 @@ namespace smooth
 	};
 };
 
-#include "string.h"
 #include "../xml/document.h"
 
 namespace smooth

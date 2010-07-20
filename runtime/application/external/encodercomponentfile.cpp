@@ -35,7 +35,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 	wavFileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".wav");
 	encFileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".").Append(GetOutputFileExtension());
 
-	out = new OutStream(STREAM_FILE, wavFileName, OS_OVERWRITE);
+	out = new OutStream(STREAM_FILE, wavFileName, OS_REPLACE);
 
 	/* Write WAVE header
 	 */
@@ -168,13 +168,15 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	/* Stream contents of created file to output driver
 	 */
-	InStream		 in(STREAM_FILE, encFileName, IS_READONLY);
+	InStream		 in(STREAM_FILE, encFileName, IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
 	Int			 bytesLeft = in.Size();
 
 	while (bytesLeft)
 	{
-		driver->WriteData((UnsignedByte *) in.InputData(buffer, Math::Min(1024, bytesLeft)), Math::Min(1024, bytesLeft));
+		in.InputData(buffer, Math::Min(1024, bytesLeft));
+
+		driver->WriteData(buffer, Math::Min(1024, bytesLeft));
 
 		bytesLeft -= Math::Min(1024, bytesLeft);
 	}

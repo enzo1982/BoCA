@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,7 +32,7 @@ namespace smooth
 	namespace IO
 	{
 		const Int	 OS_APPEND	= 0;
-		const Int	 OS_OVERWRITE	= 1;
+		const Int	 OS_REPLACE	= 1;
 
 		class SMOOTHAPI OutStream : public Stream
 		{
@@ -45,6 +45,13 @@ namespace smooth
 
 				Bool			 WriteData		();
 			public:
+							 OutStream		(Int, Driver *);
+							 OutStream		(Int, const String &, Int = OS_APPEND);
+							 OutStream		(Int, FILE *);
+							 OutStream		(Int, Void *, Long);
+							 OutStream		(Int, InStream *);
+				virtual			~OutStream		();
+
 				Bool			 OutputNumber		(Long, Int);
 				Bool			 OutputNumberRaw	(Long, Int);
 				Bool			 OutputNumberPDP	(Long, Int);
@@ -66,12 +73,6 @@ namespace smooth
 
 				Bool			 Flush			();
 
-							 OutStream		(Int, Driver *);
-							 OutStream		(Int, const String &, Int = OS_APPEND);
-							 OutStream		(Int, FILE *);
-							 OutStream		(Int, Void *, Long);
-							 OutStream		(Int, InStream *);
-							~OutStream		();
 		};
 	};
 };

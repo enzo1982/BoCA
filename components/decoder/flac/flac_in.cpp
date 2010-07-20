@@ -74,12 +74,9 @@ Bool BoCA::FLACIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READONLY);
+	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READ);
 	InStream	*f_in = new InStream(STREAM_DRIVER, ioDriver);
 
-	Format	&format = track.GetFormat();
-
-	format.order	= BYTE_INTEL;
 	track.fileSize	= f_in->Size();
 
 	infoTrack = &track;
@@ -213,13 +210,13 @@ FLAC__StreamDecoderWriteStatus BoCA::FLACStreamDecoderWriteCallback(const FLAC__
 
 	Int	 oSize = filter->samplesBuffer.Size();
 
-	filter->samplesBuffer.Resize(oSize + frame->header.blocksize * filter->track.GetFormat().channels);
+	filter->samplesBuffer.Resize(oSize + frame->header.blocksize * frame->header.channels);
 
-	for (Int i = 0; i < (signed) frame->header.blocksize; i++)
+	for (Int i = 0; i < signed(frame->header.blocksize); i++)
 	{
-		for (Int j = 0; j < filter->track.GetFormat().channels; j++)
+		for (Int j = 0; j < signed(frame->header.channels); j++)
 		{
-			filter->samplesBuffer[oSize + i * filter->track.GetFormat().channels + j] = buffer[j][i];
+			filter->samplesBuffer[oSize + i * signed(frame->header.channels) + j] = buffer[j][i];
 		}
 	}
 
@@ -269,6 +266,7 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO)
 	{
 		filter->infoTrack->GetFormat().bits	= metadata->data.stream_info.bits_per_sample;
+		filter->infoTrack->GetFormat().order	= BYTE_INTEL;
 		filter->infoTrack->GetFormat().channels	= metadata->data.stream_info.channels;
 		filter->infoTrack->GetFormat().rate	= metadata->data.stream_info.sample_rate;
 		filter->infoTrack->length		= metadata->data.stream_info.total_samples * filter->infoTrack->GetFormat().channels;

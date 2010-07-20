@@ -328,7 +328,7 @@ Error BoCA::APETag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track
 
 Error BoCA::APETag::ParseStreamInfo(const String &fileName, Track &track)
 {
-	InStream		 in(STREAM_FILE, fileName, IS_READONLY);
+	InStream		 in(STREAM_FILE, fileName, IS_READ);
 	Buffer<UnsignedByte>	 buffer(32);
 
 	in.InputData(buffer, 32);
@@ -458,7 +458,7 @@ Bool BoCA::APETag::ParseAPEBinaryItem(const Buffer<UnsignedByte> &buffer, Int &o
 
 Error BoCA::APETag::UpdateStreamInfo(const String &fileName, const Track &track)
 {
-	InStream		 in(STREAM_FILE, fileName, IS_READONLY);
+	InStream		 in(STREAM_FILE, fileName, IS_READ);
 	Buffer<UnsignedByte>	 buffer(32);
 
 	in.InputData(buffer, 32);
@@ -490,7 +490,8 @@ Error BoCA::APETag::UpdateStreamInfo(const String &fileName, const Track &track)
 			{
 				Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
 
-				out.OutputData(in.InputData(buffer, bytes), bytes);
+				in.InputData(buffer, bytes);
+				out.OutputData(buffer, bytes);
 			}
 
 			in.Close();
@@ -535,7 +536,8 @@ Error BoCA::APETag::UpdateStreamInfo(const String &fileName, const Track &track)
 			{
 				Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
 
-				out.OutputData(in.InputData(buffer, bytes), bytes);
+				in.InputData(buffer, bytes);
+				out.OutputData(buffer, bytes);
 			}
 
 			buffer.Resize(0);

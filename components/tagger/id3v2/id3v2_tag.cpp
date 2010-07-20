@@ -422,7 +422,7 @@ Error BoCA::ID3v2Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 
 Error BoCA::ID3v2Tag::ParseStreamInfo(const String &fileName, Track &track)
 {
-	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
 
 	/* Look for ID3v2 tag.
 	 */
@@ -454,7 +454,7 @@ Error BoCA::ID3v2Tag::ParseStreamInfo(const String &fileName, Track &track)
 
 Error BoCA::ID3v2Tag::UpdateStreamInfo(const String &fileName, const Track &track)
 {
-	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
 
 	/* Look for ID3v2 tag.
 	 */
@@ -496,7 +496,8 @@ Error BoCA::ID3v2Tag::UpdateStreamInfo(const String &fileName, const Track &trac
 		{
 			Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
 
-			out.OutputData(in.InputData(buffer, bytes), bytes);
+			in.InputData(buffer, bytes);
+			out.OutputData(buffer, bytes);
 		}
 
 		in.Close();

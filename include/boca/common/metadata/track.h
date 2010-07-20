@@ -64,9 +64,6 @@ namespace BoCA
 
 			/* Other information:
 			 */
-			String		 fileSizeString;
-			String		 lengthString;
-
 			String		 outfile;
 			String		 origFilename;
 
@@ -99,6 +96,9 @@ namespace BoCA
 			Void		 SetOriginalInfo(const Info &nOriginalInfo)	{ originalInfo = nOriginalInfo; }
 			Info		&GetOriginalInfo()				{ return originalInfo; }
 			const Info	&GetOriginalInfo() const			{ return originalInfo; }
+
+			String		 GetLengthString() const;
+			String		 GetFileSizeString() const;
 	};
 };
 

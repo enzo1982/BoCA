@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -74,15 +74,36 @@ Bool BoCA::WaveOut::Activate()
 
 Bool BoCA::WaveOut::Deactivate()
 {
-	Int	 size = nOfSamples * (track.GetFormat().bits / 8) + 36;
+	Config		*config = Config::Get();
+	const Info	&info = track.GetInfo();
+
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFINFOTag", False))
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 tagBuffer;
+
+			tagger->RenderBuffer(tagBuffer, track);
+
+			driver->WriteData(tagBuffer, tagBuffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
+	}
+
+	/* Write file and data size to header.
+	 */
+	Int	 fileSize = driver->GetSize() - 8;
+	Int	 dataSize = nOfSamples * (track.GetFormat().bits / 8);
 
 	driver->Seek(4);
-	driver->WriteData((unsigned char *) &size, 4);
-
-	size -= 36;
+	driver->WriteData((unsigned char *) &fileSize, 4);
 
 	driver->Seek(40);
-	driver->WriteData((unsigned char *) &size, 4);
+	driver->WriteData((unsigned char *) &dataSize, 4);
 
 	return True;
 }

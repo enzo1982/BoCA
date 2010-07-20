@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,35 +13,15 @@
 
 BoCA::ConfigureResample::ConfigureResample()
 {
-	Point	 pos;
-	Size	 size;
-
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 399;
-	size.cy = 59;
+	group_converter		= new GroupBox(i18n->TranslateString("Converter"), Point(7, 11), Size(399, 59));
+	group_samplerate	= new GroupBox(i18n->TranslateString("Output samplerate"), Point(7, 82), Size(399, 43));
 
-	group_converter		= new GroupBox(i18n->TranslateString("Converter"), pos, size);
+	text_converter		= new Text(String(i18n->TranslateString("Converter")).Append(":"), Point(17, 27));
 
-	pos.y += 71;
-	size.cy = 43;
-
-	group_samplerate	= new GroupBox(i18n->TranslateString("Output samplerate"), pos, size);
-
-	pos.x = 17;
-	pos.y = 27;
-
-	text_converter		= new Text(String(i18n->TranslateString("Converter")).Append(":"), pos);
-
-	pos.x += text_converter->textSize.cx + 7;
-	pos.y -= 3;
-	size.cx = 325;
-	size.cy = 0;
-
-	combo_converter		= new ComboBox(pos, size);
+	combo_converter		= new ComboBox(Point(24 + text_converter->textSize.cx, 24), Size(325, 0));
 	combo_converter->SelectNthEntry(config->GetIntValue("Resample", "Converter", SRC_SINC_BEST_QUALITY));
 	combo_converter->onSelectEntry.Connect(&ConfigureResample::SetConverter, this);
 
@@ -54,25 +34,13 @@ BoCA::ConfigureResample::ConfigureResample()
 		combo_converter->AddEntry(name);
 	}
 
-	pos.x = 72;
-	pos.y = 49;
+	text_description	= new Text("Description", Point(72, 49));
+	text_samplerate		= new Text(String(i18n->TranslateString("Samplerate")).Append(":"), Point(17, 98));
 
-	text_description	= new Text("Description", pos);
-
-	pos.x = 17;
-	pos.y = 98;
-
-	text_samplerate		= new Text(String(i18n->TranslateString("Samplerate")).Append(":"), pos);
-
-	pos.x += text_samplerate->textSize.cx + 7;
-	pos.y -= 3;
-	size.cx = 70;
-	size.cy = 0;
-
-	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), pos, size, 6);
+	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), Point(24 + text_samplerate->textSize.cx, 95), Size(70, 0), 6);
 	edit_samplerate->SetFlags(EDB_NUMERIC);
 
-	list_samplerate	= new ListBox(pos, size);
+	list_samplerate	= new ListBox(Point(24 + text_samplerate->textSize.cx, 95), Size(70, 0));
 	list_samplerate->AddEntry(  "8000");
 	list_samplerate->AddEntry( "11025");
 	list_samplerate->AddEntry( "12000");

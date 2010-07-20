@@ -139,7 +139,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 	/* Open decoded WAVE file and read header
 	 */
-	in = new InStream(STREAM_FILE, wavFileName, IS_READONLY);
+	in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
 	Format	&format = track.GetFormat();
 
@@ -270,7 +270,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 
 	/* Open decoded WAVE file and skip the header
 	 */
-	in = new InStream(STREAM_FILE, wavFileName, IS_READONLY);
+	in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
 	in->Seek(44);
 

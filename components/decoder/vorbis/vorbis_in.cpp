@@ -62,7 +62,7 @@ Bool BoCA::VorbisIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	 in(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
 	Format	&format = track.GetFormat();
 

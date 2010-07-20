@@ -293,7 +293,7 @@ Void BoCA::LayerTagBasic::AddCover()
 		image_covers->Add(entry);
 
 		Picture		 picture;
-		InStream	 in(STREAM_FILE, file, IS_READONLY);
+		InStream	 in(STREAM_FILE, file, IS_READ);
 
 		picture.data.Resize(in.Size());
 

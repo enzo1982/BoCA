@@ -53,7 +53,7 @@ BoCA::RIFFTag::~RIFFTag()
 Error BoCA::RIFFTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
 	Config		*currentConfig = Config::Get();
-	char		*prevOutFormat = String::SetOutputFormat("UTF-8");
+	char		*prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "RIFFINFOTagEncoding", "ISO-8859-1"));
 
 	const Info	&info = track.GetInfo();
 
@@ -64,9 +64,9 @@ Error BoCA::RIFFTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tra
 	if	(info.artist != NIL) RenderTagItem("IART", info.artist, buffer);
 	if	(info.title  != NIL) RenderTagItem("INAM", info.title, buffer);
 	if	(info.album  != NIL) RenderTagItem("IPRD", info.album, buffer);
-	if	(info.track   >   0) RenderTagItem("ITRK", String::FromInt(info.track), buffer);
-	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year), buffer);
 	if	(info.genre  != NIL) RenderTagItem("IGNR", info.genre, buffer);
+	if	(info.track   >   0) RenderTagItem("ITRK", String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track)), buffer);
+	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year).Append("-01-01"), buffer);
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderTagItem("ICMT", info.comment, buffer);
 	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		RenderTagItem("ICMT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer);
@@ -110,17 +110,17 @@ Int BoCA::RIFFTag::RenderTagHeader(Buffer<UnsignedByte> &buffer)
 
 Int BoCA::RIFFTag::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
 {
-	Int		 size = strlen(value) + (strlen(value) & 1) + 8;
+	Int		 stringSize = strlen(value) + 1;
+	Int		 bufferSize = stringSize + (stringSize & 1) + 8;
 
-	buffer.Resize(buffer.Size() + size);
+	buffer.Resize(buffer.Size() + bufferSize);
 
-	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - size, size);
+	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - bufferSize, bufferSize);
 
 	out.OutputString(id);
-	out.OutputNumber(size - 8, 4);
+	out.OutputNumber(stringSize, 4);
 	out.OutputString(value);
-	out.OutputNumber(0, 1 + (strlen(value) & 1));
-
+	out.OutputNumber(0, 1 + (stringSize & 1));
 	return Success();
 }
 
@@ -140,7 +140,7 @@ Error BoCA::RIFFTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &trac
 	/* Parse individual comment items.
 	 */
 	Info	&info = track.GetInfo();
-	char	*prevInFormat = String::SetInputFormat("UTF-8");
+	char	*prevInFormat = String::SetInputFormat("ISO-8859-1");
 
 	while (!error)
 	{
@@ -154,7 +154,7 @@ Error BoCA::RIFFTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &trac
 		else if (id == "INAM") info.title   = value;
 		else if (id == "IPRD") info.album   = value;
 		else if (id == "ITRK") info.track   = value.ToInt();
-		else if (id == "ICRD") info.year    = value.ToInt();
+		else if (id == "ICRD") info.year    = value.Head(4).ToInt();
 		else if (id == "IGNR") info.genre   = value;
 		else if (id == "ICMT") info.comment = value;
 
@@ -175,7 +175,7 @@ Error BoCA::RIFFTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &trac
 
 Error BoCA::RIFFTag::ParseStreamInfo(const String &fileName, Track &track)
 {
-	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
 	Bool		 error = False;
 
 	/* Read RIFF chunk.

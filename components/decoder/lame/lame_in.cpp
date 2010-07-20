@@ -62,7 +62,7 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	ex_lame_decode_init();
 
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 	Format	&format = track.GetFormat();
 

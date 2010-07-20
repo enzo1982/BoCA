@@ -36,7 +36,7 @@ const String &BoCA::WaveIn::GetComponentSpecs()
 
 Bool BoCA::WaveIn::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
 	Int		 magic = f_in->InputNumber(4);
 
 	delete f_in;
@@ -46,7 +46,7 @@ Bool BoCA::WaveIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READONLY);
+	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 	Format	&format = track.GetFormat();
 

@@ -32,6 +32,8 @@ namespace smooth
 				List				 list;
 				Hotspot				*headHotspot;
 
+				Void				 CalculateHeight();
+
 				Void				 PaintText(const Color &, Bool);
 			public:
 				static const Int		 classID;

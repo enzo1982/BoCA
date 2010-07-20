@@ -198,6 +198,15 @@ Bool BoCA::Config::LoadSettings()
 
 Bool BoCA::Config::SaveSettings()
 {
+	/* Save persistent values first.
+	 */
+	for (Int i = 0; i < persistentIntIDs.Length(); i++)
+	{
+		const String &nthID = persistentIntIDs.GetNthReference(i);
+
+		config->SetIntValue(nthID.Head(nthID.Find("::")), nthID.Tail(nthID.Length() - nthID.Find("::") - 2), *persistentIntValues.GetNth(i));
+	}
+
 	config->SetIntValue("Settings", "FirstStart", 0);
 	config->SetStringValue("Settings", "Language", language);
 	config->SetIntValue("Settings", "WindowPosX", wndPos.x);

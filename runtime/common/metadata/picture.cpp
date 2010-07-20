@@ -43,7 +43,7 @@ BoCA::Picture &BoCA::Picture::operator =(const Picture &oPicture)
 
 Int BoCA::Picture::LoadFromFile(const String &fileName)
 {
-	InStream	 in(STREAM_FILE, fileName, IS_READONLY);
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
 
 	type = 0x03; // Cover (front)
 	mime = fileName.EndsWith(".png") ? "image/png" : "image/jpeg";
@@ -56,7 +56,7 @@ Int BoCA::Picture::LoadFromFile(const String &fileName)
 
 Int BoCA::Picture::SaveToFile(const String &fileName) const
 {
-	OutStream	 out(STREAM_FILE, String(fileName).Append(mime == "image/png" ? ".png" : ".jpg"), OS_OVERWRITE);
+	OutStream	 out(STREAM_FILE, String(fileName).Append(mime == "image/png" ? ".png" : ".jpg"), OS_REPLACE);
 
 	out.OutputData(data, data.Size());
 
