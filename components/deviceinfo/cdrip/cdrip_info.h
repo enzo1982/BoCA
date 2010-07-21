@@ -17,11 +17,11 @@ namespace BoCA
 	class CDRipInfo : public CS::DeviceInfoComponent
 	{
 		private:
+			static Bool		 initialized;
+
 			Void			 CollectDriveInfo();
 		public:
 			static const String	&GetComponentSpecs();
-
-			static Bool		 initialized;
 
 						 CDRipInfo();
 						~CDRipInfo();

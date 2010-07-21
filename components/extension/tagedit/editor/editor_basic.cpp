@@ -497,7 +497,7 @@ Void BoCA::LayerTagBasic::OnSelectNone()
  */
 Void BoCA::LayerTagBasic::OnModifyTrack()
 {
-	Info	&info = track.GetInfo();
+	Info	 info = track.GetInfo();
 
 	info.artist	= edit_artist->GetText();
 	info.title	= edit_title->GetText();
@@ -511,6 +511,8 @@ Void BoCA::LayerTagBasic::OnModifyTrack()
 
 	info.disc	= edit_disc->GetText().ToInt();
 	info.numDiscs	= edit_ndiscs->GetText().ToInt();
+
+	track.SetInfo(info);
 
 	Int	 index = image_covers->GetSelectedEntryNumber();
 

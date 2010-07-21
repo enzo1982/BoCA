@@ -48,10 +48,7 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
 
-	Format	&format = track.GetFormat();
-
 	track.fileSize	= f_in->Size();
-	format.order	= BYTE_INTEL;
 
 	/* Read RIFF chunk.
 	 */
@@ -77,12 +74,17 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			if (f_in->InputNumber(2) != 1) { errorState = True; errorString = "Unsupported audio format"; }
 
+			Format	 format = track.GetFormat();
+
 			format.channels	= (unsigned short) f_in->InputNumber(2);
 			format.rate	= (unsigned long) f_in->InputNumber(4);
 
 			f_in->RelSeek(6);
 
+			format.order	= BYTE_INTEL;
 			format.bits	= (unsigned short) f_in->InputNumber(2);
+
+			track.SetFormat(format);
 
 			/* Skip rest of chunk.
 			 */
@@ -90,7 +92,7 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 		}
 		else if (chunk == "data")
 		{
-			track.length	= (unsigned long) cSize / (format.bits / 8);
+			track.length	= (unsigned long) cSize / (track.GetFormat().bits / 8);
 		}
 		else
 		{

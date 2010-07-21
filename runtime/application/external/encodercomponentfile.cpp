@@ -85,7 +85,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	execInfo.cbSize		= sizeof(execInfo);
 	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	execInfo.lpVerb		= "open";
-	execInfo.lpFile		= String(specs->external_command).Replace("/", "\\");
+	execInfo.lpFile		= String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
 	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
 								   .Replace("%INFILE", String("\"").Append(wavFileName).Append("\""))
 								   .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))

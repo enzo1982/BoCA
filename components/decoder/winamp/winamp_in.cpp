@@ -160,10 +160,6 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
-	Format	&format = track.GetFormat();
-	Info	&info = track.GetInfo();
-
-	format.order	= BYTE_INTEL;
 	track.fileSize	= f_in->Size();
 	track.length	= -1;
 
@@ -242,11 +238,13 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
 	}
 
-	track.approxLength = (Int) (Float(length_ms) * Float(format.rate * format.channels) / 1000.0);
+	track.approxLength = (Int) (Float(length_ms) * Float(track.GetFormat().rate * track.GetFormat().channels) / 1000.0);
 
 	String	 trackTitle = title;
 
 	delete [] title;
+
+	Info	 info = track.GetInfo();
 
 	Int	 artistComplete = 0;
 
@@ -275,11 +273,13 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 		info.title = NIL;
 	}
 
+	track.SetInfo(info);
+
 	/* Return an error if we didn't get useful format data.
 	 */
-	if (format.rate	    == 0 ||
-	    format.channels == 0 ||
-	    format.bits	    == 0)
+	if (track.GetFormat().rate     == 0 ||
+	    track.GetFormat().channels == 0 ||
+	    track.GetFormat().bits     == 0)
 	{
 		errorState = True;
 
@@ -534,11 +534,14 @@ int BoCA::Out_Open(int samplerate, int numchannels, int bitspersamp, int bufferl
 {
 	if (filter->infoTrack == NIL) return 0;
 
-	Format	&format = filter->infoTrack->GetFormat();
+	Format	 format = filter->infoTrack->GetFormat();
 
+	format.order	= BYTE_INTEL;
 	format.channels	= numchannels;
 	format.rate	= samplerate;
 	format.bits	= bitspersamp;
+
+	filter->infoTrack->SetFormat(format);
 
 	return 0;
 }

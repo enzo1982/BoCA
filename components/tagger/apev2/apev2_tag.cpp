@@ -241,7 +241,7 @@ Error BoCA::APETag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track
 
 	char	*prevInFormat = String::SetInputFormat("UTF-8");
 
-	Info	&info = track.GetInfo();
+	Info	 info = track.GetInfo();
 
 	for (Int i = 0; i < numItems; i++)
 	{
@@ -320,6 +320,8 @@ Error BoCA::APETag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track
 			track.pictures.Add(picture);
 		}
 	}
+
+	track.SetInfo(info);
 
 	String::SetInputFormat(prevInFormat);
 

@@ -346,11 +346,16 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, ma
 {
 	MADIn	*filter = (MADIn *) client_data;
 
-	filter->infoTrack->GetFormat().bits	= 16;
-	filter->infoTrack->GetFormat().order	= BYTE_INTEL;
-	filter->infoTrack->GetFormat().channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
-	filter->infoTrack->GetFormat().rate	= header->samplerate;
-	filter->infoTrack->approxLength		= filter->infoTrack->fileSize / (header->bitrate / 8) * filter->infoTrack->GetFormat().rate * filter->infoTrack->GetFormat().channels;
+	Format	 format = filter->infoTrack->GetFormat();
+
+	format.bits	= 16;
+	format.order	= BYTE_INTEL;
+	format.channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
+	format.rate	= header->samplerate;
+
+	filter->infoTrack->approxLength = filter->infoTrack->fileSize / (header->bitrate / 8) * format.rate * format.channels;
+
+	filter->infoTrack->SetFormat(format);
 
 	/* If we previously found a Xing header,
 	 * we can compute the exact duration from
@@ -358,7 +363,7 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, ma
 	 */
 	if (filter->numFrames > 0)
 	{
-		filter->infoTrack->length = filter->numFrames * Math::Round((Float) header->duration.fraction / MAD_TIMER_RESOLUTION * filter->infoTrack->GetFormat().rate) * filter->infoTrack->GetFormat().channels;
+		filter->infoTrack->length = filter->numFrames * Math::Round((Float) header->duration.fraction / MAD_TIMER_RESOLUTION * format.rate) * format.channels;
 	}
 
 	return MAD_FLOW_STOP;

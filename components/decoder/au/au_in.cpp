@@ -49,7 +49,7 @@ Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	// TODO: Add more checking to this!
 
-	Format	&format = track.GetFormat();
+	Format	 format = track.GetFormat();
 
 	track.fileSize = f_in->Size();
 	format.order = BYTE_RAW;
@@ -74,6 +74,8 @@ Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &track)
 		format.rate = UnsignedInt32(f_in->InputNumberRaw(4));
 		format.channels = UnsignedInt32(f_in->InputNumberRaw(4));
 	}
+
+	track.SetFormat(format);
 
 	delete f_in;
 

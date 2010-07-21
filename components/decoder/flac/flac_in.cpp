@@ -265,11 +265,16 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO)
 	{
-		filter->infoTrack->GetFormat().bits	= metadata->data.stream_info.bits_per_sample;
-		filter->infoTrack->GetFormat().order	= BYTE_INTEL;
-		filter->infoTrack->GetFormat().channels	= metadata->data.stream_info.channels;
-		filter->infoTrack->GetFormat().rate	= metadata->data.stream_info.sample_rate;
-		filter->infoTrack->length		= metadata->data.stream_info.total_samples * filter->infoTrack->GetFormat().channels;
+		Format	 format = filter->infoTrack->GetFormat();
+
+		format.bits	= metadata->data.stream_info.bits_per_sample;
+		format.order	= BYTE_INTEL;
+		format.channels	= metadata->data.stream_info.channels;
+		format.rate	= metadata->data.stream_info.sample_rate;
+
+		filter->infoTrack->length = metadata->data.stream_info.total_samples * format.channels;
+
+		filter->infoTrack->SetFormat(format);
 	}
 	else if (metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT)
 	{

@@ -65,7 +65,7 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 	int		 channels	= 0;
 	void		*decoder	= ex_bonk_decoder_create();
 
-	Format		&format		= track.GetFormat();
+	Format		 format		= track.GetFormat();
 
 	int		 bytes = Math::Min(in->Size(), 524288);
 
@@ -79,6 +79,8 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 	format.channels = channels;
 	format.order = BYTE_INTEL;
 	format.bits = 16;
+
+	track.SetFormat(format);
 
 	track.length = length;
 	track.fileSize = in->Size();

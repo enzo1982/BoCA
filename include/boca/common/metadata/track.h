@@ -86,15 +86,12 @@ namespace BoCA
 			Int		 GetTrackID() const				{ return trackID; }
 
 			Void		 SetFormat(const Format &nFormat)		{ format = nFormat; }
-			Format		&GetFormat()					{ return format; }
 			const Format	&GetFormat() const				{ return format; }
 
 			Void		 SetInfo(const Info &nInfo)			{ info = nInfo; }
-			Info		&GetInfo()					{ return info; }
 			const Info	&GetInfo() const				{ return info; }
 
 			Void		 SetOriginalInfo(const Info &nOriginalInfo)	{ originalInfo = nOriginalInfo; }
-			Info		&GetOriginalInfo()				{ return originalInfo; }
 			const Info	&GetOriginalInfo() const			{ return originalInfo; }
 
 			String		 GetLengthString() const;

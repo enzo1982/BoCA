@@ -88,7 +88,7 @@ Void BoCA::ChooserAlbums::OnModifyTrack(const Track &track)
 			for (Int j = 0; j < tracks.Length(); j++)
 			{
 				Track	&track = tracks.GetNthReference(j);
-				Info	&trackInfo = track.GetInfo();
+				Info	 trackInfo = track.GetInfo();
 
 				if (!IsAlbumIdentical(track, origAlbum)) continue;
 
@@ -102,6 +102,8 @@ Void BoCA::ChooserAlbums::OnModifyTrack(const Track &track)
 
 				trackInfo.disc		= info.disc;
 				trackInfo.numDiscs	= info.numDiscs;
+
+				track.SetInfo(trackInfo);
 
 				JobList::Get()->onComponentModifyTrack.Emit(track);
 			}
@@ -238,7 +240,7 @@ Void BoCA::ChooserAlbums::UpdateAlbumList()
 		if (!found)
 		{
 			Track		 album;
-			Info		&albumInfo = album.GetInfo();
+			Info		 albumInfo = album.GetInfo();
 			const Info	&trackInfo = track.GetInfo();
 
 			albumInfo.artist	= trackInfo.artist;
@@ -251,6 +253,8 @@ Void BoCA::ChooserAlbums::UpdateAlbumList()
 
 			albumInfo.disc		= trackInfo.disc;
 			albumInfo.numDiscs	= trackInfo.numDiscs;
+
+			album.SetInfo(albumInfo);
 
 			const Info	&info = album.GetInfo();
 			String		 jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.album.Length() > 0 ? info.album : I18n::Get()->TranslateString("unknown album")).Append("\t");

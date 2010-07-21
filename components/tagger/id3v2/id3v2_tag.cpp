@@ -247,7 +247,7 @@ Error BoCA::ID3v2Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 
 	ID3TagIterator	*iterator = ex_ID3Tag_CreateIterator(tag);
 
-	Info		&info = track.GetInfo();
+	Info		 info = track.GetInfo();
 
 	for (UnsignedInt i = 0; i < ex_ID3Tag_NumFrames(tag); i++)
 	{
@@ -412,6 +412,8 @@ Error BoCA::ID3v2Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 			}
 		}
 	}
+
+	track.SetInfo(info);
 
 	ex_ID3TagIterator_Delete(iterator);
 

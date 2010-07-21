@@ -185,7 +185,7 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 	Config		*currentConfig = Config::Get();
 
 	MP4FileHandle	 mp4File;
-	Info		&info = track.GetInfo();
+	Info		 info = track.GetInfo();
 
 	if (String::IsUnicode(fileName))
 	{
@@ -254,6 +254,8 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 			}
 		}
 	}
+
+	track.SetInfo(info);
 
 	String::SetInputFormat(prevInFormat);
 

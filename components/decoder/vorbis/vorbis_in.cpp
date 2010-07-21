@@ -64,7 +64,7 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	Format	&format = track.GetFormat();
+	Format	 format = track.GetFormat();
 
 	format.order = BYTE_INTEL;
 	format.bits = 16;
@@ -106,9 +106,9 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 
 				if (packetNum == 0)
 				{
-					format.rate = vi.rate;
-					format.channels = vi.channels;
-					track.length = -1;
+					format.rate	= vi.rate;
+					format.channels	= vi.channels;
+					track.length	= -1;
 
 					Int	 bitrate = 0;
 
@@ -141,6 +141,8 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 			}
 		}
 	}
+
+	track.SetFormat(format);
 
 	if (initialized)
 	{

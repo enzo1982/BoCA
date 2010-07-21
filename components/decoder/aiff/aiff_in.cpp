@@ -50,7 +50,7 @@ Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	// TODO: Add more checking to this!
 
-	Format	&format = track.GetFormat();
+	Format	 format = track.GetFormat();
 
 	track.fileSize = f_in->Size();
 	format.order = BYTE_RAW;
@@ -75,6 +75,8 @@ Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &track)
 		f_in->InputNumber(1);
 
 	track.length = UnsignedInt32(f_in->InputNumberRaw(4) - 8) / (format.bits / 8);
+
+	track.SetFormat(format);
 
 	delete f_in;
 

@@ -49,17 +49,19 @@ Error BoCA::VocIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	// TODO: Add more checking to this!
 
-	Format	&format = track.GetFormat();
-
 	track.fileSize = f_in->Size();
-	format.order = BYTE_INTEL;
 
 	// Read magic number
 	for (Int i = 0; i < 30; i++) f_in->InputNumber(1);
 
+	Format	 format = track.GetFormat();
+
+	format.order = BYTE_INTEL;
 	format.rate = UnsignedInt32(f_in->InputNumber(4));
 	format.bits = UnsignedInt8(f_in->InputNumber(1));
 	format.channels = UnsignedInt8(f_in->InputNumber(1));
+
+	track.SetFormat(format);
 
 	track.length = (track.fileSize - 42 - 4 * Int((track.fileSize - 42) / 7340032)) / (format.bits / 8);
 

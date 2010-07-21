@@ -85,7 +85,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	execInfo.cbSize		= sizeof(execInfo);
 	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	execInfo.lpVerb		= "open";
-	execInfo.lpFile		= String(specs->external_command).Replace("/", "\\");
+	execInfo.lpFile		= String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
 
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
@@ -141,10 +141,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	 */
 	in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
-	Format	&format = track.GetFormat();
-
 	track.fileSize	= File(streamURI).GetFileSize();
-	format.order	= BYTE_INTEL;
 
 	/* Read RIFF chunk
 	 */
@@ -168,12 +165,17 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		{
 			if (in->InputNumber(2) != 1) { errorState = True; errorString = "Unsupported audio format"; }
 
+			Format	 format = track.GetFormat();
+
 			format.channels	= (unsigned short) in->InputNumber(2);
 			format.rate	= (unsigned long) in->InputNumber(4);
 
 			in->RelSeek(6);
 
+			format.order	= BYTE_INTEL;
 			format.bits	= (unsigned short) in->InputNumber(2);
+
+			track.SetFormat(format);
 
 			/* Skip rest of chunk
 			 */
@@ -181,7 +183,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		}
 		else if (chunk == "data")
 		{
-			track.length	= (unsigned long) cSize / (format.bits / 8);
+			track.length	= (unsigned long) cSize / (track.GetFormat().bits / 8);
 		}
 		else
 		{
@@ -219,7 +221,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	execInfo.cbSize		= sizeof(execInfo);
 	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	execInfo.lpVerb		= "open";
-	execInfo.lpFile		= specs->external_command;
+	execInfo.lpFile		= String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
 
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.

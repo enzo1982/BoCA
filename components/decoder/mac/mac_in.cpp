@@ -80,7 +80,7 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (hAPEDecompress == NIL) return Error();
 
-	Format	&format = track.GetFormat();
+	Format	 format = track.GetFormat();
 
 	format.order	= BYTE_INTEL;
 	format.bits	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BITS_PER_SAMPLE, 0, 0);
@@ -89,6 +89,8 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 	format.rate	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_SAMPLE_RATE, 0, 0);
 
 	track.length	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0) * format.channels;
+
+	track.SetFormat(format);
 
 	ex_APEDecompress_Destroy(hAPEDecompress);
 

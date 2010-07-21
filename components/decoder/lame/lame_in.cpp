@@ -64,7 +64,7 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
-	Format	&format = track.GetFormat();
+	Format	 format = track.GetFormat();
 
 	format.order	= BYTE_INTEL;
 	format.bits	= 16;
@@ -100,6 +100,8 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 		}
 	}
 	while (f_in->GetPos() < f_in->Size());
+
+	track.SetFormat(format);
 
 	delete f_in;
 
@@ -177,8 +179,8 @@ Int BoCA::LAMEIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	pcm_l.Resize(size * 64);
 	pcm_r.Resize(size * 64);
 
-	Int	 nSamples = ex_lame_decode(data, size, pcm_l, pcm_r);
-	Format	&format = track.GetFormat();
+	Int		 nSamples = ex_lame_decode(data, size, pcm_l, pcm_r);
+	const Format	&format = track.GetFormat();
 
 	data.Resize(nSamples * format.channels * (format.bits / 8));
 

@@ -80,9 +80,11 @@ Void smooth::AttachDLL(Void *instance)
 		else if (error != CDEX_OK &&
 			 error != CDEX_NOCDROMDEVICES)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
 
-		if (error == CDEX_OK) config->cdrip_numdrives = ex_CR_GetNumCDROM();
+		/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
+		 */
+		config->cdrip_numdrives = ex_CR_GetNumCDROM();
 
-		if (config->cdrip_numdrives <= config->cdrip_activedrive) config->cdrip_activedrive = 0;
+		if (ex_CR_GetNumCDROM() <= config->GetIntValue("Ripper", "ActiveDrive", 0)) config->SetIntValue("Ripper", "ActiveDrive", 0);
 
 		initializedCDRip = True;
 	}
@@ -120,15 +122,16 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Config	*config = Config::Get();
 
-	Format	&format = track.GetFormat();
-	Info	&info = track.GetInfo();
-
 	track.isCDTrack	= True;
+
+	Format	 format;
 
 	format.channels		= 2;
 	format.rate		= 44100;
 	format.bits		= 16;
 	format.order		= BYTE_INTEL;
+
+	track.SetFormat(format);
 
 	Int	 trackNumber = 0;
 	Int	 trackLength = 0;
@@ -184,6 +187,8 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Fill MCDI data.
 	 */
+	Info	 info;
+
 	info.mcdi = component->GetNthDeviceMCDI(audiodrive);
 
 	Int	 entryNumber = -1;
@@ -265,6 +270,8 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 			info.isrc = data.isrc;
 		}
 	}
+
+	track.SetInfo(info);
 
 	return Success();
 }
@@ -373,7 +380,7 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 		params.bJitterCorrection	= config->cdrip_jitter;
 		params.bDetectJitterErrors	= config->cdrip_detectJitterErrors;
 		params.bDetectC2Errors		= config->cdrip_detectC2Errors;
-		params.nSpeed			= config->GetIntValue("CDRip", "RippingSpeed", 0);
+		params.nSpeed			= config->GetIntValue("Ripper", "RippingSpeed", 0);
 		params.bEnableMultiRead		= False;
 		params.nMultiReadCount		= 0;
 

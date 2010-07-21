@@ -139,7 +139,7 @@ Error BoCA::RIFFTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &trac
 
 	/* Parse individual comment items.
 	 */
-	Info	&info = track.GetInfo();
+	Info	 info = track.GetInfo();
 	char	*prevInFormat = String::SetInputFormat("ISO-8859-1");
 
 	while (!error)
@@ -166,6 +166,8 @@ Error BoCA::RIFFTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &trac
 		 */
 		in.InputNumber(1 + (length & 1));
 	}
+
+	track.SetInfo(info);
 
 	String::SetInputFormat(prevInFormat);
 

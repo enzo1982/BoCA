@@ -74,9 +74,11 @@ Void smooth::AttachDLL(Void *instance)
 		else if (error != CDEX_OK &&
 			 error != CDEX_NOCDROMDEVICES)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
 
-		if (error == CDEX_OK) config->cdrip_numdrives = ex_CR_GetNumCDROM();
+		/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
+		 */
+		config->cdrip_numdrives = ex_CR_GetNumCDROM();
 
-		if (config->cdrip_numdrives <= config->cdrip_activedrive) config->cdrip_activedrive = 0;
+		if (ex_CR_GetNumCDROM() <= config->GetIntValue("Ripper", "ActiveDrive", 0)) config->SetIntValue("Ripper", "ActiveDrive", 0);
 
 		initializedCDRip = True;
 	}

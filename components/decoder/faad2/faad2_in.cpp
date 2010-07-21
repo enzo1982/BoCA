@@ -131,7 +131,7 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 
 Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 {
-	Format	&format = track.GetFormat();
+	Format	 format = track.GetFormat();
 
 	if (!streamURI.ToLower().EndsWith(".aac"))
 	{
@@ -289,6 +289,8 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 			boca.DeleteComponent(tagger);
 		}
 	}
+
+	track.SetFormat(format);
 
 	return Success();
 }

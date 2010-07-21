@@ -111,7 +111,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		File(streamURI).Copy(encFileName);
 	}
 
-	CreateProcessA(NIL, String(specs->external_command).Append(" ").Append(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+	CreateProcessA(NIL, String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter()).Append(" ").Append(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	hProcess = processInfo.hProcess;
 
@@ -131,10 +131,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Read decoded WAVE file header
 	 */
-	Format	&format = track.GetFormat();
-
 	track.fileSize	= File(streamURI).GetFileSize();
-	format.order	= BYTE_INTEL;
 
 	/* Read RIFF chunk
 	 */
@@ -158,12 +155,17 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		{
 			if (in->InputNumber(2) != 1) { errorState = True; errorString = "Unsupported audio format"; }
 
+			Format	 format = track.GetFormat();
+
 			format.channels	= (unsigned short) in->InputNumber(2);
 			format.rate	= (unsigned long) in->InputNumber(4);
 
 			in->RelSeek(6);
 
+			format.order	= BYTE_INTEL;
 			format.bits	= (unsigned short) in->InputNumber(2);
+
+			track.SetFormat(format);
 
 			/* Skip rest of chunk
 			 */
@@ -171,10 +173,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		}
 		else if (chunk == "data")
 		{
-			track.length	= (unsigned long) cSize / (format.bits / 8);
-
-			if (track.length == 0x3fffffff ||
-			    track.length == 0x7fffffff) track.length = -1;
+			if ((unsigned) cSize == 0xffffffff) track.length = -1;
+			else				    track.length = (unsigned long) cSize / (track.GetFormat().bits / 8);
 		}
 		else
 		{
@@ -270,7 +270,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 		File(track.origFilename).Copy(encFileName);
 	}
 
-	CreateProcessA(NIL, String(specs->external_command).Append(" ").Append(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+	CreateProcessA(NIL, String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter()).Append(" ").Append(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	hProcess = processInfo.hProcess;
 

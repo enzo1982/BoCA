@@ -160,8 +160,6 @@ Bool BoCA::Config::LoadSettings()
 	enc_filePattern			= config->GetStringValue("Settings", "EncoderFilenamePattern", "<artist> - <album>\\<artist> - <album> - <track> - <title>");
 	checkUpdatesAtStartup		= config->GetIntValue("Settings", "CheckUpdatesAtStartup", 1);
 
-	cdrip_activedrive		= config->GetIntValue("CDRip", "ActiveCDROM", 0);
-	cdrip_debuglevel		= config->GetIntValue("CDRip", "DebugCDRip", 0);
 	cdrip_paranoia			= config->GetIntValue("CDRip", "CDParanoia", 0);
 	cdrip_paranoia_mode		= config->GetIntValue("CDRip", "CDParanoiaMode", 3);
 	cdrip_detectJitterErrors	= config->GetIntValue("CDRip", "DetectJitterErrors", 1);
@@ -221,8 +219,6 @@ Bool BoCA::Config::SaveSettings()
 	config->SetStringValue("Settings", "EncoderFilenamePattern", enc_filePattern);
 	config->SetIntValue("Settings", "CheckUpdatesAtStartup", checkUpdatesAtStartup);
 
-	config->SetIntValue("CDRip", "ActiveCDROM", cdrip_activedrive);
-	config->SetIntValue("CDRip", "DebugCDRip", cdrip_debuglevel);
 	config->SetIntValue("CDRip", "CDParanoia", cdrip_paranoia);
 	config->SetIntValue("CDRip", "CDParanoiaMode", cdrip_paranoia_mode);
 	config->SetIntValue("CDRip", "DetectJitterErrors", cdrip_detectJitterErrors);

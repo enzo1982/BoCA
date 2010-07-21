@@ -14,18 +14,21 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 {
 	Config	*config = Config::Get();
 
-	setspeed	= config->GetIntValue("CDRip", "RippingSpeed", 0);
-	cdparanoia	= config->cdrip_paranoia;
 	jitter		= config->cdrip_jitter;
 	swapchannels	= config->cdrip_swapchannels;
+
+	setspeed	= config->GetIntValue("Ripper", "RippingSpeed", 0);
+	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
+	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
+
 	locktray	= config->GetIntValue("CDRip", "LockTray", True);
 	ntscsi		= config->GetIntValue("CDRip", "UseNTSCSI", True);
-	autoRead	= config->GetIntValue("CDRip", "AutoReadContents", True);
-	autoRip		= config->GetIntValue("CDRip", "AutoRip", False);
 	autoEject	= config->GetIntValue("CDRip", "EjectAfterRipping", False);
 	readCDText	= config->GetIntValue("CDRip", "ReadCDText", True);
 	readCDPlayerIni	= config->GetIntValue("CDRip", "ReadCDPlayerIni", True);
 	readISRC	= config->GetIntValue("CDRip", "ReadISRC", False);
+
+	cdparanoia	= config->cdrip_paranoia;
 
 	I18n	*i18n = I18n::Get();
 
@@ -46,7 +49,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 		boca.DeleteComponent(info);
 	}
 
-	combo_drive->SelectNthEntry(config->cdrip_activedrive);
+	combo_drive->SelectNthEntry(config->GetIntValue("Ripper", "ActiveDrive", 0));
 
 	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(157, 0), &setspeed);
 	check_speed->onAction.Connect(&ConfigureCDRip::ToggleSetSpeed, this);
@@ -55,7 +58,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 
 	for (Int i = 48; i > 0; i -= 4) combo_speed->AddEntry(String::FromInt(i).Append("x"));
 
-	combo_speed->SelectNthEntry((48 - config->GetIntValue("CDRip", "RippingSpeed", 0)) / 4);
+	combo_speed->SelectNthEntry((48 - config->GetIntValue("Ripper", "RippingSpeed", 0)) / 4);
 
 	ToggleSetSpeed();
 
@@ -188,21 +191,24 @@ Int BoCA::ConfigureCDRip::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	if (config->cdrip_numdrives >= 1) config->cdrip_activedrive = combo_drive->GetSelectedEntryNumber();
+	if (config->cdrip_numdrives >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
 
-	config->SetIntValue("CDRip", "RippingSpeed", setspeed ? 48 - (combo_speed->GetSelectedEntryNumber() * 4) : 0);
-	config->cdrip_paranoia		= cdparanoia;
-	config->cdrip_paranoia_mode	= combo_paranoia_mode->GetSelectedEntryNumber();
 	config->cdrip_jitter		= jitter;
 	config->cdrip_swapchannels	= swapchannels;
+
+	config->SetIntValue("Ripper", "RippingSpeed", setspeed ? 48 - (combo_speed->GetSelectedEntryNumber() * 4) : 0);
+	config->SetIntValue("Ripper", "AutoReadContents", autoRead);
+	config->SetIntValue("Ripper", "AutoRip", autoRip);
+
 	config->SetIntValue("CDRip", "LockTray", locktray);
 	config->SetIntValue("CDRip", "UseNTSCSI", ntscsi);
-	config->SetIntValue("CDRip", "AutoReadContents", autoRead);
-	config->SetIntValue("CDRip", "AutoRip", autoRip);
 	config->SetIntValue("CDRip", "EjectAfterRipping", autoEject);
 	config->SetIntValue("CDRip", "ReadCDText", readCDText);
 	config->SetIntValue("CDRip", "ReadCDPlayerIni", readCDPlayerIni);
 	config->SetIntValue("CDRip", "ReadISRC", readISRC);
+
+	config->cdrip_paranoia		= cdparanoia;
+	config->cdrip_paranoia_mode	= combo_paranoia_mode->GetSelectedEntryNumber();
 
 	return Success();
 }

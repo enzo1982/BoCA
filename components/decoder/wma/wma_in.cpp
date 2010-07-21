@@ -133,12 +133,14 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (pWfx != NIL)
 		{
-			Format	&format = track.GetFormat();
+			Format	 format = track.GetFormat();
 
 			format.order	= BYTE_INTEL;
 			format.bits	= pWfx->wBitsPerSample;
 			format.rate	= pWfx->nSamplesPerSec;
 			format.channels	= pWfx->nChannels;
+
+			track.SetFormat(format);
 
 			delete [] pWfx;
 		}

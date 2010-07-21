@@ -167,7 +167,7 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 	/* Parse individual comment items.
 	 */
 	Int	 numItems = in.InputNumber(4);
-	Info	&info = track.GetInfo();
+	Info	 info = track.GetInfo();
 	char	*prevInFormat = String::SetInputFormat("UTF-8");
 
 	for (Int i = 0; i < numItems; i++)
@@ -217,6 +217,8 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 			track.pictures.Add(picture);
 		}
 	}
+
+	track.SetInfo(info);
 
 	String::SetInputFormat(prevInFormat);
 

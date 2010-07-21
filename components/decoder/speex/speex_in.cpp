@@ -65,7 +65,7 @@ Bool BoCA::SpeexIn::CanOpenStream(const String &streamURI)
 Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
-	Format		&format = track.GetFormat();
+	Format		 format = track.GetFormat();
 
 	format.order = BYTE_INTEL;
 	format.bits = 16;
@@ -104,8 +104,8 @@ Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 				{
 					SpeexHeader	*header = ex_speex_packet_to_header((char *) op.packet, op.bytes);
 
-					format.rate = header->rate;
-					format.channels = header->nb_channels;
+					format.rate	= header->rate;
+					format.channels	= header->nb_channels;
 
 					track.length = -1;
 
@@ -135,6 +135,8 @@ Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 			}
 		}
 	}
+
+	track.SetFormat(format);
 
 	if (initialized) ex_ogg_stream_clear(&os);
 

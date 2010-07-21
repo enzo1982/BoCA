@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -194,7 +194,7 @@ Void BoCA::LayerTagDetails::OnSelectNone()
  */
 Void BoCA::LayerTagDetails::OnModifyTrack()
 {
-	Info	&info = track.GetInfo();
+	Info	 info = track.GetInfo();
 
 	info.label	= edit_publisher->GetText();
 	info.isrc	= edit_isrc->GetText();
@@ -221,6 +221,8 @@ Void BoCA::LayerTagDetails::OnModifyTrack()
 	else if	(!modified_remix       && edit_remix->GetText()	      != NIL) info.other.Add(String(INFO_REMIX).Append(":").Append(edit_remix->GetText()));
 	else if	(!modified_composer    && edit_composer->GetText()    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(edit_composer->GetText()));
 	else if	(!modified_textwriter  && edit_textwriter->GetText()  != NIL) info.other.Add(String(INFO_LYRICIST).Append(":").Append(edit_textwriter->GetText()));
+
+	track.SetInfo(info);
 
 	onModifyTrack.Emit(track);
 }

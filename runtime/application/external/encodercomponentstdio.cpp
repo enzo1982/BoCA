@@ -75,7 +75,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 							      .Replace("%YEAR", String("\"").Append(String::FromInt(info.year)).Append("\""))
 							      .Replace("%GENRE", String("\"").Append((char *) info.genre).Append("\""));
 
-	CreateProcessA(NIL, String(specs->external_command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+	CreateProcessA(NIL, String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter()).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	hProcess = processInfo.hProcess;
 

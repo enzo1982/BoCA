@@ -58,10 +58,7 @@ namespace BoCA
 
 			Bool		 checkUpdatesAtStartup;
 
-			Array<String>	 cdrip_drives;
 			Int		 cdrip_numdrives;
-			Int		 cdrip_activedrive;
-			Int		 cdrip_debuglevel;
 			Bool		 cdrip_paranoia;
 			Bool		 cdrip_jitter;
 			Int		 cdrip_paranoia_mode;

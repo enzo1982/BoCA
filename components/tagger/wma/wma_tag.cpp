@@ -231,7 +231,7 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 
 		hr = metadataEditor2->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
 
-		Info	&info = track.GetInfo();
+		Info	 info = track.GetInfo();
 
 		WORD	 langIndex = 0;
 		WORD	 numIndices = 0;
@@ -360,6 +360,8 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 		}
 
 		delete [] indices;
+
+		track.SetInfo(info);
 
 		pHeaderInfo->Release();
 	}

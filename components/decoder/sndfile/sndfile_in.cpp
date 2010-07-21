@@ -136,7 +136,7 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (sndf != NIL)
 	{
-		Format	&format = track.GetFormat();
+		Format	 format = track.GetFormat();
 
 		track.fileSize	= File(streamURI).GetFileSize();
 		format.order	= BYTE_INTEL;
@@ -161,14 +161,18 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 				break;
 		}
 
+		track.SetFormat(format);
+
 		track.length	= sinfo.frames * sinfo.channels;
 
-		Info	&info = track.GetInfo();
+		Info	 info = track.GetInfo();
 
 		info.artist	= ex_sf_get_string(sndf, SF_STR_ARTIST);
 		info.title	= ex_sf_get_string(sndf, SF_STR_TITLE);
 		info.year	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_DATE));
 		info.comment	= ex_sf_get_string(sndf, SF_STR_COMMENT);
+
+		track.SetInfo(info);
 
 		ex_sf_close(sndf);
 	}

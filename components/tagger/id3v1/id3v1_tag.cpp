@@ -131,7 +131,7 @@ Error BoCA::ID3v1Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 	{
 		char	*prevInFormat = String::SetInputFormat("ISO-8859-1");
 
-		Info	&info = track.GetInfo();
+		Info	 info = track.GetInfo();
 
 		info.title	= in.InputString(30);
 		info.artist	= in.InputString(30);
@@ -153,6 +153,8 @@ Error BoCA::ID3v1Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 		}
 
 		info.genre	= GetID3CategoryName(in.InputNumber(1));
+
+		track.SetInfo(info);
 
 		String::SetInputFormat(prevInFormat);
 
