@@ -24,21 +24,21 @@ const String &BoCA::SpeexIn::GetComponentSpecs()
 
 	if (oggdll != NIL && speexdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Speex Speech Decoder</name>		\
-		    <version>1.0</version>			\
-		    <id>speex-in</id>				\
-		    <type>decoder</type>			\
-		    <format>					\
-		      <name>Speex Files</name>			\
-		      <extension>spx</extension>		\
-		      <tag mode=\"other\">VorbisComment</tag>	\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "							\
+											\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
+		  <component>								\
+		    <name>Speex Speech Decoder</name>					\
+		    <version>1.0</version>						\
+		    <id>speex-in</id>							\
+		    <type>decoder</type>						\
+		    <format>								\
+		      <name>Speex Files</name>						\
+		      <extension>spx</extension>					\
+		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
+		    </format>								\
+		  </component>								\
+											\
 		";
 	}
 

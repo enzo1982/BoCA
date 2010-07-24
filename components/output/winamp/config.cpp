@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,33 +13,19 @@
 
 BoCA::ConfigureWinampOut::ConfigureWinampOut()
 {
-	Point	 pos;
-	Size	 size;
-
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
 
-	pos.x	= 7;
-	pos.y	= 7;
-	size.cx	= 425;
-	size.cy	= 170;
-
-	list_output		= new ListBox(pos, size);
+	list_output		= new ListBox(Point(7, 7), Size(425, 170));
 	list_output->SetFlags(LF_MULTICHECKBOX);
 	list_output->onSelectEntry.Connect(&ConfigureWinampOut::SelectOutputPlugin, this);
 	list_output->onMarkEntry.Connect(&ConfigureWinampOut::SelectOutputPlugin, this);
 
-	pos.x	+= 433;
-	size.cx	= 0;
-	size.cy	= 0;
-
-	button_output		= new Button(i18n->TranslateString("Configure"), NIL, pos, size);
+	button_output		= new Button(i18n->TranslateString("Configure"), NIL, Point(440, 7), Size());
 	button_output->onAction.Connect(&ConfigureWinampOut::ConfigureOutputPlugin, this);
 	button_output->Deactivate();
 
-	pos.y += 30;
-
-	button_output_about	= new Button(i18n->TranslateString("About"), NIL, pos, size);
+	button_output_about	= new Button(i18n->TranslateString("About"), NIL, Point(440, 37), Size());
 	button_output_about->onAction.Connect(&ConfigureWinampOut::AboutOutputPlugin, this);
 	button_output_about->Deactivate();
 

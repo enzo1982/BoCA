@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -43,7 +43,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	slider_quality		= new Slider(Point(text_quality->textSize.cx + 18, 14), Size(289 - text_quality->textSize.cx, 0), OR_HORZ, &quality, -20, 100);
 	slider_quality->onValueChange.Connect(&ConfigureVorbis::SetQuality, this);
 
-	text_quality_value	= new Text("", Point(313, 16));
+	text_quality_value	= new Text(NIL, Point(313, 16));
 
 	group_quality->Add(text_quality);
 	group_quality->Add(slider_quality);
@@ -57,7 +57,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	slider_abrmin		= new Slider(Point(38, 14), Size(228, 0), OR_HORZ, &abrMin, 32, 320);
 	slider_abrmin->onValueChange.Connect(&ConfigureVorbis::SetABRMin, this);
 
-	edit_abrmin		= new EditBox("", Point(279, 13), Size(25, 0), 3);
+	edit_abrmin		= new EditBox(NIL, Point(279, 13), Size(25, 0), 3);
 	edit_abrmin->SetFlags(EDB_NUMERIC);
 	edit_abrmin->onInput.Connect(&ConfigureVorbis::SetABRMinByEditBox, this);
 
@@ -69,7 +69,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	slider_abrnom		= new Slider(Point(38, 41), Size(228, 0), OR_HORZ, &abrNom, 32, 320);
 	slider_abrnom->onValueChange.Connect(&ConfigureVorbis::SetABRNom, this);
 
-	edit_abrnom		= new EditBox("", Point(279, 40), Size(25, 0), 3);
+	edit_abrnom		= new EditBox(NIL, Point(279, 40), Size(25, 0), 3);
 	edit_abrnom->SetFlags(EDB_NUMERIC);
 	edit_abrnom->onInput.Connect(&ConfigureVorbis::SetABRNomByEditBox, this);
 
@@ -81,7 +81,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	slider_abrmax		= new Slider(Point(38, 68), Size(228, 0), OR_HORZ, &abrMax, 32, 320);
 	slider_abrmax->onValueChange.Connect(&ConfigureVorbis::SetABRMax, this);
 
-	edit_abrmax		= new EditBox("", Point(279, 67), Size(25, 0), 3);
+	edit_abrmax		= new EditBox(NIL, Point(279, 67), Size(25, 0), 3);
 	edit_abrmax->SetFlags(EDB_NUMERIC);
 	edit_abrmax->onInput.Connect(&ConfigureVorbis::SetABRMaxByEditBox, this);
 

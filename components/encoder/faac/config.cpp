@@ -113,7 +113,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	slider_bitrate		= new Slider(Point(option_bitrate->GetWidth() + 19, 13), Size(227 - option_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 8, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureFAAC::SetBitrate, this);
 
-	edit_bitrate		= new EditBox("", Point(254, 12), Size(25, 0), 3);
+	edit_bitrate		= new EditBox(NIL, Point(254, 12), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureFAAC::SetBitrateByEditBox, this);
 
@@ -126,7 +126,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	slider_quality		= new Slider(Point(option_quality->GetWidth() + 19, 38), Size(227 - option_quality->GetWidth(), 0), OR_HORZ, &aacQuality, 10, 500);
 	slider_quality->onValueChange.Connect(&ConfigureFAAC::SetQuality, this);
 
-	edit_quality		= new EditBox("", Point(254, 37), Size(25, 0), 3);
+	edit_quality		= new EditBox(NIL, Point(254, 37), Size(25, 0), 3);
 	edit_quality->SetFlags(EDB_NUMERIC);
 	edit_quality->onInput.Connect(&ConfigureFAAC::SetQualityByEditBox, this);
 

@@ -9,11 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca/application/external/encodercomponentstdio.h>
-#include <boca/common/config.h>
 #include <boca/common/utilities.h>
-
-#include <boca/application/registry.h>
-#include <boca/application/taggercomponent.h>
 
 #include <smooth/io/drivers/driver_win32.h>
 
@@ -139,45 +135,16 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 		return False;
 	}
 
-	Config	*config = Config::Get();
-
-	/* Get tagging mode and type
+	/* Create tag buffer
 	 */
-	Int	 tagMode = specs->formats.GetFirst()->GetTagMode();
-	String	 tagType = specs->formats.GetFirst()->GetTagType();
-
-	/* Create tag if requested
-	 */
-	Buffer<UnsignedByte>	 tag;
-
-	const Info		&info = track.GetInfo();
-
-	if (tagMode != TAG_MODE_NONE && (info.artist != NIL || info.title != NIL))
-	{
-		String			 taggerID;
-
-		if	(tagType == "ID3v1"	  && config->GetIntValue("Tags", "EnableID3v1", False))	     taggerID = "id3v1-tag";
-		else if	(tagType == "ID3v2"	  && config->GetIntValue("Tags", "EnableID3v2", True))	     taggerID = "id3v2-tag";
-		else if	(tagType == "APEv2"	  && config->GetIntValue("Tags", "EnableAPEv2", True))	     taggerID = "apev2-tag";
-		else if (tagType == "MP4Metadata" && config->GetIntValue("Tags", "EnableMP4Metadata", True)) taggerID = "mp4-tag";
-
-		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
-
-		if (tagger != NIL)
-		{
-			if (tagMode == TAG_MODE_OTHER)	tagger->RenderStreamInfo(encFileName, track);
-			else				tagger->RenderBuffer(tag, track);
-
-			boca.DeleteComponent(tagger);
-		}
-	}
+	Buffer<UnsignedByte>	 tagBuffer;
+	Int			 tagMode = RenderTag(encFileName, track, tagBuffer);
 
 	/* Prepend tag
 	 */
 	if (tagMode == TAG_MODE_PREPEND)
 	{
-		driver->WriteData(tag, tag.Size());
+		driver->WriteData(tagBuffer, tagBuffer.Size());
 	}
 
 	/* Stream contents of created file to output driver
@@ -199,7 +166,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 	 */
 	if (tagMode == TAG_MODE_APPEND)
 	{
-		driver->WriteData(tag, tag.Size());
+		driver->WriteData(tagBuffer, tagBuffer.Size());
 	}
 
 	in.Close();

@@ -8,7 +8,7 @@
   <format>
     <name>MPEG Audio Layer 3</name>
     <extension>mp3</extension>
-    <tag mode="prepend">ID3v2</tag>
+    <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
   </format>
   <external>
     <command>codecs/cmdline/mp3sDecoder.exe</command>

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -27,6 +27,8 @@ namespace BoCA
 
 				Track			 track;
 				Format			 format;
+
+				virtual Int		 RenderTag(const String &, const Track &, Buffer<UnsignedByte> &);
 			public:
 							 EncoderComponentExternal(ComponentSpecs *);
 				virtual			~EncoderComponentExternal();
@@ -37,7 +39,7 @@ namespace BoCA
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 				virtual Void		 FreeConfigurationLayer();
-
+			accessors:
 				Bool			 GetErrorState()	{ return errorState; }
 				const String		&GetErrorString()	{ return errorString; }
 		};

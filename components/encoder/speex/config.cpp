@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -82,7 +82,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	slider_cbr_quality	= new Slider(Point(74, 14), Size(101, 0), OR_HORZ, &quality, 0, 10);
 	slider_cbr_quality->onValueChange.Connect(&ConfigureSpeex::SetQuality, this);
 
-	text_cbr_quality_value	= new Text("", Point(182, 16));
+	text_cbr_quality_value	= new Text(NIL, Point(182, 16));
 
 	option_cbr_bitrate	= new OptionBox(i18n->TranslateString("Bitrate:"), Point(10, 39), Size(55, 0), &cbrmode, 1);
 	option_cbr_bitrate->onAction.Connect(&ConfigureSpeex::SetCBRMode, this);
@@ -90,7 +90,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	slider_cbr_bitrate	= new Slider(Point(74, 39), Size(101, 0), OR_HORZ, &bitrate, 4, 64);
 	slider_cbr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetBitrate, this);
 
-	text_cbr_bitrate_value	= new Text("", Point(182, 41));
+	text_cbr_bitrate_value	= new Text(NIL, Point(182, 41));
 
 	group_cbr_quality->Add(option_cbr_quality);
 	group_cbr_quality->Add(slider_cbr_quality);
@@ -106,7 +106,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	slider_vbr_quality	= new Slider(Point(text_vbr_quality->textSize.cx + 18, 14), Size(157 - text_vbr_quality->textSize.cx, 0), OR_HORZ, &vbrq, 0, 100);
 	slider_vbr_quality->onValueChange.Connect(&ConfigureSpeex::SetVBRQuality, this);
 
-	text_vbr_quality_value	= new Text("", Point(182, 16));
+	text_vbr_quality_value	= new Text(NIL, Point(182, 16));
 
 	check_vbr_bitrate	= new CheckBox(i18n->TranslateString("Max. bitrate:"), Point(10, 39), Size(80, 0), &use_vbrmax);
 	check_vbr_bitrate->onAction.Connect(&ConfigureSpeex::ToggleVBRBitrate, this);
@@ -114,7 +114,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	slider_vbr_bitrate	= new Slider(Point(93, 39), Size(82, 0), OR_HORZ, &vbrmax, 4, 64);
 	slider_vbr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetVBRBitrate, this);
 
-	text_vbr_bitrate_value	= new Text("", Point(182, 41));
+	text_vbr_bitrate_value	= new Text(NIL, Point(182, 41));
 
 	group_vbr_quality->Add(text_vbr_quality);
 	group_vbr_quality->Add(slider_vbr_quality);
@@ -130,7 +130,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	slider_abr_bitrate	= new Slider(Point(text_abr_bitrate->textSize.cx + 18, 14), Size(157 - text_abr_bitrate->textSize.cx, 0), OR_HORZ, &abr, 4, 64);
 	slider_abr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetABRBitrate, this);
 
-	text_abr_bitrate_value	= new Text("", Point(182, 16));
+	text_abr_bitrate_value	= new Text(NIL, Point(182, 16));
 
 	group_abr_bitrate->Add(text_abr_bitrate);
 	group_abr_bitrate->Add(slider_abr_bitrate);
@@ -153,7 +153,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	slider_complexity	= new Slider(Point(text_complexity->textSize.cx + 18, 14), Size(144 - text_complexity->textSize.cx, 0), OR_HORZ, &complexity, 1, 10);
 	slider_complexity->onValueChange.Connect(&ConfigureSpeex::SetComplexity, this);
 
-	text_complexity_value	= new Text("", Point(169, 16));
+	text_complexity_value	= new Text(NIL, Point(169, 16));
 
 	group_complexity->Add(text_complexity);
 	group_complexity->Add(slider_complexity);

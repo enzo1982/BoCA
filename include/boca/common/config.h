@@ -40,53 +40,11 @@ namespace BoCA
 		public:
 			String		 configDir;
 
-			Bool		 firstStart;
-
-			Point		 wndPos;
-			Size		 wndSize;
-			Bool		 maximized;
-
-			String		 language;
 			Bool		 languageChanged;
- 
-			Bool		 showTitleInfo;
-			Bool		 showTooltips;
-
-			String		 encoderID;
-			String		 enc_outdir;
-			String		 enc_filePattern;
-
-			Bool		 checkUpdatesAtStartup;
 
 			Int		 cdrip_numdrives;
-			Bool		 cdrip_paranoia;
-			Bool		 cdrip_jitter;
-			Int		 cdrip_paranoia_mode;
-			Bool		 cdrip_swapchannels;
-			Bool		 cdrip_autoRead_active;
-			Bool		 cdrip_detectJitterErrors;
-			Bool		 cdrip_detectC2Errors;
 			Int		 cdrip_timeout;
-
-			String		 freedb_dir;
-			String		 freedb_server;
-			Int		 freedb_mode;
-			Int		 freedb_cddbp_port;
-			Int		 freedb_http_port;
-			String		 freedb_query_path;
-			String		 freedb_submit_path;
-			String		 freedb_email;
-			Int		 freedb_proxy_mode;
-			String		 freedb_proxy;
-			Int		 freedb_proxy_port;
-			String		 freedb_proxy_user;
-			String		 freedb_proxy_password;
-			Bool		 enable_local_cddb;
-			Bool		 enable_remote_cddb;
-			Bool		 enable_auto_cddb;
-			Bool		 enable_overwrite_cdtext;
-			Bool		 enable_cddb_cache;
-			Bool		 update_joblist;
+			Bool		 cdrip_autoRead_active;
 
 			Int		 SetIntValue(const String &, const String &, Int);
 			Int		 SetStringValue(const String &, const String &, const String &);

@@ -8,7 +8,7 @@
   <format>
     <name>Speex Files</name>
     <extension>spx</extension>
-    <tag mode="other">VorbisComment</tag>
+    <tag id="vorbis-tag" mode="other">Vorbis Comment</tag>
   </format>
   <external>
     <command>codecs/cmdline/speexenc.exe</command>

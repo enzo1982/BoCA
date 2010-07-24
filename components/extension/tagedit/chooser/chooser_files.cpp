@@ -363,16 +363,34 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 {
 	Config	*config = Config::Get();
 
-	Int	 error = Error();
+	Int	 error	     = Error();
 	String	 errorString = "Unknown error";
 
-	/* Get tagging mode and type
+	/* Get tagger mode, format and ID
 	 */
-	DecoderComponent	*decoder = ChooserFilesUtilities::CreateDecoderComponent(track.origFilename);
-	FileFormat		*format = decoder->GetFormats().GetFirst();
+	DecoderComponent		*decoder = ChooserFilesUtilities::CreateDecoderComponent(track.origFilename);
+	const Array<FileFormat *>	&formats = decoder->GetFormats();
 
-	Int	 tagMode = format->GetTagMode();
-	String	 tagType = format->GetTagType();
+	Int	 tagMode = TAG_MODE_NONE;
+	String	 tagFormat;
+	String	 taggerID;
+
+	String	 lcURI = track.origFilename.ToLower();
+
+	foreach (FileFormat *format, formats)
+	{
+		foreach (String extension, format->GetExtensions())
+		{
+			if (lcURI.EndsWith(String(".").Append(extension)))
+			{
+				tagMode	  = format->GetTagMode();
+				tagFormat = format->GetTagFormat();
+				taggerID  = format->GetTaggerID();
+
+				break;
+			}
+		}
+	}
 
 	Registry::Get().DeleteComponent(decoder);
 
@@ -380,30 +398,35 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 	 */
 	if (tagMode != TAG_MODE_NONE)
 	{
-		String		 taggerID;
-
-		if	(tagType == "ID3v1"	   && config->GetIntValue("Tags", "EnableID3v1", False))       taggerID = "id3v1-tag";
-		else if	(tagType == "ID3v2"	   && config->GetIntValue("Tags", "EnableID3v2", True))	       taggerID = "id3v2-tag";
-		else if	(tagType == "APEv2"	   && config->GetIntValue("Tags", "EnableAPEv2", True))	       taggerID = "apev2-tag";
-		else if (tagType == "MP4Metadata"  && config->GetIntValue("Tags", "EnableMP4Metadata", True))  taggerID = "mp4-tag";
-		else if (tagType == "FLACMetadata" && config->GetIntValue("Tags", "EnableFLACMetadata", True)) taggerID = "flac-tag";
-		else if (tagType == "WMAMetadata"  && config->GetIntValue("Tags", "EnableWMAMetadata", True))  taggerID = "wma-tag";
-		else if (tagType == "RIFFMetadata" && config->GetIntValue("Tags", "EnableRIFFMetadata", True)) taggerID = "riff-tag";
-
 		Registry	&boca = AS::Registry::Get();
 		TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
 
 		if (tagger != NIL)
 		{
-			error = tagger->UpdateStreamInfo(track.origFilename, track);
-			errorString = tagger->GetErrorString();
+			foreach (TagFormat *tag, tagger->GetTagFormats())
+			{
+				if (tag->GetName() != tagFormat) continue;
+
+				/* Set to Success() by default, so we won't report an
+				 * error if the tag format is simply deactivated.
+				 */
+				error = Success();
+
+				if (config->GetIntValue("Tags", String("Enable").Append(String(tagFormat).Replace(" ", NIL)), tag->IsDefault()))
+				{
+					error	    = tagger->UpdateStreamInfo(track.origFilename, track);
+					errorString = tagger->GetErrorString();
+				}
+
+				break;
+			}
 
 			boca.DeleteComponent(tagger);
 		}
 		else
 		{
-			error = Error();
-			errorString = "Not implemented";
+			error	    = Error();
+			errorString = "Not supported";
 		}
 	}
 

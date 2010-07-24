@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,7 +13,7 @@
 BoCA::LayerEditText::LayerEditText() : Layer()
 {
 	text_label	= new Text("Value:", Point(7, 10));
-	edit_value	= new EditBox("", Point(text_label->textSize.cx + 14, 7), Size(280, 0), 255);
+	edit_value	= new EditBox(NIL, Point(text_label->textSize.cx + 14, 7), Size(280, 0), 255);
 
 	Add(text_label);
 	Add(edit_value);

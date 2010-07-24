@@ -40,12 +40,19 @@ Void smooth::DetachDLL()
 
 BoCA::TagEdit::TagEdit()
 {
-	mainTabLayer = new LayerTags();
+	mainTabLayer = NIL;
 
-	getMainTabLayer.Connect(mainTabLayer);
+	getMainTabLayer.Connect(&TagEdit::GetMainTabLayer, this);
 }
 
 BoCA::TagEdit::~TagEdit()
 {
-	Object::DeleteObject(mainTabLayer);
+	if (mainTabLayer != NIL) Object::DeleteObject(mainTabLayer);
+}
+
+Layer *BoCA::TagEdit::GetMainTabLayer()
+{
+	if (mainTabLayer == NIL) mainTabLayer = new LayerTags();
+
+	return mainTabLayer;
 }

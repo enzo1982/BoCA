@@ -22,6 +22,8 @@
 
 BoCA::LayerTags::LayerTags() : Layer("Tags")
 {
+	tab_editor	= NIL;
+
 	tab_mode	= new TabWidget(Point(7, 7), Size(100, 150));
 	tab_mode->onSelectTab.Connect(&LayerTags::OnSelectTab, this);
 
@@ -94,12 +96,20 @@ Void BoCA::LayerTags::OnChangeSize(const Size &nSize)
  */
 Void BoCA::LayerTags::OnSelectTab(const Widget *widget)
 {
+	if (tab_editor == NIL) return;
+
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(tab_editor->GetVisibleArea());
+
 	onSelectNone.Emit();
 
 	foreach (Chooser *chooser, choosers)
 	{
 		if (chooser == widget) chooser->ReselectEntry();
 	}
+
+	surface->EndPaint();
 }
 
 /* Called when a list entry is modified.

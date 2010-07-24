@@ -12,9 +12,6 @@
 #include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
-#include <boca/application/registry.h>
-#include <boca/application/taggercomponent.h>
-
 #include <smooth/io/drivers/driver_win32.h>
 
 using namespace smooth::IO;
@@ -29,49 +26,12 @@ BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()
 
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
-	/* Get tagging mode and type
+	/* Query tags and update track
 	 */
-	Int	 tagMode = TAG_MODE_NONE;
-	String	 tagType;
+	QueryTags(streamURI, track);
 
-	String	 lcURI = streamURI.ToLower();
-
-	for (Int i = 0; i < specs->formats.Length(); i++)
-	{
-		FileFormat	*format = specs->formats.GetNth(i);
-
-		for (Int j = 0; j < format->GetExtensions().Length(); j++)
-		{
-			if (lcURI.EndsWith(String(".").Append(format->GetExtensions().GetNth(j))))
-			{
-				tagMode = format->GetTagMode();
-				tagType = format->GetTagType();
-			}
-		}
-	}
-
-	/* Read tag if requested
+	/* Set up security attributes
 	 */
-	if (tagMode != TAG_MODE_NONE)
-	{
-		String			 taggerID;
-
-		if	(tagType == "ID3v1")		taggerID = "id3v1-tag";
-		else if	(tagType == "ID3v2")		taggerID = "id3v2-tag";
-		else if	(tagType == "APEv2")		taggerID = "apev2-tag";
-		else if (tagType == "MP4Metadata")	taggerID = "mp4-tag";
-
-		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
-
-		if (tagger != NIL)
-		{
-			tagger->ParseStreamInfo(streamURI, track);
-
-			boca.DeleteComponent(tagger);
-		}
-	}
-
 	SECURITY_ATTRIBUTES	 secAttr;
 
 	ZeroMemory(&secAttr, sizeof(secAttr));

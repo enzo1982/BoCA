@@ -25,23 +25,23 @@ const String &BoCA::MADIn::GetComponentSpecs()
 
 	if (maddll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>MAD MP3 Decoder</name>		\
-		    <version>1.0</version>			\
-		    <id>mad-in</id>				\
-		    <type>decoder</type>			\
-		    <format>					\
-		      <name>MPEG Audio Files</name>		\
-		      <extension>mp1</extension>		\
-		      <extension>mp2</extension>		\
-		      <extension>mp3</extension>		\
-		      <tag mode=\"prepend\">ID3v2</tag>		\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "						\
+										\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+		  <component>							\
+		    <name>MAD MP3 Decoder</name>				\
+		    <version>1.0</version>					\
+		    <id>mad-in</id>						\
+		    <type>decoder</type>					\
+		    <format>							\
+		      <name>MPEG Audio Files</name>				\
+		      <extension>mp1</extension>				\
+		      <extension>mp2</extension>				\
+		      <extension>mp3</extension>				\
+		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>	\
+		    </format>							\
+		  </component>							\
+										\
 		";
 	}
 

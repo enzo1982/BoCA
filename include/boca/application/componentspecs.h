@@ -27,7 +27,8 @@ namespace BoCA
 				String			 name;
 				Array<String>		 extensions;
 
-				String			 tagType;
+				String			 taggerID;
+				String			 tagFormat;
 				Int			 tagMode;
 			public:
 				const String		&GetName()				{ return name; }
@@ -36,8 +37,11 @@ namespace BoCA
 				const Array<String>	&GetExtensions()			{ return extensions; }
 				Void			 AddExtension(const String &nExt)	{ extensions.Add(nExt); }
 
-				const String		&GetTagType()				{ return tagType; }
-				Void			 SetTagType(const String &nTagType)	{ tagType = nTagType; }
+				const String		&GetTaggerID()				{ return taggerID; }
+				Void			 SetTaggerID(const String &nTaggerID)	{ taggerID = nTaggerID; }
+
+				const String		&GetTagFormat()				{ return tagFormat; }
+				Void			 SetTagFormat(const String &nTagFormat)	{ tagFormat = nTagFormat; }
 
 				Int			 GetTagMode()				{ return tagMode; }
 				Void			 SetTagMode(Int nTagMode)		{ tagMode = nTagMode; }

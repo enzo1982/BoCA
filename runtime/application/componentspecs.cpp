@@ -206,7 +206,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				else if (node2->GetName() == "extension") format->AddExtension(node2->GetContent());
 				else if (node2->GetName() == "tag")
 				{
-					format->SetTagType(node2->GetContent());
+					format->SetTagFormat(node2->GetContent());
+
+					if (node2->GetAttributeByName("id") != NIL) format->SetTaggerID(node2->GetAttributeByName("id")->GetContent());
 
 					if (node2->GetAttributeByName("mode") != NIL)
 					{

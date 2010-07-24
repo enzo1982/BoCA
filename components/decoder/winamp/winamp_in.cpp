@@ -61,7 +61,7 @@ const String &BoCA::WinampIn::GetComponentSpecs()
 
 						m++;
 						o = m;
-						extension = "";
+						extension = NIL;
 					}
 				}
 			}

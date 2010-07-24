@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,17 +13,9 @@
 
 BoCA::ConfigureWinampIn::ConfigureWinampIn()
 {
-	Point	 pos;
-	Size	 size;
-
 	I18n	*i18n = I18n::Get();
 
-	pos.x	= 7;
-	pos.y	= 7;
-	size.cx	= 425;
-	size.cy	= 170;
-
-	list_input		= new ListBox(pos, size);
+	list_input		= new ListBox(Point(7, 7), Size(425, 170));
 	list_input->onSelectEntry.Connect(&ConfigureWinampIn::SelectInputPlugin, this);
 
 	for (Int k = 0; k < winamp_in_modules.Length(); k++)
@@ -31,17 +23,11 @@ BoCA::ConfigureWinampIn::ConfigureWinampIn()
 		list_input->AddEntry(winamp_in_modules.GetNth(k)->description);
 	}
 
-	pos.x	+= 433;
-	size.cx	= 0;
-	size.cy	= 0;
-
-	button_input		= new Button(i18n->TranslateString("Configure"), NIL, pos, size);
+	button_input		= new Button(i18n->TranslateString("Configure"), NIL, Point(440, 7), Size());
 	button_input->onAction.Connect(&ConfigureWinampIn::ConfigureInputPlugin, this);
 	button_input->Deactivate();
 
-	pos.y += 30;
-
-	button_input_about	= new Button(i18n->TranslateString("About"), NIL, pos, size);
+	button_input_about	= new Button(i18n->TranslateString("About"), NIL, Point(440, 37), Size());
 	button_input_about->onAction.Connect(&ConfigureWinampIn::AboutInputPlugin, this);
 	button_input_about->Deactivate();
 

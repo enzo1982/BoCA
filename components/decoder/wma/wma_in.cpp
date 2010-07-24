@@ -22,21 +22,21 @@ const String &BoCA::WMAIn::GetComponentSpecs()
 
 	if (wmvcoredll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Windows Media Decoder</name>		\
-		    <version>1.0</version>			\
-		    <id>wma-in</id>				\
-		    <type>decoder</type>			\
-		    <format>					\
-		      <name>Windows Media Audio Files</name>	\
-		      <extension>wma</extension>		\
-		      <tag mode=\"other\">WMAMetadata</tag>	\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "						\
+										\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+		  <component>							\
+		    <name>Windows Media Decoder</name>				\
+		    <version>1.0</version>					\
+		    <id>wma-in</id>						\
+		    <type>decoder</type>					\
+		    <format>							\
+		      <name>Windows Media Audio Files</name>			\
+		      <extension>wma</extension>				\
+		      <tag id=\"wma-tag\" mode=\"other\">WMA Metadata</tag>	\
+		    </format>							\
+		  </component>							\
+										\
 		";
 	}
 

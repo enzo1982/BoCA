@@ -8,7 +8,7 @@
   <format>
     <name>Apple Lossless Files</name>
     <extension>m4a</extension>
-    <tag mode="other">MP4Metadata</tag>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>
   <external>
     <command>codecs/cmdline/alac.exe</command>

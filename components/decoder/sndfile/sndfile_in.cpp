@@ -22,65 +22,65 @@ const String &BoCA::SndFileIn::GetComponentSpecs()
 
 	if (sndfiledll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>LibSndFile Input</name>		\
-		    <version>1.0</version>			\
-		    <id>sndfile-in</id>				\
-		    <type>decoder</type>			\
-		    <format>					\
-		      <name>Windows Wave Files</name>		\
-		      <extension>wav</extension>		\
-		      <tag mode=\"other\">RIFFMetadata</tag>	\
-		    </format>					\
-		    <format>					\
-		      <name>Apple Audio Files</name>		\
-		      <extension>aif</extension>		\
-		      <extension>aiff</extension>		\
-		      <extension>aifc</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>Sun Audio Files</name>		\
-		      <extension>au</extension>			\
-		      <extension>snd</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>Paris Audio Files</name>		\
-		      <extension>paf</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>Amiga Audio Files</name>		\
-		      <extension>iff</extension>		\
-		      <extension>svx</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>IRCAM Sound Files</name>		\
-		      <extension>sf</extension>			\
-		    </format>					\
-		    <format>					\
-		      <name>Creative Voice Files</name>		\
-		      <extension>voc</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>Sound Forge Wave64</name>		\
-		      <extension>w64</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>Portable Voice Format</name>	\
-		      <extension>pvf</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>HMM Toolkit Format</name>		\
-		      <extension>htk</extension>		\
-		    </format>					\
-		    <format>					\
-		      <name>Apple Core Audio</name>		\
-		      <extension>caf</extension>		\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "						\
+										\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+		  <component>							\
+		    <name>LibSndFile Input</name>				\
+		    <version>1.0</version>					\
+		    <id>sndfile-in</id>						\
+		    <type>decoder</type>					\
+		    <format>							\
+		      <name>Windows Wave Files</name>				\
+		      <extension>wav</extension>				\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+		    </format>							\
+		    <format>							\
+		      <name>Apple Audio Files</name>				\
+		      <extension>aif</extension>				\
+		      <extension>aiff</extension>				\
+		      <extension>aifc</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Sun Audio Files</name>				\
+		      <extension>au</extension>					\
+		      <extension>snd</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Paris Audio Files</name>				\
+		      <extension>paf</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Amiga Audio Files</name>				\
+		      <extension>iff</extension>				\
+		      <extension>svx</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>IRCAM Sound Files</name>				\
+		      <extension>sf</extension>					\
+		    </format>							\
+		    <format>							\
+		      <name>Creative Voice Files</name>				\
+		      <extension>voc</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Sound Forge Wave64</name>				\
+		      <extension>w64</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Portable Voice Format</name>			\
+		      <extension>pvf</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>HMM Toolkit Format</name>				\
+		      <extension>htk</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Apple Core Audio</name>				\
+		      <extension>caf</extension>				\
+		    </format>							\
+		  </component>							\
+										\
 		";
 	}
 

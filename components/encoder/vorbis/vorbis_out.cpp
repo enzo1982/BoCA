@@ -26,21 +26,21 @@ const String &BoCA::VorbisOut::GetComponentSpecs()
 
 	if (oggdll != NIL && vorbisdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Ogg Vorbis Encoder</name>		\
-		    <version>1.0</version>			\
-		    <id>vorbis-out</id>				\
-		    <type>encoder</type>			\
-		    <format>					\
-		      <name>Ogg Vorbis Audio</name>		\
-		      <extension>ogg</extension>		\
-		      <tag mode=\"other\">VorbisComment</tag>	\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "							\
+											\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
+		  <component>								\
+		    <name>Ogg Vorbis Encoder</name>					\
+		    <version>1.0</version>						\
+		    <id>vorbis-out</id>							\
+		    <type>encoder</type>						\
+		    <format>								\
+		      <name>Ogg Vorbis Audio</name>					\
+		      <extension>ogg</extension>					\
+		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
+		    </format>								\
+		  </component>								\
+											\
 		";
 	}
 

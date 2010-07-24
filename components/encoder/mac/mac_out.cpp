@@ -23,22 +23,22 @@ const String &BoCA::MACOut::GetComponentSpecs()
 
 	if (macdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Monkey's Audio Encoder</name>		\
-		    <version>1.0</version>			\
-		    <id>mac-out</id>				\
-		    <type>encoder</type>			\
-		    <format>					\
-		      <name>Monkey's Audio</name>		\
-		      <extension>ape</extension>		\
-		      <extension>mac</extension>		\
-		      <tag mode=\"append\">APEv2</tag>		\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "						\
+										\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+		  <component>							\
+		    <name>Monkey's Audio Encoder</name>				\
+		    <version>1.0</version>					\
+		    <id>mac-out</id>						\
+		    <type>encoder</type>					\
+		    <format>							\
+		      <name>Monkey's Audio</name>				\
+		      <extension>ape</extension>				\
+		      <extension>mac</extension>				\
+		      <tag id=\"apev2-tag\" mode=\"append\">APEv2</tag>		\
+		    </format>							\
+		  </component>							\
+										\
 		";
 	}
 

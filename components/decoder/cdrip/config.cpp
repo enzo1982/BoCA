@@ -14,21 +14,23 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 {
 	Config	*config = Config::Get();
 
-	jitter		= config->cdrip_jitter;
-	swapchannels	= config->cdrip_swapchannels;
-
 	setspeed	= config->GetIntValue("Ripper", "RippingSpeed", 0);
 	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
 	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
 
-	locktray	= config->GetIntValue("CDRip", "LockTray", True);
+	jitter		= config->GetIntValue("CDRip", "JitterCorrection", False);
+	swapchannels	= config->GetIntValue("CDRip", "SwapChannels", False);
+
 	ntscsi		= config->GetIntValue("CDRip", "UseNTSCSI", True);
+
+	locktray	= config->GetIntValue("CDRip", "LockTray", True);
 	autoEject	= config->GetIntValue("CDRip", "EjectAfterRipping", False);
+
 	readCDText	= config->GetIntValue("CDRip", "ReadCDText", True);
 	readCDPlayerIni	= config->GetIntValue("CDRip", "ReadCDPlayerIni", True);
 	readISRC	= config->GetIntValue("CDRip", "ReadISRC", False);
 
-	cdparanoia	= config->cdrip_paranoia;
+	cdparanoia	= config->GetIntValue("CDRip", "CDParanoia", False);
 
 	I18n	*i18n = I18n::Get();
 
@@ -86,7 +88,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No verify"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No scratch repair"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("Full cdparanoia mode"));
-	combo_paranoia_mode->SelectNthEntry(config->cdrip_paranoia_mode);
+	combo_paranoia_mode->SelectNthEntry(config->GetIntValue("CDRip", "CDParanoiaMode", 3));
 
 	ToggleParanoia();
 
@@ -193,22 +195,24 @@ Int BoCA::ConfigureCDRip::SaveSettings()
 
 	if (config->cdrip_numdrives >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
 
-	config->cdrip_jitter		= jitter;
-	config->cdrip_swapchannels	= swapchannels;
-
 	config->SetIntValue("Ripper", "RippingSpeed", setspeed ? 48 - (combo_speed->GetSelectedEntryNumber() * 4) : 0);
 	config->SetIntValue("Ripper", "AutoReadContents", autoRead);
 	config->SetIntValue("Ripper", "AutoRip", autoRip);
 
-	config->SetIntValue("CDRip", "LockTray", locktray);
+	config->SetIntValue("CDRip", "JitterCorrection", jitter);
+	config->SetIntValue("CDRip", "SwapChannels", swapchannels);
+
 	config->SetIntValue("CDRip", "UseNTSCSI", ntscsi);
+
+	config->SetIntValue("CDRip", "LockTray", locktray);
 	config->SetIntValue("CDRip", "EjectAfterRipping", autoEject);
+
 	config->SetIntValue("CDRip", "ReadCDText", readCDText);
 	config->SetIntValue("CDRip", "ReadCDPlayerIni", readCDPlayerIni);
 	config->SetIntValue("CDRip", "ReadISRC", readISRC);
 
-	config->cdrip_paranoia		= cdparanoia;
-	config->cdrip_paranoia_mode	= combo_paranoia_mode->GetSelectedEntryNumber();
+	config->SetIntValue("CDRip", "CDParanoia", cdparanoia);
+	config->SetIntValue("CDRip", "CDParanoiaMode", combo_paranoia_mode->GetSelectedEntryNumber());
 
 	return Success();
 }

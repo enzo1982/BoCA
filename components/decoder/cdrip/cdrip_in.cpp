@@ -359,7 +359,7 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 		CDROMPARAMS	 params;
 		int		 nParanoiaMode = PARANOIA_MODE_FULL ^ PARANOIA_MODE_NEVERSKIP;
 
-		switch (config->cdrip_paranoia_mode)
+		switch (config->GetIntValue("CDRip", "CDParanoiaMode", 3))
 		{
 			case 0:
 				nParanoiaMode = PARANOIA_MODE_OVERLAP;
@@ -374,12 +374,12 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
  
 		ex_CR_GetCDROMParameters(&params);
 
-		params.nRippingMode		= config->cdrip_paranoia;
+		params.nRippingMode		= config->GetIntValue("CDRip", "CDParanoia", False);
 		params.nParanoiaMode		= nParanoiaMode;
-		params.bSwapLefRightChannel	= config->cdrip_swapchannels;
-		params.bJitterCorrection	= config->cdrip_jitter;
-		params.bDetectJitterErrors	= config->cdrip_detectJitterErrors;
-		params.bDetectC2Errors		= config->cdrip_detectC2Errors;
+		params.bSwapLefRightChannel	= config->GetIntValue("CDRip", "SwapChannels", False);
+		params.bJitterCorrection	= config->GetIntValue("CDRip", "JitterCorrection", False);
+		params.bDetectJitterErrors	= config->GetIntValue("CDRip", "DetectJitterErrors", True);
+		params.bDetectC2Errors		= config->GetIntValue("CDRip", "DetectC2Errors", True);
 		params.nSpeed			= config->GetIntValue("Ripper", "RippingSpeed", 0);
 		params.bEnableMultiRead		= False;
 		params.nMultiReadCount		= 0;

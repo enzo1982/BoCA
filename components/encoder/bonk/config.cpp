@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -74,7 +74,7 @@ BoCA::ConfigureBonk::ConfigureBonk()
 	pos.x += 127;
 	pos.y += 2;
 
-	text_quant		= new Text("", pos);
+	text_quant		= new Text(NIL, pos);
 	SetQuantization();
 
 	pos.x += 49;
@@ -86,7 +86,7 @@ BoCA::ConfigureBonk::ConfigureBonk()
 	pos.x += 127;
 	pos.y += 2;
 
-	text_downsampling	= new Text("", pos);
+	text_downsampling	= new Text(NIL, pos);
 	SetDownsamplingRatio();
 
 	pos.x -= 303;
@@ -99,7 +99,7 @@ BoCA::ConfigureBonk::ConfigureBonk()
 	pos.x += 303;
 	pos.y += 2;
 
-	text_predictor		= new Text("", pos);
+	text_predictor		= new Text(NIL, pos);
 	SetPredictorSize();
 	SetEncoderMode();
 

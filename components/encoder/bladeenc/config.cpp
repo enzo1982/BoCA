@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,9 +12,6 @@
 
 BoCA::ConfigureBladeEnc::ConfigureBladeEnc()
 {
-	Point	 pos;
-	Size	 size;
-
 	Config	*config = Config::Get();
 
 	bitrate		= GetSliderValue();
@@ -26,76 +23,24 @@ BoCA::ConfigureBladeEnc::ConfigureBladeEnc()
 
 	I18n	*i18n = I18n::Get();
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 168;
-	size.cy = 43;
+	group_bit		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(168, 43));
+	group_copyright		= new GroupBox(i18n->TranslateString("Copyright bit"), Point(183, 11), Size(168, 43));
+	group_crc		= new GroupBox(i18n->TranslateString("CRC"), Point(7, 66), Size(168, 43));
+	group_original		= new GroupBox(i18n->TranslateString("Original bit"), Point(183, 66), Size(168, 43));
+	group_dualchannel	= new GroupBox(i18n->TranslateString("Channels"), Point(7, 121), Size(168, 43));
+	group_private		= new GroupBox(i18n->TranslateString("Private bit"), Point(183, 121), Size(168, 43));
 
-	group_bit		= new GroupBox(i18n->TranslateString("Bitrate"), pos, size);
-
-	pos.x += 176;
-
-	group_copyright		= new GroupBox(i18n->TranslateString("Copyright bit"), pos, size);
-
-	pos.x -= 176;
-	pos.y += 55;
-
-	group_crc		= new GroupBox(i18n->TranslateString("CRC"), pos, size);
-
-	pos.x += 176;
-
-	group_original		= new GroupBox(i18n->TranslateString("Original bit"), pos, size);
-
-	pos.x -= 176;
-	pos.y += 55;
-
-	group_dualchannel	= new GroupBox(i18n->TranslateString("Channels"), pos, size);
-
-	pos.x += 176;
-
-	group_private		= new GroupBox(i18n->TranslateString("Private bit"), pos, size);
-
-	pos.x = 17;
-	pos.y = 24;
-	size.cx = 103;
-	size.cy = 0;
-
-	slider_bit		= new Slider(pos, size, OR_HORZ, &bitrate, 0, 13);
+	slider_bit		= new Slider(Point(17, 24), Size(103, 0), OR_HORZ, &bitrate, 0, 13);
 	slider_bit->onValueChange.Connect(&ConfigureBladeEnc::SetBitrate, this);
 
-	pos.x += 110;
-	pos.y += 2;
-
-	text_bit		= new Text("", pos);
+	text_bit		= new Text(NIL, Point(127, 26));
 	SetBitrate();
 
-	pos.x += 66;
-	pos.y -= 2;
-	size.cx += 44;
-
-	check_copyright		= new CheckBox(i18n->TranslateString("Set Copyright bit"), pos, size, &copyright);
-
-	pos.x = 17;
-	pos.y += 55;
-	size.cx = 147;
-	size.cy = 0;
-
-	check_crc		= new CheckBox(i18n->TranslateString("Enable CRC"), pos, size, &crc);
-
-	pos.x += 176;
-
-	check_original		= new CheckBox(i18n->TranslateString("Set Original bit"), pos, size, &original);
-
-	pos.x = 17;
-	pos.y += 55;
-	size.cx = 147;
-	size.cy = 0;
-
-	check_dualchannel	= new CheckBox(i18n->TranslateString("Dual channel encoding"), pos, size, &dualchannel);
-
-	pos.x += 176;
-
-	check_private		= new CheckBox(i18n->TranslateString("Set Private bit"), pos, size, &priv);
+	check_copyright		= new CheckBox(i18n->TranslateString("Set Copyright bit"), Point(193, 24), Size(147, 0), &copyright);
+	check_crc		= new CheckBox(i18n->TranslateString("Enable CRC"), Point(17, 79), Size(147, 0), &crc);
+	check_original		= new CheckBox(i18n->TranslateString("Set Original bit"), Point(193, 79), Size(147, 0), &original);
+	check_dualchannel	= new CheckBox(i18n->TranslateString("Dual channel encoding"), Point(17, 134), Size(147, 0), &dualchannel);
+	check_private		= new CheckBox(i18n->TranslateString("Set Private bit"), Point(193, 134), Size(147, 0), &priv);
 
 	Add(group_bit);
 	Add(slider_bit);

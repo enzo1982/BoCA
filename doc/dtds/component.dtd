@@ -17,7 +17,8 @@
 		<!ELEMENT extension (#PCDATA)>
 
 		<!ELEMENT tag (#PCDATA)>
-		<!ATTLIST tag mode CDATA #REQUIRED>
+		<!ATTLIST tag id   CDATA #REQUIRED
+			      mode CDATA #REQUIRED>
 
 	<!ELEMENT tagformat (name, coverart?, encodings?)>
 	<!ATTLIST tagformat default NMTOKEN #IMPLIED>

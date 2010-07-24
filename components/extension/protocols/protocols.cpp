@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -40,12 +40,19 @@ Void smooth::DetachDLL()
 
 BoCA::Protocols::Protocols()
 {
-	mainTabLayer = new LayerProtocols();
+	mainTabLayer = NIL;
 
-	getMainTabLayer.Connect(mainTabLayer);
+	getMainTabLayer.Connect(&Protocols::GetMainTabLayer, this);
 }
 
 BoCA::Protocols::~Protocols()
 {
-	Object::DeleteObject(mainTabLayer);
+	if (mainTabLayer != NIL) Object::DeleteObject(mainTabLayer);
+}
+
+Layer *BoCA::Protocols::GetMainTabLayer()
+{
+	if (mainTabLayer == NIL) mainTabLayer = new LayerProtocols();
+
+	return mainTabLayer;
 }

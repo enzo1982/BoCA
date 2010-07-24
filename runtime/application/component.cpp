@@ -52,6 +52,11 @@ const Array<BoCA::AS::FileFormat *> &BoCA::AS::Component::GetFormats() const
 	return specs->formats;
 }
 
+const Array<BoCA::AS::TagFormat *> &BoCA::AS::Component::GetTagFormats() const
+{
+	return specs->tag_formats;
+}
+
 BoCA::ConfigLayer *BoCA::AS::Component::GetConfigurationLayer()
 {
 	return (ConfigLayer *) specs->func_GetConfigurationLayer(component);

@@ -23,43 +23,43 @@ const String &BoCA::FAACOut::GetComponentSpecs()
 
 	if (faacdll != NIL)
 	{
-		componentSpecs = "					\
-									\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
-		  <component>						\
-		    <name>FAAC MP4/AAC Encoder</name>			\
-		    <version>1.0</version>				\
-		    <id>faac-out</id>					\
-		    <type>encoder</type>				\
-									\
+		componentSpecs = "							\
+											\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
+		  <component>								\
+		    <name>FAAC MP4/AAC Encoder</name>					\
+		    <version>1.0</version>						\
+		    <id>faac-out</id>							\
+		    <type>encoder</type>						\
+											\
 		";
 
 		if (mp4v2dll != NIL)
 		{
-			componentSpecs.Append("				\
-									\
-			    <format>					\
-			      <name>MP4 Audio Files</name>		\
-			      <extension>m4a</extension>		\
-			      <extension>m4b</extension>		\
-			      <extension>m4r</extension>		\
-			      <extension>mp4</extension>		\
-			      <extension>3gp</extension>		\
-			      <tag mode=\"other\">MP4Metadata</tag>	\
-			    </format>					\
-									\
+			componentSpecs.Append("						\
+											\
+			    <format>							\
+			      <name>MP4 Audio Files</name>				\
+			      <extension>m4a</extension>				\
+			      <extension>m4b</extension>				\
+			      <extension>m4r</extension>				\
+			      <extension>mp4</extension>				\
+			      <extension>3gp</extension>				\
+			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
+			    </format>							\
+											\
 			");
 		}
 
-		componentSpecs.Append("					\
-									\
-		    <format>						\
-		      <name>Advanced Audio Files</name>			\
-		      <extension>aac</extension>			\
-		      <tag mode=\"prepend\">ID3v2</tag>			\
-		    </format>						\
-		  </component>						\
-									\
+		componentSpecs.Append("							\
+											\
+		    <format>								\
+		      <name>Advanced Audio Files</name>					\
+		      <extension>aac</extension>					\
+		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
+		    </format>								\
+		  </component>								\
+											\
 		");
 	}
 

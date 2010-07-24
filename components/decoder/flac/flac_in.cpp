@@ -24,21 +24,21 @@ const String &BoCA::FLACIn::GetComponentSpecs()
 
 	if (flacdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>FLAC Audio Decoder</name>		\
-		    <version>1.0</version>			\
-		    <id>flac-in</id>				\
-		    <type>decoder</type>			\
-		    <format>					\
-		      <name>FLAC Audio Files</name>		\
-		      <extension>flac</extension>		\
-		      <tag mode=\"other\">FLACMetadata</tag>	\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "						\
+										\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+		  <component>							\
+		    <name>FLAC Audio Decoder</name>				\
+		    <version>1.0</version>					\
+		    <id>flac-in</id>						\
+		    <type>decoder</type>					\
+		    <format>							\
+		      <name>FLAC Audio Files</name>				\
+		      <extension>flac</extension>				\
+		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
+		    </format>							\
+		  </component>							\
+										\
 		";
 	}
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -27,7 +27,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 
 	text_commandline = new Text("Resulting arguments string:", Point(6, 156));
 
-	edit_commandline = new EditBox("", Point(6, 174), Size(250, 0));
+	edit_commandline = new EditBox(NIL, Point(6, 174), Size(250, 0));
 	edit_commandline->Deactivate();
 
 	foreach (Parameter *param, specs->external_parameters)

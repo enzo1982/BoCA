@@ -8,7 +8,7 @@
   <format>
     <name>La Audio Files</name>
     <extension>la</extension>
-    <tag mode="append">ID3v1</tag>
+    <tag id="id3v1-tag" mode="append">ID3v1</tag>
   </format>
   <external>
     <command>codecs/cmdline/la.exe</command>

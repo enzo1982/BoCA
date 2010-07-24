@@ -14,21 +14,21 @@ using namespace smooth::IO;
 
 const String &BoCA::WaveIn::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Windows Wave File Input</name>	\
-	    <version>1.0</version>			\
-	    <id>wave-in</id>				\
-	    <type>decoder</type>			\
-	    <format>					\
-	      <name>Windows Wave Files</name>		\
-	      <extension>wav</extension>		\
-	      <tag mode=\"other\">RIFFMetadata</tag>	\
-	    </format>					\
-	  </component>					\
-							\
+	static String	 componentSpecs = "				\
+									\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+	  <component>							\
+	    <name>Windows Wave File Input</name>			\
+	    <version>1.0</version>					\
+	    <id>wave-in</id>						\
+	    <type>decoder</type>					\
+	    <format>							\
+	      <name>Windows Wave Files</name>				\
+	      <extension>wav</extension>				\
+	      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+	    </format>							\
+	  </component>							\
+									\
 	";
 
 	return componentSpecs;
