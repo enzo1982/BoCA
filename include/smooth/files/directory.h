@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,7 +23,8 @@ namespace smooth
 	class SMOOTHAPI Directory
 	{
 		private:
-			static String			 dirDelimiter;
+			static char			*directoryDelimiter;
+			static char			*unicodePathPrefix;
 
 			String				 dirName;
 			String				 dirPath;
@@ -61,7 +62,8 @@ namespace smooth
 
 			operator			 String() const;
 
-			static const String		&GetDirectoryDelimiter();
+			static const char		*GetDirectoryDelimiter();
+			static const char		*GetUnicodePathPrefix();
 
 			static Directory		 GetActiveDirectory();
 			static Int			 SetActiveDirectory(const Directory &);

@@ -90,7 +90,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		File(wavFileName).Delete();
 
 		errorState = True;
-		errorString = String("Decoder returned exit code ").Append(String::FromInt(exitCode)).Append(".");
+		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return Error();
 	}
@@ -224,6 +224,9 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 		/* Remove temporary WAVE file
 		 */
 		File(wavFileName).Delete();
+
+		errorState = True;
+		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return False;
 	}

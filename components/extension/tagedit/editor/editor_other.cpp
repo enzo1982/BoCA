@@ -195,6 +195,40 @@ Void BoCA::LayerTagOther::OnSelectTrack(const Track &nTrack)
 		else if	(value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) { edit_wcommercial->SetText(value.Tail(value.Length() - value.Find(":") - 1)); }
 	}
 
+	surface->EndPaint();
+}
+
+/* Called when an album is selected from the list.
+ * ----
+ * Copy new info to track and update input fields.
+ */
+Void BoCA::LayerTagOther::OnSelectAlbum(const Track &nTrack)
+{
+	if (&nTrack == &track) return;
+
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(GetVisibleArea());
+
+	OnSelectNone();
+
+	track = nTrack;
+
+	group_web->Activate();
+
+	const Info	&info = track.GetInfo();
+
+	for (Int i = 0; i < info.other.Length(); i++)
+	{
+		String	 value = info.other.GetNth(i);
+
+		if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	    { edit_wartist->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
+		else if	(value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")))  { edit_wpublisher->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
+		else if	(value.StartsWith(String(INFO_WEB_RADIO).Append(":")))	    { edit_wradio->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
+		else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	    { edit_wsource->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
+		else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")))  { edit_wcopyright->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
+		else if	(value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) { edit_wcommercial->SetText(value.Tail(value.Length() - value.Find(":") - 1)); }
+	}
 
 	surface->EndPaint();
 }

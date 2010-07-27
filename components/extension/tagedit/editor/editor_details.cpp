@@ -149,6 +149,9 @@ Void BoCA::LayerTagDetails::OnSelectTrack(const Track &nTrack)
 	group_details->Activate();
 	group_publisher->Activate();
 
+	text_isrc->Activate();
+	edit_isrc->Activate();
+
 	const Info	&info = track.GetInfo();
 
 	edit_publisher->SetText(info.label);
@@ -165,6 +168,33 @@ Void BoCA::LayerTagDetails::OnSelectTrack(const Track &nTrack)
 		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   { edit_textwriter->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
 	}
 
+	surface->EndPaint();
+}
+
+/* Called when an album is selected from the list.
+ * ----
+ * Copy new info to track and update input fields.
+ */
+Void BoCA::LayerTagDetails::OnSelectAlbum(const Track &nTrack)
+{
+	if (&nTrack == &track) return;
+
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(GetVisibleArea());
+
+	OnSelectNone();
+
+	track = nTrack;
+
+	group_publisher->Activate();
+
+	text_isrc->Deactivate();
+	edit_isrc->Deactivate();
+
+	const Info	&info = track.GetInfo();
+
+	edit_publisher->SetText(info.label);
 
 	surface->EndPaint();
 }

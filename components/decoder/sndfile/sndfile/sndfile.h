@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -30,14 +30,7 @@
 #define	SNDFILE_1
 
 #include <stdio.h>
-
-/* For the Metrowerks CodeWarrior Pro Compiler (mainly MacOS) */
-
-#if	(defined (__MWERKS__))
-#include	<unix.h>
-#else
-#include	<sys/types.h>
-#endif
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,6 +66,10 @@ enum
 	SF_FORMAT_SD2			= 0x160000,		/* Sound Designer 2 */
 	SF_FORMAT_FLAC			= 0x170000,		/* FLAC lossless file format */
 	SF_FORMAT_CAF			= 0x180000,		/* Core Audio File format */
+	SF_FORMAT_WVE			= 0x190000,		/* Psion WVE format */
+	SF_FORMAT_OGG			= 0x200000,		/* Xiph OGG container */
+	SF_FORMAT_MPC2K			= 0x210000,		/* Akai MPC 2000 sampler */
+	SF_FORMAT_RF64			= 0x220000,		/* RF64 WAV file */
 
 	/* Subtypes from here on. */
 
@@ -106,6 +103,8 @@ enum
 	SF_FORMAT_DPCM_8		= 0x0050,		/* 8 bit differential PCM (XI only) */
 	SF_FORMAT_DPCM_16		= 0x0051,		/* 16 bit differential PCM (XI only) */
 
+	SF_FORMAT_VORBIS		= 0x0060,		/* Xiph Vorbis encoding. */
+
 	/* Endian-ness options. */
 
 	SF_ENDIAN_FILE			= 0x00000000,	/* Default file endian-ness. */
@@ -127,12 +126,15 @@ enum
 enum
 {	SFC_GET_LIB_VERSION				= 0x1000,
 	SFC_GET_LOG_INFO				= 0x1001,
+	SFC_GET_CURRENT_SF_INFO			= 0x1002,
+
 
 	SFC_GET_NORM_DOUBLE				= 0x1010,
 	SFC_GET_NORM_FLOAT				= 0x1011,
 	SFC_SET_NORM_DOUBLE				= 0x1012,
 	SFC_SET_NORM_FLOAT				= 0x1013,
 	SFC_SET_SCALE_FLOAT_INT_READ	= 0x1014,
+	SFC_SET_SCALE_INT_FLOAT_WRITE	= 0x1015,
 
 	SFC_GET_SIMPLE_FORMAT_COUNT		= 0x1020,
 	SFC_GET_SIMPLE_FORMAT			= 0x1021,
@@ -152,6 +154,7 @@ enum
 	SFC_GET_MAX_ALL_CHANNELS		= 0x1045,
 
 	SFC_SET_ADD_PEAK_CHUNK			= 0x1050,
+	SFC_SET_ADD_HEADER_PAD_CHUNK	= 0x1051,
 
 	SFC_UPDATE_HEADER_NOW			= 0x1060,
 	SFC_SET_UPDATE_HEADER_AUTO		= 0x1061,
@@ -179,6 +182,17 @@ enum
 	SFC_GET_BROADCAST_INFO			= 0x10F0,
 	SFC_SET_BROADCAST_INFO			= 0x10F1,
 
+	SFC_GET_CHANNEL_MAP_INFO		= 0x1100,
+	SFC_SET_CHANNEL_MAP_INFO		= 0x1101,
+
+	SFC_RAW_DATA_NEEDS_ENDSWAP		= 0x1110,
+
+	/* Support for Wavex Ambisonics Format */
+	SFC_WAVEX_SET_AMBISONIC			= 0x1200,
+	SFC_WAVEX_GET_AMBISONIC			= 0x1201,
+
+	SFC_SET_VBR_ENCODING_QUALITY	= 0x1300,
+
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,
 
@@ -205,7 +219,9 @@ enum
 	SF_STR_SOFTWARE					= 0x03,
 	SF_STR_ARTIST					= 0x04,
 	SF_STR_COMMENT					= 0x05,
-	SF_STR_DATE						= 0x06
+	SF_STR_DATE						= 0x06,
+	SF_STR_ALBUM					= 0x07,
+	SF_STR_LICENSE					= 0x08
 } ;
 
 /*
@@ -214,7 +230,7 @@ enum
 */
 
 #define	SF_STR_FIRST	SF_STR_TITLE
-#define	SF_STR_LAST		SF_STR_DATE
+#define	SF_STR_LAST		SF_STR_LICENSE
 
 enum
 {	/* True and false */
@@ -224,7 +240,10 @@ enum
 	/* Modes for opening files. */
 	SFM_READ	= 0x10,
 	SFM_WRITE	= 0x20,
-	SFM_RDWR	= 0x30
+	SFM_RDWR	= 0x30,
+
+	SF_AMBISONIC_NONE		= 0x40,
+	SF_AMBISONIC_B_FORMAT	= 0x41
 } ;
 
 /* Public error values. These are guaranteed to remain unchanged for the duration
@@ -241,22 +260,66 @@ enum
 	SF_ERR_UNSUPPORTED_ENCODING	= 4
 } ;
 
+
+/* Channel map values (used with SFC_SET/GET_CHANNEL_MAP).
+*/
+
+enum
+{	SF_CHANNEL_MAP_INVALID = 0,
+	SF_CHANNEL_MAP_MONO = 1,
+	SF_CHANNEL_MAP_LEFT,					/* Apple calls this 'Left' */
+	SF_CHANNEL_MAP_RIGHT,					/* Apple calls this 'Right' */
+	SF_CHANNEL_MAP_CENTER,					/* Apple calls this 'Center' */
+	SF_CHANNEL_MAP_FRONT_LEFT,
+	SF_CHANNEL_MAP_FRONT_RIGHT,
+	SF_CHANNEL_MAP_FRONT_CENTER,
+	SF_CHANNEL_MAP_REAR_CENTER,				/* Apple calls this 'Center Surround', Msft calls this 'Back Center' */
+	SF_CHANNEL_MAP_REAR_LEFT,				/* Apple calls this 'Left Surround', Msft calls this 'Back Left' */
+	SF_CHANNEL_MAP_REAR_RIGHT,				/* Apple calls this 'Right Surround', Msft calls this 'Back Right' */
+	SF_CHANNEL_MAP_LFE,						/* Apple calls this 'LFEScreen', Msft calls this 'Low Frequency'  */
+	SF_CHANNEL_MAP_FRONT_LEFT_OF_CENTER,	/* Apple calls this 'Left Center' */
+	SF_CHANNEL_MAP_FRONT_RIGHT_OF_CENTER,	/* Apple calls this 'Right Center */
+	SF_CHANNEL_MAP_SIDE_LEFT,				/* Apple calls this 'Left Surround Direct' */
+	SF_CHANNEL_MAP_SIDE_RIGHT,				/* Apple calls this 'Right Surround Direct' */
+	SF_CHANNEL_MAP_TOP_CENTER,				/* Apple calls this 'Top Center Surround' */
+	SF_CHANNEL_MAP_TOP_FRONT_LEFT,			/* Apple calls this 'Vertical Height Left' */
+	SF_CHANNEL_MAP_TOP_FRONT_RIGHT,			/* Apple calls this 'Vertical Height Right' */
+	SF_CHANNEL_MAP_TOP_FRONT_CENTER,		/* Apple calls this 'Vertical Height Center' */
+	SF_CHANNEL_MAP_TOP_REAR_LEFT,			/* Apple and MS call this 'Top Back Left' */
+	SF_CHANNEL_MAP_TOP_REAR_RIGHT,			/* Apple and MS call this 'Top Back Right' */
+	SF_CHANNEL_MAP_TOP_REAR_CENTER,			/* Apple and MS call this 'Top Back Center' */
+
+	SF_CHANNEL_MAP_AMBISONIC_B_W,
+	SF_CHANNEL_MAP_AMBISONIC_B_X,
+	SF_CHANNEL_MAP_AMBISONIC_B_Y,
+	SF_CHANNEL_MAP_AMBISONIC_B_Z,
+
+	SF_CHANNEL_MAP_MAX,
+} ;
+
+
 /* A SNDFILE* pointer can be passed around much like stdio.h's FILE* pointer. */
 
 typedef	struct SNDFILE_tag	SNDFILE ;
 
-/* The following typedef is system specific and is defined when libsndfile is.
-** compiled. sf_count_t can be one of loff_t (Linux), off_t (*BSD),
-** off64_t (Solaris), __int64_t (Win32) etc.
+/* The following typedef is system specific and is defined when libsndfile is
+** compiled. sf_count_t can be one of loff_t (Linux), off_t (*BSD), off64_t 
+** (Solaris), __int64 (Win32) etc. On windows, we need to allow the same
+** header file to be compiler by both GCC and the microsoft compiler.
 */
 
+#if (defined (_MSCVER) || defined (_MSC_VER))
+typedef __int64		sf_count_t ;
+#define SF_COUNT_MAX		0x7fffffffffffffffi64
+#else
 typedef __int64	sf_count_t ;
-
 #define SF_COUNT_MAX		0x7FFFFFFFFFFFFFFFLL
+#endif
 
-/* A pointer to a SF_INFO structure is passed to sf_open_read () and filled in.
+
+/* A pointer to a SF_INFO structure is passed to sf_open () and filled in.
 ** On write, the SF_INFO structure is filled in by the user and passed into
-** sf_open_write ().
+** sf_open ().
 */
 
 struct SF_INFO
@@ -368,23 +431,30 @@ typedef struct
 } SF_LOOP_INFO ;
 
 
-/*	Struct used to retrieve broadcast (EBU) information from a file. 
+/*	Struct used to retrieve broadcast (EBU) information from a file.
 **	Strongly (!) based on EBU "bext" chunk format used in Broadcast WAVE.
 */
-typedef struct
-{	char			description [256] ;
-	char			originator [32] ;
-	char			originator_reference [32] ;
-	char			origination_date [10] ;
-	char			origination_time [8] ;
-	int				time_reference_low ;
-	int				time_reference_high ;
-	short			version ;
-	char			umid [64] ;
-	char			reserved [190] ;
-	unsigned int	coding_history_size ;
-	char			coding_history [256] ;
-} SF_BROADCAST_INFO ;
+#define	SF_BROADCAST_INFO_VAR(coding_hist_size) \
+			struct \
+			{	char			description [256] ; \
+				char			originator [32] ; \
+				char			originator_reference [32] ; \
+				char			origination_date [10] ; \
+				char			origination_time [8] ; \
+				unsigned int	time_reference_low ; \
+				unsigned int	time_reference_high ; \
+				short			version ; \
+				char			umid [64] ; \
+				char			reserved [190] ; \
+				unsigned int	coding_history_size ; \
+				char			coding_history [coding_hist_size] ; \
+			}
+
+/* SF_BROADCAST_INFO is the above struct with coding_history field of 256 bytes. */
+typedef SF_BROADCAST_INFO_VAR (256) SF_BROADCAST_INFO ;
+
+
+/*	Virtual I/O functionality. */
 
 typedef sf_count_t		(*sf_vio_get_filelen)	(void *user_data) ;
 typedef sf_count_t		(*sf_vio_seek)		(sf_count_t offset, int whence, void *user_data) ;
@@ -402,13 +472,15 @@ struct SF_VIRTUAL_IO
 
 typedef	struct SF_VIRTUAL_IO SF_VIRTUAL_IO ;
 
+
 /* Open the specified file for read, write or both. On error, this will
 ** return a NULL pointer. To find the error number, pass a NULL SNDFILE
-** to sf_perror () or sf_error_str ().
+** to sf_strerror ().
 ** All calls to sf_open() should be matched with a call to sf_close().
 */
 
 SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
+
 
 /* Use the existing file descriptor to create a SNDFILE object. If close_desc
 ** is TRUE, the file descriptor will be closed when sf_close() is called. If
@@ -417,7 +489,7 @@ SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
 ** of file header is at the current file offset. This allows sound files within
 ** larger container files to be read and/or written.
 ** On error, this will return a NULL pointer. To find the error number, pass a
-** NULL SNDFILE to sf_perror () or sf_error_str ().
+** NULL SNDFILE to sf_strerror ().
 ** All calls to sf_open_fd() should be matched with a call to sf_close().
 
 */
@@ -426,17 +498,20 @@ SNDFILE* 	sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc) ;
 
 SNDFILE* 	sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data) ;
 
+
 /* sf_error () returns a error number which can be translated to a text
 ** string using sf_error_number().
 */
 
 int		sf_error		(SNDFILE *sndfile) ;
 
+
 /* sf_strerror () returns to the caller a pointer to the current error message for
 ** the given SNDFILE.
 */
 
 const char* sf_strerror (SNDFILE *sndfile) ;
+
 
 /* sf_error_number () allows the retrieval of the error string for each internal
 ** error number.
@@ -445,7 +520,8 @@ const char* sf_strerror (SNDFILE *sndfile) ;
 
 const char*	sf_error_number	(int errnum) ;
 
-/* The following three error functions are deprecated but they will remain in the
+
+/* The following two error functions are deprecated but they will remain in the
 ** library for the forseeable future. The function sf_strerror() should be used
 ** in their place.
 */
@@ -458,9 +534,11 @@ int		sf_error_str	(SNDFILE *sndfile, char* str, size_t len) ;
 
 int		sf_command	(SNDFILE *sndfile, int command, void *data, int datasize) ;
 
+
 /* Return TRUE if fields of the SF_INFO struct are a valid combination of values. */
 
 int		sf_format_check	(const SF_INFO *info) ;
+
 
 /* Seek within the waveform data chunk of the SNDFILE. sf_seek () uses
 ** the same values for whence (SEEK_SET, SEEK_CUR and SEEK_END) as
@@ -476,6 +554,7 @@ int		sf_format_check	(const SF_INFO *info) ;
 
 sf_count_t	sf_seek 		(SNDFILE *sndfile, sf_count_t frames, int whence) ;
 
+
 /* Functions for retrieving and setting string data within sound files.
 ** Not all file types support this features; AIFF and WAV do. For both
 ** functions, the str_type parameter must be one of the SF_STR_* values
@@ -488,11 +567,18 @@ int sf_set_string (SNDFILE *sndfile, int str_type, const char* str) ;
 
 const char* sf_get_string (SNDFILE *sndfile, int str_type) ;
 
+
+/* Return the library version string. */
+
+const char * sf_version_string (void) ;
+
+
 /* Functions for reading/writing the waveform data of a sound file.
 */
 
 sf_count_t	sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes) ;
 sf_count_t	sf_write_raw 	(SNDFILE *sndfile, const void *ptr, sf_count_t bytes) ;
+
 
 /* Functions for reading and writing the data chunk in terms of frames.
 ** The number of items actually read/written = frames * number of channels.
@@ -516,6 +602,7 @@ sf_count_t	sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frame
 sf_count_t	sf_readf_double		(SNDFILE *sndfile, double *ptr, sf_count_t frames) ;
 sf_count_t	sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames) ;
 
+
 /* Functions for reading and writing the data chunk in terms of items.
 ** Otherwise similar to above.
 ** All of these read/write function return number of items read/written.
@@ -533,12 +620,14 @@ sf_count_t	sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t items)
 sf_count_t	sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t items) ;
 sf_count_t	sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t items) ;
 
+
 /* Close the SNDFILE and clean up all memory allocations associated with this
 ** file.
 ** Returns 0 on success, or an error number.
 */
 
 int		sf_close		(SNDFILE *sndfile) ;
+
 
 /* If the file is opened SFM_WRITE or SFM_RDWR, call fsync() on the file
 ** to force the writing of data to disk. If the file is opened SFM_READ
@@ -547,8 +636,28 @@ int		sf_close		(SNDFILE *sndfile) ;
 
 void	sf_write_sync	(SNDFILE *sndfile) ;
 
+
+
+/* The function sf_wchar_open() is Windows Only!
+** Open a file passing in a Windows Unicode filename. Otherwise, this is
+** the same as sf_open().
+**
+** In order for this to work, you need to do the following:
+**
+**		#include <windows.h>
+**		#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
+**		#including <sndfile.h>
+*/
+
+#if ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+SNDFILE* sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
+#endif
+
+
+
 #ifdef __cplusplus
 }		/* extern "C" */
 #endif	/* __cplusplus */
 
 #endif	/* SNDFILE_H */
+

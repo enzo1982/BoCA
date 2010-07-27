@@ -172,18 +172,26 @@ Bool BoCA::LAMEOut::Activate()
 			ex_lame_set_error_protection(lameFlags, config->GetIntValue("LAME", "CRC", 0));
 			ex_lame_set_strict_ISO(lameFlags, config->GetIntValue("LAME", "StrictISO", 0));
 
-			if (config->GetIntValue("LAME", "Resample", -1) == 0)	  ex_lame_set_out_samplerate(lameFlags, format.rate);
-			else if (config->GetIntValue("LAME", "Resample", -1) > 0) ex_lame_set_out_samplerate(lameFlags, config->GetIntValue("LAME", "Resample", -1));
+			/* Set resampling.
+			 */
+			if	(config->GetIntValue("LAME", "Resample", -1) == 0) ex_lame_set_out_samplerate(lameFlags, format.rate);
+			else if (config->GetIntValue("LAME", "Resample", -1) >  0) ex_lame_set_out_samplerate(lameFlags, config->GetIntValue("LAME", "Resample", -1));
 
+			/* Set bitrate.
+			 */
 			if (config->GetIntValue("LAME", "VBRMode", 0) == vbr_off)
 			{
 				if (config->GetIntValue("LAME", "SetBitrate", 1)) ex_lame_set_brate(lameFlags, config->GetIntValue("LAME", "Bitrate", 192));
 				else						  ex_lame_set_compression_ratio(lameFlags, ((double) config->GetIntValue("LAME", "Ratio", 1100)) / 100);
 			}
 
+			/* Set quality.
+			 */
 			if (config->GetIntValue("LAME", "SetQuality", 0)) ex_lame_set_quality(lameFlags, config->GetIntValue("LAME", "Quality", 5));
 			else						  ex_lame_set_quality(lameFlags, 5);
 
+			/* Set audio filtering.
+			 */
 			if (config->GetIntValue("LAME", "DisableFiltering", 0))
 			{
 				ex_lame_set_lowpassfreq(lameFlags, -1);
@@ -198,24 +206,21 @@ Bool BoCA::LAMEOut::Activate()
 				if (config->GetIntValue("LAME", "SetHighpass", 0) && config->GetIntValue("LAME", "SetHighpassWidth", 0)) ex_lame_set_highpasswidth(lameFlags, config->GetIntValue("LAME", "HighpassWidth", 0));
 			}
 
-			if (format.channels == 2)
-			{
-				if	(config->GetIntValue("LAME", "StereoMode", 0) == 1)	ex_lame_set_mode(lameFlags, MONO);
-				else if (config->GetIntValue("LAME", "StereoMode", 0) == 2)	ex_lame_set_mode(lameFlags, STEREO);
-				else if (config->GetIntValue("LAME", "StereoMode", 0) == 3)	ex_lame_set_mode(lameFlags, JOINT_STEREO);
-				else								ex_lame_set_mode(lameFlags, NOT_SET);
+			/* Set Stereo mode.
+			 */
+			if	(config->GetIntValue("LAME", "StereoMode", 0) == 1)	ex_lame_set_mode(lameFlags, MONO);
+			else if (config->GetIntValue("LAME", "StereoMode", 0) == 2)	ex_lame_set_mode(lameFlags, STEREO);
+			else if (config->GetIntValue("LAME", "StereoMode", 0) == 3)	ex_lame_set_mode(lameFlags, JOINT_STEREO);
+			else								ex_lame_set_mode(lameFlags, NOT_SET);
 
-				if (config->GetIntValue("LAME", "StereoMode", 0) == 3)
-				{
-					if (config->GetIntValue("LAME", "ForceJS", 0))	ex_lame_set_force_ms(lameFlags, 1);
-					else						ex_lame_set_force_ms(lameFlags, 0);
-				}
-			}
-			else if (format.channels == 1)
+			if (config->GetIntValue("LAME", "StereoMode", 0) == 3)
 			{
-				ex_lame_set_mode(lameFlags, MONO);
+				if (config->GetIntValue("LAME", "ForceJS", 0))	ex_lame_set_force_ms(lameFlags, 1);
+				else						ex_lame_set_force_ms(lameFlags, 0);
 			}
 
+			/* Set VBR mode.
+			 */
 			switch (config->GetIntValue("LAME", "VBRMode", 0))
 			{
 				default:
@@ -238,6 +243,8 @@ Bool BoCA::LAMEOut::Activate()
 			if (config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && config->GetIntValue("LAME", "SetMinVBRBitrate", 0)) ex_lame_set_VBR_min_bitrate_kbps(lameFlags, config->GetIntValue("LAME", "MinVBRBitrate", 128));
 			if (config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && config->GetIntValue("LAME", "SetMaxVBRBitrate", 0)) ex_lame_set_VBR_max_bitrate_kbps(lameFlags, config->GetIntValue("LAME", "MaxVBRBitrate", 128));
 
+			/* Set ATH.
+			 */
 			if (config->GetIntValue("LAME", "EnableATH", 1))
 			{
 				if (config->GetIntValue("LAME", "ATHType", -1) != -1) ex_lame_set_ATHtype(lameFlags, config->GetIntValue("LAME", "ATHType", -1));
@@ -247,6 +254,8 @@ Bool BoCA::LAMEOut::Activate()
 				ex_lame_set_noATH(lameFlags, 1);
 			}
 
+			/* Set TNS.
+			 */
 			ex_lame_set_useTemporal(lameFlags, config->GetIntValue("LAME", "UseTNS", 1));
 
 			break;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,9 +14,9 @@
 #include "definitions.h"
 
 /* FIXME: The array argument is evaluated multiple times which
- *         prevents us from passing rvalues, yet.
+ *        prevents us from passing rvalues, yet.
  *
- *         Try using iterators in the future to solve this problem.
+ *        Try using iterators in the future to solve this problem.
  */
 #define foreach(var, array)										\
         if (Int _index_ = 0)    { }									\

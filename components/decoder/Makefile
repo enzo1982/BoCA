@@ -37,7 +37,9 @@ endif
 	cd faad2 && make clean
 	cd flac && make clean
 	cd lame && make clean
+ifeq ($(BUILD_WIN32),True)
 	cd mac && make clean
+endif
 	cd mad && make clean
 	cd sndfile && make clean
 	cd speex && make clean

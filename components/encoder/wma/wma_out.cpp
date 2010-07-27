@@ -97,6 +97,8 @@ Bool BoCA::WMAOut::Activate()
 
 	hr = m_pProfileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo);
 
+	Int	 defaultCodec = GetDefaultCodec(pCodecInfo);
+
 	if (config->GetIntValue("WMA", "Uncompressed", False))
 	{
 		hr = m_pProfile->CreateNewStream(WMMEDIATYPE_Audio, &m_pStreamConfig);
@@ -108,17 +110,17 @@ Bool BoCA::WMAOut::Activate()
 		DWORD	 oneValue = 1;
 		DWORD	 twoValue = 2;
 
-		if (config->GetIntValue("WMA", "EnableVBR", True))    hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &trueValue,  sizeof(BOOL));
-		else						      hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &falseValue, sizeof(BOOL));
+		if (config->GetIntValue("WMA", "EnableVBR", True))    hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", defaultCodec), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &trueValue,  sizeof(BOOL));
+		else						      hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", defaultCodec), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &falseValue, sizeof(BOOL));
 
-		if (config->GetIntValue("WMA", "Enable2Pass", False)) hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &twoValue, sizeof(DWORD));
-		else						      hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
+		if (config->GetIntValue("WMA", "Enable2Pass", False)) hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", defaultCodec), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &twoValue, sizeof(DWORD));
+		else						      hr = pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", defaultCodec), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
 
-		hr = pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", -1), config->GetIntValue("WMA", "CodecFormat", 0), &m_pStreamConfig);
+		hr = pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", defaultCodec), config->GetIntValue("WMA", "CodecFormat", 0), &m_pStreamConfig);
 	}
 	else
 	{
-		m_pStreamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue("WMA", "Codec", -1), track.GetFormat());
+		m_pStreamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue("WMA", "Codec", defaultCodec), track.GetFormat());
 	}
 
 	hr = m_pStreamConfig->SetStreamNumber(1);
@@ -267,6 +269,36 @@ Void BoCA::WMAOut::FreeConfigurationLayer()
 
 		configLayer = NIL;
 	}
+}
+
+/* Select default codec to be used when no codec is set.
+ */
+Int BoCA::WMAOut::GetDefaultCodec(IWMCodecInfo3 *codecInfo)
+{
+	HRESULT	 hr = S_OK;
+	DWORD	 numCodecs = 0;
+	Int	 index = -1;
+
+	hr = codecInfo->GetCodecInfoCount(WMMEDIATYPE_Audio, &numCodecs);
+
+	for (DWORD i = 0; i < numCodecs; i++)
+	{
+		DWORD	 nameLen = 0;
+
+		hr = codecInfo->GetCodecName(WMMEDIATYPE_Audio, i, NIL, &nameLen);
+
+		WCHAR	*name = new WCHAR [nameLen];
+
+		hr = codecInfo->GetCodecName(WMMEDIATYPE_Audio, i, name, &nameLen);
+
+		if ( String(name).Contains("Windows Media Audio") &&
+		    !String(name).Contains("Voice") &&
+		    !String(name).Contains("Lossless")) index = i;
+
+		delete [] name;
+	}
+
+	return index;
 }
 
 /* This method will return the format best matching

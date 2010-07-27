@@ -120,6 +120,9 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 		 */
 		File(encFileName).Delete();
 
+		errorState = True;
+		errorString = String("Encoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
+
 		return False;
 	}
 

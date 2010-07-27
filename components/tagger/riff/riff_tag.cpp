@@ -59,8 +59,6 @@ Error BoCA::RIFFTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tra
 
 	buffer.Resize(12);
 
-	Int	 numItems = 0;
-
 	if	(info.artist != NIL) RenderTagItem("IART", info.artist, buffer);
 	if	(info.title  != NIL) RenderTagItem("INAM", info.title, buffer);
 	if	(info.album  != NIL) RenderTagItem("IPRD", info.album, buffer);
@@ -69,7 +67,7 @@ Error BoCA::RIFFTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tra
 	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year).Append("-01-01"), buffer);
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderTagItem("ICMT", info.comment, buffer);
-	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		RenderTagItem("ICMT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer);
+	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				RenderTagItem("ICMT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer);
 
 	/* Save other text info.
 	 */

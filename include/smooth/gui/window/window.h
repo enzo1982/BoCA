@@ -91,6 +91,8 @@ namespace smooth
 				Int				 SetIcon(const Bitmap &);
 				const Bitmap			&GetIcon() const;
 
+				Int				 SetIconDirect(Void *);
+
 				virtual Rect			 GetVisibleArea() const			 { return Rect(Point(), GetSize()); }
 
 				virtual Int			 SetMetrics(const Point &, const Size &);

@@ -78,7 +78,7 @@ Bool BoCA::WaveOut::Deactivate()
 	Config		*config = Config::Get();
 	const Info	&info = track.GetInfo();
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFINFOTag", False))
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFINFOTag", True))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");

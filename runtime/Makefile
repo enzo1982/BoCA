@@ -39,8 +39,11 @@ else
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	LDOPTS += -lole32 -Xlinker --dynamicbase -Xlinker --nxcompat
+	LDOPTS += -lole32
 
+ifneq ($(BUILD_X64),True)
+	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat
+endif
 	DLLEXT = .dll
 else
 	DLLEXT = .so

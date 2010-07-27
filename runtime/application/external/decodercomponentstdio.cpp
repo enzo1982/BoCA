@@ -179,7 +179,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		errorState = True;
-		errorString = String("Decoder returned exit code ").Append(String::FromInt(exitCode)).Append(".");
+		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return Error();
 	}
@@ -280,7 +280,13 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 		File(encFileName).Delete();
 	}
 
-	if (!specs->external_ignoreExitCode && exitCode != 0) return False;
+	if (!specs->external_ignoreExitCode && exitCode != 0)
+	{
+		errorState = True;
+		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
+
+		return False;
+	}
 
 	return True;
 }

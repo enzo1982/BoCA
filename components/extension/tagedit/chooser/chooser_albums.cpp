@@ -87,25 +87,65 @@ Void BoCA::ChooserAlbums::OnModifyTrack(const Track &track)
 			 */
 			for (Int j = 0; j < tracks.Length(); j++)
 			{
-				Track	&track = tracks.GetNthReference(j);
-				Info	 trackInfo = track.GetInfo();
+				Track	&mTrack = tracks.GetNthReference(j);
 
-				if (!IsAlbumIdentical(track, origAlbum)) continue;
+				if (!IsAlbumIdentical(mTrack, origAlbum)) continue;
 
-				trackInfo.artist	= info.artist;
-				trackInfo.album		= info.album;
-				trackInfo.genre		= info.genre;
-				trackInfo.year		= info.year;
-				trackInfo.comment	= info.comment;
+				Info	 mTrackInfo = mTrack.GetInfo();
 
-				trackInfo.numTracks	= info.numTracks;
+				/* Update basic info.
+				 */
+				mTrackInfo.artist	= info.artist;
+				mTrackInfo.album	= info.album;
+				mTrackInfo.genre	= info.genre;
+				mTrackInfo.year		= info.year;
+				mTrackInfo.comment	= info.comment;
 
-				trackInfo.disc		= info.disc;
-				trackInfo.numDiscs	= info.numDiscs;
+				mTrackInfo.numTracks	= info.numTracks;
 
-				track.SetInfo(trackInfo);
+				mTrackInfo.disc		= info.disc;
+				mTrackInfo.numDiscs	= info.numDiscs;
 
-				JobList::Get()->onComponentModifyTrack.Emit(track);
+				mTrackInfo.label	= info.label;
+
+				/* Update other text info.
+				 */
+				for (Int i = 0; i < mTrackInfo.other.Length(); i++)
+				{
+					String	 value = mTrackInfo.other.GetNth(i);
+
+					if (value.StartsWith(String(INFO_WEB_ARTIST).Append(":"))    ||
+					    value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")) ||
+					    value.StartsWith(String(INFO_WEB_RADIO).Append(":"))     ||
+					    value.StartsWith(String(INFO_WEB_SOURCE).Append(":"))    ||
+					    value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")) ||
+					    value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) mTrackInfo.other.RemoveNth(i);
+				}
+
+				for (Int i = 0; i < info.other.Length(); i++)
+				{
+					String	 value = info.other.GetNth(i);
+
+					if (value.StartsWith(String(INFO_WEB_ARTIST).Append(":"))    ||
+					    value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")) ||
+					    value.StartsWith(String(INFO_WEB_RADIO).Append(":"))     ||
+					    value.StartsWith(String(INFO_WEB_SOURCE).Append(":"))    ||
+					    value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")) ||
+					    value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) mTrackInfo.other.Add(value);
+				}
+
+				mTrack.SetInfo(mTrackInfo);
+
+				/* Update cover art.
+				 */
+				mTrack.pictures.RemoveAll();
+
+				foreach (const Picture &picture, track.pictures)
+				{
+					mTrack.pictures.Add(picture);
+				}
+
+				JobList::Get()->onComponentModifyTrack.Emit(mTrack);
 			}
 
 			origAlbum = track;
@@ -243,6 +283,8 @@ Void BoCA::ChooserAlbums::UpdateAlbumList()
 			Info		 albumInfo = album.GetInfo();
 			const Info	&trackInfo = track.GetInfo();
 
+			/* Copy basic info.
+			 */
 			albumInfo.artist	= trackInfo.artist;
 			albumInfo.album		= trackInfo.album;
 			albumInfo.genre		= trackInfo.genre;
@@ -254,8 +296,33 @@ Void BoCA::ChooserAlbums::UpdateAlbumList()
 			albumInfo.disc		= trackInfo.disc;
 			albumInfo.numDiscs	= trackInfo.numDiscs;
 
+			albumInfo.label		= trackInfo.label;
+
+			/* Copy other text info.
+			 */
+			for (Int i = 0; i < trackInfo.other.Length(); i++)
+			{
+				String	 value = trackInfo.other.GetNth(i);
+
+				if (value.StartsWith(String(INFO_WEB_ARTIST).Append(":"))    ||
+				    value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")) ||
+				    value.StartsWith(String(INFO_WEB_RADIO).Append(":"))     ||
+				    value.StartsWith(String(INFO_WEB_SOURCE).Append(":"))    ||
+				    value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")) ||
+				    value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) albumInfo.other.Add(value);
+			}
+
 			album.SetInfo(albumInfo);
 
+			/* Copy cover art.
+			 */
+			foreach (const Picture &picture, track.pictures)
+			{
+				album.pictures.Add(picture);
+			}
+
+			/* Add to album list.
+			 */
 			const Info	&info = album.GetInfo();
 			String		 jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.album.Length() > 0 ? info.album : I18n::Get()->TranslateString("unknown album")).Append("\t");
 

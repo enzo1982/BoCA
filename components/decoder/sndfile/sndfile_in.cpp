@@ -169,6 +169,7 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		info.artist	= ex_sf_get_string(sndf, SF_STR_ARTIST);
 		info.title	= ex_sf_get_string(sndf, SF_STR_TITLE);
+		info.album	= ex_sf_get_string(sndf, SF_STR_ALBUM);
 		info.year	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_DATE));
 		info.comment	= ex_sf_get_string(sndf, SF_STR_COMMENT);
 
@@ -239,9 +240,15 @@ Bool BoCA::SndFileIn::Deactivate()
 
 Int BoCA::SndFileIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	const Format	&format = track.GetFormat();
+
+	/* Set size to a sample number a multiple of the number of channels.
+	 */
+	size -= size % (format.bits / 8 * format.channels);
+
 	data.Resize(size);
 
-	if (track.GetFormat().bits == 8)
+	if (format.bits == 8)
 	{
 		Buffer<short>	 buffer(size);
 
@@ -249,11 +256,11 @@ Int BoCA::SndFileIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 		for (Int i = 0; i < size; i++) data[i] = (buffer[i] >> 8) - 128;
 	}
-	else if	(track.GetFormat().bits == 16)
+	else if	(format.bits == 16)
 	{
 		size = ex_sf_read_short(sndf, (short *) (UnsignedByte *) data, size / 2) * 2;
 	}
-	else if (track.GetFormat().bits == 24)
+	else if (format.bits == 24)
 	{
 		Buffer<int>	 buffer(size / 2);
 
@@ -268,7 +275,7 @@ Int BoCA::SndFileIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 			data[i * 3 + 2] = (buffer[i] >> 24) & 0xFF;
 		}
 	}
-	else if (track.GetFormat().bits == 32)
+	else if (format.bits == 32)
 	{
 		size = ex_sf_read_int(sndf, (int *) (UnsignedByte *) data, size / 4) * 4;
 	}

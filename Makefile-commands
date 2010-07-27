@@ -18,7 +18,9 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	DLLEXT = .dll
 
+ifneq ($(BUILD_X64),True)
 	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat
+endif
 else
 	DLLEXT = .so
 endif

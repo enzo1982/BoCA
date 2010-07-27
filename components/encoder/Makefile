@@ -29,7 +29,9 @@ endif
 	cd faac && make clean
 	cd flac && make clean
 	cd lame && make clean
+ifeq ($(BUILD_WIN32),True)
 	cd mac && make clean
+endif
 	cd speex && make clean
 ifeq ($(BUILD_WIN32),True)
 	cd twinvq && make clean
