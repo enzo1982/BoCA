@@ -33,6 +33,9 @@ namespace BoCA
 
 			Bool		 dontUpdateAlbumList;
 
+			Void		 AddToAlbumList(const Track &);
+			Void		 RemoveFromAlbumList(const Track &);
+
 			Void		 UpdateAlbumList();
 
 			Bool		 IsAlbumIdentical(const Track &, const Track &);

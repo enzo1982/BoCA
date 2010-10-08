@@ -57,15 +57,19 @@ Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &t
 
 	Int	 numItems = 0;
 
-	if	(info.artist != NIL) { RenderTagItem("ARTIST", info.artist, buffer);				  numItems++; }
-	if	(info.title  != NIL) { RenderTagItem("TITLE", info.title, buffer);				  numItems++; }
-	if	(info.album  != NIL) { RenderTagItem("ALBUM", info.album, buffer);				  numItems++; }
-	if	(info.track   >   0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : "")
-								   .Append(String::FromInt(info.track)), buffer); numItems++; }
-	if	(info.year    >   0) { RenderTagItem("DATE", String::FromInt(info.year), buffer);		  numItems++; }
-	if	(info.genre  != NIL) { RenderTagItem("GENRE", info.genre, buffer);				  numItems++; }
-	if	(info.label  != NIL) { RenderTagItem("ORGANIZATION", info.label, buffer);			  numItems++; }
-	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);				  numItems++; }
+	if	(info.artist != NIL) { RenderTagItem("ARTIST", info.artist, buffer);		  numItems++; }
+	if	(info.title  != NIL) { RenderTagItem("TITLE", info.title, buffer);		  numItems++; }
+	if	(info.album  != NIL) { RenderTagItem("ALBUM", info.album, buffer);		  numItems++; }
+	if	(info.year    >   0) { RenderTagItem("DATE", String::FromInt(info.year), buffer); numItems++; }
+	if	(info.genre  != NIL) { RenderTagItem("GENRE", info.genre, buffer);		  numItems++; }
+	if	(info.label  != NIL) { RenderTagItem("ORGANIZATION", info.label, buffer);	  numItems++; }
+	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);		  numItems++; }
+
+	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track)), buffer);	     numItems++; }
+	if	(info.numTracks > 0) { RenderTagItem("TOTALTRACKS", String(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks)), buffer); numItems++; }
+
+	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc)), buffer);	     numItems++; }
+	if	(info.numDiscs	> 0) { RenderTagItem("TOTALDISCS", String(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderTagItem("COMMENT", info.comment, buffer);						  numItems++; }
 	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderTagItem("COMMENT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
@@ -94,6 +98,14 @@ Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &t
 			{ RenderTagItem("replaygain_album_gain", info.album_gain, buffer); numItems++; }
 			{ RenderTagItem("replaygain_album_peak", info.album_peak, buffer); numItems++; }
 		}
+	}
+
+	/* Save CD table of contents.
+	 */
+	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
+	{
+		if	(info.mcdi.GetData().Size() > 0) { RenderTagItem("CDTOC", info.mcdi.GetOffsetString(), buffer);	numItems++; }
+		else if	(info.offsets != NIL)		 { RenderTagItem("CDTOC", info.offsets, buffer);		numItems++; }
 	}
 
 	/* Save cover art.
@@ -178,15 +190,20 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 		String	 id	 = comment.Head(comment.Find("=")).ToUpper();
 		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1);
 
-		if	(id == "ARTIST")       info.artist  = value;
-		else if (id == "TITLE")	       info.title   = value;
-		else if (id == "ALBUM")	       info.album   = value;
-		else if (id == "TRACKNUMBER")  info.track   = value.ToInt();
-		else if (id == "DATE")	       info.year    = value.ToInt();
-		else if (id == "GENRE")	       info.genre   = value;
-		else if (id == "COMMENT")      info.comment = value;
-		else if (id == "ORGANIZATION") info.label   = value;
-		else if (id == "ISRC")	       info.isrc    = value;
+		if	(id == "ARTIST")       info.artist   = value;
+		else if (id == "TITLE")	       info.title    = value;
+		else if (id == "ALBUM")	       info.album    = value;
+		else if (id == "DATE")	       info.year     = value.ToInt();
+		else if (id == "GENRE")	       info.genre    = value;
+		else if (id == "COMMENT")      info.comment  = value;
+		else if (id == "ORGANIZATION") info.label    = value;
+		else if (id == "ISRC")	       info.isrc     = value;
+
+		else if (id == "TRACKNUMBER")  info.track     = value.ToInt();
+		else if (id == "TOTALTRACKS")  info.numTracks = value.ToInt();
+
+		else if (id == "DISCNUMBER")   info.disc      = value.ToInt();
+		else if (id == "TOTALDISCS")   info.numDiscs  = value.ToInt();
 
 		else if (id == "PERFORMER")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
 
@@ -197,14 +214,21 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 			else if (id == "REPLAYGAIN_ALBUM_GAIN") info.album_gain = value;
 			else if (id == "REPLAYGAIN_ALBUM_PEAK") info.album_peak = value;
 		}
+		else if (id == "CDTOC")
+		{
+			info.offsets = value;
+		}
 		else if (id == "COVERART" && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
 		{
 			/* This is an unofficial way to store cover art in Vorbis
 			 * comments. It is used by some existing software.
 			 */
-			Picture	 picture;
+			Picture			 picture;
+			Buffer<UnsignedByte>	 buffer;
 
-			Encoding::Base64(picture.data).Decode(value);
+			Encoding::Base64(buffer).Decode(value);
+
+			picture.data = buffer;
 
 			if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
 			else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&

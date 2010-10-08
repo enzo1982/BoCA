@@ -27,30 +27,30 @@ namespace smooth
 {
 	namespace Threads
 	{
-		const Int	 THREAD_CREATED		= 0;
-		const Int	 THREAD_RUNNING		= 1;
-		const Int	 THREAD_STOPPED		= 2;
-		const Int	 THREAD_STARTME		= 3;
-		const Int	 THREAD_STOPPED_SELF	= 4;
+		const Short	 THREAD_CREATED		= 0;
+		const Short	 THREAD_RUNNING		= 1;
+		const Short	 THREAD_STOPPED		= 2;
+		const Short	 THREAD_STARTME		= 3;
+		const Short	 THREAD_STOPPED_SELF	= 4;
 
-		const Int	 THREAD_KILLFLAG_KILL	= 0;
-		const Int	 THREAD_KILLFLAG_WAIT	= 1;
+		const Short	 THREAD_KILLFLAG_KILL	= 0;
+		const Short	 THREAD_KILLFLAG_WAIT	= 1;
 
-		const Int	 THREAD_WAITFLAG_WAIT	= 0;
-		const Int	 THREAD_WAITFLAG_START	= 2;
+		const Short	 THREAD_WAITFLAG_WAIT	= 0;
+		const Short	 THREAD_WAITFLAG_START	= 2;
 
 		class SMOOTHAPI Thread : public Object
 		{
 			private:
-				Int			 status;
+				Short			 status;
 
 				ThreadBackend		*backend;
 
-				static Int		 nOfRunningThreads;
+				static Short		 nOfRunningThreads;
 
 				static Void		 MainCaller(Thread *);
 			public:
-				static const Int	 classID;
+				static const Short	 classID;
 
 							 Thread(Void * = NIL);
 							 Thread(const Thread &);
@@ -58,13 +58,13 @@ namespace smooth
 
 				Thread &operator	 =(const Thread &);
 
-				Int			 GetStatus() const;
+				Short			 GetStatus() const;
 				Int			 GetThreadID() const;
 
 				Int			 Start();
 				Int			 Stop();
 
-				inline static Int	 GetNOfRunningThreads() { return nOfRunningThreads; }
+				inline static Short	 GetNOfRunningThreads() { return nOfRunningThreads; }
 			callbacks:
 				Callback1<Int, Thread *> threadMain;
 		};

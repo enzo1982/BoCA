@@ -15,6 +15,8 @@ BoCA::ConfigureWinampIn::ConfigureWinampIn()
 {
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Extensions::Winamp Adapter");
+
 	list_input		= new ListBox(Point(7, 7), Size(425, 170));
 	list_input->onSelectEntry.Connect(&ConfigureWinampIn::SelectInputPlugin, this);
 

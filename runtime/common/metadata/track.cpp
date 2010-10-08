@@ -18,8 +18,11 @@ BoCA::Track::Track()
 {
 	trackID		= nextTrackID++;
 
+	sampleOffset	= 0;
+
 	length		= -1;
 	approxLength	= -1;
+
 	fileSize	= -1;
 
 	isCDTrack	= False;
@@ -47,6 +50,9 @@ BoCA::Track &BoCA::Track::operator =(const int nil)
 {
 	trackID		= -1;
 
+	pictures.RemoveAll();
+	tracks.RemoveAll();
+
 	return *this;
 }
 
@@ -61,8 +67,11 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 	info		= oTrack.info;
 	originalInfo	= oTrack.originalInfo;
 
+	sampleOffset	= oTrack.sampleOffset;
+
 	length		= oTrack.length;
 	approxLength	= oTrack.approxLength;
+
 	fileSize	= oTrack.fileSize;
 
 	isCDTrack	= oTrack.isCDTrack;
@@ -71,10 +80,11 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 
 	pictures.RemoveAll();
 
-	foreach (const Picture &picture, oTrack.pictures)
-	{
-		pictures.Add(picture);
-	}
+	foreach (const Picture &picture, oTrack.pictures) pictures.Add(picture);
+
+	tracks.RemoveAll();
+
+	foreach (const Track &track, oTrack.tracks) tracks.Add(track);
 
 	offset		= oTrack.offset;
 	discid		= oTrack.discid;
@@ -104,10 +114,18 @@ Bool BoCA::Track::operator !=(const int nil) const
 
 String BoCA::Track::GetLengthString() const
 {
+	Int	 seconds = 0;
+	String	 secondsString;
+
+	if	(length >= 0)	    seconds = Math::Round(Float(length) / (format.rate * format.channels));
+	else if (approxLength >= 0) seconds = Math::Round(Float(approxLength) / (format.rate * format.channels));
+
+	secondsString = String::FromInt(seconds / 60).Append(":").Append(seconds % 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 60));
+
 	String	 lengthString;
 
-	if	(length >= 0)	    lengthString = String::FromInt(Math::Floor(length / (format.rate * format.channels) / 60)).Append(":").Append((length / (format.rate * format.channels) % 60) < 10 ? "0" : NIL).Append(String::FromInt(length / (format.rate * format.channels) % 60));
-	else if (approxLength >= 0) lengthString = String("~ ").Append(String::FromInt(Math::Floor(approxLength / (format.rate * format.channels) / 60)).Append(":").Append((approxLength / (format.rate * format.channels) % 60) < 10 ? "0" : NIL).Append(String::FromInt(approxLength / (format.rate * format.channels) % 60)));
+	if	(length >= 0)	    lengthString = secondsString;
+	else if (approxLength >= 0) lengthString = String("~ ").Append(secondsString);
 	else			    lengthString = "?";
 
 	wchar_t	 sign[2] = { 0x2248, 0 };
@@ -132,15 +150,15 @@ Bool BoCA::Track::LoadCoverArtFiles()
 		Directory		 directory = File(origFilename).GetFilePath();
 		const Array<File>	&jpgFiles = directory.GetFilesByPattern("*.jpg");
 
-		foreach (File file, jpgFiles) LoadCoverArtFile(file);
+		foreach (const File &file, jpgFiles) LoadCoverArtFile(file);
 
 		const Array<File>	&jpegFiles = directory.GetFilesByPattern("*.jpeg");
 
-		foreach (File file, jpegFiles) LoadCoverArtFile(file);
+		foreach (const File &file, jpegFiles) LoadCoverArtFile(file);
 
 		const Array<File>	&pngFiles = directory.GetFilesByPattern("*.png");
 
-		foreach (File file, pngFiles) LoadCoverArtFile(file);
+		foreach (const File &file, pngFiles) LoadCoverArtFile(file);
 	}
 
 	return True;

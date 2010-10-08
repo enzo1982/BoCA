@@ -31,6 +31,10 @@ DynamicLoader *cdripdll	= NIL;
 
 Bool LoadCDRipDLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("CDRip.dll")).Exists()) return False;
+#endif
+
 	cdripdll = new DynamicLoader("CDRip");
 
 	ex_CR_Init			= (CR_INIT) cdripdll->GetFunctionAddress("CR_Init");

@@ -10,14 +10,18 @@
 
 #include <boca/application/external/configlayer.h>
 #include <boca/common/config.h>
+#include <boca/common/i18n.h>
 
 BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 {
 	specs = iSpecs;
 
 	Config	*config = Config::Get();
+	I18n	*i18n	= I18n::Get();
 
-	text_parameters = new Text("Command line arguments:", Point(6, 6));
+	i18n->SetContext("Configuration");
+
+	text_parameters = new Text(i18n->TranslateString("Command line arguments:"), Point(6, 6));
 
 	list_parameters	= new ListBox(Point(6, 24), Size(250, 64));
 	list_parameters->SetFlags(LF_MULTICHECKBOX);
@@ -25,7 +29,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 	list_parameters->onMarkEntry.Connect(&ConfigLayerExternal::OnSelectParameter, this);
 	list_parameters->onMarkEntry.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
 
-	text_commandline = new Text("Resulting arguments string:", Point(6, 156));
+	text_commandline = new Text(i18n->TranslateString("Resulting arguments string:"), Point(6, 156));
 
 	edit_commandline = new EditBox(NIL, Point(6, 174), Size(250, 0));
 	edit_commandline->Deactivate();

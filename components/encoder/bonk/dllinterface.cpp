@@ -29,12 +29,23 @@ Bool LoadBonkDLL()
 {
 	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
 	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Bonk-OpenMP.dll")).Exists()) return False;
+#endif
+
 		bonkdll = new DynamicLoader("codecs/Bonk-OpenMP");
 
 		if (bonkdll->GetSystemModuleHandle() == NIL) FreeBonkDLL();
 	}
 
-	if (bonkdll == NIL) bonkdll = new DynamicLoader("codecs/Bonk");
+	if (bonkdll == NIL)
+	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Bonk.dll")).Exists()) return False;
+#endif
+
+		bonkdll = new DynamicLoader("codecs/Bonk");
+	}
 
 	ex_bonk_encoder_create			= (BONKENCODERCREATE) bonkdll->GetFunctionAddress("bonk_encoder_create");
 	ex_bonk_encoder_init			= (BONKENCODERINIT) bonkdll->GetFunctionAddress("bonk_encoder_init");

@@ -387,6 +387,10 @@
 					Name="communication"
 					>
 					<File
+						RelativePath="..\..\..\runtime\common\communication\application.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\runtime\common\communication\joblist.cpp"
 						>
 					</File>
@@ -420,6 +424,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\runtime\common\metadata\picture.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\runtime\common\metadata\picturedata.cpp"
 						>
 					</File>
 					<File
@@ -638,6 +646,10 @@
 						Name="communication"
 						>
 						<File
+							RelativePath="..\..\..\include\boca\common\communication\application.h"
+							>
+						</File>
+						<File
 							RelativePath="..\..\..\include\boca\common\communication\joblist.h"
 							>
 						</File>
@@ -671,6 +683,10 @@
 						</File>
 						<File
 							RelativePath="..\..\..\include\boca\common\metadata\picture.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\include\boca\common\metadata\picturedata.h"
 							>
 						</File>
 						<File

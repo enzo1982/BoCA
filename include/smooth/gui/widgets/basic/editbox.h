@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,9 +29,9 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int EDB_ALPHANUMERIC	= 0;
-		const Int EDB_NUMERIC		= 1;
-		const Int EDB_ASTERISK		= 2;
+		const Short	 EDB_ALPHANUMERIC	= 0;
+		const Short	 EDB_NUMERIC		= 1;
+		const Short	 EDB_ASTERISK		= 2;
 
 		class SMOOTHAPI EditBox : public Widget
 		{
@@ -41,7 +41,7 @@ namespace smooth
 				List				*dropDownList;
 				ComboBox			*comboBox;
 			public:
-				static const Int		 classID;
+				static const Short		 classID;
 
 								 EditBox(const String &, const Point &, const Size &, Int = 0);
 				virtual				~EditBox();

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,7 +26,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int DIV_MOVABLE	= 32768;
+		const Short	 DIV_MOVABLE	= 32768;
 
 		class SMOOTHAPI Divider : public Widget
 		{
@@ -42,7 +42,7 @@ namespace smooth
 
 				Void			 UpdateMetrics();
 			public:
-				static const Int	 classID;
+				static const Short	 classID;
 
 							 Divider(Int, Int = OR_HORZ | OR_TOP);
 				virtual			~Divider();

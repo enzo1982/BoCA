@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,10 +27,10 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 TB_NONE	= 0;
-		const Int	 TB_MINBUTTON	= 1;
-		const Int	 TB_MAXBUTTON	= 2;
-		const Int	 TB_CLOSEBUTTON	= 4;
+		const Short	 TB_NONE	= 0;
+		const Short	 TB_MINBUTTON	= 1;
+		const Short	 TB_MAXBUTTON	= 2;
+		const Short	 TB_CLOSEBUTTON	= 4;
 
 		class SMOOTHAPI Titlebar : public Widget
 		{
@@ -46,7 +46,7 @@ namespace smooth
 
 				Shortcut		*closeShortcut;
 			public:
-				static const Int	 classID;
+				static const Short	 classID;
 
 							 Titlebar(Int = TB_MINBUTTON | TB_MAXBUTTON | TB_CLOSEBUTTON);
 			 	virtual			~Titlebar();

@@ -76,9 +76,8 @@ Bool BoCA::VorbisOut::Activate()
 
 	if (format.channels > 2)
 	{
-		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
-
-		errorState = True;
+		errorString = "BonkEnc does not support more than 2 channels!";
+		errorState  = True;
 
 		return False;
 	}
@@ -268,14 +267,4 @@ ConfigLayer *BoCA::VorbisOut::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureVorbis();
 
 	return configLayer;
-}
-
-Void BoCA::VorbisOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
 }

@@ -31,6 +31,8 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::FLAC");
+
 	layer_simple		= new Layer(i18n->TranslateString("Basic"));
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 	layer_advanced		= new Layer(i18n->TranslateString("Expert"));
@@ -41,6 +43,8 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	size.cy = 245;
 
 	tabwidget		= new TabWidget(pos, size);
+
+	i18n->SetContext("Encoders::FLAC::Basic");
 
 	pos.x = 7;
 	pos.y = 11;
@@ -92,6 +96,8 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	check_loose_mid_side	= new CheckBox(i18n->TranslateString("Adaptive Joint Stereo"), pos, size, &loose_mid_side_stereo);
 
+	i18n->SetContext("Encoders::FLAC::Format");
+
 	pos.x = 7;
 	pos.y = 11;
 	size.cx = 480;
@@ -130,6 +136,8 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	pos.y += 3;
 
 	text_blocksize_bytes	= new Text(i18n->TranslateString("bytes"), pos);
+
+	i18n->SetContext("Encoders::FLAC::Expert");
 
 	pos.x = 7;
 	pos.y = 11;

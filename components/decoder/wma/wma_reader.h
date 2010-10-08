@@ -22,64 +22,67 @@ namespace BoCA
 			  public IWMReaderCallbackAdvanced
 	{
 		private:
-			LONG				 m_cRef;
+			LONG			 m_cRef;
 
-			BOOL				 m_fEOF;
-			QWORD				 m_qwTime;
-			DWORD				 m_dwAudioOutputNum;
+			BOOL			 m_fEOF;
+			QWORD			 m_qwTime;
+			DWORD			 m_dwAudioOutputNum;
 
-			HANDLE				 m_hAsyncEvent;
+			HANDLE			 m_hAsyncEvent;
 
-			IWMReaderAdvanced		*m_pReaderAdvanced;
+			IWMReaderAdvanced	*m_pReaderAdvanced;
 
-			Bool				 active;
-			Bool				 error;
+			Bool			 active;
+			Bool			 error;
 
-			String				 errorString;
+			String			 errorString;
 
-			Buffer<UnsignedByte>		*samplesBuffer;
-			Mutex				*samplesBufferMutex;
+			Buffer<UnsignedByte>	*samplesBuffer;
+			Mutex			*samplesBufferMutex;
 		public:
-							 WMAReader();
-							~WMAReader();
+						 WMAReader();
+						~WMAReader();
 
-			HRESULT STDMETHODCALLTYPE	 QueryInterface(REFIID, void **);
-			ULONG STDMETHODCALLTYPE		 AddRef();
-			ULONG STDMETHODCALLTYPE		 Release();
-
-			HRESULT STDMETHODCALLTYPE	 OnStatus(WMT_STATUS, HRESULT, WMT_ATTR_DATATYPE, BYTE *, void *);
-			HRESULT STDMETHODCALLTYPE	 OnSample(DWORD, QWORD, QWORD, DWORD, INSSBuffer *, void *);
-			HRESULT STDMETHODCALLTYPE	 OnTime(QWORD, void *);
-
-			HRESULT STDMETHODCALLTYPE	 OnStreamSample(WORD wStreamNum, QWORD cnsSampleTime, QWORD cnsSampleDuration, DWORD dwFlags, INSSBuffer *pSample, void *pvContext)
-							{ return S_OK; }
-
-			HRESULT STDMETHODCALLTYPE	 OnStreamSelection(WORD wStreamCount, WORD *pStreamNumbers, WMT_STREAM_SELECTION *pSelections, void *pvContext)
-							{ return S_OK; }
-
-			HRESULT STDMETHODCALLTYPE	 OnOutputPropsChanged(DWORD dwOutputNum, WM_MEDIA_TYPE *pMediaType, void *pvContext)
-							{ return S_OK; }
-
-			HRESULT STDMETHODCALLTYPE	 AllocateForStream(WORD wStreamNum, DWORD cbBuffer, INSSBuffer **ppBuffer, void *pvContext)
-							{ return E_NOTIMPL; }
-
-			HRESULT STDMETHODCALLTYPE	 AllocateForOutput(DWORD dwOutputNum, DWORD cbBuffer, INSSBuffer **ppBuffer, void *pvContext)
-							{ return E_NOTIMPL; }
-
-			Void				 SetAsyncEvent(HRESULT hrAsync);
+			Void			 SetAsyncEvent(HRESULT hrAsync);
 		accessors:
-			Bool				 IsActive();
-			Void				 SetActive(Bool);
+			Bool			 IsActive();
+			Void			 SetActive(Bool);
 
-			Bool				 IsError();
-			const String			&GetErrorString();
+			Bool			 IsError();
+			const String		&GetErrorString();
 
-			HANDLE				 GetAsyncEventHandle() const;
+			HANDLE			 GetAsyncEventHandle() const;
 
-			Void				 SetReaderAdvanced(IWMReaderAdvanced *);
-			Void				 SetAudioOutputNum(DWORD);
+			Void			 SetReaderAdvanced(IWMReaderAdvanced *);
+			Void			 SetAudioOutputNum(DWORD);
 
-			Void				 SetSamplesBuffer(Buffer<UnsignedByte> *, Mutex *);
+			Void			 SetSamplesBuffer(Buffer<UnsignedByte> *, Mutex *);
+		public:
+			/* IUnknown methods
+			 */
+			STDMETHOD(QueryInterface)(REFIID, void __RPC_FAR * __RPC_FAR *);
+			STDMETHOD_(ULONG, AddRef)();
+			STDMETHOD_(ULONG, Release)();
+
+			/* IWMStatusCallback methods
+			 */
+			STDMETHOD(OnStatus)(WMT_STATUS, HRESULT, WMT_ATTR_DATATYPE, BYTE *, void *);
+
+			/* IWMReaderCallback methods
+			 */
+			STDMETHOD(OnSample)(DWORD, QWORD, QWORD, DWORD, INSSBuffer *, void *);
+
+			/* IWMReaderCallbackAdvanced methods
+			 */
+			STDMETHOD(OnTime)(QWORD, void *);
+
+			STDMETHOD(OnStreamSample)(WORD wStreamNum, QWORD cnsSampleTime, QWORD cnsSampleDuration, DWORD dwFlags, INSSBuffer *pSample, void *pvContext)	{ return S_OK; }
+			STDMETHOD(OnStreamSelection)(WORD wStreamCount, WORD *pStreamNumbers, WMT_STREAM_SELECTION *pSelections, void *pvContext)			{ return S_OK; }
+
+			STDMETHOD(OnOutputPropsChanged)(DWORD dwOutputNum, WM_MEDIA_TYPE *pMediaType, void *pvContext)							{ return S_OK; }
+
+			STDMETHOD(AllocateForStream)(WORD wStreamNum, DWORD cbBuffer, INSSBuffer **ppBuffer, void *pvContext)						{ return E_NOTIMPL; }
+			STDMETHOD(AllocateForOutput)(DWORD dwOutputNum, DWORD cbBuffer, INSSBuffer **ppBuffer, void *pvContext)						{ return E_NOTIMPL; }
 	};
 };
 

@@ -220,6 +220,11 @@ namespace smooth
 				return GetNthReference(GetEntryNumberByIndex(index));
 			}
 
+			const s &GetReference(Int index) const
+			{
+				return GetNthReference(GetEntryNumberByIndex(index));
+			}
+
 			Bool Set(Int index, const s &value)
 			{
 				return SetNth(GetEntryNumberByIndex(index), value);
@@ -238,6 +243,18 @@ namespace smooth
 			}
 
 			s &GetNthReference(Int n)
+			{
+				if (nOfEntries > n && n >= 0)
+				{
+					lastAccessedEntry = n;
+
+					return entries[n]->GetValueReference();
+				}
+
+				return nullValue;
+			}
+
+			const s &GetNthReference(Int n) const
 			{
 				if (nOfEntries > n && n >= 0)
 				{

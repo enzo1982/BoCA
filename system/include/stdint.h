@@ -47,7 +47,7 @@ typedef unsigned long long   uint_least64_t;
  *  Not actually guaranteed to be fastest for all purposes
  *  Here we use the exact-width types for 8 and 16-bit ints. 
  */
-typedef char int_fast8_t;
+typedef signed char int_fast8_t;
 typedef unsigned char uint_fast8_t;
 typedef short  int_fast16_t;
 typedef unsigned short  uint_fast16_t;
@@ -57,12 +57,28 @@ typedef long long  int_fast64_t;
 typedef unsigned long long   uint_fast64_t;
 
 /* 7.18.1.4  Integer types capable of holding object pointers */
-typedef int intptr_t;
-typedef unsigned uintptr_t;
+
+#ifndef _INTPTR_T_DEFINED
+#define _INTPTR_T_DEFINED
+#ifdef _WIN64
+  typedef __int64 intptr_t;
+#else
+  typedef int intptr_t;
+#endif
+#endif
+
+#ifndef _UINTPTR_T_DEFINED
+#define _UINTPTR_T_DEFINED
+#ifdef _WIN64
+  typedef unsigned __int64 uintptr_t;
+#else
+  typedef unsigned int uintptr_t;
+#endif
+#endif
 
 /* 7.18.1.5  Greatest-width integer types */
 typedef long long  intmax_t;
-typedef unsigned long long   uintmax_t;
+typedef unsigned long long uintmax_t;
 
 /* 7.18.2  Limits of specified-width integer types */
 #if !defined ( __cplusplus) || defined (__STDC_LIMIT_MACROS)
@@ -116,10 +132,16 @@ typedef unsigned long long   uintmax_t;
 #define UINT_FAST64_MAX UINT64_MAX
 
 /* 7.18.2.4  Limits of integer types capable of holding
-    object pointers */ 
+    object pointers */
+#ifdef _WIN64
+#define INTPTR_MIN INT64_MIN
+#define INTPTR_MAX INT64_MAX
+#define UINTPTR_MAX UINT64_MAX
+#else
 #define INTPTR_MIN INT32_MIN
 #define INTPTR_MAX INT32_MAX
 #define UINTPTR_MAX UINT32_MAX
+#endif
 
 /* 7.18.2.5  Limits of greatest-width integer types */
 #define INTMAX_MIN INT64_MIN
@@ -127,13 +149,13 @@ typedef unsigned long long   uintmax_t;
 #define UINTMAX_MAX UINT64_MAX
 
 /* 7.18.3  Limits of other integer types */
-#define PTRDIFF_MIN INT32_MIN
-#define PTRDIFF_MAX INT32_MAX
+#define PTRDIFF_MIN INTPTR_MIN
+#define PTRDIFF_MAX INTPTR_MAX
 
-#define SIG_ATOMIC_MIN INT32_MIN
-#define SIG_ATOMIC_MAX INT32_MAX
+#define SIG_ATOMIC_MIN INTPTR_MIN
+#define SIG_ATOMIC_MAX INTPTR_MAX
 
-#define SIZE_MAX UINT32_MAX
+#define SIZE_MAX UINTPTR_MAX
 
 #ifndef WCHAR_MIN  /* also in wchar.h */ 
 #define WCHAR_MIN 0
@@ -165,13 +187,13 @@ typedef unsigned long long   uintmax_t;
 	*expression* with *promoted* type."
 */
 
-#define INT8_C(val) ((int8_t) + (val))
-#define UINT8_C(val) ((uint8_t) + (val##U))
-#define INT16_C(val) ((int16_t) + (val))
-#define UINT16_C(val) ((uint16_t) + (val##U))
+#define INT8_C(val) val
+#define UINT8_C(val) val
+#define INT16_C(val) val
+#define UINT16_C(val) val
 
-#define INT32_C(val) val##L
-#define UINT32_C(val) val##UL
+#define INT32_C(val) val
+#define UINT32_C(val) val##U
 #define INT64_C(val) val##LL
 #define UINT64_C(val) val##ULL
 

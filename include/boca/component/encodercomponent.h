@@ -30,13 +30,21 @@ namespace BoCA
 						 EncoderComponent();
 				virtual		~EncoderComponent();
 
+				/* Called to set information about output stream.
+				 */
 				virtual Bool	 SetAudioTrackInfo(const Track &);
 
+				/* Returns the configured output file extension.
+				 */
 				virtual String	 GetOutputFileExtension();
 
+				/* Activate/deactivate filter.
+				 */
 				virtual Bool	 Activate() = 0;
 				virtual Bool	 Deactivate() = 0;
 
+				/* Write data from buffer.
+				 */
 				virtual Int	 WriteData(Buffer<UnsignedByte> &, Int) = 0;
 		};
 	};

@@ -45,15 +45,17 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::Speex");
+
 	group_profile		= new GroupBox(i18n->TranslateString("Profile"), Point(7, 11), Size(366, 43));
 
 	text_profile		= new Text(i18n->TranslateString("Select encoding profile:"), Point(10, 16));
 
 	combo_profile		= new ComboBox(Point(18 + text_profile->textSize.cx, 13), Size(338 - text_profile->textSize.cx, 0));
-	combo_profile->AddEntry("Auto");
-	combo_profile->AddEntry("Narrowband (8 kHz)");
-	combo_profile->AddEntry("Wideband (16 kHz)");
-	combo_profile->AddEntry("Ultra-Wideband (32 kHz)");
+	combo_profile->AddEntry(i18n->TranslateString("Auto"));
+	combo_profile->AddEntry(i18n->TranslateString("Narrowband (8 kHz)"));
+	combo_profile->AddEntry(i18n->TranslateString("Wideband (16 kHz)"));
+	combo_profile->AddEntry(i18n->TranslateString("Ultra-Wideband (32 kHz)"));
 	combo_profile->SelectNthEntry(config->GetIntValue("Speex", "Mode", -1) + 1);
 
 	group_profile->Add(text_profile);
@@ -61,13 +63,13 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	group_vbr_mode		= new GroupBox(i18n->TranslateString("VBR mode"), Point(7, 66), Size(128, 91));
 
-	option_cbr		= new OptionBox("CBR (no VBR)", Point(10, 14), Size(108, 0), &vbrmode, 0);
+	option_cbr		= new OptionBox(i18n->TranslateString("CBR (no VBR)"), Point(10, 14), Size(108, 0), &vbrmode, 0);
 	option_cbr->onAction.Connect(&ConfigureSpeex::SetVBRMode, this);
 
-	option_vbr		= new OptionBox("VBR", Point(10, 39), Size(108, 0), &vbrmode, 1);
+	option_vbr		= new OptionBox(i18n->TranslateString("VBR"), Point(10, 39), Size(108, 0), &vbrmode, 1);
 	option_vbr->onAction.Connect(&ConfigureSpeex::SetVBRMode, this);
 
-	option_abr		= new OptionBox("ABR", Point(10, 64), Size(108, 0), &vbrmode, 2);
+	option_abr		= new OptionBox(i18n->TranslateString("ABR"), Point(10, 64), Size(108, 0), &vbrmode, 2);
 	option_abr->onAction.Connect(&ConfigureSpeex::SetVBRMode, this);
 
 	group_vbr_mode->Add(option_cbr);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,7 +34,7 @@ namespace smooth
 			protected:
 				static Int		 defaultPackageSize;
 
-				Int			 streamType;
+				Short			 streamType;
 				Bool			 crosslinked;
 				Bool			 closefile;
 
@@ -60,15 +60,15 @@ namespace smooth
 				Driver			*driver;
 				Array<Filter *, Void *>	 filters;
 
-				mutable Int		 lastError;
+				mutable Short		 lastError;
 			public:
 				static Bool		 SetDefaultPackageSize	(Int);
 
 				Int64			 Size() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return size; }
 				Int64			 GetPos() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return currentFilePos; }
 
-				Int			 GetStreamType() const	{ return streamType; }
-				Int			 GetLastError() const	{ return lastError; }
+				Short			 GetStreamType() const	{ return streamType; }
+				Short			 GetLastError() const	{ return lastError; }
 
 							 Stream			();
 							~Stream			();

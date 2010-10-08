@@ -25,12 +25,12 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 FONT_GDIPLUS	= 4;
+		const Short	 FONT_GDIPLUS	= 4;
 
 		class FontGDIPlus : public FontBackend
 		{
 			public:
-					 FontGDIPlus(const String &, Int, Int, Int, const Color &);
+					 FontGDIPlus(const String &, Short, Short, Short, const Color &);
 					~FontGDIPlus();
 
 				Size	 GetTextSize(const String &) const;

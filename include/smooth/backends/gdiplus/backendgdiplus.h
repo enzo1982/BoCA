@@ -25,7 +25,7 @@ namespace smooth
 {
 	namespace Backends
 	{
-		const Int	 BACKEND_GDIPLUS = 4;
+		const Short	 BACKEND_GDIPLUS = 4;
 
 		class BackendGDIPlus : public Backend
 		{

@@ -75,6 +75,12 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	hProcess = processInfo.hProcess;
 
+	/* Close stdio pipe write handle.
+	 */
+	CloseHandle(wPipe);
+
+	/* Read WAVE header into buffer.
+	 */
 	Buffer<UnsignedByte>	 buffer(44);
 	Int			 bytesReadTotal = 0;
 	DWORD			 bytesRead = 0;
@@ -133,8 +139,26 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		}
 		else if (chunk == "data")
 		{
-			if ((unsigned) cSize == 0xffffffff) track.length = -1;
-			else				    track.length = (unsigned long) cSize / (track.GetFormat().bits / 8);
+			if ((unsigned) cSize == 0xffffffff || (unsigned) cSize == 0) track.length = -1;
+			else							     track.length = (unsigned long) cSize / (track.GetFormat().bits / 8);
+
+			/* Read the rest of the file to find actual size.
+			 */
+			if (track.length == -1)
+			{
+				Buffer<UnsignedByte>	 data(12288);
+
+				track.length = 0;
+
+				while (True)
+				{
+					Int	 size = 0;
+
+					if (!ReadFile(rPipe, data, data.Size(), (DWORD *) &size, NIL) || size == 0) break;
+
+					track.length += size / (track.GetFormat().bits / 8);
+				}
+			}
 		}
 		else
 		{
@@ -150,11 +174,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	delete in;
 
 	CloseHandle(rPipe);
-	CloseHandle(wPipe);
 
 	TerminateProcess(hProcess, 0);
 
-	/* Wait until the decoder exits
+	/* Wait until the decoder exits.
 	 */
 	unsigned long	 exitCode = 0;
 
@@ -174,7 +197,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		File(encFileName).Delete();
 	}
 
-	/* Check if anything went wrong
+	/* Check if anything went wrong.
 	 */
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
@@ -201,7 +224,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 	CreatePipe(&rPipe, &wPipe, &secAttr, 131072);
 	SetHandleInformation(rPipe, HANDLE_FLAG_INHERIT, 0);
 
-	/* Start 3rd party command line encoder
+	/* Start 3rd party command line encoder.
 	 */
 	STARTUPINFOA		 startupInfo;
 
@@ -234,7 +257,11 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 	hProcess = processInfo.hProcess;
 
-	/* Skip the WAVE header
+	/* Close stdio pipe write handle before reading.
+	 */
+	CloseHandle(wPipe);
+
+	/* Skip the WAVE header.
 	 */
 	Buffer<UnsignedByte>	 buffer(44);
 	Int			 bytesReadTotal = 0;
@@ -253,14 +280,13 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 {
-	/* Close stdio pipe
+	/* Close stdio pipe read handle.
 	 */
 	CloseHandle(rPipe);
-	CloseHandle(wPipe);
 
 	TerminateProcess(hProcess, 0);
 
-	/* Wait until the decoder exits
+	/* Wait until the decoder exits.
 	 */
 	unsigned long	 exitCode = 0;
 
@@ -291,17 +317,20 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 	return True;
 }
 
+Bool BoCA::AS::DecoderComponentExternalStdIO::Seek(Int64 samplePosition)
+{
+	return False;
+}
+
 Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	/* Hand data over from the input file
+	/* Hand data over from the input file.
 	 */
-	size = 6144;
+	size = 12288;
 
 	data.Resize(size);
 
-	ReadFile(rPipe, data, size, (DWORD *) &size, NIL);
-
-	if (size == 0) return -1;
+	if (!ReadFile(rPipe, data, size, (DWORD *) &size, NIL) || size == 0) return -1;
 
 	return size;
 }

@@ -44,7 +44,6 @@ namespace BoCA
 				virtual Int		 SetDriver(IO::Driver *);
 
 				virtual ConfigLayer	*GetConfigurationLayer();
-				virtual Void		 FreeConfigurationLayer();
 			accessors:
 				Bool			 GetErrorState()			{ return errorState; }
 				const String		&GetErrorString()			{ return errorString; }

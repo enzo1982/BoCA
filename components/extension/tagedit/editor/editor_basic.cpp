@@ -16,11 +16,15 @@
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
-BoCA::LayerTagBasic::LayerTagBasic() : Editor("Info")
+BoCA::LayerTagBasic::LayerTagBasic() : Editor("Basic")
 {
 	I18n	*i18n = I18n::Get();
 
-	group_info		= new GroupBox("Title information", Point(7, 10), Size(400, 178));
+	i18n->SetContext("Extensions::Tag Editor::Basic");
+
+	SetText(i18n->TranslateString("Basic"));
+
+	group_info		= new GroupBox(i18n->TranslateString("Title information"), Point(7, 10), Size(400, 178));
 
 	text_artist		= new Text(String(i18n->TranslateString("Artist")).Append(":"), Point(9, 13));
 	text_title		= new Text(String(i18n->TranslateString("Title")).Append(":"), text_artist->GetPosition() + Point(0, 27));
@@ -116,7 +120,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Editor("Info")
 	group_info->Add(text_year);
 	group_info->Add(edit_year);
 
-	group_cover		= new GroupBox("Cover art", Point(415, 10), Size(400, 178));
+	group_cover		= new GroupBox(i18n->TranslateString("Cover art"), Point(415, 10), Size(400, 178));
 
 	text_covers		= new Text(String(i18n->TranslateString("Covers")).Append(":"), Point(9, 13));
 	text_cover_type		= new Text(String(i18n->TranslateString("Type")).Append(":"), Point(9, 94));
@@ -154,11 +158,11 @@ BoCA::LayerTagBasic::LayerTagBasic() : Editor("Info")
 	edit_cover_desc		= new MultiEdit(NIL, text_cover_desc->GetPosition() + Point(maxTextSize3 + 7, -3), Size(300, 50));
 	edit_cover_desc->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	button_cover_add	= new Button("Add", NIL, Point(89, 9), Size(0, 0));
+	button_cover_add	= new Button(i18n->TranslateString("Add"), NIL, Point(89, 9), Size(0, 0));
 	button_cover_add->SetOrientation(OR_UPPERRIGHT);
 	button_cover_add->onAction.Connect(&LayerTagBasic::AddCover, this);
 
-	button_cover_remove	= new Button("Remove", NIL, button_cover_add->GetPosition() + Point(0, 28), Size(0, 0));
+	button_cover_remove	= new Button(i18n->TranslateString("Remove"), NIL, button_cover_add->GetPosition() + Point(0, 28), Size(0, 0));
 	button_cover_remove->SetOrientation(OR_UPPERRIGHT);
 	button_cover_remove->Deactivate();
 	button_cover_remove->onAction.Connect(&LayerTagBasic::RemoveCover, this);
@@ -292,20 +296,21 @@ Void BoCA::LayerTagBasic::AddCover()
 
 		image_covers->Add(entry);
 
-		Picture		 picture;
-		InStream	 in(STREAM_FILE, file, IS_READ);
+		InStream		 in(STREAM_FILE, file, IS_READ);
+		Buffer<UnsignedByte>	 buffer(in.Size());
 
-		picture.data.Resize(in.Size());
+		in.InputData(buffer, buffer.Size());
 
-		in.InputData(picture.data, picture.data.Size());
+		Picture	 picture;
 
-		if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
-		else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
-			 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
-			 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
-			 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+		if	(buffer[0] == 0xFF && buffer[1] == 0xD8) picture.mime = "image/jpeg";
+		else if (buffer[0] == 0x89 && buffer[1] == 0x50 &&
+			 buffer[2] == 0x4E && buffer[3] == 0x47 &&
+			 buffer[4] == 0x0D && buffer[5] == 0x0A &&
+			 buffer[6] == 0x1A && buffer[7] == 0x0A) picture.mime = "image/png";
 
 		picture.type = 0;
+		picture.data = buffer;
 
 		track.pictures.Add(picture);
 
@@ -489,6 +494,8 @@ Void BoCA::LayerTagBasic::OnSelectNone()
 	combo_cover_type->Deactivate();
 	text_cover_desc->Deactivate();
 	edit_cover_desc->Deactivate();
+
+	track = NIL;
 }
 
 /* Called when a track is modified.

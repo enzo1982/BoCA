@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>TiMidity Software MIDI Synthesizer</name>
+  <version>1.0</version>
+  <id>timidity-in</id>
+  <type>decoder</type>
+  <format>
+    <name>MIDI Files</name>
+    <extension>mid</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/timidity/timidity.exe</command>
+    <arguments>-c codecs/cmdline/timidity/crude.cfg -L codecs/cmdline/timidity -OwS1 -o %OUTFILE %OPTIONS %INFILE</arguments>
+    <mode>file</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

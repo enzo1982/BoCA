@@ -31,12 +31,12 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 SURFACE_CAIRO	= 3;
+		const Short	 SURFACE_CAIRO	= 3;
 
 		class SurfaceCairo : public SurfaceBackend
 		{
 			private:
-				static Int			 surfaceDPI;
+				static Short			 surfaceDPI;
 			protected:
 				Size				 allocSize;
 #ifdef __WIN32__
@@ -78,7 +78,7 @@ namespace smooth
 
 				Void				*GetSystemSurface() const;
 
-				Int				 GetSurfaceDPI() const;
+				Short				 GetSurfaceDPI() const;
 
 				Int				 SetPixel(const Point &, const Color &);
 

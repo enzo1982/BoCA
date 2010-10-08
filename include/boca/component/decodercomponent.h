@@ -32,17 +32,32 @@ namespace BoCA
 						 DecoderComponent();
 				virtual		~DecoderComponent();
 
+				/* Stream information functions.
+				 */
 				virtual Bool	 CanOpenStream(const String &) = 0;
 				virtual Error	 GetStreamInfo(const String &, Track &) = 0;
 
+				/* Called to set information about input stream.
+				 */
 				virtual Bool	 SetAudioTrackInfo(const Track &);
 
-				Int64		 GetInBytes() { return inBytes; }
-
+				/* Activate/deactivate filter.
+				 */
 				virtual Bool	 Activate() = 0;
 				virtual Bool	 Deactivate() = 0;
 
+				/* Seek to specified sample position.
+				 *
+				 * Notes: - May be called only once directly after Activate().
+				 *	  - Default implementation simply returns false to signal failure.
+				 */
+				virtual Bool	 Seek(Int64);
+
+				/* Read data into buffer.
+				 */
 				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int) = 0;
+			accessors:
+				Int64		 GetInBytes() { return inBytes; }
 		};
 	};
 };

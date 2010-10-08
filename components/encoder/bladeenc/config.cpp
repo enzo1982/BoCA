@@ -23,6 +23,8 @@ BoCA::ConfigureBladeEnc::ConfigureBladeEnc()
 
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::BladeEnc");
+
 	group_bit		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(168, 43));
 	group_copyright		= new GroupBox(i18n->TranslateString("Copyright bit"), Point(183, 11), Size(168, 43));
 	group_crc		= new GroupBox(i18n->TranslateString("CRC"), Point(7, 66), Size(168, 43));

@@ -38,7 +38,7 @@ namespace BoCA
 			 */
 							 MCDI(const Buffer<UnsignedByte> &);
 							 MCDI(const MCDI &);
-			virtual				~MCDI();
+							~MCDI();
 
 			MCDI &operator			 =(const MCDI &);
 
@@ -50,6 +50,8 @@ namespace BoCA
 
 			Int				 GetNumberOfAudioTracks() const;
 			Int				 GetNumberOfDataTracks() const;
+
+			String				 GetOffsetString() const;
 		accessors:
 			Bool				 SetData(const Buffer<UnsignedByte> &);
 			const Buffer<UnsignedByte>	&GetData() const;

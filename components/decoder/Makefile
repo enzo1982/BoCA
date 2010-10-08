@@ -7,6 +7,7 @@ all:
 ifeq ($(BUILD_WIN32),True)
 	cd cdrip && make
 endif
+	cd cuesheet && make
 	cd faad2 && make
 	cd flac && make
 	cd lame && make
@@ -34,6 +35,7 @@ clean:
 ifeq ($(BUILD_WIN32),True)
 	cd cdrip && make clean
 endif
+	cd cuesheet && make clean
 	cd faad2 && make clean
 	cd flac && make clean
 	cd lame && make clean

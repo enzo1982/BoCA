@@ -31,8 +31,8 @@ namespace smooth
 {
 	namespace IO
 	{
-		const Int	 OS_APPEND	= 0;
-		const Int	 OS_REPLACE	= 1;
+		const Short	 OS_APPEND	= 0;
+		const Short	 OS_REPLACE	= 1;
 
 		class SMOOTHAPI OutStream : public Stream
 		{

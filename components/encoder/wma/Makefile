@@ -14,7 +14,7 @@ OBJECTS	  = config.o dllinterface.o wma_out.o
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  = -lole32 -luuid -Xlinker --enable-stdcall-fixup
+LIBS	  = -lole32
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

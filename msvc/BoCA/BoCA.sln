@@ -163,6 +163,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Tagger RIFF", "BoCA Ta
 		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Extension YouTube", "BoCA Extension YouTube\BoCA Extension YouTube.vcproj", "{18208AF1-5B52-45DC-BA37-B0CD3CDD216B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -301,6 +306,10 @@ Global
 		{F1E03BB7-5109-415C-805F-379FA88FB90E}.Debug|Win32.Build.0 = Debug|Win32
 		{F1E03BB7-5109-415C-805F-379FA88FB90E}.Release|Win32.ActiveCfg = Release|Win32
 		{F1E03BB7-5109-415C-805F-379FA88FB90E}.Release|Win32.Build.0 = Release|Win32
+		{18208AF1-5B52-45DC-BA37-B0CD3CDD216B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{18208AF1-5B52-45DC-BA37-B0CD3CDD216B}.Debug|Win32.Build.0 = Debug|Win32
+		{18208AF1-5B52-45DC-BA37-B0CD3CDD216B}.Release|Win32.ActiveCfg = Release|Win32
+		{18208AF1-5B52-45DC-BA37-B0CD3CDD216B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

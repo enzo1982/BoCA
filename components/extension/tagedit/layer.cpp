@@ -22,6 +22,12 @@
 
 BoCA::LayerTags::LayerTags() : Layer("Tags")
 {
+	I18n	*i18n	= I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor");
+
+	SetText(i18n->TranslateString("Tags"));
+
 	tab_editor	= NIL;
 
 	tab_mode	= new TabWidget(Point(7, 7), Size(100, 150));

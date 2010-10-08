@@ -32,7 +32,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 CF_MULTILINE	= 1;
+		const Short	 CF_MULTILINE	= 1;
 
 		class SMOOTHAPI Cursor : public Widget
 		{
@@ -80,7 +80,7 @@ namespace smooth
 				Int				 DrawWidget();
 				Void				 ShowCursor(Bool);
 			public:
-				static const Int		 classID;
+				static const Short		 classID;
 
 								 Cursor(const Point &, const Size &);
 				virtual				~Cursor();

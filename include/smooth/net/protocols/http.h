@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,7 +33,7 @@ namespace smooth
 			class SMOOTHAPI HTTP : public Protocol
 			{
 				private:
-					Int			 mode;
+					Short			 mode;
 
 					String			 server;
 					String			 path;
@@ -41,7 +41,7 @@ namespace smooth
 
 					String			 proxy;
 					Int			 proxyPort;
-					Int			 proxyMode;
+					Short			 proxyMode;
 					String			 proxyUser;
 					String			 proxyPass;
 
@@ -72,12 +72,12 @@ namespace smooth
 					Int			 SetParameter(const String &, const String &);		// Set parameter
 					Int			 SetParameterFile(const String &, const String &);	// Set file to be transmitted; forces HTTP_METHOD_POST
 
-					Int			 SetMode(Int);						// Set mode (get or post)
+					Int			 SetMode(Short);					// Set mode (get or post)
 
 					Int			 SetContent(const String &);				// Set content to be transmitted; forces HTTP_METHOD_POST
 
 					Int			 SetProxy(const String &, Int);				// Set proxy host name and port
-					Int			 SetProxyMode(Int);					// Set proxy mode
+					Int			 SetProxyMode(Short);					// Set proxy mode
 					Int			 SetProxyAuth(const String &, const String &);		// Set user name and password for proxy
 
 					String			 GetResponseHeaderField(const String &);
@@ -85,14 +85,14 @@ namespace smooth
 					Int			 DownloadToFile(const String &);
 			};
 
-			const Int	 HTTP_METHOD_GET	= 0;
-			const Int	 HTTP_METHOD_POST	= 1;
+			const Short	 HTTP_METHOD_GET	= 0;
+			const Short	 HTTP_METHOD_POST	= 1;
 
-			const Int	 HTTP_PROXY_NONE	= 0;
-			const Int	 HTTP_PROXY_HTTP	= 1;
-			const Int	 HTTP_PROXY_HTTPS	= 2;
-			const Int	 HTTP_PROXY_SOCKS4	= 3;
-			const Int	 HTTP_PROXY_SOCKS5	= 4;
+			const Short	 HTTP_PROXY_NONE	= 0;
+			const Short	 HTTP_PROXY_HTTP	= 1;
+			const Short	 HTTP_PROXY_HTTPS	= 2;
+			const Short	 HTTP_PROXY_SOCKS4	= 3;
+			const Short	 HTTP_PROXY_SOCKS5	= 4;
 		};
 	};
 };

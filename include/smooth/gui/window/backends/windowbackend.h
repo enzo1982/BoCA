@@ -30,14 +30,14 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 WINDOW_NONE = 0;
+		const Short	 WINDOW_NONE = 0;
 
 		class WindowBackend
 		{
 			private:
 				static WindowBackend		*(*backend_creator)();
 			protected:
-				Int				 type;
+				Short				 type;
 
 				Surface				*nullSurface;
 				Surface				*drawSurface;
@@ -51,7 +51,7 @@ namespace smooth
 								 WindowBackend(Void * = NIL);
 				virtual				~WindowBackend();
 
-				Int				 GetWindowType();
+				Short				 GetWindowType();
 
 				virtual Void			*GetSystemWindow() const;
 

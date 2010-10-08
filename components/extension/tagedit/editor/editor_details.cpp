@@ -18,7 +18,11 @@ BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 {
 	I18n	*i18n = I18n::Get();
 
-	group_details		= new GroupBox("Detailed information", Point(7, 10), Size(400, 147));
+	i18n->SetContext("Extensions::Tag Editor::Details");
+
+	SetText(i18n->TranslateString("Details"));
+
+	group_details		= new GroupBox(i18n->TranslateString("Detailed information"), Point(7, 10), Size(400, 147));
 
 	text_band		= new Text(String(i18n->TranslateString("Band / orchestra")).Append(":"), Point(9, 13));
 	text_conductor		= new Text(String(i18n->TranslateString("Performer refinement")).Append(":"), text_band->GetPosition() + Point(0, 27));
@@ -56,7 +60,7 @@ BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 
 	Add(group_details);
 
-	group_publisher		= new GroupBox("Publisher information", Point(7, 10), Size(400, 66));
+	group_publisher		= new GroupBox(i18n->TranslateString("Publisher information"), Point(7, 10), Size(400, 66));
 
 	text_publisher		= new Text(String(i18n->TranslateString("Publisher / label")).Append(":"), Point(9, 13));
 	text_isrc		= new Text(String(i18n->TranslateString("ISRC")).Append(":"), text_publisher->GetPosition() + Point(0, 27));
@@ -216,6 +220,8 @@ Void BoCA::LayerTagDetails::OnSelectNone()
 
 	group_details->Deactivate();
 	group_publisher->Deactivate();
+
+	track = NIL;
 }
 
 /* Called when a track is modified.

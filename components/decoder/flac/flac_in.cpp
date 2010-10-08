@@ -80,7 +80,7 @@ Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
 	track.fileSize	= f_in->Size();
 
 	infoTrack = &track;
-	finished = False;
+	stop = False;
 
 	driver = ioDriver;
 
@@ -111,7 +111,9 @@ BoCA::FLACIn::~FLACIn()
 
 Bool BoCA::FLACIn::Activate()
 {
-	finished = False;
+	stop = False;
+
+	seekPosition = 0;
 
 	readDataMutex = new Mutex();
 	samplesBufferMutex = new Mutex();
@@ -120,14 +122,21 @@ Bool BoCA::FLACIn::Activate()
 
 	infoTrack = new Track();
 
-	decoderThread = NonBlocking1<Bool>(&FLACIn::ReadFLAC, this).Call(True);
+	decoderThread = NIL;
 
 	return True;
 }
 
 Bool BoCA::FLACIn::Deactivate()
 {
-	decoderThread->Stop();
+	if (decoderThread != NIL)
+	{
+		stop = True;
+
+		readDataMutex->Release();
+
+		while (decoderThread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(0);
+	}
 
 	delete readDataMutex;
 	delete samplesBufferMutex;
@@ -137,8 +146,17 @@ Bool BoCA::FLACIn::Deactivate()
 	return True;
 }
 
+Bool BoCA::FLACIn::Seek(Int64 samplePosition)
+{
+	seekPosition = samplePosition / track.GetFormat().channels;
+
+	return True;
+}
+
 Int BoCA::FLACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	if (decoderThread == NIL) decoderThread = NonBlocking1<Bool>(&FLACIn::ReadFLAC, this).Call(True);
+
 	if (decoderThread->GetStatus() != THREAD_RUNNING && samplesBuffer.Size() <= 0) return -1;
 
 	readDataMutex->Release();
@@ -181,7 +199,12 @@ Int BoCA::FLACIn::ReadFLAC(Bool readData)
 
 	ex_FLAC__stream_decoder_process_until_end_of_metadata(decoder);
 
-	if (readData) ex_FLAC__stream_decoder_process_until_end_of_stream(decoder);
+	if (readData)
+	{
+		ex_FLAC__stream_decoder_seek_absolute(decoder, seekPosition);
+
+		ex_FLAC__stream_decoder_process_until_end_of_stream(decoder);
+	}
 
 	ex_FLAC__stream_decoder_finish(decoder);
 	ex_FLAC__stream_decoder_delete(decoder);
@@ -256,7 +279,7 @@ FLAC__bool BoCA::FLACStreamDecoderEofCallback(const FLAC__StreamDecoder *decoder
 {
 	FLACIn	*filter = (FLACIn *) client_data;
 
-	return (filter->driver->GetPos() == filter->driver->GetSize());
+	return (filter->stop || filter->driver->GetPos() == filter->driver->GetSize());
 }
 
 void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
@@ -317,13 +340,7 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 
 		picture.description.ImportFrom("UTF-8", (char *) metadata->data.picture.description);
 
-		picture.data.Resize(metadata->data.picture.data_length);
-
-		// FixMe: I don't know why, but without the memset statement memcpy hangs the process
-		//	  in about 20% of all cases on Windows XP x64 when the buffers are > 1MB.
-
-		memset(picture.data, 0, picture.data.Size());
-		memcpy(picture.data, metadata->data.picture.data, picture.data.Size());
+		picture.data.Set(metadata->data.picture.data, metadata->data.picture.data_length);
 
 		filter->infoTrack->pictures.Add(picture);
 	}

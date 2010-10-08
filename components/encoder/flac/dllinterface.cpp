@@ -49,12 +49,23 @@ Bool LoadFLACDLL()
 {
 	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
 	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FLAC-OpenMP.dll")).Exists()) return False;
+#endif
+
 		flacdll = new DynamicLoader("codecs/FLAC-OpenMP");
 
 		if (flacdll->GetSystemModuleHandle() == NIL) FreeFLACDLL();
 	}
 
-	if (flacdll == NIL) flacdll = new DynamicLoader("codecs/FLAC");
+	if (flacdll == NIL)
+	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FLAC.dll")).Exists()) return False;
+#endif
+
+		flacdll = new DynamicLoader("codecs/FLAC");
+	}
 
 	ex_FLAC__stream_encoder_new						= (FLAC__STREAM_ENCODER_NEW) flacdll->GetFunctionAddress("FLAC__stream_encoder_new");
 	ex_FLAC__stream_encoder_delete						= (FLAC__STREAM_ENCODER_DELETE) flacdll->GetFunctionAddress("FLAC__stream_encoder_delete");

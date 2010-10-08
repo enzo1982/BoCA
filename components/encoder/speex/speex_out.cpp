@@ -285,13 +285,3 @@ ConfigLayer *BoCA::SpeexOut::GetConfigurationLayer()
 
 	return configLayer;
 }
-
-Void BoCA::SpeexOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
-}

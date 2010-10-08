@@ -21,6 +21,7 @@ FLAC__STREAM_DECODER_FINISH				 ex_FLAC__stream_decoder_finish				= NIL;
 FLAC__STREAM_DECODER_GET_CHANNELS			 ex_FLAC__stream_decoder_get_channels			= NIL;
 FLAC__STREAM_DECODER_GET_BITS_PER_SAMPLE		 ex_FLAC__stream_decoder_get_bits_per_sample		= NIL;
 FLAC__STREAM_DECODER_GET_SAMPLE_RATE			 ex_FLAC__stream_decoder_get_sample_rate		= NIL;
+FLAC__STREAM_DECODER_SEEK_ABSOLUTE			 ex_FLAC__stream_decoder_seek_absolute			= NIL;
 FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_METADATA	 ex_FLAC__stream_decoder_process_until_end_of_metadata	= NIL;
 FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_STREAM	 ex_FLAC__stream_decoder_process_until_end_of_stream	= NIL;
 
@@ -53,12 +54,23 @@ Bool LoadFLACDLL()
 {
 	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
 	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FLAC-OpenMP.dll")).Exists()) return False;
+#endif
+
 		flacdll = new DynamicLoader("codecs/FLAC-OpenMP");
 
 		if (flacdll->GetSystemModuleHandle() == NIL) FreeFLACDLL();
 	}
 
-	if (flacdll == NIL) flacdll = new DynamicLoader("codecs/FLAC");
+	if (flacdll == NIL)
+	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FLAC.dll")).Exists()) return False;
+#endif
+
+		flacdll = new DynamicLoader("codecs/FLAC");
+	}
 
 	ex_FLAC__stream_decoder_new				= (FLAC__STREAM_DECODER_NEW) flacdll->GetFunctionAddress("FLAC__stream_decoder_new");
 	ex_FLAC__stream_decoder_delete				= (FLAC__STREAM_DECODER_DELETE) flacdll->GetFunctionAddress("FLAC__stream_decoder_delete");
@@ -68,6 +80,7 @@ Bool LoadFLACDLL()
 	ex_FLAC__stream_decoder_get_channels			= (FLAC__STREAM_DECODER_GET_CHANNELS) flacdll->GetFunctionAddress("FLAC__stream_decoder_get_channels");
 	ex_FLAC__stream_decoder_get_bits_per_sample		= (FLAC__STREAM_DECODER_GET_BITS_PER_SAMPLE) flacdll->GetFunctionAddress("FLAC__stream_decoder_get_bits_per_sample");
 	ex_FLAC__stream_decoder_get_sample_rate			= (FLAC__STREAM_DECODER_GET_SAMPLE_RATE) flacdll->GetFunctionAddress("FLAC__stream_decoder_get_sample_rate");
+	ex_FLAC__stream_decoder_seek_absolute			= (FLAC__STREAM_DECODER_SEEK_ABSOLUTE) flacdll->GetFunctionAddress("FLAC__stream_decoder_seek_absolute");
 	ex_FLAC__stream_decoder_process_until_end_of_metadata	= (FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_METADATA) flacdll->GetFunctionAddress("FLAC__stream_decoder_process_until_end_of_metadata");
 	ex_FLAC__stream_decoder_process_until_end_of_stream	= (FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_STREAM) flacdll->GetFunctionAddress("FLAC__stream_decoder_process_until_end_of_stream");
 
@@ -102,6 +115,7 @@ Bool LoadFLACDLL()
 	    ex_FLAC__stream_decoder_get_channels			== NIL ||
 	    ex_FLAC__stream_decoder_get_bits_per_sample			== NIL ||
 	    ex_FLAC__stream_decoder_get_sample_rate			== NIL ||
+	    ex_FLAC__stream_decoder_seek_absolute			== NIL ||
 	    ex_FLAC__stream_decoder_process_until_end_of_metadata	== NIL ||
 	    ex_FLAC__stream_decoder_process_until_end_of_stream		== NIL ||
 

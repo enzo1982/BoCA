@@ -15,6 +15,8 @@ BoCA::ConfigureTwinVQ::ConfigureTwinVQ()
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::TwinVQ");
+
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(233, 39));
 
 	text_bitrate		= new Text(i18n->TranslateString("Bitrate per channel:"), Point(16, 24));

@@ -37,7 +37,7 @@ namespace smooth
 
 				String				 GetNthTabText(Int);
 			public:
-				static const Int		 classID;
+				static const Short		 classID;
 
 								 ListEntry(const String &);
 				virtual				~ListEntry();

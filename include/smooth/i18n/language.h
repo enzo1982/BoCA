@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,17 +12,15 @@
 #define H_OBJSMOOTH_I18N_LANGUAGE
 
 #include "../misc/string.h"
+#include "section.h"
 
 namespace smooth
 {
 	namespace I18n
 	{
-		class SMOOTHAPI Language
+		class SMOOTHAPI Language : public Section
 		{
 			public:
-				Array<String>	 strings;
-
-				String		 name;
 				String		 encoding;
 				String		 magic;
 				String		 author;
@@ -31,6 +29,8 @@ namespace smooth
 
 						 Language();
 						~Language();
+
+				virtual Error	 Parse(XML::Node *);
 		};
 	};
 };

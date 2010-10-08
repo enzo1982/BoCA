@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,17 +25,17 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 RGBA	= 0;	// Red, Green, Blue, Alpha
-		const Int	 HSV	= 1;	// Hue, Saturation, Value
-		const Int	 YUV	= 2;	// Value, Blue, Red
-		const Int	 CMY	= 3;	// Cyan, Magenta, Yellow (subtractive)
-		const Int	 CMYK	= 4;	// Cyan, Magenta, Yellow, Black
-		const Int	 GRAY	= 5;	// Black
+		const Short	 RGBA	= 0;	// Red, Green, Blue, Alpha
+		const Short	 HSV	= 1;	// Hue, Saturation, Value
+		const Short	 YUV	= 2;	// Value, Blue, Red
+		const Short	 CMY	= 3;	// Cyan, Magenta, Yellow (subtractive)
+		const Short	 CMYK	= 4;	// Cyan, Magenta, Yellow, Black
+		const Short	 GRAY	= 5;	// Black
 
 		class SMOOTHAPI Color
 		{
 			protected:
-				Int		 colorSpace;
+				Short		 colorSpace;
 				Long		 color;
 			public:
 						 Color()					{ color = 0; colorSpace = RGBA; }

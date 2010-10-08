@@ -1,0 +1,30 @@
+<VideoSite>
+  <name>MyVideo.de</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-flv_audio-in</decoder>
+
+  <script type="text/javascript">
+    function canHandleURL(URL) {
+      if (URL.toLowerCase().substr(0, 28) == "http://www.myvideo.de/watch/") return true;
+      else								     return false;
+    }
+
+    function getVideoURL(html) {
+      return html.match(/&lt;link rel='image_src' href='(.*?)' \/&gt;/), (RegExp.$1).replace(/thumbs\//, "").replace(/_[0-9]+.jpg/, ".flv");
+    }
+
+    function queryMetadata(html) {
+      var metadata = new Metadata();
+
+      metadata.title	   = (html.match(/&lt;h1 class='globalHd'&gt;(.*?)&lt;\/h1&gt;/), RegExp.$1);
+      metadata.description = (html.match(/Beschreibung: &lt;\/td&gt;&lt;td&gt;((?:.|\n|\r)*?)&lt;\/td&gt;/), RegExp.$1);
+
+      metadata.date	   = (html.match(/Eingestellt am: &lt;\/td&gt;&lt;td&gt;(.*?)&lt;\/td&gt;/), RegExp.$1);
+      metadata.thumbnail   = (html.match(/&lt;link rel='image_src' href=\'(.*?)' \/&gt;/), RegExp.$1);
+
+      metadata.uploader	   = (html.match(/Eingestellt von: &lt;\/td&gt;&lt;td&gt; &lt;a .*?&gt;(.*?)&lt;\/a&gt;.*?&lt;\/td&gt;/), RegExp.$1);
+
+      return metadata;
+    }
+  </script>
+</VideoSite>

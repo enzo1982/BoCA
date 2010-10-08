@@ -153,7 +153,7 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 	{
 		foreach (const Picture &picInfo, track.pictures)
 		{
-			MP4TagArtwork	 artwork = { picInfo.data, picInfo.data.Size(), picInfo.mime == "image/png" ? MP4_ART_PNG : MP4_ART_JPEG };
+			MP4TagArtwork	 artwork = { const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data), picInfo.data.Size(), picInfo.mime == "image/png" ? MP4_ART_PNG : MP4_ART_JPEG };
 
 			ex_MP4TagsAddArtwork(mp4Tags, &artwork);
 		}
@@ -238,9 +238,7 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 			{
 				Picture	 picture;
 
-				picture.data.Resize(size);
-
-				memcpy(picture.data, buffer, size);
+				picture.data.Set(buffer, size);
 
 				if	(buffer[0] == 0xFF && buffer[1] == 0xD8) picture.mime = "image/jpeg";
 				else if (buffer[0] == 0x89 && buffer[1] == 0x50 &&

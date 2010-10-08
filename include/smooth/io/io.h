@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,22 +17,22 @@ namespace smooth
 {
 	namespace IO
 	{
-		const Int	 STREAM_NONE		= 0;
-		const Int	 STREAM_STREAM		= 1;
-		const Int	 STREAM_DRIVER		= 2;
-		const Int	 STREAM_FILE		= 3;
-		const Int	 STREAM_ANSI		= 4;
-		const Int	 STREAM_BUFFER		= 5;
+		const Short	 STREAM_NONE		= 0;
+		const Short	 STREAM_STREAM		= 1;
+		const Short	 STREAM_DRIVER		= 2;
+		const Short	 STREAM_FILE		= 3;
+		const Short	 STREAM_ANSI		= 4;
+		const Short	 STREAM_BUFFER		= 5;
 
-		const Int	 IO_ERROR_OK		= 0;	// everything went well
-		const Int	 IO_ERROR_INTERNAL	= 1;	// an internal error
-		const Int	 IO_ERROR_BADPARAM	= 2;	// a function has been called with a bad parameter
-		const Int	 IO_ERROR_UNEXPECTED	= 3;	// some function returned an unexpected value
-		const Int	 IO_ERROR_UNKNOWN	= 4;	// an unknown error occurred
-		const Int	 IO_ERROR_NOTOPEN	= 5;	// the connected stream is not open or no stream is connected
-		const Int	 IO_ERROR_OPNOTAVAIL	= 6;	// the requested operation is not available on the connected stream
-		const Int	 IO_ERROR_WRONGOS	= 7;	// the requested functionality is not available under the current operating system
-		const Int	 IO_ERROR_NODATA	= 8;	// no data is available in the queue
+		const Short	 IO_ERROR_OK		= 0;	// everything went well
+		const Short	 IO_ERROR_INTERNAL	= 1;	// an internal error
+		const Short	 IO_ERROR_BADPARAM	= 2;	// a function has been called with a bad parameter
+		const Short	 IO_ERROR_UNEXPECTED	= 3;	// some function returned an unexpected value
+		const Short	 IO_ERROR_UNKNOWN	= 4;	// an unknown error occurred
+		const Short	 IO_ERROR_NOTOPEN	= 5;	// the connected stream is not open or no stream is connected
+		const Short	 IO_ERROR_OPNOTAVAIL	= 6;	// the requested operation is not available on the connected stream
+		const Short	 IO_ERROR_WRONGOS	= 7;	// the requested functionality is not available under the current operating system
+		const Short	 IO_ERROR_NODATA	= 8;	// no data is available in the queue
 	};
 };
 

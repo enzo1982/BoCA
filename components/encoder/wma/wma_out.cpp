@@ -261,16 +261,6 @@ ConfigLayer *BoCA::WMAOut::GetConfigurationLayer()
 	return configLayer;
 }
 
-Void BoCA::WMAOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
-}
-
 /* Select default codec to be used when no codec is set.
  */
 Int BoCA::WMAOut::GetDefaultCodec(IWMCodecInfo3 *codecInfo)

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,8 +16,8 @@
 
 using namespace smooth;
 
-const int	 BYTE_INTEL	= 0;
-const int	 BYTE_RAW	= 1;
+const Byte	 BYTE_INTEL	= 0;
+const Byte	 BYTE_RAW	= 1;
 
 namespace BoCA
 {
@@ -26,15 +26,15 @@ namespace BoCA
 		public:
 			/* Audio format information:
 			 */
-			Int	 channels;
 			Int	 rate;
-			Int	 bits;
-			Int	 order;
+			Byte	 channels;
+			Byte	 bits;
+			Byte	 order;
 
 			/* Class constructor / destructor:
 			 */
 				 Format();
-			virtual	~Format();
+				~Format();
 	};
 };
 

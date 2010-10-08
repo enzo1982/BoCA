@@ -37,7 +37,7 @@ Void BoCA::ChooserFilesTree::OnOpen()
 {
 	const Array<Directory>	&subDirectories = directory.GetDirectories();
 
-	foreach (Directory currentDirectory, subDirectories)
+	foreach (const Directory &currentDirectory, subDirectories)
 	{
 		Tree	*newTree = new ChooserFilesTree(currentDirectory);
 

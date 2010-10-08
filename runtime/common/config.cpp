@@ -16,6 +16,8 @@ BoCA::Config::Config()
 {
 	languageChanged		= False;
 
+	enable_console		= False;
+
 	cdrip_numdrives		= 0;
 	cdrip_timeout		= 0;
 	cdrip_autoRead_active	= False;

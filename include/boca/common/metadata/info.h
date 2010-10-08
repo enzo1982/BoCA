@@ -54,16 +54,16 @@ namespace BoCA
 			String			 title;
 			String			 album;
 			String			 genre;
-			Int			 year;
+			Short			 year;
 			String			 comment;
 
 			/* Disc information:
 			 */
-			Int			 track;
-			Int			 numTracks;
+			Byte			 track;
+			Byte			 numTracks;
 
-			Int			 disc;
-			Int			 numDiscs;
+			Byte			 disc;
+			Byte			 numDiscs;
 
 			/* Publisher information:
 			 */
@@ -90,7 +90,7 @@ namespace BoCA
 			 */
 						 Info();
 						 Info(const Info &);
-			virtual			~Info();
+						~Info();
 
 			Info &operator		 =(const Info &);
 	};

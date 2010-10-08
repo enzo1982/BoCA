@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -36,6 +36,10 @@ DynamicLoader *flacdll	= NIL;
 
 Bool LoadFLACDLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FLAC.dll")).Exists()) return False;
+#endif
+
 	flacdll = new DynamicLoader("codecs/FLAC");
 
 	ex_FLAC__metadata_chain_new				= (FLAC__METADATA_CHAIN_NEW) flacdll->GetFunctionAddress("FLAC__metadata_chain_new");

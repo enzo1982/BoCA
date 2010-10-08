@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,9 +25,9 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 IMAGE_FORMAT_PCI	= 0;
-		const Int	 IMAGE_FORMAT_PNG	= 1;
-		const Int	 IMAGE_FORMAT_JPEG	= 2;
+		const Short	 IMAGE_FORMAT_PCI	= 0;
+		const Short	 IMAGE_FORMAT_PNG	= 1;
+		const Short	 IMAGE_FORMAT_JPEG	= 2;
 
 		abstract class SMOOTHAPI ImageLoader
 		{
@@ -47,7 +47,7 @@ namespace smooth
 				virtual const Bitmap	&Load() = 0;
 
 				static Bitmap		 Load(const String &);
-				static Bitmap		 Load(const Buffer<UnsignedByte> &, Int);
+				static Bitmap		 Load(const Buffer<UnsignedByte> &, Short);
 		};
 	};
 };

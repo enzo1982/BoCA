@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,19 +30,18 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 SURFACE_NONE = 0;
+		const Short	 SURFACE_NONE = 0;
 
 		class SurfaceBackend
 		{
 			private:
 				static SurfaceBackend	*(*backend_creator)(Void *, const Size &);
 			protected:
-				Int			 type;
+				Short			 type;
+				Short			 painting;
 
 				Size			 size;
 				Rect			 paintRect;
-
-				Int			 painting;
 
 				FontSizeModifier	 fontSize;
 				RightToLeftModifier	 rightToLeft;
@@ -54,7 +53,7 @@ namespace smooth
 							 SurfaceBackend(Void * = NIL, const Size & = Size());
 				virtual			~SurfaceBackend();
 
-				Int			 GetSurfaceType() const;
+				Short			 GetSurfaceType() const;
 
 				virtual Int		 SetSize(const Size &);
 				virtual const Size	&GetSize() const;
@@ -68,12 +67,12 @@ namespace smooth
 
 				virtual Void		*GetSystemSurface() const;
 
-				virtual Int		 GetSurfaceDPI() const;
+				virtual Short		 GetSurfaceDPI() const;
 
 				virtual Int		 SetPixel(const Point &, const Color &);
 
 				virtual Int		 Line(const Point &, const Point &, const Color &);
-				virtual Int		 Frame(const Rect &, Int);
+				virtual Int		 Frame(const Rect &, Short);
 				virtual Int		 Box(const Rect &, const Color &, Int, const Size &);
 
 				virtual Int		 SetText(const String &, const Rect &, const Font &, Bool);

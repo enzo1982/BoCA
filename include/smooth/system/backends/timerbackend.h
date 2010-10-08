@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,14 +25,14 @@ namespace smooth
 {
 	namespace System
 	{
-		const Int	 TIMER_NONE = 0;
+		const Short	 TIMER_NONE = 0;
 
 		class TimerBackend
 		{
 			private:
 				static TimerBackend	*(*backend_creator)();
 			protected:
-				Int			 type;
+				Short			 type;
 			public:
 				static Int		 SetBackend(TimerBackend *(*)());
 				static TimerBackend	*CreateBackendInstance();
@@ -40,7 +40,7 @@ namespace smooth
 							 TimerBackend();
 				virtual			~TimerBackend();
 
-				Int			 GetTimerType() const;
+				Short			 GetTimerType() const;
 
 				virtual Int		 Start(Int);
 				virtual Int		 Stop();

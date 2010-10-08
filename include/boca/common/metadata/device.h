@@ -39,7 +39,7 @@ namespace BoCA
 			/* Class constructor / destructor:
 			 */
 					 Device(int = 0);
-			virtual		~Device();
+					~Device();
 	};
 };
 

@@ -1,0 +1,32 @@
+<VideoSite>
+  <name>Dailymotion</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-m4v_audio-in</decoder>
+
+  <script type="text/javascript">
+    function canHandleURL(URL) {
+      if (URL.toLowerCase().substr(0, 33) == "http://www.dailymotion.com/video/") return true;
+      else									  return false;
+    }
+
+    function getVideoURL(html) {
+      var sequence = unescape((html.match(/so.addVariable\("sequence",  "(.*?)"\);/), RegExp.$1));
+
+      return (sequence.match(/"hqURL":"(.*?)"/), RegExp.$1).replace(/\\\//g, "/");
+    }
+
+    function queryMetadata(html) {
+      var metadata = new Metadata();
+
+      metadata.title	   = (html.match(/&lt;Attribute name="title"&gt;(.*?)&lt;\/Attribute&gt;/), RegExp.$1);
+      metadata.description = (html.match(/&lt;div .*? id="video_description"&gt;(.*?)&lt;\/div&gt;/), RegExp.$1);
+
+      metadata.date	   = (html.match(/&lt;Attribute name="date"&gt;(.*?)&lt;\/Attribute&gt;/), RegExp.$1);
+      metadata.thumbnail   = (html.match(/&lt;link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/&gt;/), "http://www.dailymotion.com" + RegExp.$1);
+
+      metadata.uploader	   = (html.match(/&lt;Attribute name="owner"&gt;(.*?)&lt;\/Attribute&gt;/), RegExp.$1);
+
+      return metadata;
+    }
+  </script>
+</VideoSite>

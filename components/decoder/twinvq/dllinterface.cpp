@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -28,6 +28,10 @@ DynamicLoader *twinvqdll	= NIL;
 
 Bool LoadTwinVQDLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\TVQdec.dll")).Exists()) return False;
+#endif
+
 	twinvqdll = new DynamicLoader("codecs/TVQdec");
 
 	ex_TvqInitialize		= (TVQINITIALIZE) twinvqdll->GetFunctionAddress("TvqInitialize");

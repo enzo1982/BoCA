@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -195,10 +195,10 @@ namespace S = smooth;
 
 namespace smooth
 {
-	const Int Break		= 1;
+	const Short	 Break	= 1;
 
-	const Bool True		= (Bool) -1;
-	const Bool False	= (Bool) 0;
+	const Bool	 True	= (Bool) -1;
+	const Bool	 False	= (Bool) 0;
 };
 
 #include "errors/error.h"
@@ -207,8 +207,6 @@ namespace smooth
 #include "templates/array.h"
 #include "misc/string.h"
 #include "basic/setup.h"
-
-#include "templates/pointer.h"
 
 using namespace smooth::Errors;
 
@@ -221,42 +219,42 @@ namespace smooth
 	Void	 DetachDLL();
 };
 
-const S::Int SM_MOUSEMOVE		= 1024;
-const S::Int SM_LBUTTONDOWN		= 1025;
-const S::Int SM_LBUTTONUP		= 1026;
-const S::Int SM_RBUTTONDOWN		= 1027;
-const S::Int SM_RBUTTONUP		= 1028;
-const S::Int SM_LBUTTONDBLCLK		= 1029;
-const S::Int SM_RBUTTONDBLCLK		= 1030;
+const S::Short	 SM_MOUSEMOVE		= 1024;
+const S::Short	 SM_LBUTTONDOWN		= 1025;
+const S::Short	 SM_LBUTTONUP		= 1026;
+const S::Short	 SM_RBUTTONDOWN		= 1027;
+const S::Short	 SM_RBUTTONUP		= 1028;
+const S::Short	 SM_LBUTTONDBLCLK	= 1029;
+const S::Short	 SM_RBUTTONDBLCLK	= 1030;
 
-const S::Int SM_WINDOWTITLECHANGED	= 1031;
-const S::Int SM_SHOWTOOLTIP		= 1032;
-const S::Int SM_MOUSEWHEEL		= 1033;
-const S::Int SM_PAINT			= 1034;
+const S::Short	 SM_WINDOWTITLECHANGED	= 1031;
+const S::Short	 SM_SHOWTOOLTIP		= 1032;
+const S::Short	 SM_MOUSEWHEEL		= 1033;
+const S::Short	 SM_PAINT		= 1034;
 
-const S::Int SM_KEYDOWN			= 1035;
-const S::Int SM_KEYUP			= 1036;
-const S::Int SM_CHAR			= 1037;
+const S::Short	 SM_KEYDOWN		= 1035;
+const S::Short	 SM_KEYUP		= 1036;
+const S::Short	 SM_CHAR		= 1037;
 
-const S::Int SM_WINDOWMETRICS		= 1038;
+const S::Short	 SM_WINDOWMETRICS	= 1038;
 
-const S::Int SM_TIMER			= 1534;
+const S::Short	 SM_TIMER		= 1534;
 
-const S::Int OR_HORZ			= 1;
-const S::Int OR_VERT			= 2;
+const S::Short	 OR_HORZ		= 1;
+const S::Short	 OR_VERT		= 2;
 
-const S::Int OR_TOP			= 4;
-const S::Int OR_BOTTOM			= 8;
+const S::Short	 OR_TOP			= 4;
+const S::Short	 OR_BOTTOM		= 8;
 
-const S::Int OR_LEFT			= 16;
-const S::Int OR_RIGHT			= 32;
+const S::Short	 OR_LEFT		= 16;
+const S::Short	 OR_RIGHT		= 32;
 
-const S::Int OR_CENTER			= 64;
-const S::Int OR_FREE			= 128;
+const S::Short	 OR_CENTER		= 64;
+const S::Short	 OR_FREE		= 128;
 
-const S::Int OR_UPPERLEFT		= 20;
-const S::Int OR_UPPERRIGHT		= 36;
-const S::Int OR_LOWERLEFT		= 12;
-const S::Int OR_LOWERRIGHT		= 40;
+const S::Short	 OR_UPPERLEFT		= OR_TOP    | OR_LEFT;
+const S::Short	 OR_UPPERRIGHT		= OR_TOP    | OR_RIGHT;
+const S::Short	 OR_LOWERLEFT		= OR_BOTTOM | OR_LEFT;
+const S::Short	 OR_LOWERRIGHT		= OR_BOTTOM | OR_RIGHT;
 
 #endif

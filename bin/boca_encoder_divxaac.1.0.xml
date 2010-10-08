@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.bonkenc.org/boca/component.dtd">
+<component>
+  <name>DivX AAC Encoder</name>
+  <version>1.0</version>
+  <id>divxaac-out</id>
+  <type>encoder</type>
+  <format>
+    <name>AAC Audio Files</name>
+    <extension>aac</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/DivXAACEnc.exe</command>
+    <arguments>-i %INFILE -o %OUTFILE %OPTIONS</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <selection name="HE-AAC Mode" argument="-e %VALUE" default="0" enabled="false">
+	<option alias="Disabled">0</option>
+	<option alias="HE-AAC v1">1</option>
+	<option alias="HE-AAC v2">2</option>
+      </selection>
+      <selection name="VBR Mode" argument="-v %VALUE" default="8" enabled="true">
+	<option alias="Disabled">0</option>
+	<option alias="Low quality VBR mode 1">1</option>
+	<option alias="Low quality VBR mode 2">2</option>
+	<option alias="Low quality VBR mode 3">3</option>
+	<option alias="Medium quality VBR mode 1">4</option>
+	<option alias="Medium quality VBR mode 2">5</option>
+	<option alias="Medium quality VBR mode 3">6</option>
+	<option alias="High quality VBR mode 1">7</option>
+	<option alias="High quality VBR mode 2">8</option>
+	<option alias="High quality VBR mode 3">9</option>
+      </selection>
+      <selection name="CBR Bitrate" argument="-b %VALUE" default="192" enabled="false">
+	<option alias="6 kbps">6</option>
+	<option alias="7 kbps">7</option>
+	<option alias="8 kbps">8</option>
+	<option alias="10 kbps">10</option>
+	<option alias="12 kbps">12</option>
+	<option alias="14 kbps">14</option>
+	<option alias="16 kbps">16</option>
+	<option alias="20 kbps">20</option>
+	<option alias="24 kbps">24</option>
+	<option alias="28 kbps">28</option>
+	<option alias="32 kbps">32</option>
+	<option alias="40 kbps">40</option>
+	<option alias="48 kbps">48</option>
+	<option alias="56 kbps">56</option>
+	<option alias="64 kbps">64</option>
+	<option alias="80 kbps">80</option>
+	<option alias="96 kbps">96</option>
+	<option alias="112 kbps">112</option>
+	<option alias="128 kbps">128</option>
+	<option alias="160 kbps">160</option>
+	<option alias="192 kbps">192</option>
+	<option alias="224 kbps">224</option>
+	<option alias="256 kbps">256</option>
+	<option alias="320 kbps">320</option>
+	<option alias="384 kbps">384</option>
+	<option alias="448 kbps">448</option>
+	<option alias="512 kbps">512</option>
+	<option alias="640 kbps">640</option>
+	<option alias="768 kbps">768</option>
+	<option alias="896 kbps">896</option>
+	<option alias="1024 kbps">1024</option>
+      </selection>
+      <selection name="Cutoff setting" argument="-f %VALUE" default="1" enabled="false">
+	<option alias="Disabled">0</option>
+	<option alias="Auto">1</option>
+      </selection>
+      <range name="Cutoff frequency" argument="-f %VALUE" default="16000" step="250" enabled="false">
+	<min alias="1 kHz">1000</min>
+	<max alias="24 kHz">24000</max>
+      </range>
+    </parameters>
+  </external>
+</component>

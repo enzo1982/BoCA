@@ -200,3 +200,64 @@ Bool BoCA::AS::Registry::DeleteComponent(Component *component)
 
 	return True;
 }
+
+BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const String &streamURI)
+{
+	DecoderComponent	*component = NIL;
+
+	/* Check those decoders that claim to
+	 * support the file extension first.
+	 */
+	for (Int i = 0; i < GetNumberOfComponents(); i++)
+	{
+		if (GetComponentType(i) != COMPONENT_TYPE_DECODER) continue;
+
+		const Array<FileFormat *>	&formats = GetComponentFormats(i);
+
+		foreach (FileFormat *format, formats)
+		{
+			const Array<String>	&extensions = format->GetExtensions();
+
+			foreach (const String &extension, extensions)
+			{
+				if (!streamURI.ToLower().EndsWith(String(".").Append(extension.ToLower()))) continue;
+
+				component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
+
+				if (component->CanOpenStream(streamURI)) return component;
+
+				DeleteComponent(component);
+			}
+		}
+
+/* TODO: Implement protocols.
+ */
+/*		const Array<Protocol *>	&protocols = GetComponentProtocols(i);
+
+		foreach (Protocol *protocol, protocols)
+		{
+			if (!streamURI.ToLower().StartsWith(String(protocol->GetIdentifier()).Append("://"))) continue;
+
+			component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
+
+			if (component->CanOpenStream(streamURI)) return component;
+
+			DeleteComponent(component);
+		}
+*/	}
+
+	/* No suitable decoder found; try all decoders now.
+	 */
+	for (Int i = 0; i < GetNumberOfComponents(); i++)
+	{
+		if (GetComponentType(i) != COMPONENT_TYPE_DECODER) continue;
+
+		component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
+
+		if (component->CanOpenStream(streamURI)) return component;
+
+		DeleteComponent(component);
+	}
+
+	return NIL;
+}

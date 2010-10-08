@@ -162,6 +162,13 @@ Bool BoCA::WaveIn::Deactivate()
 	return True;
 }
 
+Bool BoCA::WaveIn::Seek(Int64 samplePosition)
+{
+	driver->Seek(driver->GetPos() + samplePosition * (track.GetFormat().bits / 8));
+
+	return True;
+}
+
 Int BoCA::WaveIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (driver->GetPos() == driver->GetSize()) return -1;

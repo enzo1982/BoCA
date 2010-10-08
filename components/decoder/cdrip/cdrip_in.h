@@ -51,7 +51,6 @@ namespace BoCA
 			Int			 ReadData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
-			Void			 FreeConfigurationLayer();
 	};
 };
 

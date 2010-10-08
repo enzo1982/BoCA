@@ -36,6 +36,8 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::WMA");
+
 	group_codec		= new GroupBox(i18n->TranslateString("Select codec"), Point(7, 11), Size(386, 67));
 
 	option_uncompressed	= new OptionBox(i18n->TranslateString("Write uncompressed WMA files"), Point(10, 13), Size(366, 0), &uncompressed, 1);

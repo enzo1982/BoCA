@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,6 +20,10 @@ DynamicLoader *srcdll	= NIL;
 
 Bool LoadSRCDLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\SampleRate.dll")).Exists()) return False;
+#endif
+
 	srcdll = new DynamicLoader("codecs/SampleRate");
 
 	ex_src_new		= (SRC_NEW) srcdll->GetFunctionAddress("src_new");

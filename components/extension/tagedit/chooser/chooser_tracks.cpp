@@ -12,12 +12,18 @@
 
 BoCA::ChooserTracks::ChooserTracks() : Chooser("Tracks")
 {
+	I18n	*i18n	= I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor");
+
+	SetText(i18n->TranslateString("Tracks"));
+
 	list_tracks	= new ListBox(Point(7, 7), Size(100, 150));
 	list_tracks->onSelectEntry.Connect(&ChooserTracks::OnSelectTrack, this);
-	list_tracks->AddTab(I18n::Get()->TranslateString("Title"));
-	list_tracks->AddTab(I18n::Get()->TranslateString("Track"), 50, OR_RIGHT);
-	list_tracks->AddTab(I18n::Get()->TranslateString("Length"), 80, OR_RIGHT);
-	list_tracks->AddTab(I18n::Get()->TranslateString("Size"), 80, OR_RIGHT);
+	list_tracks->AddTab(i18n->TranslateString("Title"));
+	list_tracks->AddTab(i18n->TranslateString("Track"), 50, OR_RIGHT);
+	list_tracks->AddTab(i18n->TranslateString("Length"), 80, OR_RIGHT);
+	list_tracks->AddTab(i18n->TranslateString("Size"), 80, OR_RIGHT);
 
 	Add(list_tracks);
 

@@ -71,18 +71,16 @@ Bool BoCA::BladeOut::Activate()
 
 	if (format.rate != 32000 && format.rate != 44100 && format.rate != 48000)
 	{
-		Utilities::ErrorMessage("Bad sampling rate! BladeEnc supports only 32, 44.1 or 48kHz.");
-
-		errorState = True;
+		errorString = "Bad sampling rate! BladeEnc supports only 32, 44.1 or 48kHz.";
+		errorState  = True;
 
 		return False;
 	}
 
 	if (format.channels > 2)
 	{
-		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
-
-		errorState = True;
+		errorString = "BonkEnc does not support more than 2 channels!";
+		errorState  = True;
 
 		return False;
 	}
@@ -203,14 +201,4 @@ ConfigLayer *BoCA::BladeOut::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureBladeEnc();
 
 	return configLayer;
-}
-
-Void BoCA::BladeOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
 }

@@ -14,7 +14,7 @@ OBJECTS	  = dllinterface.o wma_in.o wma_reader.o
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  = -lole32 -luuid -Xlinker --enable-stdcall-fixup
+LIBS	  = -lole32 -luuid
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

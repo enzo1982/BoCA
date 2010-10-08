@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,17 +24,17 @@ namespace smooth
 	class SMOOTHAPI ObjectType
 	{
 		private:
-			Int			 type;
+			Short			 type;
 			Object			*object;
 		public:
 						 ObjectType(Object *);
 						 ObjectType(const ObjectType &);
 
-			operator		 Int() const		{ return type; }
-			Int operator		 =(Int newType)		{ type = newType; return type; }
+			operator		 Short() const		 { return type; }
+			Short operator		 =(Short newType)	 { type = newType; return type; }
 
-			Bool operator		 ==(Int) const;
-			inline Bool operator	 !=(Int objType) const	{ return !(*this == objType); }
+			Bool operator		 ==(Short) const;
+			inline Bool operator	 !=(Short objType) const { return !(*this == objType); }
 	};
 };
 

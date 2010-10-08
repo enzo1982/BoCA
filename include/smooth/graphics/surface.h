@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,9 +42,9 @@ namespace smooth
 				Threads::Mutex	*mutex;
 			public:
 						 Surface(Void * = NIL, const Size & = Size());
-				virtual		~Surface();
+						~Surface();
 
-				Int		 GetSurfaceType() const;
+				Short		 GetSurfaceType() const;
 
 				Int		 SetSize(const Size &);
 				const Size	&GetSize() const;
@@ -58,12 +58,12 @@ namespace smooth
 
 				Void		*GetSystemSurface() const;
 
-				Int		 GetSurfaceDPI() const;
+				Short		 GetSurfaceDPI() const;
 
 				Int		 SetPixel(const Point &, const Color &);
 
 				Int		 Line(const Point &, const Point &, const Color &);
-				Int		 Frame(const Rect &, Int);
+				Int		 Frame(const Rect &, Short);
 				Int		 Box(const Rect &, const Color &, Int, const Size & = Size(0, 0));
 
 				Int		 SetText(const String &, const Rect &, const Font &, Bool = False);
@@ -75,8 +75,8 @@ namespace smooth
 				Int		 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
 		};
 
-		const Int	 FRAME_UP	= 0;
-		const Int	 FRAME_DOWN	= 1;
+		const Short	 FRAME_UP	= 0;
+		const Short	 FRAME_DOWN	= 1;
 	};
 };
 

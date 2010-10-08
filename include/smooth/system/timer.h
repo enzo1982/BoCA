@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,8 +27,8 @@ namespace smooth
 {
 	namespace System
 	{
-		const Int	 TIMER_STOPPED = 0;
-		const Int	 TIMER_RUNNING = 1;
+		const Short	 TIMER_STOPPED = 0;
+		const Short	 TIMER_RUNNING = 1;
 
 		class SMOOTHAPI Timer : public Object
 		{
@@ -36,9 +36,9 @@ namespace smooth
 				TimerBackend		*backend;
 
 				Int			 interval;
-				Int			 status;
+				Short			 status;
 			public:
-				static const Int	 classID;
+				static const Short	 classID;
 
 							 Timer();
 				virtual			~Timer();
@@ -51,7 +51,7 @@ namespace smooth
 				Int			 GetID() const;
 
 				Int			 GetInterval() const;
-				Int			 GetStatus() const;
+				Short			 GetStatus() const;
 			signals:
 				Signal0<Void>		 onInterval;
 		};

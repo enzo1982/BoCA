@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,13 +21,13 @@ namespace smooth
 		class SMOOTHAPI FontSizeModifier
 		{
 			private:
-				Int		 fontSize;
+				Short		 fontSize;
 			public:
 						 FontSizeModifier();
-				virtual		~FontSizeModifier();
+						~FontSizeModifier();
 
-				Void		 SetFontSize(Int);
-				Int		 GetFontSize() const;
+				Void		 SetFontSize(Short);
+				Short		 GetFontSize() const;
 
 				Int		 TranslateX(Int) const;
 				Int		 TranslateY(Int) const;

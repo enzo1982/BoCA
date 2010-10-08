@@ -39,14 +39,14 @@ namespace smooth
 
 namespace smooth
 {
-	const Int SP_PAINT	= 0;
-	const Int SP_MOUSEIN	= 1;
-	const Int SP_MOUSEOUT	= 2;
-	const Int SP_MOUSEDOWN	= 3;
-	const Int SP_MOUSEUP	= 4;
-	const Int SP_UPDATE	= 5;
-	const Int SP_SHOW	= 6;
-	const Int SP_HIDE	= 7;
+	const Short	 SP_PAINT	= 0;
+	const Short	 SP_MOUSEIN	= 1;
+	const Short	 SP_MOUSEOUT	= 2;
+	const Short	 SP_MOUSEDOWN	= 3;
+	const Short	 SP_MOUSEUP	= 4;
+	const Short	 SP_UPDATE	= 5;
+	const Short	 SP_SHOW	= 6;
+	const Short	 SP_HIDE	= 7;
 
 	namespace GUI
 	{
@@ -61,17 +61,20 @@ namespace smooth
 				Tooltip				*tooltip;
 				System::Timer			*tipTimer;
 
-				Bool				 registered;
-
 				Point				 pos;
 				Size				 size;
+
+				Bool				 registered;
 			protected:
 				Bool				 visible;
 				Bool				 active;
 				Bool				 focussed;
 
 				Bool				 alwaysActive;
-				Bool				 independent;			// Makes a widget independent from its container; i.e. it can be painted and used even if it's located outside of the container
+				Bool				 independent;			// Makes a widget independent of its container; i.e. it can be painted and used even if it's located outside of the container
+
+				Short				 orientation;
+
 				Bool				 tabstopCapable;
 
 				Bool				 mouseOver;
@@ -81,7 +84,8 @@ namespace smooth
 
 				Bool				 mouseDragging;
 
-				Int				 orientation;
+				Bool				 backgroundColorSet;
+				Color				 backgroundColor;
 
 				String				 text;
 				String				 statusText;
@@ -90,9 +94,6 @@ namespace smooth
 				Layer				*tooltipLayer;
 
 				Font				 font;
-
-				Color				 backgroundColor;
-				Bool				 backgroundColorSet;
 
 				Widget				*container;
 
@@ -107,9 +108,9 @@ namespace smooth
 
 				virtual Void			 EnqueueForDeletion();
 			public:
-				static const Int		 classID;
+				static const Short		 classID;
 
-				Int				 subtype;
+				Short				 subtype;
 
 				Size				 textSize;
 

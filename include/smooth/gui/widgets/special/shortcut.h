@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,10 +25,10 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 SC_NONE	= 0;
-		const Int	 SC_ALT		= 1;
-		const Int	 SC_CTRL	= 2;
-		const Int	 SC_SHIFT	= 4;
+		const Short	 SC_NONE	= 0;
+		const Short	 SC_ALT		= 1;
+		const Short	 SC_CTRL	= 2;
+		const Short	 SC_SHIFT	= 4;
 
 		class SMOOTHAPI Shortcut : public Widget
 		{
@@ -38,7 +38,7 @@ namespace smooth
 
 				Widget			*ref;
 			public:
-				static const Int	 classID;
+				static const Short	 classID;
 
 							 Shortcut(Int, Int, Widget * = NIL, Int = 0);
 				virtual			~Shortcut();

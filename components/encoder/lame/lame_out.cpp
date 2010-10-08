@@ -84,27 +84,24 @@ Bool BoCA::LAMEOut::Activate()
 		case 24000:
 			if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 0) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 192 || config->GetIntValue("LAME", "Bitrate", 192) == 224 || config->GetIntValue("LAME", "Bitrate", 192) == 256 || config->GetIntValue("LAME", "Bitrate", 192) == 320))
 			{
-				Utilities::ErrorMessage("Bad bitrate! The selected bitrate is not supported for this sampling rate.");
-
-				errorState = True;
+				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
+				errorState  = True;
 
 				return False;
 			}
 
 			if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 320))
 			{
-				Utilities::ErrorMessage("Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.");
-
-				errorState = True;
+				errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
+				errorState  = True;
 
 				return False;
 			}
 
 			if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 320))
 			{
-				Utilities::ErrorMessage("Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.");
-
-				errorState = True;
+				errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
+				errorState  = True;
 
 				return False;
 			}
@@ -114,44 +111,39 @@ Bool BoCA::LAMEOut::Activate()
 		case 48000:
 			if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 0) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 8 || config->GetIntValue("LAME", "Bitrate", 192) == 16 || config->GetIntValue("LAME", "Bitrate", 192) == 24 || config->GetIntValue("LAME", "Bitrate", 192) == 144))
 			{
-				Utilities::ErrorMessage("Bad bitrate! The selected bitrate is not supported for this sampling rate.");
-
-				errorState = True;
+				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
+				errorState  = True;
 
 				return False;
 			}
 
 			if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 144))
 			{
-				Utilities::ErrorMessage("Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.");
-
-				errorState = True;
+				errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
+				errorState  = True;
 
 				return False;
 			}
 
 			if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 144))
 			{
-				Utilities::ErrorMessage("Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.");
-
-				errorState = True;
+				errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
+				errorState  = True;
 
 				return False;
 			}
 			break;
 		default:
-			Utilities::ErrorMessage("Bad sampling rate! The selected sampling rate is not supported.");
-
-			errorState = True;
+			errorString = "Bad sampling rate! The selected sampling rate is not supported.";
+			errorState  = True;
 
 			return False;
 	}
 
 	if (format.channels > 2)
 	{
-		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
-
-		errorState = True;
+		errorString = "BonkEnc does not support more than 2 channels!";
+		errorState  = True;
 
 		return False;
 	}
@@ -275,7 +267,8 @@ Bool BoCA::LAMEOut::Activate()
 
 	if (ex_lame_init_params(lameFlags) < 0)
 	{
-		Utilities::ErrorMessage("Bad LAME encoder settings!\n\nPlease check your encoder settings in the\nconfiguration dialog.");
+		errorString = "Bad LAME encoder settings!\n\nPlease check your encoder settings in the\nconfiguration dialog.";
+		errorState  = True;
 
 		return False;
 	}
@@ -383,14 +376,4 @@ ConfigLayer *BoCA::LAMEOut::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureLAME();
 
 	return configLayer;
-}
-
-Void BoCA::LAMEOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,17 +17,9 @@ namespace smooth
 {
 	class Object;
 
-	template <class t> class Pointer;
-	template <class t> class PointerProxy;
-
 	namespace System
 	{
 		class Timer;
-	};
-
-	namespace Threads
-	{
-		class Mutex;
 	};
 };
 
@@ -38,10 +30,8 @@ namespace smooth
 	abstract class SMOOTHAPI Object
 	{
 		friend class Signal;
-		friend class Pointer<class t>;
-		friend class PointerProxy<class t>;
 		private:
-			static Int			 nextClassID;
+			static Short			 nextClassID;
 			static Int			 nextObjectHandle;
 
 			static Array<Object *, Void *>	 objects;
@@ -53,10 +43,7 @@ namespace smooth
 			String				 name;
 
 			Bool				 isDeleteable;
-			mutable Int			 isObjectInUse;
-
-			Int				 refCount;
-			Threads::Mutex			*objMutex;
+			mutable Short			 isObjectInUse;
 		protected:
 			ObjectType			 type;
 
@@ -70,15 +57,15 @@ namespace smooth
 			 */
 			virtual Void			 EnqueueForDeletion()			{ }
 		public:
-			static const Int		 classID;
+			static const Short		 classID;
 
-			static Int			 RequestClassID();
+			static Short			 RequestClassID();
 			static Int			 RequestObjectHandle();
 
 			static Int			 GetNOfObjects();
 			static Object			*GetNthObject(Int);
 
-			static Object			*GetObject(Int, Int = Object::classID);
+			static Object			*GetObject(Int, Short = Object::classID);
 			static Object			*GetObject(const String &);
 
 			static Int			 DeleteObject(Object *);
@@ -99,7 +86,7 @@ namespace smooth
 			operator			 String() const				{ return ToString(); }
 
 			const ObjectType		&GetObjectType() const			{ return type; }
-			virtual inline Bool		 IsTypeCompatible(Int objType) const	{ return (objType == classID); }
+			virtual inline Bool		 IsTypeCompatible(Short objType) const	{ return (objType == classID); }
 
 			Bool				 IsObjectInUse() const			{ return isObjectInUse > 0; }
 		slots:

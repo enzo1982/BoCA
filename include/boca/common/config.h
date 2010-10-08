@@ -42,6 +42,8 @@ namespace BoCA
 
 			Bool		 languageChanged;
 
+			Bool		 enable_console;
+
 			Int		 cdrip_numdrives;
 			Int		 cdrip_timeout;
 			Bool		 cdrip_autoRead_active;

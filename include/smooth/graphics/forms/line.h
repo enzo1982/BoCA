@@ -19,14 +19,13 @@ namespace smooth
 	};
 };
 
-#include "form.h"
 #include "point.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Line : public Form
+		class SMOOTHAPI Line
 		{
 			public:
 				Int		 sx;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,6 +13,7 @@
 
 #include "../../definitions.h"
 #include "../../templates/signals.h"
+#include "../../templates/callbacks.h"
 
 namespace smooth
 {
@@ -44,6 +45,8 @@ namespace smooth
 
 					Signal1<Void, Int>					 downloadProgress;
 					Signal1<Void, const String &>				 downloadSpeed;
+				callbacks:
+					Callback0<Bool>						 doCancelDownload;
 			};
 		};
 	};

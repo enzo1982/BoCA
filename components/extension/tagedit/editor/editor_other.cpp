@@ -18,7 +18,11 @@ BoCA::LayerTagOther::LayerTagOther() : Editor("Other")
 {
 	I18n	*i18n = I18n::Get();
 
-	group_original		= new GroupBox("Original information", Point(7, 10), Size(400, 120));
+	i18n->SetContext("Extensions::Tag Editor::Other");
+
+	SetText(i18n->TranslateString("Other"));
+
+	group_original		= new GroupBox(i18n->TranslateString("Original information"), Point(7, 10), Size(400, 120));
 
 	text_oartist		= new Text(String(i18n->TranslateString("Original artist")).Append(":"), Point(9, 13));
 	text_oalbum		= new Text(String(i18n->TranslateString("Original album")).Append(":"), text_oartist->GetPosition() + Point(0, 27));
@@ -51,7 +55,7 @@ BoCA::LayerTagOther::LayerTagOther() : Editor("Other")
 
 	Add(group_original);
 
-	group_web		= new GroupBox("Webpage URLs", Point(7, 10), Size(400, 174));
+	group_web		= new GroupBox(i18n->TranslateString("Webpage URLs"), Point(7, 10), Size(400, 174));
 
 	text_wartist		= new Text(String(i18n->TranslateString("Artist webpage")).Append(":"), Point(9, 13));
 	text_wpublisher		= new Text(String(i18n->TranslateString("Publisher webpage")).Append(":"), text_wartist->GetPosition() + Point(0, 27));
@@ -253,6 +257,8 @@ Void BoCA::LayerTagOther::OnSelectNone()
 
 	group_original->Deactivate();
 	group_web->Deactivate();
+
+	track = NIL;
 }
 
 /* Called when a track is modified.

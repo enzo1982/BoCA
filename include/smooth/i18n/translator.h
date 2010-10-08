@@ -38,6 +38,8 @@ namespace smooth
 
 				Int				 LoadDoc(XML::Document *, Language *);
 			public:
+				static Translator		*defaultTranslator;
+
 								 Translator(const String &);
 				virtual				~Translator();
 
@@ -45,9 +47,10 @@ namespace smooth
 				Int				 SelectUserDefaultLanguage();
 				
 				Int				 ActivateLanguage(const String &);
-				const String			&TranslateString(const String &);
+				const String			&TranslateString(const String &, const String & = NIL);
 
-				static Translator		*defaultTranslator;
+				Bool				 SetContext(const String &);
+				const String			&GetContext() const;
 			accessors:
 				Int				 GetNOfLanguages() const;
 

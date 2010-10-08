@@ -30,6 +30,8 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	tabwidget		= new TabWidget(Point(7, 7), Size(525, 208));
 
+	i18n->SetContext("Encoders::FAAC::Format");
+
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 
 	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), Point(135, 11), Size(120, 65));
@@ -101,6 +103,8 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	group_id3v2->Add(check_id3v2);
 	group_id3v2->Add(text_note);
 	group_id3v2->Add(text_id3v2);
+
+	i18n->SetContext("Encoders::FAAC::Quality");
 
 	layer_quality		= new Layer(i18n->TranslateString("Quality"));
 

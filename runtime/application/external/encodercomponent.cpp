@@ -41,16 +41,6 @@ BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()
 	return configLayer;
 }
 
-Void BoCA::AS::EncoderComponentExternal::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
-}
-
 Int BoCA::AS::EncoderComponentExternal::RenderTag(const String &streamURI, const Track &track, Buffer<UnsignedByte> &tagBuffer)
 {
 	Config	*config = Config::Get();
@@ -65,7 +55,7 @@ Int BoCA::AS::EncoderComponentExternal::RenderTag(const String &streamURI, const
 
 	foreach (FileFormat *format, specs->formats)
 	{
-		foreach (String extension, format->GetExtensions())
+		foreach (const String &extension, format->GetExtensions())
 		{
 			if (lcURI.EndsWith(String(".").Append(extension)))
 			{

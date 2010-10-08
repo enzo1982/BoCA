@@ -53,6 +53,10 @@ DynamicLoader *vorbisdll	= NIL;
 
 Bool LoadOggDLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Ogg.dll")).Exists()) return False;
+#endif
+
 	oggdll = new DynamicLoader("codecs/Ogg");
 
 	ex_ogg_stream_init		= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
@@ -93,12 +97,23 @@ Bool LoadVorbisDLL()
 {
 	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
 	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Vorbis-OpenMP.dll")).Exists()) return False;
+#endif
+
 		vorbisdll = new DynamicLoader("codecs/Vorbis-OpenMP");
 
 		if (vorbisdll->GetSystemModuleHandle() == NIL) FreeVorbisDLL();
 	}
 
-	if (vorbisdll == NIL) vorbisdll = new DynamicLoader("codecs/Vorbis");
+	if (vorbisdll == NIL)
+	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Vorbis.dll")).Exists()) return False;
+#endif
+
+		vorbisdll = new DynamicLoader("codecs/Vorbis");
+	}
 
 	ex_vorbis_info_init		= (VORBISINFOINIT) vorbisdll->GetFunctionAddress("vorbis_info_init");
 	ex_vorbis_comment_init		= (VORBISCOMMENTINIT) vorbisdll->GetFunctionAddress("vorbis_comment_init");

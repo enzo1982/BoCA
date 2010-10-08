@@ -170,7 +170,7 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 				picture.bPictureType	= picInfo.type;
 				picture.pwszDescription	= new WCHAR [picInfo.description.Length() + 1];
 				picture.dwDataLen	= picInfo.data.Size();
-				picture.pbData		= (BYTE *) (UnsignedByte *) picInfo.data;
+				picture.pbData		= (BYTE *) const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data);
 
 				wcsncpy(picture.pwszMIMEType, picInfo.mime, picInfo.mime.Length() + 1);
 				wcsncpy(picture.pwszDescription, picInfo.description, picInfo.description.Length() + 1);
@@ -244,15 +244,16 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 
 		for (Int i = 0; i < numIndices; i++)
 		{
-			WORD	 nameLen = 1024;
-			LPWSTR	 name = new WCHAR [nameLen];
-			DWORD	 cbLength = 0;
+			WORD			 nameLen  = 1024;
+			LPWSTR			 name	  = new WCHAR [nameLen];
+			DWORD			 cbLength = 0;
 
 			hr = pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, NIL, NIL, NIL, &cbLength);
 
-			BYTE	*pbValue = new BYTE [cbLength];
+			WMT_ATTR_DATATYPE	 type	  = WMT_TYPE_DWORD;
+			BYTE			*pbValue  = new BYTE [cbLength];
 
-			hr = pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, NIL, NIL, pbValue, &cbLength);
+			hr = pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, &type, NIL, pbValue, &cbLength);
 
 			if	(String(name) == g_wszWMAuthor)			 info.artist  = (LPWSTR) pbValue;
 			else if (String(name) == g_wszWMTitle)			 info.title   = (LPWSTR) pbValue;
@@ -285,13 +286,22 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 			else if (String(name) == g_wszWMAudioSourceURL)		 info.other.Add(String(INFO_WEB_SOURCE).Append(":").Append((LPWSTR) pbValue));
 			else if (String(name) == g_wszWMCopyrightURL)		 info.other.Add(String(INFO_WEB_COPYRIGHT).Append(":").Append((LPWSTR) pbValue));
 
+			else if (String(name) == g_wszWMTrack)
+			{
+				if	(type == WMT_TYPE_DWORD)  info.track = 1 + ((DWORD *) pbValue)[0];
+				else if (type == WMT_TYPE_STRING) info.track = 1 + String((LPWSTR) pbValue).ToInt();
+			}
 			else if (String(name) == g_wszWMTrackNumber)
 			{
-				String	 trackString = (LPWSTR) pbValue;
+				if	(type == WMT_TYPE_DWORD)  info.track = ((DWORD *) pbValue)[0];
+				else if (type == WMT_TYPE_STRING)
+				{
+					String	 trackString = (LPWSTR) pbValue;
 
-				info.track = trackString.ToInt();
+					info.track = trackString.ToInt();
 
-				if (trackString.Find("/") >= 0) info.numTracks = trackString.Tail(trackString.Length() - trackString.Find("/") - 1).ToInt();
+					if (trackString.Find("/") >= 0) info.numTracks = trackString.Tail(trackString.Length() - trackString.Find("/") - 1).ToInt();
+				}
 			}
 			else if (String(name) == g_wszWMPartOfSet)
 			{
@@ -348,9 +358,7 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 				picture.type = picData->bPictureType;
 				picture.description = picData->pwszDescription;
 
-				picture.data.Resize(picData->dwDataLen);
-
-				memcpy(picture.data, picData->pbData, picture.data.Size());
+				picture.data.Set(picData->pbData, picData->dwDataLen);
 
 				if (picture.data.Size() > 16 && picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
 			}

@@ -31,8 +31,8 @@ namespace smooth
 {
 	namespace IO
 	{
-		const Int	 IS_READ	= 2;
-		const Int	 IS_WRITE	= 4;
+		const Short	 IS_READ	= 2;
+		const Short	 IS_WRITE	= 4;
 
 		class SMOOTHAPI InStream : public Stream
 		{

@@ -9,6 +9,6 @@ set BUILD_WIN32=True
 set BUILD_X64=True
 
 echo BonkEnc Component Development Kit v1.1 Beta 1 (x64)
-echo Copyright (C) 2001-2009 Robert Kausch
+echo Copyright (C) 2001-2010 Robert Kausch
 
 bash

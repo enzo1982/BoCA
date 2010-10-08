@@ -80,9 +80,8 @@ Bool BoCA::TwinVQOut::Activate()
 		case 22050:
 			if (config->GetIntValue("TwinVQ", "Bitrate", 48) == 48)
 			{
-				Utilities::ErrorMessage("Bad bitrate! The selected bitrate is not supported for this sampling rate.");
-
-				errorState = True;
+				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
+				errorState  = True;
 
 				return False;
 			}
@@ -90,26 +89,23 @@ Bool BoCA::TwinVQOut::Activate()
 		case 44100:
 			if (config->GetIntValue("TwinVQ", "Bitrate", 48) != 48)
 			{
-				Utilities::ErrorMessage("Bad bitrate! The selected bitrate is not supported for this sampling rate.");
-
-				errorState = True;
+				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
+				errorState  = True;
 
 				return False;
 			}
 			break;
 		default:
-			Utilities::ErrorMessage("Bad sampling rate! The selected sampling rate is not supported.");
-
-			errorState = True;
+			errorString = "Bad sampling rate! The selected sampling rate is not supported.";
+			errorState  = True;
 
 			return False;
 	}
 
 	if (format.channels > 2)
 	{
-		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
-
-		errorState = True;
+		errorString = "BonkEnc does not support more than 2 channels!";
+		errorState  = True;
 
 		return False;
 	}
@@ -228,14 +224,4 @@ ConfigLayer *BoCA::TwinVQOut::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureTwinVQ();
 
 	return configLayer;
-}
-
-Void BoCA::TwinVQOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
 }

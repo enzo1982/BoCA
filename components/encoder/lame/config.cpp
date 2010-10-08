@@ -14,9 +14,6 @@
 
 BoCA::ConfigureLAME::ConfigureLAME()
 {
-	Point	 pos;
-	Size	 size;
-
 	Config	*config = Config::Get();
 
 	preset			= config->GetIntValue("LAME", "Preset", 2);
@@ -48,36 +45,22 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::LAME");
+
 	register_layer_basic	= new Layer(i18n->TranslateString("Basic"));
 	register_layer_misc	= new Layer(i18n->TranslateString("Misc"));
 	register_layer_expert	= new Layer(i18n->TranslateString("Expert"));
 	register_layer_filtering= new Layer(i18n->TranslateString("Audio processing"));
 
-	pos.x = 7;
-	pos.y = 7;
-	size.cx = 408;
-	size.cy = 218;
+	i18n->SetContext("Encoders::LAME::Basic");
 
-	reg_register		= new TabWidget(pos, size);
+	reg_register		= new TabWidget(Point(7, 7), Size(408, 218));
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 390;
-	size.cy = 39;
+	basic_preset		= new GroupBox(i18n->TranslateString("Presets"), Point(7, 11), Size(390, 39));
 
-	basic_preset		= new GroupBox(i18n->TranslateString("Presets"), pos, size);
+	basic_text_preset	= new Text(i18n->TranslateString("Use preset:"), Point(16, 24));
 
-	pos.x += 9;
-	pos.y += 13;
-
-	basic_text_preset	= new Text(i18n->TranslateString("Use preset:"), pos);
-
-	pos.x += (basic_text_preset->textSize.cx + 8);
-	pos.y -= 3;
-	size.cx = 363 - basic_text_preset->textSize.cx;
-	size.cy = 0;
-
-	basic_combo_preset	= new ComboBox(pos, size);
+	basic_combo_preset	= new ComboBox(Point(24 + basic_text_preset->textSize.cx, 21), Size(363 - basic_text_preset->textSize.cx, 0));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Custom settings"));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Medium, Fast"));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Standard, Fast"));
@@ -86,99 +69,86 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	basic_combo_preset->SelectNthEntry(preset);
 	basic_combo_preset->onSelectEntry.Connect(&ConfigureLAME::SetPreset, this);
 
-	pos.x = 142;
-	pos.y = 62;
-	size.cx = 255;
-	size.cy = 63;
+	basic_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(142, 62), Size(255, 63));
 
-	basic_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 76;
-	size.cy = 0;
-
-	basic_option_set_bitrate= new OptionBox(i18n->TranslateString("Set bitrate:"), pos, size, &set_bitrate, 1);
+	basic_option_set_bitrate= new OptionBox(i18n->TranslateString("Set bitrate:"), Point(152, 73), Size(76, 0), &set_bitrate, 1);
 	basic_option_set_bitrate->onAction.Connect(&ConfigureLAME::SetBitrateOption, this);
 
-	pos.y += 25;
-
-	basic_option_set_ratio	= new OptionBox(i18n->TranslateString("Set ratio:"), pos, size, &set_bitrate, 0);
+	basic_option_set_ratio	= new OptionBox(i18n->TranslateString("Set ratio:"), Point(152, 98), Size(76, 0), &set_bitrate, 0);
 	basic_option_set_ratio->onAction.Connect(&ConfigureLAME::SetBitrateOption, this);
 
-	pos.y -= 25;
-	pos.x += 85;
-	size.cx = 99;
-
-	basic_slider_bitrate	= new Slider(pos, size, OR_HORZ, &bitrate, 0, 17);
+	basic_slider_bitrate	= new Slider(Point(237, 73), Size(99, 0), OR_HORZ, &bitrate, 0, 17);
 	basic_slider_bitrate->onValueChange.Connect(&ConfigureLAME::SetBitrate, this);
 
-	pos.x += 106;
-	pos.y += 2;
-
-	basic_text_bitrate	= new Text(NIL, pos);
+	basic_text_bitrate	= new Text(NIL, Point(343, 75));
 	SetBitrate();
 
-	pos.x -= 83;
-	pos.y += 25;
+	basic_text_ratio	= new Text("1 :", Point(260, 100));
 
-	basic_text_ratio	= new Text("1 :", pos);
-
-	pos.x += 16;
-	pos.y -= 3;
-	size.cx = 19;
-
-	basic_edit_ratio	= new EditBox(String::FromFloat(((double) ratio) / 100), pos, size, 2);
+	basic_edit_ratio	= new EditBox(String::FromFloat(((double) ratio) / 100), Point(276, 97), Size(19, 0), 2);
 	basic_edit_ratio->SetFlags(EDB_NUMERIC);
 
-	pos.x = 142;
-	pos.y = 137;
-	size.cx = 255;
-	size.cy = 51;
+	vbr_vbrmode		= new GroupBox(i18n->TranslateString("VBR mode"), Point(7, 62), Size(127, 88));
 
-	basic_quality		= new GroupBox(i18n->TranslateString("Quality"), pos, size);
+	vbr_option_vbrmtrh	= new OptionBox("VBR", Point(17, 73), Size(107, 0), &vbrmode, vbr_mtrh);
+	vbr_option_vbrmtrh->onAction.Connect(&ConfigureLAME::SetVBRMode, this);
 
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 76;
-	size.cy = 0;
+	vbr_option_abr		= new OptionBox("ABR", Point(17, 98), Size(107, 0), &vbrmode, vbr_abr);
+	vbr_option_abr->onAction.Connect(&ConfigureLAME::SetVBRMode, this);
 
-	basic_check_set_quality	= new CheckBox(i18n->TranslateString("Set quality:"), pos, size, &set_quality);
+	vbr_option_cbr		= new OptionBox(String("CBR (").Append(i18n->TranslateString("no VBR")).Append(")"), Point(17, 123), Size(107, 0), &vbrmode, vbr_off);
+	vbr_option_cbr->onAction.Connect(&ConfigureLAME::SetVBRMode, this);
+
+	vbr_quality		= new GroupBox(i18n->TranslateString("VBR quality"), Point(142, 62), Size(255, 51));
+
+	vbr_text_setquality	= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(153, 75));
+
+	vbr_slider_quality	= new Slider(Point(161 + vbr_text_setquality->textSize.cx, 73), Size(204 - vbr_text_setquality->textSize.cx, 0), OR_HORZ, &vbrquality, 0, 90);
+	vbr_slider_quality->onValueChange.Connect(&ConfigureLAME::SetVBRQuality, this);
+
+	vbr_text_quality	= new Text(NIL, Point(372, 75));
+	SetVBRQuality();
+
+	vbr_text_quality_worse= new Text(i18n->TranslateString("worse"), Point());
+	vbr_text_quality_worse->SetPosition(Point(vbr_slider_quality->GetX() + 3 - (vbr_text_quality_worse->textSize.cx / 2), 92));
+
+	vbr_text_quality_better= new Text(i18n->TranslateString("better"), Point());
+	vbr_text_quality_better->SetPosition(Point(360 - (vbr_text_quality_better->textSize.cx / 2), 92));
+
+	vbr_abrbitrate		= new GroupBox(i18n->TranslateString("ABR target bitrate"), Point(142, 62), Size(255, 39));
+
+	vbr_slider_abrbitrate	= new Slider(Point(152, 73), Size(169, 0), OR_HORZ, &abrbitrate, 8, 320);
+	vbr_slider_abrbitrate->onValueChange.Connect(&ConfigureLAME::SetABRBitrate, this);
+
+	vbr_edit_abrbitrate	= new EditBox(NIL, Point(329, 72), Size(25, 0), 3);
+	vbr_edit_abrbitrate->SetFlags(EDB_NUMERIC);
+	vbr_edit_abrbitrate->onInput.Connect(&ConfigureLAME::SetABRBitrateByEditBox, this);
+	SetABRBitrate();
+
+	vbr_text_abrbitrate_kbps= new Text("kbps", Point(361, 75));
+
+	basic_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(142, 137), Size(255, 51));
+
+	basic_check_set_quality	= new CheckBox(i18n->TranslateString("Set quality:"), Point(152, 148), Size(76, 0), &set_quality);
 	basic_check_set_quality->onAction.Connect(&ConfigureLAME::SetQualityOption, this);
 
-	pos.x += 85;
-	size.cx = 137;
-
-	basic_slider_quality	= new Slider(pos, size, OR_HORZ, &quality, 0, 9);
+	basic_slider_quality	= new Slider(Point(237, 148), Size(137, 0), OR_HORZ, &quality, 0, 9);
 	basic_slider_quality->onValueChange.Connect(&ConfigureLAME::SetQuality, this);
 
-	pos.x += 144;
-	pos.y += 2;
-
-	basic_text_quality	= new Text(NIL, pos);
+	basic_text_quality	= new Text(NIL, Point(381, 150));
 	SetQuality();
 
-	pos.y += 17;
+	basic_text_quality_worse= new Text(i18n->TranslateString("worse"), Point());
+	basic_text_quality_worse->SetPosition(Point(240 - (basic_text_quality_worse->textSize.cx / 2), 167));
 
-	basic_text_quality_worse= new Text(i18n->TranslateString("worse"), pos);
-	basic_text_quality_worse->SetPosition(Point(240 - (basic_text_quality_worse->textSize.cx / 2), pos.y));
+	basic_text_quality_better= new Text(i18n->TranslateString("better"), Point());
+	basic_text_quality_better->SetPosition(Point(369 - (basic_text_quality_better->textSize.cx / 2), 167));
 
-	basic_text_quality_better= new Text(i18n->TranslateString("better"), pos);
-	basic_text_quality_better->SetPosition(Point(369 - (basic_text_quality_better->textSize.cx / 2), pos.y));
+	i18n->SetContext("Encoders::LAME::Misc");
 
-	pos.x = 153;
-	pos.y = 11;
-	size.cx = 244;
-	size.cy = 39;
+	basic_stereomode	= new GroupBox(i18n->TranslateString("Stereo mode"), Point(153, 11), Size(244, 39));
 
-	basic_stereomode	= new GroupBox(i18n->TranslateString("Stereo mode"), pos, size);
-
-	pos.x += 10;
-	pos.y += 10;
-	size.cx = 108;
-	size.cy = 0;
-
-	basic_combo_stereomode	= new ComboBox(pos, size);
+	basic_combo_stereomode	= new ComboBox(Point(163, 21), Size(108, 0));
 	basic_combo_stereomode->AddEntry(i18n->TranslateString("Auto"));
 	basic_combo_stereomode->AddEntry(i18n->TranslateString("Mono"));
 	basic_combo_stereomode->AddEntry(i18n->TranslateString("Stereo"));
@@ -186,219 +156,53 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	basic_combo_stereomode->SelectNthEntry(config->GetIntValue("LAME", "StereoMode", 0));
 	basic_combo_stereomode->onSelectEntry.Connect(&ConfigureLAME::SetStereoMode, this);
 
-	pos.x += 115;
-	pos.y += 1;
+	basic_check_forcejs	= new CheckBox(i18n->TranslateString("Force Joint Stereo"),Point(278, 22), Size(108, 0), &forcejs);
 
-	basic_check_forcejs	= new CheckBox(i18n->TranslateString("Force Joint Stereo"), pos, size, &forcejs);
+	vbr_bitrate		= new GroupBox(i18n->TranslateString("VBR bitrate range"), Point(7, 113), Size(390, 63));
 
-	pos.x = 7;
-	pos.y = 62;
-	size.cx = 127;
-	size.cy = 88;
-
-	vbr_vbrmode		= new GroupBox(i18n->TranslateString("VBR mode"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 107;
-	size.cy = 0;
-
-	vbr_option_vbrmtrh	= new OptionBox("VBR", pos, size, &vbrmode, vbr_mtrh);
-	vbr_option_vbrmtrh->onAction.Connect(&ConfigureLAME::SetVBRMode, this);
-
-	pos.y += 25;
-
-	vbr_option_abr		= new OptionBox("ABR", pos, size, &vbrmode, vbr_abr);
-	vbr_option_abr->onAction.Connect(&ConfigureLAME::SetVBRMode, this);
-
-	pos.y += 25;
-
-	vbr_option_cbr		= new OptionBox(String("CBR (").Append(i18n->TranslateString("no VBR")).Append(")"), pos, size, &vbrmode, vbr_off);
-	vbr_option_cbr->onAction.Connect(&ConfigureLAME::SetVBRMode, this);
-
-	pos.x = 142;
-	pos.y = 62;
-	size.cx = 255;
-	size.cy = 51;
-
-	vbr_quality		= new GroupBox(i18n->TranslateString("VBR quality"), pos, size);
-
-	pos.x += 11;
-	pos.y += 13;
-
-	vbr_text_setquality	= new Text(String(i18n->TranslateString("Quality")).Append(":"), pos);
-
-	pos.x += (vbr_text_setquality->textSize.cx + 8);
-	pos.y -= 2;
-	size.cx = 204 - vbr_text_setquality->textSize.cx;
-	size.cy = 0;
-
-	vbr_slider_quality	= new Slider(pos, size, OR_HORZ, &vbrquality, 0, 90);
-	vbr_slider_quality->onValueChange.Connect(&ConfigureLAME::SetVBRQuality, this);
-
-	pos.x = 372;
-	pos.y += 2;
-
-	vbr_text_quality	= new Text(NIL, pos);
-	SetVBRQuality();
-
-	pos.y += 17;
-
-	vbr_text_quality_worse= new Text(i18n->TranslateString("worse"), pos);
-	vbr_text_quality_worse->SetX(vbr_slider_quality->GetX() + 3 - (vbr_text_quality_worse->textSize.cx / 2));
-
-	vbr_text_quality_better= new Text(i18n->TranslateString("better"), pos);
-	vbr_text_quality_better->SetX(360 - (vbr_text_quality_better->textSize.cx / 2));
-
-	pos.x = 142;
-	pos.y = 62;
-	size.cx = 255;
-	size.cy = 39;
-
-	vbr_abrbitrate		= new GroupBox(i18n->TranslateString("ABR target bitrate"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 169;
-	size.cy = 0;
-
-	vbr_slider_abrbitrate	= new Slider(pos, size, OR_HORZ, &abrbitrate, 8, 320);
-	vbr_slider_abrbitrate->onValueChange.Connect(&ConfigureLAME::SetABRBitrate, this);
-
-	pos.x += 177;
-	pos.y -= 1;
-	size.cx = 25;
-
-	vbr_edit_abrbitrate	= new EditBox(NIL, pos, size, 3);
-	vbr_edit_abrbitrate->SetFlags(EDB_NUMERIC);
-	vbr_edit_abrbitrate->onInput.Connect(&ConfigureLAME::SetABRBitrateByEditBox, this);
-	SetABRBitrate();
-
-	pos.x += 32;
-	pos.y += 3;
-
-	vbr_text_abrbitrate_kbps= new Text("kbps", pos);
-
-	pos.x = 7;
-	pos.y = 113;
-	size.cx = 390;
-	size.cy = 63;
-
-	vbr_bitrate		= new GroupBox(i18n->TranslateString("VBR bitrate range"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 146;
-	size.cy = 0;
-
-	vbr_check_set_min_brate	= new CheckBox(i18n->TranslateString("Set minimum VBR bitrate:"), pos, size, &set_min_vbr_brate);
+	vbr_check_set_min_brate	= new CheckBox(i18n->TranslateString("Set minimum VBR bitrate:"), Point(17, 124), Size(146, 0), &set_min_vbr_brate);
 	vbr_check_set_min_brate->onAction.Connect(&ConfigureLAME::SetMinVBRBitrateOption, this);
 
-	pos.x += 155;
-	size.cx = 161;
-
-	vbr_slider_min_brate	= new Slider(pos, size, OR_HORZ, &min_vbr_brate, 0, 17);
+	vbr_slider_min_brate	= new Slider(Point(172, 124), Size(161, 0), OR_HORZ, &min_vbr_brate, 0, 17);
 	vbr_slider_min_brate->onValueChange.Connect(&ConfigureLAME::SetMinVBRBitrate, this);
 
-	pos.x += 168;
-	pos.y += 2;
+	vbr_text_min_brate_kbps	= new Text("kbps", Point(340, 126));
 
-	vbr_text_min_brate_kbps	= new Text("kbps", pos);
-
-	pos.x -= 323;
-	pos.y += 23;
-	size.cx = 146;
-
-	vbr_check_set_max_brate	= new CheckBox(i18n->TranslateString("Set maximum VBR bitrate:"), pos, size, &set_max_vbr_brate);
+	vbr_check_set_max_brate	= new CheckBox(i18n->TranslateString("Set maximum VBR bitrate:"), Point(17, 149), Size(146, 0), &set_max_vbr_brate);
 	vbr_check_set_max_brate->onAction.Connect(&ConfigureLAME::SetMaxVBRBitrateOption, this);
 
-	pos.x += 155;
-	size.cx = 161;
-
-	vbr_slider_max_brate	= new Slider(pos, size, OR_HORZ, &max_vbr_brate, 0, 17);
+	vbr_slider_max_brate	= new Slider(Point(172, 149), Size(161, 0), OR_HORZ, &max_vbr_brate, 0, 17);
 	vbr_slider_max_brate->onValueChange.Connect(&ConfigureLAME::SetMaxVBRBitrate, this);
 
-	pos.x += 168;
-	pos.y += 2;
-
-	vbr_text_max_brate_kbps	= new Text(NIL, pos);
+	vbr_text_max_brate_kbps	= new Text(NIL, Point(340, 151));
 
 	SetMinVBRBitrate();
 	SetMaxVBRBitrate();
 	SetVBRMode();
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 138;
-	size.cy = 90;
+	misc_bits		= new GroupBox(i18n->TranslateString("Control bits"), Point(7, 11), Size(138, 90));
 
-	misc_bits		= new GroupBox(i18n->TranslateString("Control bits"), pos, size);
+	misc_check_copyright	= new CheckBox(i18n->TranslateString("Set Copyright bit"), Point(17, 22), Size(117, 0), &set_copyright);
+	misc_check_original	= new CheckBox(i18n->TranslateString("Set Original bit"), Point(17, 47), Size(117, 0), &set_original);
+	misc_check_private	= new CheckBox(i18n->TranslateString("Set Private bit"), Point(17, 72), Size(117, 0), &set_private);
 
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 117;
-	size.cy = 0;
+	misc_crc		= new GroupBox(i18n->TranslateString("CRC"), Point(153, 62), Size(244, 39));
 
-	misc_check_copyright	= new CheckBox(i18n->TranslateString("Set Copyright bit"), pos, size, &set_copyright);
+	misc_check_crc		= new CheckBox(i18n->TranslateString("Enable CRC"), Point(163, 73), Size(225, 0), &set_crc);
 
-	pos.y += 25;
+	i18n->SetContext("Encoders::LAME::Expert");
 
-	misc_check_original	= new CheckBox(i18n->TranslateString("Set Original bit"), pos, size, &set_original);
+	misc_format		= new GroupBox(i18n->TranslateString("Stream format"), Point(7, 113), Size(390, 39));
 
-	pos.y += 25;
+	misc_check_iso		= new CheckBox(i18n->TranslateString("Enforce strict ISO compliance"), Point(17, 124), Size(369, 0), &set_iso);
 
-	misc_check_private	= new CheckBox(i18n->TranslateString("Set Private bit"), pos, size, &set_private);
+	expert_ath		= new GroupBox(i18n->TranslateString("ATH"), Point(7, 11), Size(390, 39));
 
-	pos.x = 153;
-	pos.y = 62;
-	size.cx = 244;
-	size.cy = 39;
-
-	misc_crc		= new GroupBox(i18n->TranslateString("CRC"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 225;
-	size.cy = 0;
-
-	misc_check_crc		= new CheckBox(i18n->TranslateString("Enable CRC"), pos, size, &set_crc);
-
-	pos.x = 7;
-	pos.y = 113;
-	size.cx = 390;
-	size.cy = 39;
-
-	misc_format		= new GroupBox(i18n->TranslateString("Stream format"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 369;
-	size.cy = 0;
-
-	misc_check_iso		= new CheckBox(i18n->TranslateString("Enforce strict ISO compliance"), pos, size, &set_iso);
-
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 390;
-	size.cy = 39;
-
-	expert_ath		= new GroupBox(i18n->TranslateString("ATH"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 93;
-	size.cy = 0;
-
-	expert_check_ath	= new CheckBox(i18n->TranslateString("Enable ATH:"), pos, size, &enable_ath);
+	expert_check_ath	= new CheckBox(i18n->TranslateString("Enable ATH:"), Point(17, 22), Size(93, 0), &enable_ath);
 	expert_check_ath->onAction.Connect(&ConfigureLAME::SetEnableATH, this);
 	expert_check_ath->SetWidth(expert_check_ath->textSize.cx + 19);
 
-	pos.x += (expert_check_ath->textSize.cx + 28);
-	pos.y -= 1;
-	size.cx = 342 - expert_check_ath->textSize.cx;
-	size.cy = 0;
-
-	expert_combo_athtype	= new ComboBox(pos, size);
+	expert_combo_athtype	= new ComboBox(Point(45 + expert_check_ath->textSize.cx, 21), Size(342 - expert_check_ath->textSize.cx, 0));
 	expert_combo_athtype->AddEntry(i18n->TranslateString("Use default setting"));
 	expert_combo_athtype->AddEntry("Gabriel Bouvigne, 9");
 	expert_combo_athtype->AddEntry("Frank Klemm");
@@ -410,33 +214,15 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	if (!enable_ath) expert_combo_athtype->Deactivate();
 
-	pos.x = 7;
-	pos.y = 62;
-	size.cx = 390;
-	size.cy = 39;
+	expert_psycho		= new GroupBox(i18n->TranslateString("Psycho acoustic model"), Point(7, 62), Size(390, 39));
 
-	expert_psycho		= new GroupBox(i18n->TranslateString("Psycho acoustic model"), pos, size);
+	expert_check_tempmask	= new CheckBox(i18n->TranslateString("Use Temporal Masking Effect"), Point(17, 73), Size(369, 0), &enable_tempmask);
 
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 369;
-	size.cy = 0;
+	i18n->SetContext("Encoders::LAME::Audio processing");
 
-	expert_check_tempmask	= new CheckBox(i18n->TranslateString("Use Temporal Masking Effect"), pos, size, &enable_tempmask);
+	filtering_resample	= new GroupBox(i18n->TranslateString("Output sampling rate"), Point(7, 11), Size(161, 39));
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 161;
-	size.cy = 39;
-
-	filtering_resample	= new GroupBox(i18n->TranslateString("Output sampling rate"), pos, size);
-
-	pos.x += 10;
-	pos.y += 10;
-	size.cx = 141;
-	size.cy = 0;
-
-	filtering_combo_resample= new ComboBox(pos, size);
+	filtering_combo_resample= new ComboBox(Point(17, 21), Size(141, 0));
 	filtering_combo_resample->AddEntry(i18n->TranslateString("auto"));
 	filtering_combo_resample->AddEntry(i18n->TranslateString("no resampling"));
 	filtering_combo_resample->AddEntry("8 kHz");
@@ -464,91 +250,37 @@ BoCA::ConfigureLAME::ConfigureLAME()
 		case 48000: filtering_combo_resample->SelectNthEntry(10); break;
 	}
 
-	pos.x = 176;
-	pos.y = 11;
-	size.cx = 221;
-	size.cy = 64;
+	filtering_highpass	= new GroupBox(i18n->TranslateString("Highpass filter"), Point(176, 11), Size(221, 64));
 
-	filtering_highpass	= new GroupBox(i18n->TranslateString("Highpass filter"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 155;
-	size.cy = 0;
-
-	filtering_set_highpass	= new CheckBox(i18n->TranslateString("Set Highpass frequency (Hz):"), pos, size, &set_highpass);
+	filtering_set_highpass	= new CheckBox(i18n->TranslateString("Set Highpass frequency (Hz):"), Point(186, 22), Size(155, 0), &set_highpass);
 	filtering_set_highpass->onAction.Connect(&ConfigureLAME::SetHighpass, this);
 
-	pos.x += 164;
-	pos.y -= 1;
-	size.cx = 37;
-
-	filtering_edit_highpass	= new EditBox(String::FromInt(config->GetIntValue("LAME", "Highpass", 0)), pos, size, 5);
+	filtering_edit_highpass	= new EditBox(String::FromInt(config->GetIntValue("LAME", "Highpass", 0)), Point(350, 21), Size(37, 0), 5);
 	filtering_edit_highpass->SetFlags(EDB_NUMERIC);
 
-	pos.x -= 164;
-	pos.y += 26;
-	size.cx = 155;
-
-	filtering_set_highpass_width= new CheckBox(i18n->TranslateString("Set Highpass width (Hz):"), pos, size, &set_highpass_width);
+	filtering_set_highpass_width= new CheckBox(i18n->TranslateString("Set Highpass width (Hz):"), Point(186, 47), Size(155, 0), &set_highpass_width);
 	filtering_set_highpass_width->onAction.Connect(&ConfigureLAME::SetHighpassWidth, this);
 
-	pos.x += 164;
-	pos.y -= 1;
-	size.cx = 37;
-
-	filtering_edit_highpass_width= new EditBox(String::FromInt(config->GetIntValue("LAME", "HighpassWidth", 0)), pos, size, 5);
+	filtering_edit_highpass_width= new EditBox(String::FromInt(config->GetIntValue("LAME", "HighpassWidth", 0)), Point(350, 46), Size(37, 0), 5);
 	filtering_edit_highpass_width->SetFlags(EDB_NUMERIC);
 
-	pos.x = 176;
-	pos.y = 87;
-	size.cx = 221;
-	size.cy = 64;
+	filtering_lowpass	= new GroupBox(i18n->TranslateString("Lowpass filter"), Point(176, 87), Size(221, 64));
 
-	filtering_lowpass	= new GroupBox(i18n->TranslateString("Lowpass filter"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 155;
-	size.cy = 0;
-
-	filtering_set_lowpass	= new CheckBox(i18n->TranslateString("Set Lowpass frequency (Hz):"), pos, size, &set_lowpass);
+	filtering_set_lowpass	= new CheckBox(i18n->TranslateString("Set Lowpass frequency (Hz):"), Point(186, 98), Size(155, 0), &set_lowpass);
 	filtering_set_lowpass->onAction.Connect(&ConfigureLAME::SetLowpass, this);
 
-	pos.x += 164;
-	pos.y -= 1;
-	size.cx = 37;
-
-	filtering_edit_lowpass	= new EditBox(String::FromInt(config->GetIntValue("LAME", "Lowpass", 0)), pos, size, 5);
+	filtering_edit_lowpass	= new EditBox(String::FromInt(config->GetIntValue("LAME", "Lowpass", 0)), Point(350, 97), Size(37, 0), 5);
 	filtering_edit_lowpass->SetFlags(EDB_NUMERIC);
 
-	pos.x -= 164;
-	pos.y += 26;
-	size.cx = 155;
-
-	filtering_set_lowpass_width= new CheckBox(i18n->TranslateString("Set Lowpass width (Hz):"), pos, size, &set_lowpass_width);
+	filtering_set_lowpass_width= new CheckBox(i18n->TranslateString("Set Lowpass width (Hz):"), Point(186, 123), Size(155, 0), &set_lowpass_width);
 	filtering_set_lowpass_width->onAction.Connect(&ConfigureLAME::SetLowpassWidth, this);
 
-	pos.x += 164;
-	pos.y -= 1;
-	size.cx = 37;
-
-	filtering_edit_lowpass_width= new EditBox(String::FromInt(config->GetIntValue("LAME", "LowpassWidth", 0)), pos, size, 5);
+	filtering_edit_lowpass_width= new EditBox(String::FromInt(config->GetIntValue("LAME", "LowpassWidth", 0)), Point(350, 122), Size(37, 0), 5);
 	filtering_edit_lowpass_width->SetFlags(EDB_NUMERIC);
 
-	pos.x = 7;
-	pos.y = 62;
-	size.cx = 161;
-	size.cy = 39;
+	filtering_misc		= new GroupBox(i18n->TranslateString("Misc settings"), Point(7, 62), Size(161, 39));
 
-	filtering_misc		= new GroupBox(i18n->TranslateString("Misc settings"), pos, size);
-
-	pos.x += 10;
-	pos.y += 11;
-	size.cx = 140;
-	size.cy = 0;
-
-	filtering_check_disable_all= new CheckBox(i18n->TranslateString("Disable all filtering"), pos, size, &disable_filtering);
+	filtering_check_disable_all= new CheckBox(i18n->TranslateString("Disable all filtering"), Point(17, 73), Size(140, 0), &disable_filtering);
 	filtering_check_disable_all->onAction.Connect(&ConfigureLAME::SetDisableFiltering, this);
 
 	SetPreset();

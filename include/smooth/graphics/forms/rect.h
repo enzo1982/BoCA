@@ -19,7 +19,6 @@ namespace smooth
 	};
 };
 
-#include "form.h"
 #include "point.h"
 #include "size.h"
 
@@ -27,7 +26,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Rect : public Form
+		class SMOOTHAPI Rect
 		{
 			constants:
 				static Int	 Outlined;

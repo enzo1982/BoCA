@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,7 +12,7 @@
 #define H_BOCA_PICTURE
 
 #include <smooth.h>
-#include "../../core/definitions.h"
+#include "picturedata.h"
 
 using namespace smooth;
 using namespace smooth::GUI;
@@ -23,10 +23,12 @@ namespace BoCA
 	{
 		public:
 
-			Int			 type;
+			Byte			 type;
+
 			String			 mime;
 			String			 description;
-			Buffer<unsigned char>	 data;
+
+			PictureData		 data;
 
 						 Picture(int = 0);
 						 Picture(const Picture &);
@@ -37,7 +39,7 @@ namespace BoCA
 			Int			 LoadFromFile(const String &);
 			Int			 SaveToFile(const String &) const;
 
-			const Bitmap		&GetBitmap() const;
+			Bitmap			 GetBitmap() const;
 	};
 };
 

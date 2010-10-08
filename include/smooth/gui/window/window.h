@@ -29,20 +29,20 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 WF_MODAL		= 1;
-		const Int	 WF_SYSTEMMODAL		= 2;
-		const Int	 WF_TOPMOST		= 4;
-		const Int	 WF_APPTOPMOST		= 8;
-		const Int	 WF_NORESIZE		= 16;
-		const Int	 WF_NOTASKBUTTON	= 32;
-		const Int	 WF_THINBORDER		= 64;
+		const Short	 WF_MODAL		= 1;
+		const Short	 WF_SYSTEMMODAL		= 2;
+		const Short	 WF_TOPMOST		= 4;
+		const Short	 WF_APPTOPMOST		= 8;
+		const Short	 WF_NORESIZE		= 16;
+		const Short	 WF_NOTASKBUTTON	= 32;
+		const Short	 WF_THINBORDER		= 64;
 
-		const Int	 WO_SEPARATOR		= 1;
-		const Int	 WO_NOSEPARATOR		= 2;
+		const Short	 WO_SEPARATOR		= 1;
+		const Short	 WO_NOSEPARATOR		= 2;
 
-		const Int	 LD_DEFAULT		= 0;
-		const Int	 LD_LEFTTORIGHT		= 1;
-		const Int	 LD_RIGHTTOLEFT		= 2;
+		const Short	 LD_DEFAULT		= 0;
+		const Short	 LD_LEFTTORIGHT		= 1;
+		const Short	 LD_RIGHTTOLEFT		= 2;
 
 		class SMOOTHAPI Window : public Widget
 		{
@@ -77,9 +77,9 @@ namespace smooth
 
 				Void				 CalculateOffsets();
 			public:
-				static const Int		 classID;
+				static const Short		 classID;
 
-				static Int			 nOfActiveWindows;
+				static Short			 nOfActiveWindows;
 
 				Bool				 initshow;
 

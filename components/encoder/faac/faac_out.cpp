@@ -95,9 +95,8 @@ Bool BoCA::FAACOut::Activate()
 
 	if (format.channels > 2)
 	{
-		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
-
-		errorState = True;
+		errorString = "BonkEnc does not support more than 2 channels!";
+		errorState  = True;
 
 		return False;
 	}
@@ -328,14 +327,4 @@ ConfigLayer *BoCA::FAACOut::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureFAAC();
 
 	return configLayer;
-}
-
-Void BoCA::FAACOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
 }

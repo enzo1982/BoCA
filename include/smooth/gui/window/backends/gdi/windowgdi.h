@@ -31,7 +31,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 WINDOW_GDI	= 1;
+		const Short	 WINDOW_GDI	= 1;
 
 		class WindowGDI : public WindowBackend
 		{

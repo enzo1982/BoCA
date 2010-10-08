@@ -30,7 +30,7 @@ namespace smooth
 			protected:
 				const Widget			*selectedTab;
 			public:
-				static const Int		 classID;
+				static const Short		 classID;
 
 								 TabWidget(const Point &, const Size &);
 				virtual				~TabWidget();

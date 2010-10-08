@@ -159,13 +159,3 @@ ConfigLayer *BoCA::MACOut::GetConfigurationLayer()
 
 	return configLayer;
 }
-
-Void BoCA::MACOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
-}

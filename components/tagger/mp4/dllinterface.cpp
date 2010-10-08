@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -42,6 +42,10 @@ DynamicLoader *mp4v2dll	= NIL;
 
 Bool LoadMP4v2DLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\MP4v2.dll")).Exists()) return False;
+#endif
+
 	mp4v2dll = new DynamicLoader("codecs/MP4v2");
 
 	ex_MP4Read			= (MP4READ) mp4v2dll->GetFunctionAddress("MP4Read");

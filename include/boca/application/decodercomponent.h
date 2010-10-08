@@ -36,6 +36,8 @@ namespace BoCA
 				virtual Bool	 Activate();
 				virtual Bool	 Deactivate();
 
+				virtual Bool	 Seek(Int64);
+
 				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int);
 
 				virtual Int	 GetPackageSize();

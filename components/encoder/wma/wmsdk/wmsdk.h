@@ -11,7 +11,6 @@
 
 #ifdef __WIN64__
 #   define _COM_interface struct
-#   define interface _COM_interface
 #endif
 
 #ifndef _MSC_VER

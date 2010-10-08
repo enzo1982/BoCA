@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,35 +27,35 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 FONT_NONE = 0;
+		const Short	 FONT_NONE = 0;
 
 		class FontBackend
 		{
 			private:
-				static FontBackend	*(*backend_creator)(const String &, Int, Int, Int, const Color &);
+				static FontBackend	*(*backend_creator)(const String &, Short, Short, Short, const Color &);
 			protected:
-				Int			 type;
+				Short			 type;
 
+				Short			 fontSize;
 				String			 fontName;
-				Int			 fontSize;
 				Color			 fontColor;
-				Int			 fontWeight;
-				Int			 fontStyle;
+				Short			 fontWeight;
+				Short			 fontStyle;
 			public:
-				static Int		 SetBackend(FontBackend *(*)(const String &, Int, Int, Int, const Color &));
+				static Int		 SetBackend(FontBackend *(*)(const String &, Short, Short, Short, const Color &));
 
-				static FontBackend	*CreateBackendInstance(const String &, Int, Int, Int, const Color &);
+				static FontBackend	*CreateBackendInstance(const String &, Short, Short, Short, const Color &);
 
-							 FontBackend(const String &, Int, Int, Int, const Color &);
+							 FontBackend(const String &, Short, Short, Short, const Color &);
 				virtual			~FontBackend();
 
-				Int			 GetFontType() const;
+				Short			 GetFontType() const;
 
 				Int			 SetName(const String &newFontName)	{ fontName = newFontName; return Success(); }
-				Int			 SetSize(Int newFontSize)		{ fontSize = newFontSize; return Success(); }
+				Int			 SetSize(Short newFontSize)		{ fontSize = newFontSize; return Success(); }
 				Int			 SetColor(const Color &newFontColor)	{ fontColor = newFontColor; return Success(); }
-				Int			 SetWeight(Int newFontWeight)		{ fontWeight = newFontWeight; return Success(); }
-				Int			 SetStyle(Int newFontStyle)		{ fontStyle = newFontStyle; return Success(); }
+				Int			 SetWeight(Short newFontWeight)		{ fontWeight = newFontWeight; return Success(); }
+				Int			 SetStyle(Short newFontStyle)		{ fontStyle = newFontStyle; return Success(); }
 
 				Int			 GetTextSizeX(const String &) const;
 				Int			 GetTextSizeY(const String &) const;

@@ -1,0 +1,411 @@
+ /* BonkEnc Audio Encoder
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the "GNU General Public License".
+  *
+  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#include "videosite.h"
+#include "scriptutilities.h"
+
+BoCA::VideoSite::VideoSite(const String &fileName)
+{
+	ParseXML(fileName);
+
+	CreateScriptContext();
+}
+
+BoCA::VideoSite::~VideoSite()
+{
+	DestroyScriptContext();
+}
+
+Bool BoCA::VideoSite::CanHandleURL(const String &URL)
+{
+	/* Use our own handle scope for this.
+	 */
+	v8::HandleScope		 handleScope;
+
+	/* Enter the created context for calling the function.
+	 */
+	v8::Context::Scope	 scope(context);
+
+	/* Get function handle.
+	 */
+	v8::Handle<v8::String>	 func_name = v8::String::New("canHandleURL");
+	v8::Handle<v8::Value>	 func_val = context->Global()->Get(func_name);
+
+	v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(func_val);
+
+	/* Set up arguments and call the function.
+	 */
+	const int		 argc = 1;
+	v8::Handle<v8::Value>	 argv[argc] = { v8::String::New(URL) };
+
+	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv); 
+
+	return result->BooleanValue();
+}
+
+String BoCA::VideoSite::GetVideoURL(const String &html)
+{
+	/* Use our own handle scope for this.
+	 */
+	v8::HandleScope		 handleScope;
+
+	/* Enter the created context for calling the function.
+	 */
+	v8::Context::Scope	 scope(context);
+
+	/* Get function handle.
+	 */
+	v8::Handle<v8::String>	 func_name = v8::String::New("getVideoURL");
+	v8::Handle<v8::Value>	 func_val = context->Global()->Get(func_name);
+
+	v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(func_val);
+
+	/* Set up arguments and call the function.
+	 */
+	const int		 argc = 1;
+	v8::Handle<v8::Value>	 argv[argc] = { v8::String::New(html.ConvertTo("ISO-8859-1")) };
+
+	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv); 
+
+	return (char *) *v8::String::AsciiValue(result);
+}
+
+Metadata BoCA::VideoSite::QueryMetadata(const String &html)
+{
+	/* Use our own handle scope for this.
+	 */
+	v8::HandleScope		 handleScope;
+
+	/* Enter the created context for calling the function.
+	 */
+	v8::Context::Scope	 scope(context);
+
+	/* Get function handle.
+	 */
+	v8::Handle<v8::String>	 func_name = v8::String::New("queryMetadata");
+	v8::Handle<v8::Value>	 func_val = context->Global()->Get(func_name);
+
+	v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(func_val);
+
+	/* Set up arguments and call the function.
+	 */
+	const int		 argc = 1;
+	v8::Handle<v8::Value>	 argv[argc] = { v8::String::New(html.ConvertTo("ISO-8859-1")) };
+
+	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv); 
+	v8::Handle<v8::Object>	 object = result->ToObject();
+
+	/* Extract data from return value.
+	 */
+	Metadata	 metadata;
+	const char	*previous = String::SetInputFormat("UTF-8");
+
+	metadata.title	     = object->Get(v8::String::New("title"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("title"))))	 : String("unknown title");
+	metadata.description = object->Get(v8::String::New("description"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("description")))) : String();
+
+	metadata.date	     = object->Get(v8::String::New("date"))->IsString()		? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("date"))))	 : String("unknown");
+	metadata.thumbnail   = object->Get(v8::String::New("thumbnail"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("thumbnail"))))	 : String();
+
+	metadata.uploader    = object->Get(v8::String::New("uploader"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("uploader"))))	 : String("unknown");
+
+	String::SetInputFormat(previous);
+
+	return metadata;
+}
+
+Bool BoCA::VideoSite::CreateScriptContext()
+{
+	/* Create a template for the global object.
+	 */
+	v8::Handle<v8::ObjectTemplate>	 global = v8::ObjectTemplate::New();
+
+	/* Bind alert function to Alert callback.
+	 */
+	global->Set(v8::String::New("alert"), v8::FunctionTemplate::New(Alert));
+
+	/* Bind downloadURL function to DownloadURL callback.
+	 */
+	global->Set(v8::String::New("downloadURL"), v8::FunctionTemplate::New(DownloadURL));
+
+	/* Create and bind template for Metadata class.
+	 */
+	v8::Handle<v8::FunctionTemplate>	 metadata = v8::FunctionTemplate::New();
+
+	metadata->PrototypeTemplate()->Set(v8::String::New("title"), v8::FunctionTemplate::New());
+	metadata->PrototypeTemplate()->Set(v8::String::New("description"), v8::FunctionTemplate::New());
+
+	metadata->PrototypeTemplate()->Set(v8::String::New("date"), v8::FunctionTemplate::New());
+	metadata->PrototypeTemplate()->Set(v8::String::New("thumbnail"), v8::FunctionTemplate::New());
+
+	metadata->PrototypeTemplate()->Set(v8::String::New("uploader"), v8::FunctionTemplate::New());
+
+	global->Set(v8::String::New("Metadata"), metadata);
+
+	/* Create a new context.
+	 */
+	context = v8::Context::New(NIL, global);
+
+	/* Enter the created context for compiling and running the script. 
+	 */
+	v8::Context::Scope	 scope(context);
+
+	/* Create a string containing the JavaScript source code.
+	 */
+	v8::Handle<v8::String>	 source = v8::String::New(script);
+	v8::Handle<v8::String>	 file = v8::String::New(name);
+
+	/* Compile and run the source code.
+	 */
+	compiled = v8::Script::Compile(source, file);
+	compiled->Run();
+
+	return True;
+}
+
+Bool BoCA::VideoSite::DestroyScriptContext()
+{
+	/* Dispose the persistent context.
+	 */
+	context.Dispose();
+
+	return True;
+}
+
+Int BoCA::VideoSite::ParseXML(const String &fileName)
+{
+	XML::Document	*document = new XML::Document();
+
+	document->LoadFile(fileName);
+
+	XML::Node	*root = document->GetRootNode();
+
+	for (Int i = 0; i < root->GetNOfNodes(); i++)
+	{
+		XML::Node	*node = root->GetNthNode(i);
+
+		if 	(node->GetName() == "name")    name    = node->GetContent();
+		else if (node->GetName() == "version") version = node->GetContent();
+		else if (node->GetName() == "decoder") decoder = node->GetContent();
+		else if (node->GetName() == "script")  script  = node->GetContent();
+	}
+
+	delete document;
+
+	return Success();
+}
+
+/* Replaces inner HTML in a string.
+ */
+String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
+{
+	String		 result = text;
+
+	/* Set input format to ISO-8859-1.
+	 */
+	const char	*prevInputFormat = String::SetInputFormat("ISO-8859-1");
+
+	/* Remove multiple whitespaces.
+	 */
+	result.Replace("\n", " ");
+	result.Replace("\r", " ");
+	result.Replace("\t", " ");
+
+	while (result.Find("  ") >= 0) result.Replace("  ", " ");
+
+	/* Breaks
+	 */
+	result.Replace("<br/>", "\n");
+	result.Replace("<br />", "\n");
+	result.Replace("<br>", "\n");
+
+	/* Bold
+	 */
+	result.Replace("<b>", "");
+	result.Replace("</b>", "");
+
+	/* Italic
+	 */
+	result.Replace("<i>", "");
+	result.Replace("</i>", "");
+
+	/* Emphasis
+	 */
+	result.Replace("<em>", "");
+	result.Replace("</em>", "");
+
+	/* Ampersand
+	 */
+	result.Replace("&amp;", "&");
+	result.Replace("&amp;", "&");
+
+	/* Brackets
+	 */
+	result.Replace("&lt;", "<");
+	result.Replace("&gt;", ">");
+
+	/* Quotation
+	 */
+	result.Replace("&quot;", "\"");
+
+	result.Replace("&bdquo;", "\"");
+	result.Replace("&ldquo;", "\"");
+	result.Replace("&rdquo;", "\"");
+
+	result.Replace("&laquo;", "«");
+	result.Replace("&raquo;", "»");
+
+	/* Umlaut
+	 */
+	result.Replace("&auml;", "ä");
+	result.Replace("&euml;", "ë");
+	result.Replace("&iuml;", "ï");
+	result.Replace("&ouml;", "ö");
+	result.Replace("&uuml;", "ü");
+	result.Replace("&yuml;", "ÿ");
+
+	result.Replace("&Auml;", "Ä");
+	result.Replace("&Euml;", "Ë");
+	result.Replace("&Iuml;", "Ï");
+	result.Replace("&Ouml;", "Ö");
+	result.Replace("&Uuml;", "Ü");
+
+	/* Grave
+	 */
+	result.Replace("&agrave;", "à");
+	result.Replace("&egrave;", "è");
+	result.Replace("&igrave;", "ì");
+	result.Replace("&ograve;", "ò");
+	result.Replace("&ugrave;", "ù");
+
+	result.Replace("&Agrave;", "À");
+	result.Replace("&Egrave;", "È");
+	result.Replace("&Igrave;", "Ì");
+	result.Replace("&Ograve;", "Ò");
+	result.Replace("&Ugrave;", "Ù");
+
+	/* Acute
+	 */
+	result.Replace("&aacute;", "á");
+	result.Replace("&eacute;", "é");
+	result.Replace("&iacute;", "í");
+	result.Replace("&oacute;", "ó");
+	result.Replace("&uacute;", "ú");
+	result.Replace("&yacute;", "ý");
+
+	result.Replace("&Aacute;", "Á");
+	result.Replace("&Eacute;", "É");
+	result.Replace("&Iacute;", "Í");
+	result.Replace("&Oacute;", "Ó");
+	result.Replace("&Uacute;", "Ú");
+	result.Replace("&Yacute;", "Ý");
+
+	/* Circumflex
+	 */
+	result.Replace("&acirc;", "â");
+	result.Replace("&ecirc;", "ê");
+	result.Replace("&icirc;", "î");
+	result.Replace("&ocirc;", "ô");
+	result.Replace("&ucirc;", "û");
+
+	result.Replace("&Acirc;", "Â");
+	result.Replace("&Ecirc;", "Ê");
+	result.Replace("&Icirc;", "Î");
+	result.Replace("&Ocirc;", "Ô");
+	result.Replace("&Ucirc;", "Û");
+
+	/* Tilde
+	 */
+	result.Replace("&atilde;", "ã");
+	result.Replace("&ntilde;", "ñ");
+	result.Replace("&otilde;", "õ");
+
+	result.Replace("&Atilde;", "Ã");
+	result.Replace("&Ntilde;", "Ñ");
+	result.Replace("&Otilde;", "Õ");
+
+	/* Cedille
+	 */
+	result.Replace("&ccedil;", "ç");
+	result.Replace("&Ccedil;", "Ç");
+
+	/* Slash
+	 */
+	result.Replace("&oslash;", "ø");
+	result.Replace("&Oslash;", "Ø");
+
+	/* Ring
+	 */
+	result.Replace("&aring;", "å");
+	result.Replace("&Aring;", "Å");
+
+	/* Nordic
+	 */
+	result.Replace("&eth;", "ð");
+	result.Replace("&thorn;", "þ");
+
+	result.Replace("&ETH;", "Ð");
+	result.Replace("&THORN;", "Þ");
+
+	/* Ligatures
+	 */
+	result.Replace("&aelig;", "æ");
+	result.Replace("&oelig;", "œ");
+	result.Replace("&szlig;", "ß");
+
+	result.Replace("&AElig;", "Æ");
+	result.Replace("&OElig;", "Œ");
+
+	/* Iberic
+	 */
+	result.Replace("&ordf;", "ª");
+	result.Replace("&ordm;", "º");
+
+	result.Replace("&iexcl;", "¡");
+	result.Replace("&iquest;", "¿");
+
+	result.Replace("&middot;", "·");
+
+	/* Currency
+	 */
+	result.Replace("&euro;", "€");
+	result.Replace("&pound;", "£");
+
+	/* Trade
+	 */
+	result.Replace("&copy;", "©");
+	result.Replace("&reg;", "®");
+
+	/* Scientific
+	 */
+	result.Replace("&deg;", "°");
+	result.Replace("&micro;", "µ");
+
+	/* Unicode
+	 */
+	Int	 offset = -1;
+
+	while ((offset = result.Find("&#")) >= 0)
+	{
+		Int	 value = result.SubString(offset + 2, 5).ToInt();
+		Int	 length = result.SubString(offset + 2, 6).Find(";") + 2;
+
+		result[offset] = value;
+
+		for (Int i = offset + 1; i < result.Length() - length; i++) result[i] = result[i + length];
+
+		result[result.Length() - length] = 0;
+	}
+
+	/* Restore previous input format.
+	 */
+	String::SetInputFormat(prevInputFormat);
+
+	return result;
+}

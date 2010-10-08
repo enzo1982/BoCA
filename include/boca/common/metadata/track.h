@@ -38,27 +38,34 @@ namespace BoCA
 		public:
 			/* Length and file size information:
 			 */
+			Int64		 sampleOffset;
+
 			Int64		 length;
 			Int64		 approxLength;
+
 			Int64		 fileSize;
 
 			/* CD track information:
 			 */
 			Bool		 isCDTrack;
-			Int		 drive;
-			Int		 cdTrack;
+			Byte		 drive;
+			Byte		 cdTrack;
 
 			/* Attached pictures:
 			 */
 			Array<Picture>	 pictures;
+
+			/* Tracks in album:
+			 */
+			Array<Track>	 tracks;
 
 			/* CDDB information:
 			 */
 			Int		 offset;
 			String		 discid;
 			String		 category;
-			Int		 revision;
-			Int		 disclength;
+			Short		 revision;
+			Short		 disclength;
 			String		 discComment;
 			String		 playorder;
 
@@ -70,7 +77,7 @@ namespace BoCA
 					 Track();
 					 Track(int);
 					 Track(const Track &);
-			virtual		~Track();
+					~Track();
 
 			Track &operator	 =(const int);
 			Track &operator	 =(const Track &);

@@ -36,9 +36,9 @@
  * seconds since midnight Jan 1, 1970.
  * NOTE: This is also defined in non-ISO sys/types.h.
  */
-#ifndef _TIME_T_DEFINED
-typedef	long	time_t;
-#define _TIME_T_DEFINED
+#ifndef _TIME32_T_DEFINED
+typedef __int32 __time32_t;
+#define _TIME32_T_DEFINED
 #endif
 
 #ifndef __STRICT_ANSI__
@@ -48,6 +48,22 @@ typedef __int64 __time64_t;
 #define _TIME64_T_DEFINED
 #endif
 #endif
+
+#ifndef _TIME_T_DEFINED
+/* FIXME __STRICT_ANSI__ ! */
+#if __MSVCRT_VERSION__ >= 0x0800
+#ifndef _USE_32BIT_TIME_T
+typedef	__time64_t time_t;
+#else
+typedef	__time32_t time_t;
+#endif /* !_USE_32BIT_TIME_T */
+#else
+typedef	__time32_t time_t;
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
+#define _TIME_T_DEFINED
+#endif
+
+
 /*
  * A type for measuring processor time (in clock ticks).
  */
@@ -81,10 +97,12 @@ struct tm
 extern "C" {
 #endif
 
-_CRTIMP clock_t __cdecl	clock (void);
-_CRTIMP time_t __cdecl	time (time_t*);
-_CRTIMP double __cdecl	difftime (time_t, time_t);
-_CRTIMP time_t __cdecl	mktime (struct tm*);
+_CRTIMP clock_t __cdecl __MINGW_NOTHROW	clock (void);
+#if __MSVCRT_VERSION__ < 0x0800
+_CRTIMP time_t __cdecl __MINGW_NOTHROW	time (time_t*);
+_CRTIMP double __cdecl __MINGW_NOTHROW	difftime (time_t, time_t);
+_CRTIMP time_t __cdecl __MINGW_NOTHROW	mktime (struct tm*);
+#endif
 
 /*
  * These functions write to and return pointers to static buffers that may
@@ -96,32 +114,65 @@ _CRTIMP time_t __cdecl	mktime (struct tm*);
  * Fault and crap out your program. Guess how I know. Hint: stat called on
  * a directory gives 'invalid' times in st_atime etc...
  */
-_CRTIMP char* __cdecl		asctime (const struct tm*);
-_CRTIMP char* __cdecl		ctime (const time_t*);
-_CRTIMP struct tm*  __cdecl	gmtime (const time_t*);
-_CRTIMP struct tm*  __cdecl	localtime (const time_t*);
+_CRTIMP char* __cdecl __MINGW_NOTHROW		asctime (const struct tm*);
+#if __MSVCRT_VERSION__ < 0x0800
+_CRTIMP char* __cdecl __MINGW_NOTHROW		ctime (const time_t*);
+_CRTIMP struct tm*  __cdecl __MINGW_NOTHROW	gmtime (const time_t*);
+_CRTIMP struct tm*  __cdecl __MINGW_NOTHROW	localtime (const time_t*);
+#endif
 
-_CRTIMP size_t __cdecl		strftime (char*, size_t, const char*, const struct tm*);
+_CRTIMP size_t __cdecl __MINGW_NOTHROW		strftime (char*, size_t, const char*, const struct tm*);
 
 #ifndef __STRICT_ANSI__
 
-extern _CRTIMP void __cdecl	_tzset (void);
+extern _CRTIMP void __cdecl __MINGW_NOTHROW	_tzset (void);
 
 #ifndef _NO_OLDNAMES
-extern _CRTIMP void __cdecl	tzset (void);
+extern _CRTIMP void __cdecl __MINGW_NOTHROW	tzset (void);
 #endif
 
-_CRTIMP char* __cdecl	_strdate(char*);
-_CRTIMP char* __cdecl	_strtime(char*);
+_CRTIMP char* __cdecl __MINGW_NOTHROW	_strdate(char*);
+_CRTIMP char* __cdecl __MINGW_NOTHROW	_strtime(char*);
 
 /* These require newer versions of msvcrt.dll (6.10 or higher). */ 
 #if __MSVCRT_VERSION__ >= 0x0601
-_CRTIMP __time64_t __cdecl  _time64( __time64_t*);
-_CRTIMP __time64_t __cdecl  _mktime64 (struct tm*);
-_CRTIMP char* __cdecl _ctime64 (const __time64_t*);
-_CRTIMP struct tm*  __cdecl _gmtime64 (const __time64_t*);
-_CRTIMP struct tm*  __cdecl _localtime64 (const __time64_t*);
+_CRTIMP __time64_t __cdecl __MINGW_NOTHROW  _time64( __time64_t*);
+_CRTIMP __time64_t __cdecl __MINGW_NOTHROW  _mktime64 (struct tm*);
+_CRTIMP char* __cdecl __MINGW_NOTHROW _ctime64 (const __time64_t*);
+_CRTIMP struct tm*  __cdecl __MINGW_NOTHROW _gmtime64 (const __time64_t*);
+_CRTIMP struct tm*  __cdecl __MINGW_NOTHROW _localtime64 (const __time64_t*);
 #endif /* __MSVCRT_VERSION__ >= 0x0601 */
+
+/* These require newer versions of msvcrt.dll (8.00 or higher). */ 
+#if __MSVCRT_VERSION__ >= 0x0800
+_CRTIMP __time32_t __cdecl __MINGW_NOTHROW	_time32 (__time32_t*);
+_CRTIMP double	   __cdecl __MINGW_NOTHROW	_difftime32 (__time32_t, __time32_t);
+_CRTIMP double	   __cdecl __MINGW_NOTHROW	_difftime64 (__time64_t, __time64_t);
+_CRTIMP __time32_t __cdecl __MINGW_NOTHROW	_mktime32 (struct tm*);
+_CRTIMP __time32_t __cdecl __MINGW_NOTHROW	_mkgmtime32 (struct tm*);
+_CRTIMP __time64_t __cdecl __MINGW_NOTHROW	_mkgmtime64 (struct tm*);
+_CRTIMP char*	   __cdecl __MINGW_NOTHROW	_ctime32 (const __time32_t*);
+_CRTIMP struct tm* __cdecl __MINGW_NOTHROW	_gmtime32 (const __time32_t*);
+_CRTIMP struct tm* __cdecl __MINGW_NOTHROW	_localtime32 (const __time32_t*);
+#ifndef _USE_32BIT_TIME_T
+_CRTALIAS time_t	   __cdecl __MINGW_NOTHROW	time (time_t* _v)		  { return(_time64 (_v)); }
+_CRTALIAS double	   __cdecl __MINGW_NOTHROW	difftime (time_t _v1, time_t _v2) { return(_difftime64 (_v1,_v2)); }
+_CRTALIAS time_t	   __cdecl __MINGW_NOTHROW	mktime (struct tm* _v)		  { return(_mktime64 (_v)); }
+_CRTALIAS time_t	   __cdecl __MINGW_NOTHROW	_mkgmtime (struct tm* _v)	  { return(_mkgmtime64 (_v)); }
+_CRTALIAS char*		   __cdecl __MINGW_NOTHROW	ctime (const time_t* _v)	  { return(_ctime64 (_v)); }
+_CRTALIAS struct tm*	   __cdecl __MINGW_NOTHROW	gmtime (const time_t* _v)	  { return(_gmtime64 (_v)); }
+_CRTALIAS struct tm*	   __cdecl __MINGW_NOTHROW	localtime (const time_t* _v)	  { return(_localtime64 (_v)); }
+#else
+_CRTALIAS time_t	   __cdecl __MINGW_NOTHROW	time (time_t* _v)		  { return(_time32 (_v)); }
+_CRTALIAS double	   __cdecl __MINGW_NOTHROW	difftime (time_t _v1, time_t _v2) { return(_difftime32 (_v1,_v2)); }
+_CRTALIAS time_t	   __cdecl __MINGW_NOTHROW	mktime (struct tm* _v)		  { return(_mktime32 (_v)); }
+_CRTALIAS time_t	   __cdecl __MINGW_NOTHROW	_mkgmtime (struct tm* _v)	  { return(_mkgmtime32 (_v)); }
+_CRTALIAS char*		   __cdecl __MINGW_NOTHROW	ctime (const time_t* _v)	  { return(_ctime32 (_v)); }
+_CRTALIAS struct tm*	   __cdecl __MINGW_NOTHROW	gmtime (const time_t* _v)	  { return(_gmtime32 (_v)); }
+_CRTALIAS struct tm*	   __cdecl __MINGW_NOTHROW	localtime (const time_t* _v)	  { return(_localtime32 (_v)); }
+#endif /* !_USE_32BIT_TIME_T */
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
+
 
 /*
  * _daylight: non zero if daylight savings time is used.
@@ -132,9 +183,9 @@ _CRTIMP struct tm*  __cdecl _localtime64 (const __time64_t*);
 #ifdef __MSVCRT__
 
 /* These are for compatibility with pre-VC 5.0 suppied MSVCRT. */
-extern _CRTIMP int* __cdecl	__p__daylight (void);
-extern _CRTIMP long* __cdecl	__p__timezone (void);
-extern _CRTIMP char** __cdecl	__p__tzname (void);
+extern _CRTIMP int* __cdecl __MINGW_NOTHROW	__p__daylight (void);
+extern _CRTIMP long* __cdecl __MINGW_NOTHROW	__p__timezone (void);
+extern _CRTIMP char** __cdecl __MINGW_NOTHROW	__p__tzname (void);
 
 __MINGW_IMPORT int	_daylight;
 __MINGW_IMPORT long	_timezone;
@@ -195,16 +246,26 @@ __MINGW_IMPORT char 	*tzname[2];
 /* wide function prototypes, also declared in wchar.h */
 #ifndef __STRICT_ANSI__
 #ifdef __MSVCRT__
-_CRTIMP wchar_t* __cdecl	_wasctime(const struct tm*);
-_CRTIMP wchar_t* __cdecl	_wctime(const time_t*);
-_CRTIMP wchar_t* __cdecl	_wstrdate(wchar_t*);
-_CRTIMP wchar_t* __cdecl	_wstrtime(wchar_t*);
-#if __MSVCRT_VERSION__ >= 0x0601
-_CRTIMP wchar_t* __cdecl	_wctime64 (const __time64_t*);
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW	_wasctime(const struct tm*);
+#if __MSVCRT_VERSION__ < 0x0800
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW	_wctime(const time_t*);
 #endif
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW	_wstrdate(wchar_t*);
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW	_wstrtime(wchar_t*);
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW	_wctime64 (const __time64_t*);
+#endif
+#if __MSVCRT_VERSION__ >= 0x0800
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW	_wctime32 (const __time32_t*);
+#ifndef _USE_32BIT_TIME_T
+_CRTALIAS wchar_t* __cdecl __MINGW_NOTHROW	_wctime (const time_t* _v) { return(_wctime64 (_v)); }
+#else
+_CRTALIAS wchar_t* __cdecl __MINGW_NOTHROW	_wctime (const time_t* _v) { return(_wctime32 (_v)); }
+#endif
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
 #endif /*  __MSVCRT__ */
 #endif /* __STRICT_ANSI__ */
-_CRTIMP size_t __cdecl		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
+_CRTIMP size_t __cdecl __MINGW_NOTHROW		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
 #define _WTIME_DEFINED
 #endif /* _WTIME_DEFINED */ 
 

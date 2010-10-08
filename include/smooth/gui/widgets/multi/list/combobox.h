@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,8 +28,8 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 CB_NORMAL	= 0;
-		const Int	 CB_HOTSPOTONLY	= 1;
+		const Short	 CB_NORMAL	= 0;
+		const Short	 CB_HOTSPOTONLY	= 1;
 
 		class SMOOTHAPI ComboBox : public List
 		{
@@ -42,7 +42,7 @@ namespace smooth
 				Hotspot			*hotspot;
 				Hotspot			*buttonHotspot;
 			public:
-				static const Int	 classID;
+				static const Short	 classID;
 
 							 ComboBox(const Point &, const Size &);
 				virtual			~ComboBox();

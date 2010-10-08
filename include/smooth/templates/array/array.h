@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,7 +20,7 @@ namespace smooth
 	{
 		public:
 					 Array()						{ }
-			virtual		~Array()						{ }
+					~Array()						{ }
 
 			/* Methods for adding entries to the list.
 			 */
@@ -49,10 +49,13 @@ namespace smooth
 			const t		&GetNext() const					{ return (const t &) ArrayBackend<s>::GetNext(); }
 			const t		&GetPrev() const					{ return (const t &) ArrayBackend<s>::GetPrev(); }
 
-			/* Getter methods for non-const references.
+			/* Getter methods for references.
 			 */
-			t		&GetReference(Int index)				{ return (t &) ArrayBackend<s>::GetReference(index); }
-			t		&GetNthReference(Int n)					{ return (t &) ArrayBackend<s>::GetNthReference(n); }
+			t		&GetReference(Int index)				{ return (t &)	     ArrayBackend<s>::GetReference(index); }
+			const t		&GetReference(Int index) const				{ return (const t &) ArrayBackend<s>::GetReference(index); }
+
+			t		&GetNthReference(Int n)					{ return (t &)	     ArrayBackend<s>::GetNthReference(n); }
+			const t		&GetNthReference(Int n) const				{ return (const t &) ArrayBackend<s>::GetNthReference(n); }
 
 			/* Locking and unlocking for synchronization.
 			 */

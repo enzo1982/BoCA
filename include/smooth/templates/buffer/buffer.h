@@ -19,15 +19,13 @@ namespace smooth
 	template <class t> class Buffer
 	{
 		private:
-			Memory		*memory_manager;
-			t		*memory;
+			Memory		*memory;
 
 			Int		 size;
 			Int		 allocated;
 		public:
 			Buffer()
 			{
-				memory_manager	= NIL;
 				memory		= NIL;
 
 				size		= 0;
@@ -36,8 +34,7 @@ namespace smooth
 
 			Buffer(Int iSize)
 			{
-				memory_manager	= new Memory(iSize * sizeof(t));
-				memory		= (t *) (void *) *memory_manager;
+				memory		= new Memory(iSize * sizeof(t));
 
 				size		= iSize;
 				allocated	= iSize;
@@ -48,7 +45,7 @@ namespace smooth
 				*this = oBuffer;
 			}
 
-			virtual ~Buffer()
+			~Buffer()
 			{
 				Free();
 			}
@@ -57,7 +54,6 @@ namespace smooth
 			{
 				if (&oBuffer == this) return *this;
 
-				memory_manager	= oBuffer.memory_manager;
 				memory		= oBuffer.memory;
 
 				size		= oBuffer.size;
@@ -81,10 +77,8 @@ namespace smooth
 				 */
 				if (nSize > allocated)
 				{
-					if (memory != NIL) memory_manager->Resize(nSize * sizeof(t));
-					else		   memory_manager = new Memory(nSize * sizeof(t));
-
-					memory		= (t *) (void *) *memory_manager;
+					if (memory != NIL) memory->Resize(nSize * sizeof(t));
+					else		   memory = new Memory(nSize * sizeof(t));
 
 					size		= nSize;
 					allocated	= nSize;
@@ -101,7 +95,7 @@ namespace smooth
 			{
 				if (memory == NIL) return True;
 
-				memset(memory, 0, size * sizeof(t));
+				memset((void *) *memory, 0, size * sizeof(t));
 
 				return True;
 			}
@@ -116,9 +110,8 @@ namespace smooth
 				 */
 				if (memory == NIL) return True;
 
-				delete memory_manager;
+				delete memory;
 
-				memory_manager	= NIL;
 				memory		= NIL;
 
 				size		= 0;
@@ -127,13 +120,13 @@ namespace smooth
 				return True;
 			}
 
-			inline t &operator	 [](const int n)	{ return memory[n]; }
+			inline t &operator	 [](const int n)	{ return ((t *) (void *) *memory)[n]; }
 			inline t &operator	 [](const Int n)	{ return (*this)[(int) n]; }
 
-			inline t operator	 [](const int n) const	{ return memory[n]; }
+			inline t operator	 [](const int n) const	{ return ((t *) (void *) *memory)[n]; }
 			inline t operator	 [](const Int n) const	{ return (*this)[(int) n]; }
 
-			inline operator		 t *() const		{ return memory; }
+			inline operator		 t *() const		{ return (t *) (memory == NIL ? NIL : (void *) *memory); }
 	};
 };
 

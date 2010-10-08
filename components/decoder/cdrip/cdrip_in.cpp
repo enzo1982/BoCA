@@ -421,16 +421,6 @@ ConfigLayer *BoCA::CDRipIn::GetConfigurationLayer()
 	return configLayer;
 }
 
-Void BoCA::CDRipIn::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
-}
-
 static int cddb_sum(int n)
 {
 	int	 ret = 0;

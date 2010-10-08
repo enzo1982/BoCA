@@ -78,9 +78,8 @@ Bool BoCA::FLACOut::Activate()
 
 	if (format.channels > 2)
 	{
-		Utilities::ErrorMessage("BonkEnc does not support more than 2 channels!");
-
-		errorState = True;
+		errorString = "BonkEnc does not support more than 2 channels!";
+		errorState  = True;
 
 		return False;
 	}
@@ -150,7 +149,7 @@ Bool BoCA::FLACOut::Activate()
 			if (picInfo.description != NIL) ex_FLAC__metadata_object_picture_set_description(picture, (FLAC__byte *) picInfo.description.ConvertTo("UTF-8"), true);
 
 			ex_FLAC__metadata_object_picture_set_mime_type(picture, picInfo.mime, true);
-			ex_FLAC__metadata_object_picture_set_data(picture, picInfo.data, picInfo.data.Size(), true);
+			ex_FLAC__metadata_object_picture_set_data(picture, const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data), picInfo.data.Size(), true);
 
 			picture->data.picture.type = (FLAC__StreamMetadata_Picture_Type) picInfo.type;
 		}
@@ -204,7 +203,8 @@ Bool BoCA::FLACOut::Activate()
 
 	if (ex_FLAC__stream_encoder_init_stream(encoder, &FLACStreamEncoderWriteCallback, &FLACStreamEncoderSeekCallback, &FLACStreamEncoderTellCallback, NIL, this) != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 	{
-		Utilities::ErrorMessage("Could not initialize %1 encoder! Please check the configuration!", "FLAC");
+		errorString = "Could not initialize FLAC encoder! Please check the configuration!";
+		errorState  = True;
 
 		ex_FLAC__stream_encoder_delete(encoder);
 
@@ -250,16 +250,6 @@ ConfigLayer *BoCA::FLACOut::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureFLAC();
 
 	return configLayer;
-}
-
-Void BoCA::FLACOut::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
 }
 
 FLAC__StreamEncoderWriteStatus BoCA::FLACStreamEncoderWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)

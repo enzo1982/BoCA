@@ -50,7 +50,6 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
 			ConfigLayer		*GetConfigurationLayer();
-			Void			 FreeConfigurationLayer();
 	};
 };
 

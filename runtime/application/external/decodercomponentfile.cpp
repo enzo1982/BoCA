@@ -253,6 +253,11 @@ Bool BoCA::AS::DecoderComponentExternalFile::Deactivate()
 	return True;
 }
 
+Bool BoCA::AS::DecoderComponentExternalFile::Seek(Int64 samplePosition)
+{
+	return False;
+}
+
 Int BoCA::AS::DecoderComponentExternalFile::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (in->GetPos() == in->Size()) return -1;

@@ -25,6 +25,8 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::Vorbis");
+
 	group_mode		= new GroupBox(i18n->TranslateString("Encoding Mode"), Point(7, 11), Size(344, 40));
 
 	option_mode_vbr		= new OptionBox(String("VBR (").Append(i18n->TranslateString("Variable Bitrate")).Append(")"), Point(10, 13), Size(158, 0), &mode, 0);
@@ -51,7 +53,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 63), Size(344, 96));
 
-	check_abrmin		= new CheckBox(String(i18n->TranslateString("Minimum bitrate")).Append(":"), Point(10, 14), Size(), &setABRMin);
+	check_abrmin		= new CheckBox(i18n->TranslateString("Minimum bitrate:"), Point(10, 14), Size(), &setABRMin);
 	check_abrmin->onAction.Connect(&ConfigureVorbis::ToggleABRMin, this);
 
 	slider_abrmin		= new Slider(Point(38, 14), Size(228, 0), OR_HORZ, &abrMin, 32, 320);
@@ -63,7 +65,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	text_abrmin_kbps	= new Text("kbps", Point(311, 16));
 
-	check_abrnom		= new CheckBox(String(i18n->TranslateString("Average bitrate")).Append(":"), Point(10, 41), Size(), &setABRNom);
+	check_abrnom		= new CheckBox(i18n->TranslateString("Average bitrate:"), Point(10, 41), Size(), &setABRNom);
 	check_abrnom->onAction.Connect(&ConfigureVorbis::ToggleABRNom, this);
 
 	slider_abrnom		= new Slider(Point(38, 41), Size(228, 0), OR_HORZ, &abrNom, 32, 320);
@@ -75,7 +77,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	text_abrnom_kbps	= new Text("kbps", Point(311, 43));
 
-	check_abrmax		= new CheckBox(String(i18n->TranslateString("Maximum bitrate")).Append(":"), Point(10, 68), Size(), &setABRMax);
+	check_abrmax		= new CheckBox(i18n->TranslateString("Maximum bitrate:"), Point(10, 68), Size(), &setABRMax);
 	check_abrmax->onAction.Connect(&ConfigureVorbis::ToggleABRMax, this);
 
 	slider_abrmax		= new Slider(Point(38, 68), Size(228, 0), OR_HORZ, &abrMax, 32, 320);

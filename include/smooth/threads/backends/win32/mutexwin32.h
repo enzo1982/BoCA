@@ -27,7 +27,7 @@ namespace smooth
 {
 	namespace Threads
 	{
-		const Int	 MUTEX_WIN32	= 2;
+		const Short	 MUTEX_WIN32	= 2;
 
 		class MutexWin32 : public MutexBackend
 		{

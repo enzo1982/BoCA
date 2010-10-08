@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,14 +32,14 @@ namespace smooth
 		{
 			/* File dialog mode constants - SFM_OPEN is default
 			 */
-			const Int	 SFM_OPEN	= 0;
-			const Int	 SFM_SAVE	= 1;
+			const Short	 SFM_OPEN	= 0;
+			const Short	 SFM_SAVE	= 1;
 
 			/* File dialog flags - SFD_FILEMUSTEXIST is always set for SFM_OPEN mode
 			 */
-			const Int	 SFD_ALLOWMULTISELECT	= 512;
-			const Int	 SFD_FILEMUSTEXIST	= 4096;
-			const Int	 SFD_CONFIRMOVERWRITE	= 2;
+			const Short	 SFD_ALLOWMULTISELECT	= 512;
+			const Short	 SFD_FILEMUSTEXIST	= 4096;
+			const Short	 SFD_CONFIRMOVERWRITE	= 2;
 
 			abstract class SMOOTHAPI FileSelectionBase : public Dialog
 			{
@@ -48,8 +48,8 @@ namespace smooth
 					Array<String>		 filters;
 					Array<String>		 files;
 
-					Int			 flags;
-					Int			 mode;
+					Short			 flags;
+					Short			 mode;
 
 					String			 defExt;
 					String			 defFile;
@@ -59,8 +59,8 @@ namespace smooth
 
 					virtual const Error	&ShowDialog() = 0;
 				accessors:
-					Int			 SetMode(Int);
-					Int			 SetFlags(Int);
+					Int			 SetMode(Short);
+					Int			 SetFlags(Short);
 					Int			 SetDefaultExtension(const String &);
 
 					Int			 AddFilter(const String &, const String &);

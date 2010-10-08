@@ -12,6 +12,7 @@
 #define H_BOCA_REGISTRY
 
 #include "component.h"
+#include "decodercomponent.h"
 
 namespace BoCA
 {
@@ -44,6 +45,8 @@ namespace BoCA
 
 				Component			*CreateComponentByID(const String &);
 				Bool				 DeleteComponent(Component *);
+
+				DecoderComponent		*CreateDecoderForStream(const String &);
 		};
 	};
 };

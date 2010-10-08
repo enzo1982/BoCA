@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ..
 
 # Enter object files here:
-OBJECTS	  = application/external/configlayer.o application/external/decodercomponent.o application/external/encodercomponent.o application/component.o application/componentspecs.o application/decodercomponent.o application/deviceinfocomponent.o application/dspcomponent.o application/encodercomponent.o application/extensioncomponent.o application/outputcomponent.o application/registry.o application/taggercomponent.o common/communication/joblist.o common/communication/menu.o common/communication/settings.o common/metadata/device.o common/metadata/format.o common/metadata/info.o common/metadata/mcdi.o common/metadata/picture.o common/metadata/track.o common/config.o common/configlayer.o common/i18n.o common/protocol.o common/utilities.o component/component.o component/decodercomponent.o component/deviceinfocomponent.o component/dspcomponent.o component/encodercomponent.o component/extensioncomponent.o component/outputcomponent.o component/taggercomponent.o core/main.o
+OBJECTS	  = application/external/configlayer.o application/external/decodercomponent.o application/external/encodercomponent.o application/component.o application/componentspecs.o application/decodercomponent.o application/deviceinfocomponent.o application/dspcomponent.o application/encodercomponent.o application/extensioncomponent.o application/outputcomponent.o application/registry.o application/taggercomponent.o common/communication/application.o common/communication/joblist.o common/communication/menu.o common/communication/settings.o common/metadata/device.o common/metadata/format.o common/metadata/info.o common/metadata/mcdi.o common/metadata/picture.o common/metadata/picturedata.o common/metadata/track.o common/config.o common/configlayer.o common/i18n.o common/protocol.o common/utilities.o component/component.o component/decodercomponent.o component/deviceinfocomponent.o component/dspcomponent.o component/encodercomponent.o component/extensioncomponent.o component/outputcomponent.o component/taggercomponent.o core/main.o
 
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += application/external/decodercomponentfile.o application/external/decodercomponentstdio.o application/external/encodercomponentfile.o application/external/encodercomponentstdio.o
@@ -39,11 +39,8 @@ else
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	LDOPTS += -lole32
+	LDOPTS += -lole32 -Xlinker --dynamicbase -Xlinker --nxcompat -Xlinker --enable-auto-import
 
-ifneq ($(BUILD_X64),True)
-	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat
-endif
 	DLLEXT = .dll
 else
 	DLLEXT = .so

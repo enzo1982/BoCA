@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -41,6 +41,10 @@ DynamicLoader *id3dll	= NIL;
 
 Bool LoadID3DLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("ID3Lib.dll")).Exists()) return False;
+#endif
+
 	id3dll = new DynamicLoader("ID3Lib");
 
 	ex_ID3Tag_New			= (ID3TAGNEW) id3dll->GetFunctionAddress("ID3Tag_New");

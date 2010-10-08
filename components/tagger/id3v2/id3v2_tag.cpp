@@ -404,9 +404,11 @@ Error BoCA::ID3v2Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 
 			if (field != NIL)
 			{
-				picture.data.Resize(ex_ID3Field_Size(field));
+				Buffer<UnsignedByte>	 buffer(ex_ID3Field_Size(field));
 
-				ex_ID3Field_GetBINARY(field, picture.data, picture.data.Size());
+				ex_ID3Field_GetBINARY(field, buffer, buffer.Size());
+
+				picture.data = buffer;
 
 				if (picture.data.Size() > 16 && picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
 			}

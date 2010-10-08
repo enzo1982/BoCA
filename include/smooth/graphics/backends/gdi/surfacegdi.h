@@ -25,12 +25,12 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 SURFACE_GDI	= 1;
+		const Short	 SURFACE_GDI	= 1;
 
 		class SurfaceGDI : public SurfaceBackend
 		{
 			private:
-				static Int		 surfaceDPI;
+				static Short		 surfaceDPI;
 			protected:
 				HWND			 window;
 
@@ -53,7 +53,7 @@ namespace smooth
 
 				Void			*GetSystemSurface() const;
 
-				Int			 GetSurfaceDPI() const;
+				Short			 GetSurfaceDPI() const;
 
 				Int			 SetPixel(const Point &, const Color &);
 

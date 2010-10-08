@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,6 +21,10 @@ DynamicLoader *macdll	= NIL;
 
 Bool LoadMACDLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\MACDll.dll")).Exists()) return False;
+#endif
+
 	macdll = new DynamicLoader("codecs/MACDll");
 
 	ex_APECompress_Create	= (APECOMPRESS_CREATE) macdll->GetFunctionAddress("c_APECompress_Create");

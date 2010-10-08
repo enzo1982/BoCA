@@ -34,6 +34,8 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Decoders::CDRip");
+
 	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 68));
 
 	combo_drive	= new ComboBox(Point(10, 12), Size(324, 0));

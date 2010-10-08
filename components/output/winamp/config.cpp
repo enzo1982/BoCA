@@ -16,6 +16,8 @@ BoCA::ConfigureWinampOut::ConfigureWinampOut()
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Extensions::Winamp Adapter");
+
 	list_output		= new ListBox(Point(7, 7), Size(425, 170));
 	list_output->SetFlags(LF_MULTICHECKBOX);
 	list_output->onSelectEntry.Connect(&ConfigureWinampOut::SelectOutputPlugin, this);

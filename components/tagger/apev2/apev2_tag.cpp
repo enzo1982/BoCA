@@ -120,6 +120,13 @@ Error BoCA::APETag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &trac
 		}
 	}
 
+	/* Save CD table of contents.
+	 */
+	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
+	{
+		if (info.mcdi.GetData().Size() > 0) { RenderAPEBinaryItem("MCDI", info.mcdi.GetData(), buffer); numItems++; }
+	}
+
 	/* Save cover art.
 	 */
 	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToAPEv2", True))
@@ -288,6 +295,10 @@ Error BoCA::APETag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track
 			else if (id == "REPLAYGAIN_ALBUM_GAIN") info.album_gain = value;
 			else if (id == "REPLAYGAIN_ALBUM_PEAK") info.album_peak = value;
 		}
+		else if (id == "MCDI")
+		{
+			info.mcdi.SetData(item);
+		}
 		else if (id.StartsWith("COVER ART") && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
 		{
 			Picture	 picture;
@@ -299,9 +310,7 @@ Error BoCA::APETag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track
 			{
 				if (item[i] == 0)
 				{
-					picture.data.Resize(item.Size() - i - 1);
-
-					memcpy(picture.data, item + i + 1, picture.data.Size());
+					picture.data.Set(item + i + 1, item.Size() - i - 1);
 
 					break;
 				}

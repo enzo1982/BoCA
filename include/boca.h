@@ -51,6 +51,7 @@ using namespace smooth;
 #include "boca/common/metadata/mcdi.h"
 #include "boca/common/metadata/track.h"
 
+#include "boca/common/communication/application.h"
 #include "boca/common/communication/joblist.h"
 #include "boca/common/communication/menu.h"
 #include "boca/common/communication/settings.h"
@@ -69,6 +70,9 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_Seek(void *component, __int64 samplePosition)					{ return ((BoCA::componentName *) component)->Seek(samplePosition); }									\
+																																		\
 		BOCA_EXPORT int BoCA_##componentName##_ReadData(void *component, void *buffer, int size)				{ return ((BoCA::componentName *) component)->ReadData(*((Buffer<UnsignedByte> *) buffer), size); }					\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
@@ -83,6 +87,7 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
+																																		\
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer, int size)				{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer), size); }					\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
@@ -108,7 +113,9 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
+																																		\
 		BOCA_EXPORT int BoCA_##componentName##_TransformData(void *component, void *buffer, int size)				{ return ((BoCA::componentName *) component)->TransformData(*((Buffer<UnsignedByte> *) buffer), size); }				\
+																																		\
 		BOCA_EXPORT int BoCA_##componentName##_Flush(void *component, void *buffer)						{ return ((BoCA::componentName *) component)->Flush(*((Buffer<UnsignedByte> *) buffer)); }						\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
@@ -126,6 +133,7 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
+																																		\
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer, int size)				{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer), size); }					\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
@@ -155,7 +163,6 @@ using namespace smooth;
 		BOCA_EXPORT void *BoCA_##componentName##_Create()									{ return new BoCA::componentName(); }													\
 		BOCA_EXPORT bool BoCA_##componentName##_Delete(void *component)								{ delete ((BoCA::componentName *) component); return True; }										\
 		BOCA_EXPORT void *BoCA_##componentName##_GetConfigurationLayer(void *component)						{ return ((BoCA::componentName *) component)->GetConfigurationLayer(); }								\
-		BOCA_EXPORT void BoCA_##componentName##_FreeConfigurationLayer(void *component)						{ return ((BoCA::componentName *) component)->FreeConfigurationLayer(); }								\
 		BOCA_EXPORT bool BoCA_##componentName##_GetErrorState(void *component)							{ return ((BoCA::componentName *) component)->GetErrorState(); }									\
 		BOCA_EXPORT const void *BoCA_##componentName##_GetErrorString(void *component)						{ return &((BoCA::componentName *) component)->GetErrorString(); }									\
 	}

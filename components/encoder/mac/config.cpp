@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,19 +12,21 @@
 
 BoCA::ConfigureMAC::ConfigureMAC()
 {
-	Config	*config = Config::Get();
-	I18n	*i18n = I18n::Get();
+	Config	*config	= Config::Get();
+	I18n	*i18n	= I18n::Get();
 
-	group_compression	= new GroupBox(i18n->TranslateString("Compression"), Point(7, 11), Size(203, 39));
+	i18n->SetContext("Encoders::Monkey's Audio");
+
+	group_compression	= new GroupBox(i18n->TranslateString("Compression"), Point(7, 11), Size(216, 39));
 
 	text_compression	= new Text(i18n->TranslateString("Compression mode:"), Point(9, 13));
 
-	combo_compression	= new ComboBox(Point(text_compression->textSize.cx + 17, 10), Size(176 - text_compression->textSize.cx, 0));
-	combo_compression->AddEntry("Fast");
-	combo_compression->AddEntry("Normal");
-	combo_compression->AddEntry("High");
-	combo_compression->AddEntry("Extra high");
-	combo_compression->AddEntry("Insane");
+	combo_compression	= new ComboBox(Point(text_compression->textSize.cx + 17, 10), Size(189 - text_compression->textSize.cx, 0));
+	combo_compression->AddEntry(i18n->TranslateString("Fast"));
+	combo_compression->AddEntry(i18n->TranslateString("Normal"));
+	combo_compression->AddEntry(i18n->TranslateString("High"));
+	combo_compression->AddEntry(i18n->TranslateString("Extra high"));
+	combo_compression->AddEntry(i18n->TranslateString("Insane"));
 	combo_compression->SelectNthEntry(config->GetIntValue("MAC", "CompressionMode", 2));
 
 	group_compression->Add(text_compression);
@@ -32,7 +34,7 @@ BoCA::ConfigureMAC::ConfigureMAC()
 
 	Add(group_compression);
 
-	SetSize(Size(217, 57));
+	SetSize(Size(230, 57));
 }
 
 BoCA::ConfigureMAC::~ConfigureMAC()

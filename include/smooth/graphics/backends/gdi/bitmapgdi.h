@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,7 +25,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 BITMAP_GDI = 1;
+		const Short	 BITMAP_GDI = 1;
 
 		class BitmapGDI : public BitmapBackend
 		{
@@ -41,6 +41,8 @@ namespace smooth
 
 				Bool			 CreateBitmap(Int, Int, Int);
 				Bool			 DeleteBitmap();
+
+				Int			 Scale(const Size &);
 
 				Bool			 SetSystemBitmap(Void *);
 				Void			*GetSystemBitmap() const;

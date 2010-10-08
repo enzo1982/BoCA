@@ -55,12 +55,23 @@ Bool LoadLAMEDLL()
 {
 	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
 	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\LAME-OpenMP.dll")).Exists()) return False;
+#endif
+
 		lamedll = new DynamicLoader("codecs/LAME-OpenMP");
 
 		if (lamedll->GetSystemModuleHandle() == NIL) FreeLAMEDLL();
 	}
 
-	if (lamedll == NIL) lamedll = new DynamicLoader("codecs/LAME");
+	if (lamedll == NIL)
+	{
+#ifdef __WIN32__
+		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\LAME.dll")).Exists()) return False;
+#endif
+
+		lamedll = new DynamicLoader("codecs/LAME");
+	}
 
 	ex_lame_init				= (LAME_INIT) lamedll->GetFunctionAddress("lame_init");
 	ex_lame_set_preset			= (LAME_SET_PRESET) lamedll->GetFunctionAddress("lame_set_preset");

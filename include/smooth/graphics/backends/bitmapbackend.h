@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,7 +28,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 BITMAP_NONE = 0;
+		const Short	 BITMAP_NONE = 0;
 
 		class BitmapBackend
 		{
@@ -38,13 +38,13 @@ namespace smooth
 				static BitmapBackend		*(*backend_creator_cI)(const int);
 				static BitmapBackend		*(*backend_creator_crS)(const BitmapBackend &);
 			protected:
-				Int				 type;
+				Short				 type;
+
+				Byte				 align;
+				Byte				 depth;
 
 				Size				 size;
-				Int				 depth;
-
 				Void				*bytes;
-				Int				 align;
 			public:
 				static Int			 SetBackend(BitmapBackend *(*)(Void *));
 				static Int			 SetBackend(BitmapBackend *(*)(Int, Int, Int));
@@ -63,13 +63,13 @@ namespace smooth
 
 				virtual				~BitmapBackend();
 
-				Int				 GetBitmapType() const;
+				Short				 GetBitmapType() const;
 
 				const Size			&GetSize() const;
-				Int				 GetDepth() const;
+				Byte				 GetDepth() const;
 
 				UnsignedByte			*GetBytes() const;
-				Int				 GetLineAlignment() const;
+				Byte				 GetLineAlignment() const;
 
 				virtual Bool			 CreateBitmap(Int, Int, Int);
 				virtual Bool			 DeleteBitmap();
@@ -80,6 +80,8 @@ namespace smooth
 				virtual Int			 GrayscaleBitmap();
 				virtual Int			 InvertColors();
 				virtual Int			 ReplaceColor(const Color &, const Color &);
+
+				virtual Int			 Scale(const Size &);
 
 				virtual Bool			 SetPixel(const Point &, const Color &);
 				virtual Color			 GetPixel(const Point &) const;

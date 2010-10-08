@@ -81,6 +81,7 @@ typedef wchar_t _TCHAR;
 #define	_vftprintf	vfwprintf
 #define _vstprintf	vswprintf
 #define	_vsntprintf	_vsnwprintf
+#define	_vsctprintf	_vscwprintf
 #define	_tscanf		wscanf
 #define	_ftscanf	fwscanf
 #define	_stscanf	swscanf
@@ -169,9 +170,17 @@ typedef wchar_t _TCHAR;
 #define _ui64tot    _ui64tow
 #define	_tasctime	_wasctime
 #define	_tctime		_wctime
+#if __MSVCRT_VERSION__ >= 0x0800
+#define	_tctime32	_wctime32
+#define	_tctime64	_wctime64
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
 #define	_tstrdate	_wstrdate
 #define	_tstrtime	_wstrtime
 #define	_tutime		_wutime
+#if __MSVCRT_VERSION__ >= 0x0800
+#define	_tutime64	_wutime64
+#define	_tutime32	_wutime32
+#endif /* __MSVCRT_VERSION__ > 0x0800 */
 #define _tcsnccoll  _wcsncoll
 #define _tcsncoll   _wcsncoll
 #define _tcsncicoll _wcsnicoll
@@ -181,6 +190,12 @@ typedef wchar_t _TCHAR;
 #define _tcreat     _wcreat
 #define _tfindfirst _wfindfirst
 #define _tfindnext  _wfindnext
+#if __MSVCRT_VERSION__ >= 0x0800
+#define _tfindfirst64 _wfindfirst64
+#define _tfindfirst32 _wfindfirst32
+#define _tfindnext64  _wfindnext64
+#define _tfindnext32  _wfindnext32
+#endif /* __MSVCRT_VERSION__ > 0x0800 */
 #define _tfdopen    _wfdopen
 #define _tfopen     _wfopen
 #define _tfreopen   _wfreopen
@@ -188,6 +203,7 @@ typedef wchar_t _TCHAR;
 #define _tgetenv    _wgetenv
 #define _tputenv    _wputenv
 #define _tsearchenv _wsearchenv
+#define  _tsystem    _wsystem
 #define _tmakepath  _wmakepath
 #define _tsplitpath _wsplitpath
 #define _tfullpath  _wfullpath
@@ -202,6 +218,18 @@ typedef wchar_t _TCHAR;
 #define _tfindfirsti64  _wfindfirsti64
 #define _tfindnexti64   _wfindnexti64
 #define _tfinddatai64_t _wfinddatai64_t
+#if __MSVCRT_VERSION__ >= 0x0601
+#define _tfinddata64_t    _wfinddata64_t
+#endif
+#if __MSVCRT_VERSION__ >= 0x0800
+#define _tfinddata32_t    _wfinddata32_t
+#define _tfinddata32i64_t _wfinddata32i64_t
+#define _tfinddata64i32_t _wfinddata64i32_t
+#define _tfindfirst32i64  _wfindfirst32i64
+#define _tfindfirst64i32  _wfindfirst64i32
+#define _tfindnext32i64   _wfindnext32i64
+#define _tfindnext64i32   _wfindnext64i32
+#endif /* __MSVCRT_VERSION__ > 0x0800 */
 #define _tchdir		_wchdir
 #define _tgetcwd	_wgetcwd
 #define _tgetdcwd	_wgetdcwd
@@ -210,6 +238,11 @@ typedef wchar_t _TCHAR;
 #define _tstat		_wstat
 #define _tstati64	_wstati64
 #define _tstat64	_wstat64
+#if __MSVCRT_VERSION__ >= 0x0800
+#define _tstat32	_wstat32
+#define _tstat32i64	_wstat32i64
+#define _tstat64i32	_wstat64i32
+#endif /* __MSVCRT_VERSION__ > 0x0800 */
 #endif  /* __MSVCRT__ */
 
 /* dirent structures and functions */
@@ -266,6 +299,7 @@ typedef char	_TCHAR;
 #define	_vftprintf	vfprintf
 #define _vstprintf	vsprintf
 #define	_vsntprintf	_vsnprintf
+#define	_vsctprintf	_vscprintf
 #define	_tscanf		scanf
 #define	_ftscanf	fscanf
 #define	_stscanf	sscanf
@@ -282,6 +316,7 @@ typedef char	_TCHAR;
 #define	_tgetenv	getenv
 #define	_tputenv	_putenv
 #define	_tsearchenv	_searchenv
+#define  _tsystem       system
 #define	_tmakepath	_makepath
 #define	_tsplitpath	_splitpath
 #define	_tfullpath	_fullpath
@@ -340,9 +375,17 @@ typedef char	_TCHAR;
 #define	_totlower	tolower
 #define	_tasctime	asctime
 #define	_tctime		ctime
+#if __MSVCRT_VERSION__ >= 0x0800
+#define	_tctime32	_ctime32
+#define	_tctime64	_ctime64
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
 #define	_tstrdate	_strdate
 #define	_tstrtime	_strtime
 #define	_tutime		_utime
+#if __MSVCRT_VERSION__ >= 0x0800
+#define	_tutime64	_utime64
+#define	_tutime32	_utime32
+#endif /* __MSVCRT_VERSION__ > 0x0800 */
 #define _tcsftime	strftime
 /* Macro functions */ 
 #define _tcsdec     _strdec
@@ -363,6 +406,12 @@ typedef char	_TCHAR;
 #define _tcreat     _creat
 #define _tfindfirst _findfirst
 #define _tfindnext  _findnext
+#if __MSVCRT_VERSION__ >= 0x0800
+#define _tfindfirst64 _findfirst64
+#define _tfindfirst32 _findfirst32
+#define _tfindnext64  _findnext64
+#define _tfindnext32  _findnext32
+#endif /* __MSVCRT_VERSION__ > 0x0800 */
 #define _tmktemp    _mktemp
 #define _topen      _open
 #define _taccess    _access
@@ -391,8 +440,25 @@ typedef char	_TCHAR;
 #define _tfindfirsti64  _findfirsti64
 #define _tfindnexti64   _findnexti64
 #define _tfinddatai64_t _finddatai64_t
+#if __MSVCRT_VERSION__ >= 0x0601
+#define _tfinddata64_t    _finddata64_t
+#endif
+#if __MSVCRT_VERSION__ >= 0x0800
+#define _tfinddata32_t    _finddata32_t
+#define _tfinddata32i64_t _finddata32i64_t
+#define _tfinddata64i32_t _finddata64i32_t
+#define _tfindfirst32i64  _findfirst32i64
+#define _tfindfirst64i32  _findfirst64i32
+#define _tfindnext32i64   _findnext32i64
+#define _tfindnext64i32   _findnext64i32
+#endif /* __MSVCRT_VERSION__ > 0x0800 */
 #define _tstati64   _stati64
 #define _tstat64    _stat64
+#if __MSVCRT_VERSION__ >= 0x0800
+#define _tstat32	_stat32
+#define _tstat32i64	_stat32i64
+#define _tstat64i32	_stat64i32
+#endif /* __MSVCRT_VERSION__ > 0x0800 */
 #endif  /* __MSVCRT__ */
 
 /* dirent structures and functions */

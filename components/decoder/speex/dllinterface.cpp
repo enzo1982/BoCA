@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -38,6 +38,10 @@ DynamicLoader *speexdll	= NIL;
 
 Bool LoadOggDLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Ogg.dll")).Exists()) return False;
+#endif
+
 	oggdll = new DynamicLoader("codecs/Ogg");
 
 	ex_ogg_stream_init		= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
@@ -76,6 +80,10 @@ Void FreeOggDLL()
 
 Bool LoadSpeexDLL()
 {
+#ifdef __WIN32__
+	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Speex.dll")).Exists()) return False;
+#endif
+
 	speexdll = new DynamicLoader("codecs/Speex");
 
 	ex_speex_bits_init		= (SPEEXBITSINIT) speexdll->GetFunctionAddress("speex_bits_init");

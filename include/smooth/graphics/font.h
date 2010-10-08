@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,48 +32,48 @@ namespace smooth
 			private:
 				FontBackend	*backend;
 			protected:
+				Short		 fontSize;
 				String		 fontName;
-				Int		 fontSize;
 				Color		 fontColor;
-				Int		 fontWeight;
-				Int		 fontStyle;
+				Short		 fontWeight;
+				Short		 fontStyle;
 			constants:
 				static String	 Default;
-				static Int	 DefaultSize;
+				static Short	 DefaultSize;
 
-				static Int	 Thin;
-				static Int	 ExtraLight;
-				static Int	 Light;
-				static Int	 Normal;
-				static Int	 Medium;
-				static Int	 SemiBold;
-				static Int	 Bold;
-				static Int	 ExtraBold;
-				static Int	 Black;
+				static Short	 Thin;
+				static Short	 ExtraLight;
+				static Short	 Light;
+				static Short	 Normal;
+				static Short	 Medium;
+				static Short	 SemiBold;
+				static Short	 Bold;
+				static Short	 ExtraBold;
+				static Short	 Black;
 
-				static Int	 Italic;
-				static Int	 Underline;
-				static Int	 StrikeOut;
+				static Short	 Italic;
+				static Short	 Underline;
+				static Short	 StrikeOut;
 			public:
-						 Font(const String & = Font::Default, Int = Font::DefaultSize, Int = Font::Normal, Int = Font::Normal, const Color & = Color());
+						 Font(const String & = Font::Default, Short = Font::DefaultSize, Short = Font::Normal, Short = Font::Normal, const Color & = Color());
 						 Font(const Font &);
-				virtual		~Font();
+						~Font();
 
 				Font &operator	 =(const Font &);
 				Bool operator	 ==(const Font &) const;
 				Bool operator	 !=(const Font &) const;
 
 				Int		 SetName(const String &);
-				Int		 SetSize(Int);
+				Int		 SetSize(Short);
 				Int		 SetColor(const Color &);
-				Int		 SetWeight(Int);
-				Int		 SetStyle(Int);
+				Int		 SetWeight(Short);
+				Int		 SetStyle(Short);
 
 				const String	&GetName() const;
-				Int		 GetSize() const;
+				Short		 GetSize() const;
 				const Color	&GetColor() const;
-				Int		 GetWeight() const;
-				Int		 GetStyle() const;
+				Short		 GetWeight() const;
+				Short		 GetStyle() const;
 
 				Int		 GetTextSizeX(const String &) const;
 				Int		 GetTextSizeY(const String & = "*") const;

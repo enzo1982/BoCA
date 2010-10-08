@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_JOBLIST
-#define H_BOCA_JOBLIST
+#ifndef H_BOCA_COMMUNICATION_JOBLIST
+#define H_BOCA_COMMUNICATION_JOBLIST
 
 #include <smooth.h>
 #include "../../core/definitions.h"
@@ -69,6 +69,9 @@ namespace BoCA
 			Signal1<Void, const Track &>	 onComponentModifyTrack;
 			Signal1<Void, const Track &>	 onComponentRemoveTrack;
 			Signal1<Void, const Track &>	 onComponentSelectTrack;
+
+			Signal1<Void, const Track &>	 onComponentMarkTrack;
+			Signal1<Void, const Track &>	 onComponentUnmarkTrack;
 
 			/* Callbacks that can be called by components to request
 			 * the corresponding action to be performed.

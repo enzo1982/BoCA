@@ -159,6 +159,12 @@ Bool BoCA::MACIn::Deactivate()
 	return True;
 }
 
+Bool BoCA::MACIn::Seek(Int64 samplePosition)
+{
+	if (ex_APEDecompress_Seek(hAPEDecompress, samplePosition / track.GetFormat().channels) == ERROR_SUCCESS) return True;
+	else													 return False;
+}
+
 Int BoCA::MACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (size <= 0) return -1;

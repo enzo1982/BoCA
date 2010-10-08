@@ -27,7 +27,7 @@ namespace smooth
 {
 	namespace Threads
 	{
-		const Int	 MUTEX_POSIX	= 1;
+		const Short	 MUTEX_POSIX	= 1;
 
 		class MutexPOSIX : public MutexBackend
 		{

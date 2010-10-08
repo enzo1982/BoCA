@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,7 +37,7 @@ namespace smooth
 				protected:
 					String			 id;
 
-					Int			 orient;
+					Short			 orient;
 
 					Int			 left;
 					Int			 top;
@@ -61,6 +61,9 @@ namespace smooth
 
 					String			 GetXMLAttributeValue(Node *, const String &) const;
 				public:
+					static const Short	 HORIZONTAL;
+					static const Short	 VERTICAL;
+
 								 Widget(Node *);
 					virtual			~Widget();
 
@@ -73,9 +76,6 @@ namespace smooth
 
 					Int			 GetDefaultWidth() const	{ return defaultWidth; }
 					Int			 GetDefaultHeight() const	{ return defaultHeight; }
-
-					static const Int	 HORIZONTAL;
-					static const Int	 VERTICAL;
 			};
 		};
 	};

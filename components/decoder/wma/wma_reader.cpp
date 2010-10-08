@@ -34,40 +34,29 @@ BoCA::WMAReader::~WMAReader()
 	CloseHandle(m_hAsyncEvent);
 }
 
-HRESULT BoCA::WMAReader::QueryInterface(REFIID riid, void **ppvObject) 
+STDMETHODIMP BoCA::WMAReader::QueryInterface(REFIID riid, void __RPC_FAR * __RPC_FAR *ppvObject)
 {
 	if (ppvObject == NIL) return E_INVALIDARG;
 
-	if (riid == IID_IWMReaderCallback)
-	{
-		*ppvObject = static_cast<IWMReaderCallback *>(this);
-	}
-	else if (riid == IID_IWMReaderCallbackAdvanced)
-	{
-		*ppvObject = static_cast<IWMReaderCallbackAdvanced *>(this);
-	}
-	else if (riid == IID_IUnknown)
-	{
-		*ppvObject = static_cast<IWMReaderCallback *>(this);
-	}
-	else
-	{
-		*ppvObject = NIL;
+	if	(riid == IID_IUnknown)			*ppvObject = 					     (this);
+	else if (riid == IID_IWMStatusCallback)		*ppvObject = static_cast<IWMStatusCallback *>	     (this);
+	else if (riid == IID_IWMReaderCallback)		*ppvObject = static_cast<IWMReaderCallback *>	     (this);
+	else if (riid == IID_IWMReaderCallbackAdvanced)	*ppvObject = static_cast<IWMReaderCallbackAdvanced *>(this);
+	else						*ppvObject = NIL;
 
-		return E_NOINTERFACE;
-	}
+	if (*ppvObject == NIL) return E_NOINTERFACE;
 
 	AddRef();
 
 	return S_OK;
 }
 
-ULONG BoCA::WMAReader::AddRef()
+STDMETHODIMP_(ULONG) BoCA::WMAReader::AddRef()
 {
 	return InterlockedIncrement(&m_cRef);
 }
 
-ULONG BoCA::WMAReader::Release()
+STDMETHODIMP_(ULONG) BoCA::WMAReader::Release()
 {
 	if (InterlockedDecrement(&m_cRef) == 0)
 	{
@@ -79,7 +68,7 @@ ULONG BoCA::WMAReader::Release()
 	return m_cRef;
 }
 
-HRESULT BoCA::WMAReader::OnStatus(WMT_STATUS status, HRESULT hr, WMT_ATTR_DATATYPE dwType, BYTE __RPC_FAR *pValue, void __RPC_FAR *pvContext)
+STDMETHODIMP BoCA::WMAReader::OnStatus(WMT_STATUS status, HRESULT hr, WMT_ATTR_DATATYPE dwType, BYTE __RPC_FAR *pValue, void __RPC_FAR *pvContext)
 {
 	/* This switch checks for the important messages sent by the reader object.
 	 */
@@ -158,7 +147,7 @@ HRESULT BoCA::WMAReader::OnStatus(WMT_STATUS status, HRESULT hr, WMT_ATTR_DATATY
 	return S_OK;
 }
 
-HRESULT BoCA::WMAReader::OnSample(DWORD dwOutputNum, QWORD cnsSampleTime, QWORD cnsSampleDuration, DWORD dwFlags, INSSBuffer *pSample, void *pvContext)
+STDMETHODIMP BoCA::WMAReader::OnSample(DWORD dwOutputNum, QWORD cnsSampleTime, QWORD cnsSampleDuration, DWORD dwFlags, INSSBuffer *pSample, void *pvContext)
 {
 	/* Check the output number of the sample against the stored output number.
 	 * Because only the first audio output is stored, all other outputs,
@@ -195,7 +184,7 @@ HRESULT BoCA::WMAReader::OnSample(DWORD dwOutputNum, QWORD cnsSampleTime, QWORD 
 	return S_OK;
 }
 
-HRESULT BoCA::WMAReader::OnTime(QWORD cnsCurrentTime, void *pvContext)
+STDMETHODIMP BoCA::WMAReader::OnTime(QWORD cnsCurrentTime, void *pvContext)
 {
 	HRESULT	 hr = S_OK;
 

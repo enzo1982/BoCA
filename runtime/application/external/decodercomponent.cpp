@@ -64,16 +64,6 @@ BoCA::ConfigLayer *BoCA::AS::DecoderComponentExternal::GetConfigurationLayer()
 	return configLayer;
 }
 
-Void BoCA::AS::DecoderComponentExternal::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
-}
-
 Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track &track)
 {
 	/* Get tagger mode and ID
@@ -85,7 +75,7 @@ Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track
 
 	foreach (FileFormat *format, specs->formats)
 	{
-		foreach (String extension, format->GetExtensions())
+		foreach (const String &extension, format->GetExtensions())
 		{
 			if (lcURI.EndsWith(String(".").Append(extension)))
 			{

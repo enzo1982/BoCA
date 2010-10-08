@@ -42,7 +42,6 @@ namespace BoCA
 				const Array<TagFormat *>	&GetTagFormats() const;
 
 				virtual ConfigLayer		*GetConfigurationLayer();
-				virtual Void			 FreeConfigurationLayer();
 
 				virtual Bool			 GetErrorState();
 				virtual const String		&GetErrorString();

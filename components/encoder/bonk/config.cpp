@@ -25,6 +25,8 @@ BoCA::ConfigureBonk::ConfigureBonk()
 
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::Bonk");
+
 	pos.x = 7;
 	pos.y = 11;
 	size.cx = 168;

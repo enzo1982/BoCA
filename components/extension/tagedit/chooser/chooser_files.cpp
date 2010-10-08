@@ -16,6 +16,12 @@
 
 BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 {
+	I18n	*i18n	= I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor");
+
+	SetText(i18n->TranslateString("Files"));
+
 	list_directories= new ListBox(Point(7,7), Size(150, 150));
 
 	div_split	= new Divider(160, OR_VERT | DIV_MOVABLE);
@@ -25,19 +31,19 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 	edit_directory->Deactivate();
 
 	list_files	= new ListBox(Point(165, 34), Size(100, 150));
-	list_files->AddTab(I18n::Get()->TranslateString("File"));
+	list_files->AddTab(i18n->TranslateString("File"));
 	list_files->Deactivate();
 	list_files->onSelectEntry.Connect(&ChooserFiles::OnSelectFile, this);
 
-	text_nofiles	= new Text("no audio files found", Point());
+	text_nofiles	= new Text(i18n->TranslateString("no audio files found"), Point());
 	text_nofiles->SetFont(GUI::Font(GUI::Font::Default, 12, GUI::Font::Bold, 0, Setup::GrayTextColor));
 
-	btn_save	= new Button("Save", NIL, Point(176, 30), Size());
+	btn_save	= new Button(i18n->TranslateString("Save"), NIL, Point(176, 30), Size());
 	btn_save->SetOrientation(OR_LOWERRIGHT);
 	btn_save->Deactivate();
 	btn_save->onAction.Connect(&ChooserFiles::OnSave, this);
 
-	btn_saveall	= new Button("Save all", NIL, Point(88, 30), Size());
+	btn_saveall	= new Button(i18n->TranslateString("Save all"), NIL, Point(88, 30), Size());
 	btn_saveall->SetOrientation(OR_LOWERRIGHT);
 	btn_saveall->Deactivate();
 	btn_saveall->onAction.Connect(&ChooserFiles::OnSaveAll, this);
@@ -185,7 +191,7 @@ Void BoCA::ChooserFiles::OnSelectDirectory(const Directory &directory)
 
 	const Array<File>	&files = directory.GetFiles();
 
-	foreach (File file, files)
+	foreach (const File &file, files)
 	{
 		String	 filename = file.GetFileName();
 		String	 extension = filename.Tail(filename.Length() - filename.FindLast(".") - 1).ToLower();
@@ -238,7 +244,9 @@ Void BoCA::ChooserFiles::OnSelectFile(ListEntry *entry)
 
 	if (decoder == NIL)
 	{
-		Utilities::ErrorMessage(String(BoCA::I18n::Get()->TranslateString("Unable to open file: %1\n\nError: %2")).Replace("%1", file.GetFileName()).Replace("%2", BoCA::I18n::Get()->TranslateString("Unknown file type")));
+		I18n	*i18n	= I18n::Get();
+
+		Utilities::ErrorMessage("Unable to open file: %1\n\nError: %2", file.GetFileName(), i18n->TranslateString("Unknown file type", "Messages"));
 
 		return;
 	}
@@ -251,7 +259,9 @@ Void BoCA::ChooserFiles::OnSelectFile(ListEntry *entry)
 
 	if (error == Error())
 	{
-		Utilities::ErrorMessage(String(BoCA::I18n::Get()->TranslateString("Unable to open file: %1\n\nError: %2")).Replace("%1", file.GetFileName()).Replace("%2", BoCA::I18n::Get()->TranslateString(errorString)));
+		I18n	*i18n	= I18n::Get();
+
+		Utilities::ErrorMessage("Unable to open file: %1\n\nError: %2", file.GetFileName(), i18n->TranslateString(errorString, "Messages"));
 
 		return;
 	}
@@ -379,7 +389,7 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 
 	foreach (FileFormat *format, formats)
 	{
-		foreach (String extension, format->GetExtensions())
+		foreach (const String &extension, format->GetExtensions())
 		{
 			if (lcURI.EndsWith(String(".").Append(extension)))
 			{
@@ -458,7 +468,7 @@ Void BoCA::ChooserFiles::GetSupportedFileExtensions()
 		{
 			const Array<String>	&extensions = format->GetExtensions();
 
-			foreach (String extension, extensions) this->extensions.Add(extension.ToLower(), extension.ToLower().ComputeCRC32());
+			foreach (const String &extension, extensions) this->extensions.Add(extension.ToLower(), extension.ToLower().ComputeCRC32());
 		}
 	}
 }

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -156,7 +156,7 @@ Void BoCA::LayerTagAdvanced::OnSelectField()
 
 Int BoCA::LayerTagAdvanced::LoadTagTypes()
 {
-	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("tagging"));
+	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("boca/boca.extension.tagedit"));
 	const Array<File>	&files = dir.GetFilesByPattern("tag_*.xml");
 
 	for (Int i = 0; i < files.Length(); i++)
@@ -173,10 +173,7 @@ Int BoCA::LayerTagAdvanced::LoadTagTypes()
 
 Int BoCA::LayerTagAdvanced::FreeTagTypes()
 {
-	for (Int i = 0; i < tagTypes.Length(); i++)
-	{
-		delete tagTypes.GetNth(i);
-	}
+	foreach (TagSpec *tagType, tagTypes) delete tagType;
 
 	tagTypes.RemoveAll();
 

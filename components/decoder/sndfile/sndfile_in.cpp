@@ -238,6 +238,12 @@ Bool BoCA::SndFileIn::Deactivate()
 	return True;
 }
 
+Bool BoCA::SndFileIn::Seek(Int64 samplePosition)
+{
+	if (ex_sf_seek(sndf, samplePosition / track.GetFormat().channels, SEEK_CUR) != -1) return True;
+	else										   return False;
+}
+
 Int BoCA::SndFileIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	const Format	&format = track.GetFormat();

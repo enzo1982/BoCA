@@ -103,7 +103,7 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 	track.length	= -1;
 
 	infoTrack = &track;
-	finished = False;
+	stop = False;
 
 	SkipID3v2Tag(f_in);
 	ReadXingTag(f_in);
@@ -167,7 +167,7 @@ BoCA::MADIn::~MADIn()
 
 Bool BoCA::MADIn::Activate()
 {
-	finished = False;
+	stop = False;
 
 	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
 
@@ -180,14 +180,21 @@ Bool BoCA::MADIn::Activate()
 
 	readDataMutex->Lock();
 
-	decoderThread = NonBlocking1<Bool>(&MADIn::ReadMAD, this).Call(True);
+	decoderThread = NIL;
 
 	return True;
 }
 
 Bool BoCA::MADIn::Deactivate()
 {
-	decoderThread->Stop();
+	if (decoderThread != NIL)
+	{
+		stop = True;
+
+		readDataMutex->Release();
+
+		while (decoderThread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(0);
+	}
 
 	delete readDataMutex;
 	delete samplesBufferMutex;
@@ -197,6 +204,8 @@ Bool BoCA::MADIn::Deactivate()
 
 Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	if (decoderThread == NIL) decoderThread = NonBlocking1<Bool>(&MADIn::ReadMAD, this).Call(True);
+
 	if (decoderThread->GetStatus() != THREAD_RUNNING && samplesBuffer.Size() <= 0) return -1;
 
 	readDataMutex->Release();
@@ -294,7 +303,7 @@ mad_flow BoCA::MADInputCallback(void *client_data, mad_stream *stream)
 {
 	MADIn	*filter = (MADIn *) client_data;
 
-	if (filter->driver->GetPos() == filter->driver->GetSize()) return MAD_FLOW_STOP;
+	if (filter->stop || filter->driver->GetPos() == filter->driver->GetSize()) return MAD_FLOW_STOP;
 
 	static Buffer<UnsignedByte>	 inputBuffer;
 

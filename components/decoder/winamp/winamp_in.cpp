@@ -419,16 +419,6 @@ ConfigLayer *BoCA::WinampIn::GetConfigurationLayer()
 	return configLayer;
 }
 
-Void BoCA::WinampIn::FreeConfigurationLayer()
-{
-	if (configLayer != NIL)
-	{
-		delete configLayer;
-
-		configLayer = NIL;
-	}
-}
-
 In_Module *BoCA::WinampIn::GetPluginForFile(const String &file)
 {
 	In_Module	*plugin = NIL;

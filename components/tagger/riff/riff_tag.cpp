@@ -82,10 +82,8 @@ Error BoCA::RIFFTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tra
 	 */
 	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
 	{
-		if (info.offsets != NIL)
-		{
-			RenderTagItem("ITOC", info.offsets, buffer);
-		}
+		if	(info.mcdi.GetData().Size() > 0) RenderTagItem("ITOC", info.mcdi.GetOffsetString(), buffer);
+		else if (info.offsets != NIL)		 RenderTagItem("ITOC", info.offsets, buffer);
 	}
 
 	RenderTagHeader(buffer);

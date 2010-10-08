@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,7 +29,7 @@ BoCA::AS::DecoderComponent *BoCA::ChooserFilesUtilities::CreateDecoderComponent(
 		{
 			const Array<String>	&extensions = format->GetExtensions();
 
-			foreach (String extension, extensions)
+			foreach (const String &extension, extensions)
 			{
 				if (!file.EndsWith(String(".").Append(extension.ToLower()))) continue;
 

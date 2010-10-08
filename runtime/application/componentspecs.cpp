@@ -49,7 +49,6 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_Delete			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Delete"));
 
 	func_GetConfigurationLayer	= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetConfigurationLayer"));
-	func_FreeConfigurationLayer	= (void (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_FreeConfigurationLayer"));
 
 	func_GetErrorState		= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorState"));
 	func_GetErrorString		= (const void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorString"));
@@ -85,6 +84,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_Activate			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Activate"));
 	func_Deactivate			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Deactivate"));
+
+	func_Seek			= (bool (*)(void *, __int64))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Seek"));
 
 	func_ReadData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
 	func_WriteData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));

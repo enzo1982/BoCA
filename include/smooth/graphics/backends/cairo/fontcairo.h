@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,12 +25,12 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 FONT_CAIRO	= 3;
+		const Short	 FONT_CAIRO	= 3;
 
 		class FontCairo : public FontBackend
 		{
 			public:
-					 FontCairo(const String &, Int, Int, Int, const Color &);
+					 FontCairo(const String &, Short, Short, Short, const Color &);
 					~FontCairo();
 
 				Size	 GetTextSize(const String &) const;

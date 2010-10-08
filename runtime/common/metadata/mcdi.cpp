@@ -100,6 +100,18 @@ Int BoCA::MCDI::GetNumberOfDataTracks() const
 	return numDataTracks;
 }
 
+String BoCA::MCDI::GetOffsetString() const
+{
+	String	 offsets = Number((Int64) GetNumberOfEntries()).ToHexString();
+
+	for (Int i = 0; i <= GetNumberOfEntries(); i++)
+	{
+		offsets.Append("+").Append(Number((Int64) GetNthEntryOffset(i) + 150).ToHexString());
+	}
+
+	return offsets.ToUpper();
+}
+
 Bool BoCA::MCDI::SetData(const Buffer<UnsignedByte> &nData)
 {
 	data.Resize(nData.Size());

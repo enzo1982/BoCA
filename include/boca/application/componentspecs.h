@@ -181,7 +181,6 @@ namespace BoCA
 				bool			 (*func_Delete)(void *);
 
 				void			*(*func_GetConfigurationLayer)(void *);
-				void			 (*func_FreeConfigurationLayer)(void *);
 
 				bool			 (*func_GetErrorState)(void *);
 				const void		*(*func_GetErrorString)(void *);
@@ -217,6 +216,8 @@ namespace BoCA
 
 				bool			 (*func_Activate)(void *);
 				bool			 (*func_Deactivate)(void *);
+
+				bool			 (*func_Seek)(void *, __int64);
 
 				int			 (*func_ReadData)(void *, void *, int);
 				int			 (*func_WriteData)(void *, void *, int);
