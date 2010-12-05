@@ -68,6 +68,7 @@ namespace smooth
 					virtual			~HTTP();
 
 					Int			 SetHeaderField(const String &, const String &);	// Set header field
+					String			 GetHeaderField(const String &);			// Get header field
 
 					Int			 SetParameter(const String &, const String &);		// Set parameter
 					Int			 SetParameterFile(const String &, const String &);	// Set file to be transmitted; forces HTTP_METHOD_POST

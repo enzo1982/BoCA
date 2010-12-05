@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
 
 SF_OPEN_FD	 ex_sf_open_fd		= NIL;
@@ -21,11 +22,9 @@ DynamicLoader *sndfiledll	= NIL;
 
 Bool LoadSndFileDLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\SndFile.dll")).Exists()) return False;
-#endif
+	sndfiledll = BoCA::Utilities::LoadCodecDLL("sndfile");
 
-	sndfiledll = new DynamicLoader("codecs/SndFile");
+	if (sndfiledll == NIL) return False;
 
 	ex_sf_open_fd		= (SF_OPEN_FD) sndfiledll->GetFunctionAddress("sf_open_fd");
 	ex_sf_close		= (SF_CLOSE) sndfiledll->GetFunctionAddress("sf_close");
@@ -46,7 +45,7 @@ Bool LoadSndFileDLL()
 
 Void FreeSndFileDLL()
 {
-	Object::DeleteObject(sndfiledll);
+	BoCA::Utilities::FreeCodecDLL(sndfiledll);
 
 	sndfiledll = NIL;
 }

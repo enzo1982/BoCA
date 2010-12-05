@@ -28,11 +28,7 @@ namespace smooth
 	{
 		/* A threads based timer backend for use on systems
 		 * that provide only limited or no timer support.
-		 *
-		 * For example, Linux allows only one timer per process
-		 * at any time.
 		 */
-
 		const Short	 TIMER_THREADS = 3;
 
 		class TimerThreads : public TimerBackend
@@ -40,17 +36,17 @@ namespace smooth
 			private:
 				Threads::Thread	*thread;
 
-				UnsignedInt	 interval;
-				UnsignedInt	 timeout;
+				Int		 interval;
+				UnsignedInt64	 timeout;
 
 				volatile Bool	 cancel;
 
-				Int		 TimerProc();
+				Int		 TimerProc(Int);
 			public:
-						 TimerThreads();
+						 TimerThreads(Timer *);
 						~TimerThreads();
 
-				Int		 Start(UnsignedInt);
+				Int		 Start(Int);
 				Int		 Stop();
 
 				Int		 GetID() const;

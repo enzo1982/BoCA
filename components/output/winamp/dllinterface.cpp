@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -15,7 +15,7 @@ Array<Out_Module *>	 winamp_out_modules;
 
 Bool LoadWinampDLLs()
 {
-	MoveFileA(GUI::Application::GetApplicationDirectory().Append("plugins\\plugins.ini"), GUI::Application::GetApplicationDirectory().Append("BonkEnc.ini"));
+	MoveFileA(GUI::Application::GetApplicationDirectory().Append("plugins\\plugins.ini"), GUI::Application::GetApplicationDirectory().Append("freac.ini"));
 
 	Directory		 directory = GUI::Application::GetApplicationDirectory().Append("plugins\\");
 	const Array<File>	&out_dlls   = directory.GetFilesByPattern("out_*.dll");
@@ -58,5 +58,5 @@ Void FreeWinampDLLs()
 	winamp_out_plugins.RemoveAll();
 	winamp_out_modules.RemoveAll();
 
-	MoveFileA(GUI::Application::GetApplicationDirectory().Append("BonkEnc.ini"), GUI::Application::GetApplicationDirectory().Append("plugins\\plugins.ini"));
+	MoveFileA(GUI::Application::GetApplicationDirectory().Append("freac.ini"), GUI::Application::GetApplicationDirectory().Append("plugins\\plugins.ini"));
 }

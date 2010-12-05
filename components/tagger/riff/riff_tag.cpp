@@ -53,7 +53,7 @@ BoCA::RIFFTag::~RIFFTag()
 Error BoCA::RIFFTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
 	Config		*currentConfig = Config::Get();
-	char		*prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "RIFFINFOTagEncoding", "ISO-8859-1"));
+	String		 prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "RIFFINFOTagEncoding", "ISO-8859-1"));
 
 	const Info	&info = track.GetInfo();
 
@@ -136,7 +136,7 @@ Error BoCA::RIFFTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &trac
 	/* Parse individual comment items.
 	 */
 	Info	 info = track.GetInfo();
-	char	*prevInFormat = String::SetInputFormat("ISO-8859-1");
+	String	 prevInFormat = String::SetInputFormat("ISO-8859-1");
 
 	while (!error)
 	{

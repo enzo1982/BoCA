@@ -240,17 +240,23 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 		if (config->GetIntValue("CDRip", "ReadCDText", True)	  && cdTextDiscID   != discid) { cdText.ReadCDText();   cdTextDiscID   = discid; }
 		if (config->GetIntValue("CDRip", "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(); cdPlayerDiscID = discid; }
 
-		if (config->GetIntValue("CDRip", "ReadCDText", True) && cdText.GetCDText().Get(trackNumber) != NIL)
+		if (config->GetIntValue("CDRip", "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 		{
-			info.artist = cdText.GetCDText().Get(0);
-			info.title  = cdText.GetCDText().Get(trackNumber);
-			info.album  = cdText.GetCDText().Get(100);
+			const CDInfo	&cdInfo = cdText.GetCDInfo();
+
+			if (cdInfo.GetTrackArtist(trackNumber) != NIL)	info.artist = cdInfo.GetTrackArtist(trackNumber);
+			else						info.artist = cdInfo.GetArtist();
+
+			info.title  = cdInfo.GetTrackTitle(trackNumber);
+			info.album  = cdInfo.GetTitle();
 		}
-		else if (config->GetIntValue("CDRip", "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().Get(trackNumber) != NIL)
+		else if (config->GetIntValue("CDRip", "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 		{
-			info.artist = cdPlayer.GetCDInfo().Get(0);
-			info.title  = cdPlayer.GetCDInfo().Get(trackNumber);
-			info.album  = cdPlayer.GetCDInfo().Get(100);
+			const CDInfo	&cdInfo = cdPlayer.GetCDInfo();
+
+			info.artist = cdInfo.GetArtist();
+			info.title  = cdInfo.GetTrackTitle(trackNumber);
+			info.album  = cdInfo.GetTitle();
 		}
 	}
 

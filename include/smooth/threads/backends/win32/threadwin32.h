@@ -40,8 +40,9 @@ namespace smooth
 					~ThreadWin32();
 
 				Void	*GetSystemThread() const;
-
 				Int	 GetThreadID() const;
+
+				Bool	 IsCurrentThread() const;
 
 				Int	 Start(Void (*)(Void *), Void *);
 				Int	 Stop();
@@ -49,7 +50,6 @@ namespace smooth
 				Bool	 IsRunning() const;
 
 				Void	 Exit();
-				Void	*Self() const;
 		};
 	};
 };

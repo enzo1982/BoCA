@@ -15,6 +15,7 @@ namespace smooth
 {
 	namespace System
 	{
+		class Timer;
 		class TimerBackend;
 	};
 };
@@ -30,14 +31,16 @@ namespace smooth
 		class TimerBackend
 		{
 			private:
-				static TimerBackend	*(*backend_creator)();
+				static TimerBackend	*(*backend_creator)(Timer *);
 			protected:
 				Short			 type;
-			public:
-				static Int		 SetBackend(TimerBackend *(*)());
-				static TimerBackend	*CreateBackendInstance();
 
-							 TimerBackend();
+				Timer			*thisTimer;
+			public:
+				static Int		 SetBackend(TimerBackend *(*)(Timer *));
+				static TimerBackend	*CreateBackendInstance(Timer *);
+
+							 TimerBackend(Timer *);
 				virtual			~TimerBackend();
 
 				Short			 GetTimerType() const;

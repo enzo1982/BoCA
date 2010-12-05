@@ -20,10 +20,14 @@ namespace BoCA
 		class DecoderComponentExternalStdIO : public DecoderComponentExternal
 		{
 			private:
+#ifdef __WIN32__
 				HANDLE		 rPipe;
 				HANDLE		 wPipe;
 
 				HANDLE		 hProcess;
+#else
+				FILE		*rPipe;
+#endif
 
 				String		 encFileName;
 			public:

@@ -154,6 +154,8 @@ Bool BoCA::LAMEIn::Activate()
 
 	SkipID3v2Tag(f_in);
 
+	driver->Seek(f_in->GetPos());
+
 	delete f_in;
 
 	return True;

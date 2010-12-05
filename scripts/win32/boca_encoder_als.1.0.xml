@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>MPEG-4 Audio Lossless Encoder</name>
+  <version>1.0</version>
+  <id>als-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MPEG-4 ALS Files</name>
+    <extension>mp4</extension>
+    <!--
+      Disabled tags for now, because mp4als.exe cannot read tagged files.
+      <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+    -->
+  </format>
+  <external>
+    <command>codecs/cmdline/mp4als.exe</command>
+    <arguments>-MP4 %OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <switch name="Adaptive prediction order" argument="-a"/>
+      <range name="Prediction order" argument="-o%VALUE" default="10">
+	<min alias="min">0</min>
+	<max alias="max">128</max>
+      </range>
+      <switch name="Use BGMC residual codes" argument="-b"/>
+      <range name="Block switching level" argument="-g%VALUE" default="0">
+	<min alias="off">0</min>
+	<max alias="max">5</max>
+      </range>
+      <switch name="Idependent stereo coding" argument="-i"/>
+      <switch name="Use long term prediction" argument="-p"/>
+    </parameters>
+  </external>
+</component>

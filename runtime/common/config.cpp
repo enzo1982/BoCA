@@ -30,7 +30,7 @@ BoCA::Config::Config()
 	{
 		configDir = S::System::System::GetApplicationDataDirectory();
 
-		if (configDir != NIL) configDir.Append("BonkEnc").Append(Directory::GetDirectoryDelimiter());
+		if (configDir != NIL) configDir.Append("freac").Append(Directory::GetDirectoryDelimiter());
 
 		Directory(configDir).Create();
 	}

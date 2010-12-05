@@ -46,13 +46,13 @@ namespace smooth
 				HDC				 paintContext;
 				HBITMAP				 paintBitmap;
 #else
-				Display				*display;
-				Visual				*visual;
+				X11::Display			*display;
+				X11::Visual			*visual;
 
-				Window				 window;
-				XWindowAttributes		 windowAttributes;
+				X11::Window			 window;
+				X11::XWindowAttributes		 windowAttributes;
 
-				Pixmap				 paintBitmap;
+				X11::Pixmap			 paintBitmap;
 #endif
 				Array<Rect *, Void *>		 paintRects;
 

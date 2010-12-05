@@ -32,8 +32,8 @@ BoCA::DonateDialog::DonateDialog()
 
 	mainWnd->Add(button_close);
 
-	text_donate		= new Text(i18n->TranslateString("Please help keep this software free by supporting the BonkEnc project\nwith a donation.\n\nClick one of the buttons below to make a donation using PayPal:"), Point(7, 45));
-	text_donate_other	= new Text(i18n->TranslateString("You can also send money directly to donate@bonkenc.org using PayPal.\n\nPlease write to donate@bonkenc.org if you would like to donate using\nelectronic transfer, mail a cheque or send money by mail."), Point(7, text_donate->textSize.cy + 116));
+	text_donate		= new Text(String(i18n->TranslateString("Please help keep this software free by supporting the %1 project\nwith a donation.\n\nClick one of the buttons below to make a donation using PayPal:")).Replace("%1", "fre:ac"), Point(7, 45));
+	text_donate_other	= new Text(String(i18n->TranslateString("You can also send money directly to %1 using PayPal.\n\nPlease write to %1 if you would like to donate using\nelectronic transfer, mail a cheque or send money by mail.")).Replace("%1", "donate@freac.org"), Point(7, text_donate->textSize.cy + 116));
 
 	text_intro		= new Text(i18n->TranslateString("Please support this project!"), Point(7, 12));
 	text_intro->SetFont(Font(Font::Default, 12, Font::Bold));
@@ -67,7 +67,7 @@ BoCA::DonateDialog::DonateDialog()
 	Add(mainWnd);
 
 	mainWnd->SetFlags(mainWnd->GetFlags() | WF_APPTOPMOST | WF_NOTASKBUTTON);
-	mainWnd->SetIcon(ImageLoader::Load("BonkEnc.pci:0"));
+	mainWnd->SetIcon(ImageLoader::Load("freac.pci:0"));
 
 	Rect	 workArea = MultiMonitor::GetActiveMonitorWorkArea();
 

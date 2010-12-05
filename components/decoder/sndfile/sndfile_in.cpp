@@ -106,17 +106,22 @@ Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 	file = fopen(streamURI.ConvertTo("UTF-8"), "r+b");
 #endif
 
-	SF_INFO	 sinfo;
+	if (file != NIL)
+	{
+		SF_INFO	 sinfo;
 
-	memset(&sinfo, 0, sizeof(SF_INFO));
+		memset(&sinfo, 0, sizeof(SF_INFO));
 
-	sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
+		sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
-	if (sndf != NIL) ex_sf_close(sndf);
+		if (sndf != NIL) ex_sf_close(sndf);
 
-	fclose(file);
+		fclose(file);
 
-	return (sndf != NIL);
+		return (sndf != NIL);
+	}
+
+	return False;
 }
 
 Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)

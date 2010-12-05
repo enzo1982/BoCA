@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Thomson mp3HD Encoder</name>
+  <version>1.0</version>
+  <id>mp3hd-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MPEG Audio Layer 3</name>
+    <extension>mp3</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/mp3hdEncoder.exe</command>
+    <arguments>-if %INFILE -of %OUTFILE %OPTIONS</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Bitrate" argument="-br %VALUE000" default="192" enabled="true" step="4">
+	<min alias="16 kbps">16</min>
+	<max alias="320 kbps">320</max>
+      </range>
+      <selection name="Encoding mode" argument="-mode %VALUE" default="0">
+	<option alias="CBR">0</option>
+	<option alias="VBR highest quality">1</option>
+	<option alias="VBR high quality">2</option>
+	<option alias="VBR intermediate quality">3</option>
+	<option alias="VBR intermediate bitrate">4</option>
+	<option alias="VBR low bitrate">5</option>
+      </selection>
+    </parameters>
+  </external>
+</component>

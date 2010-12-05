@@ -173,10 +173,10 @@ const BoCA::MCDI &BoCA::CDRipInfo::GetNthDeviceMCDI(Int n)
 	 * request was less than half a second ago.
 	 */
 	{
-		static Int	 lastDrive = -1;
-		static Int	 lastAccess = 0;
+		static Int		 lastDrive = -1;
+		static UnsignedInt64	 lastAccess = 0;
 
-		Int	 clockValue = clock();
+		UnsignedInt64	 clockValue = S::System::System::Clock();
 
 		if (lastDrive == n && clockValue - lastAccess < 500)
 		{

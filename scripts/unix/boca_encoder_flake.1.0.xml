@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Flake FLAC Encoder</name>
+  <version>1.0</version>
+  <id>flake-out</id>
+  <type>encoder</type>
+  <format>
+    <name>FLAC Audio Files</name>
+    <extension>flac</extension>
+    <tag id="flac-tag" mode="other">FLAC Metadata</tag>
+  </format>
+  <external>
+    <command>/usr/bin/flake</command>
+    <arguments>%OPTIONS %INFILE -o %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Compression level" argument="-%VALUE" default="5">
+	<min alias="worst">0</min>
+	<max alias="best">12</max>
+      </range>
+      <range name="Block size" argument="-b %VALUE" default="4608" step="16">
+	<min alias="small">16</min>
+	<max alias="large">4608</max>
+      </range>
+      <selection name="Prediction type" argument="-t %VALUE" default="2">
+	<option alias="no prediction">0</option>
+	<option alias="fixed prediction">1</option>
+	<option alias="Levinson-Durbin recursion">2</option>
+      </selection>
+      <range name="Prediction order" argument="-l %VALUE" default="8">
+	<min alias="min">1</min>
+	<max alias="max">12</max>
+      </range>
+      <selection name="Prediction order selection method" argument="-m %VALUE" default="1">
+	<option alias="maximum">0</option>
+	<option alias="estimate">1</option>
+	<option alias="2-level">2</option>
+ 	<option alias="4-level">3</option>
+	<option alias="8-level">4</option>
+	<option alias="full search">5</option>
+	<option alias="log search">6</option>
+      </selection>
+      <range name="Rice partition order" argument="-r %VALUE" default="6">
+	<min alias="min">1</min>
+	<max alias="max">8</max>
+      </range>
+      <selection name="Stereo decorrelation method" argument="-s %VALUE" default="1">
+	<option alias="independent channels">0</option>
+	<option alias="mid-side">1</option>
+      </selection>
+      <selection name="Variable block size" argument="-v %VALUE" default="0">
+	<option alias="fixed">0</option>
+	<option alias="variable, method 1">1</option>
+	<option alias="variable, method 2">2</option>
+      </selection>
+    </parameters>
+  </external>
+</component>

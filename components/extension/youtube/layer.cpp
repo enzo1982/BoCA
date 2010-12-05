@@ -242,7 +242,7 @@ Void BoCA::LayerYouTube::LoadVideoSites()
 	{
 		VideoSite	*site = new VideoSite(file);
 
-		sites.Add(site);
+		if (site->IsSane()) sites.Add(site);
 	}
 }
 
@@ -382,6 +382,16 @@ Void BoCA::LayerYouTube::OnDownloadTrack()
 	I18n	*i18n	= I18n::Get();
 
 	i18n->SetContext("Extensions::Video Downloader::Errors");
+
+	/* Let's see if we are already downloading this video.
+	 */
+	for (Int i = 0; i < list_downloads->Length(); i++)
+	{
+		VideoListEntry	*entry = (VideoListEntry *) list_downloads->GetNthEntry(i);
+		Video		*video = entry->GetVideo();
+
+		if (video->GetVideoURL() == edit_url->GetText() && !video->IsDownloadFinished() && !video->IsDownloadCancelled()) { Utilities::ErrorMessage(i18n->TranslateString("You are already downloading this video!")); return; }
+	}
 
 	/* Find a video site that can handle the URL.
 	 */
@@ -527,11 +537,15 @@ Void BoCA::LayerYouTube::OnEditMetadata()
  */
 Void BoCA::LayerYouTube::OnApplicationModifyTrack(const Track &track)
 {
+	I18n	*i18n	= I18n::Get();
+
+	i18n->SetContext("Extensions::Video Downloader");
+
 	const Info	&info = track.GetInfo();
 	String		 jlEntry;
 
 	if (info.artist == NIL && info.title == NIL) jlEntry = String("\t").Append(track.origFilename).Append("\t");
-	else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown")).Append("\t").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
+	else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown")).Append("\t").Append(info.title.Length() > 0 ? info.title : i18n->TranslateString("unknown title")).Append("\t");
 
 	jlEntry.Append(track.GetLengthString()).Append("\t").Append(track.GetFileSizeString());
 
@@ -680,7 +694,7 @@ Bool BoCA::LayerYouTube::StartDownload(const String &URL)
 	/* Start download.
 	 */
 	Config	*config = Config::Get();
-	String	 videoFile = S::System::System::GetTempDirectory().Append("video_temp_").Append(String::FromInt(GetTickCount())).Append(".").Append(fileExt);
+	String	 videoFile = S::System::System::GetTempDirectory().Append("video_temp_").Append(String::FromInt(S::System::System::Clock())).Append(".").Append(fileExt);
 
 	if (config->GetIntValue("YouTube", "SaveVideoFiles", False))
 	{
@@ -690,7 +704,23 @@ Bool BoCA::LayerYouTube::StartDownload(const String &URL)
 
 		if (!videoFile.EndsWith(Directory::GetDirectoryDelimiter())) videoFile.Append(Directory::GetDirectoryDelimiter());
 
-		videoFile.Append(Utilities::ReplaceIncompatibleCharacters(video->GetVideoTitle())).Append(".").Append(fileExt);
+		videoFile.Append(Utilities::ReplaceIncompatibleCharacters(video->GetVideoTitle()));
+
+		Int	 count = 1;
+
+		while (File(String(videoFile).Append(".").Append(fileExt)).Exists())
+		{
+			count++;
+
+			if (!File(String(videoFile).Append(" (").Append(String::FromInt(count)).Append(").").Append(fileExt)).Exists())
+			{
+				videoFile.Append(" (").Append(String::FromInt(count)).Append(")");
+
+				break;
+			}
+		}
+
+		videoFile.Append(".").Append(fileExt);
 	}
 
 	video->SetVideoFile(videoFile);
@@ -734,44 +764,19 @@ Bool BoCA::LayerYouTube::FinishDownload(Video *video)
 	info.other.Add(String("Video uploader").Append(":").Append(video->GetVideoUploader()));
 	info.other.Add(String("Video upload date").Append(":").Append(video->GetVideoDate()));
 
+	if (video->GetVideoThumbnail().mime == "image/jpeg") track.pictures.Add(video->GetVideoThumbnail());
+
 	track.SetInfo(info);
 
-	/* Download video thumbnail.
-	 */
-	if (video->GetVideoThumbnailURL().StartsWith("http://"))
-	{
-		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(video->GetVideoThumbnailURL());
-		Buffer<UnsignedByte>	 buffer;
+	I18n	*i18n	= I18n::Get();
 
-		protocol->DownloadToBuffer(buffer);
-
-		String		 streamURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
-
-		delete protocol;
-
-		if (streamURL != NIL)
-		{
-			Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(streamURL);
-
-			protocol->DownloadToBuffer(buffer);
-
-			delete protocol;
-		}
-
-		Picture	 picture;
-
-		picture.mime = "image/jpeg";
-		picture.type = 0;
-		picture.data = buffer;
-
-		track.pictures.Add(picture);
-	}
+	i18n->SetContext("Extensions::Video Downloader");
 
 	/* Add track to joblist.
 	 */
 	JobList::Get()->onComponentAddTrack.Emit(track);
 
-	String		 jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown")).Append("\t").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t").Append(track.GetLengthString()).Append("\t").Append(track.GetFileSizeString());
+	String		 jlEntry = String(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown")).Append("\t").Append(info.title.Length() > 0 ? info.title : i18n->TranslateString("unknown title")).Append("\t").Append(track.GetLengthString()).Append("\t").Append(track.GetFileSizeString());
 
 	tracks.Add(track, list_tracks->AddEntry(jlEntry)->GetHandle());
 

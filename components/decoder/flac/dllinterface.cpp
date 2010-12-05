@@ -52,25 +52,9 @@ DynamicLoader *flacdll	= NIL;
 
 Bool LoadFLACDLL()
 {
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
-	{
-#ifdef __WIN32__
-		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FLAC-OpenMP.dll")).Exists()) return False;
-#endif
+	flacdll = BoCA::Utilities::LoadCodecDLL("FLAC");
 
-		flacdll = new DynamicLoader("codecs/FLAC-OpenMP");
-
-		if (flacdll->GetSystemModuleHandle() == NIL) FreeFLACDLL();
-	}
-
-	if (flacdll == NIL)
-	{
-#ifdef __WIN32__
-		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FLAC.dll")).Exists()) return False;
-#endif
-
-		flacdll = new DynamicLoader("codecs/FLAC");
-	}
+	if (flacdll == NIL) return False;
 
 	ex_FLAC__stream_decoder_new				= (FLAC__STREAM_DECODER_NEW) flacdll->GetFunctionAddress("FLAC__stream_decoder_new");
 	ex_FLAC__stream_decoder_delete				= (FLAC__STREAM_DECODER_DELETE) flacdll->GetFunctionAddress("FLAC__stream_decoder_delete");
@@ -147,7 +131,7 @@ Bool LoadFLACDLL()
 
 Void FreeFLACDLL()
 {
-	Object::DeleteObject(flacdll);
+	BoCA::Utilities::FreeCodecDLL(flacdll);
 
 	flacdll = NIL;
 }

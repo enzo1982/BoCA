@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>TwoLAME MP2 Encoder</name>
+  <version>1.0</version>
+  <id>twolame-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MPEG Audio Layer 2</name>
+    <extension>mp2</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/twolame.exe</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <selection name="Bitrate" argument="-b %VALUE" enabled="true" default="192">
+	<option>8</option>
+	<option>16</option>
+	<option>24</option>
+	<option>32</option>
+	<option>40</option>
+	<option>48</option>
+	<option>56</option>
+	<option>64</option>
+	<option>80</option>
+	<option>96</option>
+	<option>112</option>
+	<option>128</option>
+	<option>144</option>
+	<option>160</option>
+	<option>192</option>
+	<option>224</option>
+	<option>256</option>
+ 	<option>320</option>
+	<option>384</option>
+      </selection>
+      <switch name="Enable VBR mode" argument="--vbr"/>
+    </parameters>
+  </external>
+</component>

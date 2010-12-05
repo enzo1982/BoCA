@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>WavPack Lossless Compressor</name>
+  <version>1.0</version>
+  <id>wv-out</id>
+  <type>encoder</type>
+  <format>
+    <name>WavPack Files</name>
+    <extension>wv</extension>
+    <tag id="apev2-tag" mode="append">APEv2</tag>
+  </format>
+  <external>
+    <command>/usr/bin/wavpack</command>
+    <arguments>-i -m %OPTIONS - -o %OUTFILE</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Enable hybrid compression" argument="-b%VALUE" default="256" step="8">
+	<min alias="64 kbps">64</min>
+	<max alias="720 kbps">720</max>
+      </range>
+      <selection name="Compression mode" argument="%VALUE" default="-h">
+	<option alias="Fast">-f</option>
+	<option alias="High quality">-h</option>
+	<option alias="Very high quality">-hh</option>
+      </selection>
+      <range name="Extra encode processing" argument="-x%VALUE" default="1">
+	<min alias="faster">1</min>
+	<max alias="better">6</max>
+      </range>
+    </parameters>
+  </external>
+</component>

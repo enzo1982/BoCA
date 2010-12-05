@@ -10,6 +10,10 @@
 
 #include <boca/common/metadata/mcdi.h>
 
+#ifndef __WIN32__
+#	include <arpa/inet.h>
+#endif
+
 BoCA::MCDI::MCDI(const Buffer<UnsignedByte> &iData)
 {
 	SetData(iData);

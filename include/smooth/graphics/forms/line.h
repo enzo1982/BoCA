@@ -39,8 +39,8 @@ namespace smooth
 				Bool operator	 ==(const Line &) const;
 				Bool operator	 !=(const Line &) const;
 			accessors:
-				Point		 GetStartPoint()				{ return Point(sx, sy); }
-				Point		 GetEndPoint()					{ return Point(ex, ey); }
+				Point		 GetStartPoint() const				{ return Point(sx, sy); }
+				Point		 GetEndPoint() const				{ return Point(ex, ey); }
 		};
 	};
 };

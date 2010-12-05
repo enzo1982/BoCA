@@ -27,25 +27,13 @@ DynamicLoader *bonkdll	= NIL;
 
 Bool LoadBonkDLL()
 {
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
-	{
 #ifdef __WIN32__
-		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Bonk-OpenMP.dll")).Exists()) return False;
+	bonkdll = BoCA::Utilities::LoadCodecDLL("Bonk");
+#else
+	bonkdll = BoCA::Utilities::LoadCodecDLL("bonk");
 #endif
 
-		bonkdll = new DynamicLoader("codecs/Bonk-OpenMP");
-
-		if (bonkdll->GetSystemModuleHandle() == NIL) FreeBonkDLL();
-	}
-
-	if (bonkdll == NIL)
-	{
-#ifdef __WIN32__
-		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Bonk.dll")).Exists()) return False;
-#endif
-
-		bonkdll = new DynamicLoader("codecs/Bonk");
-	}
+	if (bonkdll == NIL) return False;
 
 	ex_bonk_decoder_create			= (BONKDECODERCREATE) bonkdll->GetFunctionAddress("bonk_decoder_create");
 	ex_bonk_decoder_init			= (BONKDECODERINIT) bonkdll->GetFunctionAddress("bonk_decoder_init");
@@ -72,7 +60,7 @@ Bool LoadBonkDLL()
 
 Void FreeBonkDLL()
 {
-	Object::DeleteObject(bonkdll);
+	BoCA::Utilities::FreeCodecDLL(bonkdll);
 
 	bonkdll = NIL;
 }

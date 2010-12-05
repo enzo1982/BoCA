@@ -330,6 +330,8 @@ Bool BoCA::FAAD2In::Activate()
 		SkipID3v2Tag(in);
 		SyncOnAACHeader(in);
 
+		driver->Seek(in->GetPos());
+
 		delete in;
 	}
 

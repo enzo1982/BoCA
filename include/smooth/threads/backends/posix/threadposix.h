@@ -39,14 +39,14 @@ namespace smooth
 						~ThreadPOSIX();
 
 				Void		*GetSystemThread() const;
-
 				Int		 GetThreadID() const;
+
+				Bool		 IsCurrentThread() const;
 
 				Int		 Start(Void (*)(Void *), Void *);
 				Int		 Stop();
 
 				Void		 Exit();
-				Void		*Self() const;
 		};
 	};
 };

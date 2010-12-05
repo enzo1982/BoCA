@@ -99,9 +99,22 @@
 
 #	define __declspec(x)
 #else
-#	include <X11/Xlib.h>
-#	include <X11/Xutil.h>
+#	include <memory.h>
+#	include	<malloc.h>
 #	include <wchar.h>
+#	include <sys/types.h>
+
+	namespace X11
+	{
+		extern "C"
+		{
+#			include <X11/Xlib.h>
+#			include <X11/Xutil.h>
+#			include <X11/Xatom.h>
+#			include <X11/Xmu/Atoms.h>
+		}
+	};
+
 #	include <linux/limits.h>
 
 #	define SMOOTHAPI
@@ -169,10 +182,6 @@
 #	define VK_F24	  XK_F24
 #endif
 
-#if defined SMOOTH_DLL
-#	include <lisa.h>
-#endif
-
 #define NIL	(0)
 
 #define callbacks	public
@@ -210,15 +219,6 @@ namespace smooth
 
 using namespace smooth::Errors;
 
-namespace smooth
-{
-	Int	 Main();
-	Int	 Main(const Array<String> &);
-
-	Void	 AttachDLL(Void *);
-	Void	 DetachDLL();
-};
-
 const S::Short	 SM_MOUSEMOVE		= 1024;
 const S::Short	 SM_LBUTTONDOWN		= 1025;
 const S::Short	 SM_LBUTTONUP		= 1026;
@@ -237,6 +237,8 @@ const S::Short	 SM_KEYUP		= 1036;
 const S::Short	 SM_CHAR		= 1037;
 
 const S::Short	 SM_WINDOWMETRICS	= 1038;
+const S::Short	 SM_GETFOCUS		= 1039;
+const S::Short	 SM_LOSEFOCUS		= 1040;
 
 const S::Short	 SM_TIMER		= 1534;
 

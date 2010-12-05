@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Shorten Lossless Encoder</name>
+  <version>1.0</version>
+  <id>shn-out</id>
+  <type>encoder</type>
+  <format>
+    <name>Shorten Audio</name>
+    <extension>shn</extension>
+  </format>
+  <external>
+    <command ignoreExitCode="true">codecs/cmdline/shorten.exe</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>

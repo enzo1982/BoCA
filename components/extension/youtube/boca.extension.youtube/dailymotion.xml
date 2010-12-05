@@ -5,8 +5,8 @@
 
   <script type="text/javascript">
     function canHandleURL(URL) {
-      if (URL.toLowerCase().substr(0, 33) == "http://www.dailymotion.com/video/") return true;
-      else									  return false;
+      if (URL.toLowerCase().match(/http:\/\/www.dailymotion.com\/video\/.*/)) return true;
+      else								      return false;
     }
 
     function getVideoURL(html) {
@@ -18,13 +18,13 @@
     function queryMetadata(html) {
       var metadata = new Metadata();
 
-      metadata.title	   = (html.match(/&lt;Attribute name="title"&gt;(.*?)&lt;\/Attribute&gt;/), RegExp.$1);
-      metadata.description = (html.match(/&lt;div .*? id="video_description"&gt;(.*?)&lt;\/div&gt;/), RegExp.$1);
+      metadata.title	   = (html.match(/&lt;Attribute name="title"&gt;(.*?)&lt;\/Attribute&gt;/) ? RegExp.$1 : null);
+      metadata.description = (html.match(/&lt;div .*? id="video_description"&gt;(.*?)&lt;\/div&gt;/) ? RegExp.$1 : null);
 
-      metadata.date	   = (html.match(/&lt;Attribute name="date"&gt;(.*?)&lt;\/Attribute&gt;/), RegExp.$1);
-      metadata.thumbnail   = (html.match(/&lt;link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/&gt;/), "http://www.dailymotion.com" + RegExp.$1);
+      metadata.date	   = (html.match(/&lt;Attribute name="date"&gt;(.*?)&lt;\/Attribute&gt;/) ? RegExp.$1 : null);
+      metadata.thumbnail   = (html.match(/&lt;link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/&gt;/) ? "http://www.dailymotion.com" + RegExp.$1 : null);
 
-      metadata.uploader	   = (html.match(/&lt;Attribute name="owner"&gt;(.*?)&lt;\/Attribute&gt;/), RegExp.$1);
+      metadata.uploader	   = (html.match(/&lt;Attribute name="owner"&gt;(.*?)&lt;\/Attribute&gt;/) ? RegExp.$1 : null);
 
       return metadata;
     }

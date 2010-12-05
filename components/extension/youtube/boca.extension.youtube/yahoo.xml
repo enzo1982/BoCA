@@ -18,11 +18,13 @@
     function queryMetadata(html) {
       var metadata = new Metadata();
 
-      metadata.title	 = (html.match(/&lt;meta name="title" content="(.*?)" \/&gt;/), RegExp.$1);
+      metadata.title	   = (html.match(/&lt;meta name="title" content="(.*?)" \/&gt;/) ? RegExp.$1 : null);
+      metadata.description = (html.match(/&lt;p id="desc_trunc" class="description"&gt;(?:.|\n|\r)*?&lt;span&gt;(.*?)&lt;\/span&gt;/) ? RegExp.$1 : null);
 
-      metadata.thumbnail = (html.match(/so.addVariable\("thumbUrl", "(.*?)"\);/), RegExp.$1);
+      metadata.date	   = (html.match(/&lt;p class="mPubDate"&gt;(.*?)&lt;\/p&gt;/) ? RegExp.$1 : null);
+      metadata.thumbnail   = (html.match(/so.addVariable\("thumbUrl", "(.*?)"\);/) ? RegExp.$1 : null);
 
-      metadata.uploader	 = (html.match(/&lt;h2 class="ti-5"&gt;&lt;a .*?&gt;(.*?)&lt;\/a&gt;&lt;\/h2&gt;/), RegExp.$1);
+      metadata.uploader	   = (html.match(/&lt;h2 class="ti-5"&gt;&lt;a .*?&gt;(.*?)&lt;\/a&gt;&lt;\/h2&gt;/) ? RegExp.$1 : null);
 
       return metadata;
     }

@@ -76,7 +76,7 @@ Bool BoCA::VorbisOut::Activate()
 
 	if (format.channels > 2)
 	{
-		errorString = "BonkEnc does not support more than 2 channels!";
+		errorString = "This encoder does not support more than 2 channels!";
 		errorState  = True;
 
 		return False;

@@ -54,7 +54,7 @@ BoCA::APETag::~APETag()
 Error BoCA::APETag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
 	Config		*currentConfig = Config::Get();
-	char		*prevOutFormat = String::SetOutputFormat("UTF-8");
+	String		 prevOutFormat = String::SetOutputFormat("UTF-8");
 
 	const Info	&info = track.GetInfo();
 
@@ -246,7 +246,7 @@ Error BoCA::APETag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track
 		if (!ParseAPEFooter(buffer, NIL, &numItems)) return Error();
 	}
 
-	char	*prevInFormat = String::SetInputFormat("UTF-8");
+	String	 prevInFormat = String::SetInputFormat("UTF-8");
 
 	Info	 info = track.GetInfo();
 

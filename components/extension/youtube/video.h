@@ -41,6 +41,7 @@ namespace BoCA
 			String				 videoDate;
 
 			String				 videoThumbnailURL;
+			Picture				 videoThumbnail;
 
 			Bool				 pageDownloaded;
 			Bool				 metadataQueried;
@@ -62,24 +63,28 @@ namespace BoCA
 			Bool				 Download();
 			Bool				 CancelDownload();
 		accessors:
+			Bool				 IsDownloadStarted()			{ return videoDownloadStarted; }
+			Bool				 IsDownloadFinished()			{ return videoDownloadFinished; }
+
 			Bool				 IsDownloadCancelled()			{ return doCancelDownload; }
 
 			Bool				 SetVideoURL(const String &nVideoURL)	{ videoURL = nVideoURL; return True; }
-			const String			 GetVideoURL() const			{ return videoURL; }
+			const String			&GetVideoURL() const			{ return videoURL; }
 
 			Bool				 SetVideoFile(const String &nVideoFile)	{ videoFile = nVideoFile; return True; }
-			const String			 GetVideoFile() const			{ return videoFile; }
+			const String			&GetVideoFile() const			{ return videoFile; }
 
-			const String			 GetVideoSiteName() const		{ return videoSite->GetName(); }
-			const String			 GetDecoderID() const			{ return videoSite->GetDecoderID(); }
+			const String			&GetVideoSiteName() const		{ return videoSite->GetName(); }
+			const String			&GetDecoderID() const			{ return videoSite->GetDecoderID(); }
 
-			const String			 GetVideoTitle() const			{ return videoTitle; }
-			const String			 GetVideoDescription() const		{ return videoDescription; }
+			const String			&GetVideoTitle() const			{ return videoTitle; }
+			const String			&GetVideoDescription() const		{ return videoDescription; }
 
-			const String			 GetVideoUploader() const		{ return videoUploader; }
-			const String			 GetVideoDate() const			{ return videoDate; }
+			const String			&GetVideoUploader() const		{ return videoUploader; }
+			const String			&GetVideoDate() const			{ return videoDate; }
 
-			const String			 GetVideoThumbnailURL() const		{ return videoThumbnailURL; }
+			const String			&GetVideoThumbnailURL() const		{ return videoThumbnailURL; }
+			const Picture			&GetVideoThumbnail() const		{ return videoThumbnail; }
 		signals:
 			Signal1<Void, Int>		 downloadProgress;
 			Signal1<Void, const String &>	 downloadSpeed;

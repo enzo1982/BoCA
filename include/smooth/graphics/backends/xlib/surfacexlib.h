@@ -30,32 +30,32 @@ namespace smooth
 		class SurfaceXLib : public SurfaceBackend
 		{
 			private:
-				Display	*display;
+				X11::Display	*display;
 			protected:
-				Window	 window;
-				Window	 rWindow;
+				X11::Window	 window;
+				X11::Window	 rWindow;
 
-				Pixmap	 bitmap;
+				X11::Pixmap	 bitmap;
 			public:
-					 SurfaceXLib(Void * = NIL, const Size & = Size());
-					~SurfaceXLib();
+						 SurfaceXLib(Void * = NIL, const Size & = Size());
+						~SurfaceXLib();
 
-				Int	 PaintRect(const Rect &);
+				Int		 PaintRect(const Rect &);
 
-				Int	 StartPaint(const Rect &);
-				Int	 EndPaint();
+				Int		 StartPaint(const Rect &);
+				Int		 EndPaint();
 
-				Void	*GetSystemSurface() const;
+				Void		*GetSystemSurface() const;
 
-				Int	 SetPixel(const Point &, const Color &);
+				Int		 SetPixel(const Point &, const Color &);
 
-				Int	 Line(const Point &, const Point &, const Color &);
-				Int	 Box(const Rect &, const Color &, Int, const Size &);
+				Int		 Line(const Point &, const Point &, const Color &);
+				Int		 Box(const Rect &, const Color &, Int, const Size &);
 
-				Int	 SetText(const String &, const Rect &, const Font &, Bool);
+				Int		 SetText(const String &, const Rect &, const Font &, Bool);
 
-				Int	 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				Int	 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
+				Int		 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
+				Int		 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
 		};
 	};
 };

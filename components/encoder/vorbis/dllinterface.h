@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,6 +17,7 @@ using namespace smooth::System;
 
 extern DynamicLoader	*oggdll;
 extern DynamicLoader	*vorbisdll;
+extern DynamicLoader	*vorbisencdll;
 
 Bool			 LoadOggDLL();
 Void			 FreeOggDLL();
@@ -39,8 +40,6 @@ extern OGGPAGEEOS		 ex_ogg_page_eos;
 extern OGGSTREAMCLEAR		 ex_ogg_stream_clear;
 
 typedef void			(*VORBISINFOINIT)		 (vorbis_info *);
-typedef int			(*VORBISENCODEINIT)		 (vorbis_info *, long, long, long, long, long);
-typedef int			(*VORBISENCODEINITVBR)		 (vorbis_info *, long, long, float);
 typedef void			(*VORBISCOMMENTINIT)		 (vorbis_comment *);
 typedef void			(*VORBISCOMMENTADDTAG)		 (vorbis_comment *, char *, char *);
 typedef int			(*VORBISANALYSISINIT)		 (vorbis_dsp_state *, vorbis_info *);
@@ -57,9 +56,10 @@ typedef void			(*VORBISDSPCLEAR)		 (vorbis_dsp_state *);
 typedef void			(*VORBISCOMMENTCLEAR)		 (vorbis_comment *);
 typedef void			(*VORBISINFOCLEAR)		 (vorbis_info *);
 
+typedef int			(*VORBISENCODEINIT)		 (vorbis_info *, long, long, long, long, long);
+typedef int			(*VORBISENCODEINITVBR)		 (vorbis_info *, long, long, float);
+
 extern VORBISINFOINIT		 ex_vorbis_info_init;
-extern VORBISENCODEINIT		 ex_vorbis_encode_init;
-extern VORBISENCODEINITVBR	 ex_vorbis_encode_init_vbr;
 extern VORBISCOMMENTINIT	 ex_vorbis_comment_init;
 extern VORBISCOMMENTADDTAG	 ex_vorbis_comment_add_tag;
 extern VORBISANALYSISINIT	 ex_vorbis_analysis_init;
@@ -75,3 +75,6 @@ extern VORBISBLOCKCLEAR		 ex_vorbis_block_clear;
 extern VORBISDSPCLEAR		 ex_vorbis_dsp_clear;
 extern VORBISCOMMENTCLEAR	 ex_vorbis_comment_clear;
 extern VORBISINFOCLEAR		 ex_vorbis_info_clear;
+
+extern VORBISENCODEINIT		 ex_vorbis_encode_init;
+extern VORBISENCODEINITVBR	 ex_vorbis_encode_init_vbr;

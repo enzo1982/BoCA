@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,23 +29,26 @@ namespace smooth
 		class SMOOTHAPI System
 		{
 			private:
-				static Int	 nextGUID;
+				static Int		 nextGUID;
 
-						 System();
-						 System(const System &);
+							 System();
+							 System(const System &);
 			public:
-				static Int	 RequestGUID();
+				static Int		 RequestGUID();
 
-				static String	 GetVersionString();
-				static String	 GetAPIVersion();
+				static String		 GetVersionString();
+				static String		 GetAPIVersion();
 
-				static Bool	 Sleep(UnsignedInt);
+				static UnsignedInt64	 Clock();
+				static Bool		 Sleep(UnsignedInt);
 
-				static String	 GetWindowsRootDirectory();
-				static String	 GetPersonalFilesDirectory();
-				static String	 GetProgramFilesDirectory();
-				static String	 GetApplicationDataDirectory();
-				static String	 GetTempDirectory();
+				static Bool		 OpenURL(const String &);
+
+				static String		 GetWindowsRootDirectory();
+				static String		 GetPersonalFilesDirectory();
+				static String		 GetProgramFilesDirectory();
+				static String		 GetApplicationDataDirectory();
+				static String		 GetTempDirectory();
 		};
 	};
 };

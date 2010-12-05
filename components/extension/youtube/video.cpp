@@ -41,6 +41,12 @@ Int BoCA::Video::DownloaderThread(String targetFileName)
 
 	DownloadPage();
 
+	/* Create target directory if it does not exist yet.
+	 */
+	Directory(File(targetFileName).GetFilePath()).Create();
+
+	/* Get video URL and start download.
+	 */
 	Bool		 error = False;
 	String		 cacheURL = videoSite->GetVideoURL(videoPageHTML);
 
@@ -117,6 +123,33 @@ Bool BoCA::Video::QueryMetadata()
 	videoDate	  = metadata.date;
 	videoUploader	  = metadata.uploader;
 	videoThumbnailURL = metadata.thumbnail;
+
+	/* Download video thumbnail.
+	 */
+	if (videoThumbnailURL.StartsWith("http://"))
+	{
+		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(videoThumbnailURL);
+		Buffer<UnsignedByte>	 buffer;
+
+		protocol->DownloadToBuffer(buffer);
+
+		String		 streamURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
+
+		delete protocol;
+
+		if (streamURL != NIL)
+		{
+			Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(streamURL);
+
+			protocol->DownloadToBuffer(buffer);
+
+			delete protocol;
+		}
+
+		videoThumbnail.mime = "image/jpeg";
+		videoThumbnail.type = 0;
+		videoThumbnail.data = buffer;
+	}
 
 	metadataQueried = True;
 

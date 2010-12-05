@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Speex Speech Decoder</name>
+  <version>1.0</version>
+  <id>speexcmd-in</id>
+  <type>decoder</type>
+  <format>
+    <name>Speex Files</name>
+    <extension>spx</extension>
+    <tag id="vorbis-tag" mode="other">Vorbis Comment</tag>
+  </format>
+  <external>
+    <command>codecs/cmdline/speexdec.exe</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <outformat>wave</outformat>
+    <parameters>
+      <switch name="Disable perceptual enhancements" argument="--no-enh"/>
+      <selection name="Force decoding mode" argument="%VALUE">
+	<option alias="Narrowband">--force-nb</option>
+	<option alias="Wideband">--force-wb</option>
+	<option alias="Ultra-wideband">--force-uwb</option>
+      </selection>
+      <selection name="Force channels" argument="%VALUE">
+	<option alias="Mono">--mono</option>
+	<option alias="Stereo">--stereo</option>
+      </selection>
+      <selection name="Force sampling rate" argument="--rate %VALUE">
+	<option>8000</option>
+	<option>11025</option>
+	<option>12000</option>
+	<option>16000</option>
+	<option>22050</option>
+	<option>24000</option>
+	<option>32000</option>
+	<option>44100</option>
+	<option>48000</option>
+      </selection>
+    </parameters>
+  </external>
+</component>

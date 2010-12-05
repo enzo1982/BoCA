@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
 
 OGGSTREAMINIT		 ex_ogg_stream_init		= NIL;
@@ -38,11 +39,9 @@ DynamicLoader *speexdll	= NIL;
 
 Bool LoadOggDLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Ogg.dll")).Exists()) return False;
-#endif
+	oggdll = BoCA::Utilities::LoadCodecDLL("ogg");
 
-	oggdll = new DynamicLoader("codecs/Ogg");
+	if (oggdll == NIL) return False;
 
 	ex_ogg_stream_init		= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
 	ex_ogg_stream_packetout		= (OGGSTREAMPACKETOUT) oggdll->GetFunctionAddress("ogg_stream_packetout");
@@ -73,18 +72,16 @@ Bool LoadOggDLL()
 
 Void FreeOggDLL()
 {
-	Object::DeleteObject(oggdll);
+	BoCA::Utilities::FreeCodecDLL(oggdll);
 
 	oggdll = NIL;
 }
 
 Bool LoadSpeexDLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Speex.dll")).Exists()) return False;
-#endif
+	speexdll = BoCA::Utilities::LoadCodecDLL("speex");
 
-	speexdll = new DynamicLoader("codecs/Speex");
+	if (speexdll == NIL) return False;
 
 	ex_speex_bits_init		= (SPEEXBITSINIT) speexdll->GetFunctionAddress("speex_bits_init");
 	ex_speex_bits_destroy		= (SPEEXBITSDESTROY) speexdll->GetFunctionAddress("speex_bits_destroy");
@@ -113,7 +110,7 @@ Bool LoadSpeexDLL()
 
 Void FreeSpeexDLL()
 {
-	Object::DeleteObject(speexdll);
+	BoCA::Utilities::FreeCodecDLL(speexdll);
 
 	speexdll = NIL;
 }

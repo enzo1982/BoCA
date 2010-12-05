@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,9 +12,9 @@
 
 BoCA::LayerLengthStatus::LayerLengthStatus()
 {
-	display_selected	= new LengthDisplay(ImageLoader::Load("BonkEnc.pci:18"));
-	display_unselected	= new LengthDisplay(ImageLoader::Load("BonkEnc.pci:19"));
-	display_all		= new LengthDisplay(ImageLoader::Load("BonkEnc.pci:20"));
+	display_selected	= new LengthDisplay(ImageLoader::Load("freac.pci:18"));
+	display_unselected	= new LengthDisplay(ImageLoader::Load("freac.pci:19"));
+	display_all		= new LengthDisplay(ImageLoader::Load("freac.pci:20"));
 
 	Add(display_selected);
 	Add(display_unselected);

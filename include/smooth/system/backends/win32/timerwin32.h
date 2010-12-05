@@ -32,9 +32,11 @@ namespace smooth
 			private:
 				Int			 timerid;
 
+				static Array<Int>	 handles;
+
 				static void WINAPI	 TimerProc(HWND, UINT, UINT_PTR, DWORD);
 			public:
-							 TimerWin32();
+							 TimerWin32(Timer *);
 							~TimerWin32();
 
 				Int			 Start(Int);

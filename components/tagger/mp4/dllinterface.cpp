@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
 
 MP4READ			 ex_MP4Read			= NIL;
@@ -42,11 +43,9 @@ DynamicLoader *mp4v2dll	= NIL;
 
 Bool LoadMP4v2DLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\MP4v2.dll")).Exists()) return False;
-#endif
+	mp4v2dll = BoCA::Utilities::LoadCodecDLL("mp4v2");
 
-	mp4v2dll = new DynamicLoader("codecs/MP4v2");
+	if (mp4v2dll == NIL) return False;
 
 	ex_MP4Read			= (MP4READ) mp4v2dll->GetFunctionAddress("MP4Read");
 	ex_MP4Modify			= (MP4MODIFY) mp4v2dll->GetFunctionAddress("MP4Modify");
@@ -109,7 +108,7 @@ Bool LoadMP4v2DLL()
 
 Void FreeMP4v2DLL()
 {
-	Object::DeleteObject(mp4v2dll);
+	BoCA::Utilities::FreeCodecDLL(mp4v2dll);
 
 	mp4v2dll = NIL;
 }

@@ -43,9 +43,11 @@ Bool LoadID3DLL()
 {
 #ifdef __WIN32__
 	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("ID3Lib.dll")).Exists()) return False;
-#endif
 
 	id3dll = new DynamicLoader("ID3Lib");
+#else
+	id3dll = new DynamicLoader("libid3");
+#endif
 
 	ex_ID3Tag_New			= (ID3TAGNEW) id3dll->GetFunctionAddress("ID3Tag_New");
 	ex_ID3Tag_Delete		= (ID3TAGDELETE) id3dll->GetFunctionAddress("ID3Tag_Delete");

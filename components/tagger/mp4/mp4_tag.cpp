@@ -113,7 +113,7 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
 
-	char	*prevOutFormat = String::SetOutputFormat("UTF-8");
+	String	 prevOutFormat = String::SetOutputFormat("UTF-8");
 
 	if (info.artist != NIL) ex_MP4TagsSetArtist(mp4Tags, info.artist);
 	if (info.title  != NIL) ex_MP4TagsSetName(mp4Tags, info.title);
@@ -202,7 +202,7 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
 
-	char	*prevInFormat = String::SetInputFormat("UTF-8");
+	String	 prevInFormat = String::SetInputFormat("UTF-8");
 
 	if	(mp4Tags->name	      != NIL) info.title    = mp4Tags->name;
 	if	(mp4Tags->artist      != NIL) info.artist   = mp4Tags->artist;

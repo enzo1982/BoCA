@@ -66,7 +66,7 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Look for UTF-8 BOM and set input format.
 	 */
-	const char	*prevInputFormat = String::SetInputFormat("ISO-8859-1");
+	String		 prevInputFormat = String::SetInputFormat("ISO-8859-1");
 
 	Int		 bom[3] = { file->InputNumber(1), file->InputNumber(1), file->InputNumber(1) };
 

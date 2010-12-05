@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
 
 NEAACDECOPEN			 ex_NeAACDecOpen			= NIL;
@@ -37,10 +38,12 @@ DynamicLoader *mp4v2dll	= NIL;
 Bool LoadFAAD2DLL()
 {
 #ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FAAD2.dll")).Exists()) return False;
+	faad2dll = BoCA::Utilities::LoadCodecDLL("FAAD2");
+#else
+	faad2dll = BoCA::Utilities::LoadCodecDLL("faad");
 #endif
 
-	faad2dll = new DynamicLoader("codecs/FAAD2");
+	if (faad2dll == NIL) return False;
 
 	ex_NeAACDecOpen				= (NEAACDECOPEN) faad2dll->GetFunctionAddress("NeAACDecOpen");
 	ex_NeAACDecInit				= (NEAACDECINIT) faad2dll->GetFunctionAddress("NeAACDecInit");
@@ -65,18 +68,16 @@ Bool LoadFAAD2DLL()
 
 Void FreeFAAD2DLL()
 {
-	Object::DeleteObject(faad2dll);
+	BoCA::Utilities::FreeCodecDLL(faad2dll);
 
 	faad2dll = NIL;
 }
 
 Bool LoadMP4v2DLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\MP4v2.dll")).Exists()) return False;
-#endif
+	mp4v2dll = BoCA::Utilities::LoadCodecDLL("mp4v2");
 
-	mp4v2dll = new DynamicLoader("codecs/MP4v2");
+	if (mp4v2dll == NIL) return False;
 
 	ex_MP4Read			= (MP4READ) mp4v2dll->GetFunctionAddress("MP4Read");
 	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
@@ -107,7 +108,7 @@ Bool LoadMP4v2DLL()
 
 Void FreeMP4v2DLL()
 {
-	Object::DeleteObject(mp4v2dll);
+	BoCA::Utilities::FreeCodecDLL(mp4v2dll);
 
 	mp4v2dll = NIL;
 }

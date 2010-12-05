@@ -11,7 +11,9 @@ BOCA_PATH = ..
 OBJECTS	  = application/external/configlayer.o application/external/decodercomponent.o application/external/encodercomponent.o application/component.o application/componentspecs.o application/decodercomponent.o application/deviceinfocomponent.o application/dspcomponent.o application/encodercomponent.o application/extensioncomponent.o application/outputcomponent.o application/registry.o application/taggercomponent.o common/communication/application.o common/communication/joblist.o common/communication/menu.o common/communication/settings.o common/metadata/device.o common/metadata/format.o common/metadata/info.o common/metadata/mcdi.o common/metadata/picture.o common/metadata/picturedata.o common/metadata/track.o common/config.o common/configlayer.o common/i18n.o common/protocol.o common/utilities.o component/component.o component/decodercomponent.o component/deviceinfocomponent.o component/dspcomponent.o component/encodercomponent.o component/extensioncomponent.o component/outputcomponent.o component/taggercomponent.o core/main.o
 
 ifeq ($(BUILD_WIN32),True)
-	OBJECTS += application/external/decodercomponentfile.o application/external/decodercomponentstdio.o application/external/encodercomponentfile.o application/external/encodercomponentstdio.o
+	OBJECTS += application/external/win32/decodercomponentfile.o application/external/win32/decodercomponentstdio.o application/external/win32/encodercomponentfile.o application/external/win32/encodercomponentstdio.o
+else ifeq ($(BUILD_UNIX),True)
+	OBJECTS += application/external/posix/decodercomponentfile.o application/external/posix/decodercomponentstdio.o application/external/posix/encodercomponentfile.o application/external/posix/encodercomponentstdio.o
 endif
 
 # Enter additional library dependencies here
@@ -28,18 +30,18 @@ CLEANCMD1 =
 include $(BOCA_PATH)/Makefile-directories
 
 CC = gcc
-CCOPTS = -g0 -Wall -fno-exceptions -ffast-math -DBOCA_CDK_BUILD -I$(BOCA_PATH)/include
+CCOPTS = -g0 -Wall -Os -ffast-math -fno-exceptions -DBOCA_CDK_BUILD -I$(BOCA_PATH)/include
 LD = gcc
-LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lws2_32 -lstdc++ $(LIBS)
+LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_X64),True)
 	CCOPTS += -march=nocona
 else
-	CCOPTS += -march=i586 -Os
+	CCOPTS += -march=i586
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	LDOPTS += -lole32 -Xlinker --dynamicbase -Xlinker --nxcompat -Xlinker --enable-auto-import
+	LDOPTS += -lole32 -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 
 	DLLEXT = .dll
 else
@@ -50,7 +52,7 @@ all : $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT)
 
 $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT) : $(OBJECTS)
 ifeq ($(BUILD_WIN32),True)
-	$(LD) --shared -o $@ $(OBJECTS) -Xlinker --out-implib -Xlinker $(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
+	$(LD) --shared -o $@ $(OBJECTS) -Wl,--out-implib,$(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
 else
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca.so

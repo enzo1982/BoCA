@@ -184,10 +184,12 @@ Void BoCA::ChooserAlbums::OnApplicationModifyTrack(const Track &track)
 	{
 		if (tracks.GetNthReference(i).GetTrackID() == track.GetTrackID())
 		{
+			Track	 album = tracks.GetNth(i);
+
 			tracks.GetNthReference(i) = track;
 
 			AddToAlbumList(track);
-			RemoveFromAlbumList(track);
+			RemoveFromAlbumList(album);
 
 			break;
 		}

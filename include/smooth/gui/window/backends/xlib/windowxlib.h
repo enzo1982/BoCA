@@ -33,34 +33,51 @@ namespace smooth
 			private:
 				static Array<WindowXLib *, Void *>	 windowBackends;
 
-				Display					*display;
+				X11::Display				*display;
+				X11::XIM				 im;
 			protected:
 				Int					 id;
 
-				Window					 wnd;
-				Window					 oldwnd;
+				X11::Window				 wnd;
+				X11::Window				 oldwnd;
+
+				X11::XIC				 ic;
 
 				Point					 pos;
 				Size					 size;
+
+				Size					 minSize;
+				Size					 maxSize;
+
+				Int					 flags;
+
+				String					 selection;
+
+				Void					 UpdateWMNormalHints();
 			public:
 									 WindowXLib(Void * = NIL);
 									~WindowXLib();
 
 				Void					*GetSystemWindow() const;
 
-				static WindowXLib			*GetWindowBackend(::Window);
+				static WindowXLib			*GetWindowBackend(X11::Window);
 
-				Int					 ProcessSystemMessages(XEvent *);
+				Int					 ProcessSystemMessages(X11::XEvent *);
 
 				Int					 Open(const String &, const Point &, const Size &, Int);
 				Int					 Close();
 
 				Int					 SetTitle(const String &);
 
+				Int					 SetMinimumSize(const Size &);
+				Int					 SetMaximumSize(const Size &);
+
 				Int					 Show();
 				Int					 Hide();
 
 				Int					 SetMetrics(const Point &, const Size &);
+			accessors:
+				Void					 SetSelection(const String &nSelection) { selection = nSelection; }
 		};
 	};
 };

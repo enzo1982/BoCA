@@ -5,8 +5,8 @@
 
   <script type="text/javascript">
     function canHandleURL(URL) {
-      if (URL.toLowerCase().substr(0, 31) == "http://www.youtube.com/watch?v=")	return true;
-      else									return false;
+      if (URL.toLowerCase().match(/http:\/\/www.youtube.com\/watch\?v=.*/)) return true;
+      else								    return false;
     }
 
     function getVideoURL(html) {
@@ -16,13 +16,13 @@
     function queryMetadata(html) {
       var metadata = new Metadata();
 
-      metadata.title	   = (html.match(/&lt;meta name="title" content="(.*?)"&gt;/), RegExp.$1);
-      metadata.description = (html.match(/&lt;p id="eow-description"\s*&gt;(.*?)&lt;\/p&gt;/), RegExp.$1);
+      metadata.title	   = (html.match(/&lt;meta name="title" content="(.*?)"&gt;/) ? RegExp.$1 : null);
+      metadata.description = (html.match(/&lt;p id="eow-description"\s*&gt;(.*?)&lt;\/p&gt;/) ? RegExp.$1 : null);
 
-      metadata.date	   = (html.match(/&lt;span id="eow-date" class="watch-video-date"\s*&gt;\s*(.*?)\s*&lt;\/span&gt;/), RegExp.$1);
-      metadata.thumbnail   = (html.match(/'VIDEO_HQ_THUMB': '(.*?)'/), RegExp.$1);
+      metadata.date	   = (html.match(/&lt;span id="eow-date" class="watch-video-date"\s*&gt;\s*(.*?)\s*&lt;\/span&gt;/) ? RegExp.$1 : null);
+      metadata.thumbnail   = (html.match(/&lt;meta property="og:image" content="(.*?)" \/&gt;/) ? RegExp.$1 : null);
 
-      metadata.uploader	   = (html.match(/'VIDEO_USERNAME': '(.*?)'/), RegExp.$1);
+      metadata.uploader    = (html.match(/'VIDEO_USERNAME': '(.*?)'/) ? RegExp.$1 : null);
 
       return metadata;
     }

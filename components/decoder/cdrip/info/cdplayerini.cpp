@@ -23,7 +23,7 @@ BoCA::CDPlayerIni::~CDPlayerIni()
 
 Int BoCA::CDPlayerIni::ReadCDInfo()
 {
-	cdInfo.RemoveAll();
+	cdInfo.Clear();
 
 	Int	 numTocEntries = ex_CR_GetNumTocEntries();
 	Int	 discID = 0;
@@ -71,7 +71,7 @@ Int BoCA::CDPlayerIni::ReadCDInfo()
 
 					for (Int i = 7; i < line.Length(); i++) artist[i - 7] = line[i];
 
-					cdInfo.Add(artist, 0);
+					cdInfo.SetArtist(artist);
 				}
 				else if (line.ToLower().StartsWith("title="))
 				{
@@ -79,7 +79,7 @@ Int BoCA::CDPlayerIni::ReadCDInfo()
 
 					for (Int i = 6; i < line.Length(); i++) title[i - 6] = line[i];
 
-					cdInfo.Add(title, 100);
+					cdInfo.SetTitle(title);
 				}
 				else if (line.StartsWith("0=") || line.ToInt() > 0)
 				{
@@ -88,7 +88,7 @@ Int BoCA::CDPlayerIni::ReadCDInfo()
 
 					for (Int i = length; i < line.Length(); i++) title[i - length] = line[i];
 
-					cdInfo.Add(title, line.ToInt() + 1);
+					cdInfo.SetTrackTitle(line.ToInt() + 1, title);
 				}
 				else if (line.StartsWith("["))
 				{
@@ -107,12 +107,12 @@ Int BoCA::CDPlayerIni::ReadCDInfo()
 
 Int BoCA::CDPlayerIni::ClearCDInfo()
 {
-	cdInfo.RemoveAll();
+	cdInfo.Clear();
 
 	return Success();
 }
 
-const Array<String> &BoCA::CDPlayerIni::GetCDInfo()
+const BoCA::CDInfo &BoCA::CDPlayerIni::GetCDInfo()
 {
 	return cdInfo;
 }

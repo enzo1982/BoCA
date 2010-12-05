@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
 
 MAD_DECODER_INIT	 ex_mad_decoder_init	= NIL;
@@ -19,11 +20,9 @@ DynamicLoader *maddll	= NIL;
 
 Bool LoadMADDLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\MAD.dll")).Exists()) return False;
-#endif
+	maddll = BoCA::Utilities::LoadCodecDLL("mad");
 
-	maddll = new DynamicLoader("codecs/MAD");
+	if (maddll == NIL) return False;
 
 	ex_mad_decoder_init	= (MAD_DECODER_INIT) maddll->GetFunctionAddress("mad_decoder_init");
 	ex_mad_decoder_run	= (MAD_DECODER_RUN) maddll->GetFunctionAddress("mad_decoder_run");
@@ -40,7 +39,7 @@ Bool LoadMADDLL()
 
 Void FreeMADDLL()
 {
-	Object::DeleteObject(maddll);
+	BoCA::Utilities::FreeCodecDLL(maddll);
 
 	maddll = NIL;
 }

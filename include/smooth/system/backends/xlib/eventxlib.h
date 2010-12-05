@@ -30,12 +30,12 @@ namespace smooth
 		class EventXLib : public EventBackend
 		{
 			private:
-				Display	*display;
+				X11::Display	*display;
 			public:
-					 EventXLib();
-					~EventXLib();
+						 EventXLib();
+						~EventXLib();
 
-				Int	 ProcessNextEvent();
+				Int		 ProcessNextEvent();
 		};
 	};
 };

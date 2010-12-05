@@ -321,14 +321,6 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\runtime\application\external\decodercomponentfile.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\runtime\application\external\decodercomponentstdio.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\runtime\application\external\encodercomponent.cpp"
 						>
 						<FileConfiguration
@@ -350,14 +342,78 @@
 							/>
 						</FileConfiguration>
 					</File>
-					<File
-						RelativePath="..\..\..\runtime\application\external\encodercomponentfile.cpp"
+					<Filter
+						Name="win32"
 						>
-					</File>
-					<File
-						RelativePath="..\..\..\runtime\application\external\encodercomponentstdio.cpp"
+						<File
+							RelativePath="..\..\..\runtime\application\external\win32\decodercomponentfile.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\runtime\application\external\win32\decodercomponentstdio.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\runtime\application\external\win32\encodercomponentfile.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\..\runtime\application\external\win32\encodercomponentstdio.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="posix"
 						>
-					</File>
+						<File
+							RelativePath="..\..\..\runtime\application\external\posix\decodercomponentfile.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath="..\..\..\runtime\application\external\posix\decodercomponentstdio.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath="..\..\..\runtime\application\external\posix\encodercomponentfile.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath="..\..\..\runtime\application\external\posix\encodercomponentstdio.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter

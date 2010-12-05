@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
 
 FLAC__METADATA_CHAIN_NEW				 ex_FLAC__metadata_chain_new				= NIL;
@@ -36,11 +37,9 @@ DynamicLoader *flacdll	= NIL;
 
 Bool LoadFLACDLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FLAC.dll")).Exists()) return False;
-#endif
+	flacdll = BoCA::Utilities::LoadCodecDLL("FLAC");
 
-	flacdll = new DynamicLoader("codecs/FLAC");
+	if (flacdll == NIL) return False;
 
 	ex_FLAC__metadata_chain_new				= (FLAC__METADATA_CHAIN_NEW) flacdll->GetFunctionAddress("FLAC__metadata_chain_new");
 	ex_FLAC__metadata_chain_delete				= (FLAC__METADATA_CHAIN_DELETE) flacdll->GetFunctionAddress("FLAC__metadata_chain_delete");
@@ -91,7 +90,7 @@ Bool LoadFLACDLL()
 
 Void FreeFLACDLL()
 {
-	Object::DeleteObject(flacdll);
+	BoCA::Utilities::FreeCodecDLL(flacdll);
 
 	flacdll = NIL;
 }

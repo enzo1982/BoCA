@@ -44,14 +44,14 @@ namespace smooth
 				Short			 GetThreadType() const;
 
 				virtual Void		*GetSystemThread() const;
-
 				virtual Int		 GetThreadID() const;
+
+				virtual	Bool		 IsCurrentThread() const;
 
 				virtual Int		 Start(Void (*)(Void *), Void *);
 				virtual Int		 Stop();
 
 				virtual Void		 Exit();
-				virtual Void		*Self() const;
 		};
 	};
 };

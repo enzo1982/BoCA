@@ -32,25 +32,9 @@ DynamicLoader *mp4v2dll	= NIL;
 
 Bool LoadFAACDLL()
 {
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
-	{
-#ifdef __WIN32__
-		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FAAC-OpenMP.dll")).Exists()) return False;
-#endif
+	faacdll = BoCA::Utilities::LoadCodecDLL("faac");
 
-		faacdll = new DynamicLoader("codecs/FAAC-OpenMP");
-
-		if (faacdll->GetSystemModuleHandle() == NIL) FreeFAACDLL();
-	}
-
-	if (faacdll == NIL)
-	{
-#ifdef __WIN32__
-		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\FAAC.dll")).Exists()) return False;
-#endif
-
-		faacdll = new DynamicLoader("codecs/FAAC");
-	}
+	if (faacdll == NIL) return False;
 
 	ex_faacEncOpen				= (FAACENCOPEN) faacdll->GetFunctionAddress("faacEncOpen");
 	ex_faacEncGetCurrentConfiguration	= (FAACENCGETCURRENTCONFIGURATION) faacdll->GetFunctionAddress("faacEncGetCurrentConfiguration");
@@ -71,18 +55,16 @@ Bool LoadFAACDLL()
 
 Void FreeFAACDLL()
 {
-	Object::DeleteObject(faacdll);
+	BoCA::Utilities::FreeCodecDLL(faacdll);
 
 	faacdll = NIL;
 }
 
 Bool LoadMP4v2DLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\MP4v2.dll")).Exists()) return False;
-#endif
+	mp4v2dll = BoCA::Utilities::LoadCodecDLL("mp4v2");
 
-	mp4v2dll = new DynamicLoader("codecs/MP4v2");
+	if (mp4v2dll == NIL) return False;
 
 	ex_MP4CreateEx			= (MP4CREATEEX) mp4v2dll->GetFunctionAddress("MP4CreateEx");
 	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
@@ -103,7 +85,7 @@ Bool LoadMP4v2DLL()
 
 Void FreeMP4v2DLL()
 {
-	Object::DeleteObject(mp4v2dll);
+	BoCA::Utilities::FreeCodecDLL(mp4v2dll);
 
 	mp4v2dll = NIL;
 }

@@ -55,6 +55,8 @@ namespace smooth
 #	define IDI_WARNING		IDI_EXCLAMATION
 #	define IDI_ERROR		IDI_HAND
 #	define IDI_INFORMATION		IDI_ASTERISK
+
+#	define MAKEINTRESOURCE(x)	(wchar_t *) 0
 #endif
 
 namespace smooth

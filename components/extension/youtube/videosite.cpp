@@ -23,6 +23,11 @@ BoCA::VideoSite::~VideoSite()
 	DestroyScriptContext();
 }
 
+Bool BoCA::VideoSite::IsSane()
+{
+	return !context.IsEmpty();
+}
+
 Bool BoCA::VideoSite::CanHandleURL(const String &URL)
 {
 	/* Use our own handle scope for this.
@@ -79,6 +84,10 @@ String BoCA::VideoSite::GetVideoURL(const String &html)
 
 Metadata BoCA::VideoSite::QueryMetadata(const String &html)
 {
+	I18n	*i18n	= I18n::Get();
+
+	i18n->SetContext("Extensions::Video Downloader");
+
 	/* Use our own handle scope for this.
 	 */
 	v8::HandleScope		 handleScope;
@@ -105,15 +114,15 @@ Metadata BoCA::VideoSite::QueryMetadata(const String &html)
 	/* Extract data from return value.
 	 */
 	Metadata	 metadata;
-	const char	*previous = String::SetInputFormat("UTF-8");
+	String		 previous = String::SetInputFormat("UTF-8");
 
-	metadata.title	     = object->Get(v8::String::New("title"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("title"))))	 : String("unknown title");
+	metadata.title	     = object->Get(v8::String::New("title"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("title"))))	 : String(i18n->TranslateString("unknown title"));
 	metadata.description = object->Get(v8::String::New("description"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("description")))) : String();
 
-	metadata.date	     = object->Get(v8::String::New("date"))->IsString()		? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("date"))))	 : String("unknown");
+	metadata.date	     = object->Get(v8::String::New("date"))->IsString()		? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("date"))))	 : String(i18n->TranslateString("unknown"));
 	metadata.thumbnail   = object->Get(v8::String::New("thumbnail"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("thumbnail"))))	 : String();
 
-	metadata.uploader    = object->Get(v8::String::New("uploader"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("uploader"))))	 : String("unknown");
+	metadata.uploader    = object->Get(v8::String::New("uploader"))->IsString()	? ReplaceInnerHTML((char *) *v8::String::Utf8Value(object->Get(v8::String::New("uploader"))))	 : String(i18n->TranslateString("unknown"));
 
 	String::SetInputFormat(previous);
 
@@ -122,6 +131,17 @@ Metadata BoCA::VideoSite::QueryMetadata(const String &html)
 
 Bool BoCA::VideoSite::CreateScriptContext()
 {
+#ifndef _M_X64
+	/* Manually set stack limit to a random stack address to
+	 * work around "maximum call stack size exceeded" error.
+	 */
+	v8::ResourceConstraints	 rc;
+
+	rc.set_stack_limit((uint32_t *) (((uint32_t) &rc) / 2));
+
+	v8::SetResourceConstraints(&rc);
+#endif
+
 	/* Create a template for the global object.
 	 */
 	v8::Handle<v8::ObjectTemplate>	 global = v8::ObjectTemplate::New();
@@ -151,6 +171,8 @@ Bool BoCA::VideoSite::CreateScriptContext()
 	/* Create a new context.
 	 */
 	context = v8::Context::New(NIL, global);
+
+	if (context.IsEmpty()) return False;
 
 	/* Enter the created context for compiling and running the script. 
 	 */
@@ -205,11 +227,11 @@ Int BoCA::VideoSite::ParseXML(const String &fileName)
  */
 String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 {
-	String		 result = text;
+	String		 result = text.Trim();
 
 	/* Set input format to ISO-8859-1.
 	 */
-	const char	*prevInputFormat = String::SetInputFormat("ISO-8859-1");
+	String	 prevInputFormat = String::SetInputFormat("ISO-8859-1");
 
 	/* Remove multiple whitespaces.
 	 */
@@ -245,6 +267,18 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 	result.Replace("&amp;", "&");
 	result.Replace("&amp;", "&");
 
+	/* Spaces
+	 */
+	result.Replace("&nbsp;", " ");
+	result.Replace("&ensp;", " ");
+	result.Replace("&emsp;", " ");
+	result.Replace("&thinsp;", " ");
+
+	/* Dashes
+	 */
+	result.Replace("&ndash;", "–");
+	result.Replace("&mdash;", "—");
+
 	/* Brackets
 	 */
 	result.Replace("&lt;", "<");
@@ -254,12 +288,19 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 	 */
 	result.Replace("&quot;", "\"");
 
-	result.Replace("&bdquo;", "\"");
-	result.Replace("&ldquo;", "\"");
-	result.Replace("&rdquo;", "\"");
+	result.Replace("&bdquo;", "„");
+	result.Replace("&ldquo;", "“");
+	result.Replace("&rdquo;", "”");
+
+	result.Replace("&sbquo;", "‚");
+	result.Replace("&lsquo;", "‘");
+	result.Replace("&rsquo;", "’");
 
 	result.Replace("&laquo;", "«");
 	result.Replace("&raquo;", "»");
+
+	result.Replace("&lsaquo;", "‹");
+	result.Replace("&rsaquo;", "›");
 
 	/* Umlaut
 	 */
@@ -381,6 +422,15 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 	 */
 	result.Replace("&copy;", "©");
 	result.Replace("&reg;", "®");
+
+	/* Mathematic
+	 */
+	result.Replace("&frac14;", "¼");
+	result.Replace("&frac12;", "½");
+	result.Replace("&frac34;", "¾");
+
+	result.Replace("&times;", "×");
+	result.Replace("&divide;", "÷");
 
 	/* Scientific
 	 */

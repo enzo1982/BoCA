@@ -30,8 +30,8 @@ namespace smooth
 		class BitmapXLib : public BitmapBackend
 		{
 			private:
-				Display			*display;
-				Pixmap			 bitmap;
+				X11::Display		*display;
+				X11::Pixmap		 bitmap;
 
 				Void			 Initialize();
 			public:

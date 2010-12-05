@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,14 +29,15 @@ Void smooth::AttachDLL(Void *instance)
 
 	/* Set number of threads for OpenMP optimized encoders.
 	 */
-	if (config->GetIntValue("OpenMP", "NumThreads", 0) > 0)
-	{
+	Int	 numThreads = config->GetIntValue("OpenMP", "NumberOfThreads", 0);
+
+	if (numThreads == 0) numThreads = CPU().GetNumCores();
+
 #ifdef __WIN32__
-		SetEnvironmentVariableA("OMP_NUM_THREADS", String::FromInt(config->GetIntValue("OpenMP", "NumThreads", 0)));
+	if (GetEnvironmentVariableA("OMP_NUM_THREADS", NIL, 0) == 0) SetEnvironmentVariableA("OMP_NUM_THREADS", String::FromInt(numThreads));
 #else
-		setenv("OMP_NUM_THREADS", String::FromInt(config->GetIntValue("OpenMP", "NumThreads", 0)), True);
+	if (getenv("OMP_NUM_THREADS") == NIL) setenv("OMP_NUM_THREADS", String::FromInt(numThreads), True);
 #endif
-	}
 }
 
 Void smooth::DetachDLL()

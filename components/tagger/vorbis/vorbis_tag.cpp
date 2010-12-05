@@ -49,7 +49,7 @@ BoCA::VorbisTag::~VorbisTag()
 Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
 	Config		*currentConfig = Config::Get();
-	char		*prevOutFormat = String::SetOutputFormat("UTF-8");
+	String		 prevOutFormat = String::SetOutputFormat("UTF-8");
 
 	const Info	&info = track.GetInfo();
 
@@ -65,11 +65,11 @@ Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &t
 	if	(info.label  != NIL) { RenderTagItem("ORGANIZATION", info.label, buffer);	  numItems++; }
 	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);		  numItems++; }
 
-	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track)), buffer);	     numItems++; }
-	if	(info.numTracks > 0) { RenderTagItem("TOTALTRACKS", String(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks)), buffer); numItems++; }
+	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track)), buffer);	    numItems++; }
+	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL", String(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks)), buffer); numItems++; }
 
-	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc)), buffer);	     numItems++; }
-	if	(info.numDiscs	> 0) { RenderTagItem("TOTALDISCS", String(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
+	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc)), buffer);	    numItems++; }
+	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL", String(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderTagItem("COMMENT", info.comment, buffer);						  numItems++; }
 	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderTagItem("COMMENT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
@@ -80,7 +80,9 @@ Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &t
 	{
 		String	 value = info.other.GetNth(i);
 
-		if (value.StartsWith(String(INFO_CONDUCTOR).Append(":"))) { RenderTagItem("PERFORMER", value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+		if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":"))) { RenderTagItem("PERFORMER", value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))  { RenderTagItem("COMPOSER",  value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))  { RenderTagItem("LYRICIST",  value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -180,7 +182,7 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 	 */
 	Int	 numItems = in.InputNumber(4);
 	Info	 info = track.GetInfo();
-	char	*prevInFormat = String::SetInputFormat("UTF-8");
+	String	 prevInFormat = String::SetInputFormat("UTF-8");
 
 	for (Int i = 0; i < numItems; i++)
 	{
@@ -190,22 +192,24 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 		String	 id	 = comment.Head(comment.Find("=")).ToUpper();
 		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1);
 
-		if	(id == "ARTIST")       info.artist   = value;
-		else if (id == "TITLE")	       info.title    = value;
-		else if (id == "ALBUM")	       info.album    = value;
-		else if (id == "DATE")	       info.year     = value.ToInt();
-		else if (id == "GENRE")	       info.genre    = value;
-		else if (id == "COMMENT")      info.comment  = value;
-		else if (id == "ORGANIZATION") info.label    = value;
-		else if (id == "ISRC")	       info.isrc     = value;
+		if	(id == "ARTIST")       info.artist    = value;
+		else if (id == "TITLE")	       info.title     = value;
+		else if (id == "ALBUM")	       info.album     = value;
+		else if (id == "DATE")	       info.year      = value.ToInt();
+		else if (id == "GENRE")	       info.genre     = value;
+		else if (id == "COMMENT")      info.comment   = value;
+		else if (id == "ORGANIZATION") info.label     = value;
+		else if (id == "ISRC")	       info.isrc      = value;
 
 		else if (id == "TRACKNUMBER")  info.track     = value.ToInt();
-		else if (id == "TOTALTRACKS")  info.numTracks = value.ToInt();
+		else if (id == "TRACKTOTAL")   info.numTracks = value.ToInt();
 
 		else if (id == "DISCNUMBER")   info.disc      = value.ToInt();
-		else if (id == "TOTALDISCS")   info.numDiscs  = value.ToInt();
+		else if (id == "DISCTOTAL")    info.numDiscs  = value.ToInt();
 
 		else if (id == "PERFORMER")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
+		else if (id == "COMPOSER")     info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
+		else if (id == "LYRICIST")     info.other.Add(String(INFO_LYRICIST).Append(":").Append(value));
 
 		else if (id.StartsWith("REPLAYGAIN"))
 		{

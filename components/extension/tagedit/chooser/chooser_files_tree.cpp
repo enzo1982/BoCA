@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,6 +17,10 @@ BoCA::ChooserFilesTree::ChooserFilesTree(const Directory &iDirectory) : Tree(iDi
 	directory = iDirectory;
 
 	if (directory.GetDirectoryName() == NIL) SetText(directory);
+
+#ifndef __WIN32__
+	if (GetText() == NIL) SetText("/");
+#endif
 
 	onOpen.Connect(&ChooserFilesTree::OnOpen, this);
 	onClose.Connect(&ChooserFilesTree::OnClose, this);

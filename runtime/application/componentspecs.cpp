@@ -37,7 +37,20 @@ BoCA::AS::ComponentSpecs::~ComponentSpecs()
 
 Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 {
+	/* Try to load the DLL.
+	 */
 	library = new DynamicLoader(file);
+
+	/* Bail out if the library could not be loaded.
+	 */
+	if (library->GetSystemModuleHandle() == NIL)
+	{
+		Object::DeleteObject(library);
+
+		library = NIL;
+
+		return False;
+	}
 
 	const char *(*BoCA_GetComponentName)() = (const char *(*)()) library->GetFunctionAddress("BoCA_GetComponentName");
 
@@ -298,8 +311,8 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 	if (mode != INTERNAL)
 	{
-		if (external_command[1] == ':' && !File(external_command).Exists()) return False;
-		if (external_command[1] != ':' && !File(GUI::Application::GetApplicationDirectory().Append(external_command)).Exists()) return False;
+		if ((external_command[1] == ':' || external_command[0] == '/') && !File(external_command).Exists())							return False;
+		if ((external_command[1] != ':' && external_command[0] != '/') && !File(GUI::Application::GetApplicationDirectory().Append(external_command)).Exists())	return False;
 	}
 
 	return True;

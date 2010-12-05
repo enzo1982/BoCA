@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>RealAudio Encoder</name>
+  <version>1.0</version>
+  <id>ra-out</id>
+  <type>encoder</type>
+  <format>
+    <name>RealAudio Files</name>
+    <extension>ra</extension>
+    <extension>rm</extension>
+  </format>
+  <external>
+    <command>codecs/cmdline/helix/producer.exe</command>
+    <arguments>-i %INFILE -o %OUTFILE %OPTIONS -a %ARTIST -t %TITLE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <selection name="Audio mode" argument="-am %VALUE" default="music">
+	<option alias="Music">music</option>
+	<option alias="Voice">voice</option>
+      </selection>
+      <selection name="Audience" argument='-ad "%VALUE"' default="100% Quality Download (VBR)">
+	<option alias="Lossless Audio">Lossless Audio</option>
+	<option alias="70% Quality Download (VBR)">70% Quality Download (VBR)</option>
+	<option alias="80% Quality Download (VBR)">80% Quality Download (VBR)</option>
+	<option alias="90% Quality Download (VBR)">90% Quality Download (VBR)</option>
+	<option alias="100% Quality Download (VBR)">100% Quality Download (VBR)</option>
+	<option alias="350k Download (VBR)">350k Download (VBR)</option>
+	<option alias="450k Download (VBR)">450k Download (VBR)</option>
+	<option alias="750k Download (VBR)">750k Download (VBR)</option>
+	<option alias="1M Download (VBR)">1M Download (VBR)</option>
+	<option alias="2M Download (VBR)">2M Download (VBR)</option>
+	<option alias="5M Download (VBR)">5M Download (VBR)</option>
+	<option alias="350k Multichannel (VBR)">350k Multichannel (VBR)</option>
+	<option alias="450k Multichannel (VBR)">450k Multichannel (VBR)</option>
+	<option alias="750k Multichannel (VBR)">750k Multichannel (VBR)</option>
+	<option alias="1M Multichannel (VBR)">1M Multichannel (VBR)</option>
+	<option alias="2M Multichannel (VBR)">2M Multichannel (VBR)</option>
+	<option alias="5M Multichannel (VBR)">5M Multichannel (VBR)</option>
+	<option alias="350k Surround Stereo (VBR)">350k Surround Stereo (VBR)</option>
+	<option alias="450k Surround Stereo (VBR)">450k Surround Stereo (VBR)</option>
+	<option alias="750k Surround Stereo (VBR)">750k Surround Stereo (VBR)</option>
+	<option alias="1M Surround Stereo (VBR)">1M Surround Stereo (VBR)</option>
+	<option alias="2M Surround Stereo (VBR)">2M Surround Stereo (VBR)</option>
+	<option alias="5M Surround Stereo (VBR)">5M Surround Stereo (VBR)</option>
+	<option alias="12k Substream for 28k Dial-up">12k Substream for 28k Dial-up</option>
+	<option alias="16k Substream for 28k Dial-up">16k Substream for 28k Dial-up</option>
+	<option alias="26k Substream for 56k Dial-up">26k Substream for 56k Dial-up</option>
+	<option alias="28k Dial-up">28k Dial-up</option>
+	<option alias="56k Dial-up">56k Dial-up</option>
+	<option alias="64k Single ISDN">64k Single ISDN</option>
+	<option alias="128k Dual ISDN">128k Dual ISDN</option>
+	<option alias="150k LAN">150k LAN</option>
+	<option alias="256k DSL or Cable">256k DSL or Cable</option>
+	<option alias="384k DSL or Cable">384k DSL or Cable</option>
+	<option alias="512k DSL or Cable">512k DSL or Cable</option>
+	<option alias="768k DSL or Cable">768k DSL or Cable</option>
+	<option alias="General Mobile Local Playback">General Mobile Local Playback</option>
+	<option alias="General Mobile Streaming">General Mobile Streaming</option>
+	<option alias="PocketPC Local Playback">PocketPC Local Playback</option>
+      </selection>
+    </parameters>
+  </external>
+</component>

@@ -21,8 +21,6 @@ namespace smooth
 
 #include "../backend.h"
 
-#include <X11/Xlib.h>
-
 namespace smooth
 {
 	namespace Backends
@@ -32,15 +30,17 @@ namespace smooth
 		class BackendXLib : public Backend
 		{
 			private:
-				static Display	*display;
+				static X11::Display	*display;
+				static X11::XIM		 im;
 			public:
-						 BackendXLib();
-				virtual		~BackendXLib();
+							 BackendXLib();
+				virtual			~BackendXLib();
 
-				Int		 Init();
-				Int		 Deinit();
+				Int			 Init();
+				Int			 Deinit();
 
-				static Display	*GetDisplay();
+				static X11::Display	*GetDisplay();
+				static X11::XIM		 GetIM();
 		};
 	};
 };

@@ -37,11 +37,14 @@ v8::Handle<v8::Value> BoCA::DownloadURL(const v8::Arguments &args)
 
 		delete protocol;
 
-		String	 result;
+		if (buffer.Size() > 0)
+		{
+			String	 result;
 
-		for (Int i = 0; i < buffer.Size(); i++) result[i] = buffer[i];
+			for (Int i = 0; i < buffer.Size(); i++) result[i] = buffer[i];
 
-		return v8::String::New(result);
+			return v8::String::New(result);
+		}
 	}
 
 	return v8::Undefined();

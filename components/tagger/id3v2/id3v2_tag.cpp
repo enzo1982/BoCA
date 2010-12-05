@@ -257,6 +257,7 @@ Error BoCA::ID3v2Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_TITLE)		info.title	= GetFrameString(frame);
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_ALBUM)		info.album	= GetFrameString(frame);
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_YEAR)		info.year	= GetFrameString(frame).ToInt();
+		else if (ex_ID3Frame_GetID(frame) == ID3FID_RELEASETIME)	info.year	= GetFrameString(frame).Head(4).ToInt();
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_COMMENT)		info.comment	= GetFrameString(frame);
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_PUBLISHER)		info.label	= GetFrameString(frame);
 		else if (ex_ID3Frame_GetID(frame) == ID3FID_ISRC)		info.isrc	= GetFrameString(frame);
@@ -588,7 +589,7 @@ Int BoCA::ID3v2Tag::SetFrameString(Void *frame, const String &text, const String
 	else if (encString == "UTF-16BE" ||
 		 encString == "UCS-2BE")	encoding = ID3TE_UTF16BE;
 
-	char		*prevOutFormat = String::SetOutputFormat(encString);
+	String		 prevOutFormat = String::SetOutputFormat(encString);
 
 	ex_ID3Field_SetINT(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_TEXTENC), encoding);
 
@@ -610,7 +611,7 @@ Int BoCA::ID3v2Tag::SetFrameString(Void *frame, const String &text, const String
 		else					ex_ID3Field_SetASCII(ex_ID3Frame_GetField((ID3Frame *) frame, ID3FN_DESCRIPTION), description);
 	}
 
-	String::SetOutputFormat(prevOutFormat);
+	String::SetOutputFormat(prevOutFormat.ConvertTo("ISO-8859-1"));
 
 	return Success();
 }

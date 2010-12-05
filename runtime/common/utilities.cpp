@@ -37,6 +37,76 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
+DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
+{
+	DynamicLoader	*loader = NIL;
+
+	/* Try loading an OpenMP enabled version of the codec.
+	 */
+	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().HasSSE3())
+	{
+#ifdef __WIN32__
+		if (File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\").Append(module).Append("-OpenMP.dll")).Exists())
+#endif
+
+		loader = new DynamicLoader(String("codecs/").Append(module).Append("-OpenMP"));
+
+		if (loader != NIL && loader->GetSystemModuleHandle() == NIL)
+		{
+			Object::DeleteObject(loader);
+
+			loader = NIL;
+		}
+	}
+
+	/* Try loading a standard version of the codec.
+	 */
+	if (loader == NIL)
+	{
+#ifdef __WIN32__
+		if (File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\").Append(module).Append(".dll")).Exists())
+#endif
+
+		loader = new DynamicLoader(String("codecs/").Append(module));
+
+		if (loader != NIL && loader->GetSystemModuleHandle() == NIL)
+		{
+			Object::DeleteObject(loader);
+
+			loader = NIL;
+		}
+	}
+
+	/* Try loading a system-wide version of the codec.
+	 */
+	if (loader == NIL)
+	{
+#ifdef __WIN32__
+		if (File(String(GUI::Application::GetApplicationDirectory()).Append(module).Append(".dll")).Exists())
+#endif
+
+		loader = new DynamicLoader(module);
+
+		if (loader != NIL && loader->GetSystemModuleHandle() == NIL)
+		{
+			Object::DeleteObject(loader);
+
+			loader = NIL;
+		}
+	}
+
+	return loader;
+}
+
+Bool BoCA::Utilities::FreeCodecDLL(DynamicLoader *loader)
+{
+	if (loader == NIL) return False;
+
+	Object::DeleteObject(loader);
+
+	return True;
+}
+
 String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
 {
 	String	 rVal	= fileName;

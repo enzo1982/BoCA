@@ -62,8 +62,11 @@ namespace smooth
 				static Bool	 DoRectsOverlap(const Rect &, const Rect &);
 				static Rect	 OverlapRect(const Rect &, const Rect &);
 			accessors:
-				Point		 GetPosition()					{ return Point(left, top); }
-				Size		 GetSize()					{ return Size(right - left, bottom - top); }
+				Point		 GetPosition() const				{ return Point(left, top); }
+				Size		 GetSize() const				{ return Size(right - left, bottom - top); }
+
+				Int		 GetWidth() const				{ return right - left; }
+				Int		 GetHeight() const				{ return bottom - top; }
 		};
 	};
 };

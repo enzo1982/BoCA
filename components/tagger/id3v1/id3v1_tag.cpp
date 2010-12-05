@@ -86,7 +86,7 @@ Error BoCA::ID3v1Tag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tr
 	out.OutputString("TAG");
 
 	const Info	&info = track.GetInfo();
-	char		*prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "ID3v1Encoding", "ISO-8859-1"));
+	String		 prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "ID3v1Encoding", "ISO-8859-1"));
 
 	{ out.OutputString(info.title.Head(Math::Min(30, info.title.Length())));   for (Int i = 0; i < 30 - info.title.Length(); i++) out.OutputNumber(0, 1); }
 	{ out.OutputString(info.artist.Head(Math::Min(30, info.artist.Length()))); for (Int i = 0; i < 30 - info.artist.Length(); i++) out.OutputNumber(0, 1); }
@@ -129,7 +129,7 @@ Error BoCA::ID3v1Tag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tra
 	 */
 	if (in.InputString(3) == "TAG")
 	{
-		char	*prevInFormat = String::SetInputFormat("ISO-8859-1");
+		String	 prevInFormat = String::SetInputFormat("ISO-8859-1");
 
 		Info	 info = track.GetInfo();
 

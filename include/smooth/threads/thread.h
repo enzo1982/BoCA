@@ -61,6 +61,8 @@ namespace smooth
 				Short			 GetStatus() const;
 				Int			 GetThreadID() const;
 
+				Bool			 IsCurrentThread() const;
+
 				Int			 Start();
 				Int			 Stop();
 

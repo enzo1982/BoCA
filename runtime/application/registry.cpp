@@ -11,19 +11,16 @@
 #include <boca/application/registry.h>
 #include <boca/application/decodercomponent.h>
 #include <boca/application/encodercomponent.h>
-
-#ifdef __WIN32__
-#	include <boca/application/external/decodercomponentfile.h>
-#	include <boca/application/external/decodercomponentstdio.h>
-#	include <boca/application/external/encodercomponentfile.h>
-#	include <boca/application/external/encodercomponentstdio.h>
-#endif
-
 #include <boca/application/deviceinfocomponent.h>
 #include <boca/application/dspcomponent.h>
 #include <boca/application/extensioncomponent.h>
 #include <boca/application/outputcomponent.h>
 #include <boca/application/taggercomponent.h>
+
+#include <boca/application/external/decodercomponentfile.h>
+#include <boca/application/external/decodercomponentstdio.h>
+#include <boca/application/external/encodercomponentfile.h>
+#include <boca/application/external/encodercomponentstdio.h>
 
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
 
@@ -161,19 +158,15 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 		switch (specs->type)
 		{
 			case COMPONENT_TYPE_DECODER:
-				if	(specs->mode == INTERNAL)	return new DecoderComponent(specs);
-#ifdef __WIN32__
-				else if (specs->mode == EXTERNAL_FILE)	return new DecoderComponentExternalFile(specs);
-				else if (specs->mode == EXTERNAL_STDIO)	return new DecoderComponentExternalStdIO(specs);
-#endif
-				break;
+				if	(specs->mode == EXTERNAL_FILE)	return new DecoderComponentExternalFile(specs);
+				else if	(specs->mode == EXTERNAL_STDIO)	return new DecoderComponentExternalStdIO(specs);
+
+				return new DecoderComponent(specs);
 			case COMPONENT_TYPE_ENCODER:
-				if	(specs->mode == INTERNAL)	return new EncoderComponent(specs);
-#ifdef __WIN32__
-				else if (specs->mode == EXTERNAL_FILE)	return new EncoderComponentExternalFile(specs);
-				else if (specs->mode == EXTERNAL_STDIO)	return new EncoderComponentExternalStdIO(specs);
-#endif
-				break;
+				if	(specs->mode == EXTERNAL_FILE)	return new EncoderComponentExternalFile(specs);
+				else if	(specs->mode == EXTERNAL_STDIO)	return new EncoderComponentExternalStdIO(specs);
+
+				return new EncoderComponent(specs);
 			case COMPONENT_TYPE_DEVICEINFO:
 				return new DeviceInfoComponent(specs);
 			case COMPONENT_TYPE_DSP:

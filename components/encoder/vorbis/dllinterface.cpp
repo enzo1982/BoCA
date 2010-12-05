@@ -21,8 +21,6 @@ OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
 OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
 
 VORBISINFOINIT			 ex_vorbis_info_init			= NIL;
-VORBISENCODEINIT		 ex_vorbis_encode_init			= NIL;
-VORBISENCODEINITVBR		 ex_vorbis_encode_init_vbr		= NIL;
 VORBISCOMMENTINIT		 ex_vorbis_comment_init			= NIL;
 VORBISCOMMENTADDTAG		 ex_vorbis_comment_add_tag		= NIL;
 VORBISANALYSISINIT		 ex_vorbis_analysis_init		= NIL;
@@ -39,16 +37,18 @@ VORBISDSPCLEAR			 ex_vorbis_dsp_clear			= NIL;
 VORBISCOMMENTCLEAR		 ex_vorbis_comment_clear		= NIL;
 VORBISINFOCLEAR			 ex_vorbis_info_clear			= NIL;
 
+VORBISENCODEINIT		 ex_vorbis_encode_init			= NIL;
+VORBISENCODEINITVBR		 ex_vorbis_encode_init_vbr		= NIL;
+
 DynamicLoader *oggdll		= NIL;
 DynamicLoader *vorbisdll	= NIL;
+DynamicLoader *vorbisencdll	= NIL;
 
 Bool LoadOggDLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Ogg.dll")).Exists()) return False;
-#endif
+	oggdll = BoCA::Utilities::LoadCodecDLL("ogg");
 
-	oggdll = new DynamicLoader("codecs/Ogg");
+	if (oggdll == NIL) return False;
 
 	ex_ogg_stream_init		= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
 	ex_ogg_stream_packetin		= (OGGSTREAMPACKETIN) oggdll->GetFunctionAddress("ogg_stream_packetin");
@@ -69,36 +69,24 @@ Bool LoadOggDLL()
 
 Void FreeOggDLL()
 {
-	Object::DeleteObject(oggdll);
+	BoCA::Utilities::FreeCodecDLL(oggdll);
 
 	oggdll = NIL;
 }
 
 Bool LoadVorbisDLL()
 {
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().GetNumCores() >= 2 && CPU().HasSSE3())
-	{
+	vorbisdll = BoCA::Utilities::LoadCodecDLL("vorbis");
+
 #ifdef __WIN32__
-		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Vorbis-OpenMP.dll")).Exists()) return False;
+	vorbisencdll = vorbisdll;
+#else
+	vorbisencdll = BoCA::Utilities::LoadCodecDLL("vorbisenc");
 #endif
 
-		vorbisdll = new DynamicLoader("codecs/Vorbis-OpenMP");
-
-		if (vorbisdll->GetSystemModuleHandle() == NIL) FreeVorbisDLL();
-	}
-
-	if (vorbisdll == NIL)
-	{
-#ifdef __WIN32__
-		if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\Vorbis.dll")).Exists()) return False;
-#endif
-
-		vorbisdll = new DynamicLoader("codecs/Vorbis");
-	}
+	if (vorbisdll == NIL || vorbisencdll == NIL) return False;
 
 	ex_vorbis_info_init		= (VORBISINFOINIT) vorbisdll->GetFunctionAddress("vorbis_info_init");
-	ex_vorbis_encode_init		= (VORBISENCODEINIT) vorbisdll->GetFunctionAddress("vorbis_encode_init");
-	ex_vorbis_encode_init_vbr	= (VORBISENCODEINITVBR) vorbisdll->GetFunctionAddress("vorbis_encode_init_vbr");
 	ex_vorbis_comment_init		= (VORBISCOMMENTINIT) vorbisdll->GetFunctionAddress("vorbis_comment_init");
 	ex_vorbis_comment_add_tag	= (VORBISCOMMENTADDTAG) vorbisdll->GetFunctionAddress("vorbis_comment_add_tag");
 	ex_vorbis_analysis_init		= (VORBISANALYSISINIT) vorbisdll->GetFunctionAddress("vorbis_analysis_init");
@@ -115,9 +103,10 @@ Bool LoadVorbisDLL()
 	ex_vorbis_comment_clear		= (VORBISCOMMENTCLEAR) vorbisdll->GetFunctionAddress("vorbis_comment_clear");
 	ex_vorbis_info_clear		= (VORBISINFOCLEAR) vorbisdll->GetFunctionAddress("vorbis_info_clear");
 
+	ex_vorbis_encode_init		= (VORBISENCODEINIT) vorbisencdll->GetFunctionAddress("vorbis_encode_init");
+	ex_vorbis_encode_init_vbr	= (VORBISENCODEINITVBR) vorbisencdll->GetFunctionAddress("vorbis_encode_init_vbr");
+
 	if (ex_vorbis_info_init			== NIL ||
-	    ex_vorbis_encode_init		== NIL ||
-	    ex_vorbis_encode_init_vbr		== NIL ||
 	    ex_vorbis_comment_init		== NIL ||
 	    ex_vorbis_comment_add_tag		== NIL ||
 	    ex_vorbis_analysis_init		== NIL ||
@@ -132,14 +121,21 @@ Bool LoadVorbisDLL()
 	    ex_vorbis_block_clear		== NIL ||
 	    ex_vorbis_dsp_clear			== NIL ||
 	    ex_vorbis_comment_clear		== NIL ||
-	    ex_vorbis_info_clear		== NIL) { FreeVorbisDLL(); return False; }
+	    ex_vorbis_info_clear		== NIL ||
+	    ex_vorbis_encode_init		== NIL ||
+	    ex_vorbis_encode_init_vbr		== NIL) { FreeVorbisDLL(); return False; }
 
 	return True;
 }
 
 Void FreeVorbisDLL()
 {
-	Object::DeleteObject(vorbisdll);
+	BoCA::Utilities::FreeCodecDLL(vorbisdll);
 
-	vorbisdll = NIL;
+#ifndef __WIN32__
+	BoCA::Utilities::FreeCodecDLL(vorbisencdll);
+#endif
+
+	vorbisdll    = NIL;
+	vorbisencdll = NIL;
 }

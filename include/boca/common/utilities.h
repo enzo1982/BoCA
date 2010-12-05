@@ -15,18 +15,22 @@
 #include "../core/definitions.h"
 
 using namespace smooth;
+using namespace smooth::System;
 
 namespace BoCA
 {
 	class BOCA_DLL_EXPORT Utilities
 	{
 		public:
-			static Void	 WarningMessage(const String &, const String & = NIL, const String & = NIL);
-			static Void	 ErrorMessage(const String &, const String & = NIL, const String & = NIL);
+			static Void		 WarningMessage(const String &, const String & = NIL, const String & = NIL);
+			static Void		 ErrorMessage(const String &, const String & = NIL, const String & = NIL);
 
-			static String	 GetNonUnicodeTempFileName(const String &);
+			static DynamicLoader	*LoadCodecDLL(const String &);
+			static Bool		 FreeCodecDLL(DynamicLoader *);
 
-			static String	 ReplaceIncompatibleCharacters(const String &);
+			static String		 GetNonUnicodeTempFileName(const String &);
+
+			static String		 ReplaceIncompatibleCharacters(const String &);
 	};
 };
 

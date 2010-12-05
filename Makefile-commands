@@ -1,7 +1,7 @@
 ########## BoCA commands makefile ##########
 
 CC = gcc
-CCOPTS = -g0 -Wall -ffast-math -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
+CCOPTS = -g0 -Wall -Os -ffast-math -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
 LD = gcc
 LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lboca -lstdc++ $(LIBS)
 
@@ -12,7 +12,7 @@ endif
 ifeq ($(BUILD_X64),True)
 	CCOPTS += -march=nocona
 else
-	CCOPTS += -march=i586 -Os
+	CCOPTS += -march=i586
 endif
 
 ifeq ($(BUILD_WIN32),True)

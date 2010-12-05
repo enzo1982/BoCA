@@ -18,7 +18,11 @@ using namespace smooth;
 
 using namespace BoCA;
 
-#include <v8/v8-main.h>
+#ifndef __WIN32__
+#	undef None
+#endif
+
+#include <v8/v8.h>
 
 namespace BoCA
 {

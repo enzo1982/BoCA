@@ -71,7 +71,11 @@ namespace smooth
 				Bool				 focussed;
 
 				Bool				 alwaysActive;
-				Bool				 independent;			// Makes a widget independent of its container; i.e. it can be painted and used even if it's located outside of the container
+
+				/* Makes a widget independent of its container; i.e. it can be
+				 * painted and used even if it's located outside of the container.
+				 */
+				Bool				 independent;
 
 				Short				 orientation;
 
@@ -117,8 +121,8 @@ namespace smooth
 								 Widget(const Point &, const Size &);
 				virtual				~Widget();
 
-				Int				 GetNOfObjects() const;
-				Widget				*GetNthObject(Int) const;
+				Int				 GetNOfObjects() const		{ return widgets.Length(); }
+				Widget				*GetNthObject(Int n) const	{ return widgets.GetNth(n); }
 
 				virtual Int			 Add(Widget *);
 				virtual Int			 Remove(Widget *);

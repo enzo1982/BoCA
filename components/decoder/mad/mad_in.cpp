@@ -109,6 +109,7 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 	ReadXingTag(f_in);
 
 	driver = ioDriver;
+	driver->Seek(f_in->GetPos());
 
 	readDataMutex = new Mutex();
 	samplesBufferMutex = new Mutex();
@@ -172,6 +173,8 @@ Bool BoCA::MADIn::Activate()
 	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
 
 	SkipID3v2Tag(f_in);
+
+	driver->Seek(f_in->GetPos());
 
 	delete f_in;
 

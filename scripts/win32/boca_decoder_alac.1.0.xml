@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Apple Lossless Decoder</name>
+  <version>1.0</version>
+  <id>alac-in</id>
+  <type>decoder</type>
+  <format>
+    <name>Apple Lossless Files</name>
+    <extension>m4a</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+  </format>
+  <external>
+    <command>codecs/cmdline/alac.exe</command>
+    <arguments>%OPTIONS %INFILE</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

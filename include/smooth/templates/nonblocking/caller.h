@@ -46,7 +46,7 @@ namespace smooth
 				}
 				else
 				{
-					while  (IsActive()) System::System::Sleep(10);
+					while (IsActive()) System::System::Sleep(10);
 
 					delete slotN;
 					delete thread;

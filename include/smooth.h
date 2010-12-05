@@ -33,7 +33,6 @@
 #include "smooth/templates/slots.h"
 #include "smooth/templates/slotsr.h"
 
-#include "smooth/basic/input.h"
 #include "smooth/basic/object.h"
 #include "smooth/basic/setup.h"
 
@@ -59,6 +58,8 @@
 
 #include "smooth/files/directory.h"
 #include "smooth/files/file.h"
+
+#include "smooth/input/pointer.h"
 
 #include "smooth/io/instream.h"
 #include "smooth/io/outstream.h"
@@ -104,6 +105,8 @@
 #include "smooth/misc/string.h"
 
 #include "smooth/gui/application/application.h"
+
+#include "smooth/gui/clipboard/clipboard.h"
 
 #ifdef __WIN32__
 #	include "smooth/gui/dialogs/directory/dirdlg_win32.h"

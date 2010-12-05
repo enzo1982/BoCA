@@ -115,35 +115,7 @@ Image *BoCA::VideoListEntry::CreateImageFromVideo()
 
 	video->QueryMetadata();
 
-	/* Download video thumbnail.
-	 */
-	if (video->GetVideoThumbnailURL().StartsWith("http://"))
-	{
-		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(video->GetVideoThumbnailURL());
-		Buffer<UnsignedByte>	 buffer;
-
-		protocol->DownloadToBuffer(buffer);
-
-		String		 streamURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
-
-		delete protocol;
-
-		if (streamURL != NIL)
-		{
-			Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(streamURL);
-
-			protocol->DownloadToBuffer(buffer);
-
-			delete protocol;
-		}
-
-		Picture	 picture;
-
-		picture.mime = "image/jpeg";
-		picture.data = buffer;
-
-		return new Image(picture.GetBitmap());
-	}
+	if (video->GetVideoThumbnail().mime == "image/jpeg") return new Image(video->GetVideoThumbnail().GetBitmap());
 
 	return new Image(Bitmap());
 }
@@ -166,11 +138,15 @@ PopupMenu *BoCA::VideoListEntry::GetContextMenu()
 {
 	if (downloadFinished) return NIL;
 
+	I18n	*i18n	= I18n::Get();
+
+	i18n->SetContext("Extensions::Video Downloader");
+
 	if (contextMenu == NIL) contextMenu = new PopupMenu();
 
 	contextMenu->RemoveAllEntries();
 
-	MenuEntry	*entryCancel = contextMenu->AddEntry("Cancel download");
+	MenuEntry	*entryCancel = contextMenu->AddEntry(i18n->TranslateString("Cancel download"));
 
 	entryCancel->onAction.Connect(&Video::CancelDownload, video);
 

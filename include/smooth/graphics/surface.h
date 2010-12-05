@@ -38,41 +38,43 @@ namespace smooth
 		class SMOOTHAPI Surface
 		{
 			private:
-				SurfaceBackend	*backend;
-				Threads::Mutex	*mutex;
+				static Int		 numInstances;
+				static Threads::Mutex	*mutex;
+
+				SurfaceBackend		*backend;
 			public:
-						 Surface(Void * = NIL, const Size & = Size());
-						~Surface();
+							 Surface(Void * = NIL, const Size & = Size());
+							~Surface();
 
-				Short		 GetSurfaceType() const;
+				Short			 GetSurfaceType() const;
 
-				Int		 SetSize(const Size &);
-				const Size	&GetSize() const;
+				Int			 SetSize(const Size &);
+				const Size		&GetSize() const;
 
-				Int		 SetRightToLeft(Bool);
+				Int			 SetRightToLeft(Bool);
 
-				Int		 PaintRect(const Rect &);
+				Int			 PaintRect(const Rect &);
 
-				Int		 StartPaint(const Rect &);
-				Int		 EndPaint();
+				Int			 StartPaint(const Rect &);
+				Int			 EndPaint();
 
-				Void		*GetSystemSurface() const;
+				Void			*GetSystemSurface() const;
 
-				Short		 GetSurfaceDPI() const;
+				Short			 GetSurfaceDPI() const;
 
-				Int		 SetPixel(const Point &, const Color &);
+				Int			 SetPixel(const Point &, const Color &);
 
-				Int		 Line(const Point &, const Point &, const Color &);
-				Int		 Frame(const Rect &, Short);
-				Int		 Box(const Rect &, const Color &, Int, const Size & = Size(0, 0));
+				Int			 Line(const Point &, const Point &, const Color &);
+				Int			 Frame(const Rect &, Short);
+				Int			 Box(const Rect &, const Color &, Int, const Size & = Size(0, 0));
 
-				Int		 SetText(const String &, const Rect &, const Font &, Bool = False);
+				Int			 SetText(const String &, const Rect &, const Font &, Bool = False);
 
-				Int		 Gradient(const Rect &, const Color &, const Color &, Int);
-				Int		 Bar(const Point &, const Point &, Int);
+				Int			 Gradient(const Rect &, const Color &, const Color &, Int);
+				Int			 Bar(const Point &, const Point &, Int);
 
-				Int		 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				Int		 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
+				Int			 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
+				Int			 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
 		};
 
 		const Short	 FRAME_UP	= 0;

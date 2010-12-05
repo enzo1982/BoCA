@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>AVI Video Audio Extractor</name>
+  <version>1.0</version>
+  <id>ffmpeg-avi_audio-in</id>
+  <type>decoder</type>
+  <format>
+    <name>AVI Video Files</name>
+    <extension>avi</extension>
+    <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
+  </format>
+  <external>
+    <command>codecs/cmdline/ffmpeg.exe</command>
+    <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

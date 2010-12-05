@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Ogg Vorbis Decoder</name>
+  <version>1.0</version>
+  <id>vorbiscmd-in</id>
+  <type>decoder</type>
+  <format>
+    <name>Ogg Vorbis Audio</name>
+    <extension>ogg</extension>
+    <tag id="vorbis-tag" mode="other">Vorbis Comment</tag>
+  </format>
+  <external>
+    <command>codecs/cmdline/oggdec.exe</command>
+    <arguments>%OPTIONS %INFILE --stdout</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+    <parameters>
+      <switch name="Downmix multi-channel audio to stereo" argument="--downmix"/>
+      <selection name="Dither output" argument="--dither %VALUE">
+	<option alias="Without noise shaping">1</option>
+ 	<option alias="With light noise shaping">2</option>
+ 	<option alias="With medium noise shaping">3</option>
+ 	<option alias="With heavy noise shaping">4</option>
+      </selection>
+    </parameters>
+  </external>
+</component>
