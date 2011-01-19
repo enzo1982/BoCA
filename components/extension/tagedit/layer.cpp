@@ -55,7 +55,7 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 
 /* ToDo: Add advanced editor once it's ready.
  */
-//	editors.Add(new LayerTagAdvanced());
+	editors.Add(new LayerTagAdvanced());
 
 	foreach (Editor *editor, editors)
 	{

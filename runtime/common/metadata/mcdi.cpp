@@ -10,7 +10,9 @@
 
 #include <boca/common/metadata/mcdi.h>
 
-#ifndef __WIN32__
+#ifdef __WIN32__
+#	include <winsock2.h>
+#else
 #	include <arpa/inet.h>
 #endif
 

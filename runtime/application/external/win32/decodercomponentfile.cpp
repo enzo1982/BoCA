@@ -12,6 +12,10 @@
 #include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 using namespace smooth::IO;
 
 BoCA::AS::DecoderComponentExternalFile::DecoderComponentExternalFile(ComponentSpecs *specs) : DecoderComponentExternal(specs)
@@ -25,10 +29,6 @@ BoCA::AS::DecoderComponentExternalFile::~DecoderComponentExternalFile()
 
 Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &streamURI, Track &track)
 {
-	/* Query tags and update track
-	 */
-	QueryTags(streamURI, track);
-
 	/* Create temporary WAVE file
 	 */
 	wavFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".wav");
@@ -159,6 +159,10 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	/* Remove temporary WAVE file
 	 */
 	File(wavFileName).Delete();
+
+	/* Query tags and update track
+	 */
+	QueryTags(streamURI, track);
 
 	return Success();
 }

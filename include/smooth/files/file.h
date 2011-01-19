@@ -27,12 +27,6 @@ namespace smooth
 		private:
 			String		 fileName;
 			String		 filePath;
-
-#ifdef __WIN32__
-			Int		 GetFileTime(FILETIME *, FILETIME *, FILETIME *) const;
-#else
-			Int		 GetFileTime(time_t *, time_t *, time_t *) const;
-#endif
 		public:
 					 File(const String &, const String & = NIL);
 					 File(const int = NIL);

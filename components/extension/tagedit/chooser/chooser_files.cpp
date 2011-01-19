@@ -10,6 +10,10 @@
 
 #include <boca.h>
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 #include "chooser_files.h"
 #include "chooser_files_tree.h"
 #include "chooser_files_utilities.h"

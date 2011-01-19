@@ -15,9 +15,15 @@ extern "C" {
 #	include <cdda_interface.h>
 }
 
+#include <glob.h>
 #include <arpa/inet.h>
-#include <stropts.h>
-#include <linux/cdrom.h>
+
+#ifdef __linux__
+#	include <stropts.h>
+#	include <linux/cdrom.h>
+#else
+#	include <sys/cdio.h>
+#endif
 
 #include "cdparanoia_info.h"
 
@@ -45,18 +51,49 @@ const String &BoCA::CDParanoiaInfo::GetComponentSpecs()
 	return componentSpecs;
 }
 
+const Array<String> &BoCA::CDParanoiaInfo::FindDrives()
+{
+#if defined __linux__
+	static const char	*deviceNames[] = { "/dev/hd?", "/dev/scd?", NIL };
+#elif defined __FreeBSD__
+	static const char	*deviceNames[] = { "/dev/acd?", "/dev/cd?", NIL };
+#else
+	static const char	*deviceNames[] = { "/dev/cdrom?", NIL };
+#endif
+
+	static Array<String>	 driveNames;
+	static Bool		 initialized = False;
+
+	if (initialized) return driveNames;
+
+	for (Int i = 0; deviceNames[i] != NIL; i++)
+	{
+		glob_t	*fileData = new glob_t;
+
+		if (glob(deviceNames[i], 0, NIL, fileData) == 0)
+		{
+			for (UnsignedInt n = 0; n < fileData->gl_pathc; n++)
+			{
+				cdrom_drive	*cd = cdda_identify(fileData->gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
+
+				if (cd != NIL) driveNames.Add(fileData->gl_pathv[n]);
+			}
+		}
+
+		globfree(fileData);
+	}
+
+	initialized = True;
+
+	return driveNames;
+}
+
 Void smooth::AttachDLL(Void *instance)
 {
-	BoCA::Config	*config = BoCA::Config::Get();
+	BoCA::Config		*config	    = BoCA::Config::Get();
+	const Array<String>	&driveNames = BoCA::CDParanoiaInfo::FindDrives();
 
-	for (Int i = 0; i < 16; i++)
-	{
-		cdrom_drive	*cd = cdda_identify(String("/dev/cdrom").Append(i > 0 ? String::FromInt(i) : String(NIL)), CDDA_MESSAGE_FORGETIT, NIL);
-
-		if (cd == NIL) break;
-
-		numDrives++;
-	}
+	numDrives = driveNames.Length();
 
 	/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
 	 */
@@ -87,7 +124,8 @@ BoCA::CDParanoiaInfo::~CDParanoiaInfo()
 
 Bool BoCA::CDParanoiaInfo::OpenNthDeviceTray(Int n)
 {
-	cdrom_drive	*cd = cdda_identify(String("/dev/cdrom").Append(n > 0 ? String::FromInt(n) : String(NIL)), CDDA_MESSAGE_FORGETIT, NIL);
+	const Array<String>	&driveNames = FindDrives();
+	cdrom_drive		*cd	    = cdda_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
 
 	if (cd != NIL)
 	{
@@ -95,8 +133,13 @@ Bool BoCA::CDParanoiaInfo::OpenNthDeviceTray(Int n)
 
 		/* Unlock tray, then eject.
 		 */
+#if defined __linux__
 		ioctl(cd->ioctl_fd, CDROM_LOCKDOOR, 0);
 		ioctl(cd->ioctl_fd, CDROMEJECT);
+#else
+		ioctl(cd->ioctl_fd, CDIOCALLOW);
+		ioctl(cd->ioctl_fd, CDIOCEJECT);
+#endif
 
 		cdda_close(cd);
 
@@ -108,7 +151,8 @@ Bool BoCA::CDParanoiaInfo::OpenNthDeviceTray(Int n)
 
 Bool BoCA::CDParanoiaInfo::CloseNthDeviceTray(Int n)
 {
-	cdrom_drive	*cd = cdda_identify(String("/dev/cdrom").Append(n > 0 ? String::FromInt(n) : String(NIL)), CDDA_MESSAGE_FORGETIT, NIL);
+	const Array<String>	&driveNames = FindDrives();
+	cdrom_drive		*cd	    = cdda_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
 
 	if (cd != NIL)
 	{
@@ -116,7 +160,11 @@ Bool BoCA::CDParanoiaInfo::CloseNthDeviceTray(Int n)
 
 		/* Close tray.
 		 */
+#if defined __linux__
 		ioctl(cd->ioctl_fd, CDROMCLOSETRAY);
+#else
+		ioctl(cd->ioctl_fd, CDIOCCLOSE);
+#endif
 
 		cdda_close(cd);
 
@@ -178,7 +226,8 @@ const BoCA::MCDI &BoCA::CDParanoiaInfo::GetNthDeviceMCDI(Int n)
 
 	mcdi.SetData(Buffer<UnsignedByte>());
 
-	cdrom_drive	*cd = cdda_identify(String("/dev/cdrom").Append(n > 0 ? String::FromInt(n) : String(NIL)), CDDA_MESSAGE_FORGETIT, NIL);
+	const Array<String>	&driveNames = FindDrives();
+	cdrom_drive		*cd	    = cdda_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
 
 	if (cd != NIL)
 	{
@@ -237,11 +286,13 @@ const BoCA::MCDI &BoCA::CDParanoiaInfo::GetNthDeviceMCDI(Int n)
 
 Void BoCA::CDParanoiaInfo::CollectDriveInfo()
 {
-	for (Int i = 0; i < 16; i++)
-	{
-		cdrom_drive	*cd = cdda_identify(String("/dev/cdrom").Append(i > 0 ? String::FromInt(i) : String(NIL)), CDDA_MESSAGE_FORGETIT, NIL);
+	const Array<String>	&driveNames = FindDrives();
 
-		if (cd == NIL) break;
+	foreach (const String &driveName, driveNames)
+	{
+		cdrom_drive	*cd = cdda_identify(driveName, CDDA_MESSAGE_FORGETIT, NIL);
+
+		if (cd == NIL) continue;
 
 		Device	 drive;
 

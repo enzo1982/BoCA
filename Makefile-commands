@@ -1,5 +1,7 @@
 ########## BoCA commands makefile ##########
 
+include $(BOCA_PATH)/Makefile-options
+
 CC = gcc
 CCOPTS = -g0 -Wall -Os -ffast-math -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
 LD = gcc
@@ -19,8 +21,16 @@ ifeq ($(BUILD_WIN32),True)
 	DLLEXT = .dll
 
 	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat -Xlinker --enable-auto-import
+else ifeq ($(BUILD_OSX),True)
+	DLLEXT = .dylib
+
+	CCOPTS += -I/opt/local/include
+	LDOPTS += -L/opt/local/lib
 else
 	DLLEXT = .so
+
+	CCOPTS += -I/usr/local/include
+	LDOPTS += -L/usr/local/lib
 endif
 
 all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT)
@@ -29,7 +39,9 @@ all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT)
 
 $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) : $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+ifneq ($(BUILD_OSX),True)
 	strip --strip-all $@
+endif
 
 clean :
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) $(OBJECTS)

@@ -192,6 +192,10 @@
 				Name="info"
 				>
 				<File
+					RelativePath="..\..\..\components\decoder\cdrip\info\cdinfo.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\components\decoder\cdrip\info\cdplayerini.cpp"
 					>
 				</File>
@@ -221,6 +225,10 @@
 			<Filter
 				Name="info"
 				>
+				<File
+					RelativePath="..\..\..\components\decoder\cdrip\info\cdinfo.h"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\components\decoder\cdrip\info\cdplayerini.h"
 					>

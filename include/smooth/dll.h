@@ -17,6 +17,10 @@
 #include "gui/application/application.h"
 #include "gui/dialogs/messagebox.h"
 
+#if defined __WIN32__
+#	include "init.win32.h"
+#endif
+
 namespace smooth
 {
 	static Void	 AttachDLL(Void *);
@@ -27,7 +31,7 @@ using namespace smooth;
 
 extern "C"
 {
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
 	BOOL WINAPI DllMain(HINSTANCE shInstance, DWORD reason, LPVOID reserved)
 	{
 		switch (reason)

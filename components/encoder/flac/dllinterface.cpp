@@ -39,7 +39,7 @@ FLAC__METADATA_OBJECT_DELETE					 ex_FLAC__metadata_object_delete					= NIL;
 FLAC__METADATA_OBJECT_PICTURE_SET_MIME_TYPE			 ex_FLAC__metadata_object_picture_set_mime_type				= NIL;
 FLAC__METADATA_OBJECT_PICTURE_SET_DESCRIPTION			 ex_FLAC__metadata_object_picture_set_description			= NIL;
 FLAC__METADATA_OBJECT_PICTURE_SET_DATA				 ex_FLAC__metadata_object_picture_set_data				= NIL;
-FLAC__METADATA_OBJECT_VORBISCOMMENT_RESIZE_COMMENTS		 ex_FLAC__metadata_object_vorbiscomment_resize_comments			= NIL;
+FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT		 ex_FLAC__metadata_object_vorbiscomment_append_comment			= NIL;
 FLAC__VENDOR_STRING_TYPE					 ex_FLAC__VENDOR_STRING							= NIL;
 FLAC__VERSION_STRING_TYPE					 ex_FLAC__VERSION_STRING						= NIL;
 
@@ -77,7 +77,7 @@ Bool LoadFLACDLL()
 	ex_FLAC__metadata_object_picture_set_mime_type				= (FLAC__METADATA_OBJECT_PICTURE_SET_MIME_TYPE) flacdll->GetFunctionAddress("FLAC__metadata_object_picture_set_mime_type");
 	ex_FLAC__metadata_object_picture_set_description			= (FLAC__METADATA_OBJECT_PICTURE_SET_DESCRIPTION) flacdll->GetFunctionAddress("FLAC__metadata_object_picture_set_description");
 	ex_FLAC__metadata_object_picture_set_data				= (FLAC__METADATA_OBJECT_PICTURE_SET_DATA) flacdll->GetFunctionAddress("FLAC__metadata_object_picture_set_data");
-	ex_FLAC__metadata_object_vorbiscomment_resize_comments			= (FLAC__METADATA_OBJECT_VORBISCOMMENT_RESIZE_COMMENTS) flacdll->GetFunctionAddress("FLAC__metadata_object_vorbiscomment_resize_comments");
+	ex_FLAC__metadata_object_vorbiscomment_append_comment			= (FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT) flacdll->GetFunctionAddress("FLAC__metadata_object_vorbiscomment_append_comment");
 	ex_FLAC__VENDOR_STRING							= (FLAC__VENDOR_STRING_TYPE) flacdll->GetFunctionAddress("FLAC__VENDOR_STRING");
 	ex_FLAC__VERSION_STRING							= (FLAC__VERSION_STRING_TYPE) flacdll->GetFunctionAddress("FLAC__VERSION_STRING");
 
@@ -107,7 +107,7 @@ Bool LoadFLACDLL()
 	    ex_FLAC__metadata_object_picture_set_mime_type			== NIL ||
 	    ex_FLAC__metadata_object_picture_set_description			== NIL ||
 	    ex_FLAC__metadata_object_picture_set_data				== NIL ||
-	    ex_FLAC__metadata_object_vorbiscomment_resize_comments		== NIL ||
+	    ex_FLAC__metadata_object_vorbiscomment_append_comment		== NIL ||
 	    ex_FLAC__VENDOR_STRING						== NIL ||
 	    ex_FLAC__VERSION_STRING						== NIL) { FreeFLACDLL(); return False; }
 

@@ -11,6 +11,10 @@
 #include <boca/application/external/encodercomponentfile.h>
 #include <boca/common/utilities.h>
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 using namespace smooth::IO;
 
 BoCA::AS::EncoderComponentExternalFile::EncoderComponentExternalFile(ComponentSpecs *specs) : EncoderComponentExternal(specs)

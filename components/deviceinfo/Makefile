@@ -1,17 +1,25 @@
 ########## BoCA directory makefile ##########
 
+BOCA_PATH = ../..
+
+include $(BOCA_PATH)/Makefile-options
+
 all:
 ifeq ($(BUILD_UNIX),True)
-	cd cdparanoia && make
+ifneq ($(BUILD_OSX),True)
+	cd cdparanoia && $(MAKE)
+endif
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd cdrip && make
+	cd cdrip && $(MAKE)
 endif
 
 clean:
 ifeq ($(BUILD_UNIX),True)
-	cd cdparanoia && make clean
+ifneq ($(BUILD_OSX),True)
+	cd cdparanoia && $(MAKE) clean
+endif
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd cdrip && make clean
+	cd cdrip && $(MAKE) clean
 endif

@@ -28,10 +28,6 @@ BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()
 
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
-	/* Query tags and update track
-	 */
-	QueryTags(streamURI, track);
-
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
@@ -161,6 +157,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	{
 		File(encFileName).Delete();
 	}
+
+	/* Query tags and update track
+	 */
+	QueryTags(streamURI, track);
 
 	/* Check if anything went wrong.
 	 */

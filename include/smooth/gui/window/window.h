@@ -30,12 +30,10 @@ namespace smooth
 	namespace GUI
 	{
 		const Short	 WF_MODAL		= 1;
-		const Short	 WF_SYSTEMMODAL		= 2;
-		const Short	 WF_TOPMOST		= 4;
-		const Short	 WF_APPTOPMOST		= 8;
-		const Short	 WF_NORESIZE		= 16;
-		const Short	 WF_NOTASKBUTTON	= 32;
-		const Short	 WF_THINBORDER		= 64;
+		const Short	 WF_TOPMOST		= 2;
+		const Short	 WF_NORESIZE		= 4;
+		const Short	 WF_NOTASKBUTTON	= 8;
+		const Short	 WF_THINBORDER		= 16;
 
 		const Short	 WO_SEPARATOR		= 1;
 		const Short	 WO_NOSEPARATOR		= 2;
@@ -132,12 +130,7 @@ namespace smooth
 
 				Int				 Restore();
 
-				Bool				 IsMaximized() const			{ return maximized; }
-				Bool				 IsMinimized() const			{ return minimized; }
-
-				Bool				 IsVisible() const			{ if (IsMinimized()) return False; return Widget::IsVisible(); }
-
-				Bool				 IsBackgroundColorSet() const		{ return backgroundColorSet; }
+				Int				 Raise();
 
 				Int				 Stay();
 				Int				 Close();
@@ -161,6 +154,14 @@ namespace smooth
 
 				virtual Int			 Add(Widget *);
 				virtual Int			 Remove(Widget *);
+			accessors:
+				Bool				 IsMaximized() const			{ return maximized; }
+				Bool				 IsMinimized() const			{ return minimized; }
+
+				Bool				 IsVisible() const			{ if (IsMinimized()) return False; return Widget::IsVisible(); }
+
+				Bool				 IsBackgroundColorSet() const		{ return backgroundColorSet; }
+
 			slots:
 				virtual Void			 OnCreate();
 				virtual Void			 OnDestroy();

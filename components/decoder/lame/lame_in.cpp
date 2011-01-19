@@ -72,6 +72,7 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 	track.length	= -1;
 
 	SkipID3v2Tag(f_in);
+	ParseVBRHeaders(f_in);
 
 	Buffer<unsigned char>	 buffer(4096);
 
@@ -93,7 +94,7 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 			format.channels	= mp3data.stereo;
 			format.rate	= mp3data.samplerate;
 
-			if	(mp3data.nsamp	 > 0) track.length = mp3data.nsamp * format.channels;
+			if	(mp3data.nsamp	 > 0) track.length = (mp3data.nsamp - delaySamples - padSamples) * format.channels;
 			else if (mp3data.bitrate > 0) track.approxLength = track.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate * format.channels;
 
 			break;
@@ -139,7 +140,14 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::LAMEIn::LAMEIn()
 {
-	packageSize = 0;
+	packageSize	 = 0;
+
+	delaySamples	 = 0;
+	padSamples	 = 0;
+
+	/* Initialize to decoder delay.
+	 */
+	delaySamplesLeft = 529;
 }
 
 BoCA::LAMEIn::~LAMEIn()
@@ -153,6 +161,7 @@ Bool BoCA::LAMEIn::Activate()
 	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
 
 	SkipID3v2Tag(f_in);
+	ParseVBRHeaders(f_in);
 
 	driver->Seek(f_in->GetPos());
 
@@ -184,12 +193,19 @@ Int BoCA::LAMEIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	Int		 nSamples = ex_lame_decode(data, size, pcm_l, pcm_r);
 	const Format	&format = track.GetFormat();
 
-	data.Resize(nSamples * format.channels * (format.bits / 8));
+	data.Resize(0);
 
-	for (Int i = 0; i < nSamples; i++)
+	if (nSamples > delaySamplesLeft)
 	{
-		for (Int j = 0; j < format.channels; j++) ((short *) (unsigned char *) data)[format.channels * i + j] = (j == 0) ? pcm_l[i] : pcm_r[i];
+		data.Resize((nSamples - delaySamplesLeft) * format.channels * (format.bits / 8));
+
+		for (Int i = delaySamplesLeft; i < nSamples; i++)
+		{
+			for (Int j = 0; j < format.channels; j++) ((short *) (unsigned char *) data)[format.channels * (i - delaySamplesLeft) + j] = (j == 0) ? pcm_l[i] : pcm_r[i];
+		}
 	}
+
+	delaySamplesLeft = Math::Max(0, delaySamplesLeft - nSamples);
 
 	return data.Size();
 }
@@ -222,4 +238,32 @@ Bool BoCA::LAMEIn::SkipID3v2Tag(InStream *in)
 	}
 
 	return True;
+}
+
+Bool BoCA::LAMEIn::ParseVBRHeaders(InStream *in)
+{
+	/* Check for a LAME header and extract
+	 * the number of samples if it exists.
+	 */
+	Buffer<UnsignedByte>	 buffer(228);
+
+	/* Read data and seek back to before
+	 * the Xing header.
+	 */
+	in->RelSeek(156);
+	in->InputData(buffer, 228);
+	in->RelSeek(-228);
+	in->RelSeek(-156);
+
+	if (buffer[0] == 'L' && buffer[1] == 'A' && buffer[2] == 'M' && buffer[3] == 'E')
+	{
+		delaySamples = ( buffer[21]	    << 4) | ((buffer[22] & 0xF0) >> 4);
+		padSamples   = ((buffer[22] & 0x0F) << 8) | ( buffer[23]	     );
+
+		delaySamplesLeft += delaySamples;
+
+		return True;
+	}
+
+	return False;
 }

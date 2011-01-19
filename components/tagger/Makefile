@@ -1,25 +1,29 @@
 ########## BoCA directory makefile ##########
 
+BOCA_PATH = ../..
+
+include $(BOCA_PATH)/Makefile-options
+
 all:
-	cd apev2 && make
-	cd flac && make
-	cd id3v1 && make
-	cd id3v2 && make
-	cd mp4 && make
-	cd riff && make
-	cd vorbis && make
+	cd apev2 && $(MAKE)
+	cd flac && $(MAKE)
+	cd id3v1 && $(MAKE)
+	cd id3v2 && $(MAKE)
+	cd mp4 && $(MAKE)
+	cd riff && $(MAKE)
+	cd vorbis && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
-	cd wma && make
+	cd wma && $(MAKE)
 endif
 
 clean:
-	cd apev2 && make clean
-	cd flac && make clean
-	cd id3v1 && make clean
-	cd id3v2 && make clean
-	cd mp4 && make clean
-	cd riff && make clean
-	cd vorbis && make clean
+	cd apev2 && $(MAKE) clean
+	cd flac && $(MAKE) clean
+	cd id3v1 && $(MAKE) clean
+	cd id3v2 && $(MAKE) clean
+	cd mp4 && $(MAKE) clean
+	cd riff && $(MAKE) clean
+	cd vorbis && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
-	cd wma && make clean
+	cd wma && $(MAKE) clean
 endif

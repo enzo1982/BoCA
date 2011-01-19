@@ -26,10 +26,6 @@ BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()
 
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
-	/* Query tags and update track
-	 */
-	QueryTags(streamURI, track);
-
 	/* Set up security attributes
 	 */
 	SECURITY_ATTRIBUTES	 secAttr;
@@ -199,6 +195,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	{
 		File(encFileName).Delete();
 	}
+
+	/* Query tags and update track
+	 */
+	QueryTags(streamURI, track);
 
 	/* Check if anything went wrong.
 	 */

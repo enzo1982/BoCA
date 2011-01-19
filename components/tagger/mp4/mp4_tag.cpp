@@ -159,6 +159,15 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 		}
 	}
 
+	/* Set media type.
+	 */
+	uint8_t	 mediaType = 1;					 //  1 == Music
+
+	if	(track.outfile.EndsWith(".m4b")) mediaType = 2;	 //  2 == Audiobook
+	else if (track.outfile.EndsWith(".m4r")) mediaType = 14; // 14 == Ringtone
+
+	ex_MP4TagsSetMediaType(mp4Tags, &mediaType);
+
 	String::SetOutputFormat(prevOutFormat);
 
 	ex_MP4TagsStore(mp4Tags, mp4File);
@@ -258,6 +267,51 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 	String::SetInputFormat(prevInFormat);
 
 	ex_MP4TagsFree(mp4Tags);
+
+	MP4Chapter_t	*chapterList  = NIL;
+	uint32_t	 chapterCount = 0;
+
+	ex_MP4GetChapters(mp4File, &chapterList, &chapterCount, MP4ChapterTypeAny);
+
+	if (chapterList != NIL)
+	{
+		MP4Duration	 offset = 0;
+
+		for (UnsignedInt i = 0; i < chapterCount; i++)
+		{
+			const Format	&format = track.GetFormat();
+
+			/* Fill track data.
+			 */
+			Track	 rTrack;
+
+			rTrack.origFilename = fileName;
+
+			rTrack.sampleOffset = Float(offset) / MP4_MSECS_TIME_SCALE * format.rate * format.channels;
+			rTrack.length	    = Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate * format.channels;
+
+			rTrack.fileSize	    = rTrack.length * (format.bits / 8);
+
+			rTrack.SetFormat(format);
+
+			/* Set track title.
+			 */
+			Info	 info = track.GetInfo();
+
+			info.title = chapterList[i].title;
+			info.track = i + 1;
+
+			rTrack.SetInfo(info);
+
+			/* Add track to track list.
+			 */
+			track.tracks.Add(rTrack);
+
+			offset += chapterList[i].duration;
+		}
+
+		ex_MP4Free(chapterList);
+	}
 
 	ex_MP4Close(mp4File);
 

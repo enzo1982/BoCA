@@ -13,6 +13,10 @@
 
 #include "encodercomponent.h"
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 namespace BoCA
 {
 	namespace AS

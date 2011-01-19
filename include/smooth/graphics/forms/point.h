@@ -28,10 +28,6 @@ namespace smooth
 		class SMOOTHAPI Point
 		{
 			public:
-#ifdef __WIN32__
-				operator	 POINT() const;
-				Point &operator	 =(const POINT &);
-#endif
 				Int		 x;
 				Int		 y;
 

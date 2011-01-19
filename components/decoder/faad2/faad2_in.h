@@ -45,6 +45,8 @@ namespace BoCA
 			Bool				 Activate();
 			Bool				 Deactivate();
 
+			Bool				 Seek(Int64);
+
 			Int				 ReadData(Buffer<UnsignedByte> &, Int);
 	};
 };

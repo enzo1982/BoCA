@@ -28,10 +28,6 @@ namespace smooth
 		class SMOOTHAPI Size
 		{
 			public:
-#ifdef __WIN32__
-				operator	 SIZE() const;
-				Size &operator	 =(const SIZE &);
-#endif
 				Int		 cx;
 				Int		 cy;
 

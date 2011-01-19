@@ -28,11 +28,7 @@ namespace smooth
 		class SMOOTHAPI DynamicLoader : public Object
 		{
 			private:
-#ifdef __WIN32__
-				HINSTANCE		 handle;
-#else
 				Void			*handle;
-#endif
 			public:
 				static const Short	 classID;
 

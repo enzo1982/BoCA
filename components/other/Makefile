@@ -1,7 +1,11 @@
 ########## BoCA directory makefile ##########
 
+BOCA_PATH = ../..
+
+include $(BOCA_PATH)/Makefile-options
+
 all:
-	cd external && make
+	cd external && $(MAKE)
 
 clean:
-	cd external && make clean
+	cd external && $(MAKE) clean

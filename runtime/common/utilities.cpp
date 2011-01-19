@@ -12,6 +12,10 @@
 #include <boca/common/config.h>
 #include <boca/common/i18n.h>
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 using namespace smooth::System;
 using namespace smooth::GUI::Dialogs;
 

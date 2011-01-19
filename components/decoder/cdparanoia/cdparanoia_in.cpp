@@ -16,6 +16,8 @@ extern "C" {
 #	include <cdda_paranoia.h>
 }
 
+#include <glob.h>
+
 #include "cdparanoia_in.h"
 #include "config.h"
 
@@ -49,18 +51,49 @@ const String &BoCA::CDParanoiaIn::GetComponentSpecs()
 	return componentSpecs;
 }
 
+const Array<String> &BoCA::CDParanoiaIn::FindDrives()
+{
+#if defined __linux__
+	static const char	*deviceNames[] = { "/dev/hd?", "/dev/scd?", NIL };
+#elif defined __FreeBSD__
+	static const char	*deviceNames[] = { "/dev/acd?", "/dev/cd?", NIL };
+#else
+	static const char	*deviceNames[] = { "/dev/cdrom?", NIL };
+#endif
+
+	static Array<String>	 driveNames;
+	static Bool		 initialized = False;
+
+	if (initialized) return driveNames;
+
+	for (Int i = 0; deviceNames[i] != NIL; i++)
+	{
+		glob_t	*fileData = new glob_t;
+
+		if (glob(deviceNames[i], 0, NIL, fileData) == 0)
+		{
+			for (UnsignedInt n = 0; n < fileData->gl_pathc; n++)
+			{
+				cdrom_drive	*cd = cdda_identify(fileData->gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
+
+				if (cd != NIL) driveNames.Add(fileData->gl_pathv[n]);
+			}
+		}
+
+		globfree(fileData);
+	}
+
+	initialized = True;
+
+	return driveNames;
+}
+
 Void smooth::AttachDLL(Void *instance)
 {
-	BoCA::Config	*config = BoCA::Config::Get();
+	BoCA::Config		*config	    = BoCA::Config::Get();
+	const Array<String>	&driveNames = BoCA::CDParanoiaIn::FindDrives();
 
-	for (Int i = 0; i < 16; i++)
-	{
-		cdrom_drive	*cd = cdda_identify(String("/dev/cdrom").Append(i > 0 ? String::FromInt(i) : String(NIL)), CDDA_MESSAGE_FORGETIT, NIL);
-
-		if (cd == NIL) break;
-
-		numDrives++;
-	}
+	numDrives = driveNames.Length();
 
 	/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
 	 */
@@ -220,7 +253,9 @@ Bool BoCA::CDParanoiaIn::Activate()
 	Int	 startSector = 0;
 	Int	 endSector = 0;
 
-	drive = cdda_identify(String("/dev/cdrom").Append(track.drive > 0 ? String::FromInt(track.drive) : String(NIL)), CDDA_MESSAGE_FORGETIT, NIL);
+	const Array<String>	&driveNames = FindDrives();
+
+	drive = cdda_identify(driveNames.GetNth(track.drive), CDDA_MESSAGE_FORGETIT, NIL);
 
 	if (drive == NIL) return False;
 

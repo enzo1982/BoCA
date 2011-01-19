@@ -46,8 +46,10 @@ BoCA::AS::Registry::Registry()
 {
 	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("boca"));
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.dll");
+#elif defined __APPLE__
+	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.dylib");
 #else
 	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.so");
 #endif

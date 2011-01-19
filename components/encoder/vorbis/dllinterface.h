@@ -10,7 +10,7 @@
 
 #include <smooth.h>
 
-#include "vorbis/vorbisenc.h"
+#include <vorbis/vorbisenc.h>
 
 using namespace smooth;
 using namespace smooth::System;

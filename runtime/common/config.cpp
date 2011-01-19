@@ -150,7 +150,7 @@ Bool BoCA::Config::SaveSettings()
 	 */
 	for (Int i = 0; i < persistentIntIDs.Length(); i++)
 	{
-		const String &nthID = persistentIntIDs.GetNthReference(i);
+		const String	&nthID = persistentIntIDs.GetNthReference(i);
 
 		config->SetIntValue(nthID.Head(nthID.Find("::")), nthID.Tail(nthID.Length() - nthID.Find("::") - 2), *persistentIntValues.GetNth(i));
 	}

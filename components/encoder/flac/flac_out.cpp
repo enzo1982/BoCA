@@ -124,14 +124,16 @@ Bool BoCA::FLACOut::Activate()
 
 		Int	 numComments = in.InputNumber(4);
 
-		ex_FLAC__metadata_object_vorbiscomment_resize_comments(vorbiscomment, numComments);
-
 		for (Int i = 0; i < numComments; i++)
 		{
-			vorbiscomment->data.vorbis_comment.comments[i].length = in.InputNumber(4);
-			vorbiscomment->data.vorbis_comment.comments[i].entry = vcBuffer + in.GetPos();
+			FLAC__StreamMetadata_VorbisComment_Entry	 entry;
 
-			in.RelSeek(vorbiscomment->data.vorbis_comment.comments[i].length);
+			entry.length = in.InputNumber(4);
+			entry.entry  = vcBuffer + in.GetPos();
+
+			ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, entry, true);
+
+			in.RelSeek(entry.length);
 		}
 
 		vorbiscomment->length = vcBuffer.Size();

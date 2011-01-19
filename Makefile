@@ -1,9 +1,9 @@
 ########## BoCA directory makefile ##########
 
 all:
-	cd runtime && make -j 2
-	cd components && make -j 2
+	cd runtime && $(MAKE) -j 2
+	cd components && $(MAKE) -j 2
 
 clean:
-	cd runtime && make clean
-	cd components && make clean
+	cd runtime && $(MAKE) clean
+	cd components && $(MAKE) clean

@@ -14,6 +14,7 @@
 MP4READ			 ex_MP4Read			= NIL;
 MP4MODIFY		 ex_MP4Modify			= NIL;
 MP4CLOSE		 ex_MP4Close			= NIL;
+MP4FREE			 ex_MP4Free			= NIL;
 MP4OPTIMIZE		 ex_MP4Optimize			= NIL;
 
 MP4TAGSALLOC		 ex_MP4TagsAlloc		= NIL;
@@ -35,9 +36,12 @@ MP4TAGSSETTRACK		 ex_MP4TagsSetTrack		= NIL;
 MP4TAGSSETDISK		 ex_MP4TagsSetDisk		= NIL;
 MP4TAGSSETCOMPILATION	 ex_MP4TagsSetCompilation	= NIL;
 MP4TAGSSETCOPYRIGHT	 ex_MP4TagsSetCopyright		= NIL;
+MP4TAGSSETMEDIATYPE	 ex_MP4TagsSetMediaType		= NIL;
 
 MP4TAGSADDARTWORK	 ex_MP4TagsAddArtwork		= NIL;
 MP4TAGSREMOVEARTWORK	 ex_MP4TagsRemoveArtwork	= NIL;
+
+MP4GETCHAPTERS		 ex_MP4GetChapters		= NIL;
 
 DynamicLoader *mp4v2dll	= NIL;
 
@@ -50,6 +54,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4Read			= (MP4READ) mp4v2dll->GetFunctionAddress("MP4Read");
 	ex_MP4Modify			= (MP4MODIFY) mp4v2dll->GetFunctionAddress("MP4Modify");
 	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
+	ex_MP4Free			= (MP4FREE) mp4v2dll->GetFunctionAddress("MP4Free");
 	ex_MP4Optimize			= (MP4OPTIMIZE) mp4v2dll->GetFunctionAddress("MP4Optimize");
 
 	ex_MP4TagsAlloc			= (MP4TAGSALLOC) mp4v2dll->GetFunctionAddress("MP4TagsAlloc");
@@ -71,13 +76,17 @@ Bool LoadMP4v2DLL()
 	ex_MP4TagsSetDisk		= (MP4TAGSSETDISK) mp4v2dll->GetFunctionAddress("MP4TagsSetDisk");
 	ex_MP4TagsSetCompilation	= (MP4TAGSSETCOMPILATION) mp4v2dll->GetFunctionAddress("MP4TagsSetCompilation");
 	ex_MP4TagsSetCopyright		= (MP4TAGSSETCOPYRIGHT) mp4v2dll->GetFunctionAddress("MP4TagsSetCopyright");
+	ex_MP4TagsSetMediaType		= (MP4TAGSSETMEDIATYPE) mp4v2dll->GetFunctionAddress("MP4TagsSetMediaType");
 
 	ex_MP4TagsAddArtwork		= (MP4TAGSADDARTWORK) mp4v2dll->GetFunctionAddress("MP4TagsAddArtwork");
 	ex_MP4TagsRemoveArtwork		= (MP4TAGSREMOVEARTWORK) mp4v2dll->GetFunctionAddress("MP4TagsRemoveArtwork");
 
+	ex_MP4GetChapters		= (MP4GETCHAPTERS) mp4v2dll->GetFunctionAddress("MP4GetChapters");
+
 	if (ex_MP4Read			== NIL ||
 	    ex_MP4Modify		== NIL ||
 	    ex_MP4Close			== NIL ||
+	    ex_MP4Free			== NIL ||
 	    ex_MP4Optimize		== NIL ||
 
 	    ex_MP4TagsAlloc		== NIL ||
@@ -99,9 +108,12 @@ Bool LoadMP4v2DLL()
 	    ex_MP4TagsSetDisk		== NIL ||
 	    ex_MP4TagsSetCompilation	== NIL ||
 	    ex_MP4TagsSetCopyright	== NIL ||
+	    ex_MP4TagsSetMediaType	== NIL ||
 
 	    ex_MP4TagsAddArtwork	== NIL ||
-	    ex_MP4TagsRemoveArtwork	== NIL) { FreeMP4v2DLL(); return False; }
+	    ex_MP4TagsRemoveArtwork	== NIL ||
+
+	    ex_MP4GetChapters		== NIL) { FreeMP4v2DLL(); return False; }
 
 	return True;
 }

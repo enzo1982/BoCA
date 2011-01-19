@@ -108,7 +108,7 @@
 
 #include "smooth/gui/clipboard/clipboard.h"
 
-#ifdef __WIN32__
+#if defined __WIN32__
 #	include "smooth/gui/dialogs/directory/dirdlg_win32.h"
 #	include "smooth/gui/dialogs/file/filedlg_win32.h"
 #else

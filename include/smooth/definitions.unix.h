@@ -8,36 +8,18 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_EVENTXLIB
-#define H_OBJSMOOTH_EVENTXLIB
+#ifndef H_OBJSMOOTH_DEFS_UNIX
+#define H_OBJSMOOTH_DEFS_UNIX
 
-namespace smooth
-{
-	namespace System
-	{
-		class EventXLib;
-	};
-};
+#include <stdlib.h>
+#include <sys/types.h>
 
-#include "../eventbackend.h"
+#define SMOOTHAPI
+#define SMOOTHVAR extern
 
-namespace smooth
-{
-	namespace System
-	{
-		const Short	 EVENT_XLIB = 2;
+#define SMOOTH_PLUGIN_API
+#define SMOOTH_PLUGIN_VAR extern
 
-		class EventXLib : public EventBackend
-		{
-			private:
-				X11::Display	*display;
-			public:
-						 EventXLib();
-						~EventXLib();
-
-				Int		 ProcessNextEvent();
-		};
-	};
-};
+#define __declspec(x)
 
 #endif

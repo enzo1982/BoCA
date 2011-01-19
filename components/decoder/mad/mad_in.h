@@ -27,6 +27,7 @@ namespace BoCA
 		private:
 			mad_decoder		 decoder;
 			Bool			 stop;
+			Bool			 finished;
 
 			Buffer<signed int>	 samplesBuffer;
 
@@ -34,12 +35,17 @@ namespace BoCA
 
 			Int			 numFrames;
 
+			Int			 delaySamples;
+			Int			 padSamples;
+
+			Int			 delaySamplesLeft;
+
 			Mutex			*readDataMutex;
 			Mutex			*samplesBufferMutex;
 			Thread			*decoderThread;
 
 			Bool			 SkipID3v2Tag(IO::InStream *);
-			Bool			 ReadXingTag(IO::InStream *);
+			Bool			 ParseVBRHeaders(IO::InStream *);
 
 			Int			 ReadMAD(Bool);
 		public:

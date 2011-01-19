@@ -27,10 +27,6 @@ BoCA::AS::DecoderComponentExternalFile::~DecoderComponentExternalFile()
 
 Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &streamURI, Track &track)
 {
-	/* Query tags and update track
-	 */
-	QueryTags(streamURI, track);
-
 	/* Create temporary WAVE file
 	 */
 	wavFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".wav");
@@ -143,6 +139,10 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	/* Remove temporary WAVE file
 	 */
 	File(wavFileName).Delete();
+
+	/* Query tags and update track
+	 */
+	QueryTags(streamURI, track);
 
 	return Success();
 }

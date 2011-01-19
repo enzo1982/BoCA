@@ -7,6 +7,8 @@ VERSION	  = 1.0
 
 BOCA_PATH = ..
 
+include $(BOCA_PATH)/Makefile-options
+
 # Enter object files here:
 OBJECTS	  = application/external/configlayer.o application/external/decodercomponent.o application/external/encodercomponent.o application/component.o application/componentspecs.o application/decodercomponent.o application/deviceinfocomponent.o application/dspcomponent.o application/encodercomponent.o application/extensioncomponent.o application/outputcomponent.o application/registry.o application/taggercomponent.o common/communication/application.o common/communication/joblist.o common/communication/menu.o common/communication/settings.o common/metadata/device.o common/metadata/format.o common/metadata/info.o common/metadata/mcdi.o common/metadata/picture.o common/metadata/picturedata.o common/metadata/track.o common/config.o common/configlayer.o common/i18n.o common/protocol.o common/utilities.o component/component.o component/decodercomponent.o component/deviceinfocomponent.o component/dspcomponent.o component/encodercomponent.o component/extensioncomponent.o component/outputcomponent.o component/taggercomponent.o core/main.o
 
@@ -41,9 +43,13 @@ else
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	LDOPTS += -lole32 -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
-
 	DLLEXT = .dll
+
+	LDOPTS += -lole32 -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
+else ifeq ($(BUILD_OSX),True)
+	DLLEXT = .dylib
+
+	LDOPTS += -Wl,-dylib_install_name,boca.$(VERSION)$(DLLEXT)
 else
 	DLLEXT = .so
 endif
@@ -55,10 +61,12 @@ ifeq ($(BUILD_WIN32),True)
 	$(LD) --shared -o $@ $(OBJECTS) -Wl,--out-implib,$(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
 else
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
-	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca.so
-	ln -s $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT) $(BOCA_PATH)/$(LIBDIR)/libboca.so
+	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca$(DLLEXT)
+	ln -s $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT) $(BOCA_PATH)/$(LIBDIR)/libboca$(DLLEXT)
 endif
+ifneq ($(BUILD_OSX),True)
 	strip --strip-all $@
+endif
 
 clean :
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT) $(BOCA_PATH)/$(LIBDIR)/libboca.a $(OBJECTS)

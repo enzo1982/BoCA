@@ -1,7 +1,11 @@
 ########## BoCA directory makefile ##########
 
+BOCA_PATH = ../..
+
+include $(BOCA_PATH)/Makefile-options
+
 all:
-	cd resample && make
+	cd resample && $(MAKE)
 
 clean:
-	cd resample && make clean
+	cd resample && $(MAKE) clean

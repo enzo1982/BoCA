@@ -66,7 +66,7 @@ BoCA::DonateDialog::DonateDialog()
 
 	Add(mainWnd);
 
-	mainWnd->SetFlags(mainWnd->GetFlags() | WF_APPTOPMOST | WF_NOTASKBUTTON);
+	mainWnd->SetFlags(mainWnd->GetFlags() | WF_TOPMOST | WF_NOTASKBUTTON);
 	mainWnd->SetIcon(ImageLoader::Load("freac.pci:0"));
 
 	Rect	 workArea = MultiMonitor::GetActiveMonitorWorkArea();

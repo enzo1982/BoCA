@@ -18,6 +18,10 @@
 #include "gui/application/application.h"
 #include "gui/dialogs/messagebox.h"
 
+#if defined __WIN32__
+#	include "init.win32.h"
+#endif
+
 namespace smooth
 {
 	static Int	 Main();
@@ -25,7 +29,7 @@ namespace smooth
 
 using namespace smooth;
 
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
 int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdLine, int siCmdShow)
 {
 	hInstance		= shInstance;

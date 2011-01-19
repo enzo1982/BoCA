@@ -1,19 +1,23 @@
 ########## BoCA directory makefile ##########
 
+BOCA_PATH = ../..
+
+include $(BOCA_PATH)/Makefile-options
+
 all:
-ifeq ($(BUILD_UNIX),True)
-	cd alsa && make
+ifeq ($(BUILD_LINUX),True)
+	cd alsa && $(MAKE)
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd waveout && make
-	cd winamp && make
+	cd waveout && $(MAKE)
+	cd winamp && $(MAKE)
 endif
 
 clean:
-ifeq ($(BUILD_UNIX),True)
-	cd alsa && make clean
+ifeq ($(BUILD_LINUX),True)
+	cd alsa && $(MAKE) clean
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd waveout && make clean
-	cd winamp && make clean
+	cd waveout && $(MAKE) clean
+	cd winamp && $(MAKE) clean
 endif

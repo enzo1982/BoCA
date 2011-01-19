@@ -17,20 +17,22 @@ namespace BoCA
 	class CDParanoiaInfo : public CS::DeviceInfoComponent
 	{
 		private:
-			static Bool		 initialized;
+			static Bool			 initialized;
 
-			Void			 CollectDriveInfo();
+			Void				 CollectDriveInfo();
 		public:
-			static const String	&GetComponentSpecs();
+			static const String		&GetComponentSpecs();
 
-						 CDParanoiaInfo();
-						~CDParanoiaInfo();
+			static const Array<String>	&FindDrives();
 
-			Bool			 OpenNthDeviceTray(Int);
-			Bool			 CloseNthDeviceTray(Int);
+							 CDParanoiaInfo();
+							~CDParanoiaInfo();
 
-			const Array<String>	&GetNthDeviceTrackList(Int);
-			const MCDI		&GetNthDeviceMCDI(Int);
+			Bool				 OpenNthDeviceTray(Int);
+			Bool				 CloseNthDeviceTray(Int);
+
+			const Array<String>		&GetNthDeviceTrackList(Int);
+			const MCDI			&GetNthDeviceMCDI(Int);
 	};
 };
 

@@ -8,34 +8,22 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_EVENTWIN32
-#define H_OBJSMOOTH_EVENTWIN32
+#ifndef H_OBJSMOOTH_INIT_WIN32
+#define H_OBJSMOOTH_INIT_WIN32
+
+#include <windows.h>
+
+#include "definitions.h"
 
 namespace smooth
 {
-	namespace System
-	{
-		class EventWin32;
-	};
-};
+#ifdef __WIN32__
+	SMOOTHVAR HINSTANCE	 hInstance;
+	SMOOTHVAR HINSTANCE	 hPrevInstance;
+	SMOOTHVAR int		 iCmdShow;
 
-#include "../eventbackend.h"
-
-namespace smooth
-{
-	namespace System
-	{
-		const Short	 EVENT_WIN32 = 1;
-
-		class EventWin32 : public EventBackend
-		{
-			public:
-					 EventWin32();
-					~EventWin32();
-
-				Int	 ProcessNextEvent();
-		};
-	};
+	SMOOTHVAR HICON		 SMOOTHICON;
+#endif
 };
 
 #endif

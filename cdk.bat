@@ -8,6 +8,6 @@ set LIBRARY_PATH=%CDK_INSTALL_PATH%/system/lib
 set BUILD_WIN32=True
 
 echo fre:ac Component Development Kit v1.1 Beta 1
-echo Copyright (C) 2001-2010 Robert Kausch
+echo Copyright (C) 2001-2011 Robert Kausch
 
 bash

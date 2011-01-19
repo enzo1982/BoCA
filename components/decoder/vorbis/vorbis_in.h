@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
-#include "vorbis/vorbisenc.h"
+#include <vorbis/vorbisenc.h>
 
 BoCA_BEGIN_COMPONENT(VorbisIn)
 

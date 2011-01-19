@@ -1,43 +1,47 @@
 ########## BoCA directory makefile ##########
 
+BOCA_PATH = ../..
+
+include $(BOCA_PATH)/Makefile-options
+
 all:
 ifeq ($(BUILD_WIN32),True)
-	cd bladeenc && make
+	cd bladeenc && $(MAKE)
 endif
-	cd bonk && make
-	cd faac && make
-	cd flac && make
-	cd lame && make
+	cd bonk && $(MAKE)
+	cd faac && $(MAKE)
+	cd flac && $(MAKE)
+	cd lame && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
-	cd mac && make
+	cd mac && $(MAKE)
 endif
-	cd speex && make
+	cd speex && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
-	cd twinvq && make
+	cd twinvq && $(MAKE)
 endif
-	cd vorbis && make
-	cd wave && make
+	cd vorbis && $(MAKE)
+	cd wave && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
-	cd wma && make
+	cd wma && $(MAKE)
 endif
 
 clean:
 ifeq ($(BUILD_WIN32),True)
-	cd bladeenc && make clean
+	cd bladeenc && $(MAKE) clean
 endif
-	cd bonk && make clean
-	cd faac && make clean
-	cd flac && make clean
-	cd lame && make clean
+	cd bonk && $(MAKE) clean
+	cd faac && $(MAKE) clean
+	cd flac && $(MAKE) clean
+	cd lame && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
-	cd mac && make clean
+	cd mac && $(MAKE) clean
 endif
-	cd speex && make clean
+	cd speex && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
-	cd twinvq && make clean
+	cd twinvq && $(MAKE) clean
 endif
-	cd vorbis && make clean
-	cd wave && make clean
+	cd vorbis && $(MAKE) clean
+	cd wave && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
-	cd wma && make clean
+	cd wma && $(MAKE) clean
 endif

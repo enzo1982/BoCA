@@ -177,6 +177,8 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 			ex_MP4Free(esc_buffer);
 
 			ex_NeAACDecClose(handle);
+
+			track.SetFormat(format);
 		}
 
 		ex_MP4Close(mp4File);
@@ -356,7 +358,7 @@ Bool BoCA::FAAD2In::Activate()
 
 		ex_NeAACDecInit2(handle, (unsigned char *) buffer, buffer_size, &rate, &channels);
 
-		sampleId = 0;
+		sampleId = 1;
 
 		ex_MP4Free(buffer);
 	}
@@ -397,6 +399,24 @@ Bool BoCA::FAAD2In::Deactivate()
 	return True;
 }
 
+Bool BoCA::FAAD2In::Seek(Int64 samplePosition)
+{
+	Format	 format = track.GetFormat();
+
+	if (!track.origFilename.ToLower().EndsWith(".aac"))
+	{
+		/* ToDo: Seeking by sample ID is not exact!
+		 */
+		MP4Timestamp	 time = Float(samplePosition / format.rate / format.channels) * ex_MP4GetTrackTimeScale(mp4File, mp4Track);
+
+		sampleId = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
+
+		return True;
+	}
+
+	return False;
+}
+
 Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (size <= 0) return -1;
@@ -432,7 +452,7 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 				samplesRead += frameInfo.samples;
 			}
 		}
-		while (samples != NIL && sampleId < ((track.length / 2048) * (double(inBytes) / track.fileSize)));
+		while (samples != NIL && samplesRead < (track.length * (2 * Float(size) / track.fileSize)));
 	}
 	else
 	{

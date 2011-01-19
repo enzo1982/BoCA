@@ -11,7 +11,9 @@ BOCA_PATH = ../../..
 OBJECTS	  = dllinterface.o speex_in.o
 
 # Enter additional defines here:
-DEFINE	  =
+ifeq ($(BUILD_WIN32),True)
+DEFINE	  = -I .
+endif
 
 # Enter additional library dependencies here:
 LIBS	  =

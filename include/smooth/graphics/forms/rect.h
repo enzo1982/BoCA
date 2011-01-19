@@ -35,10 +35,6 @@ namespace smooth
 				static Int	 Inverted;
 				static Int	 Dotted;
 			public:
-#ifdef __WIN32__
-				operator	 RECT() const;
-				Rect &operator	 =(const RECT &);
-#endif
 				Int		 left;
 				Int		 top;
 				Int		 right;

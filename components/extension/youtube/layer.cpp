@@ -15,6 +15,10 @@
 #include "videolist.h"
 #include "videolistentry.h"
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 using namespace smooth::Net;
 
 BoCA::LayerYouTube::LayerYouTube() : Layer("Video")

@@ -22,6 +22,8 @@ namespace smooth
 	};
 };
 
+#include <stdio.h>
+
 #include "../definitions.h"
 #include "stream.h"
 

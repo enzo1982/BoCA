@@ -10,6 +10,10 @@
 
 #include "scriptutilities.h"
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 using namespace smooth::GUI;
 using namespace smooth::GUI::Dialogs;
 

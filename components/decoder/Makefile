@@ -1,63 +1,71 @@
 ########## BoCA directory makefile ##########
 
+BOCA_PATH = ../..
+
+include $(BOCA_PATH)/Makefile-options
+
 all:
-	cd aiff && make
-	cd au && make
-	cd bonk && make
+	cd aiff && $(MAKE)
+	cd au && $(MAKE)
+	cd bonk && $(MAKE)
 ifeq ($(BUILD_UNIX),True)
-	cd cdparanoia && make
+ifneq ($(BUILD_OSX),True)
+	cd cdparanoia && $(MAKE)
+endif
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd cdrip && make
+	cd cdrip && $(MAKE)
 endif
-	cd cuesheet && make
-	cd faad2 && make
-	cd flac && make
-	cd lame && make
+	cd cuesheet && $(MAKE)
+	cd faad2 && $(MAKE)
+	cd flac && $(MAKE)
+	cd lame && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
-	cd mac && make
+	cd mac && $(MAKE)
 endif
-	cd mad && make
-	cd sndfile && make
-	cd speex && make
+	cd mad && $(MAKE)
+	cd sndfile && $(MAKE)
+	cd speex && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
-	cd twinvq && make
+	cd twinvq && $(MAKE)
 endif
-	cd voc && make
-	cd vorbis && make
-	cd wave && make
+	cd voc && $(MAKE)
+	cd vorbis && $(MAKE)
+	cd wave && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
-	cd winamp && make
-	cd wma && make
+	cd winamp && $(MAKE)
+	cd wma && $(MAKE)
 endif
 
 clean:
-	cd aiff && make clean
-	cd au && make clean
-	cd bonk && make clean
+	cd aiff && $(MAKE) clean
+	cd au && $(MAKE) clean
+	cd bonk && $(MAKE) clean
 ifeq ($(BUILD_UNIX),True)
-	cd cdparanoia && make clean
+ifneq ($(BUILD_OSX),True)
+	cd cdparanoia && $(MAKE) clean
+endif
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd cdrip && make clean
+	cd cdrip && $(MAKE) clean
 endif
-	cd cuesheet && make clean
-	cd faad2 && make clean
-	cd flac && make clean
-	cd lame && make clean
+	cd cuesheet && $(MAKE) clean
+	cd faad2 && $(MAKE) clean
+	cd flac && $(MAKE) clean
+	cd lame && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
-	cd mac && make clean
+	cd mac && $(MAKE) clean
 endif
-	cd mad && make clean
-	cd sndfile && make clean
-	cd speex && make clean
+	cd mad && $(MAKE) clean
+	cd sndfile && $(MAKE) clean
+	cd speex && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
-	cd twinvq && make clean
+	cd twinvq && $(MAKE) clean
 endif
-	cd voc && make clean
-	cd vorbis && make clean
-	cd wave && make clean
+	cd voc && $(MAKE) clean
+	cd vorbis && $(MAKE) clean
+	cd wave && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
-	cd winamp && make clean
-	cd wma && make clean
+	cd winamp && $(MAKE) clean
+	cd wma && $(MAKE) clean
 endif
