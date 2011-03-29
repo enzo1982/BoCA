@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,7 +16,15 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 {
 	Config	*config = Config::Get();
 
-	setspeed	= config->GetIntValue("Ripper", "RippingSpeed", 0);
+	for (Int i = 0; i < config->cdrip_numdrives; i++)
+	{
+		driveOffsets.Add(config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
+		driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
+	}
+
+	useoffset	= driveOffsets.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
+	setspeed	= driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
+
 	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
 	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
 
@@ -38,7 +46,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 
 	i18n->SetContext("Decoders::CDRip");
 
-	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 68));
+	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 94));
 
 	combo_drive	= new ComboBox(Point(10, 12), Size(324, 0));
 
@@ -56,23 +64,35 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	}
 
 	combo_drive->SelectNthEntry(config->GetIntValue("Ripper", "ActiveDrive", 0));
+	combo_drive->onSelectEntry.Connect(&ConfigureCDRip::SelectDrive, this);
 
 	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(157, 0), &setspeed);
 	check_speed->onAction.Connect(&ConfigureCDRip::ToggleSetSpeed, this);
 
 	combo_speed		= new ComboBox(Point(176, 39), Size(158, 0));
+	combo_speed->onSelectEntry.Connect(&ConfigureCDRip::SelectSpeed, this);
 
 	for (Int i = 48; i > 0; i -= 4) combo_speed->AddEntry(String::FromInt(i).Append("x"));
 
-	combo_speed->SelectNthEntry((48 - config->GetIntValue("Ripper", "RippingSpeed", 0)) / 4);
+	check_offset		= new CheckBox(i18n->TranslateString("Use read offset:"), Point(10, 67), Size(157, 0), &useoffset);
+	check_offset->onAction.Connect(&ConfigureCDRip::ToggleUseOffset, this);
 
-	ToggleSetSpeed();
+	edit_offset		= new EditBox(NIL, Point(176, 66), Size(36, 0), 5);
+	edit_offset->SetFlags(EDB_NUMERIC);
+	edit_offset->onInput.Connect(&ConfigureCDRip::ChangeOffset, this);
+
+	text_offset_samples	= new Text(i18n->TranslateString("samples"), Point(220, 69));
+
+	SelectDrive();
 
 	group_drive->Add(combo_drive);
 	group_drive->Add(check_speed);
 	group_drive->Add(combo_speed);
+	group_drive->Add(check_offset);
+	group_drive->Add(edit_offset);
+	group_drive->Add(text_offset_samples);
 
-	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 91), Size(344, 65));
+	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 117), Size(344, 65));
 
 	check_readCDText	= new CheckBox(i18n->TranslateString("Read CD Text"), Point(10, 11), Size(157, 0), &readCDText);
 	check_readCDPlayerIni	= new CheckBox(i18n->TranslateString("Read cdplayer.ini"), Point(176, 11), Size(157, 0), &readCDPlayerIni);
@@ -82,7 +102,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	group_cdinfo->Add(check_readCDPlayerIni);
 	group_cdinfo->Add(check_readISRC);
 
-	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 168), Size(344, 68));
+	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 194), Size(344, 68));
 
 	check_paranoia		= new CheckBox(i18n->TranslateString("Activate cdparanoia mode:"), Point(10, 14), Size(157, 0), &cdparanoia);
 	check_paranoia->onAction.Connect(&ConfigureCDRip::ToggleParanoia, this);
@@ -116,7 +136,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	group_automatization->Add(check_autoRip);
 	group_automatization->Add(check_autoEject);
 
-	group_cdoptions	= new GroupBox(i18n->TranslateString("CD options"), Point(359, 168), Size(178, 68));
+	group_cdoptions	= new GroupBox(i18n->TranslateString("CD options"), Point(359, 194), Size(178, 68));
 
 	check_locktray	= new CheckBox(i18n->TranslateString("Lock CD tray while ripping"), Point(10, 14), Size(157, 0), &locktray);
 	check_ntscsi	= new CheckBox(i18n->TranslateString("Use native NT SCSI library"), check_locktray->GetPosition() + Point(0, 26), Size(157, 0), &ntscsi);
@@ -144,7 +164,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	Add(group_cdoptions);
 	Add(group_cdinfo);
 
-	SetSize(Size(544, 243));
+	SetSize(Size(544, 269));
 }
 
 BoCA::ConfigureCDRip::~ConfigureCDRip()
@@ -153,6 +173,9 @@ BoCA::ConfigureCDRip::~ConfigureCDRip()
 	DeleteObject(combo_drive);
 	DeleteObject(check_speed);
 	DeleteObject(combo_speed);
+	DeleteObject(check_offset);
+	DeleteObject(edit_offset);
+	DeleteObject(text_offset_samples);
 
 	DeleteObject(group_ripping);
 	DeleteObject(check_paranoia);
@@ -175,10 +198,60 @@ BoCA::ConfigureCDRip::~ConfigureCDRip()
 	DeleteObject(check_readISRC);
 }
 
+Void BoCA::ConfigureCDRip::SelectDrive()
+{
+	edit_offset->SetText(String::FromInt(driveOffsets.GetNth(combo_drive->GetSelectedEntryNumber())));
+	combo_speed->SelectNthEntry((48 - driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber())) / 4);
+
+	check_offset->SetChecked(driveOffsets.GetNth(combo_drive->GetSelectedEntryNumber()));
+	check_speed->SetChecked(driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber()));
+
+	ToggleUseOffset();
+	ToggleSetSpeed();
+}
+
+Void BoCA::ConfigureCDRip::ToggleUseOffset()
+{
+	if (useoffset)
+	{
+		edit_offset->Activate();
+		text_offset_samples->Activate();
+	}
+	else
+	{
+		edit_offset->Deactivate();
+		text_offset_samples->Deactivate();
+	}
+}
+
+Void BoCA::ConfigureCDRip::ChangeOffset()
+{
+	if (!useoffset) return;
+
+	driveOffsets.SetNth(combo_drive->GetSelectedEntryNumber(), edit_offset->GetText().ToInt());
+}
+
 Void BoCA::ConfigureCDRip::ToggleSetSpeed()
 {
-	if (setspeed)	combo_speed->Activate();
-	else		combo_speed->Deactivate();
+	if (setspeed)
+	{
+		combo_speed->Activate();
+
+		driveSpeeds.SetNth(combo_drive->GetSelectedEntryNumber(), 48 - (combo_speed->GetSelectedEntryNumber() * 4));
+	}
+	else
+	{
+		combo_speed->Deactivate();
+
+		driveSpeeds.SetNth(combo_drive->GetSelectedEntryNumber(), 0);
+	}
+}
+
+Void BoCA::ConfigureCDRip::SelectSpeed()
+{
+	if (!setspeed) return;
+
+	driveSpeeds.SetNth(combo_drive->GetSelectedEntryNumber(), 48 - (combo_speed->GetSelectedEntryNumber() * 4));
 }
 
 Void BoCA::ConfigureCDRip::ToggleParanoia()
@@ -199,7 +272,12 @@ Int BoCA::ConfigureCDRip::SaveSettings()
 
 	if (config->cdrip_numdrives >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
 
-	config->SetIntValue("Ripper", "RippingSpeed", setspeed ? 48 - (combo_speed->GetSelectedEntryNumber() * 4) : 0);
+	for (Int i = 0; i < config->cdrip_numdrives; i++)
+	{
+		config->SetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), driveOffsets.GetNth(i));
+		config->SetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
+	}
+
 	config->SetIntValue("Ripper", "AutoReadContents", autoRead);
 	config->SetIntValue("Ripper", "AutoRip", autoRip);
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,6 +14,7 @@
 #include <smooth/io/drivers/driver_posix.h>
 
 #include "mad_in.h"
+#include "config.h"
 #include "dllinterface.h"
 #include "xing/dxhead.h"
 
@@ -68,11 +69,11 @@ namespace BoCA
 	/* FIXME: This is the scaling function included in the MAD
 	 *	  package. It should be replaced by a more decent one.
 	 */
-	static inline signed int scale(mad_fixed_t sample)
+	static inline signed int scale(mad_fixed_t sample, int scale)
 	{
 		/* Round
 		 */
-		sample += (1L << (MAD_F_FRACBITS - 16));
+		sample += (1L << (MAD_F_FRACBITS - scale));
 
 		/* Clip
 		 */
@@ -81,7 +82,7 @@ namespace BoCA
 
 		/* Quantize
 		 */
-		return sample >> (MAD_F_FRACBITS + 1 - 16);
+		return sample >> (MAD_F_FRACBITS + 1 - scale);
 	}
 };
 
@@ -103,7 +104,8 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 	track.length	= -1;
 
 	infoTrack = &track;
-	stop = False;
+	stop	  = False;
+	finished  = False;
 
 	SkipID3v2Tag(f_in);
 	ParseVBRHeaders(f_in);
@@ -156,6 +158,8 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::MADIn::MADIn()
 {
+	configLayer	 = NIL;
+
 	packageSize	 = 0;
 
 	infoTrack	 = NIL;
@@ -172,6 +176,7 @@ BoCA::MADIn::MADIn()
 
 BoCA::MADIn::~MADIn()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::MADIn::Activate()
@@ -221,6 +226,8 @@ Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	if (decoderThread->GetStatus() != THREAD_RUNNING && samplesBuffer.Size() <= 0) return -1;
 
+	const Format	&format = track.GetFormat();
+
 	readDataMutex->Release();
 
 	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
@@ -229,11 +236,17 @@ Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	samplesBufferMutex->Lock();
 
-	size = samplesBuffer.Size() * (track.GetFormat().bits / 8);
+	size = samplesBuffer.Size() * (format.bits / 8);
 
 	data.Resize(size);
 
-	for (Int i = 0; i < samplesBuffer.Size(); i++) ((Short *) (unsigned char *) data)[i] = scale(samplesBuffer[i]);
+	for (Int i = 0; i < samplesBuffer.Size(); i++)
+	{
+		int	 sample = scale(samplesBuffer[i], format.bits);
+
+		if	(format.bits == 16) ((Short *) (unsigned char *) data)[i] = sample;
+		else if (format.bits == 24) { data[i * 3] = sample & 0xFF; data[i * 3 + 1] = (sample >> 8) & 0xFF; data[i * 3 + 2] = (sample >> 16) & 0xFF; }
+	}
 
 	samplesBuffer.Resize(0);
 
@@ -335,6 +348,13 @@ Int BoCA::MADIn::ReadMAD(Bool readData)
 	return Success();
 }
 
+ConfigLayer *BoCA::MADIn::GetConfigurationLayer()
+{
+	if (configLayer == NIL) configLayer = new ConfigureMAD();
+
+	return configLayer;
+}
+
 mad_flow BoCA::MADInputCallback(void *client_data, mad_stream *stream)
 {
 	MADIn	*filter = (MADIn *) client_data;
@@ -350,7 +370,7 @@ mad_flow BoCA::MADInputCallback(void *client_data, mad_stream *stream)
 	 */
 	if (filter->driver->GetPos() == filter->driver->GetSize()) filter->finished = True;
 
-	Int	 bytes = Math::Min(131072, filter->finished ? 1440 : filter->driver->GetSize() - filter->driver->GetPos());
+	Int	 bytes = Math::Min((Int64) 131072, filter->finished ? 1440 : filter->driver->GetSize() - filter->driver->GetPos());
 	Int	 backup = stream->bufend - stream->next_frame;
 
 	inputBuffer.Resize(bytes + backup);
@@ -403,14 +423,15 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, ma
 {
 	MADIn	*filter = (MADIn *) client_data;
 
+	Config	*config = Config::Get();
 	Format	 format = filter->infoTrack->GetFormat();
 
-	format.bits	= 16;
+	format.bits	= config->GetIntValue("MAD", "Enable24Bit", False) ? 24 : 16;
 	format.order	= BYTE_INTEL;
 	format.channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
 	format.rate	= header->samplerate;
 
-	filter->infoTrack->approxLength = filter->infoTrack->fileSize / (header->bitrate / 8) * format.rate * format.channels;
+	filter->infoTrack->approxLength = filter->infoTrack->fileSize / (header->bitrate / 8) * format.rate;
 
 	filter->infoTrack->SetFormat(format);
 
@@ -420,9 +441,9 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, ma
 	 */
 	if (filter->numFrames > 0)
 	{
-		filter->infoTrack->length = filter->numFrames * Math::Round((Float) header->duration.fraction / MAD_TIMER_RESOLUTION * format.rate) * format.channels;
+		filter->infoTrack->length = filter->numFrames * Math::Round((Float) header->duration.fraction / MAD_TIMER_RESOLUTION * format.rate);
 
-		filter->infoTrack->length -= (filter->delaySamples + filter->padSamples) * format.channels;
+		filter->infoTrack->length -= (filter->delaySamples + filter->padSamples);
 	}
 
 	return MAD_FLOW_STOP;

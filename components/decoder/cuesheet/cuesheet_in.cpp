@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -206,9 +206,9 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
-			Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate * format.channels +
-					     msf.SubString(3, 2).ToInt() * format.rate * format.channels +
-					     msf.SubString(6, 2).ToInt() * format.rate * format.channels / 75;
+			Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
+					     msf.SubString(3, 2).ToInt() * format.rate +
+					     msf.SubString(6, 2).ToInt() * format.rate / 75;
 
 			iTrack.sampleOffset = samplePos;
 		}
@@ -235,9 +235,9 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 					{
 						String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
-						Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate * format.channels +
-								     msf.SubString(3, 2).ToInt() * format.rate * format.channels +
-								     msf.SubString(6, 2).ToInt() * format.rate * format.channels / 75;
+						Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
+								     msf.SubString(3, 2).ToInt() * format.rate +
+								     msf.SubString(6, 2).ToInt() * format.rate / 75;
 
 						iTrack.length = samplePos - iTrack.sampleOffset;
 
@@ -294,7 +294,7 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 		const Track	&iTrack = track.tracks.GetNthReference(0);
 		const Format	&format = iTrack.GetFormat();
 
-		if (iTrack.sampleOffset >= 0) offset += iTrack.sampleOffset / format.channels / (format.rate / 75);
+		if (iTrack.sampleOffset >= 0) offset += iTrack.sampleOffset / (format.rate / 75);
 	}
 
 	String	 offsets = Number((Int64) track.tracks.Length()).ToHexString();
@@ -306,8 +306,8 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 		const Track	&iTrack = track.tracks.GetNthReference(i);
 		const Format	&format = iTrack.GetFormat();
 
-		if	(iTrack.length	     >= 0) offset += iTrack.length / format.channels / (format.rate / 75);
-		else if (iTrack.approxLength >= 0) offset += iTrack.approxLength / format.channels / (format.rate / 75);
+		if	(iTrack.length	     >= 0) offset += iTrack.length / (format.rate / 75);
+		else if (iTrack.approxLength >= 0) offset += iTrack.approxLength / (format.rate / 75);
 		else				   { offsets = NIL; break; }
 	}
 
@@ -345,7 +345,7 @@ Bool BoCA::CueSheetIn::AddTrack(const Track &track, Array<Track> &tracks)
 	rTrack.length	    = track.length;
 	rTrack.approxLength = track.approxLength;
 
-	rTrack.fileSize	    = track.length * (track.GetFormat().bits / 8);
+	rTrack.fileSize	    = track.length * track.GetFormat().channels * (track.GetFormat().bits / 8);
 
 	rTrack.SetFormat(track.GetFormat());
 	rTrack.SetInfo(track.GetInfo());

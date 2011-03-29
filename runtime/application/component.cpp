@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,12 +14,12 @@ BoCA::AS::Component::Component(ComponentSpecs *iSpecs)
 {
 	specs = iSpecs;
 
-	if (specs->mode == INTERNAL) component = specs->func_Create();
+	if (specs->mode == COMPONENT_MODE_INTERNAL) component = specs->func_Create();
 }
 
 BoCA::AS::Component::~Component()
 {
-	if (specs->mode == INTERNAL) specs->func_Delete(component);
+	if (specs->mode == COMPONENT_MODE_INTERNAL) specs->func_Delete(component);
 }
 
 String BoCA::AS::Component::GetComponentSpecs()
@@ -42,7 +42,7 @@ const String &BoCA::AS::Component::GetID() const
 	return specs->id;
 }
 
-Int BoCA::AS::Component::GetType() const
+BoCA::ComponentType BoCA::AS::Component::GetType() const
 {
 	return specs->type;
 }

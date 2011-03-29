@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -133,6 +133,10 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 				}
 
 				break;
+			default:
+				/* Unsupported parameter type.
+				 */
+				break;
 		}
 	}
 
@@ -192,6 +196,10 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 					config->SetIntValue(specs->id, param->GetName(), range->GetValue());
 				}
 
+				break;
+			default:
+				/* Unsupported parameter type.
+				 */
 				break;
 		}
 	}
@@ -256,6 +264,10 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 				}
 
 				break;
+			default:
+				/* Unsupported parameter type.
+				 */
+				break;
 		}
 	}
 
@@ -295,6 +307,10 @@ Void BoCA::AS::ConfigLayerExternal::OnSliderValueChange()
 					value->SetPosition(Point(240 - value->textSize.cx, 13));
 				}
 
+				break;
+			default:
+				/* Only interested in slider ranges here.
+				 */
 				break;
 		}
 	}

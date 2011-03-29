@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -51,6 +51,7 @@ typedef void			(*MP4TAGSADDARTWORK)		(const MP4Tags *, const MP4TagArtwork *);
 typedef void			(*MP4TAGSREMOVEARTWORK)		(const MP4Tags *, uint32_t);
 
 typedef MP4ChapterType		(*MP4GETCHAPTERS)		(MP4FileHandle, MP4Chapter_t **, uint32_t *, MP4ChapterType);
+typedef MP4ChapterType		(*MP4SETCHAPTERS)		(MP4FileHandle, MP4Chapter_t *, uint32_t, MP4ChapterType);
 
 extern MP4READ			 ex_MP4Read;
 extern MP4MODIFY		 ex_MP4Modify;
@@ -83,3 +84,4 @@ extern MP4TAGSADDARTWORK	 ex_MP4TagsAddArtwork;
 extern MP4TAGSREMOVEARTWORK	 ex_MP4TagsRemoveArtwork;
 
 extern MP4GETCHAPTERS		 ex_MP4GetChapters;
+extern MP4SETCHAPTERS		 ex_MP4SetChapters;

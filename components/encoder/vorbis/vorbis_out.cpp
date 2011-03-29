@@ -110,7 +110,6 @@ Bool BoCA::VorbisOut::Activate()
 	ogg_packet	 header_comm;
 	ogg_packet	 header_code;
 
-
 	ex_vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
 
 	ex_ogg_stream_packetin(&os, &header); /* automatically placed in its own page */

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,6 +29,9 @@ BoCA::CoverDisplay::CoverDisplay(const Bitmap &cover)
 	Add(window);
 
 	window->Add(image_cover);
+
+	window->SetMinimumSize(window->GetSize());
+	window->SetMaximumSize(window->GetSize());
 
 	window->SetFlags(window->GetFlags() | WF_NOTASKBUTTON);
 }

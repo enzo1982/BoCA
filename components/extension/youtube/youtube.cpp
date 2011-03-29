@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -9,7 +9,10 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth.h>
-#include <smooth/dll.h>
+
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
 
 #include "youtube.h"
 #include "config.h"
@@ -31,26 +34,30 @@ const String &BoCA::YouTube::GetComponentSpecs()
 	return componentSpecs;
 }
 
-Void smooth::AttachDLL(Void *instance)
-{
-}
-
-Void smooth::DetachDLL()
-{
-}
-
 BoCA::YouTube::YouTube()
 {
 	configLayer  = NIL;
 	mainTabLayer = NIL;
 
 	getMainTabLayer.Connect(&YouTube::GetMainTabLayer, this);
+
+#ifdef __WIN32__
+	/* Init the Microsoft COM library.
+	 */
+	CoInitialize(NIL);
+#endif
 }
 
 BoCA::YouTube::~YouTube()
 {
 	if (configLayer	 != NIL) Object::DeleteObject(configLayer);
 	if (mainTabLayer != NIL) Object::DeleteObject(mainTabLayer);
+
+#ifdef __WIN32__
+	/* Uninit the Microsoft COM library.
+	 */
+	CoUninitialize();
+#endif
 }
 
 ConfigLayer *BoCA::YouTube::GetConfigurationLayer()

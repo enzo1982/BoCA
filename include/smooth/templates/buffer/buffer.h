@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -121,10 +121,7 @@ namespace smooth
 			}
 
 			inline t &operator	 [](const int n)	{ return ((t *) (void *) *memory)[n]; }
-			inline t &operator	 [](const Int n)	{ return (*this)[(int) n]; }
-
 			inline t operator	 [](const int n) const	{ return ((t *) (void *) *memory)[n]; }
-			inline t operator	 [](const Int n) const	{ return (*this)[(int) n]; }
 
 			inline operator		 t *() const		{ return (t *) (memory == NIL ? NIL : (void *) *memory); }
 	};

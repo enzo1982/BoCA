@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -27,11 +27,18 @@ namespace BoCA
 			GroupBox		*group_auto;
 			CheckBox		*check_auto_download;
 
+			GroupBox		*group_downloads;
+			Text			*text_max_downloads;
+			EditBox			*edit_max_downloads;
+			Arrows			*arrows_max_downloads;
+
 			GroupBox		*group_files;
 			CheckBox		*check_keep;
 
 			EditBox			*edit_dir;
 			Button			*button_browse;
+
+			Int			 maxDownloads;
 
 			Bool			 autoDownload;
 			Bool			 keepVideoFiles;
@@ -43,6 +50,9 @@ namespace BoCA
 
 			Int			 SaveSettings();
 		slots:
+			Void			 EditMaxDownloads();
+			Void			 ArrowsMaxDownloads();
+
 			Void			 ToggleKeepFiles();
 
 			Void			 SelectOutputDir();

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -164,7 +164,7 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 			/* Set approxLength, because WMA duration is not always 100% accurate.
 			 */
 			track.length = -1;
-			track.approxLength = *(QWORD *) pbValue * track.GetFormat().rate * track.GetFormat().channels / 10000000;
+			track.approxLength = *(QWORD *) pbValue * track.GetFormat().rate / 10000000;
 
 			delete [] pbValue;
 		}
@@ -331,7 +331,7 @@ Int BoCA::WMAIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	/* Update inBytes to indicate progress.
 	 */
-	inBytes += track.fileSize * data.Size() / (track.approxLength * (track.GetFormat().bits / 8));
+	inBytes += track.fileSize * data.Size() / (track.approxLength * track.GetFormat().channels * (track.GetFormat().bits / 8));
 
 	return data.Size();
 }

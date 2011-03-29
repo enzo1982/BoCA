@@ -25,6 +25,8 @@ namespace BoCA
 		friend mad_flow	 MADErrorCallback(void *, mad_stream *, mad_frame *);
 
 		private:
+			ConfigLayer		*configLayer;
+
 			mad_decoder		 decoder;
 			Bool			 stop;
 			Bool			 finished;
@@ -61,6 +63,8 @@ namespace BoCA
 			Bool			 Deactivate();
 
 			Int			 ReadData(Buffer<UnsignedByte> &, Int);
+
+			ConfigLayer		*GetConfigurationLayer();
 	};
 };
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -47,23 +47,25 @@ Error BoCA::VocIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
-	// TODO: Add more checking to this!
-
+	/* ToDo: Add more checking to this!
+	 */
 	track.fileSize = f_in->Size();
 
-	// Read magic number
-	for (Int i = 0; i < 30; i++) f_in->InputNumber(1);
+	/* Read magic number.
+	 */
+	for (Int i = 0; i < 30; i++)
+		f_in->InputNumber(1);
 
 	Format	 format = track.GetFormat();
 
-	format.order = BYTE_INTEL;
-	format.rate = UnsignedInt32(f_in->InputNumber(4));
-	format.bits = UnsignedInt8(f_in->InputNumber(1));
-	format.channels = UnsignedInt8(f_in->InputNumber(1));
+	format.order	= BYTE_INTEL;
+	format.rate	= UnsignedInt32(f_in->InputNumber(4));
+	format.bits	= UnsignedInt8(f_in->InputNumber(1));
+	format.channels	= UnsignedInt8(f_in->InputNumber(1));
 
 	track.SetFormat(format);
 
-	track.length = (track.fileSize - 42 - 4 * Int((track.fileSize - 42) / 7340032)) / (format.bits / 8);
+	track.length = (track.fileSize - 42 - 4 * Int((track.fileSize - 42) / 7340032)) / format.channels / (format.bits / 8);
 
 	delete f_in;
 
@@ -83,8 +85,11 @@ BoCA::VocIn::~VocIn()
 Bool BoCA::VocIn::Activate()
 {
 	InStream	*in = new InStream(STREAM_DRIVER, driver);
-    
-	for (Int i = 0; i < 27; i++) in->InputNumber(1); // Read magic number
+
+	/* Read magic number.
+	 */
+	for (Int i = 0; i < 27; i++)
+		in->InputNumber(1);
 
 	bytesLeft = in->InputNumber(3) - 12;
 

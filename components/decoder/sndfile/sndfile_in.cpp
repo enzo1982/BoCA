@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -149,7 +149,7 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 		format.channels	= sinfo.channels;
 		format.rate	= sinfo.samplerate;
 
-		switch (sinfo.format & 0xFF)
+		switch (sinfo.format & SF_FORMAT_SUBMASK)
 		{
 			case SF_FORMAT_PCM_U8:
 			case SF_FORMAT_PCM_S8:
@@ -168,7 +168,7 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		track.SetFormat(format);
 
-		track.length	= sinfo.frames * sinfo.channels;
+		track.length	= sinfo.frames;
 
 		Info	 info = track.GetInfo();
 
@@ -245,8 +245,8 @@ Bool BoCA::SndFileIn::Deactivate()
 
 Bool BoCA::SndFileIn::Seek(Int64 samplePosition)
 {
-	if (ex_sf_seek(sndf, samplePosition / track.GetFormat().channels, SEEK_CUR) != -1) return True;
-	else										   return False;
+	if (ex_sf_seek(sndf, samplePosition, SEEK_CUR) != -1) return True;
+	else						      return False;
 }
 
 Int BoCA::SndFileIn::ReadData(Buffer<UnsignedByte> &data, Int size)

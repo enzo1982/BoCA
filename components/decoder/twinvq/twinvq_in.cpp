@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -145,7 +145,7 @@ Error BoCA::TwinVQIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	track.fileSize		= File(streamURI).GetFileSize();
 	track.length		= -1;
-	track.approxLength	= track.fileSize / (ex_TvqGetBitRate() * 1000 / 8) * format.rate * format.channels;
+	track.approxLength	= track.fileSize / (ex_TvqGetBitRate() * 1000 / 8) * format.rate;
 
 	Info	 info = track.GetInfo();
 

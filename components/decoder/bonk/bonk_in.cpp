@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -67,7 +67,7 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Format		 format		= track.GetFormat();
 
-	int		 bytes = Math::Min(in->Size(), 524288);
+	int		 bytes = Math::Min(in->Size(), (Int64) 524288);
 
 	dataBuffer.Resize(bytes);
 
@@ -82,7 +82,7 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	track.SetFormat(format);
 
-	track.length = length;
+	track.length = length / format.channels;
 	track.fileSize = in->Size();
 
 	unsigned char	*id3tag = NIL;
@@ -133,7 +133,7 @@ Bool BoCA::BonkIn::Activate()
 
 	decoder = ex_bonk_decoder_create();
 
-	int		 bytes = Math::Min(driver->GetSize(), 524288);
+	int		 bytes = Math::Min(driver->GetSize(), (Int64) 524288);
 
 	dataBuffer.Resize(bytes);
 

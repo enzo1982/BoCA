@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -148,7 +148,7 @@ Bool BoCA::FLACIn::Deactivate()
 
 Bool BoCA::FLACIn::Seek(Int64 samplePosition)
 {
-	seekPosition = samplePosition / track.GetFormat().channels;
+	seekPosition = samplePosition;
 
 	return True;
 }
@@ -295,7 +295,7 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 		format.channels	= metadata->data.stream_info.channels;
 		format.rate	= metadata->data.stream_info.sample_rate;
 
-		filter->infoTrack->length = metadata->data.stream_info.total_samples * format.channels;
+		filter->infoTrack->length = metadata->data.stream_info.total_samples;
 
 		filter->infoTrack->SetFormat(format);
 	}

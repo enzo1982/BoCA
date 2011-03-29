@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -138,34 +138,39 @@ Error BoCA::ID3v2Tag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tr
 	 */
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		String	 pair  = info.other.GetNth(i);
 
-		if	(value.StartsWith(String(INFO_CONTENTGROUP).Append(":")))   { frames.Add(ex_ID3Frame_NewID(ID3FID_CONTENTGROUP));	SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_SUBTITLE).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_SUBTITLE));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
-		else if	(value.StartsWith(String(INFO_BAND).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_BAND));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_CONDUCTOR));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_REMIX).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_MIXARTIST));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_COMPOSER));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_LYRICIST));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		if (value == NIL) continue;
 
-		else if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))    { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGARTIST));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))     { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGALBUM));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_ORIG_LYRICIST).Append(":")))  { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGLYRICIST));	SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_ORIG_YEAR).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGYEAR));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		if	(key == String(INFO_CONTENTGROUP).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_CONTENTGROUP));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_SUBTITLE).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_SUBTITLE));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 
-		else if	(value.StartsWith(String(INFO_BPM).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_BPM));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_INITIALKEY).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_INITIALKEY));		SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_BAND).Append(":"))		 { frames.Add(ex_ID3Frame_NewID(ID3FID_BAND));		    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_CONDUCTOR).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_CONDUCTOR));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_REMIX).Append(":"))		 { frames.Add(ex_ID3Frame_NewID(ID3FID_MIXARTIST));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_COMPOSER).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_COMPOSER));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_LYRICIST).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_LYRICIST));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 
-		else if	(value.StartsWith(String(INFO_RADIOSTATION).Append(":")))   { frames.Add(ex_ID3Frame_NewID(ID3FID_NETRADIOSTATION));	SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_RADIOOWNER).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_NETRADIOOWNER));	SetFrameString(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1)); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_ORIG_ARTIST).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGARTIST));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_ORIG_ALBUM).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGALBUM));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_ORIG_LYRICIST).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGLYRICIST));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_ORIG_YEAR).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_ORIGYEAR));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 
-		else if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWARTIST));		SetFrameURL(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1));    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")))  { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWPUBLISHER));	SetFrameURL(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1));    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_WEB_RADIO).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWRADIOPAGE));	SetFrameURL(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1));    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	    { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWAUDIOSOURCE));	SetFrameURL(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1));    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")))  { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWCOPYRIGHT));	SetFrameURL(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1));    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
-		else if	(value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWCOMMERCIALINFO));	SetFrameURL(frames.GetLast(), value.Tail(value.Length() - value.Find(":") - 1));    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_BPM).Append(":"))		 { frames.Add(ex_ID3Frame_NewID(ID3FID_BPM));		    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_INITIALKEY).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_INITIALKEY));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+
+		else if	(key == String(INFO_RADIOSTATION).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_NETRADIOSTATION));   SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_RADIOOWNER).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_NETRADIOOWNER));	    SetFrameString(frames.GetLast(), value); ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+
+		else if	(key == String(INFO_WEB_ARTIST).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWARTIST));	    SetFrameURL(frames.GetLast(), value);    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_WEB_PUBLISHER).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWPUBLISHER));	    SetFrameURL(frames.GetLast(), value);    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_WEB_RADIO).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWRADIOPAGE));	    SetFrameURL(frames.GetLast(), value);    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_WEB_SOURCE).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWAUDIOSOURCE));    SetFrameURL(frames.GetLast(), value);    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))	 { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWCOPYRIGHT));	    SetFrameURL(frames.GetLast(), value);    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
+		else if	(key == String(INFO_WEB_COMMERCIAL).Append(":")) { frames.Add(ex_ID3Frame_NewID(ID3FID_WWWCOMMERCIALINFO)); SetFrameURL(frames.GetLast(), value);    ex_ID3Tag_AddFrame(tag, frames.GetLast()); }
 	}
 
 	/* Save Replay Gain info.

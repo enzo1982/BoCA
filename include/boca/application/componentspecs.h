@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -19,6 +19,57 @@ using namespace smooth::System;
 
 namespace BoCA
 {
+	enum ComponentType
+	{
+		COMPONENT_TYPE_UNKNOWN = 0,
+		COMPONENT_TYPE_DECODER,
+		COMPONENT_TYPE_ENCODER,
+		COMPONENT_TYPE_TAGGER,
+		COMPONENT_TYPE_EXTENSION,
+		COMPONENT_TYPE_DSP,
+		COMPONENT_TYPE_OUTPUT,
+		COMPONENT_TYPE_DEVICEINFO,
+
+		NUM_COMPONENT_TYPES
+	};
+
+	enum ComponentMode
+	{
+		COMPONENT_MODE_INTERNAL = 0,
+		COMPONENT_MODE_EXTERNAL_FILE,
+		COMPONENT_MODE_EXTERNAL_STDIO,
+
+		NUM_COMPONENT_MODES
+	};
+
+	enum TagMode
+	{
+		TAG_MODE_NONE = 0,
+		TAG_MODE_PREPEND,
+		TAG_MODE_APPEND,
+		TAG_MODE_OTHER,
+
+		NUM_TAG_MODES
+	};
+
+	enum OptionType
+	{
+		OPTION_TYPE_OPTION = 0,
+		OPTION_TYPE_MIN,
+		OPTION_TYPE_MAX,
+
+		NUM_OPTION_TYPES
+	};
+
+	enum ParameterType
+	{
+		PARAMETER_TYPE_SWITCH = 0,
+		PARAMETER_TYPE_SELECTION,
+		PARAMETER_TYPE_RANGE,
+
+		NUM_PARAMETER_TYPES
+	};
+
 	namespace AS
 	{
 		class BOCA_DLL_EXPORT FileFormat
@@ -29,7 +80,7 @@ namespace BoCA
 
 				String			 taggerID;
 				String			 tagFormat;
-				Int			 tagMode;
+				TagMode			 tagMode;
 			public:
 				const String		&GetName()				{ return name; }
 				Void			 SetName(const String &nName)		{ name = nName; }
@@ -43,8 +94,8 @@ namespace BoCA
 				const String		&GetTagFormat()				{ return tagFormat; }
 				Void			 SetTagFormat(const String &nTagFormat)	{ tagFormat = nTagFormat; }
 
-				Int			 GetTagMode()				{ return tagMode; }
-				Void			 SetTagMode(Int nTagMode)		{ tagMode = nTagMode; }
+				TagMode			 GetTagMode()				{ return tagMode; }
+				Void			 SetTagMode(TagMode nTagMode)		{ tagMode = nTagMode; }
 		};
 
 		class BOCA_DLL_EXPORT TagFormat
@@ -86,12 +137,12 @@ namespace BoCA
 		class BOCA_DLL_EXPORT Option
 		{
 			private:
-				Int			 type;
+				OptionType		 type;
 				String			 alias;
 				String			 value;
 			public:
-				Int			 GetType()				{ return type; }
-				Void			 SetType(Int nType)			{ type = nType; }
+				OptionType		 GetType()				{ return type; }
+				Void			 SetType(OptionType nType)		{ type = nType; }
 
 				const String		&GetAlias()				{ return alias; }
 				Void			 SetAlias(const String &nAlias)		{ alias = nAlias; }
@@ -103,7 +154,7 @@ namespace BoCA
 		class BOCA_DLL_EXPORT Parameter
 		{
 			private:
-				Int			 type;
+				ParameterType		 type;
 				String			 name;
 				String			 argument;
 				Bool			 enabled;
@@ -111,8 +162,8 @@ namespace BoCA
 				String			 defaultValue;
 				Array<Option *>		 options;
 			public:
-				Int			 GetType()				{ return type; }
-				Void			 SetType(Int nType)			{ type = nType; }
+				ParameterType		 GetType()				{ return type; }
+				Void			 SetType(ParameterType nType)		{ type = nType; }
 
 				const String		&GetName()				{ return name; }
 				Void			 SetName(const String &nName)		{ name = nName; }
@@ -145,9 +196,9 @@ namespace BoCA
 				Bool			 ParseExternalParameters(XML::Node *);
 			public:
 				String			 id;
-				Int			 type;
+				ComponentType		 type;
 
-				Int			 mode;
+				ComponentMode		 mode;
 
 				String			 name;
 				String			 version;
@@ -238,32 +289,6 @@ namespace BoCA
 				const void		*(*func_GetNthDeviceMCDI)(void *, int);
 		};
 	};
-
-	const Int	 OPTION_TYPE_OPTION		= 0;
-	const Int	 OPTION_TYPE_MIN		= 1;
-	const Int	 OPTION_TYPE_MAX		= 2;
-
-	const Int	 PARAMETER_TYPE_SWITCH		= 0;
-	const Int	 PARAMETER_TYPE_SELECTION	= 1;
-	const Int	 PARAMETER_TYPE_RANGE		= 2;
-
-	const Int	 COMPONENT_TYPE_UNKNOWN		= 0;
-	const Int	 COMPONENT_TYPE_DECODER		= 1;
-	const Int	 COMPONENT_TYPE_ENCODER		= 2;
-	const Int	 COMPONENT_TYPE_TAGGER		= 3;
-	const Int	 COMPONENT_TYPE_EXTENSION	= 4;
-	const Int	 COMPONENT_TYPE_DSP		= 5;
-	const Int	 COMPONENT_TYPE_OUTPUT		= 6;
-	const Int	 COMPONENT_TYPE_DEVICEINFO	= 7;
-
-	const Int	 INTERNAL			= 0;
-	const Int	 EXTERNAL_FILE			= 1;
-	const Int	 EXTERNAL_STDIO			= 2;
-
-	const Int	 TAG_MODE_NONE			= 0;
-	const Int	 TAG_MODE_PREPEND		= 1;
-	const Int	 TAG_MODE_APPEND		= 2;
-	const Int	 TAG_MODE_OTHER			= 3;
 };
 
 #endif

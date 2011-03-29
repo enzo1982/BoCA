@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -78,7 +78,7 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	while (!done)
 	{
-		Int	 size = Math::Min(4096, track.fileSize - in.GetPos());
+		Int	 size = Math::Min((Int64) 4096, track.fileSize - in.GetPos());
 
 		buffer = ex_ogg_sync_buffer(&oy, size);
 
@@ -115,7 +115,7 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 					if	(vi.bitrate_nominal > 0)		       bitrate = vi.bitrate_nominal;
 			 		else if (vi.bitrate_lower > 0 && vi.bitrate_upper > 0) bitrate = (vi.bitrate_lower + vi.bitrate_upper) / 2;
 
-					if (bitrate > 0) track.approxLength = track.fileSize / (bitrate / 8) * format.rate * format.channels;
+					if (bitrate > 0) track.approxLength = track.fileSize / (bitrate / 8) * format.rate;
 				}
 
 				if (packetNum == 1)

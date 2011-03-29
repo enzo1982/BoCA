@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -94,8 +94,8 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 			format.channels	= mp3data.stereo;
 			format.rate	= mp3data.samplerate;
 
-			if	(mp3data.nsamp	 > 0) track.length = (mp3data.nsamp - delaySamples - padSamples) * format.channels;
-			else if (mp3data.bitrate > 0) track.approxLength = track.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate * format.channels;
+			if	(mp3data.nsamp	 > 0) track.length = mp3data.nsamp - delaySamples - padSamples;
+			else if (mp3data.bitrate > 0) track.approxLength = track.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate;
 
 			break;
 		}

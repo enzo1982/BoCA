@@ -74,9 +74,14 @@ Error BoCA::RIFFTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tra
 	 */
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		String	 pair  = info.other.GetNth(i);
 
-		if (value.StartsWith(String(INFO_WEB_ARTIST).Append(":"))) RenderTagItem("IURL", value.Tail(value.Length() - value.Find(":") - 1), buffer);
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+
+		if (value == NIL) continue;
+
+		if (key == String(INFO_WEB_ARTIST).Append(":")) RenderTagItem("IURL", value, buffer);
 	}
 
 	/* Save CD table of contents.

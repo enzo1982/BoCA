@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -78,11 +78,11 @@ const String &BoCA::LayerLengthStatus::GetTotalLengthString(const Array<Track> &
 
 		if (track.length >= 0)
 		{
-			seconds += track.length / (track.GetFormat().rate * track.GetFormat().channels);
+			seconds += track.length / track.GetFormat().rate;
 		}
 		else if (track.approxLength >= 0)
 		{
-			seconds += track.approxLength / (track.GetFormat().rate * track.GetFormat().channels);
+			seconds += track.approxLength / track.GetFormat().rate;
 
 			approx = True;
 		}

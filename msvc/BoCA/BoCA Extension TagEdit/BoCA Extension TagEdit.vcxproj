@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{62E967ED-6F1C-4BF9-A3CF-2ECF68F68D4C}</ProjectGuid>
+    <RootNamespace>BoCAExtensionTagEdit</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;UNICODE;_UNICODE;BOCA_COMPONENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>smooth.lib;boca.1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)boca_extension_tagedit.1.0.dll</OutputFile>
+      <AdditionalLibraryDirectories>../../../../../smooth/msvc/smooth/Debug;../debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BOCAEXTENSIONTAGEDIT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\components\extension\tagedit\layer.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\tagedit.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\tagspec.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\utilities.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\editor\editor.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\editor\editor_advanced.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\editor\editor_advanced_number.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\editor\editor_advanced_text.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\editor\editor_basic.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\editor\editor_basic_cover.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\editor\editor_details.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\editor\editor_other.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\chooser\chooser.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\chooser\chooser_albums.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\chooser\chooser_files.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\chooser\chooser_files_tree.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\chooser\chooser_files_utilities.cpp" />
+    <ClCompile Include="..\..\..\components\extension\tagedit\chooser\chooser_tracks.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\components\extension\tagedit\layer.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\tagedit.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\tagspec.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\utilities.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\chooser\chooser.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\chooser\chooser_albums.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\chooser\chooser_files.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\chooser\chooser_files_tree.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\chooser\chooser_files_utilities.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\chooser\chooser_tracks.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\editor\editor.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\editor\editor_advanced.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\editor\editor_advanced_number.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\editor\editor_advanced_text.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\editor\editor_basic.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\editor\editor_basic_cover.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\editor\editor_details.h" />
+    <ClInclude Include="..\..\..\components\extension\tagedit\editor\editor_other.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BoCA\BoCA.vcxproj">
+      <Project>{94f50ab3-6adb-4f2e-97c5-3fbbc7e30fa3}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

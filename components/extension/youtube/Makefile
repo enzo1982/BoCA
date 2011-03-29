@@ -14,7 +14,11 @@ OBJECTS	  = config.o layer.o scriptutilities.o video.o videolist.o videolistentr
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  = -lv8
+LIBS	  = -lsmooth-js
+
+ifeq ($(BUILD_WIN32),True)
+	LIBS	  += -lole32
+endif
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -7,6 +7,14 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#ifdef __WIN32__
+#	include <windows.h>
+#	include <mmreg.h>
+#else
+#	define WAVE_FORMAT_PCM	      0x0001
+#	define WAVE_FORMAT_EXTENSIBLE 0xFFFE
+#endif
 
 #include "wave_out.h"
 
@@ -51,20 +59,20 @@ Bool BoCA::WaveOut::Activate()
 	const Format	&format = track.GetFormat();
 
 	out->OutputString("RIFF");
-	out->OutputNumber(track.length * (format.bits / 8) + 36, 4);
+	out->OutputNumber(track.length * format.channels * (format.bits / 8) + 36, 4);
 	out->OutputString("WAVE");
-	out->OutputString("fmt ");
 
+	out->OutputString("fmt ");
 	out->OutputNumber(16, 4);
-	out->OutputNumber(1, 2);
+	out->OutputNumber(WAVE_FORMAT_PCM, 2);
 	out->OutputNumber(format.channels, 2);
 	out->OutputNumber(format.rate, 4);
 	out->OutputNumber(format.rate * format.channels * (format.bits / 8), 4);
 	out->OutputNumber(format.channels * (format.bits / 8), 2);
-
 	out->OutputNumber(format.bits, 2);
+
 	out->OutputString("data");
-	out->OutputNumber(track.length * (format.bits / 8), 4);
+	out->OutputNumber(track.length * format.channels * (format.bits / 8), 4);
 
 	delete out;
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -15,8 +15,8 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 {
 	library = NIL;
 
-	mode = INTERNAL;
-	debug = False;
+	mode	= COMPONENT_MODE_INTERNAL;
+	debug	= False;
 
 	external_ignoreExitCode = False;
 }
@@ -157,6 +157,10 @@ String BoCA::AS::ComponentSpecs::GetExternalArgumentsString()
 
 				arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromFloat(config->GetIntValue(id, param->GetName(), param->GetDefault().ToFloat() / param->GetStepSize()) * param->GetStepSize()))).Append(" ");
 
+				break;
+			default:
+				/* Unsupported parameter type.
+				 */
 				break;
 		}
 	}
@@ -301,7 +305,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				else if (node2->GetName() == "arguments")  external_arguments	= node2->GetContent();
 				else if (node2->GetName() == "informat")   external_informat	= node2->GetContent();
 				else if (node2->GetName() == "outformat")  external_outformat	= node2->GetContent();
-				else if (node2->GetName() == "mode")	   mode			= node2->GetContent() == "file" ? EXTERNAL_FILE : EXTERNAL_STDIO;
+				else if (node2->GetName() == "mode")	   mode			= node2->GetContent() == "file" ? COMPONENT_MODE_EXTERNAL_FILE : COMPONENT_MODE_EXTERNAL_STDIO;
 				else if (node2->GetName() == "parameters") ParseExternalParameters(node2);
 			}
 		}
@@ -309,7 +313,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 	delete document;
 
-	if (mode != INTERNAL)
+	if (mode != COMPONENT_MODE_INTERNAL)
 	{
 		if ((external_command[1] == ':' || external_command[0] == '/') && !File(external_command).Exists())							return False;
 		if ((external_command[1] != ':' && external_command[0] != '/') && !File(GUI::Application::GetApplicationDirectory().Append(external_command)).Exists())	return False;

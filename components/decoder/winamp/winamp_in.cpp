@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -238,7 +238,7 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
 	}
 
-	track.approxLength = (Int) (Float(length_ms) * Float(track.GetFormat().rate * track.GetFormat().channels) / 1000.0);
+	track.approxLength = (Int) (Float(length_ms) * Float(track.GetFormat().rate) / 1000.0);
 
 	String	 trackTitle = title;
 
@@ -405,7 +405,7 @@ Int BoCA::WinampIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	/* Set inBytes to a value that reflects
 	 * our approximate position in the file.
 	 */
-	samplesDone += size / (track.GetFormat().bits / 8);
+	samplesDone += size / track.GetFormat().channels / (track.GetFormat().bits / 8);
 	inBytes = track.fileSize * samplesDone / track.approxLength;
 
 	if (size == 0)	return -1;

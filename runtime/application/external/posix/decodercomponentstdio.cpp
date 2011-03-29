@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -15,6 +15,9 @@
 #include <smooth/io/drivers/driver_ansi.h>
 
 #include <sys/wait.h>
+
+#define WAVE_FORMAT_PCM	       0x0001
+#define WAVE_FORMAT_EXTENSIBLE 0xFFFE
 
 using namespace smooth::IO;
 
@@ -69,7 +72,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 		/* Read decoded WAVE file header
 		 */
-		track.fileSize	= File(streamURI).GetFileSize();
+		track.origFilename = streamURI;
+		track.fileSize	   = File(streamURI).GetFileSize();
 
 		/* Read RIFF chunk
 		 */
@@ -91,7 +95,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 			if (chunk == "fmt ")
 			{
-				if (in->InputNumber(2) != 1) { errorState = True; errorString = "Unsupported audio format"; }
+				Int	 waveFormat = in->InputNumber(2);
+
+				if (waveFormat != WAVE_FORMAT_PCM &&
+				    waveFormat != WAVE_FORMAT_EXTENSIBLE) { errorState = True; errorString = "Unsupported audio format"; }
 
 				Format	 format = track.GetFormat();
 
@@ -107,12 +114,12 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 				/* Skip rest of chunk
 				 */
-				in->RelSeek(cSize - 16);
+				in->RelSeek(cSize - 16 + cSize % 2);
 			}
 			else if (chunk == "data")
 			{
 				if ((unsigned) cSize == 0xffffffff || (unsigned) cSize == 0) track.length = -1;
-				else							     track.length = (unsigned long) cSize / (track.GetFormat().bits / 8);
+				else							     track.length = (unsigned long) cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
 
 				/* Read the rest of the file to find actual size.
 				 */
@@ -128,7 +135,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 						if (size == 0) break;
 
-						track.length += size / (track.GetFormat().bits / 8);
+						track.length += size / track.GetFormat().channels / (track.GetFormat().bits / 8);
 					}
 				}
 			}
@@ -136,7 +143,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 			{
 				/* Skip chunk
 				 */
-				in->RelSeek(cSize);
+				in->RelSeek(cSize + cSize % 2);
 			}
 		}
 		while (!errorState && chunk != "data");

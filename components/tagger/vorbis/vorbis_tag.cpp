@@ -79,11 +79,16 @@ Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &t
 	 */
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		String	 pair  = info.other.GetNth(i);
 
-		if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":"))) { RenderTagItem("PERFORMER", value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
-		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))  { RenderTagItem("COMPOSER",  value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
-		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))  { RenderTagItem("LYRICIST",  value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+
+		if (value == NIL) continue;
+
+		if	(key == String(INFO_CONDUCTOR).Append(":")) { RenderTagItem("PERFORMER", value, buffer); numItems++; }
+		else if	(key == String(INFO_COMPOSER).Append(":"))  { RenderTagItem("COMPOSER",  value, buffer); numItems++; }
+		else if	(key == String(INFO_LYRICIST).Append(":"))  { RenderTagItem("LYRICIST",  value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.

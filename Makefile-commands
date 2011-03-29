@@ -25,12 +25,16 @@ else ifeq ($(BUILD_OSX),True)
 	DLLEXT = .dylib
 
 	CCOPTS += -I/opt/local/include
-	LDOPTS += -L/opt/local/lib
+	LDOPTS += -L/opt/local/lib -Wl,-rpath,.
 else
 	DLLEXT = .so
 
 	CCOPTS += -I/usr/local/include
-	LDOPTS += -L/usr/local/lib
+	LDOPTS += -L/usr/local/lib -Wl,-rpath,.
+
+ifeq ($(BUILD_SOLARIS),True)
+	CCOPTS += -fpic
+endif
 endif
 
 all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT)

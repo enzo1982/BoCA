@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -169,24 +169,21 @@ const BoCA::MCDI &BoCA::CDRipInfo::GetNthDeviceMCDI(Int n)
 {
 	static MCDI	 mcdi = MCDI(Buffer<UnsignedByte>());
 
-	/* Do not read the TOC again if the last
-	 * request was less than half a second ago.
+	/* Do not read the TOC again if the last request
+	 * was less than a quarter of a second ago.
 	 */
-	{
-		static Int		 lastDrive = -1;
-		static UnsignedInt64	 lastAccess = 0;
+	static Int		 lastDrive  = -1;
+	static UnsignedInt64	 lastAccess = 0;
 
+	{
 		UnsignedInt64	 clockValue = S::System::System::Clock();
 
-		if (lastDrive == n && clockValue - lastAccess < 500)
+		if (lastDrive == n && clockValue - lastAccess < 250)
 		{
 			lastAccess = clockValue;
 
 			return mcdi;
 		}
-
-		lastDrive = n;
-		lastAccess = clockValue;
 	}
 
 	mcdi.SetData(Buffer<UnsignedByte>());
@@ -224,6 +221,9 @@ const BoCA::MCDI &BoCA::CDRipInfo::GetNthDeviceMCDI(Int n)
 
 		mcdi.SetData(buffer);
 	}
+
+	lastDrive  = n;
+	lastAccess = S::System::System::Clock();
 
 	return mcdi;
 }

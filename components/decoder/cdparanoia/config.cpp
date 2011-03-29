@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,7 +14,13 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 {
 	Config	*config = Config::Get();
 
-	setspeed	= config->GetIntValue("Ripper", "RippingSpeed", 0);
+	for (Int i = 0; i < config->cdrip_numdrives; i++)
+	{
+		driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
+	}
+
+	setspeed	= driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
+
 	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
 	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
 
@@ -45,17 +51,19 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	}
 
 	combo_drive->SelectNthEntry(config->GetIntValue("Ripper", "ActiveDrive", 0));
+	combo_drive->onSelectEntry.Connect(&ConfigureCDParanoia::SelectDrive, this);
 
 	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(157, 0), &setspeed);
 	check_speed->onAction.Connect(&ConfigureCDParanoia::ToggleSetSpeed, this);
 
 	combo_speed		= new ComboBox(Point(176, 39), Size(158, 0));
+	combo_speed->onSelectEntry.Connect(&ConfigureCDParanoia::SelectSpeed, this);
 
 	for (Int i = 48; i > 0; i -= 4) combo_speed->AddEntry(String::FromInt(i).Append("x"));
 
 	combo_speed->SelectNthEntry((48 - config->GetIntValue("Ripper", "RippingSpeed", 0)) / 4);
 
-	ToggleSetSpeed();
+	SelectDrive();
 
 	group_drive->Add(combo_drive);
 	group_drive->Add(check_speed);
@@ -123,10 +131,36 @@ BoCA::ConfigureCDParanoia::~ConfigureCDParanoia()
 	DeleteObject(check_autoRip);
 }
 
+Void BoCA::ConfigureCDParanoia::SelectDrive()
+{
+	combo_speed->SelectNthEntry((48 - driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber())) / 4);
+
+	check_speed->SetChecked(driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber()));
+
+	ToggleSetSpeed();
+}
+
 Void BoCA::ConfigureCDParanoia::ToggleSetSpeed()
 {
-	if (setspeed)	combo_speed->Activate();
-	else		combo_speed->Deactivate();
+	if (setspeed)
+	{
+		combo_speed->Activate();
+
+		driveSpeeds.SetNth(combo_drive->GetSelectedEntryNumber(), 48 - (combo_speed->GetSelectedEntryNumber() * 4));
+	}
+	else
+	{
+		combo_speed->Deactivate();
+
+		driveSpeeds.SetNth(combo_drive->GetSelectedEntryNumber(), 0);
+	}
+}
+
+Void BoCA::ConfigureCDParanoia::SelectSpeed()
+{
+	if (!setspeed) return;
+
+	driveSpeeds.SetNth(combo_drive->GetSelectedEntryNumber(), 48 - (combo_speed->GetSelectedEntryNumber() * 4));
 }
 
 Void BoCA::ConfigureCDParanoia::ToggleParanoia()
@@ -147,7 +181,11 @@ Int BoCA::ConfigureCDParanoia::SaveSettings()
 
 	if (config->cdrip_numdrives >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
 
-	config->SetIntValue("Ripper", "RippingSpeed", setspeed ? 48 - (combo_speed->GetSelectedEntryNumber() * 4) : 0);
+	for (Int i = 0; i < config->cdrip_numdrives; i++)
+	{
+		config->SetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
+	}
+
 	config->SetIntValue("Ripper", "AutoReadContents", autoRead);
 	config->SetIntValue("Ripper", "AutoRip", autoRip);
 

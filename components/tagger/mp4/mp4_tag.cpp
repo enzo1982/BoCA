@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -142,9 +142,14 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 	 */
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		String	 pair  = info.other.GetNth(i);
 
-		if (value.StartsWith(String(INFO_COMPOSER).Append(":"))) ex_MP4TagsSetComposer(mp4Tags, value.Tail(value.Length() - value.Find(":") - 1));
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+
+		if (value == NIL) continue;
+
+		if (key == String(INFO_COMPOSER).Append(":")) ex_MP4TagsSetComposer(mp4Tags, value);
 	}
 
 	/* Save cover art.
@@ -168,10 +173,38 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 
 	ex_MP4TagsSetMediaType(mp4Tags, &mediaType);
 
-	String::SetOutputFormat(prevOutFormat);
-
 	ex_MP4TagsStore(mp4Tags, mp4File);
 	ex_MP4TagsFree(mp4Tags);
+
+	/* Save chapters.
+	 */
+	if (track.tracks.Length() > 0 && currentConfig->GetIntValue("Tags", "WriteChapters", True))
+	{
+		MP4Chapter_t	*chapterList = new MP4Chapter_t [track.tracks.Length()];
+		uint32_t	 chapterCount = track.tracks.Length();
+
+		for (UnsignedInt i = 0; i < chapterCount; i++)
+		{
+			const Track	&chapterTrack  = track.tracks.GetNthReference(i);
+			const Info	&chapterInfo   = chapterTrack.GetInfo();
+			const Format	&chapterFormat = chapterTrack.GetFormat();
+
+			const char	*chapterTitle  = chapterInfo.title;
+
+			memset(chapterList[i].title, 0, MP4V2_CHAPTER_TITLE_MAX + 1);
+			strncpy(chapterList[i].title, chapterTitle, Math::Max(strlen(chapterTitle), MP4V2_CHAPTER_TITLE_MAX));
+
+			if	(chapterTrack.length	   >= 0) chapterList[i].duration = Float(chapterTrack.length)	    * MP4_MSECS_TIME_SCALE / chapterFormat.rate;
+			else if (chapterTrack.approxLength >= 0) chapterList[i].duration = Float(chapterTrack.approxLength) * MP4_MSECS_TIME_SCALE / chapterFormat.rate;
+			else					 chapterList[i].duration = MP4_INVALID_DURATION;
+		}
+
+		ex_MP4SetChapters(mp4File, chapterList, chapterCount, (MP4ChapterType) currentConfig->GetIntValue("Tags", "WriteChaptersType", MP4ChapterTypeAny));
+
+		delete [] chapterList;
+	}
+
+	String::SetOutputFormat(prevOutFormat);
 
 	ex_MP4Close(mp4File);
 
@@ -264,16 +297,16 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 
 	track.SetInfo(info);
 
-	String::SetInputFormat(prevInFormat);
-
 	ex_MP4TagsFree(mp4Tags);
 
+	/* Read chapters.
+	 */
 	MP4Chapter_t	*chapterList  = NIL;
 	uint32_t	 chapterCount = 0;
 
 	ex_MP4GetChapters(mp4File, &chapterList, &chapterCount, MP4ChapterTypeAny);
 
-	if (chapterList != NIL)
+	if (chapterList != NIL && currentConfig->GetIntValue("Tags", "ReadChapters", True))
 	{
 		MP4Duration	 offset = 0;
 
@@ -285,12 +318,12 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 			 */
 			Track	 rTrack;
 
-			rTrack.origFilename = fileName;
+			rTrack.origFilename = track.origFilename;
 
-			rTrack.sampleOffset = Float(offset) / MP4_MSECS_TIME_SCALE * format.rate * format.channels;
-			rTrack.length	    = Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate * format.channels;
+			rTrack.sampleOffset = Float(offset) / MP4_MSECS_TIME_SCALE * format.rate;
+			rTrack.length	    = Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate;
 
-			rTrack.fileSize	    = rTrack.length * (format.bits / 8);
+			rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
 
 			rTrack.SetFormat(format);
 
@@ -312,6 +345,8 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 
 		ex_MP4Free(chapterList);
 	}
+
+	String::SetInputFormat(prevInFormat);
 
 	ex_MP4Close(mp4File);
 

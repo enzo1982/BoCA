@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -169,7 +169,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_NeAACDecInit2(handle, (unsigned char *) esc_buffer, buffer_size, (unsigned long *) &format.rate, (unsigned char *) &format.channels);
 
-			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * format.channels * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
 
 			format.order	= BYTE_INTEL;
 			format.bits	= 16;
@@ -233,7 +233,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 		ex_NeAACDecSetConfiguration(handle, fConfig);
 
-		Int		 size = Math::Min(32768, track.fileSize);
+		Int		 size = Math::Min((Int64) 32768, track.fileSize);
 		unsigned char	*data = new unsigned char [size];
 
 		f_in->InputData((void *) data, size);
@@ -271,7 +271,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 		}
 		while (samples != NIL);
 
-		if (samplesRead > 0 && samplesBytes > 0) track.approxLength = samplesRead * (track.fileSize / samplesBytes);
+		if (samplesRead > 0 && samplesBytes > 0) track.approxLength = samplesRead / format.channels * (track.fileSize / samplesBytes);
 
 		delete [] data;
 
@@ -401,13 +401,11 @@ Bool BoCA::FAAD2In::Deactivate()
 
 Bool BoCA::FAAD2In::Seek(Int64 samplePosition)
 {
-	Format	 format = track.GetFormat();
-
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
 		/* ToDo: Seeking by sample ID is not exact!
 		 */
-		MP4Timestamp	 time = Float(samplePosition / format.rate / format.channels) * ex_MP4GetTrackTimeScale(mp4File, mp4Track);
+		MP4Timestamp	 time = Float(samplePosition / track.GetFormat().rate) * ex_MP4GetTrackTimeScale(mp4File, mp4Track);
 
 		sampleId = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
 
@@ -452,7 +450,7 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 				samplesRead += frameInfo.samples;
 			}
 		}
-		while (samples != NIL && samplesRead < (track.length * (2 * Float(size) / track.fileSize)));
+		while (samples != NIL && samplesRead < (track.length * track.GetFormat().channels * (2 * Float(size) / track.fileSize)));
 	}
 	else
 	{

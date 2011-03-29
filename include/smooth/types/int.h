@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,9 +13,9 @@
 
 namespace smooth
 {
-	typedef long		 Int;
-	typedef signed long	 SignedInt;
-	typedef unsigned long	 UnsignedInt;
+	typedef int		 Int;
+	typedef signed int	 SignedInt;
+	typedef unsigned int	 UnsignedInt;
 
 	typedef char		 Byte;
 	typedef signed char	 SignedByte;
@@ -37,9 +37,9 @@ namespace smooth
 	typedef signed short	 SignedInt16;
 	typedef unsigned short	 UnsignedInt16;
 
-	typedef long		 Int32;
-	typedef signed long	 SignedInt32;
-	typedef unsigned long	 UnsignedInt32;
+	typedef int		 Int32;
+	typedef signed int	 SignedInt32;
+	typedef unsigned int	 UnsignedInt32;
 
 	typedef __int64		 Int64;
 	typedef signed __int64	 SignedInt64;

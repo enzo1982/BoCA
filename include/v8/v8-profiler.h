@@ -194,11 +194,16 @@ class HeapGraphNode;
 class V8EXPORT HeapGraphEdge {
  public:
   enum Type {
-    CONTEXT_VARIABLE = 0,  // A variable from a function context.
-    ELEMENT = 1,           // An element of an array.
-    PROPERTY = 2,          // A named object property.
-    INTERNAL = 3           // A link that can't be accessed from JS,
-                           // thus, its name isn't a real property name.
+    kContextVariable = 0,  // A variable from a function context.
+    kElement = 1,          // An element of an array.
+    kProperty = 2,         // A named object property.
+    kInternal = 3,         // A link that can't be accessed from JS,
+                           // thus, its name isn't a real property name
+                           // (e.g. parts of a ConsString).
+    kHidden = 4,           // A link that is needed for proper sizes
+                           // calculation, but may be hidden from user.
+    kShortcut = 5          // A link that must not be followed during
+                           // sizes calculation.
   };
 
   /** Returns edge type (see HeapGraphEdge::Type). */
@@ -240,12 +245,15 @@ class V8EXPORT HeapGraphPath {
 class V8EXPORT HeapGraphNode {
  public:
   enum Type {
-    INTERNAL = 0,   // Internal node, a virtual one, for housekeeping.
-    ARRAY = 1,      // An array of elements.
-    STRING = 2,     // A string.
-    OBJECT = 3,     // A JS object (except for arrays and strings).
-    CODE = 4,       // Compiled code.
-    CLOSURE = 5     // Function closure.
+    kInternal = 0,   // For compatibility, will be removed.
+    kHidden = 0,     // Hidden node, may be filtered when shown to user.
+    kArray = 1,      // An array of elements.
+    kString = 2,     // A string.
+    kObject = 3,     // A JS object (except for arrays and strings).
+    kCode = 4,       // Compiled code.
+    kClosure = 5,    // Function closure.
+    kRegExp = 6,     // RegExp.
+    kHeapNumber = 7  // Number stored in the heap.
   };
 
   /** Returns node type (see HeapGraphNode::Type). */
@@ -258,17 +266,35 @@ class V8EXPORT HeapGraphNode {
    */
   Handle<String> GetName() const;
 
+  /**
+   * Returns node id. For the same heap object, the id remains the same
+   * across all snapshots. Not applicable to aggregated heap snapshots
+   * as they only contain aggregated instances.
+   */
+  uint64_t GetId() const;
+
+  /**
+   * Returns the number of instances. Only applicable to aggregated
+   * heap snapshots.
+   */
+  int GetInstancesCount() const;
+
   /** Returns node's own size, in bytes. */
   int GetSelfSize() const;
 
-  /** Returns node's network (self + reachable nodes) size, in bytes. */
-  int GetTotalSize() const;
-
   /**
-   * Returns node's private size, in bytes. That is, the size of memory
-   * that will be reclaimed having this node collected.
+   * Returns node's retained size, in bytes. That is, self + sizes of
+   * the objects that are reachable only from this object. In other
+   * words, the size of memory that will be reclaimed having this node
+   * collected.
+   *
+   * Exact retained size calculation has O(N) (number of nodes)
+   * computational complexity, while approximate has O(1). It is
+   * assumed that initially heap profiling tools provide approximate
+   * sizes for all nodes, and then exact sizes are calculated for the
+   * most 'interesting' nodes.
    */
-  int GetPrivateSize() const;
+  int GetRetainedSize(bool exact) const;
 
   /** Returns child nodes count of the node. */
   int GetChildrenCount() const;
@@ -287,6 +313,22 @@ class V8EXPORT HeapGraphNode {
 
   /** Returns a retaining path by index. */
   const HeapGraphPath* GetRetainingPath(int index) const;
+
+  /**
+   * Returns a dominator node. This is the node that participates in every
+   * path from the snapshot root to the current node.
+   */
+  const HeapGraphNode* GetDominatorNode() const;
+};
+
+
+class V8EXPORT HeapSnapshotsDiff {
+ public:
+  /** Returns the root node for added nodes. */
+  const HeapGraphNode* GetAdditionsRoot() const;
+
+  /** Returns the root node for deleted nodes. */
+  const HeapGraphNode* GetDeletionsRoot() const;
 };
 
 
@@ -295,6 +337,18 @@ class V8EXPORT HeapGraphNode {
  */
 class V8EXPORT HeapSnapshot {
  public:
+  enum Type {
+    kFull = 0,       // Heap snapshot with all instances and references.
+    kAggregated = 1  // Snapshot doesn't contain individual heap entries,
+                     // instead they are grouped by constructor name.
+  };
+  enum SerializationFormat {
+    kJSON = 0  // See format description near 'Serialize' method.
+  };
+
+  /** Returns heap snapshot type. */
+  Type GetType() const;
+
   /** Returns heap snapshot UID (assigned by the profiler.) */
   unsigned GetUid() const;
 
@@ -302,7 +356,37 @@ class V8EXPORT HeapSnapshot {
   Handle<String> GetTitle() const;
 
   /** Returns the root node of the heap graph. */
-  const HeapGraphNode* GetHead() const;
+  const HeapGraphNode* GetRoot() const;
+
+  /**
+   * Returns a diff between this snapshot and another one. Only snapshots
+   * of the same type can be compared.
+   */
+  const HeapSnapshotsDiff* CompareWith(const HeapSnapshot* snapshot) const;
+
+  /**
+   * Prepare a serialized representation of the snapshot. The result
+   * is written into the stream provided in chunks of specified size.
+   * The total length of the serialized snapshot is unknown in
+   * advance, it is can be roughly equal to JS heap size (that means,
+   * it can be really big - tens of megabytes).
+   *
+   * For the JSON format, heap contents are represented as an object
+   * with the following structure:
+   *
+   *  {
+   *    snapshot: {title: "...", uid: nnn},
+   *    nodes: [
+   *      meta-info (JSON string),
+   *      nodes themselves
+   *    ],
+   *    strings: [strings]
+   *  }
+   *
+   * Outgoing node links are stored after each node. Nodes reference strings
+   * and other nodes by their indexes in corresponding arrays.
+   */
+  void Serialize(OutputStream* stream, SerializationFormat format) const;
 };
 
 
@@ -320,8 +404,13 @@ class V8EXPORT HeapProfiler {
   /** Returns a profile by uid. */
   static const HeapSnapshot* FindSnapshot(unsigned uid);
 
-  /** Takes a heap snapshot and returns it. Title may be an empty string. */
-  static const HeapSnapshot* TakeSnapshot(Handle<String> title);
+  /**
+   * Takes a heap snapshot and returns it. Title may be an empty string.
+   * See HeapSnapshot::Type for types description.
+   */
+  static const HeapSnapshot* TakeSnapshot(
+      Handle<String> title,
+      HeapSnapshot::Type type = HeapSnapshot::kFull);
 };
 
 

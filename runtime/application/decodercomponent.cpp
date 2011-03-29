@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -33,14 +33,16 @@ Bool BoCA::AS::DecoderComponent::SetAudioTrackInfo(const Track &track)
 	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
-Bool BoCA::AS::DecoderComponent::CanOpenStream(const String &file)
+Bool BoCA::AS::DecoderComponent::CanOpenStream(const String &streamURI)
 {
-	return specs->func_CanOpenStream(component, file);
+	return specs->func_CanOpenStream(component, streamURI);
 }
 
-Error BoCA::AS::DecoderComponent::GetStreamInfo(const String &file, Track &track)
+Error BoCA::AS::DecoderComponent::GetStreamInfo(const String &streamURI, Track &track)
 {
-	return specs->func_GetStreamInfo(component, file, &track);
+	track.origFilename = streamURI;
+
+	return specs->func_GetStreamInfo(component, streamURI, &track);
 }
 
 Bool BoCA::AS::DecoderComponent::Activate()

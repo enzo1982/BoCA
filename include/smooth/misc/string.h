@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -144,10 +144,7 @@ namespace smooth
 			static String			 Implode(const Array<String> &, const String & = String());
 
 			wchar_t &operator		 [](const int);
-			wchar_t &operator		 [](const Int);
-
 			wchar_t operator		 [](const int) const;
-			wchar_t operator		 [](const Int) const;
 
 			operator			 char *() const;
 			operator			 wchar_t *() const;

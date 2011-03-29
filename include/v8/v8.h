@@ -38,23 +38,9 @@
 #ifndef V8_H_
 #define V8_H_
 
-#include <stdio.h>
+#include "v8stdint.h"
 
 #ifdef _WIN32
-// When compiling on MinGW stdint.h is available.
-#ifdef __MINGW32__
-#include <stdint.h>
-#else  // __MINGW32__
-typedef signed char int8_t;
-typedef unsigned char uint8_t;
-typedef short int16_t;  // NOLINT
-typedef unsigned short uint16_t;  // NOLINT
-typedef int int32_t;
-typedef unsigned int uint32_t;
-typedef __int64 int64_t;
-typedef unsigned __int64 uint64_t;
-// intptr_t and friends are defined in crtdefs.h through stdio.h.
-#endif  // __MINGW32__
 
 // Setup for Windows DLL export/import. When building the V8 DLL the
 // BUILDING_V8_SHARED needs to be defined. When building a program which uses
@@ -75,8 +61,6 @@ typedef unsigned __int64 uint64_t;
 #endif  // BUILDING_V8_SHARED
 
 #else  // _WIN32
-
-#include <stdint.h>
 
 // Setup for Linux shared library export. There is no need to distinguish
 // between building or using the V8 shared library, but we should not
@@ -127,7 +111,6 @@ class Arguments;
 class Object;
 class Heap;
 class Top;
-
 }
 
 
@@ -136,6 +119,9 @@ class Top;
 
 /**
  * A weak reference callback function.
+ *
+ * This callback should either explicitly invoke Dispose on |object| if
+ * V8 wrapper is not needed anymore, or 'revive' it by invocation of MakeWeak.
  *
  * \param object the weak global object to be reclaimed by the garbage collector
  * \param parameter the value passed in when making the weak global object
@@ -146,9 +132,9 @@ typedef void (*WeakReferenceCallback)(Persistent<Value> object,
 
 // --- H a n d l e s ---
 
-#define TYPE_CHECK(T, S)                              \
-  while (false) {                                     \
-    *(static_cast<T**>(0)) = static_cast<S*>(0);      \
+#define TYPE_CHECK(T, S)                                       \
+  while (false) {                                              \
+    *(static_cast<T* volatile*>(0)) = static_cast<S*>(0);      \
   }
 
 /**
@@ -464,16 +450,21 @@ class V8EXPORT HandleScope {
   // typedef in the ImplementationUtilities class.
   class V8EXPORT Data {
    public:
-    int extensions;
     internal::Object** next;
     internal::Object** limit;
+    int level;
+
     inline void Initialize() {
-      extensions = -1;
       next = limit = NULL;
+      level = 0;
     }
   };
 
-  Data previous_;
+  void Leave();
+
+
+  internal::Object** prev_next_;
+  internal::Object** prev_limit_;
 
   // Allow for the active closing of HandleScopes which allows to pass a handle
   // from the HandleScope being closed to the next top most HandleScope.
@@ -755,8 +746,9 @@ class V8EXPORT StackTrace {
     kFunctionName = 1 << 3,
     kIsEval = 1 << 4,
     kIsConstructor = 1 << 5,
+    kScriptNameOrSourceURL = 1 << 6,
     kOverview = kLineNumber | kColumnOffset | kScriptName | kFunctionName,
-    kDetailed = kOverview | kIsEval | kIsConstructor
+    kDetailed = kOverview | kIsEval | kIsConstructor | kScriptNameOrSourceURL
   };
 
   /**
@@ -814,6 +806,13 @@ class V8EXPORT StackFrame {
    * function for this StackFrame.
    */
   Local<String> GetScriptName() const;
+
+  /**
+   * Returns the name of the resource that contains the script for the
+   * function for this StackFrame or sourceURL value if the script name
+   * is undefined and its source ends with //@ sourceURL=... string.
+   */
+  Local<String> GetScriptNameOrSourceURL() const;
 
   /**
    * Returns the name of the function associated with this stack frame.
@@ -915,6 +914,11 @@ class Value : public Data {
    * Returns true if this value is a Date.
    */
   V8EXPORT bool IsDate() const;
+
+  /**
+   * Returns true if this value is a RegExp.
+   */
+  V8EXPORT bool IsRegExp() const;
 
   V8EXPORT Local<Boolean> ToBoolean() const;
   V8EXPORT Local<Number> ToNumber() const;
@@ -1034,7 +1038,7 @@ class String : public Primitive {
    */
   V8EXPORT bool IsExternalAscii() const;
 
-  class V8EXPORT ExternalStringResourceBase {
+  class V8EXPORT ExternalStringResourceBase {  // NOLINT
    public:
     virtual ~ExternalStringResourceBase() {}
 
@@ -1351,6 +1355,53 @@ class Date : public Value {
 };
 
 
+/**
+ * An instance of the built-in RegExp constructor (ECMA-262, 15.10).
+ */
+class RegExp : public Value {
+ public:
+  /**
+   * Regular expression flag bits. They can be or'ed to enable a set
+   * of flags.
+   */
+  enum Flags {
+    kNone = 0,
+    kGlobal = 1,
+    kIgnoreCase = 2,
+    kMultiline = 4
+  };
+
+  /**
+   * Creates a regular expression from the given pattern string and
+   * the flags bit field. May throw a JavaScript exception as
+   * described in ECMA-262, 15.10.4.1.
+   *
+   * For example,
+   *   RegExp::New(v8::String::New("foo"),
+   *               static_cast<RegExp::Flags>(kGlobal | kMultiline))
+   * is equivalent to evaluating "/foo/gm".
+   */
+  V8EXPORT static Local<RegExp> New(Handle<String> pattern,
+                                    Flags flags);
+
+  /**
+   * Returns the value of the source property: a string representing
+   * the regular expression.
+   */
+  V8EXPORT Local<String> GetSource() const;
+
+  /**
+   * Returns the flags bit field.
+   */
+  V8EXPORT Flags GetFlags() const;
+
+  static inline RegExp* Cast(v8::Value* obj);
+
+ private:
+  V8EXPORT static void CheckCast(v8::Value* obj);
+};
+
+
 enum PropertyAttribute {
   None       = 0,
   ReadOnly   = 1 << 0,
@@ -1487,6 +1538,11 @@ class Object : public Value {
    * user-defined toString function. This one does not.
    */
   V8EXPORT Local<String> ObjectProtoToString();
+
+  /**
+   * Returns the name of the function invoked as a constructor for this object.
+   */
+  V8EXPORT Local<String> GetConstructorName();
 
   /** Gets the number of internal fields for this Object. */
   V8EXPORT int InternalFieldCount();
@@ -1722,18 +1778,19 @@ class Arguments {
   inline bool IsConstructCall() const;
   inline Local<Value> Data() const;
  private:
+  static const int kDataIndex = 0;
+  static const int kCalleeIndex = -1;
+  static const int kHolderIndex = -2;
+
   friend class ImplementationUtilities;
-  inline Arguments(Local<Value> data,
-                   Local<Object> holder,
-                   Local<Function> callee,
-                   bool is_construct_call,
-                   void** values, int length);
-  Local<Value> data_;
-  Local<Object> holder_;
-  Local<Function> callee_;
-  bool is_construct_call_;
-  void** values_;
+  inline Arguments(internal::Object** implicit_args,
+                   internal::Object** values,
+                   int length,
+                   bool is_construct_call);
+  internal::Object** implicit_args_;
+  internal::Object** values_;
   int length_;
+  bool is_construct_call_;
 };
 
 
@@ -1754,8 +1811,6 @@ class V8EXPORT AccessorInfo {
 
 
 typedef Handle<Value> (*InvocationCallback)(const Arguments& args);
-
-typedef int (*LookupCallback)(Local<Object> self, Local<String> name);
 
 /**
  * NamedProperty[Getter|Setter] are used as interceptors on object.
@@ -1816,9 +1871,9 @@ typedef Handle<Value> (*IndexedPropertySetter)(uint32_t index,
 
 /**
  * Returns a non-empty handle if the interceptor intercepts the request.
- * The result is true if the property exists and false otherwise.
+ * The result is an integer encoding property attributes.
  */
-typedef Handle<Boolean> (*IndexedPropertyQuery)(uint32_t index,
+typedef Handle<Integer> (*IndexedPropertyQuery)(uint32_t index,
                                                 const AccessorInfo& info);
 
 /**
@@ -2137,6 +2192,7 @@ class V8EXPORT ObjectTemplate : public Template {
                                  IndexedPropertyDeleter deleter = 0,
                                  IndexedPropertyEnumerator enumerator = 0,
                                  Handle<Value> data = Handle<Value>());
+
   /**
    * Sets the callback to be used when calling instances created from
    * this template as a function.  If no callback is set, instances
@@ -2297,12 +2353,15 @@ class V8EXPORT ResourceConstraints {
   void set_max_young_space_size(int value) { max_young_space_size_ = value; }
   int max_old_space_size() const { return max_old_space_size_; }
   void set_max_old_space_size(int value) { max_old_space_size_ = value; }
+  int max_executable_size() { return max_executable_size_; }
+  void set_max_executable_size(int value) { max_executable_size_ = value; }
   uint32_t* stack_limit() const { return stack_limit_; }
   // Sets an address beyond which the VM's stack may not grow.
   void set_stack_limit(uint32_t* value) { stack_limit_ = value; }
  private:
   int max_young_space_size_;
   int max_old_space_size_;
+  int max_executable_size_;
   uint32_t* stack_limit_;
 };
 
@@ -2351,6 +2410,30 @@ typedef void* (*CreateHistogramCallback)(const char* name,
                                          size_t buckets);
 
 typedef void (*AddHistogramSampleCallback)(void* histogram, int sample);
+
+// --- M e m o r y  A l l o c a t i o n   C a l l b a c k ---
+  enum ObjectSpace {
+    kObjectSpaceNewSpace = 1 << 0,
+    kObjectSpaceOldPointerSpace = 1 << 1,
+    kObjectSpaceOldDataSpace = 1 << 2,
+    kObjectSpaceCodeSpace = 1 << 3,
+    kObjectSpaceMapSpace = 1 << 4,
+    kObjectSpaceLoSpace = 1 << 5,
+
+    kObjectSpaceAll = kObjectSpaceNewSpace | kObjectSpaceOldPointerSpace |
+      kObjectSpaceOldDataSpace | kObjectSpaceCodeSpace | kObjectSpaceMapSpace |
+      kObjectSpaceLoSpace
+  };
+
+  enum AllocationAction {
+    kAllocationActionAllocate = 1 << 0,
+    kAllocationActionFree = 1 << 1,
+    kAllocationActionAll = kAllocationActionAllocate | kAllocationActionFree
+  };
+
+typedef void (*MemoryAllocationCallback)(ObjectSpace space,
+                                         AllocationAction action,
+                                         int size);
 
 // --- F a i l e d A c c e s s C h e c k C a l l b a c k ---
 typedef void (*FailedAccessCheckCallback)(Local<Object> target,
@@ -2410,13 +2493,18 @@ class V8EXPORT HeapStatistics {
  public:
   HeapStatistics();
   size_t total_heap_size() { return total_heap_size_; }
+  size_t total_heap_size_executable() { return total_heap_size_executable_; }
   size_t used_heap_size() { return used_heap_size_; }
 
  private:
   void set_total_heap_size(size_t size) { total_heap_size_ = size; }
+  void set_total_heap_size_executable(size_t size) {
+    total_heap_size_executable_ = size;
+  }
   void set_used_heap_size(size_t size) { used_heap_size_ = size; }
 
   size_t total_heap_size_;
+  size_t total_heap_size_executable_;
   size_t used_heap_size_;
 
   friend class V8;
@@ -2570,6 +2658,20 @@ class V8EXPORT V8 {
    * operations will result in the allocation of objects.
    */
   static void SetGlobalGCEpilogueCallback(GCCallback);
+
+  /**
+   * Enables the host application to provide a mechanism to be notified
+   * and perform custom logging when V8 Allocates Executable Memory.
+   */
+  static void AddMemoryAllocationCallback(MemoryAllocationCallback callback,
+                                          ObjectSpace space,
+                                          AllocationAction action);
+
+  /**
+   * This function removes callback which was installed by
+   * AddMemoryAllocationCallback function.
+   */
+  static void RemoveMemoryAllocationCallback(MemoryAllocationCallback callback);
 
   /**
    * Allows the host application to group objects together. If one
@@ -3151,12 +3253,42 @@ class V8EXPORT Locker {
 };
 
 
+/**
+ * An interface for exporting data from V8, using "push" model.
+ */
+class V8EXPORT OutputStream {  // NOLINT
+ public:
+  enum OutputEncoding {
+    kAscii = 0  // 7-bit ASCII.
+  };
+  enum WriteResult {
+    kContinue = 0,
+    kAbort = 1
+  };
+  virtual ~OutputStream() {}
+  /** Notify about the end of stream. */
+  virtual void EndOfStream() = 0;
+  /** Get preferred output chunk size. Called only once. */
+  virtual int GetChunkSize() { return 1024; }
+  /** Get preferred output encoding. Called only once. */
+  virtual OutputEncoding GetOutputEncoding() { return kAscii; }
+  /**
+   * Writes the next chunk of snapshot data into the stream. Writing
+   * can be stopped by returning kAbort as function result. EndOfStream
+   * will not be called in case writing was aborted.
+   */
+  virtual WriteResult WriteAsciiChunk(char* data, int size) = 0;
+};
+
+
 
 // --- I m p l e m e n t a t i o n ---
 
 
 namespace internal {
 
+static const int kApiPointerSize = sizeof(void*);  // NOLINT
+static const int kApiIntSize = sizeof(int);  // NOLINT
 
 // Tag information for HeapObject.
 const int kHeapObjectTag = 1;
@@ -3168,10 +3300,10 @@ const int kSmiTag = 0;
 const int kSmiTagSize = 1;
 const intptr_t kSmiTagMask = (1 << kSmiTagSize) - 1;
 
-template <size_t ptr_size> struct SmiConstants;
+template <size_t ptr_size> struct SmiTagging;
 
 // Smi constants for 32-bit systems.
-template <> struct SmiConstants<4> {
+template <> struct SmiTagging<4> {
   static const int kSmiShiftSize = 0;
   static const int kSmiValueSize = 31;
   static inline int SmiToInt(internal::Object* value) {
@@ -3179,10 +3311,15 @@ template <> struct SmiConstants<4> {
     // Throw away top 32 bits and shift down (requires >> to be sign extending).
     return static_cast<int>(reinterpret_cast<intptr_t>(value)) >> shift_bits;
   }
+
+  // For 32-bit systems any 2 bytes aligned pointer can be encoded as smi
+  // with a plain reinterpret_cast.
+  static const uintptr_t kEncodablePointerMask = 0x1;
+  static const int kPointerToSmiShift = 0;
 };
 
 // Smi constants for 64-bit systems.
-template <> struct SmiConstants<8> {
+template <> struct SmiTagging<8> {
   static const int kSmiShiftSize = 31;
   static const int kSmiValueSize = 32;
   static inline int SmiToInt(internal::Object* value) {
@@ -3190,21 +3327,37 @@ template <> struct SmiConstants<8> {
     // Shift down and throw away top 32 bits.
     return static_cast<int>(reinterpret_cast<intptr_t>(value) >> shift_bits);
   }
+
+  // To maximize the range of pointers that can be encoded
+  // in the available 32 bits, we require them to be 8 bytes aligned.
+  // This gives 2 ^ (32 + 3) = 32G address space covered.
+  // It might be not enough to cover stack allocated objects on some platforms.
+  static const int kPointerAlignment = 3;
+
+  static const uintptr_t kEncodablePointerMask =
+      ~(uintptr_t(0xffffffff) << kPointerAlignment);
+
+  static const int kPointerToSmiShift =
+      kSmiTagSize + kSmiShiftSize - kPointerAlignment;
 };
 
-const int kSmiShiftSize = SmiConstants<sizeof(void*)>::kSmiShiftSize;
-const int kSmiValueSize = SmiConstants<sizeof(void*)>::kSmiValueSize;
+typedef SmiTagging<kApiPointerSize> PlatformSmiTagging;
+const int kSmiShiftSize = PlatformSmiTagging::kSmiShiftSize;
+const int kSmiValueSize = PlatformSmiTagging::kSmiValueSize;
+const uintptr_t kEncodablePointerMask =
+    PlatformSmiTagging::kEncodablePointerMask;
+const int kPointerToSmiShift = PlatformSmiTagging::kPointerToSmiShift;
 
 template <size_t ptr_size> struct InternalConstants;
 
 // Internal constants for 32-bit systems.
 template <> struct InternalConstants<4> {
-  static const int kStringResourceOffset = 3 * sizeof(void*);
+  static const int kStringResourceOffset = 3 * kApiPointerSize;
 };
 
 // Internal constants for 64-bit systems.
 template <> struct InternalConstants<8> {
-  static const int kStringResourceOffset = 3 * sizeof(void*);
+  static const int kStringResourceOffset = 3 * kApiPointerSize;
 };
 
 /**
@@ -3218,12 +3371,12 @@ class Internals {
   // These values match non-compiler-dependent values defined within
   // the implementation of v8.
   static const int kHeapObjectMapOffset = 0;
-  static const int kMapInstanceTypeOffset = sizeof(void*) + sizeof(int);
+  static const int kMapInstanceTypeOffset = kApiPointerSize + kApiIntSize;
   static const int kStringResourceOffset =
-      InternalConstants<sizeof(void*)>::kStringResourceOffset;
+      InternalConstants<kApiPointerSize>::kStringResourceOffset;
 
-  static const int kProxyProxyOffset = sizeof(void*);
-  static const int kJSObjectHeaderSize = 3 * sizeof(void*);
+  static const int kProxyProxyOffset = kApiPointerSize;
+  static const int kJSObjectHeaderSize = 3 * kApiPointerSize;
   static const int kFullStringRepresentationMask = 0x07;
   static const int kExternalTwoByteRepresentationTag = 0x02;
 
@@ -3241,7 +3394,7 @@ class Internals {
   }
 
   static inline int SmiValue(internal::Object* value) {
-    return SmiConstants<sizeof(void*)>::SmiToInt(value);
+    return PlatformSmiTagging::SmiToInt(value);
   }
 
   static inline int GetInstanceType(internal::Object* obj) {
@@ -3250,9 +3403,14 @@ class Internals {
     return ReadField<uint8_t>(map, kMapInstanceTypeOffset);
   }
 
+  static inline void* GetExternalPointerFromSmi(internal::Object* value) {
+    const uintptr_t address = reinterpret_cast<uintptr_t>(value);
+    return reinterpret_cast<void*>(address >> kPointerToSmiShift);
+  }
+
   static inline void* GetExternalPointer(internal::Object* obj) {
     if (HasSmiTag(obj)) {
-      return obj;
+      return GetExternalPointerFromSmi(obj);
     } else if (GetInstanceType(obj) == kProxyType) {
       return ReadField<void*>(obj, kProxyProxyOffset);
     } else {
@@ -3270,10 +3428,9 @@ class Internals {
     uint8_t* addr = reinterpret_cast<uint8_t*>(ptr) + offset - kHeapObjectTag;
     return *reinterpret_cast<T*>(addr);
   }
-
 };
 
-}
+}  // namespace internal
 
 
 template <class T>
@@ -3337,14 +3494,13 @@ void Persistent<T>::ClearWeak() {
 }
 
 
-Arguments::Arguments(v8::Local<v8::Value> data,
-                     v8::Local<v8::Object> holder,
-                     v8::Local<v8::Function> callee,
-                     bool is_construct_call,
-                     void** values, int length)
-    : data_(data), holder_(holder), callee_(callee),
-      is_construct_call_(is_construct_call),
-      values_(values), length_(length) { }
+Arguments::Arguments(internal::Object** implicit_args,
+                     internal::Object** values, int length,
+                     bool is_construct_call)
+    : implicit_args_(implicit_args),
+      values_(values),
+      length_(length),
+      is_construct_call_(is_construct_call) { }
 
 
 Local<Value> Arguments::operator[](int i) const {
@@ -3354,7 +3510,8 @@ Local<Value> Arguments::operator[](int i) const {
 
 
 Local<Function> Arguments::Callee() const {
-  return callee_;
+  return Local<Function>(reinterpret_cast<Function*>(
+      &implicit_args_[kCalleeIndex]));
 }
 
 
@@ -3364,12 +3521,13 @@ Local<Object> Arguments::This() const {
 
 
 Local<Object> Arguments::Holder() const {
-  return holder_;
+  return Local<Object>(reinterpret_cast<Object*>(
+      &implicit_args_[kHolderIndex]));
 }
 
 
 Local<Value> Arguments::Data() const {
-  return data_;
+  return Local<Value>(reinterpret_cast<Value*>(&implicit_args_[kDataIndex]));
 }
 
 
@@ -3432,7 +3590,7 @@ Local<Value> Object::UncheckedGetInternalField(int index) {
     // If the object is a plain JSObject, which is the common case,
     // we know where to find the internal fields and can return the
     // value directly.
-    int offset = I::kJSObjectHeaderSize + (sizeof(void*) * index);
+    int offset = I::kJSObjectHeaderSize + (internal::kApiPointerSize * index);
     O* value = I::ReadField<O*>(obj, offset);
     O** result = HandleScope::CreateHandle(value);
     return Local<Value>(reinterpret_cast<Value*>(result));
@@ -3468,7 +3626,7 @@ void* Object::GetPointerFromInternalField(int index) {
     // If the object is a plain JSObject, which is the common case,
     // we know where to find the internal fields and can return the
     // value directly.
-    int offset = I::kJSObjectHeaderSize + (sizeof(void*) * index);
+    int offset = I::kJSObjectHeaderSize + (internal::kApiPointerSize * index);
     O* value = I::ReadField<O*>(obj, offset);
     return I::GetExternalPointer(value);
   }
@@ -3541,6 +3699,14 @@ Date* Date::Cast(v8::Value* value) {
   CheckCast(value);
 #endif
   return static_cast<Date*>(value);
+}
+
+
+RegExp* RegExp::Cast(v8::Value* value) {
+#ifdef V8_ENABLE_CHECKS
+  CheckCast(value);
+#endif
+  return static_cast<RegExp*>(value);
 }
 
 

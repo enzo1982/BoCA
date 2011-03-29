@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -160,13 +160,13 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 		switch (specs->type)
 		{
 			case COMPONENT_TYPE_DECODER:
-				if	(specs->mode == EXTERNAL_FILE)	return new DecoderComponentExternalFile(specs);
-				else if	(specs->mode == EXTERNAL_STDIO)	return new DecoderComponentExternalStdIO(specs);
+				if	(specs->mode == COMPONENT_MODE_EXTERNAL_FILE)	return new DecoderComponentExternalFile(specs);
+				else if	(specs->mode == COMPONENT_MODE_EXTERNAL_STDIO)	return new DecoderComponentExternalStdIO(specs);
 
 				return new DecoderComponent(specs);
 			case COMPONENT_TYPE_ENCODER:
-				if	(specs->mode == EXTERNAL_FILE)	return new EncoderComponentExternalFile(specs);
-				else if	(specs->mode == EXTERNAL_STDIO)	return new EncoderComponentExternalStdIO(specs);
+				if	(specs->mode == COMPONENT_MODE_EXTERNAL_FILE)	return new EncoderComponentExternalFile(specs);
+				else if	(specs->mode == COMPONENT_MODE_EXTERNAL_STDIO)	return new EncoderComponentExternalStdIO(specs);
 
 				return new EncoderComponent(specs);
 			case COMPONENT_TYPE_DEVICEINFO:

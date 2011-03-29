@@ -111,6 +111,9 @@
 #if defined __WIN32__
 #	include "smooth/gui/dialogs/directory/dirdlg_win32.h"
 #	include "smooth/gui/dialogs/file/filedlg_win32.h"
+#elif defined __APPLE__
+#	include "smooth/gui/dialogs/directory/dirdlg_cocoa.h"
+#	include "smooth/gui/dialogs/file/filedlg_cocoa.h"
 #else
 #	include "smooth/gui/dialogs/directory/dirdlg_gtk.h"
 #	include "smooth/gui/dialogs/file/filedlg_gtk.h"

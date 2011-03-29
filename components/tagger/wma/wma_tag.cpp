@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -123,29 +123,34 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 		 */
 		for (Int i = 0; i < info.other.Length(); i++)
 		{
-			String	 value = info.other.GetNth(i);
+			String	 pair  = info.other.GetNth(i);
 
-			if	(value.StartsWith(String(INFO_CONTENTGROUP).Append(":")))  RenderWMAItem(g_wszWMContentGroupDescription, value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_SUBTITLE).Append(":")))	   RenderWMAItem(g_wszWMSubTitle,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			String	 key   = pair.Head(pair.Find(":") + 1);
+			String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
-			else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":")))	   RenderWMAItem(g_wszWMConductor,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	   RenderWMAItem(g_wszWMComposer,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   RenderWMAItem(g_wszWMWriter,			 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			if (value == NIL) continue;
 
-			else if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))   RenderWMAItem(g_wszWMOriginalArtist,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))    RenderWMAItem(g_wszWMOriginalAlbumTitle,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_ORIG_LYRICIST).Append(":"))) RenderWMAItem(g_wszWMOriginalLyricist,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_ORIG_YEAR).Append(":")))	   RenderWMAItem(g_wszWMOriginalReleaseYear,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			if	(key == String(INFO_CONTENTGROUP).Append(":"))	RenderWMAItem(g_wszWMContentGroupDescription, value, pHeaderInfo);
+			else if	(key == String(INFO_SUBTITLE).Append(":"))	RenderWMAItem(g_wszWMSubTitle,		      value, pHeaderInfo);
 
-			else if	(value.StartsWith(String(INFO_BPM).Append(":")))	   RenderWMAItem(g_wszWMBeatsPerMinute,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_INITIALKEY).Append(":")))	   RenderWMAItem(g_wszWMInitialKey,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(key == String(INFO_CONDUCTOR).Append(":"))	RenderWMAItem(g_wszWMConductor,		      value, pHeaderInfo);
+			else if	(key == String(INFO_COMPOSER).Append(":"))	RenderWMAItem(g_wszWMComposer,		      value, pHeaderInfo);
+			else if	(key == String(INFO_LYRICIST).Append(":"))	RenderWMAItem(g_wszWMWriter,		      value, pHeaderInfo);
 
-			else if	(value.StartsWith(String(INFO_RADIOSTATION).Append(":")))  RenderWMAItem(g_wszWMRadioStationName,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_RADIOOWNER).Append(":")))	   RenderWMAItem(g_wszWMRadioStationOwner,	 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(key == String(INFO_ORIG_ARTIST).Append(":"))	RenderWMAItem(g_wszWMOriginalArtist,	      value, pHeaderInfo);
+			else if	(key == String(INFO_ORIG_ALBUM).Append(":"))	RenderWMAItem(g_wszWMOriginalAlbumTitle,      value, pHeaderInfo);
+			else if	(key == String(INFO_ORIG_LYRICIST).Append(":"))	RenderWMAItem(g_wszWMOriginalLyricist,	      value, pHeaderInfo);
+			else if	(key == String(INFO_ORIG_YEAR).Append(":"))	RenderWMAItem(g_wszWMOriginalReleaseYear,     value, pHeaderInfo);
 
-			else if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	   RenderWMAItem(g_wszWMAuthorURL,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	   RenderWMAItem(g_wszWMAudioSourceURL,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
-			else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":"))) RenderWMAItem(g_wszWMCopyrightURL,		 value.Tail(value.Length() - value.Find(":") - 1), pHeaderInfo);
+			else if	(key == String(INFO_BPM).Append(":"))		RenderWMAItem(g_wszWMBeatsPerMinute,	      value, pHeaderInfo);
+			else if	(key == String(INFO_INITIALKEY).Append(":"))	RenderWMAItem(g_wszWMInitialKey,	      value, pHeaderInfo);
+
+			else if	(key == String(INFO_RADIOSTATION).Append(":"))	RenderWMAItem(g_wszWMRadioStationName,	      value, pHeaderInfo);
+			else if	(key == String(INFO_RADIOOWNER).Append(":"))	RenderWMAItem(g_wszWMRadioStationOwner,	      value, pHeaderInfo);
+
+			else if	(key == String(INFO_WEB_ARTIST).Append(":"))	RenderWMAItem(g_wszWMAuthorURL,		      value, pHeaderInfo);
+			else if	(key == String(INFO_WEB_SOURCE).Append(":"))	RenderWMAItem(g_wszWMAudioSourceURL,	      value, pHeaderInfo);
+			else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))	RenderWMAItem(g_wszWMCopyrightURL,	      value, pHeaderInfo);
 		}
 
 		/* Save CD table of contents.

@@ -28,6 +28,8 @@ using namespace smooth;
 # include "boca/component/taggercomponent.h"
 #else
 # define BOCA_EXPORT __declspec (dllimport)
+
+# include "boca/core/core.h"
 #endif
 
 #include "boca/application/component.h"

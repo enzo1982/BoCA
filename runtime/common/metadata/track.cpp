@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -117,8 +117,8 @@ String BoCA::Track::GetLengthString() const
 	Int	 seconds = 0;
 	String	 secondsString;
 
-	if	(length >= 0)	    seconds = Math::Round(Float(length) / (format.rate * format.channels));
-	else if (approxLength >= 0) seconds = Math::Round(Float(approxLength) / (format.rate * format.channels));
+	if	(length	      >= 0) seconds = Math::Round(Float(length)	      / format.rate);
+	else if (approxLength >= 0) seconds = Math::Round(Float(approxLength) / format.rate);
 
 	secondsString = String::FromInt(seconds / 60).Append(":").Append(seconds % 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 60));
 

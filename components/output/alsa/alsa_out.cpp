@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -61,9 +61,9 @@ Bool BoCA::ALSAOut::Activate()
 
 	snd_pcm_hw_params_set_access(playback_handle, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
 
-	if	(format.bits ==  8) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_S8);
+	if	(format.bits ==  8) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_U8);
 	else if	(format.bits == 16) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_S16_LE);
-	else if	(format.bits == 24) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_S24_LE);
+	else if	(format.bits == 24) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_S32_LE);
 	else if	(format.bits == 32) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_S32_LE);
 
 	snd_pcm_hw_params_set_rate(playback_handle, hw_params, format.rate, 0);
@@ -90,7 +90,22 @@ Bool BoCA::ALSAOut::Deactivate()
 Int BoCA::ALSAOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	const Format		&format = track.GetFormat();
-	snd_pcm_sframes_t	 frames = snd_pcm_writei(playback_handle, data, size / format.channels / (format.bits / 8));
+	snd_pcm_sframes_t	 frames = -1;
+
+	if (format.bits == 24)
+	{
+		/* Convert 24 bit samples to 32 bit.
+		 */
+		Buffer<Int32>	 samples(size / (format.bits / 8));
+
+		for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) * 256;
+
+		frames = snd_pcm_writei(playback_handle, samples, size / format.channels / (format.bits / 8));
+	}
+	else
+	{
+		frames = snd_pcm_writei(playback_handle, data, size / format.channels / (format.bits / 8));
+	}
 
 	if (frames < 0) return 0;
 

@@ -96,12 +96,17 @@ Error BoCA::APETag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &trac
 	 */
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		String	 pair  = info.other.GetNth(i);
 
-		if	(value.StartsWith(String(INFO_SUBTITLE).Append(":")))  { RenderAPEItem("Subtitle",  value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
-		else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":"))) { RenderAPEItem("Conductor", value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
-		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))  { RenderAPEItem("Composer",  value.Tail(value.Length() - value.Find(":") - 1), buffer); numItems++; }
+		if (value == NIL) continue;
+
+		if	(key == String(INFO_SUBTITLE).Append(":"))  { RenderAPEItem("Subtitle",  value, buffer); numItems++; }
+
+		else if	(key == String(INFO_CONDUCTOR).Append(":")) { RenderAPEItem("Conductor", value, buffer); numItems++; }
+		else if	(key == String(INFO_COMPOSER).Append(":"))  { RenderAPEItem("Composer",  value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.

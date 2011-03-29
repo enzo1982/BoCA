@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -88,7 +88,7 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 	format.channels	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_CHANNELS, 0, 0);
 	format.rate	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_SAMPLE_RATE, 0, 0);
 
-	track.length	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0) * format.channels;
+	track.length	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0);
 
 	track.SetFormat(format);
 
@@ -161,8 +161,8 @@ Bool BoCA::MACIn::Deactivate()
 
 Bool BoCA::MACIn::Seek(Int64 samplePosition)
 {
-	if (ex_APEDecompress_Seek(hAPEDecompress, samplePosition / track.GetFormat().channels) == ERROR_SUCCESS) return True;
-	else													 return False;
+	if (ex_APEDecompress_Seek(hAPEDecompress, samplePosition) == ERROR_SUCCESS) return True;
+	else									    return False;
 }
 
 Int BoCA::MACIn::ReadData(Buffer<UnsignedByte> &data, Int size)

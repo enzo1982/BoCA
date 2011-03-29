@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,9 +12,8 @@
 #include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
-#ifdef __WIN32__
-#	include <windows.h>
-#endif
+#include <windows.h>
+#include <mmreg.h>
 
 using namespace smooth::IO;
 
@@ -99,7 +98,8 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	 */
 	in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
-	track.fileSize	= File(streamURI).GetFileSize();
+	track.origFilename = streamURI;
+	track.fileSize	   = File(streamURI).GetFileSize();
 
 	/* Read RIFF chunk
 	 */
@@ -121,7 +121,10 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 		if (chunk == "fmt ")
 		{
-			if (in->InputNumber(2) != 1) { errorState = True; errorString = "Unsupported audio format"; }
+			Int	 waveFormat = in->InputNumber(2);
+
+			if (waveFormat != WAVE_FORMAT_PCM &&
+			    waveFormat != WAVE_FORMAT_EXTENSIBLE) { errorState = True; errorString = "Unsupported audio format"; }
 
 			Format	 format = track.GetFormat();
 
@@ -137,17 +140,17 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 			/* Skip rest of chunk
 			 */
-			in->RelSeek(cSize - 16);
+			in->RelSeek(cSize - 16 + cSize % 2);
 		}
 		else if (chunk == "data")
 		{
-			track.length	= (unsigned long) cSize / (track.GetFormat().bits / 8);
+			track.length	= (unsigned long) cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
 		}
 		else
 		{
 			/* Skip chunk
 			 */
-			in->RelSeek(cSize);
+			in->RelSeek(cSize + cSize % 2);
 		}
 	}
 	while (!errorState && chunk != "data");
@@ -266,7 +269,7 @@ Int BoCA::AS::DecoderComponentExternalFile::ReadData(Buffer<UnsignedByte> &data,
 {
 	if (in->GetPos() == in->Size()) return -1;
 
-	size = Math::Min(2048, in->Size() - in->GetPos());
+	size = Math::Min((Int64) 2048, in->Size() - in->GetPos());
 
 	/* Hand data over from the input file
 	 */

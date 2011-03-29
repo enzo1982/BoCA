@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,21 +26,27 @@
 
 // tag identifiers
 
-const int	 PCIF_TAG	= 1;	// identifies the PCIF tag
-const int	 RESO_TAG	= 2;	// resolution tag
-const int	 FORM_TAG	= 3;	// format tag
-const int	 DESC_TAG	= 4;	// description tag
-const int	 DATA_TAG	= 5;	// data tag
+enum PCITagID
+{
+	PCIF_TAG = 1,	// identifies the PCIF tag
+	RESO_TAG,	// resolution tag
+	FORM_TAG,	// format tag
+	DESC_TAG,	// description tag
+	DATA_TAG	// data tag
+};
 
 // compression identifiers
 
-const int	 UNCOMPRESSED	= 0;	// raw image data
-const int	 RAW		= 0;	// raw image data
-const int	 STANDARD	= 1;	// PCI compressed data
-const int	 PCI		= 1;	// PCI compressed data
-const int	 JPEG		= 2;	// JPEG compressed data
-const int	 RLE		= 3;	// RLE compressed data
-const int	 BZIP2		= 4;	// BZIP2 compressed data
+enum
+{
+	UNCOMPRESSED = 0,	// raw image data
+	RAW	     = 0,	// raw image data
+	STANDARD     = 1,	// PCI compressed data
+	PCI	     = 1,	// PCI compressed data
+	JPEG,			// JPEG compressed data
+	RLE,			// RLE compressed data
+	BZIP2			// BZIP2 compressed data
+};
 
 // color format identifiers
 

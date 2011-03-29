@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -204,24 +204,21 @@ const BoCA::MCDI &BoCA::CDParanoiaInfo::GetNthDeviceMCDI(Int n)
 {
 	static MCDI	 mcdi = MCDI(Buffer<UnsignedByte>());
 
-	/* Do not read the TOC again if the last
-	 * request was less than half a second ago.
+	/* Do not read the TOC again if the last request
+	 * was less than a quarter of a second ago.
 	 */
-	{
-		static Int		 lastDrive = -1;
-		static UnsignedInt64	 lastAccess = 0;
+	static Int		 lastDrive  = -1;
+	static UnsignedInt64	 lastAccess = 0;
 
+	{
 		UnsignedInt64	 clockValue = S::System::System::Clock();
 
-		if (lastDrive == n && clockValue - lastAccess < 500)
+		if (lastDrive == n && clockValue - lastAccess < 250)
 		{
 			lastAccess = clockValue;
 
 			return mcdi;
 		}
-
-		lastDrive = n;
-		lastAccess = clockValue;
 	}
 
 	mcdi.SetData(Buffer<UnsignedByte>());
@@ -260,7 +257,7 @@ const BoCA::MCDI &BoCA::CDParanoiaInfo::GetNthDeviceMCDI(Int n)
 			{
 				toc.tracks[i].rsvd	  = 0;
 				toc.tracks[i].ADR	  = cd->disc_toc[i].bFlags;
-				toc.tracks[i].trackNumber = i + 1;
+				toc.tracks[i].trackNumber = cd->disc_toc[i].bTrack;
 				toc.tracks[i].rsvd2	  = 0;
 				toc.tracks[i].addr	  = htonl(cd->disc_toc[i].dwStartSector);
 			}
@@ -280,6 +277,9 @@ const BoCA::MCDI &BoCA::CDParanoiaInfo::GetNthDeviceMCDI(Int n)
 			mcdi.SetData(buffer);
 		}
 	}
+
+	lastDrive  = n;
+	lastAccess = S::System::System::Clock();
 
 	return mcdi;
 }

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,6 +14,8 @@
 using namespace smooth::Net;
 using namespace smooth::Threads;
 using namespace smooth::IO;
+
+Int	 BoCA::Video::activeDownloads = 0;
 
 BoCA::Video::Video(VideoSite *iVideoSite)
 {
@@ -35,6 +37,18 @@ BoCA::Video::~Video()
 
 Int BoCA::Video::DownloaderThread(String targetFileName)
 {
+	Config	*config = Config::Get();
+
+	/* Wait until number of active downloads drops below maximum.
+	 */
+	Int	&maxActiveDownloads = config->GetPersistentIntValue("YouTube", "MaxDownloads", 8);
+
+	while (activeDownloads >= maxActiveDownloads) S::System::System::Sleep(100);
+
+	activeDownloads++;
+	
+	/* Start download.
+	 */
 	startDownload.Emit(this);
 
 	videoDownloadStarted = True;
@@ -83,6 +97,8 @@ Int BoCA::Video::DownloaderThread(String targetFileName)
 	finishDownload.Emit(this);
 
 	videoDownloadFinished = True;
+
+	activeDownloads--;
 
 	if (error) return Error();
 	else	   return Success();

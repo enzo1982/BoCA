@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -102,7 +102,7 @@ Bool BoCA::BonkOut::Activate()
 	}
 
 	ex_bonk_encoder_init(encoder,
-		(unsigned int) Math::Max(track.length, 0), format.rate, format.channels,
+		(unsigned int) Math::Max(track.length * format.channels, (Int64) 0), format.rate, format.channels,
 		config->GetIntValue("Bonk", "Lossless", 0), config->GetIntValue("Bonk", "JointStereo", 0),
 		config->GetIntValue("Bonk", "Predictor", 32), config->GetIntValue("Bonk", "Lossless", 0) ? 1 : config->GetIntValue("Bonk", "Downsampling", 2),
 		int(1024.0 * format.rate / 44100),

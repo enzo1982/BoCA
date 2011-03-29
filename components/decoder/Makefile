@@ -9,8 +9,11 @@ all:
 	cd au && $(MAKE)
 	cd bonk && $(MAKE)
 ifeq ($(BUILD_UNIX),True)
+ifneq ($(BUILD_SOLARIS),True)
+	cd cdio && $(MAKE)
 ifneq ($(BUILD_OSX),True)
 	cd cdparanoia && $(MAKE)
+endif
 endif
 endif
 ifeq ($(BUILD_WIN32),True)
@@ -42,8 +45,11 @@ clean:
 	cd au && $(MAKE) clean
 	cd bonk && $(MAKE) clean
 ifeq ($(BUILD_UNIX),True)
+ifneq ($(BUILD_SOLARIS),True)
+	cd cdio && $(MAKE) clean
 ifneq ($(BUILD_OSX),True)
 	cd cdparanoia && $(MAKE) clean
+endif
 endif
 endif
 ifeq ($(BUILD_WIN32),True)

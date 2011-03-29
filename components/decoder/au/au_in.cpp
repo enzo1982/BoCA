@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -25,6 +25,7 @@ const String &BoCA::SunAuIn::GetComponentSpecs()
 	    <format>					\
 	      <name>Sun Audio Files</name>		\
 	      <extension>au</extension>			\
+	      <extension>snd</extension>		\
 	    </format>					\
 	  </component>					\
 							\
@@ -46,22 +47,19 @@ Bool BoCA::SunAuIn::CanOpenStream(const String &streamURI)
 Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in	= new InStream(STREAM_FILE, streamURI, IS_READ);
+	Format		 format = track.GetFormat();
 
-	// TODO: Add more checking to this!
+	track.fileSize	= f_in->Size();
+	format.order	= BYTE_RAW;
 
-	Format	 format = track.GetFormat();
+	/* Skip magic number and data offset.
+	 */
+	f_in->RelSeek(8);
 
-	track.fileSize = f_in->Size();
-	format.order = BYTE_RAW;
+	track.length	= UnsignedInt32(f_in->InputNumberRaw(4));
+	format.bits	= UnsignedInt32(f_in->InputNumberRaw(4));
 
-	// Read magic number and header size
-	for (Int i = 0; i < 8; i++)
-		f_in->InputNumber(1);
-
-	track.length = UnsignedInt32(f_in->InputNumberRaw(4));
-	format.bits = UnsignedInt32(f_in->InputNumberRaw(4));
-
-	if	(format.bits == 2) format.bits = 8;
+	if	(format.bits == 2) format.bits =  8;
 	else if (format.bits == 3) format.bits = 16;
 	else if (format.bits == 4) format.bits = 24;
 	else if (format.bits == 5) format.bits = 32;
@@ -69,10 +67,10 @@ Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (!errorState)
 	{
-		track.length = track.length / (format.bits / 8);
+		format.rate	= UnsignedInt32(f_in->InputNumberRaw(4));
+		format.channels	= UnsignedInt32(f_in->InputNumberRaw(4));
 
-		format.rate = UnsignedInt32(f_in->InputNumberRaw(4));
-		format.channels = UnsignedInt32(f_in->InputNumberRaw(4));
+		track.length	= track.length / format.channels / (format.bits / 8);
 	}
 
 	track.SetFormat(format);
@@ -96,13 +94,15 @@ Bool BoCA::SunAuIn::Activate()
 {
 	InStream	*in = new InStream(STREAM_DRIVER, driver);
     
-	in->InputNumber(4); // Read magic number
+	/* Read magic number.
+	 */
+	in->InputNumber(4);
 
-	Int		 headerSize = in->InputNumberRaw(4);
+	Int		 dataOffset = in->InputNumberRaw(4);
 
 	delete in;
 
-	driver->Seek(headerSize);
+	driver->Seek(dataOffset);
 
 	return True;
 }
@@ -119,6 +119,10 @@ Int BoCA::SunAuIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	data.Resize(size);
 
 	size = driver->ReadData(data, size);
+
+	/* Convert 8 bit samples to unsigned.
+	 */
+	if (track.GetFormat().bits == 8) for (Int i = 0; i < size; i++) data[i] = data[i] + 128;
 
 	return size;
 }

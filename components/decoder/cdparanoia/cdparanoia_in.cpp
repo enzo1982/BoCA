@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -215,8 +215,8 @@ Error BoCA::CDParanoiaIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (entryNumber == -1) return Error();
 
-	track.length	= (trackLength * 2352) / (format.bits / 8);
-	track.fileSize	= trackLength * 2352;
+	track.length	= (trackLength * 1176) / (format.bits / 8);
+	track.fileSize	= trackLength * 1176 * format.channels;
 
 	track.cdTrack	= trackNumber;
 	track.drive	= audiodrive;
@@ -284,7 +284,7 @@ Bool BoCA::CDParanoiaIn::Activate()
 
 	Config	*config = Config::Get();
 
-	Int	 speed = config->GetIntValue("Ripper", "RippingSpeed", 0);
+	Int	 speed = config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 
 	if (speed > 0)	cdda_speed_set(drive, speed);
 	else		cdda_speed_set(drive, -1);

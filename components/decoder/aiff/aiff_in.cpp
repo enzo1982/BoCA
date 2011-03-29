@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -7,6 +7,9 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#include <stdint.h>
+#include <math.h>
 
 #include "aiff_in.h"
 
@@ -26,6 +29,7 @@ const String &BoCA::AIFFIn::GetComponentSpecs()
 	      <name>Apple Audio Files</name>		\
 	      <extension>aif</extension>		\
 	      <extension>aiff</extension>		\
+	      <extension>aifc</extension>		\
 	    </format>					\
 	  </component>					\
 							\
@@ -48,39 +52,96 @@ Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
-	// TODO: Add more checking to this!
+	track.fileSize	= f_in->Size();
 
-	Format	 format = track.GetFormat();
+	/* Read FORM chunk.
+	 */
+	if (f_in->InputString(4) != "FORM") { errorState = True; errorString = "Unknown file type"; }
 
-	track.fileSize = f_in->Size();
-	format.order = BYTE_RAW;
+	f_in->RelSeek(4);
 
-	// Read magic number
-	for (Int i = 0; i < 20; i++)
-		f_in->InputNumber(1);
+	String	 fileType = f_in->InputString(4);
 
-	format.channels = UnsignedInt16(f_in->InputNumberRaw(2));
+	if (fileType != "AIFF" && fileType != "AIFC") { errorState = True; errorString = "Unknown file type"; }
 
-	for (Int j = 0; j < 4; j++)
-		f_in->InputNumber(1);
+	String		 chunk;
 
-	format.bits = UnsignedInt16(f_in->InputNumberRaw(2));
+	while (!errorState)
+	{
+		if (f_in->GetPos() >= f_in->Size()) break;
 
-	for (Int k = 0; k < 2; k++)
-		f_in->InputNumber(1);
+		/* Read next chunk.
+		 */
+		chunk = f_in->InputString(4);
 
-	format.rate = UnsignedInt16(f_in->InputNumberRaw(2));
+		Int	 cSize = f_in->InputNumberRaw(4);
 
-	for (Int l = 0; l < 10; l++)
-		f_in->InputNumber(1);
+		if (chunk == "COMM")
+		{
+			Int	 cStart = f_in->GetPos();
 
-	track.length = UnsignedInt32(f_in->InputNumberRaw(4) - 8) / (format.bits / 8);
+			Format	 format = track.GetFormat();
 
-	track.SetFormat(format);
+			format.channels	= (unsigned short) f_in->InputNumberRaw(2);
+			track.length	= (unsigned long) f_in->InputNumberRaw(4);
+
+			format.order	= BYTE_RAW;
+			format.bits	= (unsigned short) f_in->InputNumberRaw(2);
+
+			/* Read sample rate as 80 bit float.
+			 */
+			int16_t		 exp = (f_in->InputNumberRaw(2) & 0x7FFF) - 16383 - 63;
+			uint64_t	 man = 0;
+
+			for (int i = 0; i < 8; i++) man = (man << 8) | f_in->InputNumberRaw(1);
+
+			format.rate	= ldexp((double) man, exp);
+
+			/* Parse AIFF-C compression type.
+			 */
+			if (fileType == "AIFC")
+			{
+				String	 compression = f_in->InputString(4);
+
+				if	(compression == "NONE") format.order = BYTE_RAW;
+				else if (compression == "sowt") format.order = BYTE_INTEL;
+				else				{ errorState = True; errorString = "Unsupported audio format"; }
+			}
+
+			track.SetFormat(format);
+
+			/* Skip rest of chunk.
+			 */
+			f_in->Seek(cStart + cSize + cSize % 2);
+		}
+		else if (chunk == "AUTH" ||
+			 chunk == "NAME" ||
+			 chunk == "ANNO")
+		{
+			Info	 info = track.GetInfo();
+
+			if	(chunk == "AUTH") info.artist  = f_in->InputString(cSize);
+			else if	(chunk == "NAME") info.title   = f_in->InputString(cSize);
+			else if	(chunk == "ANNO") info.comment = f_in->InputString(cSize);
+
+			track.SetInfo(info);
+
+			/* Skip rest of chunk.
+			 */
+			f_in->RelSeek(cSize % 2);
+		}
+		else
+		{
+			/* Skip chunk.
+			 */
+			f_in->RelSeek(cSize + cSize % 2);
+		}
+	}
 
 	delete f_in;
 
-	return Success();
+	if (errorState)	return Error();
+	else		return Success();
 }
 
 BoCA::AIFFIn::AIFFIn()
@@ -94,7 +155,27 @@ BoCA::AIFFIn::~AIFFIn()
 
 Bool BoCA::AIFFIn::Activate()
 {
-	driver->Seek(54); // Skip the header
+	InStream	*in = new InStream(STREAM_DRIVER, driver);
+    
+	in->Seek(12);
+
+	String		 chunk;
+
+	do
+	{
+		/* Read next chunk
+		 */
+		chunk = in->InputString(4);
+
+		Int	 cSize = in->InputNumberRaw(4);
+
+		if (chunk != "SSND") in->RelSeek(cSize + cSize % 2);
+	}
+	while (chunk != "SSND");
+
+	driver->Seek(in->GetPos() + 8);
+
+	delete in;
 
 	return True;
 }
@@ -111,6 +192,10 @@ Int BoCA::AIFFIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	data.Resize(size);
 
 	size = driver->ReadData(data, size);
+
+	/* Convert 8 bit samples to unsigned.
+	 */
+	if (track.GetFormat().bits == 8) for (Int i = 0; i < size; i++) data[i] = data[i] + 128;
 
 	return size;
 }

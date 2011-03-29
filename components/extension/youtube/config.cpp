@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -9,6 +9,13 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "config.h"
+
+#ifdef __WIN32__
+#	include <shlobj.h>
+#else
+#	include <unistd.h>
+#	include <pwd.h>
+#endif
 
 using namespace smooth::GUI::Dialogs;
 
@@ -20,6 +27,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 	i18n->SetContext("Extensions::Video Downloader::Configuration");
 
 	autoDownload	= config->GetIntValue("YouTube", "AutoDownload", False);
+	maxDownloads	= config->GetIntValue("YouTube", "MaxDownloads", 8);
 	keepVideoFiles	= config->GetIntValue("YouTube", "SaveVideoFiles", False);
 
 	String	 videoOutputDir = config->GetStringValue("YouTube", "VideoOutputDir", GetDefaultVideoOutputDirectory());
@@ -30,7 +38,24 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	group_auto->Add(check_auto_download);
 
-	group_files		= new GroupBox(i18n->TranslateString("Video files"), Point(7, 64), Size(344, 69));
+	group_downloads		= new GroupBox(i18n->TranslateString("Downloads"), Point(7, 64), Size(344, 41));
+
+	text_max_downloads	= new Text(i18n->TranslateString("Maximum number of simultaneous downloads:"), Point(10, 14));
+
+	edit_max_downloads	= new EditBox(String::FromInt(maxDownloads), Point(text_max_downloads->textSize.cx + 17, 11), Size(18, 0), 2);
+	edit_max_downloads->onInput.Connect(&ConfigureYouTube::EditMaxDownloads, this);
+	edit_max_downloads->SetFlags(EDB_NUMERIC);
+
+	arrows_max_downloads	= new Arrows(Point(edit_max_downloads->GetX() + 18, 11), Size(0, 20), OR_VERT, &maxDownloads, 1, 32);
+	arrows_max_downloads->onValueChange.Connect(&ConfigureYouTube::ArrowsMaxDownloads, this);
+
+	group_downloads->Add(text_max_downloads);
+	group_downloads->Add(edit_max_downloads);
+	group_downloads->Add(arrows_max_downloads);
+
+	group_auto->Add(check_auto_download);
+
+	group_files		= new GroupBox(i18n->TranslateString("Video files"), Point(7, 117), Size(344, 69));
 
 	check_keep		= new CheckBox(i18n->TranslateString("Save downloaded video files"), Point(10, 14), Size(236, 0), &keepVideoFiles);
 	check_keep->onAction.Connect(&ConfigureYouTube::ToggleKeepFiles, this);
@@ -45,11 +70,12 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 	group_files->Add(button_browse);
 
 	Add(group_auto);
+	Add(group_downloads);
 	Add(group_files);
 
 	ToggleKeepFiles();
 
-	SetSize(Size(358, 140));
+	SetSize(Size(358, 193));
 }
 
 BoCA::ConfigureYouTube::~ConfigureYouTube()
@@ -57,11 +83,26 @@ BoCA::ConfigureYouTube::~ConfigureYouTube()
 	DeleteObject(group_auto);
 	DeleteObject(check_auto_download);
 
+	DeleteObject(group_downloads);
+	DeleteObject(text_max_downloads);
+	DeleteObject(edit_max_downloads);
+	DeleteObject(arrows_max_downloads);
+
 	DeleteObject(group_files);
 	DeleteObject(check_keep);
 
 	DeleteObject(edit_dir);
 	DeleteObject(button_browse);
+}
+
+Void BoCA::ConfigureYouTube::EditMaxDownloads()
+{
+	arrows_max_downloads->SetValue(edit_max_downloads->GetText().ToInt());
+}
+
+Void BoCA::ConfigureYouTube::ArrowsMaxDownloads()
+{
+	edit_max_downloads->SetText(String::FromInt(maxDownloads));
 }
 
 Void BoCA::ConfigureYouTube::ToggleKeepFiles()
@@ -109,6 +150,7 @@ Int BoCA::ConfigureYouTube::SaveSettings()
 	config->SetStringValue("YouTube", "VideoOutputDir", videoOutputDir);
 
 	config->SetIntValue("YouTube", "AutoDownload", autoDownload);
+	config->SetIntValue("YouTube", "MaxDownloads", maxDownloads);
 	config->SetIntValue("YouTube", "SaveVideoFiles", keepVideoFiles);
 
 	return Success();
@@ -120,13 +162,45 @@ const String &BoCA::ConfigureYouTube::GetDefaultVideoOutputDirectory()
 
 	if (defaultOutputDir != NIL) return defaultOutputDir;
 
-	defaultOutputDir = S::System::System::GetPersonalFilesDirectory();
+#ifdef __WIN32__
+	ITEMIDLIST	*idlist;
+	OSVERSIONINFOA	 vInfo;
+
+	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+	GetVersionExA(&vInfo);
+
+	if (vInfo.dwMajorVersion >= 6 || (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)) SHGetSpecialFolderLocation(NIL, CSIDL_MYVIDEO, &idlist);
+	else											   SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+
+	if (Setup::enableUnicode)
+	{
+		Buffer<wchar_t>	 buffer(MAX_PATH);
+
+		SHGetPathFromIDListW(idlist, buffer);
+
+		defaultOutputDir = buffer;
+	}
+	else
+	{
+		Buffer<char>	 buffer(MAX_PATH);
+
+		SHGetPathFromIDListA(idlist, buffer);
+
+		defaultOutputDir = buffer;
+	}
+
+	CoTaskMemFree(idlist);
+
+	if (defaultOutputDir == NIL) defaultOutputDir = S::System::System::GetPersonalFilesDirectory();
+#else
+	passwd	*pw = getpwuid(getuid());
+
+	if (pw != NIL)	defaultOutputDir = pw->pw_dir;
+	else		defaultOutputDir = "~";
+#endif
 
 	if (!defaultOutputDir.EndsWith(Directory::GetDirectoryDelimiter())) defaultOutputDir.Append(Directory::GetDirectoryDelimiter());
-
-#ifdef __WIN32__
-	defaultOutputDir.Append("My Videos").Append(Directory::GetDirectoryDelimiter());
-#endif
 
 	return defaultOutputDir;
 }

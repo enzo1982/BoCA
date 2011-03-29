@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,18 +29,18 @@ namespace smooth
 		class SMOOTHAPI CRC32
 		{
 			private:
-				static Int			 table[256];
+				static UnsignedInt32		 table[256];
 				static Bool			 initialized;
 
 				static Void			 InitTable();
-				static UnsignedLong		 Reflect(UnsignedLong, char);
+				static UnsignedInt32		 Reflect(UnsignedInt32, char);
 
 				const Buffer<UnsignedByte>	&buffer;
 			public:
 								 CRC32(const Buffer<UnsignedByte> &);
 								~CRC32();
 
-				Int				 Compute() const;
+				UnsignedInt32			 Compute() const;
 		};
 	};
 };

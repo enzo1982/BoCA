@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,6 +14,10 @@
 #include <smooth.h>
 #include "../common/configlayer.h"
 #include "../core/definitions.h"
+
+#ifdef CS
+#	undef CS
+#endif
 
 using namespace smooth;
 using namespace smooth::GUI;

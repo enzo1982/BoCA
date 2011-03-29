@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,21 +33,29 @@ namespace smooth
 	{
 		class SMOOTHAPI Pointer
 		{
+			public:
+				/* Cursor constants.
+				 */
+				enum CursorType
+				{
+					CursorArrow = 0,
+					CursorTextEdit,
+					CursorHand,
+					CursorHSize,
+					CursorVSize,
+
+					NumCursorTypes
+				};
+
 			private:
 				static GUI::Point	 mousePosition;
 
 							 Pointer();
 							 Pointer(const Pointer &);
 			public:
-				/* Cursor constants and functions.
+				/* Cursor functions.
 				 */
-				static const Int	 CursorArrow	= 0;
-				static const Int	 CursorTextEdit	= 1;
-				static const Int	 CursorHand	= 2;
-				static const Int	 CursorHSize	= 3;
-				static const Int	 CursorVSize	= 4;
-
-				static Bool		 SetCursor(const GUI::Window *, Int);
+				static Bool		 SetCursor(const GUI::Window *, CursorType);
 
 				/* Pointer position functions.
 				 */

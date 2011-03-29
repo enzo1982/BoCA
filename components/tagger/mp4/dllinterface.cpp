@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -42,6 +42,7 @@ MP4TAGSADDARTWORK	 ex_MP4TagsAddArtwork		= NIL;
 MP4TAGSREMOVEARTWORK	 ex_MP4TagsRemoveArtwork	= NIL;
 
 MP4GETCHAPTERS		 ex_MP4GetChapters		= NIL;
+MP4SETCHAPTERS		 ex_MP4SetChapters		= NIL;
 
 DynamicLoader *mp4v2dll	= NIL;
 
@@ -82,6 +83,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4TagsRemoveArtwork		= (MP4TAGSREMOVEARTWORK) mp4v2dll->GetFunctionAddress("MP4TagsRemoveArtwork");
 
 	ex_MP4GetChapters		= (MP4GETCHAPTERS) mp4v2dll->GetFunctionAddress("MP4GetChapters");
+	ex_MP4SetChapters		= (MP4SETCHAPTERS) mp4v2dll->GetFunctionAddress("MP4SetChapters");
 
 	if (ex_MP4Read			== NIL ||
 	    ex_MP4Modify		== NIL ||
@@ -113,7 +115,8 @@ Bool LoadMP4v2DLL()
 	    ex_MP4TagsAddArtwork	== NIL ||
 	    ex_MP4TagsRemoveArtwork	== NIL ||
 
-	    ex_MP4GetChapters		== NIL) { FreeMP4v2DLL(); return False; }
+	    ex_MP4GetChapters		== NIL ||
+	    ex_MP4SetChapters		== NIL) { FreeMP4v2DLL(); return False; }
 
 	return True;
 }

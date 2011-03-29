@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -216,8 +216,8 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (entryNumber == -1) return Error();
 
-	track.length	= (trackLength * 2352) / (format.bits / 8);
-	track.fileSize	= trackLength * 2352;
+	track.length	= (trackLength * 1176) / (format.bits / 8);
+	track.fileSize	= trackLength * 1176 * format.channels;
 
 	track.cdTrack	= trackNumber;
 	track.drive	= audiodrive;
@@ -288,6 +288,11 @@ BoCA::CDRipIn::CDRipIn()
 
 	packageSize	= 0;
 	ripperOpen	= False;
+
+	readOffset	= 0;
+
+	skipSamples	= 0;
+	prependSamples	= 0;
 }
 
 BoCA::CDRipIn::~CDRipIn()
@@ -345,15 +350,34 @@ Int BoCA::CDRipIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 		return -1;
 	}
 
+	/* Set up buffer respecting empty samples to prepend.
+	 */
+	Int	 prependBytes = 4 * prependSamples;
+	Int	 skipBytes    = 4 * skipSamples;
+
+	prependSamples = 0;
+	skipSamples    = 0;
+
+	data.Resize(dataBufferSize + prependBytes);
+
+	if (prependBytes > 0) data.Zero();
+
+	/* Rip chunk.
+	 */
 	BOOL	 abort = false;
+	LONG	 lSize = size;
 
-	data.Resize(dataBufferSize);
+	ex_CR_RipChunk(data + prependBytes, &lSize, abort);
 
-	ex_CR_RipChunk(data, &size, abort);
+	/* Strip samples to skip from the beginning.
+	 */
+	Int	 dataBytes = lSize + prependBytes - skipBytes;
 
-	inBytes += size;
+	if (skipBytes > 0) memmove(data, data + skipBytes, dataBytes);
 
-	return size;
+	inBytes += dataBytes;
+
+	return dataBytes;
 }
 
 Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
@@ -386,7 +410,7 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 		params.bJitterCorrection	= config->GetIntValue("CDRip", "JitterCorrection", False);
 		params.bDetectJitterErrors	= config->GetIntValue("CDRip", "DetectJitterErrors", True);
 		params.bDetectC2Errors		= config->GetIntValue("CDRip", "DetectC2Errors", True);
-		params.nSpeed			= config->GetIntValue("Ripper", "RippingSpeed", 0);
+		params.nSpeed			= config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 		params.bEnableMultiRead		= False;
 		params.nMultiReadCount		= 0;
 
@@ -396,9 +420,27 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 
 		ex_CR_SetCDROMParameters(&params);
 
+		/* Lock tray if requested.
+		 */
 		if (config->GetIntValue("CDRip", "LockTray", True)) ex_CR_LockCD(True);
 
-		ex_CR_OpenRipper(&dataBufferSize, startSector, endSector);
+		/* Calculate offset values.
+		 */
+		readOffset = config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0);
+
+		startSector += readOffset / 588;
+		endSector   += readOffset / 588;
+
+		if	(readOffset % 588 < 0) { startSector--; skipSamples = 588 + readOffset % 588; }
+		else if (readOffset % 588 > 0) { endSector++;	skipSamples = 	    readOffset % 588; }
+
+		if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
+
+		/* Open ripper.
+		 */
+		LONG	 lDataBufferSize = dataBufferSize;
+
+		ex_CR_OpenRipper(&lDataBufferSize, startSector, endSector);
 
 		ripperOpen = True;
 	}
