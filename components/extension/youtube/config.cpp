@@ -10,13 +10,6 @@
 
 #include "config.h"
 
-#ifdef __WIN32__
-#	include <shlobj.h>
-#else
-#	include <unistd.h>
-#	include <pwd.h>
-#endif
-
 using namespace smooth::GUI::Dialogs;
 
 BoCA::ConfigureYouTube::ConfigureYouTube()
@@ -30,7 +23,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 	maxDownloads	= config->GetIntValue("YouTube", "MaxDownloads", 8);
 	keepVideoFiles	= config->GetIntValue("YouTube", "SaveVideoFiles", False);
 
-	String	 videoOutputDir = config->GetStringValue("YouTube", "VideoOutputDir", GetDefaultVideoOutputDirectory());
+	String	 videoOutputDir = config->GetStringValue("YouTube", "VideoOutputDir", S::System::System::GetPersonalFilesDirectory(S::System::PersonalFilesMovies));
 
 	group_auto		= new GroupBox(i18n->TranslateString("Automatization"), Point(7, 11), Size(344, 41));
 
@@ -59,6 +52,8 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	check_keep		= new CheckBox(i18n->TranslateString("Save downloaded video files"), Point(10, 14), Size(236, 0), &keepVideoFiles);
 	check_keep->onAction.Connect(&ConfigureYouTube::ToggleKeepFiles, this);
+
+	if (config->GetIntValue("YouTube", "DisableSaveOption", False)) check_keep->Deactivate();
 
 	edit_dir		= new EditBox(videoOutputDir, Point(10, 39), Size(236, 0), 0);
 
@@ -154,53 +149,4 @@ Int BoCA::ConfigureYouTube::SaveSettings()
 	config->SetIntValue("YouTube", "SaveVideoFiles", keepVideoFiles);
 
 	return Success();
-}
-
-const String &BoCA::ConfigureYouTube::GetDefaultVideoOutputDirectory()
-{
-	static String	 defaultOutputDir;
-
-	if (defaultOutputDir != NIL) return defaultOutputDir;
-
-#ifdef __WIN32__
-	ITEMIDLIST	*idlist;
-	OSVERSIONINFOA	 vInfo;
-
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-	GetVersionExA(&vInfo);
-
-	if (vInfo.dwMajorVersion >= 6 || (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)) SHGetSpecialFolderLocation(NIL, CSIDL_MYVIDEO, &idlist);
-	else											   SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
-
-	if (Setup::enableUnicode)
-	{
-		Buffer<wchar_t>	 buffer(MAX_PATH);
-
-		SHGetPathFromIDListW(idlist, buffer);
-
-		defaultOutputDir = buffer;
-	}
-	else
-	{
-		Buffer<char>	 buffer(MAX_PATH);
-
-		SHGetPathFromIDListA(idlist, buffer);
-
-		defaultOutputDir = buffer;
-	}
-
-	CoTaskMemFree(idlist);
-
-	if (defaultOutputDir == NIL) defaultOutputDir = S::System::System::GetPersonalFilesDirectory();
-#else
-	passwd	*pw = getpwuid(getuid());
-
-	if (pw != NIL)	defaultOutputDir = pw->pw_dir;
-	else		defaultOutputDir = "~";
-#endif
-
-	if (!defaultOutputDir.EndsWith(Directory::GetDirectoryDelimiter())) defaultOutputDir.Append(Directory::GetDirectoryDelimiter());
-
-	return defaultOutputDir;
 }

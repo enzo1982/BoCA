@@ -10,7 +10,7 @@
     }
 
     function getVideoURL(html) {
-      return html.match(/"fmt_stream_map": "[0-9]+\|(.*?)\|/), (RegExp.$1).replace(/\\\//g, "/");
+      return html.match(/"fmt_stream_map": "[0-9]+\|(.*?)\|/), (RegExp.$1).replace(/\\\//g, "/").replace(/\\u0026/g, "&amp;");
     }
 
     function queryMetadata(html) {
@@ -19,10 +19,10 @@
       metadata.title	   = (html.match(/&lt;meta name="title" content="(.*?)"&gt;/) ? RegExp.$1 : null);
       metadata.description = (html.match(/&lt;p id="eow-description"\s*&gt;(.*?)&lt;\/p&gt;/) ? RegExp.$1 : null);
 
-      metadata.date	   = (html.match(/&lt;span id="eow-date" class="watch-video-date"\s*&gt;\s*(.*?)\s*&lt;\/span&gt;/) ? RegExp.$1 : null);
-      metadata.thumbnail   = (html.match(/&lt;meta property="og:image" content="(.*?)" \/&gt;/) ? RegExp.$1 : null);
+      metadata.date	   = (html.match(/&lt;span id="eow-date-short" class="watch-video-date"\s*&gt;\s*(.*?)\s*&lt;\/span&gt;/) ? RegExp.$1 : null);
+      metadata.thumbnail   = (html.match(/&lt;meta property="og:image" content="(.*?)"\s*\/?&gt;/) ? RegExp.$1 : null);
 
-      metadata.uploader    = (html.match(/'VIDEO_USERNAME': '(.*?)'/) ? RegExp.$1 : null);
+      metadata.uploader    = (html.match(/'VIDEO_USERNAME': (?:'|")(.*?)(?:'|")/) ? RegExp.$1 : null);
 
       return metadata;
     }

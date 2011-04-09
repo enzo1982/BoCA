@@ -10,21 +10,19 @@
     }
 
     function getVideoURL(html) {
-      var sequence = unescape((html.match(/so.addVariable\("sequence",  "(.*?)"\);/), RegExp.$1));
+      var sequence = unescape((html.match(/.addVariable\("sequence",  "(.*?)"\);/), RegExp.$1));
 
-      return (sequence.match(/"hqURL":"(.*?)"/), RegExp.$1).replace(/\\\//g, "/");
+      return (sequence.match(/"sdURL":"(.*?)"/), RegExp.$1).replace(/\\\//g, "/");
     }
 
     function queryMetadata(html) {
       var metadata = new Metadata();
 
-      metadata.title	   = (html.match(/&lt;Attribute name="title"&gt;(.*?)&lt;\/Attribute&gt;/) ? RegExp.$1 : null);
-      metadata.description = (html.match(/&lt;div .*? id="video_description"&gt;(.*?)&lt;\/div&gt;/) ? RegExp.$1 : null);
-
-      metadata.date	   = (html.match(/&lt;Attribute name="date"&gt;(.*?)&lt;\/Attribute&gt;/) ? RegExp.$1 : null);
+      metadata.title	   = (html.match(/&lt;h1 class="dmco_title"&gt;&lt;span .*?&gt;(.*?)&lt;\/span&gt;&lt;\/h1&gt;/) ? RegExp.$1 : null);
+ 
       metadata.thumbnail   = (html.match(/&lt;link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/&gt;/) ? "http://www.dailymotion.com" + RegExp.$1 : null);
 
-      metadata.uploader	   = (html.match(/&lt;Attribute name="owner"&gt;(.*?)&lt;\/Attribute&gt;/) ? RegExp.$1 : null);
+      metadata.uploader	   = (html.match(/&lt;div class="user_container"&gt;.*?&lt;img\s+alt="(.*?)" .*?\/&gt;/) ? RegExp.$1 : null);
 
       return metadata;
     }

@@ -11,7 +11,7 @@
     <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
   </format>
   <external>
-    <command>codecs/cmdline/pvconv.exe</command>
+    <command>pvconv</command>
     <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
     <mode>file</mode>
     <outformat>wave</outformat>

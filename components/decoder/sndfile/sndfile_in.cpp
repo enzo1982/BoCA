@@ -99,6 +99,8 @@ Void smooth::DetachDLL()
 
 Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 {
+	FILE	*file = 0;
+
 #ifdef __WIN32__
 	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
 	else			  file = fopen(streamURI, "rb");
@@ -112,7 +114,7 @@ Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 
 		memset(&sinfo, 0, sizeof(SF_INFO));
 
-		sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
+		SNDFILE	*sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
 		if (sndf != NIL) ex_sf_close(sndf);
 
@@ -126,6 +128,8 @@ Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 {
+	FILE	*file = 0;
+
 #ifdef __WIN32__
 	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
 	else			  file = fopen(streamURI, "rb");
@@ -137,7 +141,7 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	memset(&sinfo, 0, sizeof(SF_INFO));
 
-	sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
+	SNDFILE	*sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
 	if (sndf != NIL)
 	{

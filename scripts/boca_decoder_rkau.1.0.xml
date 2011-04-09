@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>RK Audio Decoder</name>
+  <version>1.0</version>
+  <id>rkau-in</id>
+  <type>decoder</type>
+  <format>
+    <name>RK Audio</name>
+    <extension>rka</extension>
+  </format>
+  <external>
+    <command>rkau</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

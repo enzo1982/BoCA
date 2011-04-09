@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,7 +29,7 @@ namespace BoCA
 			Buffer<unsigned char>		 samplesBuffer;
 			Buffer<unsigned char>		 backBuffer;
 
-			Int				 GetAudioTrack();
+			Int				 GetAudioTrack(MP4FileHandle) const;
 
 			Bool				 SkipID3v2Tag(IO::InStream *);
 			Bool				 SyncOnAACHeader(IO::InStream *);

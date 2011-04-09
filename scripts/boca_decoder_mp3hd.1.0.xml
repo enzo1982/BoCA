@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Thomson mp3HD Decoder</name>
+  <version>1.0</version>
+  <id>mp3hd-in</id>
+  <type>decoder</type>
+  <format>
+    <name>MPEG Audio Layer 3</name>
+    <extension>mp3</extension>
+    <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
+  </format>
+  <external>
+    <command ignoreExitCode="true">mp3hdDecoder</command>
+    <arguments>-if %INFILE -of %OUTFILE %OPTIONS</arguments>
+    <mode>file</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Musepack Audio Encoder</name>
+  <version>1.0</version>
+  <id>mpc-out</id>
+  <type>encoder</type>
+  <format>
+    <name>Musepack Audio Files</name>
+    <extension>mpc</extension>
+    <tag id="apev2-tag" mode="append">APEv2</tag>
+  </format>
+  <external>
+    <command>mpcenc</command>
+    <arguments>%OPTIONS - %OUTFILE</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Quality" argument="--quality %VALUE" default="5">
+	<min alias="poor">0</min>
+	<max alias="excellent">10</max>
+      </range>
+      <selection name="Mid/Side stereo mode" argument="--ms %VALUE" default="11">
+	<option alias="off">0</option>
+	<option alias="reduced">1</option>
+	<option alias="on">2</option>
+	<option alias="decoupled">3</option>
+	<option alias="enhanced 1.5/3 dB">10</option>
+	<option alias="enhanced 2/6 dB">11</option>
+	<option alias="enhanced 2.5/9 dB">12</option>
+	<option alias="enhanced 3/12 dB">13</option>
+	<option alias="enhanced 3/∞ dB">15</option>
+      </selection>
+      <range name="Adaptive noise shaping order" argument="--ans %VALUE" default="6">
+	<min alias="off">0</min>
+	<max alias="high">6</max>
+      </range>
+      <selection name="ClearVoiceDetection" argument="--cvd %VALUE" default="2">
+	<option alias="off">0</option>
+	<option alias="on">1</option>
+	<option alias="dual">2</option>
+      </selection>
+    </parameters>
+  </external>
+</component>

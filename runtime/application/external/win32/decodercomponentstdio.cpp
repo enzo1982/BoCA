@@ -38,6 +38,9 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	secAttr.nLength		= sizeof(secAttr);
 	secAttr.bInheritHandle	= True;
 
+	HANDLE	 rPipe = NIL;
+	HANDLE	 wPipe = NIL;
+
 	CreatePipe(&rPipe, &wPipe, &secAttr, 131072);
 	SetHandleInformation(rPipe, HANDLE_FLAG_INHERIT, 0);
 
@@ -61,7 +64,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
-	encFileName = streamURI;
+	String	 encFileName = streamURI;
 
 	if (String::IsUnicode(streamURI))
 	{
@@ -72,7 +75,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	CreateProcessA(NIL, String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter()).Append(" ").Append(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
-	hProcess = processInfo.hProcess;
+	HANDLE	 hProcess = processInfo.hProcess;
 
 	/* Close stdio pipe write handle.
 	 */

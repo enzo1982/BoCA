@@ -158,7 +158,7 @@ Bool BoCA::VorbisOut::Activate()
 
 	WriteOggPackets(True);
 
-	return true;
+	return True;
 }
 
 Bool BoCA::VorbisOut::Deactivate()
@@ -184,7 +184,7 @@ Bool BoCA::VorbisOut::Deactivate()
 	ex_vorbis_comment_clear(&vc);
 	ex_vorbis_info_clear(&vi);
 
-	return true;
+	return True;
 }
 
 Int BoCA::VorbisOut::WriteData(Buffer<UnsignedByte> &data, Int size)

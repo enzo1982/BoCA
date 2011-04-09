@@ -69,7 +69,7 @@ Error BoCA::BonkIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	int		 bytes = Math::Min(in->Size(), (Int64) 524288);
 
-	dataBuffer.Resize(bytes);
+	Buffer<unsigned char>	 dataBuffer(bytes);
 
 	in->InputData(dataBuffer, bytes);
 

@@ -37,15 +37,17 @@ LD = gcc
 LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_X64),True)
-	CCOPTS += -march=nocona
+	CCOPTS += -m64 -march=nocona
+	LDOPTS += -m64
 else
-	CCOPTS += -march=i586
+	CCOPTS += -m32 -march=pentium4
+	LDOPTS += -m32
 endif
 
 ifeq ($(BUILD_WIN32),True)
 	DLLEXT = .dll
 
-	LDOPTS += -lole32 -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
+	LDOPTS += -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 else ifeq ($(BUILD_OSX),True)
 	DLLEXT = .dylib
 

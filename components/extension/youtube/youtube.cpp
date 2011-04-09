@@ -10,10 +10,6 @@
 
 #include <smooth.h>
 
-#ifdef __WIN32__
-#	include <windows.h>
-#endif
-
 #include "youtube.h"
 #include "config.h"
 
@@ -40,24 +36,12 @@ BoCA::YouTube::YouTube()
 	mainTabLayer = NIL;
 
 	getMainTabLayer.Connect(&YouTube::GetMainTabLayer, this);
-
-#ifdef __WIN32__
-	/* Init the Microsoft COM library.
-	 */
-	CoInitialize(NIL);
-#endif
 }
 
 BoCA::YouTube::~YouTube()
 {
 	if (configLayer	 != NIL) Object::DeleteObject(configLayer);
 	if (mainTabLayer != NIL) Object::DeleteObject(mainTabLayer);
-
-#ifdef __WIN32__
-	/* Uninit the Microsoft COM library.
-	 */
-	CoUninitialize();
-#endif
 }
 
 ConfigLayer *BoCA::YouTube::GetConfigurationLayer()

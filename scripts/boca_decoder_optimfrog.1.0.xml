@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>OptimFROG Audio Decoder</name>
+  <version>1.0</version>
+  <id>ofr-in</id>
+  <type>decoder</type>
+  <format>
+    <name>OptimFROG Files</name>
+    <extension>ofr</extension>
+    <tag id="apev2-tag" mode="append">APEv2</tag>
+  </format>
+  <external>
+    <command>ofr</command>
+    <arguments>--decode %OPTIONS %INFILE --output -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

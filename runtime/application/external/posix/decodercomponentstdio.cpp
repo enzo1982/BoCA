@@ -34,7 +34,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
-	encFileName = streamURI;
+	String	 encFileName = streamURI;
 
 	if (String::IsUnicode(streamURI))
 	{
@@ -46,9 +46,13 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	/* Start 3rd party command line encoder
 	 */
 	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String(encFileName).Replace(" ", "\\ "));
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+												     .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+												     .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+												     .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
 
-	rPipe = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "r");
+	FILE	*rPipe = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "r");
 
 	/* Read WAVE header into buffer.
 	 */
@@ -201,7 +205,11 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 	/* Start 3rd party command line encoder.
 	 */
 	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String(encFileName).Replace(" ", "\\ "));
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+												     .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+												     .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+												     .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
 
 	rPipe = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "r");
 

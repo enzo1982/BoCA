@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,33 +31,31 @@ namespace smooth
 
 #include "dialog.h"
 
-#ifndef __WIN32__
-#	define MB_OK			0
-#	define MB_OKCANCEL		1
-#	define MB_ABORTRETRYIGNORE	2
-#	define MB_YESNOCANCEL		3
-#	define MB_YESNO			4
-#	define MB_RETRYCANCEL		5
+#define MB_OK			0
+#define MB_OKCANCEL		1
+#define MB_ABORTRETRYIGNORE	2
+#define MB_YESNOCANCEL		3
+#define MB_YESNO		4
+#define MB_RETRYCANCEL		5
 
-#	define IDOK			1
-#	define IDCANCEL			2
-#	define IDABORT			3
-#	define IDRETRY			4
-#	define IDIGNORE			5
-#	define IDYES			6
-#	define IDNO			7
-#	define IDCLOSE			8
+#define IDOK			1
+#define IDCANCEL		2
+#define IDABORT			3
+#define IDRETRY			4
+#define IDIGNORE		5
+#define IDYES			6
+#define IDNO			7
+#define IDCLOSE			8
 
-#	define IDI_HAND			(wchar_t *) 32513
-#	define IDI_QUESTION		(wchar_t *) 32514
-#	define IDI_EXCLAMATION		(wchar_t *) 32515
-#	define IDI_ASTERISK		(wchar_t *) 32516
-#	define IDI_WARNING		IDI_EXCLAMATION
-#	define IDI_ERROR		IDI_HAND
-#	define IDI_INFORMATION		IDI_ASTERISK
+#define IDI_ERROR		(wchar_t *) 32513
+#define IDI_QUESTION		(wchar_t *) 32514
+#define IDI_WARNING		(wchar_t *) 32515
+#define IDI_INFORMATION		(wchar_t *) 32516
+#define IDI_HAND		IDI_ERROR
+#define IDI_EXCLAMATION		IDI_WARNING
+#define IDI_ASTERISK		IDI_INFORMATION
 
-#	define MAKEINTRESOURCE(x)	(wchar_t *) 0
-#endif
+#define MAKEINTRESOURCE(x)	(wchar_t *) 0
 
 namespace smooth
 {
@@ -74,7 +72,6 @@ namespace smooth
 
 					Int			 lines;
 					String			 line[256];
-					wchar_t			*msgicon;
 					Int			 buttons;
 
 					Window			*msgbox;

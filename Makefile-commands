@@ -12,9 +12,11 @@ ifneq ($(EXCEPTION),True)
 endif
 
 ifeq ($(BUILD_X64),True)
-	CCOPTS += -march=nocona
+	CCOPTS += -m64 -march=nocona
+	LDOPTS += -m64
 else
-	CCOPTS += -march=i586
+	CCOPTS += -m32 -march=pentium4
+	LDOPTS += -m32
 endif
 
 ifeq ($(BUILD_WIN32),True)

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>La Lossless Audio Encoder</name>
+  <version>1.0</version>
+  <id>la-out</id>
+  <type>encoder</type>
+  <format>
+    <name>La Audio Files</name>
+    <extension>la</extension>
+    <tag id="id3v1-tag" mode="append">ID3v1</tag>
+  </format>
+  <external>
+    <command>la</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <switch name="High compression mode" argument="-high"/>
+      <switch name="Disable seeking" argument="-noseek"/>
+    </parameters>
+  </external>
+</component>

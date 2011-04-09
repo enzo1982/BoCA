@@ -90,13 +90,13 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 					{
 						if (option->GetType() == OPTION_TYPE_MIN)
 						{
-							min	 = option->GetValue().ToFloat() / param->GetStepSize();
+							min	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
 							minAlias = option->GetAlias();
 						}
 
 						if (option->GetType() == OPTION_TYPE_MAX)
 						{
-							max	 = option->GetValue().ToFloat() / param->GetStepSize();
+							max	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
 							maxAlias = option->GetAlias();
 						}
 					}

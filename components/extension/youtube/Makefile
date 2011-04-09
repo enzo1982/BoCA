@@ -16,10 +16,6 @@ DEFINE	  =
 # Enter additional library dependencies here:
 LIBS	  = -lsmooth-js
 
-ifeq ($(BUILD_WIN32),True)
-	LIBS	  += -lole32
-endif
-
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =
 ALLCMD2   =

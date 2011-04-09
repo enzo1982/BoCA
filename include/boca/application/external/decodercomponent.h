@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,7 +29,7 @@ namespace BoCA
 
 				Int64			 inBytes;
 
-				virtual Int		 QueryTags(const String &, Track &);
+				virtual Int		 QueryTags(const String &, Track &) const;
 			public:
 							 DecoderComponentExternal(ComponentSpecs *);
 				virtual			~DecoderComponentExternal();

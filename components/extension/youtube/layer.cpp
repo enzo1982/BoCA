@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -9,16 +9,12 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "layer.h"
-#include "config.h"
 #include "video.h"
 #include "videosite.h"
 #include "videolist.h"
 #include "videolistentry.h"
 
-#ifdef __WIN32__
-#	include <windows.h>
-#endif
-
+using namespace smooth::GUI::Dialogs;
 using namespace smooth::Net;
 
 BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
@@ -27,6 +23,8 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 	I18n	*i18n	= I18n::Get();
 
 	i18n->SetContext("Extensions::Video Downloader");
+
+	missingDecoders = False;
 
 	/* Load video sites.
 	 */
@@ -54,6 +52,8 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 	check_keep_files	= new CheckBox(i18n->TranslateString("Save downloaded video files"), Point(8, 34), Size(300, 0), (Bool *) &config->GetPersistentIntValue("YouTube", "SaveVideoFiles", False));
 	check_keep_files->SetOrientation(OR_UPPERRIGHT);
 	check_keep_files->SetWidth(check_keep_files->textSize.cx + 20);
+
+	if (missingDecoders) check_keep_files->Deactivate();
 
 	check_auto_download->SetX(check_auto_download->GetWidth() + check_keep_files->GetWidth() + 16);
 	check_keep_files->SetX(check_keep_files->GetWidth() + 8);
@@ -150,6 +150,7 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 
 	/* Connect slots.
 	 */
+	onShow.Connect(&LayerYouTube::OnShowLayer, this);
 	onChangeSize.Connect(&LayerYouTube::OnChangeSize, this);
 
 	JobList::Get()->onApplicationModifyTrack.Connect(&LayerYouTube::OnApplicationModifyTrack, this);
@@ -159,10 +160,6 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 	JobList::Get()->onApplicationRemoveAllTracks.Connect(&LayerYouTube::OnApplicationRemoveAllTracks, this);
 
 	Application::Get()->onQuit.Connect(&LayerYouTube::OnQuit, this);
-
-	/* Init clipboard text copy.
-	 */
-	GetClipboardText();
 
 	/* Create and start clipboard checking timer.
 	 */
@@ -242,12 +239,21 @@ Void BoCA::LayerYouTube::LoadVideoSites()
 	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("boca/boca.extension.youtube"));
 	const Array<File>	&files = dir.GetFilesByPattern("*.xml");
 
+	BoCA::Config		*config = BoCA::Config::Get();
+	AS::Registry		&boca = AS::Registry::Get();
+
 	foreach (const File &file, files)
 	{
 		VideoSite	*site = new VideoSite(file);
 
 		if (site->IsSane()) sites.Add(site);
+
+		if (!boca.ComponentExists(site->GetDecoderID())) missingDecoders = True;
 	}
+
+	if (missingDecoders) config->SetIntValue("YouTube", "SaveVideoFiles", True);
+
+	config->SetIntValue("YouTube", "DisableSaveOption", missingDecoders);
 }
 
 Void BoCA::LayerYouTube::FreeVideoSites()
@@ -279,22 +285,46 @@ VideoSite *BoCA::LayerYouTube::GetVideoSiteForURL(const String &URL)
  */
 String BoCA::LayerYouTube::GetClipboardText()
 {
-	String	 clipboardText;
+	if (container->GetContainerWindow() == NIL) return NIL;
 
-#ifdef __WIN32__
-	OpenClipboard(NIL);
-
-	if	(Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT)) clipboardText = (wchar_t *) GetClipboardData(CF_UNICODETEXT);
-	else if (			 IsClipboardFormatAvailable(CF_TEXT)	   ) clipboardText = (char *)	 GetClipboardData(CF_TEXT);
-
-	CloseClipboard();
-#endif
+	String	 clipboardText = Clipboard(container->GetContainerWindow()).GetClipboardText();
 
 	/* Save clipboard text to compare later.
 	 */
 	previousClipboardText = clipboardText;
 
 	return clipboardText;
+}
+
+/* Called when component is displayed.
+ * ----
+ */
+Void BoCA::LayerYouTube::OnShowLayer()
+{
+	static Bool	 initialized = False;
+
+	if (initialized)		 return;
+	if (GetContainerWindow() == NIL) return;
+
+	BoCA::Config	*config = BoCA::Config::Get();
+
+	if (missingDecoders && !config->GetIntValue("YouTube", "DoNotShowDecoderWarning", False))
+	{
+		BoCA::I18n	*i18n = BoCA::I18n::Get();
+
+		i18n->SetContext("Extensions::Video Downloader::Errors");
+
+		Bool		 doNotShowAgain = False;
+		MessageDlg	*messageBox = new MessageDlg(i18n->TranslateString("Some required video decoders could not be found. Video files\ncannot be added to the joblist for conversion to audio files.\n\nPlease install FFmpeg to fix this problem!"), i18n->TranslateString("Note"), MB_OK, (wchar_t *) IDI_EXCLAMATION, i18n->TranslateString("Do not display this note again"), &doNotShowAgain);
+
+		messageBox->ShowDialog();
+
+		DeleteObject(messageBox);
+
+		config->SetIntValue("YouTube", "DoNotShowDecoderWarning", doNotShowAgain);
+	}
+
+	initialized = True;
 }
 
 /* Called when component canvas size changes.
@@ -344,6 +374,14 @@ Void BoCA::LayerYouTube::OnChangeSize(const Size &nSize)
  */
 Void BoCA::LayerYouTube::OnTimerCheckClipboard()
 {
+	if (container->GetContainerWindow() == NIL) return;
+
+	/* Initialize clipboard text when running the first time.
+	 */
+	static Bool	 initialized = False;
+
+	if (!initialized) { GetClipboardText(); initialized = True; }
+
 	Config	*config = Config::Get();
 
 	/* Quit if auto download is disabled.
@@ -704,7 +742,7 @@ Bool BoCA::LayerYouTube::StartDownload(const String &URL)
 	{
 		video->QueryMetadata();
 
-		videoFile = config->GetStringValue("YouTube", "VideoOutputDir", ConfigureYouTube::GetDefaultVideoOutputDirectory());
+		videoFile = config->GetStringValue("YouTube", "VideoOutputDir", S::System::System::GetPersonalFilesDirectory(S::System::PersonalFilesMovies));
 
 		if (!videoFile.EndsWith(Directory::GetDirectoryDelimiter())) videoFile.Append(Directory::GetDirectoryDelimiter());
 
@@ -738,21 +776,20 @@ Bool BoCA::LayerYouTube::StartDownload(const String &URL)
  */
 Bool BoCA::LayerYouTube::FinishDownload(Video *video)
 {
-	Track	 track;
-
-	track.origFilename = video->GetVideoFile();
-
 	/* Open track and get basic info.
 	 */
 	AS::Registry		&boca = AS::Registry::Get();
 	AS::DecoderComponent	*decoder = (AS::DecoderComponent *) boca.CreateComponentByID(video->GetDecoderID());
 
-	if (decoder != NIL)
-	{
-		decoder->GetStreamInfo(track.origFilename, track);
+	if (decoder == NIL) return False;
 
-		boca.DeleteComponent(decoder);
-	}
+	Track	 track;
+
+	track.origFilename = video->GetVideoFile();
+
+	decoder->GetStreamInfo(track.origFilename, track);
+
+	boca.DeleteComponent(decoder);
 
 	/* Fill in metadata.
 	 */

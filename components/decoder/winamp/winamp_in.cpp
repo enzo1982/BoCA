@@ -167,7 +167,7 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Get the correct plugin and set callback functions.
 	 */
-	plugin = GetPluginForFile(streamURI);
+	In_Module	*plugin = GetPluginForFile(streamURI);
 
 	plugin->SetInfo			= SetInfo;
 	plugin->VSASetInfo		= VSASetInfo;
@@ -200,8 +200,10 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	samplesBufferMutex = new Mutex();
 
-	filter = this;
+	filter	  = this;
 	infoTrack = &track;
+
+	String	 trackTitle;
 
 	/* Copy the file and play the temporary copy
 	 * if the file name contains Unicode characters.
@@ -210,23 +212,36 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 
-		plugin->Play(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
+		errorState = plugin->Play(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 	}
 	else
 	{
-		plugin->Play(streamURI);
+		errorState = plugin->Play(streamURI);
 	}
 
-	Int	 start = clock();
+	if (!errorState)
+	{
+		/* Give the plugin one second to start sending samples.
+		 */
+		Int	 start = S::System::System::Clock();
 
-	while (clock() - start < CLOCKS_PER_SEC && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
+		while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
 
-	int	 length_ms = -1;
-	char	*title = new char [1024];
+		/* Get track info and stop plugin.
+		 */
+		int	 length_ms = -1;
+		char	*title	   = new char [1024];
 
-	plugin->GetFileInfo(NIL, title, &length_ms);
+		plugin->GetFileInfo(NIL, title, &length_ms);
 
-	plugin->Stop();
+		track.approxLength = (Int) (Float(length_ms) * Float(track.GetFormat().rate) / 1000.0);
+
+		trackTitle = title;
+
+		delete [] title;
+
+		plugin->Stop();
+	}
 
 	delete plugin->outMod;
 	delete samplesBufferMutex;
@@ -238,42 +253,21 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
 	}
 
-	track.approxLength = (Int) (Float(length_ms) * Float(track.GetFormat().rate) / 1000.0);
-
-	String	 trackTitle = title;
-
-	delete [] title;
-
-	Info	 info = track.GetInfo();
-
-	Int	 artistComplete = 0;
-
 	if (trackTitle.Find(File(				      streamURI ).GetFileName()) == -1 &&
 	    trackTitle.Find(File(Utilities::GetNonUnicodeTempFileName(streamURI)).GetFileName()) == -1)
 	{
-		for (Int m = 0; m < trackTitle.Length(); m++)
+		const Array<String>	&parts = trackTitle.Explode(" - ");
+
+		if (parts.Length() > 1)
 		{
-			if (trackTitle[  m  ] == ' ' &&
-			    trackTitle[m + 1] == '-' &&
-			    trackTitle[m + 2] == ' ')
-			{
-				artistComplete = (m += 3);
+			Info	 info = track.GetInfo();
 
-				info.title = NIL;
-			}
+			info.artist = parts.GetFirst();
+			info.title  = parts.GetLast();
 
-			if (!artistComplete)	info.artist[m] = trackTitle[m];
-			else			info.title[m - artistComplete] = trackTitle[m];
+			track.SetInfo(info);
 		}
 	}
-
-	if (artistComplete == 0)
-	{
-		info.artist = NIL;
-		info.title = NIL;
-	}
-
-	track.SetInfo(info);
 
 	/* Return an error if we didn't get useful format data.
 	 */
@@ -282,11 +276,10 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 	    track.GetFormat().bits     == 0)
 	{
 		errorState = True;
-
-		return Error();
 	}
 
-	return Success();
+	if (errorState)	return Error();
+	else		return Success();
 }
 
 BoCA::WinampIn::WinampIn()
@@ -386,14 +379,18 @@ Bool BoCA::WinampIn::Deactivate()
 
 Int BoCA::WinampIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	/* Give the plugin one second to send more samples.
+	 */
 	samplesBufferMutex->Release();
 
-	Int	 start = clock();
+	Int	 start = S::System::System::Clock();
 
-	while (clock() - start < CLOCKS_PER_SEC && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
+	while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
 
 	samplesBufferMutex->Lock();
 
+	/* Copy samples to output buffer.
+	 */
 	size = samplesBuffer.Size();
 
 	data.Resize(size);
@@ -419,7 +416,7 @@ ConfigLayer *BoCA::WinampIn::GetConfigurationLayer()
 	return configLayer;
 }
 
-In_Module *BoCA::WinampIn::GetPluginForFile(const String &file)
+In_Module *BoCA::WinampIn::GetPluginForFile(const String &file) const
 {
 	In_Module	*plugin = NIL;
 

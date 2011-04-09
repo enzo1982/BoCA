@@ -32,8 +32,8 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 {
 	/* Create temporary WAVE file
 	 */
-	wavFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".wav");
-	encFileName = streamURI;
+	String	 wavFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".wav");
+	String	 encFileName = streamURI;
 
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
@@ -48,7 +48,15 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	/* Start 3rd party command line decoder
 	 */
 	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String(encFileName).Replace(" ", "\\ ")).Replace("%OUTFILE", String(wavFileName).Replace(" ", "\\ "));
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+												     .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+												     .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+												     .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"))
+							      .Replace("%OUTFILE", String(wavFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+												      .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+												      .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+												      .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
 
 	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "r");
 
@@ -80,7 +88,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 	/* Open decoded WAVE file and read header
 	 */
-	in = new InStream(STREAM_FILE, wavFileName, IS_READ);
+	InStream	*in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
 	track.origFilename = streamURI;
 	track.fileSize	   = File(streamURI).GetFileSize();
@@ -174,7 +182,15 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	/* Start 3rd party command line decoder
 	 */
 	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String(encFileName).Replace(" ", "\\ ")).Replace("%OUTFILE", String(wavFileName).Replace(" ", "\\ "));
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+												     .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+												     .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+												     .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"))
+							      .Replace("%OUTFILE", String(wavFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+												      .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+												      .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+												      .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
 
 	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "r");
 

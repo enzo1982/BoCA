@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Musepack Audio Decoder</name>
+  <version>1.0</version>
+  <id>mpc-in</id>
+  <type>decoder</type>
+  <format>
+    <name>Musepack Audio Files</name>
+    <extension>mpc</extension>
+    <tag id="apev2-tag" mode="append">APEv2</tag>
+  </format>
+  <external>
+    <command>mpcdec</command>
+    <arguments>%OPTIONS %INFILE -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

@@ -11,7 +11,7 @@
     <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>
   <external>
-    <command>/usr/bin/alac-decoder</command>
+    <command>alac-decoder</command>
     <arguments>%OPTIONS %INFILE</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

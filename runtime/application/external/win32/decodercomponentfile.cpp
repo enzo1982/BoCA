@@ -30,8 +30,8 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 {
 	/* Create temporary WAVE file
 	 */
-	wavFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".wav");
-	encFileName = streamURI;
+	String	 wavFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".wav");
+	String	 encFileName = streamURI;
 
 	/* Start 3rd party command line decoder
 	 */
@@ -96,7 +96,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 	/* Open decoded WAVE file and read header
 	 */
-	in = new InStream(STREAM_FILE, wavFileName, IS_READ);
+	InStream	*in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
 	track.origFilename = streamURI;
 	track.fileSize	   = File(streamURI).GetFileSize();

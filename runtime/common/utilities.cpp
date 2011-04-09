@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,10 +11,6 @@
 #include <boca/common/utilities.h>
 #include <boca/common/config.h>
 #include <boca/common/i18n.h>
-
-#ifdef __WIN32__
-#	include <windows.h>
-#endif
 
 using namespace smooth::System;
 using namespace smooth::GUI::Dialogs;

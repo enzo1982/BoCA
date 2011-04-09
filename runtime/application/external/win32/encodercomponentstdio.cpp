@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,6 +12,9 @@
 #include <boca/common/utilities.h>
 
 #include <smooth/io/drivers/driver_win32.h>
+
+#include <windows.h>
+#include <mmreg.h>
 
 using namespace smooth::IO;
 
@@ -86,7 +89,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 	out->OutputString("fmt ");
 
 	out->OutputNumber(16, 4);
-	out->OutputNumber(1, 2);
+	out->OutputNumber(WAVE_FORMAT_PCM, 2);
 	out->OutputNumber(format.channels, 2);
 	out->OutputNumber(format.rate, 4);
 	out->OutputNumber(format.rate * format.channels * (format.bits / 8), 4);

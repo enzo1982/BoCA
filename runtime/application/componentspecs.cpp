@@ -155,7 +155,7 @@ String BoCA::AS::ComponentSpecs::GetExternalArgumentsString()
 			case PARAMETER_TYPE_RANGE:
 				if (!config->GetIntValue(id, String("Set ").Append(param->GetName()), param->GetEnabled())) continue;
 
-				arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromFloat(config->GetIntValue(id, param->GetName(), param->GetDefault().ToFloat() / param->GetStepSize()) * param->GetStepSize()))).Append(" ");
+				arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromFloat(config->GetIntValue(id, param->GetName(), Math::Round(param->GetDefault().ToFloat() / param->GetStepSize())) * param->GetStepSize()))).Append(" ");
 
 				break;
 			default:
@@ -313,10 +313,31 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 	delete document;
 
+	/* Check if external command actually exists.
+	 */
 	if (mode != COMPONENT_MODE_INTERNAL)
 	{
-		if ((external_command[1] == ':' || external_command[0] == '/') && !File(external_command).Exists())							return False;
-		if ((external_command[1] != ':' && external_command[0] != '/') && !File(GUI::Application::GetApplicationDirectory().Append(external_command)).Exists())	return False;
+		if (external_command[0] != '/' && external_command[1] != ':')
+		{
+#if defined __WIN32__
+			static const char	*places[] = { "%APPDIR\\%COMMAND", "%APPDIR\\codecs\\cmdline\\%COMMAND", "%APPDIR\\%COMMAND.exe", "%APPDIR\\codecs\\cmdline\\%COMMAND.exe", NIL };
+#elif defined __APPLE__
+			static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/opt/local/bin/%COMMAND", NIL };
+#else
+			static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", NIL };
+#endif
+
+			for (Int i = 0; places[i] != NIL; i++)
+			{
+				String	 file = String(places[i]).Replace("%APPDIR", GUI::Application::GetApplicationDirectory()).Replace("%COMMAND", external_command).Replace("\\\\", "\\");
+
+				if (File(file).Exists()) { external_command = file; break; }
+			}
+
+			if (external_command[0] != '/' && external_command[1] != ':') return False;
+		}
+
+		if (!File(external_command).Exists()) return False;
 	}
 
 	return True;

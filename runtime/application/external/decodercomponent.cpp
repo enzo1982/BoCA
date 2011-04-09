@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -64,7 +64,7 @@ BoCA::ConfigLayer *BoCA::AS::DecoderComponentExternal::GetConfigurationLayer()
 	return configLayer;
 }
 
-Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track &track)
+Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track &track) const
 {
 	/* Get tagger mode and ID
 	 */

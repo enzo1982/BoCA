@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>LAME Command Line Encoder</name>
+  <version>1.0</version>
+  <id>lamecmd-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MPEG 1 Audio Layer 3</name>
+    <extension>mp3</extension>
+    <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
+  </format>
+  <external>
+    <command>lame</command>
+    <arguments>%OPTIONS - %OUTFILE</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <parameters>
+      <selection name="Use preset" argument="--preset %VALUE" enabled="true" default="standard">
+	<option alias="Medium">medium</option>
+	<option alias="Standard">standard</option>
+	<option alias="Extreme">extreme</option>
+	<option alias="Insane">insane</option>
+      </selection>
+      <switch name="Force CBR encoding" argument="--cbr"/>
+      <selection name="CBR bitrate / VBR minimum bitrate" argument="-b %VALUE" default="32">
+	<option>8</option>
+	<option>16</option>
+	<option>24</option>
+	<option>32</option>
+	<option>40</option>
+	<option>48</option>
+	<option>56</option>
+	<option>64</option>
+	<option>80</option>
+	<option>96</option>
+	<option>112</option>
+	<option>128</option>
+	<option>144</option>
+	<option>160</option>
+	<option>192</option>
+	<option>224</option>
+	<option>256</option>
+ 	<option>320</option>
+      </selection>
+      <selection name="VBR maximum bitrate" argument="-B %VALUE" default="320">
+	<option>8</option>
+	<option>16</option>
+	<option>24</option>
+	<option>32</option>
+	<option>40</option>
+	<option>48</option>
+	<option>56</option>
+	<option>64</option>
+	<option>80</option>
+	<option>96</option>
+	<option>112</option>
+	<option>128</option>
+	<option>144</option>
+	<option>160</option>
+	<option>192</option>
+	<option>224</option>
+	<option>256</option>
+ 	<option>320</option>
+      </selection>
+      <range name="VBR quality" argument="-V %VALUE" default="4">
+	<min alias="best">0</min>
+	<max alias="worst">9</max>
+      </range>
+    </parameters>
+  </external>
+</component>

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,7 +32,7 @@ const String &BoCA::WMAOut::GetComponentSpecs()
 		    <id>wma-out</id>						\
 		    <type>encoder</type>					\
 		    <format>							\
-		      <name>Windows Media Audio</name>				\
+		      <name>Windows Media Audio Files</name>			\
 		      <extension>wma</extension>				\
 		      <tag id=\"wma-tag\" mode=\"other\">WMA Metadata</tag>	\
 		    </format>							\

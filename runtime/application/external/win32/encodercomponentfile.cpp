@@ -11,9 +11,8 @@
 #include <boca/application/external/encodercomponentfile.h>
 #include <boca/common/utilities.h>
 
-#ifdef __WIN32__
-#	include <windows.h>
-#endif
+#include <windows.h>
+#include <mmreg.h>
 
 using namespace smooth::IO;
 
@@ -45,7 +44,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 	out->OutputString("fmt ");
 
 	out->OutputNumber(16, 4);
-	out->OutputNumber(1, 2);
+	out->OutputNumber(WAVE_FORMAT_PCM, 2);
 	out->OutputNumber(format.channels, 2);
 	out->OutputNumber(format.rate, 4);
 	out->OutputNumber(format.rate * format.channels * (format.bits / 8), 4);

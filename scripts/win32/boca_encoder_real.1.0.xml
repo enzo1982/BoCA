@@ -11,7 +11,7 @@
     <extension>rm</extension>
   </format>
   <external>
-    <command>codecs/cmdline/helix/producer.exe</command>
+    <command>helix/producer</command>
     <arguments>-i %INFILE -o %OUTFILE %OPTIONS -a %ARTIST -t %TITLE</arguments>
     <mode>file</mode>
     <informat>wave</informat>

@@ -68,8 +68,14 @@ Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 	Format		 format = track.GetFormat();
 
 	format.order = BYTE_INTEL;
-	format.bits = 16;
+	format.bits  = 16;
+
 	track.fileSize = in.Size();
+
+	ogg_sync_state		 oy;
+	ogg_stream_state	 os;
+	ogg_page		 og;
+	ogg_packet		 op;
 
 	ex_ogg_sync_init(&oy);
 
@@ -79,9 +85,8 @@ Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	while (!done)
 	{
-		Int	 size = Math::Min((Int64) 4096, track.fileSize - in.GetPos());
-
-		buffer = ex_ogg_sync_buffer(&oy, size);
+		Int	 size	= Math::Min((Int64) 4096, track.fileSize - in.GetPos());
+		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
 
 		in.InputData(buffer, size);
 
@@ -166,9 +171,8 @@ Bool BoCA::SpeexIn::Activate()
 
 	while (!done)
 	{
-		Int	 size = 4096;
-
-		buffer = ex_ogg_sync_buffer(&oy, size);
+		Int	 size	= 4096;
+		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
 
 		size = driver->ReadData((unsigned char *) buffer, 4096);
 
@@ -240,7 +244,7 @@ Int BoCA::SpeexIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (size <= 0) return -1;
 
-	buffer = ex_ogg_sync_buffer(&oy, size);
+	char	*buffer = ex_ogg_sync_buffer(&oy, size);
 
 	size = driver->ReadData((unsigned char *) buffer, size);
 

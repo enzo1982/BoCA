@@ -10,7 +10,7 @@
     <extension>aac</extension>
   </format>
   <external>
-    <command>codecs/cmdline/DivXAACEnc.exe</command>
+    <command>DivXAACEnc</command>
     <arguments>-i %INFILE -o %OUTFILE %OPTIONS</arguments>
     <mode>file</mode>
     <informat>wave</informat>

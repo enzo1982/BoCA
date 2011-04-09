@@ -13,6 +13,8 @@
 
 #include <sys/wait.h>
 
+#define WAVE_FORMAT_PCM 0x0001
+
 using namespace smooth::IO;
 
 BoCA::AS::EncoderComponentExternalFile::EncoderComponentExternalFile(ComponentSpecs *specs) : EncoderComponentExternal(specs)
@@ -43,7 +45,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 	out->OutputString("fmt ");
 
 	out->OutputNumber(16, 4);
-	out->OutputNumber(1, 2);
+	out->OutputNumber(WAVE_FORMAT_PCM, 2);
 	out->OutputNumber(format.channels, 2);
 	out->OutputNumber(format.rate, 4);
 	out->OutputNumber(format.rate * format.channels * (format.bits / 8), 4);
@@ -78,8 +80,14 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
-							      .Replace("%INFILE", String(wavFileName).Replace(" ", "\\ "))
-							      .Replace("%OUTFILE", String(encFileName).Replace(" ", "\\ "))
+							      .Replace("%INFILE", String(wavFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+												     .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+												     .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+												     .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"))
+							      .Replace("%OUTFILE", String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+												      .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+												      .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+												      .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"))
 							      .Replace("%ARTIST", String("\"").Append((char *) info.artist).Append("\""))
 							      .Replace("%ALBUM", String("\"").Append((char *) info.album).Append("\""))
 							      .Replace("%TITLE", String("\"").Append((char *) info.title).Append("\""))

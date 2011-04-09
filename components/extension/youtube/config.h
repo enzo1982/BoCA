@@ -43,8 +43,6 @@ namespace BoCA
 			Bool			 autoDownload;
 			Bool			 keepVideoFiles;
 		public:
-			static const String	&GetDefaultVideoOutputDirectory();
-
 						 ConfigureYouTube();
 						~ConfigureYouTube();
 

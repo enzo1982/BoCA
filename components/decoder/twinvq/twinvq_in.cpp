@@ -116,6 +116,8 @@ Bool BoCA::TwinVQIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::TwinVQIn::GetStreamInfo(const String &streamURI, Track &track)
 {
+	BFILE	*bfp = 0;
+
 	if (String::IsUnicode(streamURI))
 	{
 		File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
@@ -129,6 +131,9 @@ Error BoCA::TwinVQIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	CChunkChunk	*twinChunk = TvqGetBsHeaderInfo(bfp);
 	CHeaderManager	*theHeaderManager = CHeaderManager::Create(*twinChunk);
+
+	headerInfo	 setupInfo;
+	INDEX		 index;
 
 	TvqGetStandardChunkInfo(theHeaderManager, &setupInfo);
 

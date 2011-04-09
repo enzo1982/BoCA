@@ -76,12 +76,12 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Buffer<unsigned char>	 buffer(4096);
 
+	Buffer<short>		 pcm_l(buffer.Size() * 64);
+	Buffer<short>		 pcm_r(buffer.Size() * 64);
+
 	do
 	{
 		f_in->InputData((void *) buffer, buffer.Size());
-
-		pcm_l.Resize(buffer.Size() * 64);
-		pcm_r.Resize(buffer.Size() * 64);
 
 		mp3data_struct	 mp3data;
 

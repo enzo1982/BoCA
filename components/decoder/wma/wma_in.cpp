@@ -26,7 +26,7 @@ const String &BoCA::WMAIn::GetComponentSpecs()
 										\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
 		  <component>							\
-		    <name>Windows Media Decoder</name>				\
+		    <name>Windows Media Audio Decoder</name>			\
 		    <version>1.0</version>					\
 		    <id>wma-in</id>						\
 		    <type>decoder</type>					\

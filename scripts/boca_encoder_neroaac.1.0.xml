@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Nero AAC Encoder</name>
+  <version>1.0</version>
+  <id>nero-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MP4 Audio Files</name>
+    <extension>m4a</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+  </format>
+  <external>
+    <command>neroAacEnc</command>
+    <arguments>-ignorelength -if - -of %OUTFILE %OPTIONS</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <parameters>
+      <selection name="Encoding mode" argument="%VALUE">
+	<option alias="Auto"/>
+	<option alias="LC AAC">-lc</option>
+	<option alias="HE AAC">-he</option>
+	<option alias="HEv2 AAC">-hev2</option>
+      </selection>
+      <range name="Quality" argument="-q %VALUE" default="0.5" step="0.1">
+	<min alias="worse">0.0</min>
+	<max alias="better">1.0</max>
+      </range>
+      <range name="Bitrate" argument="-br %VALUE000" default="96" step="4">
+	<min>12 kbps</min>
+	<max>424 kbps</max>
+      </range>
+      <range name="Bitrate (Streaming)" argument="-cbr %VALUE000" default="96" step="4">
+	<min>12 kbps</min>
+	<max>424 kbps</max>
+      </range>
+    </parameters>
+  </external>
+</component>

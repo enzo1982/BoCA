@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -19,8 +19,6 @@ namespace BoCA
 {
 	class WinampIn : public CS::DecoderComponent
 	{
-		friend int	 dsp_dosamples(short int *, int, int, int, int);
-		friend void	 VSASetInfo(int, int);
 		friend int	 Out_Open(int, int, int, int, int);
 		friend int	 Out_CanWrite();
 		friend int	 Out_Write(char *, int);
@@ -36,7 +34,7 @@ namespace BoCA
 
 			In_Module		*plugin;
 
-			In_Module		*GetPluginForFile(const String &);
+			In_Module		*GetPluginForFile(const String &) const;
 		public:
 			static const String	&GetComponentSpecs();
 

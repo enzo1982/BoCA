@@ -83,6 +83,8 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 
 	if (mp4v2dll != NIL && !streamURI.ToLower().EndsWith(".aac"))
 	{
+		MP4FileHandle	 mp4File;
+
 		if (String::IsUnicode(streamURI))
 		{
 			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
@@ -94,7 +96,7 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 			mp4File = ex_MP4Read(streamURI, 0);
 		}
 
-		mp4Track = GetAudioTrack();
+		Int	 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0)
 		{
@@ -138,6 +140,8 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
 
+		MP4FileHandle	 mp4File;
+
 		if (String::IsUnicode(streamURI))
 		{
 			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
@@ -149,12 +153,12 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 			mp4File = ex_MP4Read(streamURI, 0);
 		}
 
-		mp4Track = GetAudioTrack();
+		Int	 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0)
 		{
-			handle	= ex_NeAACDecOpen();
-			fConfig	= ex_NeAACDecGetCurrentConfiguration(handle);
+			NeAACDecHandle			 handle	 = ex_NeAACDecOpen();
+			NeAACDecConfigurationPtr	 fConfig = ex_NeAACDecGetCurrentConfiguration(handle);
 
 			fConfig->defSampleRate	= 44100;
 			fConfig->defObjectType	= LC;
@@ -224,8 +228,8 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 			return Error();
 		}
 
-		handle	= ex_NeAACDecOpen();
-		fConfig	= ex_NeAACDecGetCurrentConfiguration(handle);
+		NeAACDecHandle			 handle	 = ex_NeAACDecOpen();
+		NeAACDecConfigurationPtr	 fConfig = ex_NeAACDecGetCurrentConfiguration(handle);
 
 		fConfig->defSampleRate	= 44100;
 		fConfig->defObjectType	= LC;
@@ -321,7 +325,7 @@ Bool BoCA::FAAD2In::Activate()
 			mp4File	= ex_MP4Read(track.origFilename, 0);
 		}
 
-		mp4Track	= GetAudioTrack();
+		mp4Track	= GetAudioTrack(mp4File);
 
 		if (mp4Track == -1) return False;
 	}
@@ -405,7 +409,7 @@ Bool BoCA::FAAD2In::Seek(Int64 samplePosition)
 	{
 		/* ToDo: Seeking by sample ID is not exact!
 		 */
-		MP4Timestamp	 time = Float(samplePosition / track.GetFormat().rate) * ex_MP4GetTrackTimeScale(mp4File, mp4Track);
+		MP4Timestamp	 time = Math::Round(Float(samplePosition / track.GetFormat().rate) * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
 
 		sampleId = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
 
@@ -508,9 +512,9 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 	return samplesRead * 2;
 }
 
-Int BoCA::FAAD2In::GetAudioTrack()
+Int BoCA::FAAD2In::GetAudioTrack(MP4FileHandle mp4File) const
 {
-	Int nOfTracks = ex_MP4GetNumberOfTracks(mp4File, NIL, 0);
+	Int	 nOfTracks = ex_MP4GetNumberOfTracks(mp4File, NIL, 0);
 
 	for (Int i = 0; i < nOfTracks; i++)
 	{

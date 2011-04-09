@@ -11,7 +11,7 @@
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>
   <external>
-    <command ignoreExitCode="true">codecs/cmdline/wvunpack.exe</command>
+    <command ignoreExitCode="true">wvunpack</command>
     <arguments>%OPTIONS %INFILE -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

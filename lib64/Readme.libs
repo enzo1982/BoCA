@@ -1,0 +1,8 @@
+To use the BoCA Component Development Kit on your platform, you need to build the
+smooth class library <http://www.smooth-project.org/> first and put the libsmooth.so
+and libsmooth-js.so libraries here.
+
+You need a recent CVS version of smooth in order to build libraries compatible with
+this SDK. A 0.8.70.x version of the smooth class library will not work.
+
+The smooth project's CVS repository is at: smooth.cvs.sourceforge.net:/cvsroot/smooth

@@ -332,7 +332,7 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 	return Success();
 }
 
-Bool BoCA::CueSheetIn::AddTrack(const Track &track, Array<Track> &tracks)
+Bool BoCA::CueSheetIn::AddTrack(const Track &track, Array<Track> &tracks) const
 {
 	/* Copy track data and add it to list of tracks.
 	 */

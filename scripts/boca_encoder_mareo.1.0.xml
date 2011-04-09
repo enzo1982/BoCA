@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>MAREO Multi Encoder Hub</name>
+  <version debug="true">1.0</version>
+  <id>mareo-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MAREO Temporary Wave File</name>
+    <extension>wav</extension>
+  </format>
+  <external>
+    <command>mareo/mareo</command>
+    <arguments>codecs\cmdline\mareo\mareo.ini %INFILE %OUTFILE %ARTIST %ALBUM %TITLE %TRACK %YEAR %GENRE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>

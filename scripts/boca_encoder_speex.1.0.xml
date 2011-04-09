@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Speex Speech Encoder</name>
+  <version>1.0</version>
+  <id>speexcmd-out</id>
+  <type>encoder</type>
+  <format>
+    <name>Speex Files</name>
+    <extension>spx</extension>
+    <tag id="vorbis-tag" mode="other">Vorbis Comment</tag>
+  </format>
+  <external>
+    <command>speexenc</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Encoding quality" argument="--quality %VALUE" default="8">
+	<min alias="fastest">0</min>
+	<max alias="best">10</max>
+      </range>
+      <switch name="Use VBR mode" argument="--vbr"/>
+      <range name="Use ABR mode" argument="--abr %VALUE" default="32">
+	<min alias="">8</min>
+	<max alias="kbps">64</max>
+      </range>
+      <switch name="Enable voice activity detection" argument="--vad"/>
+      <switch name="Denoise input before encoding" argument="--denoise"/>
+      <switch name="Apply adaptive gain control" argument="--agc"/>
+    </parameters>
+  </external>
+</component>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>WaoN MIDI Notes Writer</name>
+  <version>1.0</version>
+  <id>waon-out</id>
+  <type>encoder</type>
+  <format>
+    <name>MIDI Files</name>
+    <extension>mid</extension>
+  </format>
+  <external>
+    <command>waon/waon</command>
+    <arguments>%OPTIONS -i %INFILE -o %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>
