@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -150,65 +150,65 @@ Bool BoCA::LAMEOut::Activate()
 
 	outBuffer.Resize(131072);
 
-	lameFlags = ex_lame_init();
+	context = ex_lame_init();
 
-	ex_lame_set_in_samplerate(lameFlags, format.rate);
-	ex_lame_set_num_channels(lameFlags, format.channels);
+	ex_lame_set_in_samplerate(context, format.rate);
+	ex_lame_set_num_channels(context, format.channels);
 
 	switch (config->GetIntValue("LAME", "Preset", 0))
 	{
 		case 0:
-			ex_lame_set_copyright(lameFlags, config->GetIntValue("LAME", "Copyright", 0));
-			ex_lame_set_original(lameFlags, config->GetIntValue("LAME", "Original", 1));
-			ex_lame_set_extension(lameFlags, config->GetIntValue("LAME", "Private", 0));
-			ex_lame_set_error_protection(lameFlags, config->GetIntValue("LAME", "CRC", 0));
-			ex_lame_set_strict_ISO(lameFlags, config->GetIntValue("LAME", "StrictISO", 0));
+			ex_lame_set_copyright(context, config->GetIntValue("LAME", "Copyright", 0));
+			ex_lame_set_original(context, config->GetIntValue("LAME", "Original", 1));
+			ex_lame_set_extension(context, config->GetIntValue("LAME", "Private", 0));
+			ex_lame_set_error_protection(context, config->GetIntValue("LAME", "CRC", 0));
+			ex_lame_set_strict_ISO(context, config->GetIntValue("LAME", "StrictISO", 0));
 
 			/* Set resampling.
 			 */
-			if	(config->GetIntValue("LAME", "Resample", -1) == 0) ex_lame_set_out_samplerate(lameFlags, format.rate);
-			else if (config->GetIntValue("LAME", "Resample", -1) >  0) ex_lame_set_out_samplerate(lameFlags, config->GetIntValue("LAME", "Resample", -1));
+			if	(config->GetIntValue("LAME", "Resample", -1) == 0) ex_lame_set_out_samplerate(context, format.rate);
+			else if (config->GetIntValue("LAME", "Resample", -1) >  0) ex_lame_set_out_samplerate(context, config->GetIntValue("LAME", "Resample", -1));
 
 			/* Set bitrate.
 			 */
 			if (config->GetIntValue("LAME", "VBRMode", 0) == vbr_off)
 			{
-				if (config->GetIntValue("LAME", "SetBitrate", 1)) ex_lame_set_brate(lameFlags, config->GetIntValue("LAME", "Bitrate", 192));
-				else						  ex_lame_set_compression_ratio(lameFlags, ((double) config->GetIntValue("LAME", "Ratio", 1100)) / 100);
+				if (config->GetIntValue("LAME", "SetBitrate", 1)) ex_lame_set_brate(context, config->GetIntValue("LAME", "Bitrate", 192));
+				else						  ex_lame_set_compression_ratio(context, ((double) config->GetIntValue("LAME", "Ratio", 1100)) / 100);
 			}
 
 			/* Set quality.
 			 */
-			if (config->GetIntValue("LAME", "SetQuality", 0)) ex_lame_set_quality(lameFlags, config->GetIntValue("LAME", "Quality", 5));
-			else						  ex_lame_set_quality(lameFlags, 5);
+			if (config->GetIntValue("LAME", "SetQuality", 0)) ex_lame_set_quality(context, config->GetIntValue("LAME", "Quality", 5));
+			else						  ex_lame_set_quality(context, 5);
 
 			/* Set audio filtering.
 			 */
 			if (config->GetIntValue("LAME", "DisableFiltering", 0))
 			{
-				ex_lame_set_lowpassfreq(lameFlags, -1);
-				ex_lame_set_highpassfreq(lameFlags, -1);
+				ex_lame_set_lowpassfreq(context, -1);
+				ex_lame_set_highpassfreq(context, -1);
 			}
 			else
 			{
-				if (config->GetIntValue("LAME", "SetLowpass", 0)) ex_lame_set_lowpassfreq(lameFlags, config->GetIntValue("LAME", "Lowpass", 0));
-				if (config->GetIntValue("LAME", "SetHighpass", 0)) ex_lame_set_highpassfreq(lameFlags, config->GetIntValue("LAME", "Highpass", 0));
+				if (config->GetIntValue("LAME", "SetLowpass", 0)) ex_lame_set_lowpassfreq(context, config->GetIntValue("LAME", "Lowpass", 0));
+				if (config->GetIntValue("LAME", "SetHighpass", 0)) ex_lame_set_highpassfreq(context, config->GetIntValue("LAME", "Highpass", 0));
 
-				if (config->GetIntValue("LAME", "SetLowpass", 0) && config->GetIntValue("LAME", "SetLowpassWidth", 0)) ex_lame_set_lowpasswidth(lameFlags, config->GetIntValue("LAME", "LowpassWidth", 0));
-				if (config->GetIntValue("LAME", "SetHighpass", 0) && config->GetIntValue("LAME", "SetHighpassWidth", 0)) ex_lame_set_highpasswidth(lameFlags, config->GetIntValue("LAME", "HighpassWidth", 0));
+				if (config->GetIntValue("LAME", "SetLowpass", 0) && config->GetIntValue("LAME", "SetLowpassWidth", 0)) ex_lame_set_lowpasswidth(context, config->GetIntValue("LAME", "LowpassWidth", 0));
+				if (config->GetIntValue("LAME", "SetHighpass", 0) && config->GetIntValue("LAME", "SetHighpassWidth", 0)) ex_lame_set_highpasswidth(context, config->GetIntValue("LAME", "HighpassWidth", 0));
 			}
 
 			/* Set Stereo mode.
 			 */
-			if	(config->GetIntValue("LAME", "StereoMode", 0) == 1)	ex_lame_set_mode(lameFlags, MONO);
-			else if (config->GetIntValue("LAME", "StereoMode", 0) == 2)	ex_lame_set_mode(lameFlags, STEREO);
-			else if (config->GetIntValue("LAME", "StereoMode", 0) == 3)	ex_lame_set_mode(lameFlags, JOINT_STEREO);
-			else								ex_lame_set_mode(lameFlags, NOT_SET);
+			if	(config->GetIntValue("LAME", "StereoMode", 0) == 1)	ex_lame_set_mode(context, MONO);
+			else if (config->GetIntValue("LAME", "StereoMode", 0) == 2)	ex_lame_set_mode(context, STEREO);
+			else if (config->GetIntValue("LAME", "StereoMode", 0) == 3)	ex_lame_set_mode(context, JOINT_STEREO);
+			else								ex_lame_set_mode(context, NOT_SET);
 
 			if (config->GetIntValue("LAME", "StereoMode", 0) == 3)
 			{
-				if (config->GetIntValue("LAME", "ForceJS", 0))	ex_lame_set_force_ms(lameFlags, 1);
-				else						ex_lame_set_force_ms(lameFlags, 0);
+				if (config->GetIntValue("LAME", "ForceJS", 0))	ex_lame_set_force_ms(context, 1);
+				else						ex_lame_set_force_ms(context, 0);
 			}
 
 			/* Set VBR mode.
@@ -219,53 +219,53 @@ Bool BoCA::LAMEOut::Activate()
 				case vbr_off:
 					break;
 				case vbr_abr:
-					ex_lame_set_VBR(lameFlags, vbr_abr);
-					ex_lame_set_VBR_mean_bitrate_kbps(lameFlags, config->GetIntValue("LAME", "ABRBitrate", 192));
+					ex_lame_set_VBR(context, vbr_abr);
+					ex_lame_set_VBR_mean_bitrate_kbps(context, config->GetIntValue("LAME", "ABRBitrate", 192));
 					break;
 				case vbr_rh:
-					ex_lame_set_VBR(lameFlags, vbr_rh);
-					ex_lame_set_VBR_quality(lameFlags, config->GetIntValue("LAME", "VBRQuality", 50) / 10);
+					ex_lame_set_VBR(context, vbr_rh);
+					ex_lame_set_VBR_quality(context, config->GetIntValue("LAME", "VBRQuality", 50) / 10);
 					break;
 				case vbr_mtrh:
-					ex_lame_set_VBR(lameFlags, vbr_mtrh);
-					ex_lame_set_VBR_quality(lameFlags, config->GetIntValue("LAME", "VBRQuality", 50) / 10);
+					ex_lame_set_VBR(context, vbr_mtrh);
+					ex_lame_set_VBR_quality(context, config->GetIntValue("LAME", "VBRQuality", 50) / 10);
 					break;
 			}
 
-			if (config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && config->GetIntValue("LAME", "SetMinVBRBitrate", 0)) ex_lame_set_VBR_min_bitrate_kbps(lameFlags, config->GetIntValue("LAME", "MinVBRBitrate", 128));
-			if (config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && config->GetIntValue("LAME", "SetMaxVBRBitrate", 0)) ex_lame_set_VBR_max_bitrate_kbps(lameFlags, config->GetIntValue("LAME", "MaxVBRBitrate", 128));
+			if (config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && config->GetIntValue("LAME", "SetMinVBRBitrate", 0)) ex_lame_set_VBR_min_bitrate_kbps(context, config->GetIntValue("LAME", "MinVBRBitrate", 128));
+			if (config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && config->GetIntValue("LAME", "SetMaxVBRBitrate", 0)) ex_lame_set_VBR_max_bitrate_kbps(context, config->GetIntValue("LAME", "MaxVBRBitrate", 128));
 
 			/* Set ATH.
 			 */
 			if (config->GetIntValue("LAME", "EnableATH", 1))
 			{
-				if (config->GetIntValue("LAME", "ATHType", -1) != -1) ex_lame_set_ATHtype(lameFlags, config->GetIntValue("LAME", "ATHType", -1));
+				if (config->GetIntValue("LAME", "ATHType", -1) != -1) ex_lame_set_ATHtype(context, config->GetIntValue("LAME", "ATHType", -1));
 			}
 			else
 			{
-				ex_lame_set_noATH(lameFlags, 1);
+				ex_lame_set_noATH(context, 1);
 			}
 
 			/* Set TNS.
 			 */
-			ex_lame_set_useTemporal(lameFlags, config->GetIntValue("LAME", "UseTNS", 1));
+			ex_lame_set_useTemporal(context, config->GetIntValue("LAME", "UseTNS", 1));
 
 			break;
 		case 1:
-			ex_lame_set_preset(lameFlags, MEDIUM_FAST);
+			ex_lame_set_preset(context, MEDIUM_FAST);
 			break;
 		case 2:
-			ex_lame_set_preset(lameFlags, STANDARD_FAST);
+			ex_lame_set_preset(context, STANDARD_FAST);
 			break;
 		case 3:
-			ex_lame_set_preset(lameFlags, EXTREME_FAST);
+			ex_lame_set_preset(context, EXTREME_FAST);
 			break;
 		case 4:
-			ex_lame_set_preset(lameFlags, config->GetIntValue("LAME", "ABRBitrate", 192));
+			ex_lame_set_preset(context, config->GetIntValue("LAME", "ABRBitrate", 192));
 			break;
 	}
 
-	if (ex_lame_init_params(lameFlags) < 0)
+	if (ex_lame_init_params(context) < 0)
 	{
 		errorString = "Bad LAME encoder settings!\n\nPlease check your encoder settings in the\nconfiguration dialog.";
 		errorState  = True;
@@ -294,7 +294,7 @@ Bool BoCA::LAMEOut::Activate()
 		}
 	}
 
-	ex_lame_set_bWriteVbrTag(lameFlags, 1);
+	ex_lame_set_bWriteVbrTag(context, 1);
 
 	return True;
 }
@@ -304,7 +304,7 @@ Bool BoCA::LAMEOut::Deactivate()
 	Config		*config = Config::Get();
 	const Info	&info = track.GetInfo();
 
-	unsigned long	 bytes = ex_lame_encode_flush(lameFlags, outBuffer, outBuffer.Size());
+	unsigned long	 bytes = ex_lame_encode_flush(context, outBuffer, outBuffer.Size());
 
 	driver->WriteData(outBuffer, bytes);
 
@@ -328,12 +328,12 @@ Bool BoCA::LAMEOut::Deactivate()
 	/* Write Xing or Info header.
 	 */
 	Buffer<unsigned char>	 buffer(2880);	// Maximum frame size
-	Int			 size = ex_lame_get_lametag_frame(lameFlags, buffer, buffer.Size());
+	Int			 size = ex_lame_get_lametag_frame(context, buffer, buffer.Size());
 
 	driver->Seek(dataOffset);
 	driver->WriteData(buffer, size);
 
-	ex_lame_close(lameFlags);
+	ex_lame_close(context);
 
 	return True;
 }
@@ -357,13 +357,13 @@ Int BoCA::LAMEOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 			if (format.bits == 32)	samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
 		}
 
-		if (format.channels == 2)	bytes = ex_lame_encode_buffer_interleaved(lameFlags, samplesBuffer, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
-		else				bytes = ex_lame_encode_buffer(lameFlags, samplesBuffer, samplesBuffer, size / (format.bits / 8), outBuffer, outBuffer.Size());
+		if (format.channels == 2)	bytes = ex_lame_encode_buffer_interleaved(context, samplesBuffer, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
+		else				bytes = ex_lame_encode_buffer(context, samplesBuffer, samplesBuffer, size / (format.bits / 8), outBuffer, outBuffer.Size());
 	}
 	else
 	{
-		if (format.channels == 2)	bytes = ex_lame_encode_buffer_interleaved(lameFlags, (signed short *) (unsigned char *) data, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
-		else				bytes = ex_lame_encode_buffer(lameFlags, (signed short *) (unsigned char *) data, (signed short *) (unsigned char *) data, size / (format.bits / 8), outBuffer, outBuffer.Size());
+		if (format.channels == 2)	bytes = ex_lame_encode_buffer_interleaved(context, (signed short *) (unsigned char *) data, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
+		else				bytes = ex_lame_encode_buffer(context, (signed short *) (unsigned char *) data, (signed short *) (unsigned char *) data, size / (format.bits / 8), outBuffer, outBuffer.Size());
 	}
 
 	driver->WriteData(outBuffer, bytes);

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,8 +20,14 @@ BoCA::ChooserAlbums::ChooserAlbums() : Chooser("Albums")
 
 	dontUpdateAlbumList = False;
 
+	tracks.EnableLocking();
+	albums.EnableLocking();
+
 	list_albums	= new ListBox(Point(7, 7), Size(100, 150));
 	list_albums->onSelectEntry.Connect(&ChooserAlbums::OnSelectAlbum, this);
+
+	list_albums->EnableLocking();
+
 	list_albums->AddTab(i18n->TranslateString("Title"));
 
 	Add(list_albums);

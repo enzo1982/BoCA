@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,11 +11,15 @@
 #include <boca.h>
 #include "dllinterface.h"
 
+FLAC_API_SUPPORTS_OGG_FLAC_TYPE				 ex_FLAC_API_SUPPORTS_OGG_FLAC				= NIL;
+
 FLAC__METADATA_CHAIN_NEW				 ex_FLAC__metadata_chain_new				= NIL;
 FLAC__METADATA_CHAIN_DELETE				 ex_FLAC__metadata_chain_delete				= NIL;
 FLAC__METADATA_CHAIN_READ				 ex_FLAC__metadata_chain_read				= NIL;
+FLAC__METADATA_CHAIN_READ_OGG				 ex_FLAC__metadata_chain_read_ogg			= NIL;
 FLAC__METADATA_CHAIN_WRITE				 ex_FLAC__metadata_chain_write				= NIL;
 FLAC__METADATA_CHAIN_SORT_PADDING			 ex_FLAC__metadata_chain_sort_padding			= NIL;
+FLAC__METADATA_CHAIN_STATUS				 ex_FLAC__metadata_chain_status				= NIL;
 
 FLAC__METADATA_ITERATOR_NEW				 ex_FLAC__metadata_iterator_new				= NIL;
 FLAC__METADATA_ITERATOR_DELETE				 ex_FLAC__metadata_iterator_delete			= NIL;
@@ -41,11 +45,15 @@ Bool LoadFLACDLL()
 
 	if (flacdll == NIL) return False;
 
+	ex_FLAC_API_SUPPORTS_OGG_FLAC				= (FLAC_API_SUPPORTS_OGG_FLAC_TYPE) flacdll->GetFunctionAddress("FLAC_API_SUPPORTS_OGG_FLAC");
+
 	ex_FLAC__metadata_chain_new				= (FLAC__METADATA_CHAIN_NEW) flacdll->GetFunctionAddress("FLAC__metadata_chain_new");
 	ex_FLAC__metadata_chain_delete				= (FLAC__METADATA_CHAIN_DELETE) flacdll->GetFunctionAddress("FLAC__metadata_chain_delete");
 	ex_FLAC__metadata_chain_read				= (FLAC__METADATA_CHAIN_READ) flacdll->GetFunctionAddress("FLAC__metadata_chain_read");
+	ex_FLAC__metadata_chain_read_ogg			= (FLAC__METADATA_CHAIN_READ_OGG) flacdll->GetFunctionAddress("FLAC__metadata_chain_read_ogg");
 	ex_FLAC__metadata_chain_write				= (FLAC__METADATA_CHAIN_WRITE) flacdll->GetFunctionAddress("FLAC__metadata_chain_write");
 	ex_FLAC__metadata_chain_sort_padding			= (FLAC__METADATA_CHAIN_SORT_PADDING) flacdll->GetFunctionAddress("FLAC__metadata_chain_sort_padding");
+	ex_FLAC__metadata_chain_status				= (FLAC__METADATA_CHAIN_STATUS) flacdll->GetFunctionAddress("FLAC__metadata_chain_status");
 
 	ex_FLAC__metadata_iterator_new				= (FLAC__METADATA_ITERATOR_NEW) flacdll->GetFunctionAddress("FLAC__metadata_iterator_new");
 	ex_FLAC__metadata_iterator_delete			= (FLAC__METADATA_ITERATOR_DELETE) flacdll->GetFunctionAddress("FLAC__metadata_iterator_delete");
@@ -63,9 +71,12 @@ Bool LoadFLACDLL()
 
 	ex_FLAC__VENDOR_STRING					= (FLAC__VENDOR_STRING_TYPE) flacdll->GetFunctionAddress("FLAC__VENDOR_STRING");
 
-	if (ex_FLAC__metadata_chain_new					== NIL ||
+	if (ex_FLAC_API_SUPPORTS_OGG_FLAC				== NIL ||
+
+	    ex_FLAC__metadata_chain_new					== NIL ||
 	    ex_FLAC__metadata_chain_delete				== NIL ||
 	    ex_FLAC__metadata_chain_read				== NIL ||
+	    ex_FLAC__metadata_chain_read_ogg				== NIL ||
 	    ex_FLAC__metadata_chain_write				== NIL ||
 	    ex_FLAC__metadata_chain_sort_padding			== NIL ||
 

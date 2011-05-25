@@ -44,12 +44,46 @@ const String &BoCA::WaveIn::GetComponentSpecs()
 
 Bool BoCA::WaveIn::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
-	Int		 magic = f_in->InputNumber(4);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	delete f_in;
+	if (in.InputString(4) != "RIFF") return False;
 
-	return (magic == 1179011410);
+	in.RelSeek(4);
+
+	if (in.InputString(4) != "WAVE") return False;
+
+	String		 chunk;
+
+	while (chunk != "fmt ")
+	{
+		if (in.GetPos() >= in.Size()) break;
+
+		/* Read next chunk.
+		 */
+		chunk = in.InputString(4);
+
+		Int	 cSize = in.InputNumber(4);
+
+		if (chunk == "fmt ")
+		{
+			Int	 waveFormat = in.InputNumber(2);
+
+			if (waveFormat == WAVE_FORMAT_PCM ||
+			    waveFormat == WAVE_FORMAT_EXTENSIBLE) return True;
+
+			/* Skip rest of chunk.
+			 */
+			in.RelSeek(cSize - 2 + cSize % 2);
+		}
+		else
+		{
+			/* Skip chunk.
+			 */
+			in.RelSeek(cSize + cSize % 2);
+		}
+	}
+
+	return False;
 }
 
 Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)

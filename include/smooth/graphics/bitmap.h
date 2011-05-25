@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -36,7 +36,7 @@ namespace smooth
 				BitmapBackend		*backend;
 			public:
 							 Bitmap(Void * = NIL);
-							 Bitmap(Int, Int, Int);
+							 Bitmap(Int, Int, Int = -1);
 							 Bitmap(const int);
 							 Bitmap(const Bitmap &);
 
@@ -50,7 +50,7 @@ namespace smooth
 				UnsignedByte		*GetBytes() const;
 				Byte			 GetLineAlignment() const;
 
-				Bool			 CreateBitmap(Int, Int, Int);
+				Bool			 CreateBitmap(Int, Int, Int = -1);
 				Bool			 DeleteBitmap();
 
 				Bool			 SetSystemBitmap(Void *);

@@ -194,8 +194,8 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 			memset(chapterList[i].title, 0, MP4V2_CHAPTER_TITLE_MAX + 1);
 			strncpy(chapterList[i].title, chapterTitle, Math::Max(strlen(chapterTitle), MP4V2_CHAPTER_TITLE_MAX));
 
-			if	(chapterTrack.length	   >= 0) chapterList[i].duration = Float(chapterTrack.length)	    * MP4_MSECS_TIME_SCALE / chapterFormat.rate;
-			else if (chapterTrack.approxLength >= 0) chapterList[i].duration = Float(chapterTrack.approxLength) * MP4_MSECS_TIME_SCALE / chapterFormat.rate;
+			if	(chapterTrack.length	   >= 0) chapterList[i].duration = Math::Round(Float(chapterTrack.length)	* MP4_MSECS_TIME_SCALE / chapterFormat.rate);
+			else if (chapterTrack.approxLength >= 0) chapterList[i].duration = Math::Round(Float(chapterTrack.approxLength) * MP4_MSECS_TIME_SCALE / chapterFormat.rate);
 			else					 chapterList[i].duration = MP4_INVALID_DURATION;
 		}
 
@@ -320,8 +320,8 @@ Error BoCA::MP4Tag::ParseStreamInfo(const String &fileName, Track &track)
 
 			rTrack.origFilename = track.origFilename;
 
-			rTrack.sampleOffset = Float(offset) / MP4_MSECS_TIME_SCALE * format.rate;
-			rTrack.length	    = Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate;
+			rTrack.sampleOffset = Math::Round(Float(offset)			 / MP4_MSECS_TIME_SCALE * format.rate);
+			rTrack.length	    = Math::Round(Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate);
 
 			rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
 

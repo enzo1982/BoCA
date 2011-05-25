@@ -267,6 +267,8 @@ Error BoCA::WinampIn::GetStreamInfo(const String &streamURI, Track &track)
 
 			track.SetInfo(info);
 		}
+
+		String::ExplodeFinish();
 	}
 
 	/* Return an error if we didn't get useful format data.

@@ -57,27 +57,6 @@ extern S::String	 cpNames[5];
 
 class SMOOTHAPI PCIIO
 {
-	friend SMOOTHAPI bool	 WritePCI(PCIOut, PCIIO &);
-	friend bool	 WritePCIFTAG(PCIOut, PCIIO &);
-	friend bool	 WriteIMAGTAG(PCIOut, PCIIO &);
-	friend bool	 WriteRESOTAG(PCIOut, PCIIO &);
-	friend bool	 WriteFORMTAG(PCIOut, PCIIO &);
-	friend bool	 WriteDESCTAG(PCIOut, PCIIO &);
-	friend bool	 WriteNAMETAG(PCIOut, PCIIO &);
-	friend bool	 WriteDATATAG(PCIOut, PCIIO &);
-	friend SMOOTHAPI bool	 ReadPCI(PCIIn, PCIIO &);
-	friend bool	 ReadPCIFTAG(PCIIn, PCIIO &);
-	friend bool	 ReadIMAGTAG(PCIIn, PCIIO &);
-	friend bool	 ReadRESOTAG(PCIIn, PCIIO &);
-	friend bool	 ReadFORMTAG(PCIIn, PCIIO &);
-	friend bool	 ReadDESCTAG(PCIIn, PCIIO &);
-	friend bool	 ReadNAMETAG(PCIIn, PCIIO &);
-	friend bool	 ReadDATATAG(PCIIn, PCIIO &);
-	friend bool	 FindImageID(PCIIn, PCIIO &);
-	friend bool	 WriteLine(PCIOut, PCIIO &, int);
-	friend bool	 ReadLine(PCIIn, PCIIO &, int);
-	friend bool	 CompressPCI(PCIOut, PCIIO &);
-	friend bool	 DecompressPCI(PCIIn, PCIIO &);
 	private:
 		int		 majorversion;	// major version of PIC file format
 		int		 minorversion;	// minor version of PCI file format
@@ -95,10 +74,38 @@ class SMOOTHAPI PCIIO
 		int		 rlebits;	// number of bits used for the runlength in RLE
 		bool		 overwrite;	// overwrite file or append to PCI file
 		int		 imageid;	// image ID in file
+
+		bool		 WritePCIFTAG(PCIOut);
+		bool		 WriteIMAGTAG(PCIOut);
+		bool		 WriteRESOTAG(PCIOut);
+		bool		 WriteFORMTAG(PCIOut);
+		bool		 WriteDESCTAG(PCIOut);
+		bool		 WriteNAMETAG(PCIOut);
+		bool		 WriteDATATAG(PCIOut);
+
+		bool		 ReadPCIFTAG(PCIIn);
+		bool		 ReadIMAGTAG(PCIIn);
+		bool		 ReadRESOTAG(PCIIn);
+		bool		 ReadFORMTAG(PCIIn);
+		bool		 ReadDESCTAG(PCIIn);
+		bool		 ReadNAMETAG(PCIIn);
+		bool		 ReadDATATAG(PCIIn);
+
+		bool		 FindImageID(PCIIn);
+
+		bool		 WriteLine(PCIOut, int);
+		bool		 ReadLine(PCIIn, int);
+
+		bool		 CompressPCI(PCIOut);
+		bool		 DecompressPCI(PCIIn);
 	public:
 				 PCIIO(const S::GUI::Bitmap &);
 				 PCIIO();
 				~PCIIO();
+
+		bool		 WritePCI(PCIOut);
+		bool		 ReadPCI(PCIIn);
+
 		void		 SetCompressionType(int);
 		void		 SetColorspace(int);
 		void		 SetBitsPerChannel(int);
@@ -109,6 +116,7 @@ class SMOOTHAPI PCIIO
 		void		 SelectImage(const S::String &);
 		void		 SetImageID(int);
 		void		 SetImageName(const S::String &);
+
 		S::GUI::Bitmap	&GetBitmap();
 };
 
@@ -117,23 +125,5 @@ SMOOTHAPI PCIOut	 OpenPCIForOutput(const S::String &);	// opens a PCI file
 SMOOTHAPI PCIIn		 OpenPCIForInput(const S::String &);	// opens a PCI file
 SMOOTHAPI bool		 ClosePCI(PCIIn);			// closes a PCI file
 SMOOTHAPI bool		 ClosePCI(PCIOut);			// closes a PCI file
-SMOOTHAPI bool		 WritePCI(PCIOut, PCIIO &);
-SMOOTHAPI bool		 ReadPCI(PCIIn, PCIIO &);
-
-bool	 WritePCIFTAG(PCIOut, PCIIO &);	// creates PCIF tag
-bool	 WriteIMAGTAG(PCIOut, PCIIO &);
-bool	 WriteRESOTAG(PCIOut, PCIIO &);	// creates RESO tag
-bool	 WriteFORMTAG(PCIOut, PCIIO &);
-bool	 WriteDESCTAG(PCIOut, PCIIO &);
-bool	 WriteNAMETAG(PCIOut, PCIIO &);
-bool	 WriteDATATAG(PCIOut, PCIIO &);
-bool	 ReadPCIFTAG(PCIIn, PCIIO &);
-bool	 ReadIMAGTAG(PCIIn, PCIIO &);
-bool	 ReadRESOTAG(PCIIn, PCIIO &);
-bool	 ReadFORMTAG(PCIIn, PCIIO &);
-bool	 ReadDESCTAG(PCIIn, PCIIO &);
-bool	 ReadNAMETAG(PCIIn, PCIIO &);
-bool	 ReadDATATAG(PCIIn, PCIIO &);
-bool	 FindImageID(PCIIn, PCIIO &);
 
 #endif

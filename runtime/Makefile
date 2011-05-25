@@ -44,6 +44,12 @@ else
 	LDOPTS += -m32
 endif
 
+ifneq ($(BUILD_WIN32),True)
+ifneq ($(BUILD_SOLARIS),True)
+	CCOPTS += -pthread
+endif
+endif
+
 ifeq ($(BUILD_WIN32),True)
 	DLLEXT = .dll
 
@@ -55,9 +61,11 @@ else ifeq ($(BUILD_OSX),True)
 else
 	DLLEXT = .so
 
-ifeq ($(BUILD_SOLARIS),True)
-	CCOPTS += -fpic
-endif
+	LDOPTS += -Wl,-rpath,.
+
+	ifeq ($(BUILD_SOLARIS),True)
+		CCOPTS += -fpic
+	endif
 endif
 
 all : $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT)

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -37,6 +37,7 @@ const String &BoCA::VorbisOut::GetComponentSpecs()
 		    <format>								\
 		      <name>Ogg Vorbis Audio</name>					\
 		      <extension>ogg</extension>					\
+		      <extension>oga</extension>					\
 		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
 		    </format>								\
 		  </component>								\
@@ -259,6 +260,18 @@ Int BoCA::VorbisOut::WriteOggPackets(Bool flush)
 	while (true);
 
 	return bytes;
+}
+
+String BoCA::VorbisOut::GetOutputFileExtension()
+{
+	Config	*config = Config::Get();
+
+	switch (config->GetIntValue("Vorbis", "FileExtension", 0))
+	{
+		default:
+		case  0: return "ogg";
+		case  1: return "oga";
+	}
 }
 
 ConfigLayer *BoCA::VorbisOut::GetConfigurationLayer()

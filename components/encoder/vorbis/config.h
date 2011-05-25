@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -28,6 +28,10 @@ namespace BoCA
 			OptionBox	*option_mode_vbr;
 			OptionBox	*option_mode_abr;
 
+			GroupBox	*group_extension;
+			OptionBox	*option_extension_ogg;
+			OptionBox	*option_extension_oga;
+
 			GroupBox	*group_quality;
 			Slider		*slider_quality;
 			Text		*text_quality;
@@ -48,6 +52,7 @@ namespace BoCA
 			Text		*text_abrmax_kbps;
 
 			Int		 mode;
+			Int		 fileExtension;
 			Int		 quality;
 			Int		 abrMin;
 			Int		 abrNom;

@@ -1,0 +1,33 @@
+﻿<VideoSite>
+  <name>Daum 뮤직</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-flv_audio-in</decoder>
+
+  <script type="text/javascript">
+    function canHandleURL(URL) {
+      if (URL.toLowerCase().match(/http:\/\/music.daum.net\/song\/songvideo.do\?.*/)) return true;
+      else									      return false;
+    }
+
+    function getVideoURL(html) {
+      var location = downloadURL("http://flvs.daum.net/viewer/MovieLocation.do?vid=" + (html.match(/http:\/\/flvs.daum.net\/flvPlayer.swf\?vid=(.*?)&amp;/), RegExp.$1));
+      var flv_data = downloadURL((location.match(/&lt;MovieLocation .*?url="(.*?)".*?\/&gt;/), RegExp.$1).replace(/&amp;amp;/g, "&amp;"));
+
+      return flv_data.match(/&lt;MovieLocation .*?movieURL="(.*?)".*?\/&gt;/), RegExp.$1;
+    }
+
+    function queryMetadata(html) {
+      var metadata = new Metadata();
+
+      metadata.title	   = (html.match(/&lt;div class="title fs_bigger"&gt;(?:.|\n|\r)*?&lt;a .*?&gt;(.*?)\s*&lt;\/a&gt;(?:.|\n|\r)*?&lt;\/div&gt;/) ? RegExp.$1 : null);
+      metadata.description = (html.match(/&lt;div class="videoLyrics"&gt;(?:.|\n|\r)*?&lt;p class="txt"&gt;((?:.|\n|\r)*?)&lt;\/p&gt;(?:.|\n|\r)*?&lt;\/div&gt;/) ? RegExp.$1 : null);
+
+      metadata.date	   = (html.match(/&lt;dd&gt;(?:.|\n|\r)*?, (\d{4}\.\d{2}\.\d{2})\s*?&lt;\/dd&gt;/) ? RegExp.$1 : null);
+      metadata.thumbnail   = (html.match(/&lt;img src="(.*?)".*?class="thumbImg".*?&gt;/) ? RegExp.$1 : null);
+
+      metadata.uploader	   = (html.match(/&lt;div class="artiName"&gt;(?:.|\n|\r)*?&lt;a .*?&gt;(.*?)&lt;\/a&gt;(?:.|\n|\r)*?&lt;\/div&gt;/) ? RegExp.$1 : null);
+
+      return metadata;
+    }
+  </script>
+</VideoSite>

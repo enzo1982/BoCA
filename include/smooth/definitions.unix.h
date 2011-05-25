@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,6 +20,8 @@
 #define SMOOTH_PLUGIN_API
 #define SMOOTH_PLUGIN_VAR extern
 
-#define __declspec(x)
+#ifndef __declspec
+#	define __declspec(x)
+#endif
 
 #endif

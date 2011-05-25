@@ -16,8 +16,13 @@ extern "C" {
 #	include <cdio/cdda.h>
 }
 
-#include <glob.h>
+#include <unistd.h>
+#include <limits.h>
 #include <arpa/inet.h>
+
+#ifndef PATH_MAX
+#	define PATH_MAX 32768
+#endif
 
 #include "cdio_info.h"
 
@@ -47,35 +52,62 @@ const String &BoCA::CDIOInfo::GetComponentSpecs()
 
 const Array<String> &BoCA::CDIOInfo::FindDrives()
 {
-#if defined __linux__
-	static const char	*deviceNames[] = { "/dev/hd?", "/dev/scd?", NIL };
-#elif defined __FreeBSD__
-	static const char	*deviceNames[] = { "/dev/acd?", "/dev/cd?", NIL };
-#else
-	static const char	*deviceNames[] = { "/dev/cdrom?", NIL };
-#endif
-
 	static Array<String>	 driveNames;
 	static Bool		 initialized = False;
 
 	if (initialized) return driveNames;
 
+#ifndef __NetBSD__
+	char	**deviceNames = cdio_get_devices(DRIVER_DEVICE);
+#else
+	char	*deviceNames[3] = { "/dev/cd0d", "/dev/cd1d", NIL };
+#endif
+
 	for (Int i = 0; deviceNames[i] != NIL; i++)
 	{
-		glob_t	*fileData = new glob_t;
+		String		 deviceName = deviceNames[i];
 
-		if (glob(deviceNames[i], 0, NIL, fileData) == 0)
+		/* Resolve link if it is one.
+		 */
+		Buffer<char>	 buffer(PATH_MAX + 1);
+
+		buffer.Zero();
+
+		if (readlink(deviceName, buffer, buffer.Size() - 1) >= 0)
 		{
-			for (UnsignedInt n = 0; n < fileData->gl_pathc; n++)
-			{
-				cdrom_drive_t	*cd = cdio_cddap_identify(fileData->gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
+			if (buffer[0] == '/') deviceName = buffer;
+			else		      deviceName = String(File(deviceName).GetFilePath()).Append("/").Append(buffer);
+		}
 
-				if (cd != NIL) driveNames.Add(fileData->gl_pathv[n]);
+		/* Check if we aleady know this device.
+		 */
+		foreach (const String &driveName, driveNames)
+		{
+			if (driveName == deviceName)
+			{
+				deviceName = NIL;
+
+				break;
 			}
 		}
 
-		globfree(fileData);
+		if (deviceName == NIL) continue;
+
+		/* Try to open device and add it to the list.
+		 */
+		cdrom_drive_t	*cd = cdio_cddap_identify(deviceName, CDDA_MESSAGE_FORGETIT, NIL);
+
+		if (cd != NIL)
+		{
+			driveNames.Add(deviceName);
+
+			cdio_cddap_close(cd);
+		}
 	}
+
+#ifndef __NetBSD__
+	cdio_free_device_list(deviceNames);
+#endif
 
 	initialized = True;
 
@@ -123,13 +155,16 @@ Bool BoCA::CDIOInfo::OpenNthDeviceTray(Int n)
 
 	if (cd != NIL)
 	{
-		cdio_cddap_open(cd);
+		int	 device_name_length = strlen(cd->cdda_device_name);
+		char	 device_name[device_name_length + 1];
+
+		strncpy(device_name, cd->cdda_device_name, device_name_length + 1);
+
+		cdio_cddap_close(cd);
 
 		/* Eject.
 		 */
-		cdio_eject_media_drive(cd->cdda_device_name);
-
-		cdio_cddap_close(cd);
+		cdio_eject_media_drive(device_name);
 
 		return True;
 	}
@@ -144,13 +179,16 @@ Bool BoCA::CDIOInfo::CloseNthDeviceTray(Int n)
 
 	if (cd != NIL)
 	{
-		cdio_cddap_open(cd);
+		int	 device_name_length = strlen(cd->cdda_device_name);
+		char	 device_name[device_name_length + 1];
+
+		strncpy(device_name, cd->cdda_device_name, device_name_length + 1);
+
+		cdio_cddap_close(cd);
 
 		/* Close tray.
 		 */
-		cdio_close_tray(cd->cdda_device_name, NIL);
-
-		cdio_cddap_close(cd);
+		cdio_close_tray(device_name, NIL);
 
 		return True;
 	}
@@ -252,14 +290,14 @@ const BoCA::MCDI &BoCA::CDIOInfo::GetNthDeviceMCDI(Int n)
 			toc.tracks[cd->tracks].rsvd2	   = 0;
 			toc.tracks[cd->tracks].addr	   = htonl(cd->disc_toc[cd->tracks].dwStartSector);
 
-			cdio_cddap_close(cd);
-
 			Buffer<UnsignedByte>	 buffer(ntohs(toc.tocLen) + 2);
 
 			memcpy(buffer, &toc, ntohs(toc.tocLen) + 2);
 
 			mcdi.SetData(buffer);
 		}
+
+		cdio_cddap_close(cd);
 	}
 
 	lastDrive  = n;
@@ -286,5 +324,7 @@ Void BoCA::CDIOInfo::CollectDriveInfo()
 		drive.canOpenTray = True;
 
 		devices.Add(drive);
+
+		cdio_cddap_close(cd);
 	}
 }

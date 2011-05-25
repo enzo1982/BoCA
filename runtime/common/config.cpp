@@ -14,8 +14,6 @@ BoCA::Config *BoCA::Config::instance = NIL;
 
 BoCA::Config::Config()
 {
-	languageChanged		= False;
-
 	enable_console		= False;
 
 	cdrip_numdrives		= 0;
@@ -49,6 +47,9 @@ BoCA::Config::Config()
 	config = new Configuration(String(configDir).Append("boca").Append(Directory::GetDirectoryDelimiter()).Append("boca.xml"), True);
 
 	LoadSettings();
+
+	persistentIntIDs.EnableLocking();
+	persistentIntValues.EnableLocking();
 }
 
 BoCA::Config::~Config()
@@ -148,6 +149,10 @@ Int &BoCA::Config::GetPersistentIntValue(const String &section, const String &na
 
 Bool BoCA::Config::LoadSettings()
 {
+	String	 configurationName = config->GetStringValue("Settings", "ActiveConfiguration", "default");
+
+	config->SetActiveConfiguration(configurationName);
+
 	return True;
 }
 
@@ -162,7 +167,49 @@ Bool BoCA::Config::SaveSettings()
 		config->SetIntValue(nthID.Head(nthID.Find("::")), nthID.Tail(nthID.Length() - nthID.Find("::") - 2), *persistentIntValues.GetNth(i));
 	}
 
+	String	 configurationName = config->GetConfigurationName();
+
+	config->SetActiveConfiguration("default");
+	config->SetStringValue("Settings", "ActiveConfiguration", configurationName);
+	config->SetActiveConfiguration(configurationName);
+
 	config->Save();
 
 	return True;
+}
+
+Int BoCA::Config::GetNOfConfigurations()
+{
+	return config->GetNOfConfigurations();
+}
+
+String BoCA::Config::GetNthConfigurationName(Int n)
+{
+	return String(config->GetNthConfigurationName(n)).Replace("BoCA::", NIL);
+}
+
+Int BoCA::Config::AddConfiguration(const String &nConfig)
+{
+	return config->AddConfiguration(String("BoCA::").Append(nConfig));
+}
+
+Int BoCA::Config::RemoveConfiguration(const String &rConfig)
+{
+	return config->RemoveConfiguration(String("BoCA::").Append(rConfig));
+}
+
+Int BoCA::Config::SetActiveConfiguration(const String &nConfig)
+{
+	if (nConfig == "default") return config->SetActiveConfiguration("default");
+	else			  return config->SetActiveConfiguration(String("BoCA::").Append(nConfig));
+}
+
+String BoCA::Config::GetConfigurationName()
+{
+	return String(config->GetConfigurationName()).Replace("BoCA::", NIL);
+}
+
+Int BoCA::Config::SetConfigurationName(const String &nConfig)
+{
+	return config->SetConfigurationName(String("BoCA::").Append(nConfig));
 }

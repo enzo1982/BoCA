@@ -26,6 +26,8 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 
 	missingDecoders = False;
 
+	tracks.EnableLocking();
+
 	/* Load video sites.
 	 */
 	LoadVideoSites();
@@ -72,6 +74,8 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 
 	list_tracks		= new ListBox(Point(7, 176), Size(100, 150));
 	list_tracks->onSelectEntry.Connect(&LayerYouTube::OnSelectTrack, this);
+
+	list_tracks->EnableLocking();
 
 	list_tracks->AddTab(I18n::Get()->TranslateString(i18n->TranslateString("Uploader")), 150);
 	list_tracks->AddTab(I18n::Get()->TranslateString(i18n->TranslateString("Title")));
@@ -237,7 +241,7 @@ BoCA::LayerYouTube::~LayerYouTube()
 Void BoCA::LayerYouTube::LoadVideoSites()
 {
 	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("boca/boca.extension.youtube"));
-	const Array<File>	&files = dir.GetFilesByPattern("*.xml");
+	const Array<File>	&files = dir.GetFilesByPattern("videosite_*.xml");
 
 	BoCA::Config		*config = BoCA::Config::Get();
 	AS::Registry		&boca = AS::Registry::Get();
@@ -246,9 +250,16 @@ Void BoCA::LayerYouTube::LoadVideoSites()
 	{
 		VideoSite	*site = new VideoSite(file);
 
-		if (site->IsSane()) sites.Add(site);
+		if (site->IsSane())
+		{
+			sites.Add(site);
 
-		if (!boca.ComponentExists(site->GetDecoderID())) missingDecoders = True;
+			if (!boca.ComponentExists(site->GetDecoderID())) missingDecoders = True;
+		}
+		else
+		{
+			delete site;
+		}
 	}
 
 	if (missingDecoders) config->SetIntValue("YouTube", "SaveVideoFiles", True);

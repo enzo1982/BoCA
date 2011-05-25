@@ -244,9 +244,11 @@ Void BoCA::ChooserFiles::OnSelectFile(ListEntry *entry)
 
 	if (decoder == NIL)
 	{
-		I18n	*i18n	= I18n::Get();
+		I18n	*i18n = I18n::Get();
 
-		Utilities::ErrorMessage("Unable to open file: %1\n\nError: %2", file.GetFileName(), i18n->TranslateString("Unknown file type", "Messages"));
+		i18n->SetContext("Extensions::Tag Editor::Errors");
+
+		Utilities::ErrorMessage(String(i18n->TranslateString("Unable to open file: %1\n\nError: %2")).Replace("%1", file.GetFileName()).Replace("%2", i18n->TranslateString("Unknown file type", "Messages")));
 
 		return;
 	}
@@ -259,9 +261,11 @@ Void BoCA::ChooserFiles::OnSelectFile(ListEntry *entry)
 
 	if (error == Error())
 	{
-		I18n	*i18n	= I18n::Get();
+		I18n	*i18n = I18n::Get();
 
-		Utilities::ErrorMessage("Unable to open file: %1\n\nError: %2", file.GetFileName(), i18n->TranslateString(errorString, "Messages"));
+		i18n->SetContext("Extensions::Tag Editor::Errors");
+
+		Utilities::ErrorMessage(String(i18n->TranslateString("Unable to open file: %1\n\nError: %2")).Replace("%1", file.GetFileName()).Replace("%2", i18n->TranslateString(errorString, "Messages")));
 
 		return;
 	}
@@ -444,7 +448,11 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 	 */
 	if (error == Error())
 	{
-		Utilities::ErrorMessage(String(BoCA::I18n::Get()->TranslateString("Unable to update tag: %1\n\nError: %2")).Replace("%1", track.origFilename).Replace("%2", BoCA::I18n::Get()->TranslateString(errorString)));
+		I18n	*i18n = I18n::Get();
+
+		i18n->SetContext("Extensions::Tag Editor::Errors");
+
+		Utilities::ErrorMessage(String(i18n->TranslateString("Unable to update tag: %1\n\nError: %2")).Replace("%1", track.origFilename).Replace("%2", i18n->TranslateString(errorString, "Messages")));
 
 		return Error();
 	}

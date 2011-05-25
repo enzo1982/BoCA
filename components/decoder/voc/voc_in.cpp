@@ -35,12 +35,14 @@ const String &BoCA::VocIn::GetComponentSpecs()
 
 Bool BoCA::VocIn::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
-	Int		 magic = f_in->InputNumber(4);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	delete f_in;
+	if (in.InputString(19) == "Creative Voice File")
+	{
+		if (in.InputNumber(1) == 0x1A) return True;
+	}
 
-	return (magic == 1634038339);
+	return False;
 }
 
 Error BoCA::VocIn::GetStreamInfo(const String &streamURI, Track &track)
@@ -51,11 +53,16 @@ Error BoCA::VocIn::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	track.fileSize = f_in->Size();
 
-	/* Read magic number.
+	/* Skip main header.
 	 */
-	for (Int i = 0; i < 30; i++)
-		f_in->InputNumber(1);
+	f_in->RelSeek(26);
 
+	/* Skip block type and size.
+	 */
+	f_in->RelSeek(4);
+
+	/* Read format data.
+	 */
 	Format	 format = track.GetFormat();
 
 	format.order	= BYTE_INTEL;
@@ -86,11 +93,16 @@ Bool BoCA::VocIn::Activate()
 {
 	InStream	*in = new InStream(STREAM_DRIVER, driver);
 
-	/* Read magic number.
+	/* Skip main header.
 	 */
-	for (Int i = 0; i < 27; i++)
-		in->InputNumber(1);
+	in->RelSeek(26);
 
+	/* Read block type.
+	 */
+	in->InputNumber(1);
+
+	/* Read block size and continue.
+	 */
 	bytesLeft = in->InputNumber(3) - 12;
 
 	delete in;

@@ -14,8 +14,17 @@ endif
 ifeq ($(BUILD_FREEBSD),True)
 	cd oss && $(MAKE)
 endif
+ifeq ($(BUILD_OPENBSD),True)
+	cd oss && $(MAKE)
+endif
+ifeq ($(BUILD_NETBSD),True)
+	cd oss && $(MAKE)
+endif
 ifeq ($(BUILD_SOLARIS),True)
 	cd oss && $(MAKE)
+endif
+ifeq ($(BUILD_QNX),True)
+	cd qsa && $(MAKE)
 endif
 ifeq ($(BUILD_WIN32),True)
 	cd waveout && $(MAKE)
@@ -32,8 +41,17 @@ endif
 ifeq ($(BUILD_FREEBSD),True)
 	cd oss && $(MAKE) clean
 endif
+ifeq ($(BUILD_OPENBSD),True)
+	cd oss && $(MAKE) clean
+endif
+ifeq ($(BUILD_NETBSD),True)
+	cd oss && $(MAKE) clean
+endif
 ifeq ($(BUILD_SOLARIS),True)
 	cd oss && $(MAKE) clean
+endif
+ifeq ($(BUILD_QNX),True)
+	cd qsa && $(MAKE) clean
 endif
 ifeq ($(BUILD_WIN32),True)
 	cd waveout && $(MAKE) clean

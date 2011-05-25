@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,40 +13,40 @@
 
 using namespace BoCA;
 
-OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
-OGGSTREAMPACKETOUT		 ex_ogg_stream_packetout		= NIL;
-OGGSTREAMPAGEIN			 ex_ogg_stream_pagein			= NIL;
-OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
-OGGPAGESERIALNO			 ex_ogg_page_serialno			= NIL;
-OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
-OGGSYNCINIT			 ex_ogg_sync_init			= NIL;
-OGGSYNCBUFFER			 ex_ogg_sync_buffer			= NIL;
-OGGSYNCWROTE			 ex_ogg_sync_wrote			= NIL;
-OGGSYNCPAGEOUT			 ex_ogg_sync_pageout			= NIL;
-OGGSYNCCLEAR			 ex_ogg_sync_clear			= NIL;
+OGGSTREAMINIT			 ex_ogg_stream_init		= NIL;
+OGGSTREAMPACKETOUT		 ex_ogg_stream_packetout	= NIL;
+OGGSTREAMPAGEIN			 ex_ogg_stream_pagein		= NIL;
+OGGPAGEEOS			 ex_ogg_page_eos		= NIL;
+OGGPAGESERIALNO			 ex_ogg_page_serialno		= NIL;
+OGGSTREAMCLEAR			 ex_ogg_stream_clear		= NIL;
+OGGSYNCINIT			 ex_ogg_sync_init		= NIL;
+OGGSYNCBUFFER			 ex_ogg_sync_buffer		= NIL;
+OGGSYNCWROTE			 ex_ogg_sync_wrote		= NIL;
+OGGSYNCPAGEOUT			 ex_ogg_sync_pageout		= NIL;
+OGGSYNCCLEAR			 ex_ogg_sync_clear		= NIL;
 
-VORBISINFOINIT			 ex_vorbis_info_init			= NIL;
-VORBISCOMMENTINIT		 ex_vorbis_comment_init			= NIL;
-VORBISCOMMENTADDTAG		 ex_vorbis_comment_add_tag		= NIL;
-VORBISANALYSISINIT		 ex_vorbis_analysis_init		= NIL;
-VORBISBLOCKINIT			 ex_vorbis_block_init			= NIL;
-VORBISANALYSISHEADEROUT		 ex_vorbis_analysis_headerout		= NIL;
-VORBISANALYSISBUFFER		 ex_vorbis_analysis_buffer		= NIL;
-VORBISANALYSISWROTE		 ex_vorbis_analysis_wrote		= NIL;
-VORBISANALYSISBLOCKOUT		 ex_vorbis_analysis_blockout		= NIL;
-VORBISANALYSIS			 ex_vorbis_analysis			= NIL;
-VORBISBITRATEADDBLOCK		 ex_vorbis_bitrate_addblock		= NIL;
-VORBISBITRATEFLUSHPACKET	 ex_vorbis_bitrate_flushpacket		= NIL;
-VORBISSYNTHESISINIT		 ex_vorbis_synthesis_init		= NIL;
-VORBISSYNTHESIS			 ex_vorbis_synthesis			= NIL;
-VORBISSYNTHESISBLOCKIN		 ex_vorbis_synthesis_blockin		= NIL;
-VORBISSYNTHESISPCMOUT		 ex_vorbis_synthesis_pcmout		= NIL;
-VORBISSYNTHESISREAD		 ex_vorbis_synthesis_read		= NIL;
-VORBISSYNTHESISHEADERIN		 ex_vorbis_synthesis_headerin		= NIL;
-VORBISBLOCKCLEAR		 ex_vorbis_block_clear			= NIL;
-VORBISDSPCLEAR			 ex_vorbis_dsp_clear			= NIL;
-VORBISCOMMENTCLEAR		 ex_vorbis_comment_clear		= NIL;
-VORBISINFOCLEAR			 ex_vorbis_info_clear			= NIL;
+VORBISINFOINIT			 ex_vorbis_info_init		= NIL;
+VORBISCOMMENTINIT		 ex_vorbis_comment_init		= NIL;
+VORBISCOMMENTADDTAG		 ex_vorbis_comment_add_tag	= NIL;
+VORBISANALYSISINIT		 ex_vorbis_analysis_init	= NIL;
+VORBISBLOCKINIT			 ex_vorbis_block_init		= NIL;
+VORBISANALYSISHEADEROUT		 ex_vorbis_analysis_headerout	= NIL;
+VORBISANALYSISBUFFER		 ex_vorbis_analysis_buffer	= NIL;
+VORBISANALYSISWROTE		 ex_vorbis_analysis_wrote	= NIL;
+VORBISANALYSISBLOCKOUT		 ex_vorbis_analysis_blockout	= NIL;
+VORBISANALYSIS			 ex_vorbis_analysis		= NIL;
+VORBISBITRATEADDBLOCK		 ex_vorbis_bitrate_addblock	= NIL;
+VORBISBITRATEFLUSHPACKET	 ex_vorbis_bitrate_flushpacket	= NIL;
+VORBISSYNTHESISINIT		 ex_vorbis_synthesis_init	= NIL;
+VORBISSYNTHESIS			 ex_vorbis_synthesis		= NIL;
+VORBISSYNTHESISBLOCKIN		 ex_vorbis_synthesis_blockin	= NIL;
+VORBISSYNTHESISPCMOUT		 ex_vorbis_synthesis_pcmout	= NIL;
+VORBISSYNTHESISREAD		 ex_vorbis_synthesis_read	= NIL;
+VORBISSYNTHESISHEADERIN		 ex_vorbis_synthesis_headerin	= NIL;
+VORBISBLOCKCLEAR		 ex_vorbis_block_clear		= NIL;
+VORBISDSPCLEAR			 ex_vorbis_dsp_clear		= NIL;
+VORBISCOMMENTCLEAR		 ex_vorbis_comment_clear	= NIL;
+VORBISINFOCLEAR			 ex_vorbis_info_clear		= NIL;
 
 DynamicLoader *oggdll		= NIL;
 DynamicLoader *vorbisdll	= NIL;
@@ -57,29 +57,29 @@ Bool LoadOggDLL()
 
 	if (oggdll == NIL) return False;
 
-	ex_ogg_stream_init		= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
-	ex_ogg_stream_packetout		= (OGGSTREAMPACKETOUT) oggdll->GetFunctionAddress("ogg_stream_packetout");
-	ex_ogg_stream_pagein		= (OGGSTREAMPAGEIN) oggdll->GetFunctionAddress("ogg_stream_pagein");
-	ex_ogg_page_eos			= (OGGPAGEEOS) oggdll->GetFunctionAddress("ogg_page_eos");
-	ex_ogg_page_serialno		= (OGGPAGESERIALNO) oggdll->GetFunctionAddress("ogg_page_serialno");
-	ex_ogg_stream_clear		= (OGGSTREAMCLEAR) oggdll->GetFunctionAddress("ogg_stream_clear");
-	ex_ogg_sync_init		= (OGGSYNCINIT) oggdll->GetFunctionAddress("ogg_sync_init");
-	ex_ogg_sync_buffer		= (OGGSYNCBUFFER) oggdll->GetFunctionAddress("ogg_sync_buffer");
-	ex_ogg_sync_wrote		= (OGGSYNCWROTE) oggdll->GetFunctionAddress("ogg_sync_wrote");
-	ex_ogg_sync_pageout		= (OGGSYNCPAGEOUT) oggdll->GetFunctionAddress("ogg_sync_pageout");
-	ex_ogg_sync_clear		= (OGGSYNCCLEAR) oggdll->GetFunctionAddress("ogg_sync_clear");
+	ex_ogg_stream_init	= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
+	ex_ogg_stream_packetout	= (OGGSTREAMPACKETOUT) oggdll->GetFunctionAddress("ogg_stream_packetout");
+	ex_ogg_stream_pagein	= (OGGSTREAMPAGEIN) oggdll->GetFunctionAddress("ogg_stream_pagein");
+	ex_ogg_page_eos		= (OGGPAGEEOS) oggdll->GetFunctionAddress("ogg_page_eos");
+	ex_ogg_page_serialno	= (OGGPAGESERIALNO) oggdll->GetFunctionAddress("ogg_page_serialno");
+	ex_ogg_stream_clear	= (OGGSTREAMCLEAR) oggdll->GetFunctionAddress("ogg_stream_clear");
+	ex_ogg_sync_init	= (OGGSYNCINIT) oggdll->GetFunctionAddress("ogg_sync_init");
+	ex_ogg_sync_buffer	= (OGGSYNCBUFFER) oggdll->GetFunctionAddress("ogg_sync_buffer");
+	ex_ogg_sync_wrote	= (OGGSYNCWROTE) oggdll->GetFunctionAddress("ogg_sync_wrote");
+	ex_ogg_sync_pageout	= (OGGSYNCPAGEOUT) oggdll->GetFunctionAddress("ogg_sync_pageout");
+	ex_ogg_sync_clear	= (OGGSYNCCLEAR) oggdll->GetFunctionAddress("ogg_sync_clear");
 
-	if (ex_ogg_stream_init			== NIL ||
-	    ex_ogg_stream_packetout		== NIL ||
-	    ex_ogg_stream_pagein		== NIL ||
-	    ex_ogg_page_eos			== NIL ||
-	    ex_ogg_page_serialno		== NIL ||
-	    ex_ogg_stream_clear			== NIL ||
-	    ex_ogg_sync_init			== NIL ||
-	    ex_ogg_sync_buffer			== NIL ||
-	    ex_ogg_sync_wrote			== NIL ||
-	    ex_ogg_sync_pageout			== NIL ||
-	    ex_ogg_sync_clear			== NIL) { FreeOggDLL(); return False; }
+	if (ex_ogg_stream_init		== NIL ||
+	    ex_ogg_stream_packetout	== NIL ||
+	    ex_ogg_stream_pagein	== NIL ||
+	    ex_ogg_page_eos		== NIL ||
+	    ex_ogg_page_serialno	== NIL ||
+	    ex_ogg_stream_clear		== NIL ||
+	    ex_ogg_sync_init		== NIL ||
+	    ex_ogg_sync_buffer		== NIL ||
+	    ex_ogg_sync_wrote		== NIL ||
+	    ex_ogg_sync_pageout		== NIL ||
+	    ex_ogg_sync_clear		== NIL) { FreeOggDLL(); return False; }
 
 	return True;
 }

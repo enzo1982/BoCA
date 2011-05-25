@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -10,6 +10,9 @@
 
 #include <smooth.h>
 #include <smooth/dll.h>
+
+#include <time.h>
+#include <stdlib.h>
 
 #include "flac_out.h"
 #include "config.h"
@@ -23,22 +26,40 @@ const String &BoCA::FLACOut::GetComponentSpecs()
 
 	if (flacdll != NIL)
 	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>FLAC Audio Encoder</name>				\
-		    <version>1.0</version>					\
-		    <id>flac-out</id>						\
-		    <type>encoder</type>					\
-		    <format>							\
-		      <name>FLAC Audio</name>					\
-		      <extension>flac</extension>				\
-		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
-		    </format>							\
-		  </component>							\
-										\
+		componentSpecs = "							\
+											\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
+		  <component>								\
+		    <name>FLAC Audio Encoder</name>					\
+		    <version>1.0</version>						\
+		    <id>flac-out</id>							\
+		    <type>encoder</type>						\
+		    <format>								\
+		      <name>FLAC Audio</name>						\
+		      <extension>flac</extension>					\
+		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>		\
+		    </format>								\
+											\
 		";
+
+		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1)
+		{
+			componentSpecs.Append("						\
+											\
+			    <format>							\
+			      <name>Ogg FLAC Files</name>				\
+			      <extension>oga</extension>				\
+			      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
+			    </format>							\
+											\
+			");
+		}
+
+		componentSpecs.Append("							\
+											\
+		  </component>								\
+											\
+		");
 	}
 
 	return componentSpecs;
@@ -56,6 +77,7 @@ Void smooth::DetachDLL()
 
 namespace BoCA
 {
+	FLAC__StreamEncoderReadStatus	 FLACStreamEncoderReadCallback(const FLAC__StreamEncoder *, FLAC__byte[], size_t *, void *);
 	FLAC__StreamEncoderWriteStatus	 FLACStreamEncoderWriteCallback(const FLAC__StreamEncoder *, const FLAC__byte[], size_t, unsigned, unsigned, void *);
 	FLAC__StreamEncoderSeekStatus	 FLACStreamEncoderSeekCallback(const FLAC__StreamEncoder *, FLAC__uint64, void *);
 	FLAC__StreamEncoderTellStatus	 FLACStreamEncoderTellCallback(const FLAC__StreamEncoder *, FLAC__uint64 *, void *);
@@ -85,6 +107,8 @@ Bool BoCA::FLACOut::Activate()
 	}
 
 	Config	*config = Config::Get();
+
+	srand(clock());
 
 	encoder = ex_FLAC__stream_encoder_new();
 
@@ -163,7 +187,8 @@ Bool BoCA::FLACOut::Activate()
 
 	metadata.Add(padding);
 
-	// Put metadata in an array and hand it to the encoder
+	/* Put metadata in an array and hand it to the encoder.
+	 */
 	{
 		FLAC__StreamMetadata	**metadataArray = new FLAC__StreamMetadata * [metadata.Length()];
 
@@ -203,7 +228,22 @@ Bool BoCA::FLACOut::Activate()
 
 	bytesWritten = 0;
 
-	if (ex_FLAC__stream_encoder_init_stream(encoder, &FLACStreamEncoderWriteCallback, &FLACStreamEncoderSeekCallback, &FLACStreamEncoderTellCallback, NIL, this) != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
+	/* Init encoder and check status.
+	 */
+	FLAC__StreamEncoderInitStatus	 status = FLAC__STREAM_ENCODER_INIT_STATUS_OK;
+
+	if (config->GetIntValue("FLAC", "FileFormat", 0) == 0 || *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0)
+	{
+		status = ex_FLAC__stream_encoder_init_stream(encoder, &FLACStreamEncoderWriteCallback, &FLACStreamEncoderSeekCallback, &FLACStreamEncoderTellCallback, NIL, this);
+	}
+	else
+	{
+		ex_FLAC__stream_encoder_set_ogg_serial_number(encoder, rand());
+
+		status = ex_FLAC__stream_encoder_init_ogg_stream(encoder, &FLACStreamEncoderReadCallback, &FLACStreamEncoderWriteCallback, &FLACStreamEncoderSeekCallback, &FLACStreamEncoderTellCallback, NIL, this);
+	}
+
+	if (status != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 	{
 		errorString = "Could not initialize FLAC encoder! Please check the configuration!";
 		errorState  = True;
@@ -247,11 +287,32 @@ Int BoCA::FLACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 	return bytesWritten;
 }
 
+String BoCA::FLACOut::GetOutputFileExtension()
+{
+	Config	*config = Config::Get();
+
+	switch (config->GetIntValue("FLAC", "FileFormat", 0))
+	{
+		default:
+		case  0: return "flac";
+		case  1: return *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 ? "oga" : "flac";
+	}
+}
+
 ConfigLayer *BoCA::FLACOut::GetConfigurationLayer()
 {
 	if (configLayer == NIL) configLayer = new ConfigureFLAC();
 
 	return configLayer;
+}
+
+FLAC__StreamEncoderReadStatus BoCA::FLACStreamEncoderReadCallback(const FLAC__StreamEncoder *encoder, FLAC__byte buffer[], size_t *bytes, void *client_data)
+{
+	FLACOut	*filter = (FLACOut *) client_data;
+
+	*bytes = filter->driver->ReadData((UnsignedByte *) buffer, *bytes);
+
+	return FLAC__STREAM_ENCODER_READ_STATUS_CONTINUE;
 }
 
 FLAC__StreamEncoderWriteStatus BoCA::FLACStreamEncoderWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)

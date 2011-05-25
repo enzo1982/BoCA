@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,16 +18,12 @@ namespace smooth
 		class Surface;
 		class SurfaceBackend;
 	};
-
-	namespace Threads
-	{
-		class Mutex;
-	};
 };
 
 #include "../definitions.h"
-#include "forms/rect.h"
 #include "../misc/string.h"
+#include "../threads/mutex.h"
+#include "forms/rect.h"
 #include "font.h"
 #include "bitmap.h"
 
@@ -38,8 +34,7 @@ namespace smooth
 		class SMOOTHAPI Surface
 		{
 			private:
-				static Int		 numInstances;
-				static Threads::Mutex	*mutex;
+				static Threads::Mutex	 mutex;
 
 				SurfaceBackend		*backend;
 			public:
@@ -74,7 +69,7 @@ namespace smooth
 				Int			 Bar(const Point &, const Point &, Int);
 
 				Int			 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				Int			 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
+				Int			 BlitToBitmap(const Rect &, Bitmap &, const Rect &);
 		};
 
 		const Short	 FRAME_UP	= 0;

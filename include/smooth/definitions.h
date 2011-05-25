@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,10 +15,19 @@
 #	ifndef __int64
 #		define __int64 long long
 #	endif
+
+#	if !defined __APPLE__ && !defined __NetBSD__ && !defined __OpenBSD__
+#		define multithread __thread
+#	else
+#		define multithread
+#	endif
+#else
+#	define multithread __declspec(thread)
 #endif
 
 #include <wchar.h>
 #include <memory.h>
+#include <stddef.h>
 
 #if defined __WIN32__
 #	include "definitions.win32.h"
@@ -65,100 +74,6 @@ using namespace smooth::Errors;
 
 namespace smooth
 {
-	enum Key
-	{
-		SK_OTHER	= 0,
-
-		SK_BACK		= 0x08,
-		SK_TAB,
-
-		SK_RETURN	= 0x0D,
-
-		SK_SHIFT	= 0x10,
-		SK_CONTROL,
-		SK_ALT,
-
-		SK_ESCAPE	= 0x1B,
-
-		SK_SPACE	= 0x20,
-
-		SK_PRIOR,
-		SK_NEXT,
-		SK_END,
-		SK_HOME,
-
-		SK_LEFT,
-		SK_UP,
-		SK_RIGHT,
-		SK_DOWN,
-
-		SK_INSERT	= 0x2D,
-		SK_DELETE,
-
-		SK_0		= 0x30,
-		SK_1,
-		SK_2,
-		SK_3,
-		SK_4,
-		SK_5,
-		SK_6,
-		SK_7,
-		SK_8,
-		SK_9,
-
-		SK_A		= 0x41,
-		SK_B,
-		SK_C,
-		SK_D,
-		SK_E,
-		SK_F,
-		SK_G,
-		SK_H,
-		SK_I,
-		SK_J,
-		SK_K,
-		SK_L,
-		SK_M,
-		SK_N,
-		SK_O,
-		SK_P,
-		SK_Q,
-		SK_R,
-		SK_S,
-		SK_T,
-		SK_U,
-		SK_V,
-		SK_W,
-		SK_X,
-		SK_Y,
-		SK_Z,
-
-		SK_F1		= 0x70,
-		SK_F2,
-		SK_F3,
-		SK_F4,
-		SK_F5,
-		SK_F6,
-		SK_F7,
-		SK_F8,
-		SK_F9,
-		SK_F10,
-		SK_F11,
-		SK_F12,
-		SK_F13,
-		SK_F14,
-		SK_F15,
-		SK_F16,
-		SK_F17,
-		SK_F18,
-		SK_F19,
-		SK_F20,
-		SK_F21,
-		SK_F22,
-		SK_F23,
-		SK_F24
-	};
-
 	enum Message
 	{
 		SM_MOUSEMOVE		= 1024,

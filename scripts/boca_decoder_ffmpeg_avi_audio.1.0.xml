@@ -6,7 +6,7 @@
   <id>ffmpeg-avi_audio-in</id>
   <type>decoder</type>
   <format>
-    <name>AVI Video Files</name>
+    <name>Microsoft AVI Video</name>
     <extension>avi</extension>
     <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
   </format>

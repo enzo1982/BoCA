@@ -40,12 +40,52 @@ const String &BoCA::AIFFIn::GetComponentSpecs()
 
 Bool BoCA::AIFFIn::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
-	Int		 magic = f_in->InputNumber(4);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	delete f_in;
+	if (in.InputString(4) != "FORM") return False;
 
-	return (magic == 1297239878);
+	in.RelSeek(4);
+
+	String	 fileType = in.InputString(4);
+
+	if	(fileType == "AIFF") return True;
+	else if (fileType != "AIFC") return False;
+
+	String		 chunk;
+
+	while (chunk != "COMM")
+	{
+		if (in.GetPos() >= in.Size()) break;
+
+		/* Read next chunk.
+		 */
+		chunk = in.InputString(4);
+
+		Int	 cSize = in.InputNumberRaw(4);
+
+		if (chunk == "COMM")
+		{
+			in.RelSeek(18);
+
+			/* Parse AIFF-C compression type.
+			 */
+			String	 compression = in.InputString(4);
+
+			if (compression == "NONE" || compression == "sowt") return True;
+
+			/* Skip rest of chunk.
+			 */
+			in.RelSeek(cSize - 22 + cSize % 2);
+		}
+		else
+		{
+			/* Skip chunk.
+			 */
+			in.RelSeek(cSize + cSize % 2);
+		}
+	}
+
+	return False;
 }
 
 Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &track)

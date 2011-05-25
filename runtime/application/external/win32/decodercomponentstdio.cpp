@@ -83,21 +83,21 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Read WAVE header into buffer.
 	 */
-	Buffer<UnsignedByte>	 buffer(44);
+	Buffer<UnsignedByte>	 buffer(68);
 	Int			 bytesReadTotal = 0;
 	DWORD			 bytesRead = 0;
 
 	do
 	{
-		if (!ReadFile(rPipe, buffer + bytesReadTotal, 44 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
+		if (!ReadFile(rPipe, buffer + bytesReadTotal, 68 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
 
 		bytesReadTotal += bytesRead;
 	}
-	while (bytesReadTotal < 44);
+	while (bytesReadTotal < 68);
 
-	if (bytesReadTotal == 44)
+	if (bytesReadTotal >= 44)
 	{
-		InStream		*in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
+		InStream		*in = new InStream(STREAM_BUFFER, buffer, bytesReadTotal);
 
 		/* Read decoded WAVE file header
 		 */

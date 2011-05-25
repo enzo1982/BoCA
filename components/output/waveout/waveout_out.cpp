@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -137,6 +137,8 @@ Bool BoCA::WaveOutOut::Activate()
 
 	waveOutRestart(hWaveOut);
 
+	/* Start worker thread.
+	 */
 	thread = NonBlocking0<>(&WaveOutOut::WorkerThread, this).Call();
 
 	return True;
@@ -152,7 +154,9 @@ Bool BoCA::WaveOutOut::Deactivate()
 
 	LeaveCriticalSection(&sync);
 
-	while (thread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(0);
+	/* Wait for worker thread to exit.
+	 */
+	thread->Wait();
 
 	if (hEvent) CloseHandle(hEvent);
 

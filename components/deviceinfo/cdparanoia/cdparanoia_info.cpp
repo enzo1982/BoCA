@@ -23,6 +23,7 @@ extern "C" {
 #	include <linux/cdrom.h>
 #else
 #	include <sys/cdio.h>
+#	include <sys/ioctl.h>
 #endif
 
 #include "cdparanoia_info.h"
@@ -57,6 +58,10 @@ const Array<String> &BoCA::CDParanoiaInfo::FindDrives()
 	static const char	*deviceNames[] = { "/dev/hd?", "/dev/scd?", NIL };
 #elif defined __FreeBSD__
 	static const char	*deviceNames[] = { "/dev/acd?", "/dev/cd?", NIL };
+#elif defined __OpenBSD__
+	static const char	*deviceNames[] = { "/dev/cd?c", NIL };
+#elif defined __NetBSD__
+	static const char	*deviceNames[] = { "/dev/cd?d", NIL };
 #else
 	static const char	*deviceNames[] = { "/dev/cdrom?", NIL };
 #endif
@@ -76,7 +81,12 @@ const Array<String> &BoCA::CDParanoiaInfo::FindDrives()
 			{
 				cdrom_drive	*cd = cdda_identify(fileData->gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
 
-				if (cd != NIL) driveNames.Add(fileData->gl_pathv[n]);
+				if (cd != NIL)
+				{
+					driveNames.Add(fileData->gl_pathv[n]);
+
+					cdda_close(cd);
+				}
 			}
 		}
 
@@ -268,14 +278,14 @@ const BoCA::MCDI &BoCA::CDParanoiaInfo::GetNthDeviceMCDI(Int n)
 			toc.tracks[cd->tracks].rsvd2	   = 0;
 			toc.tracks[cd->tracks].addr	   = htonl(cd->disc_toc[cd->tracks].dwStartSector);
 
-			cdda_close(cd);
-
 			Buffer<UnsignedByte>	 buffer(ntohs(toc.tocLen) + 2);
 
 			memcpy(buffer, &toc, ntohs(toc.tocLen) + 2);
 
 			mcdi.SetData(buffer);
 		}
+
+		cdda_close(cd);
 	}
 
 	lastDrive  = n;
@@ -302,5 +312,7 @@ Void BoCA::CDParanoiaInfo::CollectDriveInfo()
 		drive.canOpenTray = True;
 
 		devices.Add(drive);
+
+		cdda_close(cd);
 	}
 }

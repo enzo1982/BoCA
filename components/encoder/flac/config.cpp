@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "config.h"
+#include "dllinterface.h"
 
 BoCA::ConfigureFLAC::ConfigureFLAC()
 {
@@ -18,6 +19,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	Config	*config = Config::Get();
 
 	preset				= config->GetIntValue("FLAC", "Preset", -1);
+	file_format			= config->GetIntValue("FLAC", "FileFormat", 0);
 	streamable_subset		= config->GetIntValue("FLAC", "StreamableSubset", 1);
 	do_mid_side_stereo		= config->GetIntValue("FLAC", "DoMidSideStereo", 1);
 	loose_mid_side_stereo		= config->GetIntValue("FLAC", "LooseMidSideStereo", 0);
@@ -37,33 +39,15 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 	layer_advanced		= new Layer(i18n->TranslateString("Expert"));
 
-	pos.x = 7;
-	pos.y = 7;
-	size.cx = 498;
-	size.cy = 245;
-
-	tabwidget		= new TabWidget(pos, size);
+	tabwidget		= new TabWidget(Point(7, 7), Size(498, 245));
 
 	i18n->SetContext("Encoders::FLAC::Basic");
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 480;
-	size.cy = 39;
+	group_preset		= new GroupBox(i18n->TranslateString("Presets"), Point(7, 11), Size(480, 39));
 
-	group_preset		= new GroupBox(i18n->TranslateString("Presets"), pos, size);
+	text_preset		= new Text(i18n->TranslateString("Use preset:"), Point(9, 13));
 
-	pos.x += 9;
-	pos.y += 13;
-
-	text_preset		= new Text(i18n->TranslateString("Use preset:"), pos);
-
-	pos.x += (text_preset->textSize.cx + 8);
-	pos.y -= 3;
-	size.cx = 453 - text_preset->textSize.cx;
-	size.cy = 0;
-
-	combo_preset		= new ComboBox(pos, size);
+	combo_preset		= new ComboBox(Point(17 + text_preset->textSize.cx, 10), Size(453 - text_preset->textSize.cx, 0));
 	combo_preset->AddEntry(i18n->TranslateString("Custom settings"));
 	combo_preset->AddEntry(String("0").Append(", ").Append(i18n->TranslateString("Fastest encoding")));
 	combo_preset->AddEntry("1");
@@ -77,86 +61,70 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	combo_preset->SelectNthEntry(preset + 1);
 	combo_preset->onSelectEntry.Connect(&ConfigureFLAC::SetPreset, this);
 
-	pos.x = 7;
-	pos.y = 62;
-	size.cx = 150;
-	size.cy = 65;
+	group_preset->Add(text_preset);
+	group_preset->Add(combo_preset);
 
-	group_stereo		= new GroupBox(i18n->TranslateString("Stereo mode"), pos, size);
+	group_file_format	= new GroupBox(i18n->TranslateString("File format"), Point(7, 62), Size(150, 65));
 
-	pos.x += 10;
-	pos.y += 13;
-	size.cx = 130;
-	size.cy = 0;
+	option_file_format_flac	= new OptionBox("FLAC", Point(10, 13), Size(130, 0), &file_format, 0);
+	option_file_format_ogg	= new OptionBox("Ogg FLAC", Point(10, 38), Size(130, 0), &file_format, 1);
 
-	check_mid_side_stereo	= new CheckBox(i18n->TranslateString("Joint Stereo"), pos, size, &do_mid_side_stereo);
+	if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 0)
+	{
+		file_format = 0;
+
+		option_file_format_ogg->Deactivate();
+	}
+
+	group_file_format->Add(option_file_format_flac);
+	group_file_format->Add(option_file_format_ogg);
+
+	group_stereo		= new GroupBox(i18n->TranslateString("Stereo mode"), Point(165, 62), Size(150, 65));
+
+	check_mid_side_stereo	= new CheckBox(i18n->TranslateString("Joint Stereo"), Point(10, 13), Size(130, 0), &do_mid_side_stereo);
 	check_mid_side_stereo->onAction.Connect(&ConfigureFLAC::SetStereoMode, this);
 
-	pos.y += 25;
+	check_loose_mid_side	= new CheckBox(i18n->TranslateString("Adaptive Joint Stereo"), Point(10, 38), Size(130, 0), &loose_mid_side_stereo);
 
-	check_loose_mid_side	= new CheckBox(i18n->TranslateString("Adaptive Joint Stereo"), pos, size, &loose_mid_side_stereo);
+	group_stereo->Add(check_mid_side_stereo);
+	group_stereo->Add(check_loose_mid_side);
+
+	layer_simple->Add(group_preset);
+	layer_simple->Add(group_file_format);
+	layer_simple->Add(group_stereo);
 
 	i18n->SetContext("Encoders::FLAC::Format");
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 480;
-	size.cy = 66;
+	group_format		= new GroupBox(i18n->TranslateString("Format"), Point(7, 11), Size(480, 66));
 
-	group_format		= new GroupBox(i18n->TranslateString("Format"), pos, size);
-
-	pos.x += 10;
-	pos.y += 13;
-	size.cy = 0;
-
-	check_streamable_subset	= new CheckBox(i18n->TranslateString("Use streamable subset"), pos, size, &streamable_subset);
+	check_streamable_subset	= new CheckBox(i18n->TranslateString("Use streamable subset"), Point(10, 13), Size(480, 0), &streamable_subset);
 	check_streamable_subset->onAction.Connect(&ConfigureFLAC::SetStreamableSubset, this);
 	check_streamable_subset->SetWidth(check_streamable_subset->textSize.cx + 21);
 
-	pos.x -= 1;
-	pos.y += 27;
+	text_blocksize		= new Text(i18n->TranslateString("Blocksize:"), Point(9, 40));
 
-	text_blocksize		= new Text(i18n->TranslateString("Blocksize:"), pos);
-
-	pos.x += text_blocksize->textSize.cx + 7;
-	pos.y -= 2;
-	size.cx = 319;
-
-	slider_blocksize	= new Slider(pos, size, OR_HORZ, &blocksize, 24, 4096);
+	slider_blocksize	= new Slider(Point(16 + text_blocksize->textSize.cx, 38), Size(319, 0), OR_HORZ, &blocksize, 24, 4096);
 	slider_blocksize->onValueChange.Connect(&ConfigureFLAC::SetBlockSize, this);
 
-	pos.x += 328;
-	pos.y -= 1;
-	size.cx = 37;
-
-	edit_blocksize		= new EditBox(NIL, pos, size, 5);
+	edit_blocksize		= new EditBox(NIL, Point(344 + text_blocksize->textSize.cx, 37), Size(37, 0), 5);
 	edit_blocksize->onInput.Connect(&ConfigureFLAC::EditBlockSize, this);
 
-	pos.x += 44;
-	pos.y += 3;
+	text_blocksize_bytes	= new Text(i18n->TranslateString("bytes"), Point(388 + text_blocksize->textSize.cx, 40));
 
-	text_blocksize_bytes	= new Text(i18n->TranslateString("bytes"), pos);
+	group_format->Add(check_streamable_subset);
+	group_format->Add(text_blocksize);
+	group_format->Add(slider_blocksize);
+	group_format->Add(edit_blocksize);
+	group_format->Add(text_blocksize_bytes);
+
+	layer_format->Add(group_format);
 
 	i18n->SetContext("Encoders::FLAC::Expert");
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 480;
-	size.cy = 56;
+	group_apodization	= new GroupBox(i18n->TranslateString("Apodization"), Point(7, 11), Size(480, 56));
 
-	group_apodization	= new GroupBox(i18n->TranslateString("Apodization"), pos, size);
-
-	pos.x += 9;
-	pos.y += 13;
-	size.cy = 0;
-
-	text_apodization	= new Text(i18n->TranslateString("Apodization function(s):"), pos);
-
-	pos.x += text_apodization->textSize.cx + 7;
-	pos.y -= 3;
-	size.cx = 454 - text_apodization->textSize.cx;
-
-	edit_apodization	= new EditBox(config->GetStringValue("FLAC", "Apodization", "tukey(0.5)"), pos, size);
+	text_apodization	= new Text(i18n->TranslateString("Apodization function(s):"), Point(9, 13));
+	edit_apodization	= new EditBox(config->GetStringValue("FLAC", "Apodization", "tukey(0.5)"), Point(16 + text_apodization->textSize.cx, 10), Size(454 - text_apodization->textSize.cx, 0));
 
 	list_apodization	= new ListBox(pos, size);
 	list_apodization->AddEntry("bartlett");
@@ -177,65 +145,31 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	edit_apodization->SetDropDownList(list_apodization);
 
-	pos.x += 2;
-	pos.y += 25;
+	text_apodization_explain= new Text(String(i18n->TranslateString("Note:")).Append(" ").Append(i18n->TranslateString("You can specify multiple functions separated by semicolons.")), Point(18 + text_apodization->textSize.cx, 35));
 
-	text_apodization_explain= new Text(String(i18n->TranslateString("Note:")).Append(" ").Append(i18n->TranslateString("You can specify multiple functions separated by semicolons.")), pos);
+	group_apodization->Add(text_apodization);
+	group_apodization->Add(edit_apodization);
+	group_apodization->Add(text_apodization_explain);
 
-	pos.x = 7;
-	pos.y = 79;
-	size.cx = 480;
-	size.cy = 62;
+	group_lpc		= new GroupBox(i18n->TranslateString("Linear predictor"), Point(7, 79), Size(480, 62));
 
-	group_lpc		= new GroupBox(i18n->TranslateString("Linear predictor"), pos, size);
+	text_max_lpc_order	= new Text(String(i18n->TranslateString("Maximum LPC order")).Append(":"), Point(9, 13));
 
-	pos.x += 9;
-	pos.y += 13;
-
-	text_max_lpc_order	= new Text(String(i18n->TranslateString("Maximum LPC order")).Append(":"), pos);
-
-	pos.x += 7;
-	pos.y -= 2;
-	size.cx = 250;
-
-	slider_max_lpc_order	= new Slider(pos, size, OR_HORZ, &max_lpc_order, 0, 32);
+	slider_max_lpc_order	= new Slider(Point(16, 11), Size(250, 0), OR_HORZ, &max_lpc_order, 0, 32);
 	slider_max_lpc_order->onValueChange.Connect(&ConfigureFLAC::SetLPCOrder, this);
 
-	pos.x += 257;
-	pos.y += 2;
+	text_max_lpc_order_value= new Text(i18n->TranslateString("disabled"), Point(273, 13));
 
-	text_max_lpc_order_value= new Text(i18n->TranslateString("disabled"), pos);
+	check_exhaustive_model	= new CheckBox(i18n->TranslateString("Exhaustive model search"), Point(323, 11), Size(150, 0), &do_exhaustive_model_search);
 
-	pos.x += 50;
-	pos.y -= 2;
-	size.cx = 150;
-	size.cy = 0;
+	text_qlp_precision	= new Text(String(i18n->TranslateString("Quantized LPC precision")).Append(":"), Point(9, 36));
 
-	check_exhaustive_model	= new CheckBox(i18n->TranslateString("Exhaustive model search"), pos, size, &do_exhaustive_model_search);
-
-	pos.x -= 314;
-	pos.y += 25;
-
-	text_qlp_precision	= new Text(String(i18n->TranslateString("Quantized LPC precision")).Append(":"), pos);
-
-	pos.x += 7;
-	pos.y -= 2;
-	size.cx = 250;
-
-	slider_qlp_precision	= new Slider(pos, size, OR_HORZ, &qlp_coeff_precision, 0, 32);
+	slider_qlp_precision	= new Slider(Point(16, 34), Size(250, 0), OR_HORZ, &qlp_coeff_precision, 0, 32);
 	slider_qlp_precision->onValueChange.Connect(&ConfigureFLAC::SetQLPPrecision, this);
 
-	pos.x += 257;
-	pos.y += 2;
+	text_qlp_precision_value= new Text(i18n->TranslateString("auto"), Point(273, 36));
 
-	text_qlp_precision_value= new Text(i18n->TranslateString("auto"), pos);
-
-	pos.x += 50;
-	pos.y -= 2;
-	size.cx = 150;
-	size.cy = 0;
-
-	check_qlp_precision_search= new CheckBox(i18n->TranslateString("Optimize LPC quantization"), pos, size, &do_qlp_coeff_prec_search);
+	check_qlp_precision_search= new CheckBox(i18n->TranslateString("Optimize LPC quantization"), Point(323, 34), Size(150, 0), &do_qlp_coeff_prec_search);
 	check_qlp_precision_search->onAction.Connect(&ConfigureFLAC::SetQLPSearch, this);
 
 	Int	 maxTextSize = Math::Max(text_max_lpc_order_value->textSize.cx, text_qlp_precision_value->textSize.cx);
@@ -243,46 +177,30 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	check_exhaustive_model->SetX(text_max_lpc_order_value->GetX() + maxTextSize + 8); check_exhaustive_model->SetWidth(189 - maxTextSize);
 	check_qlp_precision_search->SetX(text_max_lpc_order_value->GetX() + maxTextSize + 8); check_qlp_precision_search->SetWidth(189 - maxTextSize);
 
-	pos.x = 7;
-	pos.y = 153;
-	size.cx = 296;
-	size.cy = 62;
+	group_lpc->Add(text_max_lpc_order);
+	group_lpc->Add(slider_max_lpc_order);
+	group_lpc->Add(text_max_lpc_order_value);
+	group_lpc->Add(check_exhaustive_model);
+	group_lpc->Add(check_qlp_precision_search);
+	group_lpc->Add(text_qlp_precision);
+	group_lpc->Add(slider_qlp_precision);
+	group_lpc->Add(text_qlp_precision_value);
 
-	group_rice		= new GroupBox(i18n->TranslateString("Residual coding"), pos, size);
+	group_rice		= new GroupBox(i18n->TranslateString("Residual coding"), Point(7, 153), Size(296, 62));
 
-	pos.x += 9;
-	pos.y += 13;
+	text_min_part_order	= new Text(String(i18n->TranslateString("Minimum partition order")).Append(":"), Point(9, 13));
 
-	text_min_part_order	= new Text(String(i18n->TranslateString("Minimum partition order")).Append(":"), pos);
-
-	pos.x += 7;
-	pos.y -= 2;
-	size.cx = 250;
-
-	slider_min_part_order	= new Slider(pos, size, OR_HORZ, &min_residual_partition_order, 0, 16);
+	slider_min_part_order	= new Slider(Point(16, 11), Size(250, 0), OR_HORZ, &min_residual_partition_order, 0, 16);
 	slider_min_part_order->onValueChange.Connect(&ConfigureFLAC::SetRiceOrder, this);
 
-	pos.x += 257;
-	pos.y += 2;
+	text_min_part_order_value= new Text(NIL, Point(273, 13));
 
-	text_min_part_order_value= new Text(NIL, pos);
+	text_max_part_order	= new Text(String(i18n->TranslateString("Maximum partition order")).Append(":"), Point(9, 36));
 
-	pos.x -= 264;
-	pos.y += 23;
-
-	text_max_part_order	= new Text(String(i18n->TranslateString("Maximum partition order")).Append(":"), pos);
-
-	pos.x += 7;
-	pos.y -= 2;
-	size.cx = 250;
-
-	slider_max_part_order	= new Slider(pos, size, OR_HORZ, &max_residual_partition_order, 0, 16);
+	slider_max_part_order	= new Slider(Point(16, 34), Size(250, 0), OR_HORZ, &max_residual_partition_order, 0, 16);
 	slider_max_part_order->onValueChange.Connect(&ConfigureFLAC::SetRiceOrder, this);
 
-	pos.x += 257;
-	pos.y += 2;
-
-	text_max_part_order_value= new Text(NIL, pos);
+	text_max_part_order_value= new Text(NIL, Point(273, 36));
 
 	maxTextSize = Math::Max(Math::Max(text_min_part_order->textSize.cx, text_max_part_order->textSize.cx), Math::Max(text_max_lpc_order->textSize.cx, text_qlp_precision->textSize.cx));
 
@@ -290,6 +208,17 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	slider_max_part_order->SetX(group_lpc->GetX() + 16 + maxTextSize); slider_max_part_order->SetWidth(250 - maxTextSize);
 	slider_max_lpc_order->SetX(group_lpc->GetX() + 16 + maxTextSize); slider_max_lpc_order->SetWidth(250 - maxTextSize);
 	slider_qlp_precision->SetX(group_lpc->GetX() + 16 + maxTextSize); slider_qlp_precision->SetWidth(250 - maxTextSize);
+
+	group_rice->Add(text_min_part_order);
+	group_rice->Add(text_max_part_order);
+	group_rice->Add(slider_min_part_order);
+	group_rice->Add(text_min_part_order_value);
+	group_rice->Add(slider_max_part_order);
+	group_rice->Add(text_max_part_order_value);
+
+	layer_advanced->Add(group_apodization);
+	layer_advanced->Add(group_lpc);
+	layer_advanced->Add(group_rice);
 
 	SetStereoMode();
 	SetStreamableSubset();
@@ -306,43 +235,6 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	tabwidget->Add(layer_format);
 	tabwidget->Add(layer_advanced);
 
-	layer_simple->Add(group_preset);
-	layer_simple->Add(text_preset);
-	layer_simple->Add(combo_preset);
-	layer_simple->Add(group_stereo);
-	layer_simple->Add(check_mid_side_stereo);
-	layer_simple->Add(check_loose_mid_side);
-
-	layer_format->Add(group_format);
-	layer_format->Add(check_streamable_subset);
-	layer_format->Add(text_blocksize);
-	layer_format->Add(slider_blocksize);
-	layer_format->Add(edit_blocksize);
-	layer_format->Add(text_blocksize_bytes);
-
-	layer_advanced->Add(group_apodization);
-	layer_advanced->Add(text_apodization);
-	layer_advanced->Add(edit_apodization);
-	layer_advanced->Add(text_apodization_explain);
-
-	layer_advanced->Add(group_lpc);
-	layer_advanced->Add(text_max_lpc_order);
-	layer_advanced->Add(slider_max_lpc_order);
-	layer_advanced->Add(text_max_lpc_order_value);
-	layer_advanced->Add(check_exhaustive_model);
-	layer_advanced->Add(check_qlp_precision_search);
-	layer_advanced->Add(text_qlp_precision);
-	layer_advanced->Add(slider_qlp_precision);
-	layer_advanced->Add(text_qlp_precision_value);
-
-	layer_advanced->Add(group_rice);
-	layer_advanced->Add(text_min_part_order);
-	layer_advanced->Add(text_max_part_order);
-	layer_advanced->Add(slider_min_part_order);
-	layer_advanced->Add(text_min_part_order_value);
-	layer_advanced->Add(slider_max_part_order);
-	layer_advanced->Add(text_max_part_order_value);
-
 	SetSize(Size(512, 259));
 }
 
@@ -356,6 +248,10 @@ BoCA::ConfigureFLAC::~ConfigureFLAC()
 	DeleteObject(group_preset);
 	DeleteObject(text_preset);
 	DeleteObject(combo_preset);
+
+	DeleteObject(group_file_format);
+	DeleteObject(option_file_format_flac);
+	DeleteObject(option_file_format_ogg);
 
 	DeleteObject(group_stereo);
 	DeleteObject(check_mid_side_stereo);
@@ -398,6 +294,7 @@ Int BoCA::ConfigureFLAC::SaveSettings()
 	Config	*config = Config::Get();
 
 	config->SetIntValue("FLAC", "Preset", preset);
+	config->SetIntValue("FLAC", "FileFormat", file_format);
 	config->SetIntValue("FLAC", "StreamableSubset", streamable_subset);
 	config->SetIntValue("FLAC", "DoMidSideStereo", do_mid_side_stereo);
 	config->SetIntValue("FLAC", "LooseMidSideStereo", loose_mid_side_stereo);
@@ -419,85 +316,23 @@ Void BoCA::ConfigureFLAC::SetPreset()
 
 	if (preset == -1)
 	{
-		check_mid_side_stereo->Activate();
-		check_loose_mid_side->Activate();
+		group_stereo->Activate();
 
-		check_streamable_subset->Activate();
-		text_blocksize->Activate();
-		slider_blocksize->Activate();
-		edit_blocksize->Activate();
-		text_blocksize_bytes->Activate();
+		group_format->Activate();
 
-		text_apodization->Activate();
-		edit_apodization->Activate();
-		text_apodization_explain->Activate();
-
-		text_max_lpc_order->Activate();
-		slider_max_lpc_order->Activate();
-		text_max_lpc_order_value->Activate();
-		check_exhaustive_model->Activate();
-		check_qlp_precision_search->Activate();
-		text_qlp_precision->Activate();
-		slider_qlp_precision->Activate();
-		text_qlp_precision_value->Activate();
-
-		text_min_part_order->Activate();
-		text_max_part_order->Activate();
-		slider_min_part_order->Activate();
-		text_min_part_order_value->Activate();
-		slider_max_part_order->Activate();
-		text_max_part_order_value->Activate();
-
-		if (!do_mid_side_stereo) check_loose_mid_side->Deactivate();
-
-		if (streamable_subset) edit_blocksize->Deactivate();
-
-		if (max_lpc_order == 0)
-		{
-			text_qlp_precision->Deactivate();
-			slider_qlp_precision->Deactivate();
-			text_qlp_precision_value->Deactivate();
-			check_exhaustive_model->Deactivate();
-			check_qlp_precision_search->Deactivate();
-		}
-
-		if (do_qlp_coeff_prec_search)
-		{
-			text_qlp_precision->Deactivate();
-			slider_qlp_precision->Deactivate();
-			text_qlp_precision_value->Deactivate();
-		}
+		group_apodization->Activate();
+		group_lpc->Activate();
+		group_rice->Activate();
 	}
 	else
 	{
-		check_mid_side_stereo->Deactivate();
-		check_loose_mid_side->Deactivate();
+		group_stereo->Deactivate();
 
-		check_streamable_subset->Deactivate();
-		text_blocksize->Deactivate();
-		slider_blocksize->Deactivate();
-		edit_blocksize->Deactivate();
-		text_blocksize_bytes->Deactivate();
+		group_format->Deactivate();
 
-		text_apodization->Deactivate();
-		edit_apodization->Deactivate();
-		text_apodization_explain->Deactivate();
-
-		text_max_lpc_order->Deactivate();
-		slider_max_lpc_order->Deactivate();
-		text_max_lpc_order_value->Deactivate();
-		check_exhaustive_model->Deactivate();
-		check_qlp_precision_search->Deactivate();
-		text_qlp_precision->Deactivate();
-		slider_qlp_precision->Deactivate();
-		text_qlp_precision_value->Deactivate();
-
-		text_min_part_order->Deactivate();
-		text_max_part_order->Deactivate();
-		slider_min_part_order->Deactivate();
-		text_min_part_order_value->Deactivate();
-		slider_max_part_order->Deactivate();
-		text_max_part_order_value->Deactivate();
+		group_apodization->Deactivate();
+		group_lpc->Deactivate();
+		group_rice->Deactivate();
 	}
 }
 

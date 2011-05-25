@@ -1,0 +1,16 @@
+<VideoConverter>
+  <name>Microsoft AVI Video Converter</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-avi_audio-in</decoder>
+
+  <format>
+    <name>Microsoft AVI Video</name>
+    <extension>avi</extension>
+    <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
+  </format>
+
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE -f avi -vcodec mpeg4 -sameq -acodec mp2 -ab 192000 %OUTFILE</arguments>
+  </external>
+</VideoConverter>

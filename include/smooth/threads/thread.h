@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_THREAD
-#define H_OBJSMOOTH_THREAD
+#ifndef H_OBJSMOOTH_THREADS_THREAD
+#define H_OBJSMOOTH_THREADS_THREAD
 
 namespace smooth
 {
@@ -22,6 +22,7 @@ namespace smooth
 
 #include "../basic/object.h"
 #include "../templates/callbacks.h"
+#include "access.h"
 
 namespace smooth
 {
@@ -66,7 +67,9 @@ namespace smooth
 				Int			 Start();
 				Int			 Stop();
 
-				inline static Short	 GetNOfRunningThreads() { return nOfRunningThreads; }
+				Int			 Wait();
+
+				inline static Short	 GetNOfRunningThreads() { return Access::Value(nOfRunningThreads); }
 			callbacks:
 				Callback1<Int, Thread *> threadMain;
 		};

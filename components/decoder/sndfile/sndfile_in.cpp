@@ -99,6 +99,16 @@ Void smooth::DetachDLL()
 
 Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 {
+	/* Do not open Ogg files with SndFile.
+	 */
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
+
+	if (in.InputString(4) == "OggS") return False;
+
+	in.Close();
+
+	/* Check if we can handle this file.
+	 */
 	FILE	*file = 0;
 
 #ifdef __WIN32__

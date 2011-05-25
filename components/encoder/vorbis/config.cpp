@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -15,6 +15,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	Config	*config = Config::Get();
 
 	mode		= config->GetIntValue("Vorbis", "Mode", 0);
+	fileExtension	= config->GetIntValue("Vorbis", "FileExtension", 0);
 	quality		= config->GetIntValue("Vorbis", "Quality", 60);
 	setABRMin	= config->GetIntValue("Vorbis", "SetMinBitrate", False);
 	abrMin		= config->GetIntValue("Vorbis", "MinBitrate", 32);
@@ -27,18 +28,26 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	i18n->SetContext("Encoders::Vorbis");
 
-	group_mode		= new GroupBox(i18n->TranslateString("Encoding Mode"), Point(7, 11), Size(344, 40));
+	group_mode		= new GroupBox(i18n->TranslateString("Encoding Mode"), Point(7, 11), Size(168, 65));
 
-	option_mode_vbr		= new OptionBox(String("VBR (").Append(i18n->TranslateString("Variable Bitrate")).Append(")"), Point(10, 13), Size(158, 0), &mode, 0);
+	option_mode_vbr		= new OptionBox(String("VBR (").Append(i18n->TranslateString("Variable Bitrate")).Append(")"), Point(10, 13), Size(148, 0), &mode, 0);
 	option_mode_vbr->onAction.Connect(&ConfigureVorbis::SetMode, this);
 
-	option_mode_abr		= new OptionBox(String("ABR (").Append(i18n->TranslateString("Average Bitrate")).Append(")"), Point(176, 13), Size(158, 0), &mode, 1);
+	option_mode_abr		= new OptionBox(String("ABR (").Append(i18n->TranslateString("Average Bitrate")).Append(")"), Point(10, 38), Size(148, 0), &mode, 1);
 	option_mode_abr->onAction.Connect(&ConfigureVorbis::SetMode, this);
 
 	group_mode->Add(option_mode_vbr);
 	group_mode->Add(option_mode_abr);
 
-	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 63), Size(344, 42));
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(183, 11), Size(168, 65));
+
+	option_extension_ogg	= new OptionBox(".ogg", Point(10, 13), Size(148, 0), &fileExtension, 0);
+	option_extension_oga	= new OptionBox(".oga", Point(10, 38), Size(148, 0), &fileExtension, 1);
+
+	group_extension->Add(option_extension_ogg);
+	group_extension->Add(option_extension_oga);
+
+	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 88), Size(344, 42));
 
 	text_quality		= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(10, 16));
 
@@ -51,7 +60,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	group_quality->Add(slider_quality);
 	group_quality->Add(text_quality_value);
 
-	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 63), Size(344, 96));
+	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 88), Size(344, 96));
 
 	check_abrmin		= new CheckBox(i18n->TranslateString("Minimum bitrate:"), Point(10, 14), Size(), &setABRMin);
 	check_abrmin->onAction.Connect(&ConfigureVorbis::ToggleABRMin, this);
@@ -127,6 +136,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	SetABRMax();
 
 	Add(group_mode);
+	Add(group_extension);
 	Add(group_quality);
 	Add(group_bitrate);
 
@@ -140,7 +150,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 			break;
 	}
 
-	SetSize(Size(358, 166));
+	SetSize(Size(358, 191));
 }
 
 BoCA::ConfigureVorbis::~ConfigureVorbis()
@@ -148,6 +158,10 @@ BoCA::ConfigureVorbis::~ConfigureVorbis()
 	DeleteObject(group_mode);
 	DeleteObject(option_mode_abr);
 	DeleteObject(option_mode_vbr);
+
+	DeleteObject(group_extension);
+	DeleteObject(option_extension_ogg);
+	DeleteObject(option_extension_oga);
 
 	DeleteObject(group_quality);
 	DeleteObject(slider_quality);
@@ -174,6 +188,7 @@ Int BoCA::ConfigureVorbis::SaveSettings()
 	Config	*config = Config::Get();
 
 	config->SetIntValue("Vorbis", "Mode", mode);
+	config->SetIntValue("Vorbis", "FileExtension", fileExtension);
 	config->SetIntValue("Vorbis", "Quality", quality);
 	config->SetIntValue("Vorbis", "SetMinBitrate", setABRMin);
 	config->SetIntValue("Vorbis", "MinBitrate", abrMin);

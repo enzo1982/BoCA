@@ -32,6 +32,7 @@ namespace smooth
 
 			Buffer<ArrayEntry<s> *>	 entries;
 
+			mutable Bool		 lockingEnabled;
 			mutable Threads::RWLock	*lock;
 
 			Bool IndexAvailable(Int index) const
@@ -77,7 +78,8 @@ namespace smooth
 
 				lastAccessedEntry = 0;
 
-				lock = NIL;
+				lockingEnabled	  = False;
+				lock		  = NIL;
 			}
 
 			virtual	~ArrayBackend()
@@ -233,134 +235,224 @@ namespace smooth
 
 			const s &GetNth(Int n) const
 			{
+				LockForRead();
+
 				if (nOfEntries > n && n >= 0)
 				{
+					const s	&entry = entries[n]->GetValue();
+
 					lastAccessedEntry = n;
 
-					return entries[n]->GetValue();
+					Unlock();
+
+					return entry;
 				}
+
+				Unlock();
 
 				return nullValue;
 			}
 
 			s &GetNthReference(Int n)
 			{
+				LockForRead();
+
 				if (nOfEntries > n && n >= 0)
 				{
+					s	&entry = entries[n]->GetValueReference();
+
 					lastAccessedEntry = n;
 
-					return entries[n]->GetValueReference();
+					Unlock();
+
+					return entry;
 				}
+
+				Unlock();
 
 				return nullValue;
 			}
 
 			const s &GetNthReference(Int n) const
 			{
+				LockForRead();
+
 				if (nOfEntries > n && n >= 0)
 				{
+					const s	&entry = entries[n]->GetValueReference();
+
 					lastAccessedEntry = n;
 
-					return entries[n]->GetValueReference();
+					Unlock();
+
+					return entry;
 				}
+
+				Unlock();
 
 				return nullValue;
 			}
 
 			Bool SetNth(Int n, const s &value)
 			{
+				LockForWrite();
+
 				if (nOfEntries > n && n >= 0)
 				{
+					Bool	 result = entries[n]->SetValue(value);
+
 					lastAccessedEntry = n;
 
-					return entries[n]->SetValue(value);
+					Unlock();
+
+					return result;
 				}
+
+				Unlock();
 
 				return False;
 			}
 
 			Int GetNthIndex(Int n) const
 			{
+				LockForRead();
+
 				if (nOfEntries > n && n >= 0)
 				{
-					return entries[n]->GetIndex();
+					Int	 index = entries[n]->GetIndex();
+
+					Unlock();
+
+					return index;
 				}
+
+				Unlock();
 
 				return -1;
 			}
 
 			const s &GetFirst() const
 			{
+				LockForRead();
+
 				if (nOfEntries > 0)
 				{
+					const s	&entry = entries[0]->GetValue();
+
 					lastAccessedEntry = 0;
 
-					return entries[0]->GetValue();
+					Unlock();
+
+					return entry;
 				}
+
+				Unlock();
 
 				return nullValue;
 			}
 
 			const s &GetLast() const
 			{
+				LockForRead();
+
 				if (nOfEntries > 0)
 				{
+					const s	&entry = entries[nOfEntries - 1]->GetValue();
+
 					lastAccessedEntry = nOfEntries - 1;
 
-					return entries[nOfEntries - 1]->GetValue();
+					Unlock();
+
+					return entry;
 				}
+
+				Unlock();
 
 				return nullValue;
 			}
 
 			const s &GetNext() const
 			{
+				LockForRead();
+
 				if (lastAccessedEntry < nOfEntries - 1)
 				{
-					lastAccessedEntry++;
+					const s	&entry = entries[++lastAccessedEntry]->GetValue();
 
-					return entries[lastAccessedEntry]->GetValue();
+					Unlock();
+
+					return entry;
 				}
+
+				Unlock();
 
 				return nullValue;
 			}
 
 			const s &GetPrev() const
 			{
+				LockForRead();
+
 				if (lastAccessedEntry > 0)
 				{
-					lastAccessedEntry--;
+					const s	&entry = entries[--lastAccessedEntry]->GetValue();
 
-					return entries[lastAccessedEntry]->GetValue();
+					Unlock();
+
+					return entry;
 				}
+
+				Unlock();
 
 				return nullValue;
 			}
 
 			inline Int Length() const
 			{
-				return nOfEntries;
+				LockForRead();
+
+				Int	 nOfEntriesTemp = nOfEntries;
+
+				Unlock();
+
+				return nOfEntriesTemp;
 			}
 
-			inline Int LockForRead() const
+			inline Bool EnableLocking() const
 			{
+				lockingEnabled = True;
+
 				if (lock == NIL) lock = new Threads::RWLock();
 
-				return lock->LockForRead();
+				return True;
 			}
 
-			inline Int LockForWrite() const
+			inline Bool DisableLocking() const
 			{
-				if (lock == NIL) lock = new Threads::RWLock();
+				lockingEnabled = False;
 
-				return lock->LockForWrite();
+				return True;
 			}
 
-			inline Int Unlock() const
+			inline Void LockForRead() const
 			{
-				if (lock == NIL) return 0;
+				if (!lockingEnabled) return;
 
-				return lock->Release();
+				lock->LockForRead();
+			}
+
+			inline Void LockForWrite() const
+			{
+				if (!lockingEnabled) return;
+
+				lock->LockForWrite();
+			}
+
+			inline Void Unlock() const
+			{
+				if (!lockingEnabled) return;
+
+				lock->Release();
 			}
 	};
 };

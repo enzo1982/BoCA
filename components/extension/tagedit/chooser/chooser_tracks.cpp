@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -18,8 +18,13 @@ BoCA::ChooserTracks::ChooserTracks() : Chooser("Tracks")
 
 	SetText(i18n->TranslateString("Tracks"));
 
+	tracks.EnableLocking();
+
 	list_tracks	= new ListBox(Point(7, 7), Size(100, 150));
 	list_tracks->onSelectEntry.Connect(&ChooserTracks::OnSelectTrack, this);
+
+	list_tracks->EnableLocking();
+
 	list_tracks->AddTab(i18n->TranslateString("Title"));
 	list_tracks->AddTab(i18n->TranslateString("Track"), 50, OR_RIGHT);
 	list_tracks->AddTab(i18n->TranslateString("Length"), 80, OR_RIGHT);

@@ -33,6 +33,7 @@ const String &BoCA::VorbisIn::GetComponentSpecs()
 		    <format>								\
 		      <name>Ogg Vorbis Audio</name>					\
 		      <extension>ogg</extension>					\
+		      <extension>oga</extension>					\
 		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
 		    </format>								\
 		  </component>								\
@@ -57,7 +58,56 @@ Void smooth::DetachDLL()
 
 Bool BoCA::VorbisIn::CanOpenStream(const String &streamURI)
 {
-	return streamURI.ToLower().EndsWith(".ogg");
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
+
+	if (in.InputString(4) != "OggS") return False;
+
+	in.Seek(0);
+
+	ogg_sync_state		 oy;
+	ogg_stream_state	 os;
+	ogg_page		 og;
+	ogg_packet		 op;
+
+	ex_ogg_sync_init(&oy);
+
+	Bool	 result = False;
+
+	Bool	 initialized = False;
+	Bool	 done = False;
+
+	while (!done)
+	{
+		Int	 size	= Math::Min((Int64) 4096, in.Size() - in.GetPos());
+		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+
+		in.InputData(buffer, size);
+
+		ex_ogg_sync_wrote(&oy, size);
+
+		if (ex_ogg_sync_pageout(&oy, &og) == 1)
+		{
+			ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+
+			initialized = True;
+
+			ex_ogg_stream_pagein(&os, &og);
+
+			if (ex_ogg_stream_packetout(&os, &op) == 1)
+			{
+				if (op.packet[0] ==  1  &&
+				    op.packet[1] == 'v' && op.packet[2] == 'o' && op.packet[3] == 'r' && op.packet[4] == 'b' && op.packet[5] == 'i' && op.packet[6] == 's') result = True;
+
+				done = True;
+			}
+		}
+	}
+
+	if (initialized) ex_ogg_stream_clear(&os);
+
+	ex_ogg_sync_clear(&oy);
+
+	return result;
 }
 
 Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)

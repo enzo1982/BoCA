@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -40,8 +40,6 @@ namespace BoCA
 		public:
 			String		 configDir;
 
-			Bool		 languageChanged;
-
 			Bool		 enable_console;
 
 			Int		 cdrip_numdrives;
@@ -58,6 +56,17 @@ namespace BoCA
 
 			Bool		 LoadSettings();
 			Bool		 SaveSettings();
+
+			Int		 AddConfiguration(const String &);
+			Int		 RemoveConfiguration(const String &);
+
+			Int		 GetNOfConfigurations();
+			String		 GetNthConfigurationName(Int);
+
+			Int		 SetActiveConfiguration(const String &);
+
+			String		 GetConfigurationName();
+			Int		 SetConfigurationName(const String &);
 
 			Void		 SetSaveSettingsOnExit(Bool);
 

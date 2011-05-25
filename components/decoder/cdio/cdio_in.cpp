@@ -17,7 +17,12 @@ extern "C" {
 #	include <cdio/paranoia.h>
 }
 
-#include <glob.h>
+#include <unistd.h>
+#include <limits.h>
+
+#ifndef PATH_MAX
+#	define PATH_MAX 32768
+#endif
 
 #include "cdio_in.h"
 #include "config.h"
@@ -54,35 +59,62 @@ const String &BoCA::CDIOIn::GetComponentSpecs()
 
 const Array<String> &BoCA::CDIOIn::FindDrives()
 {
-#if defined __linux__
-	static const char	*deviceNames[] = { "/dev/hd?", "/dev/scd?", NIL };
-#elif defined __FreeBSD__
-	static const char	*deviceNames[] = { "/dev/acd?", "/dev/cd?", NIL };
-#else
-	static const char	*deviceNames[] = { "/dev/cdrom?", NIL };
-#endif
-
 	static Array<String>	 driveNames;
 	static Bool		 initialized = False;
 
 	if (initialized) return driveNames;
 
+#ifndef __NetBSD__
+	char	**deviceNames = cdio_get_devices(DRIVER_DEVICE);
+#else
+	char	*deviceNames[3] = { "/dev/cd0d", "/dev/cd1d", NIL };
+#endif
+
 	for (Int i = 0; deviceNames[i] != NIL; i++)
 	{
-		glob_t	*fileData = new glob_t;
+		String		 deviceName = deviceNames[i];
 
-		if (glob(deviceNames[i], 0, NIL, fileData) == 0)
+		/* Resolve link if it is one.
+		 */
+		Buffer<char>	 buffer(PATH_MAX + 1);
+
+		buffer.Zero();
+
+		if (readlink(deviceName, buffer, buffer.Size() - 1) >= 0)
 		{
-			for (UnsignedInt n = 0; n < fileData->gl_pathc; n++)
-			{
-				cdrom_drive_t	*cd = cdio_cddap_identify(fileData->gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
+			if (buffer[0] == '/') deviceName = buffer;
+			else		      deviceName = String(File(deviceName).GetFilePath()).Append("/").Append(buffer);
+		}
 
-				if (cd != NIL) driveNames.Add(fileData->gl_pathv[n]);
+		/* Check if we aleady know this device.
+		 */
+		foreach (const String &driveName, driveNames)
+		{
+			if (driveName == deviceName)
+			{
+				deviceName = NIL;
+
+				break;
 			}
 		}
 
-		globfree(fileData);
+		if (deviceName == NIL) continue;
+
+		/* Try to open device and add it to the list.
+		 */
+		cdrom_drive_t	*cd = cdio_cddap_identify(deviceName, CDDA_MESSAGE_FORGETIT, NIL);
+
+		if (cd != NIL)
+		{
+			driveNames.Add(deviceName);
+
+			cdio_cddap_close(cd);
+		}
 	}
+
+#ifndef __NetBSD__
+	cdio_free_device_list(deviceNames);
+#endif
 
 	initialized = True;
 

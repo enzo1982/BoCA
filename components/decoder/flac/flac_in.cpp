@@ -24,22 +24,40 @@ const String &BoCA::FLACIn::GetComponentSpecs()
 
 	if (flacdll != NIL)
 	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>FLAC Audio Decoder</name>				\
-		    <version>1.0</version>					\
-		    <id>flac-in</id>						\
-		    <type>decoder</type>					\
-		    <format>							\
-		      <name>FLAC Audio Files</name>				\
-		      <extension>flac</extension>				\
-		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
-		    </format>							\
-		  </component>							\
-										\
+		componentSpecs = "							\
+											\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
+		  <component>								\
+		    <name>FLAC Audio Decoder</name>					\
+		    <version>1.0</version>						\
+		    <id>flac-in</id>							\
+		    <type>decoder</type>						\
+		    <format>								\
+		      <name>FLAC Audio Files</name>					\
+		      <extension>flac</extension>					\
+		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>		\
+		    </format>								\
+											\
 		";
+
+		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 && oggdll != NIL)
+		{
+			componentSpecs.Append("						\
+											\
+			    <format>							\
+			      <name>Ogg FLAC Files</name>				\
+			      <extension>oga</extension>				\
+			      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
+			    </format>							\
+											\
+			");
+		}
+
+		componentSpecs.Append("							\
+											\
+		  </component>								\
+											\
+		");
 	}
 
 	return componentSpecs;
@@ -47,11 +65,13 @@ const String &BoCA::FLACIn::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
+	LoadOggDLL();
 	LoadFLACDLL();
 }
 
 Void smooth::DetachDLL()
 {
+	FreeOggDLL();
 	FreeFLACDLL();
 }
 
@@ -69,7 +89,62 @@ namespace BoCA
 
 Bool BoCA::FLACIn::CanOpenStream(const String &streamURI)
 {
-	return streamURI.ToLower().EndsWith(".flac");
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
+
+	String	 fileType = in.InputString(4);
+
+	if	(fileType == "fLaC") return True;
+	else if (fileType != "OggS") return False;
+
+	if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 0 || oggdll == NIL) return False;
+
+	in.Seek(0);
+
+	ogg_sync_state		 oy;
+	ogg_stream_state	 os;
+	ogg_page		 og;
+	ogg_packet		 op;
+
+	ex_ogg_sync_init(&oy);
+
+	Bool	 result = False;
+
+	Bool	 initialized = False;
+	Bool	 done = False;
+
+	while (!done)
+	{
+		Int	 size	= Math::Min((Int64) 4096, in.Size() - in.GetPos());
+		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+
+		in.InputData(buffer, size);
+
+		ex_ogg_sync_wrote(&oy, size);
+
+		if (ex_ogg_sync_pageout(&oy, &og) == 1)
+		{
+			ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+
+			initialized = True;
+
+			ex_ogg_stream_pagein(&os, &og);
+
+			if (ex_ogg_stream_packetout(&os, &op) == 1)
+			{
+				if (op.packet[0] == 0x7F &&
+				    op.packet[1] == 'F' && op.packet[2] == 'L' && op.packet[3] == 'A' && op.packet[4] == 'C' &&
+				    op.packet[5] == 0x01) result = True;
+
+				done = True;
+			}
+		}
+	}
+
+	if (initialized) ex_ogg_stream_clear(&os);
+
+	ex_ogg_sync_clear(&oy);
+
+	return result;
 }
 
 Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
@@ -88,8 +163,7 @@ Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
 	samplesBufferMutex = new Mutex();
 
 	decoderThread = NonBlocking1<Bool>(&FLACIn::ReadFLAC, this).Call(False);
-
-	while (decoderThread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(0);
+	decoderThread->Wait();
 
 	delete readDataMutex;
 	delete samplesBufferMutex;
@@ -135,7 +209,7 @@ Bool BoCA::FLACIn::Deactivate()
 
 		readDataMutex->Release();
 
-		while (decoderThread->GetStatus() == THREAD_RUNNING) S::System::System::Sleep(0);
+		decoderThread->Wait();
 	}
 
 	delete readDataMutex;
@@ -195,7 +269,13 @@ Int BoCA::FLACIn::ReadFLAC(Bool readData)
 		ex_FLAC__stream_decoder_set_metadata_respond(decoder, FLAC__METADATA_TYPE_PICTURE);
 	}
 
-	ex_FLAC__stream_decoder_init_stream(decoder, &FLACStreamDecoderReadCallback, &FLACStreamDecoderSeekCallback, &FLACStreamDecoderTellCallback, &FLACStreamDecoderLengthCallback, &FLACStreamDecoderEofCallback, &FLACStreamDecoderWriteCallback, &FLACStreamDecoderMetadataCallback, &FLACStreamDecoderErrorCallback, this);
+	char	 signature[5] = { 0, 0, 0, 0, 0 };
+
+	driver->ReadData((UnsignedByte *) signature, 4);
+	driver->Seek(0);
+
+	if	(String(signature) == "fLaC") ex_FLAC__stream_decoder_init_stream(decoder, &FLACStreamDecoderReadCallback, &FLACStreamDecoderSeekCallback, &FLACStreamDecoderTellCallback, &FLACStreamDecoderLengthCallback, &FLACStreamDecoderEofCallback, &FLACStreamDecoderWriteCallback, &FLACStreamDecoderMetadataCallback, &FLACStreamDecoderErrorCallback, this);
+	else if (String(signature) == "OggS") ex_FLAC__stream_decoder_init_ogg_stream(decoder, &FLACStreamDecoderReadCallback, &FLACStreamDecoderSeekCallback, &FLACStreamDecoderTellCallback, &FLACStreamDecoderLengthCallback, &FLACStreamDecoderEofCallback, &FLACStreamDecoderWriteCallback, &FLACStreamDecoderMetadataCallback, &FLACStreamDecoderErrorCallback, this);
 
 	ex_FLAC__stream_decoder_process_until_end_of_metadata(decoder);
 
@@ -222,7 +302,7 @@ FLAC__StreamDecoderReadStatus BoCA::FLACStreamDecoderReadCallback(const FLAC__St
 
 	filter->readDataMutex->Release();
 
-	return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
+	return filter->stop ? FLAC__STREAM_DECODER_READ_STATUS_ABORT : FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 }
 
 FLAC__StreamDecoderWriteStatus BoCA::FLACStreamDecoderWriteCallback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)

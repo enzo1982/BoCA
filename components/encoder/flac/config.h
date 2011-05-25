@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -31,6 +31,10 @@ namespace BoCA
 			GroupBox	*group_preset;
 			Text		*text_preset;
 			ComboBox	*combo_preset;
+
+			GroupBox	*group_file_format;
+			OptionBox	*option_file_format_flac;
+			OptionBox	*option_file_format_ogg;
 
 			GroupBox	*group_stereo;
 			CheckBox	*check_mid_side_stereo;
@@ -72,6 +76,7 @@ namespace BoCA
 			Text		*text_max_part_order_value;
 
 			Int		 preset;
+			Int		 file_format;
 			Bool		 streamable_subset;
 			Bool		 do_mid_side_stereo;
 			Bool		 loose_mid_side_stereo;

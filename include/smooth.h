@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -59,6 +59,7 @@
 #include "smooth/files/directory.h"
 #include "smooth/files/file.h"
 
+#include "smooth/input/keyboard.h"
 #include "smooth/input/pointer.h"
 
 #include "smooth/io/instream.h"
@@ -73,6 +74,7 @@
 #include "smooth/threads/rwlock.h"
 #include "smooth/threads/semaphore.h"
 #include "smooth/threads/thread.h"
+#include "smooth/threads/access.h"
 
 #include "smooth/graphics/forms/line.h"
 #include "smooth/graphics/forms/point.h"
@@ -114,6 +116,9 @@
 #elif defined __APPLE__
 #	include "smooth/gui/dialogs/directory/dirdlg_cocoa.h"
 #	include "smooth/gui/dialogs/file/filedlg_cocoa.h"
+#elif defined __QNXNTO__
+#	include "smooth/gui/dialogs/directory/dirdlg_photon.h"
+#	include "smooth/gui/dialogs/file/filedlg_photon.h"
 #else
 #	include "smooth/gui/dialogs/directory/dirdlg_gtk.h"
 #	include "smooth/gui/dialogs/file/filedlg_gtk.h"

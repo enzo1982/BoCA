@@ -7,6 +7,8 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
+include $(BOCA_PATH)/Makefile-options
+
 # Enter object files here:
 OBJECTS	  = oss_out.o
 
@@ -14,7 +16,11 @@ OBJECTS	  = oss_out.o
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  =
+ifeq ($(BUILD_OPENBSD),True)
+	LIBS	  = -lossaudio
+else ifeq ($(BUILD_NETBSD),True)
+	LIBS	  = -lossaudio
+endif
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

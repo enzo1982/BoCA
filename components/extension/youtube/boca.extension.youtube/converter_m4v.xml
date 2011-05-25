@@ -1,0 +1,16 @@
+<VideoConverter>
+  <name>MP4 Video Converter</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-m4v_audio-in</decoder>
+
+  <format>
+    <name>MP4 Video</name>
+    <extension>m4v</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+  </format>
+
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE -f mp4 -vcodec copy -acodec copy %OUTFILE</arguments>
+  </external>
+</VideoConverter>

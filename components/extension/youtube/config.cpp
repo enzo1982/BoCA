@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "config.h"
+#include "converter.h"
 
 using namespace smooth::GUI::Dialogs;
 
@@ -48,7 +49,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	group_auto->Add(check_auto_download);
 
-	group_files		= new GroupBox(i18n->TranslateString("Video files"), Point(7, 117), Size(344, 69));
+	group_files		= new GroupBox(i18n->TranslateString("Video files"), Point(7, 117), Size(344, 96));
 
 	check_keep		= new CheckBox(i18n->TranslateString("Save downloaded video files"), Point(10, 14), Size(236, 0), &keepVideoFiles);
 	check_keep->onAction.Connect(&ConfigureYouTube::ToggleKeepFiles, this);
@@ -60,9 +61,27 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 	button_browse		= new Button(i18n->TranslateString("Browse"), NIL, Point(254, 38), Size(0, 0));
 	button_browse->onAction.Connect(&ConfigureYouTube::SelectOutputDir, this);
 
+	text_format		= new Text(i18n->TranslateString("Output format:"), Point(10, 70));
+
+	combo_format		= new ComboBox(Point(17 + text_format->textSize.cx, 67), Size(317 - text_format->textSize.cx, 0));
+	combo_format->AddEntry(i18n->TranslateString("keep original format"));
+
+	Array<Converter *>	&converters = Converter::Get();
+
+	foreach (Converter *converter, converters)
+	{
+		AS::FileFormat	*format = converter->GetFormat();
+
+		combo_format->AddEntry(String(format->GetName()).Append(" (*.").Append(format->GetExtensions().GetFirst()).Append(")"));
+	}
+
+	combo_format->SelectNthEntry(config->GetIntValue("YouTube", "OutputFormat", -1) + 1);
+
 	group_files->Add(check_keep);
 	group_files->Add(edit_dir);
 	group_files->Add(button_browse);
+	group_files->Add(text_format);
+	group_files->Add(combo_format);
 
 	Add(group_auto);
 	Add(group_downloads);
@@ -70,7 +89,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	ToggleKeepFiles();
 
-	SetSize(Size(358, 193));
+	SetSize(Size(358, 220));
 }
 
 BoCA::ConfigureYouTube::~ConfigureYouTube()
@@ -88,6 +107,9 @@ BoCA::ConfigureYouTube::~ConfigureYouTube()
 
 	DeleteObject(edit_dir);
 	DeleteObject(button_browse);
+
+	DeleteObject(text_format);
+	DeleteObject(combo_format);
 }
 
 Void BoCA::ConfigureYouTube::EditMaxDownloads()
@@ -106,11 +128,25 @@ Void BoCA::ConfigureYouTube::ToggleKeepFiles()
 	{
 		edit_dir->Activate();
 		button_browse->Activate();
+
+		if (Converter::Get().Length() > 0)
+		{
+			text_format->Activate();
+			combo_format->Activate();
+		}
+		else
+		{
+			text_format->Deactivate();
+			combo_format->Deactivate();
+		}
 	}
 	else
 	{
 		edit_dir->Deactivate();
 		button_browse->Deactivate();
+
+		text_format->Deactivate();
+		combo_format->Deactivate();
 	}
 }
 
@@ -147,6 +183,7 @@ Int BoCA::ConfigureYouTube::SaveSettings()
 	config->SetIntValue("YouTube", "AutoDownload", autoDownload);
 	config->SetIntValue("YouTube", "MaxDownloads", maxDownloads);
 	config->SetIntValue("YouTube", "SaveVideoFiles", keepVideoFiles);
+	config->SetIntValue("YouTube", "OutputFormat", combo_format->GetSelectedEntryNumber() - 1);
 
 	return Success();
 }

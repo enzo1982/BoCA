@@ -57,6 +57,10 @@ const Array<String> &BoCA::CDParanoiaIn::FindDrives()
 	static const char	*deviceNames[] = { "/dev/hd?", "/dev/scd?", NIL };
 #elif defined __FreeBSD__
 	static const char	*deviceNames[] = { "/dev/acd?", "/dev/cd?", NIL };
+#elif defined __OpenBSD__
+	static const char	*deviceNames[] = { "/dev/cd?c", NIL };
+#elif defined __NetBSD__
+	static const char	*deviceNames[] = { "/dev/cd?d", NIL };
 #else
 	static const char	*deviceNames[] = { "/dev/cdrom?", NIL };
 #endif
@@ -76,7 +80,12 @@ const Array<String> &BoCA::CDParanoiaIn::FindDrives()
 			{
 				cdrom_drive	*cd = cdda_identify(fileData->gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
 
-				if (cd != NIL) driveNames.Add(fileData->gl_pathv[n]);
+				if (cd != NIL)
+				{
+					driveNames.Add(fileData->gl_pathv[n]);
+
+					cdda_close(cd);
+				}
 			}
 		}
 

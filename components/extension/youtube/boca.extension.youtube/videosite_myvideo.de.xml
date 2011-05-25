@@ -1,0 +1,43 @@
+<VideoSite>
+  <name>MyVideo.de</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-flv_audio-in</decoder>
+
+  <script type="text/javascript">
+    function canHandleURL(URL) {
+      if (URL.toLowerCase().match(/http:\/\/www.myvideo.de\/watch\/.*/) ||
+	  URL.toLowerCase().match(/http:\/\/www.myvideo.de\/themen\/.*m_id=.*/)) return true;
+      else									 return false;
+    }
+
+    function getVideoURL(html) {
+      var id	  = (html.match(/p.addVariable\('v','(.*?)'\);/) ? RegExp.$1 :
+		    (html.match(/p.addVariable\('ID', '(.*?)'\);/), RegExp.$1));
+
+      var regExp  = new RegExp("'(http:\/\/[^']*?\/thumbs\/" + id + "_[0-9]+.jpg)'");
+      var results = null;
+
+      return (results = regExp.exec(html)), results != null ? results[1].replace(/thumbs\//, "").replace(/_[0-9]+.jpg/, ".flv") : null;
+    }
+
+    function queryMetadata(html) {
+      var id	   = (html.match(/p.addVariable\('v','(.*?)'\);/) ? RegExp.$1 :
+		     (html.match(/p.addVariable\('ID', '(.*?)'\);/), RegExp.$1));
+
+      var regExp   = new RegExp("'(http:\/\/[^']*?\/thumbs\/" + id + "_[0-9]+.jpg)'");
+      var results  = null;
+
+      var metadata = new Metadata();
+
+      metadata.title	   = (html.match(/&lt;h1 class='globalHd'&gt;(.*?)&lt;\/h1&gt;/) ? RegExp.$1 : null);
+      metadata.description = (html.match(/Beschreibung: &lt;\/div&gt;&lt;div .*?&gt;&lt;div&gt;((?:.|\n|\r)*?)&lt;\/div&gt;&lt;\/div&gt;/) ? RegExp.$1 : null);
+
+      metadata.date	   = (html.match(/Eingestellt am: (.*?)&lt;\/div&gt;/) ? RegExp.$1 : null);
+      metadata.thumbnail   = ((results = regExp.exec(html)), results != null ? results[1] : null);
+
+      metadata.uploader	   = (html.match(/Von: &lt;a .*?&gt;(.*?)&lt;\/a&gt;/) ? RegExp.$1 : null);
+
+      return metadata;
+    }
+  </script>
+</VideoSite>

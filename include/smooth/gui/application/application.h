@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,17 +30,26 @@ namespace smooth
 		abstract class SMOOTHAPI Application : public Widget
 		{
 			private:
-				static String		 startupDirectory;
-				static String		 applicationDirectory;
+				static String			 command;
+				static Array<String>		 args;
+
+				static String			 startupDirectory;
+				static String			 applicationDirectory;
 			public:
-				static const Short	 classID;
+				static const Short		 classID;
 
-							 Application(const String & = NIL);
+								 Application(const String & = NIL);
 
-				Int			 Loop();
+				Int				 Loop();
+			accessors:
+				static Void			 SetCommand(const String &nCommand)	{ command = nCommand; }
+				static Void			 SetArguments(const Array<String> &);
 
-				static String		 GetStartupDirectory();
-				static String		 GetApplicationDirectory();
+				static const String		&GetCommand()				{ return command; }
+				static const Array<String>	&GetArguments()				{ return args; }
+
+				static String			 GetStartupDirectory();
+				static String			 GetApplicationDirectory();
 		};
 	};
 };

@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
+#include "lame/lame.h"
 
 BoCA_BEGIN_COMPONENT(LAMEIn)
 
@@ -17,6 +18,8 @@ namespace BoCA
 	class LAMEIn : public CS::DecoderComponent
 	{
 		private:
+			hip_t			 context;
+
 			Buffer<short>		 pcm_l;
 			Buffer<short>		 pcm_r;
 

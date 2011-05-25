@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = config.o layer.o scriptutilities.o video.o videolist.o videolistentry.o videosite.o youtube.o
+OBJECTS	  = config.o converter.o layer.o scriptutilities.o video.o videolist.o videolistentry.o videosite.o youtube.o
 
 # Enter additional defines here:
 DEFINE	  =

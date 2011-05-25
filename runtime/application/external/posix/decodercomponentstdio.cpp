@@ -56,23 +56,23 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Read WAVE header into buffer.
 	 */
-	Buffer<UnsignedByte>	 buffer(44);
+	Buffer<UnsignedByte>	 buffer(68);
 	Int			 bytesReadTotal = 0;
 	Int			 bytesRead = 0;
 
 	do
 	{
-		bytesRead = fread(buffer + bytesReadTotal, 1, 44 - bytesReadTotal, rPipe);
+		bytesRead = fread(buffer + bytesReadTotal, 1, 68 - bytesReadTotal, rPipe);
 
-		if (bytesRead != 44 - bytesReadTotal && (ferror(rPipe) || bytesRead == 0)) break;
+		if (bytesRead != 68 - bytesReadTotal && (ferror(rPipe) || bytesRead == 0)) break;
 
 		bytesReadTotal += bytesRead;
 	}
-	while (bytesReadTotal < 44);
+	while (bytesReadTotal < 68);
 
-	if (bytesReadTotal == 44)
+	if (bytesReadTotal >= 44)
 	{
-		InStream		*in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
+		InStream		*in = new InStream(STREAM_BUFFER, buffer, bytesReadTotal);
 
 		/* Read decoded WAVE file header
 		 */

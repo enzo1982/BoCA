@@ -19,6 +19,12 @@ else
 	LDOPTS += -m32
 endif
 
+ifneq ($(BUILD_WIN32),True)
+ifneq ($(BUILD_SOLARIS),True)
+	CCOPTS += -pthread
+endif
+endif
+
 ifeq ($(BUILD_WIN32),True)
 	DLLEXT = .dll
 
@@ -31,12 +37,18 @@ else ifeq ($(BUILD_OSX),True)
 else
 	DLLEXT = .so
 
-	CCOPTS += -I/usr/local/include
-	LDOPTS += -L/usr/local/lib -Wl,-rpath,.
-
-ifeq ($(BUILD_SOLARIS),True)
-	CCOPTS += -fpic
-endif
+	ifeq ($(BUILD_SOLARIS),True)
+		CCOPTS += -fpic
+		LDOPTS += -Wl,-rpath,.
+	else ifeq ($(BUILD_NETBSD),True)
+		CCOPTS += -I/usr/pkg/include
+		LDOPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,.
+	else ifeq ($(BUILD_HAIKU),True)
+		LDOPTS += -L/boot/common/lib -Wl,-rpath,.
+	else
+		CCOPTS += -I/usr/local/include
+		LDOPTS += -L/usr/local/lib -Wl,-rpath,.
+	endif
 endif
 
 all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT)

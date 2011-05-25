@@ -6,10 +6,18 @@ include $(BOCA_PATH)/Makefile-options
 
 all:
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_SOLARIS),True)
-	cd cdio && $(MAKE)
 ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_QNX),True)
+ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_OPENBSD),True)
+	cd cdio && $(MAKE)
+endif
+ifneq ($(BUILD_NETBSD),True)
+ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE)
+endif
+endif
+endif
 endif
 endif
 endif
@@ -19,10 +27,18 @@ endif
 
 clean:
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_SOLARIS),True)
-	cd cdio && $(MAKE) clean
 ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_QNX),True)
+ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_OPENBSD),True)
+	cd cdio && $(MAKE) clean
+endif
+ifneq ($(BUILD_NETBSD),True)
+ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE) clean
+endif
+endif
+endif
 endif
 endif
 endif

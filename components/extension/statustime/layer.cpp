@@ -12,6 +12,10 @@
 
 BoCA::LayerLengthStatus::LayerLengthStatus()
 {
+	tracks.EnableLocking();
+	tracks_selected.EnableLocking();
+	tracks_unselected.EnableLocking();
+
 	display_selected	= new LengthDisplay(ImageLoader::Load("freac.pci:18"));
 	display_unselected	= new LengthDisplay(ImageLoader::Load("freac.pci:19"));
 	display_all		= new LengthDisplay(ImageLoader::Load("freac.pci:20"));
@@ -47,7 +51,12 @@ BoCA::LayerLengthStatus::~LayerLengthStatus()
 
 Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 {
-	Hide();
+	Surface	*surface = GetDrawSurface();
+
+	if (IsRegistered())
+	{
+		surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+	}
 
 	display_selected->SetText(GetTotalLengthString(tracks_selected));
 	display_unselected->SetText(GetTotalLengthString(tracks_unselected));
@@ -59,9 +68,12 @@ Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 
 	SetSize(Size(display_all->GetWidth() + display_selected->GetWidth() + display_unselected->GetWidth() + 6, display_all->GetHeight()));
 
-	if (IsRegistered()) container->Paint(SP_UPDATE);
+	if (IsRegistered())
+	{
+		container->Paint(SP_UPDATE);
 
-	Show();
+		surface->EndPaint();
+	}
 }
 
 const String &BoCA::LayerLengthStatus::GetTotalLengthString(const Array<Track> &tracks)

@@ -1,0 +1,15 @@
+<VideoConverter>
+  <name>Adobe Flash Video Converter</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-flv_audio-in</decoder>
+
+  <format>
+    <name>Adobe Flash Video</name>
+    <extension>flv</extension>
+  </format>
+
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE -f flv -vcodec copy -acodec copy %OUTFILE</arguments>
+  </external>
+</VideoConverter>

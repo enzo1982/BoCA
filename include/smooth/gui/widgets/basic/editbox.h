@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -60,8 +60,10 @@ namespace smooth
 			signals:
 				Signal1<Void, const String &>	 onInput;
 				Signal1<Void, const String &>	 onEnter;
+
+				Signal1<Void, ListEntry *>	 onSelectEntry;
 			slots:
-				Void				 OnSelectListEntry(ListEntry *);
+				Void				 OnSelectEntry(ListEntry *);
 
 				Void				 OnChangeSize(const Size &);
 		};

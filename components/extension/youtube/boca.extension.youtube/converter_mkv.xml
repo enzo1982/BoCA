@@ -1,0 +1,15 @@
+<VideoConverter>
+  <name>Matroska Video Converter</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-mkv_audio-in</decoder>
+
+  <format>
+    <name>Matroska Video</name>
+    <extension>mkv</extension>
+  </format>
+
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE -f matroska -vcodec copy -acodec copy %OUTFILE</arguments>
+  </external>
+</VideoConverter>

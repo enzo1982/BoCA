@@ -26,6 +26,7 @@ BoCA::AS::ComponentSpecs::~ComponentSpecs()
 	if (library != NIL) delete library;
 
 	foreach (FileFormat *format, formats) delete format;
+	foreach (TagFormat *format, tag_formats) delete format;
 
 	foreach (Parameter *parameter, external_parameters)
 	{
@@ -320,9 +321,13 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 		if (external_command[0] != '/' && external_command[1] != ':')
 		{
 #if defined __WIN32__
-			static const char	*places[] = { "%APPDIR\\%COMMAND", "%APPDIR\\codecs\\cmdline\\%COMMAND", "%APPDIR\\%COMMAND.exe", "%APPDIR\\codecs\\cmdline\\%COMMAND.exe", NIL };
+			static const char	*places[] = { "%APPDIR\\codecs\\cmdline\\%COMMAND", "%APPDIR\\codecs\\cmdline\\%COMMAND.exe", NIL };
 #elif defined __APPLE__
-			static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/opt/local/bin/%COMMAND", NIL };
+			static const char	*places[] = { "%APPDIR\\codecs\\cmdline\\%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/opt/local/bin/%COMMAND", "/sw/bin/%COMMAND", NIL };
+#elif defined __HAIKU__
+			static const char	*places[] = { "/boot/common/bin/%COMMAND", NIL };
+#elif defined __NetBSD__
+			static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/usr/pkg/bin/%COMMAND", NIL };
 #else
 			static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", NIL };
 #endif

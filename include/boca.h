@@ -16,7 +16,11 @@
 using namespace smooth;
 
 #if defined BOCA_COMPONENT_BUILD
-# define BOCA_EXPORT __declspec (dllexport)
+# ifdef __WIN32__
+#  define BOCA_EXPORT __declspec (dllexport)
+# else
+#  define BOCA_EXPORT
+# endif
 
 # include "boca/component/component.h"
 # include "boca/component/decodercomponent.h"
@@ -27,7 +31,11 @@ using namespace smooth;
 # include "boca/component/outputcomponent.h"
 # include "boca/component/taggercomponent.h"
 #else
-# define BOCA_EXPORT __declspec (dllimport)
+# ifdef __WIN32__
+#  define BOCA_EXPORT __declspec (dllimport)
+# else
+#  define BOCA_EXPORT
+# endif
 
 # include "boca/core/core.h"
 #endif

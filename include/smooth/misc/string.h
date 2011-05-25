@@ -31,16 +31,17 @@ namespace smooth
 
 			Buffer<wchar_t>			 wString;
 
-			static char			*inputFormat;
-			static char			*outputFormat;
-			static char			*internalFormat;
-
-			static Int			 nOfStrings;
+			static Threads::Mutex		 explodeMutex;
 
 			static Array<char *, void *>	 allocatedBuffers;
 
-			static Void			 DeleteTemporaryBuffers();
+			static const char		*GetDefaultEncoding();
+
+			static Void			 DeleteTemporaryBuffers(Bool = False);
 		public:
+			static Int			 Initialize();
+			static Int			 Free();
+
 							 String(const int = NIL);
 							 String(const char *);
 							 String(const wchar_t *);
@@ -53,10 +54,10 @@ namespace smooth
 			static Bool			 IsANSI(const String &);
 			static Bool			 IsUnicode(const String &);
 
-			static const char		*GetInputFormat()				{ return inputFormat; }
+			static const char		*GetInputFormat();
 			static char			*SetInputFormat(const char *);
 
-			static const char		*GetOutputFormat()				{ return outputFormat; }
+			static const char		*GetOutputFormat();
 			static char			*SetOutputFormat(const char *);
 
 			static const char		*GetInternalFormat();
@@ -141,6 +142,8 @@ namespace smooth
 			String				 ToTitle() const;
 
 			const Array<String>		&Explode(const String &) const;
+			static Int			 ExplodeFinish();
+
 			static String			 Implode(const Array<String> &, const String & = String());
 
 			wchar_t &operator		 [](const int);

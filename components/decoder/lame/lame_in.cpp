@@ -60,8 +60,6 @@ Bool BoCA::LAMEIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	ex_lame_decode_init();
-
 	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 	Format	 format = track.GetFormat();
@@ -79,6 +77,8 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 	Buffer<short>		 pcm_l(buffer.Size() * 64);
 	Buffer<short>		 pcm_r(buffer.Size() * 64);
 
+	hip_t	 context = ex_hip_decode_init();
+
 	do
 	{
 		f_in->InputData((void *) buffer, buffer.Size());
@@ -87,7 +87,7 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		memset(&mp3data, 0, sizeof(mp3data));
 
-		Int	 nSamples = ex_lame_decode_headers(buffer, buffer.Size(), pcm_l, pcm_r, &mp3data);
+		Int	 nSamples = ex_hip_decode_headers(context, buffer, buffer.Size(), pcm_l, pcm_r, &mp3data);
 
 		if (mp3data.header_parsed && nSamples > mp3data.framesize)
 		{
@@ -102,11 +102,11 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 	}
 	while (f_in->GetPos() < f_in->Size());
 
+	ex_hip_decode_exit(context);
+
 	track.SetFormat(format);
 
 	delete f_in;
-
-	ex_lame_decode_exit();
 
 	if (!errorState)
 	{
@@ -140,6 +140,8 @@ Error BoCA::LAMEIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::LAMEIn::LAMEIn()
 {
+	context		 = 0;
+
 	packageSize	 = 0;
 
 	delaySamples	 = 0;
@@ -156,8 +158,6 @@ BoCA::LAMEIn::~LAMEIn()
 
 Bool BoCA::LAMEIn::Activate()
 {
-	ex_lame_decode_init();
-
 	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
 
 	SkipID3v2Tag(f_in);
@@ -167,12 +167,14 @@ Bool BoCA::LAMEIn::Activate()
 
 	delete f_in;
 
+	context = ex_hip_decode_init();
+
 	return True;
 }
 
 Bool BoCA::LAMEIn::Deactivate()
 {
-	ex_lame_decode_exit();
+	ex_hip_decode_exit(context);
 
 	return True;
 }
@@ -190,7 +192,7 @@ Int BoCA::LAMEIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	pcm_l.Resize(size * 64);
 	pcm_r.Resize(size * 64);
 
-	Int		 nSamples = ex_lame_decode(data, size, pcm_l, pcm_r);
+	Int		 nSamples = ex_hip_decode(context, data, size, pcm_l, pcm_r);
 	const Format	&format = track.GetFormat();
 
 	data.Resize(0);

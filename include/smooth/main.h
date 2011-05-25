@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,6 +14,7 @@
 #include "system/system.h"
 #include "init.h"
 #include "version.h"
+#include "misc/args.h"
 #include "misc/string.h"
 #include "gui/application/application.h"
 #include "gui/dialogs/messagebox.h"
@@ -30,54 +31,70 @@ namespace smooth
 using namespace smooth;
 
 #if defined __WIN32__
-int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdLine, int siCmdShow)
+int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLine, int iCmdShow)
 {
-	hInstance		= shInstance;
-	hPrevInstance		= shPrevInstance;
-	szCmdLine		= String(sszCmdLine);
-	iCmdShow		= siCmdShow;
+	Int	 retValue = -1;
 
-	Init();
+	hInstance     = shInstance;
+	hPrevInstance = shPrevInstance;
 
-	if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
+	if (Init())
 	{
-		if (IDNO == GUI::Dialogs::QuickMessage("This program might not be compatible with the smooth library\ninstalled on your system. Continue execution?", "Warning", MB_YESNO, IDI_QUESTION))
+		if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
 		{
-			Free();
+			if (IDNO == GUI::Dialogs::QuickMessage("This program might not be compatible with the smooth library\ninstalled on your system. Continue execution?", "Warning", MB_YESNO, IDI_QUESTION))
+			{
+				Free();
 
-			return -1;
+				return -1;
+			}
 		}
+
+		ArgumentsParser	 args(NIL, szCmdLine);
+
+		GUI::Application::SetCommand(args.GetCommand());
+		GUI::Application::SetArguments(args.GetArguments());
+
+		GUI::Application::GetStartupDirectory();
+		GUI::Application::GetApplicationDirectory();
+
+		retValue = Main();
+
+		Free();
 	}
-
-	GUI::Application::GetStartupDirectory();
-	GUI::Application::GetApplicationDirectory();
-
-	Int	 retValue = Main();
-
-	Free();
 
 	return retValue;
 }
 #else
 int main(int argc, char **argv)
 {
-	for (Int i = 1; i < argc; i++) szCmdLine.Append(String(i > 1 ? " " : "").Append(argv[i]));
+	Int	 retValue = -1;
 
-	Init();
-
-	if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
+	if (Init())
 	{
+		if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
+		{
+			Free();
+
+			return -1;
+		}
+
+		String		 cmdLine;
+
+		for (Int i = 1; i < argc; i++) cmdLine.Append(String(i > 1 ? " " : "").Append(argv[i]));
+
+		ArgumentsParser	 args(argv[0], cmdLine);
+
+		GUI::Application::SetCommand(args.GetCommand());
+		GUI::Application::SetArguments(args.GetArguments());
+
+		GUI::Application::GetStartupDirectory();
+		GUI::Application::GetApplicationDirectory();
+
+		retValue = Main();
+
 		Free();
-
-		return -1;
 	}
-
-	GUI::Application::GetStartupDirectory();
-	GUI::Application::GetApplicationDirectory();
-
-	Int	 retValue = Main();
-
-	Free();
 
 	return retValue;
 }

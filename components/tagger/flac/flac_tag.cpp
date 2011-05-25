@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -22,28 +22,45 @@ const String &BoCA::FLACTag::GetComponentSpecs()
 
 	if (flacdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>FLAC Audio Tagger</name>		\
-		    <version>1.0</version>			\
-		    <id>flac-tag</id>				\
-		    <type>tagger</type>				\
-		    <format>					\
-		      <name>FLAC Audio Files</name>		\
-		      <extension>flac</extension>		\
-		    </format>					\
-		    <tagformat>					\
-		      <name>FLAC Metadata</name>		\
-		      <coverart supported=\"true\"/>		\
-		      <encodings>				\
-			<encoding>UTF-8</encoding>		\
-		      </encodings>				\
-		    </tagformat>				\
-		  </component>					\
-								\
+		componentSpecs = "							\
+											\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
+		  <component>								\
+		    <name>FLAC Audio Tagger</name>					\
+		    <version>1.0</version>						\
+		    <id>flac-tag</id>							\
+		    <type>tagger</type>							\
+		    <format>								\
+		      <name>FLAC Audio Files</name>					\
+		      <extension>flac</extension>					\
+		    </format>								\
+											\
 		";
+
+		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1)
+		{
+			componentSpecs.Append("						\
+											\
+			    <format>							\
+			      <name>Ogg FLAC Files</name>				\
+			      <extension>oga</extension>				\
+			    </format>							\
+											\
+			");
+		}
+
+		componentSpecs.Append("							\
+											\
+		    <tagformat>								\
+		      <name>FLAC Metadata</name>					\
+		      <coverart supported=\"true\"/>					\
+		      <encodings>							\
+			<encoding>UTF-8</encoding>					\
+		      </encodings>							\
+		    </tagformat>							\
+		  </component>								\
+											\
+		");
 	}
 
 	return componentSpecs;
@@ -69,6 +86,15 @@ BoCA::FLACTag::~FLACTag()
 
 Error BoCA::FLACTag::UpdateStreamInfo(const String &streamURI, const Track &track)
 {
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
+
+	String	 fileType = in.InputString(4);
+
+	if (fileType != "fLaC" && fileType != "OggS")		       return Error();
+	if (fileType == "OggS" && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0) return Error();
+
+	in.Close();
+
 	Config	*config = Config::Get();
 
 	FLAC__Metadata_Chain	*chain = ex_FLAC__metadata_chain_new();
@@ -77,11 +103,33 @@ Error BoCA::FLACTag::UpdateStreamInfo(const String &streamURI, const Track &trac
 	{
 		File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".tag"));
 
-		ex_FLAC__metadata_chain_read(chain, Utilities::GetNonUnicodeTempFileName(streamURI).Append(".tag"));
+		FLAC__bool	 success = false;
+
+		if	(fileType == "fLaC") success = ex_FLAC__metadata_chain_read(chain, Utilities::GetNonUnicodeTempFileName(streamURI).Append(".tag"));
+		else if (fileType == "OggS") success = ex_FLAC__metadata_chain_read_ogg(chain, Utilities::GetNonUnicodeTempFileName(streamURI).Append(".tag"));
+
+		if (!success)
+		{
+			File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".tag")).Delete();
+
+			ex_FLAC__metadata_chain_delete(chain);
+
+			return Error();
+		}
 	}
 	else
 	{
-		ex_FLAC__metadata_chain_read(chain, streamURI);
+		FLAC__bool	 success = false;
+
+		if	(fileType == "fLaC") success = ex_FLAC__metadata_chain_read(chain, streamURI);
+		else if (fileType == "OggS") success = ex_FLAC__metadata_chain_read_ogg(chain, streamURI);
+
+		if (!success)
+		{
+			ex_FLAC__metadata_chain_delete(chain);
+
+			return Error();
+		}
 	}
 
 	FLAC__Metadata_Iterator	*iterator = ex_FLAC__metadata_iterator_new();
@@ -174,15 +222,24 @@ Error BoCA::FLACTag::UpdateStreamInfo(const String &streamURI, const Track &trac
 	/* Adjust padding and write changes.
 	 */
 	ex_FLAC__metadata_chain_sort_padding(chain);
-	ex_FLAC__metadata_chain_write(chain, true, false);
+
+	if (!ex_FLAC__metadata_chain_write(chain, true, false)) { errorState = True; }
 
 	ex_FLAC__metadata_chain_delete(chain);
 
 	if (String::IsUnicode(streamURI))
 	{
-		File(streamURI).Delete();
-		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".tag")).Move(streamURI);
+		if (!errorState)
+		{
+			File(streamURI).Delete();
+			File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".tag")).Move(streamURI);
+		}
+		else
+		{
+			File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".tag")).Delete();
+		}
 	}
 
-	return Success();
+	if (errorState)	return Error();
+	else		return Success();
 }

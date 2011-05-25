@@ -38,6 +38,9 @@ namespace BoCA
 			EditBox			*edit_dir;
 			Button			*button_browse;
 
+			Text			*text_format;
+			ComboBox		*combo_format;
+
 			Int			 maxDownloads;
 
 			Bool			 autoDownload;

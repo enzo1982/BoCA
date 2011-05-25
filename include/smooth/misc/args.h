@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,12 +23,14 @@ namespace smooth
 	class SMOOTHAPI ArgumentsParser
 	{
 		private:
+			String			 command;
 			Array<String>		 args;
 		public:
-						 ArgumentsParser(const String &);
+						 ArgumentsParser(const String &, const String &);
 						~ArgumentsParser();
-
-			const Array<String>	&GetArguments() const;
+		accessors:
+			const String		&GetCommand() const	{ return command; }
+			const Array<String>	&GetArguments() const	{ return args; }
 	};
 };
 

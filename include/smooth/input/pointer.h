@@ -48,20 +48,22 @@ namespace smooth
 				};
 
 			private:
-				static GUI::Point	 mousePosition;
+				static const GUI::Window	*pointerWindow;
+				static GUI::Point		 mousePosition;
 
-							 Pointer();
-							 Pointer(const Pointer &);
+								 Pointer();
+								 Pointer(const Pointer &);
 			public:
 				/* Cursor functions.
 				 */
-				static Bool		 SetCursor(const GUI::Window *, CursorType);
+				static Bool			 SetCursor(const GUI::Window *, CursorType);
 
 				/* Pointer position functions.
 				 */
-				static const GUI::Point	&GetPosition();
+				static const GUI::Point		&GetPosition();
+				static const GUI::Window	*GetPointerWindow();
 
-				static Void		 UpdatePosition(Int, Int);
+				static Void			 UpdatePosition(const GUI::Window *, Int, Int);
 		};
 	};
 };

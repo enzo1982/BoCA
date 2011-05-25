@@ -216,7 +216,7 @@ Int BoCA::SpeexOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 	const Format	&format = track.GetFormat();
 
 	static Int	 totalSamples = 0;
-	Int		 samples = size / (format.bits / 8) / format.channels;
+	Int		 samples = size / format.channels / (format.bits / 8);
 
 	totalSamples += samples;
 

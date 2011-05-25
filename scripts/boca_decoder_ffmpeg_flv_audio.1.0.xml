@@ -6,7 +6,7 @@
   <id>ffmpeg-flv_audio-in</id>
   <type>decoder</type>
   <format>
-    <name>Flash Video Files</name>
+    <name>Adobe Flash Video</name>
     <extension>flv</extension>
     <extension>f4v</extension>
   </format>

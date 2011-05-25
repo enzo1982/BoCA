@@ -36,12 +36,11 @@ const String &BoCA::SunAuIn::GetComponentSpecs()
 
 Bool BoCA::SunAuIn::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
-	Int		 magic = f_in->InputNumber(4);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	delete f_in;
+	if (in.InputString(4) == ".snd") return True;
 
-	return (magic == 1684960046);
+	return False;
 }
 
 Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &track)

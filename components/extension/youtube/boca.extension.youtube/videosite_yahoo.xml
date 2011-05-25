@@ -1,0 +1,32 @@
+<VideoSite>
+  <name>Yahoo! Video</name>
+  <version>1.0</version>
+  <decoder>ffmpeg-flv_audio-in</decoder>
+
+  <script type="text/javascript">
+    function canHandleURL(URL) {
+      if (URL.toLowerCase().search(/^http:\/\/(.*?\.)?video\.yahoo\.com\/watch\//) != -1) return true;
+      else										  return false;
+    }
+
+    function getVideoURL(html) {
+      var playlist = downloadURL("http://cosmos.bcst.yahoo.com/up/yep/process/getPlaylistFOP.php?node_id=" + (html.match(/so.addVariable\("id", "(.*?)"\);/), RegExp.$1));
+
+      return playlist.match(/&lt;STREAM APP="(.*?)" FULLPATH="(.*?)" .*?&gt;&lt;\/STREAM&gt;/), (RegExp.$1 + RegExp.$2).replace(/&amp;amp;/g, "&amp;");
+    }
+
+    function queryMetadata(html) {
+      var metadata = new Metadata();
+
+      metadata.title	   = (html.match(/&lt;meta name="title" content="(.*?)" \/&gt;/) ? RegExp.$1 : null);
+      metadata.description = (html.match(/&lt;p id="desc_trunc" class="description"&gt;(?:.|\n|\r)*?&lt;span&gt;(.*?)&lt;\/span&gt;/) ? RegExp.$1 : null);
+
+      metadata.date	   = (html.match(/&lt;p class="mPubDate"&gt;(.*?)&lt;\/p&gt;/) ? RegExp.$1 : null);
+      metadata.thumbnail   = (html.match(/so.addVariable\("thumbUrl", "(.*?)"\);/) ? RegExp.$1 : null);
+
+      metadata.uploader	   = (html.match(/&lt;h2 class="ti-5"&gt;&lt;a .*?&gt;(.*?)&lt;\/a&gt;&lt;\/h2&gt;/) ? RegExp.$1 : null);
+
+      return metadata;
+    }
+  </script>
+</VideoSite>
