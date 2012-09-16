@@ -87,8 +87,6 @@ namespace BoCA
 
 			Void			 OnApplicationRemoveAllTracks();
 
-			Void			 OnQuit();
-
 			Void			 OnTimerCheckClipboard();
 
 			Void			 OnEditDownloadURL();
@@ -101,7 +99,10 @@ namespace BoCA
 			Void			 OnEditMetadata();
 
 			Void			 OnShowLayer();
+			Void			 OnQuit();
+
 			Void			 OnChangeSize(const Size &);
+			Void			 OnChangeLanguageSettings();
 		public:
 						 LayerYouTube();
 						~LayerYouTube();

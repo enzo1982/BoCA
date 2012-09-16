@@ -1,34 +1,36 @@
 <VideoSite>
   <name>ClipFish.de</name>
   <version>1.0</version>
-  <decoder>ffmpeg-flv_audio-in</decoder>
+  <decoder>avconv-flv_audio-in</decoder>
 
   <script type="text/javascript">
-    function canHandleURL(URL) {
-      if (URL.toLowerCase().match(/http:\/\/www.clipfish.de\/(.*\/)?video\/.*/)) return true;
-      else									 return false;
-    }
+    <![CDATA[
+      function canHandleURL(URL) {
+	if (URL.toLowerCase().match(/http:\/\/www.clipfish.de\/(.*\/)?video\/.*/)) return true;
+	else									   return false;
+      }
 
-    function getVideoURL(html) {
-      var devxml = downloadURL((html.match(/data: "(.*?)"/), RegExp.$1));
+      function getVideoURL(html) {
+	var devxml = downloadURL((html.match(/data: "(.*?)"/), RegExp.$1.substr(0, 7) == "http://" ? RegExp.$1 : "http://www.clipfish.de" + RegExp.$1));
 
-      return devxml.match(/&lt;filename&gt;(.*?)&lt;\/filename&gt;/), RegExp.$1;
-    }
+	return devxml.match(/<filename>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/filename>/), RegExp.$1;
+      }
 
-    function queryMetadata(html) {
-      var metadata = new Metadata();
+      function queryMetadata(html) {
+	var metadata = new Metadata();
 
-      var devxml = downloadURL((html.match(/data: "(.*?)"/), RegExp.$1));
+	var devxml = downloadURL((html.match(/data: "(.*?)"/), RegExp.$1.substr(0, 7) == "http://" ? RegExp.$1 : "http://www.clipfish.de" + RegExp.$1));
 
-      metadata.title	   = (devxml.match(/&lt;title&gt;&lt;!\[CDATA\[(.*?)\]\]&gt;&lt;\/title&gt;/) ? RegExp.$1 : null);
-      metadata.description = (html.match(/Beschreibung: &lt;\/label&gt; &lt;span .*?&gt;(.*?)&lt;\/span&gt;/) ? RegExp.$1 : null);
+	metadata.title	     = (devxml.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/) ? RegExp.$1 : null);
+	metadata.description = (html.match(/<span itemprop="description">[\s\n\r]*((?:.|\n|\r)*?)[\s\n\r]*<div class="cf-clearer">.*?<\/div>[\s\n\r]*<\/span>/) ? RegExp.$1 : null);
 
-      metadata.date	   = (html.match(/(?:Upload:|Jahr:) &lt;\/label&gt;(.*?)&lt;br \/&gt;/) ? RegExp.$1 : null);
-      metadata.thumbnail   = (devxml.match(/&lt;imageurl&gt;(.*?)&lt;\/imageurl&gt;/) ? RegExp.$1 : null);
+	metadata.date	     = (html.match(/(?:Upload:|Jahr:)\s*<span.*?>(.*?)<\/span>/) ? RegExp.$1 : null);
+	metadata.thumbnail   = (devxml.match(/<imageurl>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/imageurl>/) ? RegExp.$1 : null);
 
-      metadata.uploader	   = (html.match(/von: &lt;\/span&gt;&lt;a .*?&gt;(.*?)&lt;\/a&gt;/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/von:\s*<\/span>\s*<a .*?>(.*?)<\/a>/) ? RegExp.$1 : null);
 
-      return metadata;
-    }
+	return metadata;
+      }
+    ]]>
   </script>
 </VideoSite>

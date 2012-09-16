@@ -34,6 +34,7 @@ const String &BoCA::WaveOut::GetComponentSpecs()
 	      <name>Windows Wave Files</name>				\
 	      <extension>wav</extension>				\
 	      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+	      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
 	    </format>							\
 	  </component>							\
 									\
@@ -90,6 +91,23 @@ Bool BoCA::WaveOut::Deactivate()
 	{
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 tagBuffer;
+
+			tagger->RenderBuffer(tagBuffer, track);
+
+			driver->WriteData(tagBuffer, tagBuffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
+	}
+
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFCartTag", True))
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("cart-tag");
 
 		if (tagger != NIL)
 		{

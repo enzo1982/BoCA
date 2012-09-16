@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,7 +17,7 @@ BoCA::LayerTagAdvanced::LayerTagAdvanced() : Editor("Advanced")
 	LoadTagTypes();
 
 	text_type	= new Text("Show fields for:", Point(7, 10));
-	combo_type	= new ComboBox(Point(text_type->textSize.cx + 14, 7), Size(220, 0));
+	combo_type	= new ComboBox(Point(text_type->GetUnscaledTextWidth() + 14, 7), Size(220, 0));
 	combo_type->onSelectEntry.Connect(&LayerTagAdvanced::OnSelectTagType, this);
 
 	for (Int i = 0; i < tagTypes.Length(); i++)
@@ -25,7 +25,7 @@ BoCA::LayerTagAdvanced::LayerTagAdvanced() : Editor("Advanced")
 		combo_type->AddEntry(tagTypes.GetNth(i)->name);
 	}
 
-	list_fields	= new ListBox(Point(7, 34), Size(text_type->textSize.cx + 227, 0));
+	list_fields	= new ListBox(Point(7, 34), Size(text_type->GetUnscaledTextWidth() + 227, 0));
 	list_fields->onSelectEntry.Connect(&LayerTagAdvanced::OnSelectField, this);
 	list_fields->AddTab("Name", 120);
 	list_fields->AddTab("ID", 50);

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,31 +16,23 @@ using namespace smooth::GUI::Dialogs;
 
 BoCA::LayerTagOther::LayerTagOther() : Editor("Other")
 {
-	I18n	*i18n = I18n::Get();
+	group_original		= new GroupBox(NIL, Point(7, 10), Size(400, 120));
 
-	i18n->SetContext("Extensions::Tag Editor::Other");
+	text_oartist		= new Text(NIL, Point(9, 13));
+	text_oalbum		= new Text(NIL, text_oartist->GetPosition() + Point(0, 27));
+	text_otextwriter	= new Text(NIL, text_oalbum->GetPosition() + Point(0, 27));
+	text_oyear		= new Text(NIL, text_otextwriter->GetPosition() + Point(0, 27));
 
-	SetText(i18n->TranslateString("Other"));
-
-	group_original		= new GroupBox(i18n->TranslateString("Original information"), Point(7, 10), Size(400, 120));
-
-	text_oartist		= new Text(String(i18n->TranslateString("Original artist")).Append(":"), Point(9, 13));
-	text_oalbum		= new Text(String(i18n->TranslateString("Original album")).Append(":"), text_oartist->GetPosition() + Point(0, 27));
-	text_otextwriter	= new Text(String(i18n->TranslateString("Original lyrics writer")).Append(":"), text_oalbum->GetPosition() + Point(0, 27));
-	text_oyear		= new Text(String(i18n->TranslateString("Original release year")).Append(":"), text_otextwriter->GetPosition() + Point(0, 27));
-
-	Int	 maxTextSize = Math::Max(Math::Max(text_oartist->textSize.cx, text_oalbum->textSize.cx), Math::Max(text_otextwriter->textSize.cx, text_oyear->textSize.cx));
-
-	edit_oartist		= new EditBox(NIL, text_oartist->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_oartist		= new EditBox(NIL, text_oartist->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_oartist->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
-	edit_oalbum		= new EditBox(NIL, text_oalbum->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_oalbum		= new EditBox(NIL, text_oalbum->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_oalbum->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
-	edit_otextwriter	= new EditBox(NIL, text_otextwriter->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_otextwriter	= new EditBox(NIL, text_otextwriter->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_otextwriter->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
-	edit_oyear		= new EditBox(NIL, text_oyear->GetPosition() + Point(maxTextSize + 7, -3), Size(50, 0), 4);
+	edit_oyear		= new EditBox(NIL, text_oyear->GetPosition() + Point(7, -3), Size(50, 0), 4);
 	edit_oyear->SetFlags(EDB_NUMERIC);
 	edit_oyear->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
@@ -55,33 +47,31 @@ BoCA::LayerTagOther::LayerTagOther() : Editor("Other")
 
 	Add(group_original);
 
-	group_web		= new GroupBox(i18n->TranslateString("Webpage URLs"), Point(7, 10), Size(400, 174));
+	group_web		= new GroupBox(NIL, Point(7, 10), Size(400, 174));
 
-	text_wartist		= new Text(String(i18n->TranslateString("Artist webpage")).Append(":"), Point(9, 13));
-	text_wpublisher		= new Text(String(i18n->TranslateString("Publisher webpage")).Append(":"), text_wartist->GetPosition() + Point(0, 27));
-	text_wradio		= new Text(String(i18n->TranslateString("Internet radio station")).Append(":"), text_wpublisher->GetPosition() + Point(0, 27));
-	text_wsource		= new Text(String(i18n->TranslateString("Audio source webpage")).Append(":"), text_wradio->GetPosition() + Point(0, 27));
-	text_wcopyright		= new Text(String(i18n->TranslateString("Copyright information")).Append(":"), text_wsource->GetPosition() + Point(0, 27));
-	text_wcommercial	= new Text(String(i18n->TranslateString("Commercial information")).Append(":"), text_wcopyright->GetPosition() + Point(0, 27));
+	text_wartist		= new Text(NIL, Point(9, 13));
+	text_wpublisher		= new Text(NIL, text_wartist->GetPosition() + Point(0, 27));
+	text_wradio		= new Text(NIL, text_wpublisher->GetPosition() + Point(0, 27));
+	text_wsource		= new Text(NIL, text_wradio->GetPosition() + Point(0, 27));
+	text_wcopyright		= new Text(NIL, text_wsource->GetPosition() + Point(0, 27));
+	text_wcommercial	= new Text(NIL, text_wcopyright->GetPosition() + Point(0, 27));
 
-	Int	 maxTextSize2 = Math::Max(Math::Max(Math::Max(text_wartist->textSize.cx, text_wcopyright->textSize.cx), Math::Max(text_wpublisher->textSize.cx, text_wcommercial->textSize.cx)), Math::Max(text_wradio->textSize.cx, text_wsource->textSize.cx));
-
-	edit_wartist		= new EditBox(NIL, text_wartist->GetPosition() + Point(maxTextSize2 + 7, -3), Size(300, 0));
+	edit_wartist		= new EditBox(NIL, text_wartist->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_wartist->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
-	edit_wpublisher		= new EditBox(NIL, text_wpublisher->GetPosition() + Point(maxTextSize2 + 7, -3), Size(300, 0));
+	edit_wpublisher		= new EditBox(NIL, text_wpublisher->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_wpublisher->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
-	edit_wradio		= new EditBox(NIL, text_wradio->GetPosition() + Point(maxTextSize2 + 7, -3), Size(300, 0));
+	edit_wradio		= new EditBox(NIL, text_wradio->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_wradio->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
-	edit_wsource		= new EditBox(NIL, text_wsource->GetPosition() + Point(maxTextSize2 + 7, -3), Size(300, 0));
+	edit_wsource		= new EditBox(NIL, text_wsource->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_wsource->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
-	edit_wcopyright		= new EditBox(NIL, text_wcopyright->GetPosition() + Point(maxTextSize2 + 7, -3), Size(300, 0));
+	edit_wcopyright		= new EditBox(NIL, text_wcopyright->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_wcopyright->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
-	edit_wcommercial	= new EditBox(NIL, text_wcommercial->GetPosition() + Point(maxTextSize2 + 7, -3), Size(300, 0));
+	edit_wcommercial	= new EditBox(NIL, text_wcommercial->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_wcommercial->onInput.Connect(&LayerTagOther::OnModifyTrack, this);
 
 	group_web->Add(text_wartist);
@@ -101,6 +91,8 @@ BoCA::LayerTagOther::LayerTagOther() : Editor("Other")
 
 	onChangeSize.Connect(&LayerTagOther::OnChangeSize, this);
 
+	Settings::Get()->onChangeLanguageSettings.Connect(&LayerTagOther::OnChangeLanguageSettings, this);
+
 	/* Initially deactivate all input fields.
 	 */
 	OnSelectNone();
@@ -108,6 +100,8 @@ BoCA::LayerTagOther::LayerTagOther() : Editor("Other")
 
 BoCA::LayerTagOther::~LayerTagOther()
 {
+	Settings::Get()->onChangeLanguageSettings.Disconnect(&LayerTagOther::OnChangeLanguageSettings, this);
+
 	DeleteObject(group_original);
 	DeleteObject(text_oartist);
 	DeleteObject(edit_oartist);
@@ -143,8 +137,8 @@ Void BoCA::LayerTagOther::OnChangeSize(const Size &nSize)
 
 	group_original->SetWidth((clientSize.cx - 23) / 2);
 
-	Int	 maxTextSize = Math::Max(Math::Max(text_oartist->textSize.cx, text_oalbum->textSize.cx), Math::Max(text_otextwriter->textSize.cx, text_oyear->textSize.cx));
-	Int	 maxTextSize2 = Math::Max(Math::Max(Math::Max(text_wartist->textSize.cx, text_wcopyright->textSize.cx), Math::Max(text_wpublisher->textSize.cx, text_wcommercial->textSize.cx)), Math::Max(text_wradio->textSize.cx, text_wsource->textSize.cx));
+	Int	 maxTextSize = Math::Max(Math::Max(text_oartist->GetUnscaledTextWidth(), text_oalbum->GetUnscaledTextWidth()), Math::Max(text_otextwriter->GetUnscaledTextWidth(), text_oyear->GetUnscaledTextWidth()));
+	Int	 maxTextSize2 = Math::Max(Math::Max(Math::Max(text_wartist->GetUnscaledTextWidth(), text_wcopyright->GetUnscaledTextWidth()), Math::Max(text_wpublisher->GetUnscaledTextWidth(), text_wcommercial->GetUnscaledTextWidth())), Math::Max(text_wradio->GetUnscaledTextWidth(), text_wsource->GetUnscaledTextWidth()));
 
 	edit_oartist->SetWidth(group_original->GetWidth() - 26 - maxTextSize);
 	edit_oalbum->SetWidth(group_original->GetWidth() - 26 - maxTextSize);
@@ -159,6 +153,81 @@ Void BoCA::LayerTagOther::OnChangeSize(const Size &nSize)
 	edit_wsource->SetWidth(group_web->GetWidth() - 26 - maxTextSize2);
 	edit_wcopyright->SetWidth(group_web->GetWidth() - 26 - maxTextSize2);
 	edit_wcommercial->SetWidth(group_web->GetWidth() - 26 - maxTextSize2);
+}
+
+/* Called when application language is changed.
+ * ----
+ */
+Void BoCA::LayerTagOther::OnChangeLanguageSettings()
+{
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor::Other");
+
+	SetText(i18n->TranslateString("Other"));
+
+	/* Hide all affected widgets prior to changing
+	 * labels to avoid flickering.
+	 */
+	Bool	 prevVisible = IsVisible();
+
+	if (prevVisible) Hide();
+
+	group_original->SetText(i18n->TranslateString("Original information"));
+
+	text_oartist->SetText(String(i18n->TranslateString("Original artist")).Append(":"));
+	text_oalbum->SetText(String(i18n->TranslateString("Original album")).Append(":"));
+	text_otextwriter->SetText(String(i18n->TranslateString("Original lyrics writer")).Append(":"));
+	text_oyear->SetText(String(i18n->TranslateString("Original release year")).Append(":"));
+
+	Int	 maxTextSize = Math::Max(Math::Max(text_oartist->GetUnscaledTextWidth(), text_oalbum->GetUnscaledTextWidth()), Math::Max(text_otextwriter->GetUnscaledTextWidth(), text_oyear->GetUnscaledTextWidth()));
+
+	edit_oartist->SetX(text_oartist->GetX() + maxTextSize + 7);
+	edit_oalbum->SetX(text_oalbum->GetX() + maxTextSize + 7);
+	edit_otextwriter->SetX(text_otextwriter->GetX() + maxTextSize + 7);
+	edit_oyear->SetX(text_oyear->GetX() + maxTextSize + 7);
+
+	group_web->SetText(i18n->TranslateString("Webpage URLs"));
+
+	text_wartist->SetText(String(i18n->TranslateString("Artist webpage")).Append(":"));
+	text_wpublisher->SetText(String(i18n->TranslateString("Publisher webpage")).Append(":"));
+	text_wradio->SetText(String(i18n->TranslateString("Internet radio station")).Append(":"));
+	text_wsource->SetText(String(i18n->TranslateString("Audio source webpage")).Append(":"));
+	text_wcopyright->SetText(String(i18n->TranslateString("Copyright information")).Append(":"));
+	text_wcommercial->SetText(String(i18n->TranslateString("Commercial information")).Append(":"));
+
+	Int	 maxTextSize2 = Math::Max(Math::Max(Math::Max(text_wartist->GetUnscaledTextWidth(), text_wcopyright->GetUnscaledTextWidth()), Math::Max(text_wpublisher->GetUnscaledTextWidth(), text_wcommercial->GetUnscaledTextWidth())), Math::Max(text_wradio->GetUnscaledTextWidth(), text_wsource->GetUnscaledTextWidth()));
+
+	edit_wartist->SetX(text_wartist->GetX() + maxTextSize2 + 7);
+	edit_wpublisher->SetX(text_wpublisher->GetX() + maxTextSize2 + 7);
+	edit_wradio->SetX(text_wradio->GetX() + maxTextSize2 + 7);
+	edit_wsource->SetX(text_wsource->GetX() + maxTextSize2 + 7);
+	edit_wcopyright->SetX(text_wcopyright->GetX() + maxTextSize2 + 7);
+	edit_wcommercial->SetX(text_wcommercial->GetX() + maxTextSize2 + 7);
+
+	/* OnChangeSize will correct sizes of any other widgets.
+	 */
+	OnChangeSize(GetSize());
+
+	/* Show all widgets again.
+	 */
+	if (prevVisible) Show();
+}
+
+EditBox *BoCA::LayerTagOther::GetActiveEditBox()
+{
+	if	(edit_oartist->IsFocussed())	 return edit_oartist;
+	else if	(edit_oalbum->IsFocussed())	 return edit_oalbum;
+	else if	(edit_otextwriter->IsFocussed()) return edit_otextwriter;
+	else if	(edit_oyear->IsFocussed())	 return edit_oyear;
+	else if	(edit_wartist->IsFocussed())	 return edit_wartist;
+	else if	(edit_wpublisher->IsFocussed())	 return edit_wpublisher;
+	else if	(edit_wradio->IsFocussed())	 return edit_wradio;
+	else if	(edit_wsource->IsFocussed())	 return edit_wsource;
+	else if	(edit_wcopyright->IsFocussed())	 return edit_wcopyright;
+	else if	(edit_wcommercial->IsFocussed()) return edit_wcommercial;
+
+	return NIL;
 }
 
 /* Called when a track is selected from the list.
@@ -199,6 +268,14 @@ Void BoCA::LayerTagOther::OnSelectTrack(const Track &nTrack)
 		else if	(value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) { edit_wcommercial->SetText(value.Tail(value.Length() - value.Find(":") - 1)); }
 	}
 
+	EditBox	*activeEditBox = GetActiveEditBox();
+
+	if (activeEditBox != NIL)
+	{
+		activeEditBox->SetFocus();
+		activeEditBox->MarkAll();
+	}
+
 	surface->EndPaint();
 }
 
@@ -232,6 +309,14 @@ Void BoCA::LayerTagOther::OnSelectAlbum(const Track &nTrack)
 		else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	    { edit_wsource->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
 		else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")))  { edit_wcopyright->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
 		else if	(value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) { edit_wcommercial->SetText(value.Tail(value.Length() - value.Find(":") - 1)); }
+	}
+
+	EditBox	*activeEditBox = GetActiveEditBox();
+
+	if (activeEditBox != NIL)
+	{
+		activeEditBox->SetFocus();
+		activeEditBox->MarkAll();
 	}
 
 	surface->EndPaint();

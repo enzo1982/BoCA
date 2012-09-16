@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -93,12 +93,12 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	group_id3v2		= new GroupBox(i18n->TranslateString("Info tags"), Point(135, 88), Size(279, 90));
 
 	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
-	check_id3v2->SetWidth(check_id3v2->textSize.cx + 20);
+	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
 
 	text_note		= new Text(i18n->TranslateString("Note:"), Point(10, 38));
-	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->textSize.cx + 12, 38));
+	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
 
-	group_id3v2->SetWidth(text_note->textSize.cx + text_id3v2->textSize.cx + 22);
+	group_id3v2->SetWidth(text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22);
 
 	group_id3v2->Add(check_id3v2);
 	group_id3v2->Add(text_note);
@@ -112,7 +112,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	option_bitrate		= new OptionBox(i18n->TranslateString("Bitrate per channel:"), Point(10, 13), Size(150, 0), &setQuality, 0);
 	option_bitrate->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
-	option_bitrate->SetWidth(option_bitrate->textSize.cx + 19);
+	option_bitrate->SetWidth(option_bitrate->GetUnscaledTextWidth() + 19);
 
 	slider_bitrate		= new Slider(Point(option_bitrate->GetWidth() + 19, 13), Size(227 - option_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 8, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureFAAC::SetBitrate, this);
@@ -125,7 +125,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	option_quality		= new OptionBox(i18n->TranslateString("Set quality:"), Point(10, 38), Size(150, 0), &setQuality, 1);
 	option_quality->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
-	option_quality->SetWidth(option_bitrate->textSize.cx + 19);
+	option_quality->SetWidth(option_bitrate->GetUnscaledTextWidth() + 19);
 
 	slider_quality		= new Slider(Point(option_quality->GetWidth() + 19, 38), Size(227 - option_quality->GetWidth(), 0), OR_HORZ, &aacQuality, 10, 500);
 	slider_quality->onValueChange.Connect(&ConfigureFAAC::SetQuality, this);
@@ -161,7 +161,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	text_bandwidth		= new Text(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz):"), Point(11, 15));
 
-	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue("FAAC", "BandWidth", 16000)), Point(text_bandwidth->textSize.cx + 19, 12), Size(291 - text_bandwidth->textSize.cx, 0), 5);
+	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue("FAAC", "BandWidth", 16000)), Point(text_bandwidth->GetUnscaledTextWidth() + 19, 12), Size(291 - text_bandwidth->GetUnscaledTextWidth(), 0), 5);
 	edit_bandwidth->SetFlags(EDB_NUMERIC);
 
 	group_bandwidth->Add(text_bandwidth);

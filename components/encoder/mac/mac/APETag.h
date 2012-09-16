@@ -148,6 +148,7 @@ public:
         BOOL bValid = (strncmp(m_cID, "APETAGEX", 8) == 0) && 
             (m_nVersion <= CURRENT_APE_TAG_VERSION) &&
             (m_nFields <= 65536) &&
+            (m_nSize >= APE_TAG_FOOTER_BYTES) &&
             (GetFieldBytes() <= (1024 * 1024 * 16));
         
         if (bValid && (bAllowHeader == FALSE) && GetIsHeader())
@@ -243,6 +244,9 @@ public:
     // clear all the fields
     int ClearFields();
     
+    // see if we've been analyzed (we do lazy analysis)
+    BOOL GetAnalyzed() { return m_bAnalyzed; }
+
     // get the total tag bytes in the file from the last analyze
     // need to call Save() then Analyze() to update any changes
     int GetTagBytes();

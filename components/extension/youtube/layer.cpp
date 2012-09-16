@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,9 +20,6 @@ using namespace smooth::Net;
 BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 {
 	Config	*config = Config::Get();
-	I18n	*i18n	= I18n::Get();
-
-	i18n->SetContext("Extensions::Video Downloader");
 
 	missingDecoders = False;
 
@@ -32,14 +29,14 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 	 */
 	LoadVideoSites();
 
-	text_url		= new Text(i18n->TranslateString("Enter video URL here:"), Point(7, 10));
+	text_url		= new Text(NIL, Point(7, 10));
 
 	Add(text_url);
 
-	edit_url		= new EditBox(NIL, Point(text_url->textSize.cx + 15, 7), Size(100, 0));
+	edit_url		= new EditBox(NIL, Point(15, 7), Size(100, 0));
 	edit_url->onInput.Connect(&LayerYouTube::OnEditDownloadURL, this);
 
-	button_add_url		= new Button(i18n->TranslateString("Download"), NIL, Point(88, 6), Size());
+	button_add_url		= new Button(NIL, NIL, Point(88, 6), Size());
 	button_add_url->SetOrientation(OR_UPPERRIGHT);
 	button_add_url->Deactivate();
 	button_add_url->onAction.Connect(&LayerYouTube::OnDownloadTrack, this);
@@ -47,40 +44,30 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 	Add(edit_url);
 	Add(button_add_url);
 
-	check_auto_download	= new CheckBox(i18n->TranslateString("Automatically download URLs copied to clipboard"), Point(8, 34), Size(300, 0), (Bool *) &config->GetPersistentIntValue("YouTube", "AutoDownload", False));
+	check_auto_download	= new CheckBox(NIL, Point(8, 34), Size(300, 0), (Bool *) &config->GetPersistentIntValue("YouTube", "AutoDownload", False));
 	check_auto_download->SetOrientation(OR_UPPERRIGHT);
-	check_auto_download->SetWidth(check_auto_download->textSize.cx + 20);
 
-	check_keep_files	= new CheckBox(i18n->TranslateString("Save downloaded video files"), Point(8, 34), Size(300, 0), (Bool *) &config->GetPersistentIntValue("YouTube", "SaveVideoFiles", False));
+	check_keep_files	= new CheckBox(NIL, Point(8, 34), Size(300, 0), (Bool *) &config->GetPersistentIntValue("YouTube", "SaveVideoFiles", False));
 	check_keep_files->SetOrientation(OR_UPPERRIGHT);
-	check_keep_files->SetWidth(check_keep_files->textSize.cx + 20);
 
 	if (missingDecoders) check_keep_files->Deactivate();
-
-	check_auto_download->SetX(check_auto_download->GetWidth() + check_keep_files->GetWidth() + 16);
-	check_keep_files->SetX(check_keep_files->GetWidth() + 8);
 
 	Add(check_auto_download);
 	Add(check_keep_files);
 
-	text_downloads		= new Text(i18n->TranslateString("Video downloads:"), Point(7, 57));
+	text_downloads		= new Text(NIL, Point(7, 57));
 
 	list_downloads		= new VideoList(Point(7, 76), Size(100, 75));
 
 	Add(text_downloads);
 	Add(list_downloads);
 
-	text_tracks		= new Text(i18n->TranslateString("Downloaded tracks:"), Point(7, 157));
+	text_tracks		= new Text(NIL, Point(7, 157));
 
 	list_tracks		= new ListBox(Point(7, 176), Size(100, 150));
 	list_tracks->onSelectEntry.Connect(&LayerYouTube::OnSelectTrack, this);
 
 	list_tracks->EnableLocking();
-
-	list_tracks->AddTab(I18n::Get()->TranslateString(i18n->TranslateString("Uploader")), 150);
-	list_tracks->AddTab(I18n::Get()->TranslateString(i18n->TranslateString("Title")));
-	list_tracks->AddTab(I18n::Get()->TranslateString(i18n->TranslateString("Length")), 80, OR_RIGHT);
-	list_tracks->AddTab(I18n::Get()->TranslateString(i18n->TranslateString("Size")), 80, OR_RIGHT);
 
 	Add(text_tracks);
 	Add(list_tracks);
@@ -94,23 +81,23 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 	Add(area_cover);
 	Add(image_cover);
 
-	text_source		= new Text(i18n->TranslateString("Video URL:"), Point(129, 109));
+	text_source		= new Text(NIL, Point(129, 109));
 	text_source->SetOrientation(OR_LOWERLEFT);
 
-	text_title		= new Text(i18n->TranslateString("Video title:"), Point(129, 82));
-	text_title->SetOrientation(OR_LOWERLEFT);
-
-	text_description	= new Text(i18n->TranslateString("Video description:"), Point(129, 55));
-	text_description->SetOrientation(OR_LOWERLEFT);
-
-	link_source		= new Hyperlink(NIL, NIL, NIL, Point(129 + Math::Max(text_source->textSize.cx, Math::Max(text_title->textSize.cx, text_description->textSize.cx)) + 8, 109));
+	link_source		= new Hyperlink(NIL, NIL, NIL, Point(129, 109));
 	link_source->SetOrientation(OR_LOWERLEFT);
 
-	edit_title		= new EditBox(NIL, Point(129 + Math::Max(text_source->textSize.cx, Math::Max(text_title->textSize.cx, text_description->textSize.cx)) + 8, 85), Size(0, 0));
+	text_title		= new Text(NIL, Point(129, 82));
+	text_title->SetOrientation(OR_LOWERLEFT);
+
+	edit_title		= new EditBox(NIL, Point(129, 85), Size(0, 0));
 	edit_title->SetOrientation(OR_LOWERLEFT);
 	edit_title->onInput.Connect(&LayerYouTube::OnEditMetadata, this);
 
-	edit_description		= new MultiEdit(NIL, Point(129 + Math::Max(text_source->textSize.cx, Math::Max(text_title->textSize.cx, text_description->textSize.cx)) + 8, 58), Size(0, 50));
+	text_description	= new Text(NIL, Point(129, 55));
+	text_description->SetOrientation(OR_LOWERLEFT);
+
+	edit_description	= new MultiEdit(NIL, Point(129, 58), Size(0, 50));
 	edit_description->SetOrientation(OR_LOWERLEFT);
 	edit_description->onInput.Connect(&LayerYouTube::OnEditMetadata, this);
 
@@ -123,22 +110,22 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 	Add(text_description);
 	Add(edit_description);
 
-	text_site		= new Text(i18n->TranslateString("Site name:"), Point(200, 109));
+	text_site		= new Text(NIL, Point(200, 109));
 	text_site->SetOrientation(OR_LOWERRIGHT);
 
-	text_uploader		= new Text(i18n->TranslateString("Uploaded by:"), Point(200, 82));
-	text_uploader->SetOrientation(OR_LOWERRIGHT);
-
-	text_date		= new Text(i18n->TranslateString("Uploaded on:"), Point(200, 55));
-	text_date->SetOrientation(OR_LOWERRIGHT);
-
-	text_site_value		= new Text(NIL, Point(200 - Math::Max(text_site->textSize.cx, Math::Max(text_uploader->textSize.cx, text_date->textSize.cx)) - 8, 109));
+	text_site_value		= new Text(NIL, Point(200, 109));
 	text_site_value->SetOrientation(OR_LOWERRIGHT);
 
-	text_uploader_value	= new Text(NIL, Point(200 - Math::Max(text_site->textSize.cx, Math::Max(text_uploader->textSize.cx, text_date->textSize.cx)) - 8, 82));
+	text_uploader		= new Text(NIL, Point(200, 82));
+	text_uploader->SetOrientation(OR_LOWERRIGHT);
+
+	text_uploader_value	= new Text(NIL, Point(200, 82));
 	text_uploader_value->SetOrientation(OR_LOWERRIGHT);
 
-	text_date_value		= new Text(NIL, Point(200 - Math::Max(text_site->textSize.cx, Math::Max(text_uploader->textSize.cx, text_date->textSize.cx)) - 8, 55));
+	text_date		= new Text(NIL, Point(200, 55));
+	text_date->SetOrientation(OR_LOWERRIGHT);
+
+	text_date_value		= new Text(NIL, Point(200, 55));
 	text_date_value->SetOrientation(OR_LOWERRIGHT);
 
 	Add(text_site);
@@ -156,6 +143,8 @@ BoCA::LayerYouTube::LayerYouTube() : Layer("Video")
 	 */
 	onShow.Connect(&LayerYouTube::OnShowLayer, this);
 	onChangeSize.Connect(&LayerYouTube::OnChangeSize, this);
+
+	Settings::Get()->onChangeLanguageSettings.Connect(&LayerYouTube::OnChangeLanguageSettings, this);
 
 	JobList::Get()->onApplicationModifyTrack.Connect(&LayerYouTube::OnApplicationModifyTrack, this);
 	JobList::Get()->onApplicationRemoveTrack.Connect(&LayerYouTube::OnApplicationRemoveTrack, this);
@@ -187,6 +176,8 @@ BoCA::LayerYouTube::~LayerYouTube()
 
 	/* Disconnect slots.
 	 */
+	Settings::Get()->onChangeLanguageSettings.Disconnect(&LayerYouTube::OnChangeLanguageSettings, this);
+
 	JobList::Get()->onApplicationModifyTrack.Disconnect(&LayerYouTube::OnApplicationModifyTrack, this);
 	JobList::Get()->onApplicationRemoveTrack.Disconnect(&LayerYouTube::OnApplicationRemoveTrack, this);
 	JobList::Get()->onApplicationSelectTrack.Disconnect(&LayerYouTube::OnApplicationSelectTrack, this);
@@ -326,7 +317,7 @@ Void BoCA::LayerYouTube::OnShowLayer()
 		i18n->SetContext("Extensions::Video Downloader::Errors");
 
 		Bool		 doNotShowAgain = False;
-		MessageDlg	*messageBox = new MessageDlg(i18n->TranslateString("Some required video decoders could not be found. Video files\ncannot be added to the joblist for conversion to audio files.\n\nPlease install FFmpeg to fix this problem!"), i18n->TranslateString("Note"), MB_OK, (wchar_t *) IDI_EXCLAMATION, i18n->TranslateString("Do not display this note again"), &doNotShowAgain);
+		MessageDlg	*messageBox = new MessageDlg(i18n->TranslateString("Some required video decoders could not be found. Video files\ncannot be added to the joblist for conversion to audio files.\n\nPlease install avconv to fix this problem!"), i18n->TranslateString("Note"), Message::Buttons::Ok, Message::Icon::Exclamation, i18n->TranslateString("Do not display this note again"), &doNotShowAgain);
 
 		messageBox->ShowDialog();
 
@@ -346,7 +337,7 @@ Void BoCA::LayerYouTube::OnChangeSize(const Size &nSize)
 	Rect	 clientRect = Rect(GetPosition(), GetSize());
 	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
-	edit_url->SetWidth(clientSize.cx - text_url->textSize.cx - 110);
+	edit_url->SetWidth(clientSize.cx - text_url->GetUnscaledTextWidth() - 110);
 
 	list_downloads->SetWidth(clientSize.cx - 15);
 
@@ -357,11 +348,11 @@ Void BoCA::LayerYouTube::OnChangeSize(const Size &nSize)
 	Font	 font;
 	String	 text = link_source->GetURL();
 
-	if (font.GetTextSizeX(text) >= clientSize.cx - Math::Max(text_source->textSize.cx, Math::Max(text_title->textSize.cx, text_description->textSize.cx)) - 344)
+	if (font.GetUnscaledTextSizeX(text) >= clientSize.cx - Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) - 344)
 	{
 		for (Int i = text.Length() - 1; i >= 13; i--)
 		{
-			if (font.GetTextSizeX(text.Head(i).Append("...")) >= clientSize.cx - Math::Max(text_source->textSize.cx, Math::Max(text_title->textSize.cx, text_description->textSize.cx)) - 344) continue;
+			if (font.GetUnscaledTextSizeX(text.Head(i).Append("...")) >= clientSize.cx - Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) - 344) continue;
 
 			link_source->SetText(text.Head(i).Append("..."));
 
@@ -375,8 +366,78 @@ Void BoCA::LayerYouTube::OnChangeSize(const Size &nSize)
 
 	/* Video title edit box.
 	 */
-	edit_title->SetWidth(clientSize.cx - Math::Max(text_source->textSize.cx, Math::Max(text_title->textSize.cx, text_description->textSize.cx)) - 344);
-	edit_description->SetWidth(clientSize.cx - Math::Max(text_source->textSize.cx, Math::Max(text_title->textSize.cx, text_description->textSize.cx)) - 344);
+	edit_title->SetWidth(clientSize.cx - Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) - 344);
+	edit_description->SetWidth(clientSize.cx - Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) - 344);
+}
+
+/* Called when application language is changed.
+ * ----
+ */
+Void BoCA::LayerYouTube::OnChangeLanguageSettings()
+{
+	I18n	*i18n	= I18n::Get();
+
+	i18n->SetContext("Extensions::Video Downloader");
+
+	SetText(i18n->TranslateString("Video"));
+
+	/* Hide all affected widgets prior to changing
+	 * labels to avoid flickering.
+	 */
+	Bool	 prevVisible = IsVisible();
+
+	if (prevVisible) Hide();
+
+	/* Set texts and positions.
+	 */
+	text_url->SetText(i18n->TranslateString("Enter video URL here:"));
+
+	edit_url->SetX(text_url->GetUnscaledTextWidth() + 15);
+
+	button_add_url->SetText(i18n->TranslateString("Download"));
+
+	check_auto_download->SetText(i18n->TranslateString("Automatically download URLs copied to clipboard"));
+	check_auto_download->SetWidth(check_auto_download->GetUnscaledTextWidth() + 20);
+
+	check_keep_files->SetText(i18n->TranslateString("Save downloaded video files"));
+	check_keep_files->SetWidth(check_keep_files->GetUnscaledTextWidth() + 20);
+
+	check_auto_download->SetX(check_auto_download->GetWidth() + check_keep_files->GetWidth() + 16);
+	check_keep_files->SetX(check_keep_files->GetWidth() + 8);
+
+	text_downloads->SetText(i18n->TranslateString("Video downloads:"));
+	text_tracks->SetText(i18n->TranslateString("Downloaded tracks:"));
+
+	list_tracks->RemoveAllTabs();
+
+	list_tracks->AddTab(i18n->TranslateString("Uploader"), 150);
+	list_tracks->AddTab(i18n->TranslateString("Title"));
+	list_tracks->AddTab(i18n->TranslateString("Length"), 80, OR_RIGHT);
+	list_tracks->AddTab(i18n->TranslateString("Size"), 80, OR_RIGHT);
+
+	text_source->SetText(i18n->TranslateString("Video URL:"));
+	text_title->SetText(i18n->TranslateString("Video title:"));
+	text_description->SetText(i18n->TranslateString("Video description:"));
+
+	link_source->SetX(129 + Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) + 8);
+	edit_title->SetX(129 + Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) + 8);
+	edit_description->SetX(129 + Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) + 8);
+
+	text_site->SetText(i18n->TranslateString("Site name:"));
+	text_uploader->SetText(i18n->TranslateString("Uploaded by:"));
+	text_date->SetText(i18n->TranslateString("Uploaded on:"));
+
+	text_site_value->SetX(200 - Math::Max(text_site->GetUnscaledTextWidth(), Math::Max(text_uploader->GetUnscaledTextWidth(), text_date->GetUnscaledTextWidth())) - 8);
+	text_uploader_value->SetX(200 - Math::Max(text_site->GetUnscaledTextWidth(), Math::Max(text_uploader->GetUnscaledTextWidth(), text_date->GetUnscaledTextWidth())) - 8);
+	text_date_value->SetX(200 - Math::Max(text_site->GetUnscaledTextWidth(), Math::Max(text_uploader->GetUnscaledTextWidth(), text_date->GetUnscaledTextWidth())) - 8);
+
+	/* OnChangeSize will correct sizes of any other widgets.
+	 */
+	OnChangeSize(GetSize());
+
+	/* Show all widgets again.
+	 */
+	if (prevVisible) Show();
 }
 
 /* Called when clipboard contents need to be checked for an update.

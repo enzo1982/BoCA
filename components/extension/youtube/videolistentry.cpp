@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -61,6 +61,7 @@ Int BoCA::VideoListEntry::Paint(Int message)
 
 	Surface	*surface	= GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
+	Size	 realSize	= GetRealSize();
 
 	switch (message)
 	{
@@ -68,7 +69,7 @@ Int BoCA::VideoListEntry::Paint(Int message)
 		case SP_PAINT:
 			surface->StartPaint(GetVisibleArea());
 
-			surface->Box(Rect(realPos, GetSize()), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos, realSize), Setup::ClientColor, Rect::Filled);
 
 			image->Paint(SP_PAINT);
 
@@ -76,7 +77,7 @@ Int BoCA::VideoListEntry::Paint(Int message)
 			{
 				progress->Paint(SP_PAINT);
 
-				surface->Box(Rect(progress->GetRealPosition(), progress->GetSize()), Setup::ClientColor, Rect::Outlined);
+				surface->Box(Rect(progress->GetRealPosition(), progress->GetRealSize()), Setup::ClientColor, Rect::Outlined);
 			}
 
 			surface->EndPaint();
@@ -85,10 +86,10 @@ Int BoCA::VideoListEntry::Paint(Int message)
 		case SP_MOUSEIN:
 			surface->StartPaint(GetVisibleArea());
 
-			surface->Box(Rect(realPos,				Size(GetWidth(), 2)), Setup::GradientStartColor, Rect::Filled);
-			surface->Box(Rect(realPos,				Size(2, GetHeight())), Setup::GradientStartColor, Rect::Filled);
-			surface->Box(Rect(realPos + Point(GetWidth() - 2, 0),	Size(2, GetHeight())), Setup::GradientStartColor, Rect::Filled);
-			surface->Box(Rect(realPos + Point(0, GetHeight() - 2),	Size(GetWidth(), 2)), Setup::GradientStartColor, Rect::Filled);
+			surface->Box(Rect(realPos,				Size(realSize.cx, 2)), Setup::GradientStartColor, Rect::Filled);
+			surface->Box(Rect(realPos,				Size(2, realSize.cy)), Setup::GradientStartColor, Rect::Filled);
+			surface->Box(Rect(realPos + Point(realSize.cx - 2, 0),	Size(2, realSize.cy)), Setup::GradientStartColor, Rect::Filled);
+			surface->Box(Rect(realPos + Point(0, realSize.cy - 2),	Size(realSize.cx, 2)), Setup::GradientStartColor, Rect::Filled);
 
 			surface->EndPaint();
 
@@ -96,10 +97,10 @@ Int BoCA::VideoListEntry::Paint(Int message)
 		case SP_MOUSEOUT:
 			surface->StartPaint(GetVisibleArea());
 
-			surface->Box(Rect(realPos,				Size(GetWidth(), 2)), Setup::ClientColor, Rect::Filled);
-			surface->Box(Rect(realPos,				Size(2, GetHeight())), Setup::ClientColor, Rect::Filled);
-			surface->Box(Rect(realPos + Point(GetWidth() - 2, 0),	Size(2, GetHeight())), Setup::ClientColor, Rect::Filled);
-			surface->Box(Rect(realPos + Point(0, GetHeight() - 2),	Size(GetWidth(), 2)), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos,				Size(realSize.cx, 2)), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos,				Size(2, realSize.cy)), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos + Point(realSize.cx - 2, 0),	Size(2, realSize.cy)), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos + Point(0, realSize.cy - 2),	Size(realSize.cx, 2)), Setup::ClientColor, Rect::Filled);
 
 			surface->EndPaint();
 

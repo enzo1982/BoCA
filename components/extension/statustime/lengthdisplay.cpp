@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -30,16 +30,17 @@ Int BoCA::LengthDisplay::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = container->GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
-				surface->Box(Rect(GetRealPosition(), GetSize()), GetBackgroundColor(), Rect::Filled);
-				surface->Frame(Rect(GetRealPosition(), GetSize()), FRAME_DOWN);
+				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
+				surface->Frame(frame, FRAME_DOWN);
 
 				if (bitmap != NIL)
 				{
-					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), Rect(GetRealPosition() + Point(2, 2), bitmap.GetSize()));
+					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), Rect(frame.GetPosition() + Point(2, 2) * surface->GetSurfaceDPI() / 96.0, bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0));
 				}
 
-				surface->SetText(text, Rect(GetRealPosition() + Point(3 + bitmap.GetSize().cx, 0), GetSize()), font);
+				surface->SetText(text, frame + Point(5 + bitmap.GetSize().cx, 2) * surface->GetSurfaceDPI() / 96.0 - Point(2, 2), font);
 			}
 
 			break;
@@ -52,7 +53,7 @@ S::Int BoCA::LengthDisplay::SetText(const String &newText)
 {
 	Widget::SetText(newText);
 
-	SetWidth(textSize.cx + bitmap.GetSize().cx + 6);
+	SetWidth(unscaledTextSize.cx + bitmap.GetSize().cx + 6);
 
 	return Success();
 }

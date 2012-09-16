@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
 
 APECOMPRESS_CREATE	 ex_APECompress_Create	= NIL;
@@ -21,11 +22,9 @@ DynamicLoader *macdll	= NIL;
 
 Bool LoadMACDLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\MACDll.dll")).Exists()) return False;
-#endif
+	macdll = BoCA::Utilities::LoadCodecDLL("MACDll");
 
-	macdll = new DynamicLoader("codecs/MACDll");
+	if (macdll == NIL) return False;
 
 	ex_APECompress_Create	= (APECOMPRESS_CREATE) macdll->GetFunctionAddress("c_APECompress_Create");
 	ex_APECompress_Destroy	= (APECOMPRESS_DESTROY) macdll->GetFunctionAddress("c_APECompress_Destroy");

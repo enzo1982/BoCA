@@ -94,17 +94,17 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 
 		const Info	&info = track.GetInfo();
 
-		if (info.artist != NIL) RenderWMAItem(g_wszWMAuthor,	 info.artist,		     pHeaderInfo);
-		if (info.title  != NIL) RenderWMAItem(g_wszWMTitle,	 info.title,		     pHeaderInfo);
-		if (info.album  != NIL) RenderWMAItem(g_wszWMAlbumTitle, info.album,		     pHeaderInfo);
-		if (info.year    >   0) RenderWMAItem(g_wszWMYear,	 String::FromInt(info.year), pHeaderInfo);
-		if (info.genre  != NIL) RenderWMAItem(g_wszWMGenre,	 info.genre,		     pHeaderInfo);
-		if (info.label  != NIL) RenderWMAItem(g_wszWMPublisher,	 info.label,		     pHeaderInfo);
-		if (info.isrc   != NIL) RenderWMAItem(g_wszWMISRC,	 info.isrc,		     pHeaderInfo);
+		if (info.artist != NIL) RenderWMAStringItem(g_wszWMAuthor,     info.artist,		   pHeaderInfo);
+		if (info.title  != NIL) RenderWMAStringItem(g_wszWMTitle,      info.title,		   pHeaderInfo);
+		if (info.album  != NIL) RenderWMAStringItem(g_wszWMAlbumTitle, info.album,		   pHeaderInfo);
+		if (info.year    >   0) RenderWMAStringItem(g_wszWMYear,       String::FromInt(info.year), pHeaderInfo);
+		if (info.genre  != NIL) RenderWMAStringItem(g_wszWMGenre,      info.genre,		   pHeaderInfo);
+		if (info.label  != NIL) RenderWMAStringItem(g_wszWMPublisher,  info.label,		   pHeaderInfo);
+		if (info.isrc   != NIL) RenderWMAStringItem(g_wszWMISRC,       info.isrc,		   pHeaderInfo);
 
 		if (info.track > 0)
 		{
-			RenderWMAItem(g_wszWMTrackNumber, String::FromInt(info.track), pHeaderInfo);
+			RenderWMAStringItem(g_wszWMTrackNumber, String::FromInt(info.track), pHeaderInfo);
 		}
 
 		if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
@@ -113,11 +113,16 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 
 			if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs));
 
-			RenderWMAItem(g_wszWMPartOfSet, discString, pHeaderInfo);
+			RenderWMAStringItem(g_wszWMPartOfSet, discString, pHeaderInfo);
 		}
 
-		if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderWMAItem(g_wszWMDescription, info.comment, pHeaderInfo);
-		else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				RenderWMAItem(g_wszWMDescription, currentConfig->GetStringValue("Tags", "DefaultComment", NIL), pHeaderInfo);
+		if (info.rating > 0)
+		{
+			RenderWMAIntegerItem(g_wszWMSharedUserRating, Math::Min(99, info.rating), pHeaderInfo);
+		}
+
+		if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderWMAStringItem(g_wszWMDescription, info.comment, pHeaderInfo);
+		else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				RenderWMAStringItem(g_wszWMDescription, currentConfig->GetStringValue("Tags", "DefaultComment", NIL), pHeaderInfo);
 
 		/* Save other text info.
 		 */
@@ -130,27 +135,27 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 
 			if (value == NIL) continue;
 
-			if	(key == String(INFO_CONTENTGROUP).Append(":"))	RenderWMAItem(g_wszWMContentGroupDescription, value, pHeaderInfo);
-			else if	(key == String(INFO_SUBTITLE).Append(":"))	RenderWMAItem(g_wszWMSubTitle,		      value, pHeaderInfo);
+			if	(key == String(INFO_CONTENTGROUP).Append(":"))	RenderWMAStringItem(g_wszWMContentGroupDescription, value,			  pHeaderInfo);
+			else if	(key == String(INFO_SUBTITLE).Append(":"))	RenderWMAStringItem(g_wszWMSubTitle,		    value,			  pHeaderInfo);
 
-			else if	(key == String(INFO_CONDUCTOR).Append(":"))	RenderWMAItem(g_wszWMConductor,		      value, pHeaderInfo);
-			else if	(key == String(INFO_COMPOSER).Append(":"))	RenderWMAItem(g_wszWMComposer,		      value, pHeaderInfo);
-			else if	(key == String(INFO_LYRICIST).Append(":"))	RenderWMAItem(g_wszWMWriter,		      value, pHeaderInfo);
+			else if	(key == String(INFO_CONDUCTOR).Append(":"))	RenderWMAStringItem(g_wszWMConductor,		    value,			  pHeaderInfo);
+			else if	(key == String(INFO_COMPOSER).Append(":"))	RenderWMAStringItem(g_wszWMComposer,		    value,			  pHeaderInfo);
+			else if	(key == String(INFO_LYRICIST).Append(":"))	RenderWMAStringItem(g_wszWMWriter,		    value,			  pHeaderInfo);
 
-			else if	(key == String(INFO_ORIG_ARTIST).Append(":"))	RenderWMAItem(g_wszWMOriginalArtist,	      value, pHeaderInfo);
-			else if	(key == String(INFO_ORIG_ALBUM).Append(":"))	RenderWMAItem(g_wszWMOriginalAlbumTitle,      value, pHeaderInfo);
-			else if	(key == String(INFO_ORIG_LYRICIST).Append(":"))	RenderWMAItem(g_wszWMOriginalLyricist,	      value, pHeaderInfo);
-			else if	(key == String(INFO_ORIG_YEAR).Append(":"))	RenderWMAItem(g_wszWMOriginalReleaseYear,     value, pHeaderInfo);
+			else if	(key == String(INFO_ORIG_ARTIST).Append(":"))	RenderWMAStringItem(g_wszWMOriginalArtist,	    value,			  pHeaderInfo);
+			else if	(key == String(INFO_ORIG_ALBUM).Append(":"))	RenderWMAStringItem(g_wszWMOriginalAlbumTitle,      value,			  pHeaderInfo);
+			else if	(key == String(INFO_ORIG_LYRICIST).Append(":"))	RenderWMAStringItem(g_wszWMOriginalLyricist,	    value,			  pHeaderInfo);
+			else if	(key == String(INFO_ORIG_YEAR).Append(":"))	RenderWMAStringItem(g_wszWMOriginalReleaseYear,     value,			  pHeaderInfo);
 
-			else if	(key == String(INFO_BPM).Append(":"))		RenderWMAItem(g_wszWMBeatsPerMinute,	      value, pHeaderInfo);
-			else if	(key == String(INFO_INITIALKEY).Append(":"))	RenderWMAItem(g_wszWMInitialKey,	      value, pHeaderInfo);
+			else if	(key == String(INFO_BPM).Append(":"))		RenderWMAStringItem(g_wszWMBeatsPerMinute,	    value,			  pHeaderInfo);
+			else if	(key == String(INFO_INITIALKEY).Append(":"))	RenderWMAStringItem(g_wszWMInitialKey,		    value,			  pHeaderInfo);
 
-			else if	(key == String(INFO_RADIOSTATION).Append(":"))	RenderWMAItem(g_wszWMRadioStationName,	      value, pHeaderInfo);
-			else if	(key == String(INFO_RADIOOWNER).Append(":"))	RenderWMAItem(g_wszWMRadioStationOwner,	      value, pHeaderInfo);
+			else if	(key == String(INFO_RADIOSTATION).Append(":"))	RenderWMAStringItem(g_wszWMRadioStationName,	    value,			  pHeaderInfo);
+			else if	(key == String(INFO_RADIOOWNER).Append(":"))	RenderWMAStringItem(g_wszWMRadioStationOwner,	    value,			  pHeaderInfo);
 
-			else if	(key == String(INFO_WEB_ARTIST).Append(":"))	RenderWMAItem(g_wszWMAuthorURL,		      value, pHeaderInfo);
-			else if	(key == String(INFO_WEB_SOURCE).Append(":"))	RenderWMAItem(g_wszWMAudioSourceURL,	      value, pHeaderInfo);
-			else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))	RenderWMAItem(g_wszWMCopyrightURL,	      value, pHeaderInfo);
+			else if	(key == String(INFO_WEB_ARTIST).Append(":"))	RenderWMAStringItem(g_wszWMAuthorURL,		    value,			  pHeaderInfo);
+			else if	(key == String(INFO_WEB_SOURCE).Append(":"))	RenderWMAStringItem(g_wszWMAudioSourceURL,	    value,			  pHeaderInfo);
+			else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))	RenderWMAStringItem(g_wszWMCopyrightURL,	    value,			  pHeaderInfo);
 		}
 
 		/* Save CD table of contents.
@@ -199,9 +204,17 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 	else		return Error();
 }
 
-Error BoCA::WMATag::RenderWMAItem(const String &id, const String &value, Void *headerInfo)
+Error BoCA::WMATag::RenderWMAStringItem(const String &id, const String &value, Void *headerInfo)
 {
 	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) value, wcslen(value) * 2 + 2);
+
+	if (hr == S_OK) return Success();
+	else		return Error();
+}
+
+Error BoCA::WMATag::RenderWMAIntegerItem(const String &id, Int value, Void *headerInfo)
+{
+	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_DWORD, 0, (BYTE *) &value, sizeof(DWORD));
 
 	if (hr == S_OK) return Success();
 	else		return Error();
@@ -315,6 +328,12 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 				info.disc = discString.ToInt();
 
 				if (discString.Find("/") >= 0) info.numDiscs = discString.Tail(discString.Length() - discString.Find("/") - 1).ToInt();
+			}
+			else if (String(name) == g_wszWMSharedUserRating)
+			{
+				info.rating = (DWORD) *pbValue;
+
+				if (info.rating == 99) info.rating = 100;
 			}
 			else if (String(name) == g_wszWMMCDI)
 			{
@@ -451,6 +470,8 @@ Error BoCA::WMATag::UpdateStreamInfo(const String &fileName, const Track &track)
 				    nameStr == g_wszWMAuthorURL			||
 				    nameStr == g_wszWMAudioSourceURL		||
 				    nameStr == g_wszWMCopyrightURL		||
+
+				    nameStr == g_wszWMSharedUserRating		||
 
 				    nameStr == g_wszWMTrackNumber		||
 				    nameStr == g_wszWMPartOfSet			||

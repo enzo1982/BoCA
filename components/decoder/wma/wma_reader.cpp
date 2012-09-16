@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -166,22 +166,25 @@ STDMETHODIMP BoCA::WMAReader::OnSample(DWORD dwOutputNum, QWORD cnsSampleTime, Q
 	 */
 	hr = pSample->GetBufferAndLength( &pData, &cbData );
 
-	while (IsActive() && samplesBuffer->Size() >= 131072) S::System::System::Sleep(0);
-
-	/* Copy the sample to the sample buffer.
-	 */
-	if (IsActive())
+	if (hr == S_OK)
 	{
-		samplesBufferMutex->Lock();
+		while (IsActive() && samplesBuffer->Size() >= 131072) S::System::System::Sleep(0);
 
-		samplesBuffer->Resize(samplesBuffer->Size() + cbData);
+		/* Copy the sample to the sample buffer.
+		 */
+		if (IsActive())
+		{
+			samplesBufferMutex->Lock();
 
-		memcpy((UnsignedByte *) *samplesBuffer + samplesBuffer->Size() - cbData, pData, cbData);
+			samplesBuffer->Resize(samplesBuffer->Size() + cbData);
 
-		samplesBufferMutex->Release();
+			memcpy((UnsignedByte *) *samplesBuffer + samplesBuffer->Size() - cbData, pData, cbData);
+
+			samplesBufferMutex->Release();
+		}
 	}
 
-	return S_OK;
+	return hr;
 }
 
 STDMETHODIMP BoCA::WMAReader::OnTime(QWORD cnsCurrentTime, void *pvContext)

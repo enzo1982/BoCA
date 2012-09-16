@@ -51,7 +51,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	text_quality		= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(10, 16));
 
-	slider_quality		= new Slider(Point(text_quality->textSize.cx + 18, 14), Size(289 - text_quality->textSize.cx, 0), OR_HORZ, &quality, -20, 100);
+	slider_quality		= new Slider(Point(text_quality->GetUnscaledTextWidth() + 18, 14), Size(289 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, -20, 100);
 	slider_quality->onValueChange.Connect(&ConfigureVorbis::SetQuality, this);
 
 	text_quality_value	= new Text(NIL, Point(313, 16));
@@ -98,7 +98,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	text_abrmax_kbps	= new Text("kbps", Point(311, 70));
 
-	Int	 maxTextSize = Math::Max(Math::Max(check_abrmin->textSize.cx, check_abrnom->textSize.cx), check_abrmax->textSize.cx);
+	Int	 maxTextSize = Math::Max(Math::Max(check_abrmin->GetUnscaledTextWidth(), check_abrnom->GetUnscaledTextWidth()), check_abrmax->GetUnscaledTextWidth());
 
 	check_abrmin->SetWidth(maxTextSize + 20);
 	check_abrnom->SetWidth(maxTextSize + 20);

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -182,7 +182,11 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 
 	/* Skip vendor string.
 	 */
-	in.RelSeek(in.InputNumber(4));
+	Int		 vendorLength = in.InputNumber(4);
+
+	if (vendorLength < 0 || vendorLength > buffer.Size() - 8) return Error();
+
+	in.RelSeek(vendorLength);
 
 	/* Parse individual comment items.
 	 */
@@ -192,7 +196,14 @@ Error BoCA::VorbisTag::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &tr
 
 	for (Int i = 0; i < numItems; i++)
 	{
+		/* Read and check next comment string length.
+		 */
 		Int	 length	 = in.InputNumber(4);
+
+		if (length < 0 || length > buffer.Size() - in.GetPos()) break;
+
+		/* Read and assign actual comment string.
+		 */
 		String	 comment = in.InputString(length);
 
 		String	 id	 = comment.Head(comment.Find("=")).ToUpper();

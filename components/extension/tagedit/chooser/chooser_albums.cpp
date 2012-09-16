@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,27 +12,30 @@
 
 BoCA::ChooserAlbums::ChooserAlbums() : Chooser("Albums")
 {
-	I18n	*i18n	= I18n::Get();
-
-	i18n->SetContext("Extensions::Tag Editor");
-
-	SetText(i18n->TranslateString("Albums"));
-
 	dontUpdateAlbumList = False;
 
 	tracks.EnableLocking();
 	albums.EnableLocking();
 
-	list_albums	= new ListBox(Point(7, 7), Size(100, 150));
+	list_albums		= new ListBox(Point(7, 7), Size(100, 150));
 	list_albums->onSelectEntry.Connect(&ChooserAlbums::OnSelectAlbum, this);
 
 	list_albums->EnableLocking();
 
-	list_albums->AddTab(i18n->TranslateString("Title"));
+	shortcut_previous	= new Shortcut(0, Input::Keyboard::KeyUp, list_albums);
+	shortcut_previous->onKeyDown.Connect(&ChooserAlbums::OnShortcutPrevious, this);
+
+	shortcut_next		= new Shortcut(0, Input::Keyboard::KeyDown, list_albums);
+	shortcut_next->onKeyDown.Connect(&ChooserAlbums::OnShortcutNext, this);
 
 	Add(list_albums);
 
+	Add(shortcut_previous);
+	Add(shortcut_next);
+
 	onChangeSize.Connect(&ChooserAlbums::OnChangeSize, this);
+
+	Settings::Get()->onChangeLanguageSettings.Connect(&ChooserAlbums::OnChangeLanguageSettings, this);
 
 	JobList::Get()->onApplicationAddTrack.Connect(&ChooserAlbums::OnApplicationAddTrack, this);
 	JobList::Get()->onApplicationModifyTrack.Connect(&ChooserAlbums::OnApplicationModifyTrack, this);
@@ -44,6 +47,8 @@ BoCA::ChooserAlbums::ChooserAlbums() : Chooser("Albums")
 
 BoCA::ChooserAlbums::~ChooserAlbums()
 {
+	Settings::Get()->onChangeLanguageSettings.Disconnect(&ChooserAlbums::OnChangeLanguageSettings, this);
+
 	JobList::Get()->onApplicationAddTrack.Disconnect(&ChooserAlbums::OnApplicationAddTrack, this);
 	JobList::Get()->onApplicationModifyTrack.Disconnect(&ChooserAlbums::OnApplicationModifyTrack, this);
 	JobList::Get()->onApplicationRemoveTrack.Disconnect(&ChooserAlbums::OnApplicationRemoveTrack, this);
@@ -52,6 +57,9 @@ BoCA::ChooserAlbums::~ChooserAlbums()
 	JobList::Get()->onApplicationRemoveAllTracks.Disconnect(&ChooserAlbums::OnApplicationRemoveAllTracks, this);
 
 	DeleteObject(list_albums);
+
+	DeleteObject(shortcut_previous);
+	DeleteObject(shortcut_next);
 }
 
 /* Called when component canvas size changes.
@@ -65,6 +73,33 @@ Void BoCA::ChooserAlbums::OnChangeSize(const Size &nSize)
 	list_albums->SetSize(Size(clientSize.cx - 15, clientSize.cy - 15));
 }
 
+/* Called when application language is changed.
+ * ----
+ */
+Void BoCA::ChooserAlbums::OnChangeLanguageSettings()
+{
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor");
+
+	SetText(i18n->TranslateString("Albums"));
+
+	/* Hide all affected widgets prior to changing
+	 * labels to avoid flickering.
+	 */
+	Bool	 prevVisible = IsVisible();
+
+	if (prevVisible) Hide();
+
+	list_albums->RemoveAllTabs();
+
+	list_albums->AddTab(i18n->TranslateString("Title"));
+
+	/* Show all widgets again.
+	 */
+	if (prevVisible) Show();
+}
+
 /* Called when an album entry is selected.
  * ----
  * Finds the corresponding album and emits onSelectAlbum.
@@ -74,6 +109,29 @@ Void BoCA::ChooserAlbums::OnSelectAlbum()
 	const Track	&album = albums.GetNth(list_albums->GetSelectedEntryNumber());
 
 	if (IsActiveChooser()) onSelectAlbum.Emit(album);
+}
+
+/* Called when the up arrow key is pressed.
+ * ----
+ * Selects the previous album.
+ */
+Void BoCA::ChooserAlbums::OnShortcutPrevious()
+{
+	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
+
+	if (list_albums->GetSelectedEntryNumber() == -1) list_albums->SelectNthEntry(list_albums->Length()		   - 1);
+	else						 list_albums->SelectNthEntry(list_albums->GetSelectedEntryNumber() - 1);
+}
+
+/* Called when the down arrow key is pressed.
+ * ----
+ * Selects the next album.
+ */
+Void BoCA::ChooserAlbums::OnShortcutNext()
+{
+	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
+
+	list_albums->SelectNthEntry(list_albums->GetSelectedEntryNumber() + 1);
 }
 
 /* Called when an album is modified.

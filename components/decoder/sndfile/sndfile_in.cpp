@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -34,6 +34,7 @@ const String &BoCA::SndFileIn::GetComponentSpecs()
 		      <name>Windows Wave Files</name>				\
 		      <extension>wav</extension>				\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
 		    </format>							\
 		    <format>							\
 		      <name>Apple Audio Files</name>				\
@@ -189,7 +190,9 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 		info.artist	= ex_sf_get_string(sndf, SF_STR_ARTIST);
 		info.title	= ex_sf_get_string(sndf, SF_STR_TITLE);
 		info.album	= ex_sf_get_string(sndf, SF_STR_ALBUM);
+		info.track	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_TRACKNUMBER));
 		info.year	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_DATE));
+		info.genre	= ex_sf_get_string(sndf, SF_STR_GENRE);
 		info.comment	= ex_sf_get_string(sndf, SF_STR_COMMENT);
 
 		track.SetInfo(info);
@@ -204,13 +207,22 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 	if (!errorState)
 	{
 		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+		AS::TaggerComponent	*cartTagger = (AS::TaggerComponent *) boca.CreateComponentByID("cart-tag");
 
-		if (tagger != NIL)
+		if (cartTagger != NIL)
 		{
-			tagger->ParseStreamInfo(streamURI, track);
+			cartTagger->ParseStreamInfo(streamURI, track);
 
-			boca.DeleteComponent(tagger);
+			boca.DeleteComponent(cartTagger);
+		}
+
+		AS::TaggerComponent	*riffTagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+
+		if (riffTagger != NIL)
+		{
+			riffTagger->ParseStreamInfo(streamURI, track);
+
+			boca.DeleteComponent(riffTagger);
 		}
 	}
 

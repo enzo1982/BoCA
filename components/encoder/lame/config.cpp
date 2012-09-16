@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -60,7 +60,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	basic_text_preset	= new Text(i18n->TranslateString("Use preset:"), Point(16, 24));
 
-	basic_combo_preset	= new ComboBox(Point(24 + basic_text_preset->textSize.cx, 21), Size(363 - basic_text_preset->textSize.cx, 0));
+	basic_combo_preset	= new ComboBox(Point(24 + basic_text_preset->GetUnscaledTextWidth(), 21), Size(363 - basic_text_preset->GetUnscaledTextWidth(), 0));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Custom settings"));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Medium, Fast"));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Standard, Fast"));
@@ -103,17 +103,17 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	vbr_text_setquality	= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(153, 75));
 
-	vbr_slider_quality	= new Slider(Point(161 + vbr_text_setquality->textSize.cx, 73), Size(204 - vbr_text_setquality->textSize.cx, 0), OR_HORZ, &vbrquality, 0, 90);
+	vbr_slider_quality	= new Slider(Point(161 + vbr_text_setquality->GetUnscaledTextWidth(), 73), Size(204 - vbr_text_setquality->GetUnscaledTextWidth(), 0), OR_HORZ, &vbrquality, 0, 90);
 	vbr_slider_quality->onValueChange.Connect(&ConfigureLAME::SetVBRQuality, this);
 
 	vbr_text_quality	= new Text(NIL, Point(372, 75));
 	SetVBRQuality();
 
 	vbr_text_quality_worse= new Text(i18n->TranslateString("worse"), Point());
-	vbr_text_quality_worse->SetPosition(Point(vbr_slider_quality->GetX() + 3 - (vbr_text_quality_worse->textSize.cx / 2), 92));
+	vbr_text_quality_worse->SetPosition(Point(vbr_slider_quality->GetX() + 3 - (vbr_text_quality_worse->GetUnscaledTextWidth() / 2), 92));
 
 	vbr_text_quality_better= new Text(i18n->TranslateString("better"), Point());
-	vbr_text_quality_better->SetPosition(Point(360 - (vbr_text_quality_better->textSize.cx / 2), 92));
+	vbr_text_quality_better->SetPosition(Point(360 - (vbr_text_quality_better->GetUnscaledTextWidth() / 2), 92));
 
 	vbr_abrbitrate		= new GroupBox(i18n->TranslateString("ABR target bitrate"), Point(142, 62), Size(255, 39));
 
@@ -139,10 +139,10 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	SetQuality();
 
 	basic_text_quality_worse= new Text(i18n->TranslateString("worse"), Point());
-	basic_text_quality_worse->SetPosition(Point(240 - (basic_text_quality_worse->textSize.cx / 2), 167));
+	basic_text_quality_worse->SetPosition(Point(240 - (basic_text_quality_worse->GetUnscaledTextWidth() / 2), 167));
 
 	basic_text_quality_better= new Text(i18n->TranslateString("better"), Point());
-	basic_text_quality_better->SetPosition(Point(369 - (basic_text_quality_better->textSize.cx / 2), 167));
+	basic_text_quality_better->SetPosition(Point(369 - (basic_text_quality_better->GetUnscaledTextWidth() / 2), 167));
 
 	i18n->SetContext("Encoders::LAME::Misc");
 
@@ -200,9 +200,9 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	expert_check_ath	= new CheckBox(i18n->TranslateString("Enable ATH:"), Point(17, 22), Size(93, 0), &enable_ath);
 	expert_check_ath->onAction.Connect(&ConfigureLAME::SetEnableATH, this);
-	expert_check_ath->SetWidth(expert_check_ath->textSize.cx + 19);
+	expert_check_ath->SetWidth(expert_check_ath->GetUnscaledTextWidth() + 19);
 
-	expert_combo_athtype	= new ComboBox(Point(45 + expert_check_ath->textSize.cx, 21), Size(342 - expert_check_ath->textSize.cx, 0));
+	expert_combo_athtype	= new ComboBox(Point(45 + expert_check_ath->GetUnscaledTextWidth(), 21), Size(342 - expert_check_ath->GetUnscaledTextWidth(), 0));
 	expert_combo_athtype->AddEntry(i18n->TranslateString("Use default setting"));
 	expert_combo_athtype->AddEntry("Gabriel Bouvigne, 9");
 	expert_combo_athtype->AddEntry("Frank Klemm");

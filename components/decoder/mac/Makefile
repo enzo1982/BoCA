@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = dllinterface.o mac_in.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -DNO_DEFINE_ENVIRONMENT_VARIABLES -D__forceinline=inline
 
 # Enter additional library dependencies here:
 LIBS	  =

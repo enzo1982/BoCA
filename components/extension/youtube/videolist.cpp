@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -45,7 +45,7 @@ Int BoCA::VideoList::Paint(Int message)
 	if (!IsVisible())	return Success();
 
 	Surface	*surface	= GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
+	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
 
 	String	 visibleEntries;
 
@@ -87,9 +87,9 @@ Int BoCA::VideoList::Paint(Int message)
 			{
 				ListEntry	*operat = GetNthEntry(i);
 
-				frame.right += operat->GetWidth();
+				frame.right += operat->GetRealSize().cx;
 
-				if (frame.right >= 0 && frame.left <= GetWidth() - 4)
+				if (frame.right >= 0 && frame.left <= GetRealSize().cx - 4)
 				{
 					operat->SetMetrics(Point(frame.left + 2, 2), Size(operat->GetWidth(), GetHeight() - 4 - (scrollbar->IsVisible() ? 17 : 0)));
 					operat->Show();
@@ -101,7 +101,7 @@ Int BoCA::VideoList::Paint(Int message)
 					operat->Hide();
 				}
 
-				frame.left += operat->GetWidth();
+				frame.left += operat->GetRealSize().cx;
 			}
 
 			visibleEntriesChecksum = visibleEntries.ComputeCRC32();
@@ -127,14 +127,14 @@ Int BoCA::VideoList::Paint(Int message)
 			{
 				ListEntry	*operat = GetNthEntry(i);
 
-				frame.right += operat->GetWidth();
+				frame.right += operat->GetRealSize().cx;
 
-				if (frame.right >= 0 && frame.left <= GetWidth() - 4)
+				if (frame.right >= 0 && frame.left <= GetRealSize().cx - 4)
 				{
 					visibleEntries.Append(operat->GetName());
 				}
 
-				frame.left += operat->GetWidth();
+				frame.left += operat->GetRealSize().cx;
 			}
 
 			if (visibleEntriesChecksum != visibleEntries.ComputeCRC32()) Paint(SP_PAINT);

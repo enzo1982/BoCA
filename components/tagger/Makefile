@@ -6,6 +6,7 @@ include $(BOCA_PATH)/Makefile-options
 
 all:
 	cd apev2 && $(MAKE)
+	cd cart && $(MAKE)
 	cd flac && $(MAKE)
 	cd id3v1 && $(MAKE)
 	cd id3v2 && $(MAKE)
@@ -18,6 +19,7 @@ endif
 
 clean:
 	cd apev2 && $(MAKE) clean
+	cd cart && $(MAKE) clean
 	cd flac && $(MAKE) clean
 	cd id3v1 && $(MAKE) clean
 	cd id3v2 && $(MAKE) clean

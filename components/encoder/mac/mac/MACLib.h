@@ -1,6 +1,6 @@
 /*****************************************************************************************
 Monkey's Audio MACLib.h (include for using MACLib.lib in your projects)
-Copyright (C) 2000-2003 by Matthew T. Ashland   All Rights Reserved.
+Copyright (C) 2000-2011 by Matthew T. Ashland   All Rights Reserved.
 
 Overview:
 
@@ -15,15 +15,19 @@ Unless otherwise specified, functions return ERROR_SUCCESS (0) on success and an
 error code on failure.
 
 The terminology "Sample" refers to a single sample value, and "Block" refers 
-to a collection    of "Channel" samples.  For simplicity, MAC typically uses blocks
+to a collection of "Channel" samples.  For simplicity, MAC typically uses blocks
 everywhere so that channel mis-alignment cannot happen. (i.e. on a CD, a sample is
 2 bytes and a block is 4 bytes ([2 bytes per sample] * [2 channels] = 4 bytes))
 
+License:
+
+http://monkeysaudio.com/license.html
+
 Questions / Suggestions:
 
-Please direct questions or comments to the Monkey's Audio developers board:
-http://www.monkeysaudio.com/cgi-bin/YaBB/YaBB.cgi -> Developers
-or, if necessary, matt @ monkeysaudio.com
+Please direct questions or comments to this email address:
+mail at monkeysaudio dot com
+[ due to a large volume of email and spams, a response can not be guaranteed ]
 *****************************************************************************************/
 
 #ifndef APE_MACLIB_H
@@ -81,7 +85,24 @@ Defines
 #define CREATE_WAV_HEADER_ON_DECOMPRESSION    -1
 #define MAX_AUDIO_BYTES_UNKNOWN -1
 
+/*****************************************************************************************
+Progress callbacks
+*****************************************************************************************/
 typedef void (__stdcall * APE_PROGRESS_CALLBACK) (int);
+
+class IAPEProgressCallback
+{
+public:
+    
+    virtual void Progress(int nPercentageDone) = 0;
+    virtual int GetKillFlag() = 0; // KILL_FLAG_CONTINUE to continue
+};
+
+/*****************************************************************************************
+All structures are designed for 4-byte alignment
+*****************************************************************************************/
+#pragma pack(push)
+#pragma pack(4)
 
 /*****************************************************************************************
 WAV header structure
@@ -116,18 +137,18 @@ APE_DESCRIPTOR structure (file header that describes lengths, offsets, etc.)
 *****************************************************************************************/
 struct APE_DESCRIPTOR
 {
-    char    cID[4];                             // should equal 'MAC '
-    uint16  nVersion;                           // version number * 1000 (3.81 = 3810)
+    char   cID[4];                             // should equal 'MAC '
+    uint16 nVersion;                           // version number * 1000 (3.81 = 3810) (remember that 4-byte alignment causes this to take 4-bytes)
 
-    uint32  nDescriptorBytes;                   // the number of descriptor bytes (allows later expansion of this header)
-    uint32  nHeaderBytes;                       // the number of header APE_HEADER bytes
-    uint32  nSeekTableBytes;                    // the number of bytes of the seek table
-    uint32  nHeaderDataBytes;                   // the number of header data bytes (from original file)
-    uint32  nAPEFrameDataBytes;                 // the number of bytes of APE frame data
-    uint32  nAPEFrameDataBytesHigh;             // the high order number of APE frame data bytes
-    uint32  nTerminatingDataBytes;              // the terminating data of the file (not including tag data)
+    uint32 nDescriptorBytes;                   // the number of descriptor bytes (allows later expansion of this header)
+    uint32 nHeaderBytes;                       // the number of header APE_HEADER bytes
+    uint32 nSeekTableBytes;                    // the number of bytes of the seek table
+    uint32 nHeaderDataBytes;                   // the number of header data bytes (from original file)
+    uint32 nAPEFrameDataBytes;                 // the number of bytes of APE frame data
+    uint32 nAPEFrameDataBytesHigh;             // the high order number of APE frame data bytes
+    uint32 nTerminatingDataBytes;              // the terminating data of the file (not including tag data)
 
-    uint8   cFileMD5[16];                       // the MD5 hash of the file (see notes for usage... it's a littly tricky)
+    uint8  cFileMD5[16];                       // the MD5 hash of the file (see notes for usage... it's a littly tricky)
 };
 
 /*****************************************************************************************
@@ -135,17 +156,22 @@ APE_HEADER structure (describes the format, duration, etc. of the APE file)
 *****************************************************************************************/
 struct APE_HEADER
 {
-    uint16    nCompressionLevel;                 // the compression level (see defines I.E. COMPRESSION_LEVEL_FAST)
-    uint16    nFormatFlags;                      // any format flags (for future use)
+    uint16 nCompressionLevel;                 // the compression level (see defines I.E. COMPRESSION_LEVEL_FAST)
+    uint16 nFormatFlags;                      // any format flags (for future use)
 
-    uint32    nBlocksPerFrame;                   // the number of audio blocks in one frame
-    uint32    nFinalFrameBlocks;                 // the number of audio blocks in the final frame
-    uint32    nTotalFrames;                      // the total number of frames
+    uint32 nBlocksPerFrame;                   // the number of audio blocks in one frame
+    uint32 nFinalFrameBlocks;                 // the number of audio blocks in the final frame
+    uint32 nTotalFrames;                      // the total number of frames
 
-    uint16    nBitsPerSample;                    // the bits per sample (typically 16)
-    uint16    nChannels;                         // the number of channels (1 or 2)
-    uint32    nSampleRate;                       // the sample rate (typically 44100)
+    uint16 nBitsPerSample;                    // the bits per sample (typically 16)
+    uint16 nChannels;                         // the number of channels (1 or 2)
+    uint32 nSampleRate;                       // the sample rate (typically 44100)
 };
+
+/*************************************************************************************************
+Reset alignment
+*************************************************************************************************/
+#pragma pack(pop)
 
 /*************************************************************************************************
 Classes (fully defined elsewhere)
@@ -441,6 +467,11 @@ extern "C"
     DLLEXPORT int __stdcall DecompressFileW(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
     DLLEXPORT int __stdcall ConvertFileW(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nCompressionLevel, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
     DLLEXPORT int __stdcall VerifyFileW(const str_utf16 * pInputFilename, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag, BOOL bQuickVerifyIfPossible = FALSE); 
+
+    DLLEXPORT int __stdcall CompressFileW2(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, IAPEProgressCallback * pProgressCallback = NULL);
+    DLLEXPORT int __stdcall DecompressFileW2(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, IAPEProgressCallback * pProgressCallback = NULL);
+    DLLEXPORT int __stdcall ConvertFileW2(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nCompressionLevel, IAPEProgressCallback * pProgressCallback = NULL);
+    DLLEXPORT int __stdcall VerifyFileW2(const str_utf16 * pInputFilename, IAPEProgressCallback * pProgressCallback = NULL, BOOL bQuickVerifyIfPossible = FALSE); 
 
     // helper functions
     DLLEXPORT int __stdcall FillWaveFormatEx(WAVEFORMATEX * pWaveFormatEx, int nSampleRate = 44100, int nBitsPerSample = 16, int nChannels = 2);

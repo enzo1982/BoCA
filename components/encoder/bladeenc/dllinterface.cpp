@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <boca.h>
 #include "dllinterface.h"
 
 BEINITSTREAM	 ex_beInitStream	= NIL;
@@ -20,11 +21,9 @@ DynamicLoader *bladedll	= NIL;
 
 Bool LoadBladeDLL()
 {
-#ifdef __WIN32__
-	if (!File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\BladeEnc.dll")).Exists()) return False;
-#endif
+	bladedll = BoCA::Utilities::LoadCodecDLL("BladeEnc");
 
-	bladedll = new DynamicLoader("codecs/BladeEnc");
+	if (bladedll == NIL) return False;
 
 	ex_beInitStream		= (BEINITSTREAM) bladedll->GetFunctionAddress("beInitStream");
 	ex_beEncodeChunk	= (BEENCODECHUNK) bladedll->GetFunctionAddress("beEncodeChunk");

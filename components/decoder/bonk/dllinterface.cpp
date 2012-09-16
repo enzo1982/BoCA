@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -27,11 +27,7 @@ DynamicLoader *bonkdll	= NIL;
 
 Bool LoadBonkDLL()
 {
-#ifdef __WIN32__
-	bonkdll = BoCA::Utilities::LoadCodecDLL("Bonk");
-#else
 	bonkdll = BoCA::Utilities::LoadCodecDLL("bonk");
-#endif
 
 	if (bonkdll == NIL) return False;
 

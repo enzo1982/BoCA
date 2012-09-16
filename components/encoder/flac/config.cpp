@@ -47,7 +47,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	text_preset		= new Text(i18n->TranslateString("Use preset:"), Point(9, 13));
 
-	combo_preset		= new ComboBox(Point(17 + text_preset->textSize.cx, 10), Size(453 - text_preset->textSize.cx, 0));
+	combo_preset		= new ComboBox(Point(17 + text_preset->GetUnscaledTextWidth(), 10), Size(453 - text_preset->GetUnscaledTextWidth(), 0));
 	combo_preset->AddEntry(i18n->TranslateString("Custom settings"));
 	combo_preset->AddEntry(String("0").Append(", ").Append(i18n->TranslateString("Fastest encoding")));
 	combo_preset->AddEntry("1");
@@ -99,17 +99,17 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	check_streamable_subset	= new CheckBox(i18n->TranslateString("Use streamable subset"), Point(10, 13), Size(480, 0), &streamable_subset);
 	check_streamable_subset->onAction.Connect(&ConfigureFLAC::SetStreamableSubset, this);
-	check_streamable_subset->SetWidth(check_streamable_subset->textSize.cx + 21);
+	check_streamable_subset->SetWidth(check_streamable_subset->GetUnscaledTextWidth() + 21);
 
 	text_blocksize		= new Text(i18n->TranslateString("Blocksize:"), Point(9, 40));
 
-	slider_blocksize	= new Slider(Point(16 + text_blocksize->textSize.cx, 38), Size(319, 0), OR_HORZ, &blocksize, 24, 4096);
+	slider_blocksize	= new Slider(Point(16 + text_blocksize->GetUnscaledTextWidth(), 38), Size(319, 0), OR_HORZ, &blocksize, 24, 4096);
 	slider_blocksize->onValueChange.Connect(&ConfigureFLAC::SetBlockSize, this);
 
-	edit_blocksize		= new EditBox(NIL, Point(344 + text_blocksize->textSize.cx, 37), Size(37, 0), 5);
+	edit_blocksize		= new EditBox(NIL, Point(344 + text_blocksize->GetUnscaledTextWidth(), 37), Size(37, 0), 5);
 	edit_blocksize->onInput.Connect(&ConfigureFLAC::EditBlockSize, this);
 
-	text_blocksize_bytes	= new Text(i18n->TranslateString("bytes"), Point(388 + text_blocksize->textSize.cx, 40));
+	text_blocksize_bytes	= new Text(i18n->TranslateString("bytes"), Point(388 + text_blocksize->GetUnscaledTextWidth(), 40));
 
 	group_format->Add(check_streamable_subset);
 	group_format->Add(text_blocksize);
@@ -124,7 +124,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	group_apodization	= new GroupBox(i18n->TranslateString("Apodization"), Point(7, 11), Size(480, 56));
 
 	text_apodization	= new Text(i18n->TranslateString("Apodization function(s):"), Point(9, 13));
-	edit_apodization	= new EditBox(config->GetStringValue("FLAC", "Apodization", "tukey(0.5)"), Point(16 + text_apodization->textSize.cx, 10), Size(454 - text_apodization->textSize.cx, 0));
+	edit_apodization	= new EditBox(config->GetStringValue("FLAC", "Apodization", "tukey(0.5)"), Point(16 + text_apodization->GetUnscaledTextWidth(), 10), Size(454 - text_apodization->GetUnscaledTextWidth(), 0));
 
 	list_apodization	= new ListBox(pos, size);
 	list_apodization->AddEntry("bartlett");
@@ -145,7 +145,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	edit_apodization->SetDropDownList(list_apodization);
 
-	text_apodization_explain= new Text(String(i18n->TranslateString("Note:")).Append(" ").Append(i18n->TranslateString("You can specify multiple functions separated by semicolons.")), Point(18 + text_apodization->textSize.cx, 35));
+	text_apodization_explain= new Text(String(i18n->TranslateString("Note:")).Append(" ").Append(i18n->TranslateString("You can specify multiple functions separated by semicolons.")), Point(18 + text_apodization->GetUnscaledTextWidth(), 35));
 
 	group_apodization->Add(text_apodization);
 	group_apodization->Add(edit_apodization);
@@ -172,7 +172,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	check_qlp_precision_search= new CheckBox(i18n->TranslateString("Optimize LPC quantization"), Point(323, 34), Size(150, 0), &do_qlp_coeff_prec_search);
 	check_qlp_precision_search->onAction.Connect(&ConfigureFLAC::SetQLPSearch, this);
 
-	Int	 maxTextSize = Math::Max(text_max_lpc_order_value->textSize.cx, text_qlp_precision_value->textSize.cx);
+	Int	 maxTextSize = Math::Max(text_max_lpc_order_value->GetUnscaledTextWidth(), text_qlp_precision_value->GetUnscaledTextWidth());
 
 	check_exhaustive_model->SetX(text_max_lpc_order_value->GetX() + maxTextSize + 8); check_exhaustive_model->SetWidth(189 - maxTextSize);
 	check_qlp_precision_search->SetX(text_max_lpc_order_value->GetX() + maxTextSize + 8); check_qlp_precision_search->SetWidth(189 - maxTextSize);
@@ -202,7 +202,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	text_max_part_order_value= new Text(NIL, Point(273, 36));
 
-	maxTextSize = Math::Max(Math::Max(text_min_part_order->textSize.cx, text_max_part_order->textSize.cx), Math::Max(text_max_lpc_order->textSize.cx, text_qlp_precision->textSize.cx));
+	maxTextSize = Math::Max(Math::Max(text_min_part_order->GetUnscaledTextWidth(), text_max_part_order->GetUnscaledTextWidth()), Math::Max(text_max_lpc_order->GetUnscaledTextWidth(), text_qlp_precision->GetUnscaledTextWidth()));
 
 	slider_min_part_order->SetX(group_lpc->GetX() + 16 + maxTextSize); slider_min_part_order->SetWidth(250 - maxTextSize);
 	slider_max_part_order->SetX(group_lpc->GetX() + 16 + maxTextSize); slider_max_part_order->SetWidth(250 - maxTextSize);

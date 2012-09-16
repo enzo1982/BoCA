@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,11 +20,17 @@ namespace BoCA
 			static const String	 genres[148];
 			static String		 dummyString;
 
-			String			 GetFrameString(Void *, String & = dummyString);
-			Int			 SetFrameString(Void *, const String &, const String & = NIL);
+			String			 GetStringField(Void *, Int);
+			Int			 SetStringField(Void *, Int, const String &);
 
-			String			 GetFrameURL(Void *);
-			Int			 SetFrameURL(Void *, const String &);
+			String			 GetASCIIField(Void *, Int);
+			Int			 SetASCIIField(Void *, Int, const String &);
+
+			Int			 GetIntegerField(Void *, Int);
+			Int			 SetIntegerField(Void *, Int, Int);
+
+			Int			 GetBinaryField(Void *, Int, Buffer<UnsignedByte> &);
+			Int			 SetBinaryField(Void *, Int, const Buffer<UnsignedByte> &);
 
 			const String		&GetID3CategoryName(UnsignedInt);
 		public:

@@ -34,6 +34,7 @@ const String &BoCA::WaveIn::GetComponentSpecs()
 	      <name>Windows Wave Files</name>				\
 	      <extension>wav</extension>				\
 	      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+	      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
 	    </format>							\
 	  </component>							\
 									\
@@ -152,13 +153,22 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 	if (!errorState)
 	{
 		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+		AS::TaggerComponent	*cartTagger = (AS::TaggerComponent *) boca.CreateComponentByID("cart-tag");
 
-		if (tagger != NIL)
+		if (cartTagger != NIL)
 		{
-			tagger->ParseStreamInfo(streamURI, track);
+			cartTagger->ParseStreamInfo(streamURI, track);
 
-			boca.DeleteComponent(tagger);
+			boca.DeleteComponent(cartTagger);
+		}
+
+		AS::TaggerComponent	*riffTagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+
+		if (riffTagger != NIL)
+		{
+			riffTagger->ParseStreamInfo(streamURI, track);
+
+			boca.DeleteComponent(riffTagger);
 		}
 	}
 

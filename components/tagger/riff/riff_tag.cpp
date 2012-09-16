@@ -123,6 +123,7 @@ Int BoCA::RIFFTag::RenderTagItem(const String &id, const String &value, Buffer<U
 	out.OutputNumber(stringSize, 4);
 	out.OutputString(value);
 	out.OutputNumber(0, 1 + (stringSize & 1));
+
 	return Success();
 }
 

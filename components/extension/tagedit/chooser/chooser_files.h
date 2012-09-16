@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -41,6 +41,9 @@ namespace BoCA
 			ListBox		*list_files;
 			Text		*text_nofiles;
 
+			Shortcut	*shortcut_previous;
+			Shortcut	*shortcut_next;
+
 			Button		*btn_save;
 			Button		*btn_saveall;
 
@@ -48,16 +51,21 @@ namespace BoCA
 
 			Void		 GetSupportedFileExtensions();
 		slots:
-			Void		 OnChangeSize(const Size &);
 			Void		 OnDragDivider(Int);
 
 			Void		 OnSelectDirectory(const Directory &);
 			Void		 OnSelectFile(ListEntry *);
 
+			Void		 OnShortcutPrevious();
+			Void		 OnShortcutNext();
+
 			Void		 OnModifyTrack(const Track &);
 
 			Void		 OnSave();
 			Void		 OnSaveAll();
+
+			Void		 OnChangeSize(const Size &);
+			Void		 OnChangeLanguageSettings();
 		public:
 					 ChooserFiles();
 					~ChooserFiles();

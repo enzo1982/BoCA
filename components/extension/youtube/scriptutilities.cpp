@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -19,7 +19,7 @@ v8::Handle<v8::Value> BoCA::Alert(const v8::Arguments &args)
 {
 	String	 text = (char *) *v8::String::AsciiValue(args[0]);
 
-	QuickMessage(text, "Information", MB_OK, IDI_INFORMATION);
+	QuickMessage(text, "Information", Message::Buttons::Ok, Message::Icon::Information);
 
 	return v8::Undefined();
 }

@@ -1,30 +1,32 @@
 <VideoSite>
   <name>YouTube</name>
   <version>1.0</version>
-  <decoder>ffmpeg-flv_audio-in</decoder>
+  <decoder>avconv-webm_audio-in</decoder>
 
   <script type="text/javascript">
-    function canHandleURL(URL) {
-      if (URL.toLowerCase().match(/http:\/\/www.youtube.com\/watch\?v=.*/)) return true;
-      else								    return false;
-    }
+    <![CDATA[
+      function canHandleURL(URL) {
+	if (URL.toLowerCase().match(/http:\/\/www.youtube.com\/watch\?v=.*/)) return true;
+	else								      return false;
+      }
 
-    function getVideoURL(html) {
-      return html.match(/"fmt_stream_map": "[0-9]+\|(.*?)\|/), (RegExp.$1).replace(/\\\//g, "/").replace(/\\u0026/g, "&amp;");
-    }
+      function getVideoURL(html) {
+	return html.match(/"url_encoded_fmt_stream_map": ".*?url=(.*?)\\u0026.*?webm.*?\\u0026sig=(.*?)\\u0026.*?,/), unescape(RegExp.$1) + "&signature=" + RegExp.$2;
+      }
 
-    function queryMetadata(html) {
-      var metadata = new Metadata();
+      function queryMetadata(html) {
+	var metadata = new Metadata();
 
-      metadata.title	   = (html.match(/&lt;meta name="title" content="(.*?)"&gt;/) ? RegExp.$1 : null);
-      metadata.description = (html.match(/&lt;p id="eow-description"\s*&gt;(.*?)&lt;\/p&gt;/) ? RegExp.$1 : null);
+	metadata.title	     = (html.match(/<meta name="title" content="(.*?)">/) ? RegExp.$1 : null);
+	metadata.description = (html.match(/<p id="eow-description"\s*>((?:.|\n|\r)*?)<\/p>/) ? RegExp.$1 : null);
 
-      metadata.date	   = (html.match(/&lt;span id="eow-date-short" class="watch-video-date"\s*&gt;\s*(.*?)\s*&lt;\/span&gt;/) ? RegExp.$1 : null);
-      metadata.thumbnail   = (html.match(/&lt;meta property="og:image" content="(.*?)"\s*\/?&gt;/) ? RegExp.$1 : null);
+	metadata.date	     = (html.match(/<span id="eow-date" class="watch-video-date"\s*>\s*(.*?)\s*<\/span>/) ? RegExp.$1 : null);
+	metadata.thumbnail   = (html.match(/<meta property="og:image" content="(.*?)"\s*\/?>/) ? RegExp.$1 : null);
 
-      metadata.uploader    = (html.match(/'VIDEO_USERNAME': (?:'|")(.*?)(?:'|")/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/<a (?:.|\n|\r)*? class=".*? yt-user-name author" rel="author"(?:.|\n|\r)*?>\s*(.*?)\s*<\/a>/) ? RegExp.$1 : null);
 
-      return metadata;
-    }
+	return metadata;
+      }
+    ]]>
   </script>
 </VideoSite>

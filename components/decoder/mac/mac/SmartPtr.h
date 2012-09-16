@@ -14,6 +14,7 @@ CSmartPtr - a simple smart pointer class that can automatically initialize and f
 template <class TYPE> class CSmartPtr
 {
 public:
+
     TYPE * m_pObject;
     BOOL m_bArray;
     BOOL m_bDelete;
@@ -62,28 +63,28 @@ public:
         m_bDelete = a_bDelete;
     }
 
-    __inline TYPE * GetPtr() const
+    __forceinline TYPE * GetPtr() const
     {
         return m_pObject;
     }
 
-    __inline operator TYPE * () const
+    __forceinline operator TYPE * () const
     {
         return m_pObject;
     }
 
-    __inline TYPE * operator ->() const
+    __forceinline TYPE * operator ->() const
     {
         return m_pObject;
     }
 
     // declare assignment, but don't implement (compiler error if we try to use)
     // that way we can't carelessly mix smart pointers and regular pointers
-    __inline void * operator =(void *) const;
+    __forceinline void * operator =(void *) const;
 };
 
 #ifdef _MSC_VER
     #pragma warning(pop)
-#endif // #ifdef _MSC_VER
+#endif // _MSC_VER
 
 #endif // #ifndef APE_SMARTPTR_H

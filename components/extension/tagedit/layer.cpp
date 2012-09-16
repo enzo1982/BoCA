@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -22,14 +22,10 @@
 
 BoCA::LayerTags::LayerTags() : Layer("Tags")
 {
-	I18n	*i18n	= I18n::Get();
-
-	i18n->SetContext("Extensions::Tag Editor");
-
-	SetText(i18n->TranslateString("Tags"));
-
 	tab_editor	= NIL;
 
+	/* Create choosers.
+	 */
 	tab_mode	= new TabWidget(Point(7, 7), Size(100, 150));
 	tab_mode->onSelectTab.Connect(&LayerTags::OnSelectTab, this);
 
@@ -43,9 +39,13 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 		chooser->onSelectAlbum.Connect(&onSelectAlbum);
 		chooser->onSelectNone.Connect(&onSelectNone);
 
+		chooser->allowTrackChangeByArrowKey.Connect(&LayerTags::AllowTrackChangeByArrowKey, this);
+
 		tab_mode->Add(chooser);
 	}
 
+	/* Create editors.
+	 */
 	tab_editor	= new TabWidget(Point(7, 226), Size(300, 218));
 	tab_editor->SetOrientation(OR_LOWERLEFT);
 
@@ -68,14 +68,24 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 		tab_editor->Add(editor);
 	}
 
-	Add(tab_mode);
 	Add(tab_editor);
+	Add(tab_mode);
 
+	/* Connect slots.
+	 */
 	onChangeSize.Connect(&LayerTags::OnChangeSize, this);
+
+	Settings::Get()->onChangeLanguageSettings.Connect(&LayerTags::OnChangeLanguageSettings, this);
 }
 
 BoCA::LayerTags::~LayerTags()
 {
+	/* Disconnect slots.
+	 */
+	Settings::Get()->onChangeLanguageSettings.Disconnect(&LayerTags::OnChangeLanguageSettings, this);
+
+	/* Free choosers and editors.
+	 */
 	foreach (Chooser *chooser, choosers) DeleteObject(chooser);
 	foreach (Editor *editor,   editors)  DeleteObject(editor);
 
@@ -94,6 +104,18 @@ Void BoCA::LayerTags::OnChangeSize(const Size &nSize)
 	tab_mode->SetSize(Size(clientSize.cx - 15, clientSize.cy - 241));
 
 	tab_editor->SetWidth(clientSize.cx - 15);
+}
+
+/* Called when application language is changed.
+ * ----
+ */
+Void BoCA::LayerTags::OnChangeLanguageSettings()
+{
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor");
+
+	SetText(i18n->TranslateString("Tags"));
 }
 
 /* Called when a different chooser tab is selected.
@@ -127,4 +149,18 @@ Void BoCA::LayerTags::OnModifyTrack(const Track &track)
 	JobList::Get()->onComponentModifyTrack.Emit(track);
 
 	((Chooser *) tab_mode->GetSelectedTab())->OnModifyTrack(track);
+}
+
+/* Called when a chooser wants to change the track by arrow key.
+ * ----
+ * Collects and evaluates responses from editors.
+ */
+Bool BoCA::LayerTags::AllowTrackChangeByArrowKey()
+{
+	foreach (Editor *editor, editors)
+	{
+		if (!editor->allowTrackChangeByArrowKey.Call()) return False;
+	}
+
+	return True;
 }

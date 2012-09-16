@@ -51,7 +51,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	text_profile		= new Text(i18n->TranslateString("Select encoding profile:"), Point(10, 16));
 
-	combo_profile		= new ComboBox(Point(18 + text_profile->textSize.cx, 13), Size(338 - text_profile->textSize.cx, 0));
+	combo_profile		= new ComboBox(Point(18 + text_profile->GetUnscaledTextWidth(), 13), Size(338 - text_profile->GetUnscaledTextWidth(), 0));
 	combo_profile->AddEntry(i18n->TranslateString("Auto"));
 	combo_profile->AddEntry(i18n->TranslateString("Narrowband (8 kHz)"));
 	combo_profile->AddEntry(i18n->TranslateString("Wideband (16 kHz)"));
@@ -105,7 +105,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	text_vbr_quality	= new Text(i18n->TranslateString("Quality:"), Point(10, 16));
 
-	slider_vbr_quality	= new Slider(Point(text_vbr_quality->textSize.cx + 18, 14), Size(157 - text_vbr_quality->textSize.cx, 0), OR_HORZ, &vbrq, 0, 100);
+	slider_vbr_quality	= new Slider(Point(text_vbr_quality->GetUnscaledTextWidth() + 18, 14), Size(157 - text_vbr_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &vbrq, 0, 100);
 	slider_vbr_quality->onValueChange.Connect(&ConfigureSpeex::SetVBRQuality, this);
 
 	text_vbr_quality_value	= new Text(NIL, Point(182, 16));
@@ -129,7 +129,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	text_abr_bitrate	= new Text(i18n->TranslateString("Bitrate:"), Point(10, 16));
 
-	slider_abr_bitrate	= new Slider(Point(text_abr_bitrate->textSize.cx + 18, 14), Size(157 - text_abr_bitrate->textSize.cx, 0), OR_HORZ, &abr, 4, 64);
+	slider_abr_bitrate	= new Slider(Point(text_abr_bitrate->GetUnscaledTextWidth() + 18, 14), Size(157 - text_abr_bitrate->GetUnscaledTextWidth(), 0), OR_HORZ, &abr, 4, 64);
 	slider_abr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetABRBitrate, this);
 
 	text_abr_bitrate_value	= new Text(NIL, Point(182, 16));
@@ -152,7 +152,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	text_complexity		= new Text(i18n->TranslateString("Complexity:"), Point(10, 16));
 
-	slider_complexity	= new Slider(Point(text_complexity->textSize.cx + 18, 14), Size(144 - text_complexity->textSize.cx, 0), OR_HORZ, &complexity, 1, 10);
+	slider_complexity	= new Slider(Point(text_complexity->GetUnscaledTextWidth() + 18, 14), Size(144 - text_complexity->GetUnscaledTextWidth(), 0), OR_HORZ, &complexity, 1, 10);
 	slider_complexity->onValueChange.Connect(&ConfigureSpeex::SetComplexity, this);
 
 	text_complexity_value	= new Text(NIL, Point(169, 16));

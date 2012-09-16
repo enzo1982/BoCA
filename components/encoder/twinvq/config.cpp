@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,7 +21,7 @@ BoCA::ConfigureTwinVQ::ConfigureTwinVQ()
 
 	text_bitrate		= new Text(i18n->TranslateString("Bitrate per channel:"), Point(16, 24));
 
-	combo_bitrate		= new ComboBox(Point(24 + text_bitrate->textSize.cx, 21), Size(176 - text_bitrate->textSize.cx, 0));
+	combo_bitrate		= new ComboBox(Point(24 + text_bitrate->GetUnscaledTextWidth(), 21), Size(176 - text_bitrate->GetUnscaledTextWidth(), 0));
 	combo_bitrate->AddEntry("24");
 	combo_bitrate->AddEntry("32");
 	combo_bitrate->AddEntry("48");
@@ -39,7 +39,7 @@ BoCA::ConfigureTwinVQ::ConfigureTwinVQ()
 
 	text_precand		= new Text(i18n->TranslateString("Number of preselection candidates:"), Point(16, 75));
 
-	combo_precand		= new ComboBox(Point(24 + text_precand->textSize.cx, 72), Size(206 - text_precand->textSize.cx, 0));
+	combo_precand		= new ComboBox(Point(24 + text_precand->GetUnscaledTextWidth(), 72), Size(206 - text_precand->GetUnscaledTextWidth(), 0));
 	combo_precand->AddEntry("4");
 	combo_precand->AddEntry("8");
 	combo_precand->AddEntry("16");

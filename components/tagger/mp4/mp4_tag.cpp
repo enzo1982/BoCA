@@ -192,7 +192,8 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 			const char	*chapterTitle  = chapterInfo.title;
 
 			memset(chapterList[i].title, 0, MP4V2_CHAPTER_TITLE_MAX + 1);
-			strncpy(chapterList[i].title, chapterTitle, Math::Max(strlen(chapterTitle), MP4V2_CHAPTER_TITLE_MAX));
+
+			if (chapterTitle != NIL) strncpy(chapterList[i].title, chapterTitle, Math::Min(strlen(chapterTitle), MP4V2_CHAPTER_TITLE_MAX));
 
 			if	(chapterTrack.length	   >= 0) chapterList[i].duration = Math::Round(Float(chapterTrack.length)	* MP4_MSECS_TIME_SCALE / chapterFormat.rate);
 			else if (chapterTrack.approxLength >= 0) chapterList[i].duration = Math::Round(Float(chapterTrack.approxLength) * MP4_MSECS_TIME_SCALE / chapterFormat.rate);

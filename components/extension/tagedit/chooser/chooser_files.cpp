@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,34 +16,33 @@
 
 BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 {
-	I18n	*i18n	= I18n::Get();
+	list_directories	= new ListBox(Point(7,7), Size(150, 150));
 
-	i18n->SetContext("Extensions::Tag Editor");
-
-	SetText(i18n->TranslateString("Files"));
-
-	list_directories= new ListBox(Point(7,7), Size(150, 150));
-
-	div_split	= new Divider(160, OR_VERT | DIV_MOVABLE);
+	div_split		= new Divider(160, OR_VERT | DIV_MOVABLE);
 	div_split->onDrag.Connect(&ChooserFiles::OnDragDivider, this);
 
-	edit_directory	= new EditBox(NIL, Point(165, 7), Size(100, 0));
+	edit_directory		= new EditBox(NIL, Point(165, 7), Size(100, 0));
 	edit_directory->Deactivate();
 
-	list_files	= new ListBox(Point(165, 34), Size(100, 150));
-	list_files->AddTab(i18n->TranslateString("File"));
+	list_files		= new ListBox(Point(165, 34), Size(100, 150));
 	list_files->Deactivate();
 	list_files->onSelectEntry.Connect(&ChooserFiles::OnSelectFile, this);
 
-	text_nofiles	= new Text(i18n->TranslateString("no audio files found"), Point());
+	text_nofiles		= new Text(NIL, Point());
 	text_nofiles->SetFont(GUI::Font(GUI::Font::Default, 12, GUI::Font::Bold, 0, Setup::GrayTextColor));
 
-	btn_save	= new Button(i18n->TranslateString("Save"), NIL, Point(176, 30), Size());
+	shortcut_previous	= new Shortcut(0, Input::Keyboard::KeyUp, list_files);
+	shortcut_previous->onKeyDown.Connect(&ChooserFiles::OnShortcutPrevious, this);
+
+	shortcut_next		= new Shortcut(0, Input::Keyboard::KeyDown, list_files);
+	shortcut_next->onKeyDown.Connect(&ChooserFiles::OnShortcutNext, this);
+
+	btn_save		= new Button(NIL, NIL, Point(176, 30), Size());
 	btn_save->SetOrientation(OR_LOWERRIGHT);
 	btn_save->Deactivate();
 	btn_save->onAction.Connect(&ChooserFiles::OnSave, this);
 
-	btn_saveall	= new Button(i18n->TranslateString("Save all"), NIL, Point(88, 30), Size());
+	btn_saveall		= new Button(NIL, NIL, Point(88, 30), Size());
 	btn_saveall->SetOrientation(OR_LOWERRIGHT);
 	btn_saveall->Deactivate();
 	btn_saveall->onAction.Connect(&ChooserFiles::OnSaveAll, this);
@@ -85,14 +84,21 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 	Add(list_files);
 	Add(text_nofiles);
 
+	Add(shortcut_previous);
+	Add(shortcut_next);
+
 	Add(btn_save);
 	Add(btn_saveall);
 
 	onChangeSize.Connect(&ChooserFiles::OnChangeSize, this);
+
+	Settings::Get()->onChangeLanguageSettings.Connect(&ChooserFiles::OnChangeLanguageSettings, this);
 }
 
 BoCA::ChooserFiles::~ChooserFiles()
 {
+	Settings::Get()->onChangeLanguageSettings.Disconnect(&ChooserFiles::OnChangeLanguageSettings, this);
+
 	ChooserFilesTree::onSelectDirectory.Disconnect(&ChooserFiles::OnSelectDirectory, this);
 
 	list_files->RemoveAllEntries();
@@ -106,6 +112,9 @@ BoCA::ChooserFiles::~ChooserFiles()
 	DeleteObject(edit_directory);
 	DeleteObject(list_files);
 	DeleteObject(text_nofiles);
+
+	DeleteObject(shortcut_previous);
+	DeleteObject(shortcut_next);
 
 	DeleteObject(btn_save);
 	DeleteObject(btn_saveall);
@@ -123,7 +132,43 @@ Void BoCA::ChooserFiles::OnChangeSize(const Size &nSize)
 
 	edit_directory->SetWidth(clientSize.cx - edit_directory->GetX() - 8);
 	list_files->SetSize(Size(clientSize.cx - list_files->GetX() - 8, clientSize.cy - 72));
-	text_nofiles->SetPosition(list_files->GetPosition() + Point((list_files->GetWidth() - text_nofiles->textSize.cx) / 2, (list_files->GetHeight() - text_nofiles->textSize.cy) / 2));
+	text_nofiles->SetPosition(list_files->GetPosition() + Point((list_files->GetWidth() - text_nofiles->GetUnscaledTextWidth()) / 2, (list_files->GetHeight() - text_nofiles->GetUnscaledTextHeight()) / 2));
+}
+
+/* Called when application language is changed.
+ * ----
+ */
+Void BoCA::ChooserFiles::OnChangeLanguageSettings()
+{
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor");
+
+	SetText(i18n->TranslateString("Files"));
+
+	/* Hide all affected widgets prior to changing
+	 * labels to avoid flickering.
+	 */
+	Bool	 prevVisible = IsVisible();
+
+	if (prevVisible) Hide();
+
+	list_files->RemoveAllTabs();
+
+	list_files->AddTab(i18n->TranslateString("File"));
+
+	text_nofiles->SetText(i18n->TranslateString("no audio files found"));
+
+	btn_save->SetText(i18n->TranslateString("Save"));
+	btn_saveall->SetText(i18n->TranslateString("Save all"));
+
+	/* OnChangeSize will correct sizes of any other widgets.
+	 */
+	OnChangeSize(GetSize());
+
+	/* Show all widgets again.
+	 */
+	if (prevVisible) Show();
 }
 
 /* Called when the splitting divider is dragged with the mouse.
@@ -139,7 +184,7 @@ Void BoCA::ChooserFiles::OnDragDivider(Int pos)
 
 	Surface	*surface = GetDrawSurface();
 
-	surface->StartPaint(clientRect);
+	surface->StartPaint(GetVisibleArea());
 
 	div_split->Hide();
 	list_directories->Hide();
@@ -156,7 +201,7 @@ Void BoCA::ChooserFiles::OnDragDivider(Int pos)
 
 	div_split->SetPos(pos);
 
-	text_nofiles->SetPosition(list_files->GetPosition() + Point((list_files->GetWidth() - text_nofiles->textSize.cx) / 2, (list_files->GetHeight() - text_nofiles->textSize.cy) / 2));
+	text_nofiles->SetPosition(list_files->GetPosition() + Point((list_files->GetWidth() - text_nofiles->GetUnscaledTextWidth()) / 2, (list_files->GetHeight() - text_nofiles->GetUnscaledTextHeight()) / 2));
 
 	div_split->Show();
 	list_directories->Show();
@@ -180,12 +225,12 @@ Void BoCA::ChooserFiles::OnSelectDirectory(const Directory &directory)
 
 	if (modified.Length() > 0)
 	{
-		if (IDYES == Dialogs::QuickMessage("There are unsaved files in this directory. Would you like to save them now?", "Save changes", MB_YESNO, IDI_QUESTION)) OnSaveAll();
+		if (Dialogs::Message::Button::Yes == Dialogs::QuickMessage("There are unsaved files in this directory. Would you like to save them now?", "Save changes", Dialogs::Message::Buttons::YesNo, Dialogs::Message::Icon::Question)) OnSaveAll();
 	}
 
 	edit_directory->SetText(String(directory).Append(Directory::GetDirectoryDelimiter()));
 
-	if (IsRegistered()) container->GetDrawSurface()->StartPaint(Rect(list_files->GetRealPosition(), list_files->GetSize()));
+	if (IsRegistered()) container->GetDrawSurface()->StartPaint(Rect(list_files->GetRealPosition(), list_files->GetRealSize()));
 
 	list_files->RemoveAllEntries();
 
@@ -277,6 +322,29 @@ Void BoCA::ChooserFiles::OnSelectFile(ListEntry *entry)
 	onSelectTrack.Emit(track);
 
 	tracks.Add(track, list_files->GetSelectedEntryNumber());
+}
+
+/* Called when the up arrow key is pressed.
+ * ----
+ * Selects the previous file.
+ */
+Void BoCA::ChooserFiles::OnShortcutPrevious()
+{
+	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
+
+	if (list_files->GetSelectedEntryNumber() == -1) list_files->SelectNthEntry(list_files->Length()			- 1);
+	else						list_files->SelectNthEntry(list_files->GetSelectedEntryNumber() - 1);
+}
+
+/* Called when the down arrow key is pressed.
+ * ----
+ * Selects the next file.
+ */
+Void BoCA::ChooserFiles::OnShortcutNext()
+{
+	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
+
+	list_files->SelectNthEntry(list_files->GetSelectedEntryNumber() + 1);
 }
 
 /* Called when a track is modified.

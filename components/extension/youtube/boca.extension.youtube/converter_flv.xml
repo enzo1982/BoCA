@@ -1,7 +1,7 @@
 <VideoConverter>
   <name>Adobe Flash Video Converter</name>
   <version>1.0</version>
-  <decoder>ffmpeg-flv_audio-in</decoder>
+  <decoder>avconv-flv_audio-in</decoder>
 
   <format>
     <name>Adobe Flash Video</name>
@@ -9,7 +9,7 @@
   </format>
 
   <external>
-    <command>ffmpeg</command>
-    <arguments>-i %INFILE -f flv -vcodec copy -acodec copy %OUTFILE</arguments>
+    <command>avconv</command>
+    <arguments>-i %INFILE -f flv -c:v copy -c:a copy %OUTFILE</arguments>
   </external>
 </VideoConverter>

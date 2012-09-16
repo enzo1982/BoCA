@@ -7,19 +7,12 @@ Cross platform building switch
 //#define BUILD_CROSS_PLATFORM
 
 /*****************************************************************************************
-Unicode
-*****************************************************************************************/
-#ifdef _UNICODE
-
-#else
-
-#endif // #ifdef _UNICODE
-
-
-/*****************************************************************************************
 Global includes
 *****************************************************************************************/
 #ifndef BUILD_CROSS_PLATFORM
+    #ifndef NO_DEFINE_ENVIRONMENT_VARIABLES
+        #include "WindowsEnvironment.h"
+    #endif
     #include <windows.h>
 #endif
 
@@ -45,17 +38,27 @@ Global includes
 /*****************************************************************************************
 Global compiler settings (useful for porting)
 *****************************************************************************************/
+// assembly code (helps performance, but limits portability)
 #ifndef BUILD_CROSS_PLATFORM
     #define ENABLE_ASSEMBLY
 #endif
 
+// BACKWARDS_COMPATIBILITY is only needed for decoding APE 3.92 or earlier files.  It
+// has not been possible to make these files for over 10 years, so it's unlikely
+// that disabling BACKWARDS_COMPATIBILITY would have any effect on a normal user.  For
+// porting or third party usage, it's probably best to not bother with BACKWARDS_COMPATIBILITY.
+// A future release of Monkey's Audio itself may remove support for these obsolete files.
 #define BACKWARDS_COMPATIBILITY
 
+// compression modes
 #define ENABLE_COMPRESSION_MODE_FAST
 #define ENABLE_COMPRESSION_MODE_NORMAL
 #define ENABLE_COMPRESSION_MODE_HIGH
 #define ENABLE_COMPRESSION_MODE_EXTRA_HIGH
 
+/*****************************************************************************************
+Global types and macros
+*****************************************************************************************/
 #ifdef _WIN32
     typedef unsigned __int32                            uint32;
     typedef __int32                                     int32;
@@ -90,18 +93,19 @@ Global compiler settings (useful for porting)
     #define TICK_COUNT_TYPE                             unsigned long long
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
+    #define __forceinline                                inline
 #endif
 
 /*****************************************************************************************
 Global defines
 *****************************************************************************************/
-#define MAC_VERSION_NUMBER                              3990
-#define MAC_VERSION_STRING                              _T("3.99")
-#define MAC_NAME                                        _T("Monkey's Audio 3.99")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v3.99"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v3.99)")
-#define CONSOLE_NAME                                    "--- Monkey's Audio Console Front End (v 3.99) (c) Matthew T. Ashland ---\n"
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v3.99\nCopyrighted (c) 2000-2004 by Matthew T. Ashland")
+#define MAC_FILE_VERSION_NUMBER                         3990
+#define MAC_VERSION_STRING                              _T("4.11")
+#define MAC_NAME                                        _T("Monkey's Audio 4.11")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.11"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.11)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.11) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.11\nCopyrighted (c) 2000-2011 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 
 /*****************************************************************************************
@@ -208,28 +212,28 @@ Error Codes
 #define ERROR_UNDEFINED                                -1
 
 #define ERROR_EXPLANATION \
-    { ERROR_IO_READ                               , "I/O read error" },                         \
-    { ERROR_IO_WRITE                              , "I/O write error" },                        \
-    { ERROR_INVALID_INPUT_FILE                    , "invalid input file" },                     \
-    { ERROR_INVALID_OUTPUT_FILE                   , "invalid output file" },                    \
-    { ERROR_INPUT_FILE_TOO_LARGE                  , "input file file too large" },              \
-    { ERROR_INPUT_FILE_UNSUPPORTED_BIT_DEPTH      , "input file unsupported bit depth" },       \
-    { ERROR_INPUT_FILE_UNSUPPORTED_SAMPLE_RATE    , "input file unsupported sample rate" },     \
-    { ERROR_INPUT_FILE_UNSUPPORTED_CHANNEL_COUNT  , "input file unsupported channel count" },   \
-    { ERROR_INPUT_FILE_TOO_SMALL                  , "input file too small" },                   \
-    { ERROR_INVALID_CHECKSUM                      , "invalid checksum" },                       \
-    { ERROR_DECOMPRESSING_FRAME                   , "decompressing frame" },                    \
-    { ERROR_INITIALIZING_UNMAC                    , "initializing unmac" },                     \
-    { ERROR_INVALID_FUNCTION_PARAMETER            , "invalid function parameter" },             \
-    { ERROR_UNSUPPORTED_FILE_TYPE                 , "unsupported file type" },                  \
-    { ERROR_INSUFFICIENT_MEMORY                   , "insufficient memory" },                    \
-    { ERROR_LOADINGAPE_DLL                        , "loading MAC.dll" },                        \
-    { ERROR_LOADINGAPE_INFO_DLL                   , "loading MACinfo.dll" },                    \
-    { ERROR_LOADING_UNMAC_DLL                     , "loading UnMAC.dll" },                      \
-    { ERROR_USER_STOPPED_PROCESSING               , "user stopped processing" },                \
-    { ERROR_SKIPPED                               , "skipped" },                                \
-    { ERROR_BAD_PARAMETER                         , "bad parameter" },                          \
-    { ERROR_APE_COMPRESS_TOO_MUCH_DATA            , "APE compress too much data" },             \
-    { ERROR_UNDEFINED                             , "undefined" },                              \
+    { ERROR_IO_READ                               , _T("I/O read error") },                         \
+    { ERROR_IO_WRITE                              , _T("I/O write error") },                        \
+    { ERROR_INVALID_INPUT_FILE                    , _T("invalid input file") },                     \
+    { ERROR_INVALID_OUTPUT_FILE                   , _T("invalid output file") },                    \
+    { ERROR_INPUT_FILE_TOO_LARGE                  , _T("input file file too large") },              \
+    { ERROR_INPUT_FILE_UNSUPPORTED_BIT_DEPTH      , _T("input file unsupported bit depth") },       \
+    { ERROR_INPUT_FILE_UNSUPPORTED_SAMPLE_RATE    , _T("input file unsupported sample rate") },     \
+    { ERROR_INPUT_FILE_UNSUPPORTED_CHANNEL_COUNT  , _T("input file unsupported channel count") },   \
+    { ERROR_INPUT_FILE_TOO_SMALL                  , _T("input file too small") },                   \
+    { ERROR_INVALID_CHECKSUM                      , _T("invalid checksum") },                       \
+    { ERROR_DECOMPRESSING_FRAME                   , _T("decompressing frame") },                    \
+    { ERROR_INITIALIZING_UNMAC                    , _T("initializing unmac") },                     \
+    { ERROR_INVALID_FUNCTION_PARAMETER            , _T("invalid function parameter") },             \
+    { ERROR_UNSUPPORTED_FILE_TYPE                 , _T("unsupported file type") },                  \
+    { ERROR_INSUFFICIENT_MEMORY                   , _T("insufficient memory") },                    \
+    { ERROR_LOADINGAPE_DLL                        , _T("loading MAC.dll") },                        \
+    { ERROR_LOADINGAPE_INFO_DLL                   , _T("loading MACinfo.dll") },                    \
+    { ERROR_LOADING_UNMAC_DLL                     , _T("loading UnMAC.dll") },                      \
+    { ERROR_USER_STOPPED_PROCESSING               , _T("user stopped processing") },                \
+    { ERROR_SKIPPED                               , _T("skipped") },                                \
+    { ERROR_BAD_PARAMETER                         , _T("bad parameter") },                          \
+    { ERROR_APE_COMPRESS_TOO_MUCH_DATA            , _T("APE compress too much data") },             \
+    { ERROR_UNDEFINED                             , _T("undefined") },                              \
 
 #endif // #ifndef APE_ALL_H

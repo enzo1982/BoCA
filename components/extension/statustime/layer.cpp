@@ -55,7 +55,7 @@ Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 
 	if (IsRegistered())
 	{
-		surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+		surface->StartPaint(Rect(container->GetRealPosition(), container->GetRealSize()));
 	}
 
 	display_selected->SetText(GetTotalLengthString(tracks_selected));
@@ -104,7 +104,10 @@ const String &BoCA::LayerLengthStatus::GetTotalLengthString(const Array<Track> &
 		}
 	}
 
-	string = String(unknown ? "> " : "").Append(approx ? "~ " : "").Append(seconds / 60 < 10 ? "0" : "").Append(String::FromInt(seconds / 60)).Append(":").Append(seconds % 60 < 10 ? "0" : "").Append(String::FromInt(seconds % 60));
+	string = String(unknown ? "> " : "").Append(approx ? "~ " : "")
+		.Append(seconds >= 3600 ? String(seconds / 3600	     < 10 ? "0" : "").Append(String::FromInt(seconds / 3600	)).Append(":") : "")
+					 .Append(seconds % 3600 / 60 < 10 ? "0" : "").Append(String::FromInt(seconds % 3600 / 60)).Append(":")
+					 .Append(seconds % 3600 % 60 < 10 ? "0" : "").Append(String::FromInt(seconds % 3600 % 60));
 
 	wchar_t	 sign[2] = { 0x2248, 0 };
 

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,35 +16,27 @@ using namespace smooth::GUI::Dialogs;
 
 BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 {
-	I18n	*i18n = I18n::Get();
+	group_details		= new GroupBox(NIL, Point(7, 10), Size(400, 147));
 
-	i18n->SetContext("Extensions::Tag Editor::Details");
+	text_band		= new Text(NIL, Point(9, 13));
+	text_conductor		= new Text(NIL, text_band->GetPosition() + Point(0, 27));
+	text_remix		= new Text(NIL, text_conductor->GetPosition() + Point(0, 27));
+	text_composer		= new Text(NIL, text_remix->GetPosition() + Point(0, 27));
+	text_textwriter		= new Text(NIL, text_composer->GetPosition() + Point(0, 27));
 
-	SetText(i18n->TranslateString("Details"));
-
-	group_details		= new GroupBox(i18n->TranslateString("Detailed information"), Point(7, 10), Size(400, 147));
-
-	text_band		= new Text(String(i18n->TranslateString("Band / orchestra")).Append(":"), Point(9, 13));
-	text_conductor		= new Text(String(i18n->TranslateString("Performer refinement")).Append(":"), text_band->GetPosition() + Point(0, 27));
-	text_remix		= new Text(String(i18n->TranslateString("Modified / remixed by")).Append(":"), text_conductor->GetPosition() + Point(0, 27));
-	text_composer		= new Text(String(i18n->TranslateString("Composer")).Append(":"), text_remix->GetPosition() + Point(0, 27));
-	text_textwriter		= new Text(String(i18n->TranslateString("Lyrics writer")).Append(":"), text_composer->GetPosition() + Point(0, 27));
-
-	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_band->textSize.cx, text_conductor->textSize.cx), text_remix->textSize.cx), Math::Max(text_composer->textSize.cx, text_textwriter->textSize.cx));
-
-	edit_band		= new EditBox(NIL, text_band->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_band		= new EditBox(NIL, text_band->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_band->onInput.Connect(&LayerTagDetails::OnModifyTrack, this);
 
-	edit_conductor		= new EditBox(NIL, text_conductor->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_conductor		= new EditBox(NIL, text_conductor->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_conductor->onInput.Connect(&LayerTagDetails::OnModifyTrack, this);
 
-	edit_remix		= new EditBox(NIL, text_remix->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_remix		= new EditBox(NIL, text_remix->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_remix->onInput.Connect(&LayerTagDetails::OnModifyTrack, this);
 
-	edit_composer		= new EditBox(NIL, text_composer->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_composer		= new EditBox(NIL, text_composer->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_composer->onInput.Connect(&LayerTagDetails::OnModifyTrack, this);
 
-	edit_textwriter		= new EditBox(NIL, text_textwriter->GetPosition() + Point(maxTextSize + 7, -3), Size(300, 0));
+	edit_textwriter		= new EditBox(NIL, text_textwriter->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_textwriter->onInput.Connect(&LayerTagDetails::OnModifyTrack, this);
 
 	group_details->Add(text_band);
@@ -60,17 +52,15 @@ BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 
 	Add(group_details);
 
-	group_publisher		= new GroupBox(i18n->TranslateString("Publisher information"), Point(7, 10), Size(400, 66));
+	group_publisher		= new GroupBox(NIL, Point(7, 10), Size(400, 66));
 
-	text_publisher		= new Text(String(i18n->TranslateString("Publisher / label")).Append(":"), Point(9, 13));
-	text_isrc		= new Text(String(i18n->TranslateString("ISRC")).Append(":"), text_publisher->GetPosition() + Point(0, 27));
+	text_publisher		= new Text(NIL, Point(9, 13));
+	text_isrc		= new Text(NIL, text_publisher->GetPosition() + Point(0, 27));
 
-	Int	 maxTextSize2 = Math::Max(text_publisher->textSize.cx, text_isrc->textSize.cx);
-
-	edit_publisher		= new EditBox(NIL, text_publisher->GetPosition() + Point(maxTextSize2 + 7, -3), Size(300, 0));
+	edit_publisher		= new EditBox(NIL, text_publisher->GetPosition() + Point(7, -3), Size(300, 0));
 	edit_publisher->onInput.Connect(&LayerTagDetails::OnModifyTrack, this);
 
-	edit_isrc		= new EditBox(NIL, text_isrc->GetPosition() + Point(maxTextSize2 + 7, -3), Size(300, 0), 12);
+	edit_isrc		= new EditBox(NIL, text_isrc->GetPosition() + Point(7, -3), Size(300, 0), 12);
 	edit_isrc->onInput.Connect(&LayerTagDetails::OnModifyTrack, this);
 
 	group_publisher->Add(text_publisher);
@@ -82,6 +72,8 @@ BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 
 	onChangeSize.Connect(&LayerTagDetails::OnChangeSize, this);
 
+	Settings::Get()->onChangeLanguageSettings.Connect(&LayerTagDetails::OnChangeLanguageSettings, this);
+
 	/* Initially deactivate all input fields.
 	 */
 	OnSelectNone();
@@ -89,6 +81,8 @@ BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 
 BoCA::LayerTagDetails::~LayerTagDetails()
 {
+	Settings::Get()->onChangeLanguageSettings.Disconnect(&LayerTagDetails::OnChangeLanguageSettings, this);
+
 	DeleteObject(group_details);
 	DeleteObject(text_band);
 	DeleteObject(edit_band);
@@ -118,8 +112,8 @@ Void BoCA::LayerTagDetails::OnChangeSize(const Size &nSize)
 
 	group_details->SetWidth((clientSize.cx - 23) / 2);
 
-	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_band->textSize.cx, text_conductor->textSize.cx), text_remix->textSize.cx), Math::Max(text_composer->textSize.cx, text_textwriter->textSize.cx));
-	Int	 maxTextSize2 = Math::Max(text_publisher->textSize.cx, text_isrc->textSize.cx);
+	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_band->GetUnscaledTextWidth(), text_conductor->GetUnscaledTextWidth()), text_remix->GetUnscaledTextWidth()), Math::Max(text_composer->GetUnscaledTextWidth(), text_textwriter->GetUnscaledTextWidth()));
+	Int	 maxTextSize2 = Math::Max(text_publisher->GetUnscaledTextWidth(), text_isrc->GetUnscaledTextWidth());
 
 	edit_band->SetWidth(group_details->GetWidth() - 26 - maxTextSize);
 	edit_conductor->SetWidth(group_details->GetWidth() - 26 - maxTextSize);
@@ -132,6 +126,72 @@ Void BoCA::LayerTagDetails::OnChangeSize(const Size &nSize)
 
 	edit_publisher->SetWidth(group_details->GetWidth() - 26 - maxTextSize2);
 	edit_isrc->SetWidth(group_details->GetWidth() - 26 - maxTextSize2);
+}
+
+/* Called when application language is changed.
+ * ----
+ */
+Void BoCA::LayerTagDetails::OnChangeLanguageSettings()
+{
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor::Details");
+
+	SetText(i18n->TranslateString("Details"));
+
+	/* Hide all affected widgets prior to changing
+	 * labels to avoid flickering.
+	 */
+	Bool	 prevVisible = IsVisible();
+
+	if (prevVisible) Hide();
+
+	group_details->SetText(i18n->TranslateString("Detailed information"));
+
+	text_band->SetText(String(i18n->TranslateString("Band / orchestra")).Append(":"));
+	text_conductor->SetText(String(i18n->TranslateString("Performer refinement")).Append(":"));
+	text_remix->SetText(String(i18n->TranslateString("Modified / remixed by")).Append(":"));
+	text_composer->SetText(String(i18n->TranslateString("Composer")).Append(":"));
+	text_textwriter->SetText(String(i18n->TranslateString("Lyrics writer")).Append(":"));
+
+	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_band->GetUnscaledTextWidth(), text_conductor->GetUnscaledTextWidth()), text_remix->GetUnscaledTextWidth()), Math::Max(text_composer->GetUnscaledTextWidth(), text_textwriter->GetUnscaledTextWidth()));
+
+	edit_band->SetX(text_band->GetX() + maxTextSize + 7);
+	edit_conductor->SetX(text_conductor->GetX() + maxTextSize + 7);
+	edit_remix->SetX(text_remix->GetX() + maxTextSize + 7);
+	edit_composer->SetX(text_composer->GetX() + maxTextSize + 7);
+	edit_textwriter->SetX(text_textwriter->GetX() + maxTextSize + 7);
+
+	group_publisher->SetText(i18n->TranslateString("Publisher information"));
+
+	text_publisher->SetText(String(i18n->TranslateString("Publisher / label")).Append(":"));
+	text_isrc->SetText(String(i18n->TranslateString("ISRC")).Append(":"));
+
+	Int	 maxTextSize2 = Math::Max(text_publisher->GetUnscaledTextWidth(), text_isrc->GetUnscaledTextWidth());
+
+	edit_publisher->SetX(text_publisher->GetX() + maxTextSize2 + 7);
+	edit_isrc->SetX(text_isrc->GetX() + maxTextSize2 + 7);
+
+	/* OnChangeSize will correct sizes of any other widgets.
+	 */
+	OnChangeSize(GetSize());
+
+	/* Show all widgets again.
+	 */
+	if (prevVisible) Show();
+}
+
+EditBox *BoCA::LayerTagDetails::GetActiveEditBox()
+{
+	if	(edit_band->IsFocussed())	return edit_band;
+	else if	(edit_conductor->IsFocussed())	return edit_conductor;
+	else if	(edit_remix->IsFocussed())	return edit_remix;
+	else if	(edit_composer->IsFocussed())	return edit_composer;
+	else if	(edit_textwriter->IsFocussed())	return edit_textwriter;
+	else if	(edit_publisher->IsFocussed())	return edit_publisher;
+	else if	(edit_isrc->IsFocussed())	return edit_isrc;
+
+	return NIL;
 }
 
 /* Called when a track is selected from the list.
@@ -172,6 +232,14 @@ Void BoCA::LayerTagDetails::OnSelectTrack(const Track &nTrack)
 		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   { edit_textwriter->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
 	}
 
+	EditBox	*activeEditBox = GetActiveEditBox();
+
+	if (activeEditBox != NIL)
+	{
+		activeEditBox->SetFocus();
+		activeEditBox->MarkAll();
+	}
+
 	surface->EndPaint();
 }
 
@@ -199,6 +267,14 @@ Void BoCA::LayerTagDetails::OnSelectAlbum(const Track &nTrack)
 	const Info	&info = track.GetInfo();
 
 	edit_publisher->SetText(info.label);
+
+	EditBox	*activeEditBox = GetActiveEditBox();
+
+	if (activeEditBox != NIL)
+	{
+		activeEditBox->SetFocus();
+		activeEditBox->MarkAll();
+	}
 
 	surface->EndPaint();
 }

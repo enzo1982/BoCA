@@ -35,6 +35,8 @@ ifeq ($(BUILD_WIN32),True)
 	cd mac && $(MAKE)
 endif
 	cd mad && $(MAKE)
+	cd mpg123 && $(MAKE)
+	cd opus && $(MAKE)
 	cd sndfile && $(MAKE)
 	cd speex && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
@@ -79,6 +81,8 @@ ifeq ($(BUILD_WIN32),True)
 	cd mac && $(MAKE) clean
 endif
 	cd mad && $(MAKE) clean
+	cd mpg123 && $(MAKE) clean
+	cd opus && $(MAKE) clean
 	cd sndfile && $(MAKE) clean
 	cd speex && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)

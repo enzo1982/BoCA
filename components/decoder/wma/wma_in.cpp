@@ -103,7 +103,11 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 			WM_MEDIA_TYPE		*pMediaType = NIL;
 			ULONG			 cbType = 0;
 
-			hr = m_pReader->GetOutputProps(i, &pProps);
+			/* Set the first output format as it is
+			 * the one with the highest quality.
+			 */
+			hr = m_pReader->GetOutputFormat(i, 0, &pProps);
+			hr = m_pReader->SetOutputProps(i, pProps);
 
 			/* Find out the space needed for pMediaType
 			 */
@@ -254,7 +258,11 @@ Bool BoCA::WMAIn::Activate()
 		WM_MEDIA_TYPE		*pMediaType = NIL;
 		ULONG			 cbType = 0;
 
-		hr = m_pReader->GetOutputProps(i, &pProps);
+		/* Set the first output format as it is
+		 * the one with the highest quality.
+		 */
+		hr = m_pReader->GetOutputFormat(i, 0, &pProps);
+		hr = m_pReader->SetOutputProps(i, pProps);
 
 		/* Find out the space needed for pMediaType
 		 */

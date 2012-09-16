@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,27 +12,27 @@
 
 BoCA::ChooserTracks::ChooserTracks() : Chooser("Tracks")
 {
-	I18n	*i18n	= I18n::Get();
-
-	i18n->SetContext("Extensions::Tag Editor");
-
-	SetText(i18n->TranslateString("Tracks"));
-
 	tracks.EnableLocking();
 
-	list_tracks	= new ListBox(Point(7, 7), Size(100, 150));
+	list_tracks		= new ListBox(Point(7, 7), Size(100, 150));
 	list_tracks->onSelectEntry.Connect(&ChooserTracks::OnSelectTrack, this);
 
 	list_tracks->EnableLocking();
 
-	list_tracks->AddTab(i18n->TranslateString("Title"));
-	list_tracks->AddTab(i18n->TranslateString("Track"), 50, OR_RIGHT);
-	list_tracks->AddTab(i18n->TranslateString("Length"), 80, OR_RIGHT);
-	list_tracks->AddTab(i18n->TranslateString("Size"), 80, OR_RIGHT);
+	shortcut_previous	= new Shortcut(0, Input::Keyboard::KeyUp, list_tracks);
+	shortcut_previous->onKeyDown.Connect(&ChooserTracks::OnShortcutPrevious, this);
+
+	shortcut_next		= new Shortcut(0, Input::Keyboard::KeyDown, list_tracks);
+	shortcut_next->onKeyDown.Connect(&ChooserTracks::OnShortcutNext, this);
 
 	Add(list_tracks);
 
+	Add(shortcut_previous);
+	Add(shortcut_next);
+
 	onChangeSize.Connect(&ChooserTracks::OnChangeSize, this);
+
+	Settings::Get()->onChangeLanguageSettings.Connect(&ChooserTracks::OnChangeLanguageSettings, this);
 
 	JobList::Get()->onApplicationAddTrack.Connect(&ChooserTracks::OnApplicationAddTrack, this);
 	JobList::Get()->onApplicationModifyTrack.Connect(&ChooserTracks::OnApplicationModifyTrack, this);
@@ -44,6 +44,8 @@ BoCA::ChooserTracks::ChooserTracks() : Chooser("Tracks")
 
 BoCA::ChooserTracks::~ChooserTracks()
 {
+	Settings::Get()->onChangeLanguageSettings.Disconnect(&ChooserTracks::OnChangeLanguageSettings, this);
+
 	JobList::Get()->onApplicationAddTrack.Disconnect(&ChooserTracks::OnApplicationAddTrack, this);
 	JobList::Get()->onApplicationModifyTrack.Disconnect(&ChooserTracks::OnApplicationModifyTrack, this);
 	JobList::Get()->onApplicationRemoveTrack.Disconnect(&ChooserTracks::OnApplicationRemoveTrack, this);
@@ -52,6 +54,9 @@ BoCA::ChooserTracks::~ChooserTracks()
 	JobList::Get()->onApplicationRemoveAllTracks.Disconnect(&ChooserTracks::OnApplicationRemoveAllTracks, this);
 
 	DeleteObject(list_tracks);
+
+	DeleteObject(shortcut_previous);
+	DeleteObject(shortcut_next);
 }
 
 /* Called when component canvas size changes.
@@ -65,6 +70,36 @@ Void BoCA::ChooserTracks::OnChangeSize(const Size &nSize)
 	list_tracks->SetSize(Size(clientSize.cx - 15, clientSize.cy - 15));
 }
 
+/* Called when application language is changed.
+ * ----
+ */
+Void BoCA::ChooserTracks::OnChangeLanguageSettings()
+{
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Extensions::Tag Editor");
+
+	SetText(i18n->TranslateString("Tracks"));
+
+	/* Hide all affected widgets prior to changing
+	 * labels to avoid flickering.
+	 */
+	Bool	 prevVisible = IsVisible();
+
+	if (prevVisible) Hide();
+
+	list_tracks->RemoveAllTabs();
+
+	list_tracks->AddTab(i18n->TranslateString("Title"));
+	list_tracks->AddTab(i18n->TranslateString("Track"), 50, OR_RIGHT);
+	list_tracks->AddTab(i18n->TranslateString("Length"), 80, OR_RIGHT);
+	list_tracks->AddTab(i18n->TranslateString("Size"), 80, OR_RIGHT);
+
+	/* Show all widgets again.
+	 */
+	if (prevVisible) Show();
+}
+
 /* Called when a list entry is selected.
  * ----
  * Finds the corresponding track and emits onSelectTrack.
@@ -76,6 +111,29 @@ Void BoCA::ChooserTracks::OnSelectTrack()
 	if (IsActiveChooser()) onSelectTrack.Emit(track);
 
 	JobList::Get()->onComponentSelectTrack.Emit(track);
+}
+
+/* Called when the up arrow key is pressed.
+ * ----
+ * Selects the previous track.
+ */
+Void BoCA::ChooserTracks::OnShortcutPrevious()
+{
+	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
+
+	if (list_tracks->GetSelectedEntryNumber() == -1) list_tracks->SelectNthEntry(list_tracks->Length()		   - 1);
+	else						 list_tracks->SelectNthEntry(list_tracks->GetSelectedEntryNumber() - 1);
+}
+
+/* Called when the down arrow key is pressed.
+ * ----
+ * Selects the next track.
+ */
+Void BoCA::ChooserTracks::OnShortcutNext()
+{
+	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
+
+	list_tracks->SelectNthEntry(list_tracks->GetSelectedEntryNumber() + 1);
 }
 
 /* Called when a track is added to the application joblist.

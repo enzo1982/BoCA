@@ -30,6 +30,10 @@ Bool BoCA::VideoSite::IsSane()
 
 Bool BoCA::VideoSite::CanHandleURL(const String &URL)
 {
+	/* Lock the V8 engine to our thread.
+	 */
+	v8::Locker		 locker;
+
 	/* Use our own handle scope for this.
 	 */
 	v8::HandleScope		 handleScope;
@@ -57,6 +61,10 @@ Bool BoCA::VideoSite::CanHandleURL(const String &URL)
 
 String BoCA::VideoSite::GetVideoURL(const String &html)
 {
+	/* Lock the V8 engine to our thread.
+	 */
+	v8::Locker		 locker;
+
 	/* Use our own handle scope for this.
 	 */
 	v8::HandleScope		 handleScope;
@@ -87,6 +95,10 @@ Metadata BoCA::VideoSite::QueryMetadata(const String &html)
 	I18n	*i18n	= I18n::Get();
 
 	i18n->SetContext("Extensions::Video Downloader");
+
+	/* Lock the V8 engine to our thread.
+	 */
+	v8::Locker		 locker;
 
 	/* Use our own handle scope for this.
 	 */

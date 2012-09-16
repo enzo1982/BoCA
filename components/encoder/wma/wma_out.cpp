@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -135,11 +135,11 @@ Bool BoCA::WMAOut::Activate()
 
 	pCodecInfo->Release();
 
-	if (!errorState)
-	{
-		hr = m_pWriter->BeginWriting();
-	}
-	else
+	if (!errorState) hr = m_pWriter->BeginWriting();
+
+	if (hr != S_OK) errorState = True;
+
+	if (errorState)
 	{
 		m_pStreamConfig->Release();
 
@@ -183,6 +183,13 @@ Bool BoCA::WMAOut::Deactivate()
 
 	m_pWriterAdvanced->Release();
 	m_pWriter->Release();
+
+	if (hr != S_OK)
+	{
+		File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+
+		return False;
+	}
 
 	/* Write metadata to file
 	 */
@@ -228,28 +235,34 @@ Bool BoCA::WMAOut::Deactivate()
 
 Int BoCA::WMAOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	HRESULT	 hr;
-
+	HRESULT		 hr = S_OK;
 	INSSBuffer	*pSample = NIL;
 
 	hr = m_pWriter->AllocateSample(size, &pSample);
+
+	if (FAILED(hr)) return -1;
 
 	BYTE	*buffer = NIL;
 
 	hr = pSample->GetBuffer(&buffer);
 
-	memcpy(buffer, data, size);
+	if (!FAILED(hr))
+	{
+		memcpy(buffer, data, size);
 
-	pSample->SetLength(size);
+		pSample->SetLength(size);
 
-	const Format	&format = track.GetFormat();
-	QWORD		 cnsSampleTime = samplesWritten * 10000000 / format.channels / format.rate;
+		const Format	&format = track.GetFormat();
+		QWORD		 cnsSampleTime = samplesWritten * 10000000 / format.channels / format.rate;
 
-	samplesWritten += size / (format.bits / 8);
+		hr = m_pWriter->WriteSample(0, cnsSampleTime, WM_SF_CLEANPOINT, pSample);
 
-        hr = m_pWriter->WriteSample(0, cnsSampleTime, WM_SF_CLEANPOINT, pSample);
+		pSample->Release();
 
-	pSample->Release();
+		if (FAILED(hr)) return -1;
+
+		samplesWritten += size / (format.bits / 8);
+	}
 
 	return size;
 }
@@ -287,6 +300,8 @@ Int BoCA::WMAOut::GetDefaultCodec(IWMCodecInfo3 *codecInfo)
 
 		delete [] name;
 	}
+
+	if (hr != S_OK) index = -1;
 
 	return index;
 }

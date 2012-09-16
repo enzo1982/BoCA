@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,9 +21,7 @@ BoCA::ConfigureResample::ConfigureResample()
 
 	text_converter		= new Text(String(i18n->TranslateString("Converter")).Append(":"), Point(17, 27));
 
-	combo_converter		= new ComboBox(Point(24 + text_converter->textSize.cx, 24), Size(325, 0));
-	combo_converter->SelectNthEntry(config->GetIntValue("Resample", "Converter", SRC_SINC_BEST_QUALITY));
-	combo_converter->onSelectEntry.Connect(&ConfigureResample::SetConverter, this);
+	combo_converter		= new ComboBox(Point(24 + text_converter->GetUnscaledTextWidth(), 24), Size(325, 0));
 
 	for (Int i = 0; true; i++)
 	{
@@ -34,13 +32,16 @@ BoCA::ConfigureResample::ConfigureResample()
 		combo_converter->AddEntry(name);
 	}
 
+	combo_converter->SelectNthEntry(config->GetIntValue("Resample", "Converter", SRC_SINC_MEDIUM_QUALITY) - SRC_SINC_BEST_QUALITY);
+	combo_converter->onSelectEntry.Connect(&ConfigureResample::SetConverter, this);
+
 	text_description	= new Text("Description", Point(72, 49));
 	text_samplerate		= new Text(String(i18n->TranslateString("Samplerate")).Append(":"), Point(17, 98));
 
-	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), Point(24 + text_samplerate->textSize.cx, 95), Size(70, 0), 6);
+	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0), 6);
 	edit_samplerate->SetFlags(EDB_NUMERIC);
 
-	list_samplerate	= new ListBox(Point(24 + text_samplerate->textSize.cx, 95), Size(70, 0));
+	list_samplerate	= new ListBox(Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0));
 	list_samplerate->AddEntry(  "8000");
 	list_samplerate->AddEntry( "11025");
 	list_samplerate->AddEntry( "12000");
@@ -91,7 +92,7 @@ Int BoCA::ConfigureResample::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("Resample", "Converter", combo_converter->GetSelectedEntryNumber());
+	config->SetIntValue("Resample", "Converter", combo_converter->GetSelectedEntryNumber() + SRC_SINC_BEST_QUALITY);
 	config->SetIntValue("Resample", "Samplerate", edit_samplerate->GetText().ToInt());
 
 	return Success();

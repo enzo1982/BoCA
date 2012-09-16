@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,6 +29,9 @@ namespace BoCA
 			Array<Track>	 tracks;
 
 			ListBox		*list_tracks;
+
+			Shortcut	*shortcut_previous;
+			Shortcut	*shortcut_next;
 		slots:
 			Void		 OnApplicationAddTrack(const Track &);
 			Void		 OnApplicationModifyTrack(const Track &);
@@ -39,7 +42,11 @@ namespace BoCA
 
 			Void		 OnSelectTrack();
 
+			Void		 OnShortcutPrevious();
+			Void		 OnShortcutNext();
+
 			Void		 OnChangeSize(const Size &);
+			Void		 OnChangeLanguageSettings();
 		public:
 					 ChooserTracks();
 					~ChooserTracks();

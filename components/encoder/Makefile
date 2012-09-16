@@ -15,6 +15,7 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	cd mac && $(MAKE)
 endif
+	cd opus && $(MAKE)
 	cd speex && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
 	cd twinvq && $(MAKE)
@@ -36,6 +37,7 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	cd mac && $(MAKE) clean
 endif
+	cd opus && $(MAKE) clean
 	cd speex && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
 	cd twinvq && $(MAKE) clean

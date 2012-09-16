@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -36,11 +36,17 @@ namespace BoCA
 			Signal1<Void, const Track &>	 onSelectTrack;
 			Signal1<Void, const Track &>	 onSelectAlbum;
 			Signal0<Void>			 onSelectNone;
+		callbacks:
+			Callback0<Bool>			 allowTrackChangeByArrowKey;
 		slots:
-			Void				 OnChangeSize(const Size &);
 			Void				 OnSelectTab(const Widget *);
 
 			Void				 OnModifyTrack(const Track &);
+
+			Void				 OnChangeSize(const Size &);
+			Void				 OnChangeLanguageSettings();
+
+			Bool				 AllowTrackChangeByArrowKey();
 		public:
 							 LayerTags();
 							~LayerTags();

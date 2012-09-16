@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -91,6 +91,8 @@ Bool BoCA::FLACIn::CanOpenStream(const String &streamURI)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
+	SkipID3v2Tag(&in);
+
 	String	 fileType = in.InputString(4);
 
 	if	(fileType == "fLaC") return True;
@@ -98,7 +100,7 @@ Bool BoCA::FLACIn::CanOpenStream(const String &streamURI)
 
 	if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 0 || oggdll == NIL) return False;
 
-	in.Seek(0);
+	in.RelSeek(-4);
 
 	ogg_sync_state		 oy;
 	ogg_stream_state	 os;
@@ -152,7 +154,11 @@ Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
 	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READ);
 	InStream	*f_in = new InStream(STREAM_DRIVER, ioDriver);
 
-	track.fileSize	= f_in->Size();
+	SkipID3v2Tag(f_in);
+
+	ioDriver->Seek(f_in->GetPos());
+
+	track.fileSize = f_in->Size();
 
 	infoTrack = &track;
 	stop = False;
@@ -185,6 +191,14 @@ BoCA::FLACIn::~FLACIn()
 
 Bool BoCA::FLACIn::Activate()
 {
+	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
+
+	SkipID3v2Tag(f_in);
+
+	driver->Seek(f_in->GetPos());
+
+	delete f_in;
+
 	stop = False;
 
 	seekPosition = 0;
@@ -272,7 +286,7 @@ Int BoCA::FLACIn::ReadFLAC(Bool readData)
 	char	 signature[5] = { 0, 0, 0, 0, 0 };
 
 	driver->ReadData((UnsignedByte *) signature, 4);
-	driver->Seek(0);
+	driver->Seek(driver->GetPos() - 4);
 
 	if	(String(signature) == "fLaC") ex_FLAC__stream_decoder_init_stream(decoder, &FLACStreamDecoderReadCallback, &FLACStreamDecoderSeekCallback, &FLACStreamDecoderTellCallback, &FLACStreamDecoderLengthCallback, &FLACStreamDecoderEofCallback, &FLACStreamDecoderWriteCallback, &FLACStreamDecoderMetadataCallback, &FLACStreamDecoderErrorCallback, this);
 	else if (String(signature) == "OggS") ex_FLAC__stream_decoder_init_ogg_stream(decoder, &FLACStreamDecoderReadCallback, &FLACStreamDecoderSeekCallback, &FLACStreamDecoderTellCallback, &FLACStreamDecoderLengthCallback, &FLACStreamDecoderEofCallback, &FLACStreamDecoderWriteCallback, &FLACStreamDecoderMetadataCallback, &FLACStreamDecoderErrorCallback, this);
@@ -290,6 +304,36 @@ Int BoCA::FLACIn::ReadFLAC(Bool readData)
 	ex_FLAC__stream_decoder_delete(decoder);
 
 	return Success();
+}
+
+Bool BoCA::FLACIn::SkipID3v2Tag(InStream *in)
+{
+	/* Check for an ID3v2 tag at the beginning of the file
+	 * and skip it if it exists. EAC and possibly other
+	 * programs write ID3 tags fo FLAC if misconfigured.
+	 */
+	if (in->InputString(3) == "ID3")
+	{
+		in->InputNumber(2); // ID3 version
+		in->InputNumber(1); // Flags
+
+		/* Read tag size as a 4 byte unsynchronized integer.
+		 */
+		Int	 tagSize = (in->InputNumber(1) << 21) +
+				   (in->InputNumber(1) << 14) +
+				   (in->InputNumber(1) <<  7) +
+				   (in->InputNumber(1)      );
+
+		in->RelSeek(tagSize);
+
+		inBytes += (tagSize + 10);
+	}
+	else
+	{
+		in->Seek(0);
+	}
+
+	return True;
 }
 
 FLAC__StreamDecoderReadStatus BoCA::FLACStreamDecoderReadCallback(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data)

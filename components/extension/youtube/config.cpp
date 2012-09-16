@@ -36,7 +36,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	text_max_downloads	= new Text(i18n->TranslateString("Maximum number of simultaneous downloads:"), Point(10, 14));
 
-	edit_max_downloads	= new EditBox(String::FromInt(maxDownloads), Point(text_max_downloads->textSize.cx + 17, 11), Size(18, 0), 2);
+	edit_max_downloads	= new EditBox(String::FromInt(maxDownloads), Point(text_max_downloads->GetUnscaledTextWidth() + 17, 11), Size(18, 0), 2);
 	edit_max_downloads->onInput.Connect(&ConfigureYouTube::EditMaxDownloads, this);
 	edit_max_downloads->SetFlags(EDB_NUMERIC);
 
@@ -63,7 +63,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	text_format		= new Text(i18n->TranslateString("Output format:"), Point(10, 70));
 
-	combo_format		= new ComboBox(Point(17 + text_format->textSize.cx, 67), Size(317 - text_format->textSize.cx, 0));
+	combo_format		= new ComboBox(Point(17 + text_format->GetUnscaledTextWidth(), 67), Size(317 - text_format->GetUnscaledTextWidth(), 0));
 	combo_format->AddEntry(i18n->TranslateString("keep original format"));
 
 	Array<Converter *>	&converters = Converter::Get();

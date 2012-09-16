@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,7 +17,8 @@ namespace BoCA
 	class WMATag : public CS::TaggerComponent
 	{
 		private:
-			Error			 RenderWMAItem(const String &, const String &, Void *);
+			Error			 RenderWMAStringItem(const String &, const String &, Void *);
+			Error			 RenderWMAIntegerItem(const String &, Int, Void *);
 			Error			 RenderWMABinaryItem(const String &, const Buffer<UnsignedByte> &, Void *);
 		public:
 			static const String	&GetComponentSpecs();
