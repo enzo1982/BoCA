@@ -72,7 +72,7 @@ extern "C" {
 #include <pshpack8.h>
   typedef struct _STRRET {
     UINT uType;
-    __MINGW_EXTENSION union {
+    __C89_NAMELESS union {
       LPWSTR pOleStr;
       UINT uOffset;
       char cStr[260 ];
@@ -92,6 +92,24 @@ extern "C" {
   typedef struct _SHELLDETAILS *LPSHELLDETAILS;
 
 #include <poppack.h>
+
+  typedef enum tagSHCOLSTATE {
+    SHCOLSTATE_TYPE_STR = 0x1,
+    SHCOLSTATE_TYPE_INT = 0x2,
+    SHCOLSTATE_TYPE_DATE = 0x3,
+    SHCOLSTATE_TYPEMASK = 0xf,
+    SHCOLSTATE_ONBYDEFAULT = 0x10,
+    SHCOLSTATE_SLOW = 0x20,
+    SHCOLSTATE_EXTENDED = 0x40,
+    SHCOLSTATE_SECONDARYUI = 0x80,
+    SHCOLSTATE_HIDDEN = 0x100,
+    SHCOLSTATE_PREFER_VARCMP = 0x200
+  } SHCOLSTATE;
+
+  typedef DWORD SHCOLSTATEF;
+
+  typedef PROPERTYKEY SHCOLUMNID;
+  typedef const SHCOLUMNID *LPCSHCOLUMNID;
 
   extern RPC_IF_HANDLE __MIDL_itf_shtypes_0000_v0_0_c_ifspec;
   extern RPC_IF_HANDLE __MIDL_itf_shtypes_0000_v0_0_s_ifspec;

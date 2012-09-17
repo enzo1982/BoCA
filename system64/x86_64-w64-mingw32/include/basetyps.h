@@ -33,7 +33,9 @@
 #if defined(__cplusplus) && !defined(CINTERFACE)
 
 #ifndef __OBJC__
+#ifndef interface
 #define interface struct
+#endif
 #endif
 
 #define __STRUCT__ struct
@@ -46,11 +48,14 @@
 #define THIS void
 #define DECLARE_INTERFACE(iface) __STRUCT__ iface
 #define DECLARE_INTERFACE_(iface,baseiface) __STRUCT__ iface : public baseiface
+#define DECLARE_INTERFACE_IID_(iface,baseiface,iidiface) __STRUCT__ iface : public baseiface
 
 #else
 
 #ifndef __OBJC__
+#ifndef interface
 #define interface struct
+#endif
 #endif
 
 #define STDMETHOD(method) HRESULT (WINAPI *method)
@@ -74,7 +79,13 @@
   struct iface##Vtbl
 #endif
 #define DECLARE_INTERFACE_(iface,baseiface) DECLARE_INTERFACE(iface)
+#define DECLARE_INTERFACE_IID_(iface,baseiface,iidiface) DECLARE_INTERFACE(iface)
 #endif
+
+#define IFACEMETHOD(method)         STDMETHOD(method)
+#define IFACEMETHOD_(type,method)   STDMETHOD_(type,method)
+#define IFACEMETHODV(method)        STDMETHODV(method)
+#define IFACEMETHODV_(type,method)  STDMETHODV_(type,method)
 
 #include <guiddef.h>
 

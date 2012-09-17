@@ -3,6 +3,16 @@
  * This file is part of the w64 mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
+
+/* Make sure we have internals defined.  */
+#include <_mingw.h>
+
+#ifndef __OBJC__
+#ifndef interface
+#define interface struct
+#endif
+#endif
+
 #ifndef RPC_NO_WINDOWS_H
 #include <windows.h>
 #endif

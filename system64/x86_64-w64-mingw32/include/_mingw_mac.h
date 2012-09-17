@@ -10,8 +10,8 @@
 #define __STRINGIFY(x) #x
 #define __MINGW64_STRINGIFY(x) __STRINGIFY(x)
 
-#define __MINGW64_VERSION_MAJOR	1
-#define __MINGW64_VERSION_MINOR	1
+#define __MINGW64_VERSION_MAJOR	3
+#define __MINGW64_VERSION_MINOR	0
 #define __MINGW64_VERSION_STR	__MINGW64_STRINGIFY(__MINGW64_VERSION_MAJOR) "." __MINGW64_STRINGIFY(__MINGW64_VERSION_MINOR)
 #define __MINGW64_VERSION_STATE	"alpha"
 
@@ -51,10 +51,12 @@
 
 #if __MINGW_USE_UNDERSCORE_PREFIX == 0
 #define __MINGW_IMP_SYMBOL(sym)	__imp_##sym
+#define __MINGW_IMP_LSYMBOL(sym) __imp_##sym
 #define __MINGW_USYMBOL(sym) sym
 #define __MINGW_LSYMBOL(sym) _##sym
 #else
 #define __MINGW_IMP_SYMBOL(sym)	_imp__##sym
+#define __MINGW_IMP_LSYMBOL(sym) __imp__##sym
 #define __MINGW_USYMBOL(sym) _##sym
 #define __MINGW_LSYMBOL(sym) sym
 #endif
@@ -116,19 +118,38 @@
 #define __WINT_TYPE__  unsigned short
 #endif
 
+#undef __MINGW_EXTENSION
 #if defined(__GNUC__) || defined(__GNUG__)
 #define __MINGW_EXTENSION	__extension__
 #else
 #define __MINGW_EXTENSION
 #endif
 
-#ifdef UNICODE
-# define __MINGW_NAME_AW(func) func##W
-#else
-# define __MINGW_NAME_AW(func) func##A
+/* Special case nameless struct/union.  */
+#ifndef __C89_NAMELESS
+#define __C89_NAMELESS __MINGW_EXTENSION
+
+#define __C89_NAMELESSSTRUCTNAME
+#define __C89_NAMELESSUNIONNAME
 #endif
-#define __MINGW_TYPEDEF_AW(type) \
-    typedef __MINGW_NAME_AW(type) type;
+
+#ifndef __GNU_EXTENSION
+#define __GNU_EXTENSION		__MINGW_EXTENSION
+#endif
+
+/* MinGW-w64 has some additional C99 printf/scanf feature support.
+   So we add some helper macros to ease recognition of them.  */
+#define __MINGW_HAVE_ANSI_C99_PRINTF 1
+#define __MINGW_HAVE_WIDE_C99_PRINTF 1
+#define __MINGW_HAVE_ANSI_C99_SCANF 1
+#define __MINGW_HAVE_WIDE_C99_SCANF 1
+
+#ifdef __MINGW_USE_BROKEN_INTERFACE
+#define __MINGW_POISON_NAME(__IFACE) __IFACE
+#else
+#define __MINGW_POISON_NAME(__IFACE)\
+  __IFACE##_layout_has_not_been_verified_and_its_declaration_is_most_likely_incorrect
+#endif
 
 #endif	/* _INC_CRTDEFS_MACRO */
 

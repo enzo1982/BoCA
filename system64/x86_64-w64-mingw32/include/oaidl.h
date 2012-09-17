@@ -258,14 +258,14 @@ extern "C" {
   typedef struct tagVARIANT VARIANT;
 
   struct tagVARIANT {
-    __MINGW_EXTENSION union {
-      __MINGW_EXTENSION struct __tagVARIANT
+    __C89_NAMELESS union {
+      __C89_NAMELESS struct __tagVARIANT
       {
 	VARTYPE vt;
 	WORD wReserved1;
 	WORD wReserved2;
 	WORD wReserved3;
-	__MINGW_EXTENSION union {
+	__C89_NAMELESS union {
 	  LONGLONG llVal;
 	  LONG lVal;
 	  BYTE bVal;
@@ -338,7 +338,7 @@ extern "C" {
     USHORT wReserved1;
     USHORT wReserved2;
     USHORT wReserved3;
-    __MINGW_EXTENSION union {
+    __C89_NAMELESS union {
       LONGLONG llVal;
       LONG lVal;
       BYTE bVal;
@@ -383,7 +383,7 @@ extern "C" {
       ULONGLONG *pullVal;
       INT *pintVal;
       UINT *puintVal;
-    };
+    } DUMMYUNIONNAME;
   };
 #ifndef DEFINED_DISPID_MEMBERID
 #define DEFINED_DISPID_MEMBERID
@@ -399,11 +399,11 @@ extern "C" {
   } TYPEKIND;
 
   typedef struct tagTYPEDESC {
-    __MINGW_EXTENSION union {
+    __C89_NAMELESS union {
       struct tagTYPEDESC *lptdesc;
       struct tagARRAYDESC *lpadesc;
       HREFTYPE hreftype;
-    };
+    } DUMMYUNIONNAME;
     VARTYPE vt;
   } TYPEDESC;
 
@@ -451,10 +451,10 @@ extern "C" {
 
   typedef struct tagELEMDESC {
     TYPEDESC tdesc;
-    __MINGW_EXTENSION union {
+    __C89_NAMELESS union {
       IDLDESC idldesc;
       PARAMDESC paramdesc;
-    };
+    } DUMMYUNIONNAME;
   } ELEMDESC,*LPELEMDESC;
 
   typedef struct tagTYPEATTR {
@@ -556,10 +556,10 @@ extern "C" {
   typedef struct tagVARDESC {
     MEMBERID memid;
     LPOLESTR lpstrSchema;
-    __MINGW_EXTENSION union {
+    __C89_NAMELESS union {
       ULONG oInst;
       VARIANT *lpvarValue;
-    };
+    } DUMMYUNIONNAME;
     ELEMDESC elemdescVar;
     WORD wVarFlags;
     VARKIND varkind;

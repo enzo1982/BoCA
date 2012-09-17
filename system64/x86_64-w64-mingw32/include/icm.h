@@ -6,6 +6,8 @@
 #ifndef _ICM_H_
 #define _ICM_H_
 
+#include <_mingw_unicode.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -413,50 +415,27 @@ extern "C" {
   WINBOOL WINAPI SetupColorMatchingW(PCOLORMATCHSETUPW pcms);
   WINBOOL WINAPI SetupColorMatchingA(PCOLORMATCHSETUPA pcms);
 
-#ifdef UNICODE
-#define ENUMTYPE ENUMTYPEW
-#define PENUMTYPE PENUMTYPEW
-#define COLORMATCHSETUP COLORMATCHSETUPW
-#define PCOLORMATCHSETUP PCOLORMATCHSETUPW
-#define LPCOLORMATCHSETUP LPCOLORMATCHSETUPW
-#define PCMSCALLBACK PCMSCALLBACKW
-#define CreateColorTransform CreateColorTransformW
-#define OpenColorProfile OpenColorProfileW
-#define CreateProfileFromLogColorSpace CreateProfileFromLogColorSpaceW
-#define RegisterCMM RegisterCMMW
-#define UnregisterCMM UnregisterCMMW
-#define GetColorDirectory GetColorDirectoryW
-#define InstallColorProfile InstallColorProfileW
-#define UninstallColorProfile UninstallColorProfileW
-#define AssociateColorProfileWithDevice AssociateColorProfileWithDeviceW
-#define DisassociateColorProfileFromDevice DisassociateColorProfileFromDeviceW
-#define EnumColorProfiles EnumColorProfilesW
-#define SetStandardColorSpaceProfile SetStandardColorSpaceProfileW
-#define GetStandardColorSpaceProfile GetStandardColorSpaceProfileW
-#define SetupColorMatching SetupColorMatchingW
+#define ENUMTYPE __MINGW_NAME_AW(ENUMTYPE)
+#define PENUMTYPE __MINGW_NAME_AW(PENUMTYPE)
+#define COLORMATCHSETUP __MINGW_NAME_AW(COLORMATCHSETUP)
+#define PCOLORMATCHSETUP __MINGW_NAME_AW(PCOLORMATCHSETUP)
+#define LPCOLORMATCHSETUP __MINGW_NAME_AW(LPCOLORMATCHSETUP)
+#define PCMSCALLBACK __MINGW_NAME_AW(PCMSCALLBACK)
 
-#else
-#define ENUMTYPE ENUMTYPEA
-#define PENUMTYPE PENUMTYPEA
-#define COLORMATCHSETUP COLORMATCHSETUPA
-#define PCOLORMATCHSETUP PCOLORMATCHSETUPA
-#define LPCOLORMATCHSETUP LPCOLORMATCHSETUPA
-#define PCMSCALLBACK PCMSCALLBACKA
-#define CreateColorTransform CreateColorTransformA
-#define OpenColorProfile OpenColorProfileA
-#define CreateProfileFromLogColorSpace CreateProfileFromLogColorSpaceA
-#define RegisterCMM RegisterCMMA
-#define UnregisterCMM UnregisterCMMA
-#define GetColorDirectory GetColorDirectoryA
-#define InstallColorProfile InstallColorProfileA
-#define UninstallColorProfile UninstallColorProfileA
-#define AssociateColorProfileWithDevice AssociateColorProfileWithDeviceA
-#define DisassociateColorProfileFromDevice DisassociateColorProfileFromDeviceA
-#define EnumColorProfiles EnumColorProfilesA
-#define SetStandardColorSpaceProfile SetStandardColorSpaceProfileA
-#define GetStandardColorSpaceProfile GetStandardColorSpaceProfileA
-#define SetupColorMatching SetupColorMatchingA
-#endif
+#define CreateColorTransform __MINGW_NAME_AW(CreateColorTransform)
+#define OpenColorProfile __MINGW_NAME_AW(OpenColorProfile)
+#define CreateProfileFromLogColorSpace __MINGW_NAME_AW(CreateProfileFromLogColorSpace)
+#define RegisterCMM __MINGW_NAME_AW(RegisterCMM)
+#define UnregisterCMM __MINGW_NAME_AW(UnregisterCMM)
+#define GetColorDirectory __MINGW_NAME_AW(GetColorDirectory)
+#define InstallColorProfile __MINGW_NAME_AW(InstallColorProfile)
+#define UninstallColorProfile __MINGW_NAME_AW(UninstallColorProfile)
+#define AssociateColorProfileWithDevice __MINGW_NAME_AW(AssociateColorProfileWithDevice)
+#define DisassociateColorProfileFromDevice __MINGW_NAME_AW(DisassociateColorProfileFromDevice)
+#define EnumColorProfiles __MINGW_NAME_AW(EnumColorProfiles)
+#define SetStandardColorSpaceProfile __MINGW_NAME_AW(SetStandardColorSpaceProfile)
+#define GetStandardColorSpaceProfile __MINGW_NAME_AW(GetStandardColorSpaceProfile)
+#define SetupColorMatching __MINGW_NAME_AW(SetupColorMatching)
 
   typedef HANDLE HCMTRANSFORM;
   typedef PVOID LPDEVCHARACTER;
@@ -485,6 +464,171 @@ extern "C" {
   WINBOOL WINAPI CMTranslateRGB(HCMTRANSFORM hcmTransform,COLORREF ColorRef,LPCOLORREF lpColorRef,DWORD dwFlags);
   WINBOOL WINAPI CMTranslateRGBs(HCMTRANSFORM hcmTransform,LPVOID lpSrcBits,BMFORMAT bmInput,DWORD dwWidth,DWORD dwHeight,DWORD dwStride,LPVOID lpDestBits,BMFORMAT bmOutput,DWORD dwTranslateDirection);
   WINBOOL WINAPI CMTranslateRGBsExt(HCMTRANSFORM hcmTransform,LPVOID lpSrcBits,BMFORMAT bmInput,DWORD dwWidth,DWORD dwHeight,DWORD dwInputStride,LPVOID lpDestBits,BMFORMAT bmOutput,DWORD dwOutputStride,LPBMCALLBACKFN lpfnCallback,LPARAM ulCallbackData);
+
+#if (_WIN32_WINNT >= 0x0600)
+  typedef enum tagCOLORDATATYPE {
+  COLOR_BYTE                 = 1,
+  COLOR_WORD,
+  COLOR_FLOAT,
+  COLOR_S2DOT13FIXED,
+  COLOR_10b_R10G10B10A2,
+  COLOR_10b_R10G10B10A2_XR
+} COLORDATATYPE, *PCOLORDATATYPE, *LPCOLORDATATYPE;
+
+#define INTENT_PERCEPTUAL 0
+#define INTENT_RELATIVE_COLORIMETRIC 1
+#define INTENT_SATURATION 2
+#define INTENT_ABSOLUTE_COLORIMETRIC 3
+
+typedef enum tagCOLORPROFILESUBTYPE {
+  CPST_PERCEPTUAL            = INTENT_PERCEPTUAL,
+  CPST_RELATIVE_COLORIMETRIC = INTENT_RELATIVE_COLORIMETRIC,
+  CPST_SATURATION            = INTENT_SATURATION,
+  CPST_ABSOLUTE_COLORIMETRIC = INTENT_ABSOLUTE_COLORIMETRIC,
+  CPST_NONE,
+  CPST_RGB_WORKING_SPACE,
+  CPST_CUSTOM_WORKING_SPACE
+} COLORPROFILESUBTYPE, *PCOLORPROFILESUBTYPE, *LPCOLORPROFILESUBTYPE;
+
+typedef enum tagCOLORPROFILETYPE {
+  CPT_ICC  = 0,
+  CPT_DMP  = 1,
+  CPT_CAMP = 2,
+  CPT_GMMP = 3
+} COLORPROFILETYPE, *PCOLORPROFILETYPE, *LPCOLORPROFILETYPE;
+
+typedef enum tagWCS_PROFILE_MANAGEMENT_SCOPE {
+  WCS_PROFILE_MANAGEMENT_SCOPE_SYSTEM_WIDE = 0,
+  WCS_PROFILE_MANAGEMENT_SCOPE_CURRENT_USER
+} WCS_PROFILE_MANAGEMENT_SCOPE;
+
+WINBOOL WINAPI WcsAssociateColorProfileWithDevice(
+  WCS_PROFILE_MANAGEMENT_SCOPE profileManagementScope,
+  PCWSTR pProfileName,
+  PCWSTR pDeviceName
+);
+
+WINBOOL WINAPI WcsCheckColors(
+  HTRANSFORM hColorTransform,
+  DWORD nColors,
+  DWORD nInputChannels,
+  COLORDATATYPE cdtInput,
+  DWORD cbInput,
+  PVOID pInputData,
+  PBYTE paResult
+);
+
+HPROFILE WINAPI WcsCreateIccProfile(
+  HPROFILE hWcsProfile,
+  DWORD dwOptions
+);
+
+WINBOOL WINAPI WcsDisassociateColorProfileFromDevice(
+  WCS_PROFILE_MANAGEMENT_SCOPE profileManagementScope,
+  PCWSTR pProfileName,
+  PCWSTR pDeviceName
+);
+
+WINBOOL WINAPI WcsEnumColorProfiles(
+  WCS_PROFILE_MANAGEMENT_SCOPE profileManagementScope,
+  PENUMTYPEW pEnumRecord,
+  PBYTE pBuffer,
+  DWORD dwSize,
+  PDWORD pnProfiles
+);
+
+WINBOOL WINAPI WcsEnumColorProfilesSize(
+  WCS_PROFILE_MANAGEMENT_SCOPE profileManagementScope,
+  PENUMTYPEW pEnumRecord,
+  PDWORD pdwSize
+);
+
+WINBOOL WINAPI WcsGetDefaultColorProfile(
+  WCS_PROFILE_MANAGEMENT_SCOPE profileManagementScope,
+  PCWSTR pDeviceName,
+  COLORPROFILETYPE cptColorProfileType,
+  COLORPROFILESUBTYPE cpstColorProfileSubType,
+  DWORD dwProfileID,
+  DWORD cbProfileName,
+  LPWSTR pProfileName
+);
+
+WINBOOL WINAPI WcsGetDefaultColorProfileSize(
+  WCS_PROFILE_MANAGEMENT_SCOPE profileManagementScope,
+  PCWSTR pDeviceName,
+  COLORPROFILETYPE cptColorProfileType,
+  COLORPROFILESUBTYPE cpstColorProfileSubType,
+  DWORD dwProfileID,
+  PDWORD pcbProfileName
+);
+
+WINBOOL WINAPI WcsGetDefaultRenderingIntent(
+  WCS_PROFILE_MANAGEMENT_SCOPE scope,
+  PDWORD pdwRenderingIntent
+);
+
+WINBOOL WINAPI WcsGetUsePerUserProfiles(
+  LPCWSTR pDeviceName,
+  DWORD dwDeviceClass,
+  WINBOOL *pUsePerUserProfiles
+);
+
+#define WcsOpenColorProfile __MINGW_NAME_AW(WcsOpenColorProfile)
+
+HPROFILE WINAPI WcsOpenColorProfileA(
+  PPROFILE pCDMPProfile,
+  PPROFILE pCAMPProfile,
+  PPROFILE pGMMPProfile,
+  DWORD dwDesiredAccess,
+  DWORD dwShareMode,
+  DWORD dwCreationMode,
+  DWORD dwFlags
+);
+
+HPROFILE WINAPI WcsOpenColorProfileW(
+  PPROFILE pCDMPProfile,
+  PPROFILE pCAMPProfile,
+  PPROFILE pGMMPProfile,
+  DWORD dwDesiredAccess,
+  DWORD dwShareMode,
+  DWORD dwCreationMode,
+  DWORD dwFlags
+);
+
+WINBOOL WINAPI WcsSetDefaultColorProfile(
+  WCS_PROFILE_MANAGEMENT_SCOPE profileManagementScope,
+  PCWSTR pDeviceName,
+  COLORPROFILETYPE cptColorProfileType,
+  COLORPROFILESUBTYPE cpstColorProfileSubType,
+  DWORD dwProfileID,
+  LPCWSTR pProfileName
+);
+
+WINBOOL WINAPI WcsSetDefaultRenderingIntent(
+  WCS_PROFILE_MANAGEMENT_SCOPE scope,
+  DWORD dwRenderingIntent
+);
+
+WINBOOL WINAPI WcsSetUsePerUserProfiles(
+  LPCWSTR pDeviceName,
+  DWORD dwDeviceClass,
+  WINBOOL usePerUserProfiles
+);
+
+WINBOOL WINAPI WcsTranslateColors(
+  HTRANSFORM hColorTransform,
+  DWORD nColors,
+  DWORD nInputChannels,
+  COLORDATATYPE cdtInput,
+  DWORD cbInput,
+  PVOID pInputData,
+  DWORD nOutputChannels,
+  COLORDATATYPE cdtOutput,
+  DWORD cbOutput,
+  PVOID pOutputData
+);
+
+#endif /*(_WIN32_WINNT >= 0x0600)*/
 
 #ifdef __cplusplus
 }

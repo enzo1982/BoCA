@@ -3,6 +3,9 @@
  * This file is part of the w64 mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
+
+#include <winsock2.h>
+
 #ifndef _MSWSOCK_
 #define _MSWSOCK_
 
@@ -33,8 +36,20 @@ extern "C" {
 #define TCP_BSDURGENT 0x7000
 
 #define SIO_UDP_CONNRESET _WSAIOW(IOC_VENDOR,12)
-
+#if (_WIN32_WINNT < 0x0600) && (_WIN32_WINNT >= 0x0501)
 #define SIO_SOCKET_CLOSE_NOTIFY _WSAIOW(IOC_VENDOR,13)
+#endif /* >= XP && < VISTA */
+#if (_WIN32_WINNT >= 0x0600)
+#define SIO_BSP_HANDLE _WSAIOR(IOC_WS2,27)
+#define SIO_BSP_HANDLE_SELECT _WSAIOR(IOC_WS2,28)
+#define SIO_BSP_HANDLE_POLL _WSAIOR(IOC_WS2,29)
+
+#define SIO_EXT_SELECT _WSAIORW(IOC_WS2,30)
+#define SIO_EXT_POLL _WSAIORW(IOC_WS2,31)
+#define SIO_EXT_SENDMSG _WSAIORW(IOC_WS2,32)
+
+#define SIO_BASE_HANDLE _WSAIOR(IOC_WS2,34)
+#endif /* _WIN32_WINNT >= 0x0600 */
 
 #ifndef __MSWSOCK_WS1_SHARED
   int WINAPI WSARecvEx(SOCKET s,char *buf,int len,int *flags);
@@ -47,7 +62,7 @@ extern "C" {
 #define TF_USE_SYSTEM_THREAD 0x10
 #define TF_USE_KERNEL_APC 0x20
 
-#include <mingw_inc/_xmitfile.h>
+#include <psdk_inc/_xmitfile.h>
 #ifndef __MSWSOCK_WS1_SHARED
   WINBOOL WINAPI TransmitFile(SOCKET hSocket,HANDLE hFile,DWORD nNumberOfBytesToWrite,DWORD nNumberOfBytesPerSend,LPOVERLAPPED lpOverlapped,LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers,DWORD dwReserved);
   WINBOOL WINAPI AcceptEx(SOCKET sListenSocket,SOCKET sAcceptSocket,PVOID lpOutputBuffer,DWORD dwReceiveDataLength,DWORD dwLocalAddressLength,DWORD dwRemoteAddressLength,LPDWORD lpdwBytesReceived,LPOVERLAPPED lpOverlapped);
@@ -72,8 +87,8 @@ extern "C" {
 #define TP_ELEMENT_FILE 2
 #define TP_ELEMENT_EOP 4
     ULONG cLength;
-    __MINGW_EXTENSION union {
-      __MINGW_EXTENSION struct {
+    __C89_NAMELESS union {
+      __C89_NAMELESS struct {
 	LARGE_INTEGER nFileOffset;
 	HANDLE hFile;
       };
@@ -152,15 +167,6 @@ extern "C" {
     } data;
   } NLA_BLOB,*PNLA_BLOB,*LPNLA_BLOB;
 
-  typedef struct _WSAMSG {
-    LPSOCKADDR name;
-    INT namelen;
-    LPWSABUF lpBuffers;
-    DWORD dwBufferCount;
-    WSABUF Control;
-    DWORD dwFlags;
-  } WSAMSG,*PWSAMSG,*LPWSAMSG;
-
   typedef struct _WSACMSGHDR {
     SIZE_T cmsg_len;
     INT cmsg_level;
@@ -180,11 +186,44 @@ extern "C" {
 #define MSG_BCAST 0x0400
 #define MSG_MCAST 0x0800
 
-  typedef INT (WINAPI *LPFN_WSARECVMSG)(SOCKET s,LPWSAMSG lpMsg,LPDWORD lpdwNumberOfBytesRecvd,LPWSAOVERLAPPED lpOverlapped,LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
+  typedef INT (WINAPI *LPFN_WSARECVMSG)(SOCKET s, LPWSAMSG lpMsg,
+					LPDWORD lpdwNumberOfBytesRecvd,
+					LPWSAOVERLAPPED lpOverlapped,
+					LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
 
 #define WSAID_WSARECVMSG {0xf689d7c8,0x6f1f,0x436b,{0x8a,0x53,0xe5,0x4f,0xe3,0x51,0xc3,0x22}}
+
+#if(_WIN32_WINNT >= 0x0600)
+  typedef struct {
+    int result;
+    ULONG fds;
+    INT timeout;
+    WSAPOLLFD fdArray[0];
+  } WSAPOLLDATA, *LPWSAPOLLDATA;
+
+  typedef INT (WSAAPI *LPFN_WSAPOLL) (LPWSAPOLLFD fdarray, ULONG nfds, INT timeout);
+
+#define WSAID_WSAPOLL {0x18C76F85,0xDC66,0x4964,{0x97,0x2E,0x23,0xC2,0x72,0x38,0x31,0x2B}}
+
+  typedef struct {
+    LPWSAMSG lpMsg;
+    DWORD dwFlags;
+    LPDWORD lpNumberOfBytesSent;
+    LPWSAOVERLAPPED lpOverlapped;
+    LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine;
+  } WSASENDMSG, *LPWSASENDMSG;
+
+  typedef INT (WSAAPI *LPFN_WSASENDMSG)(SOCKET s, LPWSAMSG lpMsg, DWORD dwFlags,
+					LPDWORD lpNumberOfBytesSent,
+					LPWSAOVERLAPPED lpOverlapped,
+					LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
+
+#define WSAID_WSASENDMSG {0xa441e712,0x754f,0x43ca,{0x84,0xa7,0x0d,0xee,0x44,0xcf,0x60,0x6d}}
+
+#endif /* (_WIN32_WINNT >= 0x0600) */
 
 #ifdef __cplusplus
 }
 #endif
-#endif
+
+#endif /* _MSWSOCK_ */

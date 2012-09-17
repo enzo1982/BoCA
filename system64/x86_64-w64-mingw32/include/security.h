@@ -3,6 +3,9 @@
  * This file is part of the w64 mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
+
+#include <_mingw_unicode.h>
+
 #ifndef NTLMSP_NAME_A
 #define NTLMSP_NAME_A "NTLM"
 #define NTLMSP_NAME L"NTLM"
@@ -22,11 +25,7 @@
 #define NEGOSSP_NAME_W L"Negotiate"
 #define NEGOSSP_NAME_A "Negotiate"
 
-#ifdef UNICODE
-#define NEGOSSP_NAME NEGOSSP_NAME_W
-#else
-#define NEGOSSP_NAME NEGOSSP_NAME_A
-#endif
+#define NEGOSSP_NAME __MINGW_NAME_UAW(NEGOSSP_NAME)
 #endif
 
 #include <sspi.h>

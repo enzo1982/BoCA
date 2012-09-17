@@ -6,6 +6,7 @@
 #ifndef _RICHEDIT_
 #define _RICHEDIT_
 
+#include <_mingw_unicode.h>
 #include <pshpack4.h>
 
 #ifdef __cplusplus
@@ -29,11 +30,7 @@ extern "C" {
 #define RICHEDIT_CLASSW L"RichEdit20W"
 
 #if (_RICHEDIT_VER >= 0x0200)
-#ifdef UNICODE
-#define RICHEDIT_CLASS RICHEDIT_CLASSW
-#else
-#define RICHEDIT_CLASS RICHEDIT_CLASSA
-#endif
+#define RICHEDIT_CLASS __MINGW_NAME_AW(RICHEDIT_CLASS)
 #else
 #define RICHEDIT_CLASS RICHEDIT_CLASS10A
 #endif
@@ -393,11 +390,7 @@ extern "C" {
   } CHARFORMATW;
 
 #if (_RICHEDIT_VER >= 0x0200)
-#ifdef UNICODE
-#define CHARFORMAT CHARFORMATW
-#else
-#define CHARFORMAT CHARFORMATA
-#endif
+#define CHARFORMAT __MINGW_NAME_AW(CHARFORMAT)
 #else
 #define CHARFORMAT CHARFORMATA
 #endif
@@ -477,11 +470,7 @@ extern "C" {
   } CHARFORMAT2A;
 #endif
 
-#ifdef UNICODE
-#define CHARFORMAT2 CHARFORMAT2W
-#else
-#define CHARFORMAT2 CHARFORMAT2A
-#endif
+#define CHARFORMAT2 __MINGW_NAME_AW(CHARFORMAT2)
 
 #define CHARFORMATDELTA (sizeof(CHARFORMAT2) - sizeof(CHARFORMAT))
 
@@ -600,11 +589,7 @@ extern "C" {
   } TEXTRANGEW;
 
 #if (_RICHEDIT_VER >= 0x0200)
-#ifdef UNICODE
-#define TEXTRANGE TEXTRANGEW
-#else
-#define TEXTRANGE TEXTRANGEA
-#endif
+#define TEXTRANGE __MINGW_NAME_AW(TEXTRANGE)
 #else
 #define TEXTRANGE TEXTRANGEA
 #endif
@@ -650,11 +635,7 @@ extern "C" {
   } FINDTEXTW;
 
 #if (_RICHEDIT_VER >= 0x0200)
-#ifdef UNICODE
-#define FINDTEXT FINDTEXTW
-#else
-#define FINDTEXT FINDTEXTA
-#endif
+#define FINDTEXT __MINGW_NAME_AW(FINDTEXT)
 #else
 #define FINDTEXT FINDTEXTA
 #endif
@@ -672,11 +653,7 @@ extern "C" {
   } FINDTEXTEXW;
 
 #if (_RICHEDIT_VER >= 0x0200)
-#ifdef UNICODE
-#define FINDTEXTEX FINDTEXTEXW
-#else
-#define FINDTEXTEX FINDTEXTEXA
-#endif
+#define FINDTEXTEX __MINGW_NAME_AW(FINDTEXTEX)
 #else
 #define FINDTEXTEX FINDTEXTEXA
 #endif

@@ -6,6 +6,7 @@
 #ifndef __RPCASYNC_H__
 #define __RPCASYNC_H__
 
+#include <_mingw_unicode.h>
 #ifdef __RPC_WIN64__
 #include <pshpack8.h>
 #endif
@@ -169,13 +170,8 @@ extern "C" {
     WINBOOL NullSession;
   } RPC_CALL_ATTRIBUTES_V1_A;
 
-#ifdef UNICODE
-#define RPC_CALL_ATTRIBUTES_V1 RPC_CALL_ATTRIBUTES_V1_W
-#define RpcServerInqCallAttributes RpcServerInqCallAttributesW
-#else
-#define RPC_CALL_ATTRIBUTES_V1 RPC_CALL_ATTRIBUTES_V1_A
-#define RpcServerInqCallAttributes RpcServerInqCallAttributesA
-#endif
+#define RPC_CALL_ATTRIBUTES_V1 __MINGW_NAME_UAW(RPC_CALL_ATTRIBUTES_V1)
+#define RpcServerInqCallAttributes __MINGW_NAME_AW(RpcServerInqCallAttributes)
 
   RPCRTAPI RPC_STATUS RPC_ENTRY RpcServerInqCallAttributesW(RPC_BINDING_HANDLE ClientBinding,void *RpcCallAttributes);
   RPCRTAPI RPC_STATUS RPC_ENTRY RpcServerInqCallAttributesA(RPC_BINDING_HANDLE ClientBinding,void *RpcCallAttributes);
@@ -185,6 +181,147 @@ extern "C" {
   RPC_STATUS RPC_ENTRY I_RpcAsyncSetHandle(PRPC_MESSAGE Message,PRPC_ASYNC_STATE pAsync);
   RPC_STATUS RPC_ENTRY I_RpcAsyncAbortCall(PRPC_ASYNC_STATE pAsync,unsigned long ExceptionCode);
   int RPC_ENTRY I_RpcExceptionFilter(unsigned long ExceptionCode);
+
+typedef union _RPC_ASYNC_NOTIFICATION_INFO {
+  struct {
+    PFN_RPCNOTIFICATION_ROUTINE NotificationRoutine;
+    HANDLE                      hThread;
+  } APC;
+  struct {
+    HANDLE       hIOPort;
+    DWORD        dwNumberOfBytesTransferred;
+    DWORD_PTR    dwCompletionKey;
+    LPOVERLAPPED lpOverlapped;
+  } IOC;
+  struct {
+    HWND hWnd;
+    UINT Msg;
+  } HWND;
+  HANDLE                      hEvent;
+  PFN_RPCNOTIFICATION_ROUTINE NotificationRoutine;
+} RPC_ASYNC_NOTIFICATION_INFO, *PRPC_ASYNC_NOTIFICATION_INFO;
+
+RPC_STATUS RPC_ENTRY RpcBindingBind(
+  PRPC_ASYNC_STATE pAsync,
+  RPC_BINDING_HANDLE Binding,
+  RPC_IF_HANDLE IfSpec
+);
+
+RPC_STATUS RPC_ENTRY RpcBindingUnbind(
+  RPC_BINDING_HANDLE Binding
+);
+
+typedef enum _RpcCallType {
+  rctInvalid,
+  rctNormal,
+  rctTraining,
+  rctGuaranteed 
+} RpcCallType;
+
+typedef enum _RpcLocalAddressFormat {
+  rlafInvalid,
+  rlafIPv4,
+  rlafIPv6 
+} RpcLocalAddressFormat;
+
+typedef enum _RPC_NOTIFICATIONS {
+  RpcNotificationCallNone           = 0,
+  RpcNotificationClientDisconnect   = 1,
+  RpcNotificationCallCancel         = 2 
+} RPC_NOTIFICATIONS;
+
+typedef enum _RpcCallClientLocality {
+  rcclInvalid,
+  rcclLocal,
+  rcclRemote,
+  rcclClientUnknownLocality 
+} RpcCallClientLocality;
+
+RPC_STATUS RPC_ENTRY RpcServerSubscribeForNotification(
+  RPC_BINDING_HANDLE Binding,
+  DWORD Notification,
+  RPC_NOTIFICATION_TYPES NotificationType,
+  RPC_ASYNC_NOTIFICATION_INFO *NotificationInfo
+);
+
+RPC_STATUS RPC_ENTRY RpcServerUnsubscribeForNotification(
+  RPC_BINDING_HANDLE Binding,
+  RPC_NOTIFICATIONS Notification,
+  unsigned long *NotificationsQueued
+);
+
+#if (_WIN32_WINNT >= 0x0600)
+
+typedef struct tagRPC_CALL_LOCAL_ADDRESS_V1_A {
+  unsigned int          Version;
+  void                  *Buffer;
+  unsigned long         BufferSize;
+  RpcLocalAddressFormat AddressFormat;
+} RPC_CALL_LOCAL_ADDRESS_V1_A, RPC_CALL_LOCAL_ADDRESS_A;
+
+typedef struct tagRPC_CALL_LOCAL_ADDRESS_V1_W {
+  unsigned int          Version;
+  void                  *Buffer;
+  unsigned long         BufferSize;
+  RpcLocalAddressFormat AddressFormat;
+} RPC_CALL_LOCAL_ADDRESS_V1_W, RPC_CALL_LOCAL_ADDRESS_W;
+
+#define RPC_CALL_LOCAL_ADDRESS_V1 __MINGW_NAME_AW(RPC_CALL_LOCAL_ADDRESS_V1_)
+#define RPC_CALL_LOCAL_ADDRESS __MINGW_NAME_AW(RPC_CALL_LOCAL_ADDRESS_)
+
+typedef struct tagRPC_CALL_ATTRIBUTES_V2A {
+  unsigned int           Version;
+  unsigned long          Flags;
+  unsigned long          ServerPrincipalNameBufferLength;
+  unsigned short         *ServerPrincipalName;
+  unsigned long          ClientPrincipalNameBufferLength;
+  unsigned short         *ClientPrincipalName;
+  unsigned long          AuthenticationLevel;
+  unsigned long          AuthenticationService;
+  WINBOOL                NullSession;
+  WINBOOL                KernelMode;
+  unsigned long          ProtocolSequence;
+  RpcCallClientLocality  IsClientLocal;
+  HANDLE                 ClientPID;
+  unsigned long          CallStatus;
+  RpcCallType            CallType;
+  RPC_CALL_LOCAL_ADDRESS_A *CallLocalAddress;
+  unsigned short         OpNum;
+  UUID                   InterfaceUuid;
+} RPC_CALL_ATTRIBUTES_V2_A, RPC_CALL_ATTRIBUTES_A;
+
+typedef struct tagRPC_CALL_ATTRIBUTES_V2W {
+  unsigned int           Version;
+  unsigned long          Flags;
+  unsigned long          ServerPrincipalNameBufferLength;
+  unsigned short         *ServerPrincipalName;
+  unsigned long          ClientPrincipalNameBufferLength;
+  unsigned short         *ClientPrincipalName;
+  unsigned long          AuthenticationLevel;
+  unsigned long          AuthenticationService;
+  WINBOOL                NullSession;
+  WINBOOL                KernelMode;
+  unsigned long          ProtocolSequence;
+  RpcCallClientLocality  IsClientLocal;
+  HANDLE                 ClientPID;
+  unsigned long          CallStatus;
+  RpcCallType            CallType;
+  RPC_CALL_LOCAL_ADDRESS_W *CallLocalAddress;
+  unsigned short         OpNum;
+  UUID                   InterfaceUuid;
+} RPC_CALL_ATTRIBUTES_V2_W, RPC_CALL_ATTRIBUTES_W;
+
+#define RPC_CALL_ATTRIBUTES_V2 __MINGW_NAME_AW(RPC_CALL_ATTRIBUTES_V2_)
+
+RPC_STATUS RPC_ENTRY RpcDiagnoseError(
+  RPC_BINDING_HANDLE BindingHandle,
+  RPC_IF_HANDLE IfSpec,
+  RPC_STATUS RpcStatus,
+  RPC_ERROR_ENUM_HANDLE *EnumHandle,
+  ULONG Options,
+  HWND ParentWindow
+);
+#endif /*(_WIN32_WINNT >= 0x0600)*/
 
 #ifdef __cplusplus
 }

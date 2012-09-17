@@ -6,6 +6,7 @@
 #ifndef _INC_CPL
 #define _INC_CPL
 
+#include <_mingw_unicode.h>
 #include <pshpack1.h>
 
 #ifdef __cplusplus
@@ -58,17 +59,10 @@ extern "C" {
     WCHAR szHelpFile[128];
   } NEWCPLINFOW,*LPNEWCPLINFOW;
 
-#ifdef UNICODE
-  typedef NEWCPLINFOW NEWCPLINFO;
-  typedef LPNEWCPLINFOW LPNEWCPLINFO;
+  __MINGW_TYPEDEF_AW(NEWCPLINFO)
+  __MINGW_TYPEDEF_AW(LPNEWCPLINFO)
 
-#define CPL_STARTWPARMS CPL_STARTWPARMSW
-#else
-  typedef NEWCPLINFOA NEWCPLINFO;
-  typedef LPNEWCPLINFOA LPNEWCPLINFO;
-
-#define CPL_STARTWPARMS CPL_STARTWPARMSA
-#endif
+#define CPL_STARTWPARMS __MINGW_NAME_AW(CPL_STARTWPARMS)
 
 #define CPL_SETUP 200
 

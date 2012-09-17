@@ -119,7 +119,7 @@ extern "C" {
 #define __T(x) L##x
 
 #define _tmain wmain
-#define _tWinMain WinMain
+#define _tWinMain wWinMain
 #define _tenviron _wenviron
 #define __targv __wargv
 
@@ -615,9 +615,7 @@ extern "C" {
 #define _tcscpy strcpy
 #define _tcsdup _strdup
 #define _tcslen strlen
-#if 0
 #define _tcsnlen strnlen
-#endif
 #define _tcsxfrm strxfrm
 #define _tcsxfrm_l _strxfrm_l
 #define _tcserror strerror

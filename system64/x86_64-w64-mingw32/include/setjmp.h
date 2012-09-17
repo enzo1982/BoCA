@@ -6,9 +6,21 @@
 #ifndef _INC_SETJMP
 #define _INC_SETJMP
 
-#include <_mingw.h>
+#include <crtdefs.h>
 
 #pragma pack(push,_CRT_PACKING)
+
+#ifndef NULL
+#ifdef __cplusplus
+#ifndef _WIN64
+#define NULL 0
+#else
+#define NULL 0LL
+#endif  /* W64 */
+#else
+#define NULL ((void *)0)
+#endif
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +44,9 @@ extern "C" {
     unsigned long UnwindFunc;
     unsigned long UnwindData[6];
   } _JUMP_BUFFER;
+
 #elif defined(__ia64__)
+
   typedef _CRT_ALIGN(16) struct _SETJMP_FLOAT128 {
     __MINGW_EXTENSION __int64 LowPart;
     __MINGW_EXTENSION __int64 HighPart;
@@ -92,7 +106,9 @@ extern "C" {
     __MINGW_EXTENSION __int64 Preds;
 
   } _JUMP_BUFFER;
+
 #elif defined(__x86_64)
+
   typedef _CRT_ALIGN(16) struct _SETJMP_FLOAT128 {
     __MINGW_EXTENSION unsigned __int64 Part[2];
   } SETJMP_FLOAT128;
@@ -124,7 +140,9 @@ extern "C" {
     SETJMP_FLOAT128 Xmm14;
     SETJMP_FLOAT128 Xmm15;
   } _JUMP_BUFFER;
+
 #endif
+
 #ifndef _JMP_BUF_DEFINED
   typedef _JBTYPE jmp_buf[_JBLEN];
 #define _JMP_BUF_DEFINED

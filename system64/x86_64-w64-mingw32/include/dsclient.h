@@ -6,6 +6,7 @@
 #ifndef __dsclient_h
 #define __dsclient_h
 
+#include <_mingw_unicode.h>
 #include <shlobj.h>
 
 DEFINE_GUID(CLSID_MicrosoftDS,0xfe1290f0,0xcfbd,0x11cf,0xa3,0x30,0x0,0xaa,0x0,0xc1,0x6e,0x65);
@@ -195,13 +196,8 @@ typedef struct {
   ULONG cchObjectClass;
 } DSBROWSEINFOA,*PDSBROWSEINFOA;
 
-#ifdef UNICODE
-#define DSBROWSEINFO DSBROWSEINFOW
-#define PDSBROWSEINFO PDSBROWSEINFOW
-#else
-#define DSBROWSEINFO DSBROWSEINFOA
-#define PDSBROWSEINFO PDSBROWSEINFOA
-#endif
+#define DSBROWSEINFO __MINGW_NAME_AW(DSBROWSEINFO)
+#define PDSBROWSEINFO __MINGW_NAME_AW(PDSBROWSEINFO)
 
 #define DSBI_NOBUTTONS 0x00000001
 #define DSBI_NOLINES 0x00000002
@@ -244,13 +240,8 @@ typedef struct {
   INT iIconResID;
 } DSBITEMA,*PDSBITEMA;
 
-#ifdef UNICODE
-#define DSBITEM DSBITEMW
-#define PDSBITEM PDSBITEMW
-#else
-#define DSBITEM DSBITEMA
-#define PDSBITEM PDSBITEMA
-#endif
+#define DSBITEM __MINGW_NAME_AW(DSBITEM)
+#define PDSBITEM __MINGW_NAME_AW(PDSBITEM)
 
 #define DSBF_STATE 0x00000001
 #define DSBF_ICONLOCATION 0x00000002
@@ -263,11 +254,7 @@ typedef struct {
 #define DSBM_QUERYINSERTW 100
 #define DSBM_QUERYINSERTA 101
 
-#ifdef UNICODE
-#define DSBM_QUERYINSERT DSBM_QUERYINSERTW
-#else
-#define DSBM_QUERYINSERT DSBM_QUERYINSERTA
-#endif
+#define DSBM_QUERYINSERT __MINGW_NAME_AW(DSBM_QUERYINSERT)
 
 #define DSBM_CHANGEIMAGESTATE 102
 #define DSBM_HELP 103
@@ -279,11 +266,7 @@ typedef struct {
 STDAPI_(int) DsBrowseForContainerW(PDSBROWSEINFOW pInfo);
 STDAPI_(int) DsBrowseForContainerA(PDSBROWSEINFOA pInfo);
 
-#ifdef UNICODE
-#define DsBrowseForContainer DsBrowseForContainerW
-#else
-#define DsBrowseForContainer DsBrowseForContainerA
-#endif
+#define DsBrowseForContainer __MINGW_NAME_AW(DsBrowseForContainer)
 
 STDAPI_(HICON) DsGetIcon(DWORD dwFlags,LPWSTR pszObjectClass,INT cxImage,INT cyImage);
 STDAPI DsGetFriendlyClassName(LPWSTR pszObjectClass,LPWSTR pszBuffer,UINT cchBuffer);

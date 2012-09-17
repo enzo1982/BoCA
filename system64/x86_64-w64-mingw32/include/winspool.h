@@ -6,6 +6,8 @@
 #ifndef _WINSPOOL_
 #define _WINSPOOL_
 
+#include <_mingw_unicode.h>
+
 #ifdef _WINUSER_
 #include <prsht.h>
 #endif
@@ -28,15 +30,9 @@ extern "C" {
     LPWSTR pComment;
   } PRINTER_INFO_1W,*PPRINTER_INFO_1W,*LPPRINTER_INFO_1W;
 
-#ifdef UNICODE
-  typedef PRINTER_INFO_1W PRINTER_INFO_1;
-  typedef PPRINTER_INFO_1W PPRINTER_INFO_1;
-  typedef LPPRINTER_INFO_1W LPPRINTER_INFO_1;
-#else
-  typedef PRINTER_INFO_1A PRINTER_INFO_1;
-  typedef PPRINTER_INFO_1A PPRINTER_INFO_1;
-  typedef LPPRINTER_INFO_1A LPPRINTER_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_INFO_1)
+  __MINGW_TYPEDEF_AW(PPRINTER_INFO_1)
+  __MINGW_TYPEDEF_AW(LPPRINTER_INFO_1)
 
   typedef struct _PRINTER_INFO_2A {
     LPSTR pServerName;
@@ -86,15 +82,9 @@ extern "C" {
     DWORD AveragePPM;
   } PRINTER_INFO_2W,*PPRINTER_INFO_2W,*LPPRINTER_INFO_2W;
 
-#ifdef UNICODE
-  typedef PRINTER_INFO_2W PRINTER_INFO_2;
-  typedef PPRINTER_INFO_2W PPRINTER_INFO_2;
-  typedef LPPRINTER_INFO_2W LPPRINTER_INFO_2;
-#else
-  typedef PRINTER_INFO_2A PRINTER_INFO_2;
-  typedef PPRINTER_INFO_2A PPRINTER_INFO_2;
-  typedef LPPRINTER_INFO_2A LPPRINTER_INFO_2;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_INFO_2)
+  __MINGW_TYPEDEF_AW(PPRINTER_INFO_2)
+  __MINGW_TYPEDEF_AW(LPPRINTER_INFO_2)
 
   typedef struct _PRINTER_INFO_3 {
     PSECURITY_DESCRIPTOR pSecurityDescriptor;
@@ -112,15 +102,9 @@ extern "C" {
     DWORD Attributes;
   } PRINTER_INFO_4W,*PPRINTER_INFO_4W,*LPPRINTER_INFO_4W;
 
-#ifdef UNICODE
-  typedef PRINTER_INFO_4W PRINTER_INFO_4;
-  typedef PPRINTER_INFO_4W PPRINTER_INFO_4;
-  typedef LPPRINTER_INFO_4W LPPRINTER_INFO_4;
-#else
-  typedef PRINTER_INFO_4A PRINTER_INFO_4;
-  typedef PPRINTER_INFO_4A PPRINTER_INFO_4;
-  typedef LPPRINTER_INFO_4A LPPRINTER_INFO_4;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_INFO_4)
+  __MINGW_TYPEDEF_AW(PPRINTER_INFO_4)
+  __MINGW_TYPEDEF_AW(LPPRINTER_INFO_4)
 
   typedef struct _PRINTER_INFO_5A {
     LPSTR pPrinterName;
@@ -138,15 +122,9 @@ extern "C" {
     DWORD TransmissionRetryTimeout;
   } PRINTER_INFO_5W,*PPRINTER_INFO_5W,*LPPRINTER_INFO_5W;
 
-#ifdef UNICODE
-  typedef PRINTER_INFO_5W PRINTER_INFO_5;
-  typedef PPRINTER_INFO_5W PPRINTER_INFO_5;
-  typedef LPPRINTER_INFO_5W LPPRINTER_INFO_5;
-#else
-  typedef PRINTER_INFO_5A PRINTER_INFO_5;
-  typedef PPRINTER_INFO_5A PPRINTER_INFO_5;
-  typedef LPPRINTER_INFO_5A LPPRINTER_INFO_5;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_INFO_5)
+  __MINGW_TYPEDEF_AW(PPRINTER_INFO_5)
+  __MINGW_TYPEDEF_AW(LPPRINTER_INFO_5)
 
   typedef struct _PRINTER_INFO_6 {
     DWORD dwStatus;
@@ -162,15 +140,9 @@ extern "C" {
     DWORD dwAction;
   } PRINTER_INFO_7W,*PPRINTER_INFO_7W,*LPPRINTER_INFO_7W;
 
-#ifdef UNICODE
-  typedef PRINTER_INFO_7W PRINTER_INFO_7;
-  typedef PPRINTER_INFO_7W PPRINTER_INFO_7;
-  typedef LPPRINTER_INFO_7W LPPRINTER_INFO_7;
-#else
-  typedef PRINTER_INFO_7A PRINTER_INFO_7;
-  typedef PPRINTER_INFO_7A PPRINTER_INFO_7;
-  typedef LPPRINTER_INFO_7A LPPRINTER_INFO_7;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_INFO_7)
+  __MINGW_TYPEDEF_AW(PPRINTER_INFO_7)
+  __MINGW_TYPEDEF_AW(LPPRINTER_INFO_7)
 
 #define DSPRINT_PUBLISH 0x00000001
 #define DSPRINT_UPDATE 0x00000002
@@ -186,15 +158,9 @@ extern "C" {
     LPDEVMODEW pDevMode;
   } PRINTER_INFO_8W,*PPRINTER_INFO_8W,*LPPRINTER_INFO_8W;
 
-#ifdef UNICODE
-  typedef PRINTER_INFO_8W PRINTER_INFO_8;
-  typedef PPRINTER_INFO_8W PPRINTER_INFO_8;
-  typedef LPPRINTER_INFO_8W LPPRINTER_INFO_8;
-#else
-  typedef PRINTER_INFO_8A PRINTER_INFO_8;
-  typedef PPRINTER_INFO_8A PPRINTER_INFO_8;
-  typedef LPPRINTER_INFO_8A LPPRINTER_INFO_8;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_INFO_8)
+  __MINGW_TYPEDEF_AW(PPRINTER_INFO_8)
+  __MINGW_TYPEDEF_AW(LPPRINTER_INFO_8)
 
   typedef struct _PRINTER_INFO_9A {
     LPDEVMODEA pDevMode;
@@ -204,15 +170,9 @@ extern "C" {
     LPDEVMODEW pDevMode;
   } PRINTER_INFO_9W,*PPRINTER_INFO_9W,*LPPRINTER_INFO_9W;
 
-#ifdef UNICODE
-  typedef PRINTER_INFO_9W PRINTER_INFO_9;
-  typedef PPRINTER_INFO_9W PPRINTER_INFO_9;
-  typedef LPPRINTER_INFO_9W LPPRINTER_INFO_9;
-#else
-  typedef PRINTER_INFO_9A PRINTER_INFO_9;
-  typedef PPRINTER_INFO_9A PPRINTER_INFO_9;
-  typedef LPPRINTER_INFO_9A LPPRINTER_INFO_9;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_INFO_9)
+  __MINGW_TYPEDEF_AW(PPRINTER_INFO_9)
+  __MINGW_TYPEDEF_AW(LPPRINTER_INFO_9)
 
 #define PRINTER_CONTROL_PAUSE 1
 #define PRINTER_CONTROL_RESUME 2
@@ -301,15 +261,9 @@ extern "C" {
     SYSTEMTIME Submitted;
   } JOB_INFO_1W,*PJOB_INFO_1W,*LPJOB_INFO_1W;
 
-#ifdef UNICODE
-  typedef JOB_INFO_1W JOB_INFO_1;
-  typedef PJOB_INFO_1W PJOB_INFO_1;
-  typedef LPJOB_INFO_1W LPJOB_INFO_1;
-#else
-  typedef JOB_INFO_1A JOB_INFO_1;
-  typedef PJOB_INFO_1A PJOB_INFO_1;
-  typedef LPJOB_INFO_1A LPJOB_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(JOB_INFO_1)
+  __MINGW_TYPEDEF_AW(PJOB_INFO_1)
+  __MINGW_TYPEDEF_AW(LPJOB_INFO_1)
 
   typedef struct _JOB_INFO_2A {
     DWORD JobId;
@@ -363,15 +317,9 @@ extern "C" {
     DWORD PagesPrinted;
   } JOB_INFO_2W,*PJOB_INFO_2W,*LPJOB_INFO_2W;
 
-#ifdef UNICODE
-  typedef JOB_INFO_2W JOB_INFO_2;
-  typedef PJOB_INFO_2W PJOB_INFO_2;
-  typedef LPJOB_INFO_2W LPJOB_INFO_2;
-#else
-  typedef JOB_INFO_2A JOB_INFO_2;
-  typedef PJOB_INFO_2A PJOB_INFO_2;
-  typedef LPJOB_INFO_2A LPJOB_INFO_2;
-#endif
+  __MINGW_TYPEDEF_AW(JOB_INFO_2)
+  __MINGW_TYPEDEF_AW(PJOB_INFO_2)
+  __MINGW_TYPEDEF_AW(LPJOB_INFO_2)
 
   typedef struct _JOB_INFO_3 {
     DWORD JobId;
@@ -413,15 +361,9 @@ extern "C" {
     DWORD JobId;
   } ADDJOB_INFO_1W,*PADDJOB_INFO_1W,*LPADDJOB_INFO_1W;
 
-#ifdef UNICODE
-  typedef ADDJOB_INFO_1W ADDJOB_INFO_1;
-  typedef PADDJOB_INFO_1W PADDJOB_INFO_1;
-  typedef LPADDJOB_INFO_1W LPADDJOB_INFO_1;
-#else
-  typedef ADDJOB_INFO_1A ADDJOB_INFO_1;
-  typedef PADDJOB_INFO_1A PADDJOB_INFO_1;
-  typedef LPADDJOB_INFO_1A LPADDJOB_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(ADDJOB_INFO_1)
+  __MINGW_TYPEDEF_AW(PADDJOB_INFO_1)
+  __MINGW_TYPEDEF_AW(LPADDJOB_INFO_1)
 
   typedef struct _DRIVER_INFO_1A {
     LPSTR pName;
@@ -431,15 +373,9 @@ extern "C" {
     LPWSTR pName;
   } DRIVER_INFO_1W,*PDRIVER_INFO_1W,*LPDRIVER_INFO_1W;
 
-#ifdef UNICODE
-  typedef DRIVER_INFO_1W DRIVER_INFO_1;
-  typedef PDRIVER_INFO_1W PDRIVER_INFO_1;
-  typedef LPDRIVER_INFO_1W LPDRIVER_INFO_1;
-#else
-  typedef DRIVER_INFO_1A DRIVER_INFO_1;
-  typedef PDRIVER_INFO_1A PDRIVER_INFO_1;
-  typedef LPDRIVER_INFO_1A LPDRIVER_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(DRIVER_INFO_1)
+  __MINGW_TYPEDEF_AW(PDRIVER_INFO_1)
+  __MINGW_TYPEDEF_AW(LPDRIVER_INFO_1)
 
   typedef struct _DRIVER_INFO_2A {
     DWORD cVersion;
@@ -459,15 +395,9 @@ extern "C" {
     LPWSTR pConfigFile;
   } DRIVER_INFO_2W,*PDRIVER_INFO_2W,*LPDRIVER_INFO_2W;
 
-#ifdef UNICODE
-  typedef DRIVER_INFO_2W DRIVER_INFO_2;
-  typedef PDRIVER_INFO_2W PDRIVER_INFO_2;
-  typedef LPDRIVER_INFO_2W LPDRIVER_INFO_2;
-#else
-  typedef DRIVER_INFO_2A DRIVER_INFO_2;
-  typedef PDRIVER_INFO_2A PDRIVER_INFO_2;
-  typedef LPDRIVER_INFO_2A LPDRIVER_INFO_2;
-#endif
+  __MINGW_TYPEDEF_AW(DRIVER_INFO_2)
+  __MINGW_TYPEDEF_AW(PDRIVER_INFO_2)
+  __MINGW_TYPEDEF_AW(LPDRIVER_INFO_2)
 
   typedef struct _DRIVER_INFO_3A {
     DWORD cVersion;
@@ -495,15 +425,9 @@ extern "C" {
     LPWSTR pDefaultDataType;
   } DRIVER_INFO_3W,*PDRIVER_INFO_3W,*LPDRIVER_INFO_3W;
 
-#ifdef UNICODE
-  typedef DRIVER_INFO_3W DRIVER_INFO_3;
-  typedef PDRIVER_INFO_3W PDRIVER_INFO_3;
-  typedef LPDRIVER_INFO_3W LPDRIVER_INFO_3;
-#else
-  typedef DRIVER_INFO_3A DRIVER_INFO_3;
-  typedef PDRIVER_INFO_3A PDRIVER_INFO_3;
-  typedef LPDRIVER_INFO_3A LPDRIVER_INFO_3;
-#endif
+  __MINGW_TYPEDEF_AW(DRIVER_INFO_3)
+  __MINGW_TYPEDEF_AW(PDRIVER_INFO_3)
+  __MINGW_TYPEDEF_AW(LPDRIVER_INFO_3)
 
   typedef struct _DRIVER_INFO_4A {
     DWORD cVersion;
@@ -533,15 +457,9 @@ extern "C" {
     LPWSTR pszzPreviousNames;
   } DRIVER_INFO_4W,*PDRIVER_INFO_4W,*LPDRIVER_INFO_4W;
 
-#ifdef UNICODE
-  typedef DRIVER_INFO_4W DRIVER_INFO_4;
-  typedef PDRIVER_INFO_4W PDRIVER_INFO_4;
-  typedef LPDRIVER_INFO_4W LPDRIVER_INFO_4;
-#else
-  typedef DRIVER_INFO_4A DRIVER_INFO_4;
-  typedef PDRIVER_INFO_4A PDRIVER_INFO_4;
-  typedef LPDRIVER_INFO_4A LPDRIVER_INFO_4;
-#endif
+  __MINGW_TYPEDEF_AW(DRIVER_INFO_4)
+  __MINGW_TYPEDEF_AW(PDRIVER_INFO_4)
+  __MINGW_TYPEDEF_AW(LPDRIVER_INFO_4)
 
   typedef struct _DRIVER_INFO_5A {
     DWORD cVersion;
@@ -567,15 +485,9 @@ extern "C" {
     DWORD dwDriverVersion;
   } DRIVER_INFO_5W,*PDRIVER_INFO_5W,*LPDRIVER_INFO_5W;
 
-#ifdef UNICODE
-  typedef DRIVER_INFO_5W DRIVER_INFO_5;
-  typedef PDRIVER_INFO_5W PDRIVER_INFO_5;
-  typedef LPDRIVER_INFO_5W LPDRIVER_INFO_5;
-#else
-  typedef DRIVER_INFO_5A DRIVER_INFO_5;
-  typedef PDRIVER_INFO_5A PDRIVER_INFO_5;
-  typedef LPDRIVER_INFO_5A LPDRIVER_INFO_5;
-#endif
+  __MINGW_TYPEDEF_AW(DRIVER_INFO_5)
+  __MINGW_TYPEDEF_AW(PDRIVER_INFO_5)
+  __MINGW_TYPEDEF_AW(LPDRIVER_INFO_5)
 
   typedef struct _DRIVER_INFO_6A {
     DWORD cVersion;
@@ -617,15 +529,9 @@ extern "C" {
     LPWSTR pszProvider;
   } DRIVER_INFO_6W,*PDRIVER_INFO_6W,*LPDRIVER_INFO_6W;
 
-#ifdef UNICODE
-  typedef DRIVER_INFO_6W DRIVER_INFO_6;
-  typedef PDRIVER_INFO_6W PDRIVER_INFO_6;
-  typedef LPDRIVER_INFO_6W LPDRIVER_INFO_6;
-#else
-  typedef DRIVER_INFO_6A DRIVER_INFO_6;
-  typedef PDRIVER_INFO_6A PDRIVER_INFO_6;
-  typedef LPDRIVER_INFO_6A LPDRIVER_INFO_6;
-#endif
+  __MINGW_TYPEDEF_AW(DRIVER_INFO_6)
+  __MINGW_TYPEDEF_AW(PDRIVER_INFO_6)
+  __MINGW_TYPEDEF_AW(LPDRIVER_INFO_6)
 
 #define DRIVER_KERNELMODE 0x00000001
 #define DRIVER_USERMODE 0x00000002
@@ -652,15 +558,9 @@ extern "C" {
     LPWSTR pDatatype;
   } DOC_INFO_1W,*PDOC_INFO_1W,*LPDOC_INFO_1W;
 
-#ifdef UNICODE
-  typedef DOC_INFO_1W DOC_INFO_1;
-  typedef PDOC_INFO_1W PDOC_INFO_1;
-  typedef LPDOC_INFO_1W LPDOC_INFO_1;
-#else
-  typedef DOC_INFO_1A DOC_INFO_1;
-  typedef PDOC_INFO_1A PDOC_INFO_1;
-  typedef LPDOC_INFO_1A LPDOC_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(DOC_INFO_1)
+  __MINGW_TYPEDEF_AW(PDOC_INFO_1)
+  __MINGW_TYPEDEF_AW(LPDOC_INFO_1)
 
   typedef struct _FORM_INFO_1A {
     DWORD Flags;
@@ -676,15 +576,9 @@ extern "C" {
     RECTL ImageableArea;
   } FORM_INFO_1W,*PFORM_INFO_1W,*LPFORM_INFO_1W;
 
-#ifdef UNICODE
-  typedef FORM_INFO_1W FORM_INFO_1;
-  typedef PFORM_INFO_1W PFORM_INFO_1;
-  typedef LPFORM_INFO_1W LPFORM_INFO_1;
-#else
-  typedef FORM_INFO_1A FORM_INFO_1;
-  typedef PFORM_INFO_1A PFORM_INFO_1;
-  typedef LPFORM_INFO_1A LPFORM_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(FORM_INFO_1)
+  __MINGW_TYPEDEF_AW(PFORM_INFO_1)
+  __MINGW_TYPEDEF_AW(LPFORM_INFO_1)
 
   typedef struct _DOC_INFO_2A {
     LPSTR pDocName;
@@ -702,15 +596,9 @@ extern "C" {
     DWORD JobId;
   } DOC_INFO_2W,*PDOC_INFO_2W,*LPDOC_INFO_2W;
 
-#ifdef UNICODE
-  typedef DOC_INFO_2W DOC_INFO_2;
-  typedef PDOC_INFO_2W PDOC_INFO_2;
-  typedef LPDOC_INFO_2W LPDOC_INFO_2;
-#else
-  typedef DOC_INFO_2A DOC_INFO_2;
-  typedef PDOC_INFO_2A PDOC_INFO_2;
-  typedef LPDOC_INFO_2A LPDOC_INFO_2;
-#endif
+  __MINGW_TYPEDEF_AW(DOC_INFO_2)
+  __MINGW_TYPEDEF_AW(PDOC_INFO_2)
+  __MINGW_TYPEDEF_AW(LPDOC_INFO_2)
 
 #define DI_CHANNEL 1
 #define DI_READ_SPOOL_JOB 3
@@ -729,15 +617,9 @@ extern "C" {
     DWORD dwFlags;
   } DOC_INFO_3W,*PDOC_INFO_3W,*LPDOC_INFO_3W;
 
-#ifdef UNICODE
-  typedef DOC_INFO_3W DOC_INFO_3;
-  typedef PDOC_INFO_3W PDOC_INFO_3;
-  typedef LPDOC_INFO_3W LPDOC_INFO_3;
-#else
-  typedef DOC_INFO_3A DOC_INFO_3;
-  typedef PDOC_INFO_3A PDOC_INFO_3;
-  typedef LPDOC_INFO_3A LPDOC_INFO_3;
-#endif
+  __MINGW_TYPEDEF_AW(DOC_INFO_3)
+  __MINGW_TYPEDEF_AW(PDOC_INFO_3)
+  __MINGW_TYPEDEF_AW(LPDOC_INFO_3)
 
 #define DI_MEMORYMAP_WRITE 0x00000001
 
@@ -753,15 +635,9 @@ extern "C" {
     LPWSTR pName;
   } PRINTPROCESSOR_INFO_1W,*PPRINTPROCESSOR_INFO_1W,*LPPRINTPROCESSOR_INFO_1W;
 
-#ifdef UNICODE
-  typedef PRINTPROCESSOR_INFO_1W PRINTPROCESSOR_INFO_1;
-  typedef PPRINTPROCESSOR_INFO_1W PPRINTPROCESSOR_INFO_1;
-  typedef LPPRINTPROCESSOR_INFO_1W LPPRINTPROCESSOR_INFO_1;
-#else
-  typedef PRINTPROCESSOR_INFO_1A PRINTPROCESSOR_INFO_1;
-  typedef PPRINTPROCESSOR_INFO_1A PPRINTPROCESSOR_INFO_1;
-  typedef LPPRINTPROCESSOR_INFO_1A LPPRINTPROCESSOR_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTPROCESSOR_INFO_1)
+  __MINGW_TYPEDEF_AW(PPRINTPROCESSOR_INFO_1)
+  __MINGW_TYPEDEF_AW(LPPRINTPROCESSOR_INFO_1)
 
   typedef struct _PRINTPROCESSOR_CAPS_1 {
     DWORD dwLevel;
@@ -780,15 +656,9 @@ extern "C" {
     LPWSTR pName;
   } PORT_INFO_1W,*PPORT_INFO_1W,*LPPORT_INFO_1W;
 
-#ifdef UNICODE
-  typedef PORT_INFO_1W PORT_INFO_1;
-  typedef PPORT_INFO_1W PPORT_INFO_1;
-  typedef LPPORT_INFO_1W LPPORT_INFO_1;
-#else
-  typedef PORT_INFO_1A PORT_INFO_1;
-  typedef PPORT_INFO_1A PPORT_INFO_1;
-  typedef LPPORT_INFO_1A LPPORT_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(PORT_INFO_1)
+  __MINGW_TYPEDEF_AW(PPORT_INFO_1)
+  __MINGW_TYPEDEF_AW(LPPORT_INFO_1)
 
   typedef struct _PORT_INFO_2A {
     LPSTR pPortName;
@@ -806,15 +676,9 @@ extern "C" {
     DWORD Reserved;
   } PORT_INFO_2W,*PPORT_INFO_2W,*LPPORT_INFO_2W;
 
-#ifdef UNICODE
-  typedef PORT_INFO_2W PORT_INFO_2;
-  typedef PPORT_INFO_2W PPORT_INFO_2;
-  typedef LPPORT_INFO_2W LPPORT_INFO_2;
-#else
-  typedef PORT_INFO_2A PORT_INFO_2;
-  typedef PPORT_INFO_2A PPORT_INFO_2;
-  typedef LPPORT_INFO_2A LPPORT_INFO_2;
-#endif
+  __MINGW_TYPEDEF_AW(PORT_INFO_2)
+  __MINGW_TYPEDEF_AW(PPORT_INFO_2)
+  __MINGW_TYPEDEF_AW(LPPORT_INFO_2)
 
 #define PORT_TYPE_WRITE 0x0001
 #define PORT_TYPE_READ 0x0002
@@ -833,15 +697,9 @@ extern "C" {
     DWORD dwSeverity;
   } PORT_INFO_3W,*PPORT_INFO_3W,*LPPORT_INFO_3W;
 
-#ifdef UNICODE
-  typedef PORT_INFO_3W PORT_INFO_3;
-  typedef PPORT_INFO_3W PPORT_INFO_3;
-  typedef LPPORT_INFO_3W LPPORT_INFO_3;
-#else
-  typedef PORT_INFO_3A PORT_INFO_3;
-  typedef PPORT_INFO_3A PPORT_INFO_3;
-  typedef LPPORT_INFO_3A LPPORT_INFO_3;
-#endif
+  __MINGW_TYPEDEF_AW(PORT_INFO_3)
+  __MINGW_TYPEDEF_AW(PPORT_INFO_3)
+  __MINGW_TYPEDEF_AW(LPPORT_INFO_3)
 
 #define PORT_STATUS_TYPE_ERROR 1
 #define PORT_STATUS_TYPE_WARNING 2
@@ -868,15 +726,9 @@ extern "C" {
     LPWSTR pName;
   } MONITOR_INFO_1W,*PMONITOR_INFO_1W,*LPMONITOR_INFO_1W;
 
-#ifdef UNICODE
-  typedef MONITOR_INFO_1W MONITOR_INFO_1;
-  typedef PMONITOR_INFO_1W PMONITOR_INFO_1;
-  typedef LPMONITOR_INFO_1W LPMONITOR_INFO_1;
-#else
-  typedef MONITOR_INFO_1A MONITOR_INFO_1;
-  typedef PMONITOR_INFO_1A PMONITOR_INFO_1;
-  typedef LPMONITOR_INFO_1A LPMONITOR_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(MONITOR_INFO_1)
+  __MINGW_TYPEDEF_AW(PMONITOR_INFO_1)
+  __MINGW_TYPEDEF_AW(LPMONITOR_INFO_1)
 
   typedef struct _MONITOR_INFO_2A {
     LPSTR pName;
@@ -890,15 +742,9 @@ extern "C" {
     LPWSTR pDLLName;
   } MONITOR_INFO_2W,*PMONITOR_INFO_2W,*LPMONITOR_INFO_2W;
 
-#ifdef UNICODE
-  typedef MONITOR_INFO_2W MONITOR_INFO_2;
-  typedef PMONITOR_INFO_2W PMONITOR_INFO_2;
-  typedef LPMONITOR_INFO_2W LPMONITOR_INFO_2;
-#else
-  typedef MONITOR_INFO_2A MONITOR_INFO_2;
-  typedef PMONITOR_INFO_2A PMONITOR_INFO_2;
-  typedef LPMONITOR_INFO_2A LPMONITOR_INFO_2;
-#endif
+  __MINGW_TYPEDEF_AW(MONITOR_INFO_2)
+  __MINGW_TYPEDEF_AW(PMONITOR_INFO_2)
+  __MINGW_TYPEDEF_AW(LPMONITOR_INFO_2)
 
   typedef struct _DATATYPES_INFO_1A {
     LPSTR pName;
@@ -908,15 +754,9 @@ extern "C" {
     LPWSTR pName;
   } DATATYPES_INFO_1W,*PDATATYPES_INFO_1W,*LPDATATYPES_INFO_1W;
 
-#ifdef UNICODE
-  typedef DATATYPES_INFO_1W DATATYPES_INFO_1;
-  typedef PDATATYPES_INFO_1W PDATATYPES_INFO_1;
-  typedef LPDATATYPES_INFO_1W LPDATATYPES_INFO_1;
-#else
-  typedef DATATYPES_INFO_1A DATATYPES_INFO_1;
-  typedef PDATATYPES_INFO_1A PDATATYPES_INFO_1;
-  typedef LPDATATYPES_INFO_1A LPDATATYPES_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(DATATYPES_INFO_1)
+  __MINGW_TYPEDEF_AW(PDATATYPES_INFO_1)
+  __MINGW_TYPEDEF_AW(LPDATATYPES_INFO_1)
 
   typedef struct _PRINTER_DEFAULTSA {
     LPSTR pDatatype;
@@ -930,15 +770,9 @@ extern "C" {
     ACCESS_MASK DesiredAccess;
   } PRINTER_DEFAULTSW,*PPRINTER_DEFAULTSW,*LPPRINTER_DEFAULTSW;
 
-#ifdef UNICODE
-  typedef PRINTER_DEFAULTSW PRINTER_DEFAULTS;
-  typedef PPRINTER_DEFAULTSW PPRINTER_DEFAULTS;
-  typedef LPPRINTER_DEFAULTSW LPPRINTER_DEFAULTS;
-#else
-  typedef PRINTER_DEFAULTSA PRINTER_DEFAULTS;
-  typedef PPRINTER_DEFAULTSA PPRINTER_DEFAULTS;
-  typedef LPPRINTER_DEFAULTSA LPPRINTER_DEFAULTS;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_DEFAULTS)
+  __MINGW_TYPEDEF_AW(PPRINTER_DEFAULTS)
+  __MINGW_TYPEDEF_AW(LPPRINTER_DEFAULTS)
 
   typedef struct _PRINTER_ENUM_VALUESA {
     LPSTR pValueName;
@@ -956,21 +790,11 @@ extern "C" {
     DWORD cbData;
   } PRINTER_ENUM_VALUESW,*PPRINTER_ENUM_VALUESW,*LPPRINTER_ENUM_VALUESW;
 
-#ifdef UNICODE
-  typedef PRINTER_ENUM_VALUESW PRINTER_ENUM_VALUES;
-  typedef PPRINTER_ENUM_VALUESW PPRINTER_ENUM_VALUES;
-  typedef LPPRINTER_ENUM_VALUESW LPPRINTER_ENUM_VALUES;
-#else
-  typedef PRINTER_ENUM_VALUESA PRINTER_ENUM_VALUES;
-  typedef PPRINTER_ENUM_VALUESA PPRINTER_ENUM_VALUES;
-  typedef LPPRINTER_ENUM_VALUESA LPPRINTER_ENUM_VALUES;
-#endif
+  __MINGW_TYPEDEF_AW(PRINTER_ENUM_VALUES)
+  __MINGW_TYPEDEF_AW(PPRINTER_ENUM_VALUES)
+  __MINGW_TYPEDEF_AW(LPPRINTER_ENUM_VALUES)
 
-#ifdef UNICODE
-#define EnumPrinters EnumPrintersW
-#else
-#define EnumPrinters EnumPrintersA
-#endif
+#define EnumPrinters __MINGW_NAME_AW(EnumPrinters)
 
   WINBOOL WINAPI EnumPrintersA(DWORD Flags,LPSTR Name,DWORD Level,LPBYTE pPrinterEnum,DWORD cbBuf,LPDWORD pcbNeeded,LPDWORD pcReturned);
   WINBOOL WINAPI EnumPrintersW(DWORD Flags,LPWSTR Name,DWORD Level,LPBYTE pPrinterEnum,DWORD cbBuf,LPDWORD pcbNeeded,LPDWORD pcReturned);
@@ -1001,77 +825,40 @@ extern "C" {
 #define SPOOL_FILE_PERSISTENT 0x00000001
 #define SPOOL_FILE_TEMPORARY 0x00000002
 
-#ifdef UNICODE
-#define OpenPrinter OpenPrinterW
-#define ResetPrinter ResetPrinterW
-#define SetJob SetJobW
-#define GetJob GetJobW
-#define EnumJobs EnumJobsW
-#define AddPrinter AddPrinterW
-#define SetPrinter SetPrinterW
-#define GetPrinter GetPrinterW
-#define AddPrinterDriver AddPrinterDriverW
-#define AddPrinterDriverEx AddPrinterDriverExW
-#define EnumPrinterDrivers EnumPrinterDriversW
-#define GetPrinterDriver GetPrinterDriverW
-#define GetPrinterDriverDirectory GetPrinterDriverDirectoryW
-#define DeletePrinterDriver DeletePrinterDriverW
-#define DeletePrinterDriverEx DeletePrinterDriverExW
-#define AddPrintProcessor AddPrintProcessorW
-#define EnumPrintProcessors EnumPrintProcessorsW
-#define GetPrintProcessorDirectory GetPrintProcessorDirectoryW
-#define EnumPrintProcessorDatatypes EnumPrintProcessorDatatypesW
-#define DeletePrintProcessor DeletePrintProcessorW
-#define StartDocPrinter StartDocPrinterW
-#define AddJob AddJobW
-#define DocumentProperties DocumentPropertiesW
-#define AdvancedDocumentProperties AdvancedDocumentPropertiesW
-#define GetPrinterData GetPrinterDataW
-#define GetPrinterDataEx GetPrinterDataExW
-#define EnumPrinterData EnumPrinterDataW
-#define EnumPrinterDataEx EnumPrinterDataExW
-#define EnumPrinterKey EnumPrinterKeyW
-#define SetPrinterData SetPrinterDataW
-#define SetPrinterDataEx SetPrinterDataExW
-#define DeletePrinterData DeletePrinterDataW
-#define DeletePrinterDataEx DeletePrinterDataExW
-#define DeletePrinterKey DeletePrinterKeyW
-#else
-#define OpenPrinter OpenPrinterA
-#define ResetPrinter ResetPrinterA
-#define SetJob SetJobA
-#define GetJob GetJobA
-#define EnumJobs EnumJobsA
-#define AddPrinter AddPrinterA
-#define SetPrinter SetPrinterA
-#define GetPrinter GetPrinterA
-#define AddPrinterDriver AddPrinterDriverA
-#define AddPrinterDriverEx AddPrinterDriverExA
-#define EnumPrinterDrivers EnumPrinterDriversA
-#define GetPrinterDriver GetPrinterDriverA
-#define GetPrinterDriverDirectory GetPrinterDriverDirectoryA
-#define DeletePrinterDriver DeletePrinterDriverA
-#define DeletePrinterDriverEx DeletePrinterDriverExA
-#define AddPrintProcessor AddPrintProcessorA
-#define EnumPrintProcessors EnumPrintProcessorsA
-#define GetPrintProcessorDirectory GetPrintProcessorDirectoryA
-#define EnumPrintProcessorDatatypes EnumPrintProcessorDatatypesA
-#define DeletePrintProcessor DeletePrintProcessorA
-#define StartDocPrinter StartDocPrinterA
-#define AddJob AddJobA
-#define DocumentProperties DocumentPropertiesA
-#define AdvancedDocumentProperties AdvancedDocumentPropertiesA
-#define GetPrinterData GetPrinterDataA
-#define GetPrinterDataEx GetPrinterDataExA
-#define EnumPrinterData EnumPrinterDataA
-#define EnumPrinterDataEx EnumPrinterDataExA
-#define EnumPrinterKey EnumPrinterKeyA
-#define SetPrinterData SetPrinterDataA
-#define SetPrinterDataEx SetPrinterDataExA
-#define DeletePrinterData DeletePrinterDataA
-#define DeletePrinterDataEx DeletePrinterDataExA
-#define DeletePrinterKey DeletePrinterKeyA
-#endif
+#define OpenPrinter __MINGW_NAME_AW(OpenPrinter)
+#define ResetPrinter __MINGW_NAME_AW(ResetPrinter)
+#define SetJob __MINGW_NAME_AW(SetJob)
+#define GetJob __MINGW_NAME_AW(GetJob)
+#define EnumJobs __MINGW_NAME_AW(EnumJobs)
+#define AddPrinter __MINGW_NAME_AW(AddPrinter)
+#define SetPrinter __MINGW_NAME_AW(SetPrinter)
+#define GetPrinter __MINGW_NAME_AW(GetPrinter)
+#define AddPrinterDriver __MINGW_NAME_AW(AddPrinterDriver)
+#define AddPrinterDriverEx __MINGW_NAME_AW(AddPrinterDriverEx)
+#define EnumPrinterDrivers __MINGW_NAME_AW(EnumPrinterDrivers)
+#define GetPrinterDriver __MINGW_NAME_AW(GetPrinterDriver)
+#define GetPrinterDriverDirectory __MINGW_NAME_AW(GetPrinterDriverDirectory)
+#define DeletePrinterDriver __MINGW_NAME_AW(DeletePrinterDriver)
+#define DeletePrinterDriverEx __MINGW_NAME_AW(DeletePrinterDriverEx)
+#define AddPrintProcessor __MINGW_NAME_AW(AddPrintProcessor)
+#define EnumPrintProcessors __MINGW_NAME_AW(EnumPrintProcessors)
+#define GetPrintProcessorDirectory __MINGW_NAME_AW(GetPrintProcessorDirectory)
+#define EnumPrintProcessorDatatypes __MINGW_NAME_AW(EnumPrintProcessorDatatypes)
+#define DeletePrintProcessor __MINGW_NAME_AW(DeletePrintProcessor)
+#define StartDocPrinter __MINGW_NAME_AW(StartDocPrinter)
+#define AddJob __MINGW_NAME_AW(AddJob)
+#define DocumentProperties __MINGW_NAME_AW(DocumentProperties)
+#define AdvancedDocumentProperties __MINGW_NAME_AW(AdvancedDocumentProperties)
+#define GetPrinterData __MINGW_NAME_AW(GetPrinterData)
+#define GetPrinterDataEx __MINGW_NAME_AW(GetPrinterDataEx)
+#define EnumPrinterData __MINGW_NAME_AW(EnumPrinterData)
+#define EnumPrinterDataEx __MINGW_NAME_AW(EnumPrinterDataEx)
+#define EnumPrinterKey __MINGW_NAME_AW(EnumPrinterKey)
+#define SetPrinterData __MINGW_NAME_AW(SetPrinterData)
+#define SetPrinterDataEx __MINGW_NAME_AW(SetPrinterDataEx)
+#define DeletePrinterData __MINGW_NAME_AW(DeletePrinterData)
+#define DeletePrinterDataEx __MINGW_NAME_AW(DeletePrinterDataEx)
+#define DeletePrinterKey __MINGW_NAME_AW(DeletePrinterKey)
 
   WINBOOL WINAPI OpenPrinterA(LPSTR pPrinterName,LPHANDLE phPrinter,LPPRINTER_DEFAULTSA pDefault);
   WINBOOL WINAPI OpenPrinterW(LPWSTR pPrinterName,LPHANDLE phPrinter,LPPRINTER_DEFAULTSW pDefault);
@@ -1349,45 +1136,24 @@ extern "C" {
 #define PRINTER_CHANGE_TIMEOUT 0x80000000
 #define PRINTER_CHANGE_ALL 0x7777FFFF
 
-#ifdef UNICODE
-#define PrinterMessageBox PrinterMessageBoxW
-#define AddForm AddFormW
-#define DeleteForm DeleteFormW
-#define GetForm GetFormW
-#define SetForm SetFormW
-#define EnumForms EnumFormsW
-#define EnumMonitors EnumMonitorsW
-#define AddMonitor AddMonitorW
-#define DeleteMonitor DeleteMonitorW
-#define EnumPorts EnumPortsW
-#define AddPort AddPortW
-#define ConfigurePort ConfigurePortW
-#define DeletePort DeletePortW
-#define GetDefaultPrinter GetDefaultPrinterW
-#define SetDefaultPrinter SetDefaultPrinterW
-#define SetPort SetPortW
-#define AddPrinterConnection AddPrinterConnectionW
-#define DeletePrinterConnection DeletePrinterConnectionW
-#else
-#define PrinterMessageBox PrinterMessageBoxA
-#define AddForm AddFormA
-#define DeleteForm DeleteFormA
-#define GetForm GetFormA
-#define SetForm SetFormA
-#define EnumForms EnumFormsA
-#define EnumMonitors EnumMonitorsA
-#define AddMonitor AddMonitorA
-#define DeleteMonitor DeleteMonitorA
-#define EnumPorts EnumPortsA
-#define AddPort AddPortA
-#define ConfigurePort ConfigurePortA
-#define DeletePort DeletePortA
-#define GetDefaultPrinter GetDefaultPrinterA
-#define SetDefaultPrinter SetDefaultPrinterA
-#define SetPort SetPortA
-#define AddPrinterConnection AddPrinterConnectionA
-#define DeletePrinterConnection DeletePrinterConnectionA
-#endif
+#define PrinterMessageBox __MINGW_NAME_AW(PrinterMessageBox)
+#define AddForm __MINGW_NAME_AW(AddForm)
+#define DeleteForm __MINGW_NAME_AW(DeleteForm)
+#define GetForm __MINGW_NAME_AW(GetForm)
+#define SetForm __MINGW_NAME_AW(SetForm)
+#define EnumForms __MINGW_NAME_AW(EnumForms)
+#define EnumMonitors __MINGW_NAME_AW(EnumMonitors)
+#define AddMonitor __MINGW_NAME_AW(AddMonitor)
+#define DeleteMonitor __MINGW_NAME_AW(DeleteMonitor)
+#define EnumPorts __MINGW_NAME_AW(EnumPorts)
+#define AddPort __MINGW_NAME_AW(AddPort)
+#define ConfigurePort __MINGW_NAME_AW(ConfigurePort)
+#define DeletePort __MINGW_NAME_AW(DeletePort)
+#define GetDefaultPrinter __MINGW_NAME_AW(GetDefaultPrinter)
+#define SetDefaultPrinter __MINGW_NAME_AW(SetDefaultPrinter)
+#define SetPort __MINGW_NAME_AW(SetPort)
+#define AddPrinterConnection __MINGW_NAME_AW(AddPrinterConnection)
+#define DeletePrinterConnection __MINGW_NAME_AW(DeletePrinterConnection)
 
   DWORD WINAPI PrinterMessageBoxA(HANDLE hPrinter,DWORD Error,HWND hWnd,LPSTR pText,LPSTR pCaption,DWORD dwType);
   DWORD WINAPI PrinterMessageBoxW(HANDLE hPrinter,DWORD Error,HWND hWnd,LPWSTR pText,LPWSTR pCaption,DWORD dwType);
@@ -1453,15 +1219,9 @@ extern "C" {
     LPWSTR pDLLName;
   } PROVIDOR_INFO_1W,*PPROVIDOR_INFO_1W,*LPPROVIDOR_INFO_1W;
 
-#ifdef UNICODE
-  typedef PROVIDOR_INFO_1W PROVIDOR_INFO_1;
-  typedef PPROVIDOR_INFO_1W PPROVIDOR_INFO_1;
-  typedef LPPROVIDOR_INFO_1W LPPROVIDOR_INFO_1;
-#else
-  typedef PROVIDOR_INFO_1A PROVIDOR_INFO_1;
-  typedef PPROVIDOR_INFO_1A PPROVIDOR_INFO_1;
-  typedef LPPROVIDOR_INFO_1A LPPROVIDOR_INFO_1;
-#endif
+  __MINGW_TYPEDEF_AW(PROVIDOR_INFO_1)
+  __MINGW_TYPEDEF_AW(PPROVIDOR_INFO_1)
+  __MINGW_TYPEDEF_AW(LPPROVIDOR_INFO_1)
 
   typedef struct _PROVIDOR_INFO_2A{
     LPSTR pOrder;
@@ -1471,25 +1231,13 @@ extern "C" {
     LPWSTR pOrder;
   } PROVIDOR_INFO_2W,*PPROVIDOR_INFO_2W,*LPPROVIDOR_INFO_2W;
 
-#ifdef UNICODE
-  typedef PROVIDOR_INFO_2W PROVIDOR_INFO_2;
-  typedef PPROVIDOR_INFO_2W PPROVIDOR_INFO_2;
-  typedef LPPROVIDOR_INFO_2W LPPROVIDOR_INFO_2;
-#else
-  typedef PROVIDOR_INFO_2A PROVIDOR_INFO_2;
-  typedef PPROVIDOR_INFO_2A PPROVIDOR_INFO_2;
-  typedef LPPROVIDOR_INFO_2A LPPROVIDOR_INFO_2;
-#endif
+  __MINGW_TYPEDEF_AW(PROVIDOR_INFO_2)
+  __MINGW_TYPEDEF_AW(PPROVIDOR_INFO_2)
+  __MINGW_TYPEDEF_AW(LPPROVIDOR_INFO_2)
 
-#ifdef UNICODE
-#define AddPrintProvidor AddPrintProvidorW
-#define DeletePrintProvidor DeletePrintProvidorW
-#define IsValidDevmode IsValidDevmodeW
-#else
-#define AddPrintProvidor AddPrintProvidorA
-#define DeletePrintProvidor DeletePrintProvidorA
-#define IsValidDevmode IsValidDevmodeA
-#endif
+#define AddPrintProvidor __MINGW_NAME_AW(AddPrintProvidor)
+#define DeletePrintProvidor __MINGW_NAME_AW(DeletePrintProvidor)
+#define IsValidDevmode __MINGW_NAME_AW(IsValidDevmode)
 
   WINBOOL WINAPI AddPrintProvidorA(LPSTR pName,DWORD level,LPBYTE pProvidorInfo);
   WINBOOL WINAPI AddPrintProvidorW(LPWSTR pName,DWORD level,LPBYTE pProvidorInfo);
@@ -1599,6 +1347,327 @@ extern "C" {
 #define SPLDS_PRINTER_NAME_ALIASES TEXT("printerNameAliases")
 #define SPLDS_PRINTER_LOCATIONS TEXT("printerLocations")
 #define SPLDS_PRINTER_MODEL TEXT("printerModel")
+
+#if (_WIN32_WINNT >= 0x0600)
+#define AddPrinterConnection2 __MINGW_NAME_AW(AddPrinterConnection2)
+#define DeletePrinterDriverPackage __MINGW_NAME_AW(DeletePrinterDriverPackage)
+#define DocumentEvent __MINGW_NAME_AW(DocumentEvent)
+
+#define PRINTER_CONNECTION_MISMATCH 0x00000020
+#define PRINTER_CONNECTION_NO_UI    0x00000040
+
+typedef enum tagPRINTER_OPTION_FLAGS {
+  PRINTER_OPTION_NO_CACHE,
+  PRINTER_OPTION_CACHE,
+  PRINTER_OPTION_CLIENT_CHANGE 
+} PRINTER_OPTION_FLAGS;
+
+typedef enum tagEPrintXPSJobOperation {
+  kJobProduction,
+  kJobConsumption 
+} EPrintXPSJobOperation;
+
+typedef enum tagEPrintXPSJobProgress {
+  kAddingDocumentSequence,
+  kDocumentSequenceAdded,
+  kAddingFixedDocument,
+  kFixedDocumentAdded,
+  kAddingFixedPage,
+  kFixedPageAdded,
+  kResourceAdded,
+  kFontAdded,
+  kImageAdded,
+  kXpsDocumentCommitted 
+} EPrintXPSJobProgress;
+
+typedef struct _PRINTER_CONNECTION_INFO_1 {
+  DWORD  dwFlags;
+  LPTSTR pszDriverName;
+} PRINTER_CONNECTION_INFO_1, *PPRINTER_CONNECTION_INFO_1;
+
+  WINBOOL AddPrinterConnection2W(HWND hWnd,LPCWSTR pszName,DWORD dwLevel,PVOID pConnectionInfo);
+  WINBOOL AddPrinterConnection2A(HWND hWnd,LPCSTR pszName,DWORD dwLevel,PVOID pConnectionInfo); /*Not supported and returns ERROR_NOT_SUPPORTED.*/
+
+HRESULT WINAPI DeletePrinterDriverPackageA(
+  LPCSTR pszServer,
+  LPCSTR pszInfPath,
+  LPCSTR pszEnvironment
+);
+
+HRESULT WINAPI DeletePrinterDriverPackageW(
+  LPCWSTR pszServer,
+  LPCWSTR pszInfPath,
+  LPCWSTR pszEnvironment
+);
+
+HRESULT DocumentEventA(
+  HANDLE hPrinter,
+  HDC hdc,
+  INT iEsc,
+  ULONG cbIn,
+  PVOID pvIn,
+  ULONG cbOut,
+  PVOID pvOut
+);
+
+HRESULT DocumentEventW(
+  HANDLE hPrinter,
+  HDC hdc,
+  INT iEsc,
+  ULONG cbIn,
+  PVOID pvIn,
+  ULONG cbOut,
+  PVOID pvOut
+);
+
+typedef struct _DRIVER_INFO_8W {
+  DWORD     cVersion;
+  LPWSTR    pName;
+  LPWSTR    pEnvironment;
+  LPWSTR    pDriverPath;
+  LPWSTR    pDataFile;
+  LPWSTR    pConfigFile;
+  LPWSTR    pHelpFile;
+  LPWSTR    pDependentFiles;
+  LPWSTR    pMonitorName;
+  LPWSTR    pDefaultDataType;
+  LPWSTR    pszzPreviousNames;
+  FILETIME  ftDriverDate;
+  DWORDLONG dwlDriverVersion;
+  LPWSTR    pszMfgName;
+  LPWSTR    pszOEMUrl;
+  LPWSTR    pszHardwareID;
+  LPWSTR    pszProvider;
+  LPWSTR    pszPrintProcessor;
+  LPWSTR    pszVendorSetup;
+  LPWSTR    pszzColorProfiles;
+  LPWSTR    pszInfPath;
+  DWORD     dwPrinterDriverAttributes;
+  LPWSTR    pszzCoreDriverDependencies;
+  FILETIME  ftMinInboxDriverVerDate;
+  DWORDLONG dwlMinInboxDriverVerVersion;
+} DRIVER_INFO_8W, *PDRIVER_INFO_8W, *LPDRIVER_INFO_8W;
+
+typedef struct _DRIVER_INFO_8A {
+  DWORD     cVersion;
+  LPSTR    pName;
+  LPSTR    pEnvironment;
+  LPSTR    pDriverPath;
+  LPSTR    pDataFile;
+  LPSTR    pConfigFile;
+  LPSTR    pHelpFile;
+  LPSTR    pDependentFiles;
+  LPSTR    pMonitorName;
+  LPSTR    pDefaultDataType;
+  LPSTR    pszzPreviousNames;
+  FILETIME  ftDriverDate;
+  DWORDLONG dwlDriverVersion;
+  LPSTR    pszMfgName;
+  LPSTR    pszOEMUrl;
+  LPSTR    pszHardwareID;
+  LPSTR    pszProvider;
+  LPSTR    pszPrintProcessor;
+  LPSTR    pszVendorSetup;
+  LPSTR    pszzColorProfiles;
+  LPSTR    pszInfPath;
+  DWORD     dwPrinterDriverAttributes;
+  LPSTR    pszzCoreDriverDependencies;
+  FILETIME  ftMinInboxDriverVerDate;
+  DWORDLONG dwlMinInboxDriverVerVersion;
+} DRIVER_INFO_8A, *PDRIVER_INFO_8A, *LPDRIVER_INFO_8A;
+
+typedef struct _FORM_INFO_2A {
+  DWORD   Flags;
+  LPSTR   pName;
+  SIZEL   Size;
+  RECTL   ImageableArea;
+  LPCSTR  pKeyword;
+  DWORD   StringType;
+  LPCSTR  pMuiDll;
+  DWORD   dwResourceId;
+  LPCSTR  pDisplayName;
+  LANGID  wLangId;
+} FORM_INFO_2A, *PFORM_INFO_2A;
+
+typedef struct _FORM_INFO_2W {
+  DWORD   Flags;
+  LPWSTR  pName;
+  SIZEL   Size;
+  RECTL   ImageableArea;
+  LPCSTR  pKeyword;
+  DWORD   StringType;
+  LPCWSTR pMuiDll;
+  DWORD   dwResourceId;
+  LPCWSTR pDisplayName;
+  LANGID  wLangId;
+} FORM_INFO_2W, *PFORM_INFO_2W;
+
+__MINGW_TYPEDEF_AW(DRIVER_INFO_8)
+__MINGW_TYPEDEF_AW(PDRIVER_INFO_8)
+__MINGW_TYPEDEF_AW(LPDRIVER_INFO_8)
+__MINGW_TYPEDEF_AW(FORM_INFO_2)
+__MINGW_TYPEDEF_AW(PFORM_INFO_2)
+
+typedef struct _PRINTPROCESSOR_CAPS_2 {
+  DWORD dwLevel;
+  DWORD dwNupOptions;
+  DWORD dwPageOrderFlags;
+  DWORD dwNumberOfCopies;
+  DWORD dwNupDirectionCaps;
+  DWORD dwNupBorderCaps;
+  DWORD dwBookletHandlingCaps;
+  DWORD dwDuplexHandlingCaps;
+  DWORD dwScalingCaps;
+} PRINTPROCESSOR_CAPS_2, *PPRINTPROCESSOR_CAPS_2;
+
+HRESULT ReportJobProcessingProgress(
+  HANDLE printerHandle,
+  ULONG jobId,
+  EPrintXPSJobOperation jobOperation,
+  EPrintXPSJobProgress jobProgress
+);
+
+typedef struct _CORE_PRINTER_DRIVERA {
+  GUID      CoreDriverGUID;
+  FILETIME  ftDriverDate;
+  DWORDLONG dwlDriverVersion;
+  CHAR      szPackageID[MAX_PATH];
+} CORE_PRINTER_DRIVERA, *PCORE_PRINTER_DRIVERA;
+
+typedef struct _CORE_PRINTER_DRIVERW {
+  GUID      CoreDriverGUID;
+  FILETIME  ftDriverDate;
+  DWORDLONG dwlDriverVersion;
+  WCHAR     szPackageID[MAX_PATH];
+} CORE_PRINTER_DRIVERW, *PCORE_PRINTER_DRIVERW;
+
+typedef struct _PRINTER_OPTIONS {
+  UINT  cbSize;
+  DWORD dwFlags;
+} PRINTER_OPTIONS, *PPRINTER_OPTIONS;
+
+__MINGW_TYPEDEF_AW(CORE_PRINTER_DRIVER)
+__MINGW_TYPEDEF_AW(PCORE_PRINTER_DRIVER)
+#define GetCorePrinterDrivers __MINGW_NAME_AW(GetCorePrinterDrivers)
+#define GetPrinterDriver2 __MINGW_NAME_AW(GetPrinterDriver2)
+#define GetPrinterDriverPackagePath __MINGW_NAME_AW(GetPrinterDriverPackagePath)
+#define GetSpoolFileHandle __MINGW_NAME_AW(GetSpoolFileHandle)
+
+HRESULT WINAPI GetCorePrinterDriversA(
+  LPCSTR pszServer,
+  LPCSTR pszEnvironment,
+  LPCSTR pszzCoreDriverDependencies,
+  DWORD cCorePrinterDrivers,
+  PCORE_PRINTER_DRIVERA pCorePrinterDrivers
+);
+
+HRESULT WINAPI GetCorePrinterDriversW(
+  LPCWSTR pszServer,
+  LPCWSTR pszEnvironment,
+  LPCWSTR pszzCoreDriverDependencies,
+  DWORD cCorePrinterDrivers,
+  PCORE_PRINTER_DRIVERW pCorePrinterDrivers
+);
+
+/*Unsupported*/
+WINBOOL WINAPI GetPrinterDriver2A(
+  HWND hWnd,
+  HANDLE hPrinter,
+  LPSTR pEnvironment,
+  DWORD Level,
+  LPBYTE pDriverInfo,
+  DWORD cbBuf,
+  LPDWORD pcbNeeded
+);
+
+WINBOOL WINAPI GetPrinterDriver2W(
+  HWND hWnd,
+  HANDLE hPrinter,
+  LPWSTR pEnvironment,
+  DWORD Level,
+  LPBYTE pDriverInfo,
+  DWORD cbBuf,
+  LPDWORD pcbNeeded
+);
+
+HRESULT WINAPI GetPrinterDriverPackagePathA(
+  LPCSTR pszServer,
+  LPCSTR pszEnvironment,
+  LPCSTR pszLanguage,
+  LPCSTR pszPackageID,
+  LPSTR  pszDriverPackageCab,
+  DWORD  cchDriverPackageCab,
+  LPDWORD pcchRequiredSize
+);
+
+HRESULT WINAPI GetPrinterDriverPackagePathW(
+  LPCWSTR pszServer,
+  LPCWSTR pszEnvironment,
+  LPCWSTR pszLanguage,
+  LPCWSTR pszPackageID,
+  LPWSTR  pszDriverPackageCab,
+  DWORD   cchDriverPackageCab,
+  LPDWORD pcchRequiredSize
+);
+
+HANDLE WINAPI GetSpoolFileHandleA(
+  HANDLE hPrinter
+);
+
+HANDLE WINAPI GetSpoolFileHandleW(
+  HANDLE hPrinter
+);
+
+HANDLE WINAPI CommitSpoolData(
+  HANDLE hPrinter,
+  HANDLE hSpoolFile,
+  DWORD cbCommit
+);
+
+WINBOOL WINAPI CloseSpoolFileHandle(
+  HANDLE hPrinter,
+  HANDLE hSpoolFile
+);
+
+WINBOOL WINAPI OpenPrinter2A(
+  LPCSTR pPrinterName,
+  LPHANDLE phPrinter,
+  LPPRINTER_DEFAULTS pDefault,
+  PPRINTER_OPTIONS pOptions
+);
+
+WINBOOL WINAPI OpenPrinter2W(
+  LPCWSTR pPrinterName,
+  LPHANDLE phPrinter,
+  LPPRINTER_DEFAULTS pDefault,
+  PPRINTER_OPTIONS pOptions
+);
+
+#define OpenPrinter2 __MINGW_NAME_AW(OpenPrinter2)
+
+HRESULT WINAPI UploadPrinterDriverPackageA(
+  LPCSTR pszServer,
+  LPCSTR pszInfPath,
+  LPCSTR pszEnvironment,
+  DWORD dwFlags,
+  HWND hwnd,
+  LPSTR pszDestInfPath,
+  PULONG pcchDestInfPath
+);
+
+HRESULT WINAPI UploadPrinterDriverPackageW(
+  LPCWSTR pszServer,
+  LPCWSTR pszInfPath,
+  LPCWSTR pszEnvironment,
+  DWORD dwFlags,
+  HWND hwnd,
+  LPWSTR pszDestInfPath,
+  PULONG pcchDestInfPath
+);
+
+#define UploadPrinterDriverPackage __MINGW_NAME_AW(UploadPrinterDriverPackage)
+
+#endif /*(_WIN32_WINNT >= 0x0600)*/
 
 #ifdef __cplusplus
 }

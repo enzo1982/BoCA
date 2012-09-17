@@ -13,6 +13,12 @@ typedef struct _GUID {
 } GUID;
 #endif
 
+#if defined(__cplusplus) && (USE___UUIDOF == 0)
+extern "C++" {
+    template<typename T> const GUID &__mingw_uuidof();
+}
+#endif
+
 #ifndef FAR
 #define FAR
 #endif
@@ -65,10 +71,16 @@ typedef GUID IID;
 typedef IID *LPIID;
 #define IID_NULL GUID_NULL
 #define IsEqualIID(riid1,riid2) IsEqualGUID(riid1,riid2)
+
+#ifndef CLSID_DEFINED
+#define CLSID_DEFINED
 typedef GUID CLSID;
+#endif
+
 typedef CLSID *LPCLSID;
 #define CLSID_NULL GUID_NULL
 #define IsEqualCLSID(rclsid1,rclsid2) IsEqualGUID(rclsid1,rclsid2)
+
 typedef GUID FMTID;
 typedef FMTID *LPFMTID;
 #define FMTID_NULL GUID_NULL
@@ -117,6 +129,7 @@ typedef FMTID *LPFMTID;
 #endif
 #endif
 
+#ifndef __WIDL__
 #ifndef _SYS_GUID_OPERATORS_
 #define _SYS_GUID_OPERATORS_
 #include <string.h>
@@ -145,6 +158,7 @@ __inline int IsEqualGUID(REFGUID rguid1,REFGUID rguid2) { return !memcmp(&rguid1
 #ifdef __cplusplus
 __inline int operator==(REFGUID guidOne,REFGUID guidOther) { return IsEqualGUID(guidOne,guidOther); }
 __inline int operator!=(REFGUID guidOne,REFGUID guidOther) { return !(guidOne==guidOther); }
+#endif
 #endif
 #endif
 #endif

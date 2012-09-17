@@ -6,8 +6,11 @@
 #ifndef __ERRORREP_H__
 #define __ERRORREP_H__
 
+#include <_mingw_unicode.h>
+
 typedef enum tagEFaultRepRetVal {
-  frrvOk = 0,frrvOkManifest,frrvOkQueued,frrvErr,frrvErrNoDW,frrvErrTimeout,frrvLaunchDebugger,frrvOkHeadless
+  frrvOk = 0,
+  frrvOkManifest,frrvOkQueued,frrvErr,frrvErrNoDW,frrvErrTimeout,frrvLaunchDebugger,frrvOkHeadless
 } EFaultRepRetVal;
 
 EFaultRepRetVal WINAPI ReportFault(LPEXCEPTION_POINTERS pep,DWORD dwOpt);
@@ -18,11 +21,7 @@ typedef EFaultRepRetVal (WINAPI *pfn_REPORTFAULT)(LPEXCEPTION_POINTERS,DWORD);
 typedef EFaultRepRetVal (WINAPI *pfn_ADDEREXCLUDEDAPPLICATIONA)(LPCSTR);
 typedef EFaultRepRetVal (WINAPI *pfn_ADDEREXCLUDEDAPPLICATIONW)(LPCWSTR);
 
-#ifdef UNICODE
-#define AddERExcludedApplication AddERExcludedApplicationW
-#define pfn_ADDEREXCLUDEDAPPLICATION pfn_ADDEREXCLUDEDAPPLICATIONW
-#else
-#define AddERExcludedApplication AddERExcludedApplicationA
-#define pfn_ADDEREXCLUDEDAPPLICATION pfn_ADDEREXCLUDEDAPPLICATIONA
-#endif
+#define AddERExcludedApplication __MINGW_NAME_AW(AddERExcludedApplication)
+#define pfn_ADDEREXCLUDEDAPPLICATION __MINGW_NAME_AW(pfn_ADDEREXCLUDEDAPPLICATION)
+
 #endif

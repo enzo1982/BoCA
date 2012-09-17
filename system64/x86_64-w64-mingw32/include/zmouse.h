@@ -3,11 +3,11 @@
  * This file is part of the w64 mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
-#ifdef UNICODE
-#define MSH_MOUSEWHEEL L"MSWHEEL_ROLLMSG"
-#else
-#define MSH_MOUSEWHEEL "MSWHEEL_ROLLMSG"
-#endif
+
+#include <_mingw_unicode.h>
+#include <psdk_inc/_push_BOOL.h>
+
+#define MSH_MOUSEWHEEL __MINGW_STRING_AW("MSWHEEL_ROLLMSG")
 
 #define WHEEL_DELTA 120
 
@@ -15,28 +15,14 @@
 #define WM_MOUSEWHEEL (WM_MOUSELAST+1)
 #endif
 
-#ifdef UNICODE
-#define MOUSEZ_CLASSNAME L"MouseZ"
-#define MOUSEZ_TITLE L"Magellan MSWHEEL"
-#else
-#define MOUSEZ_CLASSNAME "MouseZ"
-#define MOUSEZ_TITLE "Magellan MSWHEEL"
-#endif
+#define MOUSEZ_CLASSNAME __MINGW_STRING_AW("MouseZ")
+#define MOUSEZ_TITLE __MINGW_STRING_AW("Magellan MSWHEEL")
 
 #define MSH_WHEELMODULE_CLASS (MOUSEZ_CLASSNAME)
 #define MSH_WHEELMODULE_TITLE (MOUSEZ_TITLE)
 
-#ifdef UNICODE
-#define MSH_WHEELSUPPORT L"MSH_WHEELSUPPORT_MSG"
-#else
-#define MSH_WHEELSUPPORT "MSH_WHEELSUPPORT_MSG"
-#endif
-
-#ifdef UNICODE
-#define MSH_SCROLL_LINES L"MSH_SCROLL_LINES_MSG"
-#else
-#define MSH_SCROLL_LINES "MSH_SCROLL_LINES_MSG"
-#endif
+#define MSH_WHEELSUPPORT __MINGW_STRING_AW("MSH_WHEELSUPPORT_MSG")
+#define MSH_SCROLL_LINES __MINGW_STRING_AW("MSH_SCROLL_LINES_MSG")
 
 #ifndef WHEEL_PAGESCROLL
 #define WHEEL_PAGESCROLL (UINT_MAX)
@@ -53,11 +39,12 @@ __CRT_INLINE HWND HwndMSWheel(PUINT puiMsh_MsgMouseWheel,PUINT puiMsh_Msg3DSuppo
   *puiMsh_MsgMouseWheel = RegisterWindowMessage(MSH_MOUSEWHEEL);
   *puiMsh_Msg3DSupport = RegisterWindowMessage(MSH_WHEELSUPPORT);
   *puiMsh_MsgScrollLines = RegisterWindowMessage(MSH_SCROLL_LINES);
-  if(*puiMsh_Msg3DSupport) *pf3DSupport = (WINBOOL)SendMessage(hdlMsWheel,*puiMsh_Msg3DSupport,0,0);
+  if(*puiMsh_Msg3DSupport) *pf3DSupport = (BOOL)SendMessage(hdlMsWheel,*puiMsh_Msg3DSupport,0,0);
   else *pf3DSupport = FALSE;
   if(*puiMsh_MsgScrollLines) *piScrollLines = (int)SendMessage(hdlMsWheel,*puiMsh_MsgScrollLines,0,0);
   else *piScrollLines = 3;
   return(hdlMsWheel);
 }
 #endif /* !__CRT__NO_INLINE */
+#include <psdk_inc/_pop_BOOL.h>
 

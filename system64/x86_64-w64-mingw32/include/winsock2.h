@@ -7,6 +7,8 @@
 #ifndef _WINSOCK2API_
 #define _WINSOCK2API_
 
+#include <_mingw_unicode.h>
+
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #else
@@ -39,15 +41,16 @@
 #define WSAAPI			WINAPI
 
 /* undefine macros from winsock.h */
-#include <mingw_inc/_ws1_undef.h>
+#include <psdk_inc/_ws1_undef.h>
 
 #include <_timeval.h>
+#include <_bsd_types.h>
 #include <inaddr.h>
-#include <mingw_inc/_bsd_types.h>
-#include <mingw_inc/_socket_types.h>
-#include <mingw_inc/_fd_types.h>
-#include <mingw_inc/_ip_types.h>
-#include <mingw_inc/_wsadata.h>
+#include <psdk_inc/_socket_types.h>
+#include <psdk_inc/_fd_types.h>
+#include <psdk_inc/_ip_types.h>
+#include <psdk_inc/_wsadata.h>
+#include <ws2def.h> /* FIXME: include order */
 
 #ifdef __cplusplus
 extern "C" {
@@ -235,11 +238,9 @@ extern int WINAPI __WSAFDIsSet(SOCKET,fd_set *);
 #define SO_MAX_MSG_SIZE 0x2003
 #define SO_PROTOCOL_INFOA 0x2004
 #define SO_PROTOCOL_INFOW 0x2005
-#ifdef UNICODE
-#define SO_PROTOCOL_INFO SO_PROTOCOL_INFOW
-#else
-#define SO_PROTOCOL_INFO SO_PROTOCOL_INFOA
-#endif
+
+#define SO_PROTOCOL_INFO __MINGW_NAME_AW(SO_PROTOCOL_INFO)
+
 #define PVD_CONFIG 0x3001
 #define SO_CONDITIONAL_ACCEPT 0x3002
 
@@ -279,8 +280,8 @@ extern int WINAPI __WSAFDIsSet(SOCKET,fd_set *);
 #define AF_TCNPROCESS 29
 #define AF_TCNMESSAGE 30
 #define AF_ICLFXBM 31
-
-#define AF_MAX 32
+#define AF_BTH 32
+#define AF_MAX 33
 
 #define _SS_MAXSIZE 128
 #define _SS_ALIGNSIZE (8)
@@ -321,6 +322,7 @@ extern int WINAPI __WSAFDIsSet(SOCKET,fd_set *);
 #define PF_BAN AF_BAN
 #define PF_ATM AF_ATM
 #define PF_INET6 AF_INET6
+#define PF_BTH AF_BTH
 
 #define PF_MAX AF_MAX
 
@@ -374,7 +376,7 @@ extern int WINAPI __WSAFDIsSet(SOCKET,fd_set *);
 #define FD_MAX_EVENTS 10
 #define FD_ALL_EVENTS ((1 << FD_MAX_EVENTS) - 1)
 
-#include <mingw_inc/_wsa_errnos.h>
+#include <psdk_inc/_wsa_errnos.h>
 
 #define WSAEVENT HANDLE
 #define LPWSAEVENT LPHANDLE
@@ -491,13 +493,8 @@ typedef unsigned int GROUP;
     WCHAR szProtocol[WSAPROTOCOL_LEN+1];
   } WSAPROTOCOL_INFOW,*LPWSAPROTOCOL_INFOW;
 
-#ifdef UNICODE
-  typedef WSAPROTOCOL_INFOW WSAPROTOCOL_INFO;
-  typedef LPWSAPROTOCOL_INFOW LPWSAPROTOCOL_INFO;
-#else
-  typedef WSAPROTOCOL_INFOA WSAPROTOCOL_INFO;
-  typedef LPWSAPROTOCOL_INFOA LPWSAPROTOCOL_INFO;
-#endif
+  __MINGW_TYPEDEF_AW(WSAPROTOCOL_INFO)
+  __MINGW_TYPEDEF_AW(LPWSAPROTOCOL_INFO)
 
 #define PFL_MULTIPLE_PROTO_ENTRIES 0x00000001
 #define PFL_RECOMMENDED_PROTO_ENTRY 0x00000002
@@ -568,6 +565,10 @@ typedef unsigned int GROUP;
 #define SIO_ADDRESS_LIST_CHANGE _WSAIO(IOC_WS2,23)
 #define SIO_QUERY_TARGET_PNP_HANDLE _WSAIOR(IOC_WS2,24)
 #define SIO_ADDRESS_LIST_SORT _WSAIORW(IOC_WS2,25)
+#if (_WIN32_WINNT >= 0x0600)
+#define SIO_RESERVED_1 _WSAIOW(IOC_WS2,26)
+#define SIO_RESERVED_2 _WSAIOW(IOC_WS2,33)
+#endif /* _WIN32_WINNT >= 0x0600 */
 
   typedef int (CALLBACK *LPCONDITIONPROC)(LPWSABUF lpCallerId,LPWSABUF lpCallerData,LPQOS lpSQOS,LPQOS lpGQOS,LPWSABUF lpCalleeId,LPWSABUF lpCalleeData,GROUP *g,DWORD_PTR dwCallbackData);
   typedef void (CALLBACK *LPWSAOVERLAPPED_COMPLETION_ROUTINE)(DWORD dwError,DWORD cbTransferred,LPWSAOVERLAPPED lpOverlapped,DWORD dwFlags);
@@ -611,6 +612,7 @@ typedef unsigned int GROUP;
   typedef struct sockaddr_storage SOCKADDR_STORAGE;
   typedef struct sockaddr_storage *PSOCKADDR_STORAGE;
   typedef struct sockaddr_storage *LPSOCKADDR_STORAGE;
+  typedef u_short ADDRESS_FAMILY;
 
 #ifndef _tagBLOB_DEFINED
 #define _tagBLOB_DEFINED
@@ -673,19 +675,10 @@ typedef unsigned int GROUP;
 #define SERVICE_TYPE_VALUE_OBJECTIDA "ObjectId"
 #define SERVICE_TYPE_VALUE_OBJECTIDW L"ObjectId"
 
-#ifdef UNICODE
-
-#define SERVICE_TYPE_VALUE_SAPID SERVICE_TYPE_VALUE_SAPIDW
-#define SERVICE_TYPE_VALUE_TCPPORT SERVICE_TYPE_VALUE_TCPPORTW
-#define SERVICE_TYPE_VALUE_UDPPORT SERVICE_TYPE_VALUE_UDPPORTW
-#define SERVICE_TYPE_VALUE_OBJECTID SERVICE_TYPE_VALUE_OBJECTIDW
-#else
-
-#define SERVICE_TYPE_VALUE_SAPID SERVICE_TYPE_VALUE_SAPIDA
-#define SERVICE_TYPE_VALUE_TCPPORT SERVICE_TYPE_VALUE_TCPPORTA
-#define SERVICE_TYPE_VALUE_UDPPORT SERVICE_TYPE_VALUE_UDPPORTA
-#define SERVICE_TYPE_VALUE_OBJECTID SERVICE_TYPE_VALUE_OBJECTIDA
-#endif
+#define SERVICE_TYPE_VALUE_SAPID __MINGW_NAME_AW(SERVICE_TYPE_VALUE_SAPID)
+#define SERVICE_TYPE_VALUE_TCPPORT __MINGW_NAME_AW(SERVICE_TYPE_VALUE_TCPPORT)
+#define SERVICE_TYPE_VALUE_UDPPORT __MINGW_NAME_AW(SERVICE_TYPE_VALUE_UDPPORT)
+#define SERVICE_TYPE_VALUE_OBJECTID __MINGW_NAME_AW(SERVICE_TYPE_VALUE_OBJECTID)
 
 #ifndef __CSADDR_DEFINED__
 #define __CSADDR_DEFINED__
@@ -706,7 +699,7 @@ typedef unsigned int GROUP;
   typedef struct _SOCKET_ADDRESS_LIST {
     INT iAddressCount;
     SOCKET_ADDRESS Address[1];
-  } SOCKET_ADDRESS_LIST,*LPSOCKET_ADDRESS_LIST;
+  } SOCKET_ADDRESS_LIST,*PSOCKET_ADDRESS_LIST,*LPSOCKET_ADDRESS_LIST;
 
   typedef struct _AFPROTOCOLS {
     INT iAddressFamily;
@@ -759,15 +752,9 @@ typedef unsigned int GROUP;
     LPBLOB lpBlob;
   } WSAQUERYSETW,*PWSAQUERYSETW,*LPWSAQUERYSETW;
 
-#ifdef UNICODE
-  typedef WSAQUERYSETW WSAQUERYSET;
-  typedef PWSAQUERYSETW PWSAQUERYSET;
-  typedef LPWSAQUERYSETW LPWSAQUERYSET;
-#else
-  typedef WSAQUERYSETA WSAQUERYSET;
-  typedef PWSAQUERYSETA PWSAQUERYSET;
-  typedef LPWSAQUERYSETA LPWSAQUERYSET;
-#endif
+  __MINGW_TYPEDEF_AW(WSAQUERYSET)
+  __MINGW_TYPEDEF_AW(PWSAQUERYSET)
+  __MINGW_TYPEDEF_AW(LPWSAQUERYSET)
 
 #define LUP_DEEP 0x0001
 #define LUP_CONTAINERS 0x0002
@@ -786,6 +773,16 @@ typedef unsigned int GROUP;
 
 #define LUP_FLUSHCACHE 0x1000
 #define LUP_FLUSHPREVIOUS 0x2000
+
+#define LUP_NON_AUTHORITATIVE 0x4000
+#define LUP_SECURE 0x8000
+#define LUP_RETURN_PREFERRED_NAMES 0x10000
+
+#define LUP_ADDRCONFIG 0x100000
+#define LUP_DUAL_ADDR 0x200000
+#define LUP_FILESERVER 0x400000
+
+#define LUP_RES_RESERVICE 0x8000 /* FIXME: not in PSDK anymore?? */
 
 #define RESULT_IS_ALIAS 0x0001
 #define RESULT_IS_ADDED 0x0010
@@ -814,15 +811,9 @@ typedef unsigned int GROUP;
     LPVOID lpValue;
   } WSANSCLASSINFOW,*PWSANSCLASSINFOW,*LPWSANSCLASSINFOW;
 
-#ifdef UNICODE
-  typedef WSANSCLASSINFOW WSANSCLASSINFO;
-  typedef PWSANSCLASSINFOW PWSANSCLASSINFO;
-  typedef LPWSANSCLASSINFOW LPWSANSCLASSINFO;
-#else
-  typedef WSANSCLASSINFOA WSANSCLASSINFO;
-  typedef PWSANSCLASSINFOA PWSANSCLASSINFO;
-  typedef LPWSANSCLASSINFOA LPWSANSCLASSINFO;
-#endif
+  __MINGW_TYPEDEF_AW(WSANSCLASSINFO)
+  __MINGW_TYPEDEF_AW(PWSANSCLASSINFO)
+  __MINGW_TYPEDEF_AW(LPWSANSCLASSINFO)
 
   typedef struct _WSAServiceClassInfoA {
     LPGUID lpServiceClassId;
@@ -838,15 +829,9 @@ typedef unsigned int GROUP;
     LPWSANSCLASSINFOW lpClassInfos;
   } WSASERVICECLASSINFOW,*PWSASERVICECLASSINFOW,*LPWSASERVICECLASSINFOW;
 
-#ifdef UNICODE
-  typedef WSASERVICECLASSINFOW WSASERVICECLASSINFO;
-  typedef PWSASERVICECLASSINFOW PWSASERVICECLASSINFO;
-  typedef LPWSASERVICECLASSINFOW LPWSASERVICECLASSINFO;
-#else
-  typedef WSASERVICECLASSINFOA WSASERVICECLASSINFO;
-  typedef PWSASERVICECLASSINFOA PWSASERVICECLASSINFO;
-  typedef LPWSASERVICECLASSINFOA LPWSASERVICECLASSINFO;
-#endif
+  __MINGW_TYPEDEF_AW(WSASERVICECLASSINFO)
+  __MINGW_TYPEDEF_AW(PWSASERVICECLASSINFO)
+  __MINGW_TYPEDEF_AW(LPWSASERVICECLASSINFO)
 
   typedef struct _WSANAMESPACE_INFOA {
     GUID NSProviderId;
@@ -864,44 +849,35 @@ typedef unsigned int GROUP;
     LPWSTR lpszIdentifier;
   } WSANAMESPACE_INFOW,*PWSANAMESPACE_INFOW,*LPWSANAMESPACE_INFOW;
 
-#ifdef UNICODE
-  typedef WSANAMESPACE_INFOW WSANAMESPACE_INFO;
-  typedef PWSANAMESPACE_INFOW PWSANAMESPACE_INFO;
-  typedef LPWSANAMESPACE_INFOW LPWSANAMESPACE_INFO;
-#else
-  typedef WSANAMESPACE_INFOA WSANAMESPACE_INFO;
-  typedef PWSANAMESPACE_INFOA PWSANAMESPACE_INFO;
-  typedef LPWSANAMESPACE_INFOA LPWSANAMESPACE_INFO;
-#endif
+  __MINGW_TYPEDEF_AW(WSANAMESPACE_INFO)
+  __MINGW_TYPEDEF_AW(PWSANAMESPACE_INFO)
+  __MINGW_TYPEDEF_AW(LPWSANAMESPACE_INFO)
+
+/* FIXME: WSAMSG originally lived in mswsock.h,
+ * newer SDKs moved it into a new ws2def.h. for
+ * now we keep it here. */
+  typedef struct _WSAMSG {
+    LPSOCKADDR name;
+    INT namelen;
+    LPWSABUF lpBuffers;
+    DWORD dwBufferCount;
+    WSABUF Control;
+    DWORD dwFlags;
+  } WSAMSG,*PWSAMSG,*LPWSAMSG;
 
 #if INCL_WINSOCK_API_TYPEDEFS
-#ifdef UNICODE
-#define LPFN_WSADUPLICATESOCKET LPFN_WSADUPLICATESOCKETW
-#define LPFN_WSAENUMPROTOCOLS LPFN_WSAENUMPROTOCOLSW
-#define LPFN_WSASOCKET LPFN_WSASOCKETW
-#define LPFN_WSAADDRESSTOSTRING LPFN_WSAADDRESSTOSTRINGW
-#define LPFN_WSASTRINGTOADDRESS LPFN_WSASTRINGTOADDRESSW
-#define LPFN_WSALOOKUPSERVICEBEGIN LPFN_WSALOOKUPSERVICEBEGINW
-#define LPFN_WSALOOKUPSERVICENEXT LPFN_WSALOOKUPSERVICENEXTW
-#define LPFN_WSAINSTALLSERVICECLASS LPFN_WSAINSTALLSERVICECLASSW
-#define LPFN_WSAGETSERVICECLASSINFO LPFN_WSAGETSERVICECLASSINFOW
-#define LPFN_WSAENUMNAMESPACEPROVIDERS LPFN_WSAENUMNAMESPACEPROVIDERSW
-#define LPFN_WSAGETSERVICECLASSNAMEBYCLASSID LPFN_WSAGETSERVICECLASSNAMEBYCLASSIDW
-#define LPFN_WSASETSERVICE LPFN_WSASETSERVICEW
-#else
-#define LPFN_WSADUPLICATESOCKET LPFN_WSADUPLICATESOCKETA
-#define LPFN_WSAENUMPROTOCOLS LPFN_WSAENUMPROTOCOLSA
-#define LPFN_WSASOCKET LPFN_WSASOCKETA
-#define LPFN_WSAADDRESSTOSTRING LPFN_WSAADDRESSTOSTRINGA
-#define LPFN_WSASTRINGTOADDRESS LPFN_WSASTRINGTOADDRESSA
-#define LPFN_WSALOOKUPSERVICEBEGIN LPFN_WSALOOKUPSERVICEBEGINA
-#define LPFN_WSALOOKUPSERVICENEXT LPFN_WSALOOKUPSERVICENEXTA
-#define LPFN_WSAINSTALLSERVICECLASS LPFN_WSAINSTALLSERVICECLASSA
-#define LPFN_WSAGETSERVICECLASSINFO LPFN_WSAGETSERVICECLASSINFOA
-#define LPFN_WSAENUMNAMESPACEPROVIDERS LPFN_WSAENUMNAMESPACEPROVIDERSA
-#define LPFN_WSAGETSERVICECLASSNAMEBYCLASSID LPFN_WSAGETSERVICECLASSNAMEBYCLASSIDA
-#define LPFN_WSASETSERVICE LPFN_WSASETSERVICEA
-#endif
+#define LPFN_WSADUPLICATESOCKET __MINGW_NAME_AW(LPFN_WSADUPLICATESOCKET)
+#define LPFN_WSAENUMPROTOCOLS __MINGW_NAME_AW(LPFN_WSAENUMPROTOCOLS)
+#define LPFN_WSASOCKET __MINGW_NAME_AW(LPFN_WSASOCKET)
+#define LPFN_WSAADDRESSTOSTRING __MINGW_NAME_AW(LPFN_WSAADDRESSTOSTRING)
+#define LPFN_WSASTRINGTOADDRESS __MINGW_NAME_AW(LPFN_WSASTRINGTOADDRESS)
+#define LPFN_WSALOOKUPSERVICEBEGIN __MINGW_NAME_AW(LPFN_WSALOOKUPSERVICEBEGIN)
+#define LPFN_WSALOOKUPSERVICENEXT __MINGW_NAME_AW(LPFN_WSALOOKUPSERVICENEXT)
+#define LPFN_WSAINSTALLSERVICECLASS __MINGW_NAME_AW(LPFN_WSAINSTALLSERVICECLASS)
+#define LPFN_WSAGETSERVICECLASSINFO __MINGW_NAME_AW(LPFN_WSAGETSERVICECLASSINFO)
+#define LPFN_WSAENUMNAMESPACEPROVIDERS __MINGW_NAME_AW(LPFN_WSAENUMNAMESPACEPROVIDERS)
+#define LPFN_WSAGETSERVICECLASSNAMEBYCLASSID __MINGW_NAME_AW(LPFN_WSAGETSERVICECLASSNAMEBYCLASSID)
+#define LPFN_WSASETSERVICE __MINGW_NAME_AW(LPFN_WSASETSERVICE)
 
   typedef SOCKET (WSAAPI *LPFN_ACCEPT)(SOCKET s,struct sockaddr *addr,int *addrlen);
   typedef int (WSAAPI *LPFN_BIND)(SOCKET s,const struct sockaddr *name,int namelen);
@@ -1002,33 +978,18 @@ typedef unsigned int GROUP;
   typedef INT (WSAAPI *LPFN_WSAPROVIDERCONFIGCHANGE)(LPHANDLE lpNotificationHandle,LPWSAOVERLAPPED lpOverlapped,LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
 #endif
 
-#ifdef UNICODE
-#define WSADuplicateSocket WSADuplicateSocketW
-#define WSAEnumProtocols WSAEnumProtocolsW
-#define WSAAddressToString WSAAddressToStringW
-#define WSASocket WSASocketW
-#define WSAStringToAddress WSAStringToAddressW
-#define WSALookupServiceBegin WSALookupServiceBeginW
-#define WSALookupServiceNext WSALookupServiceNextW
-#define WSAInstallServiceClass WSAInstallServiceClassW
-#define WSAGetServiceClassInfo WSAGetServiceClassInfoW
-#define WSAEnumNameSpaceProviders WSAEnumNameSpaceProvidersW
-#define WSAGetServiceClassNameByClassId WSAGetServiceClassNameByClassIdW
-#define WSASetService WSASetServiceW
-#else
-#define WSADuplicateSocket WSADuplicateSocketA
-#define WSAEnumProtocols WSAEnumProtocolsA
-#define WSASocket WSASocketA
-#define WSAAddressToString WSAAddressToStringA
-#define WSAStringToAddress WSAStringToAddressA
-#define WSALookupServiceBegin WSALookupServiceBeginA
-#define WSALookupServiceNext WSALookupServiceNextA
-#define WSAInstallServiceClass WSAInstallServiceClassA
-#define WSAGetServiceClassInfo WSAGetServiceClassInfoA
-#define WSAEnumNameSpaceProviders WSAEnumNameSpaceProvidersA
-#define WSAGetServiceClassNameByClassId WSAGetServiceClassNameByClassIdA
-#define WSASetService WSASetServiceA
-#endif
+#define WSADuplicateSocket __MINGW_NAME_AW(WSADuplicateSocket)
+#define WSAEnumProtocols __MINGW_NAME_AW(WSAEnumProtocols)
+#define WSAAddressToString __MINGW_NAME_AW(WSAAddressToString)
+#define WSASocket __MINGW_NAME_AW(WSASocket)
+#define WSAStringToAddress __MINGW_NAME_AW(WSAStringToAddress)
+#define WSALookupServiceBegin __MINGW_NAME_AW(WSALookupServiceBegin)
+#define WSALookupServiceNext __MINGW_NAME_AW(WSALookupServiceNext)
+#define WSAInstallServiceClass __MINGW_NAME_AW(WSAInstallServiceClass)
+#define WSAGetServiceClassInfo __MINGW_NAME_AW(WSAGetServiceClassInfo)
+#define WSAEnumNameSpaceProviders __MINGW_NAME_AW(WSAEnumNameSpaceProviders)
+#define WSAGetServiceClassNameByClassId __MINGW_NAME_AW(WSAGetServiceClassNameByClassId)
+#define WSASetService __MINGW_NAME_AW(WSASetService)
 
 #ifndef __WINSOCK_WS1_SHARED
 /* these 46 functions have the same prototypes as in winsock2 */
@@ -1137,6 +1098,145 @@ typedef unsigned int GROUP;
 #define WSAGETASYNCERROR(lParam) HIWORD(lParam)
 #define WSAGETSELECTEVENT(lParam) LOWORD(lParam)
 #define WSAGETSELECTERROR(lParam) HIWORD(lParam)
+
+#if (_WIN32_WINNT >= 0x0600)
+typedef struct _WSANAMESPACE_INFOEXA {
+  GUID NSProviderId;
+  DWORD dwNameSpace;
+  WINBOOL fActive;
+  DWORD dwVersion;
+  LPSTR lpszIdentifier;
+  BLOB ProviderSpecific;
+} WSANAMESPACE_INFOEXA, *PWSANAMESPACE_INFOEXA, *LPWSANAMESPACE_INFOEXA;
+
+typedef struct _WSANAMESPACE_INFOEXW {
+  GUID NSProviderId;
+  DWORD dwNameSpace;
+  WINBOOL fActive;
+  DWORD dwVersion;
+  LPWSTR lpszIdentifier;
+  BLOB ProviderSpecific;
+} WSANAMESPACE_INFOEXW, *PWSANAMESPACE_INFOEXW, *LPWSANAMESPACE_INFOEXW;
+
+__MINGW_TYPEDEF_AW(WSANAMESPACE_INFOEX)
+__MINGW_TYPEDEF_AW(PWSANAMESPACE_INFOEX)
+__MINGW_TYPEDEF_AW(LPWSANAMESPACE_INFOEX)
+
+typedef struct _WSAQUERYSET2A {
+  DWORD         dwSize;
+  LPSTR         lpszServiceInstanceName;
+  LPWSAVERSION  lpVersion;
+  LPSTR         lpszComment;
+  DWORD         dwNameSpace;
+  LPGUID        lpNSProviderId;
+  LPSTR         lpszContext;
+  DWORD         dwNumberOfProtocols;
+  LPAFPROTOCOLS lpafpProtocols;
+  LPSTR         lpszQueryString;
+  DWORD         dwNumberOfCsAddrs;
+  LPCSADDR_INFO lpcsaBuffer;
+  DWORD         dwOutputFlags;
+  LPBLOB        lpBlob;
+} WSAQUERYSET2A, *PWSAQUERYSET2A, *LPWSAQUERYSET2A;
+
+typedef struct _WSAQUERYSET2W {
+  DWORD         dwSize;
+  LPWSTR        lpszServiceInstanceName;
+  LPWSAVERSION  lpVersion;
+  LPWSTR        lpszComment;
+  DWORD         dwNameSpace;
+  LPGUID        lpNSProviderId;
+  LPTSTR        lpszContext;
+  DWORD         dwNumberOfProtocols;
+  LPAFPROTOCOLS lpafpProtocols;
+  LPWSTR        lpszQueryString;
+  DWORD         dwNumberOfCsAddrs;
+  LPCSADDR_INFO lpcsaBuffer;
+  DWORD         dwOutputFlags;
+  LPBLOB        lpBlob;
+} WSAQUERYSET2W, *PWSAQUERYSET2W, *LPWSAQUERYSET2W;
+
+#define POLLRDNORM 0x0100
+#define POLLRDBAND 0x0200
+#define POLLIN    (POLLRDNORM | POLLRDBAND)
+#define POLLPRI    0x0400
+
+#define POLLWRNORM 0x0010
+#define POLLOUT   (POLLWRNORM)
+#define POLLWRBAND 0x0020
+
+#define POLLERR    0x0001
+#define POLLHUP    0x0002
+#define POLLNVAL   0x0004
+
+typedef struct pollfd {
+  SOCKET fd;
+  short  events;
+  short  revents;
+} WSAPOLLFD, *PWSAPOLLFD, *LPWSAPOLLFD;
+
+WINSOCK_API_LINKAGE WINBOOL PASCAL WSAConnectByList(
+  SOCKET s,
+  PSOCKET_ADDRESS_LIST SocketAddressList,
+  LPDWORD LocalAddressLength,
+  LPSOCKADDR LocalAddress,
+  LPDWORD RemoteAddressLength,
+  LPSOCKADDR RemoteAddress,
+  const struct timeval *timeout,
+  LPWSAOVERLAPPED Reserved
+);
+
+WINSOCK_API_LINKAGE WINBOOL PASCAL WSAConnectByNameA(
+  SOCKET s,
+  LPSTR nodename,
+  LPSTR servicename,
+  LPDWORD LocalAddressLength,
+  LPSOCKADDR LocalAddress,
+  LPDWORD RemoteAddressLength,
+  LPSOCKADDR RemoteAddress,
+  const struct timeval *timeout,
+  LPWSAOVERLAPPED Reserved
+);
+
+WINSOCK_API_LINKAGE WINBOOL PASCAL WSAConnectByNameW(
+  SOCKET s,
+  LPWSTR nodename,
+  LPWSTR servicename,
+  LPDWORD LocalAddressLength,
+  LPSOCKADDR LocalAddress,
+  LPDWORD RemoteAddressLength,
+  LPSOCKADDR RemoteAddress,
+  const struct timeval *timeout,
+  LPWSAOVERLAPPED Reserved
+);
+#define WSAConnectByName __MINGW_NAME_AW(WSAConnectByName)
+
+INT WSAAPI WSAEnumNameSpaceProvidersExA(
+  LPDWORD lpdwBufferLength,
+  LPWSANAMESPACE_INFOEXA lpnspBuffer
+);
+
+INT WSAAPI WSAEnumNameSpaceProvidersExW(
+  LPDWORD lpdwBufferLength,
+  LPWSANAMESPACE_INFOEXW lpnspBuffer
+);
+#define WSAEnumNameSpaceProvidersEx __MINGW_NAME_AW(WSAEnumNameSpaceProvidersEx)
+
+int WSAAPI WSAPoll(
+  WSAPOLLFD fdarray[],
+  ULONG nfds,
+  INT timeout
+);
+
+int WSAAPI WSASendMsg(
+  SOCKET s,
+  LPWSAMSG lpMsg,
+  DWORD dwFlags,
+  LPDWORD lpNumberOfBytesSent,
+  LPWSAOVERLAPPED lpOverlapped,
+  LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
+);
+#endif /*(_WIN32_WINNT >= 0x0600)*/
 
 #ifdef __cplusplus
 }

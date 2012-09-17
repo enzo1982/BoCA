@@ -6,28 +6,32 @@
 #ifndef _PSAPI_H_
 #define _PSAPI_H_
 
+#include <_mingw_unicode.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef UNICODE
-#define GetModuleBaseName GetModuleBaseNameW
-#define GetModuleFileNameEx GetModuleFileNameExW
-#define GetMappedFileName GetMappedFileNameW
-#define GetDeviceDriverBaseName GetDeviceDriverBaseNameW
-#define GetDeviceDriverFileName GetDeviceDriverFileNameW
-#define PENUM_PAGE_FILE_CALLBACK PENUM_PAGE_FILE_CALLBACKW
-#define EnumPageFiles EnumPageFilesW
-#define GetProcessImageFileName GetProcessImageFileNameW
-#else
-#define GetModuleBaseName GetModuleBaseNameA
-#define GetModuleFileNameEx GetModuleFileNameExA
-#define GetMappedFileName GetMappedFileNameA
-#define GetDeviceDriverBaseName GetDeviceDriverBaseNameA
-#define GetDeviceDriverFileName GetDeviceDriverFileNameA
-#define PENUM_PAGE_FILE_CALLBACK PENUM_PAGE_FILE_CALLBACKA
-#define EnumPageFiles EnumPageFilesA
-#define GetProcessImageFileName GetProcessImageFileNameA
+#define GetModuleBaseName __MINGW_NAME_AW(GetModuleBaseName)
+#define GetModuleFileNameEx __MINGW_NAME_AW(GetModuleFileNameEx)
+#define GetMappedFileName __MINGW_NAME_AW(GetMappedFileName)
+#define GetDeviceDriverBaseName __MINGW_NAME_AW(GetDeviceDriverBaseName)
+#define GetDeviceDriverFileName __MINGW_NAME_AW(GetDeviceDriverFileName)
+#define PENUM_PAGE_FILE_CALLBACK __MINGW_NAME_AW(PENUM_PAGE_FILE_CALLBACK)
+#define EnumPageFiles __MINGW_NAME_AW(EnumPageFiles)
+#define GetProcessImageFileName __MINGW_NAME_AW(GetProcessImageFileName)
+
+#ifndef LIST_MODULES_DEFAULT
+#define LIST_MODULES_DEFAULT 0x0
+#endif
+#ifndef LIST_MODULES_32BIT
+#define LIST_MODULES_32BIT 0x01
+#endif
+#ifndef LIST_MODULES_64BIT
+#define LIST_MODULES_64BIT 0x02
+#endif
+#ifndef LIST_MODULES_ALL
+#define LIST_MODULES_ALL (LIST_MODULES_32BIT|LIST_MODULES_64BIT)
 #endif
 
   WINBOOL WINAPI EnumProcesses(DWORD *lpidProcess,DWORD cb,DWORD *cbNeeded);
@@ -128,6 +132,64 @@ extern "C" {
   WINBOOL WINAPI EnumPageFilesA (PENUM_PAGE_FILE_CALLBACKA pCallBackRoutine,LPVOID pContext);
   DWORD WINAPI GetProcessImageFileNameA(HANDLE hProcess,LPSTR lpImageFileName,DWORD nSize);
   DWORD WINAPI GetProcessImageFileNameW(HANDLE hProcess,LPWSTR lpImageFileName,DWORD nSize);
+  
+typedef struct _PSAPI_WS_WATCH_INFORMATION_EX {
+  PSAPI_WS_WATCH_INFORMATION BasicInfo;
+  ULONG_PTR                  FaultingThreadId;
+  ULONG_PTR                  Flags;
+} PSAPI_WS_WATCH_INFORMATION_EX, *PPSAPI_WS_WATCH_INFORMATION_EX;
+
+WINBOOL WINAPI GetWsChangesEx(
+  HANDLE hProcess,
+  PPSAPI_WS_WATCH_INFORMATION_EX lpWatchInfoEx,
+  DWORD cb
+);
+
+WINBOOL WINAPI EnumProcessModulesEx(
+  HANDLE hProcess,
+  HMODULE *lphModule,
+  DWORD cb,
+  LPDWORD lpcbNeeded,
+  DWORD dwFilterFlag
+);
+
+typedef union _PSAPI_WORKING_SET_BLOCK {
+  ULONG_PTR Flags;
+  __C89_NAMELESS struct {
+    ULONG_PTR Protection  :5;
+    ULONG_PTR ShareCount  :3;
+    ULONG_PTR Shared  :1;
+    ULONG_PTR Reserved  :3;
+#ifdef _WIN64
+    ULONG_PTR VirtualPage  :52;
+#else
+    ULONG_PTR VirtualPage  :20;
+#endif
+  } ;
+} PSAPI_WORKING_SET_BLOCK, *PPSAPI_WORKING_SET_BLOCK;
+
+typedef struct _PSAPI_WORKING_SET_INFORMATION {
+  ULONG_PTR               NumberOfEntries;
+  PSAPI_WORKING_SET_BLOCK WorkingSetInfo[1];
+} PSAPI_WORKING_SET_INFORMATION, *PPSAPI_WORKING_SET_INFORMATION;
+
+typedef union _PSAPI_WORKING_SET_EX_BLOCK {
+  ULONG_PTR Flags;
+  __C89_NAMELESS struct {
+    ULONG_PTR Valid  :1;
+    ULONG_PTR ShareCount  :3;
+    ULONG_PTR Win32Protection  :11;
+    ULONG_PTR Shared  :1;
+    ULONG_PTR Node  :6;
+    ULONG_PTR Locked  :1;
+    ULONG_PTR LargePage  :1;
+  } DUMMYSTRUCTNAME;
+} PSAPI_WORKING_SET_EX_BLOCK, *PPSAPI_WORKING_SET_EX_BLOCK;
+
+typedef struct _PSAPI_WORKING_SET_EX_INFORMATION {
+  PVOID                      VirtualAddress;
+  PSAPI_WORKING_SET_EX_BLOCK VirtualAttributes;
+} PSAPI_WORKING_SET_EX_INFORMATION, *PPSAPI_WORKING_SET_EX_INFORMATION;
 
 #ifdef __cplusplus
 }

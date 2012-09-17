@@ -10,10 +10,6 @@
 
 #pragma pack(push,_CRT_PACKING)
 
-#ifndef _MM_MALLOC_H_INCLUDED
-#define _MM_MALLOC_H_INCLUDED
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,7 +21,11 @@ extern "C" {
 #endif
 
 #ifndef _STATIC_ASSERT
+#if defined(_MSC_VER)
 #define _STATIC_ASSERT(expr) typedef char __static_assert_t[(expr)]
+#else
+#define _STATIC_ASSERT(expr) extern void __static_assert_t(int [(expr)?1:-1])
+#endif
 #endif
 
 /* Return codes for _heapwalk()  */
@@ -55,6 +55,10 @@ extern "C" {
 /* Make sure that X86intrin.h doesn't produce here collisions.  */
 #if (!defined (_XMMINTRIN_H_INCLUDED) && !defined (_MM_MALLOC_H_INCLUDED)) || defined(_aligned_malloc)
 #define __DO_ALIGN_DEFINES
+#endif
+
+#ifndef _MM_MALLOC_H_INCLUDED
+#define _MM_MALLOC_H_INCLUDED
 #endif
 
 #ifdef __DO_ALIGN_DEFINES
@@ -94,6 +98,12 @@ extern "C" {
 #pragma pop_macro("_aligned_free")
 
 #endif
+
+/* Users should really use MS provided versions */
+void * __mingw_aligned_malloc (size_t _Size, size_t _Alignment);
+void __mingw_aligned_free (void *_Memory);
+void * __mingw_aligned_offset_realloc (void *_Memory, size_t _Size, size_t _Alignment, size_t _Offset);
+void * __mingw_aligned_realloc (void *_Memory, size_t _Size, size_t _Offset);
 
 #define _MAX_WAIT_MALLOC_CRT 60000
 

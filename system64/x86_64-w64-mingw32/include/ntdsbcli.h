@@ -6,13 +6,18 @@
 #ifndef _NTDSBCLI_H_
 #define _NTDSBCLI_H_
 
+#include <_mingw_unicode.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define xRPC_STRING
 
+#ifndef __WCHAR_DEFINED
+#define __WCHAR_DEFINED
   typedef unsigned short WCHAR;
+#endif
 
 #ifndef _NTDSBCLI_DEFINED
 #define NTDSBCLI_API __declspec(dllimport) _stdcall
@@ -31,7 +36,7 @@ extern "C" {
 #define g_wszRestoreAnnotation L"NTDS Restore Interface"
 #define g_aszRestoreAnnotation "NTDS Restore Interface"
 
-#ifdef UNICODE
+#if defined(UNICODE)
 #define g_szBackupAnnotation g_wszBackupAnnotation
 #define g_szRestoreAnnotation g_wszRestoreAnnotation
 #else
@@ -49,7 +54,7 @@ extern "C" {
 
 #define BACKUP_DISABLE_INCREMENTAL 0xffffffff
 
-#ifdef UNICODE
+#if defined(UNICODE)
   typedef WCHAR BFT;
 #else
   typedef CHAR BFT;
@@ -82,37 +87,19 @@ extern "C" {
     WCHAR *wszNewDatabaseName;
   } EDB_RSTMAPW,*PEDB_RSTMAPW;
 
-#ifdef UNICODE
-#define EDB_RSTMAP EDB_RSTMAPW
-#define PEDB_RSTMAP PEDB_RSTMAPW
-#else
-#define EDB_RSTMAP EDB_RSTMAPA
-#define PEDB_RSTMAP PEDB_RSTMAPA
-#endif
+#define EDB_RSTMAP __MINGW_NAME_AW(EDB_RSTMAP)
+#define PEDB_RSTMAP __MINGW_NAME_AW(PEDB_RSTMAP)
 
-#ifdef UNICODE
-#define DsIsNTDSOnline DsIsNTDSOnlineW
-#define DsBackupPrepare DsBackupPrepareW
-#define DsBackupGetDatabaseNames DsBackupGetDatabaseNamesW
-#define DsBackupOpenFile DsBackupOpenFileW
-#define DsBackupGetBackupLogs DsBackupGetBackupLogsW
-#define DsRestoreGetDatabaseLocations DsRestoreGetDatabaseLocationsW
-#define DsRestorePrepare DsRestorePrepareW
-#define DsRestoreRegister DsRestoreRegisterW
-#define DsSetCurrentBackupLog DsSetCurrentBackupLogW
-#define DsSetAuthIdentity DsSetAuthIdentityW
-#else
-#define DsIsNTDSOnline DsIsNTDSOnlineA
-#define DsBackupPrepare DsBackupPrepareA
-#define DsBackupGetDatabaseNames DsBackupGetDatabaseNamesA
-#define DsBackupOpenFile DsBackupOpenFileA
-#define DsBackupGetBackupLogs DsBackupGetBackupLogsA
-#define DsRestoreGetDatabaseLocations DsRestoreGetDatabaseLocationsA
-#define DsRestorePrepare DsRestorePrepareA
-#define DsRestoreRegister DsRestoreRegisterA
-#define DsSetCurrentBackupLog DsSetCurrentBackupLogA
-#define DsSetAuthIdentity DsSetAuthIdentityA
-#endif
+#define DsIsNTDSOnline __MINGW_NAME_AW(DsIsNTDSOnline)
+#define DsBackupPrepare __MINGW_NAME_AW(DsBackupPrepare)
+#define DsBackupGetDatabaseNames __MINGW_NAME_AW(DsBackupGetDatabaseNames)
+#define DsBackupOpenFile __MINGW_NAME_AW(DsBackupOpenFile)
+#define DsBackupGetBackupLogs __MINGW_NAME_AW(DsBackupGetBackupLogs)
+#define DsRestoreGetDatabaseLocations __MINGW_NAME_AW(DsRestoreGetDatabaseLocations)
+#define DsRestorePrepare __MINGW_NAME_AW(DsRestorePrepare)
+#define DsRestoreRegister __MINGW_NAME_AW(DsRestoreRegister)
+#define DsSetCurrentBackupLog __MINGW_NAME_AW(DsSetCurrentBackupLog)
+#define DsSetAuthIdentity __MINGW_NAME_AW(DsSetAuthIdentity)
 
   HRESULT NTDSBCLI_API DsIsNTDSOnlineA(LPCSTR szServerName,WINBOOL *pfNTDSOnline);
   HRESULT NTDSBCLI_API DsIsNTDSOnlineW(LPCWSTR szServerName,WINBOOL *pfNTDSOnline);
