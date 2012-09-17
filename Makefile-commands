@@ -2,9 +2,9 @@
 
 include $(BOCA_PATH)/Makefile-options
 
-CC = gcc
+CC     = gcc
 CCOPTS = -g0 -Wall -Os -ffast-math -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
-LD = gcc
+LD     = gcc
 LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lboca -lstdc++ $(LIBS)
 
 ifneq ($(EXCEPTION),True)
@@ -21,7 +21,11 @@ endif
 
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_QNX),True)
+ifneq ($(BUILD_HAIKU),True)
 	CCOPTS += -pthread
+endif
+endif
 endif
 endif
 
@@ -32,8 +36,7 @@ ifeq ($(BUILD_WIN32),True)
 else ifeq ($(BUILD_OSX),True)
 	DLLEXT = .dylib
 
-	CCOPTS += -I/opt/local/include
-	LDOPTS += -L/opt/local/lib -Wl,-rpath,.
+	LDOPTS += -Wl,-rpath,.
 else
 	DLLEXT = .so
 
@@ -58,7 +61,11 @@ all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT)
 $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) : $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
 ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_SOLARIS),True)
 	strip --strip-all $@
+else
+	strip $@
+endif
 endif
 
 clean :
