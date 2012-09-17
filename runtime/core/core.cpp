@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -44,8 +44,17 @@ Void BoCA::Init()
 
 #ifdef __WIN32__
 	if (GetEnvironmentVariableA("OMP_NUM_THREADS", NIL, 0) == 0) SetEnvironmentVariableA("OMP_NUM_THREADS", String::FromInt(numThreads));
+
 #else
 	if (getenv("OMP_NUM_THREADS") == NIL) setenv("OMP_NUM_THREADS", String::FromInt(numThreads), True);
+#endif
+
+	/* Work around an Intel Compiler bug.
+	 */
+#ifdef __WIN32__
+	SetEnvironmentVariableA("KMP_AFFINITY", "none");
+#else
+	setenv("KMP_AFFINITY", "none", True);
 #endif
 
 	initialized = True;

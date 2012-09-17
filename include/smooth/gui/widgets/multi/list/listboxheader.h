@@ -33,6 +33,9 @@ namespace smooth
 				Bool			 draggingTab;
 
 				Point			 startMousePos;
+
+				Int			 moveTabStartWidth;
+				Int			 lastTabStartWidth;
 			protected:
 				Hotspot			*dragHotspot;
 

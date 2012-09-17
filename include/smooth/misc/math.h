@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,14 +31,14 @@ namespace smooth
 
 			static Float		 Abs(Float);
 			static Int64		 Sign(Float);
-			static Int64		 Round(Float);
+			static Int64		 Round(Float f)			{ return (Int64) (f + (f < 0 ? -0.5 : 0.5)); }
 			static Float		 Fract(Float);
 			static Int64		 Floor(Float);
 			static Int64		 Ceil(Float);
 			static Float		 Mod(Float, Float);
 
-			static Float		 Min(Float, Float);
-			static Float		 Max(Float, Float);
+			static Float		 Min(Float f1, Float f2)	{ return (f1 < f2 ? f1 : f2); }
+			static Float		 Max(Float f1, Float f2)	{ return (f1 > f2 ? f1 : f2); }
 
 			static Float		 Pow(Float, Float);
 			static Float		 Sqrt(Float);
@@ -61,14 +61,14 @@ namespace smooth
 			static Float		 Atan2(Float, Float);
 
 			static Int		 Abs(Int);
-			static Int		 Min(Int, Int);
-			static Int		 Max(Int, Int);
+			static Int		 Min(Int i1, Int i2)		{ return (i1 < i2 ? i1 : i2); }
+			static Int		 Max(Int i1, Int i2)		{ return (i1 > i2 ? i1 : i2); }
 			static Int		 Mod(Int, Int);
 			static Float		 Pow(Int, Int);
 
 			static Int64		 Abs(Int64);
-			static Int64		 Min(Int64, Int64);
-			static Int64		 Max(Int64, Int64);
+			static Int64		 Min(Int64 i1, Int64 i2)	{ return (i1 < i2 ? i1 : i2); }
+			static Int64		 Max(Int64 i1, Int64 i2)	{ return (i1 > i2 ? i1 : i2); }
 			static Int64		 Mod(Int64, Int64);
 			static Float		 Pow(Int64, Int64);
 	};

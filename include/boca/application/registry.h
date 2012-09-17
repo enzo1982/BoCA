@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,12 +32,12 @@ namespace BoCA
 				static Bool			 Free();
 
 				Int				 GetNumberOfComponents();
-				Int				 GetNumberOfComponentsOfType(Int);
+				Int				 GetNumberOfComponentsOfType(ComponentType);
 
 				const String			&GetComponentName(Int);
 				const String			&GetComponentVersion(Int);
 				const String			&GetComponentID(Int);
-				Int				 GetComponentType(Int);
+				ComponentType			 GetComponentType(Int);
 				const Array<FileFormat *>	&GetComponentFormats(Int);
 				const Array<TagFormat *>	&GetComponentTagFormats(Int);
 

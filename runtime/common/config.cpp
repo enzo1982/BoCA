@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -18,7 +18,6 @@ BoCA::Config::Config()
 
 	cdrip_numdrives		= 0;
 	cdrip_timeout		= 0;
-	cdrip_autoRead_active	= False;
 
 	saveSettingsOnExit	= True;
 
@@ -30,7 +29,7 @@ BoCA::Config::Config()
 
 		if (configDir != NIL)
 		{
-#ifdef __WIN32__
+#if defined __WIN32__ || defined __HAIKU__
 			configDir.Append("freac").Append(Directory::GetDirectoryDelimiter());
 #else
 			configDir.Append(".freac").Append(Directory::GetDirectoryDelimiter());
@@ -200,8 +199,28 @@ Int BoCA::Config::RemoveConfiguration(const String &rConfig)
 
 Int BoCA::Config::SetActiveConfiguration(const String &nConfig)
 {
-	if (nConfig == "default") return config->SetActiveConfiguration("default");
-	else			  return config->SetActiveConfiguration(String("BoCA::").Append(nConfig));
+	if (GetConfigurationName() == nConfig) return Success();
+
+	/* Activate the requested configuration.
+	 */
+	Int	 result = 0;
+
+	if (nConfig == "default") result = config->SetActiveConfiguration("default");
+	else			  result = config->SetActiveConfiguration(String("BoCA::").Append(nConfig));
+
+	/* Update persistent values.
+	 */
+	if (result == Success())
+	{
+		for (Int i = 0; i < persistentIntIDs.Length(); i++)
+		{
+			const String	&nthID = persistentIntIDs.GetNthReference(i);
+
+			*persistentIntValues.GetNth(i) = config->GetIntValue(nthID.Head(nthID.Find("::")), nthID.Tail(nthID.Length() - nthID.Find("::") - 2), *persistentIntValues.GetNth(i));
+		}
+	}
+
+	return result;
 }
 
 String BoCA::Config::GetConfigurationName()

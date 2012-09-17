@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,6 +29,15 @@ BoCA::AS::EncoderComponentExternalStdIO::~EncoderComponentExternalStdIO()
 
 Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 {
+	encFileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".").Append(GetOutputFileExtension());
+
+	/* Remove temporary file if it exists.
+	 * Might be a leftover of a previous encoding attempt.
+	 */
+	File(encFileName).Delete();
+
+	/* Set up security attributes
+	 */
 	SECURITY_ATTRIBUTES	 secAttr;
 
 	ZeroMemory(&secAttr, sizeof(secAttr));
@@ -41,30 +50,9 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 	/* Start 3rd party command line encoder
 	 */
-	STARTUPINFOA		 startupInfo;
-
-	ZeroMemory(&startupInfo, sizeof(startupInfo));
-
-	startupInfo.cb		= sizeof(startupInfo);
-	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
-	startupInfo.hStdInput	= rPipe;
-	startupInfo.hStdOutput	= NIL;
-	startupInfo.hStdError	= NIL;
-
-	PROCESS_INFORMATION	 processInfo;
-
-	ZeroMemory(&processInfo, sizeof(processInfo));
-
-	encFileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".").Append(GetOutputFileExtension());
-
-	/* Remove temporary file if it exists.
-	 * Might be a leftover of a previous encoding attempt.
-	 */
-	File(encFileName).Delete();
-
 	const Info	&info = track.GetInfo();
 
+	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
 							      .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))
 							      .Replace("%ARTIST", String("\"").Append((char *) info.artist).Append("\""))
@@ -74,7 +62,24 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 							      .Replace("%YEAR", String("\"").Append(String::FromInt(info.year)).Append("\""))
 							      .Replace("%GENRE", String("\"").Append((char *) info.genre).Append("\""));
 
-	CreateProcessA(NIL, String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter()).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+	if (specs->debug) AllocConsole();
+
+	STARTUPINFOA		 startupInfo;
+
+	ZeroMemory(&startupInfo, sizeof(startupInfo));
+
+	startupInfo.cb		= sizeof(startupInfo);
+	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
+	startupInfo.hStdInput	= rPipe;
+	startupInfo.hStdOutput	= GetStdHandle(STD_OUTPUT_HANDLE);
+	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
+
+	PROCESS_INFORMATION	 processInfo;
+
+	ZeroMemory(&processInfo, sizeof(processInfo));
+
+	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	hProcess = processInfo.hProcess;
 
@@ -127,6 +132,13 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 		S::System::System::Sleep(10);
 	}
 
+	if (specs->debug)
+	{
+		Dialogs::QuickMessage("Click OK to close console window.", "Info", Dialogs::Message::Buttons::Ok, Dialogs::Message::Icon::Information);
+
+		FreeConsole();
+	}
+
 	/* Check if anything went wrong
 	 */
 	if (!specs->external_ignoreExitCode && exitCode != 0)
@@ -135,7 +147,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 		 */
 		File(encFileName).Delete();
 
-		errorState = True;
+		errorState  = True;
 		errorString = String("Encoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return False;
@@ -190,7 +202,13 @@ Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &dat
 
 	GetExitCodeProcess(hProcess, &exitCode);
 
-	if (exitCode != STILL_ACTIVE) return -1;
+	if (exitCode != STILL_ACTIVE)
+	{
+		errorState  = True;
+		errorString = "Encoder quit prematurely.";
+
+		return -1;
+	}
 
 	/* Hand data over to the encoder using the stdio pipe
 	 */

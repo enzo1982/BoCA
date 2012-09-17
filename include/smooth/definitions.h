@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,7 +16,7 @@
 #		define __int64 long long
 #	endif
 
-#	if !defined __APPLE__ && !defined __NetBSD__ && !defined __OpenBSD__
+#	if !defined __APPLE__ && !defined __NetBSD__ && !defined __OpenBSD__ && !defined __HAIKU__
 #		define multithread __thread
 #	else
 #		define multithread
@@ -74,7 +74,7 @@ using namespace smooth::Errors;
 
 namespace smooth
 {
-	enum Message
+	enum Messages
 	{
 		SM_MOUSEMOVE		= 1024,
 		SM_LBUTTONDOWN,

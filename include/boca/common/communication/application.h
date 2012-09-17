@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -23,20 +23,23 @@ namespace BoCA
 		private:
 			/* Singleton class, therefore private constructor/destructor
 			 */
-			static Application		*instance;
+			static Application	*instance;
 
-							 Application();
-							~Application();
+						 Application();
+						~Application();
 		public:
 			/* Returns a new or existing instance of Application
 			 */
-			static Application		*Get();
+			static Application	*Get();
 
 			/* Destroys an existing instance of Application
 			 */
-			static Void			 Free();
+			static Void		 Free();
+		callbacks:
+			Callback0<String>	 getClientName;		// returns the client application's name string
+			Callback0<String>	 getClientVersion;	// returns the client application's version string
 		signals:
-			Signal0<Void>			 onQuit;	// called when application is about to quit
+			Signal0<Void>		 onQuit;		// called when application is about to quit
 	};
 };
 

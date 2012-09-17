@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -31,11 +31,11 @@ BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()
 
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
+	String	 encFileName = streamURI;
+
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
-	String	 encFileName = streamURI;
-
 	if (String::IsUnicode(streamURI))
 	{
 		encFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
@@ -177,7 +177,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	 */
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
-		errorState = True;
+		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return Error();
@@ -190,11 +190,11 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 {
+	encFileName = track.origFilename;
+
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
-	encFileName = track.origFilename;
-
 	if (String::IsUnicode(track.origFilename))
 	{
 		encFileName = Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
@@ -248,7 +248,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
-		errorState = True;
+		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return False;

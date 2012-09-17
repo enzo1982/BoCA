@@ -31,10 +31,10 @@ CLEANCMD1 =
 
 include $(BOCA_PATH)/Makefile-directories
 
-CC = gcc
-CCOPTS = -g0 -Wall -Os -ffast-math -fno-exceptions -DBOCA_CDK_BUILD -I$(BOCA_PATH)/include
-LD = gcc
-LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
+CC	  = gcc
+CCOPTS	  = -g0 -Wall -Os -ffast-math -fno-exceptions -DBOCA_CDK_BUILD -I$(BOCA_PATH)/include
+LD	  = gcc
+LDOPTS	  = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_X64),True)
 	CCOPTS += -m64 -march=nocona
@@ -46,7 +46,11 @@ endif
 
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_QNX),True)
+ifneq ($(BUILD_HAIKU),True)
 	CCOPTS += -pthread
+endif
+endif
 endif
 endif
 
@@ -79,7 +83,11 @@ else
 	ln -s $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(DLLEXT) $(BOCA_PATH)/$(LIBDIR)/libboca$(DLLEXT)
 endif
 ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_SOLARIS),True)
 	strip --strip-all $@
+else
+	strip $@
+endif
 endif
 
 clean :

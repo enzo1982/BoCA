@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,20 +40,20 @@ namespace smooth
 				Int		 right;
 				Int		 bottom;
 
-						 Rect()						{ left = 0; top = 0; right = 0; bottom = 0; }
+						 Rect()						{ left = 0;	 top = 0;      right = 0;		bottom = 0;		 }
 						 Rect(const Point &iPos, const Size &iSize)	{ left = iPos.x; top = iPos.y; right = left + iSize.cx; bottom = top + iSize.cy; }
 
-				Rect operator	 +(const Point &) const;
-				Rect operator	 -(const Point &) const;
+				Rect operator	 +(const Point &point) const			{ return Rect(Point(left, top) + point, Size(right - left, bottom - top)); }
+				Rect operator	 -(const Point &point) const			{ return Rect(Point(left, top) - point, Size(right - left, bottom - top)); }
 
-				Rect operator	 +(const Size &) const;
-				Rect operator	 -(const Size &) const;
+				Rect operator	 +(const Size &size) const			{ return Rect(Point(left, top), Size(right - left, bottom - top) + size); }
+				Rect operator	 -(const Size &size) const			{ return Rect(Point(left, top), Size(right - left, bottom - top) - size); }
 
-				Rect operator	 *(const Float) const;
-				Rect operator	 /(const Float) const;
+				Rect operator	 *(const Float factor) const			{ return Rect(Point(left, top) * factor,  Size(right - left, bottom - top) * factor);  }
+				Rect operator	 /(const Float divisor) const			{ return Rect(Point(left, top) / divisor, Size(right - left, bottom - top) / divisor); }
 
-				Bool operator	 ==(const Rect &) const;
-				Bool operator	 !=(const Rect &) const;
+				Bool operator	 ==(const Rect &rect) const			{ return (left == rect.left && top == rect.top && right == rect.right && bottom == rect.bottom); }
+				Bool operator	 !=(const Rect &rect) const			{ return (left != rect.left || top != rect.top || right != rect.right || bottom != rect.bottom); }
 
 				static Bool	 DoRectsOverlap(const Rect &, const Rect &);
 				static Rect	 OverlapRect(const Rect &, const Rect &);

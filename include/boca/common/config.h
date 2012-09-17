@@ -44,7 +44,6 @@ namespace BoCA
 
 			Int		 cdrip_numdrives;
 			Int		 cdrip_timeout;
-			Bool		 cdrip_autoRead_active;
 
 			Int		 SetIntValue(const String &, const String &, Int);
 			Int		 SetStringValue(const String &, const String &, const String &);

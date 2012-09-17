@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,7 +19,7 @@ namespace smooth
 	};
 };
 
-#include "../../definitions.h"
+#include "../../misc/math.h"
 
 namespace smooth
 {
@@ -31,17 +31,17 @@ namespace smooth
 				Int		 cx;
 				Int		 cy;
 
-						 Size()			{ cx = 0; cy = 0; }
-						 Size(Int iCX, Int iCY)	{ cx = iCX; cy = iCY; }
+						 Size()				{ cx = 0;   cy = 0;   }
+						 Size(Int iCX, Int iCY)		{ cx = iCX; cy = iCY; }
 
-				Size operator	 +(const Size &) const;
-				Size operator	 -(const Size &) const;
+				Size operator	 +(const Size &size) const	{ return Size(cx + size.cx, cy + size.cy); }
+				Size operator	 -(const Size &size) const	{ return Size(cx - size.cx, cy - size.cy); }
 
-				Size operator	 *(const Float) const;
-				Size operator	 /(const Float) const;
+				Size operator	 *(const Float factor) const 	{ return Size(Math::Round(cx * factor),  Math::Round(cy * factor));  }
+				Size operator	 /(const Float divisor) const	{ return Size(Math::Round(cx / divisor), Math::Round(cy / divisor)); }
 
-				Bool operator	 ==(const Size &) const;
-				Bool operator	 !=(const Size &) const;
+				Bool operator	 ==(const Size &size) const	{ return (cx == size.cx && cy == size.cy); }
+				Bool operator	 !=(const Size &size) const	{ return (cx != size.cx || cy != size.cy); }
 		};
 	};
 };

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,38 +31,48 @@ namespace smooth
 
 #include "dialog.h"
 
-#define MB_OK			0
-#define MB_OKCANCEL		1
-#define MB_ABORTRETRYIGNORE	2
-#define MB_YESNOCANCEL		3
-#define MB_YESNO		4
-#define MB_RETRYCANCEL		5
-
-#define IDOK			1
-#define IDCANCEL		2
-#define IDABORT			3
-#define IDRETRY			4
-#define IDIGNORE		5
-#define IDYES			6
-#define IDNO			7
-#define IDCLOSE			8
-
-#define IDI_ERROR		(wchar_t *) 32513
-#define IDI_QUESTION		(wchar_t *) 32514
-#define IDI_WARNING		(wchar_t *) 32515
-#define IDI_INFORMATION		(wchar_t *) 32516
-#define IDI_HAND		IDI_ERROR
-#define IDI_EXCLAMATION		IDI_WARNING
-#define IDI_ASTERISK		IDI_INFORMATION
-
-#define MAKEINTRESOURCE(x)	(wchar_t *) 0
-
 namespace smooth
 {
 	namespace GUI
 	{
 		namespace Dialogs
 		{
+			namespace Message
+			{
+				namespace Buttons
+				{
+					const Int		 Ok		  = 0;
+					const Int		 OkCancel	  = 1;
+					const Int		 AbortRetryIgnore = 2;
+					const Int		 YesNoCancel	  = 3;
+					const Int		 YesNo		  = 4;
+					const Int		 RetryCancel	  = 5;
+				};
+
+				namespace Button
+				{
+					const Int		 Ok		  = 1;
+					const Int		 Cancel		  = 2;
+					const Int		 Abort		  = 3;
+					const Int		 Retry		  = 4;
+					const Int		 Ignore 	  = 5;
+					const Int		 Yes		  = 6;
+					const Int		 No		  = 7;
+					const Int		 Close		  = 8;
+				};
+
+				namespace Icon
+				{
+					const wchar_t * const	 Error		  = (wchar_t *) 32513;
+					const wchar_t * const	 Question	  = (wchar_t *) 32514;
+					const wchar_t * const	 Warning	  = (wchar_t *) 32515;
+					const wchar_t * const	 Information	  = (wchar_t *) 32516;
+					const wchar_t * const	 Hand		  = Error;
+					const wchar_t * const	 Exclamation	  = Warning;
+					const wchar_t * const	 Asterisk	  = Information;
+				};
+			};
+
 			class SMOOTHAPI MessageDlg : public Dialog
 			{
 				private:
@@ -97,7 +107,7 @@ namespace smooth
 					Void			 MessageButton1();
 					Void			 MessageButton2();
 				public:
-								 MessageDlg(const String &, const String &, Int, wchar_t *, const String & = NIL, Bool * = NIL);
+								 MessageDlg(const String &, const String &, Int, const wchar_t *, const String & = NIL, Bool * = NIL);
 					virtual			~MessageDlg();
 
 					const Error		&ShowDialog();
@@ -111,8 +121,8 @@ namespace smooth
 					static Bool		 IsDefaultRightToLeft();
 			};
 
-			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, char *);
-			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, wchar_t *);
+			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, const char *);
+			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, const wchar_t *);
 		}
 	}
 };

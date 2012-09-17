@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -97,7 +97,7 @@ Int BoCA::AS::Registry::GetNumberOfComponents()
 	return componentSpecs.Length();
 }
 
-Int BoCA::AS::Registry::GetNumberOfComponentsOfType(Int type)
+Int BoCA::AS::Registry::GetNumberOfComponentsOfType(ComponentType type)
 {
 	Int	 number = 0;
 
@@ -124,7 +124,7 @@ const String &BoCA::AS::Registry::GetComponentID(Int n)
 	return componentSpecs.GetNth(n)->id;
 }
 
-Int BoCA::AS::Registry::GetComponentType(Int n)
+BoCA::ComponentType BoCA::AS::Registry::GetComponentType(Int n)
 {
 	return componentSpecs.GetNth(n)->type;
 }

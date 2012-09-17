@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -33,17 +33,6 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	String	 wavFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".wav");
 	String	 encFileName = streamURI;
 
-	/* Start 3rd party command line decoder
-	 */
-	SHELLEXECUTEINFOA	 execInfo;
-
-	ZeroMemory(&execInfo, sizeof(execInfo));
-
-	execInfo.cbSize		= sizeof(execInfo);
-	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
-	execInfo.lpVerb		= "open";
-	execInfo.lpFile		= String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
-
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
@@ -54,9 +43,33 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		File(streamURI).Copy(encFileName);
 	}
 
-	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")).Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
-	execInfo.lpDirectory	= Application::GetApplicationDirectory();
-	execInfo.nShow		= specs->debug ? SW_SHOW : SW_HIDE;
+	/* Start 3rd party command line decoder
+	 */
+	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""))
+							      .Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
+
+	SHELLEXECUTEINFOA	 execInfo;
+
+	ZeroMemory(&execInfo, sizeof(execInfo));
+
+	execInfo.cbSize	     = sizeof(execInfo);
+	execInfo.fMask	     = SEE_MASK_NOCLOSEPROCESS;
+	execInfo.lpVerb	     = "open";
+	execInfo.lpDirectory = Application::GetApplicationDirectory();
+	execInfo.nShow	     = specs->debug ? SW_SHOW : SW_HIDE;
+
+	if (specs->debug)
+	{
+		execInfo.lpFile	      = String("cmd.exe");
+		execInfo.lpParameters = String("/c ").Append(command).Append(" ").Append(arguments).Append(" & pause");
+	}
+	else
+	{
+		execInfo.lpFile	      = String(command);
+		execInfo.lpParameters = String(arguments);
+	}
 
 	ShellExecuteExA(&execInfo);
 
@@ -88,7 +101,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		 */
 		File(wavFileName).Delete();
 
-		errorState = True;
+		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return Error();
@@ -177,17 +190,6 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	wavFileName = Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".wav");
 	encFileName = track.origFilename;
 
-	/* Start 3rd party command line decoder
-	 */
-	SHELLEXECUTEINFOA	 execInfo;
-
-	ZeroMemory(&execInfo, sizeof(execInfo));
-
-	execInfo.cbSize		= sizeof(execInfo);
-	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
-	execInfo.lpVerb		= "open";
-	execInfo.lpFile		= String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
-
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
@@ -198,9 +200,33 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 		File(track.origFilename).Copy(encFileName);
 	}
 
-	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")).Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
-	execInfo.lpDirectory	= Application::GetApplicationDirectory();
-	execInfo.nShow		= specs->debug ? SW_SHOW : SW_HIDE;
+	/* Start 3rd party command line decoder
+	 */
+	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""))
+							      .Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
+
+	SHELLEXECUTEINFOA	 execInfo;
+
+	ZeroMemory(&execInfo, sizeof(execInfo));
+
+	execInfo.cbSize	     = sizeof(execInfo);
+	execInfo.fMask	     = SEE_MASK_NOCLOSEPROCESS;
+	execInfo.lpVerb	     = "open";
+	execInfo.lpDirectory = Application::GetApplicationDirectory();
+	execInfo.nShow	     = specs->debug ? SW_SHOW : SW_HIDE;
+
+	if (specs->debug)
+	{
+		execInfo.lpFile	      = String("cmd.exe");
+		execInfo.lpParameters = String("/c ").Append(command).Append(" ").Append(arguments).Append(" & pause");
+	}
+	else
+	{
+		execInfo.lpFile	      = String(command);
+		execInfo.lpParameters = String(arguments);
+	}
 
 	ShellExecuteExA(&execInfo);
 
@@ -232,7 +258,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 		 */
 		File(wavFileName).Delete();
 
-		errorState = True;
+		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return False;

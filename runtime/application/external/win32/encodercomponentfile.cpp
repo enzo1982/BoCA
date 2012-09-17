@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -75,28 +75,39 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	/* Start 3rd party command line encoder
 	 */
+	const Info		&info = track.GetInfo();
+
+	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String("\"").Append(wavFileName).Append("\""))
+							      .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))
+							      .Replace("%ARTIST", String("\"").Append((char *) info.artist).Append("\""))
+							      .Replace("%ALBUM", String("\"").Append((char *) info.album).Append("\""))
+							      .Replace("%TITLE", String("\"").Append((char *) info.title).Append("\""))
+							      .Replace("%TRACK", String("\"").Append(String::FromInt(info.track)).Append("\""))
+							      .Replace("%YEAR", String("\"").Append(String::FromInt(info.year)).Append("\""))
+							      .Replace("%GENRE", String("\"").Append((char *) info.genre).Append("\""));
+
 	SHELLEXECUTEINFOA	 execInfo;
 
 	ZeroMemory(&execInfo, sizeof(execInfo));
 
-	const Info		&info = track.GetInfo();
+	execInfo.cbSize	     = sizeof(execInfo);
+	execInfo.fMask	     = SEE_MASK_NOCLOSEPROCESS;
+	execInfo.lpVerb	     = "open";
+	execInfo.lpDirectory = Application::GetApplicationDirectory();
+	execInfo.nShow	     = specs->debug ? SW_SHOW : SW_HIDE;
 
-	execInfo.cbSize		= sizeof(execInfo);
-	execInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
-	execInfo.lpVerb		= "open";
-	execInfo.lpFile		= String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
-	execInfo.lpParameters	= String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
-								   .Replace("%INFILE", String("\"").Append(wavFileName).Append("\""))
-								   .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))
-								   .Replace("%ARTIST", String("\"").Append((char *) info.artist).Append("\""))
-								   .Replace("%ALBUM", String("\"").Append((char *) info.album).Append("\""))
-								   .Replace("%TITLE", String("\"").Append((char *) info.title).Append("\""))
-								   .Replace("%TRACK", String("\"").Append(String::FromInt(info.track)).Append("\""))
-								   .Replace("%YEAR", String("\"").Append(String::FromInt(info.year)).Append("\""))
-								   .Replace("%GENRE", String("\"").Append((char *) info.genre).Append("\""));
-
-	execInfo.lpDirectory	= Application::GetApplicationDirectory();
-	execInfo.nShow		= specs->debug ? SW_SHOW : SW_HIDE;
+	if (specs->debug)
+	{
+		execInfo.lpFile	      = String("cmd.exe");
+		execInfo.lpParameters = String("/c ").Append(command).Append(" ").Append(arguments).Append(" & pause");
+	}
+	else
+	{
+		execInfo.lpFile	      = String(command);
+		execInfo.lpParameters = String(arguments);
+	}
 
 	ShellExecuteExA(&execInfo);
 
@@ -123,7 +134,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 		 */
 		File(encFileName).Delete();
 
-		errorState = True;
+		errorState  = True;
 		errorString = String("Encoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return False;

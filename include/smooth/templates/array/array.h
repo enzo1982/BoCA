@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,7 +20,7 @@ namespace smooth
 	{
 		public:
 					 Array()						{ }
-					~Array()						{ }
+			virtual		~Array()						{ }
 
 			/* Methods for adding entries to the list.
 			 */
@@ -59,10 +59,10 @@ namespace smooth
 
 			/* Locking and unlocking for synchronization.
 			 */
-			Int		 LockForRead() const					{ return ArrayBackend<s>::LockForRead(); }
-			Int		 LockForWrite() const					{ return ArrayBackend<s>::LockForWrite(); }
+			Void		 LockForRead() const					{ ArrayBackend<s>::LockForRead(); }
+			Void		 LockForWrite() const					{ ArrayBackend<s>::LockForWrite(); }
 
-			Int		 Unlock() const						{ return ArrayBackend<s>::Unlock(); }
+			Void		 Unlock() const						{ ArrayBackend<s>::Unlock(); }
 	};
 };
 

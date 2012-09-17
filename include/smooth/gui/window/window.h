@@ -29,6 +29,7 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Short	 WF_NORMAL		= 0;
 		const Short	 WF_MODAL		= 1;
 		const Short	 WF_TOPMOST		= 2;
 		const Short	 WF_NORESIZE		= 4;
@@ -91,7 +92,7 @@ namespace smooth
 
 				Int				 SetIconDirect(Void *);
 
-				virtual Rect			 GetVisibleArea() const			 { return Rect(Point(), GetSize()); }
+				virtual Rect			 GetVisibleArea() const			 { return Rect(Point(), GetRealSize()); }
 
 				virtual Int			 SetMetrics(const Point &, const Size &);
 

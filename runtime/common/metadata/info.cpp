@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -19,6 +19,8 @@ BoCA::Info::Info() : mcdi(Buffer<UnsignedByte>())
 
 	disc		= -1;
 	numDiscs	= -1;
+
+	rating		= 0;
 }
 
 BoCA::Info::Info(const Info &oInfo) : mcdi(Buffer<UnsignedByte>())
@@ -47,6 +49,8 @@ BoCA::Info &BoCA::Info::operator =(const Info &oInfo)
 	disc		= oInfo.disc;
 	numDiscs	= oInfo.numDiscs;
 
+	rating		= oInfo.rating;
+
 	label		= oInfo.label;
 	isrc		= oInfo.isrc;
 
@@ -67,4 +71,3 @@ BoCA::Info &BoCA::Info::operator =(const Info &oInfo)
 
 	return *this;
 }
-

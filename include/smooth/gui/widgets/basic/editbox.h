@@ -57,6 +57,8 @@ namespace smooth
 				Int				 GetCursorPos();
 
 				Int				 MarkAll();
+			accessors:
+				Bool				 IsFocussed() const;
 			signals:
 				Signal1<Void, const String &>	 onInput;
 				Signal1<Void, const String &>	 onEnter;

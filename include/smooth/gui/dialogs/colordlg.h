@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,6 +27,7 @@ namespace smooth
 		class Slider;
 		class Titlebar;
 		class Divider;
+		class ActiveArea;
 	};
 };
 
@@ -43,12 +44,8 @@ namespace smooth
 				private:
 					Color		 color;
 
+					Int		 xoffset;
 					Int		 yoffset;
-					Int		 huexoffset;
-					Int		 ncxoffset;
-					Int		 ocxoffset;
-					Int		 crsizex;
-					Int		 crsizey;
 
 					Bool		 huecapt;
 					Bool		 vscapt;
@@ -80,6 +77,8 @@ namespace smooth
 					Divider		*divbar;
 					Button		*okbtn;
 					Button		*cancelbtn;
+					ActiveArea	*ncarea;
+					ActiveArea	*ocarea;
 					Slider		*hueslider;
 					Slider		*satslider;
 					Slider		*valslider;
@@ -108,8 +107,6 @@ namespace smooth
 					Void		 ColorDlgMessageProc(Int, Int, Int);
 					Void		 ColorDlgUpdatePickers();
 					Bool		 ColorDlgKillProc();
-					Void		 ColorDlgOK();
-					Void		 ColorDlgCancel();
 					Void		 ColorDlgHueSlider();
 					Void		 ColorDlgSatSlider();
 					Void		 ColorDlgValSlider();
@@ -128,6 +125,11 @@ namespace smooth
 					virtual		~ColorSelection();
 
 					const Error	&ShowDialog();
+				slots:
+					Void		 OnOK();
+					Void		 OnCancel();
+
+					Void		 OnSelectOriginalColor();
 				accessors:
 					Int		 SetColor(const Color &);
 					const Color	&GetColor() const;

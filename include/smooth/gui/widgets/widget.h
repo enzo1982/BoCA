@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,9 +55,6 @@ namespace smooth
 			private:
 				Array<Widget *, Void *>		 widgets;
 
-				Surface				*nullSurface;
-				Surface				*drawSurface;
-
 				Tooltip				*tooltip;
 				System::Timer			*tipTimer;
 
@@ -99,6 +96,9 @@ namespace smooth
 
 				Font				 font;
 
+				Size				 unscaledTextSize;
+				Size				 scaledTextSize;
+
 				Widget				*container;
 
 				PopupMenu			*contextMenu;
@@ -115,8 +115,6 @@ namespace smooth
 				static const Short		 classID;
 
 				Short				 subtype;
-
-				Size				 textSize;
 
 								 Widget(const Point &, const Size &);
 				virtual				~Widget();
@@ -141,6 +139,7 @@ namespace smooth
 				Widget				*GetNextTabstopWidget(Int) const;
 
 				virtual Point			 GetRealPosition() const;
+				virtual Size			 GetRealSize() const;
 
 				virtual Int			 Show();
 				virtual Int			 Hide();
@@ -188,6 +187,15 @@ namespace smooth
 
 				virtual Int			 SetFont(const Font &);
 				virtual const Font		&GetFont() const;
+
+				Int				 GetUnscaledTextWidth() const	{ return unscaledTextSize.cx; }
+				Int				 GetScaledTextWidth() const	{ return scaledTextSize.cx; }
+
+				Int				 GetUnscaledTextHeight() const	{ return unscaledTextSize.cy; }
+				Int				 GetScaledTextHeight() const	{ return scaledTextSize.cy; }
+
+				const Size			&GetUnscaledTextSize() const	{ return unscaledTextSize; }
+				const Size			&GetScaledTextSize() const	{ return scaledTextSize; }
 
 				virtual Int			 SetOrientation(Int);
 				virtual Int			 GetOrientation() const;

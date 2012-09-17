@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -22,7 +22,7 @@ Void BoCA::Utilities::WarningMessage(const String &message, const String &replac
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Warning"), MB_OK, IDI_EXCLAMATION);
+	if (!config->enable_console) QuickMessage(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Warning"), Message::Buttons::Ok, Message::Icon::Exclamation);
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Warning")).Append(": ").Append(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
@@ -33,7 +33,7 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), MB_OK, IDI_HAND);
+	if (!config->enable_console) QuickMessage(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Hand);
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 

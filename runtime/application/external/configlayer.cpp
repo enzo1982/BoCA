@@ -105,7 +105,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 					Slider		*range = new Slider(Point(10, 11), Size(210, 0), OR_HORZ, NIL, min, max);
 					Text		*value = new Text(String::FromFloat(max * param->GetStepSize()).Append(param->GetStepSize() < 1 ? ".0" : ""), Point(230, 13));
 
-					range->SetWidth(222 - value->textSize.cx);
+					range->SetWidth(222 - value->GetUnscaledTextWidth());
 
 					range->SetValue(config->GetIntValue(specs->id, param->GetName(), param->GetDefault().ToFloat() / param->GetStepSize()));
 
@@ -115,7 +115,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 					Text		*minText = new Text(minAlias, Point(10, 30));
 					Text		*maxText = new Text(maxAlias, Point(10, 30));
 
-					maxText->SetPosition(Point(231 - value->textSize.cx - maxText->textSize.cx, 30));
+					maxText->SetPosition(Point(231 - value->GetUnscaledTextWidth() - maxText->GetUnscaledTextWidth(), 30));
 
 					group->Hide();
 					group->Add(range);
@@ -304,7 +304,7 @@ Void BoCA::AS::ConfigLayerExternal::OnSliderValueChange()
 					Text		*value = (Text *) group->GetNthObject(1);
 
 					value->SetText(String::FromFloat(range->GetValue() * param->GetStepSize()).Append(param->GetStepSize() < 1 && range->GetValue() % 10 == 0 ? ".0" : ""));
-					value->SetPosition(Point(240 - value->textSize.cx, 13));
+					value->SetPosition(Point(240 - value->GetUnscaledTextWidth(), 13));
 				}
 
 				break;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,11 +16,11 @@ namespace smooth
 	namespace Threads
 	{
 		class Access;
+		class Mutex;
 	};
 };
 
 #include "../definitions.h"
-#include "mutex.h"
 
 namespace smooth
 {
@@ -29,8 +29,11 @@ namespace smooth
 		class SMOOTHAPI Access
 		{
 			private:
-				static Mutex	 mutex;
+				static Mutex	*mutex;
 			public:
+				static Int	 Initialize();
+				static Int	 Free();
+
 				/* Access functions for Short.
 				 */
 				static Short	 Value(volatile Short &);

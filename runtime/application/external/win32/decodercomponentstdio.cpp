@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,6 +29,18 @@ BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()
 
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
+	String	 encFileName = streamURI;
+
+	/* Copy the file and decode the temporary copy
+	 * if the file name contains Unicode characters.
+	 */
+	if (String::IsUnicode(streamURI))
+	{
+		encFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
+
+		File(streamURI).Copy(encFileName);
+	}
+
 	/* Set up security attributes
 	 */
 	SECURITY_ATTRIBUTES	 secAttr;
@@ -46,6 +58,12 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Start 3rd party command line encoder
 	 */
+	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""));
+
+	if (specs->debug) AllocConsole();
+
 	STARTUPINFOA		 startupInfo;
 
 	ZeroMemory(&startupInfo, sizeof(startupInfo));
@@ -61,19 +79,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	ZeroMemory(&processInfo, sizeof(processInfo));
 
-	/* Copy the file and decode the temporary copy
-	 * if the file name contains Unicode characters.
-	 */
-	String	 encFileName = streamURI;
-
-	if (String::IsUnicode(streamURI))
-	{
-		encFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
-
-		File(streamURI).Copy(encFileName);
-	}
-
-	CreateProcessA(NIL, String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter()).Append(" ").Append(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	HANDLE	 hProcess = processInfo.hProcess;
 
@@ -199,6 +205,13 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		S::System::System::Sleep(10);
 	}
 
+	if (specs->debug)
+	{
+		Dialogs::QuickMessage("Click OK to close console window.", "Info", Dialogs::Message::Buttons::Ok, Dialogs::Message::Icon::Information);
+
+		FreeConsole();
+	}
+
 	/* Remove temporary copy if necessary.
 	 */
 	if (String::IsUnicode(streamURI))
@@ -214,7 +227,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	 */
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
-		errorState = True;
+		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return Error();
@@ -227,6 +240,20 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 {
+	encFileName = track.origFilename;
+
+	/* Copy the file and decode the temporary copy
+	 * if the file name contains Unicode characters.
+	 */
+	if (String::IsUnicode(track.origFilename))
+	{
+		encFileName = Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
+
+		File(track.origFilename).Copy(encFileName);
+	}
+
+	/* Set up security attributes
+	 */
 	SECURITY_ATTRIBUTES	 secAttr;
 
 	ZeroMemory(&secAttr, sizeof(secAttr));
@@ -239,6 +266,12 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 	/* Start 3rd party command line encoder.
 	 */
+	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""));
+
+	if (specs->debug) AllocConsole();
+
 	STARTUPINFOA		 startupInfo;
 
 	ZeroMemory(&startupInfo, sizeof(startupInfo));
@@ -254,19 +287,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 	ZeroMemory(&processInfo, sizeof(processInfo));
 
-	/* Copy the file and decode the temporary copy
-	 * if the file name contains Unicode characters.
-	 */
-	encFileName = track.origFilename;
-
-	if (String::IsUnicode(track.origFilename))
-	{
-		encFileName = Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
-
-		File(track.origFilename).Copy(encFileName);
-	}
-
-	CreateProcessA(NIL, String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter()).Append(" ").Append(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString()).Replace("%INFILE", String("\"").Append(encFileName).Append("\"")), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	hProcess = processInfo.hProcess;
 
@@ -312,6 +333,13 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 		S::System::System::Sleep(10);
 	}
 
+	if (specs->debug)
+	{
+		Dialogs::QuickMessage("Click OK to close console window.", "Info", Dialogs::Message::Buttons::Ok, Dialogs::Message::Icon::Information);
+
+		FreeConsole();
+	}
+
 	/* Remove temporary copy if necessary.
 	 */
 	if (String::IsUnicode(track.origFilename))
@@ -321,7 +349,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
-		errorState = True;
+		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		return False;
@@ -343,7 +371,13 @@ Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data
 
 	data.Resize(size);
 
-	if (!ReadFile(rPipe, data, size, (DWORD *) &size, NIL) || size == 0) return -1;
+	if (!ReadFile(rPipe, data, size, (DWORD *) &size, NIL) || size == 0)
+	{
+		errorState  = True;
+		errorString = "Decoder quit prematurely.";
+
+		return -1;
+	}
 
 	return size;
 }
