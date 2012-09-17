@@ -370,6 +370,11 @@ class StreamWriter(Codec):
         """
         pass
 
+    def seek(self, offset, whence=0):
+        self.stream.seek(offset, whence)
+        if whence == 0 and offset == 0:
+            self.reset()
+
     def __getattr__(self, name,
                     getattr=getattr):
 
@@ -601,8 +606,8 @@ class StreamReader(Codec):
 
             Resets the codec buffers used for keeping state.
         """
-        self.reset()
         self.stream.seek(offset, whence)
+        self.reset()
 
     def next(self):
 
@@ -693,6 +698,12 @@ class StreamReaderWriter:
 
         self.reader.reset()
         self.writer.reset()
+
+    def seek(self, offset, whence=0):
+        self.stream.seek(offset, whence)
+        self.reader.reset()
+        if whence == 0 and offset == 0:
+            self.writer.reset()
 
     def __getattr__(self, name,
                     getattr=getattr):
@@ -858,10 +869,15 @@ def open(filename, mode='rb', encoding=None, errors='strict', buffering=1):
         parameter.
 
     """
-    if encoding is not None and \
-       'b' not in mode:
-        # Force opening of the file in binary mode
-        mode = mode + 'b'
+    if encoding is not None:
+        if 'U' in mode:
+            # No automatic conversion of '\n' is done on reading and writing
+            mode = mode.strip().replace('U', '')
+            if mode[:1] not in set('rwa'):
+                mode = 'r' + mode
+        if 'b' not in mode:
+            # Force opening of the file in binary mode
+            mode = mode + 'b'
     file = __builtin__.open(filename, mode, buffering)
     if encoding is None:
         return file

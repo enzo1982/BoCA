@@ -1,6 +1,6 @@
 /* ANSI and traditional C compatability macros
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1998, 1999, 2000, 2001,
-   2002, 2003, 2004, 2005, 2006, 2007, 2009
+   2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010
    Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -178,7 +178,7 @@ So instead we use the macro below and test it against specific values.  */
 /* inline requires special treatment; it's in C99, and GCC >=2.7 supports
    it too, but it's not in C89.  */
 #undef inline
-#if __STDC_VERSION__ > 199901L || defined(__cplusplus)
+#if __STDC_VERSION__ >= 199901L || defined(__cplusplus) || (defined(__SUNPRO_C) && defined(__C99FEATURES__))
 /* it's a keyword */
 #else
 # if GCC_VERSION >= 2007
@@ -414,6 +414,15 @@ So instead we use the macro below and test it against specific values.  */
 #define EXPORTED_CONST extern const
 #else
 #define EXPORTED_CONST const
+#endif
+
+/* Be conservative and only use enum bitfields with GCC.
+   FIXME: provide a complete autoconf test for buggy enum bitfields.  */
+
+#if (GCC_VERSION > 2000)
+#define ENUM_BITFIELD(TYPE) __extension__ enum TYPE
+#else
+#define ENUM_BITFIELD(TYPE) unsigned int
 #endif
 
 #ifdef __cplusplus

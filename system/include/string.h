@@ -57,7 +57,7 @@ _CRTIMP char* __cdecl __MINGW_NOTHROW	strstr (const char*, const char*)  __MINGW
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strtok (char*, const char*);
 _CRTIMP size_t __cdecl __MINGW_NOTHROW	strxfrm (char*, const char*, size_t);
 
-//#ifndef __STRICT_ANSI__
+#ifndef __STRICT_ANSI__
 /*
  * Extra non-ANSI functions provided by the CRTDLL library
  */
@@ -116,7 +116,7 @@ _CRTIMP void __cdecl __MINGW_NOTHROW	swab (const char*, char*, size_t);
 #endif /* _UWIN */
 #endif /* _NO_OLDNAMES */
 
-//#endif	/* Not __STRICT_ANSI__ */
+#endif	/* Not __STRICT_ANSI__ */
 
 #ifndef _WSTRING_DEFINED
 /*

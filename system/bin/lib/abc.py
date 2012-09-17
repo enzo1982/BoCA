@@ -4,18 +4,24 @@
 """Abstract Base Classes (ABCs) according to PEP 3119."""
 
 
+# Instance of old-style class
+class _C: pass
+_InstanceType = type(_C())
+
+
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 
     Requires that the metaclass is ABCMeta or derived from it.  A
     class that has a metaclass derived from ABCMeta cannot be
     instantiated unless all of its abstract methods are overridden.
-    The abstract methods can be called using any of the the normal
+    The abstract methods can be called using any of the normal
     'super' call mechanisms.
 
     Usage:
 
-        class C(metaclass=ABCMeta):
+        class C:
+            __metaclass__ = ABCMeta
             @abstractmethod
             def my_abstract_method(self, ...):
                 ...
@@ -30,12 +36,13 @@ class abstractproperty(property):
     Requires that the metaclass is ABCMeta or derived from it.  A
     class that has a metaclass derived from ABCMeta cannot be
     instantiated unless all of its abstract properties are overridden.
-    The abstract properties can be called using any of the the normal
+    The abstract properties can be called using any of the normal
     'super' call mechanisms.
 
     Usage:
 
-        class C(metaclass=ABCMeta):
+        class C:
+            __metaclass__ = ABCMeta
             @abstractproperty
             def my_abstract_property(self):
                 ...
@@ -43,7 +50,8 @@ class abstractproperty(property):
     This defines a read-only property; you can also define a read-write
     abstract property using the 'long' form of property declaration:
 
-        class C(metaclass=ABCMeta):
+        class C:
+            __metaclass__ = ABCMeta
             def getx(self): ...
             def setx(self, value): ...
             x = abstractproperty(getx, setx)
@@ -121,6 +129,9 @@ class ABCMeta(type):
         if subclass in cls._abc_cache:
             return True
         subtype = type(instance)
+        # Old-style instances
+        if subtype is _InstanceType:
+            subtype = subclass
         if subtype is subclass or subclass is None:
             if (cls._abc_negative_cache_version ==
                 ABCMeta._abc_invalidation_counter and

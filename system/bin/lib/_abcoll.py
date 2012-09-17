@@ -21,6 +21,14 @@ __all__ = ["Hashable", "Iterable", "Iterator",
 
 ### ONE-TRICK PONIES ###
 
+def _hasattr(C, attr):
+    try:
+        return any(attr in B.__dict__ for B in C.__mro__)
+    except AttributeError:
+        # Old-style class
+        return hasattr(C, attr)
+
+
 class Hashable:
     __metaclass__ = ABCMeta
 
@@ -31,11 +39,16 @@ class Hashable:
     @classmethod
     def __subclasshook__(cls, C):
         if cls is Hashable:
-            for B in C.__mro__:
-                if "__hash__" in B.__dict__:
-                    if B.__dict__["__hash__"]:
-                        return True
-                    break
+            try:
+                for B in C.__mro__:
+                    if "__hash__" in B.__dict__:
+                        if B.__dict__["__hash__"]:
+                            return True
+                        break
+            except AttributeError:
+                # Old-style class
+                if getattr(C, "__hash__", None):
+                    return True
         return NotImplemented
 
 
@@ -50,7 +63,7 @@ class Iterable:
     @classmethod
     def __subclasshook__(cls, C):
         if cls is Iterable:
-            if any("__iter__" in B.__dict__ for B in C.__mro__):
+            if _hasattr(C, "__iter__"):
                 return True
         return NotImplemented
 
@@ -60,7 +73,7 @@ Iterable.register(str)
 class Iterator(Iterable):
 
     @abstractmethod
-    def __next__(self):
+    def next(self):
         raise StopIteration
 
     def __iter__(self):
@@ -69,7 +82,7 @@ class Iterator(Iterable):
     @classmethod
     def __subclasshook__(cls, C):
         if cls is Iterator:
-            if any("next" in B.__dict__ for B in C.__mro__):
+            if _hasattr(C, "next"):
                 return True
         return NotImplemented
 
@@ -84,7 +97,7 @@ class Sized:
     @classmethod
     def __subclasshook__(cls, C):
         if cls is Sized:
-            if any("__len__" in B.__dict__ for B in C.__mro__):
+            if _hasattr(C, "__len__"):
                 return True
         return NotImplemented
 
@@ -99,7 +112,7 @@ class Container:
     @classmethod
     def __subclasshook__(cls, C):
         if cls is Container:
-            if any("__contains__" in B.__dict__ for B in C.__mro__):
+            if _hasattr(C, "__contains__"):
                 return True
         return NotImplemented
 
@@ -114,7 +127,7 @@ class Callable:
     @classmethod
     def __subclasshook__(cls, C):
         if cls is Callable:
-            if any("__call__" in B.__dict__ for B in C.__mro__):
+            if _hasattr(C, "__call__"):
                 return True
         return NotImplemented
 
@@ -249,12 +262,12 @@ class MutableSet(Set):
 
     @abstractmethod
     def add(self, value):
-        """Return True if it was added, False if already there."""
+        """Add an element."""
         raise NotImplementedError
 
     @abstractmethod
     def discard(self, value):
-        """Return True if it was deleted, False if not there."""
+        """Remove an element.  Do not raise an exception if absent."""
         raise NotImplementedError
 
     def remove(self, value):
@@ -267,7 +280,7 @@ class MutableSet(Set):
         """Return the popped value.  Raise KeyError if empty."""
         it = iter(self)
         try:
-            value = it.__next__()
+            value = next(it)
         except StopIteration:
             raise KeyError
         self.discard(value)
@@ -286,10 +299,9 @@ class MutableSet(Set):
             self.add(value)
         return self
 
-    def __iand__(self, c):
-        for value in self:
-            if value not in c:
-                self.discard(value)
+    def __iand__(self, it):
+        for value in (self - it):
+            self.discard(value)
         return self
 
     def __ixor__(self, it):
@@ -357,8 +369,9 @@ class Mapping(Sized, Iterable, Container):
     __hash__ = None
 
     def __eq__(self, other):
-        return isinstance(other, Mapping) and \
-               dict(self.items()) == dict(other.items())
+        if not isinstance(other, Mapping):
+            return NotImplemented
+        return dict(self.items()) == dict(other.items())
 
     def __ne__(self, other):
         return not (self == other)
@@ -519,6 +532,7 @@ class Sequence(Sized, Iterable, Container):
 Sequence.register(tuple)
 Sequence.register(basestring)
 Sequence.register(buffer)
+Sequence.register(xrange)
 
 
 class MutableSequence(Sequence):
@@ -557,5 +571,6 @@ class MutableSequence(Sequence):
 
     def __iadd__(self, values):
         self.extend(values)
+        return self
 
 MutableSequence.register(list)

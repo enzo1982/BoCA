@@ -50,6 +50,53 @@ typedef struct _PROCESS_MEMORY_COUNTERS {
 	DWORD PeakPagefileUsage;
 } PROCESS_MEMORY_COUNTERS,*PPROCESS_MEMORY_COUNTERS;
 
+typedef struct _PROCESS_MEMORY_COUNTERS_EX {
+	DWORD cb;
+	DWORD PageFaultCount;
+	DWORD PeakWorkingSetSize;
+	DWORD WorkingSetSize;
+	DWORD QuotaPeakPagedPoolUsage;
+	DWORD QuotaPagedPoolUsage;
+	DWORD QuotaPeakNonPagedPoolUsage;
+	DWORD QuotaNonPagedPoolUsage;
+	DWORD PagefileUsage;
+	DWORD PeakPagefileUsage;
+	DWORD PrivateUsage;
+} PROCESS_MEMORY_COUNTERS_EX,*PPROCESS_MEMORY_COUNTERS_EX;
+
+typedef struct _PERFORMANCE_INFORMATION {
+  DWORD cb;
+  DWORD CommitTotal;
+  DWORD CommitLimit;
+  DWORD CommitPeak;
+  DWORD PhysicalTotal;
+  DWORD PhysicalAvailable;
+  DWORD SystemCache;
+  DWORD KernelTotal;
+  DWORD KernelPaged;
+  DWORD KernelNonpaged;
+  DWORD PageSize;
+  DWORD HandleCount;
+  DWORD ProcessCount;
+  DWORD ThreadCount;
+} PERFORMANCE_INFORMATION, *PPERFORMANCE_INFORMATION;
+
+typedef union _PSAPI_WORKING_SET_BLOCK {
+  ULONG_PTR Flags;
+  struct {
+    ULONG_PTR Protection  :5;
+    ULONG_PTR ShareCount  :3;
+    ULONG_PTR Shared  :1;
+    ULONG_PTR Reserved  :3;
+    ULONG_PTR VirtualPage  :20;
+  } ;
+} PSAPI_WORKING_SET_BLOCK, *PPSAPI_WORKING_SET_BLOCK;
+
+typedef struct _PSAPI_WORKING_SET_INFORMATION {
+  ULONG_PTR               NumberOfEntries;
+  PSAPI_WORKING_SET_BLOCK WorkingSetInfo[1];
+} PSAPI_WORKING_SET_INFORMATION, *PPSAPI_WORKING_SET_INFORMATION;
+
 /* Grouped by application,not in alphabetical order. */
 BOOL WINAPI EnumProcesses(DWORD *,DWORD,DWORD *);
 BOOL WINAPI EnumProcessModules(HANDLE,HMODULE *,DWORD,LPDWORD);
@@ -70,6 +117,7 @@ DWORD WINAPI GetDeviceDriverBaseNameW(LPVOID,LPWSTR,DWORD);
 DWORD WINAPI GetDeviceDriverFileNameA(LPVOID,LPSTR,DWORD);
 DWORD WINAPI GetDeviceDriverFileNameW(LPVOID,LPWSTR,DWORD);
 BOOL WINAPI GetProcessMemoryInfo(HANDLE,PPROCESS_MEMORY_COUNTERS,DWORD);
+BOOL WINAPI GetPerformanceInfo(PPERFORMANCE_INFORMATION,DWORD);
 #if (_WIN32_WINNT >= 0x0501)
 DWORD WINAPI GetProcessImageFileNameA(HANDLE,LPSTR,DWORD);
 DWORD WINAPI GetProcessImageFileNameW(HANDLE,LPWSTR,DWORD);

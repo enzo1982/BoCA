@@ -234,8 +234,9 @@ typedef struct _DRIVE_LAYOUT_INFORMATION_EX *PDRIVE_LAYOUT_INFORMATION_EX;
 #define FILE_ATTRIBUTE_OFFLINE            0x00001000
 #define FILE_ATTRIBUTE_NOT_CONTENT_INDEXED 0x00002000
 #define FILE_ATTRIBUTE_ENCRYPTED          0x00004000
+#define FILE_ATTRIBUTE_VIRTUAL            0x00010000
 
-#define FILE_ATTRIBUTE_VALID_FLAGS        0x00007fb7
+#define FILE_ATTRIBUTE_VALID_FLAGS        0x00017fb7
 #define FILE_ATTRIBUTE_VALID_SET_FLAGS    0x000031a7
 
 #define FILE_COPY_STRUCTURED_STORAGE      0x00000041
@@ -945,6 +946,15 @@ typedef enum _TIMER_TYPE {
   SynchronizationTimer
 } TIMER_TYPE;
 
+typedef enum _TIMER_INFORMATION_CLASS {
+  TimerBasicInformation
+} TIMER_INFORMATION_CLASS;
+
+typedef struct _TIMER_BASIC_INFORMATION {
+  LARGE_INTEGER TimeRemaining;
+  BOOLEAN SignalState;
+} TIMER_BASIC_INFORMATION, *PTIMER_BASIC_INFORMATION;
+
 #define EVENT_INCREMENT                   1
 #define IO_NO_INCREMENT                   0
 #define IO_CD_ROM_INCREMENT               1
@@ -1065,10 +1075,12 @@ enum
    IRP_RETRY_IO_COMPLETION = 0x4000
 };
 
-
+#ifndef _DRIVE_LAYOUT_INFORMATION_MBR_DEFINED
+#define _DRIVE_LAYOUT_INFORMATION_MBR_DEFINED
 typedef struct _DRIVE_LAYOUT_INFORMATION_MBR {
   ULONG  Signature;
 } DRIVE_LAYOUT_INFORMATION_MBR, *PDRIVE_LAYOUT_INFORMATION_MBR;
+#endif
 
 typedef struct _DRIVE_LAYOUT_INFORMATION_GPT {
   GUID  DiskId;
@@ -9003,6 +9015,26 @@ DDKAPI
 ZwQuerySymbolicLinkObject(
   /*IN*/ HANDLE  LinkHandle,
   /*IN OUT*/ PUNICODE_STRING  LinkTarget,
+  /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtQueryTimer(
+  /*IN*/ HANDLE  TimerHandle,
+  /*IN*/ TIMER_INFORMATION_CLASS TimerInformationClass,
+  /*OUT*/ PVOID TimerInformation,
+  /*IN*/ ULONG TimerInformationLength,
+  /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+ZwQueryTimer(
+  /*IN*/ HANDLE  TimerHandle,
+  /*IN*/ TIMER_INFORMATION_CLASS TimerInformationClass,
+  /*OUT*/ PVOID TimerInformation,
+  /*IN*/ ULONG TimerInformationLength,
   /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
 
 NTOSAPI

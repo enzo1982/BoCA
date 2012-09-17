@@ -43,15 +43,17 @@ del l
 
 # Capitalize the words in a string, e.g. " aBc  dEf " -> "Abc Def".
 def capwords(s, sep=None):
-    """capwords(s, [sep]) -> string
+    """capwords(s [,sep]) -> string
 
     Split the argument into words using split, capitalize each
     word using capitalize, and join the capitalized words using
-    join. Note that this replaces runs of whitespace characters by
-    a single space.
+    join.  If the optional second argument sep is absent or None,
+    runs of whitespace characters are replaced by a single space
+    and leading and trailing whitespace are removed, otherwise
+    sep is used to split and join the words.
 
     """
-    return (sep or ' ').join([x.capitalize() for x in s.split(sep)])
+    return (sep or ' ').join(x.capitalize() for x in s.split(sep))
 
 
 # Construct a translation string
@@ -532,9 +534,8 @@ except ImportError:
 # the Formatter class
 # see PEP 3101 for details and purpose of this class
 
-# The hard parts are reused from the C implementation.  They're
-# exposed here via the sys module.  sys was chosen because it's always
-# available and doesn't have to be dynamically loaded.
+# The hard parts are reused from the C implementation.  They're exposed as "_"
+# prefixed methods of str and unicode.
 
 # The overall parser is implemented in str._formatter_parser.
 # The field name parser is implemented in str._formatter_field_name_split

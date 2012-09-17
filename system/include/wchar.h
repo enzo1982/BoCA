@@ -24,7 +24,6 @@
 #define __need_wchar_t
 #define __need_NULL
 #include <stddef.h>
-#include <stdio.h>
 
 #ifndef __VALIST
 #if defined __GNUC__ && __GNUC__ >= 3
@@ -368,6 +367,7 @@ struct __wfinddata64_t {
 };
 #endif
 #if __MSVCRT_VERSION__ >= 0x0800
+#include <stdio.h>
 struct __wfinddata32_t {
 	unsigned	attrib;
 	__time32_t	time_create;

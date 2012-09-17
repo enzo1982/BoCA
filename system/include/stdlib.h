@@ -117,10 +117,10 @@ __MINGW_IMPORT char**  __argv_dll;
 
 #else		/* ! __DECLSPEC_SUPPORTED */
 # ifdef __MSVCRT__
-   extern int* _imp____mbcur_max;
+   extern int* _imp____mb_cur_max;
 #  define MB_CUR_MAX (*_imp____mb_cur_max)
 # else		/* not __MSVCRT */
-   extern int*  _imp____mbcur_max_dll;
+   extern int*  _imp____mb_cur_max_dll;
 #  define MB_CUR_MAX (*_imp____mb_cur_max_dll)
 # endif 	/* not __MSVCRT */
 #endif  	/*  __DECLSPEC_SUPPORTED */
@@ -310,16 +310,8 @@ _CRTIMP long __cdecl __MINGW_NOTHROW _wtol (const wchar_t *);
 #endif
 #if !defined __NO_ISOCEXT  /*  in libmingwex.a */
 double __cdecl __MINGW_NOTHROW __strtod (const char*, char**);
-#ifdef __cplusplus
-/* We require a function with external linkage. */
-#else
-static
-#endif /* Not __cplusplus */
-__inline__ double __cdecl __MINGW_NOTHROW
-strtod (const char* __restrict__ __nptr, char** __restrict__ __endptr)
-{
-  return __strtod(__nptr, __endptr);
-}
+extern double __cdecl __MINGW_NOTHROW
+strtod (const char* __restrict__ __nptr, char** __restrict__ __endptr);
 float __cdecl __MINGW_NOTHROW strtof (const char * __restrict__, char ** __restrict__);
 long double __cdecl __MINGW_NOTHROW strtold (const char * __restrict__, char ** __restrict__);
 #else
@@ -440,10 +432,10 @@ _CRTIMP __int64 __cdecl __MINGW_NOTHROW	_wtoi64(const wchar_t *);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _i64tow(__int64, wchar_t *, int);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _ui64tow(unsigned __int64, wchar_t *, int);
 
-_CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotl(unsigned int, int) __MINGW_ATTRIB_CONST;
-_CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotr(unsigned int, int) __MINGW_ATTRIB_CONST;
-_CRTIMP unsigned long __cdecl __MINGW_NOTHROW _lrotl(unsigned long, int) __MINGW_ATTRIB_CONST;
-_CRTIMP unsigned long __cdecl __MINGW_NOTHROW _lrotr(unsigned long, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned int __cdecl __MINGW_NOTHROW (_rotl)(unsigned int, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned int __cdecl __MINGW_NOTHROW (_rotr)(unsigned int, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned long __cdecl __MINGW_NOTHROW (_lrotl)(unsigned long, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned long __cdecl __MINGW_NOTHROW (_lrotr)(unsigned long, int) __MINGW_ATTRIB_CONST;
 
 _CRTIMP int __cdecl __MINGW_NOTHROW _set_error_mode (int);
 
