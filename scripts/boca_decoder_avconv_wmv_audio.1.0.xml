@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Windows Media Audio Decoder</name>
+  <name>Windows Media Video Audio Extractor</name>
   <version>1.0</version>
-  <id>ffmpeg-wma-in</id>
+  <id>avconv-wmv_audio-in</id>
   <type>decoder</type>
   <format>
-    <name>Windows Media Audio Files</name>
-    <extension>wma</extension>
+    <name>Windows Media Video Files</name>
+    <extension>wmv</extension>
     <tag id="wma-tag" mode="other">WMA Metadata</tag>
   </format>
   <external>
-    <command>ffmpeg</command>
-    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <command>avconv</command>
+    <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>

@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Matroska Video Audio Extractor</name>
+  <name>AVI Video Audio Extractor</name>
   <version>1.0</version>
-  <id>ffmpeg-mkv_audio-in</id>
+  <id>avconv-avi_audio-in</id>
   <type>decoder</type>
   <format>
-    <name>Matroska Video Files</name>
-    <extension>mkv</extension>
+    <name>Microsoft AVI Video</name>
+    <extension>avi</extension>
+    <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
   </format>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

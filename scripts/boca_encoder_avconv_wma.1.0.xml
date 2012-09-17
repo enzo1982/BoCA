@@ -3,7 +3,7 @@
 <component>
   <name>Windows Media Audio Encoder</name>
   <version>1.0</version>
-  <id>ffmpeg-wma-out</id>
+  <id>avconv-wma-out</id>
   <type>encoder</type>
   <format>
     <name>Windows Media Audio Files</name>
@@ -11,12 +11,12 @@
     <tag id="wma-tag" mode="other">WMA Metadata</tag>
   </format>
   <external>
-    <command>ffmpeg</command>
-    <arguments>-f wav -i %INFILE -acodec wmav2 %OPTIONS %OUTFILE</arguments>
+    <command>avconv</command>
+    <arguments>-f wav -i %INFILE -c:a wmav2 %OPTIONS %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
     <parameters>
-      <range name="Bitrate" argument="-ab %VALUE000" default="192" enabled="true" step="4">
+      <range name="Bitrate" argument="-b:a %VALUE000" default="192" enabled="true" step="4">
 	<min alias="24 kbps">24</min>
 	<max alias="320 kbps">320</max>
       </range>

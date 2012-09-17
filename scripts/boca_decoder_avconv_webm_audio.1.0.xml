@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>MP4 Video Audio Extractor</name>
+  <name>WebM Audio Extractor</name>
   <version>1.0</version>
-  <id>ffmpeg-m4v_audio-in</id>
+  <id>avconv-webm_audio-in</id>
   <type>decoder</type>
   <format>
-    <name>MP4 Video Files</name>
-    <extension>m4v</extension>
-    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+    <name>WebM Video</name>
+    <extension>webm</extension>
   </format>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

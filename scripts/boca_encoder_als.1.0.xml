@@ -8,10 +8,7 @@
   <format>
     <name>MPEG-4 ALS Files</name>
     <extension>mp4</extension>
-    <!--
-      Disabled tags for now, because mp4als cannot read tagged files.
-      <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
-    -->
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>
   <external>
     <command>mp4als</command>

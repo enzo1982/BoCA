@@ -3,15 +3,15 @@
 <component>
   <name>MPEG-1 Audio Layer 2 Encoder</name>
   <version>1.0</version>
-  <id>ffmpeg-mp2-out</id>
+  <id>avconv-mp2-out</id>
   <type>encoder</type>
   <format>
     <name>MPEG-1 Audio Layer 2</name>
     <extension>mp2</extension>
   </format>
   <external>
-    <command>ffmpeg</command>
-    <arguments>-f wav -i %INFILE -acodec mp2 %OPTIONS %OUTFILE</arguments>
+    <command>avconv</command>
+    <arguments>-f wav -i %INFILE -c:a mp2 %OPTIONS %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>

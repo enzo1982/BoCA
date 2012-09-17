@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>RealAudio Decoder</name>
+  <name>Apple Lossless Decoder</name>
   <version>1.0</version>
-  <id>ffmpeg-realaudio-in</id>
+  <id>avconv-alac-in</id>
   <type>decoder</type>
   <format>
-    <name>RealAudio Files</name>
-    <extension>ra</extension>
+    <name>Apple Lossless Files</name>
+    <extension>m4a</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

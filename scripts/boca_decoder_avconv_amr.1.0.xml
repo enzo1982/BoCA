@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>ATRAC-3 Decoder</name>
+  <name>Adaptive Multi-Rate Decoder</name>
   <version>1.0</version>
-  <id>ffmpeg-atrac3-in</id>
+  <id>avconv-amr-in</id>
   <type>decoder</type>
   <format>
-    <name>ATRAC-3 Files</name>
-    <extension>aa3</extension>
-    <extension>wav</extension>
-  </format>
-  <format>
-    <name>OpenMG Audio Files</name>
-    <extension>oma</extension>
-    <extension>omg</extension>
+    <name>AMR Files</name>
+    <extension>amr</extension>
   </format>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Apple Lossless Decoder</name>
+  <name>ATRAC-3 Decoder</name>
   <version>1.0</version>
-  <id>ffmpeg-alac-in</id>
+  <id>avconv-atrac3-in</id>
   <type>decoder</type>
   <format>
-    <name>Apple Lossless Files</name>
-    <extension>m4a</extension>
-    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+    <name>ATRAC-3 Files</name>
+    <extension>aa3</extension>
+    <extension>wav</extension>
+  </format>
+  <format>
+    <name>OpenMG Audio Files</name>
+    <extension>oma</extension>
+    <extension>omg</extension>
   </format>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

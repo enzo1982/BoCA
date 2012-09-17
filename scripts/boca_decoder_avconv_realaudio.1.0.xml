@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>MPEG Video Audio Extractor</name>
+  <name>RealAudio Decoder</name>
   <version>1.0</version>
-  <id>ffmpeg-mpg_audio-in</id>
+  <id>avconv-realaudio-in</id>
   <type>decoder</type>
   <format>
-    <name>MPEG Video Files</name>
-    <extension>mpg</extension>
-    <extension>mpeg</extension>
+    <name>RealAudio Files</name>
+    <extension>ra</extension>
   </format>
   <external>
-    <command>ffmpeg</command>
-    <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
