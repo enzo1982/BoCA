@@ -40,7 +40,7 @@ extern OGGPAGEEOS		 ex_ogg_page_eos;
 extern OGGSTREAMCLEAR		 ex_ogg_stream_clear;
 
 typedef OpusEncoder *		(*OPUSENCODERCREATE)	 (opus_int32, int, int, int *);
-typedef int			(*OPUSENCODE)		 (OpusEncoder *, const opus_int16 *, int, unsigned char *, int);
+typedef int			(*OPUSENCODE)		 (OpusEncoder *, const opus_int16 *, int, unsigned char *, opus_int32);
 typedef int			(*OPUSENCODERCTL)	 (OpusEncoder *, int, ...);
 typedef void			(*OPUSENCODERDESTROY)	 (OpusEncoder *);
 typedef const char *		(*OPUSGETVERSIONSTRING)	 ();

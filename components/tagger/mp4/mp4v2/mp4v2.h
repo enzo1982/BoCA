@@ -32,8 +32,8 @@
 
 /*****************************************************************************/
 
-#include "platform.h"
-#include "project.h"
+#include <mp4v2/platform.h>
+#include <mp4v2/project.h>
 
 /*****************************************************************************/
 
@@ -54,17 +54,17 @@ extern "C" {
 
 /*****************************************************************************/
 
-#include "general.h"
-#include "file.h"
-#include "file_prop.h"
-#include "track.h"
-#include "track_prop.h"
-#include "sample.h"
-#include "chapter.h"
-#include "itmf_generic.h"
-#include "itmf_tags.h"
-#include "streaming.h"
-#include "isma.h"
+#include <mp4v2/general.h>
+#include <mp4v2/file.h>
+#include <mp4v2/file_prop.h>
+#include <mp4v2/track.h>
+#include <mp4v2/track_prop.h>
+#include <mp4v2/sample.h>
+#include <mp4v2/chapter.h>
+#include <mp4v2/itmf_generic.h>
+#include <mp4v2/itmf_tags.h>
+#include <mp4v2/streaming.h>
+#include <mp4v2/isma.h>
 
 /*****************************************************************************/
 

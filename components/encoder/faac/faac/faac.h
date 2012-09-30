@@ -26,7 +26,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#ifdef WIN32
+#ifdef _WIN32
 # ifndef FAACAPI
 #  define FAACAPI __stdcall
 # endif
@@ -50,7 +50,7 @@ psymodellist_t;
 typedef void *faacEncHandle;
 
 #ifndef HAVE_INT32_T
-typedef int int32_t;
+typedef signed int int32_t;
 #endif
 
 /*

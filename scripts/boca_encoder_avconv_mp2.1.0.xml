@@ -8,10 +8,11 @@
   <format>
     <name>MPEG-1 Audio Layer 2</name>
     <extension>mp2</extension>
+    <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
   </format>
   <external>
     <command>avconv</command>
-    <arguments>-f wav -i %INFILE -c:a mp2 %OPTIONS %OUTFILE</arguments>
+    <arguments>-f wav -i %INFILE -c:a mp2 %OPTIONS -y %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>

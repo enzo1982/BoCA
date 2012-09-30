@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -24,6 +24,8 @@ namespace BoCA
 
 			Buffer<short>		 pcm_l;
 			Buffer<short>		 pcm_r;
+
+			Int			 numFrames;
 
 			Int			 delaySamples;
 			Int			 padSamples;

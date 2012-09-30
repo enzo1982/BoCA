@@ -41,8 +41,12 @@ else
 	DLLEXT = .so
 
 	ifeq ($(BUILD_SOLARIS),True)
-		CCOPTS += -fpic
+		CCOPTS += -fPIC
 		LDOPTS += -Wl,-rpath,.
+	else ifeq ($(BUILD_LINUX),True)
+		ifeq ($(BUILD_X64),True)
+			CCOPTS += -fPIC
+		endif
 	else ifeq ($(BUILD_NETBSD),True)
 		CCOPTS += -I/usr/pkg/include
 		LDOPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,.

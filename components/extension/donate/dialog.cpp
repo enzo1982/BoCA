@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -48,9 +48,17 @@ BoCA::DonateDialog::DonateDialog()
 	mainWnd->Add(text_donate_other);
 	mainWnd->Add(text_thanks);
 
-	link_donate_5		= new Hyperlink(NIL, ImageLoader::Load(File(String(Application::GetApplicationDirectory()).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_5.png"))), String("file:///").Append(Application::GetApplicationDirectory().Replace("\\", "/")).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_5.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 - 100, text_donate->GetUnscaledTextHeight() + 56));
-	link_donate_10		= new Hyperlink(NIL, ImageLoader::Load(File(String(Application::GetApplicationDirectory()).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_10.png"))), String("file:///").Append(Application::GetApplicationDirectory().Replace("\\", "/")).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_10.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 - 30, text_donate->GetUnscaledTextHeight() + 56));
-	link_donate_other	= new Hyperlink(NIL, ImageLoader::Load(File(String(Application::GetApplicationDirectory()).Append("boca/boca.extension.donate/donate_other_").Append(i18n->TranslateString("en")).Append(".png"))), String("file:///").Append(Application::GetApplicationDirectory().Replace("\\", "/")).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_other.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 + 40, text_donate->GetUnscaledTextHeight() + 56));
+	Bitmap	 image_5     = ImageLoader::Load(File(String(Application::GetApplicationDirectory()).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_5.png")));
+	Bitmap	 image_10    = ImageLoader::Load(File(String(Application::GetApplicationDirectory()).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_10.png")));
+	Bitmap	 image_other = ImageLoader::Load(File(String(Application::GetApplicationDirectory()).Append("boca/boca.extension.donate/donate_other_").Append(i18n->TranslateString("en")).Append(".png")));
+
+	image_5.SetBackgroundColor(Setup::BackgroundColor);
+	image_10.SetBackgroundColor(Setup::BackgroundColor);
+	image_other.SetBackgroundColor(Setup::BackgroundColor);
+
+	link_donate_5		= new Hyperlink(NIL, image_5, String("file:///").Append(Application::GetApplicationDirectory().Replace("\\", "/")).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_5.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 - 100, text_donate->GetUnscaledTextHeight() + 56));
+	link_donate_10		= new Hyperlink(NIL, image_10, String("file:///").Append(Application::GetApplicationDirectory().Replace("\\", "/")).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_10.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 - 30, text_donate->GetUnscaledTextHeight() + 56));
+	link_donate_other	= new Hyperlink(NIL, image_other, String("file:///").Append(Application::GetApplicationDirectory().Replace("\\", "/")).Append("boca/boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_other.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 + 40, text_donate->GetUnscaledTextHeight() + 56));
 
 	mainWnd->Add(link_donate_5);
 	mainWnd->Add(link_donate_10);
@@ -67,7 +75,7 @@ BoCA::DonateDialog::DonateDialog()
 	Add(mainWnd);
 
 	mainWnd->SetFlags(mainWnd->GetFlags() | WF_TOPMOST | WF_NOTASKBUTTON);
-	mainWnd->SetIcon(ImageLoader::Load("freac.pci:0"));
+	mainWnd->SetIcon(ImageLoader::Load("icons/freac.png"));
 
 	Rect	 workArea = MultiMonitor::GetActiveMonitorWorkArea();
 

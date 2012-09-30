@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef __ACCESS_CONTROL__
@@ -209,14 +209,14 @@ extern "C" {
     __MINGW_TYPEDEF_AW(ACTRL_AUDIT)
     __MINGW_TYPEDEF_AW(PACTRL_AUDIT)
 
-#define TRUSTEE_ACCESS_ALLOWED 0x00000001L
-#define TRUSTEE_ACCESS_READ 0x00000002L
-#define TRUSTEE_ACCESS_WRITE 0x00000004L
+#define TRUSTEE_ACCESS_ALLOWED __MSABI_LONG(0x00000001)
+#define TRUSTEE_ACCESS_READ __MSABI_LONG(0x00000002)
+#define TRUSTEE_ACCESS_WRITE __MSABI_LONG(0x00000004)
 
-#define TRUSTEE_ACCESS_EXPLICIT 0x00000001L
+#define TRUSTEE_ACCESS_EXPLICIT __MSABI_LONG(0x00000001)
 #define TRUSTEE_ACCESS_READ_WRITE (TRUSTEE_ACCESS_READ | TRUSTEE_ACCESS_WRITE)
 
-#define TRUSTEE_ACCESS_ALL 0xFFFFFFFFL
+#define TRUSTEE_ACCESS_ALL __MSABI_LONG(0xFFFFFFFF)
 
     typedef struct _TRUSTEE_ACCESSA {
       LPSTR lpProperty;

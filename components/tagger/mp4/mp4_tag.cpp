@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -123,14 +123,14 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 
 	if (info.track > 0)
 	{
-		MP4TagTrack	 mp4Track = { info.track, info.numTracks };
+		MP4TagTrack	 mp4Track = { (uint16_t) info.track, (uint16_t) info.numTracks };
 
 		ex_MP4TagsSetTrack(mp4Tags, &mp4Track);
 	}
 
 	if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
 	{
-		MP4TagDisk	 mp4Disk = { info.disc, info.numDiscs };
+		MP4TagDisk	 mp4Disk = { (uint16_t) info.disc, (uint16_t) info.numDiscs };
 
 		ex_MP4TagsSetDisk(mp4Tags, &mp4Disk);
 	}
@@ -158,7 +158,7 @@ Error BoCA::MP4Tag::RenderStreamInfo(const String &fileName, const Track &track)
 	{
 		foreach (const Picture &picInfo, track.pictures)
 		{
-			MP4TagArtwork	 artwork = { const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data), picInfo.data.Size(), picInfo.mime == "image/png" ? MP4_ART_PNG : MP4_ART_JPEG };
+			MP4TagArtwork	 artwork = { const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data), (uint32_t) picInfo.data.Size(), picInfo.mime == "image/png" ? MP4_ART_PNG : MP4_ART_JPEG };
 
 			ex_MP4TagsAddArtwork(mp4Tags, &artwork);
 		}

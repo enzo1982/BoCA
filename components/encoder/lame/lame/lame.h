@@ -4,7 +4,7 @@
  *	Copyright (c) 1999 Mark Taylor
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
+ * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
@@ -13,7 +13,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
+ * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
@@ -1247,23 +1247,33 @@ void CDECL lame_set_write_id3tag_automatic(lame_global_flags * gfp, int);
 int CDECL lame_get_write_id3tag_automatic(lame_global_flags const* gfp);
 
 /* experimental */
-int CDECL id3tag_set_textinfo_latin1(lame_global_flags * gfp, char const *id, char const *text);
+int CDECL id3tag_set_textinfo_latin1(lame_t gfp, char const *id, char const *text);
 
 /* experimental */
-int CDECL id3tag_set_textinfo_ucs2(lame_global_flags * gfp,
-                                   char const *id, unsigned short const *text);
+int CDECL id3tag_set_comment_latin1(lame_t gfp, char const *lang, char const *desc, char const *text);
+
+#if DEPRECATED_OR_OBSOLETE_CODE_REMOVED
+#else
+/* experimental */
+int CDECL id3tag_set_textinfo_ucs2(lame_t gfp, char const *id, unsigned short const *text);
 
 /* experimental */
-int CDECL id3tag_set_comment_latin1(lame_global_flags * gfp,
-                                    char const *lang, char const *desc, char const *text);
-
-/* experimental */
-int CDECL id3tag_set_comment_ucs2(lame_global_flags * gfp,
-                                  char const *lang,
+int CDECL id3tag_set_comment_ucs2(lame_t gfp, char const *lang,
                                   unsigned short const *desc, unsigned short const *text);
 
 /* experimental */
 int CDECL id3tag_set_fieldvalue_ucs2(lame_t gfp, const unsigned short *fieldvalue);
+#endif
+
+/* experimental */
+int CDECL id3tag_set_fieldvalue_utf16(lame_t gfp, const unsigned short *fieldvalue);
+
+/* experimental */
+int CDECL id3tag_set_textinfo_utf16(lame_t gfp, char const *id, unsigned short const *text);
+
+/* experimental */
+int CDECL id3tag_set_comment_utf16(lame_t gfp, char const *lang, unsigned short const *desc, unsigned short const *text);
+
 
 /***********************************************************************
 *

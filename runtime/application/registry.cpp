@@ -59,14 +59,8 @@ BoCA::AS::Registry::Registry()
 		File		 file = dllFiles.GetNth(i);
 		ComponentSpecs	*specs = new ComponentSpecs();
 
-		if (specs->LoadFromDLL(file))
-		{
-			componentSpecs.Add(specs);
-		}
-		else
-		{
-			delete specs;
-		}
+		if (specs->LoadFromDLL(file)) InsertComponent(specs);
+		else			      delete specs;
 	}
 
 	const Array<File>	&xmlFiles = dir.GetFilesByPattern("boca_*.xml");
@@ -76,20 +70,40 @@ BoCA::AS::Registry::Registry()
 		File		 file = xmlFiles.GetNth(i);
 		ComponentSpecs	*specs = new ComponentSpecs();
 
-		if (specs->LoadFromXML(file))
-		{
-			componentSpecs.Add(specs);
-		}
-		else
-		{
-			delete specs;
-		}
+		if (specs->LoadFromXML(file)) InsertComponent(specs);
+		else			      delete specs;
 	}
 }
 
 BoCA::AS::Registry::~Registry()
 {
 	foreach (ComponentSpecs *cs, componentSpecs) delete cs;
+}
+
+Void BoCA::AS::Registry::InsertComponent(ComponentSpecs *specs)
+{
+	/* Sort encoder components by name.
+	 */
+	if (specs->type == COMPONENT_TYPE_ENCODER)
+	{
+		for (Int i = 0; i < componentSpecs.Length(); i++)
+		{
+			ComponentSpecs	*entry = componentSpecs.GetNth(i);
+
+			if (entry->type != COMPONENT_TYPE_ENCODER) continue;
+
+			String		 lSpecsName = String(specs->name).ToLower();
+			String		 lEntryName = String(entry->name).ToLower();
+
+			for (Int n = 0; n < lSpecsName.Length(); n++)
+			{
+				if	(lSpecsName[n] < lEntryName[n]) { componentSpecs.InsertAtPos(i, specs); return; }
+				else if (lSpecsName[n] > lEntryName[n]) { 					break;  }
+			}
+		}
+	}
+
+	componentSpecs.Add(specs);
 }
 
 Int BoCA::AS::Registry::GetNumberOfComponents()

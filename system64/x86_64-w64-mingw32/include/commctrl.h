@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _INC_COMMCTRL
@@ -11,11 +11,6 @@
 #ifndef _WINRESRC_
 #ifndef _WIN32_IE
 #define _WIN32_IE 0x0501
-#else
-/* FIXME: This really must be 0x0501 !!! */
-#if (_WIN32_IE < 0x0500)
-#error _WIN32_IE setting conflicts
-#endif
 #endif
 #endif
 
@@ -285,8 +280,8 @@ extern "C" {
 
 #ifndef NOIMAGEAPIS
 
-#define CLR_NONE 0xffffffffL
-#define CLR_DEFAULT 0xFF000000L
+#define CLR_NONE __MSABI_LONG(0xffffffff)
+#define CLR_DEFAULT __MSABI_LONG(0xFF000000)
 
 #ifndef HIMAGELIST
   struct _IMAGELIST;
@@ -530,7 +525,7 @@ extern "C" {
 #endif
 
 #define HDM_GETITEMCOUNT (HDM_FIRST+0)
-#define Header_GetItemCount(hwndHD) (int)SNDMSG((hwndHD),HDM_GETITEMCOUNT,0,0L)
+#define Header_GetItemCount(hwndHD) (int)SNDMSG((hwndHD),HDM_GETITEMCOUNT,(WPARAM)0,(LPARAM)0)
 
 #define HDM_INSERTITEMA (HDM_FIRST+1)
 #define HDM_INSERTITEMW (HDM_FIRST+10)
@@ -540,7 +535,7 @@ extern "C" {
 #define Header_InsertItem(hwndHD,i,phdi) (int)SNDMSG((hwndHD),HDM_INSERTITEM,(WPARAM)(int)(i),(LPARAM)(const HD_ITEM *)(phdi))
 
 #define HDM_DELETEITEM (HDM_FIRST+2)
-#define Header_DeleteItem(hwndHD,i) (WINBOOL)SNDMSG((hwndHD),HDM_DELETEITEM,(WPARAM)(int)(i),0L)
+#define Header_DeleteItem(hwndHD,i) (WINBOOL)SNDMSG((hwndHD),HDM_DELETEITEM,(WPARAM)(int)(i),(LPARAM)0)
 
 #define HDM_GETITEMA (HDM_FIRST+3)
 #define HDM_GETITEMW (HDM_FIRST+11)
@@ -1075,6 +1070,11 @@ extern "C" {
 
 #define TB_GETMETRICS (WM_USER+101)
 #define TB_SETMETRICS (WM_USER+102)
+#if (_WIN32_WINNT >= 0x600)
+#define TB_GETITEMDROPDOWNRECT (WM_USER + 103)
+#define TB_SETPRESSEDIMAGELIST (WM_USER + 104)
+#define TB_GETPRESSEDIMAGELIST (WM_USER + 105)
+#endif
 #define TB_SETWINDOWTHEME CCM_SETWINDOWTHEME
 
 #define TBN_GETBUTTONINFOA (TBN_FIRST-0)
@@ -1991,14 +1991,14 @@ extern "C" {
 #define HOTKEY_CLASS __MINGW_NAME_AW(HOTKEY_CLASS)
 #endif
 
-#define CCS_TOP 0x1L
-#define CCS_NOMOVEY 0x2L
-#define CCS_BOTTOM 0x3L
-#define CCS_NORESIZE 0x4L
-#define CCS_NOPARENTALIGN 0x8L
-#define CCS_ADJUSTABLE 0x20L
-#define CCS_NODIVIDER 0x40L
-#define CCS_VERT 0x80L
+#define CCS_TOP __MSABI_LONG(0x1)
+#define CCS_NOMOVEY __MSABI_LONG(0x2)
+#define CCS_BOTTOM __MSABI_LONG(0x3)
+#define CCS_NORESIZE __MSABI_LONG(0x4)
+#define CCS_NOPARENTALIGN __MSABI_LONG(0x8)
+#define CCS_ADJUSTABLE __MSABI_LONG(0x20)
+#define CCS_NODIVIDER __MSABI_LONG(0x40)
+#define CCS_VERT __MSABI_LONG(0x80)
 #define CCS_LEFT (CCS_VERT | CCS_TOP)
 #define CCS_RIGHT (CCS_VERT | CCS_BOTTOM)
 #define CCS_NOMOVEX (CCS_VERT | CCS_NOMOVEY)
@@ -2041,11 +2041,11 @@ extern "C" {
 #define LVM_GETUNICODEFORMAT CCM_GETUNICODEFORMAT
 #define ListView_GetUnicodeFormat(hwnd) (WINBOOL)SNDMSG((hwnd),LVM_GETUNICODEFORMAT,0,0)
 #define LVM_GETBKCOLOR (LVM_FIRST+0)
-#define ListView_GetBkColor(hwnd) (COLORREF)SNDMSG((hwnd),LVM_GETBKCOLOR,0,0L)
+#define ListView_GetBkColor(hwnd) (COLORREF)SNDMSG((hwnd),LVM_GETBKCOLOR,(WPARAM)0,(LPARAM)0)
 #define LVM_SETBKCOLOR (LVM_FIRST+1)
 #define ListView_SetBkColor(hwnd,clrBk) (WINBOOL)SNDMSG((hwnd),LVM_SETBKCOLOR,0,(LPARAM)(COLORREF)(clrBk))
 #define LVM_GETIMAGELIST (LVM_FIRST+2)
-#define ListView_GetImageList(hwnd,iImageList) (HIMAGELIST)SNDMSG((hwnd),LVM_GETIMAGELIST,(WPARAM)(INT)(iImageList),0L)
+#define ListView_GetImageList(hwnd,iImageList) (HIMAGELIST)SNDMSG((hwnd),LVM_GETIMAGELIST,(WPARAM)(INT)(iImageList),(LPARAM)0)
 
 #define LVSIL_NORMAL 0
 #define LVSIL_SMALL 1
@@ -2055,7 +2055,7 @@ extern "C" {
 #define ListView_SetImageList(hwnd,himl,iImageList) (HIMAGELIST)SNDMSG((hwnd),LVM_SETIMAGELIST,(WPARAM)(iImageList),(LPARAM)(HIMAGELIST)(himl))
 
 #define LVM_GETITEMCOUNT (LVM_FIRST+4)
-#define ListView_GetItemCount(hwnd) (int)SNDMSG((hwnd),LVM_GETITEMCOUNT,0,0L)
+#define ListView_GetItemCount(hwnd) (int)SNDMSG((hwnd),LVM_GETITEMCOUNT,(WPARAM)0,(LPARAM)0)
 
 #define LVIF_TEXT 0x1
 #define LVIF_IMAGE 0x2
@@ -2128,8 +2128,8 @@ extern "C" {
 
 #define LVITEM_V1_SIZE __MINGW_NAME_AW_EXT(LVITEM,_V1_SIZE)
 
-#define LPSTR_TEXTCALLBACKW ((LPWSTR)-1L)
-#define LPSTR_TEXTCALLBACKA ((LPSTR)-1L)
+#define LPSTR_TEXTCALLBACKW ((LPWSTR)(INT_PTR)-1)
+#define LPSTR_TEXTCALLBACKA ((LPSTR)(INT_PTR)-1)
 
 #define LPSTR_TEXTCALLBACK __MINGW_NAME_AW(LPSTR_TEXTCALLBACK)
 
@@ -2159,10 +2159,10 @@ extern "C" {
 #define ListView_InsertItem(hwnd,pitem) (int)SNDMSG((hwnd),LVM_INSERTITEM,0,(LPARAM)(const LV_ITEM *)(pitem))
 
 #define LVM_DELETEITEM (LVM_FIRST+8)
-#define ListView_DeleteItem(hwnd,i) (WINBOOL)SNDMSG((hwnd),LVM_DELETEITEM,(WPARAM)(int)(i),0L)
+#define ListView_DeleteItem(hwnd,i) (WINBOOL)SNDMSG((hwnd),LVM_DELETEITEM,(WPARAM)(int)(i),(LPARAM)0)
 
 #define LVM_DELETEALLITEMS (LVM_FIRST+9)
-#define ListView_DeleteAllItems(hwnd) (WINBOOL)SNDMSG((hwnd),LVM_DELETEALLITEMS,0,0L)
+#define ListView_DeleteAllItems(hwnd) (WINBOOL)SNDMSG((hwnd),LVM_DELETEALLITEMS,(WPARAM)0,(LPARAM)0)
 
 #define LVM_GETCALLBACKMASK (LVM_FIRST+10)
 #define ListView_GetCallbackMask(hwnd) (WINBOOL)SNDMSG((hwnd),LVM_GETCALLBACKMASK,0,0)
@@ -2280,17 +2280,17 @@ extern "C" {
 #define LVA_SNAPTOGRID 0x5
 
 #define LVM_ARRANGE (LVM_FIRST+22)
-#define ListView_Arrange(hwndLV,code) (WINBOOL)SNDMSG((hwndLV),LVM_ARRANGE,(WPARAM)(UINT)(code),0L)
+#define ListView_Arrange(hwndLV,code) (WINBOOL)SNDMSG((hwndLV),LVM_ARRANGE,(WPARAM)(UINT)(code),(LPARAM)0)
 
 #define LVM_EDITLABELA (LVM_FIRST+23)
 #define LVM_EDITLABELW (LVM_FIRST+118)
 
 #define LVM_EDITLABEL __MINGW_NAME_AW(LVM_EDITLABEL)
 
-#define ListView_EditLabel(hwndLV,i) (HWND)SNDMSG((hwndLV),LVM_EDITLABEL,(WPARAM)(int)(i),0L)
+#define ListView_EditLabel(hwndLV,i) (HWND)SNDMSG((hwndLV),LVM_EDITLABEL,(WPARAM)(int)(i),(LPARAM)0)
 
 #define LVM_GETEDITCONTROL (LVM_FIRST+24)
-#define ListView_GetEditControl(hwndLV) (HWND)SNDMSG((hwndLV),LVM_GETEDITCONTROL,0,0L)
+#define ListView_GetEditControl(hwndLV) (HWND)SNDMSG((hwndLV),LVM_GETEDITCONTROL,(WPARAM)0,(LPARAM)0)
 
 #define LV_COLUMNA LVCOLUMNA
 #define LV_COLUMNW LVCOLUMNW
@@ -2317,10 +2317,8 @@ extern "C" {
     LPWSTR pszText;
     int cchTextMax;
     int iSubItem;
-# if (_WIN32_IE >= 0x0300)
     int iImage;
     int iOrder;
-# endif
 # if (_WIN32_WINNT >= 0x0600)
     int cxMin;
     int cxDefault;
@@ -2398,17 +2396,17 @@ extern "C" {
 #define ListView_SetColumnWidth(hwnd,iCol,cx) (WINBOOL)SNDMSG((hwnd),LVM_SETCOLUMNWIDTH,(WPARAM)(int)(iCol),MAKELPARAM((cx),0))
 
 #define LVM_GETHEADER (LVM_FIRST+31)
-#define ListView_GetHeader(hwnd) (HWND)SNDMSG((hwnd),LVM_GETHEADER,0,0L)
+#define ListView_GetHeader(hwnd) (HWND)SNDMSG((hwnd),LVM_GETHEADER,(WPARAM)0,(LPARAM)0)
 #define LVM_CREATEDRAGIMAGE (LVM_FIRST+33)
 #define ListView_CreateDragImage(hwnd,i,lpptUpLeft) (HIMAGELIST)SNDMSG((hwnd),LVM_CREATEDRAGIMAGE,(WPARAM)(int)(i),(LPARAM)(LPPOINT)(lpptUpLeft))
 #define LVM_GETVIEWRECT (LVM_FIRST+34)
 #define ListView_GetViewRect(hwnd,prc) (WINBOOL)SNDMSG((hwnd),LVM_GETVIEWRECT,0,(LPARAM)(RECT *)(prc))
 #define LVM_GETTEXTCOLOR (LVM_FIRST+35)
-#define ListView_GetTextColor(hwnd) (COLORREF)SNDMSG((hwnd),LVM_GETTEXTCOLOR,0,0L)
+#define ListView_GetTextColor(hwnd) (COLORREF)SNDMSG((hwnd),LVM_GETTEXTCOLOR,(WPARAM)0,(LPARAM)0)
 #define LVM_SETTEXTCOLOR (LVM_FIRST+36)
 #define ListView_SetTextColor(hwnd,clrText) (WINBOOL)SNDMSG((hwnd),LVM_SETTEXTCOLOR,0,(LPARAM)(COLORREF)(clrText))
 #define LVM_GETTEXTBKCOLOR (LVM_FIRST+37)
-#define ListView_GetTextBkColor(hwnd) (COLORREF)SNDMSG((hwnd),LVM_GETTEXTBKCOLOR,0,0L)
+#define ListView_GetTextBkColor(hwnd) (COLORREF)SNDMSG((hwnd),LVM_GETTEXTBKCOLOR,(WPARAM)0,(LPARAM)0)
 #define LVM_SETTEXTBKCOLOR (LVM_FIRST+38)
 #define ListView_SetTextBkColor(hwnd,clrTextBk) (WINBOOL)SNDMSG((hwnd),LVM_SETTEXTBKCOLOR,0,(LPARAM)(COLORREF)(clrTextBk))
 #define LVM_GETTOPINDEX (LVM_FIRST+39)
@@ -2418,7 +2416,7 @@ extern "C" {
 #define LVM_GETORIGIN (LVM_FIRST+41)
 #define ListView_GetOrigin(hwndLV,ppt) (WINBOOL)SNDMSG((hwndLV),LVM_GETORIGIN,(WPARAM)0,(LPARAM)(POINT *)(ppt))
 #define LVM_UPDATE (LVM_FIRST+42)
-#define ListView_Update(hwndLV,i) (WINBOOL)SNDMSG((hwndLV),LVM_UPDATE,(WPARAM)(i),0L)
+#define ListView_Update(hwndLV,i) (WINBOOL)SNDMSG((hwndLV),LVM_UPDATE,(WPARAM)(i),(LPARAM)0)
 #define LVM_SETITEMSTATE (LVM_FIRST+43)
 #define ListView_SetItemState(hwndLV,i,data,mask) { LV_ITEM _ms_lvi; _ms_lvi.stateMask = mask; _ms_lvi.state = data; SNDMSG((hwndLV),LVM_SETITEMSTATE,(WPARAM)(i),(LPARAM)(LV_ITEM *)&_ms_lvi);}
 #define ListView_SetCheckState(hwndLV,i,fCheck) ListView_SetItemState(hwndLV,i,INDEXTOSTATEIMAGEMASK((fCheck)?2:1),LVIS_STATEIMAGEMASK)
@@ -2456,10 +2454,10 @@ extern "C" {
 #define ListView_SetItemPosition32(hwndLV,i,x0,y0) { POINT ptNewPos; ptNewPos.x = x0; ptNewPos.y = y0; SNDMSG((hwndLV),LVM_SETITEMPOSITION32,(WPARAM)(int)(i),(LPARAM)&ptNewPos); }
 
 #define LVM_GETSELECTEDCOUNT (LVM_FIRST+50)
-#define ListView_GetSelectedCount(hwndLV) (UINT)SNDMSG((hwndLV),LVM_GETSELECTEDCOUNT,0,0L)
+#define ListView_GetSelectedCount(hwndLV) (UINT)SNDMSG((hwndLV),LVM_GETSELECTEDCOUNT,(WPARAM)0,(LPARAM)0)
 
 #define LVM_GETITEMSPACING (LVM_FIRST+51)
-#define ListView_GetItemSpacing(hwndLV,fSmall) (DWORD)SNDMSG((hwndLV),LVM_GETITEMSPACING,fSmall,0L)
+#define ListView_GetItemSpacing(hwndLV,fSmall) (DWORD)SNDMSG((hwndLV),LVM_GETITEMSPACING,fSmall,(LPARAM)0)
 
 #define LVM_GETISEARCHSTRINGA (LVM_FIRST+52)
 #define LVM_GETISEARCHSTRINGW (LVM_FIRST+117)
@@ -3691,13 +3689,13 @@ typedef struct tagTVDISPINFOEXW {
 #define TCS_EX_REGISTERDROP 0x2
 
 #define TCM_GETIMAGELIST (TCM_FIRST+2)
-#define TabCtrl_GetImageList(hwnd) (HIMAGELIST)SNDMSG((hwnd),TCM_GETIMAGELIST,0,0L)
+#define TabCtrl_GetImageList(hwnd) (HIMAGELIST)SNDMSG((hwnd),TCM_GETIMAGELIST,(WPARAM)0,(LPARAM)0)
 
 #define TCM_SETIMAGELIST (TCM_FIRST+3)
 #define TabCtrl_SetImageList(hwnd,himl) (HIMAGELIST)SNDMSG((hwnd),TCM_SETIMAGELIST,0,(LPARAM)(HIMAGELIST)(himl))
 
 #define TCM_GETITEMCOUNT (TCM_FIRST+4)
-#define TabCtrl_GetItemCount(hwnd) (int)SNDMSG((hwnd),TCM_GETITEMCOUNT,0,0L)
+#define TabCtrl_GetItemCount(hwnd) (int)SNDMSG((hwnd),TCM_GETITEMCOUNT,(WPARAM)0,(LPARAM)0)
 
 #define TCIF_TEXT 0x1
 #define TCIF_IMAGE 0x2
@@ -3782,10 +3780,10 @@ typedef struct tagTVDISPINFOEXW {
 #define TabCtrl_InsertItem(hwnd,iItem,pitem) (int)SNDMSG((hwnd),TCM_INSERTITEM,(WPARAM)(int)(iItem),(LPARAM)(const TC_ITEM *)(pitem))
 
 #define TCM_DELETEITEM (TCM_FIRST+8)
-#define TabCtrl_DeleteItem(hwnd,i) (WINBOOL)SNDMSG((hwnd),TCM_DELETEITEM,(WPARAM)(int)(i),0L)
+#define TabCtrl_DeleteItem(hwnd,i) (WINBOOL)SNDMSG((hwnd),TCM_DELETEITEM,(WPARAM)(int)(i),(LPARAM)0)
 
 #define TCM_DELETEALLITEMS (TCM_FIRST+9)
-#define TabCtrl_DeleteAllItems(hwnd) (WINBOOL)SNDMSG((hwnd),TCM_DELETEALLITEMS,0,0L)
+#define TabCtrl_DeleteAllItems(hwnd) (WINBOOL)SNDMSG((hwnd),TCM_DELETEALLITEMS,(WPARAM)0,(LPARAM)0)
 
 #define TCM_GETITEMRECT (TCM_FIRST+10)
 #define TabCtrl_GetItemRect(hwnd,i,prc) (WINBOOL)SNDMSG((hwnd),TCM_GETITEMRECT,(WPARAM)(int)(i),(LPARAM)(RECT *)(prc))
@@ -3812,21 +3810,21 @@ typedef struct tagTVDISPINFOEXW {
 #define TCM_HITTEST (TCM_FIRST+13)
 #define TabCtrl_HitTest(hwndTC,pinfo) (int)SNDMSG((hwndTC),TCM_HITTEST,0,(LPARAM)(TC_HITTESTINFO *)(pinfo))
 #define TCM_SETITEMEXTRA (TCM_FIRST+14)
-#define TabCtrl_SetItemExtra(hwndTC,cb) (WINBOOL)SNDMSG((hwndTC),TCM_SETITEMEXTRA,(WPARAM)(cb),0L)
+#define TabCtrl_SetItemExtra(hwndTC,cb) (WINBOOL)SNDMSG((hwndTC),TCM_SETITEMEXTRA,(WPARAM)(cb),(LPARAM)0)
 #define TCM_ADJUSTRECT (TCM_FIRST+40)
 #define TabCtrl_AdjustRect(hwnd,bLarger,prc) (int)SNDMSG(hwnd,TCM_ADJUSTRECT,(WPARAM)(WINBOOL)(bLarger),(LPARAM)(RECT *)prc)
 #define TCM_SETITEMSIZE (TCM_FIRST+41)
 #define TabCtrl_SetItemSize(hwnd,x,y) (DWORD)SNDMSG((hwnd),TCM_SETITEMSIZE,0,MAKELPARAM(x,y))
 #define TCM_REMOVEIMAGE (TCM_FIRST+42)
-#define TabCtrl_RemoveImage(hwnd,i) (void)SNDMSG((hwnd),TCM_REMOVEIMAGE,i,0L)
+#define TabCtrl_RemoveImage(hwnd,i) (void)SNDMSG((hwnd),TCM_REMOVEIMAGE,i,(LPARAM)0)
 #define TCM_SETPADDING (TCM_FIRST+43)
 #define TabCtrl_SetPadding(hwnd,cx,cy) (void)SNDMSG((hwnd),TCM_SETPADDING,0,MAKELPARAM(cx,cy))
 #define TCM_GETROWCOUNT (TCM_FIRST+44)
-#define TabCtrl_GetRowCount(hwnd) (int)SNDMSG((hwnd),TCM_GETROWCOUNT,0,0L)
+#define TabCtrl_GetRowCount(hwnd) (int)SNDMSG((hwnd),TCM_GETROWCOUNT,(WPARAM)0,(LPARAM)0)
 #define TCM_GETTOOLTIPS (TCM_FIRST+45)
-#define TabCtrl_GetToolTips(hwnd) (HWND)SNDMSG((hwnd),TCM_GETTOOLTIPS,0,0L)
+#define TabCtrl_GetToolTips(hwnd) (HWND)SNDMSG((hwnd),TCM_GETTOOLTIPS,(WPARAM)0,(LPARAM)0)
 #define TCM_SETTOOLTIPS (TCM_FIRST+46)
-#define TabCtrl_SetToolTips(hwnd,hwndTT) (void)SNDMSG((hwnd),TCM_SETTOOLTIPS,(WPARAM)(hwndTT),0L)
+#define TabCtrl_SetToolTips(hwnd,hwndTT) (void)SNDMSG((hwnd),TCM_SETTOOLTIPS,(WPARAM)(hwndTT),(LPARAM)0)
 #define TCM_GETCURFOCUS (TCM_FIRST+47)
 #define TabCtrl_GetCurFocus(hwnd) (int)SNDMSG((hwnd),TCM_GETCURFOCUS,0,0)
 #define TCM_SETCURFOCUS (TCM_FIRST+48)
@@ -3914,9 +3912,9 @@ typedef struct tagTVDISPINFOEXW {
 #define MCM_SETCURSEL (MCM_FIRST+2)
 #define MonthCal_SetCurSel(hmc,pst) (WINBOOL)SNDMSG(hmc,MCM_SETCURSEL,0,(LPARAM)(pst))
 #define MCM_GETMAXSELCOUNT (MCM_FIRST+3)
-#define MonthCal_GetMaxSelCount(hmc) (DWORD)SNDMSG(hmc,MCM_GETMAXSELCOUNT,0,0L)
+#define MonthCal_GetMaxSelCount(hmc) (DWORD)SNDMSG(hmc,MCM_GETMAXSELCOUNT,(WPARAM)0,(LPARAM)0)
 #define MCM_SETMAXSELCOUNT (MCM_FIRST+4)
-#define MonthCal_SetMaxSelCount(hmc,n) (WINBOOL)SNDMSG(hmc,MCM_SETMAXSELCOUNT,(WPARAM)(n),0L)
+#define MonthCal_SetMaxSelCount(hmc,n) (WINBOOL)SNDMSG(hmc,MCM_SETMAXSELCOUNT,(WPARAM)(n),(LPARAM)0)
 #define MCM_GETSELRANGE (MCM_FIRST+5)
 #define MonthCal_GetSelRange(hmc,rgst) SNDMSG(hmc,MCM_GETSELRANGE,0,(LPARAM)(rgst))
 #define MCM_SETSELRANGE (MCM_FIRST+6)
@@ -4351,6 +4349,29 @@ typedef struct tagTVDISPINFOEXW {
 #define BCM_GETTEXTMARGIN (BCM_FIRST+0x5)
 #define Button_GetTextMargin(hwnd,pmargin) (WINBOOL)SNDMSG((hwnd),BCM_GETTEXTMARGIN,0,(LPARAM)(pmargin))
 
+#define BCM_SETNOTE (BCM_FIRST+0x9)
+#define Button_SetNote(hwnd, psz) \
+  (WINBOOL)SNDMSG((hwnd), BCM_SETNOTE, 0, (LPARAM)(psz))
+#define BCM_GETNOTE (BCM_FIRST + 0xa)
+#define Button_GetNote(hwnd, psz, pcc) \
+  (WINBOOL)SNDMSG((hwnd), BCM_GETNOTE, (WPARAM)pcc, (LPARAM)psz)
+#define BCM_GETNOTELENGTH (BCM_FIRST + 0xb)
+#define Button_GetNoteLength(hwnd) \
+  (LRESULT)SNDMSG((hwnd), BCM_GETNOTELENGTH, 0, 0)
+#define BCM_SETSHIELD (BCM_FIRST + 0xc)
+#define Button_SetElevationRequiredState(hwnd, fRequired) \
+  (LRESULT)SNDMSG((hwnd), BCM_SETSHIELD, 0, (LPARAM)fRequired)
+
+#define BCM_SETDROPDOWNSTATE (BCM_FIRST + 0x6)
+#define Button_SetDropDownState(hwnd, fDropDown) \
+   (WINBOOL)SNDMSG((hwnd), BCM_SETDROPDOWNSTATE, (WPARAM)fDropDown, 0)
+#define BCM_SETSPLITINFO (BCM_FIRST + 0x7)
+#define Button_SetSplitInfo(hwnd,psi) \
+   (WINBOOL)SNDMSG((hwnd), BCM_SETSPLITINFO, 0, (LPARAM)psi)
+#define BCM_GETSPLITINFO (BCM_FIRST + 0x8)
+#define Button_GetSplitInfo(hwnd,psi) \
+   (WINBOOL)SNDMSG((hwnd), BCM_GETSPLITINFO, 0, (LPARAM)psi)
+
   typedef struct tagNMBCHOTITEM {
     NMHDR hdr;
     DWORD dwFlags;
@@ -4359,6 +4380,36 @@ typedef struct tagTVDISPINFOEXW {
 #define BCN_HOTITEMCHANGE (BCN_FIRST+0x1)
 
 #define BST_HOT 0x200
+
+/* Vista and 6.0 version new Button control styles.  */
+#define BS_SPLITBUTTON          0xc
+#define BS_DEFSPLITBUTTON       0xd
+#define BS_COMMANDLINK          0xe
+#define BS_DEFCOMMANDLINK       0xf
+
+#define BST_DROPDOWNPUSHED 0x400
+
+#define BCSIF_GLYPH 0x1
+#define BCSIF_IMAGE 0x2
+#define BCSIF_STYLE 0x4
+#define BCSIF_SIZE 0x8
+
+#define BCSS_NOSPLIT 0x1
+#define BCSS_STRETCH 0x2
+#define BCSS_ALIGNLEFT 0x4
+#define BCSS_IMAGE 0x8
+
+#define BCN_DROPDOWN (BCN_FIRST + 0x2)
+
+#define BCCL_NOGLYPH (HIMAGELIST)((size_t) -1)
+
+typedef struct tagBUTTON_SPLITINFO
+{
+  UINT mask;
+  HIMAGELIST himlGlyph;
+  UINT uSplitStyle;
+  SIZE size;
+} BUTTON_SPLITINFO, *PBUTTON_SPLITINFO;
 
 #endif
 
@@ -4574,19 +4625,19 @@ typedef const void* (CALLBACK *PFNDPAMERGECONST)(UINT, const void*, const void*,
 
 #ifndef NOFLATSBAPIS
 
-#define WSB_PROP_CYVSCROLL 0x1L
-#define WSB_PROP_CXHSCROLL 0x2L
-#define WSB_PROP_CYHSCROLL 0x4L
-#define WSB_PROP_CXVSCROLL 0x8L
-#define WSB_PROP_CXHTHUMB 0x10L
-#define WSB_PROP_CYVTHUMB 0x20L
-#define WSB_PROP_VBKGCOLOR 0x40L
-#define WSB_PROP_HBKGCOLOR 0x80L
-#define WSB_PROP_VSTYLE 0x100L
-#define WSB_PROP_HSTYLE 0x200L
-#define WSB_PROP_WINSTYLE 0x400L
-#define WSB_PROP_PALETTE 0x800L
-#define WSB_PROP_MASK 0xfffL
+#define WSB_PROP_CYVSCROLL __MSABI_LONG(0x1)
+#define WSB_PROP_CXHSCROLL __MSABI_LONG(0x2)
+#define WSB_PROP_CYHSCROLL __MSABI_LONG(0x4)
+#define WSB_PROP_CXVSCROLL __MSABI_LONG(0x8)
+#define WSB_PROP_CXHTHUMB __MSABI_LONG(0x10)
+#define WSB_PROP_CYVTHUMB __MSABI_LONG(0x20)
+#define WSB_PROP_VBKGCOLOR __MSABI_LONG(0x40)
+#define WSB_PROP_HBKGCOLOR __MSABI_LONG(0x80)
+#define WSB_PROP_VSTYLE __MSABI_LONG(0x100)
+#define WSB_PROP_HSTYLE __MSABI_LONG(0x200)
+#define WSB_PROP_WINSTYLE __MSABI_LONG(0x400)
+#define WSB_PROP_PALETTE __MSABI_LONG(0x800)
+#define WSB_PROP_MASK __MSABI_LONG(0xfff)
 
 #define FSB_FLAT_MODE 2
 #define FSB_ENCARTA_MODE 1

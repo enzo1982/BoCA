@@ -62,7 +62,6 @@ namespace BoCA
 	/* Constants.
 	 */
 	const Int	 maxFrameSize  = 2880;
-	const Int	 maxPacketSize = 1275;
 
 	/* Opus header definition.
 	 */
@@ -121,7 +120,14 @@ Bool BoCA::OpusIn::CanOpenStream(const String &streamURI)
 
 			if (ex_ogg_stream_packetout(&os, &op) == 1)
 			{
-				if (op.packet[0] == 'O' && op.packet[1] == 'p' && op.packet[2] == 'u' && op.packet[3] == 's' && op.packet[4] == 'H' && op.packet[5] == 'e' && op.packet[6] == 'a' && op.packet[7] == 'd') result = True;
+				if (op.packet[0] == 'O' && op.packet[1] == 'p' && op.packet[2] == 'u' && op.packet[3] == 's' && op.packet[4] == 'H' && op.packet[5] == 'e' && op.packet[6] == 'a' && op.packet[7] == 'd')
+				{
+					/* Check Opus version and number of channels.
+					 */
+					OpusHeader	*setup = (OpusHeader *) op.packet;
+
+					if (setup->version_id >> 4 == 0 && setup->nb_channels <= 2) result = True;
+				}
 
 				done = True;
 			}

@@ -64,8 +64,7 @@ namespace BoCA
 {
 	/* Constants.
 	 */
-//	const Int	 frameSize     = 960;  // 960 = 48 kHz / 50 fps
-	const Int	 maxPacketSize = 1275;
+	const Int	 maxPacketSize = 4000;
 
 	/* Opus header definition.
 	 */
@@ -177,7 +176,7 @@ Bool BoCA::OpusOut::Activate()
 
 	strncpy(setup.codec_id, "OpusHead", 8);
 
-	setup.version_id	= 0;
+	setup.version_id	= 1;
 	setup.nb_channels	= format.channels;
 	setup.preskip		= 0;
 	setup.sample_rate	= format.rate;

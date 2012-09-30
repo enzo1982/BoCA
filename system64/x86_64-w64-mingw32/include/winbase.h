@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _WINBASE_
@@ -8,9 +8,27 @@
 
 #include <_mingw_unicode.h>
 
+#ifndef WINADVAPI
+#ifndef _ADVAPI32_
 #define WINADVAPI DECLSPEC_IMPORT
+#else
+#define WINADVAPI
+#endif
+#endif
+
+#ifndef WINBASEAPI
+#ifndef _KERNEL32_
 #define WINBASEAPI DECLSPEC_IMPORT
+#else
+#define WINBASEAPI
+#endif
+#endif
+
+#ifndef _ZAWPROXY_
 #define ZAWPROXYAPI DECLSPEC_IMPORT
+#else
+#define ZAWPROXYAPI
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -602,7 +620,7 @@ extern "C" {
 #define DRIVE_CDROM 5
 #define DRIVE_RAMDISK 6
 
-#define GetFreeSpace(w) (0x100000L)
+#define GetFreeSpace(w) (__MSABI_LONG(0x100000))
 #define FILE_TYPE_UNKNOWN 0x0
 #define FILE_TYPE_DISK 0x1
 #define FILE_TYPE_CHAR 0x2
@@ -1070,13 +1088,13 @@ extern "C" {
   __CRT_INLINE PVOID __cdecl
   __InlineInterlockedCompareExchangePointer(PVOID volatile *Destination,PVOID ExChange,PVOID Comperand) {
     return ((PVOID)(LONG_PTR)
-	    InterlockedCompareExchange((LONG volatile *)Destination,(LONG)(LONG_PTR)ExChange,(LONG)(LONG_PTR)Comperand));
+	    InterlockedCompareExchange((LONG volatile *)(LONG_PTR)Destination,(LONG)(LONG_PTR)ExChange,(LONG)(LONG_PTR)Comperand));
   }
 #define InterlockedCompareExchangePointer __InlineInterlockedCompareExchangePointer
 #else
 #define InterlockedCompareExchangePointer(Destination,ExChange,Comperand)	\
 	   (PVOID)(LONG_PTR)							\
-	    InterlockedCompareExchange((LONG volatile *)(Destination),(LONG)(LONG_PTR)(ExChange),(LONG)(LONG_PTR)(Comperand))
+	    InterlockedCompareExchange((LONG volatile *)(LONG_PTR)(Destination),(LONG)(LONG_PTR)(ExChange),(LONG)(LONG_PTR)(Comperand))
 #endif /* __cplusplus */
 
 #define InterlockedIncrementAcquire InterlockedIncrement
@@ -1615,8 +1633,8 @@ extern "C" {
   WINBASEAPI HFILE WINAPI _lcreat(LPCSTR lpPathName,int iAttribute);
   WINBASEAPI UINT WINAPI _lread(HFILE hFile,LPVOID lpBuffer,UINT uBytes);
   WINBASEAPI UINT WINAPI _lwrite(HFILE hFile,LPCCH lpBuffer,UINT uBytes);
-  WINBASEAPI long WINAPI _hread(HFILE hFile,LPVOID lpBuffer,long lBytes);
-  WINBASEAPI long WINAPI _hwrite(HFILE hFile,LPCCH lpBuffer,long lBytes);
+  WINBASEAPI __LONG32 WINAPI _hread(HFILE hFile,LPVOID lpBuffer,__LONG32 lBytes);
+  WINBASEAPI __LONG32 WINAPI _hwrite(HFILE hFile,LPCCH lpBuffer,__LONG32 lBytes);
   WINBASEAPI HFILE WINAPI _lclose(HFILE hFile);
   WINBASEAPI LONG WINAPI _llseek(HFILE hFile,LONG lOffset,int iOrigin);
   WINADVAPI WINBOOL WINAPI IsTextUnicode(CONST VOID *lpv,int iSize,LPINT lpiResult);
@@ -2796,8 +2814,8 @@ WINBASEAPI BOOLEAN TryAcquireSRWLockShared(PSRWLOCK SRWLock);
 
 /*One-Time Initialization http://msdn.microsoft.com/en-us/library/aa363808(VS.85).aspx*/
 /* FIXME: See above !!! */
-#define INIT_ONCE_ASYNC 0x00000002UL
-#define INIT_ONCE_INIT_FAILED 0x00000004UL
+#define INIT_ONCE_ASYNC __MSABI_LONG(0x00000002U)
+#define INIT_ONCE_INIT_FAILED __MSABI_LONG(0x00000004U)
 
 typedef PRTL_RUN_ONCE PINIT_ONCE;
 typedef PRTL_RUN_ONCE LPINIT_ONCE;
@@ -3740,7 +3758,7 @@ WINBASEAPI WINBOOL WINAPI SetFileIoOverlappedRange(
   ULONG Length
 );
 
-#define PROCESS_AFFINITY_ENABLE_AUTO_UPDATE 0x00000001UL
+#define PROCESS_AFFINITY_ENABLE_AUTO_UPDATE __MSABI_LONG(0x00000001U)
 
 WINBASEAPI WINBOOL WINAPI SetProcessAffinityUpdateMode(
   HANDLE ProcessHandle,
@@ -4037,3 +4055,100 @@ WINBASEAPI PUMS_CONTEXT GetCurrentUmsThread(void);
 
 #endif /* _WINBASE_ */
 
+#if !defined(NOWINBASEINTERLOCK) && !defined(MICROSOFT_WINDOWS_WINBASE_INTERLOCKED_CPLUSPLUS_H_INCLUDED)
+#define MICROSOFT_WINDOWS_WINBASE_INTERLOCKED_CPLUSPLUS_H_INCLUDED
+
+#ifdef __cplusplus
+
+extern "C++" {
+    FORCEINLINE unsigned InterlockedIncrement(unsigned volatile *Addend) {
+        return (unsigned)InterlockedIncrement((volatile LONG*)Addend);
+    }
+
+    FORCEINLINE unsigned long InterlockedIncrement(unsigned long volatile *Addend) {
+        return (unsigned long)InterlockedIncrement((volatile LONG*)Addend);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedIncrement(unsigned __int64 volatile *Addend) {
+        return (unsigned __int64)InterlockedIncrement64((volatile LONGLONG*)Addend);
+    }
+
+    FORCEINLINE unsigned InterlockedDecrement(unsigned volatile *Addend) {
+        return (unsigned long)InterlockedDecrement((volatile LONG*)Addend);
+    }
+
+    FORCEINLINE unsigned long InterlockedDecrement(unsigned long volatile *Addend) {
+        return (unsigned long)InterlockedDecrement((volatile LONG*)Addend);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedDecrement(unsigned __int64 volatile *Addend) {
+        return (unsigned __int64)InterlockedDecrement64((volatile LONGLONG*)Addend);
+    }
+
+    FORCEINLINE unsigned InterlockedExchange(unsigned volatile *Target, unsigned Value) {
+        return (unsigned)InterlockedExchange((volatile LONG*) Target, (LONG)Value);
+    }
+
+    FORCEINLINE unsigned long InterlockedExchange(unsigned long volatile *Target, unsigned long Value) {
+        return (unsigned long)InterlockedExchange((volatile LONG*)Target, (LONG)Value);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedExchange(unsigned __int64 volatile *Target, unsigned __int64 Value) {
+        return (unsigned __int64)InterlockedExchange64((volatile LONGLONG*)Target, (LONGLONG)Value);
+    }
+
+    FORCEINLINE unsigned InterlockedExchangeAdd(unsigned volatile *Addend, unsigned Value) {
+        return (unsigned)InterlockedExchangeAdd((volatile LONG*)Addend, (LONG)Value);
+    }
+
+    FORCEINLINE unsigned InterlockedExchangeSubtract(unsigned volatile *Addend, unsigned Value) {
+        return (unsigned)InterlockedExchangeAdd((volatile LONG*)Addend, -(LONG)Value);
+    }
+
+    FORCEINLINE unsigned long InterlockedExchangeAdd(unsigned long volatile *Addend, unsigned long Value) {
+        return (unsigned long)InterlockedExchangeAdd((volatile LONG*)Addend, (LONG)Value);
+    }
+
+    FORCEINLINE unsigned long InterlockedExchangeSubtract(unsigned long volatile *Addend, unsigned long Value) {
+        return (unsigned long)InterlockedExchangeAdd((volatile LONG*)Addend, -(LONG)Value);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedExchangeAdd(unsigned __int64 volatile *Addend, unsigned __int64 Value) {
+        return (unsigned __int64)InterlockedExchangeAdd64((volatile LONGLONG*)Addend,  (LONGLONG)Value);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedExchangeSubtract(unsigned __int64 volatile *Addend, unsigned __int64 Value) {
+        return (unsigned __int64)InterlockedExchangeAdd64((volatile LONGLONG*)Addend, -(LONGLONG)Value);
+    }
+
+    FORCEINLINE unsigned InterlockedCompareExchange(unsigned volatile *Destination, unsigned Exchange, unsigned Comperand) {
+        return (unsigned)InterlockedCompareExchange((volatile LONG*)Destination, (LONG)Exchange, (LONG)Comperand);
+    }
+
+    FORCEINLINE unsigned long InterlockedCompareExchange(unsigned long volatile *Destination, unsigned long Exchange,
+                                                         unsigned long Comperand) {
+        return (unsigned long)InterlockedCompareExchange((volatile LONG*)Destination, (LONG)Exchange, (LONG)Comperand);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedAnd(unsigned __int64 volatile *Destination, unsigned __int64 Value) {
+        return (unsigned __int64)InterlockedAnd64((volatile LONGLONG*)Destination, (LONGLONG)Value);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedOr(unsigned __int64 volatile *Destination, unsigned __int64 Value) {
+        return (unsigned __int64)InterlockedOr64((volatile LONGLONG*)Destination, (LONGLONG)Value);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedXor(unsigned __int64 volatile *Destination, unsigned __int64 Value) {
+        return (unsigned __int64)InterlockedXor64((volatile LONGLONG*)Destination, (LONGLONG)Value);
+    }
+
+    FORCEINLINE unsigned __int64 InterlockedCompareExchange(unsigned __int64 volatile *Destination, unsigned __int64 Exchange,
+                                                            unsigned __int64 Comperand) {
+        return (unsigned __int64)InterlockedCompareExchange64((volatile LONGLONG*)Destination, (LONGLONG)Exchange,
+                                                              (LONGLONG)Comperand);
+    }
+}
+
+#endif /* __cplusplus */
+
+#endif /* !defined(NOWINBASEINTERLOCK) && !defined(MICROSOFT_WINDOWS_WINBASE_INTERLOCKED_CPLUSPLUS_H_INCLUDED) */

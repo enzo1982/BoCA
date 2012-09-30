@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _RICHEDIT_
@@ -999,16 +999,16 @@ extern "C" {
 
   typedef struct hyphresult {
     KHYPH khyph;
-    long ichHyph;
+    __LONG32 ichHyph;
     WCHAR chHyph;
   } HYPHRESULT;
 
-  void WINAPI HyphenateProc(WCHAR *pszWord,LANGID langid,long ichExceed,HYPHRESULT *phyphresult);
+  void WINAPI HyphenateProc(WCHAR *pszWord,LANGID langid,__LONG32 ichExceed,HYPHRESULT *phyphresult);
 
   typedef struct tagHyphenateInfo {
     SHORT cbSize;
     SHORT dxHyphenateZone;
-    void (WINAPI *pfnHyphenate)(WCHAR*,LANGID,long,HYPHRESULT*);
+    void (WINAPI *pfnHyphenate)(WCHAR*,LANGID,__LONG32,HYPHRESULT*);
   } HYPHENATEINFO;
 
 #include <poppack.h>

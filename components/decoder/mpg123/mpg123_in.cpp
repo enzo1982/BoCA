@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,6 +14,7 @@
 #include "mpg123_in.h"
 #include "config.h"
 #include "dllinterface.h"
+#include "xing/dxhead.h"
 
 using namespace smooth::IO;
 
@@ -122,8 +123,8 @@ Error BoCA::MPG123In::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_mpg123_info(context, &mp3data);
 
-			/*if	(mp3data.nsamp	 > 0) track.length = mp3data.nsamp - delaySamples - padSamples;
-			else if (mp3data.bitrate > 0)*/ track.approxLength = track.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate;
+			if	(numFrames	 > 0) track.length = numFrames * ex_mpg123_spf(context) - delaySamples - padSamples;
+			else if (mp3data.bitrate > 0) track.approxLength = track.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate;
 
 			break;
 		}
@@ -173,6 +174,8 @@ BoCA::MPG123In::MPG123In()
 	context		 = 0;
 
 	packageSize	 = 0;
+
+	numFrames	 = 0;
 
 	delaySamples	 = 0;
 	padSamples	 = 0;
@@ -283,7 +286,7 @@ Bool BoCA::MPG123In::SkipID3v2Tag(InStream *in)
 
 Bool BoCA::MPG123In::ParseVBRHeaders(InStream *in)
 {
-	/* Check for a LAME header and extract
+	/* Check for a Xing header and extract
 	 * the number of samples if it exists.
 	 */
 	Buffer<UnsignedByte>	 buffer(228);
@@ -291,20 +294,43 @@ Bool BoCA::MPG123In::ParseVBRHeaders(InStream *in)
 	/* Read data and seek back to before
 	 * the Xing header.
 	 */
-	in->RelSeek(156);
-	in->InputData(buffer, 228);
-	in->RelSeek(-228);
-	in->RelSeek(-156);
+	in->InputData(buffer, 156);
 
-	if (buffer[0] == 'L' && buffer[1] == 'A' && buffer[2] == 'M' && buffer[3] == 'E')
+	XHEADDATA		 data;
+
+	data.toc = NIL;
+
+	if (GetXingHeader(&data, buffer))
 	{
-		delaySamples = ( buffer[21]	    << 4) | ((buffer[22] & 0xF0) >> 4);
-		padSamples   = ((buffer[22] & 0x0F) << 8) | ( buffer[23]	     );
+		numFrames = data.frames;
 
-		delaySamplesLeft += delaySamples;
+		in->InputData(buffer, 228);
+
+		if (buffer[0] == 'L' && buffer[1] == 'A' && buffer[2] == 'M' && buffer[3] == 'E')
+		{
+			delaySamples = ( buffer[21]	    << 4) | ((buffer[22] & 0xF0) >> 4);
+			padSamples   = ((buffer[22] & 0x0F) << 8) | ( buffer[23]	     );
+
+			delaySamplesLeft += delaySamples;
+		}
 
 		return True;
 	}
+	else if (buffer[36] == 'V' && buffer[37] == 'B' && buffer[38] == 'R' && buffer[39] == 'I')
+	{
+		numFrames    = ((buffer[50] << 24) | (buffer[51] << 16) | (buffer[52] << 8) | (buffer[53])) - 1;
+
+		delaySamples = 576;
+		padSamples   = ((buffer[42] << 8) | (buffer[43])) - delaySamples;
+
+		delaySamplesLeft += delaySamples;
+
+		in->RelSeek(228);
+
+		return True;
+	}
+
+	in->RelSeek(-156);
 
 	return False;
 }

@@ -162,16 +162,16 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 				{
 					Buffer<UnsignedByte>	 data(12288);
 
-					track.length = 0;
-
 					while (True)
 					{
 						Int	 size = 0;
 
 						if (!ReadFile(rPipe, data, data.Size(), (DWORD *) &size, NIL) || size == 0) break;
 
-						track.length += size / track.GetFormat().channels / (track.GetFormat().bits / 8);
+						bytesReadTotal += size;
 					}
+
+					track.length = (bytesReadTotal - in->GetPos()) / track.GetFormat().channels / (track.GetFormat().bits / 8);
 				}
 			}
 			else
@@ -297,17 +297,21 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 	/* Skip the WAVE header.
 	 */
-	Buffer<UnsignedByte>	 buffer(44);
-	Int			 bytesReadTotal = 0;
+	Buffer<UnsignedByte>	 buffer(8);
 	DWORD			 bytesRead = 0;
+	DWORD			 fmtSize = 0;
 
-	do
-	{
-		if (!ReadFile(rPipe, buffer + bytesReadTotal, 44 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
+	ReadFile(rPipe, buffer,	      8, &bytesRead, NIL); // RIFF chunk
+	ReadFile(rPipe, buffer,	      4, &bytesRead, NIL); // WAVE ID
+	ReadFile(rPipe, buffer,	      4, &bytesRead, NIL); //  fmt FOURCC
+	ReadFile(rPipe, buffer,       4, &bytesRead, NIL); //  fmt chunk size
 
-		bytesReadTotal += bytesRead;
-	}
-	while (bytesReadTotal < 44);
+	fmtSize = buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24;
+
+	buffer.Resize(Math::Max(8, fmtSize));
+
+	ReadFile(rPipe, buffer, fmtSize, &bytesRead, NIL); // rest of  fmt chunk
+	ReadFile(rPipe, buffer,	      8, &bytesRead, NIL); // data header
 
 	return True;
 }

@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _MATH_H_
@@ -10,7 +10,7 @@
 #pragma GCC system_header
 #endif
 
-#include <_mingw.h>
+#include <crtdefs.h>
 
 struct _exception;
 
@@ -76,6 +76,37 @@ struct _exception;
 extern "C" {
 #endif
 
+#ifndef __MINGW_SOFTMATH
+#define __MINGW_SOFTMATH
+
+/* IEEE float/double type shapes.  */
+
+  typedef union __mingw_dbl_type_t {
+    double x;
+    unsigned long long val;
+    __C89_NAMELESS struct {
+      unsigned int low, high;
+    } lh;
+  } __mingw_dbl_type_t;
+
+  typedef union __mingw_flt_type_t {
+    float x;
+    unsigned int val;
+  } __mingw_flt_type_t;
+
+  typedef union __mingw_ldbl_type_t
+  {
+    long double x;
+    __C89_NAMELESS struct {
+      unsigned int low, high;
+      int sign_exponent : 16;
+      int res1 : 16;
+      int res0 : 32;
+    } lh;
+  } __mingw_ldbl_type_t;
+
+#endif
+
 #ifndef _HUGE
   extern double * __MINGW_IMP_SYMBOL(_HUGE);
 #define _HUGE	(* __MINGW_IMP_SYMBOL(_HUGE))
@@ -121,14 +152,41 @@ extern "C" {
   double __cdecl sqrt(double _X);
   double __cdecl ceil(double _X);
   double __cdecl floor(double _X);
-  double __cdecl fabs(double _X);
+
+/* 7.12.7.2 The fabs functions: Double in C89 */
+  extern  float __cdecl fabsf (float x);
+  extern long double __cdecl fabsl (long double);
+  extern double __cdecl fabs (double _X);
+
 #ifndef __CRT__NO_INLINE
 #if !defined (__ia64__)
+  __CRT_INLINE float __cdecl fabsf (float x)
+  {
+#ifdef __x86_64__
+    return __builtin_fabsf (x);
+#else
+    float res = 0.0F;
+    __asm__ __volatile__ ("fabs;" : "=t" (res) : "0" (x));
+    return res;
+#endif
+  }
+
+  __CRT_INLINE long double __cdecl fabsl (long double x)
+  {
+    long double res = 0.0l;
+    __asm__ __volatile__ ("fabs;" : "=t" (res) : "0" (x));
+    return res;
+  }
+
   __CRT_INLINE double __cdecl fabs (double x)
   {
+#ifdef __x86_64__
+    return __builtin_fabs (x);
+#else
     double res = 0.0;
     __asm__ __volatile__ ("fabs;" : "=t" (res) : "0" (x));
     return res;
+#endif
   }
 #endif
 #endif
@@ -308,14 +366,45 @@ typedef long double double_t;
     return sw & (FP_NAN | FP_NORMAL | FP_ZERO );
   }
   __CRT_INLINE int __cdecl __fpclassify (double x) {
+#ifdef __x86_64__
+    __mingw_dbl_type_t hlp;
+    unsigned int l, h;
+
+    hlp.x = x;
+    h = hlp.lh.high;
+    l = hlp.lh.low | (h & 0xfffff);
+    h &= 0x7ff00000;
+    if ((h | l) == 0)
+      return FP_ZERO;
+    if (!h)
+      return FP_SUBNORMAL;
+    if (h == 0x7ff00000)
+      return (l ? FP_NAN : FP_INFINITE);
+    return FP_NORMAL;
+#else
     unsigned short sw;
     __asm__ __volatile__ ("fxam; fstsw %%ax;" : "=a" (sw): "t" (x));
     return sw & (FP_NAN | FP_NORMAL | FP_ZERO );
+#endif
   }
   __CRT_INLINE int __cdecl __fpclassifyf (float x) {
+#ifdef __x86_64__
+    __mingw_flt_type_t hlp;
+
+    hlp.x = x;
+    hlp.val &= 0x7fffffff;
+    if (hlp.val == 0)
+      return FP_ZERO;
+    if (hlp.val < 0x800000)
+      return FP_SUBNORMAL;
+    if (hlp.val >= 0x7f800000)
+      return (hlp.val > 0x7f800000 ? FP_NAN : FP_INFINITE);
+    return FP_NORMAL;
+#else
     unsigned short sw;
     __asm__ __volatile__ ("fxam; fstsw %%ax;" : "=a" (sw): "t" (x));
     return sw & (FP_NAN | FP_NORMAL | FP_ZERO );
+#endif
   }
 #endif
 
@@ -340,20 +429,42 @@ typedef long double double_t;
 #ifndef __CRT__NO_INLINE
   __CRT_INLINE int __cdecl __isnan (double _x)
   {
+#ifdef __x86_64__
+    __mingw_dbl_type_t hlp;
+    int l, h;
+
+    hlp.x = _x;
+    l = hlp.lh.low;
+    h = hlp.lh.high & 0x7fffffff;
+    h |= (unsigned int) (l | -l) >> 31;
+    h = 0x7ff00000 - h;
+    return (int) ((unsigned int) h) >> 31;
+#else
     unsigned short sw;
     __asm__ __volatile__ ("fxam;"
       "fstsw %%ax": "=a" (sw) : "t" (_x));
     return (sw & (FP_NAN | FP_NORMAL | FP_INFINITE | FP_ZERO | FP_SUBNORMAL))
       == FP_NAN;
+#endif
   }
 
   __CRT_INLINE int __cdecl __isnanf (float _x)
   {
+#ifdef __x86_64__
+    __mingw_flt_type_t hlp;
+    int i;
+    
+    hlp.x = _x;
+    i = hlp.val & 0x7fffffff;
+    i = 0x7f800000 - i;
+    return (int) (((unsigned int) i) >> 31);
+#else
     unsigned short sw;
     __asm__ __volatile__ ("fxam;"
       "fstsw %%ax": "=a" (sw) : "t" (_x));
     return (sw & (FP_NAN | FP_NORMAL | FP_INFINITE | FP_ZERO | FP_SUBNORMAL))
       == FP_NAN;
+#endif
   }
 
   __CRT_INLINE int __cdecl __isnanl (long double _x)
@@ -379,15 +490,28 @@ typedef long double double_t;
   extern int __cdecl __signbitl (long double);
 #ifndef __CRT__NO_INLINE
   __CRT_INLINE int __cdecl __signbit (double x) {
+#ifdef __x86_64__
+    __mingw_dbl_type_t hlp;
+    
+    hlp.x = x;
+    return ((hlp.lh.high & 0x80000000) != 0);
+#else
     unsigned short stw;
     __asm__ __volatile__ ( "fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
     return stw & 0x0200;
+#endif
   }
 
   __CRT_INLINE int __cdecl __signbitf (float x) {
+#ifdef __x86_64__
+    __mingw_flt_type_t hlp;
+    hlp.x = x;
+    return ((hlp.val & 0x80000000) != 0);
+#else
     unsigned short stw;
     __asm__ __volatile__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
     return stw & 0x0200;
+#endif
   }
 
   __CRT_INLINE int __cdecl __signbitl (long double x) {
@@ -526,18 +650,49 @@ typedef long double double_t;
 #if !(__MINGW_GNUC_PREREQ (4, 0) && defined (__FAST_MATH__))
   __CRT_INLINE double __cdecl logb (double x)
   {
+#ifdef __x86_64__
+  __mingw_dbl_type_t hlp;
+  int lx, hx;
+
+  hlp.x = x;
+  lx = hlp.lh.low;
+  hx = hlp.lh.high & 0x7fffffff; /* high |x| */
+  if ((hx | lx) == 0)
+    return -1.0 / fabs (x);
+  if (hx >= 0x7ff00000)
+    return x * x;
+  if ((hx >>= 20) == 0) /* IEEE 754 logb */
+    return -1022.0;
+  return (double) (hx - 1023);
+#else
     double res = 0.0;
     __asm__ __volatile__ ("fxtract\n\t"
       "fstp	%%st" : "=t" (res) : "0" (x));
     return res;
+#endif
   }
 
   __CRT_INLINE float __cdecl logbf (float x)
   {
+#ifdef __x86_64__
+    int v;
+    __mingw_flt_type_t hlp;
+
+    hlp.x = x;
+    v = hlp.val & 0x7fffffff;                     /* high |x| */
+    if (!v)
+      return (float)-1.0 / fabsf (x);
+    if (v >= 0x7f800000)
+    return x * x;
+  if ((v >>= 23) == 0) /* IEEE 754 logb */
+    return -126.0;
+  return (float) (v - 127);
+#else
     float res = 0.0F;
     __asm__ __volatile__ ("fxtract\n\t"
       "fstp	%%st" : "=t" (res) : "0" (x));
     return res;
+#endif
   }
 
   __CRT_INLINE long double __cdecl logbl (long double x)
@@ -569,29 +724,6 @@ typedef long double double_t;
   extern float __cdecl cbrtf (float);
   extern long double __cdecl cbrtl (long double);
 
-/* 7.12.7.2 The fabs functions: Double in C89 */
-  extern  float __cdecl fabsf (float x);
-#ifndef __CRT__NO_INLINE
-#if !defined (__ia64__)
-  __CRT_INLINE float __cdecl fabsf (float x)
-  {
-    float res = 0.0F;
-    __asm__ __volatile__ ("fabs;" : "=t" (res) : "0" (x));
-    return res;
-  }
-#endif
-#endif
-  extern long double __cdecl fabsl (long double);
-#ifndef __CRT__NO_INLINE
-#if !defined (__ia64__)
-  __CRT_INLINE long double __cdecl fabsl (long double x)
-  {
-    long double res = 0.0l;
-    __asm__ __volatile__ ("fabs;" : "=t" (res) : "0" (x));
-    return res;
-  }
-#endif
-#endif
 /* 7.12.7.3  */
   extern double __cdecl hypot (double, double) __MINGW_ATTRIB_DEPRECATED_MSVC2005; /* in libmoldname.a */
   extern float __cdecl hypotf (float x, float y);
@@ -773,6 +905,25 @@ __MINGW_EXTENSION long long __cdecl llrintl (long double);
   extern double __cdecl copysign (double, double); /* in libmoldname.a */
   extern float __cdecl copysignf (float, float);
   extern long double __cdecl copysignl (long double, long double);
+
+#ifndef __CRT__NO_INLINE
+#if !defined (__ia64__)
+  __CRT_INLINE double __cdecl copysign (double x, double y)
+  {
+    __mingw_dbl_type_t hx, hy;
+    hx.x = x; hy.x = y;
+    hx.lh.high = (hx.lh.high & 0x7fffffff) | (hy.lh.high & 0x80000000);
+    return hx.x;
+  }
+  __CRT_INLINE float __cdecl copysignf (float x, float y)
+  {
+    __mingw_flt_type_t hx, hy;
+    hx.x = x; hy.x = y;
+    hx.val = (hx.val & 0x7fffffff) | (hy.val & 0x80000000);
+    return hx.x;
+  }
+#endif
+#endif
 
 /* 7.12.11.2 Return a NaN */
   extern double __cdecl nan(const char *tagp);

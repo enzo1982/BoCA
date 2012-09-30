@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = dllinterface.o faad2_in.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -I .
 
 # Enter additional library dependencies here:
 LIBS	  =

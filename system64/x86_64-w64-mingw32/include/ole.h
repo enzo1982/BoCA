@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _OLE_H_
@@ -28,9 +28,9 @@ extern "C" {
 #define LRESULT LONG_PTR
 #define HGLOBAL HANDLE
 
-#define OT_LINK 1L
-#define OT_EMBEDDED 2L
-#define OT_STATIC 3L
+#define OT_LINK __MSABI_LONG(1)
+#define OT_EMBEDDED __MSABI_LONG(2)
+#define OT_STATIC __MSABI_LONG(3)
 
 #define OLEVERB_PRIMARY 0
 

@@ -1,12 +1,12 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _INC_STDLIB
 #define _INC_STDLIB
 
-#include <_mingw.h>
+#include <crtdefs.h>
 #include <limits.h>
 
 #pragma pack(push,_CRT_PACKING)
@@ -300,7 +300,7 @@ extern "C" {
 #ifndef _CRT_TERMINATE_DEFINED
 #define _CRT_TERMINATE_DEFINED
   void __cdecl __MINGW_NOTHROW exit(int _Code) __MINGW_ATTRIB_NORETURN;
-  _CRTIMP void __cdecl __MINGW_NOTHROW _exit(int _Code) __MINGW_ATTRIB_NORETURN;
+  void __cdecl __MINGW_NOTHROW _exit(int _Code) __MINGW_ATTRIB_NORETURN;
 
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
   /* C99 function name */
@@ -327,6 +327,12 @@ extern "C" {
 #endif
 
   __MINGW_EXTENSION __int64 __cdecl _abs64(__int64);
+#ifdef __MINGW_INTRIN_INLINE
+  __MINGW_INTRIN_INLINE __int64 __cdecl _abs64(__int64 x) {
+    return __builtin_llabs(x);
+  }
+#endif
+
   int __cdecl atexit(void (__cdecl *)(void));
 #ifndef _CRT_ATOF_DEFINED
 #define _CRT_ATOF_DEFINED
@@ -343,7 +349,7 @@ extern "C" {
   void __cdecl qsort(void *_Base,size_t _NumOfElements,size_t _SizeOfElements,int (__cdecl *_PtFuncCompare)(const void *,const void *));
 #endif
   unsigned short __cdecl _byteswap_ushort(unsigned short _Short);
-  /*unsigned long __cdecl _byteswap_ulong (unsigned long _Long); */
+  unsigned long __cdecl _byteswap_ulong (unsigned long _Long);
   __MINGW_EXTENSION unsigned __int64 __cdecl _byteswap_uint64(unsigned __int64 _Int64);
   div_t __cdecl div(int _Numerator,int _Denominator);
   char *__cdecl getenv(const char *_VarName) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;

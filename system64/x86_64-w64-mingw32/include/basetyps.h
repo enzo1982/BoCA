@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #if !defined(_BASETYPS_H_)
@@ -33,9 +33,8 @@
 #if defined(__cplusplus) && !defined(CINTERFACE)
 
 #ifndef __OBJC__
-#ifndef interface
+#undef interface
 #define interface struct
-#endif
 #endif
 
 #define __STRUCT__ struct
@@ -53,9 +52,8 @@
 #else
 
 #ifndef __OBJC__
-#ifndef interface
+#undef interface
 #define interface struct
-#endif
 #endif
 
 #define STDMETHOD(method) HRESULT (WINAPI *method)
@@ -91,7 +89,7 @@
 
 #ifndef _ERROR_STATUS_T_DEFINED
 #define _ERROR_STATUS_T_DEFINED
-typedef unsigned long error_status_t;
+typedef unsigned __LONG32 error_status_t;
 #endif
 
 #ifndef _WCHAR_T_DEFINED

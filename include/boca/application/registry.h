@@ -27,6 +27,8 @@ namespace BoCA
 
 								 Registry();
 								~Registry();
+
+				Void				 InsertComponent(ComponentSpecs *);
 			public:
 				static Registry			&Get();
 				static Bool			 Free();

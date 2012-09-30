@@ -11,7 +11,7 @@
   </format>
   <external>
     <command>avconv</command>
-    <arguments>-i %INFILE %OPTIONS -f wav %OUTFILE</arguments>
+    <arguments>-i %INFILE %OPTIONS -f wav -y %OUTFILE</arguments>
     <mode>file</mode>
     <outformat>wave</outformat>
   </external>

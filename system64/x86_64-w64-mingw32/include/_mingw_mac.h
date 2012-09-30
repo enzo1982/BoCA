@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 
@@ -130,7 +130,20 @@
 #define __C89_NAMELESS __MINGW_EXTENSION
 
 #define __C89_NAMELESSSTRUCTNAME
+#define __C89_NAMELESSSTRUCTNAME1
+#define __C89_NAMELESSSTRUCTNAME2
+#define __C89_NAMELESSSTRUCTNAME3
+#define __C89_NAMELESSSTRUCTNAME4
+#define __C89_NAMELESSSTRUCTNAME5
 #define __C89_NAMELESSUNIONNAME
+#define __C89_NAMELESSUNIONNAME1
+#define __C89_NAMELESSUNIONNAME2
+#define __C89_NAMELESSUNIONNAME3
+#define __C89_NAMELESSUNIONNAME4
+#define __C89_NAMELESSUNIONNAME5
+#define __C89_NAMELESSUNIONNAME6
+#define __C89_NAMELESSUNIONNAME7
+#define __C89_NAMELESSUNIONNAME8
 #endif
 
 #ifndef __GNU_EXTENSION
@@ -149,6 +162,62 @@
 #else
 #define __MINGW_POISON_NAME(__IFACE)\
   __IFACE##_layout_has_not_been_verified_and_its_declaration_is_most_likely_incorrect
+#endif
+
+#ifndef __MSABI_LONG
+#ifndef __LP64__
+#define __MSABI_LONG(x)  x ## l
+#else
+#define __MSABI_LONG(x)  x
+#endif
+#endif
+
+#if __GNUC__
+#define __MINGW_GCC_VERSION	(__GNUC__	* 10000	+ \
+				 __GNUC_MINOR__	* 100	+ \
+				 __GNUC_PATCHLEVEL__)
+#else
+#define __MINGW_GCC_VERSION				0
+#endif
+
+#if defined (__GNUC__) && defined (__GNUC_MINOR__)
+#define __MINGW_GNUC_PREREQ(major, minor) \
+  (__GNUC__ > (major) \
+   || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#define __MINGW_GNUC_PREREQ(major, minor)  0
+#endif
+
+#if defined (_MSC_VER)
+#define __MINGW_MSC_PREREQ(major, minor) \
+  (_MSC_VER >= (major * 100 + minor * 10))
+#else
+#define __MINGW_MSC_PREREQ(major, minor)   0
+#endif
+
+#ifdef __MINGW_MSVC_COMPAT_WARNINGS
+# if __MINGW_GNUC_PREREQ (4, 5)
+#  define __MINGW_ATTRIB_DEPRECATED_STR(X) __attribute__ ((__deprecated__ (X)))
+# else
+#  define __MINGW_ATTRIB_DEPRECATED_STR(X) __MINGW_ATTRIB_DEPRECATED
+# endif
+#else
+# define __MINGW_ATTRIB_DEPRECATED_STR(X)
+#endif
+
+#define __MINGW_SEC_WARN_STR "This function or variable may be unsafe, use _CRT_SECURE_NO_WARNINGS to disable deprecation"
+#define __MINGW_MSVC2005_DEPREC_STR "This POSIX function is deprecated beginning in Visual C++ 2005, use _CRT_NONSTDC_NO_DEPRECATE to disable deprecation"
+
+#if !defined (_CRT_NONSTDC_NO_DEPRECATE)
+# define __MINGW_ATTRIB_DEPRECATED_MSVC2005 __MINGW_ATTRIB_DEPRECATED_STR (__MINGW_MSVC2005_DEPREC_STR)
+#else
+# define __MINGW_ATTRIB_DEPRECATED_MSVC2005
+#endif
+
+#if !defined (_CRT_SECURE_NO_WARNINGS) || (_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES == 0)
+# define __MINGW_ATTRIB_DEPRECATED_SEC_WARN __MINGW_ATTRIB_DEPRECATED_STR (__MINGW_SEC_WARN_STR)
+#else
+# define __MINGW_ATTRIB_DEPRECATED_SEC_WARN
 #endif
 
 #endif	/* _INC_CRTDEFS_MACRO */

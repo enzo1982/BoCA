@@ -68,7 +68,11 @@ else
 	LDOPTS += -Wl,-rpath,.
 
 	ifeq ($(BUILD_SOLARIS),True)
-		CCOPTS += -fpic
+		CCOPTS += -fPIC
+	else ifeq ($(BUILD_LINUX),True)
+		ifeq ($(BUILD_X64),True)
+			CCOPTS += -fPIC
+		endif
 	endif
 endif
 

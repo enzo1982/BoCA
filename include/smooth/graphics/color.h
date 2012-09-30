@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -43,8 +43,8 @@ namespace smooth
 						 Color(Long iColor, Int iColorSpace = RGBA)	{ color = iColor; colorSpace = iColorSpace; }
 						 Color(Int r, Int g, Int b, Int c = RGBA)	{ SetColor(r, g, b, c); }
 
-				Int		 GetRed() const					{ return color & 255; }
-				Int		 GetGreen() const				{ return (color >> 8) & 255; }
+				Int		 GetRed() const					{ return  color	       & 255; }
+				Int		 GetGreen() const				{ return (color >>  8) & 255; }
 				Int		 GetBlue() const				{ return (color >> 16) & 255; }
 				Int		 GetAlpha() const				{ return (color >> 24) & 255; }
 
@@ -54,7 +54,10 @@ namespace smooth
 				Color		 ConvertTo(Int) const;
 				Color		 Grayscale() const				{ return Color(ConvertTo(GRAY), ConvertTo(GRAY), ConvertTo(GRAY)); }
 
-				Color		 Average(const Color &color2) const		{ return Color((GetRed() + color2.GetRed()) / 2, (GetGreen() + color2.GetGreen()) / 2, (GetBlue() + color2.GetBlue()) / 2, (GetAlpha() + color2.GetAlpha()) / 2); }
+				Color		 Average(const Color &color2) const		{ return Color( (GetRed()   + color2.GetRed())	 / 2	    |
+													       ((GetGreen() + color2.GetGreen()) / 2) <<  8 |
+													       ((GetBlue()  + color2.GetBlue())	 / 2) << 16 |
+													       ((GetAlpha() + color2.GetAlpha()) / 2) << 24); }
 
 				Color		 Downsample(Int) const;
 				Color		 Upsample(Int) const;

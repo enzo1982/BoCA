@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = dllinterface.o mp4_tag.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -I .
 
 # Enter additional library dependencies here:
 LIBS	  =

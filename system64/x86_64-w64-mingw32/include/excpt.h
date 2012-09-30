@@ -1,12 +1,12 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _INC_EXCPT
 #define _INC_EXCPT
 
-#include <_mingw.h>
+#include <crtdefs.h>
 
 #pragma pack(push,_CRT_PACKING)
 
@@ -106,11 +106,16 @@ extern "C" {
   : : : "%eax");
 #elif defined(__x86_64)
 #define __try1(pHandler) \
-  __asm__ __volatile__ ("pushq %0;pushq %%gs:0;movq %%rsp,%%gs:0;" : : "g" (pHandler));
-
-#define	__except1	\
-  __asm__ __volatile__ ("movq (%%rsp),%%rax;movq %%rax,%%gs:0;addq $16,%%rsp;" \
-  : : : "%rax");
+    __asm__ __volatile__ ("\t.l_startw:\n" \
+    "\t.seh_handler __C_specific_handler, @except\n" \
+    "\t.seh_handlerdata\n" \
+    "\t.long 1\n" \
+    "\t.rva .l_startw, .l_endw, " __MINGW64_STRINGIFY(__MINGW_USYMBOL(pHandler)) " ,.l_endw\n" \
+    "\t.text" \
+    );
+#define __except1 \
+    asm ("\tnop\n" \
+    "\t.l_endw: nop\n");
 #else
 #define __try1(pHandler)
 #define __except1

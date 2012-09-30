@@ -1,12 +1,14 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _WINDEF_
 #define _WINDEF_
 
-#ifndef STRICT
+#include <_mingw.h>
+
+#if !defined (STRICT) && !defined (NO_STRICT)
 #define STRICT 1
 #endif
 
@@ -20,7 +22,7 @@ extern "C" {
 
 #ifndef BASETYPES
 #define BASETYPES
-typedef unsigned long ULONG;
+typedef unsigned __LONG32 ULONG;
 typedef ULONG *PULONG;
 typedef unsigned short USHORT;
 typedef USHORT *PUSHORT;
@@ -101,7 +103,7 @@ typedef char *PSZ;
 typedef int WINBOOL;
 #pragma push_macro("BOOL")
 #undef BOOL
-#if !defined(__OBJC__) && !defined(__OBJC_BOOL) && !defined(__objc_INCLUDE_GNU)
+#if !defined(__OBJC__) && !defined(__OBJC_BOOL) && !defined(__objc_INCLUDE_GNU) && !defined(_NO_BOOL_TYPEDEF)
 typedef int BOOL;
 #endif
 #define BOOL WINBOOL
@@ -112,7 +114,7 @@ typedef BOOL *LPBOOL;
 
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
-typedef unsigned long DWORD;
+typedef unsigned __LONG32 DWORD;
 typedef float FLOAT;
 typedef FLOAT *PFLOAT;
 typedef BYTE *PBYTE;
@@ -121,7 +123,7 @@ typedef int *PINT;
 typedef int *LPINT;
 typedef WORD *PWORD;
 typedef WORD *LPWORD;
-typedef long *LPLONG;
+typedef __LONG32 *LPLONG;
 typedef DWORD *PDWORD;
 typedef DWORD *LPDWORD;
 typedef void *LPVOID;

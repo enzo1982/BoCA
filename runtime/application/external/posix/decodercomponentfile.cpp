@@ -224,7 +224,26 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	 */
 	in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
-	in->Seek(44);
+	in->Seek(12);
+
+	String	 chunk;
+
+	do
+	{
+		/* Read next chunk
+		 */
+		chunk = in->InputString(4);
+
+		Int	 cSize = in->InputNumber(4);
+
+		if (chunk != "data")
+		{
+			/* Skip chunk
+			 */
+			in->RelSeek(cSize + cSize % 2);
+		}
+	}
+	while (chunk != "data");
 
 	return True;
 }

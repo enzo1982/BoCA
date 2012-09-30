@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,11 +11,10 @@
 #ifndef H_OBJSMOOTH_RESOURCES
 #define H_OBJSMOOTH_RESOURCES
 
-#define IDR_VERSION	001
+#define IDR_VERSION	1
 
-#define IDI_ICON	100
+#define IDI_ICON	20000
 
-#define IDB_ICON	500
-#define IDB_LIGHT	501
+#define IDB_LIGHT	20500
 
 #endif

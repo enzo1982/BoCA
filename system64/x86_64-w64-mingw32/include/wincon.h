@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _WINCON_
@@ -69,6 +69,9 @@ extern "C" {
 #define MOUSE_MOVED 0x1
 #define DOUBLE_CLICK 0x2
 #define MOUSE_WHEELED 0x4
+#if (_WIN32_WINNT >= 0x0600)
+#define MOUSE_HWHEELED 0x8
+#endif
 
   typedef struct _WINDOW_BUFFER_SIZE_RECORD {
     COORD dwSize;
@@ -262,8 +265,12 @@ extern "C" {
 
 #define CONSOLE_FULLSCREEN 1
 #define CONSOLE_FULLSCREEN_HARDWARE 2
-
   WINBASEAPI WINBOOL WINAPI GetConsoleDisplayMode(LPDWORD lpModeFlags);
+
+#define CONSOLE_FULLSCREEN_MODE 1
+#define CONSOLE_WINDOWED_MODE 2
+  WINBASEAPI WINBOOL WINAPI SetConsoleDisplayMode(HANDLE hConsoleOutput, DWORD dwFlags, PCOORD lpNewScreenBufferDimensions);
+
   WINBASEAPI HWND WINAPI GetConsoleWindow(VOID);
   WINBASEAPI DWORD WINAPI GetConsoleProcessList(LPDWORD lpdwProcessList,DWORD dwProcessCount);
   WINBASEAPI WINBOOL WINAPI AddConsoleAliasA(LPSTR Source,LPSTR Target,LPSTR ExeName);
@@ -279,7 +286,6 @@ extern "C" {
   WINBASEAPI DWORD WINAPI GetConsoleAliasExesA(LPSTR ExeNameBuffer,DWORD ExeNameBufferLength);
   WINBASEAPI DWORD WINAPI GetConsoleAliasExesW(LPWSTR ExeNameBuffer,DWORD ExeNameBufferLength);
 
-#if (_WIN32_WINNT >= 0x0600)
 #ifndef LF_FACESIZE
 #define LF_FACESIZE 32
 #endif
@@ -323,6 +329,7 @@ WINBOOL WINAPI GetConsoleHistoryInfo(
   PCONSOLE_HISTORY_INFO lpConsoleHistoryInfo
 );
 
+#if (_WIN32_WINNT >= 0x0600)
 #define GetConsoleOriginalTitle __MINGW_NAME_AW(GetConsoleOriginalTitle)
 
 WINBASEAPI DWORD WINAPI GetConsoleOriginalTitleA(
@@ -334,6 +341,7 @@ WINBASEAPI DWORD WINAPI GetConsoleOriginalTitleW(
   LPWSTR lpConsoleTitle,
   DWORD nSize
 );
+#endif /* (_WIN32_WINNT >= 0x0600) */
 
 WINBASEAPI WINBOOL WINAPI GetConsoleScreenBufferInfoEx(
   HANDLE hConsoleOutput,
@@ -360,8 +368,6 @@ WINBASEAPI WINBOOL WINAPI SetCurrentConsoleFontEx(
   WINBOOL bMaximumWindow,
   PCONSOLE_FONT_INFOEX lpConsoleCurrentFontEx
 );
-
-#endif /* (_WIN32_WINNT >= 0x0600) */
 
 #ifdef __cplusplus
 }

@@ -1,12 +1,16 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
+
+/* Make sure __LONG32 is defined.  */
+#include <_mingw.h>
+
 #ifndef GUID_DEFINED
 #define GUID_DEFINED
 typedef struct _GUID {
-  unsigned long Data1;
+  unsigned __LONG32 Data1;
   unsigned short Data2;
   unsigned short Data3;
   unsigned char Data4[8 ];
@@ -15,7 +19,7 @@ typedef struct _GUID {
 
 #if defined(__cplusplus) && (USE___UUIDOF == 0)
 extern "C++" {
-    template<typename T> const GUID &__mingw_uuidof();
+__extension__    template<typename T> const GUID &__mingw_uuidof();
 }
 #endif
 
@@ -136,12 +140,12 @@ typedef FMTID *LPFMTID;
 
 #ifdef __cplusplus
 __inline int InlineIsEqualGUID(REFGUID rguid1,REFGUID rguid2) {
-  return (((unsigned long *) &rguid1)[0]==((unsigned long *) &rguid2)[0] && ((unsigned long *) &rguid1)[1]==((unsigned long *) &rguid2)[1] &&
-    ((unsigned long *) &rguid1)[2]==((unsigned long *) &rguid2)[2] && ((unsigned long *) &rguid1)[3]==((unsigned long *) &rguid2)[3]);
+  return (((unsigned __LONG32 *) &rguid1)[0]==((unsigned __LONG32 *) &rguid2)[0] && ((unsigned __LONG32 *) &rguid1)[1]==((unsigned __LONG32 *) &rguid2)[1] &&
+    ((unsigned __LONG32 *) &rguid1)[2]==((unsigned __LONG32 *) &rguid2)[2] && ((unsigned __LONG32 *) &rguid1)[3]==((unsigned __LONG32 *) &rguid2)[3]);
 }
 __inline int IsEqualGUID(REFGUID rguid1,REFGUID rguid2) { return !memcmp(&rguid1,&rguid2,sizeof(GUID)); }
 #else
-#define InlineIsEqualGUID(rguid1,rguid2) (((unsigned long *) rguid1)[0]==((unsigned long *) rguid2)[0] && ((unsigned long *) rguid1)[1]==((unsigned long *) rguid2)[1] && ((unsigned long *) rguid1)[2]==((unsigned long *) rguid2)[2] && ((unsigned long *) rguid1)[3]==((unsigned long *) rguid2)[3])
+#define InlineIsEqualGUID(rguid1,rguid2) (((unsigned __LONG32 *) rguid1)[0]==((unsigned __LONG32 *) rguid2)[0] && ((unsigned __LONG32 *) rguid1)[1]==((unsigned __LONG32 *) rguid2)[1] && ((unsigned __LONG32 *) rguid1)[2]==((unsigned __LONG32 *) rguid2)[2] && ((unsigned __LONG32 *) rguid1)[3]==((unsigned __LONG32 *) rguid2)[3])
 #define IsEqualGUID(rguid1,rguid2) (!memcmp(rguid1,rguid2,sizeof(GUID)))
 #endif
 

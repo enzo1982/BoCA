@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _WS2TCPIP_H_
@@ -110,7 +110,6 @@ void IN6_SET_ADDR_LOOPBACK(struct in6_addr *);
 void IN6ADDR_SETANY(struct sockaddr_in6 *);
 void IN6ADDR_SETLOOPBACK(struct sockaddr_in6 *);
 
-#ifndef __CRT__NO_INLINE
 WS2TCPIP_INLINE int IN6_ADDR_EQUAL(const struct in6_addr *a,const struct in6_addr *b) { return (memcmp(a,b,sizeof(struct in6_addr))==0); }
 WS2TCPIP_INLINE int IN6_IS_ADDR_UNSPECIFIED(const struct in6_addr *a) { return ((a->s6_words[0]==0) && (a->s6_words[1]==0) && (a->s6_words[2]==0) && (a->s6_words[3]==0) && (a->s6_words[4]==0) && (a->s6_words[5]==0) && (a->s6_words[6]==0) && (a->s6_words[7]==0)); }
 WS2TCPIP_INLINE int IN6_IS_ADDR_LOOPBACK(const struct in6_addr *a) { return ((a->s6_words[0]==0) && (a->s6_words[1]==0) && (a->s6_words[2]==0) && (a->s6_words[3]==0) && (a->s6_words[4]==0) && (a->s6_words[5]==0) && (a->s6_words[6]==0) && (a->s6_words[7]==0x0100)); }
@@ -145,7 +144,6 @@ WS2TCPIP_INLINE void IN6ADDR_SETLOOPBACK(struct sockaddr_in6 *a) {
   IN6_SET_ADDR_LOOPBACK(&a->sin6_addr);
   a->sin6_scope_id = 0;
 }
-#endif /* !__CRT__NO_INLINE */
 
 #ifdef __cplusplus
 }
@@ -188,7 +186,7 @@ C_ASSERT(sizeof(IN6_PKTINFO)==20);
 #define EAI_SERVICE WSATYPE_NOT_FOUND
 #define EAI_SOCKTYPE WSAESOCKTNOSUPPORT
 
-#define EAI_NODATA EAI_NONAME
+#define EAI_NODATA 11004 /* WSANO_DATA */
 
 typedef struct addrinfo {
   int ai_flags;
@@ -340,23 +338,23 @@ typedef PVOID LPLOOKUPSERVICE_COMPLETION_ROUTINE; /*reserved*/
 
 WINSOCK_API_LINKAGE int WSAAPI GetAddrInfoExA(PCSTR pName, PCSTR pServiceName, DWORD dwNameSpace,
 					      LPGUID lpNspId,const ADDRINFOEXA *pHints,PADDRINFOEXA *ppResult,
-					      struct timeval *timeout,LPOVERLAPPED lpOverlapped,
+					      PTIMEVAL timeout,LPOVERLAPPED lpOverlapped,
 					      LPLOOKUPSERVICE_COMPLETION_ROUTINE lpCompletionRoutine,
 					      LPHANDLE lpNameHandle);
 WINSOCK_API_LINKAGE int WSAAPI GetAddrInfoExW(PCWSTR pName,PCWSTR pServiceName,DWORD dwNameSpace,
 					      LPGUID lpNspId,const ADDRINFOEXW *pHints,PADDRINFOEXW *ppResult,
-					      struct timeval *timeout,LPOVERLAPPED lpOverlapped,
+					      PTIMEVAL timeout,LPOVERLAPPED lpOverlapped,
 					      LPLOOKUPSERVICE_COMPLETION_ROUTINE lpCompletionRoutine,
 					      LPHANDLE lpNameHandle);
 
 WINSOCK_API_LINKAGE int WSAAPI SetAddrInfoExA(PCSTR pName, PCSTR pServiceName, SOCKET_ADDRESS *pAddresses,
 					      DWORD dwAddressCount,LPBLOB lpBlob,DWORD dwFlags,DWORD dwNameSpace,
-					      LPGUID lpNspId,struct timeval *timeout,LPOVERLAPPED lpOverlapped,
+					      LPGUID lpNspId,PTIMEVAL timeout,LPOVERLAPPED lpOverlapped,
 					      LPLOOKUPSERVICE_COMPLETION_ROUTINE lpCompletionRoutine,
 					      LPHANDLE lpNameHandle);
 WINSOCK_API_LINKAGE int WSAAPI SetAddrInfoExW(PCWSTR pName,PCWSTR pServiceName,SOCKET_ADDRESS *pAddresses,
 					      DWORD dwAddressCount,LPBLOB lpBlob,DWORD dwFlags,DWORD dwNameSpace,
-					      LPGUID lpNspId,struct timeval *timeout,LPOVERLAPPED lpOverlapped,
+					      LPGUID lpNspId,PTIMEVAL timeout,LPOVERLAPPED lpOverlapped,
 					      LPLOOKUPSERVICE_COMPLETION_ROUTINE lpCompletionRoutine,
 					      LPHANDLE lpNameHandle);
 
@@ -367,24 +365,24 @@ WINSOCK_API_LINKAGE void WSAAPI FreeAddrInfoExW(PADDRINFOEXW pAddrInfo);
 #define LPFN_GETADDRINFOEX __MINGW_NAME_AW(LPFN_GETADDRINFOEX)
   typedef int (WSAAPI *LPFN_GETADDRINFOEXA)(PCSTR pName, PCSTR pServiceName, DWORD dwNameSpace,
 					    LPGUID lpNspId,const ADDRINFOEXA *pHints,PADDRINFOEXA *ppResult,
-					    struct timeval *timeout,LPOVERLAPPED lpOverlapped,
+					    PTIMEVAL timeout,LPOVERLAPPED lpOverlapped,
 					    LPLOOKUPSERVICE_COMPLETION_ROUTINE lpCompletionRoutine,
 					    LPHANDLE lpNameHandle);
   typedef int (WSAAPI *LPFN_GETADDRINFOEXW)(PCWSTR pName,PCWSTR pServiceName,DWORD dwNameSpace,
 					    LPGUID lpNspId,const ADDRINFOEXW *pHints,PADDRINFOEXW *ppResult,
-					    struct timeval *timeout,LPOVERLAPPED lpOverlapped,
+					    PTIMEVAL timeout,LPOVERLAPPED lpOverlapped,
 					    LPLOOKUPSERVICE_COMPLETION_ROUTINE lpCompletionRoutine,
 					    LPHANDLE lpNameHandle);
 
 #define LPFN_SETADDRINFOEX __MINGW_NAME_AW(LPFN_SETADDRINFOEX)
   typedef int (WSAAPI *LPFN_SETADDRINFOEXA)(PCSTR pName, PCSTR pServiceName, SOCKET_ADDRESS *pAddresses,
 					    DWORD dwAddressCount,LPBLOB lpBlob,DWORD dwFlags,DWORD dwNameSpace,
-					    LPGUID lpNspId,struct timeval *timeout,LPOVERLAPPED lpOverlapped,
+					    LPGUID lpNspId,PTIMEVAL timeout,LPOVERLAPPED lpOverlapped,
 					    LPLOOKUPSERVICE_COMPLETION_ROUTINE lpCompletionRoutine,
 					    LPHANDLE lpNameHandle);
   typedef int (WSAAPI *LPFN_SETADDRINFOEXW)(PCWSTR pName,PCWSTR pServiceName,SOCKET_ADDRESS *pAddresses,
 					    DWORD dwAddressCount,LPBLOB lpBlob,DWORD dwFlags,DWORD dwNameSpace,
-					    LPGUID lpNspId,struct timeval *timeout,LPOVERLAPPED lpOverlapped,
+					    LPGUID lpNspId,PTIMEVAL timeout,LPOVERLAPPED lpOverlapped,
 					    LPLOOKUPSERVICE_COMPLETION_ROUTINE lpCompletionRoutine,
 					    LPHANDLE lpNameHandle);
 

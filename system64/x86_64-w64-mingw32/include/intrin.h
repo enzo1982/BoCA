@@ -1,13 +1,13 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef __INTRIN_H_
 #define __INTRIN_H_
 #ifndef RC_INVOKED
 
-#include <_mingw.h>
+#include <crtdefs.h>
 #include <setjmp.h>
 #include <stddef.h>
 
@@ -48,6 +48,37 @@ typedef union __m128i { char v[16]; } __m128i;
 
 #ifndef WINAPI
 #define WINAPI __stdcall
+#endif
+
+#ifdef __MMX__
+#if defined(__cplusplus)
+extern "C" {
+#endif
+#include <mmintrin.h>
+#if defined(__cplusplus)
+}
+#endif
+#endif
+
+/* NOTE: it's not included by MS version, but we do it to try work around C++/C linkage differences */
+#ifdef __SSE2__
+#if defined(__cplusplus)
+extern "C" {
+#endif
+#include <emmintrin.h>
+#if defined(__cplusplus)
+}
+#endif
+#endif
+
+#ifdef __SSE3__
+#if defined(__cplusplus)
+extern "C" {
+#endif
+#include <pmmintrin.h>
+#if defined(__cplusplus)
+}
+#endif
 #endif
 
 #if (defined(_X86_) && !defined(__x86_64))
@@ -458,6 +489,7 @@ extern "C" {
     __MACHINEIA64(void __yield(void))
     __MACHINEIA64(void __fci(void*))
 
+#if !defined(__GNUC__) || !defined(__MMX__)
     __MACHINEX86X_NOX64(void _m_empty(void))
     __MACHINEX86X_NOX64(__m64 _m_from_int(int))
     __MACHINEX86X_NOX64(int _m_to_int(__m64))
@@ -523,6 +555,7 @@ extern "C" {
     __MACHINEX86X_NOX64(__m64 _mm_setr_pi32(int,int))
     __MACHINEX86X_NOX64(__m64 _mm_setr_pi16(short,short,short,short))
     __MACHINEX86X_NOX64(__m64 _mm_setr_pi8(char,char,char,char,char,char,char,char))
+#endif
 #pragma push_macro ("_m_pextrw")
 #undef _m_pextrw
     __MACHINEX86X_NOX64(int _m_pextrw(__m64,int))
@@ -532,22 +565,27 @@ extern "C" {
 #undef _m_pinsrw
     __MACHINEX86X_NOX64(__m64 _m_pinsrw(__m64,int,int))
 #pragma pop_macro ("_m_pinsrw")
+#if !defined(__GNUC__) || !defined(__SSE2__)
     __MACHINEX86X_NOX64(__m64 _m_pmaxsw(__m64,__m64))
     __MACHINEX86X_NOX64(__m64 _m_pmaxub(__m64,__m64))
     __MACHINEX86X_NOX64(__m64 _m_pminsw(__m64,__m64))
     __MACHINEX86X_NOX64(__m64 _m_pminub(__m64,__m64))
     __MACHINEX86X_NOX64(int _m_pmovmskb(__m64))
     __MACHINEX86X_NOX64(__m64 _m_pmulhuw(__m64,__m64))
+#endif
 #pragma push_macro ("_m_pshufw")
 #undef _m_pshufw
     __MACHINEX86X_NOX64(__m64 _m_pshufw(__m64,int))
 #pragma pop_macro ("_m_pshufw")
+#if !defined(__GNUC__) || !defined(__SSE2__)
     __MACHINEX86X_NOX64(void _m_maskmovq(__m64,__m64,char*))
     __MACHINEX86X_NOX64(__m64 _m_pavgb(__m64,__m64))
     __MACHINEX86X_NOX64(__m64 _m_pavgw(__m64,__m64))
     __MACHINEX86X_NOX64(__m64 _m_psadbw(__m64,__m64))
+#endif
     __MACHINEX86X_NOWIN64(__m64 _m_from_float(float))
     __MACHINEX86X_NOWIN64(float _m_to_float(__m64))
+#if !defined(__GNUC__) || !defined(__SSE2__)
     __MACHINEX86X_NOIA64(__m128 _mm_add_ss(__m128,__m128))
     __MACHINEX86X_NOIA64(__m128 _mm_add_ps(__m128,__m128))
     __MACHINEX86X_NOIA64(__m128 _mm_sub_ss(__m128,__m128))
@@ -612,10 +650,12 @@ extern "C" {
     __MACHINEX86X_NOWIN64(__m64 _mm_cvtt_ps2pi(__m128))
     __MACHINEX86X_NOIA64(__m128 _mm_cvt_si2ss(__m128,int))
     __MACHINEX86X_NOWIN64(__m128 _mm_cvt_pi2ps(__m128,__m64))
+#endif
 #pragma push_macro ("_mm_shuffle_ps")
 #undef _mm_shuffle_ps
     __MACHINEX86X_NOIA64(__m128 _mm_shuffle_ps(__m128,__m128,int const))
 #pragma pop_macro ("_mm_shuffle_ps")
+#if !defined(__GNUC__) || !defined(__SSE2__)
     __MACHINEX86X_NOIA64(__m128 _mm_unpackhi_ps(__m128,__m128))
     __MACHINEX86X_NOIA64(__m128 _mm_unpacklo_ps(__m128,__m128))
     __MACHINEX86X_NOIA64(__m128 _mm_loadh_pi(__m128,__m64 const*))
@@ -647,6 +687,7 @@ extern "C" {
     __MACHINEX86X_NOIA64(void _mm_setcsr(unsigned int))
     __MACHINEX86X_NOIA64(__m128 _mm_movelh_ps(__m128,__m128))
     __MACHINEX86X_NOIA64(__m128 _mm_movehl_ps(__m128,__m128))
+#endif
     __MACHINEX86X_NOIA64(void _m_prefetch(void*))
     __MACHINEX86X_NOIA64(void _m_prefetchw(void*_Source))
     __MACHINEX86X_NOWIN64(void _m_femms(void))
@@ -674,6 +715,7 @@ extern "C" {
     __MACHINEX86X_NOWIN64(__m64 _m_pfpnacc(__m64,__m64))
     __MACHINEX86X_NOWIN64(__m64 _m_pi2fw(__m64))
     __MACHINEX86X_NOWIN64(__m64 _m_pswapd(__m64))
+#if !defined(__GNUC__) || !defined(__SSE2__)
     __MACHINEX86X(__m128d _mm_add_sd(__m128d,__m128d))
     __MACHINEX86X(__m128d _mm_add_pd(__m128d,__m128d))
     __MACHINEX86X(__m128d _mm_div_sd(__m128d,__m128d))
@@ -771,7 +813,13 @@ extern "C" {
     __MACHINEX86X(__m128i _mm_add_epi8(__m128i,__m128i))
     __MACHINEX86X(__m128i _mm_add_epi16(__m128i,__m128i))
     __MACHINEX86X(__m128i _mm_add_epi32(__m128i,__m128i))
+#endif
+
+#if !defined(__GNUC__) || !defined(__MMX__)
     __MACHINEX86X_NOX64(__m64 _mm_add_si64(__m64,__m64))
+#endif
+
+#if !defined(__GNUC__) || !defined(__SSE2__)
     __MACHINEX86X(__m128i _mm_add_epi64(__m128i,__m128i))
     __MACHINEX86X(__m128i _mm_adds_epi8(__m128i,__m128i))
     __MACHINEX86X(__m128i _mm_adds_epi16(__m128i,__m128i))
@@ -793,7 +841,11 @@ extern "C" {
     __MACHINEX86X(__m128i _mm_sub_epi8(__m128i,__m128i))
     __MACHINEX86X(__m128i _mm_sub_epi16(__m128i,__m128i))
     __MACHINEX86X(__m128i _mm_sub_epi32(__m128i,__m128i))
+#endif
+#if !defined(__GNUC__) || !defined(__MMX__)
     __MACHINEX86X_NOX64(__m64 _mm_sub_si64(__m64,__m64))
+#endif
+#if !defined(__GNUC__) || !defined(__SSE2__)
     __MACHINEX86X(__m128i _mm_sub_epi64(__m128i,__m128i))
     __MACHINEX86X(__m128i _mm_subs_epi8(__m128i,__m128i))
     __MACHINEX86X(__m128i _mm_subs_epi16(__m128i,__m128i))
@@ -880,6 +932,8 @@ extern "C" {
     __MACHINEX86X(void _mm_mfence(void))
     __MACHINEX86X(void _mm_stream_si32(int*,int))
     __MACHINEX86X(void _mm_pause(void))
+#endif
+#if !defined(__GNUC__) || !defined(__SSE3__)
     __MACHINEX86X(__m128 _mm_addsub_ps(__m128,__m128))
     __MACHINEX86X(__m128d _mm_addsub_pd(__m128d,__m128d))
     __MACHINEX86X(__m128 _mm_hadd_ps(__m128,__m128))
@@ -893,6 +947,7 @@ extern "C" {
     __MACHINEX86X(__m128 _mm_movehdup_ps(__m128))
     __MACHINEX86X(__m128 _mm_moveldup_ps(__m128))
     __MACHINEX86X(void _mm_mwait(unsigned int,unsigned int))
+#endif
     __MACHINEI(void _WriteBarrier(void))
     __MACHINEI(void _ReadWriteBarrier(void))
     __MACHINEIA64(void _WriteBarrier(void))
@@ -946,6 +1001,7 @@ extern "C" {
     __MACHINEI(void __outwordstring(unsigned short Port,unsigned short *Buffer,unsigned long Count))
     __MACHINEI(void __outdwordstring(unsigned short Port,unsigned long *Buffer,unsigned long Count))
     __MACHINEI(unsigned int __getcallerseflags())
+#if !defined(__GNUC__) || !defined(__SSE2__)
     __MACHINEX64(__MINGW_EXTENSION __m128i _mm_set_epi64x(__int64 i1,__int64 i0))
     __MACHINEX64(__MINGW_EXTENSION __m128i _mm_set1_epi64x(__int64 i))
     __MACHINEX64(__MINGW_EXTENSION __int64 _mm_cvtsd_si64x(__m128d a))
@@ -956,6 +1012,7 @@ extern "C" {
     __MACHINEX64(__MINGW_EXTENSION __int64 _mm_cvttss_si64x(__m128 a))
     __MACHINEX64(__MINGW_EXTENSION __m128i _mm_cvtsi64x_si128(__int64 a))
     __MACHINEX64(__MINGW_EXTENSION __int64 _mm_cvtsi128_si64x(__m128i a))
+#endif
     __MACHINEX64(__MINGW_EXTENSION void _mm_stream_si64x(__int64 *,__int64))
     __MACHINEI(void __stosb(unsigned char *,unsigned char,size_t))
     __MACHINEI(void __stosw(unsigned short *,unsigned short,size_t))

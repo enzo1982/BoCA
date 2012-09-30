@@ -50,7 +50,7 @@ extern OGGSYNCPAGEOUT		 ex_ogg_sync_pageout;
 extern OGGSYNCCLEAR		 ex_ogg_sync_clear;
 
 typedef OpusDecoder *		(*OPUSDECODERCREATE)	 (opus_int32, int, int *);
-typedef int			(*OPUSDECODE)		 (OpusDecoder *, const unsigned char *, int, opus_int16 *, int, int);
+typedef int			(*OPUSDECODE)		 (OpusDecoder *, const unsigned char *, opus_int32, opus_int16 *, int, int);
 typedef int			(*OPUSDECODERCTL)	 (OpusDecoder *, int, ...);
 typedef void			(*OPUSDECODERDESTROY)	 (OpusDecoder *);
 

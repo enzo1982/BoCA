@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef _INC_WINSNMP
@@ -25,9 +25,9 @@ extern "C" {
   typedef unsigned char smiBYTE,*smiLPBYTE;
 
 #if ULONG_MAX==4294967295U
-  typedef signed long smiINT,*smiLPINT;
+  typedef signed __LONG32 smiINT,*smiLPINT;
   typedef smiINT smiINT32,*smiLPINT32;
-  typedef unsigned long smiUINT32,*smiLPUINT32;
+  typedef unsigned __LONG32 smiUINT32,*smiLPUINT32;
 #elif UINT_MAX==4294967295U
   typedef int smiINT,*smiLPINT;
   typedef smiINT smiINT32,*smiLPINT32;

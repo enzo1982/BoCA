@@ -1,9 +1,9 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
-#include <_mingw.h>
+#include <crtdefs.h>
 
 #ifndef _INC_LIMITS
 #define _INC_LIMITS
@@ -74,6 +74,14 @@
 #endif
 #endif
 
+#ifndef SSIZE_MAX
+#ifdef _WIN64
+#define SSIZE_MAX _I64_MAX
+#else
+#define SSIZE_MAX INT_MAX
+#endif
+#endif
+
 #ifdef _POSIX_
 #define _POSIX_ARG_MAX 4096
 #define _POSIX_CHILD_MAX 6
@@ -98,8 +106,9 @@
 #undef PATH_MAX
 #define PATH_MAX 512
 #define PIPE_BUF _POSIX_PIPE_BUF
-#define SSIZE_MAX _POSIX_SSIZE_MAX
+/*#define SSIZE_MAX _POSIX_SSIZE_MAX*/
 #define STREAM_MAX 20
 #define TZNAME_MAX 10
 #endif
-#endif
+
+#endif /* _INC_LIMITS */

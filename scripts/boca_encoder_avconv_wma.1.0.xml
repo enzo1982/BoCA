@@ -12,7 +12,7 @@
   </format>
   <external>
     <command>avconv</command>
-    <arguments>-f wav -i %INFILE -c:a wmav2 %OPTIONS %OUTFILE</arguments>
+    <arguments>-f wav -i %INFILE -c:a wmav2 %OPTIONS -y %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
     <parameters>

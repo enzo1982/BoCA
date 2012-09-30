@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = config.o dllinterface.o faac_out.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -I .
 
 # Enter additional library dependencies here:
 LIBS	  =

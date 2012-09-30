@@ -245,6 +245,7 @@ struct flag_info
 };
 
 struct bfd_elf_dynamic_list;
+struct bfd_elf_version_tree;
 
 /* This structure holds all the information needed to communicate
    between BFD and the linker when doing a link.  */
@@ -335,6 +336,9 @@ struct bfd_link_info
 
   /* TRUE if we should warn when adding a DT_TEXTREL to a shared object.  */
   unsigned int warn_shared_textrel: 1;
+
+  /* TRUE if we should error when adding a DT_TEXTREL.  */
+  unsigned int error_textrel: 1;
 
   /* TRUE if .hash section should be created.  */
   unsigned int emit_hash: 1;
@@ -496,6 +500,9 @@ struct bfd_link_info
 
   /* List of symbols should be dynamic.  */
   struct bfd_elf_dynamic_list *dynamic_list;
+
+  /* The version information.  */
+  struct bfd_elf_version_tree *version_info;
 };
 
 /* This structures holds a set of callback functions.  These are called

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -24,6 +24,7 @@ MPG123_DECODE			 ex_mpg123_decode		= NIL;
 
 MPG123_GETFORMAT		 ex_mpg123_getformat		= NIL;
 MPG123_INFO			 ex_mpg123_info			= NIL;
+MPG123_SPF			 ex_mpg123_spf			= NIL;
 
 MPG123_SUPPORTED_DECODERS	 ex_mpg123_supported_decoders	= NIL;
 MPG123_DECODER			 ex_mpg123_decoder		= NIL;
@@ -47,6 +48,7 @@ Bool LoadMPG123DLL()
 
 	ex_mpg123_getformat		= (MPG123_GETFORMAT) mpg123dll->GetFunctionAddress("mpg123_getformat");
 	ex_mpg123_info			= (MPG123_INFO) mpg123dll->GetFunctionAddress("mpg123_info");
+	ex_mpg123_spf			= (MPG123_SPF) mpg123dll->GetFunctionAddress("mpg123_spf");
 
 	ex_mpg123_supported_decoders	= (MPG123_SUPPORTED_DECODERS) mpg123dll->GetFunctionAddress("mpg123_supported_decoders");
 	ex_mpg123_decoder		= (MPG123_DECODER) mpg123dll->GetFunctionAddress("mpg123_decoder");
@@ -62,6 +64,7 @@ Bool LoadMPG123DLL()
 
 	    ex_mpg123_getformat			== NIL ||
 	    ex_mpg123_info			== NIL ||
+	    ex_mpg123_spf			== NIL ||
 
 	    ex_mpg123_supported_decoders	== NIL ||
 	    ex_mpg123_decoder			== NIL) { FreeMPG123DLL(); return False; }

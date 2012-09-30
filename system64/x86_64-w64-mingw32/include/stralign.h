@@ -1,6 +1,6 @@
 /**
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the w64 mingw-runtime package.
+ * This file is part of the mingw-w64 runtime package.
  * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
 #ifndef __STRALIGN_H_
@@ -26,7 +26,7 @@ extern "C" {
 #define ua_wcsrchr wcsrchr
 
   PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source);
-#ifndef __CRT__NO_INLINE
+#if !defined (__CRT__NO_INLINE) && !defined (__CYGWIN__)
   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
 #else
 #define ua_wcscpy wcscpy
@@ -54,7 +54,7 @@ extern "C" {
     return uaw_CharUpperW(String);
   }
 #endif /* !__CRT__NO_INLINE */
-#endif /* _X86_ */
+#endif /* CharUpper */
 
 #ifdef lstrcmp
   int ua_lstrcmpW(LPCUWSTR String1,LPCUWSTR String2);
@@ -137,7 +137,7 @@ extern "C" {
     return uaw_wcslen(String);
   }
 #endif /* !__CRT__NO_INLINE */
-#endif
+#endif /* _X86_ */
   int ua_wcsicmp(LPCUWSTR String1,LPCUWSTR String2);
 
 #ifndef __CRT__NO_INLINE
@@ -147,7 +147,7 @@ extern "C" {
     return uaw_wcsicmp(String1,String2);
   }
 #endif /* !__CRT__NO_INLINE */
-#endif
+#endif /* _WSTRING_DEFINED */
 
 #ifndef __UA_WCSLEN
 #define __UA_WCSLEN ua_wcslen
