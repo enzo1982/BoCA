@@ -37,6 +37,7 @@ const String &BoCA::OpusOut::GetComponentSpecs()
 		    <type>encoder</type>						\
 		    <format>								\
 		      <name>Opus Audio</name>						\
+		      <extension>opus</extension>					\
 		      <extension>oga</extension>					\
 		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
 		    </format>								\
@@ -373,6 +374,18 @@ Int BoCA::OpusOut::WriteOggPackets(Bool flush)
 	while (true);
 
 	return bytes;
+}
+
+String BoCA::OpusOut::GetOutputFileExtension()
+{
+	Config	*config = Config::Get();
+
+	switch (config->GetIntValue("Opus", "FileExtension", 0))
+	{
+		default:
+		case  0: return "opus";
+		case  1: return "oga";
+	}
 }
 
 ConfigLayer *BoCA::OpusOut::GetConfigurationLayer()

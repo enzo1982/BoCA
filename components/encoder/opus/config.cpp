@@ -14,6 +14,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 {
 	Config	*config = Config::Get();
 
+	fileExtension	= config->GetIntValue("Opus", "FileExtension", 0);
 	bitrate		= config->GetIntValue("Opus", "Bitrate", 128) / 2;
 	complexity	= config->GetIntValue("Opus", "Complexity", 10);
 	framesize	= Math::Round(Math::Log2(config->GetIntValue("Opus", "FrameSize", 20000) / 2500));
@@ -26,14 +27,14 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	i18n->SetContext("Encoders::Opus");
 
-	group_basic		= new GroupBox(i18n->TranslateString("Basic settings"), Point(7, 11), Size(344, 66));
+	group_basic		= new GroupBox(i18n->TranslateString("Basic settings"), Point(7, 11), Size(228, 66));
 
 	text_mode		= new Text(i18n->TranslateString("Encoding mode:"), Point(7, 13));
 
 	combo_mode		= new ComboBox(Point(120, 10), Size(214, 0));
 	combo_mode->AddEntry(i18n->TranslateString("Auto"));
 	combo_mode->AddEntry(i18n->TranslateString("Voice"));
-	combo_mode->AddEntry(i18n->TranslateString("Audio"));
+	combo_mode->AddEntry(i18n->TranslateString("Music"));
 	combo_mode->SelectNthEntry(config->GetIntValue("Opus", "Mode", 0));
 	combo_mode->onSelectEntry.Connect(&ConfigureOpus::SetMode, this);
 
@@ -50,17 +51,25 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	Int	 maxTextSize = Math::Max(text_mode->GetUnscaledTextWidth(), text_bandwidth->GetUnscaledTextWidth());
 
-	combo_mode->SetMetrics(Point(14 + maxTextSize, combo_mode->GetY()), Size(320 - maxTextSize, combo_mode->GetHeight()));
-	combo_bandwidth->SetMetrics(Point(14 + maxTextSize, combo_bandwidth->GetY()), Size(320 - maxTextSize, combo_bandwidth->GetHeight()));
+	combo_mode->SetMetrics(Point(14 + maxTextSize, combo_mode->GetY()), Size(202 - maxTextSize, combo_mode->GetHeight()));
+	combo_bandwidth->SetMetrics(Point(14 + maxTextSize, combo_bandwidth->GetY()), Size(202 - maxTextSize, combo_bandwidth->GetHeight()));
 
 	group_basic->Add(text_mode);
 	group_basic->Add(combo_mode);
 	group_basic->Add(text_bandwidth);
 	group_basic->Add(combo_bandwidth);
 
-	group_vbr		= new GroupBox(i18n->TranslateString("VBR"), Point(7, 89), Size(344, 40));
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(243, 11), Size(108, 66));
 
-	check_vbr		= new CheckBox(i18n->TranslateString("Enable VBR"), Point(10, 13), Size(324, 0), &enableVBR);
+	option_extension_opus	= new OptionBox(".opus", Point(10, 13), Size(88, 0), &fileExtension, 0);
+	option_extension_oga	= new OptionBox(".oga", Point(10, 38), Size(88, 0), &fileExtension, 1);
+
+	group_extension->Add(option_extension_opus);
+	group_extension->Add(option_extension_oga);
+
+	group_vbr		= new GroupBox(i18n->TranslateString("Variable bitrate"), Point(7, 89), Size(344, 40));
+
+	check_vbr		= new CheckBox(i18n->TranslateString("Enable variable bitrate encoding"), Point(10, 13), Size(324, 0), &enableVBR);
 
 	group_vbr->Add(check_vbr);
 
@@ -99,7 +108,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	group_stream		= new GroupBox(i18n->TranslateString("Stream"), Point(7, 219), Size(344, 40));
 
-	text_framesize		= new Text(i18n->TranslateString("Frame size:"), Point(10, 13));
+	text_framesize		= new Text(i18n->TranslateString("Frame length:"), Point(10, 13));
 
 	slider_framesize	= new Slider(Point(17 + text_framesize->GetUnscaledTextWidth(), 11), Size(254 - text_framesize->GetUnscaledTextWidth(), 0), OR_HORZ, &framesize, 0, 5);
 	slider_framesize->onValueChange.Connect(&ConfigureOpus::SetFrameSize, this);
@@ -135,6 +144,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	SetPacketLoss();
 
 	Add(group_basic);
+	Add(group_extension);
 	Add(group_vbr);
 	Add(group_quality);
 	Add(group_stream);
@@ -150,6 +160,10 @@ BoCA::ConfigureOpus::~ConfigureOpus()
 	DeleteObject(combo_mode);
 	DeleteObject(text_bandwidth);
 	DeleteObject(combo_bandwidth);
+
+	DeleteObject(group_extension);
+	DeleteObject(option_extension_opus);
+	DeleteObject(option_extension_oga);
 
 	DeleteObject(group_vbr);
 	DeleteObject(check_vbr);
@@ -181,6 +195,8 @@ Int BoCA::ConfigureOpus::SaveSettings()
 
 	config->SetIntValue("Opus", "Mode", combo_mode->GetSelectedEntryNumber());
 	config->SetIntValue("Opus", "Bandwidth", combo_bandwidth->GetSelectedEntryNumber());
+
+	config->SetIntValue("Opus", "FileExtension", fileExtension);
 
 	config->SetIntValue("Opus", "Bitrate", bitrate * 2);
 	config->SetIntValue("Opus", "Complexity", complexity);

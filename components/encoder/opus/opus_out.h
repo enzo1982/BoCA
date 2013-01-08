@@ -50,6 +50,8 @@ namespace BoCA
 
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
+			String			 GetOutputFileExtension();
+
 			ConfigLayer		*GetConfigurationLayer();
 	};
 };

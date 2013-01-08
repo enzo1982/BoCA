@@ -34,6 +34,7 @@ const String &BoCA::OpusIn::GetComponentSpecs()
 		    <type>decoder</type>						\
 		    <format>								\
 		      <name>Opus Audio</name>						\
+		      <extension>opus</extension>					\
 		      <extension>oga</extension>					\
 		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
 		    </format>								\

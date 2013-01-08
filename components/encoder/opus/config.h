@@ -30,6 +30,10 @@ namespace BoCA
 			Text		*text_bandwidth;
 			ComboBox	*combo_bandwidth;
 
+			GroupBox	*group_extension;
+			OptionBox	*option_extension_opus;
+			OptionBox	*option_extension_oga;
+
 			GroupBox	*group_vbr;
 			CheckBox	*check_vbr;
 
@@ -54,6 +58,7 @@ namespace BoCA
 			Text		*text_packet_loss_value;
 
 			Int		 bitrate;
+			Int		 fileExtension;
 			Int		 complexity;
 			Int		 framesize;
 			Int		 packet_loss;
