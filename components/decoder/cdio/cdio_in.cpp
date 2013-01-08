@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,11 +11,8 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
-extern "C" {
-#	define DO_NOT_WANT_PARANOIA_COMPATIBILITY
-#	include <cdio/cdda.h>
-#	include <cdio/paranoia.h>
-}
+#include <cdio/cdio.h>
+#include <cdio/paranoia.h>
 
 #include <unistd.h>
 #include <limits.h>
@@ -70,7 +67,7 @@ const Array<String> &BoCA::CDIOIn::FindDrives()
 	char	*deviceNames[3] = { "/dev/cd0d", "/dev/cd1d", NIL };
 #endif
 
-	for (Int i = 0; deviceNames[i] != NIL; i++)
+	for (Int i = 0; deviceNames != NIL && deviceNames[i] != NIL; i++)
 	{
 		String		 deviceName = deviceNames[i];
 
@@ -102,13 +99,13 @@ const Array<String> &BoCA::CDIOIn::FindDrives()
 
 		/* Try to open device and add it to the list.
 		 */
-		cdrom_drive_t	*cd = cdio_cddap_identify(deviceName, CDDA_MESSAGE_FORGETIT, NIL);
+		CdIo_t	*cd = cdio_open(deviceName, DRIVER_UNKNOWN);
 
 		if (cd != NIL)
 		{
 			driveNames.Add(deviceName);
 
-			cdio_cddap_close(cd);
+			cdio_destroy(cd);
 		}
 	}
 
@@ -284,25 +281,24 @@ BoCA::CDIOIn::~CDIOIn()
 Bool BoCA::CDIOIn::Activate()
 {
 	Int	 startSector = 0;
-	Int	 endSector = 0;
+	Int	 endSector   = 0;
 
 	const Array<String>	&driveNames = FindDrives();
 
-	drive = cdio_cddap_identify(driveNames.GetNth(track.drive), CDDA_MESSAGE_FORGETIT, NIL);
+	cd = cdio_open(driveNames.GetNth(track.drive), DRIVER_UNKNOWN);
 
-	if (drive == NIL) return False;
+	if (cd == NIL) return False;
 
-	cdio_cddap_open(drive);
-
-	Int	 numTocEntries = drive->tracks;
+	Int	 firstTrack  = cdio_get_first_track_num(cd);
+	Int	 lastTrack   = cdio_get_last_track_num(cd);
 	Int	 entryNumber = -1;
 
-	for (Int i = 0; i < numTocEntries; i++)
+	for (Int i = firstTrack; i <= lastTrack; i++)
 	{
-		startSector = drive->disc_toc[i].dwStartSector;
-		endSector = drive->disc_toc[i + 1].dwStartSector;
+		startSector = cdio_get_track_lsn(cd, i);
+		endSector   = cdio_get_track_last_lsn(cd, i);
 
-		if (cdio_cddap_track_audiop(drive, drive->disc_toc[i].bTrack) && (drive->disc_toc[i].bTrack == track.cdTrack))
+		if (cdio_get_track_format(cd, i) == TRACK_FORMAT_AUDIO && i == track.cdTrack)
 		{
 			nextSector  = startSector;
 			sectorsLeft = endSector - startSector;
@@ -319,8 +315,8 @@ Bool BoCA::CDIOIn::Activate()
 
 	Int	 speed = config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 
-	if (speed > 0)	cdio_cddap_speed_set(drive, speed);
-	else		cdio_cddap_speed_set(drive, -1);
+	if (speed > 0)	cdio_set_speed(cd, speed);
+	else		cdio_set_speed(cd, -1);
 
 	paranoia = NIL;
 
@@ -341,6 +337,10 @@ Bool BoCA::CDIOIn::Activate()
 				break;
 		}
 
+		drive = cdio_cddap_identify_cdio(cd, CDDA_MESSAGE_FORGETIT, NIL);
+		
+		cdio_cddap_open(drive);
+		
 		paranoia = cdio_paranoia_init(drive);
 
 		cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
@@ -352,11 +352,15 @@ Bool BoCA::CDIOIn::Activate()
 
 Bool BoCA::CDIOIn::Deactivate()
 {
-	if (drive == NIL) return False;
+	if (cd == NIL) return False;
 
-	if (paranoia != NIL) cdio_paranoia_free(paranoia);
+	if (paranoia != NIL)
+	{
+		cdio_paranoia_free(paranoia);
+		cdio_cddap_close_no_free_cdio(drive);
+	}
 
-	cdio_cddap_close(drive);
+	cdio_destroy(cd);
 
 	return True;
 }
@@ -377,7 +381,7 @@ Int BoCA::CDIOIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	}
 	else
 	{
-		cdio_cddap_read(drive, data, nextSector, sectors);
+		cdio_read_audio_sectors(cd, data, nextSector, sectors);
 	}
 
 	nextSector  += sectors;

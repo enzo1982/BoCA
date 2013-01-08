@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,10 +11,7 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
-extern "C" {
-#	define DO_NOT_WANT_PARANOIA_COMPATIBILITY
-#	include <cdio/cdda.h>
-}
+#include <cdio/cdio.h>
 
 #include <unistd.h>
 #include <limits.h>
@@ -63,7 +60,7 @@ const Array<String> &BoCA::CDIOInfo::FindDrives()
 	char	*deviceNames[3] = { "/dev/cd0d", "/dev/cd1d", NIL };
 #endif
 
-	for (Int i = 0; deviceNames[i] != NIL; i++)
+	for (Int i = 0; deviceNames != NIL && deviceNames[i] != NIL; i++)
 	{
 		String		 deviceName = deviceNames[i];
 
@@ -95,13 +92,13 @@ const Array<String> &BoCA::CDIOInfo::FindDrives()
 
 		/* Try to open device and add it to the list.
 		 */
-		cdrom_drive_t	*cd = cdio_cddap_identify(deviceName, CDDA_MESSAGE_FORGETIT, NIL);
+		CdIo_t	*cd = cdio_open(deviceName, DRIVER_UNKNOWN);
 
 		if (cd != NIL)
 		{
 			driveNames.Add(deviceName);
 
-			cdio_cddap_close(cd);
+			cdio_destroy(cd);
 		}
 	}
 
@@ -151,49 +148,21 @@ BoCA::CDIOInfo::~CDIOInfo()
 Bool BoCA::CDIOInfo::OpenNthDeviceTray(Int n)
 {
 	const Array<String>	&driveNames = FindDrives();
-	cdrom_drive_t		*cd	    = cdio_cddap_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
 
-	if (cd != NIL)
-	{
-		int	 device_name_length = strlen(cd->cdda_device_name);
-		char	 device_name[device_name_length + 1];
-
-		strncpy(device_name, cd->cdda_device_name, device_name_length + 1);
-
-		cdio_cddap_close(cd);
-
-		/* Eject.
-		 */
-		cdio_eject_media_drive(device_name);
-
-		return True;
-	}
-
-	return False;
+	/* Eject.
+	 */
+	if (cdio_eject_media_drive(driveNames.GetNth(n)) == DRIVER_OP_SUCCESS) return True;
+	else								       return False;
 }
 
 Bool BoCA::CDIOInfo::CloseNthDeviceTray(Int n)
 {
 	const Array<String>	&driveNames = FindDrives();
-	cdrom_drive_t		*cd	    = cdio_cddap_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
 
-	if (cd != NIL)
-	{
-		int	 device_name_length = strlen(cd->cdda_device_name);
-		char	 device_name[device_name_length + 1];
-
-		strncpy(device_name, cd->cdda_device_name, device_name_length + 1);
-
-		cdio_cddap_close(cd);
-
-		/* Close tray.
-		 */
-		cdio_close_tray(device_name, NIL);
-
-		return True;
-	}
-
-	return False;
+	/* Close tray.
+	 */
+	if (cdio_close_tray(driveNames.GetNth(n), NIL) == DRIVER_OP_SUCCESS) return True;
+	else								     return False;
 }
 
 const Array<String> &BoCA::CDIOInfo::GetNthDeviceTrackList(Int n)
@@ -246,7 +215,7 @@ const BoCA::MCDI &BoCA::CDIOInfo::GetNthDeviceMCDI(Int n)
 	mcdi.SetData(Buffer<UnsignedByte>());
 
 	const Array<String>	&driveNames = FindDrives();
-	cdrom_drive_t		*cd	    = cdio_cddap_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
+	CdIo_t			*cd	    = cdio_open(driveNames.GetNth(n), DRIVER_UNKNOWN);
 
 	if (cd != NIL)
 	{
@@ -267,37 +236,34 @@ const BoCA::MCDI &BoCA::CDIOInfo::GetNthDeviceMCDI(Int n)
 			TOCTRACK	 tracks[100];
 		} __attribute__((__packed__)) TOC;
 
-		if (cdio_cddap_open(cd) == 0)
+		TOC	 toc;
+
+		toc.tocLen	= htons(2 + cdio_get_num_tracks(cd) * 8 + 8);
+		toc.firstTrack	= cdio_get_first_track_num(cd);
+		toc.lastTrack	= cdio_get_last_track_num(cd);
+
+		for (Int i = 0; i <= toc.lastTrack - toc.firstTrack; i++)
 		{
-			TOC	 toc;
-
-			toc.tocLen	= htons(2 + cd->tracks * 8 + 8);
-			toc.firstTrack	= 1;
-			toc.lastTrack	= cd->tracks;
-
-			for (Int i = 0; i < cd->tracks; i++)
-			{
-				toc.tracks[i].rsvd	  = 0;
-				toc.tracks[i].ADR	  = (0x01 << 4) | (!cdio_cddap_track_audiop(cd, cd->disc_toc[i].bTrack) << 2) | (cdio_cddap_track_copyp(cd, cd->disc_toc[i].bTrack) << 1) | (cdio_cddap_track_preemp(cd, cd->disc_toc[i].bTrack));
-				toc.tracks[i].trackNumber = cd->disc_toc[i].bTrack;
-				toc.tracks[i].rsvd2	  = 0;
-				toc.tracks[i].addr	  = htonl(cd->disc_toc[i].dwStartSector);
-			}
-
-			toc.tracks[cd->tracks].rsvd	   = 0;
-			toc.tracks[cd->tracks].ADR	   = (0x01 << 4) | (!cdio_cddap_track_audiop(cd, 0xAA) << 2) | (cdio_cddap_track_copyp(cd, 0xAA) << 1) | (cdio_cddap_track_preemp(cd, 0xAA));
-			toc.tracks[cd->tracks].trackNumber = 0xAA;
-			toc.tracks[cd->tracks].rsvd2	   = 0;
-			toc.tracks[cd->tracks].addr	   = htonl(cd->disc_toc[cd->tracks].dwStartSector);
-
-			Buffer<UnsignedByte>	 buffer(ntohs(toc.tocLen) + 2);
-
-			memcpy(buffer, &toc, ntohs(toc.tocLen) + 2);
-
-			mcdi.SetData(buffer);
+			toc.tracks[i].rsvd	  = 0;
+			toc.tracks[i].ADR	  = (0x01 << 4) | ((cdio_get_track_format(cd, toc.firstTrack + i) != TRACK_FORMAT_AUDIO) << 2) | (cdio_get_track_copy_permit(cd, toc.firstTrack + i) << 1) | (cdio_get_track_preemphasis(cd, toc.firstTrack + i));
+			toc.tracks[i].trackNumber = toc.firstTrack + i;
+			toc.tracks[i].rsvd2	  = 0;
+			toc.tracks[i].addr	  = htonl(cdio_get_track_lsn(cd, toc.firstTrack + i));
 		}
 
-		cdio_cddap_close(cd);
+		toc.tracks[toc.lastTrack - toc.firstTrack + 1].rsvd	   = 0;
+		toc.tracks[toc.lastTrack - toc.firstTrack + 1].ADR	   = (0x01 << 4) | ((cdio_get_track_format(cd, CDIO_CDROM_LEADOUT_TRACK) != TRACK_FORMAT_AUDIO) << 2) | (cdio_get_track_copy_permit(cd, CDIO_CDROM_LEADOUT_TRACK) << 1) | (cdio_get_track_preemphasis(cd, CDIO_CDROM_LEADOUT_TRACK));
+		toc.tracks[toc.lastTrack - toc.firstTrack + 1].trackNumber = 0xAA;
+		toc.tracks[toc.lastTrack - toc.firstTrack + 1].rsvd2	   = 0;
+		toc.tracks[toc.lastTrack - toc.firstTrack + 1].addr	   = htonl(cdio_get_track_lsn(cd, CDIO_CDROM_LEADOUT_TRACK));
+
+		Buffer<UnsignedByte>	 buffer(ntohs(toc.tocLen) + 2);
+
+		memcpy(buffer, &toc, ntohs(toc.tocLen) + 2);
+
+		mcdi.SetData(buffer);
+
+		cdio_destroy(cd);
 	}
 
 	lastDrive  = n;
@@ -312,19 +278,22 @@ Void BoCA::CDIOInfo::CollectDriveInfo()
 
 	foreach (const String &driveName, driveNames)
 	{ 
-		cdrom_drive_t	*cd = cdio_cddap_identify(driveName, CDDA_MESSAGE_FORGETIT, NIL);
+		CdIo_t		*cd = cdio_open(driveName, DRIVER_UNKNOWN);
+		cdio_hwinfo_t	 device;
 
 		if (cd == NIL) continue;
 
+		cdio_get_hwinfo(cd, &device);
+		
 		Device	 drive;
 
 		drive.type = DEVICE_CDROM;
-		drive.name = cd->drive_model;
+		drive.name = String(device.psz_vendor).Append(" ").Append(device.psz_model).Append(" ").Append(device.psz_revision);
 
 		drive.canOpenTray = True;
 
 		devices.Add(drive);
 
-		cdio_cddap_close(cd);
+		cdio_destroy(cd);
 	}
 }
