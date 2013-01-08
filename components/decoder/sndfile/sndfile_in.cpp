@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -41,6 +41,7 @@ const String &BoCA::SndFileIn::GetComponentSpecs()
 		      <extension>aif</extension>				\
 		      <extension>aiff</extension>				\
 		      <extension>aifc</extension>				\
+		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
 		    </format>							\
 		    <format>							\
 		      <name>Sun Audio Files</name>				\
@@ -224,6 +225,56 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 
 			boca.DeleteComponent(riffTagger);
 		}
+
+		/* Read AIFF embedded ID3 tag.
+		 */
+		InStream	 in(STREAM_FILE, streamURI, IS_READ);
+
+		if (in.InputString(4) == "FORM")
+		{
+			in.RelSeek(4);
+
+			String	 type = in.InputString(4);
+
+			while (type == "AIFF" || type == "AIFC")
+			{
+				if (in.GetPos() >= in.Size()) break;
+
+				/* Read next chunk.
+				 */
+				String	 chunk = in.InputString(4);
+				Int	 cSize = in.InputNumberRaw(4);
+
+				if (chunk == "ID3 ")
+				{
+					Buffer<UnsignedByte>	 buffer(cSize);
+
+					in.InputData(buffer, cSize);
+
+					AS::Registry		&boca = AS::Registry::Get();
+					AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+					if (tagger != NIL)
+					{
+						tagger->ParseBuffer(buffer, track);
+
+						boca.DeleteComponent(tagger);
+					}
+
+					/* Skip rest of chunk.
+					 */
+					in.RelSeek(cSize % 2);
+				}
+				else
+				{
+					/* Skip chunk.
+					 */
+					in.RelSeek(cSize + cSize % 2);
+				}
+			}
+		}
+
+		in.Close();
 	}
 
 	if (errorState)	return Error();

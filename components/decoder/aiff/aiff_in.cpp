@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,22 +17,23 @@ using namespace smooth::IO;
 
 const String &BoCA::AIFFIn::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Apple Audio File Decoder</name>	\
-	    <version>1.0</version>			\
-	    <id>aiff-in</id>				\
-	    <type>decoder</type>			\
-	    <format>					\
-	      <name>Apple Audio Files</name>		\
-	      <extension>aif</extension>		\
-	      <extension>aiff</extension>		\
-	      <extension>aifc</extension>		\
-	    </format>					\
-	  </component>					\
-							\
+	static String	 componentSpecs = "			\
+								\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+	  <component>						\
+	    <name>Apple Audio File Decoder</name>		\
+	    <version>1.0</version>				\
+	    <id>aiff-in</id>					\
+	    <type>decoder</type>				\
+	    <format>						\
+	      <name>Apple Audio Files</name>			\
+	      <extension>aif</extension>			\
+	      <extension>aiff</extension>			\
+	      <extension>aifc</extension>			\
+	      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>	\
+	    </format>						\
+	  </component>						\
+								\
 	";
 
 	return componentSpecs;
@@ -165,6 +166,26 @@ Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &track)
 			else if	(chunk == "ANNO") info.comment = f_in->InputString(cSize);
 
 			track.SetInfo(info);
+
+			/* Skip rest of chunk.
+			 */
+			f_in->RelSeek(cSize % 2);
+		}
+		else if (chunk == "ID3 ")
+		{
+			Buffer<UnsignedByte>	 buffer(cSize);
+
+			f_in->InputData(buffer, cSize);
+
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+			if (tagger != NIL)
+			{
+				tagger->ParseBuffer(buffer, track);
+
+				boca.DeleteComponent(tagger);
+			}
 
 			/* Skip rest of chunk.
 			 */
