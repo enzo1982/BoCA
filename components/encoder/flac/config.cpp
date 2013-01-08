@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -18,7 +18,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	Config	*config = Config::Get();
 
-	preset				= config->GetIntValue("FLAC", "Preset", -1);
+	preset				= config->GetIntValue("FLAC", "Preset", 5);
 	file_format			= config->GetIntValue("FLAC", "FileFormat", 0);
 	streamable_subset		= config->GetIntValue("FLAC", "StreamableSubset", 1);
 	do_mid_side_stereo		= config->GetIntValue("FLAC", "DoMidSideStereo", 1);
@@ -28,8 +28,8 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	qlp_coeff_precision		= config->GetIntValue("FLAC", "QLPCoeffPrecision", 0);
 	do_qlp_coeff_prec_search	= config->GetIntValue("FLAC", "DoQLPCoeffPrecSearch", 0);
 	do_exhaustive_model_search	= config->GetIntValue("FLAC", "DoExhaustiveModelSearch", 0);
-	min_residual_partition_order	= config->GetIntValue("FLAC", "MinResidualPartitionOrder", 3);
-	max_residual_partition_order	= config->GetIntValue("FLAC", "MaxResidualPartitionOrder", 3);
+	min_residual_partition_order	= config->GetIntValue("FLAC", "MinResidualPartitionOrder", 0);
+	max_residual_partition_order	= config->GetIntValue("FLAC", "MaxResidualPartitionOrder", 5);
 
 	I18n	*i18n = I18n::Get();
 
@@ -54,7 +54,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	combo_preset->AddEntry("2");
 	combo_preset->AddEntry("3");
 	combo_preset->AddEntry("4");
-	combo_preset->AddEntry("5");
+	combo_preset->AddEntry(String("5").Append(", ").Append(i18n->TranslateString("Default")));
 	combo_preset->AddEntry("6");
 	combo_preset->AddEntry("7");
 	combo_preset->AddEntry(String("8").Append(", ").Append(i18n->TranslateString("Best compression")));

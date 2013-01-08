@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -203,7 +203,7 @@ Bool BoCA::FLACOut::Activate()
 	ex_FLAC__stream_encoder_set_sample_rate(encoder, format.rate);
 	ex_FLAC__stream_encoder_set_bits_per_sample(encoder, format.bits == 32 ? 24 : format.bits);
 
-	if (config->GetIntValue("FLAC", "Preset", -1) < 0)
+	if (config->GetIntValue("FLAC", "Preset", 5) < 0)
 	{
 		ex_FLAC__stream_encoder_set_streamable_subset(encoder, config->GetIntValue("FLAC", "StreamableSubset", 1));
 		ex_FLAC__stream_encoder_set_do_mid_side_stereo(encoder, config->GetIntValue("FLAC", "DoMidSideStereo", 1));
@@ -214,16 +214,16 @@ Bool BoCA::FLACOut::Activate()
 		ex_FLAC__stream_encoder_set_qlp_coeff_precision(encoder, config->GetIntValue("FLAC", "QLPCoeffPrecision", 0));
 		ex_FLAC__stream_encoder_set_do_qlp_coeff_prec_search(encoder, config->GetIntValue("FLAC", "DoQLPCoeffPrecSearch", 0));
 		ex_FLAC__stream_encoder_set_do_exhaustive_model_search(encoder, config->GetIntValue("FLAC", "DoExhaustiveModelSearch", 0));
-		ex_FLAC__stream_encoder_set_min_residual_partition_order(encoder, config->GetIntValue("FLAC", "MinResidualPartitionOrder", 3));
-		ex_FLAC__stream_encoder_set_max_residual_partition_order(encoder, config->GetIntValue("FLAC", "MaxResidualPartitionOrder", 3));
+		ex_FLAC__stream_encoder_set_min_residual_partition_order(encoder, config->GetIntValue("FLAC", "MinResidualPartitionOrder", 0));
+		ex_FLAC__stream_encoder_set_max_residual_partition_order(encoder, config->GetIntValue("FLAC", "MaxResidualPartitionOrder", 5));
 	}
 	else
 	{
 		ex_FLAC__stream_encoder_set_streamable_subset(encoder, true);
-		ex_FLAC__stream_encoder_set_compression_level(encoder, config->GetIntValue("FLAC", "Preset", -1));
+		ex_FLAC__stream_encoder_set_compression_level(encoder, config->GetIntValue("FLAC", "Preset", 5));
 
-		if (config->GetIntValue("FLAC", "Preset", -1) < 3) ex_FLAC__stream_encoder_set_blocksize(encoder, 1152);
-		else						   ex_FLAC__stream_encoder_set_blocksize(encoder, 4608);
+		if (config->GetIntValue("FLAC", "Preset", 5) < 3) ex_FLAC__stream_encoder_set_blocksize(encoder, 1152);
+		else						  ex_FLAC__stream_encoder_set_blocksize(encoder, 4608);
 	}
 
 	bytesWritten = 0;
