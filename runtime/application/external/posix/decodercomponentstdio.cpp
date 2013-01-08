@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -160,7 +160,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	/* Wait until the decoder exits.
 	 */
 	unsigned long	 exitStatus = pclose(rPipe);
-	unsigned long	 exitCode   = WEXITSTATUS(exitStatus);
+	unsigned long	 exitCode   = WIFEXITED(exitStatus)   ? WEXITSTATUS(exitStatus) : -1;
+	unsigned long	 exitSignal = WIFSIGNALED(exitStatus) ? WTERMSIG(exitStatus)	: -1;
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -175,7 +176,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Check if anything went wrong.
 	 */
-	if (!specs->external_ignoreExitCode && exitCode != 0)
+	if (!specs->external_ignoreExitCode && exitCode != 0 && exitCode != 0x80 + SIGPIPE && exitSignal != SIGPIPE)
 	{
 		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
@@ -239,7 +240,8 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 	/* Wait until the decoder exits.
 	 */
 	unsigned long	 exitStatus = pclose(rPipe);
-	unsigned long	 exitCode   = WEXITSTATUS(exitStatus);
+	unsigned long	 exitCode   = WIFEXITED(exitStatus)   ? WEXITSTATUS(exitStatus) : -1;
+	unsigned long	 exitSignal = WIFSIGNALED(exitStatus) ? WTERMSIG(exitStatus)	: -1;
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -248,7 +250,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 		File(encFileName).Delete();
 	}
 
-	if (!specs->external_ignoreExitCode && exitCode != 0)
+	if (!specs->external_ignoreExitCode && exitCode != 0 && exitCode != 0x80 + SIGPIPE && exitSignal != SIGPIPE)
 	{
 		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
