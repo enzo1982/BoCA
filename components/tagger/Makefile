@@ -29,3 +29,23 @@ clean:
 ifeq ($(BUILD_WIN32),True)
 	cd wma && $(MAKE) clean
 endif
+
+install:
+	cd apev2 && $(MAKE) install
+	cd cart && $(MAKE) install
+	cd flac && $(MAKE) install
+	cd id3v1 && $(MAKE) install
+	cd id3v2 && $(MAKE) install
+	cd mp4 && $(MAKE) install
+	cd riff && $(MAKE) install
+	cd vorbis && $(MAKE) install
+
+uninstall:
+	cd apev2 && $(MAKE) uninstall
+	cd cart && $(MAKE) uninstall
+	cd flac && $(MAKE) uninstall
+	cd id3v1 && $(MAKE) uninstall
+	cd id3v2 && $(MAKE) uninstall
+	cd mp4 && $(MAKE) uninstall
+	cd riff && $(MAKE) uninstall
+	cd vorbis && $(MAKE) uninstall

@@ -7,6 +7,8 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
+include $(BOCA_PATH)/Makefile-options
+
 # Enter object files here:
 OBJECTS	  = dialog.o donate.o
 
@@ -20,7 +22,11 @@ LIBS	  =
 ALLCMD1   =
 ALLCMD2   =
 CLEANCMD1 =
-CLEANCMD1 =
+CLEANCMD2 =
+INSTCMD1  = cp -r boca.extension.donate $(PREFIX)/lib/boca
+INSTCMD2  = chmod -R a=rX,u=rwX $(PREFIX)/lib/boca/boca.extension.donate
+UINSTCMD1 = rm -f -r $(PREFIX)/lib/boca/boca.extension.donate
+UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 

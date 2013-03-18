@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -25,12 +25,15 @@ namespace BoCA
 			static Void		 WarningMessage(const String &, const String & = NIL, const String & = NIL);
 			static Void		 ErrorMessage(const String &, const String & = NIL, const String & = NIL);
 
+			static String		 GetBoCADirectory();
+
 			static DynamicLoader	*LoadCodecDLL(const String &);
 			static Bool		 FreeCodecDLL(DynamicLoader *);
 
 			static String		 GetNonUnicodeTempFileName(const String &);
 
 			static String		 ReplaceIncompatibleCharacters(const String &);
+			static String		 CreateDirectoryForFile(const String &);
 	};
 };
 

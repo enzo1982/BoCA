@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -152,7 +152,7 @@ Error BoCA::FLACTag::UpdateStreamInfo(const String &streamURI, const Track &trac
 	const Info		&info = track.GetInfo();
 	Buffer<unsigned char>	 vcBuffer;
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True))
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableFLACMetadata", True))
 	{
 		FLAC__StreamMetadata	*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
@@ -199,7 +199,7 @@ Error BoCA::FLACTag::UpdateStreamInfo(const String &streamURI, const Track &trac
 		ex_FLAC__metadata_iterator_insert_block_after(iterator, vorbiscomment);
 	}
 
-	if (config->GetIntValue("Tags", "CoverArtWriteToTags", True))
+	if (config->GetIntValue("Tags", "CoverArtWriteToTags", True) && config->GetIntValue("Tags", "CoverArtWriteToFLACMetadata", True))
 	{
 		for (Int i = 0; i < track.pictures.Length(); i++)
 		{

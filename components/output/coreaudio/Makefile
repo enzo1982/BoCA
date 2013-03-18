@@ -20,7 +20,11 @@ LIBS	  = -framework CoreServices -framework AudioUnit
 ALLCMD1   =
 ALLCMD2   =
 CLEANCMD1 =
-CLEANCMD1 =
+CLEANCMD2 =
+INSTCMD1  =
+INSTCMD2  = 
+UINSTCMD1 =
+UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 

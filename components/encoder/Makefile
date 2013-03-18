@@ -47,3 +47,21 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	cd wma && $(MAKE) clean
 endif
+
+install:
+	cd faac && $(MAKE) install
+	cd flac && $(MAKE) install
+	cd lame && $(MAKE) install
+	cd opus && $(MAKE) install
+	cd speex && $(MAKE) install
+	cd vorbis && $(MAKE) install
+	cd wave && $(MAKE) install
+
+uninstall:
+	cd faac && $(MAKE) uninstall
+	cd flac && $(MAKE) uninstall
+	cd lame && $(MAKE) uninstall
+	cd opus && $(MAKE) uninstall
+	cd speex && $(MAKE) uninstall
+	cd vorbis && $(MAKE) uninstall
+	cd wave && $(MAKE) uninstall

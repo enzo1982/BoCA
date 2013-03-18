@@ -37,6 +37,17 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
+String BoCA::Utilities::GetBoCADirectory()
+{
+	Directory	 bocaDirectory(GUI::Application::GetApplicationDirectory().Append("boca"));
+
+#ifndef __WIN32__
+	if (!bocaDirectory.Exists()) bocaDirectory = String(BOCA_INSTALL_PREFIX).Append("/lib/boca");
+#endif
+
+	return String(bocaDirectory).Append(Directory::GetDirectoryDelimiter());
+}
+
 DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
 {
 	DynamicLoader	*loader = NIL;
@@ -150,4 +161,14 @@ String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string)
 	}
 
 	return rVal;
+}
+
+String BoCA::Utilities::CreateDirectoryForFile(const String &fileName)
+{
+	File		 file(fileName);
+	Directory	 directory(file.GetFilePath());
+
+	directory.Create();
+
+	return file;
 }

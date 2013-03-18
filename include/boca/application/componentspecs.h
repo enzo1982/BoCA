@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,6 +29,7 @@ namespace BoCA
 		COMPONENT_TYPE_DSP,
 		COMPONENT_TYPE_OUTPUT,
 		COMPONENT_TYPE_DEVICEINFO,
+		COMPONENT_TYPE_PLAYLIST,
 
 		NUM_COMPONENT_TYPES
 	};
@@ -287,6 +288,11 @@ namespace BoCA
 
 				const void		*(*func_GetNthDeviceTrackList)(void *, int);
 				const void		*(*func_GetNthDeviceMCDI)(void *, int);
+
+				void			 (*func_SetTrackList)(void *, const void *);
+
+				const void		*(*func_ReadPlaylist)(void *, const wchar_t *);
+				int			 (*func_WritePlaylist)(void *, const wchar_t *);
 		};
 	};
 };

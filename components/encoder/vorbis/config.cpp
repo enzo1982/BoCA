@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -188,12 +188,17 @@ Int BoCA::ConfigureVorbis::SaveSettings()
 	Config	*config = Config::Get();
 
 	config->SetIntValue("Vorbis", "Mode", mode);
+
 	config->SetIntValue("Vorbis", "FileExtension", fileExtension);
+
 	config->SetIntValue("Vorbis", "Quality", quality);
+
 	config->SetIntValue("Vorbis", "SetMinBitrate", setABRMin);
 	config->SetIntValue("Vorbis", "MinBitrate", abrMin);
+
 	config->SetIntValue("Vorbis", "SetBitrate", setABRNom);
 	config->SetIntValue("Vorbis", "Bitrate", abrNom);
+
 	config->SetIntValue("Vorbis", "SetMaxBitrate", setABRMax);
 	config->SetIntValue("Vorbis", "MaxBitrate", abrMax);
 

@@ -113,6 +113,7 @@
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
     <ClCompile Include="..\..\..\runtime\application\outputcomponent.cpp" />
+    <ClCompile Include="..\..\..\runtime\application\playlistcomponent.cpp" />
     <ClCompile Include="..\..\..\runtime\application\registry.cpp" />
     <ClCompile Include="..\..\..\runtime\application\taggercomponent.cpp" />
     <ClCompile Include="..\..\..\runtime\application\external\configlayer.cpp">
@@ -192,6 +193,10 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
+    <ClCompile Include="..\..\..\runtime\component\playlistcomponent.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)2.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)2.xdc</XMLDocumentationFileName>
+    </ClCompile>
     <ClCompile Include="..\..\..\runtime\component\taggercomponent.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
@@ -203,12 +208,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\boca.h" />
+    <ClInclude Include="..\..\..\include\boca\application\playlistcomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\component.h" />
     <ClInclude Include="..\..\..\include\boca\component\decodercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\deviceinfocomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\encodercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\extensioncomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\outputcomponent.h" />
+    <ClInclude Include="..\..\..\include\boca\component\playlistcomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\taggercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\common\config.h" />
     <ClInclude Include="..\..\..\include\boca\common\configlayer.h" />

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,7 +21,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	bitrate			= GetSliderValue();
 	ratio			= config->GetIntValue("LAME", "Ratio", 1100);
 	set_quality		= config->GetIntValue("LAME", "SetQuality", 0);
-	quality			= 9 - config->GetIntValue("LAME", "Quality", 5);
+	quality			= 9 - config->GetIntValue("LAME", "Quality", 3);
 	forcejs			= config->GetIntValue("LAME", "ForceJS", 0);
 	vbrmode			= config->GetIntValue("LAME", "VBRMode", 4);
 	vbrquality		= 90 - config->GetIntValue("LAME", "VBRQuality", 50);

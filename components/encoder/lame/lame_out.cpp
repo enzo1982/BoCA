@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -82,7 +82,7 @@ Bool BoCA::LAMEOut::Activate()
 		case 16000:
 		case 22050:
 		case 24000:
-			if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 0) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 192 || config->GetIntValue("LAME", "Bitrate", 192) == 224 || config->GetIntValue("LAME", "Bitrate", 192) == 256 || config->GetIntValue("LAME", "Bitrate", 192) == 320))
+			if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 4) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 192 || config->GetIntValue("LAME", "Bitrate", 192) == 224 || config->GetIntValue("LAME", "Bitrate", 192) == 256 || config->GetIntValue("LAME", "Bitrate", 192) == 320))
 			{
 				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
 				errorState  = True;
@@ -90,7 +90,7 @@ Bool BoCA::LAMEOut::Activate()
 				return False;
 			}
 
-			if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 320))
+			if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 320))
 			{
 				errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
 				errorState  = True;
@@ -98,7 +98,7 @@ Bool BoCA::LAMEOut::Activate()
 				return False;
 			}
 
-			if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 320))
+			if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 320))
 			{
 				errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
 				errorState  = True;
@@ -109,7 +109,7 @@ Bool BoCA::LAMEOut::Activate()
 		case 32000:
 		case 44100:
 		case 48000:
-			if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 0) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 8 || config->GetIntValue("LAME", "Bitrate", 192) == 16 || config->GetIntValue("LAME", "Bitrate", 192) == 24 || config->GetIntValue("LAME", "Bitrate", 192) == 144))
+			if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 4) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 8 || config->GetIntValue("LAME", "Bitrate", 192) == 16 || config->GetIntValue("LAME", "Bitrate", 192) == 24 || config->GetIntValue("LAME", "Bitrate", 192) == 144))
 			{
 				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
 				errorState  = True;
@@ -117,7 +117,7 @@ Bool BoCA::LAMEOut::Activate()
 				return False;
 			}
 
-			if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 144))
+			if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 144))
 			{
 				errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
 				errorState  = True;
@@ -125,7 +125,7 @@ Bool BoCA::LAMEOut::Activate()
 				return False;
 			}
 
-			if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 144))
+			if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 144))
 			{
 				errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
 				errorState  = True;
@@ -155,7 +155,7 @@ Bool BoCA::LAMEOut::Activate()
 	ex_lame_set_in_samplerate(context, format.rate);
 	ex_lame_set_num_channels(context, format.channels);
 
-	switch (config->GetIntValue("LAME", "Preset", 0))
+	switch (config->GetIntValue("LAME", "Preset", 2))
 	{
 		case 0:
 			ex_lame_set_copyright(context, config->GetIntValue("LAME", "Copyright", 0));
@@ -171,7 +171,7 @@ Bool BoCA::LAMEOut::Activate()
 
 			/* Set bitrate.
 			 */
-			if (config->GetIntValue("LAME", "VBRMode", 0) == vbr_off)
+			if (config->GetIntValue("LAME", "VBRMode", 4) == vbr_off)
 			{
 				if (config->GetIntValue("LAME", "SetBitrate", 1)) ex_lame_set_brate(context, config->GetIntValue("LAME", "Bitrate", 192));
 				else						  ex_lame_set_compression_ratio(context, ((double) config->GetIntValue("LAME", "Ratio", 1100)) / 100);
@@ -179,8 +179,7 @@ Bool BoCA::LAMEOut::Activate()
 
 			/* Set quality.
 			 */
-			if (config->GetIntValue("LAME", "SetQuality", 0)) ex_lame_set_quality(context, config->GetIntValue("LAME", "Quality", 5));
-			else						  ex_lame_set_quality(context, 5);
+			if (config->GetIntValue("LAME", "SetQuality", 0)) ex_lame_set_quality(context, config->GetIntValue("LAME", "Quality", 3));
 
 			/* Set audio filtering.
 			 */
@@ -213,7 +212,7 @@ Bool BoCA::LAMEOut::Activate()
 
 			/* Set VBR mode.
 			 */
-			switch (config->GetIntValue("LAME", "VBRMode", 0))
+			switch (config->GetIntValue("LAME", "VBRMode", 4))
 			{
 				default:
 				case vbr_off:
@@ -232,8 +231,8 @@ Bool BoCA::LAMEOut::Activate()
 					break;
 			}
 
-			if (config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && config->GetIntValue("LAME", "SetMinVBRBitrate", 0)) ex_lame_set_VBR_min_bitrate_kbps(context, config->GetIntValue("LAME", "MinVBRBitrate", 128));
-			if (config->GetIntValue("LAME", "VBRMode", 0) != vbr_off && config->GetIntValue("LAME", "SetMaxVBRBitrate", 0)) ex_lame_set_VBR_max_bitrate_kbps(context, config->GetIntValue("LAME", "MaxVBRBitrate", 128));
+			if (config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && config->GetIntValue("LAME", "SetMinVBRBitrate", 0)) ex_lame_set_VBR_min_bitrate_kbps(context, config->GetIntValue("LAME", "MinVBRBitrate", 128));
+			if (config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && config->GetIntValue("LAME", "SetMaxVBRBitrate", 0)) ex_lame_set_VBR_max_bitrate_kbps(context, config->GetIntValue("LAME", "MaxVBRBitrate", 128));
 
 			/* Set ATH.
 			 */

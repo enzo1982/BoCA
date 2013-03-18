@@ -9,3 +9,7 @@ all:
 
 clean:
 	cd external && $(MAKE) clean
+
+install:
+
+uninstall:

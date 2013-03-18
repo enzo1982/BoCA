@@ -114,7 +114,7 @@ Bool BoCA::FLACOut::Activate()
 
 	Buffer<unsigned char>	 vcBuffer;
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True))
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableFLACMetadata", True))
 	{
 		FLAC__StreamMetadata	*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
@@ -163,7 +163,7 @@ Bool BoCA::FLACOut::Activate()
 		vorbiscomment->length = vcBuffer.Size();
 	}
 
-	if (config->GetIntValue("Tags", "CoverArtWriteToTags", True))
+	if (config->GetIntValue("Tags", "CoverArtWriteToTags", True) && config->GetIntValue("Tags", "CoverArtWriteToFLACMetadata", True))
 	{
 		for (Int i = 0; i < track.pictures.Length(); i++)
 		{

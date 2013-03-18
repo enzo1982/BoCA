@@ -45,3 +45,47 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	cd cdrip && $(MAKE) clean
 endif
+
+install:
+ifeq ($(BUILD_UNIX),True)
+ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_QNX),True)
+ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_OPENBSD),True)
+ifneq ($(BUILD_FREEBSD),True)
+	cd cdio && $(MAKE) install
+endif
+endif
+ifneq ($(BUILD_LINUX),True)
+ifneq ($(BUILD_NETBSD),True)
+ifneq ($(BUILD_HAIKU),True)
+	cd cdparanoia && $(MAKE) install
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+
+uninstall:
+ifeq ($(BUILD_UNIX),True)
+ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_QNX),True)
+ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_OPENBSD),True)
+ifneq ($(BUILD_FREEBSD),True)
+	cd cdio && $(MAKE) uninstall
+endif
+endif
+ifneq ($(BUILD_LINUX),True)
+ifneq ($(BUILD_NETBSD),True)
+ifneq ($(BUILD_HAIKU),True)
+	cd cdparanoia && $(MAKE) uninstall
+endif
+endif
+endif
+endif
+endif
+endif
+endif

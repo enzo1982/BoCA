@@ -231,7 +231,7 @@ BoCA::LayerYouTube::~LayerYouTube()
 
 Void BoCA::LayerYouTube::LoadVideoSites()
 {
-	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("boca/boca.extension.youtube"));
+	Directory		 dir(Utilities::GetBoCADirectory().Append("boca.extension.youtube"));
 	const Array<File>	&files = dir.GetFilesByPattern("videosite_*.xml");
 
 	BoCA::Config		*config = BoCA::Config::Get();
@@ -317,7 +317,7 @@ Void BoCA::LayerYouTube::OnShowLayer()
 		i18n->SetContext("Extensions::Video Downloader::Errors");
 
 		Bool		 doNotShowAgain = False;
-		MessageDlg	*messageBox = new MessageDlg(i18n->TranslateString("Some required video decoders could not be found. Video files\ncannot be added to the joblist for conversion to audio files.\n\nPlease install avconv to fix this problem!"), i18n->TranslateString("Note"), Message::Buttons::Ok, Message::Icon::Exclamation, i18n->TranslateString("Do not display this note again"), &doNotShowAgain);
+		MessageDlg	*messageBox = new MessageDlg(i18n->TranslateString("Some required video decoders could not be found. Video files\ncannot be added to the joblist for conversion to audio files.\n\nPlease install avconv or FFmpeg to fix this problem!"), i18n->TranslateString("Note"), Message::Buttons::Ok, Message::Icon::Exclamation, i18n->TranslateString("Do not display this note again"), &doNotShowAgain);
 
 		messageBox->ShowDialog();
 

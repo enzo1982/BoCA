@@ -15,12 +15,15 @@
 #include <boca/application/dspcomponent.h>
 #include <boca/application/extensioncomponent.h>
 #include <boca/application/outputcomponent.h>
+#include <boca/application/playlistcomponent.h>
 #include <boca/application/taggercomponent.h>
 
 #include <boca/application/external/decodercomponentfile.h>
 #include <boca/application/external/decodercomponentstdio.h>
 #include <boca/application/external/encodercomponentfile.h>
 #include <boca/application/external/encodercomponentstdio.h>
+
+#include <boca/common/utilities.h>
 
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
 
@@ -44,7 +47,7 @@ Bool BoCA::AS::Registry::Free()
 
 BoCA::AS::Registry::Registry()
 {
-	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("boca"));
+	Directory		 dir(Utilities::GetBoCADirectory());
 
 #if defined __WIN32__
 	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.dll");
@@ -191,6 +194,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 				return new ExtensionComponent(specs);
 			case COMPONENT_TYPE_OUTPUT:
 				return new OutputComponent(specs);
+			case COMPONENT_TYPE_PLAYLIST:
+				return new PlaylistComponent(specs);
 			case COMPONENT_TYPE_TAGGER:
 				return new TaggerComponent(specs);
 			default:

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -119,6 +119,11 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_GetNthDeviceTrackList	= (const void *(*)(void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNthDeviceTrackList"));
 	func_GetNthDeviceMCDI		= (const void *(*)(void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNthDeviceMCDI"));
 
+	func_SetTrackList		= (void (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetTrackList"));
+
+	func_ReadPlaylist		= (const void *(*)(void *, const wchar_t *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadPlaylist"));
+	func_WritePlaylist		= (int (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WritePlaylist"));
+
 	return ParseXMLSpec(String(func_GetComponentSpecs()).Trim());
 }
 
@@ -173,6 +178,20 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 {
 	if (xml == NIL) return False;
 
+	/* Places for external commands.
+	 */
+#if defined __WIN32__
+	static const char	*places[] = { "%APPDIR\\codecs\\cmdline\\%COMMAND", "%APPDIR\\codecs\\cmdline\\%COMMAND.exe", NIL };
+#elif defined __APPLE__
+	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/opt/local/bin/%COMMAND", "/sw/bin/%COMMAND", NIL };
+#elif defined __HAIKU__
+	static const char	*places[] = { "/boot/common/bin/%COMMAND", NIL };
+#elif defined __NetBSD__
+	static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/usr/pkg/bin/%COMMAND", NIL };
+#else
+	static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", NIL };
+#endif
+
 	XML::Document	*document = new XML::Document();
 
 	document->ParseMemory((void *) (char *) xml, xml.Length());
@@ -208,6 +227,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			else if (node->GetContent() == "deviceinfo")	type = COMPONENT_TYPE_DEVICEINFO;
 			else if (node->GetContent() == "dsp")		type = COMPONENT_TYPE_DSP;
 			else if (node->GetContent() == "extension")	type = COMPONENT_TYPE_EXTENSION;
+			else if (node->GetContent() == "playlist")	type = COMPONENT_TYPE_PLAYLIST;
 			else if (node->GetContent() == "tagger")	type = COMPONENT_TYPE_TAGGER;
 			else						type = COMPONENT_TYPE_UNKNOWN;
 		}
@@ -288,7 +308,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 			tag_formats.Add(format);
 		}
-		else if (node->GetName() == "external")
+		else if (node->GetName() == "external" && external_command == NIL)
 		{
 			for (Int j = 0; j < node->GetNOfNodes(); j++)
 			{
@@ -309,41 +329,30 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				else if (node2->GetName() == "mode")	   mode			= node2->GetContent() == "file" ? COMPONENT_MODE_EXTERNAL_FILE : COMPONENT_MODE_EXTERNAL_STDIO;
 				else if (node2->GetName() == "parameters") ParseExternalParameters(node2);
 			}
+
+			/* Check if external command actually exists.
+			 */
+			if (external_command[0] != '/' && external_command[1] != ':')
+			{
+				for (Int i = 0; places[i] != NIL; i++)
+				{
+					String	 file = String(places[i]).Replace("%APPDIR", GUI::Application::GetApplicationDirectory()).Replace("%COMMAND", external_command).Replace("\\\\", "\\");
+
+					if (File(file).Exists()) { external_command = file; break; }
+				}
+
+				if (external_command[0] != '/' && external_command[1] != ':') external_command = NIL;
+			}
+
+			if (!File(external_command).Exists()) external_command = NIL;
 		}
 	}
 
 	delete document;
 
-	/* Check if external command actually exists.
+	/* Report an error if no external command could be found in external mode.
 	 */
-	if (mode != COMPONENT_MODE_INTERNAL)
-	{
-		if (external_command[0] != '/' && external_command[1] != ':')
-		{
-#if defined __WIN32__
-			static const char	*places[] = { "%APPDIR\\codecs\\cmdline\\%COMMAND", "%APPDIR\\codecs\\cmdline\\%COMMAND.exe", NIL };
-#elif defined __APPLE__
-			static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/opt/local/bin/%COMMAND", "/sw/bin/%COMMAND", NIL };
-#elif defined __HAIKU__
-			static const char	*places[] = { "/boot/common/bin/%COMMAND", NIL };
-#elif defined __NetBSD__
-			static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/usr/pkg/bin/%COMMAND", NIL };
-#else
-			static const char	*places[] = { "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", NIL };
-#endif
-
-			for (Int i = 0; places[i] != NIL; i++)
-			{
-				String	 file = String(places[i]).Replace("%APPDIR", GUI::Application::GetApplicationDirectory()).Replace("%COMMAND", external_command).Replace("\\\\", "\\");
-
-				if (File(file).Exists()) { external_command = file; break; }
-			}
-
-			if (external_command[0] != '/' && external_command[1] != ':') return False;
-		}
-
-		if (!File(external_command).Exists()) return False;
-	}
+	if (mode != COMPONENT_MODE_INTERNAL && external_command == NIL) return False;
 
 	return True;
 }

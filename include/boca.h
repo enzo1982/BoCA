@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,6 +29,7 @@ using namespace smooth;
 # include "boca/component/dspcomponent.h"
 # include "boca/component/extensioncomponent.h"
 # include "boca/component/outputcomponent.h"
+# include "boca/component/playlistcomponent.h"
 # include "boca/component/taggercomponent.h"
 #else
 # ifdef __WIN32__
@@ -48,6 +49,7 @@ using namespace smooth;
 #include "boca/application/dspcomponent.h"
 #include "boca/application/extensioncomponent.h"
 #include "boca/application/outputcomponent.h"
+#include "boca/application/playlistcomponent.h"
 #include "boca/application/taggercomponent.h"
 #include "boca/application/registry.h"
 
@@ -152,6 +154,14 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_SetPause(void *component, bool pause)						{ return ((BoCA::componentName *) component)->SetPause(pause); }									\
 		BOCA_EXPORT bool BoCA_##componentName##_IsPlaying(void *component)							{ return ((BoCA::componentName *) component)->IsPlaying(); }										\
+	}
+
+#define BoCA_DEFINE_PLAYLIST_COMPONENT(componentName)										 																		\
+	extern "C" {																																\
+		BOCA_EXPORT void BoCA_##componentName##_SetTrackList(void *component, const void *trackList)				{ return ((BoCA::componentName *) component)->SetTrackList(*((const Array<BoCA::Track> *) trackList)); }					\
+																																		\
+		BOCA_EXPORT const void *BoCA_##componentName##_ReadPlaylist(void *component, const wchar_t *file)			{ return &((BoCA::componentName *) component)->ReadPlaylist(file); }									\
+		BOCA_EXPORT int BoCA_##componentName##_WritePlaylist(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->WritePlaylist(file); }									\
 	}
 
 #define BoCA_DEFINE_TAGGER_COMPONENT(componentName)										 																		\

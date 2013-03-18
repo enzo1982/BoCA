@@ -17,3 +17,15 @@ clean:
 	cd statustime && $(MAKE) clean
 	cd tagedit && $(MAKE) clean
 	cd youtube && $(MAKE) clean
+
+install:
+	cd donate && $(MAKE) install
+	cd statustime && $(MAKE) install
+	cd tagedit && $(MAKE) install
+	cd youtube && $(MAKE) install
+
+uninstall:
+	cd donate && $(MAKE) uninstall
+	cd statustime && $(MAKE) uninstall
+	cd tagedit && $(MAKE) uninstall
+	cd youtube && $(MAKE) uninstall

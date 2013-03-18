@@ -9,3 +9,9 @@ all:
 
 clean:
 	cd resample && $(MAKE) clean
+
+install:
+	cd resample && $(MAKE) install
+
+uninstall:
+	cd resample && $(MAKE) uninstall

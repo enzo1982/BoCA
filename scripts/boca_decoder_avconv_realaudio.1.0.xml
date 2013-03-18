@@ -15,4 +15,10 @@
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
 </component>

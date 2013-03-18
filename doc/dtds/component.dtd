@@ -2,7 +2,7 @@
 
 <!ENTITY % BoCA.Version "-//DTD BoCA 1.0 Draft//EN">
 
-<!ELEMENT component (name, version, id, type, format*, tagformat*, external?)>
+<!ELEMENT component (name, version, id, type, format*, tagformat*, external*)>
 
 	<!ELEMENT name (#PCDATA)>
 

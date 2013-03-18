@@ -3,19 +3,19 @@
 include $(BOCA_PATH)/Makefile-options
 
 CC     = gcc
-CCOPTS = -g0 -Wall -Os -ffast-math -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
+CCOPTS = -g0 -Wall -Os -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
 LD     = gcc
-LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lsmooth -lboca -lstdc++ $(LIBS)
+LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ -s $(LIBS)
 
 ifneq ($(EXCEPTION),True)
 	CCOPTS += -fno-exceptions
 endif
 
 ifeq ($(BUILD_X64),True)
-	CCOPTS += -m64 -march=nocona
+	CCOPTS += -m64
 	LDOPTS += -m64
 else
-	CCOPTS += -m32 -march=pentium4
+	CCOPTS += -m32
 	LDOPTS += -m32
 endif
 
@@ -30,18 +30,14 @@ endif
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	DLLEXT = .dll
-
-	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat -Xlinker --enable-auto-import
-else ifeq ($(BUILD_OSX),True)
-	DLLEXT = .dylib
-
-	LDOPTS += -Wl,-rpath,.
+	LDOPTS += -lsmooth -lboca -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 else
-	DLLEXT = .so
+	LDOPTS += -L$(PREFIX)/lib -lsmooth-$(SMOOTHVER) -lboca-$(VERSION)
 
 	ifeq ($(BUILD_SOLARIS),True)
 		CCOPTS += -fPIC
+		LDOPTS += -Wl,-rpath,.
+	else ifeq ($(BUILD_OSX),True)
 		LDOPTS += -Wl,-rpath,.
 	else ifeq ($(BUILD_LINUX),True)
 		ifeq ($(BUILD_X64),True)
@@ -58,24 +54,34 @@ else
 	endif
 endif
 
-all : $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT)
+all: allcmds $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
+
+allcmds:
 	$(ALLCMD1)
 	$(ALLCMD2)
 
-$(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) : $(OBJECTS)
+$(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) : $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
-ifneq ($(BUILD_OSX),True)
-ifneq ($(BUILD_SOLARIS),True)
-	strip --strip-all $@
-else
-	strip $@
-endif
-endif
 
-clean :
-	rm -f $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(DLLEXT) $(OBJECTS)
+clean:
+	rm -f $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) $(OBJECTS)
 	$(CLEANCMD1)
 	$(CLEANCMD2)
+
+install: uninstall
+ifneq ($(BUILD_WIN32),True)
+	cp $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) $(PREFIX)/lib/boca
+	chmod a=r,u=rw $(PREFIX)/lib/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
+endif
+	$(INSTCMD1)
+	$(INSTCMD2)
+
+uninstall:
+ifneq ($(BUILD_WIN32),True)
+	rm -f $(PREFIX)/lib/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
+endif
+	$(UINSTCMD1)
+	$(UINSTCMD2)
 
 .c.o:
 	$(CC) $(CCOPTS) -c $< -o $@
