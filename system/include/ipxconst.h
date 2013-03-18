@@ -1,36 +1,47 @@
-/*
- * ipxconst.h - Routing and Remote Access Services
- *
- * THIS SOFTWARE IS NOT COPYRIGHTED
- *
- * This source code is offered for use in the public domain.  You may use,
- * modify or distribute it freely.
- *
- * This code is distributed in the hope that it will be useful but
- * WITHOUT ANY WARRANTY.  ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- * DISCLAIMED.  This includes but is not limited to warranties of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
-#ifndef _IPXCONST_H
-#define _IPXCONST_H
-#if __GNUC__ >= 3
-#pragma GCC system_header
-#endif
+#ifndef _IPXCONST_
+#define _IPXCONST_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define ADMIN_STATE_DISABLED 1
+#define ADMIN_STATE_ENABLED 2
 
-/*--- Router Management Reference - Router Information Structures - IPX Information Structures */
-#if (_WIN32_WINNT >= 0x0500)
-#define ADMIN_STATE_DISABLED 0x00000001
-#define ADMIN_STATE_ENABLED 0x00000002
-#define ADMIN_STATE_ENABLED_ONLY_FOR_NETBIOS_STATIC_ROUTING 0x00000003
-#define ADMIN_STATE_ENABLED_ONLY_FOR_OPER_STATE_UP 0x00000004
-#endif /* (_WIN32_WINNT >= 0x0500) */
+#define ADMIN_STATE_ENABLED_ONLY_FOR_NETBIOS_STATIC_ROUTING 3
+#define ADMIN_STATE_ENABLED_ONLY_FOR_OPER_STATE_UP 4
 
-#ifdef __cplusplus
-}
-#endif
+#define OPER_STATE_DOWN 1
+#define OPER_STATE_UP 2
+#define OPER_STATE_SLEEPING 3
+#define OPER_STATE_STARTING 4
+#define OPER_STATE_STOPPING 5
+
+#define IPX_STANDARD_UPDATE 1
+#define IPX_NO_UPDATE 2
+#define IPX_AUTO_STATIC_UPDATE 3
+
+#define IPX_STANDARD_PACKET_TYPE 1
+#define IPX_RELIABLE_DELIVERY_PACKET_TYPE 2
+
+#define IPX_PACE_DEFVAL 18
+
+#define IPX_UPDATE_INTERVAL_DEFVAL 60
+
+#define R_Interface RR_InterfaceID
+#define R_Protocol RR_RoutingProtocol
+
+#define R_Network RR_Network.N_NetNumber
+#define R_TickCount RR_FamilySpecificData.FSD_TickCount
+#define R_HopCount RR_FamilySpecificData.FSD_HopCount
+#define R_NextHopMacAddress RR_NextHopAddress.NHA_Mac
+
+#define R_Flags RR_FamilySpecificData.FSD_Flags
+
+#define MAX_INTERFACE_INDEX 0xFFFFFFFE
+#define GLOBAL_INTERFACE_INDEX 0xFFFFFFFF
+
+#define GLOBAL_WAN_ROUTE 0x00000001
+#define DO_NOT_ADVERTISE_ROUTE 0x00000002
 #endif

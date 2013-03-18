@@ -1,36 +1,19 @@
 #ifndef __GETOPT_H__
-/* 
- * getopt.h
+/**
+ * DISCLAIMER
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
  *
- * $Id$
- *
- * Defines constants and function prototypes required to implement
- * the `getopt', `getopt_long' and `getopt_long_only' APIs.
- *
- * This file is part of the MinGW32 package set.
- *
- * Contributed by Keith Marshall <keithmarshall@users.sourceforge.net>
- *
- *
- * THIS SOFTWARE IS NOT COPYRIGHTED
- *
- * This source code is offered for use in the public domain. You may
- * use, modify or distribute it freely.
- *
- * This code is distributed in the hope that it will be useful but
- * WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- * DISCLAIMED. This includes but is not limited to warranties of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- * $Revision$
- * $Author$
- * $Date$
- *
+ * The mingw-w64 runtime package and its code is distributed in the hope that it 
+ * will be useful but WITHOUT ANY WARRANTY.  ALL WARRANTIES, EXPRESSED OR 
+ * IMPLIED ARE HEREBY DISCLAIMED.  This includes but is not limited to 
+ * warranties of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+
 #define __GETOPT_H__
 
 /* All the headers include this file. */
-#include <_mingw.h>
+#include <crtdefs.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,7 +26,7 @@ extern int opterr;		/* flag to enable built-in diagnostics... */
 
 extern char *optarg;		/* pointer to argument of current option  */
 
-extern int getopt( int, char * const [], const char * );
+extern int getopt(int nargc, char * const *nargv, const char *options);
 
 #ifdef _BSD_SOURCE
 /*
@@ -53,7 +36,6 @@ extern int getopt( int, char * const [], const char * );
  * to maintain portability, developers are advised to avoid it.
  */
 # define optreset  __mingw_optreset
-
 extern int optreset;
 #endif
 #ifdef __cplusplus
@@ -69,6 +51,7 @@ extern int optreset;
  * to declare the extended API.
  */
 #endif /* !defined(__GETOPT_H__) */
+
 #if !defined(__UNISTD_H_SOURCED__) && !defined(__GETOPT_LONG_H__)
 #define __GETOPT_LONG_H__
 
@@ -91,8 +74,10 @@ enum    		/* permitted values for its `has_arg' field...	*/
   optional_argument		/* option may take an argument		*/
 };
 
-extern int getopt_long( int, char * const [], const char *, const struct option *, int * );
-extern int getopt_long_only( int, char * const [], const char *, const struct option *, int * );
+extern int getopt_long(int nargc, char * const *nargv, const char *options,
+    const struct option *long_options, int *idx);
+extern int getopt_long_only(int nargc, char * const *nargv, const char *options,
+    const struct option *long_options, int *idx);
 /*
  * Previous MinGW implementation had...
  */
@@ -108,4 +93,3 @@ extern int getopt_long_only( int, char * const [], const char *, const struct op
 #endif
 
 #endif /* !defined(__UNISTD_H_SOURCED__) && !defined(__GETOPT_LONG_H__) */
-/* $RCSfile$Revision: 1.4 $: end of file */

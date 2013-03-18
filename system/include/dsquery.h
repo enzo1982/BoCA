@@ -1,53 +1,23 @@
-/*
- * dsquery.h - Active Directory
- *
- * THIS SOFTWARE IS NOT COPYRIGHTED
- *
- * This source code is offered for use in the public domain.  You may use,
- * modify or distribute it freely.
- *
- * This code is distributed in the hope that it will be useful but
- * WITHOUT ANY WARRANTY.  ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- * DISCLAIMED.  This includes but is not limited to warranties of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
  */
-#ifndef _DSQUERY_H
-#define _DSQUERY_H
-#if __GNUC__ >= 3
-#pragma GCC system_header
-#endif
+#ifndef __dsquery_h
+#define __dsquery_h
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+DEFINE_GUID(CLSID_DsQuery,0x8a23e65e,0x31c2,0x11d0,0x89,0x1c,0x0,0xa0,0x24,0xab,0x2d,0xbb);
+DEFINE_GUID(CLSID_DsFindObjects,0x83ee3fe1,0x57d9,0x11d0,0xb9,0x32,0x0,0xa0,0x24,0xab,0x2d,0xbb);
+DEFINE_GUID(CLSID_DsFindPeople,0x83ee3fe2,0x57d9,0x11d0,0xb9,0x32,0x0,0xa0,0x24,0xab,0x2d,0xbb);
+DEFINE_GUID(CLSID_DsFindPrinter,0xb577f070,0x7ee2,0x11d0,0x91,0x3f,0x0,0xaa,0x0,0xc1,0x6e,0x65);
+DEFINE_GUID(CLSID_DsFindComputer,0x16006700,0x87ad,0x11d0,0x91,0x40,0x0,0xaa,0x0,0xc1,0x6e,0x65);
+DEFINE_GUID(CLSID_DsFindVolume,0xc1b3cbf1,0x886a,0x11d0,0x91,0x40,0x0,0xaa,0x0,0xc1,0x6e,0x65);
+DEFINE_GUID(CLSID_DsFindContainer,0xc1b3cbf2,0x886a,0x11d0,0x91,0x40,0x0,0xaa,0x0,0xc1,0x6e,0x65);
+DEFINE_GUID(CLSID_DsFindAdvanced,0x83ee3fe3,0x57d9,0x11d0,0xb9,0x32,0x0,0xa0,0x24,0xab,0x2d,0xbb);
+DEFINE_GUID(CLSID_DsFindDomainController,0x538c7b7e,0xd25e,0x11d0,0x97,0x42,0x0,0xa0,0xc9,0x6,0xaf,0x45);
+DEFINE_GUID(CLSID_DsFindFrsMembers,0x94ce4b18,0xb3d3,0x11d1,0xb9,0xb4,0x0,0xc0,0x4f,0xd8,0xd5,0xb0);
 
-/*--- Active Directory Reference - Active Directory Structures - Active Directory Display Structures */
-#if (_WIN32_WINNT >= 0x0500)
-typedef struct {
-	DWORD dwFlags;
-	INT fmt;
-	INT cx;
-	INT idsName;
-	LONG offsetProperty;
-	DWORD dwReserved;
-} DSCOLUMN,*LPDSCOLUMN;
-#define DSCOLUMNPROP_ADSPATH -1
-#define DSCOLUMNPROP_OBJECTCLASS -2
-typedef struct {
-	DWORD cbStruct;
-	LONG cClasses;
-	DWORD offsetClass[1];
-} DSQUERYCLASSLIST,*LPDSQUERYCLASSLIST;
-typedef struct {
-	DWORD cbStruct;
-	DWORD dwFlags;
-	LPWSTR pDefaultScope;
-	LPWSTR pDefaultSaveLocation;
-	LPWSTR pUserName;
-	LPWSTR pPassword;
-	LPWSTR pServer;
-} DSQUERYINITPARAMS,*LPDSQUERYINITPARAMS;
+#ifndef GUID_DEFS_ONLY
 #define DSQPF_NOSAVE 0x00000001
 #define DSQPF_SAVELOCATION 0x00000002
 #define DSQPF_SHOWHIDDENOBJECTS 0x00000004
@@ -55,18 +25,51 @@ typedef struct {
 #define DSQPF_ENABLEADVANCEDFEATURES 0x00000010
 #define DSQPF_HASCREDENTIALS 0x00000020
 #define DSQPF_NOCHOOSECOLUMNS 0x00000040
-typedef struct {
-	DWORD cbStruct;
-	DWORD dwFlags;
-	HINSTANCE hInstance;
-	LONG offsetQuery;
-	LONG iColumns;
-	DWORD dwReserved;
-	DSCOLUMN aColumns[1];
-} DSQUERYPARAMS,*LPDSQUERYPARAMS;
-#endif /* (_WIN32_WINNT >= 0x0500) */
 
-#ifdef __cplusplus
-}
+typedef struct {
+  DWORD cbStruct;
+  DWORD dwFlags;
+  LPWSTR pDefaultScope;
+  LPWSTR pDefaultSaveLocation;
+  LPWSTR pUserName;
+  LPWSTR pPassword;
+  LPWSTR pServer;
+} DSQUERYINITPARAMS,*LPDSQUERYINITPARAMS;
+
+#define CFSTR_DSQUERYPARAMS TEXT("DsQueryParameters")
+
+#define DSCOLUMNPROP_ADSPATH ((LONG)(-1))
+#define DSCOLUMNPROP_OBJECTCLASS ((LONG)(-2))
+
+typedef struct {
+  DWORD dwFlags;
+  INT fmt;
+  INT cx;
+  INT idsName;
+  LONG offsetProperty;
+  DWORD dwReserved;
+} DSCOLUMN,*LPDSCOLUMN;
+
+typedef struct {
+  DWORD cbStruct;
+  DWORD dwFlags;
+  HINSTANCE hInstance;
+  LONG offsetQuery;
+  LONG iColumns;
+  DWORD dwReserved;
+  DSCOLUMN aColumns[1];
+} DSQUERYPARAMS,*LPDSQUERYPARAMS;
+
+#define CFSTR_DSQUERYSCOPE TEXT("DsQueryScope")
+
+typedef struct {
+  DWORD cbStruct;
+  LONG cClasses;
+  DWORD offsetClass[1];
+} DSQUERYCLASSLIST,*LPDSQUERYCLASSLIST;
+
+#define DSQPM_GETCLASSLIST (CQPM_HANDLERSPECIFIC+0)
+#define DSQPM_HELPTOPICS (CQPM_HANDLERSPECIFIC+1)
 #endif
+
 #endif

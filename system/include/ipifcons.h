@@ -1,19 +1,19 @@
-/*
-	ipifcons.h - Routing and Remote Access Services
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
+ */
+#ifndef __IPIFCONS_H__
+#define __IPIFCONS_H__
 
-	This file is part of a free library for the Win32 API.
-
-	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-*/
-#ifndef _IPIFCONS_H
-#define _IPIFCONS_H
-#if __GNUC__ >=3
-#pragma GCC system_header
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+typedef ULONG IFTYPE;
+
 #define MIN_IF_TYPE 1
+
 #define IF_TYPE_OTHER 1
 #define IF_TYPE_REGULAR_1822 2
 #define IF_TYPE_HDH_1822 3
@@ -159,35 +159,33 @@
 #define IF_TYPE_MSDSL 143
 #define IF_TYPE_IEEE1394 144
 #define IF_TYPE_RECEIVE_ONLY 145
+
 #define MAX_IF_TYPE 145
+
 #define IF_ACCESS_LOOPBACK 1
 #define IF_ACCESS_BROADCAST 2
 #define IF_ACCESS_POINTTOPOINT 3
 #define IF_ACCESS_POINTTOMULTIPOINT 4
+
 #define IF_CHECK_NONE 0x00
 #define IF_CHECK_MCAST 0x01
 #define IF_CHECK_SEND 0x02
+
 #define IF_CONNECTION_DEDICATED 1
 #define IF_CONNECTION_PASSIVE 2
 #define IF_CONNECTION_DEMAND 3
+
 #define IF_ADMIN_STATUS_UP 1
 #define IF_ADMIN_STATUS_DOWN 2
 #define IF_ADMIN_STATUS_TESTING 3
+
 #define IF_OPER_STATUS_NON_OPERATIONAL 0
 #define IF_OPER_STATUS_UNREACHABLE 1
 #define IF_OPER_STATUS_DISCONNECTED 2
 #define IF_OPER_STATUS_CONNECTING 3
 #define IF_OPER_STATUS_CONNECTED 4
 #define IF_OPER_STATUS_OPERATIONAL 5
-#define MIB_IF_ADMIN_STATUS_UP 1
-#define MIB_IF_ADMIN_STATUS_DOWN 2
-#define MIB_IF_ADMIN_STATUS_TESTING 3
-#define MIB_IF_OPER_STATUS_NON_OPERATIONAL 0
-#define MIB_IF_OPER_STATUS_UNREACHABLE 1
-#define MIB_IF_OPER_STATUS_DISCONNECTED 2
-#define MIB_IF_OPER_STATUS_CONNECTING 3
-#define MIB_IF_OPER_STATUS_CONNECTED 4
-#define MIB_IF_OPER_STATUS_OPERATIONAL 5
+
 #define MIB_IF_TYPE_OTHER 1
 #define MIB_IF_TYPE_ETHERNET 6
 #define MIB_IF_TYPE_TOKENRING 9
@@ -196,4 +194,18 @@
 #define MIB_IF_TYPE_LOOPBACK 24
 #define MIB_IF_TYPE_SLIP 28
 
+#define MIB_IF_ADMIN_STATUS_UP 1
+#define MIB_IF_ADMIN_STATUS_DOWN 2
+#define MIB_IF_ADMIN_STATUS_TESTING 3
+
+#define MIB_IF_OPER_STATUS_NON_OPERATIONAL 0
+#define MIB_IF_OPER_STATUS_UNREACHABLE 1
+#define MIB_IF_OPER_STATUS_DISCONNECTED 2
+#define MIB_IF_OPER_STATUS_CONNECTING 3
+#define MIB_IF_OPER_STATUS_CONNECTED 4
+#define MIB_IF_OPER_STATUS_OPERATIONAL 5
+
+#ifdef __cplusplus
+}
+#endif
 #endif

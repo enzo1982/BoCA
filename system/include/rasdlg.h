@@ -1,8 +1,13 @@
-#ifndef _RASDLG_H
-#define _RASDLG_H
-#if __GNUC__ >= 3
-#pragma GCC system_header
-#endif
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
+ */
+#ifndef _RASDLG_H_
+#define _RASDLG_H_
+
+#include <_mingw_unicode.h>
+#include <pshpack4.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,143 +15,165 @@ extern "C" {
 
 #include <ras.h>
 
-#define RASPBDEVENT_AddEntry	1
-#define RASPBDEVENT_EditEntry	2
-#define RASPBDEVENT_RemoveEntry	3
-#define RASPBDEVENT_DialEntry	4
-#define RASPBDEVENT_EditGlobals	5
-#define RASPBDEVENT_NoUser	6
-#define RASPBDEVENT_NoUserEdit	7
- 
-#define RASPBDFLAG_PositionDlg	1
-#define RASPBDFLAG_ForceCloseOnDial	2
-#define RASPBDFLAG_NoUser	16
+  typedef VOID (WINAPI *RASPBDLGFUNCW)(ULONG_PTR,DWORD,LPWSTR,LPVOID);
+  typedef VOID (WINAPI *RASPBDLGFUNCA)(ULONG_PTR,DWORD,LPSTR,LPVOID);
 
-#define RASEDFLAG_PositionDlg	1
-#define RASEDFLAG_NewEntry	2
-#define RASEDFLAG_CloneEntry	4
+#define RASPBDEVENT_AddEntry 1
+#define RASPBDEVENT_EditEntry 2
+#define RASPBDEVENT_RemoveEntry 3
+#define RASPBDEVENT_DialEntry 4
+#define RASPBDEVENT_EditGlobals 5
+#define RASPBDEVENT_NoUser 6
+#define RASPBDEVENT_NoUserEdit 7
 
-#define RASDDFLAG_PositionDlg	1
+#define RASNOUSER_SmartCard 0x00000001
 
-#ifndef RC_INVOKED
-#include <pshpack4.h>
+#define RASNOUSERW struct tagRASNOUSERW
+  RASNOUSERW {
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwTimeoutMs;
+    WCHAR szUserName[UNLEN + 1];
+    WCHAR szPassword[PWLEN + 1];
+    WCHAR szDomain[DNLEN + 1];
+  };
 
-typedef struct tagRASENTRYDLGA
-{
-	DWORD dwSize;
-	HWND  hwndOwner;
-	DWORD dwFlags;
-	LONG  xDlg;
-	LONG  yDlg;
-	CHAR  szEntry[RAS_MaxEntryName + 1];
-	DWORD dwError;
-	ULONG_PTR reserved;
-	ULONG_PTR reserved2;
-} RASENTRYDLGA, *LPRASENTRYDLGA;
-typedef struct tagRASENTRYDLGW
-{
-	DWORD dwSize;
-	HWND  hwndOwner;
-	DWORD dwFlags;
-	LONG  xDlg;
-	LONG  yDlg;
-	WCHAR szEntry[RAS_MaxEntryName + 1];
-	DWORD dwError;
-	ULONG_PTR reserved;
-	ULONG_PTR reserved2;
-} RASENTRYDLGW, *LPRASENTRYDLGW;
+#define RASNOUSERA struct tagRASNOUSERA
+  RASNOUSERA {
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwTimeoutMs;
+    CHAR szUserName[UNLEN + 1];
+    CHAR szPassword[PWLEN + 1];
+    CHAR szDomain[DNLEN + 1];
+  };
 
-typedef struct tagRASDIALDLG
-{
-	DWORD dwSize;
-	HWND  hwndOwner;
-	DWORD dwFlags;
-	LONG  xDlg;
-	LONG  yDlg;
-	DWORD dwSubEntry;
-	DWORD dwError;
-	ULONG_PTR reserved;
-	ULONG_PTR reserved2;
-} RASDIALDLG, *LPRASDIALDLG;
+#define RASNOUSER __MINGW_NAME_AW(RASNOUSER)
 
-/* Application-defined callback functions */
-typedef VOID (WINAPI* RASPBDLGFUNCW)(DWORD, DWORD, LPWSTR, LPVOID);
-typedef VOID (WINAPI* RASPBDLGFUNCA)(DWORD, DWORD, LPSTR, LPVOID);
+#define LPRASNOUSERW RASNOUSERW*
+#define LPRASNOUSERA RASNOUSERA*
+#define LPRASNOUSER RASNOUSER*
 
-typedef struct tagRASPBDLGA
-{
-	DWORD         dwSize;
-	HWND          hwndOwner;
-	DWORD         dwFlags;
-	LONG          xDlg;
-	LONG          yDlg;
-	ULONG_PTR     dwCallbackId;
-	RASPBDLGFUNCA pCallback;
-	DWORD         dwError;
-	ULONG_PTR     reserved;
-	ULONG_PTR     reserved2;
-} RASPBDLGA, *LPRASPBDLGA;
-typedef struct tagRASPBDLGW
-{
-	DWORD         dwSize;
-	HWND          hwndOwner;
-	DWORD         dwFlags;
-	LONG          xDlg;
-	LONG          yDlg;
-	ULONG_PTR     dwCallbackId;
-	RASPBDLGFUNCW pCallback;
-	DWORD         dwError;
-	ULONG_PTR     reserved;
-	ULONG_PTR     reserved2;
-} RASPBDLGW, *LPRASPBDLGW;
+#define RASPBDFLAG_PositionDlg 0x00000001
+#define RASPBDFLAG_ForceCloseOnDial 0x00000002
+#define RASPBDFLAG_NoUser 0x00000010
+#define RASPBDFLAG_UpdateDefaults 0x80000000
 
-typedef struct tagRASNOUSERA
-{
-	DWORD dwSize;
-	DWORD dwFlags;
-	DWORD dwTimeoutMs;
-	CHAR  szUserName[UNLEN + 1];
-	CHAR  szPassword[PWLEN + 1];
-	CHAR  szDomain[DNLEN + 1];
-} RASNOUSERA, *LPRASNOUSERA;
-typedef struct tagRASNOUSERW
-{
-	DWORD dwSize;
-	DWORD dwFlags;
-	DWORD dwTimeoutMs;
-	WCHAR szUserName[UNLEN + 1];
-	WCHAR szPassword[PWLEN + 1];
-	WCHAR szDomain[DNLEN + 1];
-} RASNOUSERW, *LPRASNOUSERW ;
+#define RASPBDLGW struct tagRASPBDLGW
+  RASPBDLGW {
+    DWORD dwSize;
+    HWND hwndOwner;
+    DWORD dwFlags;
+    LONG xDlg;
+    LONG yDlg;
+    ULONG_PTR dwCallbackId;
+    RASPBDLGFUNCW pCallback;
+    DWORD dwError;
+    ULONG_PTR reserved;
+    ULONG_PTR reserved2;
+  };
 
-#include <poppack.h>
+#define RASPBDLGA struct tagRASPBDLGA
+  RASPBDLGA {
+    DWORD dwSize;
+    HWND hwndOwner;
+    DWORD dwFlags;
+    LONG xDlg;
+    LONG yDlg;
+    ULONG_PTR dwCallbackId;
+    RASPBDLGFUNCA pCallback;
+    DWORD dwError;
+    ULONG_PTR reserved;
+    ULONG_PTR reserved2;
+  };
 
-BOOL APIENTRY RasDialDlgA(LPSTR,LPSTR,LPSTR,LPRASDIALDLG);
-BOOL APIENTRY RasDialDlgW(LPWSTR,LPWSTR,LPWSTR,LPRASDIALDLG);
-BOOL APIENTRY RasEntryDlgA(LPSTR,LPSTR,LPRASENTRYDLGA);
-BOOL APIENTRY RasEntryDlgW(LPWSTR,LPWSTR,LPRASENTRYDLGW);
-BOOL APIENTRY RasPhonebookDlgA(LPSTR,LPSTR,LPRASPBDLGA);
-BOOL APIENTRY RasPhonebookDlgW(LPWSTR,LPWSTR,LPRASPBDLGW);
+#define RASPBDLG __MINGW_NAME_AW(RASPBDLG)
+#define RASPBDLGFUNC __MINGW_NAME_AW(RASPBDLGFUNC)
 
-#ifdef UNICODE
-typedef RASENTRYDLGW	RASENTRYDLG, *LPRASENTRYDLG;
-typedef RASPBDLGW	RASPBDLG, *LPRASPBDLG;
-typedef RASNOUSERW	RASNOUSER, *LPRASNOUSER;
-#define RasDialDlg	RasDialDlgW
-#define RasEntryDlg	RasEntryDlgW
-#define RasPhonebookDlg	RasPhonebookDlgW
-#else
-typedef RASENTRYDLGA	RASENTRYDLG, *LPRASENTRYDLG;
-typedef RASPBDLGA	RASPBDLG, *LPRASPBDLG;
-typedef RASNOUSERA	RASNOUSER, *LPRASNOUSER;
-#define RasDialDlg	RasDialDlgA
-#define RasEntryDlg	RasEntryDlgA
-#define RasPhonebookDlg	RasPhonebookDlgA
-#endif /* UNICODE */
+#define LPRASPBDLGW RASPBDLGW*
+#define LPRASPBDLGA RASPBDLGA*
+#define LPRASPBDLG RASPBDLG*
 
-#endif /* RC_INVOKED */
+#define RASEDFLAG_PositionDlg 0x00000001
+#define RASEDFLAG_NewEntry 0x00000002
+#define RASEDFLAG_CloneEntry 0x00000004
+#define RASEDFLAG_NoRename 0x00000008
+#define RASEDFLAG_ShellOwned 0x40000000
+#define RASEDFLAG_NewPhoneEntry 0x00000010
+#define RASEDFLAG_NewTunnelEntry 0x00000020
+#define RASEDFLAG_NewDirectEntry 0x00000040
+#define RASEDFLAG_NewBroadbandEntry 0x00000080
+#define RASEDFLAG_InternetEntry 0x00000100
+#define RASEDFLAG_NAT 0x00000200
+
+#define RASENTRYDLGW struct tagRASENTRYDLGW
+  RASENTRYDLGW {
+    DWORD dwSize;
+    HWND hwndOwner;
+    DWORD dwFlags;
+    LONG xDlg;
+    LONG yDlg;
+    WCHAR szEntry[RAS_MaxEntryName + 1];
+    DWORD dwError;
+    ULONG_PTR reserved;
+    ULONG_PTR reserved2;
+  };
+
+#define RASENTRYDLGA struct tagRASENTRYDLGA
+  RASENTRYDLGA {
+    DWORD dwSize;
+    HWND hwndOwner;
+    DWORD dwFlags;
+    LONG xDlg;
+    LONG yDlg;
+    CHAR szEntry[RAS_MaxEntryName + 1];
+    DWORD dwError;
+    ULONG_PTR reserved;
+    ULONG_PTR reserved2;
+  };
+
+#define RASENTRYDLG __MINGW_NAME_AW(RASENTRYDLG)
+
+#define LPRASENTRYDLGW RASENTRYDLGW*
+#define LPRASENTRYDLGA RASENTRYDLGA*
+#define LPRASENTRYDLG RASENTRYDLG*
+
+#define RASDDFLAG_PositionDlg 0x00000001
+#define RASDDFLAG_NoPrompt 0x00000002
+#define RASDDFLAG_LinkFailure 0x80000000
+
+#define RASDIALDLG struct tagRASDIALDLG
+  RASDIALDLG {
+    DWORD dwSize;
+    HWND hwndOwner;
+    DWORD dwFlags;
+    LONG xDlg;
+    LONG yDlg;
+    DWORD dwSubEntry;
+    DWORD dwError;
+    ULONG_PTR reserved;
+    ULONG_PTR reserved2;
+  };
+
+#define LPRASDIALDLG RASDIALDLG*
+
+  typedef WINBOOL (WINAPI *RasCustomDialDlgFn)(HINSTANCE hInstDll,DWORD dwFlags,LPWSTR lpszPhonebook,LPWSTR lpszEntry,LPWSTR lpszPhoneNumber,LPRASDIALDLG lpInfo,PVOID pvInfo);
+  typedef WINBOOL (WINAPI *RasCustomEntryDlgFn)(HINSTANCE hInstDll,LPWSTR lpszPhonebook,LPWSTR lpszEntry,LPRASENTRYDLG lpInfo,DWORD dwFlags);
+
+  WINBOOL WINAPI RasPhonebookDlgA(LPSTR lpszPhonebook,LPSTR lpszEntry,LPRASPBDLGA lpInfo);
+  WINBOOL WINAPI RasPhonebookDlgW(LPWSTR lpszPhonebook,LPWSTR lpszEntry,LPRASPBDLGW lpInfo);
+  WINBOOL WINAPI RasEntryDlgA(LPSTR lpszPhonebook,LPSTR lpszEntry,LPRASENTRYDLGA lpInfo);
+  WINBOOL WINAPI RasEntryDlgW(LPWSTR lpszPhonebook,LPWSTR lpszEntry,LPRASENTRYDLGW lpInfo);
+  WINBOOL WINAPI RasDialDlgA(LPSTR lpszPhonebook,LPSTR lpszEntry,LPSTR lpszPhoneNumber,LPRASDIALDLG lpInfo);
+  WINBOOL WINAPI RasDialDlgW(LPWSTR lpszPhonebook,LPWSTR lpszEntry,LPWSTR lpszPhoneNumber,LPRASDIALDLG lpInfo);
+
+#define RasPhonebookDlg __MINGW_NAME_AW(RasPhonebookDlg)
+#define RasEntryDlg __MINGW_NAME_AW(RasEntryDlg)
+#define RasDialDlg __MINGW_NAME_AW(RasDialDlg)
 
 #ifdef __cplusplus
 }
 #endif
+
+#include <poppack.h>
 #endif

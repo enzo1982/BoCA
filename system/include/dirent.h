@@ -1,19 +1,22 @@
 /*
  * DIRENT.H (formerly DIRLIB.H)
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is a part of the mingw-runtime package.
+ * This file is part of the mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER within the package.
  *
  */
+
 #ifndef _DIRENT_H_
 #define _DIRENT_H_
 
 /* All the headers include this file. */
-#include <_mingw.h>
+#include <crtdefs.h>
 
 #include <io.h>
 
 #ifndef RC_INVOKED
+
+#pragma pack(push,_CRT_PACKING)
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,7 +27,7 @@ struct dirent
 	long		d_ino;		/* Always zero. */
 	unsigned short	d_reclen;	/* Always zero. */
 	unsigned short	d_namlen;	/* Length of name in d_name. */
-	char		d_name[FILENAME_MAX]; /* File name. */
+	char		d_name[260]; /* [FILENAME_MAX] */ /* File name. */
 };
 
 /*
@@ -72,7 +75,7 @@ struct _wdirent
 	long		d_ino;		/* Always zero. */
 	unsigned short	d_reclen;	/* Always zero. */
 	unsigned short	d_namlen;	/* Length of name in d_name. */
-	wchar_t		d_name[FILENAME_MAX]; /* File name. */
+	wchar_t		d_name[260]; /* [FILENAME_MAX] */ /* File name. */
 };
 
 /*
@@ -105,7 +108,7 @@ typedef struct
 } _WDIR;
 
 _WDIR* __cdecl __MINGW_NOTHROW _wopendir (const wchar_t*);
-struct _wdirent*  __cdecl __MINGW_NOTHROW _wreaddir (_WDIR*);
+struct _wdirent* __cdecl __MINGW_NOTHROW _wreaddir (_WDIR*);
 int __cdecl __MINGW_NOTHROW _wclosedir (_WDIR*);
 void __cdecl __MINGW_NOTHROW _wrewinddir (_WDIR*);
 long __cdecl __MINGW_NOTHROW _wtelldir (_WDIR*);
@@ -116,6 +119,9 @@ void __cdecl __MINGW_NOTHROW _wseekdir (_WDIR*, long);
 }
 #endif
 
+#pragma pack(pop)
+
 #endif	/* Not RC_INVOKED */
 
 #endif	/* Not _DIRENT_H_ */
+

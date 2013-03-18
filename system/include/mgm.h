@@ -1,75 +1,74 @@
-#ifndef _MGM_H
-#define _MGM_H
-#if __GNUC__ >= 3
-#pragma GCC system_header
-#endif
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
+ */
+#ifndef _MGM_H_
+#define _MGM_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef struct _MGM_IF_ENTRY {
+  DWORD dwIfIndex;
+  DWORD dwIfNextHopAddr;
+  WINBOOL bIGMP;
+  WINBOOL bIsEnabled;
+} MGM_IF_ENTRY,*PMGM_IF_ENTRY;
 
-#if (_WIN32_WINNT >= 0x0500)
+typedef DWORD (*PMGM_RPF_CALLBACK)(DWORD dwSourceAddr,DWORD dwSourceMask,DWORD dwGroupAddr,DWORD dwGroupMask,PDWORD pdwInIfIndex,PDWORD pdwInIfNextHopAddr,PDWORD pdwUpStreamNbr,DWORD dwHdrSize,PBYTE pbPacketHdr,PBYTE pbRoute);
+typedef DWORD (*PMGM_CREATION_ALERT_CALLBACK)(DWORD dwSourceAddr,DWORD dwSourceMask,DWORD dwGroupAddr,DWORD dwGroupMask,DWORD dwInIfIndex,DWORD dwInIfNextHopAddr,DWORD dwIfCount,PMGM_IF_ENTRY pmieOutIfList);
+typedef DWORD (*PMGM_PRUNE_ALERT_CALLBACK)(DWORD dwSourceAddr,DWORD dwSourceMask,DWORD dwGroupAddr,DWORD dwGroupMask,DWORD dwIfIndex,DWORD dwIfNextHopAddr,WINBOOL bMemberDelete,PDWORD pdwTimeout);
+typedef DWORD (*PMGM_JOIN_ALERT_CALLBACK)(DWORD dwSourceAddr,DWORD dwSourceMask,DWORD dwGroupAddr,DWORD dwGroupMask,WINBOOL bMemberUpdate);
+typedef DWORD (*PMGM_WRONG_IF_CALLBACK)(DWORD dwSourceAddr,DWORD dwGroupAddr,DWORD dwIfIndex,DWORD dwIfNextHopAddr,DWORD dwHdrSize,PBYTE pbPacketHdr);
+typedef DWORD (*PMGM_LOCAL_JOIN_CALLBACK) (DWORD dwSourceAddr,DWORD dwSourceMask,DWORD dwGroupAddr,DWORD dwGroupMask,DWORD dwIfIndex,DWORD dwIfNextHopAddr);
+typedef DWORD (*PMGM_LOCAL_LEAVE_CALLBACK) (DWORD dwSourceAddr,DWORD dwSourceMask,DWORD dwGroupAddr,DWORD dwGroupMask,DWORD dwIfIndex,DWORD dwIfNextHopAddr);
+typedef DWORD (*PMGM_DISABLE_IGMP_CALLBACK) (DWORD dwIfIndex,DWORD dwIfNextHopAddr);
+typedef DWORD (*PMGM_ENABLE_IGMP_CALLBACK) (DWORD dwIfIndex,DWORD dwIfNextHopAddr);
+
+typedef struct _ROUTING_PROTOCOL_CONFIG {
+  DWORD dwCallbackFlags;
+  PMGM_RPF_CALLBACK pfnRpfCallback;
+  PMGM_CREATION_ALERT_CALLBACK pfnCreationAlertCallback;
+  PMGM_PRUNE_ALERT_CALLBACK pfnPruneAlertCallback;
+  PMGM_JOIN_ALERT_CALLBACK pfnJoinAlertCallback;
+  PMGM_WRONG_IF_CALLBACK pfnWrongIfCallback;
+  PMGM_LOCAL_JOIN_CALLBACK pfnLocalJoinCallback;
+  PMGM_LOCAL_LEAVE_CALLBACK pfnLocalLeaveCallback;
+  PMGM_DISABLE_IGMP_CALLBACK pfnDisableIgmpCallback;
+  PMGM_ENABLE_IGMP_CALLBACK pfnEnableIgmpCallback;
+} ROUTING_PROTOCOL_CONFIG,*PROUTING_PROTOCOL_CONFIG;
+
+typedef enum _MGM_ENUM_TYPES {
+  ANY_SOURCE = 0,ALL_SOURCES
+} MGM_ENUM_TYPES;
+
+typedef struct _SOURCE_GROUP_ENTRY {
+  DWORD dwSourceAddr;
+  DWORD dwSourceMask;
+  DWORD dwGroupAddr;
+  DWORD dwGroupMask;
+} SOURCE_GROUP_ENTRY,*PSOURCE_GROUP_ENTRY;
+
 #define MGM_JOIN_STATE_FLAG 0x00000001
 #define MGM_FORWARD_STATE_FLAG 0x00000002
+
 #define MGM_MFE_STATS_0 0x00000001
 #define MGM_MFE_STATS_1 0x00000002
-typedef enum _MGM_ENUM_TYPES {
-	ANY_SOURCE=0,
-	ALL_SOURCES
-} MGM_ENUM_TYPES;
-typedef struct _MGM_IF_ENTRY {
-	DWORD dwIfIndex;
-	DWORD dwIfNextHopAddr;
-	BOOL bIGMP;
-	BOOL bIsEnabled;
-} MGM_IF_ENTRY,*PMGM_IF_ENTRY;
-typedef DWORD(CALLBACK *PMGM_RPF_CALLBACK)(DWORD,DWORD,DWORD,DWORD,PDWORD,PDWORD,PDWORD,DWORD,PBYTE,PBYTE);
-typedef DWORD(CALLBACK *PMGM_CREATION_ALERT_CALLBACK)(DWORD,DWORD,DWORD,DWORD,DWORD,DWORD,DWORD,PMGM_IF_ENTRY);
-typedef DWORD(CALLBACK *PMGM_PRUNE_ALERT_CALLBACK)(DWORD,DWORD,DWORD,DWORD,DWORD,DWORD,BOOL,PDWORD);
-typedef DWORD(CALLBACK *PMGM_JOIN_ALERT_CALLBACK)(DWORD,DWORD,DWORD,DWORD,BOOL);
-typedef DWORD(CALLBACK *PMGM_WRONG_IF_CALLBACK)(DWORD,DWORD,DWORD,DWORD,DWORD,PBYTE);
-typedef DWORD(CALLBACK *PMGM_LOCAL_JOIN_CALLBACK)(DWORD,DWORD,DWORD,DWORD,DWORD,DWORD);
-typedef DWORD(CALLBACK *PMGM_LOCAL_LEAVE_CALLBACK)(DWORD,DWORD,DWORD,DWORD,DWORD,DWORD);
-typedef DWORD(CALLBACK *PMGM_DISABLE_IGMP_CALLBACK)(DWORD,DWORD);
-typedef DWORD(CALLBACK *PMGM_ENABLE_IGMP_CALLBACK)(DWORD,DWORD);
-typedef struct _ROUTING_PROTOCOL_CONFIG {
-	DWORD dwCallbackFlags;
-	PMGM_RPF_CALLBACK pfnRpfCallback;
-	PMGM_CREATION_ALERT_CALLBACK pfnCreationAlertCallback;
-	PMGM_PRUNE_ALERT_CALLBACK pfnPruneAlertCallback;
-	PMGM_JOIN_ALERT_CALLBACK pfnJoinAlertCallback;
-	PMGM_WRONG_IF_CALLBACK pfnWrongIfCallback;
-	PMGM_LOCAL_JOIN_CALLBACK pfnLocalJoinCallback;
-	PMGM_LOCAL_LEAVE_CALLBACK pfnLocalLeaveCallback;
-	PMGM_DISABLE_IGMP_CALLBACK pfnDisableIgmpCallback;
-	PMGM_ENABLE_IGMP_CALLBACK pfnEnableIgmpCallback;
-} ROUTING_PROTOCOL_CONFIG,*PROUTING_PROTOCOL_CONFIG;
-typedef struct _SOURCE_GROUP_ENTRY {
-	DWORD dwSourceAddr;
-	DWORD dwSourceMask;
-	DWORD dwGroupAddr;
-	DWORD dwGroupMask;
-} SOURCE_GROUP_ENTRY,*PSOURCE_GROUP_ENTRY;
-DWORD WINAPI MgmAddGroupMembershipEntry(HANDLE,DWORD,DWORD,DWORD,DWORD,DWORD,DWORD,DWORD);
-DWORD WINAPI MgmDeleteGroupMembershipEntry(HANDLE,DWORD,DWORD,DWORD,DWORD,DWORD,DWORD,DWORD);
-DWORD WINAPI MgmDeRegisterMProtocol(HANDLE);
-DWORD WINAPI MgmGetFirstMfe(PDWORD,PBYTE,PDWORD);
-DWORD WINAPI MgmGetFirstMfeStats(PDWORD,PBYTE,PDWORD,DWORD);
-DWORD WINAPI MgmGetMfe(PMIB_IPMCAST_MFE,PDWORD,PBYTE);
-DWORD WINAPI MgmGetMfeStats(PMIB_IPMCAST_MFE,PDWORD,PBYTE,DWORD);
-DWORD WINAPI MgmGetNextMfe(PMIB_IPMCAST_MFE,PDWORD,PBYTE,PDWORD);
-DWORD WINAPI MgmGetNextMfeStats(PMIB_IPMCAST_MFE,PDWORD,PBYTE,PDWORD,DWORD);
-DWORD WINAPI MgmGetProtocolOnInterface(DWORD,DWORD,PDWORD,PDWORD);
-DWORD WINAPI MgmGroupEnumerationEnd(HANDLE);
-DWORD WINAPI MgmGroupEnumerationGetNext(HANDLE,PDWORD,PBYTE,PDWORD);
-DWORD WINAPI MgmGroupEnumerationStart(HANDLE,MGM_ENUM_TYPES,HANDLE*);
-DWORD WINAPI MgmRegisterMProtocol(PROUTING_PROTOCOL_CONFIG,DWORD,DWORD,HANDLE*);
-DWORD WINAPI MgmReleaseInterfaceOwnership(HANDLE,DWORD,DWORD);
-DWORD WINAPI MgmSetMfe(HANDLE,PMIB_IPMCAST_MFE);
-DWORD WINAPI MgmTakeInterfaceOwnership(HANDLE,DWORD,DWORD);
-#endif
 
-#ifdef __cplusplus
-}
-#endif
+DWORD MgmRegisterMProtocol(PROUTING_PROTOCOL_CONFIG prpiInfo,DWORD dwProtocolId,DWORD dwComponentId,HANDLE *phProtocol);
+DWORD MgmDeRegisterMProtocol(HANDLE hProtocol);
+DWORD MgmTakeInterfaceOwnership(HANDLE hProtocol,DWORD dwIfIndex,DWORD dwIfNextHopAddr);
+DWORD MgmReleaseInterfaceOwnership(HANDLE hProtocol,DWORD dwIfIndex,DWORD dwIfNextHopAddr);
+DWORD MgmGetProtocolOnInterface(DWORD dwIfIndex,DWORD dwIfNextHopAddr,PDWORD pdwIfProtocolId,PDWORD pdwIfComponentId);
+DWORD MgmAddGroupMembershipEntry(HANDLE hProtocol,DWORD dwSourceAddr,DWORD dwSourceMask,DWORD dwGroupAddr,DWORD dwGroupMask,DWORD dwIfIndex,DWORD dwIfNextHopIPAddr,DWORD dwFlags);
+DWORD MgmDeleteGroupMembershipEntry(HANDLE hProtocol,DWORD dwSourceAddr,DWORD dwSourceMask,DWORD dwGroupAddr,DWORD dwGroupMask,DWORD dwIfIndex,DWORD dwIfNextHopIPAddr,DWORD dwFlags);
+DWORD MgmGetMfe(PMIB_IPMCAST_MFE pimm,PDWORD pdwBufferSize,PBYTE pbBuffer);
+DWORD MgmGetFirstMfe(PDWORD pdwBufferSize,PBYTE pbBuffer,PDWORD pdwNumEntries);
+DWORD MgmGetNextMfe(PMIB_IPMCAST_MFE pimmStart,PDWORD pdwBufferSize,PBYTE pbBuffer,PDWORD pdwNumEntries);
+DWORD MgmGetMfeStats(PMIB_IPMCAST_MFE pimm,PDWORD pdwBufferSize,PBYTE pbBuffer,DWORD dwFlags);
+DWORD MgmGetFirstMfeStats(PDWORD pdwBufferSize,PBYTE pbBuffer,PDWORD pdwNumEntries,DWORD dwFlags);
+DWORD MgmGetNextMfeStats(PMIB_IPMCAST_MFE pimmStart,PDWORD pdwBufferSize,PBYTE pbBuffer,PDWORD pdwNumEntries,DWORD dwFlags);
+DWORD MgmGroupEnumerationStart(HANDLE hProtocol,MGM_ENUM_TYPES metEnumType,HANDLE *phEnumHandle);
+DWORD MgmGroupEnumerationGetNext(HANDLE hEnum,PDWORD pdwBufferSize,PBYTE pbBuffer,PDWORD pdwNumEntries);
+DWORD MgmGroupEnumerationEnd(HANDLE hEnum);
+DWORD MgmSetMfe(HANDLE hProtocol,PMIB_IPMCAST_MFE pmimm);
+
 #endif

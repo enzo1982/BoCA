@@ -1,10 +1,8 @@
-#ifndef _MINGW_FLOAT_H_
-/* 
+/*
  * float.h
- *
  * This file has no copyright assigned and is placed in the Public Domain.
- * This file is a part of the mingw-runtime package.
- * No warranty is given; refer to the file DISCLAIMER within the package.
+ * This file is part of the mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within the package.
  *
  * Constants related to floating point arithmetic.
  *
@@ -12,34 +10,116 @@
  * point controller.
  *
  */
-#define _MINGW_FLOAT_H_
-/*
- * NOTE:
- *
- * GCC provides float.h, but it doesn't include the non-standard stuff for
- * accessing the fp controller.  We parse the GCC-supplied header, for its
- * standard content, and then define the MS-specific extensions here.
- *
- * In a MinGW standard Win32 hosted environment, this should be the float.h
- * found by a system include path search, but this can't be guaranteed; for
- * a cross-compiler setup, the GCC-supplied header, which is guarded by the
- * _FLOAT_H___ macro, may be found first, thus...
- *
- */
-#if !defined(_FLOAT_H___) && !defined(__FLOAT_H)
 
- /*
-  * ...when we didn't find the GCC-supplied header first, we want to pull
-  * it in now; include_next should achieve this, (and we must rely on the
-  * GCC header maintainers to extend us the same courtesy, to get this one
-  * pulled in, when the GCC-supplied header is found first).
-  *
-  */
-# include_next <float.h>
+#if (defined (__GNUC__) && defined (__GNUC_MINOR__)) \
+    || (defined(__clang__) && defined(__clang_major__))
+#if (__GNUC__ < 4  || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)) \
+    || (__clang_major__ >=3)
+#if !defined(_FLOAT_H___) && !defined(__FLOAT_H)
+#include_next <float.h>
+#endif
+#elif !defined (_FLOAT_H___)
+#if (__GNUC__ < 4)
+#error Corrupt install of gcc-s internal headers, or search order was changed.
+#else
+	/* #include_next <float_ginclude.h> */
+	
+   	/* Number of decimal digits, q, such that any floating-point number with q
+   	   decimal digits can be rounded into a floating-point number with p radix b
+	   digits and back again without change to the q decimal digits,
+
+	   p * log10(b)			if b is a power of 10
+	   floor((p - 1) * log10(b))	otherwise
+	*/
+	#undef FLT_DIG
+	#undef DBL_DIG
+	#undef LDBL_DIG
+	#define FLT_DIG		__FLT_DIG__
+	#define DBL_DIG		__DBL_DIG__
+	#define LDBL_DIG	__LDBL_DIG__
+	
+	
+	/* Maximum representable finite floating-point number,
+
+	   (1 - b**-p) * b**emax
+	*/
+	#undef FLT_MAX
+	#undef DBL_MAX
+	#undef LDBL_MAX
+	#define FLT_MAX		__FLT_MAX__
+	#define DBL_MAX		__DBL_MAX__
+	#define LDBL_MAX	__LDBL_MAX__
+	
+	
+	/* Minimum normalized positive floating-point number, b**(emin - 1).  */
+	#undef FLT_MIN
+	#undef DBL_MIN
+	#undef LDBL_MIN
+	#define FLT_MIN		__FLT_MIN__
+	#define DBL_MIN		__DBL_MIN__
+	#define LDBL_MIN	__LDBL_MIN__
+	
+	/* Needed for libjava building - Victor K. */
+
+	/* Radix of exponent representation, b. */
+    #undef FLT_RADIX
+    #define FLT_RADIX	__FLT_RADIX__
+    
+    /* Minimum int x such that FLT_RADIX**(x-1) is a normalized float, emin */
+	#undef FLT_MIN_EXP
+	#undef DBL_MIN_EXP
+	#undef LDBL_MIN_EXP
+	#define FLT_MIN_EXP	__FLT_MIN_EXP__
+	#define DBL_MIN_EXP	__DBL_MIN_EXP__
+	#define LDBL_MIN_EXP	__LDBL_MIN_EXP__
+
+	/* Minimum negative integer such that 10 raised to that power is in the
+   	range of normalized floating-point numbers,
+
+	ceil(log10(b) * (emin - 1))
+	*/
+	#undef FLT_MIN_10_EXP
+	#undef DBL_MIN_10_EXP
+	#undef LDBL_MIN_10_EXP
+	#define FLT_MIN_10_EXP	__FLT_MIN_10_EXP__
+	#define DBL_MIN_10_EXP	__DBL_MIN_10_EXP__
+	#define LDBL_MIN_10_EXP	__LDBL_MIN_10_EXP__
+
+	/* Maximum int x such that FLT_RADIX**(x-1) is a representable float, emax.  */
+	#undef FLT_MAX_EXP
+	#undef DBL_MAX_EXP
+	#undef LDBL_MAX_EXP
+	#define FLT_MAX_EXP	__FLT_MAX_EXP__
+	#define DBL_MAX_EXP	__DBL_MAX_EXP__
+	#define LDBL_MAX_EXP	__LDBL_MAX_EXP__
+
+	/* Maximum integer such that 10 raised to that power is in the range of
+   	representable finite floating-point numbers,
+
+	floor(log10((1 - b**-p) * b**emax))
+	*/
+	#undef FLT_MAX_10_EXP
+	#undef DBL_MAX_10_EXP
+	#undef LDBL_MAX_10_EXP
+	#define FLT_MAX_10_EXP	__FLT_MAX_10_EXP__
+	#define DBL_MAX_10_EXP	__DBL_MAX_10_EXP__
+	#define LDBL_MAX_10_EXP	__LDBL_MAX_10_EXP__
+
+	/* Addition rounds to 0: zero, 1: nearest, 2: +inf, 3: -inf, -1: unknown.  */
+	/* ??? This is supposed to change with calls to fesetround in <fenv.h>.  */
+	#undef FLT_ROUNDS
+	#define FLT_ROUNDS 1
+    
+	#define _FLOAT_H___
+#endif
+#endif
 #endif
 
+#ifndef _MINGW_FLOAT_H_
+#define _MINGW_FLOAT_H_
+
 /* All the headers include this file. */
-#include <_mingw.h>
+#include <crtdefs.h>
 
 /*
  * Functions and definitions for controlling the FPU.
@@ -49,12 +129,43 @@
 /* TODO: These constants are only valid for x86 machines */
 
 /* Control word masks for unMask */
+#define	_MCW_DN  	0x03000000  	/* Denormal control */
 #define	_MCW_EM		0x0008001F	/* Error masks */
 #define	_MCW_IC		0x00040000	/* Infinity */
 #define	_MCW_RC		0x00000300	/* Rounding */
 #define	_MCW_PC		0x00030000	/* Precision */
 
+/* Number of base-FLT_RADIX digits in the significand, p.  */
+#undef FLT_MANT_DIG
+#undef DBL_MANT_DIG
+#undef LDBL_MANT_DIG
+#define FLT_MANT_DIG   __FLT_MANT_DIG__
+#define DBL_MANT_DIG   __DBL_MANT_DIG__
+#define LDBL_MANT_DIG  __LDBL_MANT_DIG__
+
+#if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+/* The floating-point expression evaluation method.
+      -1  indeterminate
+       0  evaluate all operations and constants just to the range and
+	  precision of the type
+       1  evaluate operations and constants of type float and double
+	  to the range and precision of the double type, evaluate
+	  long double operations and constants to the range and
+	  precision of the long double type
+       2  evaluate all operations and constants to the range and
+	  precision of the long double type
+
+   ??? This ought to change with the setting of the fp control word;
+   the value provided by the compiler assumes the widest setting.  */
+#undef FLT_EVAL_METHOD
+#define FLT_EVAL_METHOD	__FLT_EVAL_METHOD__
+
+#endif /* C99 */
+
+
 /* Control word values for unNew (use with related unMask above) */
+#define	_DN_SAVE	0x00000000
+#define	_DN_FLUSH	0x01000000
 #define	_EM_INVALID	0x00000010
 #define	_EM_DENORMAL	0x00080000
 #define	_EM_ZERODIVIDE	0x00000008
@@ -107,6 +218,20 @@
 #define _FPE_STACKUNDERFLOW	0x8b
 #define _FPE_EXPLICITGEN	0x8c    /* raise( SIGFPE ); */
 
+#define CW_DEFAULT _CW_DEFAULT
+#define MCW_PC  _MCW_PC
+#define PC_24   _PC_24
+#define PC_53   _PC_53
+#define PC_64   _PC_64
+
+#if defined(_M_IX86)
+#define _CW_DEFAULT (_RC_NEAR+_PC_53+_EM_INVALID+_EM_ZERODIVIDE+_EM_OVERFLOW+_EM_UNDERFLOW+_EM_INEXACT+_EM_DENORMAL)
+#elif defined(_M_IA64)
+#define _CW_DEFAULT (_RC_NEAR+_PC_64+_EM_INVALID+_EM_ZERODIVIDE+_EM_OVERFLOW+_EM_UNDERFLOW+_EM_INEXACT+_EM_DENORMAL)
+#elif defined(_M_AMD64)
+#define _CW_DEFAULT (_RC_NEAR+_EM_INVALID+_EM_ZERODIVIDE+_EM_OVERFLOW+_EM_UNDERFLOW+_EM_INEXACT+_EM_DENORMAL)
+#endif
+
 #ifndef RC_INVOKED
 
 #ifdef	__cplusplus
@@ -116,7 +241,8 @@ extern "C" {
 /* Set the FPU control word as cw = (cw & ~unMask) | (unNew & unMask),
  * i.e. change the bits in unMask to have the values they have in unNew,
  * leaving other bits unchanged. */
-_CRTIMP unsigned int __cdecl __MINGW_NOTHROW _controlfp (unsigned int unNew, unsigned int unMask);
+_CRTIMP unsigned int __cdecl __MINGW_NOTHROW _controlfp (unsigned int unNew, unsigned int unMask) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
+_CRTIMP errno_t __cdecl _controlfp_s(unsigned int *_CurrentState, unsigned int _NewValue, unsigned int _Mask);
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _control87 (unsigned int unNew, unsigned int unMask);
 
 
@@ -147,8 +273,10 @@ _CRTIMP int * __cdecl __MINGW_NOTHROW __fpecode(void);
  * but they really belong in math.h.
  */
 
-_CRTIMP double __cdecl __MINGW_NOTHROW _chgsign	(double);
-_CRTIMP double __cdecl __MINGW_NOTHROW _copysign (double, double);
+#ifndef _SIGN_DEFINED
+#define _SIGN_DEFINED
+_CRTIMP double __cdecl __MINGW_NOTHROW _chgsign (double _X);
+_CRTIMP double __cdecl __MINGW_NOTHROW _copysign (double _Number,double _Sign);
 _CRTIMP double __cdecl __MINGW_NOTHROW _logb (double);
 _CRTIMP double __cdecl __MINGW_NOTHROW _nextafter (double, double);
 _CRTIMP double __cdecl __MINGW_NOTHROW _scalb (double, long);
@@ -156,6 +284,10 @@ _CRTIMP double __cdecl __MINGW_NOTHROW _scalb (double, long);
 _CRTIMP int __cdecl __MINGW_NOTHROW _finite (double);
 _CRTIMP int __cdecl __MINGW_NOTHROW _fpclass (double);
 _CRTIMP int __cdecl __MINGW_NOTHROW _isnan (double);
+
+#define _copysignl copysignl
+extern long double __cdecl _chgsignl (long double);
+#endif /* _SIGN_DEFINED */
 
 #ifdef	__cplusplus
 }

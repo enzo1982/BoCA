@@ -34,6 +34,11 @@
 #include <wingdi.h>
 
 #include <basetyps.h>
+
+#ifndef _COM_interface
+#define _COM_interface struct
+#endif
+
 typedef _COM_interface IStream IStream;
 typedef _COM_interface IDirectDrawSurface7 IDirectDrawSurface7;
 

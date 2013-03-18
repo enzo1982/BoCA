@@ -1,3 +1,8 @@
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
+ */
 #ifndef _W32API_H
 #define _W32API_H
 #define _W32API_H_
@@ -5,9 +10,9 @@
 #pragma GCC system_header
 #endif
 
-#define __W32API_VERSION 3.17
+#define __W32API_VERSION 3.14
 #define __W32API_MAJOR_VERSION 3
-#define __W32API_MINOR_VERSION 17
+#define __W32API_MINOR_VERSION 14
 
 /* The following defines are for documentation purposes.  The following defines
  * identify the versions of Windows and Internet Explorer.  They are not to be

@@ -1,40 +1,27 @@
-#ifndef _ERRORREP_H
-#define _ERRORREP_H
-#if __GNUC__ >= 3
-#pragma GCC system_header
-#endif
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
+ */
+#ifndef __ERRORREP_H__
+#define __ERRORREP_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <_mingw_unicode.h>
 
-#if (_WIN32_WINNT >= 0x0501)
-typedef enum {
-	frrvErr = 3,
-	frrvErrNoDW = 4,
-	frrvErrTimeout = 5,
-	frrvLaunchDebugger = 6,
-	frrvOk = 0,
-	frrvOkHeadless = 7,
-	frrvOkManifest = 1,
-	frrvOkQueued = 2
+typedef enum tagEFaultRepRetVal {
+  frrvOk = 0,
+  frrvOkManifest,frrvOkQueued,frrvErr,frrvErrNoDW,frrvErrTimeout,frrvLaunchDebugger,frrvOkHeadless
 } EFaultRepRetVal;
-BOOL WINAPI AddERExcludedApplicationA(LPCSTR);
-BOOL WINAPI AddERExcludedApplicationW(LPCWSTR);
-EFaultRepRetVal WINAPI ReportFault(LPEXCEPTION_POINTERS,DWORD);
-#endif
 
-#ifdef UNICODE
-#if (_WIN32_WINNT >= 0x0501)
-#define AddERExcludedApplication AddERExcludedApplicationW
-#endif
-#else
-#if (_WIN32_WINNT >= 0x0501)
-#define AddERExcludedApplication AddERExcludedApplicationA
-#endif
-#endif
+EFaultRepRetVal WINAPI ReportFault(LPEXCEPTION_POINTERS pep,DWORD dwOpt);
+WINBOOL WINAPI AddERExcludedApplicationA(LPCSTR szApplication);
+WINBOOL WINAPI AddERExcludedApplicationW(LPCWSTR wszApplication);
 
-#ifdef __cplusplus
-}
-#endif
+typedef EFaultRepRetVal (WINAPI *pfn_REPORTFAULT)(LPEXCEPTION_POINTERS,DWORD);
+typedef EFaultRepRetVal (WINAPI *pfn_ADDEREXCLUDEDAPPLICATIONA)(LPCSTR);
+typedef EFaultRepRetVal (WINAPI *pfn_ADDEREXCLUDEDAPPLICATIONW)(LPCWSTR);
+
+#define AddERExcludedApplication __MINGW_NAME_AW(AddERExcludedApplication)
+#define pfn_ADDEREXCLUDEDAPPLICATION __MINGW_NAME_AW(pfn_ADDEREXCLUDEDAPPLICATION)
+
 #endif

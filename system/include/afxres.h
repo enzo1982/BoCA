@@ -1,3 +1,8 @@
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
+ */
 #ifndef _AFXRES_H
 #define _AFXRES_H
 #if __GNUC__ >= 3
@@ -8,7 +13,7 @@
 extern "C" {
 #endif
 
-#ifndef _WINDOWS_H
+#ifndef _INC_WINDOWS
 #include <windows.h>
 #endif
 
@@ -21,3 +26,4 @@ extern "C" {
 }
 #endif
 #endif
+
