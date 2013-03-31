@@ -61,6 +61,7 @@ allcmds:
 	$(ALLCMD2)
 
 $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) : $(OBJECTS)
+	mkdir -p $(BOCA_PATH)/$(BINDIR)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
 
 clean:

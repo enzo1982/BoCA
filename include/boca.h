@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -158,7 +158,8 @@ using namespace smooth;
 
 #define BoCA_DEFINE_PLAYLIST_COMPONENT(componentName)										 																		\
 	extern "C" {																																\
-		BOCA_EXPORT void BoCA_##componentName##_SetTrackList(void *component, const void *trackList)				{ return ((BoCA::componentName *) component)->SetTrackList(*((const Array<BoCA::Track> *) trackList)); }					\
+		BOCA_EXPORT void BoCA_##componentName##_SetTrackList(void *component, const void *trackList)				{ return ((BoCA::componentName *) component)->SetTrackList(*((const Array<BoCA::Track> *) trackList)); }				\
+		BOCA_EXPORT bool BoCA_##componentName##_CanOpenFile(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->CanOpenFile(file); }									\
 																																		\
 		BOCA_EXPORT const void *BoCA_##componentName##_ReadPlaylist(void *component, const wchar_t *file)			{ return &((BoCA::componentName *) component)->ReadPlaylist(file); }									\
 		BOCA_EXPORT int BoCA_##componentName##_WritePlaylist(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->WritePlaylist(file); }									\

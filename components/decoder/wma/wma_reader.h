@@ -41,7 +41,7 @@ namespace BoCA
 			Mutex			*samplesBufferMutex;
 		public:
 						 WMAReader();
-						~WMAReader();
+			virtual			~WMAReader();
 
 			Void			 SetAsyncEvent(HRESULT hrAsync);
 		accessors:

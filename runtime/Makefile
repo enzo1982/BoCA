@@ -74,6 +74,8 @@ endif
 all: $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED)
 
 $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED): $(OBJECTS)
+	mkdir -p $(BOCA_PATH)/$(BINDIR)
+	mkdir -p $(BOCA_PATH)/$(LIBDIR)
 ifeq ($(BUILD_WIN32),True)
 	$(LD) --shared -o $@ $(OBJECTS) -Wl,--out-implib,$(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
 else

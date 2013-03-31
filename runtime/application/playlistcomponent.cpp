@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,6 +21,11 @@ BoCA::AS::PlaylistComponent::~PlaylistComponent()
 Void BoCA::AS::PlaylistComponent::SetTrackList(const Array<Track> &tracks)
 {
 	specs->func_SetTrackList(component, &tracks);
+}
+
+Bool BoCA::AS::PlaylistComponent::CanOpenFile(const String &file)
+{
+	return specs->func_CanOpenFile(component, file);
 }
 
 const Array<BoCA::Track> &BoCA::AS::PlaylistComponent::ReadPlaylist(const String &file)

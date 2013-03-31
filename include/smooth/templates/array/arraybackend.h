@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -82,6 +82,19 @@ namespace smooth
 				lock		  = NIL;
 			}
 
+			ArrayBackend(const ArrayBackend<s> &oArray)
+			{
+				nOfEntries	  = 0;
+				greatestIndex	  = 0;
+
+				lastAccessedEntry = 0;
+
+				lockingEnabled	  = False;
+				lock		  = NIL;
+
+				*this = oArray;
+			}
+
 			virtual	~ArrayBackend()
 			{
 				RemoveAll();
@@ -92,6 +105,15 @@ namespace smooth
 
 					lock = NIL;
 				}
+			}
+
+			ArrayBackend<s> &operator =(const ArrayBackend<s> &oArray)
+			{
+				if (&oArray == this) return *this;
+
+				for (Int i = 0; i < oArray.Length(); i++) Add(oArray.GetNthReference(i));
+
+				return *this;
 			}
 
 			Int Add(const s &value)
