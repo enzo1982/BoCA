@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,6 +17,7 @@
 #include "dllinterface.h"
 
 using namespace smooth::IO;
+using namespace smooth::GUI::Dialogs;
 
 const String &BoCA::CDRipIn::GetComponentSpecs()
 {
@@ -408,8 +409,8 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 		params.nParanoiaMode		= nParanoiaMode;
 		params.bSwapLefRightChannel	= config->GetIntValue("CDRip", "SwapChannels", False);
 		params.bJitterCorrection	= config->GetIntValue("CDRip", "JitterCorrection", False);
-		params.bDetectJitterErrors	= config->GetIntValue("CDRip", "DetectJitterErrors", True);
-		params.bDetectC2Errors		= config->GetIntValue("CDRip", "DetectC2Errors", True);
+//		params.bDetectJitterErrors	= config->GetIntValue("CDRip", "DetectJitterErrors", True);
+//		params.bDetectC2Errors		= config->GetIntValue("CDRip", "DetectC2Errors", True);
 		params.nSpeed			= config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 		params.bEnableMultiRead		= False;
 		params.nMultiReadCount		= 0;
@@ -452,6 +453,29 @@ Bool BoCA::CDRipIn::CloseRipper()
 {
 	if (ripperOpen)
 	{
+		if (ex_CR_GetNumberOfCacheErrors() > 0)
+		{
+			BoCA::Config	*config = BoCA::Config::Get();
+
+			Bool	 noCacheWarning = config->GetIntValue("CDRip", "NoCacheWarning", False);
+
+			if (!noCacheWarning)
+			{
+				MessageDlg	*msgBox = new MessageDlg("The CD-ROM drive appears to be seeking impossibly quickly.\n"
+									 "This could be due to timer bugs, a drive that really is improbably fast,\n"
+									 "or, most likely, a bug in cdparanoia's cache modelling.\n\n"
+									 "Please consider using another drive for ripping audio CDs and send a bug\n"
+									 "report to support@freac.org to assist developers in correcting the problem.", "Warning", Message::Buttons::Ok, Message::Icon::Warning, "Do not display this warning again", &noCacheWarning);
+
+				msgBox->ShowDialog();
+
+				config->SetIntValue("CDRip", "NoCacheWarning", noCacheWarning);
+				config->SaveSettings();
+
+				Object::DeleteObject(msgBox);
+			}
+		}
+
 		ex_CR_CloseRipper();
 
 		if (Config::Get()->GetIntValue("CDRip", "LockTray", True)) ex_CR_LockCD(False);

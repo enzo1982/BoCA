@@ -76,10 +76,12 @@ all: $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED)
 $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED): $(OBJECTS)
 	mkdir -p $(BOCA_PATH)/$(BINDIR)
 	mkdir -p $(BOCA_PATH)/$(LIBDIR)
+
 ifeq ($(BUILD_WIN32),True)
 	$(LD) --shared -o $@ $(OBJECTS) -Wl,--out-implib,$(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
 else
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
 	ln -s $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
 endif
@@ -90,16 +92,30 @@ ifeq ($(BUILD_WIN32),True)
 else
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
 endif
+
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) 
 
 install: uninstall
 ifneq ($(BUILD_WIN32),True)
 	cp $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(PREFIX)/lib/boca
 	ln -s $(PREFIX)/lib/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/lib/libboca-$(VERSION)$(SHARED)
+
 ifeq ($(BUILD_OSX),True)
 	ln -s $(PREFIX)/lib/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/lib/libboca-$(VERSION).0$(SHARED)
 else
 	ln -s $(PREFIX)/lib/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/lib/libboca-$(VERSION)$(SHARED).0
+endif
+
+ifeq ($(BUILD_LINUX),True)
+	ldconfig
+else ifeq ($(BUILD_FREEBSD),True)
+	ldconfig
+else ifeq ($(BUILD_OPENBSD),True)
+	ldconfig
+else ifeq ($(BUILD_NETBSD),True)
+	ldconfig
+else ifeq ($(BUILD_HAIKU),True)
+	ldconfig
 endif
 endif
 
@@ -110,8 +126,21 @@ ifeq ($(BUILD_OSX),True)
 else
 	rm -f $(PREFIX)/lib/libboca-$(VERSION)$(SHARED).0
 endif
+
 	rm -f $(PREFIX)/lib/libboca-$(VERSION)$(SHARED)
 	rm -f $(PREFIX)/lib/boca/boca.$(VERSION)$(SHARED)
+
+ifeq ($(BUILD_LINUX),True)
+	ldconfig
+else ifeq ($(BUILD_FREEBSD),True)
+	ldconfig
+else ifeq ($(BUILD_OPENBSD),True)
+	ldconfig
+else ifeq ($(BUILD_NETBSD),True)
+	ldconfig
+else ifeq ($(BUILD_HAIKU),True)
+	ldconfig
+endif
 endif
 
 .c.o:

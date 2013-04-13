@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -340,13 +340,21 @@ FLAC__StreamDecoderReadStatus BoCA::FLACStreamDecoderReadCallback(const FLAC__St
 {
 	FLACIn	*filter = (FLACIn *) client_data;
 
+	if (filter->stop)
+	{
+	    *bytes = 0;
+
+	    return FLAC__STREAM_DECODER_READ_STATUS_ABORT;
+	}
+
 	filter->readDataMutex->Lock();
 
 	*bytes = filter->driver->ReadData(buffer, *bytes);
 
 	filter->readDataMutex->Release();
 
-	return filter->stop ? FLAC__STREAM_DECODER_READ_STATUS_ABORT : FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
+	if (*bytes == 0) return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
+	else		 return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 }
 
 FLAC__StreamDecoderWriteStatus BoCA::FLACStreamDecoderWriteCallback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)

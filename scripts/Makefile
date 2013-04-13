@@ -5,11 +5,7 @@ BOCA_PATH = ..
 include $(BOCA_PATH)/Makefile-options
 
 install: uninstall
-ifeq ($(BUILD_OSX),True)
-	cp macosx/boca_decoder_alac.1.0.xml $(PREFIX)/lib/boca
-else
-	cp unix/boca_decoder_alac.1.0.xml $(PREFIX)/lib/boca
-endif
+	cp boca_decoder_alac.1.0.xml $(PREFIX)/lib/boca
 	cp boca_decoder_als.1.0.xml $(PREFIX)/lib/boca
 	cp boca_decoder_avconv_amr.1.0.xml $(PREFIX)/lib/boca
 	cp boca_decoder_avconv_atrac3.1.0.xml $(PREFIX)/lib/boca
@@ -30,11 +26,6 @@ endif
 	cp boca_decoder_shorten.1.0.xml $(PREFIX)/lib/boca
 	cp boca_decoder_timidity.1.0.xml $(PREFIX)/lib/boca
 	cp boca_decoder_tta.1.0.xml $(PREFIX)/lib/boca
-ifeq ($(BUILD_OSX),True)
-	cp macosx/boca_decoder_wavpack.1.0.xml $(PREFIX)/lib/boca
-else
-	cp unix/boca_decoder_wavpack.1.0.xml $(PREFIX)/lib/boca
-endif
 	cp boca_encoder_aften.1.0.xml $(PREFIX)/lib/boca
 	cp boca_encoder_als.1.0.xml $(PREFIX)/lib/boca
 	cp boca_encoder_avconv_alac.1.0.xml $(PREFIX)/lib/boca
@@ -51,11 +42,10 @@ endif
 	cp boca_encoder_shorten.1.0.xml $(PREFIX)/lib/boca
 	cp boca_encoder_tta.1.0.xml $(PREFIX)/lib/boca
 	cp boca_encoder_twolame.1.0.xml $(PREFIX)/lib/boca
-ifeq ($(BUILD_OSX),True)
-	cp macosx/boca_encoder_wavpack.1.0.xml $(PREFIX)/lib/boca
-else
+
+	cp unix/boca_decoder_wavpack.1.0.xml $(PREFIX)/lib/boca
 	cp unix/boca_encoder_wavpack.1.0.xml $(PREFIX)/lib/boca
-endif
+
 	chmod a=r,u=rw $(PREFIX)/lib/boca/boca_*.1.0.xml
 
 uninstall:

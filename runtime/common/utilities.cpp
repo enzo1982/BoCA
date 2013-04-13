@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,6 +13,7 @@
 #include <boca/common/i18n.h>
 
 using namespace smooth::System;
+using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
 Void BoCA::Utilities::WarningMessage(const String &message, const String &replace1, const String &replace2)
@@ -171,4 +172,86 @@ String BoCA::Utilities::CreateDirectoryForFile(const String &fileName)
 	directory.Create();
 
 	return file;
+}
+
+String BoCA::Utilities::GetRelativeFileName(const String &trackFileName, const String &baseFileName)
+{
+	String	 compTrackFileName = trackFileName;
+	String	 compBaseFileName  = baseFileName;
+
+#ifdef __WIN32__
+	/* Ignore case on Windows systems.
+	 */
+	compTrackFileName = compTrackFileName.ToLower();
+	compBaseFileName  = compBaseFileName.ToLower();
+#endif
+
+	Int	 equalBytes	   = 0;
+	Int	 furtherComponents = 0;
+	Bool	 found		   = False;
+
+	for (Int i = 0; i < baseFileName.Length(); i++)
+	{
+		if (compBaseFileName[i] != compTrackFileName[i]) found = True;
+
+		if (baseFileName[i] == '\\' || baseFileName[i] == '/')
+		{
+			if (!found) equalBytes = i + 1;
+			else	    furtherComponents++;
+		}
+	}
+
+	String	 relativeFileName = trackFileName;
+
+	if (equalBytes > 0)
+	{
+		relativeFileName = NIL;
+
+		for (Int m = 0; m < trackFileName.Length() - equalBytes; m++) relativeFileName[m] = trackFileName[m + equalBytes];
+	}
+
+	if ( relativeFileName[1] != ':' &&	    // Absolute local path
+	    !relativeFileName.StartsWith("\\\\") && // Network resource
+	    !relativeFileName.Contains("://"))	    // Protocol
+	{
+		for (Int m = 0; m < furtherComponents; m++) relativeFileName = String("..").Append(Directory::GetDirectoryDelimiter()).Append(relativeFileName);
+	}
+
+	return relativeFileName;
+}
+
+String BoCA::Utilities::GetCDTrackFileName(const Track &track)
+{
+	/* Special handling for CD tracks on Windows.
+	 */
+	String	 fileName = track.origFilename;
+
+#ifdef __WIN32__
+	if (track.isCDTrack)
+	{
+		for (Int drive = 2; drive < 26; drive++)
+		{
+			String	 trackCDA = String(" ").Append(":\\track").Append(track.cdTrack < 10 ? "0" : NIL).Append(String::FromInt(track.cdTrack)).Append(".cda");
+
+			trackCDA[0] = drive + 'A';
+
+			InStream	*in = new InStream(STREAM_FILE, trackCDA, IS_READ);
+
+			in->Seek(32);
+
+			Int	 trackLength = in->InputNumber(4);
+
+			delete in;
+
+			if (track.length == (trackLength * 1176) / (track.GetFormat().bits / 8))
+			{
+				fileName = trackCDA;
+
+				break;
+			}
+		}
+	}
+#endif
+
+	return fileName;
 }

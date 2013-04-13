@@ -12,7 +12,7 @@
 #define H_BOCA_UTILITIES
 
 #include <smooth.h>
-#include "../core/definitions.h"
+#include "metadata/track.h"
 
 using namespace smooth;
 using namespace smooth::System;
@@ -34,6 +34,10 @@ namespace BoCA
 
 			static String		 ReplaceIncompatibleCharacters(const String &);
 			static String		 CreateDirectoryForFile(const String &);
+
+			static String		 GetRelativeFileName(const String &, const String &);
+
+			static String		 GetCDTrackFileName(const Track &);
 	};
 };
 

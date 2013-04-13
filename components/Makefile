@@ -8,6 +8,7 @@ all:
 	cd extension && $(MAKE)
 	cd other && $(MAKE)
 	cd output && $(MAKE)
+	cd playlist && $(MAKE)
 	cd tagger && $(MAKE)
 
 clean:
@@ -18,6 +19,7 @@ clean:
 	cd extension && $(MAKE) clean
 	cd other && $(MAKE) clean
 	cd output && $(MAKE) clean
+	cd playlist && $(MAKE) clean
 	cd tagger && $(MAKE) clean
 
 install:
@@ -28,6 +30,7 @@ install:
 	cd extension && $(MAKE) install
 	cd other && $(MAKE) install
 	cd output && $(MAKE) install
+	cd playlist && $(MAKE) install
 	cd tagger && $(MAKE) install
 
 uninstall:
@@ -38,4 +41,5 @@ uninstall:
 	cd extension && $(MAKE) uninstall
 	cd other && $(MAKE) uninstall
 	cd output && $(MAKE) uninstall
+	cd playlist && $(MAKE) uninstall
 	cd tagger && $(MAKE) uninstall

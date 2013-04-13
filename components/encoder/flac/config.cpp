@@ -340,6 +340,8 @@ Void BoCA::ConfigureFLAC::SetLPCOrder()
 {
 	I18n	*i18n = I18n::Get();
 
+	i18n->SetContext("Encoders::FLAC::Expert");
+
 	if (max_lpc_order == 0)	text_max_lpc_order_value->SetText(i18n->TranslateString("disabled"));
 	else			text_max_lpc_order_value->SetText(String::FromInt(max_lpc_order));
 
@@ -391,6 +393,8 @@ Void BoCA::ConfigureFLAC::SetQLPPrecision()
 	text_qlp_precision_value->SetFont(font);
 
 	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Encoders::FLAC::Expert");
 
 	if (qlp_coeff_precision == 0)	text_qlp_precision_value->SetText(i18n->TranslateString("auto"));
 	else				text_qlp_precision_value->SetText(String::FromInt(qlp_coeff_precision));

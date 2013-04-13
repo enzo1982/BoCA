@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -26,6 +26,7 @@ CR_SETCDROMPARAMETERS		 ex_CR_SetCDROMParameters	= NIL;
 CR_LOCKCD			 ex_CR_LockCD			= NIL;
 CR_READCDTEXT			 ex_CR_ReadCDText		= NIL;
 CR_READANDGETISRC		 ex_CR_ReadAndGetISRC		= NIL;
+CR_GETNUMBEROFCACHEERRORS	 ex_CR_GetNumberOfCacheErrors	= NIL;
 
 DynamicLoader *cdripdll	= NIL;
 
@@ -53,6 +54,7 @@ Bool LoadCDRipDLL()
 	ex_CR_LockCD			= (CR_LOCKCD) cdripdll->GetFunctionAddress("CR_LockCD");
 	ex_CR_ReadCDText		= (CR_READCDTEXT) cdripdll->GetFunctionAddress("CR_ReadCDText");
 	ex_CR_ReadAndGetISRC		= (CR_READANDGETISRC) cdripdll->GetFunctionAddress("CR_ReadAndGetISRC");
+	ex_CR_GetNumberOfCacheErrors	= (CR_GETNUMBEROFCACHEERRORS) cdripdll->GetFunctionAddress("CR_GetNumberOfCacheErrors");
 
 	if (ex_CR_Init				== NIL ||
 	    ex_CR_DeInit			== NIL ||
@@ -69,7 +71,8 @@ Bool LoadCDRipDLL()
 	    ex_CR_SetCDROMParameters		== NIL ||
 	    ex_CR_LockCD			== NIL ||
 	    ex_CR_ReadCDText			== NIL ||
-	    ex_CR_ReadAndGetISRC		== NIL) { FreeCDRipDLL(); return False; }
+	    ex_CR_ReadAndGetISRC		== NIL ||
+	    ex_CR_GetNumberOfCacheErrors	== NIL) { FreeCDRipDLL(); return False; }
 
 	return True;
 }
