@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>FLACCL OpenCL FLAC Encoder</name>
+  <version>1.0</version>
+  <id>flaccl-out</id>
+  <type>encoder</type>
+  <format>
+    <name>FLAC Audio Files</name>
+    <extension>flac</extension>
+    <tag id="flac-tag" mode="other">FLAC Metadata</tag>
+  </format>
+  <external>
+    <command>flaccl/CUETools.FLACCL.cmd</command>
+    <arguments>%OPTIONS %INFILE -o %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Compression level" argument="-%VALUE" default="7">
+	<min alias="worst">0</min>
+	<max alias="best">11</max>
+      </range>
+      <range name="Block size" argument="-b %VALUE" default="4608" step="16">
+	<min alias="small">16</min>
+	<max alias="large">4608</max>
+      </range>
+      <range name="Prediction order" argument="-l %VALUE" default="8">
+	<min alias="min">1</min>
+	<max alias="max">32</max>
+      </range>
+      <range name="Rice partition order" argument="-r %VALUE" default="6">
+	<min alias="min">0</min>
+	<max alias="max">8</max>
+      </range>
+      <selection name="Stereo decorrelation method" argument="-s %VALUE" default="search">
+	<option alias="independent">independent</option>
+	<option alias="search">search</option>
+      </selection>
+      <selection name="Variable block size" argument="-v %VALUE" default="0">
+	<option alias="fixed">0</option>
+	<option alias="variable">1</option>
+      </selection>
+    </parameters>
+  </external>
+</component>

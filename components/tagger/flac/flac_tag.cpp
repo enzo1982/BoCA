@@ -84,6 +84,13 @@ BoCA::FLACTag::~FLACTag()
 {
 }
 
+Error BoCA::FLACTag::RenderStreamInfo(const String &streamURI, const Track &track)
+{
+	/* Render works like update for FLAC files.
+	 */
+	return UpdateStreamInfo(streamURI, track);
+}
+
 Error BoCA::FLACTag::UpdateStreamInfo(const String &streamURI, const Track &track)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
