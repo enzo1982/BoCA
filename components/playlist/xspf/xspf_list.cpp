@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <Xspf.h>
-#include <Uri.h>
+#include <xspf/Xspf.h>
+#include <uriparser/Uri.h>
 
 #include "xspf_list.h"
 
@@ -79,10 +79,12 @@ const Array<BoCA::Track> &BoCA::XSPFPlaylist::ReadPlaylist(const String &file)
 
 	memory[numBytes] = 0;
 
-	reader.parseMemory(memory, numBytes, &callback, String("file://").Append(EncodeURI(String(File(file).GetFilePath()).Replace("\\", "/"))));
+	reader.parseMemory(memory, numBytes, &callback, String("file://").Append(EncodeURI(String(file).Replace("\\", "/")).Replace("%3A", ":")));
 
 	delete [] memory;
 
+	/* Complete relative filenames.
+	 */
 	for (Int i = 0; i < trackList.Length(); i++)
 	{
 		Track	&track = trackList.GetNthReference(i);
@@ -136,7 +138,7 @@ Error BoCA::XSPFPlaylist::WritePlaylist(const String &file)
 		if (info.track   >    0) xspfTrack.setTrackNum(info.track);
 		if (track.length >=   0) xspfTrack.setDuration(Math::Round((Float) track.length / track.GetFormat().rate * 1000.0));
 
-		xspfTrack.lendAppendLocation(String("file://").Append(EncodeURI(fileName.Replace("\\", "/"))));
+		xspfTrack.lendAppendLocation(EncodeURI(fileName.Replace("\\", "/")).Replace("%3A", ":"));
 
 		writer->addTrack(xspfTrack);
 	}

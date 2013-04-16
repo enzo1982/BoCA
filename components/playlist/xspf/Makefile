@@ -14,7 +14,7 @@ OBJECTS	  = xspf_list.o
 
 # Enter additional defines here:
 ifeq ($(BUILD_WIN32),True)
-	DEFINE	  = -I expat -I uriparser -I xspf
+	DEFINE	  = -I . -I expat
 endif
 
 # Enter additional library dependencies here:
