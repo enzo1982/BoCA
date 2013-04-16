@@ -286,6 +286,10 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 	result.Replace("&emsp;", " ");
 	result.Replace("&thinsp;", " ");
 
+	/* Ellipse
+	 */
+	result.Replace("&hellip;", "...");
+
 	/* Dashes
 	 */
 	result.Replace("&ndash;", "–");

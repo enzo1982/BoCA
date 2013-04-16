@@ -1,0 +1,37 @@
+<VideoSite>
+  <name>Vimeo</name>
+  <version>1.0</version>
+  <decoder>avconv-m4v_audio-in</decoder>
+
+  <script type="text/javascript">
+    <![CDATA[
+      function canHandleURL(URL) {
+	if (URL.toLowerCase().match(/http:\/\/vimeo.com\/(?:.*\/)*[0-9]+#?/)) return true;
+	else								     return false;
+      }
+
+      function getVideoURL(html) {
+	var clip_id   = (html.match(/"video":\{(?:.*?)"id":(.*?),/), RegExp.$1);
+	var timestamp = (html.match(/"request":\{(?:.*?)"timestamp":(.*?),/), RegExp.$1);
+	var signature = (html.match(/"request":\{(?:.*?)"signature":"(.*?)",/), RegExp.$1);
+	var quality   = (html.match(/"qualities":\[[^\]]*?"hd"[^\]]*?\]/) ? "hd" : "sd");
+
+	return "http://player.vimeo.com/play_redirect?clip_id=" + clip_id + "&sig=" + signature + "&time=" + timestamp + "&quality=" + quality + "&codecs=H264";
+      }
+
+      function queryMetadata(html) {
+	var metadata = new Metadata();
+
+	metadata.title	     = (html.match(/"title":"(.*?)",/) ? RegExp.$1.replace(/\\/g, "") : null);
+	metadata.description = (html.match(/<meta name="description" content="((?:.|\n|\r)*?)">/) ? RegExp.$1.replace(/\\/g, "") : null);
+
+	metadata.date	     = (html.match(/<meta itemprop="uploadDate" content="(.*?)T(?:.*?)">/) ? RegExp.$1 : null);
+	metadata.thumbnail   = (html.match(/"thumbnail":"(.*?)",/) ? RegExp.$1.replace(/\\/g, "") : null);
+
+	metadata.uploader    = (html.match(/"owner":\{"name":"(.*?)",(.*?)\}/) ? RegExp.$1 : null);
+
+	return metadata;
+      }
+    ]]>
+  </script>
+</VideoSite>
