@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -166,6 +166,7 @@ Bool BoCA::OpusOut::Activate()
 
 	ex_opus_encoder_ctl(encoder, OPUS_SET_BITRATE( config->GetIntValue("Opus", "Bitrate", 128) * 1000));
 	ex_opus_encoder_ctl(encoder, OPUS_SET_VBR(config->GetIntValue("Opus", "EnableVBR", True)));
+	ex_opus_encoder_ctl(encoder, OPUS_SET_VBR_CONSTRAINT(config->GetIntValue("Opus", "EnableConstrainedVBR", False)));
 	ex_opus_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(config->GetIntValue("Opus", "Complexity", 10)));
 	ex_opus_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(config->GetIntValue("Opus", "PacketLoss", 0)));
 	ex_opus_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue("Opus", "EnableDTX", True)));

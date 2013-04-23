@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,6 +21,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	packet_loss	= config->GetIntValue("Opus", "PacketLoss", 0);
 
 	enableVBR	= config->GetIntValue("Opus", "EnableVBR", True);
+	enableCVBR	= config->GetIntValue("Opus", "EnableConstrainedVBR", False);
 	enableDTX	= config->GetIntValue("Opus", "EnableDTX", True);
 
 	I18n	*i18n = I18n::Get();
@@ -67,13 +68,17 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	group_extension->Add(option_extension_opus);
 	group_extension->Add(option_extension_oga);
 
-	group_vbr		= new GroupBox(i18n->TranslateString("Variable bitrate"), Point(7, 89), Size(344, 40));
+	group_vbr		= new GroupBox(i18n->TranslateString("Variable bitrate"), Point(7, 89), Size(344, 63));
 
 	check_vbr		= new CheckBox(i18n->TranslateString("Enable variable bitrate encoding"), Point(10, 13), Size(324, 0), &enableVBR);
+	check_vbr->onAction.Connect(&ConfigureOpus::SetVBR, this);
+
+	check_cvbr		= new CheckBox(i18n->TranslateString("Constrain bitrate to target value"), Point(27, 36), Size(307, 0), &enableCVBR);
 
 	group_vbr->Add(check_vbr);
+	group_vbr->Add(check_cvbr);
 
-	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 141), Size(344, 66));
+	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 164), Size(344, 66));
 
 	text_bitrate		= new Text(i18n->TranslateString("Bitrate:"), Point(10, 13));
 
@@ -106,7 +111,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	group_quality->Add(slider_complexity);
 	group_quality->Add(text_complexity_value);
 
-	group_stream		= new GroupBox(i18n->TranslateString("Stream"), Point(7, 219), Size(344, 40));
+	group_stream		= new GroupBox(i18n->TranslateString("Stream"), Point(7, 242), Size(344, 40));
 
 	text_framesize		= new Text(i18n->TranslateString("Frame length:"), Point(10, 13));
 
@@ -119,7 +124,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	group_stream->Add(slider_framesize);
 	group_stream->Add(text_framesize_value);
 
-	group_options		= new GroupBox(i18n->TranslateString("Options"), Point(7, 271), Size(344, 66));
+	group_options		= new GroupBox(i18n->TranslateString("Options"), Point(7, 294), Size(344, 66));
 
 	check_dtx		= new CheckBox(i18n->TranslateString("Enable discontinous transmission"), Point(10, 13), Size(324, 0), &enableDTX);
 
@@ -137,6 +142,8 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	SetMode();
 
+	SetVBR();
+
 	SetBitrate();
 	SetComplexity();
 	SetFrameSize();
@@ -150,7 +157,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	Add(group_stream);
 	Add(group_options);
 
-	SetSize(Size(358, 344));
+	SetSize(Size(358, 367));
 }
 
 BoCA::ConfigureOpus::~ConfigureOpus()
@@ -167,6 +174,7 @@ BoCA::ConfigureOpus::~ConfigureOpus()
 
 	DeleteObject(group_vbr);
 	DeleteObject(check_vbr);
+	DeleteObject(check_cvbr);
 
 	DeleteObject(group_quality);
 	DeleteObject(text_bitrate);
@@ -204,6 +212,7 @@ Int BoCA::ConfigureOpus::SaveSettings()
 	config->SetIntValue("Opus", "PacketLoss", packet_loss);
 
 	config->SetIntValue("Opus", "EnableVBR", enableVBR);
+	config->SetIntValue("Opus", "EnableConstrainedVBR", enableCVBR);
 	config->SetIntValue("Opus", "EnableDTX", enableDTX);
 
 	return Success();
@@ -230,6 +239,22 @@ Void BoCA::ConfigureOpus::SetMode()
 			text_packet_loss_value->Deactivate();
 
 			break;
+	}
+
+	SetVBR();
+}
+
+Void BoCA::ConfigureOpus::SetVBR()
+{
+	if (enableVBR && combo_mode->GetSelectedEntryNumber() != 1)
+	{
+		check_cvbr->Activate();
+	}
+	else
+	{
+		enableCVBR = False;
+
+		check_cvbr->Deactivate();
 	}
 }
 

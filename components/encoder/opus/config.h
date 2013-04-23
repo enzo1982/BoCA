@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -36,6 +36,7 @@ namespace BoCA
 
 			GroupBox	*group_vbr;
 			CheckBox	*check_vbr;
+			CheckBox	*check_cvbr;
 
 			GroupBox	*group_quality;
 			Text		*text_bitrate;
@@ -64,9 +65,12 @@ namespace BoCA
 			Int		 packet_loss;
 
 			Bool		 enableVBR;
+			Bool		 enableCVBR;
 			Bool		 enableDTX;
 		slots:
 			Void		 SetMode();
+
+			Void		 SetVBR();
 
 			Void		 SetBitrate();
 			Void		 SetBitrateByEditBox();
