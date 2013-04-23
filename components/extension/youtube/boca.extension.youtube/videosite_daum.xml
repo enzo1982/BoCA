@@ -1,4 +1,4 @@
-﻿<VideoSite>
+<VideoSite>
   <name>Daum 뮤직</name>
   <version>1.0</version>
   <decoder>avconv-flv_audio-in</decoder>

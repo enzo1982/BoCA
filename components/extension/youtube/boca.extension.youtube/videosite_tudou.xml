@@ -1,4 +1,4 @@
-﻿<VideoSite>
+<VideoSite>
   <name>Tudou 土豆网</name>
   <version>1.0</version>
   <decoder>avconv-flv_audio-in</decoder>
