@@ -54,13 +54,13 @@ static int truncate(const char *path, size_t length)
 	int	 result = -1;
 	HANDLE	 fh;
 
-	fh = ::CreateFile(path,
-			  GENERIC_WRITE | GENERIC_READ,
-			  0,
-			  NULL,
-			  OPEN_EXISTING,
-			  FILE_ATTRIBUTE_NORMAL,
-			  NULL);
+	fh = ::CreateFileA(path,
+			   GENERIC_WRITE | GENERIC_READ,
+			   0,
+			   NULL,
+			   OPEN_EXISTING,
+			   FILE_ATTRIBUTE_NORMAL,
+			   NULL);
 
 	if (INVALID_HANDLE_VALUE != fh)
 	{

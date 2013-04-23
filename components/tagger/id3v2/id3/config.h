@@ -113,7 +113,7 @@
 /* #undef HAVE_SYS_PARAM_H */
 
 /* Define if you have the <unistd.h> header file.  */
-#ifndef _MSV_VER
+#ifndef _MSC_VER
 #  define HAVE_UNISTD_H 1
 #endif
 
