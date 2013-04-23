@@ -113,7 +113,9 @@
 /* #undef HAVE_SYS_PARAM_H */
 
 /* Define if you have the <unistd.h> header file.  */
-/* #undef HAVE_UNISTD_H */
+#ifndef _MSV_VER
+#  define HAVE_UNISTD_H 1
+#endif
 
 /* Define if you have the <wchar.h> header file.  */
 #define HAVE_WCHAR_H 1
@@ -140,7 +142,7 @@
 
 #ifdef CXX_HAS_BUGGY_FOR_LOOPS
 /* #undef for */
-#define for if(1) for
+#  define for if(1) for
 #endif
 
 //
@@ -151,23 +153,23 @@
 //
 
 #ifdef CXX_HAS_NO_BOOL
-#define bool int
-#define true 1
-#define false 0
+#  define bool int
+#  define true 1
+#  define false 0
 #endif
    
 #if defined (ID3_ENABLE_DEBUG) && defined (HAVE_LIBCW_SYS_H) && defined (__cplusplus)
 
-#define DEBUG
+#  define DEBUG
 
-#include <libcw/sys.h>
-#include <libcw/debug.h>
+#  include <libcw/sys.h>
+#  include <libcw/debug.h>
 
-#define ID3D_INIT_DOUT()    Debug( libcw_do.on() )
-#define ID3D_INIT_WARNING() Debug( dc::warning.on() )
-#define ID3D_INIT_NOTICE()  Debug( dc::notice.on() )
-#define ID3D_NOTICE(x)      Dout( dc::notice, x )
-#define ID3D_WARNING(x)     Dout( dc::warning, x )
+#  define ID3D_INIT_DOUT()    Debug( libcw_do.on() )
+#  define ID3D_INIT_WARNING() Debug( dc::warning.on() )
+#  define ID3D_INIT_NOTICE()  Debug( dc::notice.on() )
+#  define ID3D_NOTICE(x)      Dout( dc::notice, x )
+#  define ID3D_WARNING(x)     Dout( dc::warning, x )
 
 #else
 

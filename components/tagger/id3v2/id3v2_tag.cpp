@@ -235,7 +235,12 @@ Error BoCA::ID3v2Tag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tr
 		}
 	}
 
-	buffer.Resize(tag->Size());
+	/* ID3Lib versions used in many Linux distributions are buggy
+	 * and return less than the actually used tag size here.
+	 *
+	 * Round to the next multiple of 2048 to compensate for that.
+	 */
+	buffer.Resize(((tag->Size() / 2048) + 1) * 2048);
 
 	Int	 size = tag->Render(buffer, ID3TT_ID3V2);
 
