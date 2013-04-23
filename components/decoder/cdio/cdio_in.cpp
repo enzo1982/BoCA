@@ -301,7 +301,7 @@ Bool BoCA::CDIOIn::Activate()
 		if (cdio_get_track_format(cd, i) == TRACK_FORMAT_AUDIO && i == track.cdTrack)
 		{
 			nextSector  = startSector;
-			sectorsLeft = endSector - startSector;
+			sectorsLeft = endSector - startSector + 1;
 
 			entryNumber = i;
 
