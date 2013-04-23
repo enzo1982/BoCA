@@ -86,6 +86,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist M3U", "BoCA P
 		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist XSPF", "BoCA Playlist XSPF\BoCA Playlist XSPF.vcxproj", "{815DA8C2-34FA-4AE8-90D7-1253183C4F01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -244,6 +246,10 @@ Global
 		{ECFC35DF-E414-4CF3-84F4-81749657D8F5}.Debug|Win32.Build.0 = Debug|Win32
 		{ECFC35DF-E414-4CF3-84F4-81749657D8F5}.Release|Win32.ActiveCfg = Release|Win32
 		{ECFC35DF-E414-4CF3-84F4-81749657D8F5}.Release|Win32.Build.0 = Release|Win32
+		{815DA8C2-34FA-4AE8-90D7-1253183C4F01}.Debug|Win32.ActiveCfg = Debug|Win32
+		{815DA8C2-34FA-4AE8-90D7-1253183C4F01}.Debug|Win32.Build.0 = Debug|Win32
+		{815DA8C2-34FA-4AE8-90D7-1253183C4F01}.Release|Win32.ActiveCfg = Release|Win32
+		{815DA8C2-34FA-4AE8-90D7-1253183C4F01}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

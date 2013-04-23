@@ -77,7 +77,7 @@ const Array<BoCA::Track> &BoCA::XSPFPlaylist::ReadPlaylist(const String &file)
 
 	in.InputData(memory, numBytes - 1);
 
-	memory[numBytes] = 0;
+	memory[numBytes - 1] = 0;
 
 	reader.parseMemory(memory, numBytes, &callback, String("file://").Append(EncodeURI(String(file).Replace("\\", "/")).Replace("%3A", ":")));
 
