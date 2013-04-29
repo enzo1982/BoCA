@@ -13,28 +13,20 @@ BOCA_PATH = ../../..
 OBJECTS	  = xspf_list.o
 
 # Enter additional defines here:
-ifeq ($(BUILD_WIN32),True)
-	DEFINE	  = -I . -I expat
-endif
+DEFINE	  = -I . -I expat
 
 # Enter additional library dependencies here:
-ifeq ($(BUILD_WIN32),True)
-	LIBS	  = xspf/libxspf.a uriparser/liburiparser.a expat/libexpat.a -lstdc++
-else
-	LIBS	  = -lxspf
-endif
+LIBS	  = xspf/libxspf.a uriparser/liburiparser.a expat/libexpat.a -lstdc++
 
 # Enter addition commands for targets all and clean here:
-ifeq ($(BUILD_WIN32),True)
-	ALLCMD1   = cd expat && $(MAKE) -j 4 && cd ../uriparser && $(MAKE) -j 4
-	ALLCMD2   = cd xspf && $(MAKE) -j 4
-	CLEANCMD1 = cd expat && $(MAKE) clean && cd ../uriparser && $(MAKE) clean
-	CLEANCMD2 = cd xspf && $(MAKE) clean
-	INSTCMD1  =
-	INSTCMD2  = 
-	UINSTCMD1 =
-	UINSTCMD2 =
-endif
+ALLCMD1   = cd expat && $(MAKE) -j 4 && cd ../uriparser && $(MAKE) -j 4
+ALLCMD2   = cd xspf && $(MAKE) -j 4
+CLEANCMD1 = cd expat && $(MAKE) clean && cd ../uriparser && $(MAKE) clean
+CLEANCMD2 = cd xspf && $(MAKE) clean
+INSTCMD1  =
+INSTCMD2  = 
+UINSTCMD1 =
+UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
