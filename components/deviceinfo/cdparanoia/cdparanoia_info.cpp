@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,13 +17,12 @@ extern "C" {
 
 #include <glob.h>
 #include <arpa/inet.h>
+#include <sys/ioctl.h>
 
 #ifdef __linux__
-#	include <stropts.h>
 #	include <linux/cdrom.h>
 #else
 #	include <sys/cdio.h>
-#	include <sys/ioctl.h>
 #endif
 
 #include "cdparanoia_info.h"
