@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = cdparanoia_info.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -I /usr/include/cdda
 
 # Enter additional library dependencies here:
 LIBS	  = -lcdda_interface
