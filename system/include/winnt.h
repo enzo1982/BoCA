@@ -1484,7 +1484,6 @@ extern "C" {
 #endif
 
 #define YieldProcessor _mm_pause
-#define MemoryBarrier __faststorefence
 #define PreFetchCacheLine(l,a) _mm_prefetch((CHAR CONST *) a,l)
 #define PrefetchForWrite(p) _m_prefetchw(p)
 #define ReadForWriteAccess(p) (_m_prefetchw(p),*(p))
@@ -1876,7 +1875,6 @@ extern "C" {
   struct _TEB *NtCurrentTeb(void);
   PVOID GetCurrentFiber(void);
   PVOID GetFiberData(void);
-  VOID MemoryBarrier(VOID);
 
 #ifdef __CRT__NO_INLINE
 # define DbgRaiseAssertionFailure() __asm__ __volatile__("int $0x2c");
@@ -1886,13 +1884,6 @@ extern "C" {
     __asm__ __volatile__("int $0x2c");
   }
 #endif
-
-  __CRT_INLINE VOID MemoryBarrier(VOID)
-  {
-    LONG Barrier = 0;
-    __asm__ __volatile__("xchgl %%eax,%0 "
-      :"=r" (Barrier));
-  }
 
   __CRT_INLINE struct _TEB *NtCurrentTeb(void)
   {
@@ -2094,7 +2085,6 @@ extern "C" {
 #endif
 
 #define YieldProcessor __yield
-#define MemoryBarrier __mf
 #define PreFetchCacheLine __lfetch
 #define ReadForWriteAccess(p) (*(p))
 #define DbgRaiseAssertionFailure() __break(ASSERT_BREAKPOINT)

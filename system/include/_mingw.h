@@ -504,10 +504,6 @@ typedef __time64_t time_t;
 
 #define _ARGMAX 100
 
-#ifndef _TRUNCATE
-#define _TRUNCATE ((size_t)-1)
-#endif
-
 #ifndef _CRT_UNUSED
 #define _CRT_UNUSED(x) (void)x
 #endif

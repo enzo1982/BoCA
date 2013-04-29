@@ -550,42 +550,6 @@ int vsnprintf (char *__stream, size_t __n, const char *__format, __builtin_va_li
   _CRTIMP int __cdecl _vsnprintf_l(char * __restrict__ buffer,size_t count,const char * __restrict__ format,_locale_t locale,va_list argptr) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
   int __cdecl _sprintf_l(char * __restrict__ buffer,const char * __restrict__ format,_locale_t locale,...) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
 
-#if !defined (__USE_MINGW_ANSI_STDIO) || __USE_MINGW_ANSI_STDIO == 0
-/* this is here to deal with software defining
- * vsnprintf as _vsnprintf, eg. libxml2.  */
-#pragma push_macro("snprintf")
-#pragma push_macro("vsnprintf")
-# undef snprintf
-# undef vsnprintf
-  int __cdecl __ms_vsnprintf(char * __restrict__ d,size_t n,const char * __restrict__ format,va_list arg)
-    __MINGW_ATTRIB_DEPRECATED_MSVC2005 __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
-
-  __mingw_ovr
-  __MINGW_ATTRIB_NONNULL(3)
-  int vsnprintf (char * __restrict__ __stream, size_t __n, const char * __restrict__ __format, va_list __local_argv)
-  {
-    return __ms_vsnprintf (__stream, __n, __format, __local_argv);
-  }
-
-  int __cdecl __ms_snprintf(char * __restrict__ s, size_t n, const char * __restrict__  format, ...);
-
-#ifndef __NO_ISOCEXT
-__mingw_ovr
-__MINGW_ATTRIB_NONNULL(3)
-int snprintf (char * __restrict__ __stream, size_t __n, const char * __restrict__ __format, ...)
-{
-  register int __retval;
-  __builtin_va_list __local_argv; __builtin_va_start( __local_argv, __format );
-  __retval = __ms_vsnprintf (__stream, __n, __format, __local_argv);
-  __builtin_va_end( __local_argv );
-  return __retval;
-}
-#endif /* !__NO_ISOCEXT */
-
-#pragma pop_macro ("vsnprintf")
-#pragma pop_macro ("snprintf")
-#endif
-
   _CRTIMP int __cdecl _vscprintf(const char * __restrict__ _Format,va_list _ArgList);
   _CRTIMP int __cdecl _set_printf_count_output(int _Value);
   _CRTIMP int __cdecl _get_printf_count_output(void);
