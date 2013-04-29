@@ -63,7 +63,7 @@
 	var metadata = new Metadata();
 
 	metadata.title	     = playlist.data[0].title;
-	metadata.description = (html.match(/<div class="info" id="long".*?>(?:.|\n|\r)*?<div class="item">((?:.|\n|\r)*?)<\/div>/) ? RegExp.$1 : null);
+	metadata.description = (html.match(/<div id="text_long".*?>((?:.|\n|\r)*?)<a .*?>.*?<\/a><\/div>/) ? RegExp.$1 : null);
 
 	metadata.thumbnail   = playlist.data[0].logo;
 

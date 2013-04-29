@@ -459,6 +459,8 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 
 	while ((offset = result.Find("&#")) >= 0)
 	{
+		/* Entities
+		 */
 		Int	 value = result.SubString(offset + 2, 5).ToInt();
 		Int	 length = result.SubString(offset + 2, 6).Find(";") + 2;
 
@@ -467,6 +469,19 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 		for (Int i = offset + 1; i < result.Length() - length; i++) result[i] = result[i + length];
 
 		result[result.Length() - length] = 0;
+	}
+
+	while ((offset = result.Find("\\u")) >= 0)
+	{
+		/* Escapes
+		 */
+		Int	 value = (Int64) Number::FromHexString(result.SubString(offset + 2, 4));
+
+		result[offset] = value;
+
+		for (Int i = offset + 1; i < result.Length() - 5; i++) result[i] = result[i + 5];
+
+		result[result.Length() - 5] = 0;
 	}
 
 	/* Restore previous input format.

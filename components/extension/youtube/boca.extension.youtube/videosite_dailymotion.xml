@@ -19,11 +19,13 @@
       function queryMetadata(html) {
 	var metadata = new Metadata();
 
-	metadata.title	   = (html.match(/<h1 class="dmco_title"><span .*?>(.*?)<\/span><\/h1>/) ? RegExp.$1 : null);
+	metadata.title	     = (html.match(/<meta property="og:title" content="(.*?)".*?\/>/) ? RegExp.$1 : null);
+	metadata.description = (html.match(/<meta property="og:description" content="((?:.|\n|\r)*?)".*?\/>/) ? RegExp.$1 : null);
 
-	metadata.thumbnail = (html.match(/<link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/>/) ? "http://www.dailymotion.com" + RegExp.$1 : null);
+	metadata.date	     = (html.match(/<meta property="video:release_date" content="(.*?)T.*?".*?\/>/) ? RegExp.$1 : null);
+	metadata.thumbnail   = (html.match(/<link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/>/) ? "http://www.dailymotion.com" + RegExp.$1 : null);
 
-	metadata.uploader  = (html.match(/<div class="user_container">.*?<img\s+alt="(.*?)" .*?\/>/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/<div class="user_container">(?:.|\n|\r)*?<img\s+alt="(.*?)" .*?\/>/) ? RegExp.$1 : null);
 
 	return metadata;
       }

@@ -11,7 +11,16 @@
       }
 
       function getVideoURL(html) {
-	return html.match(/"url_encoded_fmt_stream_map": ".*?url=(.*?)\\u0026.*?webm.*?\\u0026sig=(.*?)\\u0026.*?,/), unescape(RegExp.$1) + "&signature=" + RegExp.$2;
+	var streamMap = (html.match(/"url_encoded_fmt_stream_map": "(.*?)"/), RegExp.$1.split(","));
+
+	for (var i = 0; i < streamMap.length; i++) {
+	  if (streamMap[i].match(/type=video%2Fwebm/)) {
+	    var url = (streamMap[i].match(/url=(.*?)(?:\\u0026.*)?$/), RegExp.$1);
+	    var sig = (streamMap[i].match(/sig=(.*?)(?:\\u0026.*)?$/), RegExp.$1);
+
+	    return "" + unescape(unescape(url)) + "&signature=" + sig;
+	  }
+	}
       }
 
       function queryMetadata(html) {
@@ -23,7 +32,7 @@
 	metadata.date	     = (html.match(/<span id="eow-date" class="watch-video-date"\s*>\s*(.*?)\s*<\/span>/) ? RegExp.$1 : null);
 	metadata.thumbnail   = (html.match(/<meta property="og:image" content="(.*?)"\s*\/?>/) ? RegExp.$1 : null);
 
-	metadata.uploader    = (html.match(/<a (?:.|\n|\r)*? class=".*? yt-user-name author" rel="author"(?:.|\n|\r)*?>\s*(.*?)\s*<\/a>/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/<a (?:.|\n|\r)*?class=".*?yt-user-name.*?"(?:.|\n|\r)*?>\s*(.*?)\s*<\/a>/) ? RegExp.$1 : null);
 
 	return metadata;
       }

@@ -22,12 +22,12 @@
 	var devxml = downloadURL((html.match(/data: "(.*?)"/), RegExp.$1.substr(0, 7) == "http://" ? RegExp.$1 : "http://www.clipfish.de" + RegExp.$1));
 
 	metadata.title	     = (devxml.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/) ? RegExp.$1 : null);
-	metadata.description = (html.match(/<span itemprop="description">[\s\n\r]*((?:.|\n|\r)*?)[\s\n\r]*<div class="cf-clearer">.*?<\/div>[\s\n\r]*<\/span>/) ? RegExp.$1 : null);
+	metadata.description = (html.match(/<span .*?itemprop="description">[\s\n\r]*((?:.|\n|\r)*?)[\s\n\r]*(?:<div class="cf-clearer">.*?<\/div>)?[\s\n\r]*<\/span>/) ? RegExp.$1 : null);
 
 	metadata.date	     = (html.match(/(?:Upload:|Jahr:)\s*<span.*?>(.*?)<\/span>/) ? RegExp.$1 : null);
 	metadata.thumbnail   = (devxml.match(/<imageurl>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/imageurl>/) ? RegExp.$1 : null);
 
-	metadata.uploader    = (html.match(/von:\s*<\/span>\s*<a .*?>(.*?)<\/a>/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/<a .*?class="cf-video-info-nickname.*?".*?><span .*?>(.*?)<\/span><\/a>/) ? RegExp.$1 : null);
 
 	return metadata;
       }
