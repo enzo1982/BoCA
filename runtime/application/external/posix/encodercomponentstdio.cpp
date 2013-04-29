@@ -13,6 +13,7 @@
 
 #include <smooth/io/drivers/driver_ansi.h>
 
+#include <signal.h>
 #include <sys/wait.h>
 
 #define WAVE_FORMAT_PCM	0x0001

@@ -12,6 +12,7 @@
 #include <boca/common/config.h>
 #include <boca/common/utilities.h>
 
+#include <signal.h>
 #include <sys/wait.h>
 
 #define WAVE_FORMAT_PCM	       0x0001
