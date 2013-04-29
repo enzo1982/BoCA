@@ -1,5 +1,7 @@
 ########## BoCA directory makefile ##########
 
+include $(BOCA_PATH)/Makefile-options
+
 ifeq ($(BUILD_X64),True)
 	BINDIR = bin64
 	LIBDIR = lib64

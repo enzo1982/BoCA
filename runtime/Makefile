@@ -97,20 +97,19 @@ endif
 
 install: uninstall
 ifneq ($(BUILD_WIN32),True)
-	cp $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(PREFIX)/lib/boca
-	ln -s $(PREFIX)/lib/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/lib/libboca-$(VERSION)$(SHARED)
+	mkdir -p $(PREFIX)/$(LIB)/boca
+	cp $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/boca
+	ln -s $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libboca-$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_OSX),True)
-	ln -s $(PREFIX)/lib/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/lib/libboca-$(VERSION).0$(SHARED)
+	ln -s $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libboca-$(VERSION).0$(SHARED)
 else
-	ln -s $(PREFIX)/lib/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/lib/libboca-$(VERSION)$(SHARED).0
+	ln -s $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libboca-$(VERSION)$(SHARED).0
 endif
 
 ifeq ($(BUILD_LINUX),True)
 	ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
-	ldconfig
-else ifeq ($(BUILD_OPENBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
 	ldconfig
@@ -122,19 +121,17 @@ endif
 uninstall:
 ifneq ($(BUILD_WIN32),True)
 ifeq ($(BUILD_OSX),True)
-	rm -f $(PREFIX)/lib/libboca-$(VERSION).0$(SHARED)
+	rm -f $(PREFIX)/$(LIB)/libboca-$(VERSION).0$(SHARED)
 else
-	rm -f $(PREFIX)/lib/libboca-$(VERSION)$(SHARED).0
+	rm -f $(PREFIX)/$(LIB)/libboca-$(VERSION)$(SHARED).0
 endif
 
-	rm -f $(PREFIX)/lib/libboca-$(VERSION)$(SHARED)
-	rm -f $(PREFIX)/lib/boca/boca.$(VERSION)$(SHARED)
+	rm -f $(PREFIX)/$(LIB)/libboca-$(VERSION)$(SHARED)
+	rm -f $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_LINUX),True)
 	ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
-	ldconfig
-else ifeq ($(BUILD_OPENBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
 	ldconfig

@@ -23,9 +23,9 @@ ALLCMD1   =
 ALLCMD2   =
 CLEANCMD1 =
 CLEANCMD2 =
-INSTCMD1  = cp -r boca.extension.donate $(PREFIX)/lib/boca
-INSTCMD2  = chmod -R a=rX,u=rwX $(PREFIX)/lib/boca/boca.extension.donate
-UINSTCMD1 = rm -f -r $(PREFIX)/lib/boca/boca.extension.donate
+INSTCMD1  = cp -r boca.extension.donate $(PREFIX)/$(LIB)/boca
+INSTCMD2  = chmod -R a=rX,u=rwX $(PREFIX)/$(LIB)/boca/boca.extension.donate
+UINSTCMD1 = rm -f -r $(PREFIX)/$(LIB)/boca/boca.extension.donate
 UINSTCMD2 =
 
 ## Do not change anything below this line. ##

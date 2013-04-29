@@ -28,9 +28,9 @@ ALLCMD1   =
 ALLCMD2   =
 CLEANCMD1 =
 CLEANCMD2 =
-INSTCMD1  = cp -r boca.extension.youtube $(PREFIX)/lib/boca
-INSTCMD2  = chmod -R a=rX,u=rwX $(PREFIX)/lib/boca/boca.extension.youtube
-UINSTCMD1 = rm -f -r $(PREFIX)/lib/boca/boca.extension.youtube
+INSTCMD1  = cp -r boca.extension.youtube $(PREFIX)/$(LIB)/boca
+INSTCMD2  = chmod -R a=rX,u=rwX $(PREFIX)/$(LIB)/boca/boca.extension.youtube
+UINSTCMD1 = rm -f -r $(PREFIX)/$(LIB)/boca/boca.extension.youtube
 UINSTCMD2 =
 
 ## Do not change anything below this line. ##

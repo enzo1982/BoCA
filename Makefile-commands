@@ -71,15 +71,16 @@ clean:
 
 install: uninstall
 ifneq ($(BUILD_WIN32),True)
-	cp $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) $(PREFIX)/lib/boca
-	chmod a=r,u=rw $(PREFIX)/lib/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
+	mkdir -p $(PREFIX)/$(LIB)/boca
+	cp $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/boca
+	chmod a=r,u=rw $(PREFIX)/$(LIB)/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
 endif
 	$(INSTCMD1)
 	$(INSTCMD2)
 
 uninstall:
 ifneq ($(BUILD_WIN32),True)
-	rm -f $(PREFIX)/lib/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
+	rm -f $(PREFIX)/$(LIB)/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
 endif
 	$(UINSTCMD1)
 	$(UINSTCMD2)
