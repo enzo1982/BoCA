@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -45,7 +45,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 	/* Start 3rd party command line decoder
 	 */
-	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
+	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
 							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""))
 							      .Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
@@ -202,7 +202,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 
 	/* Start 3rd party command line decoder
 	 */
-	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
+	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
 							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""))
 							      .Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));

@@ -42,7 +42,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 	 */
 	const Info	&info = track.GetInfo();
 
-	String	 command   = String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter());
+	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
 							      .Replace("%OUTFILE", String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
 												      .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
