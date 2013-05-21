@@ -112,6 +112,8 @@ endif
 
 ifeq ($(BUILD_LINUX),True)
 	ldconfig
+else ifeq ($(BUILD_GNU),True)
+	ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
@@ -133,6 +135,8 @@ endif
 	rm -f $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_LINUX),True)
+	ldconfig
+else ifeq ($(BUILD_GNU),True)
 	ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
 	ldconfig
