@@ -10,7 +10,7 @@ AR	= ar
 ifeq ($(BUILD_SOLARIS),True)
 	CCOPTS += -fPIC
 else ifeq ($(BUILD_LINUX),True)
-	ifeq ($(BUILD_X64),True)
+	ifeq ($(BUILD_X86_64),True)
 		CCOPTS += -fPIC
 	endif
 endif

@@ -11,7 +11,10 @@ ifneq ($(EXCEPTION),True)
 	CCOPTS += -fno-exceptions
 endif
 
-ifeq ($(BUILD_X64),True)
+ifeq ($(BUILD_OSX),True)
+	CCOPTS += -arch x86_64 -arch i386
+	LDOPTS += -arch x86_64 -arch i386
+else ifeq ($(BUILD_X86_64),True)
 	CCOPTS += -m64
 	LDOPTS += -m64
 else
@@ -40,7 +43,7 @@ else
 	else ifeq ($(BUILD_OSX),True)
 		LDOPTS += -Wl,-rpath,.
 	else ifeq ($(BUILD_LINUX),True)
-		ifeq ($(BUILD_X64),True)
+		ifeq ($(BUILD_X86_64),True)
 			CCOPTS += -fPIC
 		endif
 	else ifeq ($(BUILD_NETBSD),True)

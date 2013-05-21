@@ -37,7 +37,10 @@ CCOPTS	  = -g0 -Wall -Os -fno-exceptions -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=
 LD	  = gcc
 LDOPTS	  = -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ -s $(LIBS)
 
-ifeq ($(BUILD_X64),True)
+ifeq ($(BUILD_OSX),True)
+	CCOPTS += -arch x86_64 -arch i386
+	LDOPTS += -arch x86_64 -arch i386
+else ifeq ($(BUILD_X86_64),True)
 	CCOPTS += -m64
 	LDOPTS += -m64
 else
@@ -65,7 +68,7 @@ else
 	ifeq ($(BUILD_SOLARIS),True)
 		CCOPTS += -fPIC
 	else ifeq ($(BUILD_LINUX),True)
-		ifeq ($(BUILD_X64),True)
+		ifeq ($(BUILD_X86_64),True)
 			CCOPTS += -fPIC
 		endif
 	endif
