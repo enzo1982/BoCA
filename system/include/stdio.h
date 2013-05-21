@@ -550,6 +550,7 @@ int vsnprintf (char *__stream, size_t __n, const char *__format, __builtin_va_li
   _CRTIMP int __cdecl _vsnprintf_l(char * __restrict__ buffer,size_t count,const char * __restrict__ format,_locale_t locale,va_list argptr) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
   int __cdecl _sprintf_l(char * __restrict__ buffer,const char * __restrict__ format,_locale_t locale,...) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
 
+#if !__USE_MINGW_ANSI_STDIO
   __mingw_ovr
   __attribute__((__format__ (gnu_printf, 3, 4))) __MINGW_ATTRIB_NONNULL(3)
   int snprintf (char *__stream, size_t __n, const char *__format, ...)
@@ -567,6 +568,7 @@ int vsnprintf (char *__stream, size_t __n, const char *__format, __builtin_va_li
   {
     return __mingw_vsnprintf( __stream, __n, __format, __local_argv );
   }
+#endif
 
   _CRTIMP int __cdecl _vscprintf(const char * __restrict__ _Format,va_list _ArgList);
   _CRTIMP int __cdecl _set_printf_count_output(int _Value);
