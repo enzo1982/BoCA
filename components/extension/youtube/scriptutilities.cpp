@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -28,8 +28,12 @@ v8::Handle<v8::Value> BoCA::DownloadURL(const v8::Arguments &args)
 {
 	String	 url = (char *) *v8::String::AsciiValue(args[0]);
 
-	if (url.StartsWith("http://"))
+	if (url.StartsWith("http://") || url.StartsWith("https://"))
 	{
+		/* HTTPS is not supported yet, so try using HTTP.
+		 */
+		url.Replace("https://", "http://");
+
 		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(url);
 		Buffer<UnsignedByte>	 buffer;
 

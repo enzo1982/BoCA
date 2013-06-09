@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -270,7 +270,7 @@ Void BoCA::LayerYouTube::FreeVideoSites()
  */
 VideoSite *BoCA::LayerYouTube::GetVideoSiteForURL(const String &URL)
 {
-	if (!URL.StartsWith("http://") || URL.Length() < 11) return NIL;
+	if (!(URL.StartsWith("http://") || URL.StartsWith("https://")) || URL.Length() < 11) return NIL;
 
 	VideoSite	*videoSite = NIL;
 
@@ -482,9 +482,10 @@ Void BoCA::LayerYouTube::OnTimerCheckClipboard()
  */
 Void BoCA::LayerYouTube::OnEditDownloadURL()
 {
-	if (edit_url->GetText().StartsWith("http://") &&
-	    edit_url->GetText().Length() >= 11)	button_add_url->Activate();
-	else					button_add_url->Deactivate();
+	if ((edit_url->GetText().StartsWith("http://") ||
+	     edit_url->GetText().StartsWith("https://")) &&
+	     edit_url->GetText().Length() >= 11) button_add_url->Activate();
+	else					 button_add_url->Deactivate();
 }
 
 /* Called when the download button is pressed.

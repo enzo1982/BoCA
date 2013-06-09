@@ -6,8 +6,8 @@
   <script type="text/javascript">
     <![CDATA[
       function canHandleURL(URL) {
-	if (URL.toLowerCase().match(/http:\/\/www.youtube.com\/watch\?v=.*/)) return true;
-	else								      return false;
+	if (URL.toLowerCase().match(/https?:\/\/www.youtube.com\/watch\?v=.*/)) return true;
+	else									return false;
       }
 
       function getVideoURL(html) {

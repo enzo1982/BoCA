@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -65,10 +65,14 @@ Int BoCA::Video::DownloaderThread(String targetFileName)
 	Bool		 error = False;
 	String		 cacheURL = videoSite->GetVideoURL(videoPageHTML);
 
-	if (!cacheURL.StartsWith("http://") || cacheURL.Length() < 11) error = True;
+	if (!(cacheURL.StartsWith("http://") || cacheURL.StartsWith("https://")) || cacheURL.Length() < 11) error = True;
 
 	if (!error)
 	{
+		/* HTTPS is not supported yet, so try using HTTP.
+		 */
+		cacheURL.Replace("https://", "http://");
+
 		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(cacheURL);
 
 		protocol->downloadProgress.Connect(&downloadProgress);
@@ -137,6 +141,10 @@ Bool BoCA::Video::DownloadPage()
 
 	if (pageDownloaded) { downloadMutex.Release(); return True; }
 
+	/* HTTPS is not supported yet, so try using HTTP.
+	 */
+	videoURL.Replace("https://", "http://");
+
 	Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(videoURL);
 	Buffer<UnsignedByte>	 buffer;
 
@@ -188,8 +196,12 @@ Bool BoCA::Video::QueryMetadata()
 
 	/* Download video thumbnail.
 	 */
-	if (videoThumbnailURL.StartsWith("http://"))
+	if (videoThumbnailURL.StartsWith("http://") || videoThumbnailURL.StartsWith("https://"))
 	{
+		/* HTTPS is not supported yet, so try using HTTP.
+		 */
+		videoThumbnailURL.Replace("https://", "http://");
+
 		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(videoThumbnailURL);
 		Buffer<UnsignedByte>	 buffer;
 
