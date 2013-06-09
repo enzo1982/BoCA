@@ -15,7 +15,7 @@
    and the __mingwthr_key_dtor() function from the MinGW
    CRT in its private gthr-win32.h header. */
 #define __MINGW32_MAJOR_VERSION 3
-#define __MINGW32_MINOR_VERSION 11
+#define __MINGW32_MINOR_VERSION 15
 
 #ifdef _WIN64
 /* MS does not prefix symbols by underscores for 64-bit.  */
