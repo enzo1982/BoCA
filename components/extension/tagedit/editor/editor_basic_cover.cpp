@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,7 +14,7 @@ using namespace smooth::GUI::Dialogs;
 
 BoCA::CoverDisplay::CoverDisplay(const Bitmap &cover)
 {
-	Rect	 monitor = S::System::MultiMonitor::GetActiveMonitorWorkArea();
+	Rect	 monitor = S::System::Screen::GetActiveScreenWorkArea();
 	Size	 size = cover.GetSize();
 
 	if (size.cx > monitor.right  - monitor.left - 40) { size.cy = size.cy * (monitor.right  - monitor.left - 40) / size.cx; size.cx = monitor.right  - monitor.left - 40; }

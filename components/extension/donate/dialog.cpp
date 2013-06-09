@@ -81,7 +81,7 @@ BoCA::DonateDialog::DonateDialog()
 	if (Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac")).Exists()) mainWnd->SetIcon(ImageLoader::Load("../share/freac/icons/freac.png"));
 #endif
 
-	Rect	 workArea = MultiMonitor::GetActiveMonitorWorkArea();
+	Rect	 workArea = Screen::GetActiveScreenWorkArea();
 
 	Size	 wndSize  = Size(Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21, text_donate->GetUnscaledTextHeight() + text_donate_other->GetUnscaledTextHeight() + 236);
 	Point	 wndPos	  = workArea.GetPosition() + Point((workArea.GetSize().cx - wndSize.cx) / 2, (workArea.GetSize().cy - wndSize.cy) / 2);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,14 +8,15 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_MULTIMONITOR
-#define H_OBJSMOOTH_MULTIMONITOR
+#ifndef H_OBJSMOOTH_SCREEN
+#define H_OBJSMOOTH_SCREEN
 
 namespace smooth
 {
 	namespace System
 	{
-		class MultiMonitor;
+		class Screen;
+		class ScreenBackend;
 	};
 };
 
@@ -26,17 +27,19 @@ namespace smooth
 {
 	namespace System
 	{
-		class SMOOTHAPI MultiMonitor
+		class SMOOTHAPI Screen
 		{
 			private:
-							 MultiMonitor();
-							 MultiMonitor(const MultiMonitor &);
+				static ScreenBackend	*backend;
+
+							 Screen();
+							 Screen(const Screen &);
 			public:
 				static Int		 Initialize();
 				static Int		 Free();
 
-				static GUI::Rect	 GetActiveMonitorMetrics();
-				static GUI::Rect	 GetActiveMonitorWorkArea();
+				static GUI::Rect	 GetActiveScreenMetrics();
+				static GUI::Rect	 GetActiveScreenWorkArea();
 
 				static GUI::Rect	 GetVirtualScreenMetrics();
 		};

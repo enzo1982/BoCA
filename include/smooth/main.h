@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,10 +33,18 @@ using namespace smooth;
 #if defined __WIN32__
 int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLine, int iCmdShow)
 {
-	Int	 retValue = -1;
+	Int		 retValue = -1;
 
 	hInstance     = shInstance;
 	hPrevInstance = shPrevInstance;
+
+	ArgumentsParser	 args(NIL, szCmdLine);
+
+	GUI::Application::SetCommand(args.GetCommand());
+	GUI::Application::SetArguments(args.GetArguments());
+
+	GUI::Application::GetStartupDirectory();
+	GUI::Application::GetApplicationDirectory();
 
 	if (Init())
 	{
@@ -50,14 +58,6 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLi
 			}
 		}
 
-		ArgumentsParser	 args(NIL, szCmdLine);
-
-		GUI::Application::SetCommand(args.GetCommand());
-		GUI::Application::SetArguments(args.GetArguments());
-
-		GUI::Application::GetStartupDirectory();
-		GUI::Application::GetApplicationDirectory();
-
 		retValue = Main();
 
 		Free();
@@ -68,7 +68,18 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLi
 #else
 int main(int argc, char **argv)
 {
-	Int	 retValue = -1;
+	Int		 retValue = -1;
+	String		 cmdLine;
+
+	for (Int i = 1; i < argc; i++) cmdLine.Append(String(i > 1 ? " " : "").Append(argv[i]));
+
+	ArgumentsParser	 args(argv[0], cmdLine);
+
+	GUI::Application::SetCommand(args.GetCommand());
+	GUI::Application::SetArguments(args.GetArguments());
+
+	GUI::Application::GetStartupDirectory();
+	GUI::Application::GetApplicationDirectory();
 
 	if (Init())
 	{
@@ -78,18 +89,6 @@ int main(int argc, char **argv)
 
 			return -1;
 		}
-
-		String		 cmdLine;
-
-		for (Int i = 1; i < argc; i++) cmdLine.Append(String(i > 1 ? " " : "").Append(argv[i]));
-
-		ArgumentsParser	 args(argv[0], cmdLine);
-
-		GUI::Application::SetCommand(args.GetCommand());
-		GUI::Application::SetArguments(args.GetArguments());
-
-		GUI::Application::GetStartupDirectory();
-		GUI::Application::GetApplicationDirectory();
 
 		retValue = Main();
 
