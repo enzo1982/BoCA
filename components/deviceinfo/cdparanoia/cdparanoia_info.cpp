@@ -197,9 +197,9 @@ const Array<String> &BoCA::CDParanoiaInfo::GetNthDeviceTrackList(Int n)
 		 */
 		if (mcdi.GetNthEntryType(i) == ENTRY_AUDIO && mcdi.GetNthEntryOffset(i + 1) - mcdi.GetNthEntryOffset(i) > 0)
 		{
-			/* Add CD track to joblist using a cdda:// URI
+			/* Add CD track to joblist using a device:// URI
 			 */
-			trackList.Add(String("cdda://")
+			trackList.Add(String("device://cdda:")
 				     .Append(String::FromInt(n))
 				     .Append("/")
 				     .Append(String::FromInt(mcdi.GetNthEntryTrackNumber(i))));

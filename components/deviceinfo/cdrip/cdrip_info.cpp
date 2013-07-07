@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -70,9 +70,10 @@ Void smooth::AttachDLL(Void *instance)
 			error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
 		}
 
-		if	(error == CDEX_ACCESSDENIED)	BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
+		if	(error == CDEX_ACCESSDENIED)			BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
 		else if (error != CDEX_OK &&
-			 error != CDEX_NOCDROMDEVICES)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
+			 error != CDEX_NOCDROMDEVICES &&
+			 error != CDEX_NATIVEEASPISUPPORTEDNOTSELECTED)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
 
 		/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
 		 */
@@ -153,9 +154,9 @@ const Array<String> &BoCA::CDRipInfo::GetNthDeviceTrackList(Int n)
 		 */
 		if (mcdi.GetNthEntryType(i) == ENTRY_AUDIO && mcdi.GetNthEntryOffset(i + 1) - mcdi.GetNthEntryOffset(i) > 0)
 		{
-			/* Add CD track to joblist using a cdda:// URI
+			/* Add CD track to joblist using a device:// URI
 			 */
-			trackList.Add(String("cdda://")
+			trackList.Add(String("device://cdda:")
 				     .Append(String::FromInt(n))
 				     .Append("/")
 				     .Append(String::FromInt(mcdi.GetNthEntryTrackNumber(i))));

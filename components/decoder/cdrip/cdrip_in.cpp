@@ -77,9 +77,10 @@ Void smooth::AttachDLL(Void *instance)
 			error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
 		}
 
-		if	(error == CDEX_ACCESSDENIED)	BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
+		if	(error == CDEX_ACCESSDENIED)			BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
 		else if (error != CDEX_OK &&
-			 error != CDEX_NOCDROMDEVICES)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
+			 error != CDEX_NOCDROMDEVICES &&
+			 error != CDEX_NATIVEEASPISUPPORTEDNOTSELECTED)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
 
 		/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
 		 */
@@ -110,7 +111,7 @@ Bool BoCA::CDRipIn::CanOpenStream(const String &streamURI)
 {
 	String	 lcURI = streamURI.ToLower();
 
-	return lcURI.StartsWith("cdda://") ||
+	return lcURI.StartsWith("device://cdda:") ||
 	       lcURI.EndsWith(".cda");
 }
 
@@ -127,10 +128,10 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Format	 format;
 
-	format.channels		= 2;
-	format.rate		= 44100;
-	format.bits		= 16;
-	format.order		= BYTE_INTEL;
+	format.channels	= 2;
+	format.rate	= 44100;
+	format.bits	= 16;
+	format.order	= BYTE_INTEL;
 
 	track.SetFormat(format);
 
@@ -138,10 +139,10 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 	Int	 trackLength = 0;
 	Int	 audiodrive = 0;
 
-	if (streamURI.StartsWith("cdda://"))
+	if (streamURI.StartsWith("device://cdda:"))
 	{
-		audiodrive = streamURI.SubString(7, 1).ToInt();
-		trackNumber = streamURI.SubString(9, streamURI.Length() - 9).ToInt();
+		audiodrive = streamURI.SubString(14, 1).ToInt();
+		trackNumber = streamURI.SubString(16, streamURI.Length() - 16).ToInt();
 	}
 	else if (streamURI.EndsWith(".cda"))
 	{
@@ -439,9 +440,11 @@ Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
 
 		/* Open ripper.
 		 */
-		LONG	 lDataBufferSize = dataBufferSize;
+		LONG	 lDataBufferSize = 0;
 
 		ex_CR_OpenRipper(&lDataBufferSize, startSector, endSector);
+
+		dataBufferSize = lDataBufferSize;
 
 		ripperOpen = True;
 	}

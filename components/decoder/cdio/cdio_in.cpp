@@ -140,7 +140,7 @@ Bool BoCA::CDIOIn::CanOpenStream(const String &streamURI)
 {
 	String	 lcURI = streamURI.ToLower();
 
-	return lcURI.StartsWith("cdda://") ||
+	return lcURI.StartsWith("device://cdda:") ||
 	       lcURI.EndsWith(".cda");
 }
 
@@ -155,10 +155,10 @@ Error BoCA::CDIOIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	Format	 format;
 
-	format.channels		= 2;
-	format.rate		= 44100;
-	format.bits		= 16;
-	format.order		= BYTE_INTEL;
+	format.channels	= 2;
+	format.rate	= 44100;
+	format.bits	= 16;
+	format.order	= BYTE_INTEL;
 
 	track.SetFormat(format);
 
@@ -166,10 +166,10 @@ Error BoCA::CDIOIn::GetStreamInfo(const String &streamURI, Track &track)
 	Int	 trackLength = 0;
 	Int	 audiodrive = 0;
 
-	if (streamURI.StartsWith("cdda://"))
+	if (streamURI.StartsWith("device://cdda:"))
 	{
-		audiodrive = streamURI.SubString(7, 1).ToInt();
-		trackNumber = streamURI.SubString(9, streamURI.Length() - 9).ToInt();
+		audiodrive = streamURI.SubString(14, 1).ToInt();
+		trackNumber = streamURI.SubString(16, streamURI.Length() - 16).ToInt();
 	}
 	else if (streamURI.EndsWith(".cda"))
 	{
