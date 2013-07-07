@@ -57,19 +57,19 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Read WAVE header into buffer.
 	 */
-	Buffer<UnsignedByte>	 buffer(68);
+	Buffer<UnsignedByte>	 buffer(76);
 	Int			 bytesReadTotal = 0;
 	Int			 bytesRead = 0;
 
 	do
 	{
-		bytesRead = fread(buffer + bytesReadTotal, 1, 68 - bytesReadTotal, rPipe);
+		bytesRead = fread(buffer + bytesReadTotal, 1, 76 - bytesReadTotal, rPipe);
 
-		if (bytesRead != 68 - bytesReadTotal && (ferror(rPipe) || bytesRead == 0)) break;
+		if (bytesRead != 76 - bytesReadTotal && (ferror(rPipe) || bytesRead == 0)) break;
 
 		bytesReadTotal += bytesRead;
 	}
-	while (bytesReadTotal < 68);
+	while (bytesReadTotal < 76);
 
 	if (bytesReadTotal >= 44)
 	{
@@ -218,19 +218,32 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 	 */
 	Buffer<UnsignedByte>	 buffer(8);
 	Int32			 bytesRead = 0;
-	Int32			 fmtSize = 0;
+	Int32			 chunkSize = 0;
 
-	bytesRead = fread(buffer, 1,	   8, rPipe); // RIFF chunk
-	bytesRead = fread(buffer, 1,	   4, rPipe); // WAVE ID
-	bytesRead = fread(buffer, 1,	   4, rPipe); //  fmt FOURCC
-	bytesRead = fread(buffer, 1,	   4, rPipe); //  fmt chunk size
+	bytesRead = fread(buffer, 1,	     8, rPipe); // RIFF chunk
+	bytesRead = fread(buffer, 1,	     4, rPipe); // WAVE ID
+	bytesRead = fread(buffer, 1,	     4, rPipe); //  fmt FOURCC
+	bytesRead = fread(buffer, 1,	     4, rPipe); //  fmt chunk size
 
-	fmtSize = buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24;
+	chunkSize = buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24;
 
-	buffer.Resize(Math::Max(8, fmtSize));
+	buffer.Resize(Math::Max(8, chunkSize));
 
-	bytesRead = fread(buffer, 1, fmtSize, rPipe); // rest of  fmt chunk
-	bytesRead = fread(buffer, 1,	   8, rPipe); // data header
+	bytesRead = fread(buffer, 1, chunkSize, rPipe); // rest of  fmt chunk
+
+	do
+	{
+		bytesRead = fread(buffer, 1,	     8, rPipe); // chunk header
+
+		if (buffer[0] == 'd' && buffer[1] == 'a' && buffer[2] == 't' && buffer[3] == 'a') break;
+
+		chunkSize = buffer[4] | buffer[5] << 8 | buffer[6] << 16 | buffer[7] << 24;
+
+		buffer.Resize(Math::Max(8, chunkSize));
+
+		bytesRead = fread(buffer, 1, chunkSize, rPipe); // rest of chunk
+	}
+	while (True);
 
 	return True;
 }

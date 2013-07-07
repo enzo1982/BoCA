@@ -89,17 +89,17 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Read WAVE header into buffer.
 	 */
-	Buffer<UnsignedByte>	 buffer(68);
+	Buffer<UnsignedByte>	 buffer(76);
 	Int			 bytesReadTotal = 0;
 	DWORD			 bytesRead = 0;
 
 	do
 	{
-		if (!ReadFile(rPipe, buffer + bytesReadTotal, 68 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
+		if (!ReadFile(rPipe, buffer + bytesReadTotal, 76 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
 
 		bytesReadTotal += bytesRead;
 	}
-	while (bytesReadTotal < 68);
+	while (bytesReadTotal < 76);
 
 	if (bytesReadTotal >= 44)
 	{
@@ -298,19 +298,32 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 	 */
 	Buffer<UnsignedByte>	 buffer(8);
 	DWORD			 bytesRead = 0;
-	DWORD			 fmtSize = 0;
+	DWORD			 chunkSize = 0;
 
-	ReadFile(rPipe, buffer,	      8, &bytesRead, NIL); // RIFF chunk
-	ReadFile(rPipe, buffer,	      4, &bytesRead, NIL); // WAVE ID
-	ReadFile(rPipe, buffer,	      4, &bytesRead, NIL); //  fmt FOURCC
-	ReadFile(rPipe, buffer,       4, &bytesRead, NIL); //  fmt chunk size
+	ReadFile(rPipe, buffer,		8, &bytesRead, NIL); // RIFF chunk
+	ReadFile(rPipe, buffer,		4, &bytesRead, NIL); // WAVE ID
+	ReadFile(rPipe, buffer,		4, &bytesRead, NIL); //  fmt FOURCC
+	ReadFile(rPipe, buffer,		4, &bytesRead, NIL); //  fmt chunk size
 
-	fmtSize = buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24;
+	chunkSize = buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24;
 
-	buffer.Resize(Math::Max(8, fmtSize));
+	buffer.Resize(Math::Max(8, chunkSize));
 
-	ReadFile(rPipe, buffer, fmtSize, &bytesRead, NIL); // rest of  fmt chunk
-	ReadFile(rPipe, buffer,	      8, &bytesRead, NIL); // data header
+	ReadFile(rPipe, buffer, chunkSize, &bytesRead, NIL); // rest of  fmt chunk
+
+	do
+	{
+		ReadFile(rPipe, buffer,		8, &bytesRead, NIL); // chunk header
+
+		if (buffer[0] == 'd' && buffer[1] == 'a' && buffer[2] == 't' && buffer[3] == 'a') break;
+
+		chunkSize = buffer[4] | buffer[5] << 8 | buffer[6] << 16 | buffer[7] << 24;
+
+		buffer.Resize(Math::Max(8, chunkSize));
+
+		ReadFile(rPipe, buffer, chunkSize, &bytesRead, NIL); // rest of chunk
+	}
+	while (True);
 
 	return True;
 }
