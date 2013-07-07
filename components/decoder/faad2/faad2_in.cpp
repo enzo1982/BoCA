@@ -419,8 +419,6 @@ Bool BoCA::FAAD2In::Seek(Int64 samplePosition)
 
 Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	if (size <= 0) return -1;
-
 	inBytes += size;
 
 	Void	*samples = NIL;
@@ -452,10 +450,14 @@ Int BoCA::FAAD2In::ReadData(Buffer<UnsignedByte> &data, Int size)
 				samplesRead += frameInfo.samples;
 			}
 		}
-		while (samples != NIL && samplesRead < (track.length * track.GetFormat().channels * (2 * Float(size) / track.fileSize)));
+		while (samples != NIL && samplesRead < (packageSize / 2));
+
+		if (samples == NIL) return -1;
 	}
 	else
 	{
+		if (size <= 0) return -1;
+
 		dataBuffer.Resize(size + backBuffer.Size());
 
 		size = driver->ReadData((unsigned char *) dataBuffer + backBuffer.Size(), size);
