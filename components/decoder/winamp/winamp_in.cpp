@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -525,7 +525,6 @@ int BoCA::Out_Open(int samplerate, int numchannels, int bitspersamp, int bufferl
 
 	Format	 format = filter->infoTrack->GetFormat();
 
-	format.order	= BYTE_INTEL;
 	format.channels	= numchannels;
 	format.rate	= samplerate;
 	format.bits	= bitspersamp;

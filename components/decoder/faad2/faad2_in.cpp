@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -175,7 +175,6 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 
 			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
 
-			format.order	= BYTE_INTEL;
 			format.bits	= 16;
 
 			ex_MP4Free(esc_buffer);
@@ -210,7 +209,6 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
-		format.order	= BYTE_INTEL;
 		format.bits	= 16;
 
 		track.fileSize	= f_in->Size();

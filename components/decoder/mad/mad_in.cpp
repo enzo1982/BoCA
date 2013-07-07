@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -426,7 +426,6 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, ma
 	Format	 format = filter->infoTrack->GetFormat();
 
 	format.bits	= config->GetIntValue("MAD", "Enable24Bit", False) ? 24 : 16;
-	format.order	= BYTE_INTEL;
 	format.channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
 	format.rate	= header->samplerate;
 

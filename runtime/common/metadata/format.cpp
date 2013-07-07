@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -15,7 +15,7 @@ BoCA::Format::Format()
 	channels	= 0;
 	rate		= 0;
 	bits		= 0;
-	order		= BYTE_INTEL;
+	order		= BYTE_NATIVE;
 }
 
 BoCA::Format::~Format()

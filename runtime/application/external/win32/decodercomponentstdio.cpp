@@ -142,7 +142,6 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 				in->RelSeek(6);
 
-				format.order	= BYTE_INTEL;
 				format.bits	= (unsigned short) in->InputNumber(2);
 
 				track.SetFormat(format);

@@ -160,7 +160,6 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 		Format	 format = track.GetFormat();
 
 		track.fileSize	= File(streamURI).GetFileSize();
-		format.order	= BYTE_INTEL;
 
 		format.channels	= sinfo.channels;
 		format.rate	= sinfo.samplerate;

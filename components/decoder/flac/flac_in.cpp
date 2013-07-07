@@ -423,7 +423,6 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 		Format	 format = filter->infoTrack->GetFormat();
 
 		format.bits	= metadata->data.stream_info.bits_per_sample;
-		format.order	= BYTE_INTEL;
 		format.channels	= metadata->data.stream_info.channels;
 		format.rate	= metadata->data.stream_info.sample_rate;
 
