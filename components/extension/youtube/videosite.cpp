@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,15 +32,16 @@ Bool BoCA::VideoSite::CanHandleURL(const String &URL)
 {
 	/* Lock the V8 engine to our thread.
 	 */
-	v8::Locker		 locker;
+	v8::Locker		 locker(isolate);
+	v8::Isolate::Scope	 isolateScope(isolate);
 
 	/* Use our own handle scope for this.
 	 */
-	v8::HandleScope		 handleScope;
+	v8::HandleScope		 handleScope(isolate);
 
 	/* Enter the created context for calling the function.
 	 */
-	v8::Context::Scope	 scope(context);
+	v8::Context::Scope	 contextScope(isolate, context);
 
 	/* Get function handle.
 	 */
@@ -63,15 +64,16 @@ String BoCA::VideoSite::GetVideoURL(const String &html)
 {
 	/* Lock the V8 engine to our thread.
 	 */
-	v8::Locker		 locker;
+	v8::Locker		 locker(isolate);
+	v8::Isolate::Scope	 isolateScope(isolate);
 
 	/* Use our own handle scope for this.
 	 */
-	v8::HandleScope		 handleScope;
+	v8::HandleScope		 handleScope(isolate);
 
 	/* Enter the created context for calling the function.
 	 */
-	v8::Context::Scope	 scope(context);
+	v8::Context::Scope	 contextScope(isolate, context);
 
 	/* Get function handle.
 	 */
@@ -98,15 +100,16 @@ Metadata BoCA::VideoSite::QueryMetadata(const String &html)
 
 	/* Lock the V8 engine to our thread.
 	 */
-	v8::Locker		 locker;
+	v8::Locker		 locker(isolate);
+	v8::Isolate::Scope	 isolateScope(isolate);
 
 	/* Use our own handle scope for this.
 	 */
-	v8::HandleScope		 handleScope;
+	v8::HandleScope		 handleScope(isolate);
 
 	/* Enter the created context for calling the function.
 	 */
-	v8::Context::Scope	 scope(context);
+	v8::Context::Scope	 contextScope(isolate, context);
 
 	/* Get function handle.
 	 */
@@ -154,6 +157,18 @@ Bool BoCA::VideoSite::CreateScriptContext()
 	v8::SetResourceConstraints(&rc);
 #endif
 
+	/* Create a new isolate.
+	 */
+	isolate = v8::Isolate::New();
+
+	/* Enter the created isolate.
+	 */
+	v8::Isolate::Scope	 isolateScope(isolate);
+
+	/* Use our own handle scope for this.
+	 */
+	v8::HandleScope		 handleScope(isolate);
+
 	/* Create a template for the global object.
 	 */
 	v8::Handle<v8::ObjectTemplate>	 global = v8::ObjectTemplate::New();
@@ -182,13 +197,13 @@ Bool BoCA::VideoSite::CreateScriptContext()
 
 	/* Create a new context.
 	 */
-	context = v8::Context::New(NIL, global);
+	context = v8::Persistent<v8::Context>(isolate, v8::Context::New(isolate, NIL, global));
 
 	if (context.IsEmpty()) return False;
 
 	/* Enter the created context for compiling and running the script. 
 	 */
-	v8::Context::Scope	 scope(context);
+	v8::Context::Scope	 contextScope(isolate, context);
 
 	/* Create a string containing the JavaScript source code.
 	 */
@@ -197,17 +212,28 @@ Bool BoCA::VideoSite::CreateScriptContext()
 
 	/* Compile and run the source code.
 	 */
-	compiled = v8::Script::Compile(source, file);
-	compiled->Run();
+	v8::Script::Compile(source, file)->Run();
 
 	return True;
 }
 
 Bool BoCA::VideoSite::DestroyScriptContext()
 {
-	/* Dispose the persistent context.
+	/* Create a scope to enter the isolate and dispose the context.
 	 */
-	context.Dispose();
+	{
+		/* Enter the isolate.
+		 */
+		v8::Isolate::Scope	 isolateScope(isolate);
+
+		/* Dispose the persistent context.
+		 */
+		context.Dispose();
+	}
+
+	/* Dispose the isolate.
+	 */
+	isolate->Dispose();
 
 	return True;
 }

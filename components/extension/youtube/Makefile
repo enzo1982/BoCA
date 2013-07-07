@@ -14,7 +14,7 @@ include $(BOCA_PATH)/Makefile-options
 OBJECTS	  = config.o converter.o layer.o scriptutilities.o video.o videolist.o videolistentry.o videosite.o youtube.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -DV8_USE_UNSAFE_HANDLES
 
 # Enter additional library dependencies here:
 ifeq ($(BUILD_WIN32),True)
