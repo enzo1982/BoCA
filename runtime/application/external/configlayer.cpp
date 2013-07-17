@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -103,7 +103,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 
 					GroupBox	*group = new GroupBox(param->GetName(), Point(6, 100), Size(250, 50));
 					Slider		*range = new Slider(Point(10, 11), Size(210, 0), OR_HORZ, NIL, min, max);
-					Text		*value = new Text(String::FromFloat(max * param->GetStepSize()).Append(param->GetStepSize() < 1 ? ".0" : ""), Point(230, 13));
+					Text		*value = new Text(String::FromFloat(max * param->GetStepSize()).Append(param->GetStepSize() < 1 ? ".0" : NIL), Point(230, 13));
 
 					range->SetWidth(222 - value->GetUnscaledTextWidth());
 
@@ -303,7 +303,7 @@ Void BoCA::AS::ConfigLayerExternal::OnSliderValueChange()
 					Slider		*range = (Slider *) group->GetNthObject(0);
 					Text		*value = (Text *) group->GetNthObject(1);
 
-					value->SetText(String::FromFloat(range->GetValue() * param->GetStepSize()).Append(param->GetStepSize() < 1 && range->GetValue() % 10 == 0 ? ".0" : ""));
+					value->SetText(String::FromFloat(range->GetValue() * param->GetStepSize()).Append(param->GetStepSize() < 1 && range->GetValue() % 10 == 0 ? ".0" : NIL));
 					value->SetPosition(Point(240 - value->GetUnscaledTextWidth(), 13));
 				}
 

@@ -59,7 +59,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 												      .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
 												      .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
 
-	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "r");
+	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? NIL : " 2> /dev/null"), "r");
 
 	/* Wait until the encoder exits
 	 */
@@ -193,7 +193,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 												      .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
 												      .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
 
-	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "r");
+	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? NIL : " 2> /dev/null"), "r");
 
 	/* Wait until the encoder exits
 	 */

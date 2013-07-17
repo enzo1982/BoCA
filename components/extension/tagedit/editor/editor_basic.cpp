@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -486,11 +486,11 @@ Void BoCA::LayerTagBasic::OnSelectTrack(const Track &nTrack)
 
 	if (info.year	   > 0) edit_year->SetText(String::FromInt(info.year));
 
-	if (info.track	   > 0) edit_track->SetText(String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track)));
-	if (info.numTracks > 0) edit_ntracks->SetText(String(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks)));
+	if (info.track	   > 0) edit_track->SetText(String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)));
+	if (info.numTracks > 0) edit_ntracks->SetText(String(info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)));
 
-	if (info.disc	   > 0) edit_disc->SetText(String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc)));
-	if (info.numDiscs  > 0) edit_ndiscs->SetText(String(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs)));
+	if (info.disc	   > 0) edit_disc->SetText(String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)));
+	if (info.numDiscs  > 0) edit_ndiscs->SetText(String(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)));
 
 	LoadCoverImages();
 
@@ -538,10 +538,10 @@ Void BoCA::LayerTagBasic::OnSelectAlbum(const Track &nTrack)
 
 	if (info.year	   > 0) edit_year->SetText(String::FromInt(info.year));
 
-	if (info.numTracks > 0) edit_ntracks->SetText(String(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks)));
+	if (info.numTracks > 0) edit_ntracks->SetText(String(info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)));
 
-	if (info.disc	   > 0) edit_disc->SetText(String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc)));
-	if (info.numDiscs  > 0) edit_ndiscs->SetText(String(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs)));
+	if (info.disc	   > 0) edit_disc->SetText(String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)));
+	if (info.numDiscs  > 0) edit_ndiscs->SetText(String(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)));
 
 	LoadCoverImages();
 

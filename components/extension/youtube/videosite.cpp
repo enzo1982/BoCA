@@ -287,18 +287,18 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 
 	/* Bold
 	 */
-	result.Replace("<b>", "");
-	result.Replace("</b>", "");
+	result.Replace("<b>", NIL);
+	result.Replace("</b>", NIL);
 
 	/* Italic
 	 */
-	result.Replace("<i>", "");
-	result.Replace("</i>", "");
+	result.Replace("<i>", NIL);
+	result.Replace("</i>", NIL);
 
 	/* Emphasis
 	 */
-	result.Replace("<em>", "");
-	result.Replace("</em>", "");
+	result.Replace("<em>", NIL);
+	result.Replace("</em>", NIL);
 
 	/* Ampersand
 	 */

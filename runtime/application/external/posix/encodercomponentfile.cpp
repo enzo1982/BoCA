@@ -96,7 +96,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 							      .Replace("%YEAR", String("\"").Append(String::FromInt(info.year)).Append("\""))
 							      .Replace("%GENRE", String("\"").Append((char *) info.genre).Append("\""));
 
-	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "r");
+	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? NIL : " 2> /dev/null"), "r");
 
 	/* Wait until the encoder exits
 	 */

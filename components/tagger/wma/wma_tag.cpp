@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -109,9 +109,9 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 
 		if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
 		{
-			String	 discString = String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc));
+			String	 discString = String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
 
-			if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs));
+			if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs));
 
 			RenderWMAStringItem(g_wszWMPartOfSet, discString, pHeaderInfo);
 		}

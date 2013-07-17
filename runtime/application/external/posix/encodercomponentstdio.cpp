@@ -55,7 +55,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 							      .Replace("%YEAR", String("\"").Append(String::FromInt(info.year)).Append("\""))
 							      .Replace("%GENRE", String("\"").Append((char *) info.genre).Append("\""));
 
-	wPipe = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? "" : " 2> /dev/null"), "w");
+	wPipe = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? NIL : " 2> /dev/null"), "w");
 
 	driver_stdin = new DriverANSI(wPipe);
 	out = new OutStream(STREAM_DRIVER, driver_stdin);

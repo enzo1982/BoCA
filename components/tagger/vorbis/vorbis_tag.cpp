@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -66,11 +66,11 @@ Error BoCA::VorbisTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &t
 	if	(info.label  != NIL) { RenderTagItem("ORGANIZATION", info.label, buffer);	  numItems++; }
 	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);		  numItems++; }
 
-	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track)), buffer);	    numItems++; }
-	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL", String(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks)), buffer); numItems++; }
+	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);	    numItems++; }
+	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL", String(info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
 
-	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc)), buffer);	    numItems++; }
-	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL", String(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
+	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)), buffer);	    numItems++; }
+	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL", String(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderTagItem("COMMENT", info.comment, buffer);						  numItems++; }
 	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderTagItem("COMMENT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }

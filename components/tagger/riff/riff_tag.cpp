@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -64,7 +64,7 @@ Error BoCA::RIFFTag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &tra
 	if	(info.title  != NIL) RenderTagItem("INAM", info.title, buffer);
 	if	(info.album  != NIL) RenderTagItem("IPRD", info.album, buffer);
 	if	(info.genre  != NIL) RenderTagItem("IGNR", info.genre, buffer);
-	if	(info.track   >   0) RenderTagItem("ITRK", String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track)), buffer);
+	if	(info.track   >   0) RenderTagItem("ITRK", String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);
 	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year).Append("-01-01"), buffer);
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderTagItem("ICMT", info.comment, buffer);

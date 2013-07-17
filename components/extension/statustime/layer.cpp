@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -104,10 +104,10 @@ const String &BoCA::LayerLengthStatus::GetTotalLengthString(const Array<Track> &
 		}
 	}
 
-	string = String(unknown ? "> " : "").Append(approx ? "~ " : "")
-		.Append(seconds >= 3600 ? String(seconds / 3600	     < 10 ? "0" : "").Append(String::FromInt(seconds / 3600	)).Append(":") : "")
-					 .Append(seconds % 3600 / 60 < 10 ? "0" : "").Append(String::FromInt(seconds % 3600 / 60)).Append(":")
-					 .Append(seconds % 3600 % 60 < 10 ? "0" : "").Append(String::FromInt(seconds % 3600 % 60));
+	string = String(unknown ? "> " : NIL).Append(approx ? "~ " : NIL)
+		.Append(seconds >= 3600 ? String(seconds / 3600	     < 10 ? "0" : NIL).Append(String::FromInt(seconds / 3600	 )).Append(":") : NIL)
+					 .Append(seconds % 3600 / 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 3600 / 60)).Append(":")
+					 .Append(seconds % 3600 % 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 3600 % 60));
 
 	wchar_t	 sign[2] = { 0x2248, 0 };
 

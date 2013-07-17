@@ -450,7 +450,7 @@ In_Module *BoCA::WinampIn::GetPluginForFile(const String &file) const
 
 						m++;
 						o = m + 1;
-						extension = "";
+						extension = NIL;
 					}
 				}
 

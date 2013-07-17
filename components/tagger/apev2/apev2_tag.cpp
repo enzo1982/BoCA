@@ -73,18 +73,18 @@ Error BoCA::APETag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &trac
 
 	if (info.track > 0)
 	{
-		String	 trackString = String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track));
+		String	 trackString = String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track));
 
-		if (info.numTracks > 0) trackString.Append("/").Append(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks));
+		if (info.numTracks > 0) trackString.Append("/").Append(info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks));
 
 		{ RenderAPEItem("Track", trackString, buffer); numItems++; }
 	}
 
 	if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
 	{
-		String	 discString = String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc));
+		String	 discString = String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
 
-		if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs));
+		if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs));
 
 		{ RenderAPEItem("Disc", discString, buffer); numItems++; }
 	}
