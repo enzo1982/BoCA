@@ -520,7 +520,7 @@ OPUS_EXPORT void opus_decoder_destroy(OpusDecoder *st);
   * @param [in] len <tt>opus_int32</tt>: size of data
   * @param [out] out_toc <tt>char*</tt>: TOC pointer
   * @param [out] frames <tt>char*[48]</tt> encapsulated frames
-  * @param [out] size <tt>short[48]</tt> sizes of the encapsulated frames
+  * @param [out] size <tt>opus_int16[48]</tt> sizes of the encapsulated frames
   * @param [out] payload_offset <tt>int*</tt>: returns the position of the payload within the packet (in bytes)
   * @returns number of frames
   */
@@ -529,7 +529,7 @@ OPUS_EXPORT int opus_packet_parse(
    opus_int32 len,
    unsigned char *out_toc,
    const unsigned char *frames[48],
-   short size[48],
+   opus_int16 size[48],
    int *payload_offset
 ) OPUS_ARG_NONNULL(1) OPUS_ARG_NONNULL(4);
 
@@ -592,6 +592,20 @@ OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_packet_get_nb_samples(const unsigne
   * @retval OPUS_INVALID_PACKET The compressed data passed is corrupted or of an unsupported type
   */
 OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_decoder_get_nb_samples(const OpusDecoder *dec, const unsigned char packet[], opus_int32 len) OPUS_ARG_NONNULL(1) OPUS_ARG_NONNULL(2);
+
+/** Applies soft-clipping to bring a float signal within the [-1,1] range. If
+  * the signal is already in that range, nothing is done. If there are values
+  * outside of [-1,1], then the signal is clipped as smoothly as possible to
+  * both fit in the range and avoid creating excessive distortion in the
+  * process.
+  * @param [in,out] pcm <tt>float*</tt>: Input PCM and modified PCM
+  * @param [in] frame_size <tt>int</tt> Number of samples per channel to process
+  * @param [in] channels <tt>int</tt>: Number of channels
+  * @param [in,out] softclip_mem <tt>float*</tt>: State memory for the soft clipping process (one float per channel, initialized to zero)
+  */
+OPUS_EXPORT void opus_pcm_soft_clip(float *pcm, int frame_size, int channels, float *softclip_mem);
+
+
 /**@}*/
 
 /** @defgroup opus_repacketizer Repacketizer
