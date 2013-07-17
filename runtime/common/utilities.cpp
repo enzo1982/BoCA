@@ -43,6 +43,8 @@ String BoCA::Utilities::GetBoCADirectory()
 	Directory	 bocaDirectory(GUI::Application::GetApplicationDirectory().Append("boca"));
 
 #ifndef __WIN32__
+	if (!bocaDirectory.Exists()) bocaDirectory = GUI::Application::GetApplicationDirectory().Append("../lib/boca");
+
 	if (!bocaDirectory.Exists()) bocaDirectory = String(BOCA_INSTALL_PREFIX).Append("/lib/boca");
 #endif
 
