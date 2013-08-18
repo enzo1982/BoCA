@@ -117,7 +117,7 @@ Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
 	else			  file = fopen(streamURI, "rb");
 #else
-	file = fopen(streamURI.ConvertTo("UTF-8"), "r+b");
+	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
 
 	if (file != NIL)
@@ -146,7 +146,7 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
 	else			  file = fopen(streamURI, "rb");
 #else
-	file = fopen(streamURI.ConvertTo("UTF-8"), "r+b");
+	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
 
 	SF_INFO	 sinfo;
@@ -298,7 +298,7 @@ Bool BoCA::SndFileIn::Activate()
 	if (Setup::enableUnicode) file = _wfopen(track.origFilename, L"rb");
 	else			  file = fopen(track.origFilename, "rb");
 #else
-	file = fopen(track.origFilename.ConvertTo("UTF-8"), "r+b");
+	file = fopen(track.origFilename.ConvertTo("UTF-8"), "rb");
 #endif
 
 	SF_INFO	 sinfo;
