@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -70,7 +70,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	foreach (Converter *converter, converters)
 	{
-		AS::FileFormat	*format = converter->GetFormat();
+		const AS::FileFormat	*format = converter->GetFormat();
 
 		combo_format->AddEntry(String(format->GetName()).Append(" (*.").Append(format->GetExtensions().GetFirst()).Append(")"));
 	}

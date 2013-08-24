@@ -75,12 +75,10 @@ Error BoCA::WMATag::RenderStreamInfo(const String &fileName, const Track &track)
 {
 	Config			*currentConfig = Config::Get();
 
-	HRESULT			 hr = S_OK;
-
 	IWMMetadataEditor	*metadataEditor = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
 
-	hr = ex_WMCreateEditor(&metadataEditor);
+	HRESULT	 hr = ex_WMCreateEditor(&metadataEditor);
 
 	hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
 
@@ -232,12 +230,10 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 {
 	Config			*currentConfig = Config::Get();
 
-	HRESULT			 hr = S_OK;
-
 	IWMMetadataEditor	*metadataEditor = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
 
-	hr = ex_WMCreateEditor(&metadataEditor);
+	HRESULT	 hr = ex_WMCreateEditor(&metadataEditor);
 
 	hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
 
@@ -409,12 +405,10 @@ Error BoCA::WMATag::ParseStreamInfo(const String &fileName, Track &track)
 
 Error BoCA::WMATag::UpdateStreamInfo(const String &fileName, const Track &track)
 {
-	HRESULT			 hr = S_OK;
-
 	IWMMetadataEditor	*metadataEditor = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
 
-	hr = ex_WMCreateEditor(&metadataEditor);
+	HRESULT	 hr = ex_WMCreateEditor(&metadataEditor);
 
 	hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
 

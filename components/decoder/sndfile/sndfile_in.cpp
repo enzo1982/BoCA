@@ -284,8 +284,8 @@ BoCA::SndFileIn::SndFileIn()
 {
 	packageSize = 0;
 
-	file = 0;
-	sndf = NIL;
+	file	    = 0;
+	sndf	    = NIL;
 }
 
 BoCA::SndFileIn::~SndFileIn()

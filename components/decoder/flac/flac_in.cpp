@@ -158,17 +158,17 @@ Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	ioDriver->Seek(f_in->GetPos());
 
-	track.fileSize = f_in->Size();
+	track.fileSize	   = f_in->Size();
 
-	infoTrack = &track;
-	stop = False;
+	infoTrack	   = &track;
+	stop		   = False;
 
-	driver = ioDriver;
+	driver		   = ioDriver;
 
-	readDataMutex = new Mutex();
+	readDataMutex	   = new Mutex();
 	samplesBufferMutex = new Mutex();
 
-	decoderThread = NonBlocking1<Bool>(&FLACIn::ReadFLAC, this).Call(False);
+	decoderThread	   = NonBlocking1<Bool>(&FLACIn::ReadFLAC, this).Call(False);
 	decoderThread->Wait();
 
 	delete readDataMutex;
@@ -182,7 +182,13 @@ Error BoCA::FLACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::FLACIn::FLACIn()
 {
-	packageSize = 0;
+	packageSize	   = 0;
+
+	readDataMutex	   = NIL;
+	samplesBufferMutex = NIL;
+
+	infoTrack	   = NIL;
+	decoderThread	   = NIL;
 }
 
 BoCA::FLACIn::~FLACIn()
@@ -199,18 +205,18 @@ Bool BoCA::FLACIn::Activate()
 
 	delete f_in;
 
-	stop = False;
+	stop		   = False;
 
-	seekPosition = 0;
+	seekPosition	   = 0;
 
-	readDataMutex = new Mutex();
+	readDataMutex	   = new Mutex();
 	samplesBufferMutex = new Mutex();
 
 	readDataMutex->Lock();
 
-	infoTrack = new Track();
+	infoTrack	   = new Track();
 
-	decoderThread = NIL;
+	decoderThread	   = NIL;
 
 	return True;
 }
@@ -275,7 +281,7 @@ Int BoCA::FLACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 Int BoCA::FLACIn::ReadFLAC(Bool readData)
 {
-	decoder = ex_FLAC__stream_decoder_new();
+	FLAC__StreamDecoder	*decoder = ex_FLAC__stream_decoder_new();
 
 	if (!readData)
 	{

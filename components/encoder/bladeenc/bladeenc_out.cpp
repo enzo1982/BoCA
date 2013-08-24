@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -54,9 +54,11 @@ Void smooth::DetachDLL()
 	FreeBladeDLL();
 }
 
-BoCA::BladeOut::BladeOut()
+BoCA::BladeOut::BladeOut() : beConfig()
 {
 	configLayer = NIL;
+
+	handle	    = NIL;
 }
 
 BoCA::BladeOut::~BladeOut()

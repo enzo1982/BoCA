@@ -81,6 +81,9 @@ Void smooth::DetachDLL()
 BoCA::FAACOut::FAACOut()
 {
 	configLayer = NIL;
+
+	handle	    = NIL;
+	fConfig	    = NIL;
 }
 
 BoCA::FAACOut::~FAACOut()

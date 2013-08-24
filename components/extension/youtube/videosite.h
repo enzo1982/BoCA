@@ -38,6 +38,8 @@ namespace BoCA
 	class VideoSite
 	{
 		private:
+			static String			 ReplaceInnerHTML(const String &);
+
 			String				 name;
 			String				 version;
 
@@ -52,8 +54,6 @@ namespace BoCA
 			Bool				 DestroyScriptContext();
 
 			Int				 ParseXML(const String &);
-
-			String				 ReplaceInnerHTML(const String &);
 		public:
 							 VideoSite(const String &);
 							~VideoSite();
@@ -66,10 +66,10 @@ namespace BoCA
 
 			Metadata			 QueryMetadata(const String &);
 		accessors:
-			const String			&GetName()	{ return name; }
-			const String			&GetVersion()	{ return version; }
+			const String			&GetName() const	{ return name; }
+			const String			&GetVersion() const	{ return version; }
 
-			const String			&GetDecoderID()	{ return decoder; }
+			const String			&GetDecoderID() const	{ return decoder; }
 	};
 };
 

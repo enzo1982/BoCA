@@ -117,9 +117,9 @@ Error BoCA::MACIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::MACIn::MACIn()
 {
-	hAPEDecompress = NIL;
+	packageSize    = 0;
 
-	packageSize = 0;
+	hAPEDecompress = NIL;
 }
 
 BoCA::MACIn::~MACIn()

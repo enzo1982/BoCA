@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -30,9 +30,7 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	 */
 	CoInitialize(NIL);
 
-	HRESULT	 hr = S_OK;
-
-	hr = ex_WMCreateProfileManager(&profileManager);
+	HRESULT	 hr = ex_WMCreateProfileManager(&profileManager);
 
 	I18n	*i18n = I18n::Get();
 
@@ -202,10 +200,8 @@ Void BoCA::ConfigureWMAEnc::FillCodecComboBox()
 {
 	combo_codec->RemoveAllEntries();
 
-	HRESULT		 hr = S_OK;
 	IWMCodecInfo3	*codecInfo = NIL;
-
-	hr = profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &codecInfo);
+	HRESULT		 hr	   = profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &codecInfo);
 
 	if (hr == S_OK)
 	{
@@ -255,10 +251,8 @@ Void BoCA::ConfigureWMAEnc::FillFormatComboBox()
 
 	combo_format->RemoveAllEntries();
 
-	HRESULT			 hr = S_OK;
 	IWMCodecInfo3		*codecInfo = NIL;
-
-	hr = profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &codecInfo);
+	HRESULT			 hr	   = profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &codecInfo);
 
 	if (hr == S_OK)
 	{
@@ -320,10 +314,8 @@ Void BoCA::ConfigureWMAEnc::OnToggleCodec()
 
 Void BoCA::ConfigureWMAEnc::OnSelectCodec()
 {
-	HRESULT			 hr = S_OK;
-	IWMCodecInfo3		*codecInfo = NIL;
-
-	hr = profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &codecInfo);
+	IWMCodecInfo3	*codecInfo = NIL;
+	HRESULT		 hr	   = profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &codecInfo);
 
 	if (hr == S_OK)
 	{

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -50,12 +50,12 @@ namespace BoCA
 
 			Int				 Run(const String &, const String &);
 		accessors:
-			const String			&GetName()	{ return name; }
-			const String			&GetVersion()	{ return version; }
+			const String			&GetName() const	{ return name; }
+			const String			&GetVersion() const	{ return version; }
 
-			const String			&GetDecoderID()	{ return decoder; }
+			const String			&GetDecoderID() const	{ return decoder; }
 
-			AS::FileFormat			*GetFormat()	{ return format; }
+			const AS::FileFormat		*GetFormat() const	{ return format; }
 	};
 };
 

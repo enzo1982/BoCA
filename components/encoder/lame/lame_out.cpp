@@ -55,6 +55,8 @@ Void smooth::DetachDLL()
 BoCA::LAMEOut::LAMEOut()
 {
 	configLayer = NIL;
+
+	context	    = NIL;
 }
 
 BoCA::LAMEOut::~LAMEOut()

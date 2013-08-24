@@ -268,9 +268,13 @@ Error BoCA::CDIOIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::CDIOIn::CDIOIn()
 {
-	configLayer	= NIL;
+	configLayer = NIL;
 
-	packageSize	= 0;
+	packageSize = 0;
+
+	cd	    = NIL;
+	drive	    = NIL;
+	paranoia    = NIL;
 }
 
 BoCA::CDIOIn::~CDIOIn()

@@ -71,15 +71,13 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	delete f_in;
 
-	HRESULT	 hr = NIL;
-
 	readerCallback = new WMAReader();
 
 	m_hAsyncEvent = readerCallback->GetAsyncEventHandle();
 
-	hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
+	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
 
-	hr = m_pReader->Open(streamURI, readerCallback, NIL);
+	if (!FAILED(hr)) hr = m_pReader->Open(streamURI, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.
@@ -93,44 +91,46 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		/* Find out the output count
 		 */
-		hr = m_pReader->GetOutputCount(&cOutputs);
+		m_pReader->GetOutputCount(&cOutputs);
 
 		/* Find the first audio output.
 		 */
 		for (DWORD i = 0; i < cOutputs; i++)
 		{
 			IWMOutputMediaProps	*pProps = NIL;
-			WM_MEDIA_TYPE		*pMediaType = NIL;
-			ULONG			 cbType = 0;
 
 			/* Set the first output format as it is
 			 * the one with the highest quality.
 			 */
-			hr = m_pReader->GetOutputFormat(i, 0, &pProps);
-			hr = m_pReader->SetOutputProps(i, pProps);
-
-			/* Find out the space needed for pMediaType
-			 */
-			hr = pProps->GetMediaType(NIL, &cbType);
-
-			pMediaType = (WM_MEDIA_TYPE *) new BYTE[cbType];
-
-			/* Get the value for MediaType
-			 */
-			hr = pProps->GetMediaType(pMediaType, &cbType);
-
-			if (pMediaType->majortype == WMMEDIATYPE_Audio)
+			if (!FAILED(m_pReader->GetOutputFormat(i, 0, &pProps)))
 			{
-				/* Store the wave format for this output
-				 */
-				pWfx = (WAVEFORMATEX *) new BYTE[pMediaType->cbFormat];
+				if (!FAILED(m_pReader->SetOutputProps(i, pProps)))
+				{
+					/* Find out the space needed for pMediaType
+					 */
+					ULONG	 cbType = 0;
 
-				CopyMemory(pWfx, pMediaType->pbFormat, pMediaType->cbFormat);
+					if (!FAILED(pProps->GetMediaType(NIL, &cbType)))
+					{
+						WM_MEDIA_TYPE	*pMediaType = (WM_MEDIA_TYPE *) new BYTE[cbType];
+
+						/* Get the value for MediaType
+						 */
+						if (!FAILED(pProps->GetMediaType(pMediaType, &cbType)) && pMediaType->majortype == WMMEDIATYPE_Audio)
+						{
+							/* Store the wave format for this output
+							 */
+							pWfx = (WAVEFORMATEX *) new BYTE[pMediaType->cbFormat];
+
+							CopyMemory(pWfx, pMediaType->pbFormat, pMediaType->cbFormat);
+						}
+
+						delete [] pMediaType;
+					}
+				}
+
+				pProps->Release();
 			}
-
-			pProps->Release();
-
-			delete [] pMediaType;
 
 			if (pWfx != NIL) break;
 		}
@@ -160,7 +160,7 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 
 		/* Get attribute "Duration"
 		 */
-		hr = GetHeaderAttribute(pHeaderInfo, g_wszWMDuration, &pbValue);
+		if (!FAILED(hr)) hr = GetHeaderAttribute(pHeaderInfo, g_wszWMDuration, &pbValue);
 
 		if (!FAILED(hr) && pbValue != NIL)
 		{
@@ -222,11 +222,9 @@ BoCA::WMAIn::~WMAIn()
 
 Bool BoCA::WMAIn::Activate()
 {
-	HRESULT	 hr = NIL;
+	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
 
-	hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
-
-	hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced, (void **) &m_pReaderAdvanced);
+	if (!FAILED(hr)) hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced, (void **) &m_pReaderAdvanced);
 
 	readerCallback = new WMAReader();
 	readerCallback->SetReaderAdvanced(m_pReaderAdvanced);
@@ -241,52 +239,54 @@ Bool BoCA::WMAIn::Activate()
 	 */
 	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
 
-	hr = m_pReaderAdvanced->SetUserProvidedClock(true);
+	m_pReaderAdvanced->SetUserProvidedClock(true);
 
 	DWORD	 cOutputs = 0;
 
 	/* Find out the output count
 	 */
-	hr = m_pReader->GetOutputCount(&cOutputs);
+	m_pReader->GetOutputCount(&cOutputs);
 
 	/* Find the first audio output.
 	 */
 	for (DWORD i = 0; i < cOutputs; i++)
 	{
 		IWMOutputMediaProps	*pProps = NIL;
-		WM_MEDIA_TYPE		*pMediaType = NIL;
-		ULONG			 cbType = 0;
 
 		/* Set the first output format as it is
 		 * the one with the highest quality.
 		 */
-		hr = m_pReader->GetOutputFormat(i, 0, &pProps);
-		hr = m_pReader->SetOutputProps(i, pProps);
-
-		/* Find out the space needed for pMediaType
-		 */
-		hr = pProps->GetMediaType(NIL, &cbType);
-
-		pMediaType = (WM_MEDIA_TYPE *) new BYTE[cbType];
-
-		/* Get the value for MediaType
-		 */
-		hr = pProps->GetMediaType(pMediaType, &cbType);
-
-		if (pMediaType->majortype == WMMEDIATYPE_Audio)
+		if (!FAILED(m_pReader->GetOutputFormat(i, 0, &pProps)))
 		{
-			readerCallback->SetAudioOutputNum(i);
+			if (!FAILED(m_pReader->SetOutputProps(i, pProps)))
+			{
+				/* Find out the space needed for pMediaType
+				 */
+				ULONG	 cbType = 0;
 
-			hr = m_pReader->Start(0, 0, 1.0, NIL);
+				if (!FAILED(pProps->GetMediaType(NIL, &cbType)))
+				{
+					WM_MEDIA_TYPE	*pMediaType = (WM_MEDIA_TYPE *) new BYTE[cbType];
 
-			/* Wait for the Start call to complete.
-			 */
-			if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+					/* Get the value for MediaType
+					 */
+					if (!FAILED(pProps->GetMediaType(pMediaType, &cbType)) && pMediaType->majortype == WMMEDIATYPE_Audio)
+					{
+						readerCallback->SetAudioOutputNum(i);
+
+						hr = m_pReader->Start(0, 0, 1.0, NIL);
+
+						/* Wait for the Start call to complete.
+						 */
+						if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+					}
+
+					delete [] pMediaType;
+				}
+			}
+
+			pProps->Release();
 		}
-
-		pProps->Release();
-
-		delete [] pMediaType;
 	}
 
 	return True;
@@ -296,9 +296,7 @@ Bool BoCA::WMAIn::Deactivate()
 {
 	readerCallback->SetActive(False);
 
-	HRESULT	 hr = NIL;
-
-	hr = m_pReader->Stop();
+	HRESULT	 hr = m_pReader->Stop();
 
 	/* Wait for the reader to stop.
 	 */
@@ -345,7 +343,6 @@ Int BoCA::WMAIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 HRESULT BoCA::WMAIn::GetHeaderAttribute(IWMHeaderInfo *pHeaderInfo, LPCWSTR pwszName, BYTE **ppbValue)
 {
-	HRESULT			 hr = S_OK;
 	WMT_ATTR_DATATYPE	 wmtType;
 	WORD			 wStreamNum = 0;
 	WORD			 cbLength = 0;
@@ -354,7 +351,7 @@ HRESULT BoCA::WMAIn::GetHeaderAttribute(IWMHeaderInfo *pHeaderInfo, LPCWSTR pwsz
 
 	/* Get the number of bytes to be allocated for pbValue
 	 */
-	hr = pHeaderInfo->GetAttributeByName(&wStreamNum, pwszName, &wmtType, NIL, &cbLength);
+	HRESULT	 hr = pHeaderInfo->GetAttributeByName(&wStreamNum, pwszName, &wmtType, NIL, &cbLength);
 
 	/* No such an attribute, so return
 	 */
@@ -366,7 +363,7 @@ HRESULT BoCA::WMAIn::GetHeaderAttribute(IWMHeaderInfo *pHeaderInfo, LPCWSTR pwsz
 	 */
 	*ppbValue = new BYTE[cbLength];
 
-	hr = pHeaderInfo->GetAttributeByName(&wStreamNum, pwszName, &wmtType, *ppbValue, &cbLength);
+	pHeaderInfo->GetAttributeByName(&wStreamNum, pwszName, &wmtType, *ppbValue, &cbLength);
 
 	return S_OK;
 }

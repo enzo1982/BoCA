@@ -29,6 +29,31 @@ const String &BoCA::WaveOutOut::GetComponentSpecs()
 
 BoCA::WaveOutOut::WaveOutOut()
 {
+	hWaveOut      = NIL;
+	hEvent	      = NIL;
+
+	write_ptr     = 0;
+	p_time	      = 0;
+
+	paused	      = 0;
+	needplay      = 0;
+	stop	      = 0;
+	newpause      = 0;
+
+	buffer	      = NIL;
+
+	buf_size      = 0;
+	buf_size_used = 0;
+
+	maxblock      = 0;
+	minblock      = 0;
+	avgblock      = 0;
+	
+	n_playing     = 0;
+	data_written  = 0;
+	last_time     = 0;
+
+	thread	      = NIL;
 }
 
 BoCA::WaveOutOut::~WaveOutOut()

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -59,12 +59,12 @@ namespace BoCA
 			Int		 AddConfiguration(const String &);
 			Int		 RemoveConfiguration(const String &);
 
-			Int		 GetNOfConfigurations();
-			String		 GetNthConfigurationName(Int);
+			Int		 GetNOfConfigurations() const;
+			String		 GetNthConfigurationName(Int) const;
 
 			Int		 SetActiveConfiguration(const String &);
 
-			String		 GetConfigurationName();
+			String		 GetConfigurationName() const;
 			Int		 SetConfigurationName(const String &);
 
 			Void		 SetSaveSettingsOnExit(Bool);

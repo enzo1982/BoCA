@@ -302,6 +302,9 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 BoCA::FAAD2In::FAAD2In()
 {
 	packageSize = 0;
+
+	handle	    = NIL;
+	fConfig	    = NIL;
 }
 
 BoCA::FAAD2In::~FAAD2In()

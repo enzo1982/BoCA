@@ -247,9 +247,12 @@ Error BoCA::CDParanoiaIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::CDParanoiaIn::CDParanoiaIn()
 {
-	configLayer	= NIL;
+	configLayer = NIL;
 
-	packageSize	= 0;
+	packageSize = 0;
+
+	drive	    = NIL;
+	paranoia    = NIL;
 }
 
 BoCA::CDParanoiaIn::~CDParanoiaIn()

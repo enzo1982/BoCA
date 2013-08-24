@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -62,12 +62,12 @@ BoCA::ConfigLayer *BoCA::AS::Component::GetConfigurationLayer()
 	return (ConfigLayer *) specs->func_GetConfigurationLayer(component);
 }
 
-Bool BoCA::AS::Component::GetErrorState()
+Bool BoCA::AS::Component::GetErrorState() const
 {
 	return specs->func_GetErrorState(component);
 }
 
-const String &BoCA::AS::Component::GetErrorString()
+const String &BoCA::AS::Component::GetErrorString() const
 {
 	return *((const String *) specs->func_GetErrorString(component));
 }

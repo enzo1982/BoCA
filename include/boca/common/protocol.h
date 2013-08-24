@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -56,11 +56,11 @@ namespace BoCA
 			 */
 			static Void				 Free();
 		accessors:
-			const String				&GetName()		{ return name; }
-			String					 GetProtocolText();
+			const String				&GetName() const	{ return name; }
+			String					 GetProtocolText() const;
 
-			Array<String>				&GetWarnings()		{ return warnings; }
-			Array<String>				&GetErrors()		{ return errors; }
+			const Array<String>			&GetWarnings() const	{ return warnings; }
+			const Array<String>			&GetErrors() const	{ return errors; }
 		signals:
 			static Signal0<Void>			 onUpdateProtocolList;
 			static Signal1<Void, const String &>	 onUpdateProtocol;

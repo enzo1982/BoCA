@@ -88,6 +88,9 @@ namespace BoCA
 BoCA::OpusOut::OpusOut()
 {
 	configLayer = NIL;
+
+	encoder	    = NIL;
+	resampler   = NIL;
 }
 
 BoCA::OpusOut::~OpusOut()

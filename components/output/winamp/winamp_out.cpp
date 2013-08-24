@@ -50,6 +50,8 @@ Void smooth::DetachDLL()
 BoCA::WinampOut::WinampOut()
 {
 	configLayer = NIL;
+
+	plugin	    = NIL;
 }
 
 BoCA::WinampOut::~WinampOut()

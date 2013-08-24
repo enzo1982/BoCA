@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -78,9 +78,8 @@ Bool BoCA::WMAOut::Activate()
 {
 	Config	*config = Config::Get();
 
-	HRESULT	 hr = S_OK;
+	HRESULT	 hr = ex_WMCreateWriter(NIL, &m_pWriter);
 
-	hr = ex_WMCreateWriter(NIL, &m_pWriter);
 	hr = m_pWriter->QueryInterface(IID_IWMWriterAdvanced, (void **) &m_pWriterAdvanced);
 
 	hr = ex_WMCreateWriterFileSink(&m_pWriterFileSink);
@@ -168,9 +167,7 @@ Bool BoCA::WMAOut::Deactivate()
 
 	Config	*config = Config::Get();
 
-	HRESULT	 hr = S_OK;
-
-	hr = m_pWriter->EndWriting();
+	HRESULT	 hr = m_pWriter->EndWriting();
 
 	hr = m_pWriterAdvanced->RemoveSink(m_pWriterFileSink);
 
@@ -235,18 +232,14 @@ Bool BoCA::WMAOut::Deactivate()
 
 Int BoCA::WMAOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	HRESULT		 hr = S_OK;
 	INSSBuffer	*pSample = NIL;
-
-	hr = m_pWriter->AllocateSample(size, &pSample);
+	HRESULT		 hr	 = m_pWriter->AllocateSample(size, &pSample);
 
 	if (FAILED(hr)) return -1;
 
 	BYTE	*buffer = NIL;
 
-	hr = pSample->GetBuffer(&buffer);
-
-	if (!FAILED(hr))
+	if (!FAILED(pSample->GetBuffer(&buffer)))
 	{
 		memcpy(buffer, data, size);
 
@@ -278,11 +271,10 @@ ConfigLayer *BoCA::WMAOut::GetConfigurationLayer()
  */
 Int BoCA::WMAOut::GetDefaultCodec(IWMCodecInfo3 *codecInfo)
 {
-	HRESULT	 hr = S_OK;
-	DWORD	 numCodecs = 0;
-	Int	 index = -1;
+	Int	 index	   = -1;
 
-	hr = codecInfo->GetCodecInfoCount(WMMEDIATYPE_Audio, &numCodecs);
+	DWORD	 numCodecs = 0;
+	HRESULT	 hr	   = codecInfo->GetCodecInfoCount(WMMEDIATYPE_Audio, &numCodecs);
 
 	for (DWORD i = 0; i < numCodecs; i++)
 	{
@@ -456,13 +448,7 @@ IWMStreamConfig *BoCA::WMAOut::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWO
  */
 Bool BoCA::WMAOut::SetInputFormat(IWMWriter *pWriter, const Format &format)
 {
-	HRESULT			 hr = S_OK;
-
-	IWMInputMediaProps	*pInputProps = NIL;
-
-	hr = pWriter->GetInputProps(0, &pInputProps);
-
-	WM_MEDIA_TYPE		 mediaType;
+	WM_MEDIA_TYPE	 mediaType;
 
 	mediaType.majortype		= WMMEDIATYPE_Audio;
 	mediaType.subtype		= WMMEDIASUBTYPE_PCM;
@@ -472,7 +458,7 @@ Bool BoCA::WMAOut::SetInputFormat(IWMWriter *pWriter, const Format &format)
 	mediaType.formattype		= WMFORMAT_WaveFormatEx;
 	mediaType.pUnk			= NIL;
 
-	WAVEFORMATEX		 waveFormat;
+	WAVEFORMATEX	 waveFormat;
 
 	waveFormat.wFormatTag		= WAVE_FORMAT_PCM;
 	waveFormat.nChannels		= format.channels;
@@ -485,11 +471,18 @@ Bool BoCA::WMAOut::SetInputFormat(IWMWriter *pWriter, const Format &format)
 	mediaType.cbFormat		= sizeof(waveFormat);
 	mediaType.pbFormat		= (BYTE *) &waveFormat;
 
-	hr = pInputProps->SetMediaType(&mediaType);
+	IWMInputMediaProps	*pInputProps = NIL;
 
-	hr = m_pWriter->SetInputProps(0, pInputProps);
+	if (!FAILED(pWriter->GetInputProps(0, &pInputProps)))
+	{
+		pInputProps->SetMediaType(&mediaType);
 
-	pInputProps->Release();
+		HRESULT	 hr = m_pWriter->SetInputProps(0, pInputProps);
 
-	return (hr == S_OK);
+		pInputProps->Release();
+
+		return !FAILED(hr);
+	}
+
+	return False;
 }

@@ -157,20 +157,25 @@ Error BoCA::MADIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::MADIn::MADIn()
 {
-	configLayer	 = NIL;
+	configLayer	   = NIL;
 
-	packageSize	 = 0;
+	packageSize	   = 0;
 
-	infoTrack	 = NIL;
+	readDataMutex	   = NIL;
+	samplesBufferMutex = NIL;
 
-	numFrames	 = 0;
+	decoderThread	   = NIL;
 
-	delaySamples	 = 0;
-	padSamples	 = 0;
+	infoTrack	   = NIL;
+
+	numFrames	   = 0;
+
+	delaySamples	   = 0;
+	padSamples	   = 0;
 
 	/* Initialize to decoder delay.
 	 */
-	delaySamplesLeft = 529;
+	delaySamplesLeft   = 529;
 }
 
 BoCA::MADIn::~MADIn()
@@ -337,6 +342,8 @@ Bool BoCA::MADIn::ParseVBRHeaders(InStream *in)
 
 Int BoCA::MADIn::ReadMAD(Bool readData)
 {
+	mad_decoder	 decoder;
+
 	if (readData)	ex_mad_decoder_init(&decoder, this, &MADInputCallback, NIL, NIL, &MADOutputCallback, &MADErrorCallback, NIL);
 	else		ex_mad_decoder_init(&decoder, this, &MADInputCallback, NIL, NIL, &MADHeaderCallback, &MADErrorCallback, NIL);
 

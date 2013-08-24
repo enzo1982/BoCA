@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -177,12 +177,12 @@ Bool BoCA::Config::SaveSettings()
 	return True;
 }
 
-Int BoCA::Config::GetNOfConfigurations()
+Int BoCA::Config::GetNOfConfigurations() const
 {
 	return config->GetNOfConfigurations();
 }
 
-String BoCA::Config::GetNthConfigurationName(Int n)
+String BoCA::Config::GetNthConfigurationName(Int n) const
 {
 	return String(config->GetNthConfigurationName(n)).Replace("BoCA::", NIL);
 }
@@ -223,7 +223,7 @@ Int BoCA::Config::SetActiveConfiguration(const String &nConfig)
 	return result;
 }
 
-String BoCA::Config::GetConfigurationName()
+String BoCA::Config::GetConfigurationName() const
 {
 	return String(config->GetConfigurationName()).Replace("BoCA::", NIL);
 }

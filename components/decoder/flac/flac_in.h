@@ -29,7 +29,6 @@ namespace BoCA
 		friend void				 FLACStreamDecoderErrorCallback(const FLAC__StreamDecoder *, FLAC__StreamDecoderErrorStatus, void *);
 
 		private:
-			FLAC__StreamDecoder	*decoder;
 			Bool			 stop;
 
 			Int64			 seekPosition;

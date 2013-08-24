@@ -152,6 +152,11 @@ Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 BoCA::SpeexIn::SpeexIn()
 {
 	packageSize = 0;
+
+	decoder	    = NIL;
+
+	frameSize   = 0;
+	nFrames	    = 0;
 }
 
 BoCA::SpeexIn::~SpeexIn()

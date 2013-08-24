@@ -170,9 +170,9 @@ BoCA::MPG123In::MPG123In()
 {
 	configLayer	 = NIL;
 
-	context		 = 0;
-
 	packageSize	 = 0;
+
+	context		 = 0;
 
 	numFrames	 = 0;
 

@@ -64,8 +64,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_GetConfigurationLayer	= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetConfigurationLayer"));
 
-	func_GetErrorState		= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorState"));
-	func_GetErrorString		= (const void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorString"));
+	func_GetErrorState		= (bool (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorState"));
+	func_GetErrorString		= (const void *(*)(const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorString"));
 
 	func_CanOpenStream		= (bool (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanOpenStream"));
 	func_GetStreamInfo		= (int (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStreamInfo"));
@@ -84,7 +84,7 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_SetDriver			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetDriver"));
 
-	func_GetInBytes			= (__int64 (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetInBytes"));
+	func_GetInBytes			= (__int64 (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetInBytes"));
 
 	func_CanWrite			= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanWrite"));
 

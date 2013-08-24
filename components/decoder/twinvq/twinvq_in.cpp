@@ -174,6 +174,8 @@ Error BoCA::TwinVQIn::GetStreamInfo(const String &streamURI, Track &track)
 BoCA::TwinVQIn::TwinVQIn()
 {
 	packageSize = 0;
+
+	bfp	    = NIL;
 }
 
 BoCA::TwinVQIn::~TwinVQIn()
