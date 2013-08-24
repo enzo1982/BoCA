@@ -17,23 +17,24 @@ using namespace smooth::IO;
 
 const String &BoCA::AIFFIn::GetComponentSpecs()
 {
-	static String	 componentSpecs = "			\
-								\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
-	  <component>						\
-	    <name>Apple Audio File Decoder</name>		\
-	    <version>1.0</version>				\
-	    <id>aiff-in</id>					\
-	    <type>decoder</type>				\
-	    <format>						\
-	      <name>Apple Audio Files</name>			\
-	      <extension>aif</extension>			\
-	      <extension>aiff</extension>			\
-	      <extension>aifc</extension>			\
-	      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>	\
-	    </format>						\
-	  </component>						\
-								\
+	static String	 componentSpecs = "				\
+									\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+	  <component>							\
+	    <name>Apple Audio File Decoder</name>			\
+	    <version>1.0</version>					\
+	    <id>aiff-in</id>						\
+	    <type>decoder</type>					\
+	    <format>							\
+	      <name>Apple Audio Files</name>				\
+	      <extension>aif</extension>				\
+	      <extension>aiff</extension>				\
+	      <extension>aifc</extension>				\
+	      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
+	      <tag id=\"tocplist-tag\" mode=\"other\">.TOC.plist</tag>	\
+	    </format>							\
+	  </component>							\
+									\
 	";
 
 	return componentSpecs;
@@ -200,6 +201,18 @@ Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &track)
 	}
 
 	delete f_in;
+
+	/* Read .TOC.plist if it exists.
+	 */
+	AS::Registry		&boca = AS::Registry::Get();
+	AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("tocplist-tag");
+
+	if (tagger != NIL)
+	{
+		tagger->ParseStreamInfo(streamURI, track);
+
+		boca.DeleteComponent(tagger);
+	}
 
 	if (errorState)	return Error();
 	else		return Success();

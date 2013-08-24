@@ -42,6 +42,7 @@ const String &BoCA::SndFileIn::GetComponentSpecs()
 		      <extension>aiff</extension>				\
 		      <extension>aifc</extension>				\
 		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
+		      <tag id=\"tocplist-tag\" mode=\"other\">.TOC.plist</tag>	\
 		    </format>							\
 		    <format>							\
 		      <name>Sun Audio Files</name>				\
@@ -207,6 +208,9 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 	if (!errorState)
 	{
 		AS::Registry		&boca = AS::Registry::Get();
+
+		/* Read CART tag if any.
+		 */
 		AS::TaggerComponent	*cartTagger = (AS::TaggerComponent *) boca.CreateComponentByID("cart-tag");
 
 		if (cartTagger != NIL)
@@ -216,6 +220,8 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 			boca.DeleteComponent(cartTagger);
 		}
 
+		/* Read RIFF tags if any.
+		 */
 		AS::TaggerComponent	*riffTagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
 
 		if (riffTagger != NIL)
@@ -223,6 +229,17 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 			riffTagger->ParseStreamInfo(streamURI, track);
 
 			boca.DeleteComponent(riffTagger);
+		}
+
+		/* Read .TOC.plist if it exists.
+		 */
+		AS::TaggerComponent	*tocTagger = (AS::TaggerComponent *) boca.CreateComponentByID("tocplist-tag");
+
+		if (tocTagger != NIL)
+		{
+			tocTagger->ParseStreamInfo(streamURI, track);
+
+			boca.DeleteComponent(tocTagger);
 		}
 
 		/* Read AIFF embedded ID3 tag.

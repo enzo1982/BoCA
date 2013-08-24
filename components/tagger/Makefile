@@ -12,6 +12,9 @@ all:
 	cd id3v2 && $(MAKE)
 	cd mp4 && $(MAKE)
 	cd riff && $(MAKE)
+ifeq ($(BUILD_OSX),True)
+	cd tocplist && $(MAKE)
+endif
 	cd vorbis && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
 	cd wma && $(MAKE)
@@ -25,6 +28,9 @@ clean:
 	cd id3v2 && $(MAKE) clean
 	cd mp4 && $(MAKE) clean
 	cd riff && $(MAKE) clean
+ifeq ($(BUILD_OSX),True)
+	cd tocplist && $(MAKE) clean
+endif
 	cd vorbis && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
 	cd wma && $(MAKE) clean
@@ -38,6 +44,9 @@ install:
 	cd id3v2 && $(MAKE) install
 	cd mp4 && $(MAKE) install
 	cd riff && $(MAKE) install
+ifeq ($(BUILD_OSX),True)
+	cd tocplist && $(MAKE) install
+endif
 	cd vorbis && $(MAKE) install
 
 uninstall:
@@ -48,4 +57,7 @@ uninstall:
 	cd id3v2 && $(MAKE) uninstall
 	cd mp4 && $(MAKE) uninstall
 	cd riff && $(MAKE) uninstall
+ifeq ($(BUILD_OSX),True)
+	cd tocplist && $(MAKE) uninstall
+endif
 	cd vorbis && $(MAKE) uninstall
