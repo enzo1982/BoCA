@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,9 +31,9 @@ namespace smooth
 			XML::Document	*configFile;
 			XML::Node	*ownRoot;
 
-			XML::Node	*FindConfigurationNode(const String &);
-			XML::Node	*FindSectionNode(const String &);
-			XML::Node	*FindValueNode(const String &, const String &);
+			XML::Node	*FindConfigurationNode(const String &) const;
+			XML::Node	*FindSectionNode(const String &) const;
+			XML::Node	*FindValueNode(const String &, const String &) const;
 		public:
 					 Configuration();
 					 Configuration(const String &, Bool = True);
@@ -46,13 +46,13 @@ namespace smooth
 			Int		 AddConfiguration(const String &);
 			Int		 RemoveConfiguration(const String &);
 
-			Int		 GetNOfConfigurations();
-			String		 GetNthConfigurationName(Int);
+			Int		 GetNOfConfigurations() const;
+			String		 GetNthConfigurationName(Int) const;
 
 			Int		 SetActiveConfiguration(const String &);
 			Int		 SetParentConfiguration(const String &);
 
-			String		 GetConfigurationName();
+			String		 GetConfigurationName() const;
 			Int		 SetConfigurationName(const String &);
 
 			Int		 GetIntValue(const String &, const String &, Int = 0);

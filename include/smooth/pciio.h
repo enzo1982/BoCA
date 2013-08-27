@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -96,8 +96,8 @@ class SMOOTHAPI PCIIO
 		bool		 WriteLine(PCIOut, int);
 		bool		 ReadLine(PCIIn, int);
 
-		bool		 CompressPCI(PCIOut);
-		bool		 DecompressPCI(PCIIn);
+		S::Bool		 CompressPCI(PCIOut);
+		S::Bool		 DecompressPCI(PCIIn);
 	public:
 				 PCIIO(const S::GUI::Bitmap &);
 				 PCIIO();

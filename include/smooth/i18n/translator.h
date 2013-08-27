@@ -48,7 +48,7 @@ namespace smooth
 
 				Int				 SetInternalLanguageInfo(const String &, const String &, const String &, Bool);
 				Int				 SelectUserDefaultLanguage();
-				
+
 				virtual Int			 ActivateLanguage(const String &);
 				const String			&TranslateString(const String &, const String & = NIL);
 

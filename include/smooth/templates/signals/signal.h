@@ -127,7 +127,7 @@ namespace smooth
 				if (slotsN == NIL) slotsN = new Array<Void *>();
 
 				slotsN->Add(new SIGNALS_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig));
-		
+
 				return Success();
 			}
 
