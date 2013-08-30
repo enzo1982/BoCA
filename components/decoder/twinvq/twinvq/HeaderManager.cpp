@@ -34,6 +34,7 @@ CHeaderManager* CHeaderManager::Create(CChunkChunk &twinChunk)
 		// TWINチャンクのヘッダを取得する
 		theManager->m_chunkID = twinChunk.GetID();
 		if ( theManager->m_chunkID == "" ) {
+			delete theManager;
 			return NULL;
 		}
 		

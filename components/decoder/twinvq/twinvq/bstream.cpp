@@ -89,6 +89,8 @@ CChunkChunk* LoadTwinChunk( BFILE *bfp )
 #if DEBUG_PRINT > 0 
 		fprintf( stderr, "Header reading error: Failed to read header data.\n" );
 #endif
+		delete[] chunkData;
+
 		return NULL;
 	}
 
@@ -122,6 +124,7 @@ CChunkChunk* TvqGetBsHeaderInfo(BFILE *bfp)             // Input:  bitstream fil
 	get_string(lbuf, KEYWORD_BYTES, bfp);
 	if ( strcmp ( lbuf, "DATA" ) ) {
 		fprintf ( stderr, "TwinVQ format error. No \"DATA\" chunk was found.\n" );
+		delete twinChunk;
 		return NULL;
 	}
 

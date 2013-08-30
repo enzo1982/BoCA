@@ -129,13 +129,21 @@ Error BoCA::TwinVQIn::GetStreamInfo(const String &streamURI, Track &track)
 		bfp = bopen(streamURI, (char *) "rb");
 	}
 
-	CChunkChunk	*twinChunk = TvqGetBsHeaderInfo(bfp);
+	/* Get setup info via header manager.
+	 */
+	CChunkChunk	*twinChunk	  = TvqGetBsHeaderInfo(bfp);
 	CHeaderManager	*theHeaderManager = CHeaderManager::Create(*twinChunk);
 
 	headerInfo	 setupInfo;
-	INDEX		 index;
 
 	TvqGetStandardChunkInfo(theHeaderManager, &setupInfo);
+
+	delete theHeaderManager;
+	delete twinChunk;
+
+	/* Read file information.
+	 */
+	INDEX	 index;
 
 	ex_TvqInitialize(&setupInfo, &index, 0);
 
@@ -195,11 +203,18 @@ Bool BoCA::TwinVQIn::Activate()
 		bfp = bopen(track.origFilename, (char *) "rb");
 	}
 
-	CChunkChunk	*twinChunk = TvqGetBsHeaderInfo(bfp);
+	/* Get setup info via header manager.
+	 */
+	CChunkChunk	*twinChunk	  = TvqGetBsHeaderInfo(bfp);
 	CHeaderManager	*theHeaderManager = CHeaderManager::Create( *twinChunk );
 
 	TvqGetStandardChunkInfo(theHeaderManager, &setupInfo);
 
+	delete theHeaderManager;
+	delete twinChunk;
+
+	/* Initialize TwinVQ reader.
+	 */
 	ex_TvqInitialize(&setupInfo, &index, 0);
 
 	TvqInitBsReader(&setupInfo);

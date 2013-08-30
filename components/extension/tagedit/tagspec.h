@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,6 +21,13 @@ using namespace BoCA;
 
 namespace BoCA
 {
+	const Int	 FIELD_TYPE_UNKNOWN	= 0;
+	const Int	 FIELD_TYPE_TEXT	= 1;
+	const Int	 FIELD_TYPE_INTEGER	= 2;
+	const Int	 FIELD_TYPE_DATA	= 3;
+	const Int	 FIELD_TYPE_GENRE	= 4;
+	const Int	 FIELD_TYPE_PICTURE	= 5;
+
 	class TagField
 	{
 		public:
@@ -29,7 +36,7 @@ namespace BoCA
 
 			String		 techId;
 
-					 TagField(Int nil = NIL)					 { }
+					 TagField(Int nil = NIL)					 { type = FIELD_TYPE_UNKNOWN; }
 					 TagField(const String &iName, Int iType, const String &iTechId) { name = iName; type = iType; techId = iTechId; }
 	};
 
@@ -41,13 +48,6 @@ namespace BoCA
 
 			Int		 LoadFromXML(const String &);
 	};
-
-	const Int	 FIELD_TYPE_UNKNOWN	= 0;
-	const Int	 FIELD_TYPE_TEXT	= 1;
-	const Int	 FIELD_TYPE_INTEGER	= 2;
-	const Int	 FIELD_TYPE_DATA	= 3;
-	const Int	 FIELD_TYPE_GENRE	= 4;
-	const Int	 FIELD_TYPE_PICTURE	= 5;
 };
 
 #endif

@@ -125,11 +125,11 @@ Bool BoCA::TwinVQOut::Activate()
 	{
 		Config	*currentConfig = Config::Get();
 
-		if	(info.artist != NIL) strncpy(setupInfo.Auth, info.artist, Math::Min(info.artist.Length(), 1024));
-		if	(info.title  != NIL) strncpy(setupInfo.Name, info.title,  Math::Min(info.title.Length(),  1024));
+		if	(info.artist != NIL) strncpy(setupInfo.Auth, info.artist, Math::Min(info.artist.Length() + 1, sizeof(setupInfo.Auth)));
+		if	(info.title  != NIL) strncpy(setupInfo.Name, info.title,  Math::Min(info.title.Length() + 1,  sizeof(setupInfo.Name)));
 
-		if	(info.comment != NIL && !config->GetIntValue("Tags", "ReplaceExistingComments", False)) strncpy(setupInfo.Comt, info.comment,						      Math::Min(info.comment.Length(),						       1024));
-		else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)			strncpy(setupInfo.Comt, currentConfig->GetStringValue("Tags", "DefaultComment", NIL), Math::Min(currentConfig->GetStringValue("Tags", "DefaultComment", NIL).Length(), 1024));
+		if	(info.comment != NIL && !config->GetIntValue("Tags", "ReplaceExistingComments", False)) strncpy(setupInfo.Comt, info.comment,						      Math::Min(info.comment.Length() + 1,						   sizeof(setupInfo.Comt)));
+		else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)			strncpy(setupInfo.Comt, currentConfig->GetStringValue("Tags", "DefaultComment", NIL), Math::Min(currentConfig->GetStringValue("Tags", "DefaultComment", NIL).Length() + 1, sizeof(setupInfo.Comt)));
 	}
 
 	encInfo.N_CAN_GLOBAL = config->GetIntValue("TwinVQ", "PreselectionCandidates", 32); // number of VQ pre-selection candidates

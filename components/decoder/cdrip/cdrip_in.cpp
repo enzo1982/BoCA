@@ -295,6 +295,8 @@ BoCA::CDRipIn::CDRipIn()
 
 	skipSamples	= 0;
 	prependSamples	= 0;
+
+	dataBufferSize	= 0;
 }
 
 BoCA::CDRipIn::~CDRipIn()

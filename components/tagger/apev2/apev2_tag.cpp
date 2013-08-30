@@ -146,7 +146,7 @@ Error BoCA::APETag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &trac
 			else if	(picInfo.type == 4) itemName.Append(" (back)");
 			else			    itemName.Append(" (other)");
 
-			strncpy((char *) (unsigned char *) picBuffer, "c:\\music\\cover.jpg", 18);
+			strncpy((char *) (unsigned char *) picBuffer, "c:\\music\\cover.jpg", 19);
 			memcpy(picBuffer + 19, picInfo.data, picInfo.data.Size());
 
 			RenderAPEBinaryItem(itemName, picBuffer, buffer);

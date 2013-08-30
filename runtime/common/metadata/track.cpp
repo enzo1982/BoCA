@@ -28,8 +28,9 @@ BoCA::Track::Track()
 	isCDTrack	= False;
 
 	drive		= -1;
-	discid		= 0;
 	cdTrack		= -1;
+
+	discid		= 0;
 }
 
 BoCA::Track::Track(int nil)
@@ -86,13 +87,7 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 
 	foreach (const Track &track, oTrack.tracks) tracks.Add(track);
 
-	offset		= oTrack.offset;
 	discid		= oTrack.discid;
-	category	= oTrack.category;
-	revision	= oTrack.revision;
-	disclength	= oTrack.disclength;
-	discComment	= oTrack.discComment;
-	playorder	= oTrack.playorder;
 
 	outfile		= oTrack.outfile;
 	origFilename	= oTrack.origFilename;

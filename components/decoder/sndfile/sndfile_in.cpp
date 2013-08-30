@@ -133,7 +133,7 @@ Bool BoCA::SndFileIn::CanOpenStream(const String &streamURI)
 
 		fclose(file);
 
-		return (sndf != NIL);
+		if (sndf != NIL) return True;
 	}
 
 	return False;
@@ -150,60 +150,65 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
 
-	SF_INFO	 sinfo;
+	if (file == NIL) { errorState = True; errorString = "Unable to open file"; }
 
-	memset(&sinfo, 0, sizeof(SF_INFO));
-
-	SNDFILE	*sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
-
-	if (sndf != NIL)
+	if (file != NIL)
 	{
-		Format	 format = track.GetFormat();
+		SF_INFO	 sinfo;
 
-		track.fileSize	= File(streamURI).GetFileSize();
+		memset(&sinfo, 0, sizeof(SF_INFO));
 
-		format.channels	= sinfo.channels;
-		format.rate	= sinfo.samplerate;
+		SNDFILE	*sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
-		switch (sinfo.format & SF_FORMAT_SUBMASK)
+		if (sndf == NIL) { errorState = True; errorString = "Unsupported audio format"; }
+
+		if (sndf != NIL)
 		{
-			case SF_FORMAT_PCM_U8:
-			case SF_FORMAT_PCM_S8:
-				format.bits = 8;
-				break;
-			case SF_FORMAT_PCM_24:
-				format.bits = 24;
-				break;
-			case SF_FORMAT_PCM_32:
-				format.bits = 32;
-				break;
-			default:
-				format.bits = 16;
-				break;
+			Format	 format = track.GetFormat();
+
+			track.fileSize	= File(streamURI).GetFileSize();
+
+			format.channels	= sinfo.channels;
+			format.rate	= sinfo.samplerate;
+
+			switch (sinfo.format & SF_FORMAT_SUBMASK)
+			{
+				case SF_FORMAT_PCM_U8:
+				case SF_FORMAT_PCM_S8:
+					format.bits = 8;
+					break;
+				case SF_FORMAT_PCM_24:
+					format.bits = 24;
+					break;
+				case SF_FORMAT_PCM_32:
+					format.bits = 32;
+					break;
+				default:
+					format.bits = 16;
+					break;
+			}
+
+			track.SetFormat(format);
+
+			track.length	= sinfo.frames;
+
+			Info	 info = track.GetInfo();
+
+			info.artist	= ex_sf_get_string(sndf, SF_STR_ARTIST);
+			info.title	= ex_sf_get_string(sndf, SF_STR_TITLE);
+			info.album	= ex_sf_get_string(sndf, SF_STR_ALBUM);
+			info.track	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_TRACKNUMBER));
+			info.year	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_DATE));
+			info.genre	= ex_sf_get_string(sndf, SF_STR_GENRE);
+			info.comment	= ex_sf_get_string(sndf, SF_STR_COMMENT);
+
+			track.SetInfo(info);
+
+			ex_sf_close(sndf);
 		}
 
-		track.SetFormat(format);
-
-		track.length	= sinfo.frames;
-
-		Info	 info = track.GetInfo();
-
-		info.artist	= ex_sf_get_string(sndf, SF_STR_ARTIST);
-		info.title	= ex_sf_get_string(sndf, SF_STR_TITLE);
-		info.album	= ex_sf_get_string(sndf, SF_STR_ALBUM);
-		info.track	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_TRACKNUMBER));
-		info.year	= (Int64) Number::FromIntString(ex_sf_get_string(sndf, SF_STR_DATE));
-		info.genre	= ex_sf_get_string(sndf, SF_STR_GENRE);
-		info.comment	= ex_sf_get_string(sndf, SF_STR_COMMENT);
-
-		track.SetInfo(info);
-
-		ex_sf_close(sndf);
+		fclose(file);
 	}
-
-	if (sndf == NIL) { errorState = True; errorString = "Unsupported audio format"; }
-
-	fclose(file);
 
 	if (!errorState)
 	{
@@ -318,13 +323,18 @@ Bool BoCA::SndFileIn::Activate()
 	file = fopen(track.origFilename.ConvertTo("UTF-8"), "rb");
 #endif
 
-	SF_INFO	 sinfo;
+	if (file != NIL)
+	{
+		SF_INFO	 sinfo;
 
-	memset(&sinfo, 0, sizeof(SF_INFO));
+		memset(&sinfo, 0, sizeof(SF_INFO));
 
-	sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
+		sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
-	return True;
+		if (sndf != NIL) return True;
+	}
+
+	return False;
 }
 
 Bool BoCA::SndFileIn::Deactivate()
