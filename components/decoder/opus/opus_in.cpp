@@ -247,9 +247,14 @@ Error BoCA::OpusIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::OpusIn::OpusIn()
 {
-	decoder	= NIL;
+	decoder	    = NIL;
 
 	packageSize = 0;
+
+	memset(&oy, 0, sizeof(oy));
+	memset(&os, 0, sizeof(os));
+	memset(&og, 0, sizeof(og));
+	memset(&op, 0, sizeof(op));
 }
 
 BoCA::OpusIn::~OpusIn()

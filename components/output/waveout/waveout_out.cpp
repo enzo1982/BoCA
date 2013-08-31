@@ -54,6 +54,8 @@ BoCA::WaveOutOut::WaveOutOut()
 	last_time     = 0;
 
 	thread	      = NIL;
+
+	memset(&sync, 0, sizeof(sync));
 }
 
 BoCA::WaveOutOut::~WaveOutOut()

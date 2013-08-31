@@ -36,6 +36,20 @@ BoCA::Track::Track()
 BoCA::Track::Track(int nil)
 {
 	trackID		= -1;
+
+	sampleOffset	= 0;
+
+	length		= -1;
+	approxLength	= -1;
+
+	fileSize	= -1;
+
+	isCDTrack	= False;
+
+	drive		= -1;
+	cdTrack		= -1;
+
+	discid		= 0;
 }
 
 BoCA::Track::Track(const Track &oTrack)

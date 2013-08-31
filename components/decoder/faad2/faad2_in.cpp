@@ -303,8 +303,12 @@ BoCA::FAAD2In::FAAD2In()
 {
 	packageSize = 0;
 
+	mp4File	    = NIL;
 	handle	    = NIL;
 	fConfig	    = NIL;
+
+	mp4Track    = -1;
+	sampleId    = 0;
 }
 
 BoCA::FAAD2In::~FAAD2In()

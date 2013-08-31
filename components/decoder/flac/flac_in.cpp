@@ -189,6 +189,10 @@ BoCA::FLACIn::FLACIn()
 
 	infoTrack	   = NIL;
 	decoderThread	   = NIL;
+
+	stop		   = False;
+
+	seekPosition	   = 0;
 }
 
 BoCA::FLACIn::~FLACIn()

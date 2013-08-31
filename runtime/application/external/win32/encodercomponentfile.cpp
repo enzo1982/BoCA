@@ -18,7 +18,9 @@ using namespace smooth::IO;
 
 BoCA::AS::EncoderComponentExternalFile::EncoderComponentExternalFile(ComponentSpecs *specs) : EncoderComponentExternal(specs)
 {
-	out = NIL;
+	out	   = NIL;
+
+	nOfSamples = 0;
 }
 
 BoCA::AS::EncoderComponentExternalFile::~EncoderComponentExternalFile()

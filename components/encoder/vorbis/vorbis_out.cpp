@@ -63,6 +63,15 @@ Void smooth::DetachDLL()
 BoCA::VorbisOut::VorbisOut()
 {
 	configLayer = NIL;
+
+	memset(&os, 0, sizeof(os));
+	memset(&og, 0, sizeof(og));
+	memset(&op, 0, sizeof(op));
+
+	memset(&vi, 0, sizeof(vi));
+	memset(&vc, 0, sizeof(vc));
+	memset(&vd, 0, sizeof(vd));
+	memset(&vb, 0, sizeof(vb));
 }
 
 BoCA::VorbisOut::~VorbisOut()

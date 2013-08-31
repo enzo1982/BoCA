@@ -15,6 +15,7 @@ BoCA::AS::Component::Component(ComponentSpecs *iSpecs)
 	specs = iSpecs;
 
 	if (specs->mode == COMPONENT_MODE_INTERNAL) component = specs->func_Create();
+	else					    component = NIL;
 }
 
 BoCA::AS::Component::~Component()

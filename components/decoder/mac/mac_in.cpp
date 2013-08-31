@@ -120,6 +120,8 @@ BoCA::MACIn::MACIn()
 	packageSize    = 0;
 
 	hAPEDecompress = NIL;
+
+	blockId	       = 0;
 }
 
 BoCA::MACIn::~MACIn()

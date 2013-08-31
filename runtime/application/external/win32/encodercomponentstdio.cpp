@@ -20,7 +20,14 @@ using namespace smooth::IO;
 
 BoCA::AS::EncoderComponentExternalStdIO::EncoderComponentExternalStdIO(ComponentSpecs *specs) : EncoderComponentExternal(specs)
 {
-	out = NIL;
+	out	     = NIL;
+
+	driver_stdin = NIL;
+
+	rPipe	     = NIL;
+	wPipe	     = NIL;
+
+	hProcess     = NIL;
 }
 
 BoCA::AS::EncoderComponentExternalStdIO::~EncoderComponentExternalStdIO()

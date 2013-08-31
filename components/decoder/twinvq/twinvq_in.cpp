@@ -184,6 +184,11 @@ BoCA::TwinVQIn::TwinVQIn()
 	packageSize = 0;
 
 	bfp	    = NIL;
+
+	frameSize   = -1;
+
+	memset(&setupInfo, 0, sizeof(setupInfo));
+	memset(&index, 0, sizeof(index));
 }
 
 BoCA::TwinVQIn::~TwinVQIn()

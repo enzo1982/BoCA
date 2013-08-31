@@ -63,6 +63,9 @@ BoCA::TwinVQOut::TwinVQOut()
 	configLayer = NIL;
 
 	bfp	    = NIL;
+
+	memset(&setupInfo, 0, sizeof(setupInfo));
+	memset(&index, 0, sizeof(index));
 }
 
 BoCA::TwinVQOut::~TwinVQOut()

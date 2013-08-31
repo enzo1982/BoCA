@@ -157,6 +157,14 @@ BoCA::SpeexIn::SpeexIn()
 
 	frameSize   = 0;
 	nFrames	    = 0;
+
+	memset(&oy, 0, sizeof(oy));
+	memset(&os, 0, sizeof(os));
+	memset(&og, 0, sizeof(og));
+	memset(&op, 0, sizeof(op));
+
+	memset(&bits, 0, sizeof(bits));
+	memset(&stereo, 0, sizeof(stereo));
 }
 
 BoCA::SpeexIn::~SpeexIn()

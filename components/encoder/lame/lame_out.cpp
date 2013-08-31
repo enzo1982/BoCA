@@ -57,6 +57,8 @@ BoCA::LAMEOut::LAMEOut()
 	configLayer = NIL;
 
 	context	    = NIL;
+
+	dataOffset  = 0;
 }
 
 BoCA::LAMEOut::~LAMEOut()

@@ -168,6 +168,9 @@ BoCA::MADIn::MADIn()
 
 	infoTrack	   = NIL;
 
+	stop		   = False;
+	finished	   = False;
+
 	numFrames	   = 0;
 
 	delaySamples	   = 0;

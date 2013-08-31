@@ -204,9 +204,14 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::WMAIn::WMAIn()
 {
-	m_pReader = NIL;
+	m_pReader	  = NIL;
+	m_pReaderAdvanced = NIL;
 
-	packageSize = 0;
+	m_hAsyncEvent	  = NIL;
+
+	readerCallback	  = NIL;
+
+	packageSize	  = 0;
 
 	/* Init the Microsoft COM library.
 	 */

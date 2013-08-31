@@ -85,9 +85,11 @@ namespace BoCA
 
 BoCA::FLACOut::FLACOut()
 {
-	configLayer = NIL;
+	configLayer  = NIL;
 
-	encoder	    = NIL;
+	encoder	     = NIL;
+
+	bytesWritten = 0;
 }
 
 BoCA::FLACOut::~FLACOut()

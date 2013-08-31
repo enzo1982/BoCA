@@ -56,9 +56,19 @@ Void smooth::DetachDLL()
 
 BoCA::WMAOut::WMAOut()
 {
-	configLayer = NIL;
+	configLayer	  = NIL;
 
-	samplesWritten = 0;
+	m_pWriter	  = NIL;
+	m_pWriterAdvanced = NIL;
+
+	m_pWriterFileSink = NIL;
+
+	m_pProfileManager = NIL;
+	m_pProfile	  = NIL;
+
+	m_pStreamConfig	  = NIL;
+
+	samplesWritten	  = 0;
 
 	/* Init the Microsoft COM library.
 	 */

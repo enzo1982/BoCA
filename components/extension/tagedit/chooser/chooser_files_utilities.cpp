@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -35,9 +35,12 @@ BoCA::AS::DecoderComponent *BoCA::ChooserFilesUtilities::CreateDecoderComponent(
 
 				component = (DecoderComponent *) Registry::Get().CreateComponentByID(boca.GetComponentID(i));
 
-				if (component->CanOpenStream(file)) return component;
+				if (component != NIL)
+				{
+					if (component->CanOpenStream(file)) return component;
 
-				boca.DeleteComponent(component);
+					boca.DeleteComponent(component);
+				}
 			}
 		}
 	}
@@ -50,9 +53,12 @@ BoCA::AS::DecoderComponent *BoCA::ChooserFilesUtilities::CreateDecoderComponent(
 
 		component = (DecoderComponent *) Registry::Get().CreateComponentByID(boca.GetComponentID(i));
 
-		if (component->CanOpenStream(file)) return component;
+		if (component != NIL)
+		{
+			if (component->CanOpenStream(file)) return component;
 
-		boca.DeleteComponent(component);
+			boca.DeleteComponent(component);
+		}
 	}
 
 	return NIL;

@@ -22,7 +22,9 @@ using namespace smooth::IO;
 
 BoCA::AS::EncoderComponentExternalStdIO::EncoderComponentExternalStdIO(ComponentSpecs *specs) : EncoderComponentExternal(specs)
 {
-	out = NIL;
+	out   = NIL;
+
+	wPipe = NIL;
 }
 
 BoCA::AS::EncoderComponentExternalStdIO::~EncoderComponentExternalStdIO()

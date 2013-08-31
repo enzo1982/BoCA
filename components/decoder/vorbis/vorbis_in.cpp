@@ -217,6 +217,16 @@ Error BoCA::VorbisIn::GetStreamInfo(const String &streamURI, Track &track)
 BoCA::VorbisIn::VorbisIn()
 {
 	packageSize = 0;
+
+	memset(&oy, 0, sizeof(oy));
+	memset(&os, 0, sizeof(os));
+	memset(&og, 0, sizeof(og));
+	memset(&op, 0, sizeof(op));
+
+	memset(&vi, 0, sizeof(vi));
+	memset(&vc, 0, sizeof(vc));
+	memset(&vd, 0, sizeof(vd));
+	memset(&vb, 0, sizeof(vb));
 }
 
 BoCA::VorbisIn::~VorbisIn()

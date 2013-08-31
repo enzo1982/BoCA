@@ -65,6 +65,12 @@ BoCA::SpeexOut::SpeexOut()
 
 	numPackets  = 0;
 	frameSize   = 0;
+
+	memset(&os, 0, sizeof(os));
+	memset(&og, 0, sizeof(og));
+	memset(&op, 0, sizeof(op));
+
+	memset(&bits, 0, sizeof(bits));
 }
 
 BoCA::SpeexOut::~SpeexOut()

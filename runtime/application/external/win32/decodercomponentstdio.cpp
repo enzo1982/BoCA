@@ -21,6 +21,10 @@ using namespace smooth::IO;
 
 BoCA::AS::DecoderComponentExternalStdIO::DecoderComponentExternalStdIO(ComponentSpecs *specs) : DecoderComponentExternal(specs)
 {
+	rPipe	 = NIL;
+	wPipe	 = NIL;
+
+	hProcess = NIL;
 }
 
 BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()

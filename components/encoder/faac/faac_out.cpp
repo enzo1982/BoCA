@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -80,10 +80,20 @@ Void smooth::DetachDLL()
 
 BoCA::FAACOut::FAACOut()
 {
-	configLayer = NIL;
+	configLayer    = NIL;
 
-	handle	    = NIL;
-	fConfig	    = NIL;
+	mp4File	       = NIL;
+	handle	       = NIL;
+	fConfig	       = NIL;
+
+	mp4Track       = -1;
+	sampleId       = 0;
+
+	frameSize      = 0;
+
+	totalSamples   = 0;
+	encodedSamples = 0;
+	delaySamples   = frameSize;
 }
 
 BoCA::FAACOut::~FAACOut()

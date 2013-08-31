@@ -91,6 +91,15 @@ BoCA::OpusOut::OpusOut()
 
 	encoder	    = NIL;
 	resampler   = NIL;
+
+	frameSize    = 0;
+
+	numPackets   = 0;
+	totalSamples = 0;
+
+	memset(&os, 0, sizeof(os));
+	memset(&og, 0, sizeof(og));
+	memset(&op, 0, sizeof(op));
 }
 
 BoCA::OpusOut::~OpusOut()

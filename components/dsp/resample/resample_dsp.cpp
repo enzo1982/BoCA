@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -49,9 +49,11 @@ Void smooth::DetachDLL()
 
 BoCA::ResampleDSP::ResampleDSP()
 {
-	state = NIL;
+	state	    = NIL;
 
 	configLayer = NIL;
+
+	ratio	    = 1;
 }
 
 BoCA::ResampleDSP::~ResampleDSP()
