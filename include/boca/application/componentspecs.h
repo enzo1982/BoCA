@@ -83,6 +83,9 @@ namespace BoCA
 				String			 tagFormat;
 				TagMode			 tagMode;
 			public:
+							 FileFormat() : tagMode(TAG_MODE_NONE)	{ }
+							~FileFormat()				{ }
+
 				const String		&GetName() const			{ return name; }
 				Void			 SetName(const String &nName)		{ name = nName; }
 
@@ -105,14 +108,20 @@ namespace BoCA
 				String			 name;
 				Bool			 defaultEnabled;
 
-				Bool			 supportsCoverArt;
-				Bool			 coverArtDefault;
-
 				Bool			 supportsFreeEncoding;
 
 				Array<String>		 encodings;
 				String			 defaultEncoding;
+
+				Bool			 supportsCoverArt;
+				Bool			 coverArtDefault;
 			public:
+							 TagFormat() : defaultEnabled(True),
+								       supportsFreeEncoding(True),
+								       supportsCoverArt(False),
+								       coverArtDefault(True)	{ }
+							~TagFormat()				{ }
+
 				const String		&GetName() const			{ return name; }
 				Void			 SetName(const String &nName)		{ name = nName; }
 
@@ -142,6 +151,9 @@ namespace BoCA
 				String			 alias;
 				String			 value;
 			public:
+							 Option() : type(OPTION_TYPE_OPTION)	{ }
+							~Option()				{ }
+
 				OptionType		 GetType() const			{ return type; }
 				Void			 SetType(OptionType nType)		{ type = nType; }
 
@@ -163,6 +175,11 @@ namespace BoCA
 				String			 defaultValue;
 				Array<Option *>		 options;
 			public:
+							 Parameter() : type(PARAMETER_TYPE_SWITCH),
+								       enabled(False),
+								       stepSize(1.0)		{ }
+							~Parameter()				{ }
+
 				ParameterType		 GetType() const			{ return type; }
 				Void			 SetType(ParameterType nType)		{ type = nType; }
 

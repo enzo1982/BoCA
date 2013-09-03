@@ -13,12 +13,83 @@
 
 BoCA::AS::ComponentSpecs::ComponentSpecs()
 {
-	library = NIL;
+	library	= NIL;
 
 	mode	= COMPONENT_MODE_INTERNAL;
 	debug	= False;
 
 	external_ignoreExitCode = False;
+
+	/* Init component function pointers.
+	 */
+	func_GetComponentSpecs		= NIL;
+
+	func_Create			= NIL;
+	func_Delete			= NIL;
+
+	func_GetConfigurationLayer	= NIL;
+
+	func_GetErrorState		= NIL;
+	func_GetErrorString		= NIL;
+
+	func_CanOpenStream		= NIL;
+	func_GetStreamInfo		= NIL;
+
+	func_SetVendorString		= NIL;
+
+	func_ParseBuffer		= NIL;
+	func_ParseStreamInfo		= NIL;
+
+	func_RenderBuffer		= NIL;
+	func_RenderStreamInfo		= NIL;
+
+	func_UpdateStreamInfo		= NIL;
+
+	func_GetPackageSize		= NIL;
+
+	func_SetDriver			= NIL;
+
+	func_GetInBytes			= NIL;
+
+	func_CanWrite			= NIL;
+
+	func_SetPause			= NIL;
+	func_IsPlaying			= NIL;
+
+	func_SetAudioTrackInfo		= NIL;
+	func_GetFormatInfo		= NIL;
+
+	func_GetOutputFileExtension	= NIL;
+
+	func_Activate			= NIL;
+	func_Deactivate			= NIL;
+
+	func_Seek			= NIL;
+
+	func_ReadData			= NIL;
+	func_WriteData			= NIL;
+	func_TransformData		= NIL;
+
+	func_Flush			= NIL;
+
+	func_GetMainTabLayer		= NIL;
+	func_GetStatusBarLayer		= NIL;
+
+	func_GetNumberOfDevices		= NIL;
+	func_GetNthDeviceInfo		= NIL;
+
+	func_OpenNthDeviceTray		= NIL;
+	func_CloseNthDeviceTray		= NIL;
+
+	func_GetNthDeviceTrackList	= NIL;
+	func_GetNthDeviceMCDI		= NIL;
+
+	func_SetTrackList		= NIL;
+
+	func_CanOpenFile		= NIL;
+
+	func_ReadPlaylist		= NIL;
+	func_WritePlaylist		= NIL;
 }
 
 BoCA::AS::ComponentSpecs::~ComponentSpecs()
@@ -57,6 +128,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	componentName = BoCA_GetComponentName();
 
+	/* Get component function pointers.
+	 */
 	func_GetComponentSpecs		= (const char *(*)())					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetComponentSpecs"));
 
 	func_Create			= (void *(*)())						library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Create"));

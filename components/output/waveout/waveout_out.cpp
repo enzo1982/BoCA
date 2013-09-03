@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -35,10 +35,10 @@ BoCA::WaveOutOut::WaveOutOut()
 	write_ptr     = 0;
 	p_time	      = 0;
 
-	paused	      = 0;
-	needplay      = 0;
-	stop	      = 0;
-	newpause      = 0;
+	paused	      = False;
+	needplay      = False;
+	stop	      = False;
+	newpause      = False;
 
 	buffer	      = NIL;
 
@@ -66,17 +66,17 @@ Bool BoCA::WaveOutOut::Activate()
 {
 	const Format	&format = track.GetFormat();
 
-	InitializeCriticalSection(&sync);
-
 	hWaveOut	= NIL;
 
 	write_ptr	= 0;
 	p_time		= 0;
 
-	paused		= 0;
-	needplay	= 0;
-	stop		= 0;
-	newpause	= 0;
+	paused		= False;
+	needplay	= False;
+	stop		= False;
+	newpause	= False;
+
+	InitializeCriticalSection(&sync);
 
 	/* Init wave format descriptor.
 	 */
@@ -175,7 +175,7 @@ Bool BoCA::WaveOutOut::Deactivate()
 {
 	EnterCriticalSection(&sync);
 
-	stop = 1;
+	stop = True;
 
 	SetEvent(hEvent);
 
@@ -259,7 +259,7 @@ Int BoCA::WaveOutOut::SetPause(Bool pause)
 {
 	EnterCriticalSection(&sync);
 
-	newpause = pause ? 1 : 0; // needs to be done in our thread to keep stupid win2k/xp happy
+	newpause = pause ? True : False; // needs to be done in our thread to keep stupid win2k/xp happy
 
 	SetEvent(hEvent);
 
@@ -276,7 +276,7 @@ Bool BoCA::WaveOutOut::IsPlaying()
 
 	EnterCriticalSection(&sync); // needs to be done in our thread
 
-	if (!paused) { needplay = 1; SetEvent(hEvent); }
+	if (!paused) { needplay = True; SetEvent(hEvent); }
 
 	const Format	&format = track.GetFormat();
 	Int		 r = MulDiv(buf_size_used + data_written, 1000, (format.bits >> 3) * format.channels * format.rate);
@@ -325,7 +325,7 @@ Void BoCA::WaveOutOut::WorkerThread()
 
 		if (!paused && newpause)
 		{
-			paused = 1;
+			paused = True;
 
 			if (hWaveOut) waveOutPause(hWaveOut);
 
@@ -334,7 +334,7 @@ Void BoCA::WaveOutOut::WorkerThread()
 
 		if (paused && !newpause)
 		{
-			paused = 0;
+			paused = False;
 
 			if (hWaveOut) waveOutRestart(hWaveOut);
 
@@ -385,7 +385,7 @@ Void BoCA::WaveOutOut::WorkerThread()
 			if (n_playing == 1) last_time = timeGetTime();
 		}
 
-		needplay = 0;
+		needplay = False;
 
 		LeaveCriticalSection(&sync);
 	}
