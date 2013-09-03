@@ -36,6 +36,8 @@
 #include <ctype.h>
 
 #include <id3/helpers.h>
+
+#include "field_impl.h"
 #include "tag_impl.h"
 
 using namespace dami;
@@ -60,25 +62,25 @@ String id3::v2::getString(const ID3_Frame* frame, ID3_FieldID fldName)
   return text;
 }
 
-String id3::v2::getStringAtIndex(const ID3_Frame* frame, ID3_FieldID fldName,
-                                 size_t nIndex)
+String id3::v2::getStringAtIndex(const ID3_Frame *frame, ID3_FieldID fldName, size_t nIndex)
 {
-  if (!frame)
-  {
-    return "";
-  }
-  String text;
-  ID3_Field* fp = frame->GetField(fldName);
-  if (fp && fp->GetNumTextItems() < nIndex)
-  {
-    ID3_TextEnc enc = fp->GetEncoding();
-    fp->SetEncoding(ID3TE_ASCII);
+	if (!frame) return "";
 
-    text = fp->GetRawTextItem(nIndex);
+	String		 text;
+	ID3_FieldImpl	*fp = (ID3_FieldImpl *) frame->GetField(fldName);
 
-    fp->SetEncoding(enc);
-  }
-  return text;
+	if (fp && fp->GetNumTextItems() < nIndex)
+	{
+		ID3_TextEnc	 enc = fp->GetEncoding();
+
+		fp->SetEncoding(ID3TE_ASCII);
+
+		text = fp->GetTextItem(nIndex);
+
+		fp->SetEncoding(enc);
+	}
+
+	return text;
 }
 
 size_t id3::v2::removeFrames(ID3_TagImpl& tag, ID3_FrameID id)
@@ -524,15 +526,19 @@ ID3_Frame* id3::v2::setSyncLyrics(ID3_TagImpl& tag, BString data,
   return frame;
 }
 
-BString id3::v2::getSyncLyrics(const ID3_TagImpl& tag, String lang, String desc)
+BString id3::v2::getSyncLyrics(const ID3_TagImpl &tag, String lang, String desc)
 {
-  // check if a SYLT frame of this language or descriptor exists
-  ID3_Frame* frame = NULL;
-  (frame = tag.Find(ID3FID_SYNCEDLYRICS, ID3FN_LANGUAGE, lang)) ||
-  (frame = tag.Find(ID3FID_SYNCEDLYRICS, ID3FN_DESCRIPTION, desc)) ||
-  (frame = tag.Find(ID3FID_SYNCEDLYRICS));
+	// check if a SYLT frame of this language or descriptor exists
+	ID3_Frame	*frame = NULL;
 
-  // get the lyrics size
-  ID3_Field* fld = frame->GetField(ID3FN_DATA);
-  return BString(reinterpret_cast<const BString::value_type *>(fld->GetRawBinary()), fld->Size());
+	(frame = tag.Find(ID3FID_SYNCEDLYRICS, ID3FN_LANGUAGE, lang))	 ||
+	(frame = tag.Find(ID3FID_SYNCEDLYRICS, ID3FN_DESCRIPTION, desc)) ||
+	(frame = tag.Find(ID3FID_SYNCEDLYRICS));
+
+	if (frame == NULL) return BString();
+
+	// get the lyrics size
+	ID3_Field	*fld = frame->GetField(ID3FN_DATA);
+
+	return BString(reinterpret_cast<const BString::value_type *>(fld->GetRawBinary()), fld->Size());
 }

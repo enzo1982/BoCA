@@ -68,7 +68,6 @@ class ID3_FieldImpl : public ID3_Field
 		size_t			 Get(char *, size_t) const;
 		size_t			 Get(char *, size_t, size_t) const;
 		const char		*GetRawText() const;
-		const char		*GetRawTextItem(size_t) const;
 		size_t			 Add(const char * data);
 
 		dami::String		 GetText() const;
@@ -84,7 +83,6 @@ class ID3_FieldImpl : public ID3_Field
 		size_t			 Get(unicode_t *buffer, size_t, size_t) const;
 		size_t			 Add(const unicode_t *);
 		const unicode_t		*GetRawUnicodeText() const;
-		const unicode_t		*GetRawUnicodeTextItem(size_t) const;
 
 		/* Binary field functions
 		 */

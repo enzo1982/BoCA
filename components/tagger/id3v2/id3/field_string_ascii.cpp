@@ -139,17 +139,20 @@ String ID3_FieldImpl::GetText() const
 
 String ID3_FieldImpl::GetTextItem(size_t index) const
 {
-  String data;
-  if (this->GetType() == ID3FTY_TEXTSTRING &&
-      ID3TE_IS_SINGLE_BYTE_ENC(this->GetEncoding()))
-  {
-    const char* raw = this->GetRawTextItem(index);
-    if (raw != NULL)
-    {
-      data = raw;
-    }
-  }
-  return data;
+	String	 data;
+
+	if (this->GetType() == ID3FTY_TEXTSTRING &&
+	    ID3TE_IS_SINGLE_BYTE_ENC(this->GetEncoding()) &&
+	    index < this->GetNumTextItems())
+	{
+		const char	*raw = _text.c_str();
+
+		for (size_t i = 0; i < index; ++i) raw += strlen(raw) + 1;
+
+		if (raw != NULL) data = raw;
+	}
+
+	return data;
 }
 
 namespace
@@ -273,22 +276,6 @@ const char* ID3_FieldImpl::GetRawText() const
       ID3TE_IS_SINGLE_BYTE_ENC(this->GetEncoding()))
   {
     text = _text.c_str();
-  }
-  return text;
-}
-
-const char* ID3_FieldImpl::GetRawTextItem(size_t index) const
-{
-  const char* text = NULL;
-  if (this->GetType() == ID3FTY_TEXTSTRING &&
-      ID3TE_IS_SINGLE_BYTE_ENC(this->GetEncoding()) &&
-      index < this->GetNumTextItems())
-  {
-    text = _text.c_str();
-    for (size_t i = 0; i < index; ++i)
-    {
-      text += strlen(text) + 1;
-    }
   }
   return text;
 }

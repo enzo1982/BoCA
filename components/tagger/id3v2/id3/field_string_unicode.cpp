@@ -127,42 +127,29 @@ const unicode_t* ID3_FieldImpl::GetRawUnicodeText() const
   return text;
 }
 
-const unicode_t* ID3_FieldImpl::GetRawUnicodeTextItem(size_t index) const
-{
-  const unicode_t* text = NULL;
-  if (this->GetType() == ID3FTY_TEXTSTRING &&
-      ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding()) &&
-      index < this->GetNumTextItems())
-  {
-    String unicode = _text + '\0' + '\0';
-    text = (unicode_t *) unicode.data();
-    for (size_t i = 0; i < index; ++i)
-    {
-      text += ucslen(text) + 1;
-    }
-  }
-  return text;
-}
-
 size_t ID3_FieldImpl::Get(unicode_t *buffer, size_t maxLength, size_t itemNum) const
 {
-  size_t length = 0;
-  size_t total_items = this->GetNumTextItems();
-  if (this->GetType() == ID3FTY_TEXTSTRING &&
-      ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding()) &&
-      buffer != NULL && maxLength > 0 && itemNum < total_items)
-  {
-    const unicode_t* text = this->GetRawUnicodeTextItem(itemNum);
-    if (NULL != text)
-    {
-      size_t length = dami::min(maxLength, ucslen(text));
-      ::memcpy(buffer, text, length * 2);
-      if (length < maxLength)
-      {
-        buffer[length] = NULL_UNICODE;
-      }
-    }
-  }
+	size_t	 length	     = 0;
+	size_t	 total_items = this->GetNumTextItems();
 
-  return length;
+	if (this->GetType() == ID3FTY_TEXTSTRING &&
+	    ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding()) &&
+	    buffer != NULL && maxLength > 0 && itemNum < total_items)
+	{
+		String		 unicode = _text + '\0' + '\0';
+		const unicode_t	*text	 = (unicode_t *) unicode.data();
+
+		for (size_t i = 0; i < itemNum; ++i) text += ucslen(text) + 1;
+
+		if (text != NULL)
+		{
+			length = dami::min(maxLength, ucslen(text));
+
+			::memcpy(buffer, text, length * 2);
+
+			if (length < maxLength) buffer[length] = NULL_UNICODE;
+		}
+	}
+
+	return length;
 }

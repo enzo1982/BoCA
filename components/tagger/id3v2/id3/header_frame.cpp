@@ -43,7 +43,7 @@ void ID3_FrameHeader::SetUnknownFrame(const char* id)
 
 	_frame_def = new ID3_FrameDef;
 
-	if (NULL == _frame_def)
+	if (_frame_def == NULL)
 	{
 		// log this;
 		return;
@@ -73,7 +73,11 @@ bool ID3_FrameHeader::SetFrameID(ID3_FrameID id)
 {
 	if (id == ID3FID_NOFRAME || id == this->GetFrameID()) return false;
 
-	_frame_def = ID3_FindFrameDef(id);
+	ID3_FrameDef	*frame_def = ID3_FindFrameDef(id);
+
+	if (frame_def == NULL) return false;
+
+	_frame_def = frame_def;
 	_flags.set(TAGALTER, _frame_def->bTagDiscard);
 	_flags.set(FILEALTER, _frame_def->bFileDiscard);
 
@@ -145,7 +149,7 @@ bool ID3_FrameHeader::Parse(ID3_Reader& reader)
 
 ID3_Err ID3_FrameHeader::Render(ID3_Writer& writer) const
 {
-	if (NULL == _frame_def)
+	if (_frame_def == NULL)
 	{
 		/* TODO: log this
 		 */
@@ -208,7 +212,7 @@ ID3_FrameHeader& ID3_FrameHeader::operator=(const ID3_FrameHeader& hdr)
 		{
 			_frame_def = new ID3_FrameDef;
 
-			if (NULL == _frame_def)
+			if (_frame_def == NULL)
 			{
 				// TODO: throw something here...
 			}
@@ -232,7 +236,7 @@ ID3_FrameID ID3_FrameHeader::GetFrameID() const
 {
 	ID3_FrameID	 eID = ID3FID_NOFRAME;
 
-	if (NULL != _frame_def)
+	if (_frame_def != NULL)
 	{
 		eID = _frame_def->eID;
 	}

@@ -111,27 +111,26 @@ size_t ID3_TagImpl::IsV2Tag(ID3_Reader &reader)
 		io::StringReader sr(size);
 		tagSize = io::readUInt28(sr) + ID3_TagHeader::SIZE;
 	}
-	else if (id != ID3_TagHeader::ID) ; // clog << "*** IsV2Tag: Not an id3v2 tag header" << endl;
-	else if ((uchar) ver[0]  >= 0xFF) ; // clog << "*** IsV2Tag: Major offset" << endl;
-	else if ((uchar) ver[1]  >= 0xFF) ; // clog << "*** ISV2Tag: Minor offset" << endl;
-	else if ((uchar) size[0] >= 0x80) ; // clog << "*** ISV2Tag: 1st size offset" << endl;
-	else if ((uchar) size[1] >= 0x80) ; // clog << "*** ISV2Tag: 2nd size offset" << endl;
-	else if ((uchar) size[2] >= 0x80) ; // clog << "*** ISV2Tag: 3rd size offset" << endl;
-	else if ((uchar) size[3] >= 0x80) ; // clog << "*** ISV2Tag: 4th size offset" << endl;
-	else				  ; // clog << "*** shouldn't get here!" << endl;
+	else if (id != ID3_TagHeader::ID) ID3D_NOTICE( "*** IsV2Tag: Not an id3v2 tag header" );
+	else if ((uchar) ver[0]  >= 0xFF) ID3D_NOTICE( "*** IsV2Tag: Major offset" );
+	else if ((uchar) ver[1]  >= 0xFF) ID3D_NOTICE( "*** ISV2Tag: Minor offset" );
+	else if ((uchar) size[0] >= 0x80) ID3D_NOTICE( "*** ISV2Tag: 1st size offset" );
+	else if ((uchar) size[1] >= 0x80) ID3D_NOTICE( "*** ISV2Tag: 2nd size offset" );
+	else if ((uchar) size[2] >= 0x80) ID3D_NOTICE( "*** ISV2Tag: 3rd size offset" );
+	else if ((uchar) size[3] >= 0x80) ID3D_NOTICE( "*** ISV2Tag: 4th size offset" );
+	else				  ID3D_NOTICE( "*** shouldn't get here!" );
 
 	return tagSize;
 }
 
-ID3_TagImpl::ID3_TagImpl(const char *name, flags_t flags)
- :	_frames(),
-	_cursor(_frames.begin()),
-	_file_name(),
-	_file_size(0),
-	_prepended_bytes(0),
-	_appended_bytes(0),
-	_is_file_writable(false),
-	_mp3_info(NULL) // need to do this before this->Clear()
+ID3_TagImpl::ID3_TagImpl(const char *name, flags_t flags) : _frames(),
+							    _cursor(_frames.begin()),
+							    _file_name(),
+							    _file_size(0),
+							    _prepended_bytes(0),
+							    _appended_bytes(0),
+							    _is_file_writable(false),
+							    _mp3_info(NULL) // need to do this before this->Clear()
 {
 	this->Clear();
 
@@ -141,15 +140,14 @@ ID3_TagImpl::ID3_TagImpl(const char *name, flags_t flags)
 	}
 }
 
-ID3_TagImpl::ID3_TagImpl(const ID3_Tag &tag)
- :	_frames(),
-	_cursor(_frames.begin()),
-	_file_name(),
-	_file_size(0),
-	_prepended_bytes(0),
-	_appended_bytes(0),
-	_is_file_writable(false),
-	_mp3_info(NULL) // need to do this before this->Clear()
+ID3_TagImpl::ID3_TagImpl(const ID3_Tag &tag) : _frames(),
+					       _cursor(_frames.begin()),
+					       _file_name(),
+					       _file_size(0),
+					       _prepended_bytes(0),
+					       _appended_bytes(0),
+					       _is_file_writable(false),
+					       _mp3_info(NULL) // need to do this before this->Clear()
 {
 	*this = tag;
 }
@@ -227,28 +225,31 @@ bool ID3_TagImpl::IsValidFrame(ID3_Frame& frame, bool testlinkedFrames)
 	// check if the frame is outdated
 	ID3_FrameDef	*myFrameDef = ID3_FindFrameDef(testframe->GetID());
 
-	if (myFrameDef != NULL && (this->GetSpec() > myFrameDef->eLastAppearance || this->GetSpec() < myFrameDef->eFirstAppearance))
+	if (myFrameDef != NULL)
 	{
-		if (myFrameDef->convert != NULL)
+		if (this->GetSpec() > myFrameDef->eLastAppearance || this->GetSpec() < myFrameDef->eFirstAppearance)
 		{
-			tmpFrame = myFrameDef->convert(testframe, this->GetSpec());
-
-			if (tmpFrame)
+			if (myFrameDef->convert != NULL)
 			{
-				testframe = tmpFrame;
-				frame = *tmpFrame;
+				tmpFrame = myFrameDef->convert(testframe, this->GetSpec());
+
+				if (tmpFrame)
+				{
+					testframe = tmpFrame;
+					frame = *tmpFrame;
+				}
+
+				//it's too old, and i couldn't convert
+				return false; //disregard frame
 			}
 
-			//it's too old, and i couldn't convert
+			//it's too old and doesn't have a conversion routine
 			return false; //disregard frame
 		}
-
-		//it's too old and doesn't have a conversion routine
-		return false; //disregard frame
-	}
-	else if (myFrameDef->convert != NULL) //fields have stayed the same, but inside the field was a structure change
-	{
-		// TODO: add here code when conversion routine of tcon is ready v2.3 <> v2.4
+		else if (myFrameDef->convert != NULL) //fields have stayed the same, but inside the field was a structure change
+		{
+			// TODO: add here code when conversion routine of tcon is ready v2.3 <> v2.4
+		}
 	}
 
 	// check the frames on their restrictions

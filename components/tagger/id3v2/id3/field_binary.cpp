@@ -137,33 +137,33 @@ size_t ID3_FieldImpl::Get(uchar *buffer,	// Destination of retrieved string
  **   myFrame.GetField(ID3FN_DATA)->FromFile("mypic.jpg");
  ** \endcode
  **/
-void ID3_FieldImpl::FromFile(const char *info //< Source filename
-                             )
+void ID3_FieldImpl::FromFile(const char *info) //< Source filename
 {
-  if (this->GetType() != ID3FTY_BINARY || NULL == info)
-  {
-    return;
-  }
+	if (this->GetType() != ID3FTY_BINARY || NULL == info) return;
 
-  FILE* temp_file = ::fopen(info, "rb");
-  if (temp_file != NULL)
-  {
-    ::fseek(temp_file, 0, SEEK_END);
-    size_t fileSize = ::ftell(temp_file);
-    ::fseek(temp_file, 0, SEEK_SET);
+	FILE	*temp_file = ::fopen(info, "rb");
 
-    uchar* buffer = new uchar[fileSize];
-    if (buffer != NULL)
-    {
-      ::fread(buffer, 1, fileSize, temp_file);
+	if (temp_file == NULL) return;
 
-      this->Set(buffer, fileSize);
+	::fseek(temp_file, 0, SEEK_END);
 
-      delete [] buffer;
-    }
+	long	 fileSize = ::ftell(temp_file);
 
-    ::fclose(temp_file);
-  }
+	::fseek(temp_file, 0, SEEK_SET);
+
+	if (fileSize >= 0)
+	{
+		uchar	*buffer = new uchar[fileSize];
+
+		if (buffer != NULL)
+		{
+			if (::fread(buffer, 1, fileSize, temp_file) == fileSize) this->Set(buffer, fileSize);
+
+			delete [] buffer;
+		}
+	}
+
+	::fclose(temp_file);
 }
 
 

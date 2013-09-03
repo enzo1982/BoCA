@@ -242,7 +242,7 @@ size_t RenderV2ToFile(const ID3_TagImpl &tag, fstream &file)
   {
     String filename = tag.GetFileName();
     String sTmpSuffix = ".XXXXXX";
-    if (filename.size() + sTmpSuffix.size() > ID3_PATH_LENGTH)
+    if (filename.size() + sTmpSuffix.size() >= ID3_PATH_LENGTH)
     {
       /* TODO: log this
        */

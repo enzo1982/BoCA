@@ -55,7 +55,6 @@ class ID3_Field
 		virtual size_t		 Get(char*, size_t) const = 0;
 		virtual size_t		 Get(char*, size_t, size_t) const = 0;
 		virtual const char	*GetRawText() const = 0;
-		virtual const char	*GetRawTextItem(size_t) const = 0;
 		virtual size_t		 Add(const char*) = 0;
 
 		virtual dami::String	 GetText() const = 0;
@@ -68,7 +67,6 @@ class ID3_Field
 		virtual size_t		 Get(unicode_t *buffer, size_t) const = 0;
 		virtual size_t		 Get(unicode_t *buffer, size_t, size_t) const = 0;
 		virtual const unicode_t	*GetRawUnicodeText() const = 0;
-		virtual const unicode_t	*GetRawUnicodeTextItem(size_t) const = 0;
 		virtual size_t		 Add(const unicode_t*) = 0;
 
 		/* Binary field functions
