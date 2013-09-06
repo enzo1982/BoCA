@@ -226,13 +226,13 @@ Error BoCA::CDIOIn::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		trackLength = info.mcdi.GetNthEntryOffset(i + 1) - info.mcdi.GetNthEntryOffset(i);
 
-		/* Strip 11250 sectors off of the track length if
+		/* Strip 11400 sectors off of the track length if
 		 * we are the last audio track before a new session.
 		 */
 		if ((i > 0 && info.mcdi.GetNthEntryType(i) != info.mcdi.GetNthEntryType(i + 1) && info.mcdi.GetNthEntryTrackNumber(i + 1) != 0xAA) ||
 		    (i < info.mcdi.GetNumberOfEntries() - 1 && info.mcdi.GetNthEntryOffset(i + 2) - info.mcdi.GetNthEntryType(i + 1) <= 0))
 		{
-			trackLength -= 11250;
+			trackLength -= 11400;
 		}
 
 		if (info.mcdi.GetNthEntryType(i) == ENTRY_AUDIO && info.mcdi.GetNthEntryTrackNumber(i) == trackNumber)
@@ -284,37 +284,22 @@ BoCA::CDIOIn::~CDIOIn()
 
 Bool BoCA::CDIOIn::Activate()
 {
-	Int	 startSector = 0;
-	Int	 endSector   = 0;
-
 	const Array<String>	&driveNames = FindDrives();
 
 	cd = cdio_open(driveNames.GetNth(track.drive), DRIVER_UNKNOWN);
 
 	if (cd == NIL) return False;
 
-	Int	 firstTrack  = cdio_get_first_track_num(cd);
-	Int	 lastTrack   = cdio_get_last_track_num(cd);
-	Int	 entryNumber = -1;
+	Int	 startSector = 0;
+	Int	 endSector   = 0;
 
-	for (Int i = firstTrack; i <= lastTrack; i++)
-	{
-		startSector = cdio_get_track_lsn(cd, i);
-		endSector   = cdio_get_track_last_lsn(cd, i);
+	if (!GetTrackSectors(startSector, endSector)) return False;
 
-		if (cdio_get_track_format(cd, i) == TRACK_FORMAT_AUDIO && i == track.cdTrack)
-		{
-			nextSector  = startSector;
-			sectorsLeft = endSector - startSector + 1;
+	nextSector  = startSector;
+	sectorsLeft = endSector - startSector + 1;
 
-			entryNumber = i;
-
-			break;
-		}
-	}
-
-	if (entryNumber == -1) return False;
-
+	/* Set ripping speed.
+	 */
 	Config	*config = Config::Get();
 
 	Int	 speed = config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
@@ -322,6 +307,8 @@ Bool BoCA::CDIOIn::Activate()
 	if (speed > 0)	cdio_set_speed(cd, speed);
 	else		cdio_set_speed(cd, -1);
 
+	/* Enable paranoia mode.
+	 */
 	paranoia = NIL;
 
 	if (config->GetIntValue("Ripper", "CDParanoia", False))
@@ -369,6 +356,23 @@ Bool BoCA::CDIOIn::Deactivate()
 	return True;
 }
 
+Bool BoCA::CDIOIn::Seek(Int64 samplePosition)
+{
+	Int	 startSector = 0;
+	Int	 endSector   = 0;
+
+	if (!GetTrackSectors(startSector, endSector)) return False;
+
+	startSector += samplePosition / 588;
+
+	nextSector  = startSector;
+	sectorsLeft = endSector - startSector + 1;
+
+	if (paranoia != NIL) cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
+
+	return True;
+}
+
 Int BoCA::CDIOIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (inBytes >= track.fileSize) return -1;
@@ -394,6 +398,25 @@ Int BoCA::CDIOIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	inBytes += data.Size();
 
 	return data.Size();
+}
+
+Bool BoCA::CDIOIn::GetTrackSectors(Int &startSector, Int &endSector)
+{
+	Int	 firstTrack = cdio_get_first_track_num(cd);
+	Int	 lastTrack  = cdio_get_last_track_num(cd);
+
+	for (Int i = firstTrack; i <= lastTrack; i++)
+	{
+		if (cdio_get_track_format(cd, i) == TRACK_FORMAT_AUDIO && i == track.cdTrack)
+		{
+			startSector = cdio_get_track_lsn(cd, i);
+			endSector   = cdio_get_track_last_lsn(cd, i);
+
+			return True;
+		}
+	}
+
+	return False;
 }
 
 ConfigLayer *BoCA::CDIOIn::GetConfigurationLayer()

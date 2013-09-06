@@ -29,6 +29,8 @@ namespace BoCA
 
 			Int				 nextSector;
 			Int				 sectorsLeft;
+
+			Bool				 GetTrackSectors(Int &, Int &);
 		public:
 			static const String		&GetComponentSpecs();
 
@@ -42,6 +44,8 @@ namespace BoCA
 
 			Bool				 Activate();
 			Bool				 Deactivate();
+
+			Bool				 Seek(Int64);
 
 			Int				 ReadData(Buffer<UnsignedByte> &, Int);
 

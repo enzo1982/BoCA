@@ -199,13 +199,13 @@ Error BoCA::CDRipIn::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		trackLength = info.mcdi.GetNthEntryOffset(i + 1) - info.mcdi.GetNthEntryOffset(i);
 
-		/* Strip 11250 sectors off of the track length if
+		/* Strip 11400 sectors off of the track length if
 		 * we are the last audio track before a new session.
 		 */
 		if ((i > 0 && info.mcdi.GetNthEntryType(i) != info.mcdi.GetNthEntryType(i + 1) && info.mcdi.GetNthEntryTrackNumber(i + 1) != 0xAA) ||
 		    (i < info.mcdi.GetNumberOfEntries() - 1 && info.mcdi.GetNthEntryOffset(i + 2) - info.mcdi.GetNthEntryType(i + 1) <= 0))
 		{
-			trackLength -= 11250;
+			trackLength -= 11400;
 		}
 
 		if (info.mcdi.GetNthEntryType(i) == ENTRY_AUDIO && info.mcdi.GetNthEntryTrackNumber(i) == trackNumber)
@@ -307,31 +307,9 @@ BoCA::CDRipIn::~CDRipIn()
 Bool BoCA::CDRipIn::Activate()
 {
 	Int	 startSector = 0;
-	Int	 endSector = 0;
+	Int	 endSector   = 0;
 
-	ex_CR_SetActiveCDROM(track.drive);
-	ex_CR_ReadToc();
-
-	Int	 numTocEntries = ex_CR_GetNumTocEntries();
-	Int	 entryNumber = -1;
-
-	for (Int i = 0; i < numTocEntries; i++)
-	{
-		TOCENTRY	 entry = ex_CR_GetTocEntry(i);
-		TOCENTRY	 nextentry = ex_CR_GetTocEntry(i + 1);
-
-		startSector = entry.dwStartSector;
-		endSector = nextentry.dwStartSector;
-
-		if (!(entry.btFlag & CDROMDATAFLAG) && (entry.btTrackNumber == track.cdTrack))
-		{
-			entryNumber = i;
-
-			break;
-		}
-	}
-
-	if (entryNumber == -1) return False;
+	if (!GetTrackSectors(startSector, endSector)) return False;
 
 	OpenRipper(startSector, endSector);
 
@@ -341,6 +319,23 @@ Bool BoCA::CDRipIn::Activate()
 Bool BoCA::CDRipIn::Deactivate()
 {
 	CloseRipper();
+
+	return True;
+}
+
+Bool BoCA::CDRipIn::Seek(Int64 samplePosition)
+{
+	Int	 startSector = 0;
+	Int	 endSector   = 0;
+
+	if (!GetTrackSectors(startSector, endSector)) return False;
+
+	startSector += samplePosition / 588;
+
+	CloseRipper();
+	OpenRipper(startSector, endSector);
+
+	skipSamples += samplePosition % 588;
 
 	return True;
 }
@@ -382,6 +377,30 @@ Int BoCA::CDRipIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	inBytes += dataBytes;
 
 	return dataBytes;
+}
+
+Bool BoCA::CDRipIn::GetTrackSectors(Int &startSector, Int &endSector)
+{
+	ex_CR_SetActiveCDROM(track.drive);
+	ex_CR_ReadToc();
+
+	Int	 numTocEntries = ex_CR_GetNumTocEntries();
+
+	for (Int i = 0; i < numTocEntries; i++)
+	{
+		TOCENTRY	 entry	   = ex_CR_GetTocEntry(i);
+		TOCENTRY	 nextentry = ex_CR_GetTocEntry(i + 1);
+
+		if (!(entry.btFlag & CDROMDATAFLAG) && (entry.btTrackNumber == track.cdTrack))
+		{
+			startSector = entry.dwStartSector;
+			endSector   = nextentry.dwStartSector;
+
+			return True;
+		}
+	}
+
+	return False;
 }
 
 Bool BoCA::CDRipIn::OpenRipper(Int startSector, Int endSector)
