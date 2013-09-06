@@ -54,7 +54,7 @@ const String &BoCA::CDParanoiaInfo::GetComponentSpecs()
 const Array<String> &BoCA::CDParanoiaInfo::FindDrives()
 {
 #if defined __linux__
-	static const char	*deviceNames[] = { "/dev/hd?", "/dev/scd?", NIL };
+	static const char	*deviceNames[] = { "/dev/hd?", "/dev/sr?", "/dev/scd?", NIL };
 #elif defined __FreeBSD__
 	static const char	*deviceNames[] = { "/dev/acd?", "/dev/cd?", NIL };
 #elif defined __OpenBSD__
@@ -262,20 +262,23 @@ const BoCA::MCDI &BoCA::CDParanoiaInfo::GetNthDeviceMCDI(Int n)
 			toc.firstTrack	= 1;
 			toc.lastTrack	= cd->tracks;
 
-			for (Int i = 0; i < cd->tracks; i++)
+			for (Int i = 0; i <= cd->tracks; i++)
 			{
 				toc.tracks[i].rsvd	  = 0;
 				toc.tracks[i].ADR	  = cd->disc_toc[i].bFlags;
 				toc.tracks[i].trackNumber = cd->disc_toc[i].bTrack;
 				toc.tracks[i].rsvd2	  = 0;
 				toc.tracks[i].addr	  = htonl(cd->disc_toc[i].dwStartSector);
-			}
 
-			toc.tracks[cd->tracks].rsvd	   = 0;
-			toc.tracks[cd->tracks].ADR	   = cd->disc_toc[cd->tracks].bFlags;
-			toc.tracks[cd->tracks].trackNumber = 0xAA;
-			toc.tracks[cd->tracks].rsvd2	   = 0;
-			toc.tracks[cd->tracks].addr	   = htonl(cd->disc_toc[cd->tracks].dwStartSector);
+				if ((i > 0 && info.mcdi.GetNthEntryType(i) != info.mcdi.GetNthEntryType(i + 1) && info.mcdi.GetNthEntryTrackNumber(i + 1) != 0xAA) ||
+				    (i < info.mcdi.GetNumberOfEntries() - 1 && info.mcdi.GetNthEntryOffset(i + 2) - info.mcdi.GetNthEntryType(i + 1) <= 0))
+
+				if ((i > 1 && (cd->disc_toc[i - 1].bFlags & 4) != (cd->disc_toc[i].bFlags & 4) && cd->disc_toc[i].bTrack != 0xAA) ||
+				    (i < cd->tracks && cd->disc_toc[i + 1].dwStartSector - cd->disc_toc[i].dwStartSector <= 0))
+				{
+					toc.tracks[i].addr = htonl(cd->disc_toc[i].dwStartSector + 11400);
+				}
+			}
 
 			Buffer<UnsignedByte>	 buffer(ntohs(toc.tocLen) + 2);
 
