@@ -179,6 +179,8 @@ Error BoCA::WaveIn::GetStreamInfo(const String &streamURI, Track &track)
 BoCA::WaveIn::WaveIn()
 {
 	packageSize = 0;
+
+	dataOffset  = 0;
 }
 
 BoCA::WaveIn::~WaveIn()
@@ -205,9 +207,11 @@ Bool BoCA::WaveIn::Activate()
 	}
 	while (chunk != "data");
 
-	driver->Seek(in->GetPos());
+	dataOffset = in->GetPos();
 
 	delete in;
+
+	driver->Seek(dataOffset);
 
 	return True;
 }
@@ -219,7 +223,7 @@ Bool BoCA::WaveIn::Deactivate()
 
 Bool BoCA::WaveIn::Seek(Int64 samplePosition)
 {
-	driver->Seek(driver->GetPos() + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
+	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
 
 	return True;
 }

@@ -348,7 +348,7 @@ Bool BoCA::SndFileIn::Deactivate()
 
 Bool BoCA::SndFileIn::Seek(Int64 samplePosition)
 {
-	if (ex_sf_seek(sndf, samplePosition, SEEK_CUR) != -1) return True;
+	if (ex_sf_seek(sndf, samplePosition, SEEK_SET) != -1) return True;
 	else						      return False;
 }
 
