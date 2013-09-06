@@ -15,6 +15,7 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 {
 	library	= NIL;
 
+	type	= COMPONENT_TYPE_UNKNOWN;
 	mode	= COMPONENT_MODE_INTERNAL;
 	debug	= False;
 

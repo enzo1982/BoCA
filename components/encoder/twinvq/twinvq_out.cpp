@@ -65,6 +65,7 @@ BoCA::TwinVQOut::TwinVQOut()
 	bfp	    = NIL;
 
 	memset(&setupInfo, 0, sizeof(setupInfo));
+	memset(&encInfo, 0, sizeof(encInfo));
 	memset(&index, 0, sizeof(index));
 }
 
