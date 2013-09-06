@@ -236,32 +236,35 @@ const BoCA::MCDI &BoCA::CDIOInfo::GetNthDeviceMCDI(Int n)
 			TOCTRACK	 tracks[100];
 		} __attribute__((__packed__)) TOC;
 
-		TOC	 toc;
-
-		toc.tocLen	= htons(2 + cdio_get_num_tracks(cd) * 8 + 8);
-		toc.firstTrack	= cdio_get_first_track_num(cd);
-		toc.lastTrack	= cdio_get_last_track_num(cd);
-
-		for (Int i = 0; i <= toc.lastTrack - toc.firstTrack; i++)
+		if (cdio_get_num_tracks(cd) != CDIO_INVALID_TRACK)
 		{
-			toc.tracks[i].rsvd	  = 0;
-			toc.tracks[i].ADR	  = (0x01 << 4) | ((cdio_get_track_format(cd, toc.firstTrack + i) != TRACK_FORMAT_AUDIO) << 2) | (cdio_get_track_copy_permit(cd, toc.firstTrack + i) << 1) | (cdio_get_track_preemphasis(cd, toc.firstTrack + i));
-			toc.tracks[i].trackNumber = toc.firstTrack + i;
-			toc.tracks[i].rsvd2	  = 0;
-			toc.tracks[i].addr	  = htonl(cdio_get_track_lsn(cd, toc.firstTrack + i));
+			TOC	 toc;
+
+			toc.tocLen	= htons(2 + cdio_get_num_tracks(cd) * 8 + 8);
+			toc.firstTrack	= cdio_get_first_track_num(cd);
+			toc.lastTrack	= cdio_get_last_track_num(cd);
+
+			for (Int i = 0; i <= toc.lastTrack - toc.firstTrack; i++)
+			{
+				toc.tracks[i].rsvd	  = 0;
+				toc.tracks[i].ADR	  = (0x01 << 4) | ((cdio_get_track_format(cd, toc.firstTrack + i) != TRACK_FORMAT_AUDIO) << 2) | (cdio_get_track_copy_permit(cd, toc.firstTrack + i) << 1) | (cdio_get_track_preemphasis(cd, toc.firstTrack + i));
+				toc.tracks[i].trackNumber = toc.firstTrack + i;
+				toc.tracks[i].rsvd2	  = 0;
+				toc.tracks[i].addr	  = htonl(cdio_get_track_lsn(cd, toc.firstTrack + i));
+			}
+
+			toc.tracks[toc.lastTrack - toc.firstTrack + 1].rsvd	   = 0;
+			toc.tracks[toc.lastTrack - toc.firstTrack + 1].ADR	   = (0x01 << 4) | ((cdio_get_track_format(cd, CDIO_CDROM_LEADOUT_TRACK) != TRACK_FORMAT_AUDIO) << 2) | (cdio_get_track_copy_permit(cd, CDIO_CDROM_LEADOUT_TRACK) << 1) | (cdio_get_track_preemphasis(cd, CDIO_CDROM_LEADOUT_TRACK));
+			toc.tracks[toc.lastTrack - toc.firstTrack + 1].trackNumber = 0xAA;
+			toc.tracks[toc.lastTrack - toc.firstTrack + 1].rsvd2	   = 0;
+			toc.tracks[toc.lastTrack - toc.firstTrack + 1].addr	   = htonl(cdio_get_track_lsn(cd, CDIO_CDROM_LEADOUT_TRACK));
+
+			Buffer<UnsignedByte>	 buffer(ntohs(toc.tocLen) + 2);
+
+			memcpy(buffer, &toc, ntohs(toc.tocLen) + 2);
+
+			mcdi.SetData(buffer);
 		}
-
-		toc.tracks[toc.lastTrack - toc.firstTrack + 1].rsvd	   = 0;
-		toc.tracks[toc.lastTrack - toc.firstTrack + 1].ADR	   = (0x01 << 4) | ((cdio_get_track_format(cd, CDIO_CDROM_LEADOUT_TRACK) != TRACK_FORMAT_AUDIO) << 2) | (cdio_get_track_copy_permit(cd, CDIO_CDROM_LEADOUT_TRACK) << 1) | (cdio_get_track_preemphasis(cd, CDIO_CDROM_LEADOUT_TRACK));
-		toc.tracks[toc.lastTrack - toc.firstTrack + 1].trackNumber = 0xAA;
-		toc.tracks[toc.lastTrack - toc.firstTrack + 1].rsvd2	   = 0;
-		toc.tracks[toc.lastTrack - toc.firstTrack + 1].addr	   = htonl(cdio_get_track_lsn(cd, CDIO_CDROM_LEADOUT_TRACK));
-
-		Buffer<UnsignedByte>	 buffer(ntohs(toc.tocLen) + 2);
-
-		memcpy(buffer, &toc, ntohs(toc.tocLen) + 2);
-
-		mcdi.SetData(buffer);
 
 		cdio_destroy(cd);
 	}
