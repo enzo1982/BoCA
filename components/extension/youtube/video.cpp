@@ -73,21 +73,9 @@ Int BoCA::Video::DownloaderThread(String targetFileName)
 		 */
 		cacheURL.Replace("https://", "http://");
 
-		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(cacheURL);
-
-		protocol->downloadProgress.Connect(&downloadProgress);
-		protocol->downloadSpeed.Connect(&downloadSpeed);
-		protocol->doCancelDownload.DisconnectAll();
-		protocol->doCancelDownload.Connect(&Video::DoCancelDownload, this);
-		protocol->DownloadToFile(targetFileName);
-
-		String	 streamURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
-
-		delete protocol;
-
-		if (streamURL != NIL)
+		do
 		{
-			Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(streamURL);
+			Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(cacheURL);
 
 			protocol->downloadProgress.Connect(&downloadProgress);
 			protocol->downloadSpeed.Connect(&downloadSpeed);
@@ -95,8 +83,11 @@ Int BoCA::Video::DownloaderThread(String targetFileName)
 			protocol->doCancelDownload.Connect(&Video::DoCancelDownload, this);
 			protocol->DownloadToFile(targetFileName);
 
+			cacheURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
+
 			delete protocol;
 		}
+		while (cacheURL != NIL);
 	}
 
 	/* Convert video file if requested.
@@ -145,31 +136,28 @@ Bool BoCA::Video::DownloadPage()
 	 */
 	videoURL.Replace("https://", "http://");
 
-	Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(videoURL);
 	Buffer<UnsignedByte>	 buffer;
+	String			 pageURL = videoURL;
 
-	protocol->DownloadToBuffer(buffer);
-
-	String	 location = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
-
-	delete protocol;
-
-	if (location != NIL)
+	do
 	{
-		if (location.StartsWith("/"))
+		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(pageURL);
+
+		protocol->DownloadToBuffer(buffer);
+
+		pageURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
+
+		delete protocol;
+
+		if (pageURL.StartsWith("/"))
 		{
 			String	 proto	= videoURL.Head(videoURL.Find("//") + 2);
 			String	 server = videoURL.SubString(proto.Length(), videoURL.Tail(videoURL.Length() - proto.Length()).Find("/"));
 
-			location = String(proto).Append(server).Append(location);
+			pageURL = String(proto).Append(server).Append(pageURL);
 		}
-
-		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(location);
-
-		protocol->DownloadToBuffer(buffer);
-
-		delete protocol;
 	}
+	while (pageURL != NIL);
 
 	videoPageHTML.ImportFrom("ISO-8859-1", (char *) (UnsignedByte *) buffer);
 
@@ -202,23 +190,20 @@ Bool BoCA::Video::QueryMetadata()
 		 */
 		videoThumbnailURL.Replace("https://", "http://");
 
-		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(videoThumbnailURL);
 		Buffer<UnsignedByte>	 buffer;
+		String			 streamURL = videoThumbnailURL;
 
-		protocol->DownloadToBuffer(buffer);
-
-		String		 streamURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
-
-		delete protocol;
-
-		if (streamURL != NIL)
+		do
 		{
 			Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(streamURL);
 
 			protocol->DownloadToBuffer(buffer);
 
+			streamURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
+
 			delete protocol;
 		}
+		while (streamURL != NIL);
 
 		videoThumbnail.mime = "image/jpeg";
 		videoThumbnail.type = 0;
