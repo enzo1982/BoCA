@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -153,7 +153,7 @@ namespace smooth
 				virtual String			 ToString() const		{ return "a Widget"; }
 			accessors:
 				virtual Bool			 IsRegistered() const		{ return registered; }
-				virtual Bool			 IsVisible() const		{ if (!registered) return visible; if (!visible) return False; return container->IsVisible(); }
+				virtual Bool			 IsVisible() const		{ if (!registered) return False; if (!visible) return False; return container->IsVisible(); }
 				virtual Bool			 IsActive() const		{ if (!registered) return active; if (!active) return False; if (alwaysActive) return True; return container->IsActive(); }
 
 				Int				 SetVisibleDirect(Bool nValue)	{ visible = nValue; return Success(); }
