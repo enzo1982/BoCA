@@ -34,12 +34,19 @@ v8::Handle<v8::Value> BoCA::DownloadURL(const v8::Arguments &args)
 		 */
 		url.Replace("https://", "http://");
 
-		Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(url);
 		Buffer<UnsignedByte>	 buffer;
 
-		protocol->DownloadToBuffer(buffer);
+		do
+		{
+			Protocols::Protocol	*protocol = Protocols::Protocol::CreateForURL(url);
 
-		delete protocol;
+			protocol->DownloadToBuffer(buffer);
+
+			url = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
+
+			delete protocol;
+		}
+		while (url != NIL);
 
 		if (buffer.Size() > 0)
 		{
