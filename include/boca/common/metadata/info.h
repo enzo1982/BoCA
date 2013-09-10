@@ -54,13 +54,13 @@ namespace BoCA
 			String			 title;
 			String			 album;
 			String			 genre;
-			Short			 year;
 			String			 comment;
+			Short			 year;
 
 			/* Disc information:
 			 */
-			Byte			 track;
-			Byte			 numTracks;
+			Short			 track;
+			Short			 numTracks;
 
 			Byte			 disc;
 			Byte			 numDiscs;
