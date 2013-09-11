@@ -130,23 +130,23 @@ Bool BoCA::FAACOut::Activate()
 	fConfig->aacObjectType	= config->GetIntValue("FAAC", "AACType", 2);
 	fConfig->allowMidside	= config->GetIntValue("FAAC", "AllowJS", 1);
 	fConfig->useTns		= config->GetIntValue("FAAC", "UseTNS", 0);
-	fConfig->bandWidth	= config->GetIntValue("FAAC", "BandWidth", 16000);
+	fConfig->bandWidth	= config->GetIntValue("FAAC", "BandWidth", 22050);
 
-	if (config->GetIntValue("FAAC", "MP4Container", 1)) fConfig->outputFormat	= 0; // Raw AAC frame headers
+	if (config->GetIntValue("FAAC", "MP4Container", 1)) fConfig->outputFormat = 0; // Raw AAC frame headers
 
-	if (config->GetIntValue("FAAC", "SetQuality", 1))   fConfig->quantqual		= config->GetIntValue("FAAC", "AACQuality", 100);
-	else						    fConfig->bitRate		= config->GetIntValue("FAAC", "Bitrate", 64) * 1000;
+	if (config->GetIntValue("FAAC", "SetQuality", 1))   fConfig->quantqual	  = config->GetIntValue("FAAC", "AACQuality", 100);
+	else						    fConfig->bitRate	  = config->GetIntValue("FAAC", "Bitrate", 96) * 1000;
 
-	if (format.bits == 8)	fConfig->inputFormat	= FAAC_INPUT_16BIT;
-	if (format.bits == 16)	fConfig->inputFormat	= FAAC_INPUT_16BIT;
-	if (format.bits == 24)	fConfig->inputFormat	= FAAC_INPUT_32BIT;
-	if (format.bits == 32)	fConfig->inputFormat	= FAAC_INPUT_FLOAT;
+	if (format.bits == 8)	fConfig->inputFormat = FAAC_INPUT_16BIT;
+	if (format.bits == 16)	fConfig->inputFormat = FAAC_INPUT_16BIT;
+	if (format.bits == 24)	fConfig->inputFormat = FAAC_INPUT_32BIT;
+	if (format.bits == 32)	fConfig->inputFormat = FAAC_INPUT_FLOAT;
 
 	ex_faacEncSetConfiguration(handle, fConfig);
 
 	if (config->GetIntValue("FAAC", "MP4Container", 1))
 	{
-		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), 0, 0, 1, 1, NIL, 0, NIL, 0);
+		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);	
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);

@@ -39,7 +39,7 @@ extern FAACENCGETDECODERSPECIFICINFO	 ex_faacEncGetDecoderSpecificInfo;
 extern FAACENCENCODE			 ex_faacEncEncode;
 extern FAACENCCLOSE			 ex_faacEncClose;
 
-typedef MP4FileHandle			(*MP4CREATEEX)					(const char *, uint32_t, uint32_t, int, int, char *, uint32_t, char **, uint32_t);
+typedef MP4FileHandle			(*MP4CREATEEX)					(const char *, uint32_t, int, int, char *, uint32_t, char **, uint32_t);
 typedef bool				(*MP4CLOSE)					(MP4FileHandle);
 typedef bool				(*MP4SETTRACKESCONFIGURATION)			(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t);
 typedef void				(*MP4SETAUDIOPROFILELEVEL)			(MP4FileHandle, uint8_t);

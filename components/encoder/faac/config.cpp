@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,7 +17,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	mpegVersion	= config->GetIntValue("FAAC", "MPEGVersion", 0);
 	aacType		= config->GetIntValue("FAAC", "AACType", 2);
-	bitrate		= config->GetIntValue("FAAC", "Bitrate", 64);
+	bitrate		= config->GetIntValue("FAAC", "Bitrate", 96);
 	allowjs		= config->GetIntValue("FAAC", "AllowJS", 1);
 	usetns		= config->GetIntValue("FAAC", "UseTNS", 0);
 	setQuality	= config->GetIntValue("FAAC", "SetQuality", 1);
@@ -114,7 +114,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	option_bitrate->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
 	option_bitrate->SetWidth(option_bitrate->GetUnscaledTextWidth() + 19);
 
-	slider_bitrate		= new Slider(Point(option_bitrate->GetWidth() + 19, 13), Size(227 - option_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 8, 256);
+	slider_bitrate		= new Slider(Point(option_bitrate->GetWidth() + 19, 13), Size(227 - option_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 8, 128);
 	slider_bitrate->onValueChange.Connect(&ConfigureFAAC::SetBitrate, this);
 
 	edit_bitrate		= new EditBox(NIL, Point(254, 12), Size(25, 0), 3);
@@ -161,7 +161,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	text_bandwidth		= new Text(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz):"), Point(11, 15));
 
-	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue("FAAC", "BandWidth", 16000)), Point(text_bandwidth->GetUnscaledTextWidth() + 19, 12), Size(291 - text_bandwidth->GetUnscaledTextWidth(), 0), 5);
+	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue("FAAC", "BandWidth", 22050)), Point(text_bandwidth->GetUnscaledTextWidth() + 19, 12), Size(291 - text_bandwidth->GetUnscaledTextWidth(), 0), 5);
 	edit_bandwidth->SetFlags(EDB_NUMERIC);
 
 	group_bandwidth->Add(text_bandwidth);
@@ -242,7 +242,7 @@ Int BoCA::ConfigureFAAC::SaveSettings()
 	Config	*config = Config::Get();
 
 	if (bitrate < 8)	bitrate = 8;
-	if (bitrate > 256)	bitrate = 256;
+	if (bitrate > 128)	bitrate = 128;
 
 	if (aacQuality < 10)	aacQuality = 10;
 	if (aacQuality > 500)	aacQuality = 500;
