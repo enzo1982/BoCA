@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -51,7 +51,11 @@ namespace smooth
 				Int				 scrollPos;
 				Int				 maxScrollPos;
 
+				Int				 tabSize;
+
 				Array<Int>			 lineIndices;
+
+				String				 ConvertTabs(const String &) const;
 
 				Bool				 ContainsRTLCharacters(const String &) const;
 
@@ -105,6 +109,9 @@ namespace smooth
 			accessors:
 				Int				 SetCursorPos(Int);
 				Int				 GetCursorPos() const;
+
+				Int				 SetTabSize(Int);
+				Int				 GetTabSize() const;
 
 				Int				 SetMaxSize(Int);
 				Int				 GetMaxSize() const;

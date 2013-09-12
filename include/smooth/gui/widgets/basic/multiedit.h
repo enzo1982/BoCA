@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,9 +45,12 @@ namespace smooth
 				virtual Int			 SetText(const String &);
 				virtual const String		&GetText() const;
 
-				Int				 GetCursorPos();
-
 				Int				 MarkAll();
+			accessors:
+				Int				 GetCursorPos() const;
+
+				Int				 SetTabSize(Int);
+				Int				 GetTabSize() const;
 			signals:
 				Signal1<Void, const String &>	 onInput;
 			slots:
