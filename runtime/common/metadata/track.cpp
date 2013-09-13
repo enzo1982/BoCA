@@ -186,9 +186,9 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 	 */
 	for (Int i = 0; i < pictures.Length(); i++)
 	{
-		if (pictures.GetNthReference(i).data.Size() != picture.data.Size()) continue;
+		if (pictures.GetNth(i).data.Size() != picture.data.Size()) continue;
 
-		if (memcmp(pictures.GetNthReference(i).data, picture.data, picture.data.Size()) == 0) return True;
+		if (memcmp(pictures.GetNth(i).data, picture.data, picture.data.Size()) == 0) return True;
 	}
 
 	if	(file.Find("front") >= 0) picture.type = 0x03; // Cover (front)
@@ -204,7 +204,7 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &directory)
 {
 	if (Config::Get()->GetIntValue("Tags", "CoverArtWriteToFiles", False))
 	{
-		foreach (Picture picture, pictures)
+		foreach (const Picture &picture, pictures)
 		{
 			String	 fileName = Config::Get()->GetStringValue("Tags", "CoverArtFilenamePattern", "<artist> - <album>\\<type>");
 

@@ -122,7 +122,7 @@ Int BoCA::Config::FindPersistentIntValueIndex(const String &section, const Strin
 
 	for (Int i = 0; i < persistentIntIDs.Length(); i++)
 	{
-		const String &nthID = persistentIntIDs.GetNthReference(i);
+		const String &nthID = persistentIntIDs.GetNth(i);
 
 		if (nthID == id) return i;
 	}
@@ -161,7 +161,7 @@ Bool BoCA::Config::SaveSettings()
 	 */
 	for (Int i = 0; i < persistentIntIDs.Length(); i++)
 	{
-		const String	&nthID = persistentIntIDs.GetNthReference(i);
+		const String	&nthID = persistentIntIDs.GetNth(i);
 
 		config->SetIntValue(nthID.Head(nthID.Find("::")), nthID.Tail(nthID.Length() - nthID.Find("::") - 2), *persistentIntValues.GetNth(i));
 	}
@@ -214,7 +214,7 @@ Int BoCA::Config::SetActiveConfiguration(const String &nConfig)
 	{
 		for (Int i = 0; i < persistentIntIDs.Length(); i++)
 		{
-			const String	&nthID = persistentIntIDs.GetNthReference(i);
+			const String	&nthID = persistentIntIDs.GetNth(i);
 
 			*persistentIntValues.GetNth(i) = config->GetIntValue(nthID.Head(nthID.Find("::")), nthID.Tail(nthID.Length() - nthID.Find("::") - 2), *persistentIntValues.GetNth(i));
 		}

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -253,7 +253,7 @@ Void BoCA::LayerTagOther::OnSelectTrack(const Track &nTrack)
 
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		const String	&value = info.other.GetNth(i);
 
 		if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))    { edit_oartist->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
 		else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))     { edit_oalbum->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
@@ -301,7 +301,7 @@ Void BoCA::LayerTagOther::OnSelectAlbum(const Track &nTrack)
 
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		const String	&value = info.other.GetNth(i);
 
 		if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	    { edit_wartist->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
 		else if	(value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")))  { edit_wpublisher->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
@@ -368,7 +368,7 @@ Void BoCA::LayerTagOther::OnModifyTrack()
 
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		const String	&value = info.other.GetNth(i);
 
 		if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))    { if (edit_oartist->GetText()     != NIL) { info.other.SetNth(i, String(INFO_ORIG_ARTIST).Append(":").Append(edit_oartist->GetText()));	   modified_oartist	= True; } else { info.other.RemoveNth(i); } }
 		else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))     { if (edit_oalbum->GetText()      != NIL) { info.other.SetNth(i, String(INFO_ORIG_ALBUM).Append(":").Append(edit_oalbum->GetText()));	   modified_oalbum	= True; } else { info.other.RemoveNth(i); } }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -291,7 +291,7 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (track.tracks.Length() > 0)
 	{
-		const Track	&iTrack = track.tracks.GetNthReference(0);
+		const Track	&iTrack = track.tracks.GetNth(0);
 		const Format	&format = iTrack.GetFormat();
 
 		if (iTrack.sampleOffset >= 0) offset += iTrack.sampleOffset / (format.rate / 75);
@@ -303,7 +303,7 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		offsets.Append("+").Append(Number((Int64) offset).ToHexString());
 
-		const Track	&iTrack = track.tracks.GetNthReference(i);
+		const Track	&iTrack = track.tracks.GetNth(i);
 		const Format	&format = iTrack.GetFormat();
 
 		if	(iTrack.length	     >= 0) offset += iTrack.length / (format.rate / 75);
@@ -311,16 +311,15 @@ Error BoCA::CueSheetIn::GetStreamInfo(const String &streamURI, Track &track)
 		else				   { offsets = NIL; break; }
 	}
 
-	if (offsets != NIL) offsets = offsets.Append("+").Append(Number((Int64) offset).ToHexString()).ToUpper();
-
-	/* Add offset string to all track.
-	 */
-	for (Int i = 0; i < track.tracks.Length(); i++)
+	if (offsets != NIL)
 	{
-		Track	&iTrack = track.tracks.GetNthReference(i);
+		offsets = offsets.Append("+").Append(Number((Int64) offset).ToHexString()).ToUpper();
 
-		if (offsets != NIL)
+		/* Add offset string to all track.
+		 */
+		for (Int i = 0; i < track.tracks.Length(); i++)
 		{
+			Track	&iTrack = track.tracks.GetNthReference(i);
 			Info	 info = iTrack.GetInfo();
 
 			info.offsets = offsets;

@@ -635,7 +635,7 @@ Void BoCA::LayerYouTube::OnSelectNone()
  */
 Void BoCA::LayerYouTube::OnEditMetadata()
 {
-	Track	 track = tracks.GetNth(list_tracks->GetSelectedEntryNumber());
+	Track	&track = tracks.GetNthReference(list_tracks->GetSelectedEntryNumber());
 	Info	 info = track.GetInfo();
 
 	info.title	= edit_title->GetText();

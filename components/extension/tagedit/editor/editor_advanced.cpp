@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -106,7 +106,7 @@ Void BoCA::LayerTagAdvanced::OnSelectTagType()
 	Int	 n = combo_type->GetSelectedEntryNumber();
 	TagSpec	*tag = tagTypes.GetNth(n);
 
-	foreach (TagField field, tag->fields)
+	foreach (const TagField &field, tag->fields)
 	{
 		list_fields->AddEntry(String(field.name).Append("\t").Append(field.techId).Append("\t").Append(""));
 	}
@@ -114,9 +114,9 @@ Void BoCA::LayerTagAdvanced::OnSelectTagType()
 
 Void BoCA::LayerTagAdvanced::OnSelectField()
 {
-	Int		 n = list_fields->GetSelectedEntryNumber();
-	TagSpec		*tag = tagTypes.GetNth(combo_type->GetSelectedEntryNumber());
-	TagField	 field = tag->fields.GetNth(n);
+	Int		 n     = list_fields->GetSelectedEntryNumber();
+	TagSpec		*tag   = tagTypes.GetNth(combo_type->GetSelectedEntryNumber());
+	const TagField	&field = tag->fields.GetNth(n);
 
 	if (layer_field != NIL)
 	{

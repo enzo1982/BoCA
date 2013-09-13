@@ -59,7 +59,7 @@ BoCA::AS::Registry::Registry()
 
 	for (Int i = 0; i < dllFiles.Length(); i++)
 	{
-		File		 file = dllFiles.GetNth(i);
+		const File	&file  = dllFiles.GetNth(i);
 		ComponentSpecs	*specs = new ComponentSpecs();
 
 		if (specs->LoadFromDLL(file)) InsertComponent(specs);
@@ -70,7 +70,7 @@ BoCA::AS::Registry::Registry()
 
 	for (Int i = 0; i < xmlFiles.Length(); i++)
 	{
-		File		 file = xmlFiles.GetNth(i);
+		const File	&file  = xmlFiles.GetNth(i);
 		ComponentSpecs	*specs = new ComponentSpecs();
 
 		if (specs->LoadFromXML(file)) InsertComponent(specs);

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -223,7 +223,7 @@ Void BoCA::LayerTagDetails::OnSelectTrack(const Track &nTrack)
 
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		const String	&value = info.other.GetNth(i);
 
 		if	(value.StartsWith(String(INFO_BAND).Append(":")))	   { edit_band->SetText(value.Tail(value.Length() - value.Find(":") - 1));	  }
 		else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":")))	   { edit_conductor->SetText(value.Tail(value.Length() - value.Find(":") - 1));   }
@@ -319,7 +319,7 @@ Void BoCA::LayerTagDetails::OnModifyTrack()
 
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 value = info.other.GetNth(i);
+		const String	&value = info.other.GetNth(i);
 
 		if	(value.StartsWith(String(INFO_BAND).Append(":")))	   { if (edit_band->GetText()	     != NIL) { info.other.SetNth(i, String(INFO_BAND).Append(":").Append(edit_band->GetText()));		 modified_band		= True; } else { info.other.RemoveNth(i); } }
 		else if	(value.StartsWith(String(INFO_CONDUCTOR).Append(":")))	   { if (edit_conductor->GetText()   != NIL) { info.other.SetNth(i, String(INFO_CONDUCTOR).Append(":").Append(edit_conductor->GetText()));	 modified_conductor	= True; } else { info.other.RemoveNth(i); } }

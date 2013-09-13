@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -182,7 +182,7 @@ Void BoCA::ChooserAlbums::OnModifyTrack(const Track &track)
 				 */
 				for (Int i = 0; i < mTrackInfo.other.Length(); i++)
 				{
-					String	 value = mTrackInfo.other.GetNth(i);
+					const String	&value = mTrackInfo.other.GetNth(i);
 
 					if (value.StartsWith(String(INFO_WEB_ARTIST).Append(":"))    ||
 					    value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")) ||
@@ -194,7 +194,7 @@ Void BoCA::ChooserAlbums::OnModifyTrack(const Track &track)
 
 				for (Int i = 0; i < info.other.Length(); i++)
 				{
-					String	 value = info.other.GetNth(i);
+					const String	&value = info.other.GetNth(i);
 
 					if (value.StartsWith(String(INFO_WEB_ARTIST).Append(":"))    ||
 					    value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")) ||
@@ -246,7 +246,7 @@ Void BoCA::ChooserAlbums::OnApplicationModifyTrack(const Track &track)
 {
 	for (Int i = 0; i < tracks.Length(); i++)
 	{
-		if (tracks.GetNthReference(i).GetTrackID() == track.GetTrackID())
+		if (tracks.GetNth(i).GetTrackID() == track.GetTrackID())
 		{
 			Track	 album = tracks.GetNth(i);
 
@@ -268,7 +268,7 @@ Void BoCA::ChooserAlbums::OnApplicationRemoveTrack(const Track &track)
 {
 	for (Int i = 0; i < tracks.Length(); i++)
 	{
-		if (tracks.GetNthReference(i).GetTrackID() == track.GetTrackID())
+		if (tracks.GetNth(i).GetTrackID() == track.GetTrackID())
 		{
 			tracks.RemoveNth(i);
 
@@ -371,7 +371,7 @@ Void BoCA::ChooserAlbums::AddToAlbumList(const Track &track)
 		 */
 		for (Int i = 0; i < trackInfo.other.Length(); i++)
 		{
-			String	 value = trackInfo.other.GetNth(i);
+			const String	&value = trackInfo.other.GetNth(i);
 
 			if (value.StartsWith(String(INFO_WEB_ARTIST).Append(":"))    ||
 			    value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")) ||
@@ -414,7 +414,7 @@ Void BoCA::ChooserAlbums::RemoveFromAlbumList(const Track &album)
 	{
 		for (Int i = 0; i < albums.Length(); i++)
 		{
-			if (!IsAlbumIdentical(album, albums.GetNthReference(i))) continue;
+			if (!IsAlbumIdentical(album, albums.GetNth(i))) continue;
 
 			albums.RemoveNth(i);
 			list_albums->Remove(list_albums->GetNthEntry(i));

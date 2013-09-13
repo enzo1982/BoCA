@@ -76,8 +76,8 @@ Error BoCA::CuesheetPlaylist::WritePlaylist(const String &file)
 
 	for (Int c = 0; c < trackList.Length() - 1; c++)
 	{
-		const Track	&track	= trackList.GetNthReference(c);
-		const Track	&track1	= trackList.GetNthReference(c + 1);
+		const Track	&track	= trackList.GetNth(c);
+		const Track	&track1	= trackList.GetNth(c + 1);
 
 		const Info	&info	= track.GetInfo();
 		const Info	&info1	= track1.GetInfo();
@@ -94,7 +94,7 @@ Error BoCA::CuesheetPlaylist::WritePlaylist(const String &file)
 	/* Metadata.
 	 */
 	{
-		const Info	&info = trackList.GetNthReference(0).GetInfo();
+		const Info	&info = trackList.GetNth(0).GetInfo();
 
 		/* Output per album metadata.
 		 */
@@ -125,7 +125,7 @@ Error BoCA::CuesheetPlaylist::WritePlaylist(const String &file)
 	 */
 	for (Int i = 0; i < trackList.Length(); i++)
 	{
-		const Track	&track = trackList.GetNthReference(i);
+		const Track	&track = trackList.GetNth(i);
 		const Info	&info  = track.GetInfo();
 
 		if (!oneFile || i == 0) out.OutputLine(String("FILE \"").Append(Utilities::GetRelativeFileName(track.origFilename, actualFile)).Append("\" ").Append(GetFileType(track.origFilename)));

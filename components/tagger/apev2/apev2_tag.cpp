@@ -96,10 +96,10 @@ Error BoCA::APETag::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &trac
 	 */
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		String	 pair  = info.other.GetNth(i);
+		const String	&pair  = info.other.GetNth(i);
 
-		String	 key   = pair.Head(pair.Find(":") + 1);
-		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+		String		 key   = pair.Head(pair.Find(":") + 1);
+		String		 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
 		if (value == NIL) continue;
 
