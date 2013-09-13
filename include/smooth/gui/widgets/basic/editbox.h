@@ -23,7 +23,7 @@ namespace smooth
 	};
 };
 
-#include "../widget.h"
+#include "../special/cursor.h"
 
 namespace smooth
 {
@@ -48,17 +48,17 @@ namespace smooth
 
 				virtual Int			 Paint(Int);
 
-				virtual Int			 SetText(const String &);
-				virtual const String		&GetText() const;
+				virtual Int			 SetText(const String &nText)	{ return cursor->SetText(nText); }
+				virtual const String		&GetText() const		{ return cursor->GetText(); }
 
 				Int				 SetDropDownList(List *);
 
-				Int				 MarkAll();
+				Int				 MarkAll()			{ return cursor->MarkAll(); }
 			accessors:
-				Bool				 IsFocussed() const;
+				Bool				 IsFocussed() const		{ return cursor->IsFocussed(); }
 
-				Int				 SetCursorPos(Int);
-				Int				 GetCursorPos() const;
+				Int				 SetCursorPos(Int nPos)		{ return cursor->SetCursorPos(nPos); }
+				Int				 GetCursorPos() const		{ return cursor->GetCursorPos(); }
 			signals:
 				Signal1<Void, const String &>	 onInput;
 				Signal1<Void, const String &>	 onEnter;

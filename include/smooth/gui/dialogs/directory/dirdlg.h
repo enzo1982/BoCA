@@ -41,7 +41,7 @@ namespace smooth
 					virtual const Error	&ShowDialog() = 0;
 				accessors:
 					Int			 SetDirName(const String &);
-					const String		&GetDirName();
+					const String		&GetDirName() const;
 			};
 		};
 	};

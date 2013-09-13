@@ -108,13 +108,13 @@ namespace smooth
 				Int				 Scroll(Int);
 			accessors:
 				Int				 SetCursorPos(Int);
-				Int				 GetCursorPos() const;
+				Int				 GetCursorPos() const		{ return focussed ? promptPos : -1; }
 
-				Int				 SetTabSize(Int);
-				Int				 GetTabSize() const;
+				Void				 SetTabSize(Int nTabSize)	{ tabSize = nTabSize; }
+				Int				 GetTabSize() const		{ return tabSize; }
 
-				Int				 SetMaxSize(Int);
-				Int				 GetMaxSize() const;
+				Void				 SetMaxSize(Int);
+				Int				 GetMaxSize() const		{ return maxSize; }
 
 				virtual Int			 SetText(const String &);
 			signals:

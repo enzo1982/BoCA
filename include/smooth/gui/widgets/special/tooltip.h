@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,9 +49,9 @@ namespace smooth
 				virtual Int		 Show();
 				virtual Int		 Hide();
 			accessors:
-				Int			 SetTimeout(Int);
+				Void			 SetTimeout(Int nTimeOut)	{ timeOut = nTimeOut; }
 
-				Int			 SetLayer(Layer *);
+				Void			 SetLayer(Layer *nLayer)	{ layer = nLayer; }
 			slots:
 				Void			 OnToolWindowPaint();
 				Void			 OnToolWindowEvent(Int, Int, Int);

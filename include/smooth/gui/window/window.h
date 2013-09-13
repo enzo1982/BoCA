@@ -85,20 +85,20 @@ namespace smooth
 								 Window(const String &, const Point &, const Size &, Void * = NIL);
 				virtual				~Window();
 
-				Int				 GetOrder() const			 { return order; }
+				Int				 GetOrder() const			{ return order; }
 
 				Int				 SetIcon(const Bitmap &);
-				const Bitmap			&GetIcon() const;
+				const Bitmap			&GetIcon() const			{ return icon; }
 
 				Int				 SetIconDirect(Void *);
 
-				virtual Rect			 GetVisibleArea() const			 { return Rect(Point(), GetRealSize()); }
+				virtual Rect			 GetVisibleArea() const			{ return Rect(Point(), GetRealSize()); }
 
 				virtual Int			 SetMetrics(const Point &, const Size &);
 
 				Int				 SetText(const String &);
 
-				Layer				*GetMainLayer() const;
+				Layer				*GetMainLayer() const			{ return mainLayer; }
 
 				Int				 SetStatusText(const String &);
 				const String			&GetStatusText() const;
@@ -109,16 +109,16 @@ namespace smooth
 				Int				 SetRightToLeft(Bool);
 				virtual Bool			 IsRightToLeft() const;
 
-				virtual Point			 GetRealPosition() const;
+				virtual Point			 GetRealPosition() const		{ return Point(0, 0); }
 
 				Rect				 GetWindowRect() const;
 				Rect				 GetClientRect() const;
 				Rect				 GetRestoredWindowRect() const;
 
-				Int				 GetFrameWidth()			{ return frameWidth; }
+				Int				 GetFrameWidth() const			{ return frameWidth; }
 
-				const Rect			&GetUpdateRect() const;
-				Int				 SetUpdateRect(const Rect &);
+				Void				 SetUpdateRect(const Rect &nUpdateRect)	{ updateRect = nUpdateRect; }
+				const Rect			&GetUpdateRect() const			{ return updateRect; }
 
 				Int				 SetMinimumSize(const Size &);
 				Int				 SetMaximumSize(const Size &);
@@ -136,7 +136,7 @@ namespace smooth
 				Int				 Stay();
 				Int				 Close();
 
-				Bool				 IsInUse() const;
+				Bool				 IsInUse() const			{ return (created && !destroyed); }
 
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);

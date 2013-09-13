@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,35 +55,35 @@ namespace smooth
 				static Bool	 hasVMX;
 				static Bool	 hasSVM;
 
-				Error		 GetCPUID();
+				Error		 GetCPUID() const;
 			public:
 						 CPU();
 			accessors:
-				Int		 GetNumCores()		{ return numCores; }
-				Int		 GetNumLogicalCPUs()	{ return numLogicalCPUs; }
+				Int		 GetNumCores() const		{ return numCores; }
+				Int		 GetNumLogicalCPUs() const	{ return numLogicalCPUs; }
 
-				Bool		 HasMMX()		{ return hasMMX; }
-				Bool		 HasMMXExt()		{ return hasMMXExt; }
+				Bool		 HasMMX() const			{ return hasMMX; }
+				Bool		 HasMMXExt() const		{ return hasMMXExt; }
 
-				Bool		 HasSSE()		{ return hasSSE; }
-				Bool		 HasSSE2()		{ return hasSSE2; }
-				Bool		 HasSSE3()		{ return hasSSE3; }
-				Bool		 HasSSSE3()		{ return hasSSSE3; }
-				Bool		 HasSSE4_1()		{ return hasSSE4_1; }
-				Bool		 HasSSE4_2()		{ return hasSSE4_2; }
-				Bool		 HasSSE4a()		{ return hasSSE4a; }
-				Bool		 HasSSE5()		{ return hasSSE5; }
+				Bool		 HasSSE() const			{ return hasSSE; }
+				Bool		 HasSSE2() const		{ return hasSSE2; }
+				Bool		 HasSSE3() const		{ return hasSSE3; }
+				Bool		 HasSSSE3() const		{ return hasSSSE3; }
+				Bool		 HasSSE4_1() const		{ return hasSSE4_1; }
+				Bool		 HasSSE4_2() const		{ return hasSSE4_2; }
+				Bool		 HasSSE4a() const		{ return hasSSE4a; }
+				Bool		 HasSSE5() const		{ return hasSSE5; }
 
-				Bool		 HasAVX()		{ return hasAVX; }
+				Bool		 HasAVX() const			{ return hasAVX; }
 
-				Bool		 Has3DNow()		{ return has3DNow; }
-				Bool		 Has3DNowExt()		{ return has3DNowExt; }
+				Bool		 Has3DNow() const		{ return has3DNow; }
+				Bool		 Has3DNowExt() const		{ return has3DNowExt; }
 
-				Bool		 HasHT()		{ return hasHT; }
-				Bool		 HasNX()		{ return hasNX; }
+				Bool		 HasHT() const			{ return hasHT; }
+				Bool		 HasNX() const			{ return hasNX; }
 
-				Bool		 HasVMX()		{ return hasVMX; }
-				Bool		 HasSVM()		{ return hasSVM; }
+				Bool		 HasVMX() const			{ return hasVMX; }
+				Bool		 HasSVM() const			{ return hasSVM; }
 		};
 	};
 };

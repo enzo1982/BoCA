@@ -66,10 +66,10 @@ namespace smooth
 					Int			 AddFilter(const String &, const String &);
 
 					Int			 SetFileName(const String &);
-					String			 GetFileName();
+					const String		&GetFileName() const;
 
-					Int			 GetNumberOfFiles();
-					String			 GetNthFileName(Int);
+					Int			 GetNumberOfFiles() const;
+					const String		&GetNthFileName(Int) const;
 			};
 		};
 	};

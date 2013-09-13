@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,30 +41,30 @@ namespace smooth
 								 Tree(const String &);
 				virtual				~Tree();
 
-				ListEntry			*AddEntry(const String &entry)	{ return list.AddEntry(entry); }
+				ListEntry			*AddEntry(const String &entry)		{ return list.AddEntry(entry); }
 
 				Int				 Add(Widget *);
 				Int				 Remove(Widget *);
 
-				Int				 RemoveAllEntries()		{ return list.RemoveAllEntries(); }
+				Int				 RemoveAllEntries()			{ return list.RemoveAllEntries(); }
 
-				Int				 Open()				{ return SetMark(True); }
-				Int				 Close()			{ return SetMark(False); }
+				Int				 Open()					{ return SetMark(True); }
+				Int				 Close()				{ return SetMark(False); }
 
 				virtual Int			 Paint(Int);
 
 				virtual Bool			 IsTypeCompatible(Short) const;
 			accessors:
-				List				*GetList()			{ return &list; }
+				List				*GetList()				{ return &list; }
 
-				Int				 Length() const			{ return list.Length(); }
-				ListEntry			*GetNthEntry(Int n) const	{ return list.GetNthEntry(n); };
+				Int				 Length() const				{ return list.Length(); }
+				ListEntry			*GetNthEntry(Int n) const		{ return list.GetNthEntry(n); };
 
-				Int				 SelectEntry(ListEntry *entry)	{ return list.SelectEntry(entry); }
-				ListEntry			*GetSelectedEntry() const	{ return list.GetSelectedEntry(); };
+				Int				 SelectEntry(const ListEntry *entry)	{ return list.SelectEntry(entry); }
+				ListEntry			*GetSelectedEntry() const		{ return list.GetSelectedEntry(); };
 
-				Int				 SelectNthEntry(Int n)		{ return list.SelectNthEntry(n); }
-				Int				 GetSelectedEntryNumber() const	{ return list.GetSelectedEntryNumber(); }
+				Int				 SelectNthEntry(Int n)			{ return list.SelectNthEntry(n); }
+				Int				 GetSelectedEntryNumber() const		{ return list.GetSelectedEntryNumber(); }
 			signals:
 				Signal1<Void, ListEntry *>	 onSelectEntry;
 

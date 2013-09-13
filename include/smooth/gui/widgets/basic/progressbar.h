@@ -49,8 +49,8 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 			accessors:
-				Int			 SetValue(Int);
-				Int			 GetValue();
+				Void			 SetValue(Int);
+				Int			 GetValue() const	{ return value; }
 		};
 	};
 };

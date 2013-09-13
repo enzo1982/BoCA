@@ -32,7 +32,7 @@ namespace smooth
 								 Section();
 				virtual				~Section();
 
-				const String			&GetString(const String &);
+				const String			&GetString(const String &) const;
 
 				virtual Error			 Parse(XML::Node *);
 			accessors:

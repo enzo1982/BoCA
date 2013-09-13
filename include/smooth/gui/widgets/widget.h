@@ -121,8 +121,8 @@ namespace smooth
 
 				virtual Int			 EnableLocking(Bool = True);
 
-				Int				 GetNOfObjects() const		{ return widgets.Length(); }
-				Widget				*GetNthObject(Int n) const	{ return widgets.GetNth(n); }
+				Int				 GetNOfObjects() const				{ return widgets.Length(); }
+				Widget				*GetNthObject(Int n) const			{ return widgets.GetNth(n); }
 
 				virtual Int			 Add(Widget *);
 				virtual Int			 Remove(Widget *);
@@ -130,10 +130,10 @@ namespace smooth
 				Window				*GetContainerWindow() const;
 				virtual Surface			*GetDrawSurface() const;
 
-				Int				 SetContainer(Widget *);
-				Widget				*GetContainer() const;
+				Void				 SetContainer(Widget *nContainer)		{ container = nContainer; }
+				Widget				*GetContainer() const				{ return container; }
 
-				Void				 SetRegisteredFlag(Bool);
+				Void				 SetRegisteredFlag(Bool nValue)			{ registered = nValue; }
 
 				Widget				*GetPreviousTabstopWidget(Int) const;
 				Widget				*GetNextTabstopWidget(Int) const;
@@ -150,55 +150,55 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 
-				virtual String			 ToString() const		{ return "a Widget"; }
+				virtual String			 ToString() const				{ return "a Widget"; }
 			accessors:
-				virtual Bool			 IsRegistered() const		{ return registered; }
-				virtual Bool			 IsVisible() const		{ if (!registered) return False; if (!visible) return False; return container->IsVisible(); }
-				virtual Bool			 IsActive() const		{ if (!registered) return active; if (!active) return False; if (alwaysActive) return True; return container->IsActive(); }
+				virtual Bool			 IsRegistered() const				{ return registered; }
+				virtual Bool			 IsVisible() const				{ if (!registered) return False; if (!visible) return False; return container->IsVisible(); }
+				virtual Bool			 IsActive() const				{ if (!registered) return active; if (!active) return False; if (alwaysActive) return True; return container->IsActive(); }
 
-				Int				 SetVisibleDirect(Bool nValue)	{ visible = nValue; return Success(); }
-				Bool				 IsVisibleDirect() const	{ return visible; }
+				Void				 SetVisibleDirect(Bool nValue)			{ visible = nValue; }
+				Bool				 IsVisibleDirect() const			{ return visible; }
 
-				Int				 SetAlwaysActive(Bool nValue)	{ alwaysActive = nValue; return Success(); }
-				Bool				 IsAlwaysActive() const		{ return alwaysActive; }
+				Void				 SetAlwaysActive(Bool nValue)			{ alwaysActive = nValue; }
+				Bool				 IsAlwaysActive() const				{ return alwaysActive; }
 
-				Int				 SetIndependent(Bool nValue)	{ independent = nValue; return Success(); }
-				Bool				 IsIndependent() const		{ return independent; }
+				Void				 SetIndependent(Bool nValue)			{ independent = nValue; }
+				Bool				 IsIndependent() const				{ return independent; }
 
-				Int				 SetTabstopCapable(Bool nValue)	{ tabstopCapable = nValue; return Success(); }
-				Bool				 IsTabstopCapable() const	{ return tabstopCapable; }
+				Void				 SetTabstopCapable(Bool nValue)			{ tabstopCapable = nValue; }
+				Bool				 IsTabstopCapable() const			{ return tabstopCapable; }
 
-				Bool				 IsMouseOver() const		{ return mouseOver; }
+				Bool				 IsMouseOver() const				{ return mouseOver; }
 
 				Int				 SetFocus();
-				Bool				 IsFocussed() const		{ return focussed; }
+				Bool				 IsFocussed() const				{ return focussed; }
 
 				virtual Int			 SetText(const String &);
-				virtual const String		&GetText() const;
+				virtual const String		&GetText() const				{ return text; }
 
 				virtual Int			 SetTooltipText(const String &);
-				virtual const String		&GetTooltipText() const;
+				virtual const String		&GetTooltipText() const				{ return tooltipText; }
 
 				virtual Int			 SetTooltipLayer(Layer *);
-				virtual Layer			*GetTooltipLayer() const;
+				virtual Layer			*GetTooltipLayer() const			{ return tooltipLayer; }
 
-				virtual Int			 SetStatusText(const String &);
-				virtual const String		&GetStatusText() const;
+				virtual Int			 SetStatusText(const String &nStatusText)	{ statusText = nStatusText; return Success(); }
+				virtual const String		&GetStatusText() const				{ return statusText; }
 
 				virtual Int			 SetFont(const Font &);
-				virtual const Font		&GetFont() const;
+				virtual const Font		&GetFont() const				{ return font; }
 
-				Int				 GetUnscaledTextWidth() const	{ return unscaledTextSize.cx; }
-				Int				 GetScaledTextWidth() const	{ return scaledTextSize.cx; }
+				Int				 GetUnscaledTextWidth() const			{ return unscaledTextSize.cx; }
+				Int				 GetScaledTextWidth() const			{ return scaledTextSize.cx; }
 
-				Int				 GetUnscaledTextHeight() const	{ return unscaledTextSize.cy; }
-				Int				 GetScaledTextHeight() const	{ return scaledTextSize.cy; }
+				Int				 GetUnscaledTextHeight() const			{ return unscaledTextSize.cy; }
+				Int				 GetScaledTextHeight() const			{ return scaledTextSize.cy; }
 
-				const Size			&GetUnscaledTextSize() const	{ return unscaledTextSize; }
-				const Size			&GetScaledTextSize() const	{ return scaledTextSize; }
+				const Size			&GetUnscaledTextSize() const			{ return unscaledTextSize; }
+				const Size			&GetScaledTextSize() const			{ return scaledTextSize; }
 
 				virtual Int			 SetOrientation(Int);
-				virtual Int			 GetOrientation() const;
+				virtual Int			 GetOrientation() const				{ return orientation; }
 
 				virtual Rect			 GetVisibleArea() const;
 
@@ -207,23 +207,23 @@ namespace smooth
 
 				virtual Bool			 IsBackgroundColorSet() const;
 
-				Int				 SetX(Int nX)			{ return SetMetrics(Point(nX, pos.y), size); }
-				Int				 GetX() const			{ return pos.x; }
+				Int				 SetX(Int nX)					{ return SetMetrics(Point(nX, pos.y), size); }
+				Int				 GetX() const					{ return pos.x; }
 
-				Int				 SetY(Int nY)			{ return SetMetrics(Point(pos.x, nY), size); }
-				Int				 GetY() const			{ return pos.y; }
+				Int				 SetY(Int nY)					{ return SetMetrics(Point(pos.x, nY), size); }
+				Int				 GetY() const					{ return pos.y; }
 
-				Int				 SetWidth(Int nWidth)		{ return SetMetrics(pos, Size(nWidth, size.cy)); }
-				Int				 GetWidth() const		{ return size.cx; }
+				Int				 SetWidth(Int nWidth)				{ return SetMetrics(pos, Size(nWidth, size.cy)); }
+				Int				 GetWidth() const				{ return size.cx; }
 
-				Int				 SetHeight(Int nHeight)		{ return SetMetrics(pos, Size(size.cx, nHeight)); }
-				Int				 GetHeight() const		{ return size.cy; }
+				Int				 SetHeight(Int nHeight)				{ return SetMetrics(pos, Size(size.cx, nHeight)); }
+				Int				 GetHeight() const				{ return size.cy; }
 
-				Int				 SetPosition(const Point &nPos)	{ return SetMetrics(nPos, size); }
-				const Point			&GetPosition() const		{ return pos; }
+				Int				 SetPosition(const Point &nPos)			{ return SetMetrics(nPos, size); }
+				const Point			&GetPosition() const				{ return pos; }
 
-				Int				 SetSize(const Size &nSize)	{ return SetMetrics(pos, nSize); }
-				const Size			&GetSize() const		{ return size; }
+				Int				 SetSize(const Size &nSize)			{ return SetMetrics(pos, nSize); }
+				const Size			&GetSize() const				{ return size; }
 
 				virtual Int			 SetMetrics(const Point &, const Size &);
 

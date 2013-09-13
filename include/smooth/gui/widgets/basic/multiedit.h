@@ -21,7 +21,7 @@ namespace smooth
 	};
 };
 
-#include "../widget.h"
+#include "../special/cursor.h"
 
 namespace smooth
 {
@@ -43,14 +43,14 @@ namespace smooth
 				virtual Int			 Paint(Int);
 
 				virtual Int			 SetText(const String &);
-				virtual const String		&GetText() const;
+				virtual const String		&GetText() const		{ return cursor->GetText(); }
 
-				Int				 MarkAll();
+				Int				 MarkAll()			{ return cursor->MarkAll(); }
 			accessors:
-				Int				 GetCursorPos() const;
+				Int				 GetCursorPos() const		{ return cursor->GetCursorPos(); }
 
-				Int				 SetTabSize(Int);
-				Int				 GetTabSize() const;
+				Void				 SetTabSize(Int nTabSize)	{ cursor->SetTabSize(nTabSize); }
+				Int				 GetTabSize() const		{ return cursor->GetTabSize(); }
 			signals:
 				Signal1<Void, const String &>	 onInput;
 			slots:

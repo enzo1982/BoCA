@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -62,13 +62,13 @@ namespace smooth
 
 					String			 ComposeHeader();
 
-					String			 GetParametersURLEncoded();
+					String			 GetParametersURLEncoded() const;
 				public:
 								 HTTP(const String &);
 					virtual			~HTTP();
 
 					Int			 SetHeaderField(const String &, const String &);	// Set header field
-					String			 GetHeaderField(const String &);			// Get header field
+					String			 GetHeaderField(const String &) const;			// Get header field
 
 					Int			 SetParameter(const String &, const String &);		// Set parameter
 					Int			 SetParameterFile(const String &, const String &);	// Set file to be transmitted; forces HTTP_METHOD_POST
@@ -81,7 +81,7 @@ namespace smooth
 					Int			 SetProxyMode(Short);					// Set proxy mode
 					Int			 SetProxyAuth(const String &, const String &);		// Set user name and password for proxy
 
-					String			 GetResponseHeaderField(const String &);
+					String			 GetResponseHeaderField(const String &) const;
 
 					Int			 DownloadToFile(const String &);
 			};

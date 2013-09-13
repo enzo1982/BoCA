@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,7 +35,7 @@ namespace smooth
 				Hotspot				*hotspot;
 				Hotspot				*markHotspot;
 
-				String				 GetNthTabText(Int);
+				String				 GetNthTabText(Int) const;
 			public:
 				static const Short		 classID;
 
@@ -47,11 +47,11 @@ namespace smooth
 				virtual String			 ToString() const		{ return "a ListEntry"; }
 			accessors:
 				Int				 SetMark(Bool);
-				Bool				 IsMarked();
+				Bool				 IsMarked() const		{ return marked; }
 
 				Int				 Select();
 				Int				 Deselect();
-				Bool				 IsSelected();
+				Bool				 IsSelected() const		{ return selected; }
 			signals:
 				static Signal2<Void, Int, Int>	 internalOnSelectEntry;
 
