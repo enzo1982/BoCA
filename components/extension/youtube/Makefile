@@ -10,6 +10,12 @@ BOCA_PATH = ../../..
 
 include $(BOCA_PATH)/Makefile-options
 
+# Disable PowerPC builds of this component on OS X for now.
+ifeq ($(BUILD_OSX),True)
+	BUILD_PPC   = False
+	BUILD_PPC64 = False
+endif
+
 # Enter object files here:
 OBJECTS	  = config.o converter.o layer.o scriptutilities.o video.o videolist.o videolistentry.o videosite.o youtube.o
 

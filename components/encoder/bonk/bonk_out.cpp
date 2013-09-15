@@ -141,19 +141,24 @@ Bool BoCA::BonkOut::Deactivate()
 
 Int BoCA::BonkOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	int	 bytes = 0;
+	static Endianness	 endianness = CPU().GetEndianness();
 
+	/* Convert samples to 16 bit.
+	 */
 	const Format	&format = track.GetFormat();
+	int		 bytes	= 0;
 
 	if (format.bits != 16)
 	{
 		samplesBuffer.Resize(size);
 
-		for (int i = 0; i < size / (format.bits / 8); i++)
+		for (Int i = 0; i < size / (format.bits / 8); i++)
 		{
-			if (format.bits == 8)	samplesBuffer[i] = (data[i] - 128) * 256;
-			if (format.bits == 24)	samplesBuffer[i] = (int) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
-			if (format.bits == 32)	samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
+			if	(format.bits ==  8				) samplesBuffer[i] = (				       data [i] - 128) * 256;
+			else if (format.bits == 32				) samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i]	       / 65536;
+
+			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) (data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
+			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) (data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0)) / 256;
 		}
 
 		bytes = ex_bonk_encoder_encode_packet(encoder, samplesBuffer, size / (format.bits / 8), dataBuffer, dataBuffer.Size());

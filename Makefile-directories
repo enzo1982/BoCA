@@ -2,10 +2,13 @@
 
 include $(BOCA_PATH)/Makefile-options
 
+BINDIR = bin
+LIBDIR = lib
+
 ifeq ($(BUILD_X86_64),True)
 	BINDIR = bin64
 	LIBDIR = lib64
-else
-	BINDIR = bin
-	LIBDIR = lib
+else ifeq ($(BUILD_PPC64),True)
+	BINDIR = bin64
+	LIBDIR = lib64
 endif

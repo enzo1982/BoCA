@@ -15,10 +15,29 @@ else ifeq ($(BUILD_LINUX),True)
 	endif
 endif
 
+ifeq ($(BUILD_OSX),True)
+ifeq ($(BUILD_X86),True)
+	CPPOPTS += -arch i386
+endif
+ifeq ($(BUILD_X86_64),True)
+	CPPOPTS += -arch x86_64
+endif
+ifeq ($(BUILD_PPC),True)
+	CPPOPTS += -arch ppc
+endif
+ifeq ($(BUILD_PPC64),True)
+	CPPOPTS += -arch ppc64
+endif
+else ifeq ($(BUILD_X86),True)
+	CPPOPTS += -m32
+else ifeq ($(BUILD_X86_64),True)
+	CPPOPTS += -m64
+endif
+
 all : $(TARGET)
 
 $(TARGET) : $(OBJECTS)
-	$(AR) cru $@ $(OBJECTS)
+	$(AR) rs $@ $(OBJECTS)
 
 clean :
 	rm -f $(TARGET) $(OBJECTS)

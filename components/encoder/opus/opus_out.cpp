@@ -250,23 +250,28 @@ Bool BoCA::OpusOut::Activate()
 
 Bool BoCA::OpusOut::Deactivate()
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	Buffer<UnsignedByte>	 data;
 
 	Int	 size = resampler->Flush(data);
 
-	const Format	&format = track.GetFormat();
-
+	/* Convert samples to 16 bit.
+	 */
+	const Format	&format	 = track.GetFormat();
 	Int		 samples = size / format.channels / (format.bits / 8);
 
 	if (format.bits != 16)
 	{
 		samplesBuffer.Resize(samples * format.channels);
 
-		for (int i = 0; i < samples * format.channels; i++)
+		for (Int i = 0; i < samples * format.channels; i++)
 		{
-			if (format.bits == 8)	samplesBuffer[i] = (data[i] - 128) * 256;
-			if (format.bits == 24)	samplesBuffer[i] = (int) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
-			if (format.bits == 32)	samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
+			if	(format.bits ==  8				) samplesBuffer[i] = (				       data [i] - 128) * 256;
+			else if (format.bits == 32				) samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i]	       / 65536;
+
+			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) (data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
+			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) (data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0)) / 256;
 		}
 	}
 	else
@@ -297,21 +302,26 @@ Bool BoCA::OpusOut::Deactivate()
 
 Int BoCA::OpusOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	size = resampler->TransformData(data, size);
 
-	const Format	&format = track.GetFormat();
-
+	/* Convert samples to 16 bit.
+	 */
+	const Format	&format	 = track.GetFormat();
 	Int		 samples = size / format.channels / (format.bits / 8);
 
 	if (format.bits != 16)
 	{
 		samplesBuffer.Resize(samples * format.channels);
 
-		for (int i = 0; i < samples * format.channels; i++)
+		for (Int i = 0; i < samples * format.channels; i++)
 		{
-			if (format.bits == 8)	samplesBuffer[i] = (data[i] - 128) * 256;
-			if (format.bits == 24)	samplesBuffer[i] = (int) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
-			if (format.bits == 32)	samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
+			if	(format.bits ==  8				) samplesBuffer[i] = (				       data [i] - 128) * 256;
+			else if (format.bits == 32				) samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i]	       / 65536;
+
+			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) (data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
+			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) (data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0)) / 256;
 		}
 	}
 	else

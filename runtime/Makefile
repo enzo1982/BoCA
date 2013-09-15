@@ -33,19 +33,33 @@ CLEANCMD1 =
 include $(BOCA_PATH)/Makefile-directories
 
 CC	  = gcc
-CCOPTS	  = -g0 -Wall -Os -fno-exceptions -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(PREFIX)\" -I$(BOCA_PATH)/include
+CCOPTS	  = -pipe -g0 -Wall -Os -fno-exceptions -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(PREFIX)\" -I$(BOCA_PATH)/include
 LD	  = gcc
-LDOPTS	  = -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ -s $(LIBS)
+LDOPTS	  = -pipe -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_OSX),True)
-	CCOPTS += -arch x86_64 -arch i386
-	LDOPTS += -arch x86_64 -arch i386
+ifeq ($(BUILD_X86),True)
+	CCOPTS += -arch i386
+	LDOPTS += -arch i386
+endif
+ifeq ($(BUILD_X86_64),True)
+	CCOPTS += -arch x86_64
+	LDOPTS += -arch x86_64
+endif
+ifeq ($(BUILD_PPC),True)
+	CCOPTS += -arch ppc
+	LDOPTS += -arch ppc
+endif
+ifeq ($(BUILD_PPC64),True)
+	CCOPTS += -arch ppc64
+	LDOPTS += -arch ppc64
+endif
+else ifeq ($(BUILD_X86),True)
+	CCOPTS += -m32
+	LDOPTS += -m32 -s
 else ifeq ($(BUILD_X86_64),True)
 	CCOPTS += -m64
-	LDOPTS += -m64
-else
-	CCOPTS += -m32
-	LDOPTS += -m32
+	LDOPTS += -m64 -s
 endif
 
 ifneq ($(BUILD_WIN32),True)
@@ -71,6 +85,8 @@ else
 		ifeq ($(BUILD_X86_64),True)
 			CCOPTS += -fPIC
 		endif
+	else
+		CCOPTS += -I/usr/local/include
 	endif
 endif
 
@@ -83,7 +99,11 @@ $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED): $(OBJECTS)
 ifeq ($(BUILD_WIN32),True)
 	$(LD) --shared -o $@ $(OBJECTS) -Wl,--out-implib,$(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
 else
+ifneq ($(BUILD_OSX),True)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+else
+	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS)
+endif
 
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
 	ln -s $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)

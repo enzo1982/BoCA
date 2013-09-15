@@ -343,30 +343,35 @@ Bool BoCA::LAMEOut::Deactivate()
 
 Int BoCA::LAMEOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	unsigned long	 bytes = 0;
+	static Endianness	 endianness = CPU().GetEndianness();
 
 	outBuffer.Resize(size + 7200);
 
+	/* Convert samples to 16 bit.
+	 */
 	const Format	&format = track.GetFormat();
+	unsigned long	 bytes	= 0;
 
 	if (format.bits != 16)
 	{
 		samplesBuffer.Resize(size / (format.bits / 8));
 
-		for (int i = 0; i < size / (format.bits / 8); i++)
+		for (Int i = 0; i < size / (format.bits / 8); i++)
 		{
-			if (format.bits == 8)	samplesBuffer[i] = (data[i] - 128) * 256;
-			if (format.bits == 24)	samplesBuffer[i] = (int) (data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
-			if (format.bits == 32)	samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i] / 65536;
+			if	(format.bits ==  8				) samplesBuffer[i] = (				       data [i] - 128) * 256;
+			else if (format.bits == 32				) samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i]	       / 65536;
+
+			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) (data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
+			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) (data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0)) / 256;
 		}
 
-		if (format.channels == 2)	bytes = ex_lame_encode_buffer_interleaved(context, samplesBuffer, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
-		else				bytes = ex_lame_encode_buffer(context, samplesBuffer, samplesBuffer, size / (format.bits / 8), outBuffer, outBuffer.Size());
+		if (format.channels == 2) bytes = ex_lame_encode_buffer_interleaved(context, samplesBuffer, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
+		else			  bytes = ex_lame_encode_buffer(context, samplesBuffer, samplesBuffer, size / (format.bits / 8), outBuffer, outBuffer.Size());
 	}
 	else
 	{
-		if (format.channels == 2)	bytes = ex_lame_encode_buffer_interleaved(context, (signed short *) (unsigned char *) data, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
-		else				bytes = ex_lame_encode_buffer(context, (signed short *) (unsigned char *) data, (signed short *) (unsigned char *) data, size / (format.bits / 8), outBuffer, outBuffer.Size());
+		if (format.channels == 2) bytes = ex_lame_encode_buffer_interleaved(context, (signed short *) (unsigned char *) data, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
+		else			  bytes = ex_lame_encode_buffer(context, (signed short *) (unsigned char *) data, (signed short *) (unsigned char *) data, size / (format.bits / 8), outBuffer, outBuffer.Size());
 	}
 
 	driver->WriteData(outBuffer, bytes);

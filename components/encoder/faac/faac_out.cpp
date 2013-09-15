@@ -203,9 +203,9 @@ Bool BoCA::FAACOut::Deactivate()
 		{
 			if (bytes > 0)
 			{
-				Int		 samplesLeft	= totalSamples - encodedSamples + delaySamples;
-				MP4Duration	 dur		= samplesLeft > frameSize ? frameSize : samplesLeft;
-				MP4Duration	 ofs		= encodedSamples > 0 ? 0 : delaySamples;
+				Int		 samplesLeft = totalSamples - encodedSamples + delaySamples;
+				MP4Duration	 dur	     = samplesLeft > frameSize ? frameSize : samplesLeft;
+				MP4Duration	 ofs	     = encodedSamples > 0 ? 0 : delaySamples;
 
 				ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, dur, ofs, true);
 
@@ -270,22 +270,25 @@ Bool BoCA::FAACOut::Deactivate()
 
 Int BoCA::FAACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	Config	*config = Config::Get();
 
-	const Format	&format = track.GetFormat();
-
-	unsigned long	 bytes = 0;
+	/* Convert samples to 16 bit.
+	 */
+	const Format	&format	     = track.GetFormat();
 	Int		 samplesRead = size / (format.bits / 8);
-
-	totalSamples += samplesRead / format.channels;
+	unsigned long	 bytes	     = 0;
 
 	if (format.bits != 16)
 	{
-		for (int i = 0; i < samplesRead; i++)
+		for (Int i = 0; i < samplesRead; i++)
 		{
-			if (format.bits ==  8) ((short *) (int32_t *) samplesBuffer)[i] = (data[i] - 128) * 256;
-			if (format.bits == 24) samplesBuffer[i] = data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0);
-			if (format.bits == 32) ((float *) (int32_t *) samplesBuffer)[i] = (1.0 / 65536) * ((int32_t *) (unsigned char *) data)[i];
+			if	(format.bits ==  8				) ((short *) (int32_t *) samplesBuffer)[i] = (						    data [i] - 128) * 256;
+			else if (format.bits == 32				) ((float *) (int32_t *) samplesBuffer)[i] = (1.0 / 65536) * ((int32_t *) (unsigned char *) data)[i];
+
+			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0);
+			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0);
 		}
 
 		bytes = ex_faacEncEncode(handle, samplesBuffer, samplesRead, outBuffer, outBuffer.Size());
@@ -295,13 +298,15 @@ Int BoCA::FAACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 		bytes = ex_faacEncEncode(handle, (int32_t *) (unsigned char *) data, samplesRead, outBuffer, outBuffer.Size());
 	}
 
+	totalSamples += samplesRead / format.channels;
+
 	if (config->GetIntValue("FAAC", "MP4Container", 1))
 	{
 		if (bytes > 0)
 		{
-			Int		 samplesLeft	= totalSamples - encodedSamples + delaySamples;
-			MP4Duration	 dur		= samplesLeft > frameSize ? frameSize : samplesLeft;
-			MP4Duration	 ofs		= encodedSamples > 0 ? 0 : delaySamples;
+			Int		 samplesLeft = totalSamples - encodedSamples + delaySamples;
+			MP4Duration	 dur	     = samplesLeft > frameSize ? frameSize : samplesLeft;
+			MP4Duration	 ofs	     = encodedSamples > 0 ? 0 : delaySamples;
 
 			ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, dur, ofs, true);
 

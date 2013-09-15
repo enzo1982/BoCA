@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -45,7 +45,6 @@ const String &BoCA::WaveOut::GetComponentSpecs()
 
 BoCA::WaveOut::WaveOut()
 {
-	nOfSamples = 0;
 }
 
 BoCA::WaveOut::~WaveOut()
@@ -87,6 +86,16 @@ Bool BoCA::WaveOut::Deactivate()
 	Config		*config = Config::Get();
 	const Info	&info = track.GetInfo();
 
+	/* Write data size to header.
+	 */
+	Int	 dataSize = (driver->GetSize() - 44) * (track.GetFormat().bits / 8);
+
+	driver->Seek(40);
+	driver->WriteData((unsigned char *) &dataSize, 4);
+	driver->Seek(driver->GetSize());
+
+	/* Write RIFF tag if requested.
+	 */
 	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFINFOTag", True))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
@@ -104,6 +113,8 @@ Bool BoCA::WaveOut::Deactivate()
 		}
 	}
 
+	/* Write CART tag if requested.
+	 */
 	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFCartTag", True))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
@@ -121,23 +132,22 @@ Bool BoCA::WaveOut::Deactivate()
 		}
 	}
 
-	/* Write file and data size to header.
+	/* Write file size to header.
 	 */
 	Int	 fileSize = driver->GetSize() - 8;
-	Int	 dataSize = nOfSamples * (track.GetFormat().bits / 8);
 
 	driver->Seek(4);
 	driver->WriteData((unsigned char *) &fileSize, 4);
-
-	driver->Seek(40);
-	driver->WriteData((unsigned char *) &dataSize, 4);
+	driver->Seek(driver->GetSize());
 
 	return True;
 }
 
 Int BoCA::WaveOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	nOfSamples += (size / (track.GetFormat().bits / 8));
+	static Endianness	 endianness = CPU().GetEndianness();
+
+	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, track.GetFormat().bits / 8);
 
 	return driver->WriteData(data, size);
 }

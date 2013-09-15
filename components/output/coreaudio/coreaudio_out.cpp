@@ -71,7 +71,9 @@ BoCA::CoreAudioOut::~CoreAudioOut()
 
 Bool BoCA::CoreAudioOut::Activate()
 {
-	const Format	&format = track.GetFormat();
+	static Endianness	 endianness = CPU().GetEndianness();
+
+	const Format	&format	= track.GetFormat();
 
 	/* Find default output audio unit.
 	 */
@@ -98,7 +100,7 @@ Bool BoCA::CoreAudioOut::Activate()
 	CA::AudioStreamBasicDescription	 streamFormat;
 
 	streamFormat.mFormatID		= CA::kAudioFormatLinearPCM;
-	streamFormat.mFormatFlags	= CA::kLinearPCMFormatFlagIsPacked;
+	streamFormat.mFormatFlags	= CA::kLinearPCMFormatFlagIsPacked | (endianness == EndianBig ? CA::kLinearPCMFormatFlagIsBigEndian : 0);
 
 	streamFormat.mChannelsPerFrame	= format.channels;
 	streamFormat.mSampleRate	= format.rate;
