@@ -26,6 +26,16 @@ namespace smooth
 {
 	namespace System
 	{
+		enum Endianness
+		{
+			EndianUnknown	= 0,
+
+			EndianBig,
+			EndianLittle,
+			EndianWordSwappedBig,   /* Middle-endian, Honeywell 316 style */
+			EndianWordSwappedLittle /* Middle-endian, PDP-11 style */
+		};
+
 		class SMOOTHAPI CPU
 		{
 			private:
@@ -58,6 +68,8 @@ namespace smooth
 				Error		 GetCPUID() const;
 			public:
 						 CPU();
+
+				Endianness	 GetEndianness() const;
 			accessors:
 				Int		 GetNumCores() const		{ return numCores; }
 				Int		 GetNumLogicalCPUs() const	{ return numLogicalCPUs; }
