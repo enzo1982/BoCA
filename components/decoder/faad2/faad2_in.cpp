@@ -89,11 +89,11 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 		{
 			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 
-			mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"), 0);
+			mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 		}
 		else
 		{
-			mp4File = ex_MP4Read(streamURI, 0);
+			mp4File = ex_MP4Read(streamURI);
 		}
 
 		Int	 mp4Track = GetAudioTrack(mp4File);
@@ -110,7 +110,7 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 			    type == MP4_MPEG4_AAC_SCALABLE_AUDIO_TYPE) isValidFile = True;
 		}
 
-		ex_MP4Close(mp4File);
+		ex_MP4Close(mp4File, 0);
 
 		if (String::IsUnicode(streamURI))
 		{
@@ -146,11 +146,11 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 
-			mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"), 0);
+			mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 		}
 		else
 		{
-			mp4File = ex_MP4Read(streamURI, 0);
+			mp4File = ex_MP4Read(streamURI);
 		}
 
 		Int	 mp4Track = GetAudioTrack(mp4File);
@@ -184,7 +184,7 @@ Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
 			track.SetFormat(format);
 		}
 
-		ex_MP4Close(mp4File);
+		ex_MP4Close(mp4File, 0);
 
 		if (!errorState)
 		{
@@ -323,11 +323,11 @@ Bool BoCA::FAAD2In::Activate()
 		{
 			File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
 
-			mp4File	= ex_MP4Read(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"), 0);
+			mp4File	= ex_MP4Read(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
 		}
 		else
 		{
-			mp4File	= ex_MP4Read(track.origFilename, 0);
+			mp4File	= ex_MP4Read(track.origFilename);
 		}
 
 		mp4Track	= GetAudioTrack(mp4File);
@@ -397,7 +397,7 @@ Bool BoCA::FAAD2In::Deactivate()
 
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
-		ex_MP4Close(mp4File);
+		ex_MP4Close(mp4File, 0);
 
 		if (String::IsUnicode(track.origFilename))
 		{

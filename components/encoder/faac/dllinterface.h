@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -40,12 +40,11 @@ extern FAACENCENCODE			 ex_faacEncEncode;
 extern FAACENCCLOSE			 ex_faacEncClose;
 
 typedef MP4FileHandle			(*MP4CREATEEX)					(const char *, uint32_t, int, int, char *, uint32_t, char **, uint32_t);
-typedef bool				(*MP4CLOSE)					(MP4FileHandle);
+typedef void				(*MP4CLOSE)					(MP4FileHandle, uint32_t);
 typedef bool				(*MP4SETTRACKESCONFIGURATION)			(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t);
 typedef void				(*MP4SETAUDIOPROFILELEVEL)			(MP4FileHandle, uint8_t);
 typedef MP4TrackId			(*MP4ADDAUDIOTRACK)				(MP4FileHandle, uint32_t, MP4Duration, uint8_t);
-typedef bool				(*MP4WRITESAMPLE)				(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t, MP4Duration,
- MP4Duration, bool);
+typedef bool				(*MP4WRITESAMPLE)				(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t, MP4Duration, MP4Duration, bool);
 
 extern MP4CREATEEX			 ex_MP4CreateEx;
 extern MP4CLOSE				 ex_MP4Close;

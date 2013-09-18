@@ -223,7 +223,7 @@ Bool BoCA::FAACOut::Deactivate()
 
 	if (config->GetIntValue("FAAC", "MP4Container", 1))
 	{
-		ex_MP4Close(mp4File);
+		ex_MP4Close(mp4File, 0);
 
 		/* Write metadata to file
 		 */

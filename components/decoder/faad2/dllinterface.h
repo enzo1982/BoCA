@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -43,8 +43,8 @@ extern NEAACDECDECODE			 ex_NeAACDecDecode;
 extern NEAACDECCLOSE			 ex_NeAACDecClose;
 extern NEAACDECGETERRORMESSAGE		 ex_NeAACDecGetErrorMessage;
 
-typedef MP4FileHandle			(*MP4READ)					(const char *, uint32_t);
-typedef bool				(*MP4CLOSE)					(MP4FileHandle);
+typedef MP4FileHandle			(*MP4READ)					(const char *);
+typedef void				(*MP4CLOSE)					(MP4FileHandle, uint32_t);
 typedef void				(*MP4FREE)					(void *);
 typedef uint32_t			(*MP4GETNUMBEROFTRACKS)				(MP4FileHandle, const char *, uint8_t);
 typedef MP4TrackId			(*MP4FINDTRACKID)				(MP4FileHandle, uint16_t, const char *, uint8_t);

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,35 +20,35 @@ extern DynamicLoader	*mp4v2dll;
 Bool			 LoadMP4v2DLL();
 Void			 FreeMP4v2DLL();
 
-typedef MP4FileHandle		(*MP4READ)			(const char *, uint32_t);
-typedef MP4FileHandle		(*MP4MODIFY)			(const char *, uint32_t, uint32_t);
-typedef bool			(*MP4CLOSE)			(MP4FileHandle);
+typedef MP4FileHandle		(*MP4READ)			(const char *);
+typedef MP4FileHandle		(*MP4MODIFY)			(const char *, uint32_t);
+typedef void			(*MP4CLOSE)			(MP4FileHandle, uint32_t);
 typedef void			(*MP4FREE)			(void *);
-typedef bool			(*MP4OPTIMIZE)			(const char *, const char *, uint32_t);
+typedef bool			(*MP4OPTIMIZE)			(const char *, const char *);
 
-typedef MP4Tags *		(*MP4TAGSALLOC)			();
-typedef void			(*MP4TAGSFETCH)			(const MP4Tags *, MP4FileHandle);
-typedef void			(*MP4TAGSSTORE)			(const MP4Tags *, MP4FileHandle);
+typedef const MP4Tags *		(*MP4TAGSALLOC)			();
+typedef bool			(*MP4TAGSFETCH)			(const MP4Tags *, MP4FileHandle);
+typedef bool			(*MP4TAGSSTORE)			(const MP4Tags *, MP4FileHandle);
 typedef void			(*MP4TAGSFREE)			(const MP4Tags *);
 
-typedef void			(*MP4TAGSSETNAME)		(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETARTIST)		(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETALBUMARTIST)	(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETALBUM)		(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETGROUPING)		(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETCOMPOSER)		(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETCOMMENTS)		(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETGENRE)		(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETGENRETYPE)		(const MP4Tags *, const uint16_t *);
-typedef void			(*MP4TAGSSETRELEASEDATE)	(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETTRACK)		(const MP4Tags *, const MP4TagTrack *);
-typedef void			(*MP4TAGSSETDISK)		(const MP4Tags *, const MP4TagDisk *);
-typedef void			(*MP4TAGSSETCOMPILATION)	(const MP4Tags *, const uint8_t *);
-typedef void			(*MP4TAGSSETCOPYRIGHT)		(const MP4Tags *, const char *);
-typedef void			(*MP4TAGSSETMEDIATYPE)		(const MP4Tags *, const uint8_t *);
+typedef bool			(*MP4TAGSSETNAME)		(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETARTIST)		(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETALBUMARTIST)	(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETALBUM)		(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETGROUPING)		(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETCOMPOSER)		(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETCOMMENTS)		(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETGENRE)		(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETGENRETYPE)		(const MP4Tags *, const uint16_t *);
+typedef bool			(*MP4TAGSSETRELEASEDATE)	(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETTRACK)		(const MP4Tags *, const MP4TagTrack *);
+typedef bool			(*MP4TAGSSETDISK)		(const MP4Tags *, const MP4TagDisk *);
+typedef bool			(*MP4TAGSSETCOMPILATION)	(const MP4Tags *, const uint8_t *);
+typedef bool			(*MP4TAGSSETCOPYRIGHT)		(const MP4Tags *, const char *);
+typedef bool			(*MP4TAGSSETMEDIATYPE)		(const MP4Tags *, const uint8_t *);
 
-typedef void			(*MP4TAGSADDARTWORK)		(const MP4Tags *, const MP4TagArtwork *);
-typedef void			(*MP4TAGSREMOVEARTWORK)		(const MP4Tags *, uint32_t);
+typedef bool			(*MP4TAGSADDARTWORK)		(const MP4Tags *, MP4TagArtwork *);
+typedef bool			(*MP4TAGSREMOVEARTWORK)		(const MP4Tags *, uint32_t);
 
 typedef MP4ChapterType		(*MP4GETCHAPTERS)		(MP4FileHandle, MP4Chapter_t **, uint32_t *, MP4ChapterType);
 typedef MP4ChapterType		(*MP4SETCHAPTERS)		(MP4FileHandle, MP4Chapter_t *, uint32_t, MP4ChapterType);
