@@ -270,9 +270,6 @@ const BoCA::MCDI &BoCA::CDParanoiaInfo::GetNthDeviceMCDI(Int n)
 				toc.tracks[i].rsvd2	  = 0;
 				toc.tracks[i].addr	  = htonl(cd->disc_toc[i].dwStartSector);
 
-				if ((i > 0 && info.mcdi.GetNthEntryType(i) != info.mcdi.GetNthEntryType(i + 1) && info.mcdi.GetNthEntryTrackNumber(i + 1) != 0xAA) ||
-				    (i < info.mcdi.GetNumberOfEntries() - 1 && info.mcdi.GetNthEntryOffset(i + 2) - info.mcdi.GetNthEntryType(i + 1) <= 0))
-
 				if ((i > 1 && (cd->disc_toc[i - 1].bFlags & 4) != (cd->disc_toc[i].bFlags & 4) && cd->disc_toc[i].bTrack != 0xAA) ||
 				    (i < cd->tracks && cd->disc_toc[i + 1].dwStartSector - cd->disc_toc[i].dwStartSector <= 0))
 				{
