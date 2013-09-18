@@ -278,6 +278,8 @@ Bool BoCA::LAMEOut::Activate()
 
 	dataOffset = 0;
 
+	/* Write ID3v2 tag if requested.
+	 */
 	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
@@ -307,10 +309,19 @@ Bool BoCA::LAMEOut::Deactivate()
 	Config		*config = Config::Get();
 	const Info	&info = track.GetInfo();
 
-	unsigned long	 bytes = ex_lame_encode_flush(context, outBuffer, outBuffer.Size());
+	/* Flush buffers and write remaining data.
+	 */
+	while (true)
+	{
+		unsigned long	 bytes = ex_lame_encode_flush(context, outBuffer, outBuffer.Size());
 
-	driver->WriteData(outBuffer, bytes);
+		if (bytes == 0) break;
 
+		driver->WriteData(outBuffer, bytes);
+	}
+
+	/* Write ID3v1 tag if requested.
+	 */
 	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
