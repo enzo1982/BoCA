@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,12 +41,16 @@ namespace smooth
 				static Short	 Increment(volatile Short &);
 				static Short	 Decrement(volatile Short &);
 
+				static Short	 Set(volatile Short &, Short);
+
 				/* Access functions for Int.
 				 */
 				static Int	 Value(volatile Int &);
 
 				static Int	 Increment(volatile Int &);
 				static Int	 Decrement(volatile Int &);
+
+				static Int	 Set(volatile Int &, Int);
 		};
 	};
 };

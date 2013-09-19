@@ -32,8 +32,6 @@ namespace smooth
 
 			EndianBig,
 			EndianLittle,
-			EndianWordSwappedBig,   /* Middle-endian, Honeywell 316 style */
-			EndianWordSwappedLittle /* Middle-endian, PDP-11 style */
 		};
 
 		class SMOOTHAPI CPU
