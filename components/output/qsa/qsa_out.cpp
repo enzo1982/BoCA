@@ -51,6 +51,8 @@ BoCA::QSAOut::~QSAOut()
 
 Bool BoCA::QSAOut::Activate()
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	const Format	&format = track.GetFormat();
 
 	if (snd_pcm_open(&playback_handle, NIL, NIL, SND_PCM_OPEN_PLAYBACK | SND_PCM_OPEN_NONBLOCK) < 0) return False;
@@ -68,10 +70,10 @@ Bool BoCA::QSAOut::Activate()
 	channel_params.format.rate	   = format.rate;
 	channel_params.format.voices	   = format.channels;
 
-	if	(format.bits ==  8) channel_params.format.format = SND_PCM_SFMT_U8;
-	else if	(format.bits == 16) channel_params.format.format = SND_PCM_SFMT_S16_LE;
-	else if	(format.bits == 24) channel_params.format.format = SND_PCM_SFMT_S24_LE;
-	else if	(format.bits == 32) channel_params.format.format = SND_PCM_SFMT_S32_LE;
+	if	(format.bits ==  8) channel_params.format.format =						    SND_PCM_SFMT_U8;
+	else if	(format.bits == 16) channel_params.format.format = (endianness == EndianBig ? SND_PCM_SFMT_S16_BE : SND_PCM_SFMT_S16_LE);
+	else if	(format.bits == 24) channel_params.format.format = (endianness == EndianBig ? SND_PCM_SFMT_S24_BE : SND_PCM_SFMT_S24_LE);
+	else if	(format.bits == 32) channel_params.format.format = (endianness == EndianBig ? SND_PCM_SFMT_S32_BE : SND_PCM_SFMT_S32_LE);
 	
 	channel_params.buf.block.frag_size = format.channels * (format.bits / 8);
 	channel_params.buf.block.frags_min = 1;

@@ -49,6 +49,8 @@ BoCA::ALSAOut::~ALSAOut()
 
 Bool BoCA::ALSAOut::Activate()
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	const Format	&format = track.GetFormat();
 
 	if (snd_pcm_open(&playback_handle, "default", SND_PCM_STREAM_PLAYBACK, 0) < 0) return False;
@@ -62,10 +64,10 @@ Bool BoCA::ALSAOut::Activate()
 	snd_pcm_hw_params_set_access(playback_handle, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
 	snd_pcm_hw_params_set_buffer_size(playback_handle, hw_params, format.rate / 4);
 
-	if	(format.bits ==  8) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_U8);
-	else if	(format.bits == 16) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_S16_LE);
-	else if	(format.bits == 24) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_S32_LE);
-	else if	(format.bits == 32) snd_pcm_hw_params_set_format(playback_handle, hw_params, SND_PCM_FORMAT_S32_LE);
+	if	(format.bits ==  8) snd_pcm_hw_params_set_format(playback_handle, hw_params,						       SND_PCM_FORMAT_U8);
+	else if	(format.bits == 16) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_S16_BE : SND_PCM_FORMAT_S16_LE);
+	else if	(format.bits == 24) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_S32_BE : SND_PCM_FORMAT_S32_LE);
+	else if	(format.bits == 32) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_S32_BE : SND_PCM_FORMAT_S32_LE);
 
 	snd_pcm_hw_params_set_rate(playback_handle, hw_params, format.rate, 0);
 	snd_pcm_hw_params_set_channels(playback_handle, hw_params, format.channels);
@@ -90,6 +92,8 @@ Bool BoCA::ALSAOut::Deactivate()
 
 Int BoCA::ALSAOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	const Format		&format = track.GetFormat();
 	snd_pcm_sframes_t	 frames = -1;
 
@@ -99,7 +103,8 @@ Int BoCA::ALSAOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 		 */
 		Buffer<Int32>	 samples(size / (format.bits / 8));
 
-		for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) * 256;
+		if (endianness == EndianLittle) for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i    ] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) * 256;
+		else				for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i + 2] + (data[3 * i + 1] << 8) + (data[3 * i	 ] << 16)) * 256;
 
 		frames = snd_pcm_writei(playback_handle, samples, size / format.channels / (format.bits / 8));
 	}
