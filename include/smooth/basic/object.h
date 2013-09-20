@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,7 +42,7 @@ namespace smooth
 			static System::Timer		*cleanupTimer;
 
 			Int				 handle;
-			String				 name;
+			mutable String			*name;
 
 			Bool				 lockingEnabled;
 
@@ -86,7 +86,7 @@ namespace smooth
 			Int				 GetHandle() const			{ return handle; }
 
 			Int				 SetName(const String &);
-			const String			&GetName() const			{ return name; }
+			const String			&GetName() const;
 
 			Int				 SetFlags(Int nFlags)			{ flags = nFlags; return Errors::Success(); }
 			Int				 GetFlags() const			{ return flags; }
