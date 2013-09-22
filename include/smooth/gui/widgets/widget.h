@@ -40,13 +40,11 @@ namespace smooth
 namespace smooth
 {
 	const Short	 SP_PAINT	= 0;
-	const Short	 SP_MOUSEIN	= 1;
-	const Short	 SP_MOUSEOUT	= 2;
-	const Short	 SP_MOUSEDOWN	= 3;
-	const Short	 SP_MOUSEUP	= 4;
-	const Short	 SP_UPDATE	= 5;
-	const Short	 SP_SHOW	= 6;
-	const Short	 SP_HIDE	= 7;
+	const Short	 SP_UPDATE	= 1;
+	const Short	 SP_MOUSEIN	= 2;
+	const Short	 SP_MOUSEOUT	= 3;
+	const Short	 SP_MOUSEDOWN	= 4;
+	const Short	 SP_MOUSEUP	= 5;
 
 	namespace GUI
 	{
