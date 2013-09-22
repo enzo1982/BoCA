@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,7 +20,7 @@ BoCA::VideoList::VideoList(const Point &iPos, const Size &iSize)
 	SetBackgroundColor(Setup::ClientColor);
 	SetMetrics(iPos, iSize);
 
-	if (GetWidth() == 0) SetWidth(120);
+	if (GetWidth()	== 0) SetWidth(120);
 	if (GetHeight() == 0) SetHeight(80);
 
 	onChangeSize.Connect(&VideoList::OnChangeSize, this);
@@ -41,8 +41,8 @@ BoCA::VideoList::~VideoList()
 
 Int BoCA::VideoList::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Surface	*surface	= GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
@@ -53,7 +53,6 @@ Int BoCA::VideoList::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			surface->StartPaint(frame);
 
@@ -162,7 +161,7 @@ Rect BoCA::VideoList::GetVisibleArea() const
 
 Int BoCA::VideoList::GetEntriesWidth() const
 {
-	Int	 entriesWidth	= 0;
+	Int	 entriesWidth = 0;
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{

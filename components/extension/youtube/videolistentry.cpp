@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -56,16 +56,15 @@ BoCA::VideoListEntry::~VideoListEntry()
 
 Int BoCA::VideoListEntry::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
-	Surface	*surface	= GetDrawSurface();
-	Point	 realPos	= GetRealPosition();
-	Size	 realSize	= GetRealSize();
+	Surface	*surface  = GetDrawSurface();
+	Point	 realPos  = GetRealPosition();
+	Size	 realSize = GetRealSize();
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			surface->StartPaint(GetVisibleArea());
 
