@@ -7,6 +7,8 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
+include $(BOCA_PATH)/Makefile-options
+
 # Enter object files here:
 OBJECTS	  = config.o dllinterface.o lame_out.o
 
@@ -15,6 +17,10 @@ DEFINE	  =
 
 # Enter additional library dependencies here:
 LIBS	  =
+
+ifeq ($(BUILD_OSX),True)
+	LIBS += -headerpad_max_install_names
+endif
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =
