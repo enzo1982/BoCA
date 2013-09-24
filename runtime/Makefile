@@ -54,12 +54,16 @@ ifeq ($(BUILD_PPC64),True)
 	CCOPTS += -arch ppc64
 	LDOPTS += -arch ppc64
 endif
-else ifeq ($(BUILD_X86),True)
+else
+	LDOPTS += -s
+
+ifeq ($(BUILD_X86),True)
 	CCOPTS += -m32
-	LDOPTS += -m32 -s
+	LDOPTS += -m32
 else ifeq ($(BUILD_X86_64),True)
 	CCOPTS += -m64
-	LDOPTS += -m64 -s
+	LDOPTS += -m64
+endif
 endif
 
 ifneq ($(BUILD_WIN32),True)
