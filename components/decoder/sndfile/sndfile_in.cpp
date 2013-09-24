@@ -181,6 +181,8 @@ Error BoCA::SndFileIn::GetStreamInfo(const String &streamURI, Track &track)
 					format.bits = 24;
 					break;
 				case SF_FORMAT_PCM_32:
+				case SF_FORMAT_FLOAT:
+				case SF_FORMAT_DOUBLE:
 					format.bits = 32;
 					break;
 				default:
@@ -323,18 +325,19 @@ Bool BoCA::SndFileIn::Activate()
 	file = fopen(track.origFilename.ConvertTo("UTF-8"), "rb");
 #endif
 
-	if (file != NIL)
-	{
-		SF_INFO	 sinfo;
+	if (file == NIL) return False;
 
-		memset(&sinfo, 0, sizeof(SF_INFO));
+	SF_INFO	 sinfo;
 
-		sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
+	memset(&sinfo, 0, sizeof(SF_INFO));
 
-		if (sndf != NIL) return True;
-	}
+	sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
-	return False;
+	if (sndf == NIL) { fclose(file); return False; }
+
+	ex_sf_command(sndf, SFC_SET_SCALE_FLOAT_INT_READ, NIL, SF_TRUE);
+
+	return True;
 }
 
 Bool BoCA::SndFileIn::Deactivate()
