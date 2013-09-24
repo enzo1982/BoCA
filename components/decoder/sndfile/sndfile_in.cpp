@@ -357,6 +357,8 @@ Bool BoCA::SndFileIn::Seek(Int64 samplePosition)
 
 Int BoCA::SndFileIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	const Format	&format = track.GetFormat();
 
 	/* Set size to a sample number a multiple of the number of channels.
@@ -387,9 +389,8 @@ Int BoCA::SndFileIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 		for (Int i = 0; i < size / 3; i++)
 		{
-			data[i * 3 + 0] = (buffer[i] >>  8) & 0xFF;
-			data[i * 3 + 1] = (buffer[i] >> 16) & 0xFF;
-			data[i * 3 + 2] = (buffer[i] >> 24) & 0xFF;
+			if (endianness == EndianLittle)	{ data[i * 3 + 0] = (buffer[i] >>  8) & 0xFF; data[i * 3 + 1] = (buffer[i] >> 16) & 0xFF; data[i * 3 + 2] = (buffer[i] >> 24) & 0xFF; }
+			else				{ data[i * 3 + 2] = (buffer[i] >>  8) & 0xFF; data[i * 3 + 1] = (buffer[i] >> 16) & 0xFF; data[i * 3 + 0] = (buffer[i] >> 24) & 0xFF; }
 		}
 	}
 	else if (format.bits == 32)
