@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,40 +20,40 @@ extern DynamicLoader	*lamedll;
 Bool			 LoadLAMEDLL();
 Void			 FreeLAMEDLL();
 
-typedef lame_t				(*LAME_INIT)				();
-typedef int				(*LAME_SET_PRESET)			(lame_t, int);
-typedef int				(*LAME_SET_IN_SAMPLERATE)		(lame_t, int);
-typedef int				(*LAME_SET_NUM_CHANNELS)		(lame_t, int);
-typedef int				(*LAME_SET_COPYRIGHT)			(lame_t, int);
-typedef int				(*LAME_SET_ORIGINAL)			(lame_t, int);
-typedef int				(*LAME_SET_EXTENSION)			(lame_t, int);
-typedef int				(*LAME_SET_ERROR_PROTECTION)		(lame_t, int);
-typedef int				(*LAME_SET_STRICT_ISO)			(lame_t, int);
-typedef int				(*LAME_SET_OUT_SAMPLERATE)		(lame_t, int);
-typedef int				(*LAME_SET_BRATE)			(lame_t, int);
-typedef int				(*LAME_SET_COMPRESSION_RATIO)		(lame_t, float);
-typedef int				(*LAME_SET_QUALITY)			(lame_t, int);
-typedef int				(*LAME_SET_LOWPASSFREQ)			(lame_t, int);
-typedef int				(*LAME_SET_HIGHPASSFREQ)		(lame_t, int);
-typedef int				(*LAME_SET_LOWPASSWIDTH)		(lame_t, int);
-typedef int				(*LAME_SET_HIGHPASSWIDTH)		(lame_t, int);
-typedef int				(*LAME_SET_MODE)			(lame_t, MPEG_mode);
-typedef int				(*LAME_SET_FORCE_MS)			(lame_t, int);
-typedef int				(*LAME_CLOSE)				(lame_t);
-typedef int				(*LAME_SET_VBR)				(lame_t, vbr_mode);
-typedef int				(*LAME_SET_VBR_QUALITY)			(lame_t, float);
-typedef int				(*LAME_SET_VBR_MEAN_BITRATE_KBPS)	(lame_t, int);
-typedef int				(*LAME_SET_VBR_MIN_BITRATE_KBPS)	(lame_t, int);
-typedef int				(*LAME_SET_VBR_MAX_BITRATE_KBPS)	(lame_t, int);
-typedef int				(*LAME_SET_NOATH)			(lame_t, int);
-typedef int				(*LAME_SET_ATHTYPE)			(lame_t, int);
-typedef int				(*LAME_SET_USETEMPORAL)			(lame_t, int);
-typedef int				(*LAME_INIT_PARAMS)			(lame_t const);
-typedef int				(*LAME_ENCODE_BUFFER)			(lame_t, const short int [], const short int [], const int, unsigned char *, const int);
-typedef int				(*LAME_ENCODE_BUFFER_INTERLEAVED)	(lame_t, short int [], int, unsigned char *, int);
-typedef int				(*LAME_ENCODE_FLUSH)			(lame_t, unsigned char *, int);
-typedef size_t				(*LAME_GET_LAMETAG_FRAME)		(lame_t, unsigned char *, size_t);
-typedef int				(*LAME_SET_BWRITEVBRTAG)		(lame_t, int);
+typedef lame_t				(CDECL *LAME_INIT)			();
+typedef int				(CDECL *LAME_SET_PRESET)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_IN_SAMPLERATE)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_NUM_CHANNELS)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_COPYRIGHT)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_ORIGINAL)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_EXTENSION)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_ERROR_PROTECTION)	(lame_t, int);
+typedef int				(CDECL *LAME_SET_STRICT_ISO)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_OUT_SAMPLERATE)	(lame_t, int);
+typedef int				(CDECL *LAME_SET_BRATE)			(lame_t, int);
+typedef int				(CDECL *LAME_SET_COMPRESSION_RATIO)	(lame_t, float);
+typedef int				(CDECL *LAME_SET_QUALITY)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_LOWPASSFREQ)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_HIGHPASSFREQ)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_LOWPASSWIDTH)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_HIGHPASSWIDTH)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_MODE)			(lame_t, MPEG_mode);
+typedef int				(CDECL *LAME_SET_FORCE_MS)		(lame_t, int);
+typedef int				(CDECL *LAME_CLOSE)			(lame_t);
+typedef int				(CDECL *LAME_SET_VBR)			(lame_t, vbr_mode);
+typedef int				(CDECL *LAME_SET_VBR_QUALITY)		(lame_t, float);
+typedef int				(CDECL *LAME_SET_VBR_MEAN_BITRATE_KBPS)	(lame_t, int);
+typedef int				(CDECL *LAME_SET_VBR_MIN_BITRATE_KBPS)	(lame_t, int);
+typedef int				(CDECL *LAME_SET_VBR_MAX_BITRATE_KBPS)	(lame_t, int);
+typedef int				(CDECL *LAME_SET_NOATH)			(lame_t, int);
+typedef int				(CDECL *LAME_SET_ATHTYPE)		(lame_t, int);
+typedef int				(CDECL *LAME_SET_USETEMPORAL)		(lame_t, int);
+typedef int				(CDECL *LAME_INIT_PARAMS)		(lame_t const);
+typedef int				(CDECL *LAME_ENCODE_BUFFER)		(lame_t, const short int [], const short int [], const int, unsigned char *, const int);
+typedef int				(CDECL *LAME_ENCODE_BUFFER_INTERLEAVED)	(lame_t, short int [], int, unsigned char *, int);
+typedef int				(CDECL *LAME_ENCODE_FLUSH)		(lame_t, unsigned char *, int);
+typedef size_t				(CDECL *LAME_GET_LAMETAG_FRAME)		(lame_t, unsigned char *, size_t);
+typedef int				(CDECL *LAME_SET_BWRITEVBRTAG)		(lame_t, int);
 
 extern LAME_INIT			 ex_lame_init;
 extern LAME_SET_PRESET			 ex_lame_set_preset;
