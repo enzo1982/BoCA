@@ -165,6 +165,10 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 Int BoCA::AS::EncoderComponentExternalFile::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
+	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, track.GetFormat().bits / 8);
+
 	/* Hand data over to the output file
 	 */
 	nOfSamples += (size / (format.bits / 8));

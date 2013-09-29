@@ -128,6 +128,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 			in->RelSeek(6);
 
 			format.bits	= (unsigned short) in->InputNumber(2);
+			format.order	= BYTE_INTEL;
 
 			track.SetFormat(format);
 

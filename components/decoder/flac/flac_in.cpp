@@ -253,6 +253,8 @@ Bool BoCA::FLACIn::Seek(Int64 samplePosition)
 
 Int BoCA::FLACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	if (decoderThread == NIL) decoderThread = NonBlocking1<Bool>(&FLACIn::ReadFLAC, this).Call(True);
 
 	if (decoderThread->GetStatus() != THREAD_RUNNING && samplesBuffer.Size() <= 0) return -1;
@@ -271,9 +273,11 @@ Int BoCA::FLACIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	for (Int i = 0; i < samplesBuffer.Size(); i++)
 	{
-		if	(track.GetFormat().bits ==  8) data[i] = samplesBuffer[i] + 128;
-		else if (track.GetFormat().bits == 16) ((Short *) (unsigned char *) data)[i] = samplesBuffer[i];
-		else if (track.GetFormat().bits == 24) { data[3 * i] = samplesBuffer[i] & 255; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 255; data[3 * i + 2] = (samplesBuffer[i] >> 16) & 255; }
+		if	(track.GetFormat().bits ==  8				   )				  data [i] = samplesBuffer[i] + 128;
+		else if (track.GetFormat().bits == 16				   ) ((Short *) (unsigned char *) data)[i] = samplesBuffer[i];
+
+		else if (track.GetFormat().bits == 24 && endianness == EndianLittle) { data[3 * i + 0] = samplesBuffer[i] & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i + 2] = (samplesBuffer[i] >> 16) & 0xFF; }
+		else if (track.GetFormat().bits == 24 && endianness == EndianBig   ) { data[3 * i + 2] = samplesBuffer[i] & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i + 0] = (samplesBuffer[i] >> 16) & 0xFF; }
 	}
 
 	samplesBuffer.Resize(0);

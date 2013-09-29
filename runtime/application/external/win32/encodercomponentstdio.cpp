@@ -203,6 +203,10 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
+	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, track.GetFormat().bits / 8);
+
 	/* Check if external encoder still exists.
 	 */
 	unsigned long	 exitCode = 0;

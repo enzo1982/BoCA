@@ -77,7 +77,7 @@ namespace BoCA
 
 		/* Clip
 		 */
-		if	(sample >= MAD_F_ONE) sample = MAD_F_ONE - 1;
+		if	(sample >= MAD_F_ONE) sample =	MAD_F_ONE - 1;
 		else if (sample < -MAD_F_ONE) sample = -MAD_F_ONE;
 
 		/* Quantize
@@ -229,6 +229,8 @@ Bool BoCA::MADIn::Deactivate()
 
 Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	if (decoderThread == NIL) decoderThread = NonBlocking1<Bool>(&MADIn::ReadMAD, this).Call(True);
 
 	if (decoderThread->GetStatus() != THREAD_RUNNING && samplesBuffer.Size() <= 0) return -1;
@@ -251,8 +253,10 @@ Int BoCA::MADIn::ReadData(Buffer<UnsignedByte> &data, Int size)
 	{
 		int	 sample = scale(samplesBuffer[i], format.bits);
 
-		if	(format.bits == 16) ((Short *) (unsigned char *) data)[i] = sample;
-		else if (format.bits == 24) { data[i * 3] = sample & 0xFF; data[i * 3 + 1] = (sample >> 8) & 0xFF; data[i * 3 + 2] = (sample >> 16) & 0xFF; }
+		if	(format.bits == 16				) ((Short *) (unsigned char *) data)[i] = sample;
+
+		else if (format.bits == 24 && endianness == EndianLittle) { data[i * 3 + 0] = sample & 0xFF; data[i * 3 + 1] = (sample >> 8) & 0xFF; data[i * 3 + 2] = (sample >> 16) & 0xFF; }
+		else if (format.bits == 24 && endianness == EndianBig	) { data[i * 3 + 2] = sample & 0xFF; data[i * 3 + 1] = (sample >> 8) & 0xFF; data[i * 3 + 0] = (sample >> 16) & 0xFF; }
 	}
 
 	samplesBuffer.Resize(0);
