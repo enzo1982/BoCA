@@ -369,11 +369,11 @@ Int BoCA::LAMEOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 		for (Int i = 0; i < size / (format.bits / 8); i++)
 		{
-			if	(format.bits ==  8				) samplesBuffer[i] = (				       data [i] - 128) * 256;
-			else if (format.bits == 32				) samplesBuffer[i] = (int) ((long *) (unsigned char *) data)[i]	       / 65536;
+			if	(format.bits ==  8				) samplesBuffer[i] =	   (				data [i] - 128) * 256;
+			else if (format.bits == 32				) samplesBuffer[i] = (int) (((long *) (unsigned char *) data)[i]	/ 65536);
 
-			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) (data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256;
-			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) (data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0)) / 256;
+			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) ((data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256);
+			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0)) / 256);
 		}
 
 		if (format.channels == 2) bytes = ex_lame_encode_buffer_interleaved(context, samplesBuffer, size / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
