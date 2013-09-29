@@ -276,7 +276,7 @@ Int BoCA::FLACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	bytesWritten = 0;
 
-	/* Convert samples to 16 bit.
+	/* Convert samples to encoder input format.
 	 */
 	const Format	&format = track.GetFormat();
 
@@ -286,7 +286,7 @@ Int BoCA::FLACOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 	{
 		if	(format.bits ==  8				) buffer[i] =				   data [i] - 128;
 		else if (format.bits == 16				) buffer[i] = ((Short *) (unsigned char *) data)[i];
-		else if (format.bits == 32				) buffer[i] = ((Int32 *) (unsigned char *) data)[i] / 65536;
+		else if (format.bits == 32				) buffer[i] = ((Int32 *) (unsigned char *) data)[i] / 256;
 
 		else if (format.bits == 24 && endianness == EndianLittle) buffer[i] = data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0);
 		else if (format.bits == 24 && endianness == EndianBig	) buffer[i] = data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0);
