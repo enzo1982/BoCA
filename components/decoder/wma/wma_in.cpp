@@ -55,7 +55,7 @@ Void smooth::DetachDLL()
 
 Bool BoCA::WMAIn::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream	*f_in  = new InStream(STREAM_FILE, streamURI, IS_READ);
 	Int		 magic = f_in->InputNumber(4);
 
 	delete f_in;
@@ -65,7 +65,7 @@ Bool BoCA::WMAIn::CanOpenStream(const String &streamURI)
 
 Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in	 = new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
 
 	track.fileSize	= f_in->Size();
 
@@ -87,7 +87,7 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 	if (!errorState)
 	{
 		DWORD		 cOutputs = 0;
-		WAVEFORMATEX	*pWfx = NIL;
+		WAVEFORMATEX	*pWfx	  = NIL;
 
 		/* Find out the output count
 		 */
@@ -187,7 +187,7 @@ Error BoCA::WMAIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (!errorState)
 	{
-		AS::Registry		&boca = AS::Registry::Get();
+		AS::Registry		&boca	= AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("wma-tag");
 
 		if (tagger != NIL)
@@ -317,6 +317,18 @@ Bool BoCA::WMAIn::Deactivate()
 	m_pReaderAdvanced->Release();
 	m_pReader->Release();
 	readerCallback->Release();
+
+	return True;
+}
+
+Bool BoCA::WMAIn::Seek(Int64 samplePosition)
+{
+	QWORD	 position = samplePosition * 10000000 / track.GetFormat().rate;
+	HRESULT	 hr	  = m_pReader->Start(position, 0, 1.0, &position);
+
+	/* Wait for the Start call to complete.
+	 */
+	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
 
 	return True;
 }

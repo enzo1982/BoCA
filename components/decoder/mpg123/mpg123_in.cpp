@@ -179,6 +179,8 @@ BoCA::MPG123In::MPG123In()
 	delaySamples	 = 0;
 	padSamples	 = 0;
 
+	dataOffset	 = 0;
+
 	/* Initialize to decoder delay.
 	 */
 	delaySamplesLeft = 529;
@@ -196,9 +198,11 @@ Bool BoCA::MPG123In::Activate()
 	SkipID3v2Tag(f_in);
 	ParseVBRHeaders(f_in);
 
-	driver->Seek(f_in->GetPos());
+	dataOffset = f_in->GetPos();
 
 	delete f_in;
+
+	driver->Seek(dataOffset);
 
 	context = ex_mpg123_new(NIL, NIL);
 
@@ -216,6 +220,25 @@ Bool BoCA::MPG123In::Activate()
 Bool BoCA::MPG123In::Deactivate()
 {
 	ex_mpg123_delete(context);
+
+	return True;
+}
+
+Bool BoCA::MPG123In::Seek(Int64 samplePosition)
+{
+	Buffer<UnsignedByte>	 data(131072);
+	off_t			 target = 0;
+
+	while (ex_mpg123_feedseek(context, samplePosition, SEEK_SET, &target) == MPG123_NEED_MORE)
+	{
+		Int64	 size = driver->ReadData(data, data.Size());
+
+		if (size == 0) break;
+
+		ex_mpg123_feed(context, data, size);
+	}
+
+	driver->Seek(dataOffset + target);
 
 	return True;
 }

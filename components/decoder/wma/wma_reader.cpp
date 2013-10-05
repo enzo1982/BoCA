@@ -91,7 +91,8 @@ STDMETHODIMP BoCA::WMAReader::OnStatus(WMT_STATUS status, HRESULT hr, WMT_ATTR_D
 		/* Playback of the opened file has begun.
 		 */
 		case WMT_STARTED:
-			m_qwTime = 10000000;
+			if (pvContext == NIL) m_qwTime =			10000000;
+			else		      m_qwTime = *(QWORD *) pvContext + 10000000;
 
 			m_pReaderAdvanced->DeliverTime(m_qwTime);
 
@@ -153,17 +154,14 @@ STDMETHODIMP BoCA::WMAReader::OnSample(DWORD dwOutputNum, QWORD cnsSampleTime, Q
 	 * Because only the first audio output is stored, all other outputs,
 	 * regardless of type, will be ignored.
 	 */
-	if (dwOutputNum != m_dwAudioOutputNum)
-	{
-		return S_OK;
-	}
+	if (dwOutputNum != m_dwAudioOutputNum) return S_OK;
 
-	BYTE	*pData = NIL;
+	BYTE	*pData	= NIL;
 	DWORD	 cbData = 0;
 
 	/* Get the sample from the buffer object.
 	 */
-	HRESULT	 hr = pSample->GetBufferAndLength( &pData, &cbData );
+	HRESULT	 hr = pSample->GetBufferAndLength(&pData, &cbData);
 
 	if (hr == S_OK)
 	{

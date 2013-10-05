@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,6 +21,8 @@ MPG123_DELETE			 ex_mpg123_delete		= NIL;
 
 MPG123_OPEN_FEED		 ex_mpg123_open_feed		= NIL;
 MPG123_DECODE			 ex_mpg123_decode		= NIL;
+MPG123_FEED			 ex_mpg123_feed			= NIL;
+MPG123_FEEDSEEK			 ex_mpg123_feedseek		= NIL;
 
 MPG123_GETFORMAT		 ex_mpg123_getformat		= NIL;
 MPG123_INFO			 ex_mpg123_info			= NIL;
@@ -45,6 +47,8 @@ Bool LoadMPG123DLL()
 
 	ex_mpg123_open_feed		= (MPG123_OPEN_FEED) mpg123dll->GetFunctionAddress("mpg123_open_feed");
 	ex_mpg123_decode		= (MPG123_DECODE) mpg123dll->GetFunctionAddress("mpg123_decode");
+	ex_mpg123_feed			= (MPG123_FEED) mpg123dll->GetFunctionAddress("mpg123_feed");
+	ex_mpg123_feedseek		= (MPG123_FEEDSEEK) mpg123dll->GetFunctionAddress("mpg123_feedseek");
 
 	ex_mpg123_getformat		= (MPG123_GETFORMAT) mpg123dll->GetFunctionAddress("mpg123_getformat");
 	ex_mpg123_info			= (MPG123_INFO) mpg123dll->GetFunctionAddress("mpg123_info");
@@ -61,6 +65,8 @@ Bool LoadMPG123DLL()
 
 	    ex_mpg123_open_feed			== NIL ||
 	    ex_mpg123_decode			== NIL ||
+	    ex_mpg123_feed			== NIL ||
+	    ex_mpg123_feedseek			== NIL ||
 
 	    ex_mpg123_getformat			== NIL ||
 	    ex_mpg123_info			== NIL ||

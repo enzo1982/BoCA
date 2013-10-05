@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -28,6 +28,8 @@ typedef void		(*MPG123_DELETE)		(mpg123_handle *);
 
 typedef int		(*MPG123_OPEN_FEED)		(mpg123_handle *);
 typedef int		(*MPG123_DECODE)		(mpg123_handle *, const unsigned char *, size_t, unsigned char *, size_t, size_t *);
+typedef int		(*MPG123_FEED)			(mpg123_handle *, const unsigned char *, size_t);
+typedef off_t		(*MPG123_FEEDSEEK)		(mpg123_handle *, off_t, int, off_t *);
 
 typedef int		(*MPG123_GETFORMAT)		(mpg123_handle *, long *, int *, int *);
 typedef int		(*MPG123_INFO)			(mpg123_handle *, mpg123_frameinfo *);
@@ -44,6 +46,8 @@ extern MPG123_DELETE			 ex_mpg123_delete;
 
 extern MPG123_OPEN_FEED			 ex_mpg123_open_feed;
 extern MPG123_DECODE			 ex_mpg123_decode;
+extern MPG123_FEED			 ex_mpg123_feed;
+extern MPG123_FEEDSEEK			 ex_mpg123_feedseek;
 
 extern MPG123_GETFORMAT			 ex_mpg123_getformat;
 extern MPG123_INFO			 ex_mpg123_info;

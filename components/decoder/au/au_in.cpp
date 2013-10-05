@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -83,6 +83,8 @@ Error BoCA::SunAuIn::GetStreamInfo(const String &streamURI, Track &track)
 BoCA::SunAuIn::SunAuIn()
 {
 	packageSize = 0;
+
+	dataOffset  = 0;
 }
 
 BoCA::SunAuIn::~SunAuIn()
@@ -97,7 +99,7 @@ Bool BoCA::SunAuIn::Activate()
 	 */
 	in->InputNumber(4);
 
-	Int		 dataOffset = in->InputNumberRaw(4);
+	dataOffset = in->InputNumberRaw(4);
 
 	delete in;
 
@@ -108,6 +110,13 @@ Bool BoCA::SunAuIn::Activate()
 
 Bool BoCA::SunAuIn::Deactivate()
 {
+	return True;
+}
+
+Bool BoCA::SunAuIn::Seek(Int64 samplePosition)
+{
+	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
+
 	return True;
 }
 

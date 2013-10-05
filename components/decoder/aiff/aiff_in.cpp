@@ -221,6 +221,8 @@ Error BoCA::AIFFIn::GetStreamInfo(const String &streamURI, Track &track)
 BoCA::AIFFIn::AIFFIn()
 {
 	packageSize = 0;
+
+	dataOffset  = 0;
 }
 
 BoCA::AIFFIn::~AIFFIn()
@@ -247,15 +249,24 @@ Bool BoCA::AIFFIn::Activate()
 	}
 	while (chunk != "SSND");
 
-	driver->Seek(in->GetPos() + 8);
+	dataOffset = in->GetPos() + 8;
 
 	delete in;
+
+	driver->Seek(dataOffset);
 
 	return True;
 }
 
 Bool BoCA::AIFFIn::Deactivate()
 {
+	return True;
+}
+
+Bool BoCA::AIFFIn::Seek(Int64 samplePosition)
+{
+	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
+
 	return True;
 }
 
