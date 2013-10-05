@@ -160,6 +160,9 @@ Bool BoCA::SpeexOut::Activate()
 
 	/* Write Speex header
 	 */
+	speex_header.frames_per_packet = 1;
+	speex_header.vbr	       = vbr;
+
 	int		 bytes;
 	unsigned char	*buffer = (unsigned char *) ex_speex_header_to_packet(&speex_header, &bytes);
 	ogg_packet	 header = { buffer, bytes, 1, 0, 0, numPackets++ };
