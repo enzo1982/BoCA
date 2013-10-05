@@ -115,7 +115,9 @@ Bool BoCA::BonkOut::Activate()
 
 Bool BoCA::BonkOut::Deactivate()
 {
-	int	 bytes = ex_bonk_encoder_finish(encoder, dataBuffer, dataBuffer.Size());
+	static Endianness	 endianness = CPU().GetEndianness();
+
+	Int	 bytes = ex_bonk_encoder_finish(encoder, dataBuffer, dataBuffer.Size());
 
 	if (bytes > dataBuffer.Size())
 	{
@@ -128,10 +130,12 @@ Bool BoCA::BonkOut::Deactivate()
 
 	if (track.length == -1)
 	{
-		int	 sample_count = ex_bonk_encoder_get_sample_count(encoder);
+		Int	 sample_count = ex_bonk_encoder_get_sample_count(encoder);
 
 		driver->Seek(ex_bonk_encoder_get_sample_count_offset(encoder));
-		driver->WriteData((unsigned char *) &sample_count, 4);
+
+		if (endianness == EndianLittle)	for (Int i = 0; i <= 3; i++) driver->WriteData(((unsigned char *) &sample_count) + i, 1);
+		else				for (Int i = 3; i >= 0; i--) driver->WriteData(((unsigned char *) &sample_count) + i, 1);
 	}
 
 	ex_bonk_encoder_close(encoder);

@@ -83,6 +83,8 @@ Bool BoCA::WaveOut::Activate()
 
 Bool BoCA::WaveOut::Deactivate()
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	Config		*config = Config::Get();
 	const Info	&info = track.GetInfo();
 
@@ -91,7 +93,10 @@ Bool BoCA::WaveOut::Deactivate()
 	Int	 dataSize = (driver->GetSize() - 44) * (track.GetFormat().bits / 8);
 
 	driver->Seek(40);
-	driver->WriteData((unsigned char *) &dataSize, 4);
+
+	if (endianness == EndianLittle)	for (Int i = 0; i <= 3; i++) driver->WriteData(((unsigned char *) &dataSize) + i, 1);
+	else				for (Int i = 3; i >= 0; i--) driver->WriteData(((unsigned char *) &dataSize) + i, 1);
+
 	driver->Seek(driver->GetSize());
 
 	/* Write RIFF tag if requested.
@@ -137,7 +142,10 @@ Bool BoCA::WaveOut::Deactivate()
 	Int	 fileSize = driver->GetSize() - 8;
 
 	driver->Seek(4);
-	driver->WriteData((unsigned char *) &fileSize, 4);
+
+	if (endianness == EndianLittle)	for (Int i = 0; i <= 3; i++) driver->WriteData(((unsigned char *) &fileSize) + i, 1);
+	else				for (Int i = 3; i >= 0; i--) driver->WriteData(((unsigned char *) &fileSize) + i, 1);
+
 	driver->Seek(driver->GetSize());
 
 	return True;

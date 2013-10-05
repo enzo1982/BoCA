@@ -66,12 +66,12 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	Int	 size = nOfSamples * (format.bits / 8) + 36;
 
 	out->Seek(4);
-	out->OutputData((unsigned char *) &size, 4);
+	out->OutputNumber(size, 4);
 
 	size -= 36;
 
 	out->Seek(40);
-	out->OutputData((unsigned char *) &size, 4);
+	out->OutputNumber(size, 4);
 
 	delete out;
 
