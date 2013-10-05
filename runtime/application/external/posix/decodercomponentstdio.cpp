@@ -58,19 +58,19 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Read WAVE header into buffer.
 	 */
-	Buffer<UnsignedByte>	 buffer(76);
+	Buffer<UnsignedByte>	 buffer(4096);
 	Int			 bytesReadTotal = 0;
 	Int			 bytesRead = 0;
 
 	do
 	{
-		bytesRead = fread(buffer + bytesReadTotal, 1, 76 - bytesReadTotal, rPipe);
+		bytesRead = fread(buffer + bytesReadTotal, 1, 4096 - bytesReadTotal, rPipe);
 
-		if (bytesRead != 76 - bytesReadTotal && (ferror(rPipe) || bytesRead == 0)) break;
+		if (bytesRead != 4096 - bytesReadTotal && (ferror(rPipe) || bytesRead == 0)) break;
 
 		bytesReadTotal += bytesRead;
 	}
-	while (bytesReadTotal < 76);
+	while (bytesReadTotal < 4096);
 
 	if (bytesReadTotal >= 44)
 	{

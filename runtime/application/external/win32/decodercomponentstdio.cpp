@@ -93,17 +93,17 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Read WAVE header into buffer.
 	 */
-	Buffer<UnsignedByte>	 buffer(76);
+	Buffer<UnsignedByte>	 buffer(4096);
 	Int			 bytesReadTotal = 0;
 	DWORD			 bytesRead = 0;
 
 	do
 	{
-		if (!ReadFile(rPipe, buffer + bytesReadTotal, 76 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
+		if (!ReadFile(rPipe, buffer + bytesReadTotal, 4096 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
 
 		bytesReadTotal += bytesRead;
 	}
-	while (bytesReadTotal < 76);
+	while (bytesReadTotal < 4096);
 
 	if (bytesReadTotal >= 44)
 	{
