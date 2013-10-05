@@ -1,5 +1,5 @@
 /*
-	libmpg123: MPEG Audio Decoder library (version 1.14.4)
+	libmpg123: MPEG Audio Decoder library (version 1.15.4)
 
 	copyright 1995-2010 by the mpg123 project - free software under the terms of the LGPL 2.1
 	see COPYING and AUTHORS files in distribution or http://mpg123.org
@@ -12,7 +12,7 @@
 
 /* A macro to check at compile time which set of API functions to expect.
    This should be incremented at least each time a new symbol is added to the header. */
-#define MPG123_API_VERSION 36
+#define MPG123_API_VERSION 37
 
 /* These aren't actually in use... seems to work without using libtool. */
 #ifdef BUILD_MPG123_DLL
@@ -842,6 +842,12 @@ EXPORT int  mpg123_set_substring(mpg123_string *sb, const char *stuff, size_t fr
  *  Even with the fill property, the character count is not obvious as there could be multiple trailing null bytes.
 */
 EXPORT size_t mpg123_strlen(mpg123_string *sb, int utf8);
+
+/** Remove trailing \r and \n, if present.
+ *  \return 0 on error, 1 on success
+ *  \param sb the string
+ */
+EXPORT int mpg123_chomp_string(mpg123_string *sb);
 
 /** The mpg123 text encodings. This contains encodings we encounter in ID3 tags or ICY meta info. */
 enum mpg123_text_encoding
