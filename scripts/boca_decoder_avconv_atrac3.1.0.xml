@@ -7,11 +7,13 @@
   <type>decoder</type>
   <format>
     <name>ATRAC-3 Files</name>
-    <extension>aa3</extension>
+    <extension>at3</extension>
     <extension>wav</extension>
+    <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
   </format>
   <format>
     <name>OpenMG Audio Files</name>
+    <extension>aa3</extension>
     <extension>oma</extension>
     <extension>omg</extension>
   </format>
