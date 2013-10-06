@@ -121,20 +121,22 @@ STDMETHODIMP BoCA::WMAReader::OnStatus(WMT_STATUS status, HRESULT hr, WMT_ATTR_D
 		/* This class reacts to any errors by changing its state to stopped.
 		 */
 		case WMT_ERROR:
-			active = False;
-			error = True;
+			active	    = False;
+
+			error	    = True;
+			errorString = "Unknown error";
 
 			break;
 
 		case WMT_MISSING_CODEC:
-			error = True;
+			error	    = True;
 			errorString = "Missing appropriate codec";
 
 			break;
 
 		case WMT_NO_RIGHTS:
 		case WMT_NO_RIGHTS_EX:
-			error = True;
+			error	    = True;
 			errorString = "Cannot open protected files";
 
 			break;

@@ -27,6 +27,8 @@ namespace BoCA
 			Buffer<UnsignedByte>	 samplesBuffer;
 			Mutex			 samplesBufferMutex;
 
+			Bool			 userProvidedClock;
+
 			HANDLE			 m_hAsyncEvent;
 
 			IWMReader		*m_pReader;

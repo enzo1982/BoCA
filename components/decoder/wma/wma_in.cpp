@@ -213,6 +213,8 @@ BoCA::WMAIn::WMAIn()
 
 	packageSize	  = 0;
 
+	userProvidedClock = True;
+
 	/* Init the Microsoft COM library.
 	 */
 	CoInitialize(NIL);
@@ -244,7 +246,7 @@ Bool BoCA::WMAIn::Activate()
 	 */
 	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
 
-	m_pReaderAdvanced->SetUserProvidedClock(true);
+	m_pReaderAdvanced->SetUserProvidedClock(userProvidedClock);
 
 	DWORD	 cOutputs = 0;
 
@@ -292,6 +294,23 @@ Bool BoCA::WMAIn::Activate()
 
 			pProps->Release();
 		}
+	}
+
+	/* Some streams do not work with a user provided clock.
+	 * Detect this here and try without it in case of an error.
+	 */
+	while (readerCallback->IsActive() && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
+
+	if (!readerCallback->IsActive() && samplesBuffer.Size() <= 0)
+	{
+		if (!userProvidedClock) return False;
+
+		Deactivate();
+
+		userProvidedClock = False;
+		errorState	  = False;
+
+		return Activate();
 	}
 
 	return True;
