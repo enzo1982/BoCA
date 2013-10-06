@@ -33,11 +33,13 @@ CLEANCMD1 =
 include $(BOCA_PATH)/Makefile-directories
 
 CC	  = gcc
-CCOPTS	  = -pipe -g0 -Wall -Os -fno-exceptions -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(PREFIX)\" -I$(BOCA_PATH)/include
+CCOPTS	  = -pipe -g0 -Wall -Os -fvisibility=hidden -fno-exceptions -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(PREFIX)\" -I$(BOCA_PATH)/include
 LD	  = gcc
 LDOPTS	  = -pipe -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_OSX),True)
+	LDOPTS += -Wl,-x
+
 ifeq ($(BUILD_X86),True)
 	CCOPTS += -arch i386
 	LDOPTS += -arch i386
@@ -114,13 +116,14 @@ endif
 endif
 
 clean:
+	rm -f $(OBJECTS)
+	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED)
+
 ifeq ($(BUILD_WIN32),True)
-	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca.a $(OBJECTS)
+	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca.a
 else
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
 endif
-
-	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) 
 
 install: uninstall
 ifneq ($(BUILD_WIN32),True)

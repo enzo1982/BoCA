@@ -9,8 +9,6 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
-include $(BOCA_PATH)/Makefile-options
-
 # Enter object files here:
 OBJECTS	  = id3v2_tag.o
 
@@ -19,10 +17,6 @@ DEFINE	  = -I id3 -DID3LIB_LINKOPTION=LINKOPTION_STATIC
 
 # Enter additional library dependencies here:
 LIBS	  = id3/libid3.a zlib/libz.a -lstdc++
-
-ifeq ($(BUILD_OSX),True)
-	LIBS += -headerpad_max_install_names
-endif
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = cd zlib && $(MAKE) -j 4

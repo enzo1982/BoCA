@@ -3,7 +3,7 @@
 include $(BOCA_PATH)/Makefile-options
 
 CC     = gcc
-CCOPTS = -pipe -g0 -Wall -Os -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
+CCOPTS = -pipe -g0 -Wall -Os -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
 LD     = gcc
 LDOPTS = -pipe -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
@@ -12,6 +12,8 @@ ifneq ($(EXCEPTION),True)
 endif
 
 ifeq ($(BUILD_OSX),True)
+	LDOPTS += -Wl,-x
+
 ifeq ($(BUILD_X86),True)
 	CCOPTS += -arch i386
 	LDOPTS += -arch i386
@@ -59,7 +61,7 @@ else
 		CCOPTS += -fPIC
 		LDOPTS += -Wl,-rpath,.
 	else ifeq ($(BUILD_OSX),True)
-		LDOPTS += -Wl,-rpath,.
+		LDOPTS += -Wl,-rpath,. -Wl,-headerpad,80
 	else ifeq ($(BUILD_LINUX),True)
 		ifeq ($(BUILD_X86_64),True)
 			CCOPTS += -fPIC
