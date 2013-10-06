@@ -128,7 +128,7 @@ Bool BoCA::FAAD2In::CanOpenStream(const String &streamURI)
 		delete f_in;
 	}
 
-	return isValidFile;;
+	return isValidFile;
 }
 
 Error BoCA::FAAD2In::GetStreamInfo(const String &streamURI, Track &track)
