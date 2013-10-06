@@ -21,10 +21,12 @@ using namespace smooth::IO;
 
 BoCA::AS::DecoderComponentExternalStdIO::DecoderComponentExternalStdIO(ComponentSpecs *specs) : DecoderComponentExternal(specs)
 {
-	rPipe	 = NIL;
-	wPipe	 = NIL;
+	rPipe	    = NIL;
+	wPipe	    = NIL;
 
-	hProcess = NIL;
+	hProcess    = NIL;
+
+	samplesRead = 0;
 }
 
 BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()
@@ -381,7 +383,25 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 Bool BoCA::AS::DecoderComponentExternalStdIO::Seek(Int64 samplePosition)
 {
-	return False;
+	const Format		&format = track.GetFormat();
+	Buffer<UnsignedByte>	 buffer(12288);
+
+	while (samplesRead < samplePosition)
+	{
+		Int	 size = Math::Min((samplePosition - samplesRead) * format.channels * (format.bits / 8), (Int64) buffer.Size());
+
+		if (!ReadFile(rPipe, buffer, size, (DWORD *) &size, NIL) || size == 0)
+		{
+			errorState  = True;
+			errorString = "Decoder quit prematurely.";
+
+			return False;
+		}
+
+		samplesRead += size / format.channels / (format.bits / 8);
+	}
+
+	return True;
 }
 
 Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data, Int size)
@@ -399,6 +419,12 @@ Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data
 
 		return -1;
 	}
+
+	/* Increment number of samples read.
+	 */
+	const Format	&format = track.GetFormat();
+
+	samplesRead += size / format.channels / (format.bits / 8);
 
 	return size;
 }

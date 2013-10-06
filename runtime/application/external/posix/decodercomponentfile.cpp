@@ -22,7 +22,9 @@ using namespace smooth::IO;
 
 BoCA::AS::DecoderComponentExternalFile::DecoderComponentExternalFile(ComponentSpecs *specs) : DecoderComponentExternal(specs)
 {
-	in = NIL;
+	in	   = NIL;
+
+	dataOffset = 0;
 }
 
 BoCA::AS::DecoderComponentExternalFile::~DecoderComponentExternalFile()
@@ -248,6 +250,8 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	}
 	while (chunk != "data");
 
+	dataOffset = in->GetPos();
+
 	return True;
 }
 
@@ -266,7 +270,9 @@ Bool BoCA::AS::DecoderComponentExternalFile::Deactivate()
 
 Bool BoCA::AS::DecoderComponentExternalFile::Seek(Int64 samplePosition)
 {
-	return False;
+	in->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
+
+	return True;
 }
 
 Int BoCA::AS::DecoderComponentExternalFile::ReadData(Buffer<UnsignedByte> &data, Int size)

@@ -78,6 +78,8 @@ Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_ogg_sync_init(&oy);
 
+	/* Get stream format and read tags.
+	 */
 	Bool	 initialized = False;
 	Bool	 done = False;
 	Int	 packetNum = 0;
@@ -142,6 +144,30 @@ Error BoCA::SpeexIn::GetStreamInfo(const String &streamURI, Track &track)
 
 	track.SetFormat(format);
 
+	ex_ogg_sync_clear(&oy);
+
+	/* Find real length of stream.
+	 */
+	ex_ogg_sync_init(&oy);
+
+	in.Seek(in.Size() - 65536);
+
+	char	*buffer = ex_ogg_sync_buffer(&oy, 65536);
+	Int	 size	= in.InputData(buffer, 65536);
+
+	ex_ogg_sync_wrote(&oy, size);
+
+	while (ex_ogg_sync_pageseek(&oy, &og) != 0)
+	{
+		if (ex_ogg_page_serialno(&og) != os.serialno) continue;
+
+		track.length = ex_ogg_page_granulepos(&og);
+
+		if (ex_ogg_page_eos(&og)) break;
+	}
+
+	/* Clean up.
+	 */
 	if (initialized) ex_ogg_stream_clear(&os);
 
 	ex_ogg_sync_clear(&oy);
@@ -248,6 +274,26 @@ Bool BoCA::SpeexIn::Deactivate()
 	ex_speex_bits_destroy(&bits);
 
 	ex_ogg_sync_clear(&oy);
+
+	return True;
+}
+
+Bool BoCA::SpeexIn::Seek(Int64 samplePosition)
+{
+	while (ex_ogg_page_granulepos(&og) < samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
+	{
+		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
+		{
+			char	*buffer = ex_ogg_sync_buffer(&oy, 131072);
+			Int	 size	= driver->ReadData((unsigned char *) buffer, 131072);
+
+			inBytes += size;
+
+			ex_ogg_sync_wrote(&oy, size);
+
+			if (size == 0) return False;
+		}
+	}
 
 	return True;
 }
