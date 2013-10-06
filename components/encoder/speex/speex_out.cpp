@@ -63,8 +63,10 @@ BoCA::SpeexOut::SpeexOut()
 
 	encoder	    = NIL;
 
-	numPackets  = 0;
-	frameSize   = 0;
+	frameSize    = 0;
+
+	numPackets   = 0;
+	totalSamples = 0;
 
 	memset(&os, 0, sizeof(os));
 	memset(&og, 0, sizeof(og));
@@ -153,10 +155,11 @@ Bool BoCA::SpeexOut::Activate()
 	ex_speex_encoder_ctl(encoder, SPEEX_GET_FRAME_SIZE, &frame_size);
 	ex_speex_encoder_ctl(encoder, SPEEX_SET_SAMPLING_RATE, &rate);
 
-	frameSize = frame_size;
-	packageSize = frame_size * (format.bits / 8) * format.channels;
+	frameSize    = frame_size;
+	totalSamples = 0;
 
-	numPackets = 0;
+	packageSize  = frame_size * (format.bits / 8) * format.channels;
+	numPackets   = 0;
 
 	/* Write Speex header
 	 */
@@ -227,8 +230,7 @@ Bool BoCA::SpeexOut::Deactivate()
 
 Int BoCA::SpeexOut::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	static Endianness	 endianness   = CPU().GetEndianness();
-	static Int		 totalSamples = 0;
+	static Endianness	 endianness = CPU().GetEndianness();
 
 	/* Convert samples to 16 bit.
 	 */
