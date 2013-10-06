@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,7 +30,7 @@ namespace smooth
 		class SMOOTHAPI RWLock
 		{
 			private:
-				static const Short	 MAX_READ_LOCKS;
+				static const Short	 maxReadLocks;
 
 				Bool			 writeLocked;
 
