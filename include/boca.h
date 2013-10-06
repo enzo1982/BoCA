@@ -19,7 +19,7 @@ using namespace smooth;
 # ifdef __WIN32__
 #  define BOCA_EXPORT __declspec (dllexport)
 # else
-#  define BOCA_EXPORT
+#  define BOCA_EXPORT __attribute__ ((visibility ("default")))
 # endif
 
 # include "boca/component/component.h"
@@ -35,7 +35,7 @@ using namespace smooth;
 # ifdef __WIN32__
 #  define BOCA_EXPORT __declspec (dllimport)
 # else
-#  define BOCA_EXPORT
+#  define BOCA_EXPORT __attribute__ ((visibility ("default")))
 # endif
 
 # include "boca/core/core.h"
