@@ -78,6 +78,14 @@ endif
 endif
 endif
 
+ifneq ($(BUILD_WIN32),True)
+ifneq ($(BUILD_LINUX),True)
+	CCOPTS += -fPIC
+else ifneq ($(BUILD_X86),True)
+	CCOPTS += -fPIC
+endif
+endif
+
 ifeq ($(BUILD_WIN32),True)
 	LDOPTS += -lsmooth -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 else ifeq ($(BUILD_OSX),True)
@@ -85,14 +93,18 @@ else ifeq ($(BUILD_OSX),True)
 else
 	LDOPTS += -L$(PREFIX)/lib -lsmooth-$(SMOOTHVER) -Wl,-soname,libboca-$(VERSION)$(SHARED).0 -Wl,-rpath,.
 
-	ifeq ($(BUILD_SOLARIS),True)
-		CCOPTS += -fPIC
-	else ifeq ($(BUILD_LINUX),True)
-		ifeq ($(BUILD_X86_64),True)
-			CCOPTS += -fPIC
+	ifneq ($(BUILD_LINUX),True)
+	ifneq ($(BUILD_SOLARIS),True)
+	ifneq ($(BUILD_OSX),True)
+	ifneq ($(BUILD_HAIKU),True)
+		ifeq ($(BUILD_NETBSD),True)
+			CCOPTS += -I/usr/pkg/include
+		else
+			CCOPTS += -I/usr/local/include
 		endif
-	else
-		CCOPTS += -I/usr/local/include
+	endif
+	endif
+	endif
 	endif
 endif
 
