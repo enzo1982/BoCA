@@ -286,7 +286,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Seek(Int64 samplePosition)
 	while (samplesRead < samplePosition)
 	{
 		Int	 size  = Math::Min((samplePosition - samplesRead) * format.channels * (format.bits / 8), (Int64) buffer.Size());
-		Int	 bytes = fread(data, 1, size, rPipe);
+		Int	 bytes = fread(buffer, 1, size, rPipe);
 
 		if (bytes != size && (ferror(rPipe) || bytes == 0))
 		{
