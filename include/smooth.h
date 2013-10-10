@@ -26,6 +26,7 @@
 #include "smooth/templates/iterator.h"
 #include "smooth/templates/buffer.h"
 #include "smooth/templates/nonblocking.h"
+#include "smooth/templates/threadlocal.h"
 
 #include "smooth/templates/callbacks.h"
 #include "smooth/templates/signals.h"
