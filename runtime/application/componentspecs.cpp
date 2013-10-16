@@ -307,6 +307,26 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			else if (node->GetContent() == "tagger")	type = COMPONENT_TYPE_TAGGER;
 			else						type = COMPONENT_TYPE_UNKNOWN;
 		}
+		else if (node->GetName() == "require")
+		{
+			requireComponents.Add(node->GetContent());
+		}
+		else if (node->GetName() == "replace")
+		{
+			replaceComponents.Add(node->GetContent());
+		}
+		else if (node->GetName() == "conflict")
+		{
+			conflictComponents.Add(node->GetContent());
+		}
+		else if (node->GetName() == "precede")
+		{
+			precedeComponents.Add(node->GetContent());
+		}
+		else if (node->GetName() == "succeed")
+		{
+			succeedComponents.Add(node->GetContent());
+		}
 		else if (node->GetName() == "format")
 		{
 			FileFormat	*format = new FileFormat();

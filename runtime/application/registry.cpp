@@ -76,6 +76,9 @@ BoCA::AS::Registry::Registry()
 		if (specs->LoadFromXML(file)) InsertComponent(specs);
 		else			      delete specs;
 	}
+
+	CheckComponents();
+	OrderComponents();
 }
 
 BoCA::AS::Registry::~Registry()
@@ -107,6 +110,97 @@ Void BoCA::AS::Registry::InsertComponent(ComponentSpecs *specs)
 	}
 
 	componentSpecs.Add(specs);
+}
+
+Void BoCA::AS::Registry::CheckComponents()
+{
+	for (Int i = 0; i < componentSpecs.Length(); i++)
+	{
+		ComponentSpecs	*cs = componentSpecs.GetNth(i);
+
+		/* Check required components.
+		 */
+		foreach (const String &requireComponent, cs->requireComponents)
+		{
+			if (!ComponentExists(requireComponent)) { componentSpecs.RemoveNth(i--); delete cs; break; }
+		}
+
+		/* Check conflicting components.
+		 */
+		foreach (const String &conflictComponent, cs->conflictComponents)
+		{
+			if (ComponentExists(conflictComponent)) { componentSpecs.RemoveNth(i--); delete cs; break; }
+		}
+
+		/* Check replaced components.
+		 */
+		foreach (const String &replaceComponent, cs->replaceComponents)
+		{
+			for (Int j = 0; j < componentSpecs.Length(); j++)
+			{
+				/* Prevent components from replacing theirselves.
+				 */
+				if (j == i) continue;
+
+				ComponentSpecs	*csr = componentSpecs.GetNth(j);
+
+				if (csr->id == replaceComponent) { componentSpecs.RemoveNth(j); if (j < i) i--; delete csr; break; }
+			}
+		}
+	}
+}
+
+Void BoCA::AS::Registry::OrderComponents()
+{
+	/* Check preceding components.
+	 */
+	for (Int i = 0; i < componentSpecs.Length(); i++)
+	{
+		ComponentSpecs	*cs = componentSpecs.GetNth(i);
+
+		foreach (const String &precedeComponent, cs->precedeComponents)
+		{
+			for (Int j = 0; j < i; j++)
+			{
+				ComponentSpecs	*csp = componentSpecs.GetNth(j);
+
+				if (csp->id == precedeComponent)
+				{
+					componentSpecs.RemoveNth(i);
+					componentSpecs.InsertAtPos(j, cs);
+
+					i = j;
+
+					break;
+				}
+			}
+		}
+	}
+
+	/* Check succeeding components.
+	 */
+	for (Int i = componentSpecs.Length() - 1; i >= 0; i--)
+	{
+		ComponentSpecs	*cs = componentSpecs.GetNth(i);
+
+		foreach (const String &succeedComponent, cs->succeedComponents)
+		{
+			for (Int j = componentSpecs.Length() - 1; j > i; j--)
+			{
+				ComponentSpecs	*csp = componentSpecs.GetNth(j);
+
+				if (csp->id == succeedComponent)
+				{
+					componentSpecs.RemoveNth(i);
+					componentSpecs.InsertAtPos(j, cs);
+
+					i = j;
+
+					break;
+				}
+			}
+		}
+	}
 }
 
 Int BoCA::AS::Registry::GetNumberOfComponents()

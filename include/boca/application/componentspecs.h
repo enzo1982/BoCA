@@ -223,6 +223,12 @@ namespace BoCA
 
 				Bool			 debug;
 
+				Array<String>		 requireComponents;
+				Array<String>		 replaceComponents;
+				Array<String>		 conflictComponents;
+				Array<String>		 precedeComponents;
+				Array<String>		 succeedComponents;
+
 				String			 external_command;
 				Bool			 external_ignoreExitCode;
 

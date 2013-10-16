@@ -2,7 +2,7 @@
 
 <!ENTITY % BoCA.Version "-//DTD BoCA 1.0 Draft//EN">
 
-<!ELEMENT component (name, version, id, type, format*, tagformat*, external*)>
+<!ELEMENT component (name, version, id, type, require*, replace*, conflict*, precede*, succeed*, format*, tagformat*, external*)>
 
 	<!ELEMENT name (#PCDATA)>
 
@@ -11,6 +11,12 @@
 
 	<!ELEMENT id (#PCDATA)>
 	<!ELEMENT type (#PCDATA)>
+
+	<!ELEMENT require (#PCDATA)>
+	<!ELEMENT replace (#PCDATA)>
+	<!ELEMENT conflict (#PCDATA)>
+	<!ELEMENT precede (#PCDATA)>
+	<!ELEMENT succeed (#PCDATA)>
 
 	<!ELEMENT format (name, extension+, tag*)>
 
