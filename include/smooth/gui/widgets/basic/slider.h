@@ -30,6 +30,7 @@ namespace smooth
 		{
 			private:
 				Int			 dummyVariable;
+				Int			 previousValue;
 
 				Int			 mouseBias;
 				Bool			 dragging;
