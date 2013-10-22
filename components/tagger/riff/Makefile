@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = riff_tag.o
+OBJECTS	  = riff.o
 
 # Enter additional defines here:
 DEFINE	  =

@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = cdparanoia_info.o
+OBJECTS	  = cdparanoia.o
 
 # Enter additional defines here:
 DEFINE	  = -I /usr/include/cdda

@@ -3,7 +3,7 @@
 <component>
   <name>Tom's Audiokompressor</name>
   <version>1.0</version>
-  <id>tak-out</id>
+  <id>tak-enc</id>
   <type>encoder</type>
   <format>
     <name>Tom's Audio</name>

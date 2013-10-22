@@ -1,7 +1,7 @@
 <VideoConverter>
   <name>Adobe Flash Video Converter</name>
   <version>1.0</version>
-  <decoder>avconv-flv_audio-in</decoder>
+  <decoder>avconv-flv_audio-dec</decoder>
 
   <format>
     <name>Adobe Flash Video</name>

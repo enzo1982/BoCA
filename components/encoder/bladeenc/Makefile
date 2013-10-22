@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = bladeenc_out.o config.o dllinterface.o
+OBJECTS	  = bladeenc.o config.o dllinterface.o
 
 # Enter additional defines here:
 DEFINE	  =

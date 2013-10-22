@@ -3,7 +3,7 @@
 <component>
   <name>Windows Media Video Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-wmv_audio-in</id>
+  <id>avconv-wmv_audio-dec</id>
   <type>decoder</type>
   <format>
     <name>Windows Media Video Files</name>

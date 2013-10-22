@@ -3,7 +3,7 @@
 <component>
   <name>Ogg Vorbis Encoder</name>
   <version>1.0</version>
-  <id>vorbiscmd-out</id>
+  <id>vorbiscmd-enc</id>
   <type>encoder</type>
   <format>
     <name>Ogg Vorbis Audio</name>

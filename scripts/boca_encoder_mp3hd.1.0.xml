@@ -3,7 +3,7 @@
 <component>
   <name>Thomson mp3HD Encoder</name>
   <version>1.0</version>
-  <id>mp3hd-out</id>
+  <id>mp3hd-enc</id>
   <type>encoder</type>
   <format>
     <name>MPEG Audio Layer 3</name>

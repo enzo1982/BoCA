@@ -3,7 +3,7 @@
 <component>
   <name>MAREO Multi Encoder Hub</name>
   <version debug="true">1.0</version>
-  <id>mareo-out</id>
+  <id>mareo-enc</id>
   <type>encoder</type>
   <format>
     <name>MAREO Temporary Wave File</name>

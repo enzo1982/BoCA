@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = xing/dxhead.o config.o dllinterface.o mpg123_in.o
+OBJECTS	  = xing/dxhead.o config.o dllinterface.o mpg123.o
 
 # Enter additional defines here:
 DEFINE	  =

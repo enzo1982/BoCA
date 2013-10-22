@@ -11,7 +11,7 @@
 #include "config.h"
 #include "dllinterface.h"
 
-BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
+BoCA::ConfigureWMA::ConfigureWMA()
 {
 	Config	*config = Config::Get();
 
@@ -39,11 +39,11 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	group_codec		= new GroupBox(i18n->TranslateString("Select codec"), Point(7, 11), Size(386, 67));
 
 	option_uncompressed	= new OptionBox(i18n->TranslateString("Write uncompressed WMA files"), Point(10, 13), Size(366, 0), &uncompressed, 1);
-	option_uncompressed->onAction.Connect(&ConfigureWMAEnc::OnToggleCodec, this);
+	option_uncompressed->onAction.Connect(&ConfigureWMA::OnToggleCodec, this);
 
 	option_codec		= new OptionBox(String(i18n->TranslateString("Use codec")).Append(":"), Point(10, 39), Size(100, 0), &uncompressed, 0);
 	option_codec->SetWidth(option_codec->GetUnscaledTextWidth() + 20);
-	option_codec->onAction.Connect(&ConfigureWMAEnc::OnToggleCodec, this);
+	option_codec->onAction.Connect(&ConfigureWMA::OnToggleCodec, this);
 
 	combo_codec		= new ComboBox(Point(18 + option_codec->GetWidth(), 38), Size(358 - option_codec->GetWidth(), 0));
 
@@ -54,16 +54,16 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	group_format		= new GroupBox(i18n->TranslateString("Select codec format"), Point(7, 90), Size(386, 93));
 
 	option_autoselect	= new OptionBox(i18n->TranslateString("Automatically select format based on settings and input format"), Point(10, 13), Size(366, 0), &autoselect, 1);
-	option_autoselect->onAction.Connect(&ConfigureWMAEnc::OnToggleFormat, this);
+	option_autoselect->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
 
 	option_format		= new OptionBox(String(i18n->TranslateString("Use format")).Append(":"), Point(10, 39), Size(100, 0), &autoselect, 0);
 	option_format->SetWidth(option_codec->GetUnscaledTextWidth() + 20);
-	option_format->onAction.Connect(&ConfigureWMAEnc::OnToggleFormat, this);
+	option_format->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
 
 	check_vbr		= new CheckBox(i18n->TranslateString("Use VBR encoding"), Point(18 + option_format->GetWidth(), 39), Size((352 - option_format->GetWidth()) / 2, 0), &useVBR);
-	check_vbr->onAction.Connect(&ConfigureWMAEnc::OnToggleVBR, this);
+	check_vbr->onAction.Connect(&ConfigureWMA::OnToggleVBR, this);
 	check_2pass		= new CheckBox(i18n->TranslateString("Use 2-pass encoding"), Point(25 + option_format->GetWidth() + check_vbr->GetWidth(), 39), Size((352 - option_format->GetWidth()) / 2, 0), &use2Pass);
-	check_2pass->onAction.Connect(&ConfigureWMAEnc::OnToggle2Pass, this);
+	check_2pass->onAction.Connect(&ConfigureWMA::OnToggle2Pass, this);
 
 	combo_format		= new ComboBox(Point(18 + option_format->GetWidth(), 64), Size(358 - option_format->GetWidth(), 0));
 
@@ -76,14 +76,14 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	group_settings		= new GroupBox(i18n->TranslateString("Codec settings"), Point(7, 195), Size(386, 67));
 
 	check_vbr_setting	= new CheckBox(i18n->TranslateString("Use VBR encoding"), Point(10, 14), Size(180, 0), &useVBRSetting);
-	check_vbr_setting->onAction.Connect(&ConfigureWMAEnc::OnToggleVBRSetting, this);
+	check_vbr_setting->onAction.Connect(&ConfigureWMA::OnToggleVBRSetting, this);
 	check_2pass_setting	= new CheckBox(i18n->TranslateString("Use 2-pass encoding"), Point(10, 40), Size(180, 0), &use2PassSetting);
-	check_2pass_setting->onAction.Connect(&ConfigureWMAEnc::OnToggle2PassSetting, this);
+	check_2pass_setting->onAction.Connect(&ConfigureWMA::OnToggle2PassSetting, this);
 
 	text_quality		= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(197, 16));
 
 	slider_quality		= new Slider(Point(204 + text_quality->GetUnscaledTextWidth(), 13), Size(142 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, 0, 20);
-	slider_quality->onValueChange.Connect(&ConfigureWMAEnc::OnSetQuality, this);
+	slider_quality->onValueChange.Connect(&ConfigureWMA::OnSetQuality, this);
 
 	text_quality_value	= new Text(String::FromInt(quality * 5), Point(353, 16));
 
@@ -117,7 +117,7 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 
 	FillCodecComboBox();
 
-	combo_codec->onSelectEntry.Connect(&ConfigureWMAEnc::OnSelectCodec, this);
+	combo_codec->onSelectEntry.Connect(&ConfigureWMA::OnSelectCodec, this);
 
 	if (config->GetIntValue("WMA", "Codec", -1) >= 0) combo_codec->SelectNthEntry(config->GetIntValue("WMA", "Codec", -1));
 
@@ -138,7 +138,7 @@ BoCA::ConfigureWMAEnc::ConfigureWMAEnc()
 	SetSize(Size(400, 269));
 }
 
-BoCA::ConfigureWMAEnc::~ConfigureWMAEnc()
+BoCA::ConfigureWMA::~ConfigureWMA()
 {
 	DeleteObject(group_codec);
 	DeleteObject(option_uncompressed);
@@ -169,7 +169,7 @@ BoCA::ConfigureWMAEnc::~ConfigureWMAEnc()
 	CoUninitialize();
 }
 
-Int BoCA::ConfigureWMAEnc::SaveSettings()
+Int BoCA::ConfigureWMA::SaveSettings()
 {
 	Config	*config = Config::Get();
 
@@ -196,7 +196,7 @@ Int BoCA::ConfigureWMAEnc::SaveSettings()
 	return Success();
 }
 
-Void BoCA::ConfigureWMAEnc::FillCodecComboBox()
+Void BoCA::ConfigureWMA::FillCodecComboBox()
 {
 	combo_codec->RemoveAllEntries();
 
@@ -232,7 +232,7 @@ Void BoCA::ConfigureWMAEnc::FillCodecComboBox()
 	}
 }
 
-Void BoCA::ConfigureWMAEnc::FillFormatComboBox()
+Void BoCA::ConfigureWMA::FillFormatComboBox()
 {
 	static UnsignedInt	 prevCodec	= -1;
 	static Bool		 prevUseVBR	= False;
@@ -293,7 +293,7 @@ Void BoCA::ConfigureWMAEnc::FillFormatComboBox()
 	combo_format->SelectNthEntry(0);
 }
 
-Void BoCA::ConfigureWMAEnc::OnToggleCodec()
+Void BoCA::ConfigureWMA::OnToggleCodec()
 {
 	if (uncompressed)
 	{
@@ -312,7 +312,7 @@ Void BoCA::ConfigureWMAEnc::OnToggleCodec()
 	}
 }
 
-Void BoCA::ConfigureWMAEnc::OnSelectCodec()
+Void BoCA::ConfigureWMA::OnSelectCodec()
 {
 	IWMCodecInfo3	*codecInfo = NIL;
 	HRESULT		 hr	   = profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &codecInfo);
@@ -426,7 +426,7 @@ Void BoCA::ConfigureWMAEnc::OnSelectCodec()
 */
 }
 
-Void BoCA::ConfigureWMAEnc::OnToggleFormat()
+Void BoCA::ConfigureWMA::OnToggleFormat()
 {
 	if (autoselect)
 	{
@@ -452,7 +452,7 @@ Void BoCA::ConfigureWMAEnc::OnToggleFormat()
 	}
 }
 
-Void BoCA::ConfigureWMAEnc::OnToggleVBR()
+Void BoCA::ConfigureWMA::OnToggleVBR()
 {
 /* ToDo: Implement 2-pass encoding.
  *
@@ -471,7 +471,7 @@ Void BoCA::ConfigureWMAEnc::OnToggleVBR()
 	FillFormatComboBox();
 }
 
-Void BoCA::ConfigureWMAEnc::OnToggle2Pass()
+Void BoCA::ConfigureWMA::OnToggle2Pass()
 {
 	if (use2Pass)
 	{
@@ -487,7 +487,7 @@ Void BoCA::ConfigureWMAEnc::OnToggle2Pass()
 	FillFormatComboBox();
 }
 
-Void BoCA::ConfigureWMAEnc::OnToggleVBRSetting()
+Void BoCA::ConfigureWMA::OnToggleVBRSetting()
 {
 	if (useVBRSetting)
 	{
@@ -511,11 +511,11 @@ Void BoCA::ConfigureWMAEnc::OnToggleVBRSetting()
 	}
 }
 
-Void BoCA::ConfigureWMAEnc::OnToggle2PassSetting()
+Void BoCA::ConfigureWMA::OnToggle2PassSetting()
 {
 }
 
-Void BoCA::ConfigureWMAEnc::OnSetQuality()
+Void BoCA::ConfigureWMA::OnSetQuality()
 {
 	text_quality_value->SetText(String::FromInt(quality * 5));
 }

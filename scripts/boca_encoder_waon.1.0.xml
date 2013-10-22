@@ -3,7 +3,7 @@
 <component>
   <name>WaoN MIDI Notes Writer</name>
   <version>1.0</version>
-  <id>waon-out</id>
+  <id>waon-enc</id>
   <type>encoder</type>
   <format>
     <name>MIDI Files</name>

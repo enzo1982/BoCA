@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = config.o dllinterface.o opus_out.o
+OBJECTS	  = config.o dllinterface.o opus.o
 
 # Enter additional defines here:
 ifeq ($(BUILD_WIN32),True)

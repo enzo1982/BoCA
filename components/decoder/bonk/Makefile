@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = bonk_in.o dllinterface.o
+OBJECTS	  = bonk.o dllinterface.o
 
 # Enter additional defines here:
 DEFINE	  =

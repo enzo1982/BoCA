@@ -110,7 +110,6 @@ ifneq ($(BUILD_FREEBSD),True)
 	cd cdio && $(MAKE) install
 endif
 endif
-ifneq ($(BUILD_LINUX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
@@ -122,10 +121,11 @@ endif
 endif
 endif
 endif
-endif
 	cd cuesheet && $(MAKE) install
 	cd faad2 && $(MAKE) install
 	cd flac && $(MAKE) install
+	cd lame && $(MAKE) install
+	cd mad && $(MAKE) install
 	cd mpg123 && $(MAKE) install
 	cd opus && $(MAKE) install
 	cd sndfile && $(MAKE) install
@@ -142,7 +142,6 @@ ifneq ($(BUILD_FREEBSD),True)
 	cd cdio && $(MAKE) uninstall
 endif
 endif
-ifneq ($(BUILD_LINUX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
@@ -154,10 +153,11 @@ endif
 endif
 endif
 endif
-endif
 	cd cuesheet && $(MAKE) uninstall
 	cd faad2 && $(MAKE) uninstall
 	cd flac && $(MAKE) uninstall
+	cd lame && $(MAKE) uninstall
+	cd mad && $(MAKE) uninstall
 	cd mpg123 && $(MAKE) uninstall
 	cd opus && $(MAKE) uninstall
 	cd sndfile && $(MAKE) uninstall

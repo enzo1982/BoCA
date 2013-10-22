@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = id3v1_tag.o
+OBJECTS	  = id3v1.o
 
 # Enter additional defines here:
 DEFINE	  =

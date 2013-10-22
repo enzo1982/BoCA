@@ -3,7 +3,7 @@
 <component>
   <name>La Lossless Audio Decoder</name>
   <version>1.0</version>
-  <id>la-in</id>
+  <id>la-dec</id>
   <type>decoder</type>
   <format>
     <name>La Audio Files</name>

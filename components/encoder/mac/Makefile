@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = config.o dllinterface.o mac_out.o
+OBJECTS	  = config.o dllinterface.o mac.o
 
 # Enter additional defines here:
 DEFINE	  = -DNO_DEFINE_ENVIRONMENT_VARIABLES -D__forceinline=inline

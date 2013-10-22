@@ -10,7 +10,7 @@ BOCA_PATH = ../../..
 include $(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
-OBJECTS	  = oss_out.o
+OBJECTS	  = oss.o
 
 # Enter additional defines here:
 DEFINE	  =

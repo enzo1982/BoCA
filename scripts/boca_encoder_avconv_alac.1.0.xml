@@ -3,7 +3,7 @@
 <component>
   <name>Apple Lossless Encoder</name>
   <version>1.0</version>
-  <id>avconv-alac-out</id>
+  <id>avconv-alac-enc</id>
   <type>encoder</type>
   <format>
     <name>Apple Lossless Files</name>

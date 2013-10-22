@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = qsa_out.o
+OBJECTS	  = qsa.o
 
 # Enter additional defines here:
 DEFINE	  =

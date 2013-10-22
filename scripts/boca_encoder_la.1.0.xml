@@ -3,7 +3,7 @@
 <component>
   <name>La Lossless Audio Encoder</name>
   <version>1.0</version>
-  <id>la-out</id>
+  <id>la-enc</id>
   <type>encoder</type>
   <format>
     <name>La Audio Files</name>

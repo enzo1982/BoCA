@@ -3,7 +3,7 @@
 <component>
   <name>Adaptive Multi-Rate Decoder</name>
   <version>1.0</version>
-  <id>avconv-amr-in</id>
+  <id>avconv-amr-dec</id>
   <type>decoder</type>
   <format>
     <name>AMR Files</name>

@@ -3,7 +3,7 @@
 <component>
   <name>Speex Speech Encoder</name>
   <version>1.0</version>
-  <id>speexcmd-out</id>
+  <id>speexcmd-enc</id>
   <type>encoder</type>
   <format>
     <name>Speex Files</name>

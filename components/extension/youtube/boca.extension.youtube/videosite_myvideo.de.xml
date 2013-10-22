@@ -1,7 +1,7 @@
 <VideoSite>
   <name>MyVideo.de</name>
   <version>1.0</version>
-  <decoder>avconv-flv_audio-in</decoder>
+  <decoder>avconv-flv_audio-dec</decoder>
 
   <script type="text/javascript">
     <![CDATA[

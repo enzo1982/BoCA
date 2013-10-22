@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Fraunhofer IIS MP3 Surround Encoder</name>
+  <name>Fraunhofer MP3 Surround Encoder</name>
   <version>1.0</version>
-  <id>fhg-out</id>
+  <id>fhg-enc</id>
   <type>encoder</type>
   <format>
     <name>MPEG Audio Layer 3</name>

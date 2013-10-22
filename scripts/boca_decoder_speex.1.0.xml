@@ -3,7 +3,7 @@
 <component>
   <name>Speex Speech Decoder</name>
   <version>1.0</version>
-  <id>speexcmd-in</id>
+  <id>speexcmd-dec</id>
   <type>decoder</type>
   <format>
     <name>Speex Files</name>

@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o faad2_in.o
+OBJECTS	  = dllinterface.o faad2.o
 
 # Enter additional defines here:
 DEFINE	  = -I .

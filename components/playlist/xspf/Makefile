@@ -10,7 +10,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = xspf_list.o
+OBJECTS	  = xspf.o
 
 # Enter additional defines here:
 DEFINE	  = -I . -I expat

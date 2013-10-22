@@ -3,7 +3,7 @@
 <component>
   <name>Qualcomm PureVoice Decoder</name>
   <version>1.0</version>
-  <id>avconv-qcp-in</id>
+  <id>avconv-qcp-dec</id>
   <type>decoder</type>
   <format>
     <name>PureVoice Files</name>

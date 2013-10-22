@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = au_in.o
+OBJECTS	  = au.o
 
 # Enter additional defines here:
 DEFINE	  =

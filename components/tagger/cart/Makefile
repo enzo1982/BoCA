@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = cart_tag.o
+OBJECTS	  = cart.o
 
 # Enter additional defines here:
 DEFINE	  =

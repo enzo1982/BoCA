@@ -3,7 +3,7 @@
 <component>
   <name>MPEG Video Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-mpg_audio-in</id>
+  <id>avconv-mpg_audio-dec</id>
   <type>decoder</type>
   <format>
     <name>MPEG Video Files</name>

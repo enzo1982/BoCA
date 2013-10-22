@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = cdio_in.o config.o
+OBJECTS	  = cdio.o config.o
 
 # Enter additional defines here:
 DEFINE	  =

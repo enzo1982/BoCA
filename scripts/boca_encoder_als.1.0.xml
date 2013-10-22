@@ -3,7 +3,7 @@
 <component>
   <name>MPEG-4 Audio Lossless Encoder</name>
   <version>1.0</version>
-  <id>als-out</id>
+  <id>als-enc</id>
   <type>encoder</type>
   <format>
     <name>MPEG-4 ALS Files</name>

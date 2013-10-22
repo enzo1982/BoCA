@@ -3,7 +3,7 @@
 <component>
   <name>RealAudio Decoder</name>
   <version>1.0</version>
-  <id>avconv-realaudio-in</id>
+  <id>avconv-realaudio-dec</id>
   <type>decoder</type>
   <format>
     <name>RealAudio Files</name>

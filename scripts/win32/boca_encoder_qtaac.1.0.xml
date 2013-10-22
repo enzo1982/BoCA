@@ -3,7 +3,7 @@
 <component>
   <name>QuickTime AAC Encoder</name>
   <version>1.0</version>
-  <id>qtaac-out</id>
+  <id>qtaac-enc</id>
   <type>encoder</type>
   <format>
     <name>MP4 Audio Files</name>

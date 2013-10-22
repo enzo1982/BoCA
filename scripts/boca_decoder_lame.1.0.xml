@@ -3,7 +3,7 @@
 <component>
   <name>LAME Command Line Decoder</name>
   <version>1.0</version>
-  <id>lamecmd-in</id>
+  <id>lamecmd-dec</id>
   <type>decoder</type>
   <format>
     <name>MPEG 1 Audio Layer 3</name>

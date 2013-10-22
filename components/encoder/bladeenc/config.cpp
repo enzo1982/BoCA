@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -10,7 +10,7 @@
 
 #include "config.h"
 
-BoCA::ConfigureBladeEnc::ConfigureBladeEnc()
+BoCA::ConfigureBlade::ConfigureBlade()
 {
 	Config	*config = Config::Get();
 
@@ -33,7 +33,7 @@ BoCA::ConfigureBladeEnc::ConfigureBladeEnc()
 	group_private		= new GroupBox(i18n->TranslateString("Private bit"), Point(183, 121), Size(168, 43));
 
 	slider_bit		= new Slider(Point(17, 24), Size(103, 0), OR_HORZ, &bitrate, 0, 13);
-	slider_bit->onValueChange.Connect(&ConfigureBladeEnc::SetBitrate, this);
+	slider_bit->onValueChange.Connect(&ConfigureBlade::SetBitrate, this);
 
 	text_bit		= new Text(NIL, Point(127, 26));
 	SetBitrate();
@@ -61,7 +61,7 @@ BoCA::ConfigureBladeEnc::ConfigureBladeEnc()
 	SetSize(Size(358, 171));
 }
 
-BoCA::ConfigureBladeEnc::~ConfigureBladeEnc()
+BoCA::ConfigureBlade::~ConfigureBlade()
 {
 	DeleteObject(group_bit);
 	DeleteObject(slider_bit);
@@ -78,7 +78,7 @@ BoCA::ConfigureBladeEnc::~ConfigureBladeEnc()
 	DeleteObject(check_dualchannel);
 }
 
-Int BoCA::ConfigureBladeEnc::SaveSettings()
+Int BoCA::ConfigureBlade::SaveSettings()
 {
 	Config	*config = Config::Get();
 
@@ -92,12 +92,12 @@ Int BoCA::ConfigureBladeEnc::SaveSettings()
 	return Success();
 }
 
-Void BoCA::ConfigureBladeEnc::SetBitrate()
+Void BoCA::ConfigureBlade::SetBitrate()
 {
 	text_bit->SetText(String::FromInt(GetBitrate()).Append(" kbit"));
 }
 
-Int BoCA::ConfigureBladeEnc::GetBitrate()
+Int BoCA::ConfigureBlade::GetBitrate()
 {
 	switch (bitrate)
 	{
@@ -119,7 +119,7 @@ Int BoCA::ConfigureBladeEnc::GetBitrate()
 	}
 }
 
-Int BoCA::ConfigureBladeEnc::GetSliderValue()
+Int BoCA::ConfigureBlade::GetSliderValue()
 {
 	switch (Config::Get()->GetIntValue("BladeEnc", "Bitrate", 192))
 	{

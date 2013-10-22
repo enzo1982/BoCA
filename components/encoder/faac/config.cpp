@@ -241,11 +241,11 @@ Int BoCA::ConfigureFAAC::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	if (bitrate < 8)	bitrate = 8;
-	if (bitrate > 128)	bitrate = 128;
+	if (bitrate    <   8) bitrate	 =   8;
+	if (bitrate    > 128) bitrate	 = 128;
 
-	if (aacQuality < 10)	aacQuality = 10;
-	if (aacQuality > 500)	aacQuality = 500;
+	if (aacQuality <  10) aacQuality =  10;
+	if (aacQuality > 500) aacQuality = 500;
 
 	config->SetIntValue("FAAC", "MPEGVersion", mpegVersion);
 	config->SetIntValue("FAAC", "AACType", aacType);
@@ -337,18 +337,6 @@ Void BoCA::ConfigureFAAC::SetFileFormat()
 		group_id3v2->Activate();
 
 		group_extension->Deactivate();
-
-		if (mpegVersion == 1) // MPEG2
-		{
-			if (aacType == 4) // LTP
-			{
-				aacType = 2;
-
-				OptionBox::internalCheckValues.Emit();
-			}
-
-			option_aactype_ltp->Deactivate();
-		}
 	}
 }
 

@@ -3,7 +3,7 @@
 <component>
   <name>WebM Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-webm_audio-in</id>
+  <id>avconv-webm_audio-dec</id>
   <type>decoder</type>
   <format>
     <name>WebM Video</name>

@@ -3,7 +3,7 @@
 <component>
   <name>DivX AAC Encoder</name>
   <version>1.0</version>
-  <id>divxaac-out</id>
+  <id>divxaac-enc</id>
   <type>encoder</type>
   <format>
     <name>AAC Audio Files</name>

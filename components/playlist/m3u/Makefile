@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = m3u_list.o
+OBJECTS	  = m3u.o
 
 # Enter additional defines here:
 DEFINE	  =

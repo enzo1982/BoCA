@@ -3,7 +3,7 @@
 <component>
   <name>Qualcomm PureVoice Decoder</name>
   <version>1.0</version>
-  <id>qcp-in</id>
+  <id>qcp-dec</id>
   <type>decoder</type>
   <format>
     <name>PureVoice</name>

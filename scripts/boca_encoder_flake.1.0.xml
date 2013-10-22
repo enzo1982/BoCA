@@ -3,7 +3,7 @@
 <component>
   <name>Flake FLAC Encoder</name>
   <version>1.0</version>
-  <id>flake-out</id>
+  <id>flake-enc</id>
   <type>encoder</type>
   <format>
     <name>FLAC Audio Files</name>

@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = pls_list.o
+OBJECTS	  = pls.o
 
 # Enter additional defines here:
 DEFINE	  =

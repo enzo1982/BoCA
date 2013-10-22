@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = tocplist_tag.o
+OBJECTS	  = tocplist.o
 
 # Enter additional defines here:
 DEFINE	  =

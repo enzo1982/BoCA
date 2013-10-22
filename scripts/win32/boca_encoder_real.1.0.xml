@@ -3,7 +3,7 @@
 <component>
   <name>RealAudio Encoder</name>
   <version>1.0</version>
-  <id>ra-out</id>
+  <id>ra-enc</id>
   <type>encoder</type>
   <format>
     <name>RealAudio Files</name>

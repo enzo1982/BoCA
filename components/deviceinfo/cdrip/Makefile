@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = cdrip_info.o dllinterface.o
+OBJECTS	  = cdrip.o dllinterface.o
 
 # Enter additional defines here:
 DEFINE	  =

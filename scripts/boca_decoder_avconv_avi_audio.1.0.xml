@@ -3,7 +3,7 @@
 <component>
   <name>AVI Video Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-avi_audio-in</id>
+  <id>avconv-avi_audio-dec</id>
   <type>decoder</type>
   <format>
     <name>Microsoft AVI Video</name>

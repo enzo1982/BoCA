@@ -3,7 +3,7 @@
 <component>
   <name>Ogg Vorbis Decoder</name>
   <version>1.0</version>
-  <id>vorbiscmd-in</id>
+  <id>vorbiscmd-dec</id>
   <type>decoder</type>
   <format>
     <name>Ogg Vorbis Audio</name>

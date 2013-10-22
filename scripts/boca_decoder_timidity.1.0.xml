@@ -3,7 +3,7 @@
 <component>
   <name>TiMidity Software MIDI Synthesizer</name>
   <version>1.0</version>
-  <id>timidity-in</id>
+  <id>timidity-dec</id>
   <type>decoder</type>
   <format>
     <name>MIDI Files</name>

@@ -3,7 +3,7 @@
 <component>
   <name>OptimFROG Audio Decoder</name>
   <version>1.0</version>
-  <id>ofr-in</id>
+  <id>ofr-dec</id>
   <type>decoder</type>
   <format>
     <name>OptimFROG Files</name>

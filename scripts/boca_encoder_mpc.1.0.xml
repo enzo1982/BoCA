@@ -3,7 +3,7 @@
 <component>
   <name>Musepack Audio Encoder</name>
   <version>1.0</version>
-  <id>mpc-out</id>
+  <id>mpc-enc</id>
   <type>encoder</type>
   <format>
     <name>Musepack Audio Files</name>

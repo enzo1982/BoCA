@@ -3,7 +3,7 @@
 <component>
   <name>Shorten Lossless Decoder</name>
   <version>1.0</version>
-  <id>shn-in</id>
+  <id>shn-dec</id>
   <type>decoder</type>
   <format>
     <name>Shorten Audio</name>

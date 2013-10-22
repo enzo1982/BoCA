@@ -3,7 +3,7 @@
 <component>
   <name>Aften A/52 (AC3) Encoder</name>
   <version>1.0</version>
-  <id>aften-out</id>
+  <id>aften-enc</id>
   <type>encoder</type>
   <format>
     <name>AC3 Files</name>

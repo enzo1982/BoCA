@@ -3,7 +3,7 @@
 <component>
   <name>RK Audio Encoder</name>
   <version>1.0</version>
-  <id>rkau-out</id>
+  <id>rkau-enc</id>
   <type>encoder</type>
   <format>
     <name>RK Audio</name>

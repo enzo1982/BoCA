@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = twinvq/bfile.o twinvq/bstream.o twinvq/Chunk.o twinvq/HeaderManager.o dllinterface.o twinvq_in.o
+OBJECTS	  = twinvq/bfile.o twinvq/bstream.o twinvq/Chunk.o twinvq/HeaderManager.o dllinterface.o twinvq.o
 
 # Enter additional defines here:
 DEFINE	  =

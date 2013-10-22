@@ -3,7 +3,7 @@
 <component>
   <name>MPEG-1 Audio Layer 2 Encoder</name>
   <version>1.0</version>
-  <id>avconv-mp2-out</id>
+  <id>avconv-mp2-enc</id>
   <type>encoder</type>
   <format>
     <name>MPEG-1 Audio Layer 2</name>

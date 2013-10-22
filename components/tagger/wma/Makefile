@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o wma_tag.o
+OBJECTS	  = dllinterface.o wma.o
 
 # Enter additional defines here:
 DEFINE	  =

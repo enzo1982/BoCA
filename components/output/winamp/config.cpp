@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,7 +11,7 @@
 #include "config.h"
 #include "dllinterface.h"
 
-BoCA::ConfigureWinampOut::ConfigureWinampOut()
+BoCA::ConfigureWinamp::ConfigureWinamp()
 {
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
@@ -20,15 +20,15 @@ BoCA::ConfigureWinampOut::ConfigureWinampOut()
 
 	list_output		= new ListBox(Point(7, 7), Size(425, 170));
 	list_output->SetFlags(LF_MULTICHECKBOX);
-	list_output->onSelectEntry.Connect(&ConfigureWinampOut::SelectOutputPlugin, this);
-	list_output->onMarkEntry.Connect(&ConfigureWinampOut::SelectOutputPlugin, this);
+	list_output->onSelectEntry.Connect(&ConfigureWinamp::SelectOutputPlugin, this);
+	list_output->onMarkEntry.Connect(&ConfigureWinamp::SelectOutputPlugin, this);
 
 	button_output		= new Button(i18n->TranslateString("Configure"), NIL, Point(440, 7), Size());
-	button_output->onAction.Connect(&ConfigureWinampOut::ConfigureOutputPlugin, this);
+	button_output->onAction.Connect(&ConfigureWinamp::ConfigureOutputPlugin, this);
 	button_output->Deactivate();
 
 	button_output_about	= new Button(i18n->TranslateString("About"), NIL, Point(440, 37), Size());
-	button_output_about->onAction.Connect(&ConfigureWinampOut::AboutOutputPlugin, this);
+	button_output_about->onAction.Connect(&ConfigureWinamp::AboutOutputPlugin, this);
 	button_output_about->Deactivate();
 
 	for (Int l = 0; l < winamp_out_modules.Length(); l++)
@@ -45,14 +45,14 @@ BoCA::ConfigureWinampOut::ConfigureWinampOut()
 	SetSize(Size(527, 184));
 }
 
-BoCA::ConfigureWinampOut::~ConfigureWinampOut()
+BoCA::ConfigureWinamp::~ConfigureWinamp()
 {
 	DeleteObject(list_output);
 	DeleteObject(button_output);
 	DeleteObject(button_output_about);
 }
 
-Int BoCA::ConfigureWinampOut::SaveSettings()
+Int BoCA::ConfigureWinamp::SaveSettings()
 {
 	Config	*config = Config::Get();
 	Int	 plugin = -1;
@@ -64,7 +64,7 @@ Int BoCA::ConfigureWinampOut::SaveSettings()
 	return Success();
 }
 
-Void BoCA::ConfigureWinampOut::SelectOutputPlugin()
+Void BoCA::ConfigureWinamp::SelectOutputPlugin()
 {
 	if (list_output->GetSelectedEntry() == NIL) return;
 
@@ -94,14 +94,14 @@ Void BoCA::ConfigureWinampOut::SelectOutputPlugin()
 	}
 }
 
-Void BoCA::ConfigureWinampOut::ConfigureOutputPlugin()
+Void BoCA::ConfigureWinamp::ConfigureOutputPlugin()
 {
 	if (list_output->GetSelectedEntry() == NIL) return;
 
 	winamp_out_modules.GetNth(list_output->GetSelectedEntryNumber())->Config((HWND) GetContainerWindow()->GetSystemWindow());
 }
 
-Void BoCA::ConfigureWinampOut::AboutOutputPlugin()
+Void BoCA::ConfigureWinamp::AboutOutputPlugin()
 {
 	if (list_output->GetSelectedEntry() == NIL) return;
 

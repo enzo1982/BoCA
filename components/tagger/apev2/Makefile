@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = apev2_tag.o
+OBJECTS	  = apev2.o
 
 # Enter additional defines here:
 DEFINE	  =

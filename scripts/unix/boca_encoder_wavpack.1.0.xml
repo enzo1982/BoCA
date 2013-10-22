@@ -3,7 +3,7 @@
 <component>
   <name>WavPack Lossless Compressor</name>
   <version>1.0</version>
-  <id>wv-out</id>
+  <id>wv-enc</id>
   <type>encoder</type>
   <format>
     <name>WavPack Files</name>

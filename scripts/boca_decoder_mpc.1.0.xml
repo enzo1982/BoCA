@@ -3,7 +3,7 @@
 <component>
   <name>Musepack Audio Decoder</name>
   <version>1.0</version>
-  <id>mpc-in</id>
+  <id>mpc-dec</id>
   <type>decoder</type>
   <format>
     <name>Musepack Audio Files</name>

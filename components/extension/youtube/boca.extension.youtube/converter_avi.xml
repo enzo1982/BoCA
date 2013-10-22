@@ -1,7 +1,7 @@
 <VideoConverter>
   <name>Microsoft AVI Video Converter</name>
   <version>1.0</version>
-  <decoder>avconv-avi_audio-in</decoder>
+  <decoder>avconv-avi_audio-dec</decoder>
 
   <format>
     <name>Microsoft AVI Video</name>

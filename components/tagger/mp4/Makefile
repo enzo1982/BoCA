@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o mp4_tag.o
+OBJECTS	  = dllinterface.o mp4.o
 
 # Enter additional defines here:
 DEFINE	  = -I .

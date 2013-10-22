@@ -3,7 +3,7 @@
 <component>
   <name>MP4 Video Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-m4v_audio-in</id>
+  <id>avconv-m4v_audio-dec</id>
   <type>decoder</type>
   <format>
     <name>MP4 Video Files</name>

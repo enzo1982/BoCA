@@ -3,7 +3,7 @@
 <component>
   <name>ATRAC-3 Decoder</name>
   <version>1.0</version>
-  <id>avconv-atrac3-in</id>
+  <id>avconv-atrac3-dec</id>
   <type>decoder</type>
   <format>
     <name>ATRAC-3 Files</name>

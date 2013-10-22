@@ -3,7 +3,7 @@
 <component>
   <name>Matroska Video Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-mkv_audio-in</id>
+  <id>avconv-mkv_audio-dec</id>
   <type>decoder</type>
   <format>
     <name>Matroska Video Files</name>

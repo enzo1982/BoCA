@@ -3,7 +3,7 @@
 <component>
   <name>LAME Command Line Encoder</name>
   <version>1.0</version>
-  <id>lamecmd-out</id>
+  <id>lamecmd-enc</id>
   <type>encoder</type>
   <format>
     <name>MPEG 1 Audio Layer 3</name>

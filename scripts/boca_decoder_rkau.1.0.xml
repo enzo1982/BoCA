@@ -3,7 +3,7 @@
 <component>
   <name>RK Audio Decoder</name>
   <version>1.0</version>
-  <id>rkau-in</id>
+  <id>rkau-dec</id>
   <type>decoder</type>
   <format>
     <name>RK Audio</name>

@@ -3,7 +3,7 @@
 <component>
   <name>Windows Media Audio Decoder</name>
   <version>1.0</version>
-  <id>avconv-wma-in</id>
+  <id>avconv-wma-dec</id>
   <type>decoder</type>
   <format>
     <name>Windows Media Audio Files</name>

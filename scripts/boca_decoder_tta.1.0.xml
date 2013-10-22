@@ -3,7 +3,7 @@
 <component>
   <name>TTA Lossless Audio Decoder</name>
   <version>1.0</version>
-  <id>tta-in</id>
+  <id>tta-dec</id>
   <type>decoder</type>
   <format>
     <name>TTA Audio Files</name>

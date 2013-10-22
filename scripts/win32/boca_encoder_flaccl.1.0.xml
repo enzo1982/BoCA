@@ -3,7 +3,7 @@
 <component>
   <name>FLACCL OpenCL FLAC Encoder</name>
   <version>1.0</version>
-  <id>flaccl-out</id>
+  <id>flaccl-enc</id>
   <type>encoder</type>
   <format>
     <name>FLAC Audio Files</name>

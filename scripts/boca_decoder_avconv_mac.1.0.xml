@@ -3,7 +3,7 @@
 <component>
   <name>Monkey's Audio Decoder</name>
   <version>1.0</version>
-  <id>avconv-mac-in</id>
+  <id>avconv-mac-dec</id>
   <type>decoder</type>
   <format>
     <name>Monkey's Audio Files</name>

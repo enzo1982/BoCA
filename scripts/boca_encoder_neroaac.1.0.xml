@@ -3,8 +3,10 @@
 <component>
   <name>Nero AAC Encoder</name>
   <version>1.0</version>
-  <id>nero-out</id>
+  <id>nero-enc</id>
   <type>encoder</type>
+  <replace>faac-enc</replace>
+  <replace>voaacenc-enc</replace>
   <format>
     <name>MP4 Audio Files</name>
     <extension>m4a</extension>

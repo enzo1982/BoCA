@@ -3,7 +3,7 @@
 <component>
   <name>Tom's Audiokompressor</name>
   <version>1.0</version>
-  <id>tak-in</id>
+  <id>tak-dec</id>
   <type>decoder</type>
   <format>
     <name>Tom's Audio</name>

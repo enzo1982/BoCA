@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = wave_out.o
+OBJECTS	  = wave.o
 
 # Enter additional defines here:
 DEFINE	  =

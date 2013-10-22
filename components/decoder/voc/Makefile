@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = voc_in.o
+OBJECTS	  = voc.o
 
 # Enter additional defines here:
 DEFINE	  =

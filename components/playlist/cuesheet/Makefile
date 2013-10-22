@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = cuesheet_list.o
+OBJECTS	  = cuesheet.o
 
 # Enter additional defines here:
 DEFINE	  =

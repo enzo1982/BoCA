@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = coreaudio_out.o
+OBJECTS	  = coreaudio.o
 
 # Enter additional defines here:
 DEFINE	  =

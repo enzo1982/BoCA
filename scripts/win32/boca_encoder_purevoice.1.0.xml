@@ -3,7 +3,7 @@
 <component>
   <name>Qualcomm PureVoice Encoder</name>
   <version>1.0</version>
-  <id>qcp-out</id>
+  <id>qcp-enc</id>
   <type>encoder</type>
   <format>
     <name>PureVoice</name>

@@ -3,7 +3,7 @@
 <component>
   <name>TwoLAME MP2 Encoder</name>
   <version>1.0</version>
-  <id>twolame-out</id>
+  <id>twolame-enc</id>
   <type>encoder</type>
   <format>
     <name>MPEG Audio Layer 2</name>

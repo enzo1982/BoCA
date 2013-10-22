@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = vorbis_tag.o
+OBJECTS	  = vorbis.o
 
 # Enter additional defines here:
 DEFINE	  =

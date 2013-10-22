@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,14 +11,14 @@
 #include "config.h"
 #include "dllinterface.h"
 
-BoCA::ConfigureWinampIn::ConfigureWinampIn()
+BoCA::ConfigureWinamp::ConfigureWinamp()
 {
 	I18n	*i18n = I18n::Get();
 
 	i18n->SetContext("Extensions::Winamp Adapter");
 
 	list_input		= new ListBox(Point(7, 7), Size(425, 170));
-	list_input->onSelectEntry.Connect(&ConfigureWinampIn::SelectInputPlugin, this);
+	list_input->onSelectEntry.Connect(&ConfigureWinamp::SelectInputPlugin, this);
 
 	for (Int k = 0; k < winamp_in_modules.Length(); k++)
 	{
@@ -26,11 +26,11 @@ BoCA::ConfigureWinampIn::ConfigureWinampIn()
 	}
 
 	button_input		= new Button(i18n->TranslateString("Configure"), NIL, Point(440, 7), Size());
-	button_input->onAction.Connect(&ConfigureWinampIn::ConfigureInputPlugin, this);
+	button_input->onAction.Connect(&ConfigureWinamp::ConfigureInputPlugin, this);
 	button_input->Deactivate();
 
 	button_input_about	= new Button(i18n->TranslateString("About"), NIL, Point(440, 37), Size());
-	button_input_about->onAction.Connect(&ConfigureWinampIn::AboutInputPlugin, this);
+	button_input_about->onAction.Connect(&ConfigureWinamp::AboutInputPlugin, this);
 	button_input_about->Deactivate();
 
 	Add(list_input);
@@ -40,32 +40,32 @@ BoCA::ConfigureWinampIn::ConfigureWinampIn()
 	SetSize(Size(527, 184));
 }
 
-BoCA::ConfigureWinampIn::~ConfigureWinampIn()
+BoCA::ConfigureWinamp::~ConfigureWinamp()
 {
 	DeleteObject(list_input);
 	DeleteObject(button_input);
 	DeleteObject(button_input_about);
 }
 
-Int BoCA::ConfigureWinampIn::SaveSettings()
+Int BoCA::ConfigureWinamp::SaveSettings()
 {
 	return Success();
 }
 
-Void BoCA::ConfigureWinampIn::SelectInputPlugin()
+Void BoCA::ConfigureWinamp::SelectInputPlugin()
 {
 	button_input->Activate();
 	button_input_about->Activate();
 }
 
-Void BoCA::ConfigureWinampIn::ConfigureInputPlugin()
+Void BoCA::ConfigureWinamp::ConfigureInputPlugin()
 {
 	if (list_input->GetSelectedEntry() == NIL) return;
 
 	winamp_in_modules.GetNth(list_input->GetSelectedEntryNumber())->Config((HWND) GetContainerWindow()->GetSystemWindow());
 }
 
-Void BoCA::ConfigureWinampIn::AboutInputPlugin()
+Void BoCA::ConfigureWinamp::AboutInputPlugin()
 {
 	if (list_input->GetSelectedEntry() == NIL) return;
 

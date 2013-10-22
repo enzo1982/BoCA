@@ -3,7 +3,7 @@
 <component>
   <name>Flash Video Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-flv_audio-in</id>
+  <id>avconv-flv_audio-dec</id>
   <type>decoder</type>
   <format>
     <name>Adobe Flash Video</name>

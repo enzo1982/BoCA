@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o vorbis_in.o
+OBJECTS	  = dllinterface.o vorbis.o
 
 # Enter additional defines here:
 ifeq ($(BUILD_WIN32),True)
