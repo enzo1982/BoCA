@@ -82,12 +82,17 @@ else
 	endif
 endif
 
-LIB = lib
+LIB	= lib
+INCLUDE	= include
 
 ifeq ($(BUILD_X86_64),True)
 	ifneq ($(BUILD_OSX),True)
 		LIB = lib64
 	endif
+endif
+
+ifeq ($(BUILD_HAIKU),True)
+	INCLUDE = develop/headers
 endif
 
 ifeq ($(PREFIX),)

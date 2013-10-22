@@ -10,18 +10,15 @@ clean:
 
 install: uninstall
 ifneq ($(BUILD_WIN32),True)
-	mkdir -p $(PREFIX)/lib/boca
+	cp -r boca $(PREFIX)/$(INCLUDE)
+	cp boca.h $(PREFIX)/$(INCLUDE)
 
-	cp -r boca $(PREFIX)/include
-	cp boca.h $(PREFIX)/include
-
-	chmod -R a=rX,u=rwX $(PREFIX)/include/boca
-	chmod a=r,u=rw $(PREFIX)/include/boca.h
+	chmod -R a=rX,u=rwX $(PREFIX)/$(INCLUDE)/boca
+	chmod a=r,u=rw $(PREFIX)/$(INCLUDE)/boca.h
 endif
 
 uninstall:
 ifneq ($(BUILD_WIN32),True)
-	rm -f $(PREFIX)/include/boca.h
-	rm -f -r $(PREFIX)/include/boca
-	rm -f -r $(PREFIX)/lib/boca
+	rm -f $(PREFIX)/$(INCLUDE)/boca.h
+	rm -f -r $(PREFIX)/$(INCLUDE)/boca
 endif
