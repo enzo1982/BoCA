@@ -8,6 +8,8 @@
 
 #include <_mingw_unicode.h>
 
+#include <winapifamily.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -180,6 +182,8 @@ extern "C" {
 #define ENABLE_PROCESSED_OUTPUT 0x1
 #define ENABLE_WRAP_AT_EOL_OUTPUT 0x2
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+
 #define PeekConsoleInput __MINGW_NAME_AW(PeekConsoleInput)
 #define ReadConsoleInput __MINGW_NAME_AW(ReadConsoleInput)
 #define WriteConsoleInput __MINGW_NAME_AW(WriteConsoleInput)
@@ -321,7 +325,7 @@ typedef struct _CONSOLE_SCREEN_BUFFER_INFOEX {
   SMALL_RECT srWindow;
   COORD      dwMaximumWindowSize;
   WORD       wPopupAttributes;
-  BOOL       bFullscreenSupported;
+  WINBOOL    bFullscreenSupported;
   COLORREF   ColorTable[16];
 } CONSOLE_SCREEN_BUFFER_INFOEX, *PCONSOLE_SCREEN_BUFFER_INFOEX;
 
@@ -368,6 +372,8 @@ WINBASEAPI WINBOOL WINAPI SetCurrentConsoleFontEx(
   WINBOOL bMaximumWindow,
   PCONSOLE_FONT_INFOEX lpConsoleCurrentFontEx
 );
+
+#endif /* WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) */
 
 #ifdef __cplusplus
 }

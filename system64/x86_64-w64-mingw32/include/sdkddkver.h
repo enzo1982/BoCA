@@ -20,6 +20,7 @@
 #define _WIN32_WINNT_WS08		0x0600
 #define _WIN32_WINNT_LONGHORN		0x0600
 #define _WIN32_WINNT_WIN7		0x0601
+#define _WIN32_WINNT_WIN8		0x0602
 
 /* _WIN32_IE */
 #define _WIN32_IE_IE20			0x0200
@@ -62,17 +63,37 @@
 #define _WIN32_IE_WIN7			_WIN32_IE_IE80
 
 /* NTDDI_VERSION */
+#ifndef NTDDI_WIN2K
 #define NTDDI_WIN2K			0x05000000
+#endif
+#ifndef NTDDI_WIN2KSP1
 #define NTDDI_WIN2KSP1			0x05000100
+#endif
+#ifndef NTDDI_WIN2KSP2
 #define NTDDI_WIN2KSP2			0x05000200
+#endif
+#ifndef NTDDI_WIN2KSP3
 #define NTDDI_WIN2KSP3			0x05000300
+#endif
+#ifndef NTDDI_WIN2KSP4
 #define NTDDI_WIN2KSP4			0x05000400
+#endif
 
+#ifndef NTDDI_WINXP
 #define NTDDI_WINXP			0x05010000
+#endif
+#ifndef NTDDI_WINXPSP1
 #define NTDDI_WINXPSP1			0x05010100
+#endif
+#ifndef NTDDI_WINXPSP2
 #define NTDDI_WINXPSP2			0x05010200
+#endif
+#ifndef NTDDI_WINXPSP3
 #define NTDDI_WINXPSP3			0x05010300
+#endif
+#ifndef NTDDI_WINXPSP4
 #define NTDDI_WINXPSP4			0x05010400
+#endif
 
 #define NTDDI_WS03			0x05020000
 #define NTDDI_WS03SP1			0x05020100
@@ -99,6 +120,7 @@
 #define NTDDI_WS08SP4			NTDDI_WIN6SP4
 
 #define NTDDI_WIN7			0x06010000
+#define NTDDI_WIN8                      0x06020000
 
 /* Version Fields in NTDDI_VERSION */
 #define OSVERSION_MASK			0xFFFF0000

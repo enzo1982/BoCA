@@ -318,14 +318,14 @@ extern const double __QNAN;
 
 /* Use the compiler's builtin define for FLT_EVAL_METHOD to
    set float_t and double_t.  */
-#if defined(__FLT_EVAL_METHOD__)  
-# if ( __FLT_EVAL_METHOD__== 0)
+#if defined (__x86_64__) || defined(__FLT_EVAL_METHOD__)  
+# if defined (__x86_64__) || ( __FLT_EVAL_METHOD__== 0)
 typedef float float_t;
 typedef double double_t;
 # elif (__FLT_EVAL_METHOD__ == 1)
 typedef double float_t;
 typedef double double_t;
-# elif (__FLT_EVAL_METHOD__ == 2)
+# else /* (__FLT_EVAL_METHOD__ == 2) default ix87 FPU */
 typedef long double float_t;
 typedef long double double_t;
 #endif
@@ -757,6 +757,8 @@ typedef long double double_t;
   extern double __cdecl lgamma (double);
   extern float __cdecl lgammaf (float);
   extern long double __cdecl lgammal (long double);
+
+  extern int signgam;
 
 /* 7.12.8.4 The tgamma functions */
   extern double __cdecl tgamma (double);

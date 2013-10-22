@@ -7,12 +7,7 @@
 #define _WINUSER_
 
 #include <_mingw_unicode.h>
-
-#ifdef _USER32_
-#define WINUSERAPI
-#else
-#define WINUSERAPI DECLSPEC_IMPORT
-#endif
+#include <apisetcconv.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -1755,6 +1750,9 @@ extern "C" {
 #define MOD_CONTROL 0x0002
 #define MOD_SHIFT 0x0004
 #define MOD_WIN 0x0008
+#if (_WIN32_WINNT >= 0x0600)
+#define MOD_NOREPEAT 0x4000
+#endif /* (_WIN32_WINNT >= 0x0600) */
 
 #define IDHOT_SNAPWINDOW (-1)
 #define IDHOT_SNAPDESKTOP (-2)
@@ -3567,11 +3565,6 @@ extern "C" {
 #define IDI_ERROR IDI_HAND
 #define IDI_INFORMATION IDI_ASTERISK
 #endif
-
-#define LoadString __MINGW_NAME_AW(LoadString)
-
-  WINUSERAPI int WINAPI LoadStringA(HINSTANCE hInstance,UINT uID,LPSTR lpBuffer,int cchBufferMax);
-  WINUSERAPI int WINAPI LoadStringW(HINSTANCE hInstance,UINT uID,LPWSTR lpBuffer,int cchBufferMax);
 
 #define IDOK 1
 #define IDCANCEL 2

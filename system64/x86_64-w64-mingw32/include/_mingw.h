@@ -79,6 +79,10 @@ limitations in handling dllimport attribute.  */
 #define USE___UUIDOF	0
 #endif
 
+#if !defined(_MSC_VER) && !defined(_inline)
+#define _inline __inline
+#endif
+
 #ifdef __cplusplus
 # define __CRT_INLINE inline
 #elif defined(_MSC_VER)
@@ -96,9 +100,11 @@ limitations in handling dllimport attribute.  */
 #define __MINGW_INTRIN_INLINE extern __inline__ __attribute__((__always_inline__,__gnu_inline__))
 #endif
 
+#ifndef __CYGWIN__
 #ifdef __NO_INLINE__
 #undef __CRT__NO_INLINE
 #define __CRT__NO_INLINE 1
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -512,6 +518,13 @@ typedef __time64_t time_t;
 #define _CRT_UNUSED(x) (void)x
 #endif
 
+/* MSVC defines _NATIVE_NULLPTR_SUPPORTED when nullptr is supported. We emulate it here for GCC. */
+#if __MINGW_GNUC_PREREQ(4, 6)
+#if defined(__GNUC__) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)
+#define _NATIVE_NULLPTR_SUPPORTED
+#endif
+#endif
+
 /* We are activating __USE_MINGW_ANSI_STDIO for various define indicators.
    Note that we enable it also for _GNU_SOURCE in C++, but not for C case. */
 #if (defined (_POSIX) || defined (_POSIX_SOURCE) || defined (_POSIX_C_SOURCE) \
@@ -618,7 +631,8 @@ typedef __time64_t time_t;
 #define __CRT_UUID_DECL(type,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8)           \
     extern "C++" {                                                      \
     template<> inline const GUID &__mingw_uuidof<type>() {              \
-        return (const IID){l,w1,w2, {b1,b2,b3,b4,b5,b6,b7,b8}};         \
+        static const IID __uuid_inst = {l,w1,w2, {b1,b2,b3,b4,b5,b6,b7,b8}}; \
+        return __uuid_inst;                                             \
     }                                                                   \
     template<> inline const GUID &__mingw_uuidof<type*>() {             \
         return __mingw_uuidof<type>();                                  \
@@ -642,7 +656,7 @@ extern "C" {
 void __cdecl __debugbreak(void);
 __MINGW_INTRIN_INLINE void __cdecl __debugbreak(void)
 {
-  __asm__ __volatile__("int $3");
+  __asm__ __volatile__("int {$}3":);
 }
 #endif
 #endif

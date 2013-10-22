@@ -11,6 +11,7 @@
 #include <guiddef.h>
 #include <bcrypt.h>
 #include <ncrypt.h>
+#include <winapifamily.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,14 +30,7 @@ extern "C" {
 #define WINIMPM	DECLSPEC_IMPORT
 #endif
 
-#ifndef WINADVAPI
-#ifndef _ADVAPI32_
-#define WINADVAPI WINIMPM
-#else
-#define WINADVAPI
-#endif
-#endif
-
+#include <apisetcconv.h>
 
 #ifndef WINAPI
 #define WINAPI __stdcall
@@ -643,6 +637,8 @@ extern "C" {
     void *pReserved;
   } CMS_DH_KEY_INFO,*PCMS_DH_KEY_INFO;
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+
 #define CryptAcquireContext __MINGW_NAME_AW(CryptAcquireContext)
 #define CryptSignHash __MINGW_NAME_AW(CryptSignHash)
 #define CryptVerifySignature __MINGW_NAME_AW(CryptVerifySignature)
@@ -694,6 +690,8 @@ extern "C" {
   WINIMPM WINBOOL WINAPI CryptDuplicateKey(HCRYPTKEY hKey,DWORD *pdwReserved,DWORD dwFlags,HCRYPTKEY *phKey);
   WINIMPM WINBOOL WINAPI CryptDuplicateHash(HCRYPTHASH hHash,DWORD *pdwReserved,DWORD dwFlags,HCRYPTHASH *phHash);
   WINBOOL __cdecl GetEncSChannel(BYTE **pData,DWORD *dwDecSize);
+
+#endif /* WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) */
 
   typedef struct _CRYPT_BIT_BLOB {
     DWORD cbData;
@@ -834,6 +832,10 @@ extern "C" {
 #define szOID_INFOSEC_mosaicUpdatedSig "2.16.840.1.101.2.1.1.19"
 #define szOID_INFOSEC_mosaicKMandUpdSig "2.16.840.1.101.2.1.1.20"
 #define szOID_INFOSEC_mosaicUpdatedInteg "2.16.840.1.101.2.1.1.21"
+
+#define szOID_NIST_AES128_CBC "2.16.840.1.101.3.4.1.2"
+#define szOID_NIST_AES192_CBC "2.16.840.1.101.3.4.1.22"
+#define szOID_NIST_AES256_CBC "2.16.840.1.101.3.4.1.42"
 
   typedef struct _CRYPT_OBJID_TABLE {
     DWORD dwAlgId;
@@ -4236,6 +4238,7 @@ extern "C" {
 
   WINIMPM WINBOOL WINAPI PFXExportCertStore(HCERTSTORE hStore,CRYPT_DATA_BLOB *pPFX,LPCWSTR szPassword,DWORD dwFlags);
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #if (_WIN32_WINNT >= 0x0600)
 #define szOID_LOYALTY_OTHER_LOGOTYPE "1.3.6.1.5.5.7.20.1"
 #define szOID_BACKGROUND_OTHER_LOGOTYPE "1.3.6.1.5.5.7.20.2"
@@ -4310,6 +4313,7 @@ typedef WINBOOL ( WINAPI *PFN_CRYPT_VERIFY_ENCODED_SIGNATURE_FUNC )(
   BYTE *pbSignature,
   DWORD cbSignature
 );
+
 
 #define CRYPT_OID_IMPORT_PUBLIC_KEY_INFO_EX2_FUNC "CryptDllImportPublicKeyInfoEx2"
 
@@ -4929,6 +4933,8 @@ WINCRYPT32API WINBOOL WINAPI CryptVerifyTimeStampSignature(
   HCERTSTORE *phStore
 );
 #endif /*(_WIN32_WINNT >= 0x0601)*/
+
+#endif /* WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) */
 
 #ifdef __cplusplus
 }

@@ -10,6 +10,7 @@
 
 #include <winsock2.h>
 #include <psdk_inc/_ip_mreq1.h>
+#include <winapifamily.h>
 
 struct ip_mreq_source {
   struct in_addr imr_multiaddr;
@@ -50,19 +51,6 @@ struct ip_msfilter {
 #define IP_PKTINFO 19
 #define IP_RECEIVE_BROADCAST 22
 
-#define IPV6_HDRINCL 2
-#define IPV6_UNICAST_HOPS 4
-#define IPV6_MULTICAST_IF 9
-#define IPV6_MULTICAST_HOPS 10
-#define IPV6_MULTICAST_LOOP 11
-#define IPV6_ADD_MEMBERSHIP 12
-#define IPV6_DROP_MEMBERSHIP 13
-#define IPV6_JOIN_GROUP IPV6_ADD_MEMBERSHIP
-#define IPV6_LEAVE_GROUP IPV6_DROP_MEMBERSHIP
-#define IPV6_PKTINFO 19
-#define IPV6_HOPLIMIT 21
-#define IPV6_PROTECTION_LEVEL 23
-
 #define PROTECTION_LEVEL_UNRESTRICTED 10
 #define PROTECTION_LEVEL_DEFAULT 20
 #define PROTECTION_LEVEL_RESTRICTED 30
@@ -80,6 +68,8 @@ struct ip_msfilter {
 
 #define IN6ADDR_ANY_INIT { 0 }
 #define IN6ADDR_LOOPBACK_INIT { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 }
+
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 #ifdef __cplusplus
 extern "C" {
@@ -187,6 +177,8 @@ C_ASSERT(sizeof(IN6_PKTINFO)==20);
 #define EAI_SOCKTYPE WSAESOCKTNOSUPPORT
 
 #define EAI_NODATA 11004 /* WSANO_DATA */
+
+#endif /* WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) */
 
 typedef struct addrinfo {
   int ai_flags;
@@ -425,6 +417,20 @@ WINSOCK_API_LINKAGE int WSAAPI WSASetSocketSecurity(
   LPWSAOVERLAPPED Overlapped,
   LPWSAOVERLAPPED_COMPLETION_ROUTINE CompletionRoutine
 );
+
+#define InetNtopA inet_ntop
+
+WINSOCK_API_LINKAGE LPCWSTR WSAAPI InetNtopW(INT Family, PVOID pAddr, LPWSTR pStringBuf, size_t StringBufSIze);
+WINSOCK_API_LINKAGE LPCSTR WSAAPI InetNtopA(INT Family, PVOID pAddr, LPSTR pStringBuf, size_t StringBufSize);
+
+#define InetNtop __MINGW_NAME_AW(InetNtop)
+
+#define InetPtonA inet_pton
+
+WINSOCK_API_LINKAGE INT WSAAPI InetPtonW(INT Family, LPCWSTR pStringBuf, PVOID pAddr);
+WINSOCK_API_LINKAGE INT WSAAPI InetPtonA(INT Family, LPCSTR pStringBuf, PVOID pAddr);
+
+#define InetPton __MINGW_NAME_AW(InetPton)
 
 #endif /*(_WIN32_WINNT >= 0x0600)*/
 
