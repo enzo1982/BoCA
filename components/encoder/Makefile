@@ -10,6 +10,7 @@ ifeq ($(BUILD_WIN32),True)
 endif
 	cd bonk && $(MAKE)
 	cd faac && $(MAKE)
+	cd fdkaac && $(MAKE)
 	cd flac && $(MAKE)
 	cd lame && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
@@ -33,6 +34,7 @@ ifeq ($(BUILD_WIN32),True)
 endif
 	cd bonk && $(MAKE) clean
 	cd faac && $(MAKE) clean
+	cd fdkaac && $(MAKE) clean
 	cd flac && $(MAKE) clean
 	cd lame && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
@@ -52,6 +54,7 @@ endif
 
 install:
 	cd faac && $(MAKE) install
+	cd fdkaac && $(MAKE) install
 	cd flac && $(MAKE) install
 	cd lame && $(MAKE) install
 	cd opus && $(MAKE) install
@@ -62,6 +65,7 @@ install:
 
 uninstall:
 	cd faac && $(MAKE) uninstall
+	cd fdkaac && $(MAKE) uninstall
 	cd flac && $(MAKE) uninstall
 	cd lame && $(MAKE) uninstall
 	cd opus && $(MAKE) uninstall

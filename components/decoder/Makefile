@@ -31,6 +31,7 @@ ifeq ($(BUILD_WIN32),True)
 endif
 	cd cuesheet && $(MAKE)
 	cd faad2 && $(MAKE)
+	cd fdkaac && $(MAKE)
 	cd flac && $(MAKE)
 	cd lame && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
@@ -79,6 +80,7 @@ ifeq ($(BUILD_WIN32),True)
 endif
 	cd cuesheet && $(MAKE) clean
 	cd faad2 && $(MAKE) clean
+	cd fdkaac && $(MAKE) clean
 	cd flac && $(MAKE) clean
 	cd lame && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
@@ -123,6 +125,7 @@ endif
 endif
 	cd cuesheet && $(MAKE) install
 	cd faad2 && $(MAKE) install
+	cd fdkaac && $(MAKE) install
 	cd flac && $(MAKE) install
 	cd lame && $(MAKE) install
 	cd mad && $(MAKE) install
@@ -155,6 +158,7 @@ endif
 endif
 	cd cuesheet && $(MAKE) uninstall
 	cd faad2 && $(MAKE) uninstall
+	cd fdkaac && $(MAKE) uninstall
 	cd flac && $(MAKE) uninstall
 	cd lame && $(MAKE) uninstall
 	cd mad && $(MAKE) uninstall
