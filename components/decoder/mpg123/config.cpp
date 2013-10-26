@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,15 +16,15 @@ BoCA::ConfigureMPG123::ConfigureMPG123()
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
 
-	i18n->SetContext("Decoders::MPG123");
+	i18n->SetContext("Decoders::mpg123");
 
-	String	 selectedDecoder = config->GetStringValue("MPG123", "Decoder", NIL);
+	String	 selectedDecoder = config->GetStringValue("mpg123", "Decoder", NIL);
 
-	group_decoding	= new GroupBox(i18n->TranslateString("Decoder"), Point(7, 11), Size(220, 41));
+	group_decoding	= new GroupBox(i18n->TranslateString("Decoder"), Point(7, 11), Size(250, 41));
 
 	text_decoder	= new Text(i18n->TranslateString("Active decoder:"), Point(10, 15));
 
-	combo_decoder	= new ComboBox(Point(17 + text_decoder->GetUnscaledTextWidth(), 12), Size(193 - text_decoder->GetUnscaledTextWidth(), 0));
+	combo_decoder	= new ComboBox(Point(17 + text_decoder->GetUnscaledTextWidth(), 12), Size(223 - text_decoder->GetUnscaledTextWidth(), 0));
 	combo_decoder->AddEntry(i18n->TranslateString("auto select"));
 
 	const char	**decoders = ex_mpg123_supported_decoders();
@@ -39,7 +39,7 @@ BoCA::ConfigureMPG123::ConfigureMPG123()
 
 	Add(group_decoding);
 
-	SetSize(Size(234, 169));
+	SetSize(Size(264, 169));
 }
 
 BoCA::ConfigureMPG123::~ConfigureMPG123()
@@ -55,8 +55,8 @@ Int BoCA::ConfigureMPG123::SaveSettings()
 
 	String	 selectedDecoder = combo_decoder->GetSelectedEntry()->GetText();
 
-	if (combo_decoder->GetSelectedEntryNumber() == 0) config->SetStringValue("MPG123", "Decoder", NIL);
-	else						  config->SetStringValue("MPG123", "Decoder", selectedDecoder);
+	if (combo_decoder->GetSelectedEntryNumber() == 0) config->SetStringValue("mpg123", "Decoder", NIL);
+	else						  config->SetStringValue("mpg123", "Decoder", selectedDecoder);
 
 	return Success();
 }

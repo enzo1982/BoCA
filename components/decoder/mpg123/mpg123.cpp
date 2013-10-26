@@ -209,7 +209,7 @@ Bool BoCA::DecoderMPG123::Activate()
 
 	Config	*config = Config::Get();
 
-	String	 selectedDecoder = config->GetStringValue("MPG123", "Decoder", NIL);
+	String	 selectedDecoder = config->GetStringValue("mpg123", "Decoder", NIL);
 
 	if (selectedDecoder != NIL) ex_mpg123_decoder(context, selectedDecoder);
 
