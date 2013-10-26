@@ -41,11 +41,15 @@ Void smooth::DetachDLL()
 
 BoCA::Donate::Donate()
 {
+	static Bool	 checkedDonation = False;
+
+	dialog = NIL;
+
+	if (checkedDonation) return;
+
 	Config	*config = Config::Get();
 
 	Int	 startCount = config->GetIntValue("Donate", "StartCount", 0) + 1;
-
-	dialog = NIL;
 
 	if (startCount % 10 == 0 && config->GetIntValue("Donate", "ShowAgain", True))
 	{
@@ -55,6 +59,8 @@ BoCA::Donate::Donate()
 	}
 
 	config->SetIntValue("Donate", "StartCount", startCount);
+
+	checkedDonation = True;
 }
 
 BoCA::Donate::~Donate()
