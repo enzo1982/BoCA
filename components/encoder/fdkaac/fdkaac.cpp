@@ -192,11 +192,8 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 {
 	Config		*config = Config::Get();
 
-	/* Configure buffer descriptors.
+	/* Prepare buffer information.
 	 */
-	AACENC_BufDesc	 input	     = { 0 };
-	AACENC_BufDesc	 output	     = { 0 };
-
 	Void	*inputBuffer	   = (int16_t *) samplesBuffer;
 	Int	 inputBufferID	   = IN_AUDIO_DATA;
 	Int	 inputBufferSize   = 0;
@@ -206,6 +203,11 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 	Int	 outputBufferID	   = OUT_BITSTREAM_DATA;
 	Int	 outputBufferSize  = outBuffer.Size();
 	Int	 outputElementSize = 1;
+
+	/* Configure buffer descriptors.
+	 */
+	AACENC_BufDesc	 input	     = { 0 };
+	AACENC_BufDesc	 output	     = { 0 };
 
 	input.numBufs		 = 1;
 	input.bufs		 = &inputBuffer;
@@ -219,6 +221,8 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 	output.bufSizes		 = &outputBufferSize;
 	output.bufElSizes	 = &outputElementSize;
 
+	/* Flush stream buffers and retrieve output.
+	 */
 	AACENC_InArgs	 inputInfo   = { 0 };
 	AACENC_OutArgs	 outputInfo  = { 0 };
 
@@ -295,11 +299,8 @@ Int BoCA::EncoderFDKAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	Config	*config = Config::Get();
 
-	/* Configure buffer descriptors.
+	/* Prepare buffer information.
 	 */
-	AACENC_BufDesc	 input	     = { 0 };
-	AACENC_BufDesc	 output	     = { 0 };
-
 	Void	*inputBuffer	   = (int16_t *) samplesBuffer;
 	Int	 inputBufferID	   = IN_AUDIO_DATA;
 	Int	 inputBufferSize   = samplesBuffer.Size();
@@ -309,18 +310,6 @@ Int BoCA::EncoderFDKAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 	Int	 outputBufferID	   = OUT_BITSTREAM_DATA;
 	Int	 outputBufferSize  = outBuffer.Size();
 	Int	 outputElementSize = 1;
-
-	input.numBufs		 = 1;
-	input.bufs		 = &inputBuffer;
-	input.bufferIdentifiers  = &inputBufferID;
-	input.bufSizes		 = &inputBufferSize;
-	input.bufElSizes	 = &inputElementSize;
-
-	output.numBufs		 = 1;
-	output.bufs		 = &outputBuffer;
-	output.bufferIdentifiers = &outputBufferID;
-	output.bufSizes		 = &outputBufferSize;
-	output.bufElSizes	 = &outputElementSize;
 
 	/* Convert samples to 16 or 24 bit.
 	 */
@@ -345,6 +334,23 @@ Int BoCA::EncoderFDKAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 	}
 
 	totalSamples += samplesRead / format.channels;
+
+	/* Configure buffer descriptors.
+	 */
+	AACENC_BufDesc	 input	     = { 0 };
+	AACENC_BufDesc	 output	     = { 0 };
+
+	input.numBufs		 = 1;
+	input.bufs		 = &inputBuffer;
+	input.bufferIdentifiers  = &inputBufferID;
+	input.bufSizes		 = &inputBufferSize;
+	input.bufElSizes	 = &inputElementSize;
+
+	output.numBufs		 = 1;
+	output.bufs		 = &outputBuffer;
+	output.bufferIdentifiers = &outputBufferID;
+	output.bufSizes		 = &outputBufferSize;
+	output.bufElSizes	 = &outputElementSize;
 
 	/* Hand input data to encoder and retrieve output.
 	 */

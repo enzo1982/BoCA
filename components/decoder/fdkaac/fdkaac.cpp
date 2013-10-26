@@ -340,6 +340,7 @@ BoCA::DecoderFDKAAC::DecoderFDKAAC()
 
 	adifFound   = False;
 	adtsFound   = False;
+	loasFound   = False;
 
 	frameSize   = 0;
 }

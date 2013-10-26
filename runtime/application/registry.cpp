@@ -122,15 +122,19 @@ Void BoCA::AS::Registry::CheckComponents()
 		 */
 		foreach (const String &requireComponent, cs->requireComponents)
 		{
-			if (!ComponentExists(requireComponent)) { componentSpecs.RemoveNth(i--); delete cs; break; }
+			if (!ComponentExists(requireComponent)) { componentSpecs.RemoveNth(i--); delete cs; cs = NIL; break; }
 		}
+
+		if (cs == NIL) continue;
 
 		/* Check conflicting components.
 		 */
 		foreach (const String &conflictComponent, cs->conflictComponents)
 		{
-			if (ComponentExists(conflictComponent)) { componentSpecs.RemoveNth(i--); delete cs; break; }
+			if (ComponentExists(conflictComponent)) { componentSpecs.RemoveNth(i--); delete cs; cs = NIL; break; }
 		}
+
+		if (cs == NIL) continue;
 
 		/* Check replaced components.
 		 */
