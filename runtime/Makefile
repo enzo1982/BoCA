@@ -157,8 +157,6 @@ else ifeq ($(BUILD_FREEBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
 	ldconfig
-else ifeq ($(BUILD_HAIKU),True)
-	ldconfig
 endif
 endif
 
@@ -180,8 +178,6 @@ else ifeq ($(BUILD_GNU),True)
 else ifeq ($(BUILD_FREEBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
-	ldconfig
-else ifeq ($(BUILD_HAIKU),True)
 	ldconfig
 endif
 endif
