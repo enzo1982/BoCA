@@ -37,105 +37,114 @@ namespace smooth
 		class SMOOTHAPI Cursor : public Widget
 		{
 			private:
-				System::Timer			*timer;
+				System::Timer					*timer;
 
-				Int				 promptPos;
-				Bool				 promptVisible;
+				Int						 promptPos;
+				Bool						 promptVisible;
 
-				Bool				 marking;
-				Int				 markStart;
-				Int				 markEnd;
+				Bool						 marking;
+				Int						 markStart;
+				Int						 markEnd;
 
-				Int				 visibleOffset;
+				Int						 visibleOffset;
 
-				Int				 scrollPos;
-				Int				 maxScrollPos;
+				Int						 scrollPos;
+				Int						 maxScrollPos;
 
-				Int				 tabSize;
+				Int						 imeAdvance;
+				Bool						 imeCursor;
 
-				Array<Int>			 lineIndices;
+				Int						 tabSize;
 
-				String				 ConvertTabs(const String &) const;
+				Array<Int>					 lineIndices;
 
-				Bool				 ContainsRTLCharacters(const String &) const;
+				String						 ConvertTabs(const String &) const;
 
-				Int				 GetDisplayCursorPositionFromLogical(Int) const;
+				Bool						 ContainsRTLCharacters(const String &) const;
 
-				Int				 GetDisplayCursorPositionFromLogical(const String &, Int) const;
-				Int				 GetLogicalCursorPositionFromDisplay(const String &, Int) const;
+				Int						 GetDisplayCursorPositionFromLogical(Int) const;
 
-				Int				 GetDisplayCursorPositionFromVisual(const String &, Int) const;
+				Int						 GetDisplayCursorPositionFromLogical(const String &, Int) const;
+				Int						 GetLogicalCursorPositionFromDisplay(const String &, Int) const;
 
-				Int				 GetVisualCursorPositionFromLogical(const String &, Int) const;
+				Int						 GetDisplayCursorPositionFromVisual(const String &, Int) const;
+
+				Int						 GetVisualCursorPositionFromLogical(const String &, Int) const;
 			protected:
-				Int				 maxSize;
+				Int						 maxSize;
 
-				PopupMenu			*contextMenu;
+				PopupMenu					*contextMenu;
 
-				Array<String>			 history;
-				Array<Int>			 historyPrompt;
-				Int				 historyPos;
+				Array<String>					 history;
+				Array<Int>					 historyPrompt;
+				Int						 historyPos;
 
-				Void				 AddHistoryEntry();
-				Void				 RemoveHistoryEntry();
-				Void				 ClearHistory();
+				Void						 AddHistoryEntry();
+				Void						 RemoveHistoryEntry();
+				Void						 ClearHistory();
 
-				Void				 Undo();
-				Void				 Redo();
+				Void						 Undo();
+				Void						 Redo();
 
-				Void				 MarkText(Int, Int);
+				Void						 MarkText(Int, Int);
 
-				Void				 InsertText(const String &);
+				Void						 InsertText(const String &);
 
-				Void				 CopyToClipboard();
-				Void				 InsertFromClipboard();
+				Void						 CopyToClipboard();
+				Void						 InsertFromClipboard();
 
-				Void				 DeleteSelectedText();
+				Void						 DeleteSelectedText();
 
-				Int				 DrawWidget();
-				Void				 ShowCursor(Bool);
+				Int						 DrawWidget();
+				Void						 ShowCursor(Bool);
 			public:
-				static const Short		 classID;
+				static const Short				 classID;
 
-								 Cursor(const Point &, const Size &);
-				virtual				~Cursor();
+										 Cursor(const Point &, const Size &);
+				virtual						~Cursor();
 
-				virtual Int			 Paint(Int);
-				virtual Int			 Process(Int, Int, Int);
+				virtual Int					 Paint(Int);
+				virtual Int					 Process(Int, Int, Int);
 
-				Int				 MarkAll();
+				Int						 MarkAll();
 
-				Int				 Scroll(Int);
+				Int						 Scroll(Int);
 			accessors:
-				Int				 SetCursorPos(Int);
-				Int				 GetCursorPos() const		{ return focussed ? promptPos : -1; }
+				virtual Int					 SetText(const String &);
 
-				Void				 SetTabSize(Int nTabSize)	{ tabSize = nTabSize; }
-				Int				 GetTabSize() const		{ return tabSize; }
+				Int						 SetCursorPos(Int);
+				Int						 GetCursorPos() const		{ return focussed ? promptPos : -1; }
 
-				Void				 SetMaxSize(Int);
-				Int				 GetMaxSize() const		{ return maxSize; }
+				Void						 SetTabSize(Int nTabSize)	{ tabSize = nTabSize; }
+				Int						 GetTabSize() const		{ return tabSize; }
 
-				virtual Int			 SetText(const String &);
+				Void						 SetMaxSize(Int);
+				Int						 GetMaxSize() const		{ return maxSize; }
+
+				Void						 SetIMEAdvance(Int);
+				Void						 SetIMECursor(Bool);
 			signals:
-				Signal1<Void, const String &>	 onInput;
-				Signal1<Void, const String &>	 onEnter;
+				Signal1<Void, const String &>			 onInput;
+				Signal1<Void, const String &>			 onEnter;
 
-				Signal2<Void, Int, Int>		 onScroll;
+				Signal2<Void, Int, Int>				 onScroll;
+
+				static Signal2<Void, Cursor *, const Point &>	 internalSetCursor;
+				static Signal1<Void, Cursor *>			 internalRemoveCursor;
 			slots:
-				Void				 OnTimer();
+				Void						 OnTimer();
 
-				Void				 OnGetFocus();
-				Void				 OnGetFocusByKeyboard();
-				Void				 OnLoseFocus();
+				Void						 OnGetFocus();
+				Void						 OnGetFocusByKeyboard();
+				Void						 OnLoseFocus();
 
-				Void				 OnSpecialKey(Int);
-				Void				 OnInput(Int, Int);
+				Void						 OnSpecialKey(Int);
+				Void						 OnInput(Int, Int);
 
-				Void				 OnCut();
-				Void				 OnInsert();
+				Void						 OnCut();
+				Void						 OnInsert();
 
-				PopupMenu			*GetContextMenu();
+				PopupMenu					*GetContextMenu();
 		};
 	};
 };

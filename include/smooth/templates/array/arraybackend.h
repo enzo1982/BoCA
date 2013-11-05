@@ -166,7 +166,7 @@ namespace smooth
 				else					 return -1;
 			}
 
-			Bool InsertAtPos(Int position, const s &value, Int index) 
+			Bool InsertAtPos(Int position, const s &value, Int index)
 			{
 				if (nOfEntries < position && position >= 0) return False;
 

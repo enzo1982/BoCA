@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -36,7 +36,9 @@ namespace smooth
 			static GUI::Color	 DividerLightColor;
 			static GUI::Color	 DividerDarkColor;
 			static GUI::Color	 TextColor;
-			static GUI::Color	 GrayTextColor;
+			static GUI::Color	 InactiveTextColor;
+			static GUI::Color	 HighlightColor;
+			static GUI::Color	 HighlightTextColor;
 			static GUI::Color	 GradientStartColor;
 			static GUI::Color	 GradientEndColor;
 			static GUI::Color	 GradientTextColor;
