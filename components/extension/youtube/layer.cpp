@@ -618,7 +618,7 @@ Void BoCA::LayerYouTube::OnSelectNone()
 
 	Font	 font;
 
-	font.SetColor(Setup::GrayTextColor);
+	font.SetColor(Setup::InactiveTextColor);
 
 	text_site->SetFont(font);
 	text_source->SetFont(font);

@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,7 +29,7 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 	list_files->onSelectEntry.Connect(&ChooserFiles::OnSelectFile, this);
 
 	text_nofiles		= new Text(NIL, Point());
-	text_nofiles->SetFont(GUI::Font(GUI::Font::Default, 12, GUI::Font::Bold, 0, Setup::GrayTextColor));
+	text_nofiles->SetFont(GUI::Font(GUI::Font::Default, 12, GUI::Font::Bold, 0, Setup::InactiveTextColor));
 
 	shortcut_previous	= new Shortcut(0, Input::Keyboard::KeyUp, list_files);
 	shortcut_previous->onKeyDown.Connect(&ChooserFiles::OnShortcutPrevious, this);
@@ -524,7 +524,7 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 
 		return Error();
 	}
-	
+
 	return Success();
 }
 
