@@ -232,7 +232,7 @@ BoCA::DecoderAIFF::~DecoderAIFF()
 Bool BoCA::DecoderAIFF::Activate()
 {
 	InStream	*in = new InStream(STREAM_DRIVER, driver);
-    
+
 	in->Seek(12);
 
 	String		 chunk;

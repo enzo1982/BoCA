@@ -331,9 +331,9 @@ Bool BoCA::DecoderCDIO::Activate()
 		}
 
 		drive = cdio_cddap_identify_cdio(cd, CDDA_MESSAGE_FORGETIT, NIL);
-		
+
 		cdio_cddap_open(drive);
-		
+
 		paranoia = cdio_paranoia_init(drive);
 
 		cdio_paranoia_seek(paranoia, startSector, SEEK_SET);

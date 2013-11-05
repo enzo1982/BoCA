@@ -68,7 +68,7 @@ Void smooth::AttachDLL(Void *instance)
 
 		error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
 
-		if (error != CDEX_OK		 && 
+		if (error != CDEX_OK		 &&
 		    error != CDEX_ACCESSDENIED	 &&
 		    vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
 		{
@@ -424,7 +424,7 @@ Bool BoCA::DecoderCDRip::OpenRipper(Int startSector, Int endSector)
 				nParanoiaMode &= ~(PARANOIA_MODE_SCRATCH | PARANOIA_MODE_REPAIR);
 				break;
 		}
- 
+
 		ex_CR_GetCDROMParameters(&params);
 
 		params.nRippingMode		= config->GetIntValue("CDRip", "CDParanoia", False);

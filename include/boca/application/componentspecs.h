@@ -133,7 +133,7 @@ namespace BoCA
 
 				Bool			 IsCoverArtDefault() const		{ return coverArtDefault; }
 				Void			 SetCoverArtDefault(Bool nCoverArt)	{ coverArtDefault = nCoverArt; }
-				
+
 				Bool			 IsFreeEncodingSupported() const	{ return supportsFreeEncoding; }
 				Void			 SetFreeEncodingSupported(Bool nAnyEnc)	{ supportsFreeEncoding = nAnyEnc; }
 

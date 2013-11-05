@@ -190,7 +190,7 @@ BoCA::DecoderWave::~DecoderWave()
 Bool BoCA::DecoderWave::Activate()
 {
 	InStream	*in = new InStream(STREAM_DRIVER, driver);
-    
+
 	in->Seek(12);
 
 	String		 chunk;

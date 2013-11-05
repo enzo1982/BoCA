@@ -126,7 +126,7 @@ Bool BoCA::OutputCoreAudio::Activate()
 	/* Start audio unit.
 	 */
 	if (CA::AudioOutputUnitStart(audioUnit) != 0) return False;
- 
+
 	paused = False;
 
 	return True;

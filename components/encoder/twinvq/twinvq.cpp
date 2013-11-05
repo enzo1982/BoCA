@@ -117,7 +117,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 
 	memset(&setupInfo, 0, sizeof(headerInfo));
 	memset(&encInfo, 0, sizeof(encSpecificInfo));
-	
+
 	ex_TvqGetVersionID(V2, setupInfo.ID);
 
 	setupInfo.channelMode = format.channels - 1;

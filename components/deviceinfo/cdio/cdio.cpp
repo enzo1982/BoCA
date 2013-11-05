@@ -280,14 +280,14 @@ Void BoCA::DeviceInfoCDIO::CollectDriveInfo()
 	const Array<String>	&driveNames = FindDrives();
 
 	foreach (const String &driveName, driveNames)
-	{ 
+	{
 		CdIo_t		*cd = cdio_open(driveName, DRIVER_UNKNOWN);
 		cdio_hwinfo_t	 device;
 
 		if (cd == NIL) continue;
 
 		cdio_get_hwinfo(cd, &device);
-		
+
 		Device	 drive;
 
 		drive.type = DEVICE_CDROM;

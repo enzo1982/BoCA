@@ -386,7 +386,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 					for (Int k = 0; k < node2->GetNOfNodes(); k++)
 					{
 						XML::Node	*node3 = node2->GetNthNode(k);
-						
+
 						if (node3->GetName() == "encoding")
 						{
 							format->AddEncoding(node3->GetContent());

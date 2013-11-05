@@ -256,7 +256,7 @@ Int BoCA::EncoderSpeex::WriteData(Buffer<UnsignedByte> &data, Int size)
 	if (format.channels == 2) ex_speex_encode_stereo_int(samplesBuffer, frameSize, &bits);
 
 	ex_speex_encode_int(encoder, samplesBuffer, &bits);
-	ex_speex_bits_insert_terminator(&bits); 
+	ex_speex_bits_insert_terminator(&bits);
 
 	Int	 dataLength = ex_speex_bits_nbytes(&bits);
 

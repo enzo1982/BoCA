@@ -74,7 +74,7 @@ Bool BoCA::OutputQSA::Activate()
 	else if	(format.bits == 16) channel_params.format.format = (endianness == EndianBig ? SND_PCM_SFMT_S16_BE : SND_PCM_SFMT_S16_LE);
 	else if	(format.bits == 24) channel_params.format.format = (endianness == EndianBig ? SND_PCM_SFMT_S24_BE : SND_PCM_SFMT_S24_LE);
 	else if	(format.bits == 32) channel_params.format.format = (endianness == EndianBig ? SND_PCM_SFMT_S32_BE : SND_PCM_SFMT_S32_LE);
-	
+
 	channel_params.buf.block.frag_size = format.channels * (format.bits / 8);
 	channel_params.buf.block.frags_min = 1;
 	channel_params.buf.block.frags_max = 1023;

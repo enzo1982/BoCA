@@ -55,7 +55,7 @@ Bool BoCA::VideoSite::CanHandleURL(const String &URL)
 	const int		 argc = 1;
 	v8::Handle<v8::Value>	 argv[argc] = { v8::String::New(URL) };
 
-	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv); 
+	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv);
 
 	return result->BooleanValue();
 }
@@ -87,7 +87,7 @@ String BoCA::VideoSite::GetVideoURL(const String &html)
 	const int		 argc = 1;
 	v8::Handle<v8::Value>	 argv[argc] = { v8::String::New(html.ConvertTo("ISO-8859-1")) };
 
-	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv); 
+	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv);
 
 	return (char *) *v8::String::AsciiValue(result);
 }
@@ -123,7 +123,7 @@ Metadata BoCA::VideoSite::QueryMetadata(const String &html)
 	const int		 argc = 1;
 	v8::Handle<v8::Value>	 argv[argc] = { v8::String::New(html.ConvertTo("ISO-8859-1")) };
 
-	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv); 
+	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv);
 	v8::Handle<v8::Object>	 object = result->ToObject();
 
 	/* Extract data from return value.
@@ -201,7 +201,7 @@ Bool BoCA::VideoSite::CreateScriptContext()
 
 	if (context.IsEmpty()) return False;
 
-	/* Enter the created context for compiling and running the script. 
+	/* Enter the created context for compiling and running the script.
 	 */
 	v8::Context::Scope	 contextScope(isolate, context);
 

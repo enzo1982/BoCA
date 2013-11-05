@@ -94,7 +94,7 @@ BoCA::DecoderSunAu::~DecoderSunAu()
 Bool BoCA::DecoderSunAu::Activate()
 {
 	InStream	*in = new InStream(STREAM_DRIVER, driver);
-    
+
 	/* Read magic number.
 	 */
 	in->InputNumber(4);

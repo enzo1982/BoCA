@@ -152,7 +152,7 @@ Void BoCA::ChooserAlbums::OnModifyTrack(const Track &track)
 			dontUpdateAlbumList = True;
 
 			Track		&origAlbum = albums.GetReference(list_albums->GetNthEntry(i)->GetHandle());
-	
+
 			/* Modify tracks and emit onComponentModifyTrack for each affected track.
 			 */
 			for (Int j = 0; j < tracks.Length(); j++)

@@ -88,7 +88,7 @@ Error BoCA::DecoderBonk::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_bonk_decoder_get_id3_data(decoder, &id3tag, &id3tag_size);
 
-	if (id3tag_size > 0) 
+	if (id3tag_size > 0)
 	{
 		Buffer<unsigned char>	 buffer(id3tag_size);
 

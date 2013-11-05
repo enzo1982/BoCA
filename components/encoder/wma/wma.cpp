@@ -446,7 +446,7 @@ IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo,
 		delete [] mediaType;
 
 		pMediaProps->Release();
-		pStreamConfig->Release();		
+		pStreamConfig->Release();
 	}
 
 	return result;

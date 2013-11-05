@@ -30,7 +30,7 @@ typedef AACENC_ERROR			(*AACENCCLOSE)			(HANDLE_AACENCODER *);
 typedef AACENC_ERROR			(*AACENCENCODE)			(const HANDLE_AACENCODER, const AACENC_BufDesc *, const AACENC_BufDesc *, const AACENC_InArgs *, AACENC_OutArgs *);
 typedef AACENC_ERROR			(*AACENCINFO)			(const HANDLE_AACENCODER, AACENC_InfoStruct *);
 typedef AACENC_ERROR			(*AACENCODER_SETPARAM)		(const HANDLE_AACENCODER, const AACENC_PARAM, const UINT);
- 
+
 extern AACENCOPEN			 ex_aacEncOpen;
 extern AACENCCLOSE			 ex_aacEncClose;
 extern AACENCENCODE			 ex_aacEncEncode;

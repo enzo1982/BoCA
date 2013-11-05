@@ -458,7 +458,7 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 			for (UnsignedInt i = 0; i < metadata->data.vorbis_comment.num_comments; i++)
 			{
 				out.OutputNumber(metadata->data.vorbis_comment.comments[i].length, 4);
-				out.OutputData(metadata->data.vorbis_comment.comments[i].entry, metadata->data.vorbis_comment.comments[i].length);			
+				out.OutputData(metadata->data.vorbis_comment.comments[i].entry, metadata->data.vorbis_comment.comments[i].length);
 			}
 
 			AS::Registry		&boca = AS::Registry::Get();

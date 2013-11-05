@@ -48,7 +48,7 @@ BoCA::OutputWaveOut::OutputWaveOut()
 	maxblock      = 0;
 	minblock      = 0;
 	avgblock      = 0;
-	
+
 	n_playing     = 0;
 	data_written  = 0;
 	last_time     = 0;
@@ -143,9 +143,9 @@ Bool BoCA::OutputWaveOut::Activate()
 
 		return False;
 	}
-	
+
 	buf_size = MulDiv(2000, wfx.nAvgBytesPerSec, 1000);
-	
+
 	maxblock = 0x10000;
 	minblock = 0x100;
 	avgblock = buf_size >> 4;
@@ -154,7 +154,7 @@ Bool BoCA::OutputWaveOut::Activate()
 	if (avgblock > maxblock)	avgblock = maxblock;
 	if (maxblock < minblock)	maxblock = minblock;
 	if (avgblock < minblock)	avgblock = minblock;
-	
+
 	buffer = (char *) LocalAlloc(LMEM_FIXED | LMEM_ZEROINIT, buf_size + maxblock); // extra space at the end of the buffer
 
 	n_playing	= 0;
@@ -376,7 +376,7 @@ Void BoCA::OutputWaveOut::WorkerThread()
 				write_ptr -= buf_size;
 				memcpy(buffer + buf_size, buffer, write_ptr);
 			}
-			
+
 			n_playing++;
 
 			waveOutPrepareHeader(hWaveOut, hdr, sizeof(WAVEHDR));
