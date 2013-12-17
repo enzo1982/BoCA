@@ -265,7 +265,8 @@ Int BoCA::VideoSite::ParseXML(const String &fileName)
  */
 String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 {
-	String		 result = text.Trim();
+	String	 result = text.Trim();
+	Int	 offset = -1;
 
 	/* Set input format to ISO-8859-1.
 	 */
@@ -299,6 +300,35 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 	 */
 	result.Replace("<em>", NIL);
 	result.Replace("</em>", NIL);
+
+	/* Paragraph
+	 */
+	result.Replace("<p>", "\n");
+	result.Replace("</p>", "\n");
+
+	while ((offset = result.Find("<p ")) >= 0)
+	{
+		Int	 length = result.Tail(result.Length() - offset).Find(">");
+
+									    result[offset] = '\n';
+		for (Int i = offset + 1; i < result.Length() - length; i++) result[i]	   = result[i + length];
+
+		result[result.Length() - length] = 0;
+	}
+
+	/* Link
+	 */
+	result.Replace("<a>", NIL);
+	result.Replace("</a>", NIL);
+
+	while ((offset = result.Find("<a ")) >= 0)
+	{
+		Int	 length = result.Tail(result.Length() - offset).Find(">") + 1;
+
+		for (Int i = offset; i < result.Length() - length; i++) result[i] = result[i + length];
+
+		result[result.Length() - length] = 0;
+	}
 
 	/* Ampersand
 	 */
@@ -481,8 +511,6 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 
 	/* Unicode
 	 */
-	Int	 offset = -1;
-
 	while ((offset = result.Find("&#")) >= 0)
 	{
 		/* Entities
@@ -509,6 +537,19 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 
 		result[result.Length() - 5] = 0;
 	}
+
+	/* Condense string.
+	 */
+	while (result.StartsWith(" ")  ||
+	       result.StartsWith("\n") ||
+	       result.StartsWith("\r") ||
+	       result.StartsWith("\t")) result = result.Tail(result.Length() - 1);
+
+	while (result.EndsWith(" ")  ||
+	       result.EndsWith("\r") ||
+	       result.EndsWith("\t")) result[result.Length() - 1] = 0;
+
+	result.Replace("\n ", "\n");
 
 	/* Restore previous input format.
 	 */
