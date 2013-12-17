@@ -562,6 +562,10 @@ Void BoCA::LayerTagBasic::OnSelectAlbum(const Track &nTrack)
  */
 Void BoCA::LayerTagBasic::OnSelectNone()
 {
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(GetVisibleArea());
+
 	FreeCoverImages();
 
 	combo_cover_type->onSelectEntry.Disconnect(&LayerTagBasic::OnModifyTrack, this);
@@ -590,6 +594,8 @@ Void BoCA::LayerTagBasic::OnSelectNone()
 	combo_cover_type->Deactivate();
 	text_cover_desc->Deactivate();
 	edit_cover_desc->Deactivate();
+
+	surface->EndPaint();
 
 	track = NIL;
 }

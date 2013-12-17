@@ -285,6 +285,10 @@ Void BoCA::LayerTagDetails::OnSelectAlbum(const Track &nTrack)
  */
 Void BoCA::LayerTagDetails::OnSelectNone()
 {
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(GetVisibleArea());
+
 	edit_band->SetText(NIL);
 	edit_conductor->SetText(NIL);
 	edit_remix->SetText(NIL);
@@ -296,6 +300,8 @@ Void BoCA::LayerTagDetails::OnSelectNone()
 
 	group_details->Deactivate();
 	group_publisher->Deactivate();
+
+	surface->EndPaint();
 
 	track = NIL;
 }

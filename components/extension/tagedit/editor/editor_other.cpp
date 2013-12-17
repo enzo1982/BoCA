@@ -328,6 +328,10 @@ Void BoCA::LayerTagOther::OnSelectAlbum(const Track &nTrack)
  */
 Void BoCA::LayerTagOther::OnSelectNone()
 {
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(GetVisibleArea());
+
 	edit_oartist->SetText(NIL);
 	edit_oalbum->SetText(NIL);
 	edit_otextwriter->SetText(NIL);
@@ -342,6 +346,8 @@ Void BoCA::LayerTagOther::OnSelectNone()
 
 	group_original->Deactivate();
 	group_web->Deactivate();
+
+	surface->EndPaint();
 
 	track = NIL;
 }
