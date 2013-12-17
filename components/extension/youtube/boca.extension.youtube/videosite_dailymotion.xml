@@ -11,9 +11,9 @@
       }
 
       function getVideoURL(html) {
-	var sequence = unescape((html.match(/var flashvars = {.*?"sequence":"(.*?)".*?};/), RegExp.$1));
+	var flashVars = unescape((html.match(/<param name="flashvars" value="(.*?)"\/>/), RegExp.$1));
 
-	return (sequence.match(/"sdURL":"(.*?)"/), RegExp.$1).replace(/\\\//g, "/");
+	return unescape((flashVars.match(/"video_url":"(.*?)"/), RegExp.$1));
       }
 
       function queryMetadata(html) {
@@ -25,7 +25,7 @@
 	metadata.date	     = (html.match(/<meta property="video:release_date" content="(.*?)T.*?".*?\/>/) ? RegExp.$1 : null);
 	metadata.thumbnail   = (html.match(/<link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/>/) ? "http://www.dailymotion.com" + RegExp.$1 : null);
 
-	metadata.uploader    = (html.match(/<div class="user_container">(?:.|\n|\r)*?<img\s+alt="(.*?)" .*?\/>/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/<meta name="author" content="(.*?)".*?\/>/) ? RegExp.$1 : null);
 
 	return metadata;
       }

@@ -6,29 +6,28 @@
   <script type="text/javascript">
     <![CDATA[
       function canHandleURL(URL) {
-	if (URL.toLowerCase().match(/http:\/\/vimeo.com\/(?:.*\/)*[0-9]+#?/)) return true;
-	else								     return false;
+	if (URL.toLowerCase().match(/https?:\/\/vimeo.com\/(?:.*\/)*[0-9]+#?/)) return true;
+	else									return false;
       }
 
       function getVideoURL(html) {
-	var clip_id   = (html.match(/"video":\{(?:.*?)"id":(.*?),/), RegExp.$1);
-	var timestamp = (html.match(/"request":\{(?:.*?)"timestamp":(.*?),/), RegExp.$1);
-	var signature = (html.match(/"request":\{(?:.*?)"signature":"(.*?)",/), RegExp.$1);
-	var quality   = (html.match(/"qualities":\[[^\]]*?"hd"[^\]]*?\]/) ? "hd" : "sd");
+	var configURL = (html.match(/data-config-url="(.*?)"/), RegExp.$1.replace(/&amp;/g, "&"));
+	var config    = eval("(" + downloadURL(configURL) + ")");
 
-	return "http://player.vimeo.com/play_redirect?clip_id=" + clip_id + "&sig=" + signature + "&time=" + timestamp + "&quality=" + quality + "&codecs=H264";
+	if ('hd' in config.request.files.h264) return config.request.files.h264.hd.url;
+	else				       return config.request.files.h264.sd.url;
       }
 
       function queryMetadata(html) {
 	var metadata = new Metadata();
 
-	metadata.title	     = (html.match(/"title":"(.*?)",/) ? RegExp.$1.replace(/\\/g, "") : null);
-	metadata.description = (html.match(/<meta name="description" content="((?:.|\n|\r)*?)">/) ? RegExp.$1.replace(/\\/g, "") : null);
+	metadata.title	     = (html.match(/"title":"(.*?)"[\},]/) ? RegExp.$1.replace(/\\/g, "") : null);
+	metadata.description = (html.match(/<div class="description"(?:.*?)>((?:.|\n|\r)*?)<\/div>/) ? RegExp.$1 : null);
 
 	metadata.date	     = (html.match(/<meta itemprop="uploadDate" content="(.*?)T(?:.*?)">/) ? RegExp.$1 : null);
-	metadata.thumbnail   = (html.match(/"thumbnail":"(.*?)",/) ? RegExp.$1.replace(/\\/g, "") : null);
+	metadata.thumbnail   = (html.match(/<meta itemprop="thumbnailUrl" content="(.*?)">/) ? RegExp.$1 : null);
 
-	metadata.uploader    = (html.match(/"owner":\{"name":"(.*?)",(.*?)\}/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/"user":\{(?:.*?)"name":"(.*?)"[\},]/) ? RegExp.$1.replace(/\\/g, "") : null);
 
 	return metadata;
       }

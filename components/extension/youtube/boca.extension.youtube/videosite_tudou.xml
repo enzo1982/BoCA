@@ -11,7 +11,7 @@
       }
 
       function getVideoURL(html) {
-	var location = downloadURL("http://v2.tudou.com/v?it=" + (html.match(/iid: ([0-9]+)/), RegExp.$1));
+	var location = downloadURL("http://v2.tudou.com/f?id=" + (html.match(/iid: ([0-9]+)/), RegExp.$1));
 
 	return location.match(/<f .*?>(.*?)<\/f>/), RegExp.$1.replace(/&amp;/g, "&") + "&vn=02";
       }
@@ -22,7 +22,6 @@
 	metadata.title	     = (html.match(/kw: '(.*?)'/) ? RegExp.$1 : null);
 	metadata.description = (html.match(/desc: '((?:.|\n|\r)*?)'/) ? RegExp.$1 : null);
 
-	metadata.date	     = (html.match(/<i class="v_time".*? title="(.*?)">/) ? RegExp.$1 : null);
 	metadata.thumbnail   = (html.match(/pic: '(.*?)'/) ? RegExp.$1 : null);
 
 	metadata.uploader    = (html.match(/<p class="v_user"><a .*?>(.*?)<\/a>/) ? RegExp.$1 : null);
