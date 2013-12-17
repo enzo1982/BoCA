@@ -44,6 +44,8 @@ namespace smooth
 			accessors:
 				Int			 SetText(const String &);
 
+				Int			 SetFont(const Font &);
+
 				Int			 SetBitmap(const Bitmap &);
 				const Bitmap		&GetBitmap() const		{ return linkBitmap; }
 
