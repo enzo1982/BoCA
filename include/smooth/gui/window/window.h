@@ -92,7 +92,7 @@ namespace smooth
 
 				Int				 SetIconDirect(Void *);
 
-				virtual Rect			 GetVisibleArea() const			{ return Rect(Point(), GetRealSize()); }
+				virtual Rect			 GetVisibleArea() const;
 
 				virtual Int			 SetMetrics(const Point &, const Size &);
 
