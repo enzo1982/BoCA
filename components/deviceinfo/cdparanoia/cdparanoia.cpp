@@ -270,11 +270,16 @@ const BoCA::MCDI &BoCA::DeviceInfoCDParanoia::GetNthDeviceMCDI(Int n)
 				toc.tracks[i].rsvd2	  = 0;
 				toc.tracks[i].addr	  = htonl(cd->disc_toc[i].dwStartSector);
 
+#ifndef __FreeBSD__
+				/* cdparanoia accounts for the session gap on mixed mode discs, so we need to undo that to build the
+				 * correct MCDI. The FreeBSD port has the corresponding code removed, so this is not necessary there.
+				 */
 				if ((i > 1 && (cd->disc_toc[i - 1].bFlags & 4) != (cd->disc_toc[i].bFlags & 4) && cd->disc_toc[i].bTrack != 0xAA) ||
 				    (i < cd->tracks && cd->disc_toc[i + 1].dwStartSector - cd->disc_toc[i].dwStartSector <= 0))
 				{
 					toc.tracks[i].addr = htonl(cd->disc_toc[i].dwStartSector + 11400);
 				}
+#endif
 			}
 
 			Buffer<UnsignedByte>	 buffer(ntohs(toc.tocLen) + 2);
