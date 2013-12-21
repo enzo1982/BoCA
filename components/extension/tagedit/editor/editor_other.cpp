@@ -89,6 +89,8 @@ BoCA::LayerTagOther::LayerTagOther() : Editor("Other")
 
 	Add(group_web);
 
+	allowTrackRemoveByDeleteKey.Connect(&LayerTagOther::AllowTrackRemoveByDeleteKey, this);
+
 	onChangeSize.Connect(&LayerTagOther::OnChangeSize, this);
 
 	Settings::Get()->onChangeLanguageSettings.Connect(&LayerTagOther::OnChangeLanguageSettings, this);
@@ -228,6 +230,13 @@ EditBox *BoCA::LayerTagOther::GetActiveEditBox()
 	else if	(edit_wcommercial->IsFocussed()) return edit_wcommercial;
 
 	return NIL;
+}
+
+Bool BoCA::LayerTagOther::AllowTrackRemoveByDeleteKey()
+{
+	if (IsVisible() && GetActiveEditBox() != NIL) return False;
+
+	return True;
 }
 
 /* Called when a track is selected from the list.

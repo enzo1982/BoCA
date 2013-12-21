@@ -164,6 +164,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Editor("Basic")
 	Add(group_cover);
 
 	allowTrackChangeByArrowKey.Connect(&LayerTagBasic::AllowTrackChangeByArrowKey, this);
+	allowTrackRemoveByDeleteKey.Connect(&LayerTagBasic::AllowTrackRemoveByDeleteKey, this);
 
 	onChangeSize.Connect(&LayerTagBasic::OnChangeSize, this);
 
@@ -447,7 +448,17 @@ EditBox *BoCA::LayerTagBasic::GetActiveEditBox()
 
 Bool BoCA::LayerTagBasic::AllowTrackChangeByArrowKey()
 {
-	if (edit_comment->IsFocussed() || edit_cover_desc->IsFocussed()) return False;
+	if (IsVisible() && (edit_comment->IsFocussed() ||
+			    edit_cover_desc->IsFocussed())) return False;
+
+	return True;
+}
+
+Bool BoCA::LayerTagBasic::AllowTrackRemoveByDeleteKey()
+{
+	if (IsVisible() && (GetActiveEditBox() != NIL  ||
+			    edit_comment->IsFocussed() ||
+			    edit_cover_desc->IsFocussed())) return False;
 
 	return True;
 }

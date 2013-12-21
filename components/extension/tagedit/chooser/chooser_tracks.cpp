@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -25,10 +25,14 @@ BoCA::ChooserTracks::ChooserTracks() : Chooser("Tracks")
 	shortcut_next		= new Shortcut(0, Input::Keyboard::KeyDown, list_tracks);
 	shortcut_next->onKeyDown.Connect(&ChooserTracks::OnShortcutNext, this);
 
+	shortcut_remove		= new Shortcut(0, Input::Keyboard::KeyDelete, list_tracks);
+	shortcut_remove->onKeyDown.Connect(&ChooserTracks::OnShortcutRemove, this);
+
 	Add(list_tracks);
 
 	Add(shortcut_previous);
 	Add(shortcut_next);
+	Add(shortcut_remove);
 
 	onChangeSize.Connect(&ChooserTracks::OnChangeSize, this);
 
@@ -57,6 +61,7 @@ BoCA::ChooserTracks::~ChooserTracks()
 
 	DeleteObject(shortcut_previous);
 	DeleteObject(shortcut_next);
+	DeleteObject(shortcut_remove);
 }
 
 /* Called when component canvas size changes.
@@ -134,6 +139,25 @@ Void BoCA::ChooserTracks::OnShortcutNext()
 	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
 
 	list_tracks->SelectNthEntry(list_tracks->GetSelectedEntryNumber() + 1);
+}
+
+/* Called when the delete key is pressed.
+ * ----
+ * Removes the currently selected track.
+ */
+Void BoCA::ChooserTracks::OnShortcutRemove()
+{
+	if (!IsVisible() || !allowTrackRemoveByDeleteKey.Call()) return;
+
+	Int	 entryNumber = list_tracks->GetSelectedEntryNumber();
+
+	if (entryNumber >= 0)
+	{
+		JobList::Get()->onComponentRemoveTrack.Emit(tracks.Get(list_tracks->GetSelectedEntry()->GetHandle()));
+
+		if (entryNumber < tracks.Length()) list_tracks->SelectNthEntry(entryNumber);
+		else				   list_tracks->SelectNthEntry(tracks.Length() - 1);
+	}
 }
 
 /* Called when a track is added to the application joblist.

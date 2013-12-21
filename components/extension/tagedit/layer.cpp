@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -40,6 +40,7 @@ BoCA::LayerTags::LayerTags() : Layer("Tags")
 		chooser->onSelectNone.Connect(&onSelectNone);
 
 		chooser->allowTrackChangeByArrowKey.Connect(&LayerTags::AllowTrackChangeByArrowKey, this);
+		chooser->allowTrackRemoveByDeleteKey.Connect(&LayerTags::AllowTrackRemoveByDeleteKey, this);
 
 		tab_mode->Add(chooser);
 	}
@@ -160,6 +161,20 @@ Bool BoCA::LayerTags::AllowTrackChangeByArrowKey()
 	foreach (Editor *editor, editors)
 	{
 		if (!editor->allowTrackChangeByArrowKey.Call()) return False;
+	}
+
+	return True;
+}
+
+/* Called when a chooser wants to delete a track by delete key.
+ * ----
+ * Collects and evaluates responses from editors.
+ */
+Bool BoCA::LayerTags::AllowTrackRemoveByDeleteKey()
+{
+	foreach (Editor *editor, editors)
+	{
+		if (!editor->allowTrackRemoveByDeleteKey.Call()) return False;
 	}
 
 	return True;

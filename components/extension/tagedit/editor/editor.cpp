@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,6 +13,7 @@
 BoCA::Editor::Editor(const String &title) : Layer(title)
 {
 	allowTrackChangeByArrowKey.Connect(True);
+	allowTrackRemoveByDeleteKey.Connect(True);
 }
 
 BoCA::Editor::~Editor()

@@ -70,6 +70,8 @@ BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 
 	Add(group_publisher);
 
+	allowTrackRemoveByDeleteKey.Connect(&LayerTagDetails::AllowTrackRemoveByDeleteKey, this);
+
 	onChangeSize.Connect(&LayerTagDetails::OnChangeSize, this);
 
 	Settings::Get()->onChangeLanguageSettings.Connect(&LayerTagDetails::OnChangeLanguageSettings, this);
@@ -192,6 +194,13 @@ EditBox *BoCA::LayerTagDetails::GetActiveEditBox()
 	else if	(edit_isrc->IsFocussed())	return edit_isrc;
 
 	return NIL;
+}
+
+Bool BoCA::LayerTagDetails::AllowTrackRemoveByDeleteKey()
+{
+	if (IsVisible() && GetActiveEditBox() != NIL) return False;
+
+	return True;
 }
 
 /* Called when a track is selected from the list.
