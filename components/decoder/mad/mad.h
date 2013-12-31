@@ -30,6 +30,7 @@ namespace BoCA
 			Bool			 stop;
 			Bool			 finished;
 
+			Buffer<unsigned char>	 inputBuffer;
 			Buffer<signed int>	 samplesBuffer;
 
 			Track			*infoTrack;

@@ -29,6 +29,8 @@ namespace BoCA
 
 			int			 frameSize;
 			int			 nFrames;
+
+			Buffer<short>		 pcmBuffer;
 		public:
 			static const String	&GetComponentSpecs();
 

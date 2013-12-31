@@ -374,11 +374,9 @@ mad_flow BoCA::MADInputCallback(void *client_data, mad_stream *stream)
 
 	if (filter->stop || filter->finished) return MAD_FLOW_STOP;
 
-	static Buffer<UnsignedByte>	 inputBuffer;
-
 	filter->readDataMutex->Lock();
 
-	/* Check if we have any nore data. If not, append an empty
+	/* Check if we have any more data. If not, append an empty
 	 * frame to the last frame to allow the decoder to finish.
 	 */
 	if (filter->driver->GetPos() == filter->driver->GetSize()) filter->finished = True;
@@ -386,17 +384,17 @@ mad_flow BoCA::MADInputCallback(void *client_data, mad_stream *stream)
 	Int	 bytes = Math::Min((Int64) 131072, filter->finished ? 1440 : filter->driver->GetSize() - filter->driver->GetPos());
 	Int	 backup = stream->bufend - stream->next_frame;
 
-	inputBuffer.Resize(bytes + backup);
+	filter->inputBuffer.Resize(bytes + backup);
 
-	if (filter->finished) inputBuffer.Zero();
+	if (filter->finished) filter->inputBuffer.Zero();
 
-	memmove(inputBuffer, stream->next_frame, backup);
+	memmove(filter->inputBuffer, stream->next_frame, backup);
 
-	if (!filter->finished) filter->driver->ReadData(inputBuffer + backup, bytes);
+	if (!filter->finished) filter->driver->ReadData(filter->inputBuffer + backup, bytes);
 
 	filter->readDataMutex->Release();
 
-	ex_mad_stream_buffer(stream, inputBuffer, bytes + backup);
+	ex_mad_stream_buffer(stream, filter->inputBuffer, bytes + backup);
 
 	filter->inBytes += bytes;
 

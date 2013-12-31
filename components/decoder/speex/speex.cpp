@@ -319,19 +319,17 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 		while (ex_ogg_stream_packetout(&os, &op) == 1)
 		{
-			static Buffer<short>	 pcm;
-
 			int	 samples = frameSize * track.GetFormat().channels;
 
-			pcm.Resize(samples);
+			pcmBuffer.Resize(samples);
 
 			ex_speex_bits_read_from(&bits, (char *) op.packet, op.bytes);
 
 			for (Int i = 0; i < nFrames; i++)
 			{
-				if (ex_speex_decode_int(decoder, &bits, pcm) < 0) break;
+				if (ex_speex_decode_int(decoder, &bits, pcmBuffer) < 0) break;
 
-				if (track.GetFormat().channels == 2) ex_speex_decode_stereo_int(pcm, frameSize, &stereo);
+				if (track.GetFormat().channels == 2) ex_speex_decode_stereo_int(pcmBuffer, frameSize, &stereo);
 
 				if (dataBufferLen < size + (samples * 2))
 				{
@@ -342,7 +340,7 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 				for (Int j = 0; j < samples; j++)
 				{
-					((short *) (UnsignedByte *) data)[size / 2 + j] = pcm[j];
+					((short *) (UnsignedByte *) data)[size / 2 + j] = pcmBuffer[j];
 				}
 
 				size += (samples * 2);
