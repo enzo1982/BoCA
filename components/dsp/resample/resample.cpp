@@ -73,14 +73,6 @@ Bool BoCA::DSPResample::Activate()
 	 */
 	if (this->format.rate != format.rate)
 	{
-		if (this->format.bits != 16 && this->format.bits != 32)
-		{
-			errorState  = True;
-			errorString = "Resampler input format not supported!";
-
-			return False;
-		}
-
 		int	 error;
 
 		ratio = Float(this->format.rate) / Float(format.rate);
@@ -112,6 +104,8 @@ Bool BoCA::DSPResample::Deactivate()
 
 Int BoCA::DSPResample::TransformData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	if (state == NIL) return size;
 
 	const Format	&format = track.GetFormat();
@@ -129,21 +123,72 @@ Int BoCA::DSPResample::TransformData(Buffer<UnsignedByte> &data, Int size)
 	src_data.data_in	= inBuffer;
 	src_data.data_out	= outBuffer;
 
-	if	(format.bits == 16) ex_src_short_to_float_array((short *) (UnsignedByte *) data, src_data.data_in, src_data.input_frames * format.channels);
+	/* Scale up 8 and 24 bit samples.
+	 */
+	if (format.bits == 8)
+	{
+		shortBuffer.Resize(size);
+
+		for (Int i = 0; i < size; i++) shortBuffer[i] = (data[i] - 128) * 256;
+	}
+
+	if (format.bits == 24)
+	{
+		intBuffer.Resize(size / (format.bits / 8));
+
+		for (Int i = 0; i < size / (format.bits / 8); i++)
+		{
+			if (endianness == EndianLittle) intBuffer[i] = (int) (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8);
+			if (endianness == EndianBig   ) intBuffer[i] = (int) (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8);
+		}
+	}
+
+	/* Convert samples to float.
+	 */
+	if	(format.bits ==  8) ex_src_short_to_float_array((short *) (SignedInt16 *) shortBuffer, src_data.data_in, src_data.input_frames * format.channels);
+	else if	(format.bits == 16) ex_src_short_to_float_array((short *) (UnsignedByte *) data, src_data.data_in, src_data.input_frames * format.channels);
+	else if (format.bits == 24) ex_src_int_to_float_array((int *) (SignedInt32 *) intBuffer, src_data.data_in, src_data.input_frames * format.channels);
 	else if (format.bits == 32) ex_src_int_to_float_array((int *) (UnsignedByte *) data, src_data.data_in, src_data.input_frames * format.channels);
 
+	/* Process input and adjust buffers.
+	 */
 	ex_src_process(state, &src_data);
 
 	data.Resize(src_data.output_frames_gen * (format.bits / 8) * format.channels);
 
-	if	(format.bits == 16) ex_src_float_to_short_array(src_data.data_out, (short *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
+	if 	(format.bits ==  8) shortBuffer.Resize(src_data.output_frames_gen * format.channels);
+	else if (format.bits == 24) intBuffer.Resize(src_data.output_frames_gen * format.channels);
+
+	/* Convert samples back to short/int.
+	 */
+	if	(format.bits ==  8) ex_src_float_to_short_array(src_data.data_out, (short *) (SignedInt16 *) shortBuffer, src_data.output_frames_gen * format.channels);
+	else if	(format.bits == 16) ex_src_float_to_short_array(src_data.data_out, (short *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
+	else if (format.bits == 24) ex_src_float_to_int_array(src_data.data_out, (int *) (SignedInt32 *) intBuffer, src_data.output_frames_gen * format.channels);
 	else if (format.bits == 32) ex_src_float_to_int_array(src_data.data_out, (int *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
+
+	/* Convert back to original sample resolution.
+	 */
+	if (format.bits == 8)
+	{
+		for (Int i = 0; i < src_data.output_frames_gen * format.channels; i++) data[i] = shortBuffer[i] / 256 + 128;
+	}
+
+	if (format.bits == 24)
+	{
+		for (Int i = 0; i < src_data.output_frames_gen * format.channels; i++)
+		{
+			if (endianness == EndianLittle) { data[3 * i + 2] = (intBuffer[i] >> 24) & 0xFF; data[3 * i + 1] = (intBuffer[i] >> 16) & 0xFF; data[3 * i    ] = (intBuffer[i] >> 8) & 0xFF; }
+			if (endianness == EndianBig   ) { data[3 * i    ] = (intBuffer[i] >> 24) & 0xFF; data[3 * i + 1] = (intBuffer[i] >> 16) & 0xFF; data[3 * i + 2] = (intBuffer[i] >> 8) & 0xFF; }
+		}
+	}
 
 	return data.Size();
 }
 
 Int BoCA::DSPResample::Flush(Buffer<UnsignedByte> &data)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	if (state == NIL) return 0;
 
 	const Format	&format = track.GetFormat();
@@ -161,12 +206,37 @@ Int BoCA::DSPResample::Flush(Buffer<UnsignedByte> &data)
 	src_data.data_in	= inBuffer;
 	src_data.data_out	= outBuffer;
 
+	/* Flush input and adjust buffers.
+	 */
 	ex_src_process(state, &src_data);
 
 	data.Resize(src_data.output_frames_gen * (format.bits / 8) * format.channels);
 
-	if	(format.bits == 16) ex_src_float_to_short_array(src_data.data_out, (short *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
+	if 	(format.bits ==  8) shortBuffer.Resize(src_data.output_frames_gen * format.channels);
+	else if (format.bits == 24) intBuffer.Resize(src_data.output_frames_gen * format.channels);
+
+	/* Convert samples back to short/int.
+	 */
+	if	(format.bits ==  8) ex_src_float_to_short_array(src_data.data_out, (short *) (SignedInt16 *) shortBuffer, src_data.output_frames_gen * format.channels);
+	else if	(format.bits == 16) ex_src_float_to_short_array(src_data.data_out, (short *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
+	else if (format.bits == 24) ex_src_float_to_int_array(src_data.data_out, (int *) (SignedInt32 *) intBuffer, src_data.output_frames_gen * format.channels);
 	else if (format.bits == 32) ex_src_float_to_int_array(src_data.data_out, (int *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
+
+	/* Convert back to original sample resolution.
+	 */
+	if (format.bits == 8)
+	{
+		for (Int i = 0; i < src_data.output_frames_gen * format.channels; i++) data[i] = shortBuffer[i] / 256 + 128;
+	}
+
+	if (format.bits == 24)
+	{
+		for (Int i = 0; i < src_data.output_frames_gen * format.channels; i++)
+		{
+			if (endianness == EndianLittle) { data[3 * i + 2] = (intBuffer[i] >> 24) & 0xFF; data[3 * i + 1] = (intBuffer[i] >> 16) & 0xFF; data[3 * i    ] = (intBuffer[i] >> 8) & 0xFF; }
+			if (endianness == EndianBig   ) { data[3 * i    ] = (intBuffer[i] >> 24) & 0xFF; data[3 * i + 1] = (intBuffer[i] >> 16) & 0xFF; data[3 * i + 2] = (intBuffer[i] >> 8) & 0xFF; }
+		}
+	}
 
 	return data.Size();
 }

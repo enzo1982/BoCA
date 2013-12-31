@@ -25,6 +25,9 @@ namespace BoCA
 
 			Buffer<float>		 inBuffer;
 			Buffer<float>		 outBuffer;
+
+			Buffer<SignedInt16>	 shortBuffer;
+			Buffer<SignedInt32>	 intBuffer;
 		public:
 			static const String	&GetComponentSpecs();
 
