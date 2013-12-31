@@ -336,8 +336,6 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 Int BoCA::EncoderOpus::EncodeFrames(const Buffer<signed short> &samplesBuffer, Buffer<unsigned char> &dataBuffer, Bool flush)
 {
-	static Buffer<signed short>	 backBuffer;
-
 	backBuffer.Resize(backBuffer.Size() + samplesBuffer.Size());
 
 	memcpy(((signed short *) backBuffer) + backBuffer.Size() - samplesBuffer.Size(), (signed short *) samplesBuffer, sizeof(short) * samplesBuffer.Size());

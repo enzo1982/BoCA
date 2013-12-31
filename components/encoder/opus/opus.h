@@ -35,6 +35,7 @@ namespace BoCA
 
 			Buffer<unsigned char>	 dataBuffer;
 			Buffer<signed short>	 samplesBuffer;
+			Buffer<signed short>	 backBuffer;
 
 			Int			 EncodeFrames(const Buffer<signed short> &, Buffer<unsigned char> &, Bool);
 
