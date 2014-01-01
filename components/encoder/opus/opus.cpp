@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -346,7 +346,7 @@ Int BoCA::EncoderOpus::EncodeFrames(const Buffer<signed short> &samplesBuffer, B
 
 	if (flush)
 	{
-		nullSamples = (backBuffer.Size() / format.channels) % frameSize;
+		nullSamples = frameSize - (backBuffer.Size() / format.channels) % frameSize;
 
 		backBuffer.Resize(backBuffer.Size() + nullSamples * format.channels);
 
