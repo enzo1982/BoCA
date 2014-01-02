@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -90,7 +90,7 @@ Bool BoCA::EncoderWave::Deactivate()
 
 	/* Write data size to header.
 	 */
-	Int	 dataSize = (driver->GetSize() - 44) * (track.GetFormat().bits / 8);
+	Int	 dataSize = driver->GetSize() - 44;
 
 	driver->Seek(40);
 
