@@ -87,10 +87,10 @@ namespace BoCA
 
 BoCA::EncoderOpus::EncoderOpus()
 {
-	configLayer = NIL;
+	configLayer  = NIL;
 
-	encoder	    = NIL;
-	resampler   = NIL;
+	encoder	     = NIL;
+	resampler    = NIL;
 
 	frameSize    = 0;
 
@@ -120,9 +120,6 @@ Bool BoCA::EncoderOpus::Activate()
 
 		return False;
 	}
-
-	frameSize    = Math::Round(48000.0 / (1000000.0 / config->GetIntValue("Opus", "FrameSize", 20000)));
-	totalSamples = 0;
 
 	/* Create and init resampler component.
 	 */
@@ -184,15 +181,25 @@ Bool BoCA::EncoderOpus::Activate()
 	ex_opus_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue("Opus", "EnableDTX", True)));
 	ex_opus_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(0));
 
-	numPackets = 0;
+	/* Get number of pre-skip samples.
+	 */
+	int	 preSkip = 0;
 
+	ex_opus_encoder_ctl(encoder, OPUS_GET_LOOKAHEAD(&preSkip));
+
+	frameSize    = Math::Round(48000.0 / (1000000.0 / config->GetIntValue("Opus", "FrameSize", 20000)));
+	totalSamples = preSkip;
+	numPackets   = 0;
+
+	/* Create Opus header.
+	 */
 	OpusHeader	 setup;
 
 	strncpy(setup.codec_id, "OpusHead", 8);
 
 	setup.version_id	= 1;
 	setup.nb_channels	= format.channels;
-	setup.preskip		= 0;
+	setup.preskip		= preSkip;
 	setup.sample_rate	= format.rate;
 	setup.output_gain	= 0;
 	setup.channel_mapping	= 0;
@@ -281,6 +288,8 @@ Bool BoCA::EncoderOpus::Deactivate()
 		memcpy((signed short *) samplesBuffer, (unsigned char *) data, size);
 	}
 
+	/* Output remaining samples to encoder.
+	 */
 	EncodeFrames(samplesBuffer, dataBuffer, True);
 
 	/* Write any remaining Ogg packets.
@@ -331,6 +340,8 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data, Int size)
 		memcpy((signed short *) samplesBuffer, (unsigned char *) data, size);
 	}
 
+	/* Output samples to encoder.
+	 */
 	return EncodeFrames(samplesBuffer, dataBuffer, False);
 }
 
@@ -344,7 +355,7 @@ Int BoCA::EncoderOpus::EncodeFrames(const Buffer<signed short> &samplesBuffer, B
 
 	Int	 nullSamples = 0;
 
-	if (flush)
+	if (flush && (backBuffer.Size() / format.channels) % frameSize > 0)
 	{
 		nullSamples = frameSize - (backBuffer.Size() / format.channels) % frameSize;
 

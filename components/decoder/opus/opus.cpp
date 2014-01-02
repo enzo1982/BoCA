@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -192,6 +192,8 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 					format.channels = setup->nb_channels;
 
+					preSkip = setup->preskip;
+
 					track.length = -1;
 				}
 
@@ -256,7 +258,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		if (ex_ogg_page_serialno(&og) != os.serialno) continue;
 
-		track.length = ex_ogg_page_granulepos(&og);
+		track.length = ex_ogg_page_granulepos(&og) - preSkip;
 
 		if (ex_ogg_page_eos(&og)) break;
 	}
@@ -275,6 +277,9 @@ BoCA::DecoderOpus::DecoderOpus()
 	decoder	    = NIL;
 
 	packageSize = 0;
+
+	preSkip	    = 0;
+	preSkipLeft = 0;
 
 	memset(&oy, 0, sizeof(oy));
 	memset(&os, 0, sizeof(os));
@@ -324,6 +329,9 @@ Bool BoCA::DecoderOpus::Activate()
 					int		 error = 0;
 
 					decoder = ex_opus_decoder_create(48000, setup->nb_channels, &error);
+
+					preSkip	    = setup->preskip;
+					preSkipLeft = setup->preskip;
 				}
 
 				if (packetNum >= 1) done = True;
@@ -349,7 +357,7 @@ Bool BoCA::DecoderOpus::Deactivate()
 
 Bool BoCA::DecoderOpus::Seek(Int64 samplePosition)
 {
-	while (ex_ogg_page_granulepos(&og) < samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
+	while (ex_ogg_page_granulepos(&og) - preSkip < samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
 	{
 		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
 		{
@@ -400,7 +408,14 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 			Int	 frameSize = ex_opus_decode(decoder, op.packet, op.bytes, (signed short *) (unsigned char *) (data + size), maxFrameSize, 0);
 
-			size += Math::Max(0, frameSize * format.channels * (format.bits / 8));
+			if (frameSize > preSkipLeft)
+			{
+				if (preSkipLeft) memmove((unsigned char *) data + size, (unsigned char *) data + size + preSkipLeft * format.channels * (format.bits / 8), (frameSize - preSkipLeft) * format.channels * (format.bits / 8));
+
+				size += Math::Max(0, (frameSize - preSkipLeft) * format.channels * (format.bits / 8));
+			}
+
+			preSkipLeft = Math::Max(0, preSkipLeft - frameSize);
 		}
 
 		if (ex_ogg_page_eos(&og)) break;
