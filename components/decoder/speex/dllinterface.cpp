@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,6 +17,7 @@ OGGSTREAMPAGEIN		 ex_ogg_stream_pagein		= NIL;
 OGGPAGEEOS		 ex_ogg_page_eos		= NIL;
 OGGPAGESERIALNO		 ex_ogg_page_serialno		= NIL;
 OGGPAGEGRANULEPOS	 ex_ogg_page_granulepos		= NIL;
+OGGPAGEPACKETS		 ex_ogg_page_packets		= NIL;
 OGGSTREAMCLEAR		 ex_ogg_stream_clear		= NIL;
 OGGSYNCINIT		 ex_ogg_sync_init		= NIL;
 OGGSYNCBUFFER		 ex_ogg_sync_buffer		= NIL;
@@ -51,6 +52,7 @@ Bool LoadOggDLL()
 	ex_ogg_page_eos		= (OGGPAGEEOS) oggdll->GetFunctionAddress("ogg_page_eos");
 	ex_ogg_page_serialno	= (OGGPAGESERIALNO) oggdll->GetFunctionAddress("ogg_page_serialno");
 	ex_ogg_page_granulepos	= (OGGPAGEGRANULEPOS) oggdll->GetFunctionAddress("ogg_page_granulepos");
+	ex_ogg_page_packets	= (OGGPAGEPACKETS) oggdll->GetFunctionAddress("ogg_page_packets");
 	ex_ogg_stream_clear	= (OGGSTREAMCLEAR) oggdll->GetFunctionAddress("ogg_stream_clear");
 	ex_ogg_sync_init	= (OGGSYNCINIT) oggdll->GetFunctionAddress("ogg_sync_init");
 	ex_ogg_sync_buffer	= (OGGSYNCBUFFER) oggdll->GetFunctionAddress("ogg_sync_buffer");
@@ -65,6 +67,7 @@ Bool LoadOggDLL()
 	    ex_ogg_page_eos		== NIL ||
 	    ex_ogg_page_serialno	== NIL ||
 	    ex_ogg_page_granulepos	== NIL ||
+	    ex_ogg_page_packets		== NIL ||
 	    ex_ogg_stream_clear		== NIL ||
 	    ex_ogg_sync_init		== NIL ||
 	    ex_ogg_sync_buffer		== NIL ||

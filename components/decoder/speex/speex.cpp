@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -181,7 +181,10 @@ BoCA::DecoderSpeex::DecoderSpeex()
 	decoder	    = NIL;
 
 	frameSize   = 0;
+	lookAhead   = 0;
 	nFrames	    = 0;
+
+	pageNumber  = 0;
 
 	memset(&oy, 0, sizeof(oy));
 	memset(&os, 0, sizeof(os));
@@ -248,8 +251,10 @@ Bool BoCA::DecoderSpeex::Activate()
 
 	ex_speex_decoder_ctl(decoder, SPEEX_SET_SAMPLING_RATE, &header->rate);
 	ex_speex_decoder_ctl(decoder, SPEEX_GET_FRAME_SIZE, &frameSize);
+	ex_speex_decoder_ctl(decoder, SPEEX_GET_LOOKAHEAD, &lookAhead);
 
-	nFrames = Math::Max(1, (Int) header->frames_per_packet);
+	nFrames	   = Math::Max(1, (Int) header->frames_per_packet);
+	pageNumber = 0;
 
 	stereo.balance	    = 1;
 	stereo.e_ratio	    = 0.5;
@@ -301,6 +306,8 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (size <= 0) return -1;
 
+	const Format	&format = track.GetFormat();
+
 	char	*buffer = ex_ogg_sync_buffer(&oy, size);
 
 	size = driver->ReadData((unsigned char *) buffer, size);
@@ -317,11 +324,18 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data, Int size)
 	{
 		ex_ogg_stream_pagein(&os, &og);
 
+		Int	 delaySamples	  = 0;
+		Int	 delaySamplesLeft = 0;
+
+		if (pageNumber++ == 0)
+		{
+			delaySamples	 = lookAhead + (ex_ogg_page_packets(&og) * nFrames * frameSize) - ex_ogg_page_granulepos(&og);
+			delaySamplesLeft = delaySamples;
+		}
+
 		while (ex_ogg_stream_packetout(&os, &op) == 1)
 		{
-			int	 samples = frameSize * track.GetFormat().channels;
-
-			pcmBuffer.Resize(samples);
+			pcmBuffer.Resize(frameSize * format.channels);
 
 			ex_speex_bits_read_from(&bits, (char *) op.packet, op.bytes);
 
@@ -329,21 +343,28 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data, Int size)
 			{
 				if (ex_speex_decode_int(decoder, &bits, pcmBuffer) < 0) break;
 
-				if (track.GetFormat().channels == 2) ex_speex_decode_stereo_int(pcmBuffer, frameSize, &stereo);
+				if (format.channels == 2) ex_speex_decode_stereo_int(pcmBuffer, frameSize, &stereo);
 
-				if (dataBufferLen < size + (samples * 2))
+				if (frameSize > delaySamplesLeft)
 				{
-					dataBufferLen += ((samples * 2) + 131072);
+					if (delaySamplesLeft) memmove((short *) pcmBuffer, (short *) pcmBuffer + delaySamplesLeft * format.channels, (frameSize - delaySamplesLeft) * format.channels * 2);
 
-					data.Resize(dataBufferLen);
+					if (dataBufferLen < size + ((frameSize - delaySamplesLeft) * format.channels * 2))
+					{
+						dataBufferLen += (((frameSize - delaySamplesLeft) * format.channels * 2) + 131072);
+
+						data.Resize(dataBufferLen);
+					}
+
+					for (Int j = 0; j < (frameSize - delaySamplesLeft) * format.channels; j++)
+					{
+						((short *) (UnsignedByte *) data)[size / 2 + j] = pcmBuffer[j];
+					}
+
+					size += ((frameSize - delaySamplesLeft) * format.channels * 2);
 				}
 
-				for (Int j = 0; j < samples; j++)
-				{
-					((short *) (UnsignedByte *) data)[size / 2 + j] = pcmBuffer[j];
-				}
-
-				size += (samples * 2);
+				delaySamplesLeft = Math::Max(0, delaySamplesLeft - frameSize);
 			}
 		}
 

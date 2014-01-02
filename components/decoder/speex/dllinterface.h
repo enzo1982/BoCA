@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -33,6 +33,7 @@ typedef int			(*OGGSTREAMPAGEIN)		(ogg_stream_state *, ogg_page *);
 typedef int			(*OGGPAGEEOS)			(ogg_page *);
 typedef int			(*OGGPAGESERIALNO)		(ogg_page *);
 typedef ogg_int64_t		(*OGGPAGEGRANULEPOS)		(ogg_page *);
+typedef int			(*OGGPAGEPACKETS)		(ogg_page *);
 typedef int			(*OGGSTREAMCLEAR)		(ogg_stream_state *);
 typedef int			(*OGGSYNCINIT)			(ogg_sync_state *);
 typedef char *			(*OGGSYNCBUFFER)		(ogg_sync_state *, int);
@@ -47,6 +48,7 @@ extern OGGSTREAMPAGEIN		 ex_ogg_stream_pagein;
 extern OGGPAGEEOS		 ex_ogg_page_eos;
 extern OGGPAGESERIALNO		 ex_ogg_page_serialno;
 extern OGGPAGEGRANULEPOS	 ex_ogg_page_granulepos;
+extern OGGPAGEPACKETS		 ex_ogg_page_packets;
 extern OGGSTREAMCLEAR		 ex_ogg_stream_clear;
 extern OGGSYNCINIT		 ex_ogg_sync_init;
 extern OGGSYNCBUFFER		 ex_ogg_sync_buffer;

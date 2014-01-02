@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -148,16 +148,13 @@ Bool BoCA::EncoderSpeex::Activate()
 
 	/* Get frame size
 	 */
-	spx_int32_t	 frame_size = 0;
 	spx_int32_t	 rate = format.rate;
 
-	ex_speex_encoder_ctl(encoder, SPEEX_GET_FRAME_SIZE, &frame_size);
 	ex_speex_encoder_ctl(encoder, SPEEX_SET_SAMPLING_RATE, &rate);
+	ex_speex_encoder_ctl(encoder, SPEEX_GET_FRAME_SIZE, &frameSize);
+	ex_speex_encoder_ctl(encoder, SPEEX_GET_LOOKAHEAD, &lookAhead);
 
-	frameSize    = frame_size;
 	totalSamples = 0;
-
-	packageSize  = frame_size * (format.bits / 8) * format.channels;
 	numPackets   = 0;
 
 	/* Write Speex header
@@ -214,6 +211,12 @@ Bool BoCA::EncoderSpeex::Activate()
 
 Bool BoCA::EncoderSpeex::Deactivate()
 {
+	/* Output remaining samples to encoder.
+	 */
+	samplesBuffer.Resize(0);
+
+	EncodeFrames(samplesBuffer, dataBuffer, True);
+
 	/* Write any remaining Ogg packets.
 	 */
 	WriteOggPackets(True);
@@ -236,8 +239,7 @@ Int BoCA::EncoderSpeex::WriteData(Buffer<UnsignedByte> &data, Int size)
 	const Format	&format	 = track.GetFormat();
 	Int		 samples = size / format.channels / (format.bits / 8);
 
-	samplesBuffer.Resize(frameSize * format.channels);
-	samplesBuffer.Zero();
+	samplesBuffer.Resize(samples * format.channels);
 
 	for (Int i = 0; i < samples * format.channels; i++)
 	{
@@ -249,35 +251,65 @@ Int BoCA::EncoderSpeex::WriteData(Buffer<UnsignedByte> &data, Int size)
 		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (spx_int16_t) ((data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0)) / 256);
 	}
 
-	totalSamples += samples;
-
 	/* Output samples to encoder.
 	 */
-	if (format.channels == 2) ex_speex_encode_stereo_int(samplesBuffer, frameSize, &bits);
+	return EncodeFrames(samplesBuffer, dataBuffer, False);
+}
 
-	ex_speex_encode_int(encoder, samplesBuffer, &bits);
-	ex_speex_bits_insert_terminator(&bits);
+Int BoCA::EncoderSpeex::EncodeFrames(const Buffer<signed short> &samplesBuffer, Buffer<unsigned char> &dataBuffer, Bool flush)
+{
+	backBuffer.Resize(backBuffer.Size() + samplesBuffer.Size());
 
-	Int	 dataLength = ex_speex_bits_nbytes(&bits);
+	memcpy(((signed short *) backBuffer) + backBuffer.Size() - samplesBuffer.Size(), (signed short *) samplesBuffer, sizeof(short) * samplesBuffer.Size());
 
-	dataBuffer.Resize(dataLength);
+	const Format	&format = track.GetFormat();
 
-	dataLength = ex_speex_bits_write(&bits, dataBuffer, dataLength);
+	Int	 nullSamples = 0;
 
-	op.packet     = (unsigned char *) (char *) dataBuffer;
-	op.bytes      = dataLength;
-	op.b_o_s      = 0;
-	op.e_o_s      = samples < frameSize ? 1 : 0;
-	op.granulepos = totalSamples;
-	op.packetno   = numPackets++;
+	if (flush)
+	{
+		nullSamples = frameSize;
 
-	ex_ogg_stream_packetin(&os, &op);
+		if ((backBuffer.Size() / format.channels) % frameSize > 0) nullSamples += frameSize - (backBuffer.Size() / format.channels) % frameSize;
 
-	dataLength = WriteOggPackets(False);
+		backBuffer.Resize(backBuffer.Size() + nullSamples * format.channels);
 
-	ex_speex_bits_reset(&bits);
+		memset(((signed short *) backBuffer) + backBuffer.Size() - nullSamples * format.channels, 0, sizeof(short) * nullSamples * format.channels);
+	}
 
-	return dataLength;
+	while (backBuffer.Size() >= frameSize * format.channels)
+	{
+		if (format.channels == 2) ex_speex_encode_stereo_int(backBuffer, frameSize, &bits);
+
+		ex_speex_encode_int(encoder, backBuffer, &bits);
+		ex_speex_bits_insert_terminator(&bits);
+
+		Int	 dataLength = ex_speex_bits_nbytes(&bits);
+
+		dataBuffer.Resize(dataLength);
+
+		dataLength = ex_speex_bits_write(&bits, (char *) (unsigned char *) dataBuffer, dataLength);
+
+		ex_speex_bits_reset(&bits);
+
+		totalSamples += frameSize;
+
+		op.packet     = dataBuffer;
+		op.bytes      = dataLength;
+		op.b_o_s      = 0;
+		op.e_o_s      =  (flush && backBuffer.Size() <=     frameSize * format.channels) ? 1 : 0;
+		op.granulepos =  (flush && backBuffer.Size() <=     frameSize * format.channels) ? totalSamples		    - nullSamples : 
+				((flush && backBuffer.Size() <= 2 * frameSize * format.channels) ? totalSamples + frameSize - nullSamples - lookAhead : totalSamples - lookAhead);
+		op.packetno   = numPackets++;
+
+		ex_ogg_stream_packetin(&os, &op);
+
+		memmove((signed short *) backBuffer, ((signed short *) backBuffer) + frameSize * format.channels, sizeof(short) * (backBuffer.Size() - frameSize * format.channels));
+
+		backBuffer.Resize(backBuffer.Size() - frameSize * format.channels);
+	}
+
+	return WriteOggPackets(flush);
 }
 
 Int BoCA::EncoderSpeex::WriteOggPackets(Bool flush)
