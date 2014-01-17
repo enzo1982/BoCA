@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -164,9 +164,9 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 
 	track.SetFormat(format);
 
-	Int	 trackNumber = 0;
+	Int	 trackNumber = -1;
 	Int	 trackLength = 0;
-	Int	 audiodrive = 0;
+	Int	 audiodrive  = 0;
 
 	if (streamURI.StartsWith("device://cdda:"))
 	{
@@ -214,7 +214,7 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 		}
 	}
 
-	if (trackNumber == 0) return Error();
+	if (trackNumber == -1) return Error();
 
 	/* Fill MCDI data.
 	 */
@@ -224,24 +224,33 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 
 	Int	 entryNumber = -1;
 
-	for (Int i = 0; i < info.mcdi.GetNumberOfEntries(); i++)
+	if (trackNumber == 0)
 	{
-		trackLength = info.mcdi.GetNthEntryOffset(i + 1) - info.mcdi.GetNthEntryOffset(i);
+		trackLength = info.mcdi.GetNthEntryOffset(0);
 
-		/* Strip 11400 sectors off of the track length if
-		 * we are the last audio track before a new session.
-		 */
-		if ((i > 0 && info.mcdi.GetNthEntryType(i) != info.mcdi.GetNthEntryType(i + 1) && info.mcdi.GetNthEntryTrackNumber(i + 1) != 0xAA) ||
-		    (i < info.mcdi.GetNumberOfEntries() - 1 && info.mcdi.GetNthEntryOffset(i + 2) - info.mcdi.GetNthEntryType(i + 1) <= 0))
+		if (info.mcdi.GetNthEntryType(0) == ENTRY_AUDIO) entryNumber = 0;
+	}
+	else
+	{
+		for (Int i = 0; i < info.mcdi.GetNumberOfEntries(); i++)
 		{
-			trackLength -= 11400;
-		}
+			trackLength = info.mcdi.GetNthEntryOffset(i + 1) - info.mcdi.GetNthEntryOffset(i);
 
-		if (info.mcdi.GetNthEntryType(i) == ENTRY_AUDIO && info.mcdi.GetNthEntryTrackNumber(i) == trackNumber)
-		{
-			entryNumber = i;
+			/* Strip 11400 sectors off of the track length if
+			 * we are the last audio track before a new session.
+			 */
+			if ((i > 0 && info.mcdi.GetNthEntryType(i) != info.mcdi.GetNthEntryType(i + 1) && info.mcdi.GetNthEntryTrackNumber(i + 1) != 0xAA) ||
+			    (i < info.mcdi.GetNumberOfEntries() - 1 && info.mcdi.GetNthEntryOffset(i + 2) - info.mcdi.GetNthEntryType(i + 1) <= 0))
+			{
+				trackLength -= 11400;
+			}
 
-			break;
+			if (info.mcdi.GetNthEntryType(i) == ENTRY_AUDIO && info.mcdi.GetNthEntryTrackNumber(i) == trackNumber)
+			{
+				entryNumber = i;
+
+				break;
+			}
 		}
 	}
 
@@ -407,14 +416,27 @@ Bool BoCA::DecoderCDIO::GetTrackSectors(Int &startSector, Int &endSector)
 	Int	 firstTrack = cdio_get_first_track_num(cd);
 	Int	 lastTrack  = cdio_get_last_track_num(cd);
 
-	for (Int i = firstTrack; i <= lastTrack; i++)
+	if (track.cdTrack == 0)
 	{
-		if (cdio_get_track_format(cd, i) == TRACK_FORMAT_AUDIO && i == track.cdTrack)
+		if (cdio_get_track_format(cd, firstTrack) == TRACK_FORMAT_AUDIO)
 		{
-			startSector = cdio_get_track_lsn(cd, i);
-			endSector   = cdio_get_track_last_lsn(cd, i);
+			startSector = 0;
+			endSector   = cdio_get_track_lsn(cd, firstTrack);
 
 			return True;
+		}
+	}
+	else
+	{
+		for (Int i = firstTrack; i <= lastTrack; i++)
+		{
+			if (cdio_get_track_format(cd, i) == TRACK_FORMAT_AUDIO && i == track.cdTrack)
+			{
+				startSector = cdio_get_track_lsn(cd, i);
+				endSector   = cdio_get_track_last_lsn(cd, i);
+
+				return True;
+			}
 		}
 	}
 

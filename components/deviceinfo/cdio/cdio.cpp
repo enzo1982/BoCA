@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -179,6 +179,16 @@ const Array<String> &BoCA::DeviceInfoCDIO::GetNthDeviceTrackList(Int n)
 		 */
 		if (mcdi.GetNthEntryType(i) == ENTRY_AUDIO && mcdi.GetNthEntryOffset(i + 1) - mcdi.GetNthEntryOffset(i) > 0)
 		{
+			/* Look for hidden track before the first track (HTOA).
+			 */
+			if (i == 0 && mcdi.GetNthEntryOffset(i) >= 450)
+			{
+				trackList.Add(String("device://cdda:")
+					     .Append(String::FromInt(n))
+					     .Append("/")
+					     .Append(String::FromInt(0)));
+			}
+
 			/* Add CD track to joblist using a device:// URI
 			 */
 			trackList.Add(String("device://cdda:")
