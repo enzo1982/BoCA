@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -287,8 +287,8 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 		else if (format.bits == 16				) buffer[i] = ((Short *) (unsigned char *) data)[i];
 		else if (format.bits == 32				) buffer[i] = ((Int32 *) (unsigned char *) data)[i] / 256;
 
-		else if (format.bits == 24 && endianness == EndianLittle) buffer[i] = data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0);
-		else if (format.bits == 24 && endianness == EndianBig	) buffer[i] = data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0);
+		else if (format.bits == 24 && endianness == EndianLittle) buffer[i] = (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 256;
+		else if (format.bits == 24 && endianness == EndianBig	) buffer[i] = (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 256;
 	}
 
 	ex_FLAC__stream_encoder_process_interleaved(encoder, buffer, size / (format.bits / 8) / format.channels);

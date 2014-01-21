@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -255,8 +255,8 @@ Int BoCA::DecoderMAD::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 		if	(format.bits == 16				) ((Short *) (unsigned char *) data)[i] = sample;
 
-		else if (format.bits == 24 && endianness == EndianLittle) { data[i * 3 + 0] = sample & 0xFF; data[i * 3 + 1] = (sample >> 8) & 0xFF; data[i * 3 + 2] = (sample >> 16) & 0xFF; }
-		else if (format.bits == 24 && endianness == EndianBig	) { data[i * 3 + 2] = sample & 0xFF; data[i * 3 + 1] = (sample >> 8) & 0xFF; data[i * 3 + 0] = (sample >> 16) & 0xFF; }
+		else if (format.bits == 24 && endianness == EndianLittle) { data[i * 3 + 2] = (sample >> 16) & 0xFF; data[i * 3 + 1] = (sample >> 8) & 0xFF; data[i * 3    ] = sample & 0xFF; }
+		else if (format.bits == 24 && endianness == EndianBig	) { data[i * 3    ] = (sample >> 16) & 0xFF; data[i * 3 + 1] = (sample >> 8) & 0xFF; data[i * 3 + 2] = sample & 0xFF; }
 	}
 
 	samplesBuffer.Resize(0);

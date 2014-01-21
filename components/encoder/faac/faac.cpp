@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -295,8 +295,8 @@ Int BoCA::EncoderFAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 			if	(format.bits ==  8				) ((short *) (int32_t *) samplesBuffer)[i] = (				    data [i] - 128) * 256;
 			else if (format.bits == 32				)			 samplesBuffer [i] = ((int32_t *) (unsigned char *) data)[i]	    / 256;
 
-			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = data[3 * i    ] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0);
-			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = data[3 * i + 2] + 256 * data[3 * i + 1] + 65536 * data[3 * i    ] - (data[3 * i    ] & 128 ? 16777216 : 0);
+			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 256;
+			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 256;
 		}
 
 		bytes = ex_faacEncEncode(handle, samplesBuffer, samplesRead, outBuffer, outBuffer.Size());

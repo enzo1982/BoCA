@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -275,8 +275,8 @@ Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 		if	(track.GetFormat().bits ==  8				   )				  data [i] = samplesBuffer[i] + 128;
 		else if (track.GetFormat().bits == 16				   ) ((Short *) (unsigned char *) data)[i] = samplesBuffer[i];
 
-		else if (track.GetFormat().bits == 24 && endianness == EndianLittle) { data[3 * i + 0] = samplesBuffer[i] & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i + 2] = (samplesBuffer[i] >> 16) & 0xFF; }
-		else if (track.GetFormat().bits == 24 && endianness == EndianBig   ) { data[3 * i + 2] = samplesBuffer[i] & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i + 0] = (samplesBuffer[i] >> 16) & 0xFF; }
+		else if (track.GetFormat().bits == 24 && endianness == EndianLittle) { data[3 * i + 2] = (samplesBuffer[i] >> 16) & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i    ] = samplesBuffer[i] & 0xFF; }
+		else if (track.GetFormat().bits == 24 && endianness == EndianBig   ) { data[3 * i    ] = (samplesBuffer[i] >> 16) & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i + 2] = samplesBuffer[i] & 0xFF; }
 	}
 
 	samplesBuffer.Resize(0);
