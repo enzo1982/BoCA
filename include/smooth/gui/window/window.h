@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -105,6 +105,8 @@ namespace smooth
 
 				Int				 SetDefaultStatusText(const String &);
 				Int				 RestoreDefaultStatusText();
+
+				const Array<String>		&GetDroppedFiles() const;
 
 				Int				 SetRightToLeft(Bool);
 				virtual Bool			 IsRightToLeft() const;
