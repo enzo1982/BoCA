@@ -7,6 +7,7 @@ include $(BOCA_PATH)/Makefile-options
 install: uninstall
 	cp boca_decoder_alac.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_als.1.0.xml $(PREFIX)/$(LIB)/boca
+	cp boca_decoder_avconv_alac.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_amr.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_atrac3.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_avi_audio.1.0.xml $(PREFIX)/$(LIB)/boca
@@ -52,6 +53,7 @@ install: uninstall
 uninstall:
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_alac.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_als.1.0.xml
+	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_alac.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_amr.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_atrac3.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_avi_audio.1.0.xml
