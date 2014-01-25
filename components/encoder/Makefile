@@ -9,6 +9,12 @@ ifeq ($(BUILD_WIN32),True)
 	cd bladeenc && $(MAKE)
 endif
 	cd bonk && $(MAKE)
+ifeq ($(BUILD_OSX),True)
+	cd coreaudio && $(MAKE)
+endif
+ifeq ($(BUILD_WIN32),True)
+	cd coreaudio && $(MAKE)
+endif
 	cd faac && $(MAKE)
 	cd fdkaac && $(MAKE)
 	cd flac && $(MAKE)
@@ -33,6 +39,12 @@ ifeq ($(BUILD_WIN32),True)
 	cd bladeenc && $(MAKE) clean
 endif
 	cd bonk && $(MAKE) clean
+ifeq ($(BUILD_OSX),True)
+	cd coreaudio && $(MAKE) clean
+endif
+ifeq ($(BUILD_WIN32),True)
+	cd coreaudio && $(MAKE) clean
+endif
 	cd faac && $(MAKE) clean
 	cd fdkaac && $(MAKE) clean
 	cd flac && $(MAKE) clean
@@ -53,23 +65,37 @@ ifeq ($(BUILD_WIN32),True)
 endif
 
 install:
+ifeq ($(BUILD_OSX),True)
+	cd coreaudio && $(MAKE) install
+endif
+ifneq ($(BUILD_OSX),True)
 	cd faac && $(MAKE) install
+endif
 	cd fdkaac && $(MAKE) install
 	cd flac && $(MAKE) install
 	cd lame && $(MAKE) install
 	cd opus && $(MAKE) install
 	cd speex && $(MAKE) install
+ifneq ($(BUILD_OSX),True)
 	cd voaacenc && $(MAKE) install
+endif
 	cd vorbis && $(MAKE) install
 	cd wave && $(MAKE) install
 
 uninstall:
+ifeq ($(BUILD_OSX),True)
+	cd coreaudio && $(MAKE) uninstall
+endif
+ifneq ($(BUILD_OSX),True)
 	cd faac && $(MAKE) uninstall
+endif
 	cd fdkaac && $(MAKE) uninstall
 	cd flac && $(MAKE) uninstall
 	cd lame && $(MAKE) uninstall
 	cd opus && $(MAKE) uninstall
 	cd speex && $(MAKE) uninstall
+ifneq ($(BUILD_OSX),True)
 	cd voaacenc && $(MAKE) uninstall
+endif
 	cd vorbis && $(MAKE) uninstall
 	cd wave && $(MAKE) uninstall
