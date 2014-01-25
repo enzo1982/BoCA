@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -100,17 +100,14 @@ Bool BoCA::OutputCoreAudio::Activate()
 	CA::AudioStreamBasicDescription	 streamFormat;
 
 	streamFormat.mFormatID		= CA::kAudioFormatLinearPCM;
-	streamFormat.mFormatFlags	= CA::kLinearPCMFormatFlagIsPacked | (endianness == EndianBig ? CA::kLinearPCMFormatFlagIsBigEndian : 0);
-
-	streamFormat.mChannelsPerFrame	= format.channels;
+	streamFormat.mFormatFlags       = CA::kLinearPCMFormatFlagIsPacked | (format.bits > 8	      ? CA::kLinearPCMFormatFlagIsSignedInteger : 0) |
+					 				     (endianness == EndianBig ? CA::kLinearPCMFormatFlagIsBigEndian	: 0);
 	streamFormat.mSampleRate	= format.rate;
+	streamFormat.mChannelsPerFrame	= format.channels;
 	streamFormat.mBitsPerChannel	= format.bits;
-
-	if (format.bits > 8) streamFormat.mFormatFlags |= CA::kLinearPCMFormatFlagIsSignedInteger;
-
 	streamFormat.mFramesPerPacket	= 1;
-	streamFormat.mBytesPerFrame	= streamFormat.mBitsPerChannel * streamFormat.mChannelsPerFrame / 8;
-	streamFormat.mBytesPerPacket	= streamFormat.mBytesPerFrame * streamFormat.mFramesPerPacket;
+	streamFormat.mBytesPerFrame	= streamFormat.mChannelsPerFrame * streamFormat.mBitsPerChannel / 8;
+	streamFormat.mBytesPerPacket	= streamFormat.mFramesPerPacket * streamFormat.mBytesPerFrame;
 
 	if (CA::AudioUnitSetProperty(audioUnit, CA::kAudioUnitProperty_StreamFormat, CA::kAudioUnitScope_Input, 0, &streamFormat, sizeof(streamFormat)) != 0) return False;
 
