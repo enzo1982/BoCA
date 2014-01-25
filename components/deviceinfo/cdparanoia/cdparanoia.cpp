@@ -249,18 +249,18 @@ const BoCA::MCDI &BoCA::DeviceInfoCDParanoia::GetNthDeviceMCDI(Int n)
 	{
 		typedef struct
 		{
-			unsigned char	 rsvd;
-			unsigned char	 ADR;
-			unsigned char	 trackNumber;
-			unsigned char	 rsvd2;
-			int32_t		 addr;
+			uint8_t		 rsvd;
+			uint8_t		 ADR;
+			uint8_t		 trackNumber;
+			uint8_t		 rsvd2;
+			uint32_t	 addr;
 		} __attribute__((__packed__)) TOCTRACK;
 
 		typedef struct
 		{
-			unsigned short	 tocLen;
-			unsigned char	 firstTrack;
-			unsigned char	 lastTrack;
+			uint16_t	 tocLen;
+			uint8_t		 firstTrack;
+			uint8_t		 lastTrack;
 			TOCTRACK	 tracks[100];
 		} __attribute__((__packed__)) TOC;
 

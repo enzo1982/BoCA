@@ -14,7 +14,7 @@ OBJECTS	  = cdio.o
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  = -lcdio -lcdio_cdda
+LIBS	  = -lcdio
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

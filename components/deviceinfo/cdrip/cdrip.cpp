@@ -208,7 +208,7 @@ const BoCA::MCDI &BoCA::DeviceInfoCDRip::GetNthDeviceMCDI(Int n)
 		Int			 numTocEntries = ex_CR_GetNumTocEntries();
 		Buffer<UnsignedByte>	 buffer(4 + 8 * numTocEntries + 8);
 
-		((short *) (UnsignedByte *) buffer)[0] = htons(buffer.Size() - 2);
+		((UnsignedInt16 *) (UnsignedByte *) buffer)[0] = htons(buffer.Size() - 2);
 
 		buffer[2] = ex_CR_GetTocEntry(0).btTrackNumber;
 		buffer[3] = ex_CR_GetTocEntry(numTocEntries - 1).btTrackNumber;
@@ -222,11 +222,11 @@ const BoCA::MCDI &BoCA::DeviceInfoCDRip::GetNthDeviceMCDI(Int n)
 			buffer[4 + 8 * i + 2] = entry.btTrackNumber;
 			buffer[4 + 8 * i + 3] = 0;
 
-			long		 address = entry.dwStartSector;
+			Int32		 address = entry.dwStartSector;
 
 			if (address < 0) address = ~((-address) - 1) & ((1 << 24) - 1);
 
-			((unsigned long *) (UnsignedByte *) buffer)[1 + 2 * i + 1] = htonl(address);
+			((UnsignedInt32 *) (UnsignedByte *) buffer)[1 + 2 * i + 1] = htonl(address);
 		}
 
 		mcdi.SetData(buffer);

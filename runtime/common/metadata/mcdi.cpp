@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -43,14 +43,14 @@ Int BoCA::MCDI::GetNumberOfEntries() const
 {
 	if (data.Size() < 2) return 0;
 
-	return (ntohs(((short *) (UnsignedByte *) data)[0]) - 2 - 8) / 8;
+	return (ntohs(((UnsignedInt16 *) (UnsignedByte *) data)[0]) - 2 - 8) / 8;
 }
 
 Int BoCA::MCDI::GetNthEntryOffset(Int n) const
 {
 	if (data.Size() < 2 + (8 * (n + 1))) return 0;
 
-	long	 lba = ntohl(((unsigned long *) (UnsignedByte *) data)[1 + 2 * n + 1]);
+	long	 lba = ntohl(((UnsignedInt32 *) (UnsignedByte *) data)[1 + 2 * n + 1]);
 
 	/* Convert 24 bit signed value to 32 bit.
 	 */
