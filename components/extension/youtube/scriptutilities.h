@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -22,9 +22,9 @@ using namespace BoCA;
 
 namespace BoCA
 {
-	v8::Handle<v8::Value>	 Alert(const v8::Arguments &args);
+	void	 Alert(const v8::FunctionCallbackInfo<v8::Value> &);
 
-	v8::Handle<v8::Value>	 DownloadURL(const v8::Arguments &args);
+	void	 DownloadURL(const v8::FunctionCallbackInfo<v8::Value> &);
 };
 
 #endif

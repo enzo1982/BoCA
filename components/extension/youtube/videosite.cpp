@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -157,9 +157,9 @@ Bool BoCA::VideoSite::CreateScriptContext()
 	v8::SetResourceConstraints(&rc);
 #endif
 
-	/* Create a new isolate.
+	/* Get current isolate.
 	 */
-	isolate = v8::Isolate::New();
+	isolate = v8::Isolate::GetCurrent();
 
 	/* Enter the created isolate.
 	 */
@@ -230,10 +230,6 @@ Bool BoCA::VideoSite::DestroyScriptContext()
 		 */
 		context.Dispose();
 	}
-
-	/* Dispose the isolate.
-	 */
-	isolate->Dispose();
 
 	return True;
 }

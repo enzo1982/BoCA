@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -15,16 +15,14 @@ using namespace smooth::GUI::Dialogs;
 
 using namespace smooth::Net;
 
-v8::Handle<v8::Value> BoCA::Alert(const v8::Arguments &args)
+void BoCA::Alert(const v8::FunctionCallbackInfo<v8::Value> &args)
 {
 	String	 text = (char *) *v8::String::AsciiValue(args[0]);
 
 	QuickMessage(text, "Information", Message::Buttons::Ok, Message::Icon::Information);
-
-	return v8::Undefined();
 }
 
-v8::Handle<v8::Value> BoCA::DownloadURL(const v8::Arguments &args)
+void BoCA::DownloadURL(const v8::FunctionCallbackInfo<v8::Value> &args)
 {
 	String	 url = (char *) *v8::String::AsciiValue(args[0]);
 
@@ -54,9 +52,7 @@ v8::Handle<v8::Value> BoCA::DownloadURL(const v8::Arguments &args)
 
 			for (Int i = 0; i < buffer.Size(); i++) result[i] = buffer[i];
 
-			return v8::String::New(result);
+			args.GetReturnValue().Set(v8::String::New(result));
 		}
 	}
-
-	return v8::Undefined();
 }
