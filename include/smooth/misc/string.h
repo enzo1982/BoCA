@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -74,50 +74,24 @@ namespace smooth
 			String					 EncodeBase64() const;
 			String					 DecodeBase64() const;
 
-			String					&Append(const char *);
-			String					&Append(const wchar_t *);
-			String					&Append(const String &);
-
-			Int					 Find(const char *) const;
-			Int					 Find(const wchar_t *) const;
 			Int					 Find(const String &) const;
-
-			Int					 FindLast(const char *) const;
-			Int					 FindLast(const wchar_t *) const;
 			Int					 FindLast(const String &) const;
 
-			String					&Replace(const char *, const char *);
-			String					&Replace(const wchar_t *, const wchar_t *);
-			String					&Replace(const char *, const String &);
-			String					&Replace(const wchar_t *, const String &);
+			String					&Append(const String &);
+			String					 Append(const String &) const;
+
 			String					&Replace(const String &, const String &);
+			String					 Replace(const String &, const String &) const;
 
-			String					&Copy(const char *);
-			String					&Copy(const wchar_t *);
 			String					&Copy(const String &);
-
-			String					&CopyN(const char *, const Int);
-			String					&CopyN(const wchar_t *, const Int);
 			String					&CopyN(const String &, const Int);
 
-			Bool					 Contains(const char *) const;
-			Bool					 Contains(const wchar_t *) const;
 			Bool					 Contains(const String &) const;
 
-			Int					 Compare(const char *) const;
-			Int					 Compare(const wchar_t *) const;
 			Int					 Compare(const String &) const;
-
-			Int					 CompareN(const char *, const Int) const;
-			Int					 CompareN(const wchar_t *, const Int) const;
 			Int					 CompareN(const String &, const Int) const;
 
-			Bool					 StartsWith(const char *) const;
-			Bool					 StartsWith(const wchar_t *) const;
 			Bool					 StartsWith(const String &) const;
-
-			Bool					 EndsWith(const char *) const;
-			Bool					 EndsWith(const wchar_t *) const;
 			Bool					 EndsWith(const String &) const;
 
 			String					 SubString(Int, Int) const;

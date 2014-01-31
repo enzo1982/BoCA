@@ -59,6 +59,8 @@ namespace smooth
 				Bool				 created;
 				volatile Bool			 destroyed;
 
+				Bool				 visibilitySet;
+
 				Bitmap				 icon;
 
 				Rect				 innerOffset;
@@ -79,8 +81,6 @@ namespace smooth
 				static const Short		 classID;
 
 				static Short			 nOfActiveWindows;
-
-				Bool				 initshow;
 
 								 Window(const String &, const Point &, const Size &, Void * = NIL);
 				virtual				~Window();
@@ -168,6 +168,7 @@ namespace smooth
 
 				Bool				 IsVisible() const			{ if (!IsRegistered()) return False; if (IsMinimized()) return False; return visible; }
 
+				Bool				 IsVisibilitySet() const		{ return visibilitySet; }
 				Bool				 IsBackgroundColorSet() const		{ return backgroundColorSet; }
 			slots:
 				virtual Void			 OnCreate();
