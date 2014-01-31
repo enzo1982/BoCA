@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -101,7 +101,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	vbr_quality		= new GroupBox(i18n->TranslateString("VBR quality"), Point(142, 62), Size(255, 51));
 
-	vbr_text_setquality	= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(153, 75));
+	vbr_text_setquality	= new Text(i18n->TranslateString("Quality").Append(":"), Point(153, 75));
 
 	vbr_slider_quality	= new Slider(Point(161 + vbr_text_setquality->GetUnscaledTextWidth(), 73), Size(204 - vbr_text_setquality->GetUnscaledTextWidth(), 0), OR_HORZ, &vbrquality, 0, 90);
 	vbr_slider_quality->onValueChange.Connect(&ConfigureLAME::SetVBRQuality, this);

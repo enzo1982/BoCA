@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -261,11 +261,11 @@ Void BoCA::LayerTagBasic::OnChangeLanguageSettings()
 
 	group_info->SetText(i18n->TranslateString("Title information"));
 
-	text_artist->SetText(String(i18n->TranslateString("Artist")).Append(":"));
-	text_title->SetText(String(i18n->TranslateString("Title")).Append(":"));
-	text_album->SetText(String(i18n->TranslateString("Album")).Append(":"));
-	text_genre->SetText(String(i18n->TranslateString("Genre")).Append(":"));
-	text_comment->SetText(String(i18n->TranslateString("Comment")).Append(":"));
+	text_artist->SetText(i18n->TranslateString("Artist").Append(":"));
+	text_title->SetText(i18n->TranslateString("Title").Append(":"));
+	text_album->SetText(i18n->TranslateString("Album").Append(":"));
+	text_genre->SetText(i18n->TranslateString("Genre").Append(":"));
+	text_comment->SetText(i18n->TranslateString("Comment").Append(":"));
 
 	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_artist->GetUnscaledTextWidth(), text_genre->GetUnscaledTextWidth()), text_title->GetUnscaledTextWidth()), Math::Max(text_album->GetUnscaledTextWidth(), text_comment->GetUnscaledTextWidth()));
 
@@ -275,9 +275,9 @@ Void BoCA::LayerTagBasic::OnChangeLanguageSettings()
 	edit_genre->SetX(text_genre->GetX() + maxTextSize + 7);
 	edit_comment->SetX(text_comment->GetX() + maxTextSize + 7);
 
-	text_track->SetText(String(i18n->TranslateString("Track")).Append(":"));
-	text_disc->SetText(String(i18n->TranslateString("Disc")).Append(":"));
-	text_year->SetText(String(i18n->TranslateString("Year")).Append(":"));
+	text_track->SetText(i18n->TranslateString("Track").Append(":"));
+	text_disc->SetText(i18n->TranslateString("Disc").Append(":"));
+	text_year->SetText(i18n->TranslateString("Year").Append(":"));
 
 	Int	 maxTextSize2 = Math::Max(Math::Max(text_track->GetUnscaledTextWidth(), text_disc->GetUnscaledTextWidth()), text_year->GetUnscaledTextWidth());
 
@@ -287,9 +287,9 @@ Void BoCA::LayerTagBasic::OnChangeLanguageSettings()
 
 	group_cover->SetText(i18n->TranslateString("Cover art"));
 
-	text_covers->SetText(String(i18n->TranslateString("Covers")).Append(":"));
-	text_cover_type->SetText(String(i18n->TranslateString("Type")).Append(":"));
-	text_cover_desc->SetText(String(i18n->TranslateString("Description")).Append(":"));
+	text_covers->SetText(i18n->TranslateString("Covers").Append(":"));
+	text_cover_type->SetText(i18n->TranslateString("Type").Append(":"));
+	text_cover_desc->SetText(i18n->TranslateString("Description").Append(":"));
 
 	Int	 maxTextSize3 = Math::Max(Math::Max(text_cover_type->GetUnscaledTextWidth(), text_covers->GetUnscaledTextWidth()), text_cover_desc->GetUnscaledTextWidth());
 

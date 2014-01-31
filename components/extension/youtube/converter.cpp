@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -201,14 +201,14 @@ Int BoCA::Converter::Run(const String &inFile, const String &outFile)
 	}
 #else
 	String	 command   = String(external_command).Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(external_arguments).Replace("%INFILE", String(inFile).Replace("\\", "\\\\").Replace(" ", "\\ ")
-											 .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
-											 .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
-											 .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"))
-						       .Replace("%OUTFILE", String(outFile).Replace("\\", "\\\\").Replace(" ", "\\ ")
-											   .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
-											   .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
-											   .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
+	String	 arguments = String(external_arguments).Replace("%INFILE", inFile.Replace("\\", "\\\\").Replace(" ", "\\ ")
+										 .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+										 .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+										 .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"))
+						       .Replace("%OUTFILE", outFile.Replace("\\", "\\\\").Replace(" ", "\\ ")
+										   .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+										   .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+										   .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
 
 	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments), "r");
 

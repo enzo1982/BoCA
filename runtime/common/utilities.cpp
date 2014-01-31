@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -23,8 +23,8 @@ Void BoCA::Utilities::WarningMessage(const String &message, const String &replac
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Warning"), Message::Buttons::Ok, Message::Icon::Exclamation);
-	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Warning")).Append(": ").Append(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
+	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Warning"), Message::Buttons::Ok, Message::Icon::Exclamation);
+	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Warning")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
 Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1, const String &replace2)
@@ -34,8 +34,8 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Hand);
-	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(String(i18n->TranslateString(message)).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
+	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Hand);
+	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
 String BoCA::Utilities::GetBoCADirectory()
@@ -60,7 +60,7 @@ DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
 	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().HasSSE3())
 	{
 #ifdef __WIN32__
-		if (File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\").Append(module).Append("-OpenMP.dll")).Exists())
+		if (File(GUI::Application::GetApplicationDirectory().Append("codecs\\").Append(module).Append("-OpenMP.dll")).Exists())
 #endif
 
 		loader = new DynamicLoader(String("codecs/").Append(module).Append("-OpenMP"));
@@ -78,7 +78,7 @@ DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
 	if (loader == NIL)
 	{
 #ifdef __WIN32__
-		if (File(String(GUI::Application::GetApplicationDirectory()).Append("codecs\\").Append(module).Append(".dll")).Exists())
+		if (File(GUI::Application::GetApplicationDirectory().Append("codecs\\").Append(module).Append(".dll")).Exists())
 #endif
 
 		loader = new DynamicLoader(String("codecs/").Append(module));
@@ -96,7 +96,7 @@ DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
 	if (loader == NIL)
 	{
 #ifdef __WIN32__
-		if (File(String(GUI::Application::GetApplicationDirectory()).Append(module).Append(".dll")).Exists())
+		if (File(GUI::Application::GetApplicationDirectory().Append(module).Append(".dll")).Exists())
 #endif
 
 		loader = new DynamicLoader(module);

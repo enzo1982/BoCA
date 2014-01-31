@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -231,13 +231,13 @@ String BoCA::AS::ComponentSpecs::GetExternalArgumentsString()
 			case PARAMETER_TYPE_SELECTION:
 				if (!config->GetIntValue(id, String("Set ").Append(param->GetName()), param->GetEnabled())) continue;
 
-				arguments.Append(String(param->GetArgument()).Replace("%VALUE", config->GetStringValue(id, param->GetName(), param->GetDefault()))).Append(" ");
+				arguments.Append(param->GetArgument().Replace("%VALUE", config->GetStringValue(id, param->GetName(), param->GetDefault()))).Append(" ");
 
 				break;
 			case PARAMETER_TYPE_RANGE:
 				if (!config->GetIntValue(id, String("Set ").Append(param->GetName()), param->GetEnabled())) continue;
 
-				arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromFloat(config->GetIntValue(id, param->GetName(), Math::Round(param->GetDefault().ToFloat() / param->GetStepSize())) * param->GetStepSize()))).Append(" ");
+				arguments.Append(param->GetArgument().Replace("%VALUE", String::FromFloat(config->GetIntValue(id, param->GetName(), Math::Round(param->GetDefault().ToFloat() / param->GetStepSize())) * param->GetStepSize()))).Append(" ");
 
 				break;
 			default:

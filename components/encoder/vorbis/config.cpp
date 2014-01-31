@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -49,7 +49,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 88), Size(344, 42));
 
-	text_quality		= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(10, 16));
+	text_quality		= new Text(i18n->TranslateString("Quality").Append(":"), Point(10, 16));
 
 	slider_quality		= new Slider(Point(text_quality->GetUnscaledTextWidth() + 18, 14), Size(289 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, -20, 100);
 	slider_quality->onValueChange.Connect(&ConfigureVorbis::SetQuality, this);

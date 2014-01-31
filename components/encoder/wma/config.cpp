@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -41,7 +41,7 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	option_uncompressed	= new OptionBox(i18n->TranslateString("Write uncompressed WMA files"), Point(10, 13), Size(366, 0), &uncompressed, 1);
 	option_uncompressed->onAction.Connect(&ConfigureWMA::OnToggleCodec, this);
 
-	option_codec		= new OptionBox(String(i18n->TranslateString("Use codec")).Append(":"), Point(10, 39), Size(100, 0), &uncompressed, 0);
+	option_codec		= new OptionBox(i18n->TranslateString("Use codec").Append(":"), Point(10, 39), Size(100, 0), &uncompressed, 0);
 	option_codec->SetWidth(option_codec->GetUnscaledTextWidth() + 20);
 	option_codec->onAction.Connect(&ConfigureWMA::OnToggleCodec, this);
 
@@ -56,7 +56,7 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	option_autoselect	= new OptionBox(i18n->TranslateString("Automatically select format based on settings and input format"), Point(10, 13), Size(366, 0), &autoselect, 1);
 	option_autoselect->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
 
-	option_format		= new OptionBox(String(i18n->TranslateString("Use format")).Append(":"), Point(10, 39), Size(100, 0), &autoselect, 0);
+	option_format		= new OptionBox(i18n->TranslateString("Use format").Append(":"), Point(10, 39), Size(100, 0), &autoselect, 0);
 	option_format->SetWidth(option_codec->GetUnscaledTextWidth() + 20);
 	option_format->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
 
@@ -80,14 +80,14 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	check_2pass_setting	= new CheckBox(i18n->TranslateString("Use 2-pass encoding"), Point(10, 40), Size(180, 0), &use2PassSetting);
 	check_2pass_setting->onAction.Connect(&ConfigureWMA::OnToggle2PassSetting, this);
 
-	text_quality		= new Text(String(i18n->TranslateString("Quality")).Append(":"), Point(197, 16));
+	text_quality		= new Text(i18n->TranslateString("Quality").Append(":"), Point(197, 16));
 
 	slider_quality		= new Slider(Point(204 + text_quality->GetUnscaledTextWidth(), 13), Size(142 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, 0, 20);
 	slider_quality->onValueChange.Connect(&ConfigureWMA::OnSetQuality, this);
 
 	text_quality_value	= new Text(String::FromInt(quality * 5), Point(353, 16));
 
-	text_bitrate		= new Text(String(i18n->TranslateString("Target bitrate")).Append(":"), Point(197, 42));
+	text_bitrate		= new Text(i18n->TranslateString("Target bitrate").Append(":"), Point(197, 42));
 
 	combo_bitrate		= new ComboBox(Point(204 + text_bitrate->GetUnscaledTextWidth(), 39), Size(142 - text_bitrate->GetUnscaledTextWidth(), 0));
 	combo_bitrate->AddEntry("32");

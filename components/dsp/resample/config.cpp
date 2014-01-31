@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -19,7 +19,7 @@ BoCA::ConfigureResample::ConfigureResample()
 	group_converter		= new GroupBox(i18n->TranslateString("Converter"), Point(7, 11), Size(399, 59));
 	group_samplerate	= new GroupBox(i18n->TranslateString("Output samplerate"), Point(7, 82), Size(399, 43));
 
-	text_converter		= new Text(String(i18n->TranslateString("Converter")).Append(":"), Point(17, 27));
+	text_converter		= new Text(i18n->TranslateString("Converter").Append(":"), Point(17, 27));
 
 	combo_converter		= new ComboBox(Point(24 + text_converter->GetUnscaledTextWidth(), 24), Size(325, 0));
 
@@ -36,7 +36,7 @@ BoCA::ConfigureResample::ConfigureResample()
 	combo_converter->onSelectEntry.Connect(&ConfigureResample::SetConverter, this);
 
 	text_description	= new Text("Description", Point(72, 49));
-	text_samplerate		= new Text(String(i18n->TranslateString("Samplerate")).Append(":"), Point(17, 98));
+	text_samplerate		= new Text(i18n->TranslateString("Samplerate").Append(":"), Point(17, 98));
 
 	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0), 6);
 	edit_samplerate->SetFlags(EDB_NUMERIC);

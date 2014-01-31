@@ -82,7 +82,7 @@ const Array<String> &BoCA::DecoderCDIO::FindDrives()
 		if (readlink(deviceName, buffer, buffer.Size() - 1) >= 0)
 		{
 			if (buffer[0] == '/') deviceName = buffer;
-			else		      deviceName = String(File(deviceName).GetFilePath()).Append("/").Append(buffer);
+			else		      deviceName = File(deviceName).GetFilePath().Append("/").Append(buffer);
 		}
 
 		/* Check if we aleady know this device.

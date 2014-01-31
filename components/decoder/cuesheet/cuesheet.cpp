@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -128,8 +128,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 				trackMode = False;
 			}
 
-			if (line.Find("\"") >= 0) iTrack.origFilename = String(File(streamURI).GetFilePath()).Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
-			else			  iTrack.origFilename = String(File(streamURI).GetFilePath()).Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1));
+			if (line.Find("\"") >= 0) iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
+			else			  iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1));
 
 			if (!File(iTrack.origFilename).Exists())
 			{

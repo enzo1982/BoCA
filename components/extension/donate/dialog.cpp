@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,8 +32,8 @@ BoCA::DonateDialog::DonateDialog()
 
 	mainWnd->Add(button_close);
 
-	text_donate		= new Text(String(i18n->TranslateString("Please help keep this software free by supporting the %1 project\nwith a donation.\n\nClick one of the buttons below to make a donation using PayPal:")).Replace("%1", "fre:ac"), Point(7, 45));
-	text_donate_other	= new Text(String(i18n->TranslateString("You can also send money directly to %1 using PayPal.\n\nPlease write to %1 if you would like to donate using\nelectronic transfer, mail a cheque or send money by mail.")).Replace("%1", "donate@freac.org"), Point(7, text_donate->GetUnscaledTextHeight() + 116));
+	text_donate		= new Text(i18n->TranslateString("Please help keep this software free by supporting the %1 project\nwith a donation.\n\nClick one of the buttons below to make a donation using PayPal:").Replace("%1", "fre:ac"), Point(7, 45));
+	text_donate_other	= new Text(i18n->TranslateString("You can also send money directly to %1 using PayPal.\n\nPlease write to %1 if you would like to donate using\nelectronic transfer, mail a cheque or send money by mail.").Replace("%1", "donate@freac.org"), Point(7, text_donate->GetUnscaledTextHeight() + 116));
 
 	text_intro		= new Text(i18n->TranslateString("Please support this project!"), Point(7, 12));
 	text_intro->SetFont(Font(Font::Default, 12, Font::Bold));

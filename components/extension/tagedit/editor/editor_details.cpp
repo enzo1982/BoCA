@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -150,11 +150,11 @@ Void BoCA::LayerTagDetails::OnChangeLanguageSettings()
 
 	group_details->SetText(i18n->TranslateString("Detailed information"));
 
-	text_band->SetText(String(i18n->TranslateString("Band / orchestra")).Append(":"));
-	text_conductor->SetText(String(i18n->TranslateString("Performer refinement")).Append(":"));
-	text_remix->SetText(String(i18n->TranslateString("Modified / remixed by")).Append(":"));
-	text_composer->SetText(String(i18n->TranslateString("Composer")).Append(":"));
-	text_textwriter->SetText(String(i18n->TranslateString("Lyrics writer")).Append(":"));
+	text_band->SetText(i18n->TranslateString("Band / orchestra").Append(":"));
+	text_conductor->SetText(i18n->TranslateString("Performer refinement").Append(":"));
+	text_remix->SetText(i18n->TranslateString("Modified / remixed by").Append(":"));
+	text_composer->SetText(i18n->TranslateString("Composer").Append(":"));
+	text_textwriter->SetText(i18n->TranslateString("Lyrics writer").Append(":"));
 
 	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_band->GetUnscaledTextWidth(), text_conductor->GetUnscaledTextWidth()), text_remix->GetUnscaledTextWidth()), Math::Max(text_composer->GetUnscaledTextWidth(), text_textwriter->GetUnscaledTextWidth()));
 
@@ -166,8 +166,8 @@ Void BoCA::LayerTagDetails::OnChangeLanguageSettings()
 
 	group_publisher->SetText(i18n->TranslateString("Publisher information"));
 
-	text_publisher->SetText(String(i18n->TranslateString("Publisher / label")).Append(":"));
-	text_isrc->SetText(String(i18n->TranslateString("ISRC")).Append(":"));
+	text_publisher->SetText(i18n->TranslateString("Publisher / label").Append(":"));
+	text_isrc->SetText(i18n->TranslateString("ISRC").Append(":"));
 
 	Int	 maxTextSize2 = Math::Max(text_publisher->GetUnscaledTextWidth(), text_isrc->GetUnscaledTextWidth());
 

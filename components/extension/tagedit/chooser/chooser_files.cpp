@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -293,7 +293,7 @@ Void BoCA::ChooserFiles::OnSelectFile(ListEntry *entry)
 
 		i18n->SetContext("Extensions::Tag Editor::Errors");
 
-		Utilities::ErrorMessage(String(i18n->TranslateString("Unable to open file: %1\n\nError: %2")).Replace("%1", file.GetFileName()).Replace("%2", i18n->TranslateString("Unknown file type", "Messages")));
+		Utilities::ErrorMessage(i18n->TranslateString("Unable to open file: %1\n\nError: %2").Replace("%1", file.GetFileName()).Replace("%2", i18n->TranslateString("Unknown file type", "Messages")));
 
 		return;
 	}
@@ -310,7 +310,7 @@ Void BoCA::ChooserFiles::OnSelectFile(ListEntry *entry)
 
 		i18n->SetContext("Extensions::Tag Editor::Errors");
 
-		Utilities::ErrorMessage(String(i18n->TranslateString("Unable to open file: %1\n\nError: %2")).Replace("%1", file.GetFileName()).Replace("%2", i18n->TranslateString(errorString, "Messages")));
+		Utilities::ErrorMessage(i18n->TranslateString("Unable to open file: %1\n\nError: %2").Replace("%1", file.GetFileName()).Replace("%2", i18n->TranslateString(errorString, "Messages")));
 
 		return;
 	}
@@ -520,7 +520,7 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 
 		i18n->SetContext("Extensions::Tag Editor::Errors");
 
-		Utilities::ErrorMessage(String(i18n->TranslateString("Unable to update tag: %1\n\nError: %2")).Replace("%1", track.origFilename).Replace("%2", i18n->TranslateString(errorString, "Messages")));
+		Utilities::ErrorMessage(i18n->TranslateString("Unable to update tag: %1\n\nError: %2").Replace("%1", track.origFilename).Replace("%2", i18n->TranslateString(errorString, "Messages")));
 
 		return Error();
 	}

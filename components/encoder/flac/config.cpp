@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -145,7 +145,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	edit_apodization->SetDropDownList(list_apodization);
 
-	text_apodization_explain= new Text(String(i18n->TranslateString("Note:")).Append(" ").Append(i18n->TranslateString("You can specify multiple functions separated by semicolons.")), Point(18 + text_apodization->GetUnscaledTextWidth(), 35));
+	text_apodization_explain= new Text(i18n->TranslateString("Note:").Append(" ").Append(i18n->TranslateString("You can specify multiple functions separated by semicolons.")), Point(18 + text_apodization->GetUnscaledTextWidth(), 35));
 
 	group_apodization->Add(text_apodization);
 	group_apodization->Add(edit_apodization);
@@ -153,7 +153,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	group_lpc		= new GroupBox(i18n->TranslateString("Linear predictor"), Point(7, 79), Size(480, 62));
 
-	text_max_lpc_order	= new Text(String(i18n->TranslateString("Maximum LPC order")).Append(":"), Point(9, 13));
+	text_max_lpc_order	= new Text(i18n->TranslateString("Maximum LPC order").Append(":"), Point(9, 13));
 
 	slider_max_lpc_order	= new Slider(Point(16, 11), Size(250, 0), OR_HORZ, &max_lpc_order, 0, 32);
 	slider_max_lpc_order->onValueChange.Connect(&ConfigureFLAC::SetLPCOrder, this);
@@ -162,7 +162,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	check_exhaustive_model	= new CheckBox(i18n->TranslateString("Exhaustive model search"), Point(323, 11), Size(150, 0), &do_exhaustive_model_search);
 
-	text_qlp_precision	= new Text(String(i18n->TranslateString("Quantized LPC precision")).Append(":"), Point(9, 36));
+	text_qlp_precision	= new Text(i18n->TranslateString("Quantized LPC precision").Append(":"), Point(9, 36));
 
 	slider_qlp_precision	= new Slider(Point(16, 34), Size(250, 0), OR_HORZ, &qlp_coeff_precision, 0, 32);
 	slider_qlp_precision->onValueChange.Connect(&ConfigureFLAC::SetQLPPrecision, this);
@@ -188,14 +188,14 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	group_rice		= new GroupBox(i18n->TranslateString("Residual coding"), Point(7, 153), Size(296, 62));
 
-	text_min_part_order	= new Text(String(i18n->TranslateString("Minimum partition order")).Append(":"), Point(9, 13));
+	text_min_part_order	= new Text(i18n->TranslateString("Minimum partition order").Append(":"), Point(9, 13));
 
 	slider_min_part_order	= new Slider(Point(16, 11), Size(250, 0), OR_HORZ, &min_residual_partition_order, 0, 16);
 	slider_min_part_order->onValueChange.Connect(&ConfigureFLAC::SetRiceOrder, this);
 
 	text_min_part_order_value= new Text(NIL, Point(273, 13));
 
-	text_max_part_order	= new Text(String(i18n->TranslateString("Maximum partition order")).Append(":"), Point(9, 36));
+	text_max_part_order	= new Text(i18n->TranslateString("Maximum partition order").Append(":"), Point(9, 36));
 
 	slider_max_part_order	= new Slider(Point(16, 34), Size(250, 0), OR_HORZ, &max_residual_partition_order, 0, 16);
 	slider_max_part_order->onValueChange.Connect(&ConfigureFLAC::SetRiceOrder, this);

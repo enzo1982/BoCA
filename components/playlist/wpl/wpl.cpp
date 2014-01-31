@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -99,7 +99,7 @@ const Array<BoCA::Track> &BoCA::PlaylistWPL::ReadPlaylist(const String &file)
 		if (!track.origFilename.StartsWith(Directory::GetDirectoryDelimiter()) && !track.origFilename.StartsWith("~") && !track.origFilename.Contains("://"))
 #endif
 		{
-			track.origFilename = String(File(file).GetFilePath()).Append(Directory::GetDirectoryDelimiter()).Append(track.origFilename);
+			track.origFilename = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(track.origFilename);
 		}
 
 		trackList.Add(track);

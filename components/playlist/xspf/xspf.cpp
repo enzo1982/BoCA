@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -79,7 +79,7 @@ const Array<BoCA::Track> &BoCA::PlaylistXSPF::ReadPlaylist(const String &file)
 
 	memory[numBytes - 1] = 0;
 
-	reader.parseMemory(memory, numBytes, &callback, String("file://").Append(EncodeURI(String(file).Replace("\\", "/")).Replace("%3A", ":")));
+	reader.parseMemory(memory, numBytes, &callback, String("file://").Append(EncodeURI(file.Replace("\\", "/")).Replace("%3A", ":")));
 
 	delete [] memory;
 
@@ -95,7 +95,7 @@ const Array<BoCA::Track> &BoCA::PlaylistXSPF::ReadPlaylist(const String &file)
 		if (!track.origFilename.StartsWith(Directory::GetDirectoryDelimiter()) && !track.origFilename.StartsWith("~") && !track.origFilename.Contains("://"))
 #endif
 		{
-			track.origFilename = String(File(file).GetFilePath()).Append(Directory::GetDirectoryDelimiter()).Append(track.origFilename);
+			track.origFilename = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(track.origFilename);
 		}
 	}
 

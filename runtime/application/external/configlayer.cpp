@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -246,7 +246,7 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 					{
 						ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
 
-						arguments.Append(String(param->GetArgument()).Replace("%VALUE", param->GetOptions().GetNth(selection->GetSelectedEntryNumber())->GetValue())).Append(" ");
+						arguments.Append(param->GetArgument().Replace("%VALUE", param->GetOptions().GetNth(selection->GetSelectedEntryNumber())->GetValue())).Append(" ");
 					}
 				}
 
@@ -259,7 +259,7 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 					{
 						Slider		*range = (Slider *) group->GetNthObject(0);
 
-						arguments.Append(String(param->GetArgument()).Replace("%VALUE", String::FromFloat(range->GetValue() * param->GetStepSize()))).Append(" ");
+						arguments.Append(param->GetArgument().Replace("%VALUE", String::FromFloat(range->GetValue() * param->GetStepSize()))).Append(" ");
 					}
 				}
 
