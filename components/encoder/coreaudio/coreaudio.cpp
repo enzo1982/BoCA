@@ -114,8 +114,9 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	Config	*config = Config::Get();
 
+	/* Fill out source format description.
+	 */
 	CA::AudioStreamBasicDescription	 sourceFormat;
-	CA::AudioStreamBasicDescription	 destinationFormat;
 
 	sourceFormat.mFormatID		    = CA::kAudioFormatLinearPCM;
 	sourceFormat.mFormatFlags	    = CA::kLinearPCMFormatFlagIsPacked | (format.bits > 8	  ? CA::kLinearPCMFormatFlagIsSignedInteger : 0) |
@@ -127,14 +128,17 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	sourceFormat.mBytesPerFrame	    = sourceFormat.mChannelsPerFrame * sourceFormat.mBitsPerChannel / 8;
 	sourceFormat.mBytesPerPacket	    = sourceFormat.mFramesPerPacket * sourceFormat.mBytesPerFrame;
 
+	/* Fill out destination format description.
+	 */
+	CA::AudioStreamBasicDescription	 destinationFormat;
+	CA::UInt32			 size = sizeof(destinationFormat);
+
 	destinationFormat.mFormatID	    = config->GetIntValue("CoreAudio", "Codec", 'aac ');
 	destinationFormat.mFormatFlags	    = 0;
 	destinationFormat.mSampleRate	    = GetOutputSampleRate(format.rate);
 	destinationFormat.mChannelsPerFrame = format.channels;
-	destinationFormat.mBitsPerChannel   = 0;
-	destinationFormat.mFramesPerPacket  = 0;
-	destinationFormat.mBytesPerFrame    = 0;
-	destinationFormat.mBytesPerPacket   = 0;
+
+	CA::AudioFormatGetProperty(CA::kAudioFormatProperty_FormatInfo, 0, NIL, &size, &destinationFormat);
 
 	/* Create audio converter object.
 	 */
@@ -150,7 +154,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Get maximum output packet size.
 	 */
-	CA::UInt32	 size = 4;
+	size = 4;
 
 	CA::AudioConverterGetProperty(converter, CA::kAudioConverterPropertyMaximumOutputPacketSize, &size, &bufferSize);
 

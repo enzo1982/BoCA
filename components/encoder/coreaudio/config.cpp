@@ -28,12 +28,12 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 
-	group_id3v2		= new GroupBox(i18n->TranslateString("Info tags"), Point(7, 88), Size(279, 90));
+	group_id3v2		= new GroupBox(i18n->TranslateString("Tags"), Point(7, 88), Size(279, 90));
 
 	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
 	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
 
-	text_note		= new Text(i18n->TranslateString("Note:"), Point(10, 38));
+	text_note		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Note")), Point(10, 38));
 	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
 
 	group_id3v2->SetWidth(Math::Max(240, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22));
@@ -65,13 +65,13 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 	group_extension->Add(option_extension_m4r);
 	group_extension->Add(option_extension_mp4);
 
-	i18n->SetContext("Encoders::CoreAudio::Quality");
+	i18n->SetContext("Encoders::CoreAudio::Codec");
 
 	layer_quality		= new Layer(i18n->TranslateString("Codec"));
 
 	group_codec		= new GroupBox(i18n->TranslateString("Audio codec"), Point(7, 11), Size(group_id3v2->GetWidth(), 43));
 
-	text_codec		= new Text(i18n->TranslateString("Audio codec:"), Point(10, 15));
+	text_codec		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Audio codec")), Point(10, 15));
 
 	combo_codec		= new ComboBox(Point(text_codec->GetUnscaledTextSize().cx + 17, 12), Size(group_codec->GetWidth() - text_codec->GetUnscaledTextSize().cx - 27, 0));
 
@@ -88,9 +88,13 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 
 	for (UnsignedInt i = 0; i < size / sizeof(CA::UInt32); i++)
 	{
-		if	(formats[i] == 'aac ') combo_codec->AddEntry("MPEG4 AAC LC");
-		else if	(formats[i] == 'aach') combo_codec->AddEntry("MPEG4 AAC HE");
-		else if	(formats[i] == 'aacp') combo_codec->AddEntry("MPEG4 AAC HEv2");
+		if	(formats[i] == 'aac ') combo_codec->AddEntry("MPEG4 AAC Low Complexity");
+		else if	(formats[i] == 'aach') combo_codec->AddEntry("MPEG4 AAC High Efficiency");
+		else if	(formats[i] == 'aacp') combo_codec->AddEntry("MPEG4 AAC High Efficiency v2");
+		else if	(formats[i] == 'aacl') combo_codec->AddEntry("MPEG4 AAC Low Delay");
+		else if	(formats[i] == 'aace') combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay");
+		else if	(formats[i] == 'aacf') combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay SBR");
+		else if	(formats[i] == 'aacs') combo_codec->AddEntry("MPEG4 AAC Spatial");
 		else if (formats[i] == 'alac') combo_codec->AddEntry("Apple Lossless Audio Codec");
 		else			       continue;
 
@@ -108,7 +112,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 66), Size(group_id3v2->GetWidth(), 43));
 
-	text_bitrate		= new Text(i18n->TranslateString("Bitrate:"), Point(10, 15));
+	text_bitrate		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Bitrate")), Point(10, 15));
 
 	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 97 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 1, 2560);
 	slider_bitrate->onValueChange.Connect(&ConfigureCoreAudio::SetBitrate, this);
@@ -227,7 +231,11 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 
 	if	(codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aac ' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aach' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacp')   group_mp4->Activate();
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacp' ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacl' ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aace' ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacf' ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacs')   group_mp4->Activate();
 	else if (codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'alac') { group_mp4->Deactivate(); fileFormat = 1; }
 
 	SetBitrate();
