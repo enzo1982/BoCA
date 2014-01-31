@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -24,7 +24,7 @@ BoCA::ConfigureVOAAC::ConfigureVOAAC()
 
 	i18n->SetContext("Encoders::VOAACEnc");
 
-	group_id3v2		= new GroupBox(i18n->TranslateString("Info tags"), Point(7, 143), Size(281, 90));
+	group_id3v2		= new GroupBox(i18n->TranslateString("Tags"), Point(7, 143), Size(281, 90));
 
 	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
 	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
