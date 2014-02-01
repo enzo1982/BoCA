@@ -24,6 +24,7 @@ namespace BoCA
 
 			CA::AudioFileID		 audioFile;
 			CA::AudioConverterRef	 converter;
+			CA::AudioBufferList	*buffers;
 
 			Buffer<unsigned char>	 buffer;
 			CA::UInt32		 bufferSize;

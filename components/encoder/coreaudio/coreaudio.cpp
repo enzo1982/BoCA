@@ -86,6 +86,7 @@ BoCA::EncoderCoreAudio::EncoderCoreAudio()
 	audioFile      = NIL;
 	converter      = NIL;
 
+	buffers	       = NIL;
 	bufferSize     = 0;
 	bytesConsumed  = 0;
 
@@ -116,7 +117,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Fill out source format description.
 	 */
-	CA::AudioStreamBasicDescription	 sourceFormat;
+	CA::AudioStreamBasicDescription	 sourceFormat = { 0 };
 
 	sourceFormat.mFormatID		    = CA::kAudioFormatLinearPCM;
 	sourceFormat.mFormatFlags	    = CA::kLinearPCMFormatFlagIsPacked | (format.bits > 8	  ? CA::kLinearPCMFormatFlagIsSignedInteger : 0) |
@@ -130,15 +131,15 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Fill out destination format description.
 	 */
-	CA::AudioStreamBasicDescription	 destinationFormat;
-	CA::UInt32			 size = sizeof(destinationFormat);
+	CA::AudioStreamBasicDescription	 destinationFormat = { 0 };
 
 	destinationFormat.mFormatID	    = config->GetIntValue("CoreAudio", "Codec", 'aac ');
-	destinationFormat.mFormatFlags	    = 0;
 	destinationFormat.mSampleRate	    = GetOutputSampleRate(format.rate);
 	destinationFormat.mChannelsPerFrame = format.channels;
 
-	CA::AudioFormatGetProperty(CA::kAudioFormatProperty_FormatInfo, 0, NIL, &size, &destinationFormat);
+	CA::UInt32	 formatSize = sizeof(destinationFormat);
+
+	CA::AudioFormatGetProperty(CA::kAudioFormatProperty_FormatInfo, 0, NIL, &formatSize, &destinationFormat);
 
 	/* Create audio converter object.
 	 */
@@ -152,15 +153,11 @@ Bool BoCA::EncoderCoreAudio::Activate()
 		return False;
 	}
 
-	/* Get maximum output packet size.
-	 */
-	size = 4;
-
-	CA::AudioConverterGetProperty(converter, CA::kAudioConverterPropertyMaximumOutputPacketSize, &size, &bufferSize);
-
 	/* Set bitrate if format does support bitrates.
 	 */
-	if (CA::AudioFormatGetPropertyInfo(CA::kAudioFormatProperty_AvailableEncodeBitRates, sizeof(destinationFormat.mFormatID), &destinationFormat.mFormatID, &size) == 0)
+	CA::UInt32	 bitratesSize = 0;
+
+	if (CA::AudioFormatGetPropertyInfo(CA::kAudioFormatProperty_AvailableEncodeBitRates, sizeof(destinationFormat.mFormatID), &destinationFormat.mFormatID, &bitratesSize) == 0)
 	{
 		CA::UInt32	 bitrate = config->GetIntValue("CoreAudio", "Bitrate", 128) * 1000;
 
@@ -197,7 +194,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Get magic cookie and supply it to audio file.
 	 */
-	CA::UInt32	 cookieSize = 4;
+	CA::UInt32	 cookieSize = 0;
 
 	if (CA::AudioConverterGetPropertyInfo(converter, CA::kAudioConverterCompressionMagicCookie, &cookieSize, NIL) == 0)
 	{
@@ -209,6 +206,22 @@ Bool BoCA::EncoderCoreAudio::Activate()
 		delete [] cookie;
 	}
 
+	/* Get maximum output packet size.
+	 */
+	CA::UInt32	 valueSize = 4;
+
+	CA::AudioConverterGetProperty(converter, CA::kAudioConverterPropertyMaximumOutputPacketSize, &valueSize, &bufferSize);
+
+	/* Set up buffer for Core Audio.
+	 */
+	buffers = (CA::AudioBufferList	*) new unsigned char [sizeof(CA::AudioBufferList) + sizeof(CA::AudioBuffer)];
+
+	buffers->mNumberBuffers = 1;
+
+	buffers->mBuffers[0].mData	     = new unsigned char [bufferSize];
+	buffers->mBuffers[0].mDataByteSize   = bufferSize;
+	buffers->mBuffers[0].mNumberChannels = format.channels;
+
 	packetsWritten = 0;
 	totalSamples   = 0;
 
@@ -217,20 +230,14 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 Bool BoCA::EncoderCoreAudio::Deactivate()
 {
-	Config		*config = Config::Get();
-	const Format	&format = track.GetFormat();
+	Config	*config = Config::Get();
 
 	/* Convert final frames.
 	 */
 	CA::UInt32				 packets = 1;
-	CA::AudioBufferList			*buffers = (CA::AudioBufferList	*) new unsigned char [sizeof(CA::AudioBufferList) + sizeof(CA::AudioBuffer)];
 	CA::AudioStreamPacketDescription	 packet;
 
-	buffers->mNumberBuffers = 1;
-
-        buffers->mBuffers[0].mData	     = new unsigned char [bufferSize];
-        buffers->mBuffers[0].mDataByteSize   = bufferSize;
-        buffers->mBuffers[0].mNumberChannels = format.channels;
+	buffers->mBuffers[0].mDataByteSize = bufferSize;
 
 	while (CA::AudioConverterFillComplexBuffer(converter, &AudioConverterComplexInputDataProc, this, &packets, buffers, &packet) == 0)
 	{
@@ -342,8 +349,6 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	const Format	&format = track.GetFormat();
-
 	/* Configure buffer.
 	 */
 	buffer.Resize(buffer.Size() + size);
@@ -360,14 +365,9 @@ Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data, Int size)
 	Int	 totalOutBytes = 0;
 
 	CA::UInt32				 packets = 1;
-	CA::AudioBufferList			*buffers = (CA::AudioBufferList	*) new unsigned char [sizeof(CA::AudioBufferList) + sizeof(CA::AudioBuffer)];
 	CA::AudioStreamPacketDescription	 packet;
 
-	buffers->mNumberBuffers = 1;
-
-        buffers->mBuffers[0].mData	     = new unsigned char [bufferSize];
-        buffers->mBuffers[0].mDataByteSize   = bufferSize;
-        buffers->mBuffers[0].mNumberChannels = format.channels;
+	buffers->mBuffers[0].mDataByteSize = bufferSize;
 
 	while (CA::AudioConverterFillComplexBuffer(converter, &AudioConverterComplexInputDataProc, this, &packets, buffers, &packet) == 0)
 	{
@@ -382,9 +382,6 @@ Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 		buffers->mBuffers[0].mDataByteSize = bufferSize;
 	}
-
-	delete [] (unsigned char *) buffers->mBuffers[0].mData;
-	delete [] (unsigned char *) buffers;
 
 	return totalOutBytes;
 }
