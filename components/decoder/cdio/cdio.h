@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -10,8 +10,8 @@
 
 #include <boca.h>
 
-#include <cdio/cdda.h>
-#include <cdio/paranoia.h>
+#include <cdio/cdio.h>
+#include <cdio/paranoia/paranoia.h>
 
 BoCA_BEGIN_COMPONENT(DecoderCDIO)
 
@@ -29,6 +29,11 @@ namespace BoCA
 
 			Int				 nextSector;
 			Int				 sectorsLeft;
+
+			Int				 readOffset;
+
+			Int				 skipSamples;
+			Int				 prependSamples;
 
 			Bool				 GetTrackSectors(Int &, Int &);
 		public:

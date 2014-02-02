@@ -15,7 +15,10 @@
 
 #include <unistd.h>
 #include <limits.h>
-#include <arpa/inet.h>
+
+#ifndef __WIN32__
+#	include <arpa/inet.h>
+#endif
 
 #ifndef PATH_MAX
 #	define PATH_MAX 32768
@@ -64,6 +67,7 @@ const Array<String> &BoCA::DeviceInfoCDIO::FindDrives()
 	{
 		String		 deviceName = deviceNames[i];
 
+#ifndef __WIN32__
 		/* Resolve link if it is one.
 		 */
 		Buffer<char>	 buffer(PATH_MAX + 1);
@@ -73,8 +77,9 @@ const Array<String> &BoCA::DeviceInfoCDIO::FindDrives()
 		if (readlink(deviceName, buffer, buffer.Size() - 1) >= 0)
 		{
 			if (buffer[0] == '/') deviceName = buffer;
-			else		      deviceName = File(deviceName).GetFilePath().Append("/").Append(buffer);
+			else		      deviceName = File(deviceName).GetFilePath().Append("/").Append((char *) buffer);
 		}
+#endif
 
 		/* Check if we aleady know this device.
 		 */

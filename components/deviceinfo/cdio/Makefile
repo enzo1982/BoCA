@@ -16,6 +16,10 @@ DEFINE	  =
 # Enter additional library dependencies here:
 LIBS	  = -lcdio
 
+ifeq ($(BUILD_WIN32),True)
+	LIBS += -lws2_32 -lwinmm
+endif
+
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =
 ALLCMD2   =

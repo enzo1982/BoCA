@@ -12,7 +12,7 @@
 #include <smooth/dll.h>
 
 #include <cdio/cdio.h>
-#include <cdio/paranoia.h>
+#include <cdio/paranoia/paranoia.h>
 
 #include <unistd.h>
 #include <limits.h>
@@ -73,6 +73,7 @@ const Array<String> &BoCA::DecoderCDIO::FindDrives()
 	{
 		String		 deviceName = deviceNames[i];
 
+#ifndef __WIN32__
 		/* Resolve link if it is one.
 		 */
 		Buffer<char>	 buffer(PATH_MAX + 1);
@@ -82,8 +83,9 @@ const Array<String> &BoCA::DecoderCDIO::FindDrives()
 		if (readlink(deviceName, buffer, buffer.Size() - 1) >= 0)
 		{
 			if (buffer[0] == '/') deviceName = buffer;
-			else		      deviceName = File(deviceName).GetFilePath().Append("/").Append(buffer);
+			else		      deviceName = File(deviceName).GetFilePath().Append("/").Append((char *) buffer);
 		}
+#endif
 
 		/* Check if we aleady know this device.
 		 */
@@ -268,24 +270,60 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 	info.disc	= 1;
 	info.numDiscs	= 1;
 
-	track.SetInfo(info);
-
 	/* Delete DeviceInfo component.
 	 */
 	boca.DeleteComponent(component);
+
+	/* Read ISRC if requested.
+	 */
+	Config	*config = Config::Get();
+
+	if (config->GetIntValue("Ripper", "ReadISRC", 0))
+	{
+		const Array<String>	&driveNames = FindDrives();
+
+		CdIo_t	*cd = cdio_open(driveNames.GetNth(track.drive), DRIVER_UNKNOWN);
+
+		if (cd != NIL)
+		{
+			char	*isrc = cdio_get_track_isrc(cd, track.cdTrack);
+
+			if (isrc != NIL)
+			{
+				/* Check if the ISRC is valid.
+				 */
+				if (isrc[0] >= 'A' && isrc[0] <= 'Z' &&
+				    isrc[1] >= 'A' && isrc[1] <= 'Z')
+				{
+					info.isrc = isrc;
+				}
+
+				free(isrc);
+			}
+
+			cdio_destroy(cd);
+		}
+	}
+
+	track.SetInfo(info);
 
 	return Success();
 }
 
 BoCA::DecoderCDIO::DecoderCDIO()
 {
-	configLayer = NIL;
+	configLayer	= NIL;
 
-	packageSize = 0;
+	packageSize	= 0;
 
-	cd	    = NIL;
-	drive	    = NIL;
-	paranoia    = NIL;
+	cd		= NIL;
+	drive		= NIL;
+	paranoia	= NIL;
+
+	readOffset	= 0;
+
+	skipSamples	= 0;
+	prependSamples	= 0;
 }
 
 BoCA::DecoderCDIO::~DecoderCDIO()
@@ -306,9 +344,6 @@ Bool BoCA::DecoderCDIO::Activate()
 
 	if (!GetTrackSectors(startSector, endSector)) return False;
 
-	nextSector  = startSector;
-	sectorsLeft = endSector - startSector + 1;
-
 	/* Set ripping speed.
 	 */
 	Config	*config = Config::Get();
@@ -317,6 +352,18 @@ Bool BoCA::DecoderCDIO::Activate()
 
 	if (speed > 0)	cdio_set_speed(cd, speed);
 	else		cdio_set_speed(cd, -1);
+
+	/* Calculate offset values.
+	 */
+	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+
+	startSector += readOffset / 588;
+	endSector   += readOffset / 588;
+
+	if	(readOffset % 588 < 0) { startSector--; skipSamples = 588 + readOffset % 588; }
+	else if (readOffset % 588 > 0) { endSector++;	skipSamples = 	    readOffset % 588; }
+
+	if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
 
 	/* Enable paranoia mode.
 	 */
@@ -349,6 +396,11 @@ Bool BoCA::DecoderCDIO::Activate()
 		cdio_paranoia_modeset(paranoia, paranoiaMode);
 	}
 
+	/* Set nextSector and sectors left to be read.
+	 */
+	nextSector  = startSector;
+	sectorsLeft = endSector - startSector + 1;
+
 	return True;
 }
 
@@ -369,6 +421,8 @@ Bool BoCA::DecoderCDIO::Deactivate()
 
 Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 {
+	Config	*config = Config::Get();
+
 	Int	 startSector = 0;
 	Int	 endSector   = 0;
 
@@ -376,10 +430,26 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 
 	startSector += samplePosition / 588;
 
+	/* Calculate offset values.
+	 */
+	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+
+	startSector += readOffset / 588;
+	endSector   += readOffset / 588;
+
+	if	(readOffset % 588 < 0) { startSector--; skipSamples = 588 + readOffset % 588; }
+	else if (readOffset % 588 > 0) { endSector++;	skipSamples = 	    readOffset % 588; }
+
+	if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
+
+	/* Set nextSector and sectors left to be read.
+	 */
 	nextSector  = startSector;
 	sectorsLeft = endSector - startSector + 1;
 
 	if (paranoia != NIL) cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
+
+	skipSamples += samplePosition % 588;
 
 	return True;
 }
@@ -388,27 +458,45 @@ Int BoCA::DecoderCDIO::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (inBytes >= track.fileSize) return -1;
 
+	/* Set up buffer respecting empty samples to prepend.
+	 */
 	Int	 sectors = Math::Min(sectorsLeft, paranoia == NIL ? 26 : 1);
 
-	data.Resize(sectors * 2352);
+	Int	 prependBytes = 4 * prependSamples;
+	Int	 skipBytes    = 4 * skipSamples;
 
+	prependSamples = 0;
+	skipSamples    = 0;
+
+	data.Resize(sectors * 2352 + prependBytes);
+
+	if (prependBytes > 0) data.Zero();
+
+	/* Rip chunk.
+	 */
 	if (paranoia != NIL)
 	{
 		int16_t	*audio = cdio_paranoia_read(paranoia, NIL);
 
-		memcpy(data, audio, data.Size());
+		memcpy(data + prependBytes, audio, data.Size());
 	}
 	else
 	{
-		cdio_read_audio_sectors(cd, data, nextSector, sectors);
+		cdio_read_audio_sectors(cd, data + prependBytes, nextSector, sectors);
 	}
 
 	nextSector  += sectors;
 	sectorsLeft -= sectors;
 
-	inBytes += data.Size();
+	/* Strip samples to skip from the beginning.
+	 */
+	Int	 dataBytes = sectors * 2352 + prependBytes - skipBytes;
 
-	return data.Size();
+	if (skipBytes > 0) memmove(data, data + skipBytes, dataBytes);
+
+	inBytes += dataBytes;
+
+	return dataBytes;
 }
 
 Bool BoCA::DecoderCDIO::GetTrackSectors(Int &startSector, Int &endSector)

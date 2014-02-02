@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -28,6 +28,9 @@ namespace BoCA
 			ComboBox	*combo_drive;
 			CheckBox	*check_speed;
 			ComboBox	*combo_speed;
+			CheckBox	*check_offset;
+			EditBox		*edit_offset;
+			Text		*text_offset_samples;
 
 			GroupBox	*group_ripping;
 			CheckBox	*check_paranoia;
@@ -39,16 +42,26 @@ namespace BoCA
 			CheckBox	*check_autoRead;
 			CheckBox	*check_autoRip;
 
+			GroupBox	*group_cdinfo;
+			CheckBox	*check_readISRC;
+
+			Bool		 useoffset;
 			Bool		 setspeed;
 			Bool		 cdparanoia;
 			Bool		 jitter;
 			Bool		 swapchannels;
 			Bool		 autoRead;
 			Bool		 autoRip;
+			Bool		 readISRC;
 
+			Array<Bool>	 driveOffsetUsed;
+			Array<Int>	 driveOffsets;
 			Array<Int>	 driveSpeeds;
 		slots:
 			Void		 SelectDrive();
+
+			Void		 ToggleUseOffset();
+			Void		 ChangeOffset();
 
 			Void		 ToggleSetSpeed();
 			Void		 SelectSpeed();
