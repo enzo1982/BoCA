@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -18,29 +18,30 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 
 	for (Int i = 0; i < config->cdrip_numdrives; i++)
 	{
+		driveOffsetUsed.Add(config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), 0));
 		driveOffsets.Add(config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
 		driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
 	}
 
-	useoffset	= driveOffsets.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
+	useoffset	= driveOffsetUsed.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 	setspeed	= driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 
 	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
 	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
 
-	jitter		= config->GetIntValue("CDRip", "JitterCorrection", False);
-	swapchannels	= config->GetIntValue("CDRip", "SwapChannels", False);
+	jitter		= config->GetIntValue("Ripper", "JitterCorrection", False);
+	swapchannels	= config->GetIntValue("Ripper", "SwapChannels", False);
 
-	ntscsi		= config->GetIntValue("CDRip", "UseNTSCSI", True);
+	ntscsi		= config->GetIntValue("Ripper", "UseNTSCSI", True);
 
-	locktray	= config->GetIntValue("CDRip", "LockTray", True);
-	autoEject	= config->GetIntValue("CDRip", "EjectAfterRipping", False);
+	locktray	= config->GetIntValue("Ripper", "LockTray", True);
+	autoEject	= config->GetIntValue("Ripper", "EjectAfterRipping", False);
 
-	readCDText	= config->GetIntValue("CDRip", "ReadCDText", True);
-	readCDPlayerIni	= config->GetIntValue("CDRip", "ReadCDPlayerIni", True);
-	readISRC	= config->GetIntValue("CDRip", "ReadISRC", False);
+	readCDText	= config->GetIntValue("Ripper", "ReadCDText", True);
+	readCDPlayerIni	= config->GetIntValue("Ripper", "ReadCDPlayerIni", True);
+	readISRC	= config->GetIntValue("Ripper", "ReadISRC", False);
 
-	cdparanoia	= config->GetIntValue("CDRip", "CDParanoia", False);
+	cdparanoia	= config->GetIntValue("Ripper", "CDParanoia", False);
 
 	I18n	*i18n = I18n::Get();
 
@@ -112,7 +113,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No verify"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No scratch repair"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("Full cdparanoia mode"));
-	combo_paranoia_mode->SelectNthEntry(config->GetIntValue("CDRip", "CDParanoiaMode", 3));
+	combo_paranoia_mode->SelectNthEntry(config->GetIntValue("Ripper", "CDParanoiaMode", 3));
 
 	ToggleParanoia();
 
@@ -203,7 +204,7 @@ Void BoCA::ConfigureCDRip::SelectDrive()
 	edit_offset->SetText(String::FromInt(driveOffsets.GetNth(combo_drive->GetSelectedEntryNumber())));
 	combo_speed->SelectNthEntry((48 - driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber())) / 4);
 
-	check_offset->SetChecked(driveOffsets.GetNth(combo_drive->GetSelectedEntryNumber()));
+	check_offset->SetChecked(driveOffsetUsed.GetNth(combo_drive->GetSelectedEntryNumber()));
 	check_speed->SetChecked(driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber()));
 
 	ToggleUseOffset();
@@ -212,6 +213,8 @@ Void BoCA::ConfigureCDRip::SelectDrive()
 
 Void BoCA::ConfigureCDRip::ToggleUseOffset()
 {
+	driveOffsetUsed.SetNth(combo_drive->GetSelectedEntryNumber(), useoffset);
+
 	if (useoffset)
 	{
 		edit_offset->Activate();
@@ -274,6 +277,7 @@ Int BoCA::ConfigureCDRip::SaveSettings()
 
 	for (Int i = 0; i < config->cdrip_numdrives; i++)
 	{
+		config->SetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), driveOffsetUsed.GetNth(i));
 		config->SetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), driveOffsets.GetNth(i));
 		config->SetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
 	}
@@ -281,20 +285,20 @@ Int BoCA::ConfigureCDRip::SaveSettings()
 	config->SetIntValue("Ripper", "AutoReadContents", autoRead);
 	config->SetIntValue("Ripper", "AutoRip", autoRip);
 
-	config->SetIntValue("CDRip", "JitterCorrection", jitter);
-	config->SetIntValue("CDRip", "SwapChannels", swapchannels);
+	config->SetIntValue("Ripper", "JitterCorrection", jitter);
+	config->SetIntValue("Ripper", "SwapChannels", swapchannels);
 
-	config->SetIntValue("CDRip", "UseNTSCSI", ntscsi);
+	config->SetIntValue("Ripper", "UseNTSCSI", ntscsi);
 
-	config->SetIntValue("CDRip", "LockTray", locktray);
-	config->SetIntValue("CDRip", "EjectAfterRipping", autoEject);
+	config->SetIntValue("Ripper", "LockTray", locktray);
+	config->SetIntValue("Ripper", "EjectAfterRipping", autoEject);
 
-	config->SetIntValue("CDRip", "ReadCDText", readCDText);
-	config->SetIntValue("CDRip", "ReadCDPlayerIni", readCDPlayerIni);
-	config->SetIntValue("CDRip", "ReadISRC", readISRC);
+	config->SetIntValue("Ripper", "ReadCDText", readCDText);
+	config->SetIntValue("Ripper", "ReadCDPlayerIni", readCDPlayerIni);
+	config->SetIntValue("Ripper", "ReadISRC", readISRC);
 
-	config->SetIntValue("CDRip", "CDParanoia", cdparanoia);
-	config->SetIntValue("CDRip", "CDParanoiaMode", combo_paranoia_mode->GetSelectedEntryNumber());
+	config->SetIntValue("Ripper", "CDParanoia", cdparanoia);
+	config->SetIntValue("Ripper", "CDParanoiaMode", combo_paranoia_mode->GetSelectedEntryNumber());
 
 	return Success();
 }

@@ -56,17 +56,17 @@ Void smooth::AttachDLL(Void *instance)
 
 		GetVersionExA(&vInfo);
 
-		if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->SetIntValue("CDRip", "UseNTSCSI", False);
+		if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->SetIntValue("Ripper", "UseNTSCSI", False);
 
-		error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
+		error = ex_CR_Init(config->GetIntValue("Ripper", "UseNTSCSI", True));
 
 		if (error != CDEX_OK		 &&
 		    error != CDEX_ACCESSDENIED	 &&
 		    vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
 		{
-			config->SetIntValue("CDRip", "UseNTSCSI", !config->GetIntValue("CDRip", "UseNTSCSI", True));
+			config->SetIntValue("Ripper", "UseNTSCSI", !config->GetIntValue("Ripper", "UseNTSCSI", True));
 
-			error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
+			error = ex_CR_Init(config->GetIntValue("Ripper", "UseNTSCSI", True));
 		}
 
 		if	(error == CDEX_ACCESSDENIED)			BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");

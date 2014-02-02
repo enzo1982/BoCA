@@ -64,17 +64,17 @@ Void smooth::AttachDLL(Void *instance)
 
 		GetVersionExA(&vInfo);
 
-		if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->SetIntValue("CDRip", "UseNTSCSI", False);
+		if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->SetIntValue("Ripper", "UseNTSCSI", False);
 
-		error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
+		error = ex_CR_Init(config->GetIntValue("Ripper", "UseNTSCSI", True));
 
 		if (error != CDEX_OK		 &&
 		    error != CDEX_ACCESSDENIED	 &&
 		    vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
 		{
-			config->SetIntValue("CDRip", "UseNTSCSI", !config->GetIntValue("CDRip", "UseNTSCSI", True));
+			config->SetIntValue("Ripper", "UseNTSCSI", !config->GetIntValue("Ripper", "UseNTSCSI", True));
 
-			error = ex_CR_Init(config->GetIntValue("CDRip", "UseNTSCSI", True));
+			error = ex_CR_Init(config->GetIntValue("Ripper", "UseNTSCSI", True));
 		}
 
 		if	(error == CDEX_ACCESSDENIED)			BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
@@ -248,10 +248,10 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		Int	 discid = ComputeDiscID();
 
-		if (config->GetIntValue("CDRip", "ReadCDText", True)	  && cdTextDiscID   != discid) { cdText.ReadCDText();   cdTextDiscID   = discid; }
-		if (config->GetIntValue("CDRip", "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(); cdPlayerDiscID = discid; }
+		if (config->GetIntValue("Ripper", "ReadCDText", True)	  && cdTextDiscID   != discid) { cdText.ReadCDText();   cdTextDiscID   = discid; }
+		if (config->GetIntValue("Ripper", "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(); cdPlayerDiscID = discid; }
 
-		if (config->GetIntValue("CDRip", "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
+		if (config->GetIntValue("Ripper", "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 		{
 			const CDInfo	&cdInfo = cdText.GetCDInfo();
 
@@ -261,7 +261,7 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 			info.title  = cdInfo.GetTrackTitle(trackNumber);
 			info.album  = cdInfo.GetTitle();
 		}
-		else if (config->GetIntValue("CDRip", "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
+		else if (config->GetIntValue("Ripper", "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 		{
 			const CDInfo	&cdInfo = cdPlayer.GetCDInfo();
 
@@ -273,7 +273,7 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Read ISRC if requested.
 	 */
-	if (config->GetIntValue("CDRip", "ReadISRC", 0))
+	if (config->GetIntValue("Ripper", "ReadISRC", 0))
 	{
 		ISRC	 data;
 
@@ -436,7 +436,7 @@ Bool BoCA::DecoderCDRip::OpenRipper(Int startSector, Int endSector)
 		CDROMPARAMS	 params;
 		int		 nParanoiaMode = PARANOIA_MODE_FULL ^ PARANOIA_MODE_NEVERSKIP;
 
-		switch (config->GetIntValue("CDRip", "CDParanoiaMode", 3))
+		switch (config->GetIntValue("Ripper", "CDParanoiaMode", 3))
 		{
 			case 0:
 				nParanoiaMode = PARANOIA_MODE_OVERLAP;
@@ -451,12 +451,12 @@ Bool BoCA::DecoderCDRip::OpenRipper(Int startSector, Int endSector)
 
 		ex_CR_GetCDROMParameters(&params);
 
-		params.nRippingMode		= config->GetIntValue("CDRip", "CDParanoia", False);
+		params.nRippingMode		= config->GetIntValue("Ripper", "CDParanoia", False);
 		params.nParanoiaMode		= nParanoiaMode;
-		params.bSwapLefRightChannel	= config->GetIntValue("CDRip", "SwapChannels", False);
-		params.bJitterCorrection	= config->GetIntValue("CDRip", "JitterCorrection", False);
-//		params.bDetectJitterErrors	= config->GetIntValue("CDRip", "DetectJitterErrors", True);
-//		params.bDetectC2Errors		= config->GetIntValue("CDRip", "DetectC2Errors", True);
+		params.bSwapLefRightChannel	= config->GetIntValue("Ripper", "SwapChannels", False);
+		params.bJitterCorrection	= config->GetIntValue("Ripper", "JitterCorrection", False);
+//		params.bDetectJitterErrors	= config->GetIntValue("Ripper", "DetectJitterErrors", True);
+//		params.bDetectC2Errors		= config->GetIntValue("Ripper", "DetectC2Errors", True);
 		params.nSpeed			= config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 		params.bEnableMultiRead		= False;
 		params.nMultiReadCount		= 0;
@@ -469,11 +469,11 @@ Bool BoCA::DecoderCDRip::OpenRipper(Int startSector, Int endSector)
 
 		/* Lock tray if requested.
 		 */
-		if (config->GetIntValue("CDRip", "LockTray", True)) ex_CR_LockCD(True);
+		if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(True);
 
 		/* Calculate offset values.
 		 */
-		readOffset = config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0);
+		readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
 
 		startSector += readOffset / 588;
 		endSector   += readOffset / 588;
@@ -505,7 +505,7 @@ Bool BoCA::DecoderCDRip::CloseRipper()
 		{
 			BoCA::Config	*config = BoCA::Config::Get();
 
-			Bool	 noCacheWarning = config->GetIntValue("CDRip", "NoCacheWarning", False);
+			Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
 
 			if (!noCacheWarning)
 			{
@@ -517,7 +517,7 @@ Bool BoCA::DecoderCDRip::CloseRipper()
 
 				msgBox->ShowDialog();
 
-				config->SetIntValue("CDRip", "NoCacheWarning", noCacheWarning);
+				config->SetIntValue("Ripper", "NoCacheWarning", noCacheWarning);
 				config->SaveSettings();
 
 				Object::DeleteObject(msgBox);
@@ -526,7 +526,7 @@ Bool BoCA::DecoderCDRip::CloseRipper()
 
 		ex_CR_CloseRipper();
 
-		if (Config::Get()->GetIntValue("CDRip", "LockTray", True)) ex_CR_LockCD(False);
+		if (Config::Get()->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(False);
 
 		ripperOpen = False;
 	}
