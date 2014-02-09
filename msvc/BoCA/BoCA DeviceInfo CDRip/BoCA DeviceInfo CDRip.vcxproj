@@ -37,8 +37,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
@@ -90,11 +88,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\components\deviceinfo\cdrip\cdrip_info.cpp" />
+    <ClCompile Include="..\..\..\components\deviceinfo\cdrip\cdrip.cpp" />
     <ClCompile Include="..\..\..\components\deviceinfo\cdrip\dllinterface.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\components\deviceinfo\cdrip\cdrip_info.h" />
+    <ClInclude Include="..\..\..\components\deviceinfo\cdrip\cdrip.h" />
     <ClInclude Include="..\..\..\components\deviceinfo\cdrip\dllinterface.h" />
   </ItemGroup>
   <ItemGroup>

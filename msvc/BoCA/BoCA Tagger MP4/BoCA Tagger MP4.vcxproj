@@ -37,8 +37,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
@@ -88,11 +86,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\components\tagger\mp4\dllinterface.cpp" />
-    <ClCompile Include="..\..\..\components\tagger\mp4\mp4_tag.cpp" />
+    <ClCompile Include="..\..\..\components\tagger\mp4\mp4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\components\tagger\mp4\dllinterface.h" />
-    <ClInclude Include="..\..\..\components\tagger\mp4\mp4_tag.h" />
+    <ClInclude Include="..\..\..\components\tagger\mp4\mp4.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BoCA\BoCA.vcxproj">

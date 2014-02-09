@@ -10,15 +10,9 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\components\playlist\m3u\m3u.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\components\playlist\m3u\m3u.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{ECFC35DF-E414-4CF3-84F4-81749657D8F5}</ProjectGuid>
-    <RootNamespace>BoCAPlaylistM3U</RootNamespace>
+    <ProjectGuid>{D17DD4D0-7F58-4D8D-8E5D-E47434A50C5D}</ProjectGuid>
+    <RootNamespace>BoCADecoderOpus</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -43,21 +37,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>boca_playlist_m3u.1.0</TargetName>
+    <TargetName>boca_decoder_opus.1.0</TargetName>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level1</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../components/decoder/opus;../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;UNICODE;_UNICODE;BOCA_COMPONENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../../../smooth/msvc/smooth/Debug;../debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>smooth.lib;boca.1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -73,6 +66,19 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\components\decoder\opus\dllinterface.h" />
+    <ClInclude Include="..\..\..\components\decoder\opus\ogg\ogg.h" />
+    <ClInclude Include="..\..\..\components\decoder\opus\ogg\os_types.h" />
+    <ClInclude Include="..\..\..\components\decoder\opus\opus.h" />
+    <ClInclude Include="..\..\..\components\decoder\opus\opus\opus.h" />
+    <ClInclude Include="..\..\..\components\decoder\opus\opus\opus_defines.h" />
+    <ClInclude Include="..\..\..\components\decoder\opus\opus\opus_types.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\components\decoder\opus\dllinterface.cpp" />
+    <ClCompile Include="..\..\..\components\decoder\opus\opus.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

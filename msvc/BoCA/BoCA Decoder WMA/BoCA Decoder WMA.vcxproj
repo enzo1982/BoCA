@@ -36,8 +36,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">boca_decoder_wma.1.0</TargetName>
@@ -81,13 +79,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\components\decoder\wma\dllinterface.cpp" />
-    <ClCompile Include="..\..\..\components\decoder\wma\wma_in.cpp" />
-    <ClCompile Include="..\..\..\components\decoder\wma\wma_reader.cpp" />
+    <ClCompile Include="..\..\..\components\decoder\wma\wma.cpp" />
+    <ClCompile Include="..\..\..\components\decoder\wma\wmareader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\components\decoder\wma\dllinterface.h" />
-    <ClInclude Include="..\..\..\components\decoder\wma\wma_in.h" />
-    <ClInclude Include="..\..\..\components\decoder\wma\wma_reader.h" />
+    <ClInclude Include="..\..\..\components\decoder\wma\wma.h" />
+    <ClInclude Include="..\..\..\components\decoder\wma\wmareader.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BoCA\BoCA.vcxproj">

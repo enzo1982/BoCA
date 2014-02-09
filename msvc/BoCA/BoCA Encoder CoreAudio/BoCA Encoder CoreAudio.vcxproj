@@ -10,15 +10,9 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\components\playlist\m3u\m3u.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\components\playlist\m3u\m3u.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{ECFC35DF-E414-4CF3-84F4-81749657D8F5}</ProjectGuid>
-    <RootNamespace>BoCAPlaylistM3U</RootNamespace>
+    <ProjectGuid>{C1C0D366-24C3-429A-944F-E057971A4D2B}</ProjectGuid>
+    <RootNamespace>BoCAEncoderCoreAudio</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -43,21 +37,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>boca_playlist_m3u.1.0</TargetName>
+    <TargetName>boca_encoder_coreaudio.1.0</TargetName>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level1</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../components/encoder/coreaudio;../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;UNICODE;_UNICODE;BOCA_COMPONENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../../../smooth/msvc/smooth/Debug;../debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>smooth.lib;boca.1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -73,6 +66,22 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\config.h" />
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\coreaudio.h" />
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\CoreAudio\AudioConverter.h" />
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\CoreAudio\AudioFile.h" />
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\CoreAudio\AudioFormat.h" />
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\CoreAudio\CoreAudioTypes.h" />
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\CoreAudio\CoreFoundation.h" />
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\CoreAudio\MacTypes.h" />
+    <ClInclude Include="..\..\..\components\encoder\coreaudio\dllinterface.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\components\encoder\coreaudio\config.cpp" />
+    <ClCompile Include="..\..\..\components\encoder\coreaudio\coreaudio.cpp" />
+    <ClCompile Include="..\..\..\components\encoder\coreaudio\dllinterface.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -37,8 +37,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
@@ -90,7 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\components\decoder\cdrip\cdrip_in.cpp" />
+    <ClCompile Include="..\..\..\components\decoder\cdrip\cdrip.cpp" />
     <ClCompile Include="..\..\..\components\decoder\cdrip\config.cpp" />
     <ClCompile Include="..\..\..\components\decoder\cdrip\dllinterface.cpp" />
     <ClCompile Include="..\..\..\components\decoder\cdrip\info\cdinfo.cpp" />
@@ -98,7 +96,7 @@
     <ClCompile Include="..\..\..\components\decoder\cdrip\info\cdtext.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\components\decoder\cdrip\cdrip_in.h" />
+    <ClInclude Include="..\..\..\components\decoder\cdrip\cdrip.h" />
     <ClInclude Include="..\..\..\components\decoder\cdrip\config.h" />
     <ClInclude Include="..\..\..\components\decoder\cdrip\dllinterface.h" />
     <ClInclude Include="..\..\..\components\decoder\cdrip\info\cdinfo.h" />

@@ -87,6 +87,24 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist M3U", "BoCA P
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist XSPF", "BoCA Playlist XSPF\BoCA Playlist XSPF.vcxproj", "{815DA8C2-34FA-4AE8-90D7-1253183C4F01}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder CoreAudio", "BoCA Encoder CoreAudio\BoCA Encoder CoreAudio.vcxproj", "{C1C0D366-24C3-429A-944F-E057971A4D2B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder Opus", "BoCA Decoder Opus\BoCA Decoder Opus.vcxproj", "{D17DD4D0-7F58-4D8D-8E5D-E47434A50C5D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Extension StatusTime", "BoCA Extension StatusTime\BoCA Extension StatusTime.vcxproj", "{9868B1DA-EE14-4A6A-BA5A-BA7BD48DC9BE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -250,6 +268,18 @@ Global
 		{815DA8C2-34FA-4AE8-90D7-1253183C4F01}.Debug|Win32.Build.0 = Debug|Win32
 		{815DA8C2-34FA-4AE8-90D7-1253183C4F01}.Release|Win32.ActiveCfg = Release|Win32
 		{815DA8C2-34FA-4AE8-90D7-1253183C4F01}.Release|Win32.Build.0 = Release|Win32
+		{C1C0D366-24C3-429A-944F-E057971A4D2B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C1C0D366-24C3-429A-944F-E057971A4D2B}.Debug|Win32.Build.0 = Debug|Win32
+		{C1C0D366-24C3-429A-944F-E057971A4D2B}.Release|Win32.ActiveCfg = Release|Win32
+		{C1C0D366-24C3-429A-944F-E057971A4D2B}.Release|Win32.Build.0 = Release|Win32
+		{D17DD4D0-7F58-4D8D-8E5D-E47434A50C5D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D17DD4D0-7F58-4D8D-8E5D-E47434A50C5D}.Debug|Win32.Build.0 = Debug|Win32
+		{D17DD4D0-7F58-4D8D-8E5D-E47434A50C5D}.Release|Win32.ActiveCfg = Release|Win32
+		{D17DD4D0-7F58-4D8D-8E5D-E47434A50C5D}.Release|Win32.Build.0 = Release|Win32
+		{9868B1DA-EE14-4A6A-BA5A-BA7BD48DC9BE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9868B1DA-EE14-4A6A-BA5A-BA7BD48DC9BE}.Debug|Win32.Build.0 = Debug|Win32
+		{9868B1DA-EE14-4A6A-BA5A-BA7BD48DC9BE}.Release|Win32.ActiveCfg = Release|Win32
+		{9868B1DA-EE14-4A6A-BA5A-BA7BD48DC9BE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

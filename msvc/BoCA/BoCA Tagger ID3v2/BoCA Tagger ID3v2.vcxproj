@@ -37,8 +37,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
@@ -90,7 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\components\tagger\id3v2\id3v2_tag.cpp" />
+    <ClCompile Include="..\..\..\components\tagger\id3v2\id3v2.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_binary.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_integer.cpp" />
@@ -136,8 +134,7 @@
     <ClCompile Include="..\..\..\components\tagger\id3v2\zlib\zutil.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\components\tagger\id3v2\dllinterface.h" />
-    <ClInclude Include="..\..\..\components\tagger\id3v2\id3v2_tag.h" />
+    <ClInclude Include="..\..\..\components\tagger\id3v2\id3v2.h" />
     <ClInclude Include="..\..\..\components\tagger\id3v2\id3\id3\field.h" />
     <ClInclude Include="..\..\..\components\tagger\id3v2\id3\id3\globals.h" />
     <ClInclude Include="..\..\..\components\tagger\id3v2\id3\id3\helpers.h" />

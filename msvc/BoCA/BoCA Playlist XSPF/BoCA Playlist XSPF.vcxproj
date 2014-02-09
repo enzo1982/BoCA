@@ -85,6 +85,7 @@
     <ClCompile Include="..\..\..\components\playlist\xspf\uriparser\UriRecompose.c" />
     <ClCompile Include="..\..\..\components\playlist\xspf\uriparser\UriResolve.c" />
     <ClCompile Include="..\..\..\components\playlist\xspf\uriparser\UriShorten.c" />
+    <ClCompile Include="..\..\..\components\playlist\xspf\xspf.cpp" />
     <ClCompile Include="..\..\..\components\playlist\xspf\xspf\XspfChunkCallback.cpp" />
     <ClCompile Include="..\..\..\components\playlist\xspf\xspf\XspfData.cpp" />
     <ClCompile Include="..\..\..\components\playlist\xspf\xspf\XspfDataWriter.cpp" />
@@ -106,10 +107,9 @@
     <ClCompile Include="..\..\..\components\playlist\xspf\xspf\XspfTrackWriter.cpp" />
     <ClCompile Include="..\..\..\components\playlist\xspf\xspf\XspfWriter.cpp" />
     <ClCompile Include="..\..\..\components\playlist\xspf\xspf\XspfXmlFormatter.cpp" />
-    <ClCompile Include="..\..\..\components\playlist\xspf\xspf_list.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\components\playlist\xspf\xspf_list.h" />
+    <ClInclude Include="..\..\..\components\playlist\xspf\xspf.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

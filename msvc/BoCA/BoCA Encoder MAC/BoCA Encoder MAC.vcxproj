@@ -37,8 +37,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
@@ -92,12 +90,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\components\encoder\mac\config.cpp" />
     <ClCompile Include="..\..\..\components\encoder\mac\dllinterface.cpp" />
-    <ClCompile Include="..\..\..\components\encoder\mac\mac_out.cpp" />
+    <ClCompile Include="..\..\..\components\encoder\mac\mac.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\components\encoder\mac\config.h" />
     <ClInclude Include="..\..\..\components\encoder\mac\dllinterface.h" />
-    <ClInclude Include="..\..\..\components\encoder\mac\mac_out.h" />
+    <ClInclude Include="..\..\..\components\encoder\mac\mac.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BoCA\BoCA.vcxproj">

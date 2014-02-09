@@ -37,8 +37,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
@@ -92,12 +90,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\components\encoder\faac\config.cpp" />
     <ClCompile Include="..\..\..\components\encoder\faac\dllinterface.cpp" />
-    <ClCompile Include="..\..\..\components\encoder\faac\faac_out.cpp" />
+    <ClCompile Include="..\..\..\components\encoder\faac\faac.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\components\encoder\faac\config.h" />
     <ClInclude Include="..\..\..\components\encoder\faac\dllinterface.h" />
-    <ClInclude Include="..\..\..\components\encoder\faac\faac_out.h" />
+    <ClInclude Include="..\..\..\components\encoder\faac\faac.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BoCA\BoCA.vcxproj">

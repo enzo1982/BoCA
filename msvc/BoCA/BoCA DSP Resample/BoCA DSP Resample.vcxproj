@@ -80,12 +80,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\components\dsp\resample\config.h" />
     <ClInclude Include="..\..\..\components\dsp\resample\dllinterface.h" />
-    <ClInclude Include="..\..\..\components\dsp\resample\resample_dsp.h" />
+    <ClInclude Include="..\..\..\components\dsp\resample\resample.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\components\dsp\resample\config.cpp" />
     <ClCompile Include="..\..\..\components\dsp\resample\dllinterface.cpp" />
-    <ClCompile Include="..\..\..\components\dsp\resample\resample_dsp.cpp" />
+    <ClCompile Include="..\..\..\components\dsp\resample\resample.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

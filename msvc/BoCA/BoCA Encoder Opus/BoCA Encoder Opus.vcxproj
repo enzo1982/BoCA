@@ -80,12 +80,17 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\components\encoder\opus\config.cpp" />
     <ClCompile Include="..\..\..\components\encoder\opus\dllinterface.cpp" />
-    <ClCompile Include="..\..\..\components\encoder\opus\opus_out.cpp" />
+    <ClCompile Include="..\..\..\components\encoder\opus\opus.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\components\encoder\opus\config.h" />
     <ClInclude Include="..\..\..\components\encoder\opus\dllinterface.h" />
-    <ClInclude Include="..\..\..\components\encoder\opus\opus_out.h" />
+    <ClInclude Include="..\..\..\components\encoder\opus\ogg\ogg.h" />
+    <ClInclude Include="..\..\..\components\encoder\opus\ogg\os_types.h" />
+    <ClInclude Include="..\..\..\components\encoder\opus\opus.h" />
+    <ClInclude Include="..\..\..\components\encoder\opus\opus\opus.h" />
+    <ClInclude Include="..\..\..\components\encoder\opus\opus\opus_defines.h" />
+    <ClInclude Include="..\..\..\components\encoder\opus\opus\opus_types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

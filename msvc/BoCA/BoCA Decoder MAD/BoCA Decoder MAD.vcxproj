@@ -37,8 +37,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
@@ -92,13 +90,13 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\components\decoder\mad\config.cpp" />
     <ClCompile Include="..\..\..\components\decoder\mad\dllinterface.cpp" />
-    <ClCompile Include="..\..\..\components\decoder\mad\mad_in.cpp" />
+    <ClCompile Include="..\..\..\components\decoder\mad\mad.cpp" />
     <ClCompile Include="..\..\..\components\decoder\mad\xing\dxhead.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\components\decoder\mad\config.h" />
     <ClInclude Include="..\..\..\components\decoder\mad\dllinterface.h" />
-    <ClInclude Include="..\..\..\components\decoder\mad\mad_in.h" />
+    <ClInclude Include="..\..\..\components\decoder\mad\mad.h" />
     <ClInclude Include="..\..\..\components\decoder\mad\xing\dxhead.h" />
   </ItemGroup>
   <ItemGroup>

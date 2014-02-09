@@ -10,15 +10,9 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\components\playlist\m3u\m3u.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\components\playlist\m3u\m3u.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{ECFC35DF-E414-4CF3-84F4-81749657D8F5}</ProjectGuid>
-    <RootNamespace>BoCAPlaylistM3U</RootNamespace>
+    <ProjectGuid>{9868B1DA-EE14-4A6A-BA5A-BA7BD48DC9BE}</ProjectGuid>
+    <RootNamespace>BoCAExtensionStatusTime</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -43,7 +37,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>boca_playlist_m3u.1.0</TargetName>
+    <TargetName>boca_extension_statustime.1.0</TargetName>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -56,8 +51,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../../../smooth/msvc/smooth/Debug;../debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>smooth.lib;boca.1.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -73,6 +66,16 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\components\extension\statustime\layer.h" />
+    <ClInclude Include="..\..\..\components\extension\statustime\lengthdisplay.h" />
+    <ClInclude Include="..\..\..\components\extension\statustime\lengthstatus.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\components\extension\statustime\layer.cpp" />
+    <ClCompile Include="..\..\..\components\extension\statustime\lengthdisplay.cpp" />
+    <ClCompile Include="..\..\..\components\extension\statustime\lengthstatus.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
