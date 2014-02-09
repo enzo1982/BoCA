@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -94,6 +94,7 @@
 #include "smooth/i18n/translator.h"
 
 #include "smooth/misc/encoding/base64.h"
+#include "smooth/misc/encoding/urlencode.h"
 
 #include "smooth/misc/hash/crc32.h"
 #include "smooth/misc/hash/md5.h"
@@ -130,9 +131,6 @@
 #include "smooth/gui/dialogs/messagebox.h"
 #include "smooth/gui/dialogs/splashscreen.h"
 #include "smooth/gui/dialogs/tipodaydlg.h"
-
-#include "smooth/gui/mdi/client.h"
-#include "smooth/gui/mdi/window.h"
 
 #include "smooth/gui/widgets/layer.h"
 #include "smooth/gui/widgets/widget.h"
