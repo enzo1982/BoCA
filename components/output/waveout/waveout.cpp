@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -101,12 +101,14 @@ Bool BoCA::OutputWaveOut::Activate()
 
 	if (mr)
 	{
-		char	 waveOutError[MAXERRORLENGTH];
-
-		String	 e = String("Unknown MMSYSTEM error.");
+		String	 e  = String("Unknown MMSYSTEM error.");
 		String	 e2 = String("Unknown error.");
 
-		if (waveOutGetErrorText(mr, waveOutError, MAXERRORLENGTH) == MMSYSERR_NOERROR) e = waveOutError;
+		char	 waveOutErrorA[MAXERRORLENGTH];
+		wchar_t	 waveOutErrorW[MAXERRORLENGTH];
+
+		if	(!Setup::enableUnicode && waveOutGetErrorTextA(mr, waveOutErrorA, MAXERRORLENGTH) == MMSYSERR_NOERROR) e = waveOutErrorA;
+		else if ( Setup::enableUnicode && waveOutGetErrorTextW(mr, waveOutErrorW, MAXERRORLENGTH) == MMSYSERR_NOERROR) e = waveOutErrorW;
 
 		switch (mr)
 		{
