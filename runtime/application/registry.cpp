@@ -23,6 +23,7 @@
 #include <boca/application/external/encodercomponentfile.h>
 #include <boca/application/external/encodercomponentstdio.h>
 
+#include <boca/common/protocol.h>
 #include <boca/common/utilities.h>
 
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
@@ -47,6 +48,11 @@ Bool BoCA::AS::Registry::Free()
 
 BoCA::AS::Registry::Registry()
 {
+	Protocol	*debug = Protocol::Get("Debug output");
+
+	debug->Write("Initializing BoCA...");
+	debug->Write("  Querying native components...");
+
 	Directory		 dir(Utilities::GetBoCADirectory());
 
 #if defined __WIN32__
@@ -62,9 +68,21 @@ BoCA::AS::Registry::Registry()
 		const File	&file  = dllFiles.GetNth(i);
 		ComponentSpecs	*specs = new ComponentSpecs();
 
-		if (specs->LoadFromDLL(file)) InsertComponent(specs);
-		else			      delete specs;
+		debug->Write(String("    Trying ").Append(file).Append("..."));
+
+		if (specs->LoadFromDLL(file))
+		{
+			InsertComponent(specs);
+		}
+		else
+		{
+			debug->Write(String("      Failed to load component."));
+
+			delete specs;
+		}
 	}
+
+	debug->Write("  Querying script components...");
 
 	const Array<File>	&xmlFiles = dir.GetFilesByPattern("boca_*.xml");
 
@@ -73,12 +91,24 @@ BoCA::AS::Registry::Registry()
 		const File	&file  = xmlFiles.GetNth(i);
 		ComponentSpecs	*specs = new ComponentSpecs();
 
-		if (specs->LoadFromXML(file)) InsertComponent(specs);
-		else			      delete specs;
+		debug->Write(String("    Trying ").Append(file).Append("..."));
+
+		if (specs->LoadFromXML(file))
+		{
+			InsertComponent(specs);
+		}
+		else
+		{
+			debug->Write(String("      Failed to load component."));
+
+			delete specs;
+		}
 	}
 
 	CheckComponents();
 	OrderComponents();
+
+	debug->Write("BoCA is ready.");
 }
 
 BoCA::AS::Registry::~Registry()
@@ -88,6 +118,10 @@ BoCA::AS::Registry::~Registry()
 
 Void BoCA::AS::Registry::InsertComponent(ComponentSpecs *specs)
 {
+	Protocol	*debug = Protocol::Get("Debug output");
+
+	debug->Write(String("      Inserting ").Append(specs->name).Append("..."));
+
 	/* Sort encoder components by name.
 	 */
 	if (specs->type == COMPONENT_TYPE_ENCODER)
@@ -114,6 +148,10 @@ Void BoCA::AS::Registry::InsertComponent(ComponentSpecs *specs)
 
 Void BoCA::AS::Registry::CheckComponents()
 {
+	Protocol	*debug = Protocol::Get("Debug output");
+
+	debug->Write("  Checking components...");
+
 	for (Int i = 0; i < componentSpecs.Length(); i++)
 	{
 		ComponentSpecs	*cs = componentSpecs.GetNth(i);
@@ -156,6 +194,10 @@ Void BoCA::AS::Registry::CheckComponents()
 
 Void BoCA::AS::Registry::OrderComponents()
 {
+	Protocol	*debug = Protocol::Get("Debug output");
+
+	debug->Write("  Sorting components...");
+
 	/* Check preceding components.
 	 */
 	for (Int i = 0; i < componentSpecs.Length(); i++)
@@ -315,8 +357,6 @@ Bool BoCA::AS::Registry::DeleteComponent(Component *component)
 
 BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const String &streamURI)
 {
-	DecoderComponent	*component = NIL;
-
 	/* Check those decoders that claim to
 	 * support the file extension first.
 	 */
@@ -334,7 +374,7 @@ BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const Str
 			{
 				if (!streamURI.ToLower().EndsWith(String(".").Append(extension.ToLower()))) continue;
 
-				component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
+				DecoderComponent	*component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
 
 				if (component != NIL)
 				{
@@ -353,7 +393,7 @@ BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const Str
 		{
 			if (!streamURI.ToLower().StartsWith(protocol->GetIdentifier().Append("://"))) continue;
 
-			component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
+			DecoderComponent	*component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
 
 			if (component != NIL)
 			{
@@ -370,7 +410,7 @@ BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const Str
 	{
 		if (GetComponentType(i) != COMPONENT_TYPE_DECODER) continue;
 
-		component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
+		DecoderComponent	*component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
 
 		if (component != NIL)
 		{
