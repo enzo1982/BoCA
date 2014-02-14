@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,7 +17,8 @@ Signal1<Void, const String &>	 BoCA::Protocol::onUpdateProtocol;
 
 BoCA::Protocol::Protocol(const String &iName)
 {
-	name = iName;
+	name	   = iName;
+	startTicks = S::System::System::Clock();
 }
 
 BoCA::Protocol::~Protocol()
@@ -26,7 +27,12 @@ BoCA::Protocol::~Protocol()
 
 Int BoCA::Protocol::Write(const String &message)
 {
-	messages.Add(message);
+	UnsignedInt64	 ticks = S::System::System::Clock() - startTicks;
+
+	messages.Add(String(ticks / 1000 / 60 / 60 <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 / 60 / 60)).Append(":")
+		    .Append(ticks / 1000 / 60 % 60 <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 / 60 % 60)).Append(":")
+		    .Append(ticks / 1000 % 60	   <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 % 60     )).Append(".")
+		    .Append(ticks % 1000	   < 100 ? (ticks % 1000 < 10 ? "00" : "0") : "").Append(String::FromInt(ticks % 1000	       )).Append(" - ").Append(message));
 
 	onUpdateProtocol.Emit(name);
 
