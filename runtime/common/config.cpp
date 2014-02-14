@@ -14,12 +14,9 @@ BoCA::Config *BoCA::Config::instance = NIL;
 
 BoCA::Config::Config()
 {
-	enable_console		= False;
+	enable_console	   = False;
 
-	cdrip_numdrives		= 0;
-	cdrip_timeout		= 0;
-
-	saveSettingsOnExit	= True;
+	saveSettingsOnExit = True;
 
 	String	 programsDir = S::System::System::GetProgramFilesDirectory();
 
