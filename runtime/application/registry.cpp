@@ -422,3 +422,19 @@ BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const Str
 
 	return NIL;
 }
+
+BoCA::AS::DeviceInfoComponent *BoCA::AS::Registry::CreateDeviceInfoComponent()
+{
+	/* Try to find an active device info component.
+	 */
+	for (Int i = 0; i < GetNumberOfComponents(); i++)
+	{
+		if (GetComponentType(i) != COMPONENT_TYPE_DEVICEINFO) continue;
+
+		DeviceInfoComponent	*component = (DeviceInfoComponent *) CreateComponentByID(GetComponentID(i));
+
+		if (component != NIL) return component;
+	}
+
+	return NIL;
+}
