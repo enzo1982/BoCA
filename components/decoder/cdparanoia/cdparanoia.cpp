@@ -23,93 +23,30 @@ extern "C" {
 
 using namespace smooth::IO;
 
-static Int	 numDrives = 0;
-
 const String &BoCA::DecoderCDParanoia::GetComponentSpecs()
 {
-	static String	 componentSpecs;
-
-	if (numDrives >= 1)
-	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>cdparanoia Ripper Component</name>	\
-		    <version>1.0</version>			\
-		    <id>cdparanoia-dec</id>			\
-		    <type>decoder</type>			\
-		    <require>cdrip-info</require>		\
-		    <format>					\
-		      <name>Windows CD Audio Track</name>	\
-		      <extension>cda</extension>		\
-		    </format>					\
-		  </component>					\
-								\
-		";
-	}
+	static String	 componentSpecs = "		\
+							\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+	  <component>					\
+	    <name>cdparanoia Ripper Component</name>	\
+	    <version>1.0</version>			\
+	    <id>cdparanoia-dec</id>			\
+	    <type>decoder</type>			\
+	    <require>cdparanoia-info</require>		\
+	    <format>					\
+	      <name>Windows CD Audio Track</name>	\
+	      <extension>cda</extension>		\
+	    </format>					\
+	  </component>					\
+							\
+	";
 
 	return componentSpecs;
 }
 
-const Array<String> &BoCA::DecoderCDParanoia::FindDrives()
-{
-#if defined __linux__
-	static const char	*deviceNames[] = { "/dev/hd?", "/dev/sr?", "/dev/scd?", NIL };
-#elif defined __FreeBSD__
-	static const char	*deviceNames[] = { "/dev/acd?", "/dev/cd?", NIL };
-#elif defined __OpenBSD__
-	static const char	*deviceNames[] = { "/dev/cd?c", NIL };
-#elif defined __NetBSD__
-	static const char	*deviceNames[] = { "/dev/cd?d", NIL };
-#else
-	static const char	*deviceNames[] = { "/dev/cdrom?", NIL };
-#endif
-
-	static Array<String>	 driveNames;
-	static Bool		 initialized = False;
-
-	if (initialized) return driveNames;
-
-	for (Int i = 0; deviceNames[i] != NIL; i++)
-	{
-		glob_t	*fileData = new glob_t;
-
-		if (glob(deviceNames[i], 0, NIL, fileData) == 0)
-		{
-			for (UnsignedInt n = 0; n < fileData->gl_pathc; n++)
-			{
-				cdrom_drive	*cd = cdda_identify(fileData->gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
-
-				if (cd != NIL)
-				{
-					driveNames.Add(fileData->gl_pathv[n]);
-
-					cdda_close(cd);
-				}
-			}
-		}
-
-		globfree(fileData);
-	}
-
-	initialized = True;
-
-	return driveNames;
-}
-
 Void smooth::AttachDLL(Void *instance)
 {
-	BoCA::Config		*config	    = BoCA::Config::Get();
-	const Array<String>	&driveNames = BoCA::DecoderCDParanoia::FindDrives();
-
-	numDrives = driveNames.Length();
-
-	/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
-	 */
-	config->cdrip_numdrives = numDrives;
-
-	if (numDrives <= config->GetIntValue("Ripper", "ActiveDrive", 0)) config->SetIntValue("Ripper", "ActiveDrive", 0);
 }
 
 Void smooth::DetachDLL()
@@ -127,7 +64,7 @@ Bool BoCA::DecoderCDParanoia::CanOpenStream(const String &streamURI)
 Error BoCA::DecoderCDParanoia::GetStreamInfo(const String &streamURI, Track &track)
 {
 	AS::Registry		&boca = AS::Registry::Get();
-	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdrip-info");
+	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdparanoia-info");
 
 	if (component == NIL) return Error();
 
@@ -272,9 +209,15 @@ BoCA::DecoderCDParanoia::~DecoderCDParanoia()
 
 Bool BoCA::DecoderCDParanoia::Activate()
 {
-	const Array<String>	&driveNames = FindDrives();
+	AS::Registry		&boca = AS::Registry::Get();
+	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdparanoia-info");
 
-	drive = cdda_identify(driveNames.GetNth(track.drive), CDDA_MESSAGE_FORGETIT, NIL);
+	if (info != NIL)
+	{
+		drive = cdda_identify(info->GetNthDeviceInfo(track.drive).path, CDDA_MESSAGE_FORGETIT, NIL);
+
+		boca.DeleteComponent(info);
+	}
 
 	if (drive == NIL) return False;
 

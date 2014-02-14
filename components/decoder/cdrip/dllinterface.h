@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,16 +20,12 @@ extern DynamicLoader	*cdripdll;
 Bool			 LoadCDRipDLL();
 Void			 FreeCDRipDLL();
 
-typedef CDEX_ERR			(CRCCONV *CR_INIT)				(int);
-typedef CDEX_ERR			(CRCCONV *CR_DEINIT)				();
-typedef BOOL				(CRCCONV *CR_ISINITIALIZED)			();
 typedef CDEX_ERR			(CRCCONV *CR_READTOC)				();
 typedef LONG				(CRCCONV *CR_GETNUMTOCENTRIES)			();
 typedef TOCENTRY			(CRCCONV *CR_GETTOCENTRY)			(LONG);
 typedef CDEX_ERR			(CRCCONV *CR_OPENRIPPER)			(LONG *, LONG, LONG);
 typedef CDEX_ERR			(CRCCONV *CR_CLOSERIPPER)			();
 typedef CDEX_ERR			(CRCCONV *CR_RIPCHUNK)				(BYTE *, LONG *, BOOL &);
-typedef LONG				(CRCCONV *CR_GETNUMCDROM)			();
 typedef void				(CRCCONV *CR_SETACTIVECDROM)			(LONG);
 typedef CDEX_ERR			(CRCCONV *CR_GETCDROMPARAMETERS)		(CDROMPARAMS *);
 typedef CDEX_ERR			(CRCCONV *CR_SETCDROMPARAMETERS)		(CDROMPARAMS *);
@@ -38,16 +34,12 @@ typedef CDEX_ERR			(CRCCONV *CR_READCDTEXT)			(BYTE *, int, LPINT);
 typedef CDEX_ERR			(CRCCONV *CR_READANDGETISRC)			(ISRC *, int);
 typedef LONG				(CRCCONV *CR_GETNUMBEROFCACHEERRORS)		();
 
-extern CR_INIT				 ex_CR_Init;
-extern CR_DEINIT			 ex_CR_DeInit;
-extern CR_ISINITIALIZED			 ex_CR_IsInitialized;
 extern CR_READTOC			 ex_CR_ReadToc;
 extern CR_GETNUMTOCENTRIES		 ex_CR_GetNumTocEntries;
 extern CR_GETTOCENTRY			 ex_CR_GetTocEntry;
 extern CR_OPENRIPPER			 ex_CR_OpenRipper;
 extern CR_CLOSERIPPER			 ex_CR_CloseRipper;
 extern CR_RIPCHUNK			 ex_CR_RipChunk;
-extern CR_GETNUMCDROM			 ex_CR_GetNumCDROM;
 extern CR_SETACTIVECDROM		 ex_CR_SetActiveCDROM;
 extern CR_GETCDROMPARAMETERS		 ex_CR_GetCDROMParameters;
 extern CR_SETCDROMPARAMETERS		 ex_CR_SetCDROMParameters;

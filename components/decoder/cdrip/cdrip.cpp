@@ -22,7 +22,7 @@ const String &BoCA::DecoderCDRip::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (cdripdll != NIL && ex_CR_GetNumCDROM() >= 1)
+	if (cdripdll != NIL)
 	{
 		componentSpecs = "				\
 								\
@@ -45,59 +45,13 @@ const String &BoCA::DecoderCDRip::GetComponentSpecs()
 	return componentSpecs;
 }
 
-static Bool	 initializedCDRip = False;
-
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadCDRipDLL();
-
-	if (cdripdll == NIL) return;
-
-	if (!ex_CR_IsInitialized())
-	{
-		BoCA::Config	*config = BoCA::Config::Get();
-
-		Long		 error = CDEX_OK;
-		OSVERSIONINFOA	 vInfo;
-
-		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-		GetVersionExA(&vInfo);
-
-		if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) config->SetIntValue("Ripper", "UseNTSCSI", False);
-
-		error = ex_CR_Init(config->GetIntValue("Ripper", "UseNTSCSI", True));
-
-		if (error != CDEX_OK		 &&
-		    error != CDEX_ACCESSDENIED	 &&
-		    vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
-		{
-			config->SetIntValue("Ripper", "UseNTSCSI", !config->GetIntValue("Ripper", "UseNTSCSI", True));
-
-			error = ex_CR_Init(config->GetIntValue("Ripper", "UseNTSCSI", True));
-		}
-
-		if	(error == CDEX_ACCESSDENIED)			BoCA::Utilities::ErrorMessage("Access to CD-ROM drives was denied by Windows.\n\nPlease contact your system administrator in order\nto be granted the right to access the CD-ROM drive.");
-		else if (error != CDEX_OK &&
-			 error != CDEX_NOCDROMDEVICES &&
-			 error != CDEX_NATIVEEASPISUPPORTEDNOTSELECTED)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
-
-		/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
-		 */
-		config->cdrip_numdrives = ex_CR_GetNumCDROM();
-
-		if (ex_CR_GetNumCDROM() <= config->GetIntValue("Ripper", "ActiveDrive", 0)) config->SetIntValue("Ripper", "ActiveDrive", 0);
-
-		initializedCDRip = True;
-	}
 }
 
 Void smooth::DetachDLL()
 {
-	if (cdripdll == NIL) return;
-
-	if (initializedCDRip) ex_CR_DeInit();
-
 	FreeCDRipDLL();
 }
 
@@ -315,6 +269,8 @@ BoCA::DecoderCDRip::~DecoderCDRip()
 
 Bool BoCA::DecoderCDRip::Activate()
 {
+	ex_CR_SetActiveCDROM(track.drive);
+
 	Int	 startSector = 0;
 	Int	 endSector   = 0;
 
@@ -390,7 +346,6 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector)
 {
-	ex_CR_SetActiveCDROM(track.drive);
 	ex_CR_ReadToc();
 
 	Int	 numTocEntries = ex_CR_GetNumTocEntries();

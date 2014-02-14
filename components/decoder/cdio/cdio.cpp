@@ -26,114 +26,31 @@
 
 using namespace smooth::IO;
 
-static Int	 numDrives = 0;
-
 const String &BoCA::DecoderCDIO::GetComponentSpecs()
 {
-	static String	 componentSpecs;
-
-	if (numDrives >= 1)
-	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>CDIO Ripper Component</name>		\
-		    <version>1.0</version>			\
-		    <id>cdio-dec</id>				\
-		    <type>decoder</type>			\
-		    <require>cdrip-info</require>		\
-		    <replace>cdparanoia-dec</replace>		\
-		    <format>					\
-		      <name>Windows CD Audio Track</name>	\
-		      <extension>cda</extension>		\
-		    </format>					\
-		  </component>					\
-								\
-		";
-	}
+	static String	 componentSpecs = "		\
+							\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+	  <component>					\
+	    <name>CDIO Ripper Component</name>		\
+	    <version>1.0</version>			\
+	    <id>cdio-dec</id>				\
+	    <type>decoder</type>			\
+	    <require>cdio-info</require>		\
+	    <replace>cdparanoia-dec</replace>		\
+	    <format>					\
+	      <name>Windows CD Audio Track</name>	\
+	      <extension>cda</extension>		\
+	    </format>					\
+	  </component>					\
+							\
+	";
 
 	return componentSpecs;
 }
 
-const Array<String> &BoCA::DecoderCDIO::FindDrives()
-{
-	static Array<String>	 driveNames;
-	static Bool		 initialized = False;
-
-	if (initialized) return driveNames;
-
-#ifndef __NetBSD__
-	char	**deviceNames = cdio_get_devices(DRIVER_DEVICE);
-#else
-	char	*deviceNames[3] = { "/dev/cd0d", "/dev/cd1d", NIL };
-#endif
-
-	for (Int i = 0; deviceNames != NIL && deviceNames[i] != NIL; i++)
-	{
-		String		 deviceName = deviceNames[i];
-
-#ifndef __WIN32__
-		/* Resolve link if it is one.
-		 */
-		Buffer<char>	 buffer(PATH_MAX + 1);
-
-		buffer.Zero();
-
-		if (readlink(deviceName, buffer, buffer.Size() - 1) >= 0)
-		{
-			if (buffer[0] == '/') deviceName = buffer;
-			else		      deviceName = File(deviceName).GetFilePath().Append("/").Append((char *) buffer);
-		}
-#endif
-
-		/* Check if we aleady know this device.
-		 */
-		foreach (const String &driveName, driveNames)
-		{
-			if (driveName == deviceName)
-			{
-				deviceName = NIL;
-
-				break;
-			}
-		}
-
-		if (deviceName == NIL) continue;
-
-		/* Try to open device and add it to the list.
-		 */
-		CdIo_t	*cd = cdio_open(deviceName, DRIVER_UNKNOWN);
-
-		if (cd != NIL)
-		{
-			driveNames.Add(deviceName);
-
-			cdio_destroy(cd);
-		}
-	}
-
-#ifndef __NetBSD__
-	cdio_free_device_list(deviceNames);
-#endif
-
-	initialized = True;
-
-	return driveNames;
-}
-
 Void smooth::AttachDLL(Void *instance)
 {
-	BoCA::Config		*config	    = BoCA::Config::Get();
-	const Array<String>	&driveNames = BoCA::DecoderCDIO::FindDrives();
-
-	numDrives = driveNames.Length();
-
-	/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
-	 */
-	config->cdrip_numdrives = numDrives;
-
-	if (numDrives <= config->GetIntValue("Ripper", "ActiveDrive", 0)) config->SetIntValue("Ripper", "ActiveDrive", 0);
 }
 
 Void smooth::DetachDLL()
@@ -151,7 +68,7 @@ Bool BoCA::DecoderCDIO::CanOpenStream(const String &streamURI)
 Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 {
 	AS::Registry		&boca = AS::Registry::Get();
-	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdrip-info");
+	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdio-info");
 
 	if (component == NIL) return Error();
 
@@ -270,19 +187,13 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 	info.disc	= 1;
 	info.numDiscs	= 1;
 
-	/* Delete DeviceInfo component.
-	 */
-	boca.DeleteComponent(component);
-
 	/* Read ISRC if requested.
 	 */
 	Config	*config = Config::Get();
 
 	if (config->GetIntValue("Ripper", "ReadISRC", 0))
 	{
-		const Array<String>	&driveNames = FindDrives();
-
-		CdIo_t	*cd = cdio_open(driveNames.GetNth(track.drive), DRIVER_UNKNOWN);
+		CdIo_t	*cd = cdio_open(component->GetNthDeviceInfo(track.drive).path, DRIVER_UNKNOWN);
 
 		if (cd != NIL)
 		{
@@ -304,6 +215,10 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 			cdio_destroy(cd);
 		}
 	}
+
+	/* Delete DeviceInfo component.
+	 */
+	boca.DeleteComponent(component);
 
 	track.SetInfo(info);
 
@@ -333,9 +248,15 @@ BoCA::DecoderCDIO::~DecoderCDIO()
 
 Bool BoCA::DecoderCDIO::Activate()
 {
-	const Array<String>	&driveNames = FindDrives();
+	AS::Registry		&boca = AS::Registry::Get();
+	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdio-info");
 
-	cd = cdio_open(driveNames.GetNth(track.drive), DRIVER_UNKNOWN);
+	if (info != NIL)
+	{
+		cd = cdio_open(info->GetNthDeviceInfo(track.drive).path, DRIVER_UNKNOWN);
+
+		boca.DeleteComponent(info);
+	}
 
 	if (cd == NIL) return False;
 

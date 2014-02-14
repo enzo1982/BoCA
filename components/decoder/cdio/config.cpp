@@ -14,16 +14,6 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 {
 	Config	*config = Config::Get();
 
-	for (Int i = 0; i < config->cdrip_numdrives; i++)
-	{
-		driveOffsetUsed.Add(config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), 0));
-		driveOffsets.Add(config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
-		driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
-	}
-
-	useoffset	= driveOffsetUsed.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
-	setspeed	= driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
-
 	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
 	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
 
@@ -36,20 +26,24 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	I18n	*i18n = I18n::Get();
 
-	i18n->SetContext("Decoders::CDParanoia");
+	i18n->SetContext("Ripper");
 
 	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 94));
 
 	combo_drive	= new ComboBox(Point(10, 12), Size(324, 0));
 
 	AS::Registry		&boca = AS::Registry::Get();
-	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdrip-info");
+	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdio-info");
 
 	if (info != NIL)
 	{
 		for (Int i = 0; i < info->GetNumberOfDevices(); i++)
 		{
 			combo_drive->AddEntry(info->GetNthDeviceInfo(i).name);
+
+			driveOffsetUsed.Add(config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), 0));
+			driveOffsets.Add(config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
+			driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
 		}
 
 		boca.DeleteComponent(info);
@@ -57,6 +51,9 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	combo_drive->SelectNthEntry(config->GetIntValue("Ripper", "ActiveDrive", 0));
 	combo_drive->onSelectEntry.Connect(&ConfigureCDIO::SelectDrive, this);
+
+	useoffset = driveOffsetUsed.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
+	setspeed  = driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 
 	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(157, 0), &setspeed);
 	check_speed->onAction.Connect(&ConfigureCDIO::ToggleSetSpeed, this);
@@ -233,9 +230,9 @@ Int BoCA::ConfigureCDIO::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	if (config->cdrip_numdrives >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
+	if (driveSpeeds.Length() >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
 
-	for (Int i = 0; i < config->cdrip_numdrives; i++)
+	for (Int i = 0; i < driveSpeeds.Length(); i++)
 	{
 		config->SetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), driveOffsetUsed.GetNth(i));
 		config->SetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), driveOffsets.GetNth(i));

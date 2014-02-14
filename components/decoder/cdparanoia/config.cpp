@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,13 +14,6 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 {
 	Config	*config = Config::Get();
 
-	for (Int i = 0; i < config->cdrip_numdrives; i++)
-	{
-		driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
-	}
-
-	setspeed	= driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
-
 	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
 	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
 
@@ -31,20 +24,22 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 	I18n	*i18n = I18n::Get();
 
-	i18n->SetContext("Decoders::CDParanoia");
+	i18n->SetContext("Ripper");
 
 	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 68));
 
 	combo_drive	= new ComboBox(Point(10, 12), Size(324, 0));
 
 	AS::Registry		&boca = AS::Registry::Get();
-	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdrip-info");
+	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdparanoia-info");
 
 	if (info != NIL)
 	{
 		for (Int i = 0; i < info->GetNumberOfDevices(); i++)
 		{
 			combo_drive->AddEntry(info->GetNthDeviceInfo(i).name);
+
+			driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
 		}
 
 		boca.DeleteComponent(info);
@@ -52,6 +47,8 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 	combo_drive->SelectNthEntry(config->GetIntValue("Ripper", "ActiveDrive", 0));
 	combo_drive->onSelectEntry.Connect(&ConfigureCDParanoia::SelectDrive, this);
+
+	setspeed = driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 
 	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(157, 0), &setspeed);
 	check_speed->onAction.Connect(&ConfigureCDParanoia::ToggleSetSpeed, this);
@@ -179,9 +176,9 @@ Int BoCA::ConfigureCDParanoia::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	if (config->cdrip_numdrives >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
+	if (driveSpeeds.Length() >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
 
-	for (Int i = 0; i < config->cdrip_numdrives; i++)
+	for (Int i = 0; i < driveSpeeds.Length(); i++)
 	{
 		config->SetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
 	}

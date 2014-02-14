@@ -39,8 +39,6 @@ namespace BoCA
 		public:
 			static const String		&GetComponentSpecs();
 
-			static const Array<String>	&FindDrives();
-
 							 DecoderCDIO();
 							~DecoderCDIO();
 

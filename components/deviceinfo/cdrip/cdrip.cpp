@@ -74,10 +74,6 @@ Void smooth::AttachDLL(Void *instance)
 			 error != CDEX_NOCDROMDEVICES &&
 			 error != CDEX_NATIVEEASPISUPPORTEDNOTSELECTED)	BoCA::Utilities::ErrorMessage("Unable to load ASPI drivers! CD ripping disabled!");
 
-		/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
-		 */
-		config->cdrip_numdrives = ex_CR_GetNumCDROM();
-
 		if (ex_CR_GetNumCDROM() <= config->GetIntValue("Ripper", "ActiveDrive", 0)) config->SetIntValue("Ripper", "ActiveDrive", 0);
 
 		initializedCDRip = True;
@@ -93,16 +89,9 @@ Void smooth::DetachDLL()
 	FreeCDRipDLL();
 }
 
-Bool	 BoCA::DeviceInfoCDRip::initialized = False;
-
 BoCA::DeviceInfoCDRip::DeviceInfoCDRip()
 {
-	if (!initialized)
-	{
-		CollectDriveInfo();
-
-		initialized = True;
-	}
+	CollectDriveInfo();
 }
 
 BoCA::DeviceInfoCDRip::~DeviceInfoCDRip()
@@ -240,6 +229,10 @@ const BoCA::MCDI &BoCA::DeviceInfoCDRip::GetNthDeviceMCDI(Int n)
 
 Void BoCA::DeviceInfoCDRip::CollectDriveInfo()
 {
+	static Bool	 initialized = False;
+
+	if (initialized) return;
+
 	Int	 nDrives = ex_CR_GetNumCDROM();
 
 	for (Int i = 0; i < nDrives; i++)
@@ -254,9 +247,12 @@ Void BoCA::DeviceInfoCDRip::CollectDriveInfo()
 
 		drive.type = DEVICE_CDROM;
 		drive.name = params.lpszCDROMID;
+		drive.path = String::FromInt(params.btAdapterID).Append(":").Append(String::FromInt(params.btTargetID)).Append(":").Append(String::FromInt(params.btLunID));
 
 		drive.canOpenTray = True;
 
 		devices.Add(drive);
 	}
+
+	initialized = True;
 }

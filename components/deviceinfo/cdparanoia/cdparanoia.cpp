@@ -41,7 +41,7 @@ const String &BoCA::DeviceInfoCDParanoia::GetComponentSpecs()
 		  <component>						\
 		    <name>cdparanoia Device Info Component</name>	\
 		    <version>1.0</version>				\
-		    <id>cdrip-info</id>					\
+		    <id>cdparanoia-info</id>				\
 		    <type>deviceinfo</type>				\
 		  </component>						\
 									\
@@ -104,10 +104,6 @@ Void smooth::AttachDLL(Void *instance)
 
 	numDrives = driveNames.Length();
 
-	/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
-	 */
-	config->cdrip_numdrives = numDrives;
-
 	if (numDrives <= config->GetIntValue("Ripper", "ActiveDrive", 0)) config->SetIntValue("Ripper", "ActiveDrive", 0);
 }
 
@@ -115,16 +111,9 @@ Void smooth::DetachDLL()
 {
 }
 
-Bool	 BoCA::DeviceInfoCDParanoia::initialized = False;
-
 BoCA::DeviceInfoCDParanoia::DeviceInfoCDParanoia()
 {
-	if (!initialized)
-	{
-		CollectDriveInfo();
-
-		initialized = True;
-	}
+	CollectDriveInfo();
 }
 
 BoCA::DeviceInfoCDParanoia::~DeviceInfoCDParanoia()
@@ -310,6 +299,10 @@ const BoCA::MCDI &BoCA::DeviceInfoCDParanoia::GetNthDeviceMCDI(Int n)
 
 Void BoCA::DeviceInfoCDParanoia::CollectDriveInfo()
 {
+	static Bool	 initialized = False;
+
+	if (initialized) return;
+
 	const Array<String>	&driveNames = FindDrives();
 
 	foreach (const String &driveName, driveNames)
@@ -322,6 +315,7 @@ Void BoCA::DeviceInfoCDParanoia::CollectDriveInfo()
 
 		drive.type = DEVICE_CDROM;
 		drive.name = cd->drive_model;
+		drive.path = driveName;
 
 		drive.canOpenTray = True;
 
@@ -329,4 +323,6 @@ Void BoCA::DeviceInfoCDParanoia::CollectDriveInfo()
 
 		cdda_close(cd);
 	}
+
+	initialized = True;
 }

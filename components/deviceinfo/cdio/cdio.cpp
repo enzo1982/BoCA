@@ -32,7 +32,9 @@ const String &BoCA::DeviceInfoCDIO::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
+#ifndef __APPLE__
 	if (numDrives >= 1)
+#endif
 	{
 		componentSpecs = "				\
 								\
@@ -40,8 +42,9 @@ const String &BoCA::DeviceInfoCDIO::GetComponentSpecs()
 		  <component>					\
 		    <name>CDIO Device Info Component</name>	\
 		    <version>1.0</version>			\
-		    <id>cdrip-info</id>				\
+		    <id>cdio-info</id>				\
 		    <type>deviceinfo</type>			\
+		    <replace>cdparanoia-info</replace>		\
 		  </component>					\
 								\
 		";
@@ -55,7 +58,11 @@ const Array<String> &BoCA::DeviceInfoCDIO::FindDrives()
 	static Array<String>	 driveNames;
 	static Bool		 initialized = False;
 
+#ifndef __APPLE__
 	if (initialized) return driveNames;
+#endif
+
+	driveNames.RemoveAll();
 
 #ifndef __NetBSD__
 	char	**deviceNames = cdio_get_devices(DRIVER_DEVICE);
@@ -123,10 +130,6 @@ Void smooth::AttachDLL(Void *instance)
 
 	numDrives = driveNames.Length();
 
-	/* ToDo: Remove next line once config->cdrip_numdrives becomes unnecessary.
-	 */
-	config->cdrip_numdrives = numDrives;
-
 	if (numDrives <= config->GetIntValue("Ripper", "ActiveDrive", 0)) config->SetIntValue("Ripper", "ActiveDrive", 0);
 }
 
@@ -134,16 +137,9 @@ Void smooth::DetachDLL()
 {
 }
 
-Bool	 BoCA::DeviceInfoCDIO::initialized = False;
-
 BoCA::DeviceInfoCDIO::DeviceInfoCDIO()
 {
-	if (!initialized)
-	{
-		CollectDriveInfo();
-
-		initialized = True;
-	}
+	CollectDriveInfo();
 }
 
 BoCA::DeviceInfoCDIO::~DeviceInfoCDIO()
@@ -292,6 +288,14 @@ const BoCA::MCDI &BoCA::DeviceInfoCDIO::GetNthDeviceMCDI(Int n)
 
 Void BoCA::DeviceInfoCDIO::CollectDriveInfo()
 {
+	static Bool	 initialized = False;
+
+#ifndef __APPLE__
+	if (initialized) return;
+#endif
+
+	devices.RemoveAll();
+
 	const Array<String>	&driveNames = FindDrives();
 
 	foreach (const String &driveName, driveNames)
@@ -307,6 +311,7 @@ Void BoCA::DeviceInfoCDIO::CollectDriveInfo()
 
 		drive.type = DEVICE_CDROM;
 		drive.name = String(device.psz_vendor).Append(" ").Append(device.psz_model).Append(" ").Append(device.psz_revision);
+		drive.path = driveName;
 
 		drive.canOpenTray = True;
 
@@ -314,4 +319,6 @@ Void BoCA::DeviceInfoCDIO::CollectDriveInfo()
 
 		cdio_destroy(cd);
 	}
+
+	initialized = True;
 }
