@@ -43,6 +43,10 @@ Bool BoCA::VideoSite::CanHandleURL(const String &URL)
 	 */
 	v8::Context::Scope	 contextScope(isolate, context);
 
+	/* Get context from persistent handle.
+	 */
+	v8::Local<v8::Context>	 context = v8::Local<v8::Context>::New(isolate, this->context);
+
 	/* Get function handle.
 	 */
 	v8::Handle<v8::String>	 func_name = v8::String::New("canHandleURL");
@@ -74,6 +78,10 @@ String BoCA::VideoSite::GetVideoURL(const String &html)
 	/* Enter the created context for calling the function.
 	 */
 	v8::Context::Scope	 contextScope(isolate, context);
+
+	/* Get context from persistent handle.
+	 */
+	v8::Local<v8::Context>	 context = v8::Local<v8::Context>::New(isolate, this->context);
 
 	/* Get function handle.
 	 */
@@ -110,6 +118,10 @@ Metadata BoCA::VideoSite::QueryMetadata(const String &html)
 	/* Enter the created context for calling the function.
 	 */
 	v8::Context::Scope	 contextScope(isolate, context);
+
+	/* Get context from persistent handle.
+	 */
+	v8::Local<v8::Context>	 context = v8::Local<v8::Context>::New(isolate, this->context);
 
 	/* Get function handle.
 	 */
@@ -197,7 +209,7 @@ Bool BoCA::VideoSite::CreateScriptContext()
 
 	/* Create a new context.
 	 */
-	context = v8::Persistent<v8::Context>(isolate, v8::Context::New(isolate, NIL, global));
+	context.Reset(isolate, v8::Context::New(isolate, NIL, global));
 
 	if (context.IsEmpty()) return False;
 
