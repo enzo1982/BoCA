@@ -35,9 +35,8 @@ namespace BoCA
 
 			Buffer<unsigned char>	 dataBuffer;
 			Buffer<spx_int16_t>	 samplesBuffer;
-			Buffer<signed short>	 backBuffer;
 
-			Int			 EncodeFrames(const Buffer<signed short> &, Buffer<unsigned char> &, Bool);
+			Int			 EncodeFrames(Buffer<signed short> &, Buffer<unsigned char> &, Bool);
 
 			Int			 WriteOggPackets(Bool);
 		public:

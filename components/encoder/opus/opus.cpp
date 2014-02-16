@@ -267,17 +267,18 @@ Bool BoCA::EncoderOpus::Deactivate()
 	 */
 	const Format	&format	 = track.GetFormat();
 	Int		 samples = size / format.channels / (format.bits / 8);
+	Int		 offset	 = samplesBuffer.Size();
 
-	samplesBuffer.Resize(samples * format.channels);
+	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
 
 	for (Int i = 0; i < samples * format.channels; i++)
 	{
-		if	(format.bits ==  8				) samplesBuffer[i] =	   (				 data [i] - 128) * 256;
-		else if (format.bits == 16				) samplesBuffer[i] = (int)  ((short *) (unsigned char *) data)[i];
-		else if (format.bits == 32				) samplesBuffer[i] = (int) (((long *)  (unsigned char *) data)[i]	 / 65536);
+		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				  data [i] - 128) * 256;
+		else if (format.bits == 16				) samplesBuffer[offset + i] = (int)  ((short *) (unsigned char *) data)[i];
+		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((long *)  (unsigned char *) data)[i]	  / 65536);
 
-		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
 	}
 
 	/* Output remaining samples to encoder.
@@ -311,17 +312,18 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data, Int size)
 	 */
 	const Format	&format	 = track.GetFormat();
 	Int		 samples = size / format.channels / (format.bits / 8);
+	Int		 offset	 = samplesBuffer.Size();
 
-	samplesBuffer.Resize(samples * format.channels);
+	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
 
 	for (Int i = 0; i < samples * format.channels; i++)
 	{
-		if	(format.bits ==  8				) samplesBuffer[i] =	   (				 data [i] - 128) * 256;
-		else if (format.bits == 16				) samplesBuffer[i] = (int)  ((short *) (unsigned char *) data)[i];
-		else if (format.bits == 32				) samplesBuffer[i] = (int) (((long *)  (unsigned char *) data)[i]	 / 65536);
+		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				  data [i] - 128) * 256;
+		else if (format.bits == 16				) samplesBuffer[offset + i] = (int)  ((short *) (unsigned char *) data)[i];
+		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((long *)  (unsigned char *) data)[i]	  / 65536);
 
-		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
 	}
 
 	/* Output samples to encoder.
@@ -329,44 +331,48 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data, Int size)
 	return EncodeFrames(samplesBuffer, dataBuffer, False);
 }
 
-Int BoCA::EncoderOpus::EncodeFrames(const Buffer<signed short> &samplesBuffer, Buffer<unsigned char> &dataBuffer, Bool flush)
+Int BoCA::EncoderOpus::EncodeFrames(Buffer<signed short> &samplesBuffer, Buffer<unsigned char> &dataBuffer, Bool flush)
 {
-	backBuffer.Resize(backBuffer.Size() + samplesBuffer.Size());
-
-	memcpy(((signed short *) backBuffer) + backBuffer.Size() - samplesBuffer.Size(), (signed short *) samplesBuffer, sizeof(short) * samplesBuffer.Size());
-
 	const Format	&format = track.GetFormat();
 
+	/* Pad end of stream with empty samples.
+	 */
 	Int	 nullSamples = 0;
 
-	if (flush && (backBuffer.Size() / format.channels) % frameSize > 0)
+	if (flush && (samplesBuffer.Size() / format.channels) % frameSize > 0)
 	{
-		nullSamples = frameSize - (backBuffer.Size() / format.channels) % frameSize;
+		nullSamples = frameSize - (samplesBuffer.Size() / format.channels) % frameSize;
 
-		backBuffer.Resize(backBuffer.Size() + nullSamples * format.channels);
+		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
 
-		memset(((signed short *) backBuffer) + backBuffer.Size() - nullSamples * format.channels, 0, sizeof(short) * nullSamples * format.channels);
+		memset(((signed short *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(short) * nullSamples * format.channels);
 	}
 
-	while (backBuffer.Size() >= frameSize * format.channels)
+	/* Encode samples and build Ogg packets.
+	 */
+	Int	 framesProcessed = 0;
+
+	while (samplesBuffer.Size() - framesProcessed * frameSize * format.channels >= frameSize * format.channels)
 	{
-		Int	 dataLength = ex_opus_encode(encoder, backBuffer, frameSize, dataBuffer, dataBuffer.Size());
+		Int	 dataLength = ex_opus_encode(encoder, samplesBuffer + framesProcessed * frameSize * format.channels, frameSize, dataBuffer, dataBuffer.Size());
 
 		totalSamples += frameSize;
 
 		op.packet     = dataBuffer;
 		op.bytes      = dataLength;
 		op.b_o_s      = 0;
-		op.e_o_s      = (flush && backBuffer.Size() <= frameSize * format.channels) ? 1 : 0;
-		op.granulepos = (flush && backBuffer.Size() <= frameSize * format.channels) ? totalSamples - nullSamples : totalSamples;
+		op.e_o_s      = (flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= frameSize * format.channels) ? 1 : 0;
+		op.granulepos = (flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= frameSize * format.channels) ? totalSamples - nullSamples : totalSamples;
 		op.packetno   = numPackets++;
 
 		ex_ogg_stream_packetin(&os, &op);
 
-		memmove((signed short *) backBuffer, ((signed short *) backBuffer) + frameSize * format.channels, sizeof(short) * (backBuffer.Size() - frameSize * format.channels));
-
-		backBuffer.Resize(backBuffer.Size() - frameSize * format.channels);
+		framesProcessed++;
 	}
+
+	memmove((signed short *) samplesBuffer, ((signed short *) samplesBuffer) + framesProcessed * frameSize * format.channels, sizeof(short) * (samplesBuffer.Size() - framesProcessed * frameSize * format.channels));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frameSize * format.channels);
 
 	return WriteOggPackets(flush);
 }
