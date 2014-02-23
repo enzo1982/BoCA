@@ -70,9 +70,9 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	foreach (Converter *converter, converters)
 	{
-		const AS::FileFormat	*format = converter->GetFormat();
+		const AS::FileFormat	&format = converter->GetFormat();
 
-		combo_format->AddEntry(format->GetName().Append(" (*.").Append(format->GetExtensions().GetFirst()).Append(")"));
+		combo_format->AddEntry(format.GetName().Append(" (*.").Append(format.GetExtensions().GetFirst()).Append(")"));
 	}
 
 	combo_format->SelectNthEntry(config->GetIntValue("YouTube", "OutputFormat", -1) + 1);

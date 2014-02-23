@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -97,7 +97,7 @@ Int BoCA::Video::DownloaderThread(String targetFileName)
 		Array<Converter *>	&converters = Converter::Get();
 		Converter		*converter  = converters.GetNth(config->GetIntValue("YouTube", "OutputFormat", -1));
 
-		String			 convertedFileName = targetFileName.Head(targetFileName.FindLast(".") + 1).Append(converter->GetFormat()->GetExtensions().GetFirst());
+		String			 convertedFileName = targetFileName.Head(targetFileName.FindLast(".") + 1).Append(converter->GetFormat().GetExtensions().GetFirst());
 
 		if (targetFileName != convertedFileName)
 		{
