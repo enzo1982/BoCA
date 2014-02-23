@@ -14,13 +14,6 @@
 #include <cdio/cdio.h>
 #include <cdio/paranoia/paranoia.h>
 
-#include <unistd.h>
-#include <limits.h>
-
-#ifndef PATH_MAX
-#	define PATH_MAX 32768
-#endif
-
 #include "cdio.h"
 #include "config.h"
 
@@ -216,11 +209,11 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 		}
 	}
 
+	track.SetInfo(info);
+
 	/* Delete DeviceInfo component.
 	 */
 	boca.DeleteComponent(component);
-
-	track.SetInfo(info);
 
 	return Success();
 }
@@ -260,11 +253,6 @@ Bool BoCA::DecoderCDIO::Activate()
 
 	if (cd == NIL) return False;
 
-	Int	 startSector = 0;
-	Int	 endSector   = 0;
-
-	if (!GetTrackSectors(startSector, endSector)) return False;
-
 	/* Set ripping speed.
 	 */
 	Config	*config = Config::Get();
@@ -273,18 +261,6 @@ Bool BoCA::DecoderCDIO::Activate()
 
 	if (speed > 0)	cdio_set_speed(cd, speed);
 	else		cdio_set_speed(cd, -1);
-
-	/* Calculate offset values.
-	 */
-	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
-
-	startSector += readOffset / 588;
-	endSector   += readOffset / 588;
-
-	if	(readOffset % 588 < 0) { startSector--; skipSamples = 588 + readOffset % 588; }
-	else if (readOffset % 588 > 0) { endSector++;	skipSamples = 	    readOffset % 588; }
-
-	if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
 
 	/* Enable paranoia mode.
 	 */
@@ -313,14 +289,12 @@ Bool BoCA::DecoderCDIO::Activate()
 
 		paranoia = cdio_paranoia_init(drive);
 
-		cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
 		cdio_paranoia_modeset(paranoia, paranoiaMode);
 	}
 
-	/* Set nextSector and sectors left to be read.
+	/* Call seek to initialize ripper to start of track.
 	 */
-	nextSector  = startSector;
-	sectorsLeft = endSector - startSector + 1;
+	Seek(0);
 
 	return True;
 }
@@ -363,14 +337,14 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 
 	if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
 
+	skipSamples += samplePosition % 588;
+
 	/* Set nextSector and sectors left to be read.
 	 */
 	nextSector  = startSector;
 	sectorsLeft = endSector - startSector + 1;
 
 	if (paranoia != NIL) cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
-
-	skipSamples += samplePosition % 588;
 
 	return True;
 }
@@ -427,16 +401,20 @@ Bool BoCA::DecoderCDIO::GetTrackSectors(Int &startSector, Int &endSector)
 
 	if (track.cdTrack == 0)
 	{
+		/* Special handling for hidden track one audio.
+		 */
 		if (cdio_get_track_format(cd, firstTrack) == TRACK_FORMAT_AUDIO)
 		{
 			startSector = 0;
-			endSector   = cdio_get_track_lsn(cd, firstTrack);
+			endSector   = cdio_get_track_lsn(cd, firstTrack) - 1;
 
 			return True;
 		}
 	}
 	else
 	{
+		/* Handle regular tracks.
+		 */
 		for (Int i = firstTrack; i <= lastTrack; i++)
 		{
 			if (cdio_get_track_format(cd, i) == TRACK_FORMAT_AUDIO && i == track.cdTrack)

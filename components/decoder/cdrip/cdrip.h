@@ -29,8 +29,6 @@ namespace BoCA
 
 			ConfigLayer		*configLayer;
 
-			Bool			 ripperOpen;
-
 			Int			 dataBufferSize;
 
 			Int			 readOffset;
@@ -41,9 +39,6 @@ namespace BoCA
 			Int			 ComputeDiscID();
 
 			Bool			 GetTrackSectors(Int &, Int &);
-
-			Bool			 OpenRipper(Int, Int);
-			Bool			 CloseRipper();
 		public:
 			static const String	&GetComponentSpecs();
 

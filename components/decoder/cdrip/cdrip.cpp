@@ -193,10 +193,6 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	info.disc	= 1;
 	info.numDiscs	= 1;
 
-	/* Delete DeviceInfo component.
-	 */
-	boca.DeleteComponent(component);
-
 	/* Read CDText and cdplayer.ini
 	 */
 	{
@@ -244,6 +240,10 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	track.SetInfo(info);
 
+	/* Delete DeviceInfo component.
+	 */
+	boca.DeleteComponent(component);
+
 	return Success();
 }
 
@@ -252,7 +252,6 @@ BoCA::DecoderCDRip::DecoderCDRip()
 	configLayer	= NIL;
 
 	packageSize	= 0;
-	ripperOpen	= False;
 
 	readOffset	= 0;
 
@@ -269,27 +268,101 @@ BoCA::DecoderCDRip::~DecoderCDRip()
 
 Bool BoCA::DecoderCDRip::Activate()
 {
+	Config	*config = Config::Get();
+
+	/* Get paranoia mode.
+	 */
+	int	 nParanoiaMode = PARANOIA_MODE_FULL ^ PARANOIA_MODE_NEVERSKIP;
+
+	switch (config->GetIntValue("Ripper", "CDParanoiaMode", 3))
+	{
+		case 0:
+			nParanoiaMode = PARANOIA_MODE_OVERLAP;
+			break;
+		case 1:
+			nParanoiaMode &= ~PARANOIA_MODE_VERIFY;
+			break;
+		case 2:
+			nParanoiaMode &= ~(PARANOIA_MODE_SCRATCH | PARANOIA_MODE_REPAIR);
+			break;
+	}
+
+	/* Change drive parameters.
+	 */
+	CDROMPARAMS	 params;
+
 	ex_CR_SetActiveCDROM(track.drive);
+	ex_CR_GetCDROMParameters(&params);
 
-	Int	 startSector = 0;
-	Int	 endSector   = 0;
+	params.nRippingMode		= config->GetIntValue("Ripper", "CDParanoia", False);
+	params.nParanoiaMode		= nParanoiaMode;
+	params.bSwapLefRightChannel	= config->GetIntValue("Ripper", "SwapChannels", False);
+	params.bJitterCorrection	= config->GetIntValue("Ripper", "JitterCorrection", False);
+//	params.bDetectJitterErrors	= config->GetIntValue("Ripper", "DetectJitterErrors", True);
+//	params.bDetectC2Errors		= config->GetIntValue("Ripper", "DetectC2Errors", True);
+	params.nSpeed			= config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
+	params.bEnableMultiRead		= False;
+	params.nMultiReadCount		= 0;
 
-	if (!GetTrackSectors(startSector, endSector)) return False;
+	/* Set maximum speed if no limit is requested.
+	 */
+	if (params.nSpeed == 0) params.nSpeed = 64;
 
-	OpenRipper(startSector, endSector);
+	ex_CR_SetCDROMParameters(&params);
+
+	/* Lock tray if requested.
+	 */
+	if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(True);
+
+	/* Call seek to initialize ripper to start of track.
+	 */
+	Seek(0);
 
 	return True;
 }
 
 Bool BoCA::DecoderCDRip::Deactivate()
 {
-	CloseRipper();
+	Config	*config = Config::Get();
+
+	/* Check for drive cache errors.
+	 */
+	if (ex_CR_GetNumberOfCacheErrors() > 0)
+	{
+		Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
+
+		if (!noCacheWarning)
+		{
+			MessageDlg	*msgBox = new MessageDlg("The CD-ROM drive appears to be seeking impossibly quickly.\n"
+								 "This could be due to timer bugs, a drive that really is improbably fast,\n"
+								 "or, most likely, a bug in cdparanoia's cache modelling.\n\n"
+								 "Please consider using another drive for ripping audio CDs and send a bug\n"
+								 "report to support@freac.org to assist developers in correcting the problem.", "Warning", Message::Buttons::Ok, Message::Icon::Warning, "Do not display this warning again", &noCacheWarning);
+
+			msgBox->ShowDialog();
+
+			config->SetIntValue("Ripper", "NoCacheWarning", noCacheWarning);
+			config->SaveSettings();
+
+			Object::DeleteObject(msgBox);
+		}
+	}
+
+	ex_CR_CloseRipper();
+
+	/* Unlock tray if previously locked.
+	 */
+	if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(False);
 
 	return True;
 }
 
 Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 {
+	Config	*config = Config::Get();
+
+	ex_CR_CloseRipper();
+
 	Int	 startSector = 0;
 	Int	 endSector   = 0;
 
@@ -297,22 +370,34 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 
 	startSector += samplePosition / 588;
 
-	CloseRipper();
-	OpenRipper(startSector, endSector);
+	/* Calculate offset values.
+	 */
+	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+
+	startSector += readOffset / 588;
+	endSector   += readOffset / 588;
+
+	if	(readOffset % 588 < 0) { startSector--; skipSamples = 588 + readOffset % 588; }
+	else if (readOffset % 588 > 0) { endSector++;	skipSamples = 	    readOffset % 588; }
+
+	if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
 
 	skipSamples += samplePosition % 588;
+
+	/* Open ripper.
+	 */
+	LONG	 lDataBufferSize = 0;
+
+	ex_CR_OpenRipper(&lDataBufferSize, startSector, endSector);
+
+	dataBufferSize = lDataBufferSize;
 
 	return True;
 }
 
 Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	if (inBytes >= track.fileSize)
-	{
-		CloseRipper();
-
-		return -1;
-	}
+	if (inBytes >= track.fileSize) return -1;
 
 	/* Set up buffer respecting empty samples to prepend.
 	 */
@@ -352,6 +437,8 @@ Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector)
 
 	if (track.cdTrack == 0)
 	{
+		/* Special handling for hidden track one audio.
+		 */
 		TOCENTRY	 entry = ex_CR_GetTocEntry(0);
 
 		if (!(entry.btFlag & CDROMDATAFLAG))
@@ -364,6 +451,8 @@ Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector)
 	}
 	else
 	{
+		/* Handle regular tracks.
+		 */
 		for (Int i = 0; i < numTocEntries; i++)
 		{
 			TOCENTRY	 entry	   = ex_CR_GetTocEntry(i);
@@ -380,113 +469,6 @@ Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector)
 	}
 
 	return False;
-}
-
-Bool BoCA::DecoderCDRip::OpenRipper(Int startSector, Int endSector)
-{
-	if (!ripperOpen)
-	{
-		Config		*config = Config::Get();
-
-		CDROMPARAMS	 params;
-		int		 nParanoiaMode = PARANOIA_MODE_FULL ^ PARANOIA_MODE_NEVERSKIP;
-
-		switch (config->GetIntValue("Ripper", "CDParanoiaMode", 3))
-		{
-			case 0:
-				nParanoiaMode = PARANOIA_MODE_OVERLAP;
-				break;
-			case 1:
-				nParanoiaMode &= ~PARANOIA_MODE_VERIFY;
-				break;
-			case 2:
-				nParanoiaMode &= ~(PARANOIA_MODE_SCRATCH | PARANOIA_MODE_REPAIR);
-				break;
-		}
-
-		ex_CR_GetCDROMParameters(&params);
-
-		params.nRippingMode		= config->GetIntValue("Ripper", "CDParanoia", False);
-		params.nParanoiaMode		= nParanoiaMode;
-		params.bSwapLefRightChannel	= config->GetIntValue("Ripper", "SwapChannels", False);
-		params.bJitterCorrection	= config->GetIntValue("Ripper", "JitterCorrection", False);
-//		params.bDetectJitterErrors	= config->GetIntValue("Ripper", "DetectJitterErrors", True);
-//		params.bDetectC2Errors		= config->GetIntValue("Ripper", "DetectC2Errors", True);
-		params.nSpeed			= config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
-		params.bEnableMultiRead		= False;
-		params.nMultiReadCount		= 0;
-
-		/* Set maximum speed if no limit is requested.
-		 */
-		if (params.nSpeed == 0) params.nSpeed = 64;
-
-		ex_CR_SetCDROMParameters(&params);
-
-		/* Lock tray if requested.
-		 */
-		if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(True);
-
-		/* Calculate offset values.
-		 */
-		readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
-
-		startSector += readOffset / 588;
-		endSector   += readOffset / 588;
-
-		if	(readOffset % 588 < 0) { startSector--; skipSamples = 588 + readOffset % 588; }
-		else if (readOffset % 588 > 0) { endSector++;	skipSamples = 	    readOffset % 588; }
-
-		if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
-
-		/* Open ripper.
-		 */
-		LONG	 lDataBufferSize = 0;
-
-		ex_CR_OpenRipper(&lDataBufferSize, startSector, endSector);
-
-		dataBufferSize = lDataBufferSize;
-
-		ripperOpen = True;
-	}
-
-	return True;
-}
-
-Bool BoCA::DecoderCDRip::CloseRipper()
-{
-	if (ripperOpen)
-	{
-		if (ex_CR_GetNumberOfCacheErrors() > 0)
-		{
-			BoCA::Config	*config = BoCA::Config::Get();
-
-			Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
-
-			if (!noCacheWarning)
-			{
-				MessageDlg	*msgBox = new MessageDlg("The CD-ROM drive appears to be seeking impossibly quickly.\n"
-									 "This could be due to timer bugs, a drive that really is improbably fast,\n"
-									 "or, most likely, a bug in cdparanoia's cache modelling.\n\n"
-									 "Please consider using another drive for ripping audio CDs and send a bug\n"
-									 "report to support@freac.org to assist developers in correcting the problem.", "Warning", Message::Buttons::Ok, Message::Icon::Warning, "Do not display this warning again", &noCacheWarning);
-
-				msgBox->ShowDialog();
-
-				config->SetIntValue("Ripper", "NoCacheWarning", noCacheWarning);
-				config->SaveSettings();
-
-				Object::DeleteObject(msgBox);
-			}
-		}
-
-		ex_CR_CloseRipper();
-
-		if (Config::Get()->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(False);
-
-		ripperOpen = False;
-	}
-
-	return True;
 }
 
 ConfigLayer *BoCA::DecoderCDRip::GetConfigurationLayer()

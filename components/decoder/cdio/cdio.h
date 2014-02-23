@@ -20,39 +20,39 @@ namespace BoCA
 	class DecoderCDIO : public CS::DecoderComponent
 	{
 		private:
-			ConfigLayer			*configLayer;
+			ConfigLayer		*configLayer;
 
-			CdIo_t				*cd;
+			CdIo_t			*cd;
 
-			cdrom_drive_t			*drive;
-			cdrom_paranoia_t		*paranoia;
+			cdrom_drive_t		*drive;
+			cdrom_paranoia_t	*paranoia;
 
-			Int				 nextSector;
-			Int				 sectorsLeft;
+			Int			 nextSector;
+			Int			 sectorsLeft;
 
-			Int				 readOffset;
+			Int			 readOffset;
 
-			Int				 skipSamples;
-			Int				 prependSamples;
+			Int			 skipSamples;
+			Int			 prependSamples;
 
-			Bool				 GetTrackSectors(Int &, Int &);
+			Bool			 GetTrackSectors(Int &, Int &);
 		public:
-			static const String		&GetComponentSpecs();
+			static const String	&GetComponentSpecs();
 
-							 DecoderCDIO();
-							~DecoderCDIO();
+						 DecoderCDIO();
+						~DecoderCDIO();
 
-			Bool				 CanOpenStream(const String &);
-			Error				 GetStreamInfo(const String &, Track &);
+			Bool			 CanOpenStream(const String &);
+			Error			 GetStreamInfo(const String &, Track &);
 
-			Bool				 Activate();
-			Bool				 Deactivate();
+			Bool			 Activate();
+			Bool			 Deactivate();
 
-			Bool				 Seek(Int64);
+			Bool			 Seek(Int64);
 
-			Int				 ReadData(Buffer<UnsignedByte> &, Int);
+			Int			 ReadData(Buffer<UnsignedByte> &, Int);
 
-			ConfigLayer			*GetConfigurationLayer();
+			ConfigLayer		*GetConfigurationLayer();
 	};
 };
 
