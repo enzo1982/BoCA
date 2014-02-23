@@ -9,13 +9,13 @@ all:
 	cd au && $(MAKE)
 	cd bonk && $(MAKE)
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_OPENBSD),True)
 	cd cdio && $(MAKE)
 endif
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
+ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE)
@@ -58,13 +58,13 @@ clean:
 	cd au && $(MAKE) clean
 	cd bonk && $(MAKE) clean
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_OPENBSD),True)
 	cd cdio && $(MAKE) clean
 endif
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
+ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE) clean
@@ -104,15 +104,13 @@ endif
 
 install:
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_OPENBSD),True)
-ifneq ($(BUILD_FREEBSD),True)
 	cd cdio && $(MAKE) install
 endif
-endif
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
+ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE) install
@@ -127,8 +125,10 @@ endif
 	cd faad2 && $(MAKE) install
 	cd fdkaac && $(MAKE) install
 	cd flac && $(MAKE) install
+ifneq ($(BUILD_OSX),True)
 	cd lame && $(MAKE) install
 	cd mad && $(MAKE) install
+endif
 	cd mpg123 && $(MAKE) install
 	cd opus && $(MAKE) install
 	cd sndfile && $(MAKE) install
@@ -137,15 +137,13 @@ endif
 
 uninstall:
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_OPENBSD),True)
-ifneq ($(BUILD_FREEBSD),True)
 	cd cdio && $(MAKE) uninstall
 endif
-endif
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
+ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE) uninstall
@@ -160,8 +158,10 @@ endif
 	cd faad2 && $(MAKE) uninstall
 	cd fdkaac && $(MAKE) uninstall
 	cd flac && $(MAKE) uninstall
+ifneq ($(BUILD_OSX),True)
 	cd lame && $(MAKE) uninstall
 	cd mad && $(MAKE) uninstall
+endif
 	cd mpg123 && $(MAKE) uninstall
 	cd opus && $(MAKE) uninstall
 	cd sndfile && $(MAKE) uninstall

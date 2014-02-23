@@ -6,13 +6,13 @@ include $(BOCA_PATH)/Makefile-options
 
 all:
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_OPENBSD),True)
 	cd cdio && $(MAKE)
 endif
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
+ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE)
@@ -29,13 +29,13 @@ endif
 
 clean:
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_OPENBSD),True)
 	cd cdio && $(MAKE) clean
 endif
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
+ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE) clean
@@ -52,15 +52,13 @@ endif
 
 install:
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_OPENBSD),True)
-ifneq ($(BUILD_FREEBSD),True)
 	cd cdio && $(MAKE) install
 endif
-endif
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
+ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE) install
@@ -74,15 +72,13 @@ endif
 
 uninstall:
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_OPENBSD),True)
-ifneq ($(BUILD_FREEBSD),True)
 	cd cdio && $(MAKE) uninstall
 endif
-endif
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
+ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
 	cd cdparanoia && $(MAKE) uninstall
