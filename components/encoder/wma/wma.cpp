@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -81,6 +81,13 @@ BoCA::EncoderWMA::~EncoderWMA()
 	/* Uninit the Microsoft COM library.
 	 */
 	CoUninitialize();
+}
+
+Int BoCA::EncoderWMA::GetNumberOfPasses()
+{
+	/* 2-pass encoding is not supported, yet.
+	 */
+	return 1;
 }
 
 Bool BoCA::EncoderWMA::Activate()
@@ -267,6 +274,13 @@ Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data, Int size)
 	}
 
 	return size;
+}
+
+Bool BoCA::EncoderWMA::NextPass()
+{
+	/* 2-pass encoding is not supported, yet.
+	 */
+	return False;
 }
 
 ConfigLayer *BoCA::EncoderWMA::GetConfigurationLayer()
