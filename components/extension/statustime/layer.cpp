@@ -86,15 +86,16 @@ const String &BoCA::LayerLengthStatus::GetTotalLengthString(const Array<Track> &
 
 	for (Int i = 0; i < tracks.Length(); i++)
 	{
-		const Track	&track = tracks.GetNth(i);
+		const Track	&track	= tracks.GetNth(i);
+		const Format	&format = track.GetFormat();
 
-		if (track.length >= 0)
+		if (track.length >= 0 && format.rate > 0)
 		{
-			seconds += track.length / track.GetFormat().rate;
+			seconds += track.length / format.rate;
 		}
-		else if (track.approxLength >= 0)
+		else if (track.approxLength >= 0 && format.rate > 0)
 		{
-			seconds += track.approxLength / track.GetFormat().rate;
+			seconds += track.approxLength / format.rate;
 
 			approx = True;
 		}
