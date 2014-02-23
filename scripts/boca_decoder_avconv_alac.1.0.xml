@@ -5,7 +5,6 @@
   <version>1.0</version>
   <id>avconv-alac-dec</id>
   <type>decoder</type>
-  <replace>alac-dec</replace>
   <format>
     <name>Apple Lossless Files</name>
     <extension>m4a</extension>
