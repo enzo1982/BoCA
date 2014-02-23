@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,6 +16,7 @@ NEAACDECINIT			 ex_NeAACDecInit			= NIL;
 NEAACDECINIT2			 ex_NeAACDecInit2			= NIL;
 NEAACDECGETCURRENTCONFIGURATION	 ex_NeAACDecGetCurrentConfiguration	= NIL;
 NEAACDECSETCONFIGURATION	 ex_NeAACDecSetConfiguration		= NIL;
+NEAACDECAUDIOSPECIFICCONFIG	 ex_NeAACDecAudioSpecificConfig		= NIL;
 NEAACDECDECODE			 ex_NeAACDecDecode			= NIL;
 NEAACDECCLOSE			 ex_NeAACDecClose			= NIL;
 NEAACDECGETERRORMESSAGE		 ex_NeAACDecGetErrorMessage		= NIL;
@@ -32,6 +33,8 @@ MP4GETTRACKDURATION		 ex_MP4GetTrackDuration			= NIL;
 MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale		= NIL;
 MP4GETSAMPLEIDFROMTIME		 ex_MP4GetSampleIdFromTime		= NIL;
 MP4READSAMPLE			 ex_MP4ReadSample			= NIL;
+MP4ITMFGETITEMSBYMEANING	 ex_MP4ItmfGetItemsByMeaning		= NIL;
+MP4ITMFITEMLISTFREE		 ex_MP4ItmfItemListFree			= NIL;
 
 DynamicLoader *faad2dll	= NIL;
 DynamicLoader *mp4v2dll	= NIL;
@@ -51,6 +54,7 @@ Bool LoadFAAD2DLL()
 	ex_NeAACDecInit2			= (NEAACDECINIT2) faad2dll->GetFunctionAddress("NeAACDecInit2");
 	ex_NeAACDecGetCurrentConfiguration	= (NEAACDECGETCURRENTCONFIGURATION) faad2dll->GetFunctionAddress("NeAACDecGetCurrentConfiguration");
 	ex_NeAACDecSetConfiguration		= (NEAACDECSETCONFIGURATION) faad2dll->GetFunctionAddress("NeAACDecSetConfiguration");
+	ex_NeAACDecAudioSpecificConfig		= (NEAACDECAUDIOSPECIFICCONFIG) faad2dll->GetFunctionAddress("NeAACDecAudioSpecificConfig");
 	ex_NeAACDecDecode			= (NEAACDECDECODE) faad2dll->GetFunctionAddress("NeAACDecDecode");
 	ex_NeAACDecClose			= (NEAACDECCLOSE) faad2dll->GetFunctionAddress("NeAACDecClose");
 	ex_NeAACDecGetErrorMessage		= (NEAACDECGETERRORMESSAGE) faad2dll->GetFunctionAddress("NeAACDecGetErrorMessage");
@@ -60,6 +64,7 @@ Bool LoadFAAD2DLL()
 	    ex_NeAACDecInit2			== NIL ||
 	    ex_NeAACDecGetCurrentConfiguration	== NIL ||
 	    ex_NeAACDecSetConfiguration		== NIL ||
+	    ex_NeAACDecAudioSpecificConfig	== NIL ||
 	    ex_NeAACDecDecode			== NIL ||
 	    ex_NeAACDecClose			== NIL ||
 	    ex_NeAACDecGetErrorMessage		== NIL) { FreeFAAD2DLL(); return False; }
@@ -92,6 +97,8 @@ Bool LoadMP4v2DLL()
 	ex_MP4GetTrackTimeScale		= (MP4GETTRACKTIMESCALE) mp4v2dll->GetFunctionAddress("MP4GetTrackTimeScale");
 	ex_MP4GetSampleIdFromTime	= (MP4GETSAMPLEIDFROMTIME) mp4v2dll->GetFunctionAddress("MP4GetSampleIdFromTime");
 	ex_MP4ReadSample		= (MP4READSAMPLE) mp4v2dll->GetFunctionAddress("MP4ReadSample");
+	ex_MP4ItmfGetItemsByMeaning	= (MP4ITMFGETITEMSBYMEANING) mp4v2dll->GetFunctionAddress("MP4ItmfGetItemsByMeaning");
+	ex_MP4ItmfItemListFree		= (MP4ITMFITEMLISTFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemListFree");
 
 	if (ex_MP4Read				== NIL ||
 	    ex_MP4Close				== NIL ||
@@ -104,7 +111,9 @@ Bool LoadMP4v2DLL()
 	    ex_MP4GetTrackDuration		== NIL ||
 	    ex_MP4GetTrackTimeScale		== NIL ||
 	    ex_MP4GetSampleIdFromTime		== NIL ||
-	    ex_MP4ReadSample			== NIL) { FreeMP4v2DLL(); return False; }
+	    ex_MP4ReadSample			== NIL ||
+	    ex_MP4ItmfGetItemsByMeaning		== NIL ||
+	    ex_MP4ItmfItemListFree		== NIL) { FreeMP4v2DLL(); return False; }
 
 	return True;
 }

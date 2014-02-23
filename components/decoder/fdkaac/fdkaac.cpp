@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -183,7 +183,11 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 			short	*outputBuffer = new short [16384];
 
-			ex_aacDecoder_DecodeFrame(handle, outputBuffer, 16384, 0);
+			if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, 16384, 0) != AAC_DEC_OK)
+			{
+				errorState  = True;
+				errorString = "Unable to decode audio data.";
+			}
 
 			delete [] outputBuffer;
 
@@ -191,22 +195,46 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 			/* Get sample rate and number of channels.
 			 */
-			CStreamInfo	*streamInfo = ex_aacDecoder_GetStreamInfo(handle);
+			if (!errorState)
+			{
+				CStreamInfo	*streamInfo = ex_aacDecoder_GetStreamInfo(handle);
 
-			format.rate	= streamInfo->sampleRate;
-			format.channels = streamInfo->numChannels;
+				format.rate	= streamInfo->sampleRate;
+				format.channels = streamInfo->numChannels;
 
-			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+				track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
 
-			format.bits	= 16;
+				format.bits	= 16;
+			}
 
 			ex_aacDecoder_Close(handle);
 
 			track.SetFormat(format);
+
+			/* Look for iTunes metadata with gapless information.
+			 */
+			MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+
+			if (items != NIL)
+			{
+				if (items->size == 1)
+				{
+					String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
+					const Array<String>	&values	     = valueString.Trim().Explode(" ");
+
+					track.length = Math::Round((Int64) Number::FromHexString(values.GetNth(3)) * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+
+					String::ExplodeFinish();
+				}
+
+				ex_MP4ItmfItemListFree(items);
+			}
 		}
 
 		ex_MP4Close(mp4File, 0);
 
+		/* Read MP4 metadata.
+		 */
 		if (!errorState)
 		{
 			AS::Registry		&boca = AS::Registry::Get();
@@ -308,41 +336,44 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 		ex_aacDecoder_Close(handle);
 
-		if (errorState) return Error();
-
 		/* Read ID3v2 tag if any.
 		 */
-		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
-
-		if (tagger != NIL)
+		if (!errorState)
 		{
-			tagger->ParseStreamInfo(streamURI, track);
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
 
-			boca.DeleteComponent(tagger);
+			if (tagger != NIL)
+			{
+				tagger->ParseStreamInfo(streamURI, track);
+
+				boca.DeleteComponent(tagger);
+			}
 		}
 	}
 
 	track.SetFormat(format);
 
-	return Success();
+	if (!errorState) return Success();
+	else		 return Error();
 }
 
 BoCA::DecoderFDKAAC::DecoderFDKAAC()
 {
-	packageSize = 0;
+	packageSize  = 0;
 
-	mp4File	    = NIL;
-	handle	    = NIL;
+	mp4File	     = NIL;
+	handle	     = NIL;
 
-	mp4Track    = -1;
-	sampleId    = 0;
+	mp4Track     = -1;
+	sampleId     = 0;
 
-	adifFound   = False;
-	adtsFound   = False;
-	loasFound   = False;
+	adifFound    = False;
+	adtsFound    = False;
+	loasFound    = False;
 
-	frameSize   = 0;
+	frameSize    = 0;
+	delaySamples = 0;
 }
 
 BoCA::DecoderFDKAAC::~DecoderFDKAAC()
@@ -370,6 +401,8 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 		handle	 = ex_aacDecoder_Open(TT_MP4_RAW, 1);
 
+		/* Get codec configuration.
+		 */
 		unsigned char	*escBuffer     = NIL;
 		unsigned int	 escBufferSize = 0;
 
@@ -378,6 +411,25 @@ Bool BoCA::DecoderFDKAAC::Activate()
 		ex_aacDecoder_ConfigRaw(handle, &escBuffer, &escBufferSize);
 
 		ex_MP4Free(escBuffer);
+
+		/* Look for iTunes metadata with gapless information.
+		 */
+		MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+
+		if (items != NIL)
+		{
+			if (items->size == 1)
+			{
+				String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
+				const Array<String>	&values	     = valueString.Trim().Explode(" ");
+
+				delaySamples = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+
+				String::ExplodeFinish();
+			}
+
+			ex_MP4ItmfItemListFree(items);
+		}
 
 		sampleId = 1;
 	}
@@ -449,40 +501,61 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 		unsigned char	*buffer	    = NIL;
 		unsigned int	 bufferSize = 0;
 
-		if (!ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL)) return -1;
-
-		unsigned int	 bytesValid = bufferSize;
-
-		while (True)
+		if (ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL))
 		{
-			if (bytesValid > 0)
-			{
-				unsigned char	*inputBuffer	 = buffer + bufferSize - bytesValid;
-				unsigned int	 inputBufferSize = bytesValid;
+			unsigned int	 bytesValid = bufferSize;
 
-				ex_aacDecoder_Fill(handle, &inputBuffer, &inputBufferSize, &bytesValid);
+			while (True)
+			{
+				if (bytesValid > 0)
+				{
+					unsigned char	*inputBuffer	 = buffer + bufferSize - bytesValid;
+					unsigned int	 inputBufferSize = bytesValid;
+
+					ex_aacDecoder_Fill(handle, &inputBuffer, &inputBufferSize, &bytesValid);
+				}
+
+				if (frameSize == 0) samplesBuffer.Resize((samplesRead + maxFrameSize) * format.channels);
+				else		    samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
+
+				short	*outputBuffer = samplesBuffer + samplesRead * format.channels;
+
+				if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, samplesBuffer.Size() - samplesRead * format.channels, 0) != AAC_DEC_OK) break;
+
+				if (frameSize == 0)
+				{
+					CStreamInfo	*streamInfo = ex_aacDecoder_GetStreamInfo(handle);
+
+					frameSize = streamInfo->frameSize;
+
+					/* Set delay samples to minimum encoder delay plus decoder delay.
+					 */
+					if (delaySamples > 0) delaySamples += frameSize;
+					else		      delaySamples  = frameSize * 2;
+
+					/* No decoder delay for LD/ELD object types.
+					 */
+					if (streamInfo->aot == AOT_ER_AAC_LD || streamInfo->aot == AOT_ER_AAC_ELD) delaySamples -= frameSize;
+
+					samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
+				}
+
+				samplesRead += frameSize;
 			}
 
-			if (frameSize == 0) samplesBuffer.Resize(samplesRead + maxFrameSize * format.channels);
-			else		    samplesBuffer.Resize(samplesRead + frameSize * format.channels);
-
-			short	*outputBuffer = samplesBuffer + samplesRead;
-
-			if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, samplesBuffer.Size() - samplesRead, 0) != AAC_DEC_OK) break;
-
-			if (frameSize == 0)
-			{
-				CStreamInfo	*streamInfo = ex_aacDecoder_GetStreamInfo(handle);
-
-				frameSize = streamInfo->frameSize;
-
-				samplesBuffer.Resize(samplesRead + frameSize * format.channels);
-			}
-
-			samplesRead += frameSize * format.channels;
+			ex_MP4Free(buffer);
 		}
+		else
+		{
+			samplesBuffer.Resize((samplesRead + 2 * frameSize) * format.channels);
 
-		ex_MP4Free(buffer);
+			short	*outputBuffer = samplesBuffer + samplesRead * format.channels;
+
+			ex_aacDecoder_DecodeFrame(handle, outputBuffer, 			      samplesBuffer.Size() -  samplesRead	       * format.channels, AACDEC_FLUSH);
+			ex_aacDecoder_DecodeFrame(handle, outputBuffer + frameSize * format.channels, samplesBuffer.Size() - (samplesRead + frameSize) * format.channels, AACDEC_FLUSH);
+
+			samplesRead += 2 * frameSize;
+		}
 	}
 	else
 	{
@@ -504,12 +577,12 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 				ex_aacDecoder_Fill(handle, &inputBuffer, &inputBufferSize, &bytesValid);
 			}
 
-			if (frameSize == 0) samplesBuffer.Resize(samplesRead + maxFrameSize * format.channels);
-			else		    samplesBuffer.Resize(samplesRead + frameSize * format.channels);
+			if (frameSize == 0) samplesBuffer.Resize((samplesRead + maxFrameSize) * format.channels);
+			else		    samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
 
-			short	*outputBuffer = samplesBuffer + samplesRead;
+			short	*outputBuffer = samplesBuffer + samplesRead * format.channels;
 
-			if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, samplesBuffer.Size() - samplesRead, 0) != AAC_DEC_OK) break;
+			if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, samplesBuffer.Size() - samplesRead * format.channels, 0) != AAC_DEC_OK) break;
 
 			if (frameSize == 0)
 			{
@@ -517,21 +590,45 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 				frameSize = streamInfo->frameSize;
 
-				samplesBuffer.Resize(samplesRead + frameSize * format.channels);
+				/* Set delay samples to minimum encoder delay plus decoder delay.
+				 */
+				delaySamples = frameSize * 2;
+
+				/* No decoder delay for LD/ELD object types.
+				 */
+				if (streamInfo->aot == AOT_ER_AAC_LD || streamInfo->aot == AOT_ER_AAC_ELD) delaySamples -= frameSize;
+
+				samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
 			}
 
-			samplesRead += frameSize * format.channels;
+			samplesRead += frameSize;
+		}
+
+		if (driver->GetPos() == driver->GetSize())
+		{
+			samplesBuffer.Resize((samplesRead + 2 * frameSize) * format.channels);
+
+			short	*outputBuffer = samplesBuffer + samplesRead * format.channels;
+
+			ex_aacDecoder_DecodeFrame(handle, outputBuffer, 			      samplesBuffer.Size() -  samplesRead	       * format.channels, AACDEC_FLUSH);
+			ex_aacDecoder_DecodeFrame(handle, outputBuffer + frameSize * format.channels, samplesBuffer.Size() - (samplesRead + frameSize) * format.channels, AACDEC_FLUSH);
+
+			samplesRead += 2 * frameSize;
 		}
 	}
 
-	if (samplesRead > 0)
-	{
-		data.Resize(samplesRead * 2);
+	data.Resize(0);
 
-		memcpy(data, samplesBuffer, samplesRead * 2);
+	if (samplesRead > delaySamples)
+	{
+		data.Resize((samplesRead - delaySamples) * format.channels * (format.bits / 8));
+
+		memcpy(data, samplesBuffer + delaySamples * format.channels, data.Size());
 	}
 
-	return samplesRead * 2;
+	delaySamples = Math::Max(0, delaySamples - samplesRead);
+
+	return data.Size();
 }
 
 Int BoCA::DecoderFDKAAC::GetAudioTrack(MP4FileHandle mp4File) const

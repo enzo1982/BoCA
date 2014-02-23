@@ -90,8 +90,7 @@ BoCA::EncoderVOAAC::EncoderVOAAC()
 	frameSize      = 0;
 
 	totalSamples   = 0;
-	encodedSamples = 0;
-	delaySamples   = frameSize;
+	delaySamples   = 0;
 
 	memset(&memOperator, 0, sizeof(memOperator));
 	memset(&userData, 0, sizeof(userData));
@@ -131,7 +130,6 @@ Bool BoCA::EncoderVOAAC::Activate()
 	unsigned long	 bufferSize  = samplesSize * 4;
 
 	outBuffer.Resize(bufferSize);
-	samplesBuffer.Resize(samplesSize);
 
 	memOperator.Alloc = ex_cmnMemAlloc;
 	memOperator.Copy  = ex_cmnMemCopy;
@@ -166,15 +164,14 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 		ex_MP4SetTrackESConfiguration(mp4File, mp4Track, esConfig, 2);
 
-		frameSize	= samplesSize / format.channels;
-
-		totalSamples	= 0;
-		encodedSamples	= 0;
-		delaySamples	= frameSize;
+		totalSamples = 0;
 	}
 
-	packageSize	= samplesSize * (format.bits / 8);
+	frameSize    = samplesSize / format.channels;
+	delaySamples = frameSize + 576;
 
+	/* Write ID3v2 tag if requested.
+	 */
 	if (!config->GetIntValue("VOAACEnc", "MP4Container", 1))
 	{
 		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("VOAACEnc", "AllowID3v2", 0))
@@ -200,36 +197,45 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 Bool BoCA::EncoderVOAAC::Deactivate()
 {
-	Config		*config = Config::Get();
+	Config	*config = Config::Get();
 
-	VO_CODECBUFFER		 output	    = { 0 };
-	VO_AUDIO_OUTPUTINFO	 outputInfo = { 0 };
-
-	output.Buffer = outBuffer;
-	output.Length = outBuffer.Size();
-
-	while (api.GetOutputData(handle, &output, &outputInfo) == VO_ERR_NONE)
-	{
-		if (config->GetIntValue("VOAACEnc", "MP4Container", 1))
-		{
-			Int		 samplesLeft = totalSamples - encodedSamples + delaySamples;
-			MP4Duration	 dur	     = samplesLeft > frameSize ? frameSize : samplesLeft;
-			MP4Duration	 ofs	     = encodedSamples > 0 ? 0 : delaySamples;
-
-			ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, output.Length, dur, ofs, true);
-
-			encodedSamples += dur;
-		}
-		else
-		{
-			driver->WriteData(outBuffer, output.Length);
-		}
-	}
+	/* Output remaining samples to encoder.
+	 */
+	EncodeFrames(samplesBuffer, outBuffer, True);
 
 	api.Uninit(handle);
 
+	/* Finish MP4 writing.
+	 */
 	if (config->GetIntValue("VOAACEnc", "MP4Container", 1))
 	{
+		/* Write iTunes metadata with gapless information.
+		 */
+		MP4ItmfItem	*item  = ex_MP4ItmfItemAlloc("----", 1);
+		String		 value = String().Append(" 00000000")
+						 .Append(" ").Append(Number((Int64) delaySamples).ToHexString(8).ToUpper())
+						 .Append(" ").Append(Number((Int64) frameSize - (delaySamples + totalSamples) % frameSize).ToHexString(8).ToUpper())
+						 .Append(" ").Append(Number((Int64) totalSamples).ToHexString(16).ToUpper())
+						 .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
+
+		item->mean = (char *) "com.apple.iTunes";
+		item->name = (char *) "iTunSMPB";
+
+		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_UTF8;
+		item->dataList.elements[0].value     = (uint8_t *) value.ConvertTo("UTF-8");
+		item->dataList.elements[0].valueSize = value.Length();
+
+		ex_MP4ItmfAddItem(mp4File, item);
+
+		item->mean = NIL;
+		item->name = NIL;
+
+		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_IMPLICIT;
+		item->dataList.elements[0].value     = NIL;
+		item->dataList.elements[0].valueSize = 0;
+
+		ex_MP4ItmfItemFree(item);
+
 		ex_MP4Close(mp4File, 0);
 
 		/* Write metadata to file
@@ -279,65 +285,90 @@ Int BoCA::EncoderVOAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	Config	*config = Config::Get();
-
 	/* Convert samples to 16 bit.
 	 */
-	const Format		&format	     = track.GetFormat();
-	Int			 samplesRead = size / (format.bits / 8);
+	const Format	&format	 = track.GetFormat();
+	Int		 samples = size / format.channels / (format.bits / 8);
+	Int		 offset	 = samplesBuffer.Size();
 
-	VO_CODECBUFFER		 input	     = { 0 };
-	VO_CODECBUFFER		 output	     = { 0 };
-	VO_AUDIO_OUTPUTINFO	 outputInfo  = { 0 };
+	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
 
-	if (format.bits != 16)
+	for (Int i = 0; i < samples * format.channels; i++)
 	{
-		for (Int i = 0; i < samplesRead; i++)
-		{
-			if	(format.bits ==  8				) samplesBuffer[i] =	   (				   data [i] - 128) * 256;
-			else if (format.bits == 32				) samplesBuffer[i] = (int) (((int32_t *) (unsigned char *) data)[i]	   / 65536);
+		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				    data [i] - 128) * 256;
+		else if	(format.bits == 16				) samplesBuffer[offset + i] = (int)  ((int16_t *) (unsigned char *) data)[i];
+		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((int32_t *) (unsigned char *) data)[i]	    / 65536);
 
-			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
-		}
-
-		input.Buffer = (uint8_t *) (int16_t *) samplesBuffer;
-		input.Length = samplesRead * 2;
-	}
-	else
-	{
-		input.Buffer = data;
-		input.Length = samplesRead * 2;
+		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
 	}
 
-	totalSamples += samplesRead / format.channels;
-
-	/* Hand input data to encoder and retrieve output.
+	/* Output samples to encoder.
 	 */
-	api.SetInputData(handle, &input);
+	return EncodeFrames(samplesBuffer, outBuffer, False);
+}
 
-	output.Buffer = outBuffer;
-	output.Length = outBuffer.Size();
+Int BoCA::EncoderVOAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<unsigned char> &outBuffer, Bool flush)
+{
+	Config		*config = Config::Get();
+	const Format	&format = track.GetFormat();
 
-	if (api.GetOutputData(handle, &output, &outputInfo) == VO_ERR_NONE)
+	/* Pad end of stream with empty samples.
+	 */
+	if (flush)
 	{
-		if (config->GetIntValue("VOAACEnc", "MP4Container", 1))
-		{
-			Int		 samplesLeft = totalSamples - encodedSamples + delaySamples;
-			MP4Duration	 dur	     = samplesLeft > frameSize ? frameSize : samplesLeft;
-			MP4Duration	 ofs	     = encodedSamples > 0 ? 0 : delaySamples;
+		Int	 nullSamples = delaySamples;
 
-			ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, output.Length, dur, ofs, true);
+		if ((samplesBuffer.Size() / format.channels + delaySamples) % frameSize > 0) nullSamples += frameSize - (samplesBuffer.Size() / format.channels + delaySamples) % frameSize;
 
-			encodedSamples += dur;
-		}
-		else
-		{
-			driver->WriteData(outBuffer, output.Length);
-		}
+		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
+
+		memset(((int16_t *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(int16_t) * nullSamples * format.channels);
+
+		totalSamples += samplesBuffer.Size() / format.channels - nullSamples;
 	}
 
-	return output.Length;
+	/* Encode samples.
+	 */
+	Int	 dataLength	 = 0;
+	Int	 framesProcessed = 0;
+
+	while (samplesBuffer.Size() - framesProcessed * frameSize * format.channels >= frameSize * format.channels)
+	{
+		/* Prepare buffer information.
+		 */
+		VO_CODECBUFFER		 input	     = { 0 };
+		VO_CODECBUFFER		 output	     = { 0 };
+		VO_AUDIO_OUTPUTINFO	 outputInfo  = { 0 };
+
+		input.Buffer = (uint8_t *) ((int16_t *) samplesBuffer + framesProcessed * frameSize * format.channels);
+		input.Length = frameSize * format.channels * sizeof(int16_t);
+
+		/* Hand input data to encoder and retrieve output.
+		 */
+		api.SetInputData(handle, &input);
+
+		output.Buffer = outBuffer;
+		output.Length = outBuffer.Size();
+
+		if (api.GetOutputData(handle, &output, &outputInfo) == VO_ERR_NONE)
+		{
+			if (!flush) totalSamples += frameSize;
+
+			dataLength += output.Length;
+
+			if (config->GetIntValue("VOAACEnc", "MP4Container", 1)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, output.Length, frameSize, 0, true);
+			else							driver->WriteData(outBuffer, output.Length);
+		}
+
+		framesProcessed++;
+	}
+
+	memmove((int16_t *) samplesBuffer, ((int16_t *) samplesBuffer) + framesProcessed * frameSize * format.channels, sizeof(int16_t) * (samplesBuffer.Size() - framesProcessed * frameSize * format.channels));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frameSize * format.channels);
+
+	return dataLength;
 }
 
 Int BoCA::EncoderVOAAC::GetSampleRateIndex(Int sampleRate)

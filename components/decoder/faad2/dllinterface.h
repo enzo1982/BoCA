@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -30,6 +30,7 @@ typedef long				(NEAACDECAPI *NEAACDECINIT)			(NeAACDecHandle, unsigned char *, 
 typedef long				(NEAACDECAPI *NEAACDECINIT2)			(NeAACDecHandle, unsigned char *, unsigned long, unsigned long *, unsigned char *);
 typedef NeAACDecConfigurationPtr	(NEAACDECAPI *NEAACDECGETCURRENTCONFIGURATION)	(NeAACDecHandle);
 typedef unsigned char			(NEAACDECAPI *NEAACDECSETCONFIGURATION)		(NeAACDecHandle, NeAACDecConfigurationPtr);
+typedef char				(NEAACDECAPI *NEAACDECAUDIOSPECIFICCONFIG)	(unsigned char *, unsigned long, mp4AudioSpecificConfig *);
 typedef void *				(NEAACDECAPI *NEAACDECDECODE)			(NeAACDecHandle, NeAACDecFrameInfo *, unsigned char *, unsigned long);
 typedef void				(NEAACDECAPI *NEAACDECCLOSE)			(NeAACDecHandle);
 typedef char *				(NEAACDECAPI *NEAACDECGETERRORMESSAGE)		(unsigned char);
@@ -39,6 +40,7 @@ extern NEAACDECINIT			 ex_NeAACDecInit;
 extern NEAACDECINIT2			 ex_NeAACDecInit2;
 extern NEAACDECGETCURRENTCONFIGURATION	 ex_NeAACDecGetCurrentConfiguration;
 extern NEAACDECSETCONFIGURATION		 ex_NeAACDecSetConfiguration;
+extern NEAACDECAUDIOSPECIFICCONFIG	 ex_NeAACDecAudioSpecificConfig;
 extern NEAACDECDECODE			 ex_NeAACDecDecode;
 extern NEAACDECCLOSE			 ex_NeAACDecClose;
 extern NEAACDECGETERRORMESSAGE		 ex_NeAACDecGetErrorMessage;
@@ -55,6 +57,8 @@ typedef MP4Duration			(*MP4GETTRACKDURATION)				(MP4FileHandle, MP4TrackId);
 typedef uint32_t			(*MP4GETTRACKTIMESCALE)				(MP4FileHandle, MP4TrackId);
 typedef MP4SampleId			(*MP4GETSAMPLEIDFROMTIME)			(MP4FileHandle, MP4TrackId, MP4Timestamp, bool);
 typedef bool				(*MP4READSAMPLE)				(MP4FileHandle, MP4TrackId, MP4SampleId, uint8_t **, uint32_t *, MP4Timestamp *, MP4Duration *, MP4Duration *, bool *);
+typedef MP4ItmfItemList *		(*MP4ITMFGETITEMSBYMEANING)			(MP4FileHandle, const char *, const char *);
+typedef void				(*MP4ITMFITEMLISTFREE)				(MP4ItmfItemList *);
 
 extern MP4READ				 ex_MP4Read;
 extern MP4CLOSE				 ex_MP4Close;
@@ -68,3 +72,5 @@ extern MP4GETTRACKDURATION		 ex_MP4GetTrackDuration;
 extern MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale;
 extern MP4GETSAMPLEIDFROMTIME		 ex_MP4GetSampleIdFromTime;
 extern MP4READSAMPLE			 ex_MP4ReadSample;
+extern MP4ITMFGETITEMSBYMEANING		 ex_MP4ItmfGetItemsByMeaning;
+extern MP4ITMFITEMLISTFREE		 ex_MP4ItmfItemListFree;

@@ -30,7 +30,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	tabwidget		= new TabWidget(Point(7, 7), Size(525, 208));
 
-	i18n->SetContext("Encoders::FAAC::Format");
+	i18n->SetContext("Encoders::AAC::Format");
 
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 
@@ -95,7 +95,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
 	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
 
-	text_note		= new Text(i18n->TranslateString("Note:"), Point(10, 38));
+	text_note		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Note")), Point(10, 38));
 	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
 
 	group_id3v2->SetWidth(text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22);
@@ -104,7 +104,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	group_id3v2->Add(text_note);
 	group_id3v2->Add(text_id3v2);
 
-	i18n->SetContext("Encoders::FAAC::Quality");
+	i18n->SetContext("Encoders::AAC::Quality");
 
 	layer_quality		= new Layer(i18n->TranslateString("Quality"));
 

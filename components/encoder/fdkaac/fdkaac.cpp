@@ -92,8 +92,7 @@ BoCA::EncoderFDKAAC::EncoderFDKAAC()
 	frameSize      = 0;
 
 	totalSamples   = 0;
-	encodedSamples = 0;
-	delaySamples   = frameSize;
+	delaySamples   = 0;
 }
 
 BoCA::EncoderFDKAAC::~EncoderFDKAAC()
@@ -146,7 +145,6 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	ex_aacEncInfo(handle, &aacInfo);
 
 	outBuffer.Resize(aacInfo.maxOutBufBytes);
-	samplesBuffer.Resize(aacInfo.frameLength * format.channels);
 
 	if (config->GetIntValue("FDKAAC", "MP4Container", 1))
 	{
@@ -156,15 +154,19 @@ Bool BoCA::EncoderFDKAAC::Activate()
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
 		ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfo.confBuf, aacInfo.confSize);
 
-		frameSize	= aacInfo.frameLength;
-
-		totalSamples	= 0;
-		encodedSamples	= 0;
-		delaySamples	= aacInfo.encoderDelay;
+		totalSamples = 0;
 	}
 
-	packageSize	= samplesBuffer.Size() * (format.bits / 8);
+	frameSize    = aacInfo.frameLength;
+	delaySamples = aacInfo.encoderDelay;
 
+	/* Adjust delay for LD/ELD object types.
+	 */
+	if (config->GetIntValue("FDKAAC", "AACType", AOT_SBR) == AOT_ER_AAC_LD)	 delaySamples -= frameSize * 0.5625;
+	if (config->GetIntValue("FDKAAC", "AACType", AOT_SBR) == AOT_ER_AAC_ELD) delaySamples -= frameSize;
+
+	/* Write ID3v2 tag if requested.
+	 */
 	if (!config->GetIntValue("FDKAAC", "MP4Container", 1))
 	{
 		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FDKAAC", "AllowID3v2", 0))
@@ -190,64 +192,45 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 Bool BoCA::EncoderFDKAAC::Deactivate()
 {
-	Config		*config = Config::Get();
+	Config	*config = Config::Get();
 
-	/* Prepare buffer information.
+	/* Output remaining samples to encoder.
 	 */
-	Void	*inputBuffer	   = (int16_t *) samplesBuffer;
-	Int	 inputBufferID	   = IN_AUDIO_DATA;
-	Int	 inputBufferSize   = 0;
-	Int	 inputElementSize  = 2;
-
-	Void	*outputBuffer	   = (uint8_t *) outBuffer;
-	Int	 outputBufferID	   = OUT_BITSTREAM_DATA;
-	Int	 outputBufferSize  = outBuffer.Size();
-	Int	 outputElementSize = 1;
-
-	/* Configure buffer descriptors.
-	 */
-	AACENC_BufDesc	 input	     = { 0 };
-	AACENC_BufDesc	 output	     = { 0 };
-
-	input.numBufs		 = 1;
-	input.bufs		 = &inputBuffer;
-	input.bufferIdentifiers  = &inputBufferID;
-	input.bufSizes		 = &inputBufferSize;
-	input.bufElSizes	 = &inputElementSize;
-
-	output.numBufs		 = 1;
-	output.bufs		 = &outputBuffer;
-	output.bufferIdentifiers = &outputBufferID;
-	output.bufSizes		 = &outputBufferSize;
-	output.bufElSizes	 = &outputElementSize;
-
-	/* Flush stream buffers and retrieve output.
-	 */
-	AACENC_InArgs	 inputInfo   = { 0 };
-	AACENC_OutArgs	 outputInfo  = { 0 };
-
-	while (ex_aacEncEncode(handle, &input, &output, &inputInfo, &outputInfo) == AACENC_OK && outputInfo.numOutBytes > 0)
-	{
-		if (config->GetIntValue("FDKAAC", "MP4Container", 1))
-		{
-			Int		 samplesLeft = totalSamples - encodedSamples + delaySamples;
-			MP4Duration	 dur	     = samplesLeft > frameSize ? frameSize : samplesLeft;
-			MP4Duration	 ofs	     = encodedSamples > 0 ? 0 : delaySamples;
-
-			ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, outputInfo.numOutBytes, dur, ofs, true);
-
-			encodedSamples += dur;
-		}
-		else
-		{
-			driver->WriteData(outBuffer, outputInfo.numOutBytes);
-		}
-	}
+	EncodeFrames(samplesBuffer, outBuffer, True);
 
 	ex_aacEncClose(&handle);
 
+	/* Finish MP4 writing.
+	 */
 	if (config->GetIntValue("FDKAAC", "MP4Container", 1))
 	{
+		/* Write iTunes metadata with gapless information.
+		 */
+		MP4ItmfItem	*item  = ex_MP4ItmfItemAlloc("----", 1);
+		String		 value = String().Append(" 00000000")
+						 .Append(" ").Append(Number((Int64) delaySamples).ToHexString(8).ToUpper())
+						 .Append(" ").Append(Number((Int64) frameSize - (delaySamples + totalSamples) % frameSize).ToHexString(8).ToUpper())
+						 .Append(" ").Append(Number((Int64) totalSamples).ToHexString(16).ToUpper())
+						 .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
+
+		item->mean = (char *) "com.apple.iTunes";
+		item->name = (char *) "iTunSMPB";
+
+		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_UTF8;
+		item->dataList.elements[0].value     = (uint8_t *) value.ConvertTo("UTF-8");
+		item->dataList.elements[0].valueSize = value.Length();
+
+		ex_MP4ItmfAddItem(mp4File, item);
+
+		item->mean = NIL;
+		item->name = NIL;
+
+		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_IMPLICIT;
+		item->dataList.elements[0].value     = NIL;
+		item->dataList.elements[0].valueSize = 0;
+
+		ex_MP4ItmfItemFree(item);
+
 		ex_MP4Close(mp4File, 0);
 
 		/* Write metadata to file
@@ -297,87 +280,110 @@ Int BoCA::EncoderFDKAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	Config	*config = Config::Get();
-
-	/* Prepare buffer information.
-	 */
-	Void	*inputBuffer	   = (int16_t *) samplesBuffer;
-	Int	 inputBufferID	   = IN_AUDIO_DATA;
-	Int	 inputBufferSize   = samplesBuffer.Size();
-	Int	 inputElementSize  = 2;
-
-	Void	*outputBuffer	   = (uint8_t *) outBuffer;
-	Int	 outputBufferID	   = OUT_BITSTREAM_DATA;
-	Int	 outputBufferSize  = outBuffer.Size();
-	Int	 outputElementSize = 1;
-
 	/* Convert samples to 16 bit.
 	 */
-	const Format	&format	     = track.GetFormat();
-	Int		 samplesRead = size / (format.bits / 8);
+	const Format	&format	 = track.GetFormat();
+	Int		 samples = size / format.channels / (format.bits / 8);
+	Int		 offset	 = samplesBuffer.Size();
 
-	if (format.bits != 16)
-	{
-		for (Int i = 0; i < samplesRead; i++)
-		{
-			if	(format.bits ==  8				) samplesBuffer[i] =	   (				   data [i] - 128) * 256;
-			else if (format.bits == 32				) samplesBuffer[i] = (int) (((int32_t *) (unsigned char *) data)[i]	   / 65536);
+	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
 
-			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
-		}
-	}
-	else
+	for (Int i = 0; i < samples * format.channels; i++)
 	{
-		inputBuffer	= (uint8_t *) data;
-		inputBufferSize = samplesRead * 2;
+		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				    data [i] - 128) * 256;
+		else if	(format.bits == 16				) samplesBuffer[offset + i] = (int)  ((int16_t *) (unsigned char *) data)[i];
+		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((int32_t *) (unsigned char *) data)[i]	    / 65536);
+
+		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
 	}
 
-	totalSamples += samplesRead / format.channels;
-
-	/* Configure buffer descriptors.
+	/* Output samples to encoder.
 	 */
-	AACENC_BufDesc	 input	     = { 0 };
-	AACENC_BufDesc	 output	     = { 0 };
+	return EncodeFrames(samplesBuffer, outBuffer, False);
+}
 
-	input.numBufs		 = 1;
-	input.bufs		 = &inputBuffer;
-	input.bufferIdentifiers  = &inputBufferID;
-	input.bufSizes		 = &inputBufferSize;
-	input.bufElSizes	 = &inputElementSize;
+Int BoCA::EncoderFDKAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<unsigned char> &outBuffer, Bool flush)
+{
+	Config		*config = Config::Get();
+	const Format	&format = track.GetFormat();
 
-	output.numBufs		 = 1;
-	output.bufs		 = &outputBuffer;
-	output.bufferIdentifiers = &outputBufferID;
-	output.bufSizes		 = &outputBufferSize;
-	output.bufElSizes	 = &outputElementSize;
-
-	/* Hand input data to encoder and retrieve output.
+	/* Pad end of stream with empty samples.
 	 */
-	AACENC_InArgs	 inputInfo   = { 0 };
-	AACENC_OutArgs	 outputInfo  = { 0 };
-
-	inputInfo.numInSamples = samplesRead;
-
-	if (ex_aacEncEncode(handle, &input, &output, &inputInfo, &outputInfo) == AACENC_OK)
+	if (flush)
 	{
-		if (config->GetIntValue("FDKAAC", "MP4Container", 1))
-		{
-			Int		 samplesLeft = totalSamples - encodedSamples + delaySamples;
-			MP4Duration	 dur	     = samplesLeft > frameSize ? frameSize : samplesLeft;
-			MP4Duration	 ofs	     = encodedSamples > 0 ? 0 : delaySamples;
+		Int	 nullSamples = delaySamples;
 
-			ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, outputInfo.numOutBytes, dur, ofs, true);
+		if ((samplesBuffer.Size() / format.channels + delaySamples) % frameSize > 0) nullSamples += frameSize - (samplesBuffer.Size() / format.channels + delaySamples) % frameSize;
 
-			encodedSamples += dur;
-		}
-		else
-		{
-			driver->WriteData(outBuffer, outputInfo.numOutBytes);
-		}
+		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
+
+		memset(((int16_t *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(int16_t) * nullSamples * format.channels);
+
+		totalSamples += samplesBuffer.Size() / format.channels - nullSamples;
 	}
 
-	return outputInfo.numOutBytes;
+	/* Encode samples.
+	 */
+	Int	 dataLength	 = 0;
+	Int	 framesProcessed = 0;
+
+	while (samplesBuffer.Size() - framesProcessed * frameSize * format.channels >= frameSize * format.channels)
+	{
+		/* Prepare buffer information.
+		 */
+		Void	*inputBuffer	   = (int16_t *) samplesBuffer + framesProcessed * frameSize * format.channels;
+		Int	 inputBufferID	   = IN_AUDIO_DATA;
+		Int	 inputBufferSize   = frameSize * format.channels;
+		Int	 inputElementSize  = 2;
+
+		Void	*outputBuffer	   = (uint8_t *) outBuffer;
+		Int	 outputBufferID	   = OUT_BITSTREAM_DATA;
+		Int	 outputBufferSize  = outBuffer.Size();
+		Int	 outputElementSize = 1;
+
+		/* Configure buffer descriptors.
+		 */
+		AACENC_BufDesc	 input	     = { 0 };
+		AACENC_BufDesc	 output	     = { 0 };
+
+		input.numBufs		 = 1;
+		input.bufs		 = &inputBuffer;
+		input.bufferIdentifiers  = &inputBufferID;
+		input.bufSizes		 = &inputBufferSize;
+		input.bufElSizes	 = &inputElementSize;
+
+		output.numBufs		 = 1;
+		output.bufs		 = &outputBuffer;
+		output.bufferIdentifiers = &outputBufferID;
+		output.bufSizes		 = &outputBufferSize;
+		output.bufElSizes	 = &outputElementSize;
+
+		/* Hand input data to encoder and retrieve output.
+		 */
+		AACENC_InArgs	 inputInfo   = { 0 };
+		AACENC_OutArgs	 outputInfo  = { 0 };
+
+		inputInfo.numInSamples = frameSize * format.channels;
+
+		if (ex_aacEncEncode(handle, &input, &output, &inputInfo, &outputInfo) == AACENC_OK)
+		{
+			if (!flush) totalSamples += frameSize;
+
+			dataLength += outputInfo.numOutBytes;
+
+			if (config->GetIntValue("FDKAAC", "MP4Container", 1)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, outputInfo.numOutBytes, frameSize, 0, true);
+			else						      driver->WriteData(outBuffer, outputInfo.numOutBytes);
+		}
+
+		framesProcessed++;
+	}
+
+	memmove((int16_t *) samplesBuffer, ((int16_t *) samplesBuffer) + framesProcessed * frameSize * format.channels, sizeof(int16_t) * (samplesBuffer.Size() - framesProcessed * frameSize * format.channels));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frameSize * format.channels);
+
+	return dataLength;
 }
 
 Int BoCA::EncoderFDKAAC::GetSampleRateIndex(Int sampleRate)

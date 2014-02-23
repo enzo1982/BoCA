@@ -260,11 +260,17 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	if (CA::AudioConverterGetProperty(converter, CA::kAudioConverterPrimeInfo, &size, &primeInfo) == 0)
 	{
+		Int	 divider = 1;
+		Int	 extra	 = 0;
+
+		if (config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'aach' ||
+		    config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'aacp') { divider = 2; extra = 480; }
+
 		CA::AudioFilePacketTableInfo	 pti;
 
-		pti.mPrimingFrames     = primeInfo.leadingFrames;
+		pti.mPrimingFrames     = primeInfo.leadingFrames + extra;
 		pti.mRemainderFrames   = primeInfo.trailingFrames;
-		pti.mNumberValidFrames = totalSamples - pti.mPrimingFrames - pti.mRemainderFrames;
+		pti.mNumberValidFrames = totalSamples / divider;
 
 		CA::AudioFileSetProperty(audioFile, CA::kAudioFilePropertyPacketTableInfo, sizeof(pti), &pti);
 	}
@@ -464,6 +470,8 @@ CA::OSStatus BoCA::AudioConverterComplexInputDataProc(CA::AudioConverterRef inAu
 	filter->suppliedData.Resize(Math::Min(filter->buffer.Size() - filter->bytesConsumed, *ioNumberDataPackets * format.channels * (format.bits / 8)));
 
 	memcpy(filter->suppliedData, filter->buffer + filter->bytesConsumed, filter->suppliedData.Size());
+
+	*ioNumberDataPackets = filter->suppliedData.Size() / format.channels / (format.bits / 8);
 
 	ioData->mBuffers[0].mData           = filter->suppliedData;
 	ioData->mBuffers[0].mDataByteSize   = filter->suppliedData.Size();

@@ -26,7 +26,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	tabwidget		= new TabWidget(Point(7, 7), Size(500, 258));
 
-	i18n->SetContext("Encoders::FDKAAC::Format");
+	i18n->SetContext("Encoders::AAC::Format");
 
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 
@@ -76,7 +76,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
 	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
 
-	text_note		= new Text(i18n->TranslateString("Note:"), Point(10, 38));
+	text_note		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Note")), Point(10, 38));
 	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
 
 	group_id3v2->SetWidth(Math::Max(240, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22));
@@ -96,7 +96,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_version->Add(option_version_mpeg2);
 	group_version->Add(option_version_mpeg4);
 
-	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_mp4->GetWidth() + 172 + (group_id3v2->GetWidth() % 2), 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_version->GetWidth() + 143 + (group_id3v2->GetWidth() % 2), 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
 
 	option_extension_m4a	= new OptionBox(".m4a", Point(10, 13),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 0);
 	option_extension_m4b	= new OptionBox(".m4b", Point(10, 38),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 1);
@@ -108,13 +108,13 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_extension->Add(option_extension_m4r);
 	group_extension->Add(option_extension_mp4);
 
-	i18n->SetContext("Encoders::FDKAAC::Quality");
+	i18n->SetContext("Encoders::AAC::Quality");
 
 	layer_quality		= new Layer(i18n->TranslateString("Quality"));
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(group_id3v2->GetWidth() + 128, 43));
 
-	text_bitrate		= new Text(i18n->TranslateString("Bitrate:"), Point(10, 15));
+	text_bitrate		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Bitrate")), Point(10, 15));
 
 	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 16, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureFDKAAC::SetBitrate, this);

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,6 +29,9 @@ MP4SETTRACKESCONFIGURATION	 ex_MP4SetTrackESConfiguration	= NIL;
 MP4SETAUDIOPROFILELEVEL		 ex_MP4SetAudioProfileLevel	= NIL;
 MP4ADDAUDIOTRACK		 ex_MP4AddAudioTrack		= NIL;
 MP4WRITESAMPLE			 ex_MP4WriteSample		= NIL;
+MP4ITMFITEMALLOC		 ex_MP4ItmfItemAlloc		= NIL;
+MP4ITMFITEMFREE			 ex_MP4ItmfItemFree		= NIL;
+MP4ITMFADDITEM			 ex_MP4ItmfAddItem		= NIL;
 
 DynamicLoader *voaacencdll	= NIL;
 DynamicLoader *mp4v2dll		= NIL;
@@ -81,13 +84,19 @@ Bool LoadMP4v2DLL()
 	ex_MP4SetAudioProfileLevel	= (MP4SETAUDIOPROFILELEVEL) mp4v2dll->GetFunctionAddress("MP4SetAudioProfileLevel");
 	ex_MP4AddAudioTrack		= (MP4ADDAUDIOTRACK) mp4v2dll->GetFunctionAddress("MP4AddAudioTrack");
 	ex_MP4WriteSample		= (MP4WRITESAMPLE) mp4v2dll->GetFunctionAddress("MP4WriteSample");
+	ex_MP4ItmfItemAlloc		= (MP4ITMFITEMALLOC) mp4v2dll->GetFunctionAddress("MP4ItmfItemAlloc");
+	ex_MP4ItmfItemFree		= (MP4ITMFITEMFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemFree");
+	ex_MP4ItmfAddItem		= (MP4ITMFADDITEM) mp4v2dll->GetFunctionAddress("MP4ItmfAddItem");
 
 	if (ex_MP4CreateEx			== NIL ||
 	    ex_MP4Close				== NIL ||
 	    ex_MP4SetTrackESConfiguration	== NIL ||
 	    ex_MP4SetAudioProfileLevel		== NIL ||
 	    ex_MP4AddAudioTrack			== NIL ||
-	    ex_MP4WriteSample			== NIL) { FreeMP4v2DLL(); return False; }
+	    ex_MP4WriteSample			== NIL ||
+	    ex_MP4ItmfItemAlloc			== NIL ||
+	    ex_MP4ItmfItemFree			== NIL ||
+	    ex_MP4ItmfAddItem			== NIL) { FreeMP4v2DLL(); return False; }
 
 	return True;
 }

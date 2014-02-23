@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -24,6 +24,9 @@ namespace BoCA
 
 			Int				 mp4Track;
 			Int				 sampleId;
+
+			Int				 frameSize;
+			Int				 delaySamples;
 
 			Buffer<unsigned char>		 dataBuffer;
 			Buffer<unsigned char>		 backBuffer;

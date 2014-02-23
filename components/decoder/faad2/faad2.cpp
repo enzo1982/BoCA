@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -186,10 +186,31 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 			ex_NeAACDecClose(handle);
 
 			track.SetFormat(format);
+
+			/* Look for iTunes metadata with gapless information.
+			 */
+			MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+
+			if (items != NIL)
+			{
+				if (items->size == 1)
+				{
+					String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
+					const Array<String>	&values	     = valueString.Trim().Explode(" ");
+
+					track.length = Math::Round((Int64) Number::FromHexString(values.GetNth(3)) * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+
+					String::ExplodeFinish();
+				}
+
+				ex_MP4ItmfItemListFree(items);
+			}
 		}
 
 		ex_MP4Close(mp4File, 0);
 
+		/* Read MP4 metadata.
+		 */
 		if (!errorState)
 		{
 			AS::Registry		&boca = AS::Registry::Get();
@@ -278,36 +299,41 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 		ex_NeAACDecClose(handle);
 
-		if (errorState) return Error();
-
 		/* Read ID3v2 tag if any.
 		 */
-		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
-
-		if (tagger != NIL)
+		if (!errorState)
 		{
-			tagger->ParseStreamInfo(streamURI, track);
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
 
-			boca.DeleteComponent(tagger);
+			if (tagger != NIL)
+			{
+				tagger->ParseStreamInfo(streamURI, track);
+
+				boca.DeleteComponent(tagger);
+			}
 		}
 	}
 
 	track.SetFormat(format);
 
-	return Success();
+	if (!errorState) return Success();
+	else		 return Error();
 }
 
 BoCA::DecoderFAAD2::DecoderFAAD2()
 {
-	packageSize = 0;
+	packageSize  = 0;
 
-	mp4File	    = NIL;
-	handle	    = NIL;
-	fConfig	    = NIL;
+	mp4File	     = NIL;
+	handle	     = NIL;
+	fConfig	     = NIL;
 
-	mp4Track    = -1;
-	sampleId    = 0;
+	mp4Track     = -1;
+	sampleId     = 0;
+
+	frameSize    = 0;
+	delaySamples = 0;
 }
 
 BoCA::DecoderFAAD2::~DecoderFAAD2()
@@ -356,6 +382,8 @@ Bool BoCA::DecoderFAAD2::Activate()
 
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
+		/* Get codec configuration.
+		 */
 		unsigned char	*escBuffer     = NIL;
 		unsigned long	 escBufferSize = 0;
 
@@ -367,6 +395,25 @@ Bool BoCA::DecoderFAAD2::Activate()
 		ex_NeAACDecInit2(handle, escBuffer, escBufferSize, &rate, &channels);
 
 		ex_MP4Free(escBuffer);
+
+		/* Look for iTunes metadata with gapless information.
+		 */
+		MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+
+		if (items != NIL)
+		{
+			if (items->size == 1)
+			{
+				String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
+				const Array<String>	&values	     = valueString.Trim().Explode(" ");
+
+				delaySamples = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+
+				String::ExplodeFinish();
+			}
+
+			ex_MP4ItmfItemListFree(items);
+		}
 
 		sampleId = 1;
 	}
@@ -432,6 +479,8 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	samplesBuffer.Resize(0);
 
+	const Format	&format = track.GetFormat();
+
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
 		unsigned char	*buffer	    = NIL;
@@ -445,11 +494,26 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 		if (!frameInfo.error && frameInfo.samples > 0 && samples != NIL)
 		{
-			samplesBuffer.Resize(samplesRead + frameInfo.samples);
+			if (frameSize == 0)
+			{
+				frameSize = frameInfo.samples / frameInfo.channels;
 
-			memcpy(samplesBuffer + samplesRead, samples, frameInfo.samples * 2);
+				/* FAAD2 automatically skips the first frame, so
+				 * subtract it from the delay sample count.
+				 */
+				if (delaySamples > 0) delaySamples -= frameSize;
+				else		      delaySamples  = frameSize;
 
-			samplesRead += frameInfo.samples;
+				/* Fix delay for LD/ELD object types.
+				 */
+				if (frameInfo.object_type == LD) delaySamples += frameSize;
+			}
+
+			samplesBuffer.Resize(samplesRead * format.channels + frameInfo.samples);
+
+			memcpy(samplesBuffer + samplesRead * format.channels, samples, frameInfo.samples * (format.bits / 8));
+
+			samplesRead += frameInfo.samples / format.channels;
 		}
 
 		ex_MP4Free(buffer);
@@ -481,11 +545,17 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 		        if (!frameInfo.error && frameInfo.samples > 0 && samples != NIL)
 			{
-				samplesBuffer.Resize(samplesRead + frameInfo.samples);
+				if (frameSize == 0)
+				{
+					frameSize    = frameInfo.samples / frameInfo.channels;
+					delaySamples = frameSize;
+				}
 
-				memcpy(samplesBuffer + samplesRead, samples, frameInfo.samples * 2);
+				samplesBuffer.Resize(samplesRead * format.channels + frameInfo.samples);
 
-				samplesRead += frameInfo.samples;
+				memcpy(samplesBuffer + samplesRead * format.channels, samples, frameInfo.samples * (format.bits / 8));
+
+				samplesRead += frameInfo.samples / format.channels;
 			}
 
 			bytesConsumed += frameInfo.bytesconsumed;
@@ -502,14 +572,18 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 		}
 	}
 
-	if (samplesRead > 0)
-	{
-		data.Resize(samplesRead * 2);
+	data.Resize(0);
 
-		memcpy(data, samplesBuffer, samplesRead * 2);
+	if (samplesRead > delaySamples)
+	{
+		data.Resize((samplesRead - delaySamples) * format.channels * (format.bits / 8));
+
+		memcpy(data, samplesBuffer + delaySamples * format.channels, data.Size());
 	}
 
-	return samplesRead * 2;
+	delaySamples = Math::Max(0, delaySamples - samplesRead);
+
+	return data.Size();
 }
 
 Int BoCA::DecoderFAAD2::GetAudioTrack(MP4FileHandle mp4File) const

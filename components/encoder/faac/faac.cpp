@@ -80,20 +80,18 @@ Void smooth::DetachDLL()
 
 BoCA::EncoderFAAC::EncoderFAAC()
 {
-	configLayer    = NIL;
+	configLayer  = NIL;
 
-	mp4File	       = NIL;
-	handle	       = NIL;
-	fConfig	       = NIL;
+	mp4File	     = NIL;
+	handle	     = NIL;
+	fConfig	     = NIL;
 
-	mp4Track       = -1;
-	sampleId       = 0;
+	mp4Track     = -1;
+	sampleId     = 0;
 
-	frameSize      = 0;
+	frameSize    = 0;
 
-	totalSamples   = 0;
-	encodedSamples = 0;
-	delaySamples   = frameSize;
+	totalSamples = 0;
 }
 
 BoCA::EncoderFAAC::~EncoderFAAC()
@@ -130,7 +128,6 @@ Bool BoCA::EncoderFAAC::Activate()
 	handle = ex_faacEncOpen(format.rate, format.channels, &samplesSize, &bufferSize);
 
 	outBuffer.Resize(bufferSize);
-	samplesBuffer.Resize(samplesSize);
 
 	fConfig = ex_faacEncGetCurrentConfiguration(handle);
 
@@ -165,15 +162,13 @@ Bool BoCA::EncoderFAAC::Activate()
 
 		ex_MP4SetTrackESConfiguration(mp4File, mp4Track, (uint8_t *) buffer, bufferSize);
 
-		frameSize	= samplesSize / format.channels;
-
-		totalSamples	= 0;
-		encodedSamples	= 0;
-		delaySamples	= frameSize;
+		totalSamples = 0;
 	}
 
-	packageSize	= samplesSize * (format.bits / 8);
+	frameSize = samplesSize / format.channels;
 
+	/* Write ID3v2 tag if requested.
+	 */
 	if (!config->GetIntValue("FAAC", "MP4Container", 1))
 	{
 		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", 0))
@@ -199,38 +194,45 @@ Bool BoCA::EncoderFAAC::Activate()
 
 Bool BoCA::EncoderFAAC::Deactivate()
 {
-	Config		*config = Config::Get();
+	Config	*config = Config::Get();
 
-	unsigned long	 bytes = 0;
-
-	do
-	{
-		bytes = ex_faacEncEncode(handle, NULL, 0, outBuffer, outBuffer.Size());
-
-		if (config->GetIntValue("FAAC", "MP4Container", 1))
-		{
-			if (bytes > 0)
-			{
-				Int		 samplesLeft = totalSamples - encodedSamples + delaySamples;
-				MP4Duration	 dur	     = samplesLeft > frameSize ? frameSize : samplesLeft;
-				MP4Duration	 ofs	     = encodedSamples > 0 ? 0 : delaySamples;
-
-				ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, dur, ofs, true);
-
-				encodedSamples += dur;
-			}
-		}
-		else
-		{
-			driver->WriteData(outBuffer, bytes);
-		}
-	}
-	while (bytes > 0);
+	/* Output remaining samples to encoder.
+	 */
+	EncodeFrames(samplesBuffer, outBuffer, True);
 
 	ex_faacEncClose(handle);
 
+	/* Finish MP4 writing.
+	 */
 	if (config->GetIntValue("FAAC", "MP4Container", 1))
 	{
+		/* Write iTunes metadata with gapless information.
+		 */
+		MP4ItmfItem	*item  = ex_MP4ItmfItemAlloc("----", 1);
+		String		 value = String().Append(" 00000000")
+						 .Append(" ").Append(Number((Int64) frameSize).ToHexString(8).ToUpper())
+						 .Append(" ").Append(Number((Int64) frameSize - totalSamples % frameSize).ToHexString(8).ToUpper())
+						 .Append(" ").Append(Number((Int64) totalSamples).ToHexString(16).ToUpper())
+						 .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
+
+		item->mean = (char *) "com.apple.iTunes";
+		item->name = (char *) "iTunSMPB";
+
+		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_UTF8;
+		item->dataList.elements[0].value     = (uint8_t *) value.ConvertTo("UTF-8");
+		item->dataList.elements[0].valueSize = value.Length();
+
+		ex_MP4ItmfAddItem(mp4File, item);
+
+		item->mean = NIL;
+		item->name = NIL;
+
+		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_IMPLICIT;
+		item->dataList.elements[0].value     = NIL;
+		item->dataList.elements[0].valueSize = 0;
+
+		ex_MP4ItmfItemFree(item);
+
 		ex_MP4Close(mp4File, 0);
 
 		/* Write metadata to file
@@ -280,53 +282,82 @@ Int BoCA::EncoderFAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	Config	*config = Config::Get();
-
 	/* Convert samples to 16 or 24 bit.
 	 */
-	const Format	&format	     = track.GetFormat();
-	Int		 samplesRead = size / (format.bits / 8);
-	unsigned long	 bytes	     = 0;
+	const Format	&format	 = track.GetFormat();
+	Int		 samples = size / format.channels / (format.bits / 8);
+	Int		 offset	 = samplesBuffer.Size();
 
-	if (format.bits != 16)
+	if (format.bits <= 16) samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels / 2);
+	else		       samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
+
+	for (Int i = 0; i < samples * format.channels; i++)
 	{
-		for (Int i = 0; i < samplesRead; i++)
-		{
-			if	(format.bits ==  8				) ((short *) (int32_t *) samplesBuffer)[i] = (				    data [i] - 128) * 256;
-			else if (format.bits == 32				)			 samplesBuffer [i] = ((int32_t *) (unsigned char *) data)[i]	    / 256;
+		if	(format.bits ==  8				) ((short *) (int32_t *) samplesBuffer)[2 * offset + i] = (				 data [i] - 128) * 256;
+		else if (format.bits == 16				) ((short *) (int32_t *) samplesBuffer)[2 * offset + i] = ((short *)   (unsigned char *) data)[i];
+		else if (format.bits == 32				)			 samplesBuffer [    offset + i] = ((int32_t *) (unsigned char *) data)[i]	 / 256;
 
-			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 256;
-			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 256;
-		}
-
-		bytes = ex_faacEncEncode(handle, samplesBuffer, samplesRead, outBuffer, outBuffer.Size());
-	}
-	else
-	{
-		bytes = ex_faacEncEncode(handle, (int32_t *) (unsigned char *) data, samplesRead, outBuffer, outBuffer.Size());
+		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 256;
+		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 256;
 	}
 
-	totalSamples += samplesRead / format.channels;
+	/* Output samples to encoder.
+	 */
+	return EncodeFrames(samplesBuffer, outBuffer, False);
+}
 
-	if (config->GetIntValue("FAAC", "MP4Container", 1))
+Int BoCA::EncoderFAAC::EncodeFrames(Buffer<int32_t> &samplesBuffer, Buffer<unsigned char> &outBuffer, Bool flush)
+{
+	Config		*config = Config::Get();
+	const Format	&format = track.GetFormat();
+
+	/* Pad end of stream with empty samples.
+	 */
+	if (flush && samplesBuffer.Size() > 0)
 	{
+		Int	 nullSamples = frameSize - (samplesBuffer.Size() / format.channels * (format.bits <= 16 ? 2 : 1)) % frameSize;
+
+		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels / (format.bits <= 16 ? 2 : 1));
+
+		memset(((int32_t *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels / (format.bits <= 16 ? 2 : 1), 0, sizeof(int32_t) * nullSamples * format.channels / (format.bits <= 16 ? 2 : 1));
+
+		totalSamples += samplesBuffer.Size() / format.channels * (format.bits <= 16 ? 2 : 1) - nullSamples;
+	}
+
+	/* Encode samples.
+	 */
+	Int	 dataLength	 = 0;
+	Int	 framesProcessed = 0;
+
+	Int	 samplesPerFrame = frameSize * format.channels / (format.bits <= 16 ? 2 : 1);
+
+	while (flush || samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame)
+	{
+		unsigned long	 bytes = 0;
+
+		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) bytes = ex_faacEncEncode(handle, samplesBuffer + framesProcessed * samplesPerFrame, frameSize * format.channels, outBuffer, outBuffer.Size());
+		else										 bytes = ex_faacEncEncode(handle, NULL, 0, outBuffer, outBuffer.Size());
+
+		if (flush && bytes == 0) break;
+
+		if (!flush) totalSamples += frameSize;
+
 		if (bytes > 0)
 		{
-			Int		 samplesLeft = totalSamples - encodedSamples + delaySamples;
-			MP4Duration	 dur	     = samplesLeft > frameSize ? frameSize : samplesLeft;
-			MP4Duration	 ofs	     = encodedSamples > 0 ? 0 : delaySamples;
+			dataLength += bytes;
 
-			ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, dur, ofs, true);
-
-			encodedSamples += dur;
+			if (config->GetIntValue("FAAC", "MP4Container", 1)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, frameSize, 0, true);
+			else						    driver->WriteData(outBuffer, bytes);
 		}
-	}
-	else
-	{
-		driver->WriteData(outBuffer, bytes);
+
+		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) framesProcessed++;
 	}
 
-	return bytes;
+	memmove((int32_t *) samplesBuffer, ((int32_t *) samplesBuffer) + framesProcessed * samplesPerFrame, sizeof(int32_t) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
+
+	return dataLength;
 }
 
 Int BoCA::EncoderFAAC::GetSampleRateIndex(Int sampleRate)

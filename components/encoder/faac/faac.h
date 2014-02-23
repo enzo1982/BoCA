@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -30,11 +30,11 @@ namespace BoCA
 			Int			 frameSize;
 
 			Int			 totalSamples;
-			Int			 encodedSamples;
-			Int			 delaySamples;
 
 			Buffer<unsigned char>	 outBuffer;
 			Buffer<int32_t>		 samplesBuffer;
+
+			Int			 EncodeFrames(Buffer<int32_t> &, Buffer<unsigned char> &, Bool);
 
 			Int			 GetSampleRateIndex(Int);
 		public:

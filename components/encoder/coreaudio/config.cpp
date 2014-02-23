@@ -24,7 +24,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 
 	tabwidget		= new TabWidget(Point(7, 7), Size(500, 208));
 
-	i18n->SetContext("Encoders::CoreAudio::Format");
+	i18n->SetContext("Encoders::AAC::Format");
 
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 
@@ -53,7 +53,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 	group_mp4->Add(option_mp4);
 	group_mp4->Add(option_aac);
 
-	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_mp4->GetWidth() + 14 + (group_id3v2->GetWidth() % 2), 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_mp4->GetWidth() + 15 + (group_id3v2->GetWidth() % 2), 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
 
 	option_extension_m4a	= new OptionBox(".m4a", Point(10, 13),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 0);
 	option_extension_m4b	= new OptionBox(".m4b", Point(10, 38),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 1);
@@ -65,7 +65,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 	group_extension->Add(option_extension_m4r);
 	group_extension->Add(option_extension_mp4);
 
-	i18n->SetContext("Encoders::CoreAudio::Codec");
+	i18n->SetContext("Encoders::AAC::Codec");
 
 	layer_quality		= new Layer(i18n->TranslateString("Codec"));
 
@@ -109,6 +109,8 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 
 	group_codec->Add(text_codec);
 	group_codec->Add(combo_codec);
+
+	i18n->SetContext("Encoders::AAC::Quality");
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 66), Size(group_id3v2->GetWidth(), 43));
 
