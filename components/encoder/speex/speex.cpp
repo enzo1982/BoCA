@@ -58,11 +58,12 @@ Void smooth::DetachDLL()
 
 BoCA::EncoderSpeex::EncoderSpeex()
 {
-	configLayer = NIL;
+	configLayer  = NIL;
 
-	encoder	    = NIL;
+	encoder	     = NIL;
 
 	frameSize    = 0;
+	lookAhead    = 0;
 
 	numPackets   = 0;
 	totalSamples = 0;
