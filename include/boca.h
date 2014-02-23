@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -78,6 +78,7 @@ using namespace smooth;
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
 		BOCA_EXPORT bool BoCA_##componentName##_CanOpenStream(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->CanOpenStream(file); }									\
 		BOCA_EXPORT int BoCA_##componentName##_GetStreamInfo(void *component, const wchar_t *file, void *track)			{ return ((BoCA::componentName *) component)->GetStreamInfo(file, *((BoCA::Track *) track)); }						\
+																																		\
 		BOCA_EXPORT __int64 BoCA_##componentName##_GetInBytes(const void *component)						{ return ((const BoCA::componentName *) component)->GetInBytes(); }									\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
@@ -96,11 +97,13 @@ using namespace smooth;
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
 																																		\
 		BOCA_EXPORT char *BoCA_##componentName##_GetOutputFileExtension(void *component)					{ return ((BoCA::componentName *) component)->GetOutputFileExtension(); }								\
+		BOCA_EXPORT int BoCA_##componentName##_GetNumberOfPasses(void *component)						{ return ((BoCA::componentName *) component)->GetNumberOfPasses(); }									\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer, int size)				{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer), size); }					\
+		BOCA_EXPORT bool BoCA_##componentName##_NextPass(void *component)							{ return ((BoCA::componentName *) component)->NextPass(); }										\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
 		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)						{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -38,6 +38,10 @@ namespace BoCA
 				 */
 				virtual String	 GetOutputFileExtension();
 
+				/* Returns the number of passes needed by the encoder.
+				 */
+				virtual Int	 GetNumberOfPasses();
+
 				/* Activate/deactivate filter.
 				 */
 				virtual Bool	 Activate() = 0;
@@ -46,6 +50,10 @@ namespace BoCA
 				/* Write data from buffer.
 				 */
 				virtual Int	 WriteData(Buffer<UnsignedByte> &, Int) = 0;
+
+				/* Start the next encoding pass.
+				 */
+				virtual Bool	 NextPass();
 		};
 	};
 };

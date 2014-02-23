@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -41,6 +41,11 @@ String BoCA::AS::EncoderComponent::GetOutputFileExtension()
 	else			return specs->formats.GetFirst()->GetExtensions().GetFirst();
 }
 
+Int BoCA::AS::EncoderComponent::GetNumberOfPasses()
+{
+	return specs->func_GetNumberOfPasses(component);
+}
+
 Bool BoCA::AS::EncoderComponent::Activate()
 {
 	SetDriver(driver);
@@ -63,4 +68,9 @@ Bool BoCA::AS::EncoderComponent::Deactivate()
 Int BoCA::AS::EncoderComponent::WriteData(Buffer<UnsignedByte> &buffer, Int size)
 {
 	return specs->func_WriteData(component, &buffer, size);
+}
+
+Bool BoCA::AS::EncoderComponent::NextPass()
+{
+	return specs->func_NextPass(component);
 }

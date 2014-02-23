@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -288,11 +288,13 @@ namespace BoCA
 				void			 (*func_GetFormatInfo)(void *, void *);
 
 				char			*(*func_GetOutputFileExtension)(void *);
+				int			 (*func_GetNumberOfPasses)(void *);
 
 				bool			 (*func_Activate)(void *);
 				bool			 (*func_Deactivate)(void *);
 
 				bool			 (*func_Seek)(void *, __int64);
+				bool			 (*func_NextPass)(void *);
 
 				int			 (*func_ReadData)(void *, void *, int);
 				int			 (*func_WriteData)(void *, void *, int);

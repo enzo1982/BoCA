@@ -61,11 +61,13 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_GetFormatInfo		= NIL;
 
 	func_GetOutputFileExtension	= NIL;
+	func_GetNumberOfPasses		= NIL;
 
 	func_Activate			= NIL;
 	func_Deactivate			= NIL;
 
 	func_Seek			= NIL;
+	func_NextPass			= NIL;
 
 	func_ReadData			= NIL;
 	func_WriteData			= NIL;
@@ -169,11 +171,13 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_GetFormatInfo		= (void (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetFormatInfo"));
 
 	func_GetOutputFileExtension	= (char *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetOutputFileExtension"));
+	func_GetNumberOfPasses		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfPasses"));
 
 	func_Activate			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Activate"));
 	func_Deactivate			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Deactivate"));
 
 	func_Seek			= (bool (*)(void *, __int64))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Seek"));
+	func_NextPass			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_NextPass"));
 
 	func_ReadData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
 	func_WriteData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
