@@ -16,8 +16,6 @@ extern "C" {
 #	include <cdda_paranoia.h>
 }
 
-#include <glob.h>
-
 #include "cdparanoia.h"
 #include "config.h"
 
@@ -194,12 +192,17 @@ Error BoCA::DecoderCDParanoia::GetStreamInfo(const String &streamURI, Track &tra
 
 BoCA::DecoderCDParanoia::DecoderCDParanoia()
 {
-	configLayer = NIL;
+	configLayer	= NIL;
 
-	packageSize = 0;
+	packageSize	= 0;
 
-	drive	    = NIL;
-	paranoia    = NIL;
+	drive		= NIL;
+	paranoia	= NIL;
+
+	readOffset	= 0;
+
+	skipSamples	= 0;
+	prependSamples	= 0;
 }
 
 BoCA::DecoderCDParanoia::~DecoderCDParanoia()
@@ -222,14 +225,6 @@ Bool BoCA::DecoderCDParanoia::Activate()
 	if (drive == NIL) return False;
 
 	cdda_open(drive);
-
-	Int	 startSector = 0;
-	Int	 endSector   = 0;
-
-	if (!GetTrackSectors(startSector, endSector)) return False;
-
-	nextSector  = startSector;
-	sectorsLeft = endSector - startSector;
 
 	/* Set ripping spped.
 	 */
@@ -263,9 +258,12 @@ Bool BoCA::DecoderCDParanoia::Activate()
 
 		paranoia = paranoia_init(drive);
 
-		paranoia_seek(paranoia, startSector, SEEK_SET);
 		paranoia_modeset(paranoia, paranoiaMode);
 	}
+
+	/* Call seek to initialize ripper to start of track.
+	 */
+	Seek(0);
 
 	return True;
 }
@@ -283,6 +281,8 @@ Bool BoCA::DecoderCDParanoia::Deactivate()
 
 Bool BoCA::DecoderCDParanoia::Seek(Int64 samplePosition)
 {
+	Config	*config = Config::Get();
+
 	Int	 startSector = 0;
 	Int	 endSector   = 0;
 
@@ -290,6 +290,22 @@ Bool BoCA::DecoderCDParanoia::Seek(Int64 samplePosition)
 
 	startSector += samplePosition / 588;
 
+	/* Calculate offset values.
+	 */
+	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+
+	startSector += readOffset / 588;
+	endSector   += readOffset / 588;
+
+	if	(readOffset % 588 < 0) { startSector--; skipSamples = 588 + readOffset % 588; }
+	else if (readOffset % 588 > 0) { endSector++;	skipSamples = 	    readOffset % 588; }
+
+	if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
+
+	skipSamples += samplePosition % 588;
+
+	/* Set nextSector and sectors left to be read.
+	 */
 	nextSector  = startSector;
 	sectorsLeft = endSector - startSector;
 
@@ -302,27 +318,45 @@ Int BoCA::DecoderCDParanoia::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (inBytes >= track.fileSize) return -1;
 
+	/* Set up buffer respecting empty samples to prepend.
+	 */
 	Int	 sectors = Math::Min(sectorsLeft, paranoia == NIL ? 26 : 1);
 
-	data.Resize(sectors * 2352);
+	Int	 prependBytes = 4 * prependSamples;
+	Int	 skipBytes    = 4 * skipSamples;
 
+	prependSamples = 0;
+	skipSamples    = 0;
+
+	data.Resize(sectors * 2352 + prependBytes);
+
+	if (prependBytes > 0) data.Zero();
+
+	/* Rip chunk.
+	 */
 	if (paranoia != NIL)
 	{
 		int16_t	*audio = paranoia_read(paranoia, NIL);
 
-		memcpy(data, audio, data.Size());
+		memcpy(data + prependBytes, audio, data.Size());
 	}
 	else
 	{
-		cdda_read(drive, data, nextSector, sectors);
+		cdda_read(drive, data + prependBytes, nextSector, sectors);
 	}
 
 	nextSector  += sectors;
 	sectorsLeft -= sectors;
 
-	inBytes += data.Size();
+	/* Strip samples to skip from the beginning.
+	 */
+	Int	 dataBytes = sectors * 2352 + prependBytes - skipBytes;
 
-	return data.Size();
+	if (skipBytes > 0) memmove(data, data + skipBytes, dataBytes);
+
+	inBytes += dataBytes;
+
+	return dataBytes;
 }
 
 Bool BoCA::DecoderCDParanoia::GetTrackSectors(Int &startSector, Int &endSector)
@@ -331,6 +365,8 @@ Bool BoCA::DecoderCDParanoia::GetTrackSectors(Int &startSector, Int &endSector)
 
 	if (track.cdTrack == 0)
 	{
+		/* Special handling for hidden track one audio.
+		 */
 		if (!(drive->disc_toc[0].bFlags & 0x04))
 		{
 			startSector = 0;
@@ -341,6 +377,8 @@ Bool BoCA::DecoderCDParanoia::GetTrackSectors(Int &startSector, Int &endSector)
 	}
 	else
 	{
+		/* Handle regular tracks.
+		 */
 		for (Int i = 0; i < numTocEntries; i++)
 		{
 			if (!(drive->disc_toc[i].bFlags & 0x04) && (drive->disc_toc[i].bTrack == track.cdTrack))

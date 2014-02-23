@@ -22,32 +22,37 @@ namespace BoCA
 	class DecoderCDParanoia : public CS::DecoderComponent
 	{
 		private:
-			ConfigLayer			*configLayer;
+			ConfigLayer		*configLayer;
 
-			cdrom_drive			*drive;
-			cdrom_paranoia			*paranoia;
+			cdrom_drive		*drive;
+			cdrom_paranoia		*paranoia;
 
-			Int				 nextSector;
-			Int				 sectorsLeft;
+			Int			 nextSector;
+			Int			 sectorsLeft;
 
-			Bool				 GetTrackSectors(Int &, Int &);
+			Int			 readOffset;
+
+			Int			 skipSamples;
+			Int			 prependSamples;
+
+			Bool			 GetTrackSectors(Int &, Int &);
 		public:
-			static const String		&GetComponentSpecs();
+			static const String	&GetComponentSpecs();
 
-							 DecoderCDParanoia();
-							~DecoderCDParanoia();
+						 DecoderCDParanoia();
+						~DecoderCDParanoia();
 
-			Bool				 CanOpenStream(const String &);
-			Error				 GetStreamInfo(const String &, Track &);
+			Bool			 CanOpenStream(const String &);
+			Error			 GetStreamInfo(const String &, Track &);
 
-			Bool				 Activate();
-			Bool				 Deactivate();
+			Bool			 Activate();
+			Bool			 Deactivate();
 
-			Bool				 Seek(Int64);
+			Bool			 Seek(Int64);
 
-			Int				 ReadData(Buffer<UnsignedByte> &, Int);
+			Int			 ReadData(Buffer<UnsignedByte> &, Int);
 
-			ConfigLayer			*GetConfigurationLayer();
+			ConfigLayer		*GetConfigurationLayer();
 	};
 };
 

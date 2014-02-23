@@ -26,7 +26,7 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 	i18n->SetContext("Ripper");
 
-	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 68));
+	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 94));
 
 	combo_drive	= new ComboBox(Point(10, 12), Size(324, 0));
 
@@ -39,6 +39,8 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 		{
 			combo_drive->AddEntry(info->GetNthDeviceInfo(i).name);
 
+			driveOffsetUsed.Add(config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), 0));
+			driveOffsets.Add(config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
 			driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
 		}
 
@@ -48,6 +50,7 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	combo_drive->SelectNthEntry(config->GetIntValue("Ripper", "ActiveDrive", 0));
 	combo_drive->onSelectEntry.Connect(&ConfigureCDParanoia::SelectDrive, this);
 
+	useoffset = driveOffsetUsed.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 	setspeed = driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 
 	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(157, 0), &setspeed);
@@ -58,15 +61,25 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 	for (Int i = 48; i > 0; i -= 4) combo_speed->AddEntry(String::FromInt(i).Append("x"));
 
-	combo_speed->SelectNthEntry((48 - config->GetIntValue("Ripper", "RippingSpeed", 0)) / 4);
+	check_offset		= new CheckBox(i18n->TranslateString("Use read offset:"), Point(10, 67), Size(157, 0), &useoffset);
+	check_offset->onAction.Connect(&ConfigureCDParanoia::ToggleUseOffset, this);
+
+	edit_offset		= new EditBox(NIL, Point(176, 66), Size(36, 0), 5);
+	edit_offset->SetFlags(EDB_NUMERIC);
+	edit_offset->onInput.Connect(&ConfigureCDParanoia::ChangeOffset, this);
+
+	text_offset_samples	= new Text(i18n->TranslateString("samples"), Point(220, 69));
 
 	SelectDrive();
 
 	group_drive->Add(combo_drive);
 	group_drive->Add(check_speed);
 	group_drive->Add(combo_speed);
+	group_drive->Add(check_offset);
+	group_drive->Add(edit_offset);
+	group_drive->Add(text_offset_samples);
 
-	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 91), Size(344, 68));
+	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 117), Size(344, 68));
 
 	check_paranoia		= new CheckBox(i18n->TranslateString("Activate cdparanoia mode:"), Point(10, 14), Size(157, 0), &cdparanoia);
 	check_paranoia->onAction.Connect(&ConfigureCDParanoia::ToggleParanoia, this);
@@ -107,7 +120,7 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	Add(group_ripping);
 	Add(group_automatization);
 
-	SetSize(Size(544, 166));
+	SetSize(Size(544, 192));
 }
 
 BoCA::ConfigureCDParanoia::~ConfigureCDParanoia()
@@ -116,6 +129,9 @@ BoCA::ConfigureCDParanoia::~ConfigureCDParanoia()
 	DeleteObject(combo_drive);
 	DeleteObject(check_speed);
 	DeleteObject(combo_speed);
+	DeleteObject(check_offset);
+	DeleteObject(edit_offset);
+	DeleteObject(text_offset_samples);
 
 	DeleteObject(group_ripping);
 	DeleteObject(check_paranoia);
@@ -130,11 +146,37 @@ BoCA::ConfigureCDParanoia::~ConfigureCDParanoia()
 
 Void BoCA::ConfigureCDParanoia::SelectDrive()
 {
+	edit_offset->SetText(String::FromInt(driveOffsets.GetNth(combo_drive->GetSelectedEntryNumber())));
 	combo_speed->SelectNthEntry((48 - driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber())) / 4);
 
+	check_offset->SetChecked(driveOffsetUsed.GetNth(combo_drive->GetSelectedEntryNumber()));
 	check_speed->SetChecked(driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber()));
 
+	ToggleUseOffset();
 	ToggleSetSpeed();
+}
+
+Void BoCA::ConfigureCDParanoia::ToggleUseOffset()
+{
+	driveOffsetUsed.SetNth(combo_drive->GetSelectedEntryNumber(), useoffset);
+
+	if (useoffset)
+	{
+		edit_offset->Activate();
+		text_offset_samples->Activate();
+	}
+	else
+	{
+		edit_offset->Deactivate();
+		text_offset_samples->Deactivate();
+	}
+}
+
+Void BoCA::ConfigureCDParanoia::ChangeOffset()
+{
+	if (!useoffset) return;
+
+	driveOffsets.SetNth(combo_drive->GetSelectedEntryNumber(), edit_offset->GetText().ToInt());
 }
 
 Void BoCA::ConfigureCDParanoia::ToggleSetSpeed()
@@ -180,6 +222,8 @@ Int BoCA::ConfigureCDParanoia::SaveSettings()
 
 	for (Int i = 0; i < driveSpeeds.Length(); i++)
 	{
+		config->SetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), driveOffsetUsed.GetNth(i));
+		config->SetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), driveOffsets.GetNth(i));
 		config->SetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
 	}
 
