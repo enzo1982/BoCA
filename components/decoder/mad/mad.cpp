@@ -116,8 +116,7 @@ Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 	readDataMutex = new Mutex();
 	samplesBufferMutex = new Mutex();
 
-	decoderThread = NonBlocking1<Bool>(&DecoderMAD::ReadMAD, this).Call(False);
-	decoderThread->Wait();
+	ReadMAD(False);
 
 	delete readDataMutex;
 	delete samplesBufferMutex;

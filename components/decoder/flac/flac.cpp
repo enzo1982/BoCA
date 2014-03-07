@@ -167,8 +167,7 @@ Error BoCA::DecoderFLAC::GetStreamInfo(const String &streamURI, Track &track)
 	readDataMutex	   = new Mutex();
 	samplesBufferMutex = new Mutex();
 
-	decoderThread	   = NonBlocking1<Bool>(&DecoderFLAC::ReadFLAC, this).Call(False);
-	decoderThread->Wait();
+	ReadFLAC(False);
 
 	delete readDataMutex;
 	delete samplesBufferMutex;
