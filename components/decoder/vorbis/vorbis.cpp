@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -202,11 +202,9 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 
 	track.SetFormat(format);
 
-	ex_ogg_sync_clear(&oy);
-
 	/* Find real length of stream.
 	 */
-	ex_ogg_sync_init(&oy);
+	ex_ogg_sync_reset(&oy);
 
 	in.Seek(in.Size() - 65536);
 

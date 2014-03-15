@@ -40,6 +40,7 @@ typedef char *			(*OGGSYNCBUFFER)		(ogg_sync_state *, int);
 typedef int			(*OGGSYNCWROTE)			(ogg_sync_state *, int);
 typedef int			(*OGGSYNCPAGEOUT)		(ogg_sync_state *, ogg_page *);
 typedef int			(*OGGSYNCPAGESEEK)		(ogg_sync_state *, ogg_page *);
+typedef int			(*OGGSYNCRESET)			(ogg_sync_state *);
 typedef int			(*OGGSYNCCLEAR)			(ogg_sync_state *);
 
 extern OGGSTREAMINIT		 ex_ogg_stream_init;
@@ -55,6 +56,7 @@ extern OGGSYNCBUFFER		 ex_ogg_sync_buffer;
 extern OGGSYNCWROTE		 ex_ogg_sync_wrote;
 extern OGGSYNCPAGEOUT		 ex_ogg_sync_pageout;
 extern OGGSYNCPAGESEEK		 ex_ogg_sync_pageseek;
+extern OGGSYNCRESET		 ex_ogg_sync_reset;
 extern OGGSYNCCLEAR		 ex_ogg_sync_clear;
 
 typedef void			(*SPEEXBITSINIT)		(SpeexBits *);

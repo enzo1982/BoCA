@@ -241,11 +241,9 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 	track.SetFormat(format);
 
-	ex_ogg_sync_clear(&oy);
-
 	/* Find real length of stream.
 	 */
-	ex_ogg_sync_init(&oy);
+	ex_ogg_sync_reset(&oy);
 
 	in.Seek(in.Size() - 65536);
 

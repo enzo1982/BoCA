@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -25,6 +25,7 @@ OGGSYNCBUFFER			 ex_ogg_sync_buffer		= NIL;
 OGGSYNCWROTE			 ex_ogg_sync_wrote		= NIL;
 OGGSYNCPAGEOUT			 ex_ogg_sync_pageout		= NIL;
 OGGSYNCPAGESEEK			 ex_ogg_sync_pageseek		= NIL;
+OGGSYNCRESET			 ex_ogg_sync_reset		= NIL;
 OGGSYNCCLEAR			 ex_ogg_sync_clear		= NIL;
 
 VORBISINFOINIT			 ex_vorbis_info_init		= NIL;
@@ -71,6 +72,7 @@ Bool LoadOggDLL()
 	ex_ogg_sync_wrote	= (OGGSYNCWROTE) oggdll->GetFunctionAddress("ogg_sync_wrote");
 	ex_ogg_sync_pageout	= (OGGSYNCPAGEOUT) oggdll->GetFunctionAddress("ogg_sync_pageout");
 	ex_ogg_sync_pageseek	= (OGGSYNCPAGESEEK) oggdll->GetFunctionAddress("ogg_sync_pageseek");
+	ex_ogg_sync_reset	= (OGGSYNCRESET) oggdll->GetFunctionAddress("ogg_sync_reset");
 	ex_ogg_sync_clear	= (OGGSYNCCLEAR) oggdll->GetFunctionAddress("ogg_sync_clear");
 
 	if (ex_ogg_stream_init		== NIL ||
@@ -85,6 +87,7 @@ Bool LoadOggDLL()
 	    ex_ogg_sync_wrote		== NIL ||
 	    ex_ogg_sync_pageout		== NIL ||
 	    ex_ogg_sync_pageseek	== NIL ||
+	    ex_ogg_sync_reset		== NIL ||
 	    ex_ogg_sync_clear		== NIL) { FreeOggDLL(); return False; }
 
 	return True;
