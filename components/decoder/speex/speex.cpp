@@ -152,9 +152,12 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_ogg_sync_wrote(&oy, size);
 
-	while (ex_ogg_sync_pageseek(&oy, &og) != 0)
+	while (true)
 	{
-		if (ex_ogg_page_serialno(&og) != os.serialno) continue;
+		Int	 seek = ex_ogg_sync_pageseek(&oy, &og);
+
+		if (seek == 0) break;
+		if (seek <  0 || ex_ogg_page_serialno(&og) != os.serialno) continue;
 
 		track.length = ex_ogg_page_granulepos(&og);
 
