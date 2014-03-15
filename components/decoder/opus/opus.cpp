@@ -158,8 +158,10 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_ogg_sync_init(&oy);
 
-	/* Get stream format and read tags.
+	/* Get stream format.
 	 */
+	Buffer<UnsignedByte>	 comments;
+
 	Bool	 initialized = False;
 	Bool	 done = False;
 	Int	 packetNum = 0;
@@ -186,6 +188,8 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 			while (ex_ogg_stream_packetout(&os, &op) == 1 && !done)
 			{
+				/* Found header packet.
+				 */
 				if (packetNum == 0)
 				{
 					OpusHeader	*setup = (OpusHeader *) op.packet;
@@ -197,26 +201,20 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 					track.length = -1;
 				}
 
+				/* Found Vorbis Comment packet.
+				 */
 				if (packetNum == 1)
 				{
 					if (op.packet[0] == 'O' && op.packet[1] == 'p' && op.packet[2] == 'u' && op.packet[3] == 's' && op.packet[4] == 'T' && op.packet[5] == 'a' && op.packet[6] == 'g' && op.packet[7] == 's')
 					{
-						Buffer<UnsignedByte>	 buffer(op.bytes - 8);
+						comments.Resize(op.bytes - 8);
 
-						memcpy(buffer, op.packet + 8, op.bytes - 8);
-
-						AS::Registry		&boca = AS::Registry::Get();
-						AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("vorbis-tag");
-
-						if (tagger != NIL)
-						{
-							tagger->ParseBuffer(buffer, track);
-
-							boca.DeleteComponent(tagger);
-						}
+						memcpy(comments, op.packet + 8, op.bytes - 8);
 					}
 				}
 
+				/* Found audio packet.
+				 */
 				if (packetNum == 3)
 				{
 					int			 error	 = 0;
@@ -232,6 +230,8 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 					}
 				}
 
+				/* Done if we reached packet three.
+				 */
 				if (packetNum >= 3) done = True;
 
 				packetNum++;
@@ -259,6 +259,21 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 		track.length = ex_ogg_page_granulepos(&og) - preSkip;
 
 		if (ex_ogg_page_eos(&og)) break;
+	}
+
+	/* Read tags.
+	 */
+	if (comments.Size() > 0)
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("vorbis-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->ParseBuffer(comments, track);
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
 	/* Clean up.

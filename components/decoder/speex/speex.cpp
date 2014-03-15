@@ -77,8 +77,10 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 
 	ex_ogg_sync_init(&oy);
 
-	/* Get stream format and read tags.
+	/* Get stream format.
 	 */
+	Buffer<UnsignedByte>	 comments;
+
 	Bool	 initialized = False;
 	Bool	 done = False;
 	Int	 packetNum = 0;
@@ -105,6 +107,8 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 
 			while (ex_ogg_stream_packetout(&os, &op) == 1 && !done)
 			{
+				/* Found header packet.
+				 */
 				if (packetNum == 0)
 				{
 					SpeexHeader	*header = ex_speex_packet_to_header((char *) op.packet, op.bytes);
@@ -117,23 +121,17 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 					free(header);
 				}
 
+				/* Found Vorbis Comment packet.
+				 */
 				if (packetNum == 1)
 				{
-					Buffer<UnsignedByte>	 buffer(op.bytes);
+					comments.Resize(op.bytes);
 
-					memcpy(buffer, op.packet, op.bytes);
-
-					AS::Registry		&boca = AS::Registry::Get();
-					AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("vorbis-tag");
-
-					if (tagger != NIL)
-					{
-						tagger->ParseBuffer(buffer, track);
-
-						boca.DeleteComponent(tagger);
-					}
+					memcpy(comments, op.packet, op.bytes);
 				}
 
+				/* Done if we reached packet one.
+				 */
 				if (packetNum >= 1) done = True;
 
 				packetNum++;
@@ -161,6 +159,21 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 		track.length = ex_ogg_page_granulepos(&og);
 
 		if (ex_ogg_page_eos(&og)) break;
+	}
+
+	/* Read tags.
+	 */
+	if (comments.Size() > 0)
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("vorbis-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->ParseBuffer(comments, track);
+
+			boca.DeleteComponent(tagger);
+		}
 	}
 
 	/* Clean up.
