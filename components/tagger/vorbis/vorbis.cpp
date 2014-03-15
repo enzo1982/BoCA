@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -120,23 +120,36 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	 */
 	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToVorbisComment", False))
 	{
-		/* This is an unofficial way to store cover art in Vorbis
-		 * comments. It is used by some existing software.
-		 *
-		 * Copy only the first picture. It's not clear if any other
-		 * software can handle multiple pictures in Vorbis comments.
+		/* This is the official way to store cover art in Vorbis
+		 * comments. It is used by most newer software.
 		 */
-		if (track.pictures.Length() > 0)
+		foreach (const Picture &picInfo, track.pictures)
 		{
-			const Picture		&picInfo = track.pictures.GetFirst();
-			Buffer<UnsignedByte>	 picBuffer(picInfo.data.Size());
+			Buffer<UnsignedByte>	 picBuffer((picInfo.mime	!= NIL ? strlen(picInfo.mime)	     : 0) +
+							   (picInfo.description != NIL ? strlen(picInfo.description) : 0) + picInfo.data.Size() + 32);
+			OutStream		 picOut(STREAM_BUFFER, picBuffer, picBuffer.Size());
 
-			memcpy(picBuffer, picInfo.data, picInfo.data.Size());
+			picOut.OutputNumberRaw(picInfo.type, 4);
 
-			RenderTagItem("COVERARTMIME", picInfo.mime, buffer);
-			RenderTagItem("COVERART", Encoding::Base64(picBuffer).Encode(), buffer);
+			picOut.OutputNumberRaw(picInfo.mime != NIL ? strlen(picInfo.mime) : 0, 4);
+			picOut.OutputString(picInfo.mime);
 
-			numItems += 2;
+			picOut.OutputNumberRaw(picInfo.description != NIL ? strlen(picInfo.description) : 0, 4);
+			picOut.OutputString(picInfo.description);
+
+			picOut.OutputNumberRaw(0, 4);
+			picOut.OutputNumberRaw(0, 4);
+			picOut.OutputNumberRaw(0, 4);
+			picOut.OutputNumberRaw(0, 4);
+
+			picOut.OutputNumberRaw(picInfo.data.Size(), 4);
+			picOut.OutputData(picInfo.data, picInfo.data.Size());
+
+			picOut.Close();
+
+			RenderTagItem("METADATA_BLOCK_PICTURE", Encoding::Base64(picBuffer).Encode(), buffer);
+
+			numItems += 1;
 		}
 	}
 
@@ -238,6 +251,36 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "CDTOC")
 		{
 			info.offsets = value;
+		}
+		else if (id == "METADATA_BLOCK_PICTURE" && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+		{
+			/* This is the official way to store cover art in Vorbis
+			 * comments. It is used by most newer software.
+			 */
+			Picture			 picture;
+			Buffer<UnsignedByte>	 buffer;
+
+			Encoding::Base64(buffer).Decode(value);
+
+			InStream		 picIn(STREAM_BUFFER, buffer, buffer.Size());
+
+			picture.type	    = picIn.InputNumberRaw(4);
+			picture.mime	    = picIn.InputString(picIn.InputNumberRaw(4));
+			picture.description = picIn.InputString(picIn.InputNumberRaw(4));
+
+			picIn.RelSeek(16);
+
+			Int	 dataSize = picIn.InputNumberRaw(4);
+
+			picture.data.Set(buffer + picIn.GetPos(), dataSize);
+
+			if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+			else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
+				 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
+				 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
+				 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+
+			if (picture.mime != "-->") track.pictures.Add(picture);
 		}
 		else if (id == "COVERART" && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
 		{
