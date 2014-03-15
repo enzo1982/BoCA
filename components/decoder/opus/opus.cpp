@@ -163,8 +163,8 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 	Buffer<UnsignedByte>	 comments;
 
 	Bool	 initialized = False;
-	Bool	 done = False;
-	Int	 packetNum = 0;
+	Bool	 done	     = False;
+	Int	 packetNum   = 0;
 
 	while (!done)
 	{
@@ -297,6 +297,8 @@ BoCA::DecoderOpus::DecoderOpus()
 	preSkip	    = 0;
 	preSkipLeft = 0;
 
+	skipSamples = 0;
+
 	memset(&oy, 0, sizeof(oy));
 	memset(&os, 0, sizeof(os));
 	memset(&og, 0, sizeof(og));
@@ -373,8 +375,10 @@ Bool BoCA::DecoderOpus::Deactivate()
 
 Bool BoCA::DecoderOpus::Seek(Int64 samplePosition)
 {
-	while (ex_ogg_page_granulepos(&og) - preSkip < samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
+	while (ex_ogg_page_granulepos(&og) - preSkip <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
 	{
+		skipSamples = preSkip + samplePosition - ex_ogg_page_granulepos(&og);
+
 		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
 		{
 			char	*buffer = ex_ogg_sync_buffer(&oy, 131072);
@@ -387,6 +391,12 @@ Bool BoCA::DecoderOpus::Seek(Int64 samplePosition)
 			if (size == 0) return False;
 		}
 	}
+
+	ex_ogg_stream_pagein(&os, &og);
+
+	preSkipLeft += skipSamples;
+
+	ex_opus_decoder_ctl(decoder, OPUS_RESET_STATE);
 
 	return True;
 }

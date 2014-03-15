@@ -82,8 +82,8 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 	Buffer<UnsignedByte>	 comments;
 
 	Bool	 initialized = False;
-	Bool	 done = False;
-	Int	 packetNum = 0;
+	Bool	 done	     = False;
+	Int	 packetNum   = 0;
 
 	while (!done)
 	{
@@ -198,6 +198,11 @@ BoCA::DecoderSpeex::DecoderSpeex()
 	lookAhead   = 0;
 	nFrames	    = 0;
 
+	preSkip	    = 0;
+	preSkipLeft = 0;
+
+	skipSamples = 0;
+
 	pageNumber  = 0;
 
 	memset(&oy, 0, sizeof(oy));
@@ -298,8 +303,10 @@ Bool BoCA::DecoderSpeex::Deactivate()
 
 Bool BoCA::DecoderSpeex::Seek(Int64 samplePosition)
 {
-	while (ex_ogg_page_granulepos(&og) < samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
+	while (ex_ogg_page_granulepos(&og) <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
 	{
+		skipSamples = samplePosition - ex_ogg_page_granulepos(&og);
+
 		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
 		{
 			char	*buffer = ex_ogg_sync_buffer(&oy, 131072);
@@ -312,6 +319,12 @@ Bool BoCA::DecoderSpeex::Seek(Int64 samplePosition)
 			if (size == 0) return False;
 		}
 	}
+
+	ex_ogg_stream_pagein(&os, &og);
+
+	preSkipLeft += skipSamples;
+
+	ex_speex_decoder_ctl(decoder, SPEEX_RESET_STATE, 0);
 
 	return True;
 }
@@ -338,13 +351,12 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data, Int size)
 	{
 		ex_ogg_stream_pagein(&os, &og);
 
-		Int	 delaySamples	  = 0;
-		Int	 delaySamplesLeft = 0;
-
 		if (pageNumber++ == 0)
 		{
-			delaySamples	 = lookAhead + (ex_ogg_page_packets(&og) * nFrames * frameSize) - ex_ogg_page_granulepos(&og);
-			delaySamplesLeft = delaySamples;
+			if (ex_ogg_page_granulepos(&og) < ex_ogg_page_packets(&og) * nFrames * frameSize) preSkip += ex_ogg_page_packets(&og) * nFrames * frameSize - ex_ogg_page_granulepos(&og);
+
+			preSkip	    += lookAhead;
+			preSkipLeft += preSkip;
 		}
 
 		while (ex_ogg_stream_packetout(&os, &op) == 1)
@@ -359,26 +371,26 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 				if (format.channels == 2) ex_speex_decode_stereo_int(pcmBuffer, frameSize, &stereo);
 
-				if (frameSize > delaySamplesLeft)
+				if (frameSize > preSkipLeft)
 				{
-					if (delaySamplesLeft) memmove((short *) pcmBuffer, (short *) pcmBuffer + delaySamplesLeft * format.channels, (frameSize - delaySamplesLeft) * format.channels * 2);
+					if (preSkipLeft) memmove((short *) pcmBuffer, (short *) pcmBuffer + preSkipLeft * format.channels, (frameSize - preSkipLeft) * format.channels * 2);
 
-					if (dataBufferLen < size + ((frameSize - delaySamplesLeft) * format.channels * 2))
+					if (dataBufferLen < size + ((frameSize - preSkipLeft) * format.channels * 2))
 					{
-						dataBufferLen += (((frameSize - delaySamplesLeft) * format.channels * 2) + 131072);
+						dataBufferLen += (((frameSize - preSkipLeft) * format.channels * 2) + 131072);
 
 						data.Resize(dataBufferLen);
 					}
 
-					for (Int j = 0; j < (frameSize - delaySamplesLeft) * format.channels; j++)
+					for (Int j = 0; j < (frameSize - preSkipLeft) * format.channels; j++)
 					{
 						((short *) (UnsignedByte *) data)[size / 2 + j] = pcmBuffer[j];
 					}
 
-					size += ((frameSize - delaySamplesLeft) * format.channels * 2);
+					size += ((frameSize - preSkipLeft) * format.channels * 2);
 				}
 
-				delaySamplesLeft = Math::Max(0, delaySamplesLeft - frameSize);
+				preSkipLeft = Math::Max(0, preSkipLeft - frameSize);
 			}
 		}
 

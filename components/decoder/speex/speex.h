@@ -31,6 +31,11 @@ namespace BoCA
 			spx_int32_t		 lookAhead;
 			spx_int32_t		 nFrames;
 
+			spx_int32_t		 preSkip;
+			spx_int32_t		 preSkipLeft;
+
+			spx_int32_t		 skipSamples;
+
 			Int			 pageNumber;
 
 			Buffer<short>		 pcmBuffer;

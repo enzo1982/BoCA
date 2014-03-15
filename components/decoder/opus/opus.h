@@ -27,6 +27,8 @@ namespace BoCA
 
 			Int			 preSkip;
 			Int			 preSkipLeft;
+
+			Int			 skipSamples;
 		public:
 			static const String	&GetComponentSpecs();
 

@@ -46,6 +46,7 @@ VORBISSYNTHESISBLOCKIN		 ex_vorbis_synthesis_blockin	= NIL;
 VORBISSYNTHESISPCMOUT		 ex_vorbis_synthesis_pcmout	= NIL;
 VORBISSYNTHESISREAD		 ex_vorbis_synthesis_read	= NIL;
 VORBISSYNTHESISHEADERIN		 ex_vorbis_synthesis_headerin	= NIL;
+VORBISSYNTHESISRESTART		 ex_vorbis_synthesis_restart	= NIL;
 VORBISBLOCKCLEAR		 ex_vorbis_block_clear		= NIL;
 VORBISDSPCLEAR			 ex_vorbis_dsp_clear		= NIL;
 VORBISCOMMENTCLEAR		 ex_vorbis_comment_clear	= NIL;
@@ -124,6 +125,7 @@ Bool LoadVorbisDLL()
 	ex_vorbis_synthesis_pcmout	= (VORBISSYNTHESISPCMOUT) vorbisdll->GetFunctionAddress("vorbis_synthesis_pcmout");
 	ex_vorbis_synthesis_read	= (VORBISSYNTHESISREAD) vorbisdll->GetFunctionAddress("vorbis_synthesis_read");
 	ex_vorbis_synthesis_headerin	= (VORBISSYNTHESISHEADERIN) vorbisdll->GetFunctionAddress("vorbis_synthesis_headerin");
+	ex_vorbis_synthesis_restart	= (VORBISSYNTHESISRESTART) vorbisdll->GetFunctionAddress("vorbis_synthesis_restart");
 	ex_vorbis_block_clear		= (VORBISBLOCKCLEAR) vorbisdll->GetFunctionAddress("vorbis_block_clear");
 	ex_vorbis_dsp_clear		= (VORBISDSPCLEAR) vorbisdll->GetFunctionAddress("vorbis_dsp_clear");
 	ex_vorbis_comment_clear		= (VORBISCOMMENTCLEAR) vorbisdll->GetFunctionAddress("vorbis_comment_clear");
@@ -147,6 +149,7 @@ Bool LoadVorbisDLL()
 	    ex_vorbis_synthesis_pcmout		== NIL ||
 	    ex_vorbis_synthesis_read		== NIL ||
 	    ex_vorbis_synthesis_headerin	== NIL ||
+	    ex_vorbis_synthesis_restart		== NIL ||
 	    ex_vorbis_block_clear		== NIL ||
 	    ex_vorbis_dsp_clear			== NIL ||
 	    ex_vorbis_comment_clear		== NIL ||

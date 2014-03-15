@@ -137,8 +137,8 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 	Buffer<UnsignedByte>	 comments;
 
 	Bool	 initialized = False;
-	Bool	 done = False;
-	Int	 packetNum = 0;
+	Bool	 done	     = False;
+	Int	 packetNum   = 0;
 
 	while (!done)
 	{
@@ -254,6 +254,8 @@ BoCA::DecoderVorbis::DecoderVorbis()
 {
 	packageSize = 0;
 
+	skipSamples = 0;
+
 	memset(&oy, 0, sizeof(oy));
 	memset(&os, 0, sizeof(os));
 	memset(&og, 0, sizeof(og));
@@ -335,8 +337,10 @@ Bool BoCA::DecoderVorbis::Deactivate()
 
 Bool BoCA::DecoderVorbis::Seek(Int64 samplePosition)
 {
-	while (ex_ogg_page_granulepos(&og) < samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
+	while (ex_ogg_page_granulepos(&og) + 1024 <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
 	{
+		skipSamples = samplePosition - ex_ogg_page_granulepos(&og) - 1024;
+
 		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
 		{
 			char	*buffer = ex_ogg_sync_buffer(&oy, 131072);
@@ -349,6 +353,10 @@ Bool BoCA::DecoderVorbis::Seek(Int64 samplePosition)
 			if (size == 0) return False;
 		}
 	}
+
+	ex_ogg_stream_pagein(&os, &og);
+
+	ex_vorbis_synthesis_restart(&vd);
 
 	return True;
 }
@@ -405,16 +413,21 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data, Int size)
 					}
 				}
 
-				if (dataBufferLen < size + (bout * vi.channels * 2))
+				if (bout > skipSamples)
 				{
-					dataBufferLen += ((bout * vi.channels * 2) + 131072);
+					if (dataBufferLen < size + ((bout - skipSamples) * vi.channels * 2))
+					{
+						dataBufferLen += (((bout - skipSamples) * vi.channels * 2) + 131072);
 
-					data.Resize(dataBufferLen);
+						data.Resize(dataBufferLen);
+					}
+
+					memcpy(((unsigned char *) data) + size, convbuffer + skipSamples * vi.channels, (bout - skipSamples) * vi.channels * 2);
+
+					size += ((bout - skipSamples) * vi.channels * 2);
 				}
 
-				memcpy(((unsigned char *) data) + size, convbuffer, bout * vi.channels * 2);
-
-				size += (bout * vi.channels * 2);
+				skipSamples = Math::Max(0, skipSamples - bout);
 
 				ex_vorbis_synthesis_read(&vd, bout);
 			}
