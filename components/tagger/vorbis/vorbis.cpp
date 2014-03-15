@@ -153,6 +153,36 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		}
 	}
 
+	/* Save chapters.
+	 */
+	if (track.tracks.Length() > 0 && currentConfig->GetIntValue("Tags", "WriteChapters", True))
+	{
+		Int64	 offset = 0;
+
+		for (Int i = 0; i < track.tracks.Length(); i++)
+		{
+			const Track	&chapterTrack  = track.tracks.GetNth(i);
+			const Info	&chapterInfo   = chapterTrack.GetInfo();
+			const Format	&chapterFormat = chapterTrack.GetFormat();
+
+			String	 value	= String(offset / chapterFormat.rate / 60 / 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 / 60)).Append(":")
+					 .Append(offset / chapterFormat.rate / 60 % 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 % 60)).Append(":")
+					 .Append(offset / chapterFormat.rate % 60      < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate % 60)).Append(".")
+					 .Append(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) < 100 ? "00" :
+						(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) <  10 ?  "0" : "")).Append(String::FromInt(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate)));
+
+			{ RenderTagItem(String("CHAPTER").Append(i < 100 ? "00" : (i < 10 ? "0" : "")).Append(String::FromInt(i + 1)), value, buffer); numItems++; }
+
+			if (chapterInfo.title != NIL)
+			{
+				{ RenderTagItem(String("CHAPTER").Append(i < 100 ? "00" : (i < 10 ? "0" : "")).Append(String::FromInt(i + 1)).Append("NAME"), chapterInfo.title, buffer); numItems++; }
+			}
+
+			if	(chapterTrack.length	   >= 0) offset += chapterTrack.length;
+			else if (chapterTrack.approxLength >= 0) offset += chapterTrack.approxLength;
+		}
+	}
+
 	RenderTagHeader(vendorString, numItems, buffer);
 
 	String::SetOutputFormat(prevOutFormat);
@@ -195,7 +225,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 	/* Skip vendor string.
 	 */
-	Int		 vendorLength = in.InputNumber(4);
+	String	 prevInFormat = String::SetInputFormat("UTF-8");
+	Int	 vendorLength = in.InputNumber(4);
 
 	if (vendorLength < 0 || vendorLength > buffer.Size() - 8) return Error();
 
@@ -203,9 +234,9 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 	/* Parse individual comment items.
 	 */
-	Int	 numItems = in.InputNumber(4);
-	Info	 info = track.GetInfo();
-	String	 prevInFormat = String::SetInputFormat("UTF-8");
+	Int	 numItems    = in.InputNumber(4);
+	Int	 itemsOffset = in.GetPos();
+	Info	 info	     = track.GetInfo();
 
 	for (Int i = 0; i < numItems; i++)
 	{
@@ -307,6 +338,98 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 	}
 
 	track.SetInfo(info);
+
+	/* Read chapters.
+	 */
+	in.Seek(itemsOffset);
+
+	for (Int i = 0; i < numItems; i++)
+	{
+		/* Read and check next comment string length.
+		 */
+		Int	 length	 = in.InputNumber(4);
+
+		if (length < 0 || length > buffer.Size() - in.GetPos()) break;
+
+		/* Read and assign actual comment string.
+		 */
+		String	 comment = in.InputString(length);
+
+		String	 id	 = comment.Head(comment.Find("=")).ToUpper();
+		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1);
+
+		if (id.StartsWith("CHAPTER") && currentConfig->GetIntValue("Tags", "ReadChapters", True))
+		{
+			const Format	&format = track.GetFormat();
+
+			Int	 chapter = id.SubString(7, 3).ToInt();
+			String	 field	 = id.Tail(id.Length() - 10);
+
+			/* Chapters must appear in order.
+			 */
+			if (track.tracks.Length() > chapter ||
+			    track.tracks.Length() < chapter - 1)
+			{
+				track.tracks.RemoveAll();
+
+				break;
+			}
+
+			/* Fill track data and add to track list.
+			 */
+			if (track.tracks.Length() == chapter - 1)
+			{
+				Track	 nTrack;
+				Info	 info = track.GetInfo();
+
+				nTrack.origFilename = track.origFilename;
+				nTrack.pictures	    = track.pictures;
+
+				info.track = chapter;
+
+				nTrack.SetInfo(info);
+				nTrack.SetFormat(format);
+
+				track.tracks.Add(nTrack, chapter);
+			}
+
+			Track	&rTrack = track.tracks.GetReference(chapter);
+
+			/* Set track offset.
+			 */
+			if (field == NIL)
+			{
+				rTrack.sampleOffset = Math::Round(value.SubString(0, 2).ToInt() * 60 * 60 * format.rate +
+								  value.SubString(3, 2).ToInt() * 60	  * format.rate +
+								  value.SubString(6, 2).ToInt()		  * format.rate +
+								  value.SubString(9, 3).ToInt()		  * format.rate / 1000.0);
+
+				rTrack.length	    = track.length - rTrack.sampleOffset;
+				rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
+			}
+
+			/* Set track title.
+			 */
+			if (field == "NAME")
+			{
+				Info	 info	= rTrack.GetInfo();
+
+				info.title = value;
+
+				rTrack.SetInfo(info);
+			}
+
+			/* Update previous track length.
+			 */
+			if (chapter > 1)
+			{
+				Track	&pTrack = track.tracks.GetReference(chapter - 1);
+
+				pTrack.length	= rTrack.sampleOffset - pTrack.sampleOffset;
+				pTrack.fileSize	= pTrack.length * format.channels * (format.bits / 8);
+			}
+		}
+	}
 
 	String::SetInputFormat(prevInFormat);
 
