@@ -22,7 +22,7 @@ Array<BoCA::Converter *> &BoCA::Converter::Get()
 {
 	if (converters.Length() == 0)
 	{
-		Directory		 dir(Utilities::GetBoCADirectory().Append("boca/boca.extension.youtube"));
+		Directory		 dir(Utilities::GetBoCADirectory().Append("boca.extension.youtube"));
 		const Array<File>	&files = dir.GetFilesByPattern("converter_*.xml");
 
 		foreach (const File &file, files)
