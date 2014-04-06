@@ -50,6 +50,8 @@ Void smooth::DetachDLL()
 {
 }
 
+UnsignedInt64	 BoCA::DecoderCDIO::lastRead = 0;
+
 Bool BoCA::DecoderCDIO::CanOpenStream(const String &streamURI)
 {
 	String	 lcURI = streamURI.ToLower();
@@ -346,6 +348,26 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 
 	if (paranoia != NIL) cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
 
+	/* Wait for drive to spin up if requested.
+	 */
+	Int		 spinUpTime = config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
+	UnsignedInt64	 startTime  = S::System::System::Clock();
+
+	while (spinUpTime > 0 && startTime - lastRead > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))
+	{
+		if (paranoia != NIL)
+		{
+			cdio_paranoia_read(paranoia, NIL);
+			cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
+		}
+		else
+		{
+			Buffer<UnsignedByte>	 buffer(2352);
+
+			cdio_read_audio_sectors(cd, buffer, nextSector, 1);
+		}
+	}
+
 	return True;
 }
 
@@ -382,6 +404,8 @@ Int BoCA::DecoderCDIO::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	nextSector  += sectors;
 	sectorsLeft -= sectors;
+
+	lastRead = S::System::System::Clock();
 
 	/* Strip samples to skip from the beginning.
 	 */

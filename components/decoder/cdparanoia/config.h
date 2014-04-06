@@ -28,6 +28,9 @@ namespace BoCA
 			ComboBox	*combo_drive;
 			CheckBox	*check_speed;
 			ComboBox	*combo_speed;
+			CheckBox	*check_spinup;
+			Slider		*slider_spinup;
+			Text		*text_spinup_seconds;
 			CheckBox	*check_offset;
 			EditBox		*edit_offset;
 			Text		*text_offset_samples;
@@ -42,25 +45,31 @@ namespace BoCA
 			CheckBox	*check_autoRead;
 			CheckBox	*check_autoRip;
 
-			Bool		 useoffset;
 			Bool		 setspeed;
+			Bool		 spinup;
+			Bool		 useoffset;
 			Bool		 cdparanoia;
 			Bool		 jitter;
 			Bool		 swapchannels;
+
 			Bool		 autoRead;
 			Bool		 autoRip;
 
 			Array<Bool>	 driveOffsetUsed;
 			Array<Int>	 driveOffsets;
 			Array<Int>	 driveSpeeds;
+			Array<Int>	 driveSpinUpTimes;
 		slots:
 			Void		 SelectDrive();
 
-			Void		 ToggleUseOffset();
-			Void		 ChangeOffset();
-
 			Void		 ToggleSetSpeed();
 			Void		 SelectSpeed();
+
+			Void		 ToggleSpinUp();
+			Void		 ChangeSpinUpTime();
+
+			Void		 ToggleUseOffset();
+			Void		 ChangeOffset();
 
 			Void		 ToggleParanoia();
 

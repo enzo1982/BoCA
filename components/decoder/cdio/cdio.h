@@ -20,6 +20,8 @@ namespace BoCA
 	class DecoderCDIO : public CS::DecoderComponent
 	{
 		private:
+			static UnsignedInt64	 lastRead;
+
 			ConfigLayer		*configLayer;
 
 			CdIo_t			*cd;

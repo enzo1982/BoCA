@@ -28,7 +28,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	i18n->SetContext("Ripper");
 
-	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 94));
+	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 121));
 
 	combo_drive	= new ComboBox(Point(10, 12), Size(324, 0));
 
@@ -44,6 +44,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 			driveOffsetUsed.Add(config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), 0));
 			driveOffsets.Add(config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
 			driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
+			driveSpinUpTimes.Add(config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(i)), -5));
 		}
 
 		boca.DeleteComponent(info);
@@ -53,6 +54,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	combo_drive->onSelectEntry.Connect(&ConfigureCDIO::SelectDrive, this);
 
 	useoffset = driveOffsetUsed.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
+	spinup	  = driveSpinUpTimes.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0)) > 0;
 	setspeed  = driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 
 	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(157, 0), &setspeed);
@@ -63,31 +65,44 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	for (Int i = 48; i > 0; i -= 4) combo_speed->AddEntry(String::FromInt(i).Append("x"));
 
-	check_offset		= new CheckBox(i18n->TranslateString("Use read offset:"), Point(10, 67), Size(157, 0), &useoffset);
+	check_spinup		= new CheckBox(i18n->TranslateString("Spin up before ripping:"), Point(10, 67), Size(157, 0), &spinup);
+	check_spinup->onAction.Connect(&ConfigureCDIO::ToggleSpinUp, this);
+
+	text_spinup_seconds	= new Text(i18n->TranslateString("%1 seconds").Replace("%1", "00"), Point(270, 69));
+	text_spinup_seconds->SetX(333 - text_spinup_seconds->GetUnscaledTextWidth());
+
+	slider_spinup		= new Slider(Point(176, 67), Size(86, 0), OR_HORZ, NIL, 1, 30);
+	slider_spinup->SetWidth(149 - text_spinup_seconds->GetUnscaledTextWidth());
+	slider_spinup->onValueChange.Connect(&ConfigureCDIO::ChangeSpinUpTime, this);
+
+	check_offset		= new CheckBox(i18n->TranslateString("Use read offset:"), Point(10, 94), Size(157, 0), &useoffset);
 	check_offset->onAction.Connect(&ConfigureCDIO::ToggleUseOffset, this);
 
-	edit_offset		= new EditBox(NIL, Point(176, 66), Size(36, 0), 5);
+	edit_offset		= new EditBox(NIL, Point(176, 93), Size(36, 0), 5);
 	edit_offset->SetFlags(EDB_NUMERIC);
 	edit_offset->onInput.Connect(&ConfigureCDIO::ChangeOffset, this);
 
-	text_offset_samples	= new Text(i18n->TranslateString("samples"), Point(220, 69));
+	text_offset_samples	= new Text(i18n->TranslateString("samples"), Point(220, 96));
 
 	SelectDrive();
 
 	group_drive->Add(combo_drive);
 	group_drive->Add(check_speed);
 	group_drive->Add(combo_speed);
+	group_drive->Add(check_spinup);
+	group_drive->Add(slider_spinup);
+	group_drive->Add(text_spinup_seconds);
 	group_drive->Add(check_offset);
 	group_drive->Add(edit_offset);
 	group_drive->Add(text_offset_samples);
 
-	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 117), Size(344, 39));
+	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 144), Size(344, 39));
 
 	check_readISRC		= new CheckBox(i18n->TranslateString("Read ISRC when adding tracks to joblist"), Point(10, 11), Size(323, 0), &readISRC);
 
 	group_cdinfo->Add(check_readISRC);
 
-	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 117/*168*/), Size(344, 68));
+	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 144/*195*/), Size(344, 68));
 
 	check_paranoia		= new CheckBox(i18n->TranslateString("Activate cdparanoia mode:"), Point(10, 14), Size(157, 0), &cdparanoia);
 	check_paranoia->onAction.Connect(&ConfigureCDIO::ToggleParanoia, this);
@@ -129,7 +144,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	Add(group_automatization);
 //	Add(group_cdinfo);
 
-	SetSize(Size(544, 192/*243*/));
+	SetSize(Size(544, 219/*270*/));
 }
 
 BoCA::ConfigureCDIO::~ConfigureCDIO()
@@ -138,6 +153,9 @@ BoCA::ConfigureCDIO::~ConfigureCDIO()
 	DeleteObject(combo_drive);
 	DeleteObject(check_speed);
 	DeleteObject(combo_speed);
+	DeleteObject(check_spinup);
+	DeleteObject(slider_spinup);
+	DeleteObject(text_spinup_seconds);
 	DeleteObject(check_offset);
 	DeleteObject(edit_offset);
 	DeleteObject(text_offset_samples);
@@ -163,9 +181,13 @@ Void BoCA::ConfigureCDIO::SelectDrive()
 
 	check_offset->SetChecked(driveOffsetUsed.GetNth(combo_drive->GetSelectedEntryNumber()));
 	check_speed->SetChecked(driveSpeeds.GetNth(combo_drive->GetSelectedEntryNumber()));
+	check_spinup->SetChecked(driveSpinUpTimes.GetNth(combo_drive->GetSelectedEntryNumber()) > 0);
+
+	slider_spinup->SetValue(Math::Abs(driveSpinUpTimes.GetNth(combo_drive->GetSelectedEntryNumber())));
 
 	ToggleUseOffset();
 	ToggleSetSpeed();
+	ToggleSpinUp();
 }
 
 Void BoCA::ConfigureCDIO::ToggleUseOffset()
@@ -189,6 +211,33 @@ Void BoCA::ConfigureCDIO::ChangeOffset()
 	if (!useoffset) return;
 
 	driveOffsets.SetNth(combo_drive->GetSelectedEntryNumber(), edit_offset->GetText().ToInt());
+}
+
+Void BoCA::ConfigureCDIO::ToggleSpinUp()
+{
+	driveSpinUpTimes.SetNth(combo_drive->GetSelectedEntryNumber(), slider_spinup->GetValue() * (spinup ? 1 : -1));
+
+	if (spinup)
+	{
+		slider_spinup->Activate();
+		text_spinup_seconds->Activate();
+	}
+	else
+	{
+		slider_spinup->Deactivate();
+		text_spinup_seconds->Deactivate();
+	}
+}
+
+Void BoCA::ConfigureCDIO::ChangeSpinUpTime()
+{
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Ripper");
+
+	text_spinup_seconds->SetText(i18n->TranslateString("%1 seconds").Replace("%1", String::FromInt(slider_spinup->GetValue())));
+
+	driveSpinUpTimes.SetNth(combo_drive->GetSelectedEntryNumber(), slider_spinup->GetValue() * (spinup ? 1 : -1));
 }
 
 Void BoCA::ConfigureCDIO::ToggleSetSpeed()
@@ -237,6 +286,7 @@ Int BoCA::ConfigureCDIO::SaveSettings()
 		config->SetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), driveOffsetUsed.GetNth(i));
 		config->SetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), driveOffsets.GetNth(i));
 		config->SetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
+		config->SetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(i)), driveSpinUpTimes.GetNth(i));
 	}
 
 	config->SetIntValue("Ripper", "AutoReadContents", autoRead);

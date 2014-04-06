@@ -22,6 +22,8 @@ namespace BoCA
 	class DecoderCDParanoia : public CS::DecoderComponent
 	{
 		private:
+			static UnsignedInt64	 lastRead;
+
 			ConfigLayer		*configLayer;
 
 			cdrom_drive		*drive;

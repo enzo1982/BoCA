@@ -61,6 +61,8 @@ Int			 BoCA::DecoderCDRip::cdPlayerDiscID = -1;
 BoCA::CDText		 BoCA::DecoderCDRip::cdText;
 Int			 BoCA::DecoderCDRip::cdTextDiscID   = -1;
 
+UnsignedInt64		 BoCA::DecoderCDRip::lastRead	    = 0;
+
 Bool BoCA::DecoderCDRip::CanOpenStream(const String &streamURI)
 {
 	String	 lcURI = streamURI.ToLower();
@@ -392,6 +394,24 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 
 	dataBufferSize = lDataBufferSize;
 
+	/* Wait for drive to spin up if requested.
+	 */
+	Int		 spinUpTime = config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
+	UnsignedInt64	 startTime  = S::System::System::Clock();
+
+	while (spinUpTime > 0 && startTime - lastRead > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))
+	{
+		Buffer<UnsignedByte>	 buffer(dataBufferSize);
+
+		BOOL	 abort = false;
+		LONG	 lSize = dataBufferSize;
+
+		ex_CR_RipChunk(buffer, &lSize, abort);
+
+		ex_CR_CloseRipper();
+		ex_CR_OpenRipper(&lDataBufferSize, startSector, endSector);
+	}
+
 	return True;
 }
 
@@ -417,6 +437,8 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data, Int size)
 	LONG	 lSize = size;
 
 	ex_CR_RipChunk(data + prependBytes, &lSize, abort);
+
+	lastRead = S::System::System::Clock();
 
 	/* Strip samples to skip from the beginning.
 	 */
