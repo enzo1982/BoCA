@@ -26,7 +26,9 @@ namespace BoCA
 			Int				 sampleId;
 
 			Int				 frameSize;
+
 			Int				 delaySamples;
+			Int				 delaySamplesLeft;
 
 			Buffer<unsigned char>		 dataBuffer;
 			Buffer<unsigned char>		 backBuffer;

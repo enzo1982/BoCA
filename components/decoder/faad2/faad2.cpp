@@ -323,17 +323,19 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderFAAD2::DecoderFAAD2()
 {
-	packageSize  = 0;
+	packageSize	 = 0;
 
-	mp4File	     = NIL;
-	handle	     = NIL;
-	fConfig	     = NIL;
+	mp4File		 = NIL;
+	handle		 = NIL;
+	fConfig		 = NIL;
 
-	mp4Track     = -1;
-	sampleId     = 0;
+	mp4Track	 = -1;
+	sampleId	 = 0;
 
-	frameSize    = 0;
-	delaySamples = 0;
+	frameSize	 = 0;
+
+	delaySamples	 = 0;
+	delaySamplesLeft = 0;
 }
 
 BoCA::DecoderFAAD2::~DecoderFAAD2()
@@ -407,7 +409,8 @@ Bool BoCA::DecoderFAAD2::Activate()
 				String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
 				const Array<String>	&values	     = valueString.Trim().Explode(" ");
 
-				delaySamples = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+				delaySamples	 = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+				delaySamplesLeft = delaySamples;
 
 				String::ExplodeFinish();
 			}
@@ -458,11 +461,10 @@ Bool BoCA::DecoderFAAD2::Seek(Int64 samplePosition)
 {
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
-		/* ToDo: Seeking by sample ID is not exact!
-		 */
-		MP4Timestamp	 time = Math::Round(Float(samplePosition / track.GetFormat().rate) * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+		MP4Timestamp	 time = Math::Round(Float(samplePosition) / track.GetFormat().rate * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
 
-		sampleId = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
+		sampleId	 = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
+		delaySamplesLeft = delaySamples + time - ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
 
 		return True;
 	}
@@ -498,15 +500,20 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 			{
 				frameSize = frameInfo.samples / frameInfo.channels;
 
+				if (delaySamples == 0)
+				{
+					delaySamples	 = frameSize;
+					delaySamplesLeft = frameSize;
+				}
+
 				/* FAAD2 automatically skips the first frame, so
 				 * subtract it from the delay sample count.
 				 */
-				if (delaySamples > 0) delaySamples -= frameSize;
-				else		      delaySamples  = frameSize;
+				delaySamplesLeft -= frameSize;
 
 				/* Fix delay for LD/ELD object types.
 				 */
-				if (frameInfo.object_type == LD) delaySamples += frameSize;
+				if (frameInfo.object_type == LD) delaySamplesLeft += frameSize;
 			}
 
 			samplesBuffer.Resize(samplesRead * format.channels + frameInfo.samples);
@@ -547,8 +554,10 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 			{
 				if (frameSize == 0)
 				{
-					frameSize    = frameInfo.samples / frameInfo.channels;
-					delaySamples = frameSize;
+					frameSize	 = frameInfo.samples / frameInfo.channels;
+
+					delaySamples	 = frameSize;
+					delaySamplesLeft = frameSize;
 				}
 
 				samplesBuffer.Resize(samplesRead * format.channels + frameInfo.samples);
@@ -574,14 +583,14 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	data.Resize(0);
 
-	if (samplesRead > delaySamples)
+	if (samplesRead > delaySamplesLeft)
 	{
-		data.Resize((samplesRead - delaySamples) * format.channels * (format.bits / 8));
+		data.Resize((samplesRead - delaySamplesLeft) * format.channels * (format.bits / 8));
 
-		memcpy(data, samplesBuffer + delaySamples * format.channels, data.Size());
+		memcpy(data, samplesBuffer + delaySamplesLeft * format.channels, data.Size());
 	}
 
-	delaySamples = Math::Max(0, delaySamples - samplesRead);
+	delaySamplesLeft = Math::Max(0, delaySamplesLeft - samplesRead);
 
 	return data.Size();
 }

@@ -28,6 +28,7 @@ MP4GETTRACKAUDIOMPEG4TYPE	 ex_MP4GetTrackAudioMpeg4Type		= NIL;
 MP4GETTRACKESCONFIGURATION	 ex_MP4GetTrackESConfiguration		= NIL;
 MP4GETTRACKDURATION		 ex_MP4GetTrackDuration			= NIL;
 MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale		= NIL;
+MP4GETSAMPLETIME		 ex_MP4GetSampleTime			= NIL;
 MP4GETSAMPLEIDFROMTIME		 ex_MP4GetSampleIdFromTime		= NIL;
 MP4READSAMPLE			 ex_MP4ReadSample			= NIL;
 MP4ITMFGETITEMSBYMEANING	 ex_MP4ItmfGetItemsByMeaning		= NIL;
@@ -82,6 +83,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4GetTrackESConfiguration	= (MP4GETTRACKESCONFIGURATION) mp4v2dll->GetFunctionAddress("MP4GetTrackESConfiguration");
 	ex_MP4GetTrackDuration		= (MP4GETTRACKDURATION) mp4v2dll->GetFunctionAddress("MP4GetTrackDuration");
 	ex_MP4GetTrackTimeScale		= (MP4GETTRACKTIMESCALE) mp4v2dll->GetFunctionAddress("MP4GetTrackTimeScale");
+	ex_MP4GetSampleTime		= (MP4GETSAMPLETIME) mp4v2dll->GetFunctionAddress("MP4GetSampleTime");
 	ex_MP4GetSampleIdFromTime	= (MP4GETSAMPLEIDFROMTIME) mp4v2dll->GetFunctionAddress("MP4GetSampleIdFromTime");
 	ex_MP4ReadSample		= (MP4READSAMPLE) mp4v2dll->GetFunctionAddress("MP4ReadSample");
 	ex_MP4ItmfGetItemsByMeaning	= (MP4ITMFGETITEMSBYMEANING) mp4v2dll->GetFunctionAddress("MP4ItmfGetItemsByMeaning");
@@ -97,6 +99,7 @@ Bool LoadMP4v2DLL()
 	    ex_MP4GetTrackESConfiguration	== NIL ||
 	    ex_MP4GetTrackDuration		== NIL ||
 	    ex_MP4GetTrackTimeScale		== NIL ||
+	    ex_MP4GetSampleTime			== NIL ||
 	    ex_MP4GetSampleIdFromTime		== NIL ||
 	    ex_MP4ReadSample			== NIL ||
 	    ex_MP4ItmfGetItemsByMeaning		== NIL ||

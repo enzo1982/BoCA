@@ -360,20 +360,22 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderFDKAAC::DecoderFDKAAC()
 {
-	packageSize  = 0;
+	packageSize	 = 0;
 
-	mp4File	     = NIL;
-	handle	     = NIL;
+	mp4File		 = NIL;
+	handle		 = NIL;
 
-	mp4Track     = -1;
-	sampleId     = 0;
+	mp4Track	 = -1;
+	sampleId	 = 0;
 
-	adifFound    = False;
-	adtsFound    = False;
-	loasFound    = False;
+	adifFound	 = False;
+	adtsFound	 = False;
+	loasFound	 = False;
 
-	frameSize    = 0;
-	delaySamples = 0;
+	frameSize	 = 0;
+
+	delaySamples	 = 0;
+	delaySamplesLeft = 0;
 }
 
 BoCA::DecoderFDKAAC::~DecoderFDKAAC()
@@ -423,7 +425,8 @@ Bool BoCA::DecoderFDKAAC::Activate()
 				String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
 				const Array<String>	&values	     = valueString.Trim().Explode(" ");
 
-				delaySamples = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+				delaySamples	 = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+				delaySamplesLeft = delaySamples;
 
 				String::ExplodeFinish();
 			}
@@ -472,11 +475,10 @@ Bool BoCA::DecoderFDKAAC::Seek(Int64 samplePosition)
 {
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
-		/* ToDo: Seeking by sample ID is not exact!
-		 */
-		MP4Timestamp	 time = Math::Round(Float(samplePosition / track.GetFormat().rate) * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+		MP4Timestamp	 time = Math::Round(Float(samplePosition) / track.GetFormat().rate * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
 
-		sampleId = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
+		sampleId	 = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
+		delaySamplesLeft = delaySamples + time - ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
 
 		return True;
 	}
@@ -528,14 +530,21 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 					frameSize = streamInfo->frameSize;
 
-					/* Set delay samples to minimum encoder delay plus decoder delay.
+					/* Set delay samples to minimum encoder delay.
 					 */
-					if (delaySamples > 0) delaySamples += frameSize;
-					else		      delaySamples  = frameSize * 2;
+					if (delaySamples == 0)
+					{
+						delaySamples	 = frameSize;
+						delaySamplesLeft = frameSize;
+					}
+
+					/* Add FDK decoder delay.
+					 */
+					delaySamplesLeft += frameSize;
 
 					/* No decoder delay for LD/ELD object types.
 					 */
-					if (streamInfo->aot == AOT_ER_AAC_LD || streamInfo->aot == AOT_ER_AAC_ELD) delaySamples -= frameSize;
+					if (streamInfo->aot == AOT_ER_AAC_LD || streamInfo->aot == AOT_ER_AAC_ELD) delaySamplesLeft -= frameSize;
 
 					samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
 				}
@@ -592,11 +601,12 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 				/* Set delay samples to minimum encoder delay plus decoder delay.
 				 */
-				delaySamples = frameSize * 2;
+				delaySamples	 = frameSize * 2;
+				delaySamplesLeft = frameSize * 2;
 
 				/* No decoder delay for LD/ELD object types.
 				 */
-				if (streamInfo->aot == AOT_ER_AAC_LD || streamInfo->aot == AOT_ER_AAC_ELD) delaySamples -= frameSize;
+				if (streamInfo->aot == AOT_ER_AAC_LD || streamInfo->aot == AOT_ER_AAC_ELD) delaySamplesLeft -= frameSize;
 
 				samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
 			}
@@ -619,14 +629,14 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	data.Resize(0);
 
-	if (samplesRead > delaySamples)
+	if (samplesRead > delaySamplesLeft)
 	{
-		data.Resize((samplesRead - delaySamples) * format.channels * (format.bits / 8));
+		data.Resize((samplesRead - delaySamplesLeft) * format.channels * (format.bits / 8));
 
-		memcpy(data, samplesBuffer + delaySamples * format.channels, data.Size());
+		memcpy(data, samplesBuffer + delaySamplesLeft * format.channels, data.Size());
 	}
 
-	delaySamples = Math::Max(0, delaySamples - samplesRead);
+	delaySamplesLeft = Math::Max(0, delaySamplesLeft - samplesRead);
 
 	return data.Size();
 }

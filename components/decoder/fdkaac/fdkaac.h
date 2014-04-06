@@ -29,7 +29,9 @@ namespace BoCA
 			Bool				 loasFound;
 
 			Int				 frameSize;
+
 			Int				 delaySamples;
+			Int				 delaySamplesLeft;
 
 			Buffer<unsigned char>		 dataBuffer;
 			Buffer<short>			 samplesBuffer;
