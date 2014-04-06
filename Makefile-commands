@@ -53,11 +53,7 @@ endif
 endif
 
 ifneq ($(BUILD_WIN32),True)
-ifneq ($(BUILD_LINUX),True)
 	CCOPTS += -fPIC
-else ifneq ($(BUILD_X86),True)
-	CCOPTS += -fPIC
-endif
 endif
 
 ifeq ($(BUILD_WIN32),True)

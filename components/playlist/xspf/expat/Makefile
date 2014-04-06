@@ -7,12 +7,8 @@ CC	= gcc
 CCOPTS	= -g0 -Os -fno-exceptions -I. -DHAVE_EXPAT_CONFIG_H
 AR	= ar
 
-ifeq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_WIN32),True)
 	CCOPTS += -fPIC
-else ifeq ($(BUILD_LINUX),True)
-	ifeq ($(BUILD_X86_64),True)
-		CCOPTS += -fPIC
-	endif
 endif
 
 ifeq ($(BUILD_OSX),True)
