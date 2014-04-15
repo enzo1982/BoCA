@@ -56,6 +56,12 @@ using namespace dami;
  ** There are other files that must be included to access more advanced
  ** functionality, but this will do most of the core functionality.
  **
+ ** In straight C the \c #include is slightly different:
+ **
+ ** \code
+ **   #include <id3.h>
+ ** \endcode
+ **
  ** \subsection creation Creating a tag
  **
  ** Almost all functionality occurs via an ID3_Tag object.  An ID3_Tag object
@@ -78,6 +84,14 @@ using namespace dami;
  **   myTag.Link("song.mp3");
  ** \endcode
  **
+ ** This is similar to the interface in straight C, where the tag creation and
+ ** tag link must be done separately:
+ **
+ ** \code
+ **   ID3Tag *myTag = ID3Tag_New();
+ **   ID3Tag_Link(myTag, "song.mp3");
+ ** \endcode
+ **
  ** The default behavior of Link() is to parse all possible tagging information
  ** and convert it into ID3v2 frames.  The tagging information parsed can be
  ** limited to a particular type (or types) of tag by passing an ID3_TagType
@@ -88,11 +102,18 @@ using namespace dami;
  **   myTag.Link("song.mp3", ID3TT_ID3V1);
  ** \endcode
  **
- ** Another example would be to read in all tags that could possibly appear at
- ** the end of the file.
+ ** The C equivalent is this:
  **
  ** \code
- **   myTag.Link("song.mp3", ID3TT_ID3V1 | ID3TT_LYRICS3V2 | ID3TT_MUSICMATCH);
+ **   ID3Tag_LinkWithFlags(myTag, "song.mp3", ID3TT_ID3V1);
+ ** \endcode
+ **
+ ** Another example would be to read in all tags that could possibly appear at
+ ** the end of the file.  Here are the C++ and C examples:
+ **
+ ** \code
+ **   myTag.Link("song.mp3", ID3TT_ID3V1 | ID3TT_LYRICS3V2 | ID3TT_MUSICMATCH); // C++
+ **   ID3Tag_LinkWithFlags(myTag, "song.mp3", ID3TT_ID3V1 | ID3TT_LYRICS3V2 | ID3TT_MUSICMATCH); // C
  ** \endcode
  **
  ** \section accessing Accessing the Tag Data
@@ -954,7 +975,7 @@ bool ID3_Tag::SetSpec(ID3_V2Spec spec)
   //a user cannot set a spec lower than ID3V2_3_0, it's obsolete!
   ID3_V2Spec spec2use = spec < ID3V2_3_0 ? ID3V2_LATEST : spec;
   _impl->UserUpdatedSpec = _impl->GetSpec() != spec2use;
-  return _impl->SetSpec(spec);
+  return _impl->SetSpec(spec2use);
 }
 
 /** Analyses a buffer to determine if we have a valid ID3v2 tag header.

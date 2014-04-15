@@ -367,9 +367,9 @@ size_t io::writeText(ID3_Writer &writer, String data)
 	return writer.getCur() - beg;
 }
 
-size_t io::writeUnicodeString(ID3_Writer &writer, String data, bool bom)
+size_t io::writeUnicodeString(ID3_Writer &writer, String data, ID3_TextEnc enc)
 {
-	size_t		 size = writeUnicodeText(writer, data, bom);
+	size_t		 size = writeUnicodeText(writer, data, enc);
 	unicode_t	 null = NULL_UNICODE;
 
 	writer.writeChars((const unsigned char *) &null, 2);
@@ -377,7 +377,7 @@ size_t io::writeUnicodeString(ID3_Writer &writer, String data, bool bom)
 	return size + 2;
 }
 
-size_t io::writeUnicodeText(ID3_Writer &writer, String data, bool bom)
+size_t io::writeUnicodeText(ID3_Writer &writer, String data, ID3_TextEnc enc)
 {
 	ID3_Writer::pos_type	 beg = writer.getCur();
 	size_t			 size = (data.size() / 2) * 2;
@@ -386,20 +386,20 @@ size_t io::writeUnicodeText(ID3_Writer &writer, String data, bool bom)
 
 	int			 is_bom = isBOM(data[0],data[1]);
 
-	if (!is_bom && bom)
+	if (enc == ID3TE_UTF16LE && !is_bom)
 	{
 		/* Write the BOM: 0xFEFF
 		 */
 		const unsigned char	 BOMch1 = 0xFE;
 		const unsigned char	 BOMch2 = 0xFF;
 
-		writer.writeChars(&BOMch1, 1);
 		writer.writeChars(&BOMch2, 1);
+		writer.writeChars(&BOMch1, 1);
 	}
 
 	for (size_t i = 0; i < size; i += 2)
 	{
-		if (!i && !bom && is_bom)
+		if (i == 0 && enc != ID3TE_UTF16LE && is_bom)
 		{
 			/* Skip unneeded leading BOM
 			*/

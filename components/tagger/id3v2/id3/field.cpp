@@ -1507,7 +1507,7 @@ ID3_FieldImpl::ID3_FieldImpl(const ID3_FieldDef &def)
 	_changed(false),
 	_fixed_size(def._fixed_size),
 	_num_items(0),
-	_enc((_type == ID3FTY_TEXTSTRING) ? ID3TE_ASCII : ID3TE_NONE)
+	_enc((_type == ID3FTY_TEXTSTRING) ? ID3TE_ISO8859_1 : ID3TE_NONE)
 {
 	this->Clear();
 }
@@ -1630,7 +1630,7 @@ size_t ID3_FieldImpl::BinSize() const
     }
     if (ID3TE_IS_DOUBLE_BYTE_ENC(enc))
     {
-      size *= 2;
+      size *= 2; // FIXME: I guess this is wrong
     }
   }
   return size;
@@ -1749,6 +1749,11 @@ ID3_Err ID3_FieldImpl::Render(ID3_Writer &writer) const
 	return ID3E_NoError;
 }
 
+/* Copies the content of one field to another.
+ * WOW, this is another strange conditional function.
+ * It copies the content BUT only if the types match from the start.
+ * Strange (Ralf)
+ */
 ID3_Field &ID3_FieldImpl::operator =(const ID3_Field &rhs)
 {
 	const ID3_FieldImpl	*fld = (const ID3_FieldImpl *) &rhs;
@@ -1775,6 +1780,11 @@ ID3_Field &ID3_FieldImpl::operator =(const ID3_Field &rhs)
 	return *this;
 }
 
+/* Sets the encoding of the underlaying text.
+ * Please note that the id3-spec does not allow size-limited texts with encodings other than ASCII.
+ * Also note that you should set the matching encoding field or because write operations are made
+ * with the TEXT_ENC field value.
+ */
 bool ID3_FieldImpl::SetEncoding(ID3_TextEnc enc)
 {
 	bool	 changed = this->IsEncodable() && (enc != this->GetEncoding()) &&
@@ -1853,26 +1863,26 @@ bool ID3_FieldImpl::SetEncoding(ID3_TextEnc enc)
 
 char *ID3_FrameInfo::ShortName(ID3_FrameID frameID)
 {
-	ID3_FrameDef	*pFD = ID3_FindFrameDef(frameID);
+	if (frameID > ID3FID_NOFRAME &&
+	    frameID < ID3FID_LASTFRAMEID) return ID3_FrameDefs[frameID - 1].sShortTextID;
 
-	if (pFD != NULL) return pFD->sShortTextID;
-	else		 return NULL;
+	return NULL;
 }
 
 char *ID3_FrameInfo::LongName(ID3_FrameID frameID)
 {
-	ID3_FrameDef	*pFD = ID3_FindFrameDef(frameID);
+	if (frameID > ID3FID_NOFRAME &&
+	    frameID < ID3FID_LASTFRAMEID) return ID3_FrameDefs[frameID - 1].sLongTextID;
 
-	if (pFD != NULL) return pFD->sLongTextID;
-	else		 return NULL;
+	return NULL;
 }
 
 const char *ID3_FrameInfo::Description(ID3_FrameID frameID)
 {
-	ID3_FrameDef	*pFD = ID3_FindFrameDef(frameID);
+	if (frameID > ID3FID_NOFRAME &&
+	    frameID < ID3FID_LASTFRAMEID) return ID3_FrameDefs[frameID - 1].sDescription;
 
-	if (pFD != NULL) return pFD->sDescription;
-	else		 return NULL;
+	return NULL;
 }
 
 int ID3_FrameInfo::MaxFrameID()
@@ -1882,44 +1892,48 @@ int ID3_FrameInfo::MaxFrameID()
 
 int ID3_FrameInfo::NumFields(ID3_FrameID frameID)
 {
-	int		 fieldnum = 0;
-	ID3_FrameDef	*pFD = ID3_FindFrameDef(frameID);
+	int	 fieldNum = 0;
 
-	if (pFD != NULL)
+	if (frameID > ID3FID_NOFRAME && frameID < ID3FID_LASTFRAMEID)
 	{
-		while (pFD->aeFieldDefs[fieldnum]._id != ID3FN_NOFIELD) ++fieldnum;
+		while (ID3_FrameDefs[frameID - 1].aeFieldDefs[fieldNum]._id != ID3FN_NOFIELD) ++fieldNum;
 	}
 
-	return fieldnum;
+	return fieldNum;
 }
 
-ID3_FieldID ID3_FrameInfo::FieldID(ID3_FrameID frameid, int fieldnum)
+ID3_FieldID ID3_FrameInfo::FieldID(ID3_FrameID frameID, int fieldNum)
 {
-	if (frameid > ID3FID_NOFRAME && frameid < ID3FID_LASTFRAMEID && fieldnum < NumFields(frameid)) return ID3_FrameDefs[frameid - 1].aeFieldDefs[fieldnum]._id;
+	if (frameID  > ID3FID_NOFRAME	  &&
+	    frameID  < ID3FID_LASTFRAMEID &&
+	    fieldNum < NumFields(frameID)) return ID3_FrameDefs[frameID - 1].aeFieldDefs[fieldNum]._id;
 
 	return ID3FN_NOFIELD;
 }
 
-ID3_FieldType ID3_FrameInfo::FieldType(ID3_FrameID frameID, int fieldnum)
+ID3_FieldType ID3_FrameInfo::FieldType(ID3_FrameID frameID, int fieldNum)
 {
-	ID3_FrameDef	*pFD = ID3_FindFrameDef(frameID);
+	if (frameID  > ID3FID_NOFRAME	  &&
+	    frameID  < ID3FID_LASTFRAMEID &&
+	    fieldNum < NumFields(frameID)) return ID3_FrameDefs[frameID - 1].aeFieldDefs[fieldNum]._type;
 
-	if (pFD != NULL) return (pFD->aeFieldDefs[fieldnum]._type);
-	else		 return ID3FTY_NONE;
+	return ID3FTY_NONE;
 }
 
-size_t ID3_FrameInfo::FieldSize(ID3_FrameID frameID, int fieldnum)
+size_t ID3_FrameInfo::FieldSize(ID3_FrameID frameID, int fieldNum)
 {
-	ID3_FrameDef	*pFD = ID3_FindFrameDef(frameID);
+	if (frameID  > ID3FID_NOFRAME	  &&
+	    frameID  < ID3FID_LASTFRAMEID &&
+	    fieldNum < NumFields(frameID)) return ID3_FrameDefs[frameID - 1].aeFieldDefs[fieldNum]._fixed_size;
 
-	if (pFD != NULL) return (pFD->aeFieldDefs[fieldnum]._fixed_size);
-	else		 return 0;
+	return 0;
 }
 
-flags_t ID3_FrameInfo::FieldFlags(ID3_FrameID frameID, int fieldnum)
+flags_t ID3_FrameInfo::FieldFlags(ID3_FrameID frameID, int fieldNum)
 {
-	ID3_FrameDef	*pFD = ID3_FindFrameDef(frameID);
+	if (frameID  > ID3FID_NOFRAME	  &&
+	    frameID  < ID3FID_LASTFRAMEID &&
+	    fieldNum < NumFields(frameID)) return ID3_FrameDefs[frameID - 1].aeFieldDefs[fieldNum]._flags;
 
-	if (pFD != NULL) return (pFD->aeFieldDefs[fieldnum]._flags);
-	else		 return 0;
+	return 0;
 }

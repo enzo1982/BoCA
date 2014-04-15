@@ -46,7 +46,7 @@ namespace
 	ID3_Err renderFields(ID3_Writer &writer, const ID3_FrameImpl &frame)
 	{
 		ID3_Err		 err;
-		ID3_TextEnc	 enc = ID3TE_ASCII;
+		ID3_TextEnc	 enc = ID3TE_ISO8859_1;
 
 		for (ID3_FrameImpl::const_iterator fi = frame.begin(); fi != frame.end(); ++fi)
 		{

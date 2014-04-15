@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -533,7 +533,7 @@ String BoCA::TaggerID3v2::GetStringField(Void *frame, Int fieldType)
 			if	(encoding == ID3TE_ISO8859_1)	result.ImportFrom("ISO-8859-1", aBuffer);
 			else if (encoding == ID3TE_UTF8)	result.ImportFrom("UTF-8", aBuffer);
 		}
-		else if (encoding == ID3TE_UTF16 || encoding == ID3TE_UTF16BE)
+		else if (encoding == ID3TE_UTF16LE || encoding == ID3TE_UTF16BE)
 		{
 			Buffer<wchar_t>	 wBuffer(1024);
 
@@ -552,18 +552,14 @@ Int BoCA::TaggerID3v2::SetStringField(Void *frame, Int fieldType, const String &
 {
 	if (string == NIL) return Error();
 
-	static String	 leBOM;
-
-	if (leBOM == NIL) leBOM[0] = 0xFEFF;
-
 	ID3_TextEnc	 encoding   = ID3TE_NONE;
 	String		 encodingID = Config::Get()->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
 
-	if	(encodingID == "UTF-8")					encoding = ID3TE_UTF8;
-	else if (encodingID == "ISO-8859-1")				encoding = ID3TE_ISO8859_1;
+	if	(encodingID == "UTF-8")				      encoding = ID3TE_UTF8;
+	else if (encodingID == "ISO-8859-1")			      encoding = ID3TE_ISO8859_1;
 	else if (encodingID == "UTF-16"	  || encodingID == "UCS-2" ||
-		 encodingID == "UTF-16LE" || encodingID == "UCS-2LE")	encoding = ID3TE_UTF16;
-	else if (encodingID == "UTF-16BE" || encodingID == "UCS-2BE")	encoding = ID3TE_UTF16BE;
+		 encodingID == "UTF-16LE" || encodingID == "UCS-2LE") encoding = ID3TE_UTF16LE;
+	else if (encodingID == "UTF-16BE" || encodingID == "UCS-2BE") encoding = ID3TE_UTF16BE;
 
 	String		 prevOutFormat = String::SetOutputFormat(encodingID);
 
@@ -575,9 +571,9 @@ Int BoCA::TaggerID3v2::SetStringField(Void *frame, Int fieldType, const String &
 	{
 		field->SetEncoding(encoding);
 
-		if	(encoding == ID3TE_UTF16)	field->Set((unicode_t *) String(leBOM).Append(string).ConvertTo("UTF-16LE"));
-		else if (encoding == ID3TE_UTF16BE)	field->Set((unicode_t *) string.ConvertTo("UTF-16BE"));
-		else					field->Set((char *) string);
+		if	(encoding == ID3TE_UTF16LE) field->Set((unicode_t *) string.ConvertTo("UTF-16LE"));
+		else if (encoding == ID3TE_UTF16BE) field->Set((unicode_t *) string.ConvertTo("UTF-16BE"));
+		else				    field->Set((char *) string);
 
 		String::SetOutputFormat(prevOutFormat.ConvertTo("ISO-8859-1"));
 

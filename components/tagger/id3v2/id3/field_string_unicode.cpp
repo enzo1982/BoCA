@@ -48,28 +48,32 @@ using namespace dami;
  ** \param string The unicode string to set this field to.
  ** \sa Add(const unicode_t*)
  **/
-size_t ID3_FieldImpl::Set(const unicode_t* data)
+size_t ID3_FieldImpl::Set(const unicode_t *data)
 {
-  size_t size = 0;
-  if (this->GetType() == ID3FTY_TEXTSTRING &&
-      ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding()) && data)
-  {
-    String text((const char*) data, ucslen(data) * 2);
-    size = this->SetText_i(text);
-  }
-  return size;
+	size_t	 size = 0;
+
+	if (this->GetType() == ID3FTY_TEXTSTRING && ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding()) && data != NULL)
+	{
+		String	 text((const char *) data, ucslen(data) * 2);
+
+		size = this->SetText_i(text);
+	}
+
+	return size;
 }
 
-size_t ID3_FieldImpl::Add(const unicode_t* data)
+size_t ID3_FieldImpl::Add(const unicode_t *data)
 {
-  size_t size = 0;
-  if (this->GetType() == ID3FTY_TEXTSTRING &&
-      ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding()))
-  {
-    String text((const char*) data, ucslen(data) * 2);
-    size = this->AddText_i(text);
-  }
-  return size;
+	size_t	 size = 0;
+
+	if (this->GetType() == ID3FTY_TEXTSTRING && ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding()) && data != NULL)
+	{
+		String	 text((const char *) data, ucslen(data) * 2);
+
+		size = this->AddText_i(text);
+	}
+
+	return size;
 }
 
 /** Copies the contents of the field into the supplied buffer, up to the

@@ -37,15 +37,18 @@
 
 using namespace dami;
 
-size_t ID3_FieldImpl::Set(const uchar* data, size_t len)
+size_t ID3_FieldImpl::Set(const uchar *data, size_t len)
 {
-  size_t size = 0;
-  if ((this->GetType() == ID3FTY_BINARY) && data && len)
-  {
-    BString str(data, len);
-    size = dami::min(len, this->SetBinary(str));
-  }
-  return size;
+	size_t	 size = 0;
+
+	if (this->GetType() == ID3FTY_BINARY && data != NULL && len > 0)
+	{
+		BString	 str(data, len);
+
+		size = dami::min(len, this->SetBinary(str));
+	}
+
+	return size;
 }
 
 /** Copies the supplied unicode string to the field.

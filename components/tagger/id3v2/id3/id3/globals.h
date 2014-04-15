@@ -139,16 +139,14 @@ ID3_ENUM(ID3_TextEnc)
 {
   ID3TE_NONE = -1,
   ID3TE_ISO8859_1,
-  ID3TE_UTF16,
+  ID3TE_UTF16LE,
   ID3TE_UTF16BE,
   ID3TE_UTF8,
   ID3TE_NUMENCODINGS,
-  ID3TE_ASCII = ID3TE_ISO8859_1, // do not use this -> use ID3TE_IS_SINGLE_BYTE_ENC(enc) instead
-  ID3TE_UNICODE = ID3TE_UTF16    // do not use this -> use ID3TE_IS_DOUBLE_BYTE_ENC(enc) instead
 };
 
 #define ID3TE_IS_SINGLE_BYTE_ENC(enc)    ((enc) == ID3TE_ISO8859_1 || (enc) == ID3TE_UTF8)
-#define ID3TE_IS_DOUBLE_BYTE_ENC(enc)    ((enc) == ID3TE_UTF16 || (enc) == ID3TE_UTF16BE)
+#define ID3TE_IS_DOUBLE_BYTE_ENC(enc)    ((enc) == ID3TE_UTF16LE || (enc) == ID3TE_UTF16BE)
 
 /** Enumeration of the various id3 specifications
  **/

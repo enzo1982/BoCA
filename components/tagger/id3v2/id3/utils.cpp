@@ -43,7 +43,7 @@
 /* Check if we have all unicodes
  */
 #if defined HAVE_ICONV_H
-#	if (defined(ID3_ICONV_FORMAT_UTF16BE) && defined(ID3_ICONV_FORMAT_UTF16) && defined(ID3_ICONV_FORMAT_UTF8) && defined(ID3_ICONV_FORMAT_ASCII))
+#	if (defined(ID3_ICONV_FORMAT_UTF16BE) && defined(ID3_ICONV_FORMAT_UTF16LE) && defined(ID3_ICONV_FORMAT_UTF8) && defined(ID3_ICONV_FORMAT_ASCII))
 #		include <iconv.h>
 #		include <errno.h>
 #	else
@@ -87,11 +87,8 @@ dami::String oldconvert(dami::String data, ID3_TextEnc sourceEnc, ID3_TextEnc ta
 {
 	dami::String	 target;
 
-#	define ID3_IS_ASCII(enc)	((enc) == ID3TE_ASCII || (enc) == ID3TE_ISO8859_1 || (enc) == ID3TE_UTF8)
-#	define ID3_IS_UNICODE(enc)	((enc) == ID3TE_UNICODE || (enc) == ID3TE_UTF16 || (enc) == ID3TE_UTF16BE)
-
-	if	(ID3_IS_ASCII(sourceEnc) && ID3_IS_UNICODE(targetEnc)) target = mbstoucs(data);
-	else if (ID3_IS_UNICODE(sourceEnc) && ID3_IS_ASCII(targetEnc)) target = ucstombs(data);
+	if	(ID3TE_IS_SINGLE_BYTE_ENC(sourceEnc) && ID3TE_IS_DOUBLE_BYTE_ENC(targetEnc)) target = mbstoucs(data);
+	else if (ID3TE_IS_DOUBLE_BYTE_ENC(sourceEnc) && ID3TE_IS_SINGLE_BYTE_ENC(targetEnc)) target = ucstombs(data);
 
 	return target;
 }
@@ -159,6 +156,10 @@ namespace
 				/* errno is probably EILSEQ here, which means either an invalid
 				 * byte sequence or a valid but unconvertible byte sequence.
 				 */
+#if !defined(ID3LIB_ICONV_OLDSTYLE)
+				delete [] source_str;
+#endif
+
 				return target;
 			}
 
@@ -167,6 +168,10 @@ namespace
 			target_size = ID3LIB_BUFSIZ;
 		}
 		while (source_size > 0);
+
+#if !defined(ID3LIB_ICONV_OLDSTYLE)
+		delete [] source_str;
+#endif
 
 		return target;
 	}
@@ -177,11 +182,11 @@ namespace
 
 		switch (enc)
 		{
-			case ID3TE_ASCII:
+			case ID3TE_ISO8859_1:
 				format = ID3_ICONV_FORMAT_ASCII;
 				break;
-			case ID3TE_UTF16:
-				format = ID3_ICONV_FORMAT_UTF16;
+			case ID3TE_UTF16LE:
+				format = ID3_ICONV_FORMAT_UTF16LE;
 				break;
 			case ID3TE_UTF16BE:
 				format = ID3_ICONV_FORMAT_UTF16BE;

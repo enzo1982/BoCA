@@ -46,7 +46,7 @@ using namespace dami;
 #	include <sys/stat.h>
 #endif
 
-#if defined WIN32 && (!defined(WINCE))
+#if defined WIN32
 #	include <windows.h>
 
 static int truncate(const char *path, size_t length)
@@ -61,47 +61,6 @@ static int truncate(const char *path, size_t length)
 			   OPEN_EXISTING,
 			   FILE_ATTRIBUTE_NORMAL,
 			   NULL);
-
-	if (INVALID_HANDLE_VALUE != fh)
-	{
-		SetFilePointer(fh, length, NULL, FILE_BEGIN);
-		SetEndOfFile(fh);
-		CloseHandle(fh);
-
-		result = 0;
-	}
-
-	return result;
-}
-
-/* Prevents a weird error I was getting compiling this under Windows.
- */
-#	if defined CreateFile
-#		undef CreateFile
-#	endif
-
-#elif defined(WINCE)
-#	include <windows.h>
-
-/* Createfile is apparently to defined to CreateFileW. (Bad Bad Bad), so we
- * work around it by converting path to Unicode.
- */
-static int truncate(const char *path, size_t length)
-{
-	int	 result = -1;
-	wchar_t	 wcTempPath[256];
-
-	mbstowcs(wcTempPath, path, 255);
-
-	HANDLE	 fh;
-
-	fh = ::CreateFile(wcTempPath,
-			  GENERIC_WRITE | GENERIC_READ,
-			  0,
-			  NULL,
-			  OPEN_EXISTING,
-			  FILE_ATTRIBUTE_NORMAL,
-			  NULL);
 
 	if (INVALID_HANDLE_VALUE != fh)
 	{

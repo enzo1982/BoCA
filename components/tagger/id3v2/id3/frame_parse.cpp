@@ -42,7 +42,7 @@ namespace
 		int		 iLoop;
 		int		 iFields;
 		io::ExitTrigger	 et(rdr);
-		ID3_TextEnc	 enc = ID3TE_ASCII;  // set the default encoding
+		ID3_TextEnc	 enc = ID3TE_ISO8859_1;  // set the default encoding
 		ID3_V2Spec	 spec = frame.GetSpec();
 		size_t		 linked_fixed_size = 0; // set the default linkedsize
 
@@ -222,6 +222,13 @@ bool ID3_FrameImpl::Parse(ID3_Reader &reader)
 	if (reader.getEnd() < beg + dataSize)
 	{
 		ID3D_WARNING("ID3_FrameImpl::Parse(): not enough data to parse frame");
+
+		return false;
+	}
+
+	if (dataSize > 16777216) //Klenotic: The max frame size is 16MB according to http://www.id3.org/easy.html.  A corrupted tag that reports a frame size of (-1) will crash the program.
+	{
+		ID3D_WARNING( "ID3_FrameImpl::Parse(): frame size too large" );
 
 		return false;
 	}

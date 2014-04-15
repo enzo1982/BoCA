@@ -49,7 +49,7 @@ size_t ID3_FieldImpl::Set(const char *data)
 {
 	size_t	 len = 0;
 
-	if ((this->GetType() == ID3FTY_TEXTSTRING) && data)
+	if ((this->GetType() == ID3FTY_TEXTSTRING) && data != NULL)
 	{
 		String	 str(data);
 
@@ -309,7 +309,7 @@ namespace
 			return io::writeText(writer, data);
 		}
 
-		return io::writeUnicodeText(writer, data, enc == ID3TE_UTF16);
+		return io::writeUnicodeText(writer, data, enc);
 	}
 
 	size_t writeEncodedString(ID3_Writer &writer, String data, ID3_TextEnc enc)
@@ -319,7 +319,7 @@ namespace
 			return io::writeString(writer, data);
 		}
 
-		return io::writeUnicodeString(writer, data, enc == ID3TE_UTF16);
+		return io::writeUnicodeString(writer, data, enc);
 	}
 }
 

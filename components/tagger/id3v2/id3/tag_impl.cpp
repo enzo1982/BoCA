@@ -270,7 +270,7 @@ bool ID3_TagImpl::IsValidFrame(ID3_Frame& frame, bool testlinkedFrames)
 			}
 
 			return false;
-		} //
+		}
 		case ID3FID_CRYPTOREG:
 		{
 			//check for same owner
@@ -326,7 +326,7 @@ bool ID3_TagImpl::IsValidFrame(ID3_Frame& frame, bool testlinkedFrames)
 			}
 
 			return false;
-		} //
+		}
 		case ID3FID_PRODUCEDNOTICE:
 		{
 			//should have at least a year and a space
@@ -337,7 +337,7 @@ bool ID3_TagImpl::IsValidFrame(ID3_Frame& frame, bool testlinkedFrames)
 			if (tmpText.size() > 4) return true;
 
 			return false;
-		} //
+		}
 		case ID3FID_COPYRIGHT:
 		{
 			//should have at least a year and a space
@@ -348,7 +348,7 @@ bool ID3_TagImpl::IsValidFrame(ID3_Frame& frame, bool testlinkedFrames)
 			if (tmpText.size() > 4) return true;
 
 			return false;
-		} //
+		}
 		case ID3FID_ENCODINGTIME:
 		{
 			//should have at least a year, contains a timestamp yyyy[-MM[-dd[THH[:mm[:ss]]]]] (between brackets [] is optional)
@@ -425,7 +425,7 @@ bool ID3_TagImpl::IsValidFrame(ID3_Frame& frame, bool testlinkedFrames)
 			}
 
 			return false;
-		}//
+		}
 		default:
 		{
 			return true;
@@ -459,21 +459,27 @@ void ID3_TagImpl::checkFrames()
 
 bool ID3_TagImpl::AttachFrame(ID3_Frame *frame)
 {
-	if (NULL == frame)
+	ID3_Frame	&testframe = *frame;
+	bool		 isvalid   = IsValidFrame(testframe, false);
+
+	if (isvalid)
 	{
-		/* TODO: log this
-		 */
-		return false;
+		frame = &testframe;
+
+		_frames.push_back(frame);
+
+		_cursor	 = _frames.begin();
+		_changed = true;
+
+		return true;
 	}
 
-	_frames.push_back(frame);
-	_cursor = _frames.begin();
+	if (frame) delete frame;
 
-	_changed = true;
+	frame = NULL;
 
-	return true;
+	return false;
 }
-
 
 ID3_Frame* ID3_TagImpl::RemoveFrame(const ID3_Frame *frame)
 {
@@ -572,13 +578,16 @@ bool ID3_TagImpl::GetFooter() const
 
 size_t ID3_TagImpl::GetExtendedBytes() const
 {
+	/* Returns the number of bytes this lib will write, is only called by id3::v2::render.
+	 */
 	if (this->GetExtended())
 	{
 		if	(this->GetSpec() == ID3V2_4_0) return  6; // minimal ID3v2.4 ext header size
 		else if (this->GetSpec() == ID3V2_3_0) return 10; // minimal ID3v2.3 ext header size
+		else				       return  0; // not implemented
 	}
 
-	return 0; // not implemented
+	return 0;
 }
 
 bool ID3_TagImpl::SetPadding(bool pad)

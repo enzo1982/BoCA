@@ -54,7 +54,7 @@ String id3::v2::getString(const ID3_Frame* frame, ID3_FieldID fldName)
     return "";
   }
   ID3_TextEnc enc = fp->GetEncoding();
-  fp->SetEncoding(ID3TE_ASCII);
+  fp->SetEncoding(ID3TE_ISO8859_1);
 
   String text(fp->GetRawText(), fp->Size());
 
@@ -73,7 +73,7 @@ String id3::v2::getStringAtIndex(const ID3_Frame *frame, ID3_FieldID fldName, si
 	{
 		ID3_TextEnc	 enc = fp->GetEncoding();
 
-		fp->SetEncoding(ID3TE_ASCII);
+		fp->SetEncoding(ID3TE_ISO8859_1);
 
 		text = fp->GetTextItem(nIndex);
 

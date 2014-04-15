@@ -236,7 +236,10 @@ size_t ID3_TagImpl::Size() const
 	 */
 	bytesUsed += bytesUsed / 3;
 
-	bytesUsed += this->PaddingSize(bytesUsed) + ID3_PADMAX;
+	/* Add padding and another ID3_PADMULTIPLE bytes
+	 * to be safe in case the above guess was too low.
+	 */
+	bytesUsed += this->PaddingSize(bytesUsed) + ID3_PADMULTIPLE;
 
 	return bytesUsed;
 }

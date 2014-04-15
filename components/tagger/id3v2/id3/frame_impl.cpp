@@ -184,7 +184,7 @@ size_t ID3_FrameImpl::Size()
     bytesUsed++;
   }
     
-  ID3_TextEnc enc = ID3TE_ASCII;
+  ID3_TextEnc enc = ID3TE_ISO8859_1;
   for (iterator fi = _fields.begin(); fi != _fields.end(); ++fi)
   {
     if (*fi && (*fi)->InScope(this->GetSpec()))

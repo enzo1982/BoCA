@@ -72,8 +72,8 @@ namespace dami
 
     size_t      writeString(ID3_Writer&, String);
     size_t      writeText(ID3_Writer&, String);
-    size_t      writeUnicodeString(ID3_Writer&, String, bool = true);
-    size_t      writeUnicodeText(ID3_Writer&, String, bool = true);
+    size_t      writeUnicodeString(ID3_Writer&, String, ID3_TextEnc);
+    size_t      writeUnicodeText(ID3_Writer&, String, ID3_TextEnc);
     size_t      writeBENumber(ID3_Writer&, uint32 val, size_t);
     size_t      writeTrailingSpaces(ID3_Writer&, String, size_t);
     size_t      writeUInt28(ID3_Writer&, uint32);
