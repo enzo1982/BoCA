@@ -148,13 +148,6 @@ class ID3_TagImpl
 		const_iterator		 end()   const { return _frames.end(); }
 
 		/* Deprecated! */
-		void			 AddNewFrame(ID3_Frame *f) { this->AttachFrame(f); }
-		size_t			 Link(const char *fileInfo, bool parseID3v1, bool parseLyrics3);
-		void			 SetCompression(bool) { ; }
-		void			 AddFrames(const ID3_Frame *, size_t);
-		bool			 HasLyrics() const { return this->HasTagType(ID3TT_LYRICS); }
-		bool			 HasV2Tag()  const { return this->HasTagType(ID3TT_ID3V2); }
-		bool			 HasV1Tag()  const { return this->HasTagType(ID3TT_ID3V1); }
 		size_t			 PaddingSize(size_t) const;
 		bool			 UserUpdatedSpec;	// used to determine whether user used SetSpec();
 

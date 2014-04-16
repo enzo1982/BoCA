@@ -122,21 +122,6 @@ class ID3_Tag
 
 		static size_t		 IsV2Tag(const uchar *);
 		static size_t		 IsV2Tag(ID3_Reader &);
-
-		/* Deprecated! */
-		void			 AddNewFrame(ID3_Frame* f);
-		size_t			 Link(const char *fileInfo, bool parseID3v1, bool parseLyrics3);
-		void			 SetCompression(bool);
-		void			 AddFrames(const ID3_Frame *, size_t);
-		bool			 HasLyrics() const;
-		bool			 HasV2Tag()  const;
-		bool			 HasV1Tag()  const;
-		size_t			 Parse(const uchar header[ID3_TAGHEADERSIZE], const uchar *buffer);
-		//ID3_Frame* operator[](size_t) const;
-		//ID3_Frame* GetFrameNum(size_t) const;
-
-		ID3_Tag			&operator <<(const ID3_Frame &);
-		ID3_Tag			&operator <<(const ID3_Frame *);
 };
 
 // deprecated!

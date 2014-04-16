@@ -85,16 +85,6 @@ static int truncate(const char *path, size_t length)
 
 #endif
 
-size_t ID3_TagImpl::Link(const char *fileInfo, bool parseID3v1, bool parseLyrics3)
-{
-	flags_t	 tt = ID3TT_NONE;
-
-	if (parseID3v1)	  tt |= ID3TT_ID3V1;
-	if (parseLyrics3) tt |= ID3TT_LYRICS;
-
-	return this->Link(fileInfo, tt);
-}
-
 size_t ID3_TagImpl::Link(const char *fileInfo, flags_t tag_types)
 {
 	_tags_to_parse.set(tag_types);
