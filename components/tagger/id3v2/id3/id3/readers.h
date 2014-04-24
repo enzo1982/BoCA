@@ -30,7 +30,7 @@
 #ifndef _ID3LIB_READERS_H_
 #define _ID3LIB_READERS_H_
 
-#include "id3/id3lib_streams.h"
+#include "id3/streams.h"
 #include "id3/reader.h"
 
 class ID3_IStreamReader : public ID3_Reader

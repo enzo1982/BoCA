@@ -31,7 +31,7 @@
 #ifndef _ID3LIB_CONTAINER_H_
 #define _ID3LIB_CONTAINER_H_
 
-#include "id3lib_frame.h"
+#include "frame.h"
 #include "field.h"
 
 class ID3_Reader;

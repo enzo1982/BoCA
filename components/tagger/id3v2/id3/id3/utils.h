@@ -34,9 +34,9 @@
 #	include <config.h>
 #endif
 
-#include "id3lib_streams.h"
+#include "streams.h"
 #include "globals.h"
-#include "id3lib_strings.h"
+#include "strings.h"
 
 namespace dami
 {

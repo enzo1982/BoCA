@@ -32,7 +32,7 @@
 
 #include <stdlib.h>
 #include <id3/field.h>
-#include <id3/id3lib_strings.h>
+#include <id3/strings.h>
 
 struct	 ID3_FieldDef;
 struct	 ID3_FrameDef;

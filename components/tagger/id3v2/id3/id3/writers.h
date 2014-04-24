@@ -31,7 +31,7 @@
 #define _ID3LIB_WRITERS_H_
 
 #include "id3/writer.h"
-#include "id3/id3lib_streams.h"
+#include "id3/streams.h"
 
 #include <memory.h>
 

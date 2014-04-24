@@ -32,14 +32,9 @@
 #define _ID3LIB_FRAME_IMPL_H_
 
 #include <vector>
+#include <bitset>
 
-#ifndef HAVE_BITSET
-#	include <id3/id3lib_bitset>
-#else
-#	include <bitset>
-#endif
-
-#include <id3/id3lib_frame.h>
+#include <id3/frame.h>
 #include "header_frame.h"
 
 class ID3_FrameImpl

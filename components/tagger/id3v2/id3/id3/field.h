@@ -28,7 +28,7 @@
 #define _ID3LIB_FIELD_H_
 
 #include "globals.h"
-#include "id3lib_strings.h"
+#include "strings.h"
 
 class ID3_Reader;
 class ID3_Writer;
