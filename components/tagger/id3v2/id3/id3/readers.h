@@ -131,7 +131,14 @@ class ID3_MemoryReader : public ID3_Reader
   {
     return this->readChars(reinterpret_cast<char_type *>(buf), len);
   }
-  virtual size_type readChars(char_type buf[], size_type len);
+  virtual size_type readChars(char_type buf[], size_type len)
+  {
+    size_type remaining = _end - _cur;
+    size_type size = (remaining > len) ? len : remaining;
+    ::memcpy(buf, _cur, size);
+    _cur += size;
+    return size;
+  }
     
   virtual pos_type getCur() 
   { 
