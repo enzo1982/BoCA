@@ -34,6 +34,7 @@
 #include <list>
 #include <stdio.h>
 #include <id3/tag.h>
+#include "container_impl.h"
 #include "header_tag.h"
 #include "mp3_header.h"
 
@@ -76,22 +77,14 @@ namespace dami
 	};
 };
 
-class ID3_TagImpl
+class ID3_TagImpl : public ID3_ContainerImpl
 {
-  	typedef std::list<ID3_Frame *> Frames;
-
-	public:
-		typedef Frames::iterator	 iterator;
-		typedef Frames::const_iterator	 const_iterator;
-
 	public:
 					 ID3_TagImpl(const char *name = NULL, flags_t = (flags_t) ID3TT_ALL);
 					 ID3_TagImpl(const ID3_Tag &tag);
 		virtual			~ID3_TagImpl();
 
 		void			 Clear();
-		bool			 HasChanged() const;
-		void			 SetChanged(bool b) { _changed = b; }
 		size_t			 Size() const;
 
 		bool			 SetUnsync(bool);
@@ -106,13 +99,6 @@ class ID3_TagImpl
 
 		size_t			 GetExtendedBytes() const;
 
-		void			 AddFrame(const ID3_Frame &);
-		void			 AddFrame(const ID3_Frame *);
-		bool			 AttachFrame(ID3_Frame *);
-		bool			 IsValidFrame(ID3_Frame &, bool);
-		void			 checkFrames();
-		ID3_Frame		*RemoveFrame(const ID3_Frame *);
-
 		size_t			 Link(const char *fileInfo, flags_t = (flags_t) ID3TT_ALL);
 		size_t			 Link(ID3_Reader &reader, flags_t = (flags_t) ID3TT_ALL);
 		flags_t			 Update(flags_t = (flags_t) ID3TT_ALL);
@@ -123,18 +109,11 @@ class ID3_TagImpl
 		size_t			 GetFileSize() const { return _file_size; }
 		const dami::String	&GetFileName() const { return _file_name; }
 
-		ID3_Frame		*Find(ID3_FrameID id) const;
-		ID3_Frame		*Find(ID3_FrameID id, ID3_FieldID fld, uint32 data) const;
-		ID3_Frame		*Find(ID3_FrameID id, ID3_FieldID fld, dami::String) const;
-		ID3_Frame		*Find(ID3_FrameID id, ID3_FieldID fld, dami::WString) const;
-
-		size_t			 NumFrames() const { return _frames.size(); }
 		ID3_TagImpl		&operator =(const ID3_Tag &);
 
 		bool			 HasTagType(ID3_TagType tt) const { return _file_tags.test(tt); }
 		ID3_V2Spec		 GetSpec() const;
 		bool			 SetSpec(ID3_V2Spec);
-		ID3_V2Spec		 MinSpec() const;
 
 		static size_t		 IsV2Tag(ID3_Reader &);
 		ID3_Err			 GetLastError();
@@ -142,19 +121,10 @@ class ID3_TagImpl
 
 		const Mp3_Headerinfo	*GetMp3HeaderInfo() const { if (_mp3_info) return _mp3_info->GetMp3HeaderInfo(); else return NULL; }
 
-		iterator		 begin()       { return _frames.begin(); }
-		iterator		 end()         { return _frames.end(); }
-		const_iterator		 begin() const { return _frames.begin(); }
-		const_iterator		 end()   const { return _frames.end(); }
-
 		/* Deprecated! */
 		size_t			 PaddingSize(size_t) const;
-		bool			 UserUpdatedSpec;	// used to determine whether user used SetSpec();
 
 	protected:
-		const_iterator		 Find(const ID3_Frame *) const;
-		iterator		 Find(const ID3_Frame *);
-
 		void			 ParseFile();
 		void			 ParseReader(ID3_Reader &reader);
 
@@ -162,9 +132,6 @@ class ID3_TagImpl
 		ID3_TagHeader		 _hdr;			// information relevant to the tag header
 		bool			 _is_padded;		// add padding to tags?
 
-		Frames			 _frames;
-
-		mutable const_iterator	 _cursor;		// which frame in list are we at
 		mutable bool		 _changed;		// has tag changed since last parse or render?
 
 		// file-related member variables

@@ -89,6 +89,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3v2.cpp" />
+    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\container.cpp" />
+    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\container_find.cpp" />
+    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\container_impl.cpp" />
+    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\container_parse.cpp" />
+    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\container_render.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_binary.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_integer.cpp" />
@@ -112,7 +117,6 @@
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\spec.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag_file.cpp" />
-    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag_find.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag_impl.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag_parse.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag_parse_lyrics3.cpp" />
@@ -135,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\components\tagger\id3v2\id3v2.h" />
+    <ClInclude Include="..\..\..\components\tagger\id3v2\id3\id3\container.h" />
     <ClInclude Include="..\..\..\components\tagger\id3v2\id3\id3\field.h" />
     <ClInclude Include="..\..\..\components\tagger\id3v2\id3\id3\globals.h" />
     <ClInclude Include="..\..\..\components\tagger\id3v2\id3\id3\helpers.h" />

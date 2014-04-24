@@ -26,11 +26,11 @@
  * http://download.sourceforge.net/id3lib/
  */
 
-#include "tag_impl.h"
+#include "container_impl.h"
 
 using namespace dami;
 
-ID3_TagImpl::const_iterator ID3_TagImpl::Find(const ID3_Frame *frame) const
+ID3_ContainerImpl::const_iterator ID3_ContainerImpl::Find(const ID3_Frame *frame) const
 {
 	const_iterator	 cur = _frames.begin();
 
@@ -42,7 +42,7 @@ ID3_TagImpl::const_iterator ID3_TagImpl::Find(const ID3_Frame *frame) const
 	return cur;
 }
 
-ID3_TagImpl::iterator ID3_TagImpl::Find(const ID3_Frame *frame)
+ID3_ContainerImpl::iterator ID3_ContainerImpl::Find(const ID3_Frame *frame)
 {
 	iterator	 cur = _frames.begin();
 
@@ -54,7 +54,7 @@ ID3_TagImpl::iterator ID3_TagImpl::Find(const ID3_Frame *frame)
 	return cur;
 }
 
-ID3_Frame *ID3_TagImpl::Find(ID3_FrameID id) const
+ID3_Frame *ID3_ContainerImpl::Find(ID3_FrameID id) const
 {
 	ID3_Frame	*frame = NULL;
 
@@ -96,7 +96,7 @@ ID3_Frame *ID3_TagImpl::Find(ID3_FrameID id) const
 	return frame;
 }
 
-ID3_Frame *ID3_TagImpl::Find(ID3_FrameID id, ID3_FieldID fldID, String data) const
+ID3_Frame *ID3_ContainerImpl::Find(ID3_FrameID id, ID3_FieldID fldID, String data) const
 {
 	ID3_Frame	*frame = NULL;
 
@@ -163,7 +163,7 @@ ID3_Frame *ID3_TagImpl::Find(ID3_FrameID id, ID3_FieldID fldID, String data) con
 	return frame;
 }
 
-ID3_Frame *ID3_TagImpl::Find(ID3_FrameID id, ID3_FieldID fldID, WString data) const
+ID3_Frame *ID3_ContainerImpl::Find(ID3_FrameID id, ID3_FieldID fldID, WString data) const
 {
 	ID3_Frame	*frame = NULL;
 
@@ -215,7 +215,7 @@ ID3_Frame *ID3_TagImpl::Find(ID3_FrameID id, ID3_FieldID fldID, WString data) co
 	return frame;
 }
 
-ID3_Frame *ID3_TagImpl::Find(ID3_FrameID id, ID3_FieldID fldID, uint32 data) const
+ID3_Frame *ID3_ContainerImpl::Find(ID3_FrameID id, ID3_FieldID fldID, uint32 data) const
 {
 	ID3_Frame	*frame = NULL;
 

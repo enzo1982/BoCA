@@ -71,26 +71,6 @@ void id3::v1::render(ID3_Writer &writer, const ID3_TagImpl &tag)
 	writer.writeChar((char) id3::v2::getGenreNum(tag));
 }
 
-namespace
-{
-	ID3_Err renderFrames(ID3_Writer &writer, const ID3_TagImpl &tag)
-	{
-		for (ID3_TagImpl::const_iterator iter = tag.begin(); iter != tag.end(); ++iter)
-		{
-			const ID3_Frame	*frame = *iter;
-
-			if (frame)
-			{
-				ID3_Err	 err = frame->Render(writer);
-
-				if (err != ID3E_NoError) return err;
-			}
-		}
-
-		return ID3E_NoError;
-	}
-}
-
 ID3_Err id3::v2::render(ID3_Writer &writer, const ID3_TagImpl &tag)
 {
 	/* There has to be at least one frame for there to be a tag...
@@ -185,24 +165,6 @@ ID3_Err id3::v2::render(ID3_Writer &writer, const ID3_TagImpl &tag)
 	return ID3E_NoError;
 }
 
-ID3_V2Spec ID3_TagImpl::MinSpec() const
-{
-	ID3_V2Spec	 minSpec = ID3V2_EARLIEST;
-
-	for (const_iterator cur = _frames.begin(); cur != _frames.end(); ++cur)
-	{
-		const ID3_Frame	*frame = *cur;
-
-		if (!frame) continue;
-
-		ID3_V2Spec	 frameSpec = frame->MinSpec();
-
-		if (minSpec < frameSpec) minSpec = frameSpec;
-	}
-
-	return minSpec;
-}
-
 size_t ID3_TagImpl::Size() const
 {
 	if (this->NumFrames() == 0) return 0;
@@ -216,17 +178,7 @@ size_t ID3_TagImpl::Size() const
 	hdr.SetSpec(spec);
 
 	size_t	 bytesUsed = hdr.Size();
-	size_t	 frameBytes = 0;
-
-	for (const_iterator cur = _frames.begin(); cur != _frames.end(); ++cur)
-	{
-		if (*cur)
-		{
-			(*cur)->SetSpec(spec);
-
-			frameBytes += (*cur)->Size();
-		}
-	}
+	size_t	 frameBytes = ID3_ContainerImpl::Size();
 
 	if (!frameBytes) return 0;
 

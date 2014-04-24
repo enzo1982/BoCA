@@ -28,64 +28,70 @@
  * http://download.sourceforge.net/id3lib/
  */
 
-#ifndef _ID3LIB_TAG_H_
-#define _ID3LIB_TAG_H_
+#ifndef _ID3LIB_CONTAINER_H_
+#define _ID3LIB_CONTAINER_H_
 
 #include "id3lib_frame.h"
-#include "container.h"
 #include "field.h"
 
 class ID3_Reader;
 class ID3_Writer;
-class ID3_TagImpl;
-class ID3_Tag;
+class ID3_ContainerImpl;
+class ID3_Container;
 
-class ID3_Tag : public ID3_Container
+class ID3_Container
 {
-	private:
-		ID3_TagImpl		*_impl;
+	public:
+		class Iterator
+		{
+			public:
+				virtual 		~Iterator() {};
+
+				virtual ID3_Frame	*GetNext() = 0;
+		};
+
+		class ConstIterator
+		{
+			public:
+				virtual			~ConstIterator() {};
+
+				virtual const ID3_Frame	*GetNext() = 0;
+		};
+
+	protected:
+		ID3_ContainerImpl	*_impl;
+		bool			 _own_impl;
 
 	public:
-					 ID3_Tag(const char *name = NULL, flags_t = (flags_t) ID3TT_ALL);
-					 ID3_Tag(const ID3_Tag &tag);
+					 ID3_Container();
+					 ID3_Container(ID3_ContainerImpl *impl);
+					 ID3_Container(const ID3_Container &container);
 
-		virtual			~ID3_Tag();
+		virtual			~ID3_Container();
 
-		bool			 SetUnsync(bool);
-		bool			 SetExtendedHeader(bool);
-		bool			 SetExperimental(bool);
+		void			 Clear();
+		bool			 HasChanged() const;
+		size_t			 Size() const;
 
-		bool			 GetUnsync() const;
-		bool			 GetExtendedHeader() const;
-		bool			 GetExperimental() const;
+		void			 AddFrame(const ID3_Frame &);
+		void			 AddFrame(const ID3_Frame *);
+		bool			 AttachFrame(ID3_Frame *);
+		ID3_Frame		*RemoveFrame(const ID3_Frame *);
 
-		bool			 SetPadding(bool);
+		ID3_Frame		*Find(ID3_FrameID) const;
+		ID3_Frame		*Find(ID3_FrameID, ID3_FieldID, uint32) const;
+		ID3_Frame		*Find(ID3_FrameID, ID3_FieldID, const char *) const;
+		ID3_Frame		*Find(ID3_FrameID, ID3_FieldID, const unicode_t *) const;
 
-		size_t			 Parse(const uchar *, size_t);
-		bool			 Parse(ID3_Reader & reader);
-		size_t			 Render(uchar *, ID3_TagType = ID3TT_ID3V2) const;
-		size_t			 Render(ID3_Writer &, ID3_TagType = ID3TT_ID3V2) const;
+		size_t			 NumFrames() const;
 
-		size_t			 Link(const char *fileInfo, flags_t = (flags_t) ID3TT_ALL);
-		size_t			 Link(ID3_Reader &reader, flags_t = (flags_t) ID3TT_ALL);
+		Iterator		*CreateIterator();
+		ConstIterator		*CreateIterator() const;
 
-		flags_t			 Update(flags_t = (flags_t) ID3TT_ALL);
-		flags_t			 Strip(flags_t = (flags_t) ID3TT_ALL);
+		ID3_Container		&operator =(const ID3_Container &);
 
-		size_t			 GetPrependedBytes() const;
-		size_t			 GetAppendedBytes() const;
-		size_t			 GetFileSize() const;
-		const char		*GetFileName() const;
-		ID3_Err			 GetLastError();
-
-		const Mp3_Headerinfo	*GetMp3HeaderInfo() const;
-
-		ID3_Tag			&operator =(const ID3_Tag &);
-
-		bool			 HasTagType(ID3_TagType tt) const;
-
-		static size_t		 IsV2Tag(const uchar *);
-		static size_t		 IsV2Tag(ID3_Reader &);
+		ID3_V2Spec		 GetSpec() const;
+		bool			 SetSpec(ID3_V2Spec);
 };
 
-#endif /* _ID3LIB_TAG_H_ */
+#endif /* _ID3LIB_CONTAINER_H_ */
