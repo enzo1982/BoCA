@@ -248,18 +248,18 @@ Int BoCA::DecoderMPG123::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (size <= 0) return -1;
 
-	inBytes += size;
+	const Format	&format = track.GetFormat();
+
+	Buffer<unsigned char>	 samples(size * 128);
+	size_t			 samplesDone;
 
 	data.Resize(size);
 
 	size = driver->ReadData(data, size);
 
-	Buffer<unsigned char>	 samples(size * 128);
-	size_t			 samplesDone;
+	inBytes += size;
 
 	ex_mpg123_decode(context, data, size, samples, samples.Size(), &samplesDone);
-
-	const Format	&format = track.GetFormat();
 
 	data.Resize(0);
 

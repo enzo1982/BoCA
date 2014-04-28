@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -181,14 +181,14 @@ Int BoCA::DecoderLAME::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (size <= 0) return -1;
 
-	inBytes += size;
+	pcm_l.Resize(size * 64);
+	pcm_r.Resize(size * 64);
 
 	data.Resize(size);
 
 	size = driver->ReadData(data, size);
 
-	pcm_l.Resize(size * 64);
-	pcm_r.Resize(size * 64);
+	inBytes += size;
 
 	Int		 nSamples = ex_hip_decode(context, data, size, pcm_l, pcm_r);
 	const Format	&format = track.GetFormat();
