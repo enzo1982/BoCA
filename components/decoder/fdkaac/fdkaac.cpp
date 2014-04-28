@@ -504,13 +504,11 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	static Int	 maxFrameSize = 2048;
 
-	inBytes += size;
+	const Format	&format = track.GetFormat();
 
 	Int	 samplesRead = 0;
 
 	samplesBuffer.Resize(0);
-
-	const Format	&format = track.GetFormat();
 
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
@@ -587,6 +585,8 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 		dataBuffer.Resize(size);
 
 		size = driver->ReadData(dataBuffer, size);
+
+		inBytes += size;
 
 		UnsignedInt	 bytesValid = size;
 

@@ -488,14 +488,12 @@ Bool BoCA::DecoderFAAD2::Seek(Int64 samplePosition)
 
 Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	inBytes += size;
+	const Format	&format = track.GetFormat();
 
 	Void	*samples = NIL;
 	Int	 samplesRead = 0;
 
 	samplesBuffer.Resize(0);
-
-	const Format	&format = track.GetFormat();
 
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
@@ -546,6 +544,8 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 		dataBuffer.Resize(size + backBuffer.Size());
 
 		size = driver->ReadData(dataBuffer + backBuffer.Size(), size);
+
+		inBytes += size;
 
 		if (backBuffer.Size() > 0)
 		{
