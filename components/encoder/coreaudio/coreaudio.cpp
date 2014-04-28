@@ -225,6 +225,30 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	packetsWritten = 0;
 	totalSamples   = 0;
 
+	/* Write ID3v2 tag if requested.
+	 */
+	if (!config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", 0))
+	{
+		const Info	&info = track.GetInfo();
+
+		if (info.artist != NIL || info.title != NIL)
+		{
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+			if (tagger != NIL)
+			{
+				Buffer<unsigned char>	 id3Buffer;
+
+				tagger->RenderBuffer(id3Buffer, track);
+
+				driver->WriteData(id3Buffer, id3Buffer.Size());
+
+				boca.DeleteComponent(tagger);
+			}
+		}
+	}
+
 	return True;
 }
 
@@ -297,34 +321,18 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	/* Write metadata to file
 	 */
-	const Info	&info = track.GetInfo();
-
-	if (info.artist != NIL || info.title != NIL)
+	if (config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableMP4Metadata", True))
 	{
-		AS::Registry	&boca = AS::Registry::Get();
+		const Info	&info = track.GetInfo();
 
-		if (config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableMP4Metadata", True))
+		if (info.artist != NIL || info.title != NIL)
 		{
+			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
 
 			if (tagger != NIL)
 			{
 				tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
-
-				boca.DeleteComponent(tagger);
-			}
-		}
-		else if (!config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", 0))
-		{
-			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
-
-			if (tagger != NIL)
-			{
-				Buffer<unsigned char>	 id3Buffer;
-
-				tagger->RenderBuffer(id3Buffer, track);
-
-				driver->WriteData(id3Buffer, id3Buffer.Size());
 
 				boca.DeleteComponent(tagger);
 			}
@@ -349,6 +357,30 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	in.Close();
 
 	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+
+	/* Write ID3v1 tag if requested.
+	 */
+	if (!config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v1", False))
+	{
+		const Info	&info = track.GetInfo();
+
+		if (info.artist != NIL || info.title != NIL)
+		{
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v1-tag");
+
+			if (tagger != NIL)
+			{
+				Buffer<unsigned char>	 id3Buffer;
+
+				tagger->RenderBuffer(id3Buffer, track);
+
+				driver->WriteData(id3Buffer, id3Buffer.Size());
+
+				boca.DeleteComponent(tagger);
+			}
+		}
+	}
 
 	return True;
 }

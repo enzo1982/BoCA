@@ -340,14 +340,28 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		 */
 		if (!errorState)
 		{
+			Bool			 foundTag = False;
+
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
 
 			if (tagger != NIL)
 			{
-				tagger->ParseStreamInfo(streamURI, track);
+				if (tagger->ParseStreamInfo(streamURI, track) == Success()) foundTag = True;
 
 				boca.DeleteComponent(tagger);
+			}
+
+			if (!foundTag)
+			{
+				tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v1-tag");
+
+				if (tagger != NIL)
+				{
+					tagger->ParseStreamInfo(streamURI, track);
+
+					boca.DeleteComponent(tagger);
+				}
 			}
 		}
 	}

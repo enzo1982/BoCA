@@ -102,7 +102,6 @@ BoCA::EncoderFAAC::~EncoderFAAC()
 Bool BoCA::EncoderFAAC::Activate()
 {
 	const Format	&format = track.GetFormat();
-	const Info	&info = track.GetInfo();
 
 	if (format.channels > 2)
 	{
@@ -169,9 +168,11 @@ Bool BoCA::EncoderFAAC::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (!config->GetIntValue("FAAC", "MP4Container", 1))
+	if (!config->GetIntValue("FAAC", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", 0))
 	{
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", 0))
+		const Info	&info = track.GetInfo();
+
+		if (info.artist != NIL || info.title != NIL)
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
@@ -273,6 +274,30 @@ Bool BoCA::EncoderFAAC::Deactivate()
 		in.Close();
 
 		File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+	}
+
+	/* Write ID3v1 tag if requested.
+	 */
+	if (!config->GetIntValue("FAAC", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v1", False))
+	{
+		const Info	&info = track.GetInfo();
+
+		if (info.artist != NIL || info.title != NIL)
+		{
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v1-tag");
+
+			if (tagger != NIL)
+			{
+				Buffer<unsigned char>	 id3Buffer;
+
+				tagger->RenderBuffer(id3Buffer, track);
+
+				driver->WriteData(id3Buffer, id3Buffer.Size());
+
+				boca.DeleteComponent(tagger);
+			}
+		}
 	}
 
 	return True;
