@@ -48,6 +48,7 @@ namespace smooth
 				Byte			 GetDepth() const;
 
 				UnsignedByte		*GetBytes() const;
+				Byte			 GetBitsPerPixel() const;
 				Byte			 GetLineAlignment() const;
 
 				Bool			 CreateBitmap(const Size &, Int = -1);
@@ -61,10 +62,10 @@ namespace smooth
 				Int			 ReplaceColor(const Color &, const Color &);
 				Int			 SetBackgroundColor(const Color &);
 
-				Int			 Scale(const Size &);
+				Bitmap			 Scale(const Size &) const;
 
 				Int			 BlitFromSurface(Surface *, const Rect &, const Rect &);
-				Int			 BlitToSurface(const Rect &, Surface *, const Rect &);
+				Int			 BlitToSurface(const Rect &, Surface *, const Rect &) const;
 
 				Bool			 SetPixel(const Point &, const Color &);
 				Color			 GetPixel(const Point &) const;

@@ -48,76 +48,71 @@ enum
 	BZIP2			// BZIP2 compressed data
 };
 
-// color format identifiers
-
-extern S::String	 cfNames[10];
-extern S::String	 cpNames[5];
-
 // structure definitions
 
 class SMOOTHAPI PCIIO
 {
 	private:
-		int		 majorversion;	// major version of PIC file format
-		int		 minorversion;	// minor version of PCI file format
-		S::GUI::Bitmap	 bmp;
-		int		 sizex;		// horizontal pixels
-		int		 sizey;		// vertical pixels
-		int		 dpix;		// horizontal dots per inch
-		int		 dpiy;		// vertical dots per inch
-		S::String	 description;	// image description
-		S::String	 imagename;	// name of the image (can be used to identify an image)
-		int		 compression;	// the compression type
-		int		 bpcc;		// bits per color channel
-		int		 colorspace;	// colorspace (implicates nof color channels)
-		int		 quality;	// image quality for JPEG compression
-		int		 rlebits;	// number of bits used for the runlength in RLE
-		bool		 overwrite;	// overwrite file or append to PCI file
-		int		 imageid;	// image ID in file
+		int				 majorversion;	// major version of PIC file format
+		int				 minorversion;	// minor version of PCI file format
+		S::GUI::Bitmap			 bmp;
+		int				 sizex;		// horizontal pixels
+		int				 sizey;		// vertical pixels
+		int				 dpix;		// horizontal dots per inch
+		int				 dpiy;		// vertical dots per inch
+		S::String			 description;	// image description
+		S::String			 imagename;	// name of the image (can be used to identify an image)
+		int				 compression;	// the compression type
+		int				 bpcc;		// bits per color channel
+		S::GUI::Color::ColorSpace	 colorspace;	// colorspace (implicates nof color channels)
+		int				 quality;	// image quality for JPEG compression
+		int				 rlebits;	// number of bits used for the runlength in RLE
+		bool				 overwrite;	// overwrite file or append to PCI file
+		int				 imageid;	// image ID in file
 
-		bool		 WritePCIFTAG(PCIOut);
-		bool		 WriteIMAGTAG(PCIOut);
-		bool		 WriteRESOTAG(PCIOut);
-		bool		 WriteFORMTAG(PCIOut);
-		bool		 WriteDESCTAG(PCIOut);
-		bool		 WriteNAMETAG(PCIOut);
-		bool		 WriteDATATAG(PCIOut);
+		bool				 WritePCIFTAG(PCIOut);
+		bool				 WriteIMAGTAG(PCIOut);
+		bool				 WriteRESOTAG(PCIOut);
+		bool				 WriteFORMTAG(PCIOut);
+		bool				 WriteDESCTAG(PCIOut);
+		bool				 WriteNAMETAG(PCIOut);
+		bool				 WriteDATATAG(PCIOut);
 
-		bool		 ReadPCIFTAG(PCIIn);
-		bool		 ReadIMAGTAG(PCIIn);
-		bool		 ReadRESOTAG(PCIIn);
-		bool		 ReadFORMTAG(PCIIn);
-		bool		 ReadDESCTAG(PCIIn);
-		bool		 ReadNAMETAG(PCIIn);
-		bool		 ReadDATATAG(PCIIn);
+		bool				 ReadPCIFTAG(PCIIn);
+		bool				 ReadIMAGTAG(PCIIn);
+		bool				 ReadRESOTAG(PCIIn);
+		bool				 ReadFORMTAG(PCIIn);
+		bool				 ReadDESCTAG(PCIIn);
+		bool				 ReadNAMETAG(PCIIn);
+		bool				 ReadDATATAG(PCIIn);
 
-		bool		 FindImageID(PCIIn);
+		bool				 FindImageID(PCIIn);
 
-		bool		 WriteLine(PCIOut, int);
-		bool		 ReadLine(PCIIn, int);
+		bool				 WriteLine(PCIOut, int);
+		bool				 ReadLine(PCIIn, int);
 
-		S::Bool		 CompressPCI(PCIOut);
-		S::Bool		 DecompressPCI(PCIIn);
+		S::Bool				 CompressPCI(PCIOut);
+		S::Bool				 DecompressPCI(PCIIn);
 	public:
-				 PCIIO(const S::GUI::Bitmap &);
-				 PCIIO();
-				~PCIIO();
+						 PCIIO(const S::GUI::Bitmap &);
+						 PCIIO();
+						~PCIIO();
 
-		bool		 WritePCI(PCIOut);
-		bool		 ReadPCI(PCIIn);
+		bool				 WritePCI(PCIOut);
+		bool				 ReadPCI(PCIIn);
 
-		void		 SetCompressionType(int);
-		void		 SetColorspace(int);
-		void		 SetBitsPerChannel(int);
-		void		 SetQuality(int);
-		void		 SetDescription(const S::String &);
-		void		 SetRLEBits(int);
-		void		 SelectImage(int);
-		void		 SelectImage(const S::String &);
-		void		 SetImageID(int);
-		void		 SetImageName(const S::String &);
+		void				 SetCompressionType(int);
+		void				 SetColorspace(S::GUI::Color::ColorSpace);
+		void				 SetBitsPerChannel(int);
+		void				 SetQuality(int);
+		void				 SetDescription(const S::String &);
+		void				 SetRLEBits(int);
+		void				 SelectImage(int);
+		void				 SelectImage(const S::String &);
+		void				 SetImageID(int);
+		void				 SetImageName(const S::String &);
 
-		S::GUI::Bitmap	&GetBitmap();
+		S::GUI::Bitmap			&GetBitmap();
 };
 
 SMOOTHAPI PCIOut	 CreatePCI(const S::String &);		// creates a new PCI file
