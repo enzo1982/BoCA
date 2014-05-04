@@ -30,7 +30,7 @@
 #ifndef _ID3LIB_WRITER_H_
 #define _ID3LIB_WRITER_H_
 
-#include "id3/globals.h"
+#include "globals.h"
 
 class ID3_Writer
 {

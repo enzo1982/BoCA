@@ -28,7 +28,6 @@
  */
 
 #include "container_impl.h"
-#include <id3/io_strings.h>
 #include "frame_def.h"
 
 ID3_FrameDef	*ID3_FindFrameDef(ID3_FrameID id);
@@ -460,7 +459,7 @@ ID3_ContainerImpl &ID3_ContainerImpl::operator=(const ID3_Container &rContainer)
 {
 	this->Clear();
 
-/*	ID3_Container::ConstIterator	*iter = rContainer.CreateIterator();
+	ID3_Container::ConstIterator	*iter = rContainer.CreateIterator();
 	const ID3_Frame			*frame = NULL;
 
 	while (NULL != (frame = iter->GetNext()))
@@ -469,6 +468,6 @@ ID3_ContainerImpl &ID3_ContainerImpl::operator=(const ID3_Container &rContainer)
 	}
 
 	delete iter;
-*/
+
 	return *this;
 }

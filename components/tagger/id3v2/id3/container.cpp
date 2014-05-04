@@ -28,8 +28,8 @@
  */
 
 #include "container_impl.h"
-#include <id3/writers.h>
-#include <memory.h>
+
+#include <id3/utils.h>
 
 using namespace dami;
 

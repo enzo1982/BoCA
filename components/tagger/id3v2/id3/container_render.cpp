@@ -29,6 +29,8 @@
 
 #include "container_impl.h"
 
+#include <stdio.h>
+
 using namespace dami;
 
 ID3_Err id3::v2::renderFrames(ID3_Writer &writer, const ID3_ContainerImpl &container)

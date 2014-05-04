@@ -30,7 +30,7 @@
 #ifndef _ID3LIB_IO_HELPERS_H_
 #define _ID3LIB_IO_HELPERS_H_
 
-#include "id3/strings.h"
+#include "strings.h"
 #include "reader.h"
 #include "writer.h"
 

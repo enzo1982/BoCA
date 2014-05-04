@@ -28,11 +28,11 @@
  */
 
 #include "header_tag.h"
-#include <id3/utils.h>
-#include <id3/tag.h>
-#include <id3/io_helpers.h>
 #include "spec.h"
-#include <string.h>
+
+#include <id3/tag.h>
+#include <id3/utils.h>
+#include <id3/io_helpers.h>
 
 using namespace dami;
 

@@ -28,8 +28,9 @@
  */
 
 #include "tag_impl.h"
+
+#include <id3/readers.h>
 #include <id3/writers.h>
-#include <memory.h>
 
 using namespace dami;
 

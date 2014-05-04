@@ -31,8 +31,9 @@
 #	include <config.h>
 #endif
 
-#include <id3/readers.h>
 #include "frame_impl.h"
+
+#include <id3/readers.h>
 
 /** \class ID3_Frame frame.h id3/frame.h
  ** \brief The representative class of an id3v2 frame.
@@ -60,13 +61,11 @@
  ** @see ID3_FrameID
  ** @see SetID
  **/
-ID3_Frame::ID3_Frame(ID3_FrameID id)
- :	_impl(new ID3_FrameImpl(id))
+ID3_Frame::ID3_Frame(ID3_FrameID id) : _impl(new ID3_FrameImpl(id))
 {
 }
 
-ID3_Frame::ID3_Frame(const ID3_Frame &frame)
- :	_impl(new ID3_FrameImpl(frame))
+ID3_Frame::ID3_Frame(const ID3_Frame &frame) : _impl(new ID3_FrameImpl(frame))
 {
 }
 

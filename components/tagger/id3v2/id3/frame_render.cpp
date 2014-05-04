@@ -31,13 +31,10 @@
 #	include <config.h>
 #endif
 
-#include <memory.h>
-
-#include <id3/tag.h>
 #include "frame_impl.h"
+
 #include <id3/io_decorators.h>
 #include <id3/io_strings.h>
-#include <id3/io_helpers.h>
 
 using namespace dami;
 

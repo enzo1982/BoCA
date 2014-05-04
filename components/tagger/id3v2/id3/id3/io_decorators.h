@@ -32,7 +32,7 @@
 
 #include "readers.h"
 #include "io_helpers.h"
-#include "id3/utils.h" // has <config.h> "id3/streams.h" "id3/globals.h" "id3/strings.h"
+#include "utils.h"
 
 namespace dami
 {

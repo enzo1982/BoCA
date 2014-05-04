@@ -31,10 +31,12 @@
 #ifndef _ID3LIB_CONTAINER_IMPL_H_
 #define _ID3LIB_CONTAINER_IMPL_H_
 
-#include <list>
-#include <stdio.h>
 #include <id3/container.h>
-#include "mp3_header.h"
+#include <id3/frame.h>
+#include <id3/field.h>
+#include <id3/strings.h>
+
+#include <list>
 
 class ID3_Reader;
 class ID3_Writer;

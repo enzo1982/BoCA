@@ -28,9 +28,8 @@
  */
 
 #include "tag_impl.h"
+
 #include <id3/helpers.h>
-#include <id3/io_decorators.h>
-#include <id3/io_strings.h>
 
 using namespace dami;
 

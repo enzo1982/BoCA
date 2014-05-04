@@ -31,6 +31,7 @@
 #endif
 
 #include "frame_impl.h"
+
 #include <id3/io_decorators.h>
 
 using namespace dami;

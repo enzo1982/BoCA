@@ -30,8 +30,10 @@
 #ifndef _ID3LIB_READERS_H_
 #define _ID3LIB_READERS_H_
 
-#include "id3/streams.h"
-#include "id3/reader.h"
+#include "streams.h"
+#include "reader.h"
+
+#include <memory.h>
 
 class ID3_IStreamReader : public ID3_Reader
 {
@@ -139,7 +141,7 @@ class ID3_MemoryReader : public ID3_Reader
     _cur += size;
     return size;
   }
-    
+
   virtual pos_type getCur() 
   { 
     return _cur - _beg; 

@@ -30,8 +30,8 @@
 #ifndef _ID3LIB_WRITERS_H_
 #define _ID3LIB_WRITERS_H_
 
-#include "id3/writer.h"
-#include "id3/streams.h"
+#include "writer.h"
+#include "streams.h"
 
 #include <memory.h>
 

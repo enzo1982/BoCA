@@ -27,21 +27,11 @@
  */
 
 #include "field_impl.h"
+
 #include <id3/utils.h>
 #include <id3/io_helpers.h>
 
 using namespace dami;
-
-/** \fn ID3_Field& ID3_Field::operator=(uint32 val)
- ** \brief A shortcut for the Set method.
- **
- ** \code
- **   myFrame.GetField(ID3FN_PICTURETYPE)->= 0x0B;
- ** \endcode
- ** 
- ** \param val The data to assign to this field
- ** \sa Set(uint32)
- **/
 
 /** \brief Sets the value of the field to the specified integer.
  ** \param data The data to assign to this field

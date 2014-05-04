@@ -30,15 +30,10 @@
 #ifndef _ID3LIB_FIELD_IMPL_H_
 #define _ID3LIB_FIELD_IMPL_H_
 
-#include <stdlib.h>
 #include <id3/field.h>
-#include <id3/strings.h>
 
 struct	 ID3_FieldDef;
 struct	 ID3_FrameDef;
-
-class	 ID3_Frame;
-class	 ID3_Reader;
 
 class ID3_FieldImpl : public ID3_Field
 {

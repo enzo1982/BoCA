@@ -31,11 +31,12 @@
 #ifndef _ID3LIB_FRAME_IMPL_H_
 #define _ID3LIB_FRAME_IMPL_H_
 
+#include <id3/frame.h>
+
+#include "header_frame.h"
+
 #include <vector>
 #include <bitset>
-
-#include <id3/frame.h>
-#include "header_frame.h"
 
 class ID3_FrameImpl
 {

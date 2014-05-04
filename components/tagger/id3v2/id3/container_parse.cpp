@@ -27,10 +27,9 @@
  * http://download.sourceforge.net/id3lib/
  */
 
-#include <string.h>
-
 #include "container_impl.h"
-#include <id3/io_strings.h>
+
+#include <id3/io_decorators.h>
 
 using namespace dami;
 

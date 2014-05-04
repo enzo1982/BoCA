@@ -27,18 +27,11 @@
  */
 
 #include "field_impl.h"
+
 #include <id3/utils.h>
 #include <id3/io_helpers.h>
 
 using namespace dami;
-
-/** \fn ID3_Field& ID3_Field::operator=(const unicode_t*)
- ** \brief Shortcut for the Set operator.
- ** Performs similarly as operator=(const char*), taking a unicode_t
- ** string as a parameter rather than an ascii string.
- ** \sa Set(const unicode_t*)
- ** \param string The string to assign to the field
- **/
 
 /** \brief Copies the supplied unicode string to the field.
  **

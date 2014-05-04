@@ -27,13 +27,10 @@
  */
 
 #if defined HAVE_CONFIG_H
-#include <config.h>
+#	include <config.h>
 #endif
 
-#include <ctype.h>
 #include "tag_impl.h"
-#include <id3/helpers.h>
-#include <id3/io_decorators.h>
 
 using namespace dami;
 

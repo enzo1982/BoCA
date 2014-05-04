@@ -31,13 +31,10 @@
 #ifndef _ID3LIB_CONTAINER_H_
 #define _ID3LIB_CONTAINER_H_
 
-#include "frame.h"
-#include "field.h"
+#include "globals.h"
 
-class ID3_Reader;
-class ID3_Writer;
 class ID3_ContainerImpl;
-class ID3_Container;
+class ID3_Frame;
 
 class ID3_Container
 {

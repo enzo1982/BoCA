@@ -27,9 +27,8 @@
  * http://download.sourceforge.net/id3lib/
  */
 
-#include <string.h>
-
 #include "tag_impl.h"
+
 #include <id3/io_strings.h>
 
 using namespace dami;

@@ -31,14 +31,13 @@
 #ifndef _ID3LIB_TAG_H_
 #define _ID3LIB_TAG_H_
 
-#include "frame.h"
 #include "container.h"
+#include "frame.h"
 #include "field.h"
 
 class ID3_Reader;
 class ID3_Writer;
 class ID3_TagImpl;
-class ID3_Tag;
 
 class ID3_Tag : public ID3_Container
 {

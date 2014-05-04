@@ -27,10 +27,10 @@
  * http://download.sourceforge.net/id3lib/
  */
 
-#include <stdio.h>  // for BUFSIZ and functions remove & rename
+#include "tag_impl.h"
+
 #include <id3/writers.h>
 #include <id3/io_strings.h>
-#include "tag_impl.h"
 
 using namespace dami;
 

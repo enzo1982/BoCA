@@ -31,9 +31,8 @@
 #ifndef _ID3LIB_TAG_IMPL_H_
 #define _ID3LIB_TAG_IMPL_H_
 
-#include <list>
-#include <stdio.h>
 #include <id3/tag.h>
+
 #include "container_impl.h"
 #include "header_tag.h"
 #include "mp3_header.h"

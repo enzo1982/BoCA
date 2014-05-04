@@ -27,12 +27,9 @@
  * http://download.sourceforge.net/id3lib/
  */
 
-#include <memory.h>
 #include "tag_impl.h"
+
 #include <id3/helpers.h>
-#include <id3/writers.h>
-#include <id3/io_decorators.h>
-#include <id3/io_helpers.h>
 #include <id3/io_strings.h>
 
 #if defined HAVE_SYS_PARAM_H

@@ -26,13 +26,10 @@
  * http://download.sourceforge.net/id3lib/
  */
 
-#include <stdio.h>
-#include <memory.h>
-
 #include "field_impl.h"
-#include <id3/reader.h>
-#include <id3/writer.h>
+
 #include <id3/io_helpers.h>
+#include <id3/writer.h>
 #include <id3/utils.h>
 
 using namespace dami;

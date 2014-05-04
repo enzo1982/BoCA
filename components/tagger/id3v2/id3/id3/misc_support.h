@@ -31,7 +31,7 @@
 #ifndef _ID3LIB_MISC_SUPPORT_H_
 #define _ID3LIB_MISC_SUPPORT_H_
 
-#include <id3/tag.h>
+#include "tag.h"
 
 char*      ID3_GetString(const ID3_Frame *, ID3_FieldID);
 char*      ID3_GetString(const ID3_Frame *, ID3_FieldID, size_t nItems);

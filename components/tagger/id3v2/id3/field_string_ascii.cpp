@@ -27,17 +27,11 @@
  */
 
 #include "field_impl.h"
+
 #include <id3/utils.h>
 #include <id3/io_helpers.h>
-#include <string.h>
 
 using namespace dami;
-
-/** \fn ID3_Field& ID3_Field::operator=(const char* data)
- ** \brief Shortcut for the Set operator.
- ** \param data The string to assign to this field
- ** \sa Set(const char*)
- **/
 
 /** \brief Copies the supplied string to the field.
  ** You may dispose of the source string after a call to this method.

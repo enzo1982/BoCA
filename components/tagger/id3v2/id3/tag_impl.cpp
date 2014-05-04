@@ -32,6 +32,7 @@
 #endif
 
 #include "tag_impl.h"
+
 #include <id3/io_strings.h>
 
 using namespace dami;

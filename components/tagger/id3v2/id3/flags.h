@@ -30,7 +30,7 @@
 #ifndef _ID3LIB_FLAGS_H_
 #define _ID3LIB_FLAGS_H_
 
-#include "flags.h"
+#include <id3/globals.h>
 
 class ID3_Flags
 {

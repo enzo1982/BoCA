@@ -28,6 +28,8 @@
 
 #include "container_impl.h"
 
+#include <id3/io_decorators.h>
+
 using namespace dami;
 
 ID3_ContainerImpl::const_iterator ID3_ContainerImpl::Find(const ID3_Frame *frame) const
