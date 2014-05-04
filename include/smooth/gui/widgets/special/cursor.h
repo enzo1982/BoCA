@@ -138,7 +138,7 @@ namespace smooth
 				Void						 OnGetFocusByKeyboard();
 				Void						 OnLoseFocus();
 
-				Void						 OnSpecialKey(Int);
+				Bool						 OnSpecialKey(Int);
 				Void						 OnInput(Int, Int);
 
 				Void						 OnCut();
