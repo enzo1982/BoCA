@@ -27,13 +27,13 @@
 #ifndef _ID3LIB_FIELD_H_
 #define _ID3LIB_FIELD_H_
 
-#include "globals.h"
 #include "strings.h"
+#include "container.h"
 
 class ID3_Reader;
 class ID3_Writer;
 
-class ID3_Field
+class ID3_Field : public ID3_Container
 {
 	public:
 		virtual void		 Clear() = 0;

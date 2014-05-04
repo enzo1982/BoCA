@@ -96,6 +96,7 @@
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\container_render.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_binary.cpp" />
+    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_frames.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_integer.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_string_ascii.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\field_string_unicode.cpp" />
@@ -113,7 +114,6 @@
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\io_helpers.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\misc_support.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\mp3_parse.cpp" />
-    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\readers.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\spec.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag_file.cpp" />
@@ -124,7 +124,6 @@
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag_parse_v1.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\tag_render.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\id3\utils.cpp" />
-    <ClCompile Include="..\..\..\components\tagger\id3v2\id3\writers.cpp" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\zlib\adler32.c" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\zlib\compress.c" />
     <ClCompile Include="..\..\..\components\tagger\id3v2\zlib\crc32.c" />

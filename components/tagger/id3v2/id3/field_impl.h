@@ -140,10 +140,12 @@ class ID3_FieldImpl : public ID3_Field
 		void			 RenderInteger(ID3_Writer&) const;
 		void			 RenderText(ID3_Writer&) const;
 		void			 RenderBinary(ID3_Writer&) const;
+		void			 RenderFrames(ID3_Writer&) const;
 
 		bool			 ParseInteger(ID3_Reader&);
 		bool			 ParseText(ID3_Reader&);
 		bool			 ParseBinary(ID3_Reader&);
+		bool			 ParseFrames(ID3_Reader&);
 };
 
 /* Ack! Not for public use

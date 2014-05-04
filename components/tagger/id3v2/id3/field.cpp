@@ -345,6 +345,106 @@ static ID3_FieldDef ID3FD_Picture[] =
   { ID3FN_NOFIELD }
 };
 
+static ID3_FieldDef ID3FD_Chapter[] =
+{
+  {
+    ID3FN_ID,                           // FIELD NAME
+    ID3FTY_TEXTSTRING,                  // FIELD TYPE
+    0,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_CSTR,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  {
+    ID3FN_STARTTIME,                    // FIELD NAME
+    ID3FTY_INTEGER,                     // FIELD TYPE
+    4,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_NONE,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  {
+    ID3FN_ENDTIME,                      // FIELD NAME
+    ID3FTY_INTEGER,                     // FIELD TYPE
+    4,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_NONE,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  {
+    ID3FN_STARTOFFSET,                  // FIELD NAME
+    ID3FTY_INTEGER,                     // FIELD TYPE
+    4,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_NONE,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  {
+    ID3FN_ENDOFFSET,                    // FIELD NAME
+    ID3FTY_INTEGER,                     // FIELD TYPE
+    4,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_NONE,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  {
+    ID3FN_FRAMES,                       // FIELD NAME
+    ID3FTY_FRAMES,                      // FIELD TYPE
+    0,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_NONE,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  { ID3FN_NOFIELD }
+};
+
+static ID3_FieldDef ID3FD_TableOfContents[] =
+{
+  {
+    ID3FN_ID,                           // FIELD NAME
+    ID3FTY_TEXTSTRING,                  // FIELD TYPE
+    0,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_CSTR,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  {
+    ID3FN_FLAGS,                        // FIELD NAME
+    ID3FTY_INTEGER,                     // FIELD TYPE
+    1,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_NONE,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  {
+    ID3FN_CHAPTERS,                     // FIELD NAME
+    ID3FTY_TEXTSTRING,                  // FIELD TYPE
+    0,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_NLIST,                        // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  {
+    ID3FN_FRAMES,                       // FIELD NAME
+    ID3FTY_FRAMES,                      // FIELD TYPE
+    0,                                  // FIXED LEN
+    ID3V2_3_0,                          // INITIAL SPEC
+    ID3V2_LATEST,                       // ENDING SPEC
+    ID3FF_NONE,                         // FLAGS
+    ID3FN_NOFIELD                       // LINKED FIELD
+  },
+  { ID3FN_NOFIELD }
+};
+
 static ID3_FieldDef ID3FD_GEO[] =
 {
   {
@@ -1205,7 +1305,9 @@ static ID3_FieldDef ID3FD_Volume1[] =
 
 // **** Currently Implemented Frames
 // APIC  PIC  ID3FID_PICTURE           Attached picture
+// CHAP       ID3FID_CHAPTER           Chapter
 // COMM  COM  ID3FID_COMMENT           Comments
+// CTOC       ID3FID_TOC               Table of contents
 // ENCR       ID3FID_CRYPTOREG         Encryption method registration
 // GEOB  GEO  ID3FID_GENERALOBJECT     General encapsulated object
 // GRID       ID3FID_GROUPINGREG       Group identification registration
@@ -1326,101 +1428,103 @@ ID3_Frame* convertTYER(ID3_Frame* oldframe, ID3_V2Spec tospec)
 static  ID3_FrameDef ID3_FrameDefs[] =
 {
   //                          short  long    born            died          replace      tag    file
-  // frame id                 id     id      tag             tag           id           discrd discrd field defs            description
-  {ID3FID_AUDIOCRYPTO,        "CRA", "AENC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_AudioEncryption,"Audio encryption"},
-  {ID3FID_PICTURE,            "PIC", "APIC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Picture,        "Attached picture"},
-  {ID3FID_AUDIOSEEKPOINT,     ""   , "ASPI", ID3V2_4_0,      ID3V2_LATEST, NULL,        false, false, ID3FD_AudioSeekPoint, "Audio seek point index"},
-  {ID3FID_COMMENT,            "COM", "COMM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,    "Comments"},
-  {ID3FID_COMMERCIAL,         ""   , "COMR", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Commercial,     "Commercial"},
-  {ID3FID_CRYPTOREG,          ""   , "ENCR", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Registration,   "Encryption method registration"},
-  {ID3FID_EQUALIZATION2,      ""   , "EQU2", ID3V2_4_0,      ID3V2_LATEST, NULL,        false, false, ID3FD_Unimplemented,  "Equalisation (2)"},
-  {ID3FID_EQUALIZATION,       "EQU", "EQUA", ID3V2_EARLIEST, ID3V2_3_0,    convertEQUA, false, true,  ID3FD_Unimplemented,  "Equalization"},
-  {ID3FID_EVENTTIMING,        "ETC", "ETCO", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_EventTiming,    "Event timing codes"},
-  {ID3FID_GENERALOBJECT,      "GEO", "GEOB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GEO,            "General encapsulated object"},
-  {ID3FID_GROUPINGREG,        ""   , "GRID", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Registration,   "Group identification registration"},
-  {ID3FID_INVOLVEDPEOPLE,     "IPL", "IPLS", ID3V2_EARLIEST, ID3V2_3_0,    convertIPLS, false, false, ID3FD_TextList,       "Involved people list"},
-  {ID3FID_LINKEDINFO,         "LNK", "LINK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_LinkedInfo,     "Linked information"},
-  {ID3FID_CDID,               "MCI", "MCDI", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Binary,         "Music CD identifier"},
-  {ID3FID_MPEGLOOKUP,         "MLL", "MLLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Unimplemented,  "MPEG location lookup table"},
-  {ID3FID_OWNERSHIP,          ""   , "OWNE", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Owner,          "Ownership frame"},
-  {ID3FID_PRIVATE,            ""   , "PRIV", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Private,        "Private frame"},
-  {ID3FID_PLAYCOUNTER,        "CNT", "PCNT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_PlayCounter,    "Play counter"},
-  {ID3FID_POPULARIMETER,      "POP", "POPM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Popularimeter,  "Popularimeter"},
-  {ID3FID_POSITIONSYNC,       ""   , "POSS", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, true,  ID3FD_Position,       "Position synchronisation frame"},
-  {ID3FID_BUFFERSIZE,         "BUF", "RBUF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Buffer,         "Recommended buffer size"},
-  {ID3FID_VOLUMEADJ2,         ""   , "RVA2", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Unimplemented,  "Relative volume adjustment (2)"},
-  {ID3FID_VOLUMEADJ,          "RVA", "RVAD", ID3V2_EARLIEST, ID3V2_3_0,    convertRVAD, false, true,  ID3FD_Unimplemented,  "Relative volume adjustment"},
-  {ID3FID_REVERB,             "REV", "RVRB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Reverb,         "Reverb"},
-  {ID3FID_SEEKFRAME,          ""   , "SEEK", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Seek,           "Seek frame"},
-  {ID3FID_SIGNATURE,          ""   , "SIGN", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Signature,      "Signature frame"},
-  {ID3FID_SYNCEDLYRICS,       "SLT", "SYLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_SyncLyrics,     "Synchronized lyric/text"},
-  {ID3FID_SYNCEDTEMPO,        "STC", "SYTC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_SyncTempo,      "Synchronized tempo codes"},
-  {ID3FID_ALBUM,              "TAL", "TALB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Album/Movie/Show title"},
-  {ID3FID_BPM,                "TBP", "TBPM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "BPM (beats per minute)"},
-  {ID3FID_COMPOSER,           "TCM", "TCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Composer"},
-  {ID3FID_CONTENTTYPE,        "TCO", "TCON", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Content type"},
-  {ID3FID_COPYRIGHT,          "TCR", "TCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Copyright message"},
-  {ID3FID_DATE,               "TDA", "TDAT", ID3V2_EARLIEST, ID3V2_3_0,    convertTDAT, false, false, ID3FD_Text,           "Date"},
-  {ID3FID_ENCODINGTIME,       ""   , "TDEN", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Encoding time"},
-  {ID3FID_PLAYLISTDELAY,      "TDY", "TDLY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Playlist delay"},
-  {ID3FID_ORIGRELEASETIME,    ""   , "TDOR", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Original release time"},
-  {ID3FID_RECORDINGTIME,      ""   , "TDRC", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Recording time"},
-  {ID3FID_RELEASETIME,        ""   , "TDRL", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Release time"},
-  {ID3FID_TAGGINGTIME,        ""   , "TDTG", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Tagging time"},
-  {ID3FID_ENCODEDBY,          "TEN", "TENC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Text,           "Encoded by"},
-  {ID3FID_LYRICIST,           "TXT", "TEXT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Lyricist/Text writer"},
-  {ID3FID_FILETYPE,           "TFT", "TFLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "File type"},
-  {ID3FID_TIME,               "TIM", "TIME", ID3V2_EARLIEST, ID3V2_3_0,    convertTIME, false, false, ID3FD_Text,           "Time"},
-  {ID3FID_INVOLVEDPEOPLE2,    ""   , "TIPL", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_TextList,       "Involved people list"},
-  {ID3FID_CONTENTGROUP,       "TT1", "TIT1", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Content group description"},
-  {ID3FID_TITLE,              "TT2", "TIT2", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Title/songname/content description"},
-  {ID3FID_SUBTITLE,           "TT3", "TIT3", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Subtitle/Description refinement"},
-  {ID3FID_INITIALKEY,         "TKE", "TKEY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Initial key"},
-  {ID3FID_LANGUAGE,           "TLA", "TLAN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Language(s)"},
-  {ID3FID_SONGLEN,            "TLE", "TLEN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Text,           "Length"},
-  {ID3FID_MUSICIANCREDITLIST, ""   , "TMCL", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_TextList,       "Musician credits list"},
-  {ID3FID_MEDIATYPE,          "TMT", "TMED", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Media type"},
-  {ID3FID_MOOD,               ""   , "TMOO", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Mood"},
-  {ID3FID_ORIGALBUM,          "TOT", "TOAL", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Original album/movie/show title"},
-  {ID3FID_ORIGFILENAME,       "TOF", "TOFN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Original filename"},
-  {ID3FID_ORIGLYRICIST,       "TOL", "TOLY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Original lyricist(s)/text writer(s)"},
-  {ID3FID_ORIGARTIST,         "TOA", "TOPE", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Original artist(s)/performer(s)"},
-  {ID3FID_ORIGYEAR,           "TOR", "TORY", ID3V2_EARLIEST, ID3V2_3_0,    convertTORY, false, false, ID3FD_Text,           "Original release year"},
-  {ID3FID_FILEOWNER,          ""   , "TOWN", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "File owner/licensee"},
-  {ID3FID_LEADARTIST,         "TP1", "TPE1", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Lead performer(s)/Soloist(s)"},
-  {ID3FID_BAND,               "TP2", "TPE2", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Band/orchestra/accompaniment"},
-  {ID3FID_CONDUCTOR,          "TP3", "TPE3", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Conductor/performer refinement"},
-  {ID3FID_MIXARTIST,          "TP4", "TPE4", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Interpreted, remixed, or otherwise modified by"},
-  {ID3FID_PARTINSET,          "TPA", "TPOS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Part of a set"},
-  {ID3FID_PRODUCEDNOTICE,     ""   , "TPRO", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Produced notice"},
-  {ID3FID_PUBLISHER,          "TPB", "TPUB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Publisher"},
-  {ID3FID_TRACKNUM,           "TRK", "TRCK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Track number/Position in set"},
-  {ID3FID_RECORDINGDATES,     "TRD", "TRDA", ID3V2_EARLIEST, ID3V2_3_0,    convertTRDA, false, false, ID3FD_Text,           "Recording dates"},
-  {ID3FID_NETRADIOSTATION,    "TRN", "TRSN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Internet radio station name"},
-  {ID3FID_NETRADIOOWNER,      "TRO", "TRSO", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Internet radio station owner"},
-  {ID3FID_SIZE,               "TSI", "TSIZ", ID3V2_EARLIEST, ID3V2_3_0,    NULL,        false, true,  ID3FD_Text,           "Size"},
-  {ID3FID_ALBUMSORTORDER,     ""   , "TSOA", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Album sort order"},
-  {ID3FID_PERFORMERSORTORDER, ""   , "TSOP", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Performer sort order"},
-  {ID3FID_TITLESORTORDER,     ""   , "TSOT", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Title sort order"},
-  {ID3FID_ISRC,               "TRC", "TSRC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "ISRC (international standard recording code)"},//http://www.ifpi.org/isrc/isrc_handbook.html
-  {ID3FID_ENCODERSETTINGS,    "TSS", "TSSE", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Software/Hardware and settings used for encoding"},
-  {ID3FID_SETSUBTITLE,        ""   , "TSST", ID3V2_4_0      ,ID3V2_LATEST, NULL,        false, false, ID3FD_Text,           "Set subtitle"},
-  {ID3FID_USERTEXT,           "TXX", "TXXX", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UserText,       "User defined text information"},
-  {ID3FID_YEAR,               "TYE", "TYER", ID3V2_EARLIEST, ID3V2_3_0,    convertTYER, false, false, ID3FD_Text,           "Year"},
-  {ID3FID_UNIQUEFILEID,       "UFI", "UFID", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UFI,            "Unique file identifier"},
-  {ID3FID_TERMSOFUSE,         ""   , "USER", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TermsOfUse,     "Terms of use"},
-  {ID3FID_UNSYNCEDLYRICS,     "ULT", "USLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,    "Unsynchronized lyric/text transcription"},
-  {ID3FID_WWWCOMMERCIALINFO,  "WCM", "WCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,            "Commercial information"},
-  {ID3FID_WWWCOPYRIGHT,       "WCP", "WCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,            "Copyright/Legal infromation"},
-  {ID3FID_WWWAUDIOFILE,       "WAF", "WOAF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,            "Official audio file webpage"},
-  {ID3FID_WWWARTIST,          "WAR", "WOAR", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,            "Official artist/performer webpage"},
-  {ID3FID_WWWAUDIOSOURCE,     "WAS", "WOAS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,            "Official audio source webpage"},
-  {ID3FID_WWWRADIOPAGE,       "WRA", "WORS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,            "Official internet radio station homepage"},
-  {ID3FID_WWWPAYMENT,         "WPY", "WPAY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,            "Payment"},
-  {ID3FID_WWWPUBLISHER,       "WPB", "WPUB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,            "Official publisher webpage"},
-  {ID3FID_WWWUSER,            "WXX", "WXXX", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UserURL,        "User defined URL link"},
-  {ID3FID_METACRYPTO,         "CRM", ""    , ID3V2_EARLIEST, ID3V2_2_1,    NULL,        false, false, ID3FD_Unimplemented,  "Encrypted meta frame"},
-  {ID3FID_METACOMPRESSION,    "CDM", ""    , ID3V2_2_1,      ID3V2_2_1,    NULL,        false, false, ID3FD_CDM,            "Compressed data meta frame"},
+  // frame id                 id     id      tag             tag           id           discrd discrd field defs             description
+  {ID3FID_AUDIOCRYPTO,        "CRA", "AENC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_AudioEncryption, "Audio encryption"},
+  {ID3FID_PICTURE,            "PIC", "APIC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Picture,         "Attached picture"},
+  {ID3FID_AUDIOSEEKPOINT,     ""   , "ASPI", ID3V2_4_0	   , ID3V2_LATEST, NULL,        false, false, ID3FD_AudioSeekPoint,  "Audio seek point index"},
+  {ID3FID_CHAPTER,            ""   , "CHAP", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Chapter,         "Chapter"},
+  {ID3FID_COMMENT,            "COM", "COMM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,     "Comments"},
+  {ID3FID_COMMERCIAL,         ""   , "COMR", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Commercial,      "Commercial"},
+  {ID3FID_TOC,                ""   , "CTOC", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TableOfContents, "Table of contents"},
+  {ID3FID_CRYPTOREG,          ""   , "ENCR", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Registration,    "Encryption method registration"},
+  {ID3FID_EQUALIZATION2,      ""   , "EQU2", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Unimplemented,   "Equalisation (2)"},
+  {ID3FID_EQUALIZATION,       "EQU", "EQUA", ID3V2_EARLIEST, ID3V2_3_0   , convertEQUA, false, true,  ID3FD_Unimplemented,   "Equalization"},
+  {ID3FID_EVENTTIMING,        "ETC", "ETCO", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_EventTiming,     "Event timing codes"},
+  {ID3FID_GENERALOBJECT,      "GEO", "GEOB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GEO,             "General encapsulated object"},
+  {ID3FID_GROUPINGREG,        ""   , "GRID", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Registration,    "Group identification registration"},
+  {ID3FID_INVOLVEDPEOPLE,     "IPL", "IPLS", ID3V2_EARLIEST, ID3V2_3_0   , convertIPLS, false, false, ID3FD_TextList,        "Involved people list"},
+  {ID3FID_LINKEDINFO,         "LNK", "LINK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_LinkedInfo,      "Linked information"},
+  {ID3FID_CDID,               "MCI", "MCDI", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Binary,          "Music CD identifier"},
+  {ID3FID_MPEGLOOKUP,         "MLL", "MLLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Unimplemented,   "MPEG location lookup table"},
+  {ID3FID_OWNERSHIP,          ""   , "OWNE", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Owner,           "Ownership frame"},
+  {ID3FID_PRIVATE,            ""   , "PRIV", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Private,         "Private frame"},
+  {ID3FID_PLAYCOUNTER,        "CNT", "PCNT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_PlayCounter,     "Play counter"},
+  {ID3FID_POPULARIMETER,      "POP", "POPM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Popularimeter,   "Popularimeter"},
+  {ID3FID_POSITIONSYNC,       ""   , "POSS", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, true,  ID3FD_Position,        "Position synchronisation frame"},
+  {ID3FID_BUFFERSIZE,         "BUF", "RBUF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Buffer,          "Recommended buffer size"},
+  {ID3FID_VOLUMEADJ2,         ""   , "RVA2", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Unimplemented,   "Relative volume adjustment (2)"},
+  {ID3FID_VOLUMEADJ,          "RVA", "RVAD", ID3V2_EARLIEST, ID3V2_3_0   , convertRVAD, false, true,  ID3FD_Unimplemented,   "Relative volume adjustment"},
+  {ID3FID_REVERB,             "REV", "RVRB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Reverb,          "Reverb"},
+  {ID3FID_SEEKFRAME,          ""   , "SEEK", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Seek,            "Seek frame"},
+  {ID3FID_SIGNATURE,          ""   , "SIGN", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Signature,       "Signature frame"},
+  {ID3FID_SYNCEDLYRICS,       "SLT", "SYLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_SyncLyrics,      "Synchronized lyric/text"},
+  {ID3FID_SYNCEDTEMPO,        "STC", "SYTC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_SyncTempo,       "Synchronized tempo codes"},
+  {ID3FID_ALBUM,              "TAL", "TALB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Album/Movie/Show title"},
+  {ID3FID_BPM,                "TBP", "TBPM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "BPM (beats per minute)"},
+  {ID3FID_COMPOSER,           "TCM", "TCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Composer"},
+  {ID3FID_CONTENTTYPE,        "TCO", "TCON", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Content type"},
+  {ID3FID_COPYRIGHT,          "TCR", "TCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Copyright message"},
+  {ID3FID_DATE,               "TDA", "TDAT", ID3V2_EARLIEST, ID3V2_3_0   , convertTDAT, false, false, ID3FD_Text,            "Date"},
+  {ID3FID_ENCODINGTIME,       ""   , "TDEN", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Encoding time"},
+  {ID3FID_PLAYLISTDELAY,      "TDY", "TDLY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Playlist delay"},
+  {ID3FID_ORIGRELEASETIME,    ""   , "TDOR", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original release time"},
+  {ID3FID_RECORDINGTIME,      ""   , "TDRC", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Recording time"},
+  {ID3FID_RELEASETIME,        ""   , "TDRL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Release time"},
+  {ID3FID_TAGGINGTIME,        ""   , "TDTG", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Tagging time"},
+  {ID3FID_ENCODEDBY,          "TEN", "TENC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Text,            "Encoded by"},
+  {ID3FID_LYRICIST,           "TXT", "TEXT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Lyricist/Text writer"},
+  {ID3FID_FILETYPE,           "TFT", "TFLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "File type"},
+  {ID3FID_TIME,               "TIM", "TIME", ID3V2_EARLIEST, ID3V2_3_0   , convertTIME, false, false, ID3FD_Text,            "Time"},
+  {ID3FID_INVOLVEDPEOPLE2,    ""   , "TIPL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TextList,        "Involved people list"},
+  {ID3FID_CONTENTGROUP,       "TT1", "TIT1", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Content group description"},
+  {ID3FID_TITLE,              "TT2", "TIT2", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Title/songname/content description"},
+  {ID3FID_SUBTITLE,           "TT3", "TIT3", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Subtitle/Description refinement"},
+  {ID3FID_INITIALKEY,         "TKE", "TKEY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Initial key"},
+  {ID3FID_LANGUAGE,           "TLA", "TLAN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Language(s)"},
+  {ID3FID_SONGLEN,            "TLE", "TLEN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Text,            "Length"},
+  {ID3FID_MUSICIANCREDITLIST, ""   , "TMCL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TextList,        "Musician credits list"},
+  {ID3FID_MEDIATYPE,          "TMT", "TMED", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Media type"},
+  {ID3FID_MOOD,               ""   , "TMOO", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Mood"},
+  {ID3FID_ORIGALBUM,          "TOT", "TOAL", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original album/movie/show title"},
+  {ID3FID_ORIGFILENAME,       "TOF", "TOFN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original filename"},
+  {ID3FID_ORIGLYRICIST,       "TOL", "TOLY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original lyricist(s)/text writer(s)"},
+  {ID3FID_ORIGARTIST,         "TOA", "TOPE", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original artist(s)/performer(s)"},
+  {ID3FID_ORIGYEAR,           "TOR", "TORY", ID3V2_EARLIEST, ID3V2_3_0   , convertTORY, false, false, ID3FD_Text,            "Original release year"},
+  {ID3FID_FILEOWNER,          ""   , "TOWN", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "File owner/licensee"},
+  {ID3FID_LEADARTIST,         "TP1", "TPE1", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Lead performer(s)/Soloist(s)"},
+  {ID3FID_BAND,               "TP2", "TPE2", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Band/orchestra/accompaniment"},
+  {ID3FID_CONDUCTOR,          "TP3", "TPE3", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Conductor/performer refinement"},
+  {ID3FID_MIXARTIST,          "TP4", "TPE4", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Interpreted, remixed, or otherwise modified by"},
+  {ID3FID_PARTINSET,          "TPA", "TPOS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Part of a set"},
+  {ID3FID_PRODUCEDNOTICE,     ""   , "TPRO", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Produced notice"},
+  {ID3FID_PUBLISHER,          "TPB", "TPUB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Publisher"},
+  {ID3FID_TRACKNUM,           "TRK", "TRCK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Track number/Position in set"},
+  {ID3FID_RECORDINGDATES,     "TRD", "TRDA", ID3V2_EARLIEST, ID3V2_3_0   , convertTRDA, false, false, ID3FD_Text,            "Recording dates"},
+  {ID3FID_NETRADIOSTATION,    "TRN", "TRSN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Internet radio station name"},
+  {ID3FID_NETRADIOOWNER,      "TRO", "TRSO", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Internet radio station owner"},
+  {ID3FID_SIZE,               "TSI", "TSIZ", ID3V2_EARLIEST, ID3V2_3_0   , NULL,        false, true,  ID3FD_Text,            "Size"},
+  {ID3FID_ALBUMSORTORDER,     ""   , "TSOA", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Album sort order"},
+  {ID3FID_PERFORMERSORTORDER, ""   , "TSOP", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Performer sort order"},
+  {ID3FID_TITLESORTORDER,     ""   , "TSOT", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Title sort order"},
+  {ID3FID_ISRC,               "TRC", "TSRC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "ISRC (international standard recording code)"},//http://www.ifpi.org/isrc/isrc_handbook.html
+  {ID3FID_ENCODERSETTINGS,    "TSS", "TSSE", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Software/Hardware and settings used for encoding"},
+  {ID3FID_SETSUBTITLE,        ""   , "TSST", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Set subtitle"},
+  {ID3FID_USERTEXT,           "TXX", "TXXX", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UserText,        "User defined text information"},
+  {ID3FID_YEAR,               "TYE", "TYER", ID3V2_EARLIEST, ID3V2_3_0   , convertTYER, false, false, ID3FD_Text,            "Year"},
+  {ID3FID_UNIQUEFILEID,       "UFI", "UFID", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UFI,             "Unique file identifier"},
+  {ID3FID_TERMSOFUSE,         ""   , "USER", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TermsOfUse,      "Terms of use"},
+  {ID3FID_UNSYNCEDLYRICS,     "ULT", "USLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,     "Unsynchronized lyric/text transcription"},
+  {ID3FID_WWWCOMMERCIALINFO,  "WCM", "WCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Commercial information"},
+  {ID3FID_WWWCOPYRIGHT,       "WCP", "WCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Copyright/Legal infromation"},
+  {ID3FID_WWWAUDIOFILE,       "WAF", "WOAF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official audio file webpage"},
+  {ID3FID_WWWARTIST,          "WAR", "WOAR", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official artist/performer webpage"},
+  {ID3FID_WWWAUDIOSOURCE,     "WAS", "WOAS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official audio source webpage"},
+  {ID3FID_WWWRADIOPAGE,       "WRA", "WORS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official internet radio station homepage"},
+  {ID3FID_WWWPAYMENT,         "WPY", "WPAY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Payment"},
+  {ID3FID_WWWPUBLISHER,       "WPB", "WPUB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official publisher webpage"},
+  {ID3FID_WWWUSER,            "WXX", "WXXX", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UserURL,         "User defined URL link"},
+  {ID3FID_METACRYPTO,         "CRM", ""    , ID3V2_EARLIEST, ID3V2_2_1   , NULL,        false, false, ID3FD_Unimplemented,   "Encrypted meta frame"},
+  {ID3FID_METACOMPRESSION,    "CDM", ""    , ID3V2_2_1     , ID3V2_2_1   , NULL,        false, false, ID3FD_CDM,             "Compressed data meta frame"},
   {ID3FID_NOFRAME}
 };
 
@@ -1575,6 +1679,11 @@ void ID3_FieldImpl::Clear()
       }
       break;
     }
+    case ID3FTY_FRAMES:
+    {
+      ID3_Container::Clear();
+      break;
+    }
     default:
     {
       break;
@@ -1651,9 +1760,17 @@ size_t ID3_FieldImpl::Size() const
   {
     size = _text.size();
   }
-  else
+  else if (_type == ID3FTY_BINARY)
   {
     size = _binary.size();
+  }
+  else if (_type == ID3FTY_FRAMES)
+  {
+    size = ID3_Container::Size();
+  }
+  else
+  {
+    size = 0;
   }
 
   return size;
@@ -1679,6 +1796,12 @@ bool ID3_FieldImpl::Parse(ID3_Reader& reader)
     case ID3FTY_TEXTSTRING:
     {
       success = this->ParseText(reader);
+      break;
+    }
+
+    case ID3FTY_FRAMES:
+    {
+      success = this->ParseFrames(reader);
       break;
     }
 
@@ -1739,6 +1862,9 @@ ID3_Err ID3_FieldImpl::Render(ID3_Writer &writer) const
 		case ID3FTY_TEXTSTRING:
 			RenderText(writer);
 			break;
+		case ID3FTY_FRAMES:
+			RenderFrames(writer);
+			break;
 		default:
 			ID3D_WARNING("ID3D_FieldImpl::Render(): unknown field type");
 			return ID3E_UnknownFieldType;
@@ -1766,9 +1892,26 @@ ID3_Field &ID3_FieldImpl::operator =(const ID3_Field &rhs)
 			case ID3FTY_TEXTSTRING:
 				this->SetEncoding(fld->GetEncoding());
 				this->SetText(fld->GetText());
+				this->_num_items = fld->GetNumTextItems();
 				break;
 			case ID3FTY_BINARY:
 				this->SetBinary(fld->GetBinary());
+				break;
+			case ID3FTY_FRAMES:
+				this->Clear();
+
+				{
+					ID3_Container::ConstIterator	*iter = fld->CreateIterator();
+					const ID3_Frame			*frame = NULL;
+
+					while (NULL != (frame = iter->GetNext()))
+					{
+						this->AttachFrame(new ID3_Frame(*frame));
+					}
+
+					delete iter;
+				}
+
 				break;
 			default:
 				break;

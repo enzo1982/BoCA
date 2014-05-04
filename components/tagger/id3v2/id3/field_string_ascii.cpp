@@ -346,6 +346,17 @@ bool ID3_FieldImpl::ParseText(ID3_Reader& reader)
       ID3D_NOTICE( "ID3_Field::ParseText(): adding string = " << text );
     }
   }
+  else if (_flags & ID3FF_NLIST)
+  {
+    ID3D_NOTICE( "ID3_Field::ParseText(): n elements text list" );
+    int num_items = io::readBENumber(reader, 1);
+    for (int i = 0; i < num_items; i++)
+    {
+      String text = readEncodedString(reader, enc);
+      this->AddText(text);
+      ID3D_NOTICE( "ID3_Field::ParseText(): adding string = " << text );
+    }
+  }
   else if (_flags & ID3FF_CSTR)
   {
     ID3D_NOTICE( "ID3_Field::ParseText(): null terminated string" );
@@ -370,8 +381,18 @@ void ID3_FieldImpl::RenderText(ID3_Writer &writer) const
 {
 	ID3_TextEnc	 enc = this->GetEncoding();
 
-	if (_flags & ID3FF_CSTR) writeEncodedString(writer, _text, enc);
-	else			 writeEncodedText(writer, _text, enc);
+	if (_flags & ID3FF_CSTR)
+	{
+		writeEncodedString(writer, _text, enc);
+	}
+	else
+	{
+		if (_flags & ID3FF_NLIST) io::writeBENumber(writer, _num_items, 1);
+
+		writeEncodedText(writer, _text, enc);
+
+		if (_flags & ID3FF_NLIST) io::writeBENumber(writer, 0, 1);
+	}
 
 	_changed = false;
 };

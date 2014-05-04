@@ -240,6 +240,12 @@ ID3_ENUM(ID3_FieldID)
   ID3FN_DELIVERY,	   /**< Way of delivery field */
   ID3FN_BITSSIZE,	   /**< contains the number of bits for other fields' fixed size */
   ID3FN_BYTESSIZE,	   /**< contains the number of bytes for other fields' fixed size */
+  ID3FN_CHAPTERS,	   /**< Chapter ID list */
+  ID3FN_STARTTIME,	   /**< Chapter start offset in milliseconds */
+  ID3FN_ENDTIME,	   /**< Chapter end offset in milliseconds */
+  ID3FN_STARTOFFSET,	   /**< Chapter start offset in bytes */
+  ID3FN_ENDOFFSET,	   /**< Chapter end offset in bytes */
+  ID3FN_FRAMES,		   /**< Sub-frames */
   ID3FN_LASTFIELDID	   /**< Last field placeholder */
 };
 
@@ -252,8 +258,10 @@ ID3_ENUM(ID3_FrameID)
   /* AENC */ ID3FID_AUDIOCRYPTO,       /**< Audio encryption */
   /* APIC */ ID3FID_PICTURE,           /**< Attached picture */
   /* ASPI */ ID3FID_AUDIOSEEKPOINT,    /**< Audio seek point index */
+  /* COMM */ ID3FID_CHAPTER,           /**< Chapter */
   /* COMM */ ID3FID_COMMENT,           /**< Comments */
   /* COMR */ ID3FID_COMMERCIAL,        /**< Commercial frame */
+  /* COMM */ ID3FID_TOC,	       /**< Table of contents */
   /* ENCR */ ID3FID_CRYPTOREG,         /**< Encryption method registration */
   /* EQU2 */ ID3FID_EQUALIZATION2,     /**< Equalisation (2) */
   /* EQUA */ ID3FID_EQUALIZATION,      /**< Equalization */
@@ -363,9 +371,11 @@ ID3_ENUM(ID3_FieldFlags)
   ID3FF_NONE	      =      0,
   ID3FF_CSTR	      = 1 << 0,  /*null (according to encoding) terminated*/
   ID3FF_LIST	      = 1 << 1,  /*null (according to encoding) seperates listitems*/
-  ID3FF_ENCODABLE     = 1 << 2,  /*possible to encode in valid encodings, 
+  ID3FF_NLIST	      = 1 << 2,  /*null (according to encoding) seperates listitems,
+				  *preceded by one item count byte*/
+  ID3FF_ENCODABLE     = 1 << 3,  /*possible to encode in valid encodings, 
                                   *if not set then string is encoded by ID3TE_ISO8859_1 */
-  ID3FF_HASLINKEDSIZE = 1 << 3   /*used together with _linked_field. 
+  ID3FF_HASLINKEDSIZE = 1 << 4   /*used together with _linked_field. 
                                   *if _linked_field is NOT set, than this field contains
                                   *a size for other fields to use, if _linked_field is set,
                                   *than it's size comes from the last field which had this 
@@ -379,6 +389,7 @@ ID3_ENUM(ID3_FieldType)
   ID3FTY_INTEGER        = 0,
   ID3FTY_BINARY,
   ID3FTY_TEXTSTRING,
+  ID3FTY_FRAMES,
   ID3FTY_NUMTYPES
 };
 
@@ -412,7 +423,7 @@ ID3_ENUM(ID3_ContentType)
 ID3_ENUM(ID3_PictureType)
 {
   ID3PT_OTHER = 0,
-  ID3PT_PNG32ICON = 1,     //  32x32 pixels 'file icon' (PNG only)
+  ID3PT_PNG32ICON = 1,     // 32x32 pixels 'file icon' (PNG only)
   ID3PT_OTHERICON = 2,     // Other file icon
   ID3PT_COVERFRONT = 3,    // Cover (front)
   ID3PT_COVERBACK = 4,     // Cover (back)
@@ -432,6 +443,13 @@ ID3_ENUM(ID3_PictureType)
   ID3PT_ILLUSTRATION = 18, // Illustration
   ID3PT_ARTISTLOGO = 19,   // Band/artist logotype
   ID3PT_PUBLISHERLOGO = 20 // Publisher/Studio logotype
+};
+
+ID3_ENUM(ID3_TOCFlags)
+{
+  ID3TF_NONE	      =      0,
+  ID3TF_ORDERED	      = 1 << 0,  /* chapters are in order */
+  ID3TF_TOPLEVEL      = 1 << 1,  /* does not have a parent */
 };
 
 ID3_ENUM(ID3_TimeStampFormat)
