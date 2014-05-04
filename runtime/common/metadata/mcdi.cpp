@@ -39,6 +39,19 @@ BoCA::MCDI &BoCA::MCDI::operator =(const MCDI &oMCDI)
 	return *this;
 }
 
+Bool BoCA::MCDI::operator ==(const MCDI &oMCDI) const
+{
+	if (oMCDI.GetData().Size() != data.Size()) return False;
+
+	if (memcmp((UnsignedByte *) oMCDI.GetData(), (UnsignedByte *) data, data.Size()) == 0) return True;
+	else										       return False;
+}
+
+Bool BoCA::MCDI::operator !=(const MCDI &oMCDI) const
+{
+	return !(*this == oMCDI);
+}
+
 Int BoCA::MCDI::GetNumberOfEntries() const
 {
 	if (data.Size() < 2) return 0;

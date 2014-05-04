@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -37,6 +37,9 @@ namespace BoCA
 
 			PictureData &operator			 =(const PictureData &);
 			PictureData &operator			 =(const Buffer<UnsignedByte> &);
+
+			Bool operator				 ==(const PictureData &) const;
+			Bool operator				 !=(const PictureData &) const;
 
 			operator				 const Buffer<UnsignedByte> &() const;
 			operator				 const UnsignedByte *() const;

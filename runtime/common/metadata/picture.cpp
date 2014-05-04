@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -36,6 +36,22 @@ BoCA::Picture &BoCA::Picture::operator =(const Picture &oPicture)
 	data		= oPicture.data;
 
 	return *this;
+}
+
+Bool BoCA::Picture::operator ==(const Picture &oPicture) const
+{
+	return (type	    == oPicture.type	    &&
+		mime	    == oPicture.mime	    &&
+		description == oPicture.description &&
+		data	    == oPicture.data);
+}
+
+Bool BoCA::Picture::operator !=(const Picture &oPicture) const
+{
+	return (type	    != oPicture.type	    ||
+		mime	    != oPicture.mime	    ||
+		description != oPicture.description ||
+		data	    != oPicture.data);
 }
 
 Int BoCA::Picture::LoadFromFile(const String &fileName)

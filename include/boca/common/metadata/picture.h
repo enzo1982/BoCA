@@ -36,6 +36,9 @@ namespace BoCA
 
 			Picture &operator	 =(const Picture &);
 
+			Bool operator		 ==(const Picture &) const;
+			Bool operator		 !=(const Picture &) const;
+
 			Int			 LoadFromFile(const String &);
 			Int			 SaveToFile(const String &) const;
 

@@ -113,6 +113,16 @@ BoCA::PictureData &BoCA::PictureData::operator =(const Buffer<UnsignedByte> &buf
 	return *this;
 }
 
+Bool BoCA::PictureData::operator ==(const PictureData &oPictureData) const
+{
+	return (crc == oPictureData.crc);
+}
+
+Bool BoCA::PictureData::operator !=(const PictureData &oPictureData) const
+{
+	return (crc != oPictureData.crc);
+}
+
 BoCA::PictureData::operator const Buffer<UnsignedByte> &() const
 {
 	return *dataStore.Get(crc);
