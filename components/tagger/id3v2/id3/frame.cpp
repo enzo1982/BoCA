@@ -144,11 +144,6 @@ ID3_V2Spec ID3_Frame::MinSpec() const
  ** @param name The name of the field to be retrieved
  ** @returns A reference to the desired field
  **/
-ID3_Field &ID3_Frame::Field(ID3_FieldID fieldName) const
-{
-	return *this->GetField(fieldName);
-}
-
 ID3_Field *ID3_Frame::GetField(ID3_FieldID fieldName) const
 {
 	return _impl->GetField(fieldName);
@@ -158,13 +153,6 @@ size_t ID3_Frame::NumFields() const
 {
 	return _impl->NumFields();
 }
-
-/*
-ID3_Field *ID3_Frame::GetFieldNum(size_t index) const
-{
-	return _impl->GetFieldNum(index);
-}
-*/
 
 size_t ID3_Frame::Size()
 {
