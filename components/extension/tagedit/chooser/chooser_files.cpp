@@ -37,6 +37,12 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 	shortcut_next		= new Shortcut(0, Input::Keyboard::KeyDown, list_files);
 	shortcut_next->onKeyDown.Connect(&ChooserFiles::OnShortcutNext, this);
 
+	shortcut_first		= new Shortcut(0, Input::Keyboard::KeyHome, list_files);
+	shortcut_first->onKeyDown.Connect(&ChooserFiles::OnShortcutFirst, this);
+
+	shortcut_last		= new Shortcut(0, Input::Keyboard::KeyEnd, list_files);
+	shortcut_last->onKeyDown.Connect(&ChooserFiles::OnShortcutLast, this);
+
 	btn_save		= new Button(NIL, NIL, Point(176, 30), Size());
 	btn_save->SetOrientation(OR_LOWERRIGHT);
 	btn_save->Deactivate();
@@ -86,6 +92,8 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 
 	Add(shortcut_previous);
 	Add(shortcut_next);
+	Add(shortcut_first);
+	Add(shortcut_last);
 
 	Add(btn_save);
 	Add(btn_saveall);
@@ -115,6 +123,8 @@ BoCA::ChooserFiles::~ChooserFiles()
 
 	DeleteObject(shortcut_previous);
 	DeleteObject(shortcut_next);
+	DeleteObject(shortcut_first);
+	DeleteObject(shortcut_last);
 
 	DeleteObject(btn_save);
 	DeleteObject(btn_saveall);
@@ -345,6 +355,28 @@ Void BoCA::ChooserFiles::OnShortcutNext()
 	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
 
 	list_files->SelectNthEntry(list_files->GetSelectedEntryNumber() + 1);
+}
+
+/* Called when the home key is pressed.
+ * ----
+ * Selects the first file.
+ */
+Void BoCA::ChooserFiles::OnShortcutFirst()
+{
+	if (!IsVisible() || !allowTrackRemoveByDeleteKey.Call()) return;
+
+	list_files->SelectNthEntry(0);
+}
+
+/* Called when the end key is pressed.
+ * ----
+ * Selects the last file.
+ */
+Void BoCA::ChooserFiles::OnShortcutLast()
+{
+	if (!IsVisible() || !allowTrackRemoveByDeleteKey.Call()) return;
+
+	list_files->SelectNthEntry(list_files->Length() - 1);
 }
 
 /* Called when a track is modified.

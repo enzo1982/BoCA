@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -28,10 +28,18 @@ BoCA::ChooserAlbums::ChooserAlbums() : Chooser("Albums")
 	shortcut_next		= new Shortcut(0, Input::Keyboard::KeyDown, list_albums);
 	shortcut_next->onKeyDown.Connect(&ChooserAlbums::OnShortcutNext, this);
 
+	shortcut_first		= new Shortcut(0, Input::Keyboard::KeyHome, list_albums);
+	shortcut_first->onKeyDown.Connect(&ChooserAlbums::OnShortcutFirst, this);
+
+	shortcut_last		= new Shortcut(0, Input::Keyboard::KeyEnd, list_albums);
+	shortcut_last->onKeyDown.Connect(&ChooserAlbums::OnShortcutLast, this);
+
 	Add(list_albums);
 
 	Add(shortcut_previous);
 	Add(shortcut_next);
+	Add(shortcut_first);
+	Add(shortcut_last);
 
 	onChangeSize.Connect(&ChooserAlbums::OnChangeSize, this);
 
@@ -60,6 +68,8 @@ BoCA::ChooserAlbums::~ChooserAlbums()
 
 	DeleteObject(shortcut_previous);
 	DeleteObject(shortcut_next);
+	DeleteObject(shortcut_first);
+	DeleteObject(shortcut_last);
 }
 
 /* Called when component canvas size changes.
@@ -132,6 +142,28 @@ Void BoCA::ChooserAlbums::OnShortcutNext()
 	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
 
 	list_albums->SelectNthEntry(list_albums->GetSelectedEntryNumber() + 1);
+}
+
+/* Called when the home key is pressed.
+ * ----
+ * Selects the first album.
+ */
+Void BoCA::ChooserAlbums::OnShortcutFirst()
+{
+	if (!IsVisible() || !allowTrackRemoveByDeleteKey.Call()) return;
+
+	list_albums->SelectNthEntry(0);
+}
+
+/* Called when the end key is pressed.
+ * ----
+ * Selects the last album.
+ */
+Void BoCA::ChooserAlbums::OnShortcutLast()
+{
+	if (!IsVisible() || !allowTrackRemoveByDeleteKey.Call()) return;
+
+	list_albums->SelectNthEntry(list_albums->Length() - 1);
 }
 
 /* Called when an album is modified.

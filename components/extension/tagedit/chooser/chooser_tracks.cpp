@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -25,6 +25,12 @@ BoCA::ChooserTracks::ChooserTracks() : Chooser("Tracks")
 	shortcut_next		= new Shortcut(0, Input::Keyboard::KeyDown, list_tracks);
 	shortcut_next->onKeyDown.Connect(&ChooserTracks::OnShortcutNext, this);
 
+	shortcut_first		= new Shortcut(0, Input::Keyboard::KeyHome, list_tracks);
+	shortcut_first->onKeyDown.Connect(&ChooserTracks::OnShortcutFirst, this);
+
+	shortcut_last		= new Shortcut(0, Input::Keyboard::KeyEnd, list_tracks);
+	shortcut_last->onKeyDown.Connect(&ChooserTracks::OnShortcutLast, this);
+
 	shortcut_remove		= new Shortcut(0, Input::Keyboard::KeyDelete, list_tracks);
 	shortcut_remove->onKeyDown.Connect(&ChooserTracks::OnShortcutRemove, this);
 
@@ -32,6 +38,8 @@ BoCA::ChooserTracks::ChooserTracks() : Chooser("Tracks")
 
 	Add(shortcut_previous);
 	Add(shortcut_next);
+	Add(shortcut_first);
+	Add(shortcut_last);
 	Add(shortcut_remove);
 
 	onChangeSize.Connect(&ChooserTracks::OnChangeSize, this);
@@ -61,6 +69,8 @@ BoCA::ChooserTracks::~ChooserTracks()
 
 	DeleteObject(shortcut_previous);
 	DeleteObject(shortcut_next);
+	DeleteObject(shortcut_first);
+	DeleteObject(shortcut_last);
 	DeleteObject(shortcut_remove);
 }
 
@@ -139,6 +149,28 @@ Void BoCA::ChooserTracks::OnShortcutNext()
 	if (!IsVisible() || !allowTrackChangeByArrowKey.Call()) return;
 
 	list_tracks->SelectNthEntry(list_tracks->GetSelectedEntryNumber() + 1);
+}
+
+/* Called when the home key is pressed.
+ * ----
+ * Selects the first track.
+ */
+Void BoCA::ChooserTracks::OnShortcutFirst()
+{
+	if (!IsVisible() || !allowTrackRemoveByDeleteKey.Call()) return;
+
+	list_tracks->SelectNthEntry(0);
+}
+
+/* Called when the end key is pressed.
+ * ----
+ * Selects the last track.
+ */
+Void BoCA::ChooserTracks::OnShortcutLast()
+{
+	if (!IsVisible() || !allowTrackRemoveByDeleteKey.Call()) return;
+
+	list_tracks->SelectNthEntry(list_tracks->Length() - 1);
 }
 
 /* Called when the delete key is pressed.
