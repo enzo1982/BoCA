@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
+#include <id3/tag.h>
 
 BoCA_BEGIN_COMPONENT(TaggerID3v2)
 
@@ -20,17 +21,20 @@ namespace BoCA
 			static const String	 genres[148];
 			static String		 dummyString;
 
-			String			 GetStringField(Void *, Int);
-			Int			 SetStringField(Void *, Int, const String &);
+			Int			 ParseContainer(const ID3_Container &, Track &);
+			Int			 RenderContainer(ID3_Container &, const Track &, Bool = False);
 
-			String			 GetASCIIField(Void *, Int);
-			Int			 SetASCIIField(Void *, Int, const String &);
+			String			 GetStringField(const ID3_Frame &, ID3_FieldID);
+			Int			 SetStringField(ID3_Frame &, ID3_FieldID, const String &);
 
-			Int			 GetIntegerField(Void *, Int);
-			Int			 SetIntegerField(Void *, Int, Int);
+			String			 GetASCIIField(const ID3_Frame &, ID3_FieldID);
+			Int			 SetASCIIField(ID3_Frame &, ID3_FieldID, const String &);
 
-			Int			 GetBinaryField(Void *, Int, Buffer<UnsignedByte> &);
-			Int			 SetBinaryField(Void *, Int, const Buffer<UnsignedByte> &);
+			Int			 GetIntegerField(const ID3_Frame &, ID3_FieldID);
+			Int			 SetIntegerField(ID3_Frame &, ID3_FieldID, Int);
+
+			Int			 GetBinaryField(const ID3_Frame &, ID3_FieldID, Buffer<UnsignedByte> &);
+			Int			 SetBinaryField(ID3_Frame &, ID3_FieldID, const Buffer<UnsignedByte> &);
 
 			const String		&GetID3CategoryName(UnsignedInt);
 		public:
