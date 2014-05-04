@@ -187,6 +187,25 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			}
 		}
 
+		/* Save chapters.
+		 */
+		if (track.tracks.Length() > 0 && currentConfig->GetIntValue("Tags", "WriteChapters", True))
+		{
+			Int64	 offset = 0;
+
+			for (Int i = 0; i < track.tracks.Length(); i++)
+			{
+				const Track	&chapterTrack  = track.tracks.GetNth(i);
+				const Info	&chapterInfo   = chapterTrack.GetInfo();
+				const Format	&chapterFormat = chapterTrack.GetFormat();
+
+				pHeaderInfo->AddMarker(chapterInfo.title, offset * 10000000 / chapterFormat.rate);
+
+				if	(chapterTrack.length	   >= 0) offset += chapterTrack.length;
+				else if (chapterTrack.approxLength >= 0) offset += chapterTrack.approxLength;
+			}
+		}
+
 		pHeaderInfo->Release();
 	}
 
@@ -387,6 +406,72 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 		delete [] indices;
 
 		track.SetInfo(info);
+
+		/* Read chapters.
+		 */
+		WORD	 numMarkers = 0;
+
+		hr = pHeaderInfo->GetMarkerCount(&numMarkers);
+
+		if (numMarkers > 0 && currentConfig->GetIntValue("Tags", "ReadChapters", True))
+		{
+			for (Int i = 0; i < numMarkers; i++)
+			{
+				const Format	&format = track.GetFormat();
+
+				QWORD	 cnsMarkerTime	  = 0;
+				WORD	 cchMarkerNameLen = 0;
+
+				hr = pHeaderInfo->GetMarker(i, NIL, &cchMarkerNameLen, NIL);
+
+				WCHAR	*pwszMarkerName = new WCHAR [cchMarkerNameLen];
+
+				hr = pHeaderInfo->GetMarker(i, pwszMarkerName, &cchMarkerNameLen, &cnsMarkerTime);
+
+				/* Fill track data.
+				 */
+				Track	 rTrack;
+
+				rTrack.origFilename = track.origFilename;
+				rTrack.pictures	    = track.pictures;
+
+				rTrack.sampleOffset = Math::Round(cnsMarkerTime * format.rate / 10000000.0);
+
+				if	(track.length	    >= 0) rTrack.length	      = track.length	   - rTrack.sampleOffset;
+				else if (track.approxLength >= 0) rTrack.approxLength = track.approxLength - rTrack.sampleOffset;
+				else				  rTrack.approxLength = 240 * format.rate;
+
+				if (rTrack.length >= 0) rTrack.fileSize	= rTrack.length	      * format.channels * (format.bits / 8);
+				else			rTrack.fileSize	= rTrack.approxLength * format.channels * (format.bits / 8);
+
+				rTrack.SetFormat(format);
+
+				/* Set track title.
+				 */
+				Info	 info = track.GetInfo();
+
+				info.title = pwszMarkerName;
+				info.track = i + 1;
+
+				rTrack.SetInfo(info);
+
+				/* Update previous track length.
+				 */
+				if (i > 0)
+				{
+					Track	&pTrack = track.tracks.GetNthReference(i - 1);
+
+					pTrack.length	= rTrack.sampleOffset - pTrack.sampleOffset;
+					pTrack.fileSize	= pTrack.length * format.channels * (format.bits / 8);
+				}
+
+				/* Add track to track list.
+				 */
+				track.tracks.Add(rTrack);
+
+				delete [] pwszMarkerName;
+			}
+		}
 
 		pHeaderInfo->Release();
 	}
