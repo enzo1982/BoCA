@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -341,8 +341,25 @@ Bool BoCA::DecoderWMA::Deactivate()
 
 Bool BoCA::DecoderWMA::Seek(Int64 samplePosition)
 {
+	/* Stop reader before seeking.
+	 */
+	readerCallback->SetActive(False);
+
+	HRESULT	 hr = m_pReader->Stop();
+
+	/* Wait for the reader to stop.
+	 */
+	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+
+	/* Clear samples buffer.
+	 */
+	samplesBuffer.Resize(0);
+
+	/* Restart reader at new position.
+	 */
 	QWORD	 position = samplePosition * 10000000 / track.GetFormat().rate;
-	HRESULT	 hr	  = m_pReader->Start(position, 0, 1.0, &position);
+
+	hr = m_pReader->Start(position, 0, 1.0, &position);
 
 	/* Wait for the Start call to complete.
 	 */
