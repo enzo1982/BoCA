@@ -127,12 +127,10 @@ Error BoCA::TaggerID3v2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	/* Save other text info.
 	 */
-	for (Int i = 0; i < info.other.Length(); i++)
+	foreach (const String &pair, info.other)
 	{
-		const String	&pair  = info.other.GetNth(i);
-
-		String		 key   = pair.Head(pair.Find(":") + 1);
-		String		 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
 		if (value == NIL) continue;
 

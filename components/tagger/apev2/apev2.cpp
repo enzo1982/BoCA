@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -94,12 +94,10 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	/* Save other text info.
 	 */
-	for (Int i = 0; i < info.other.Length(); i++)
+	foreach (const String &pair, info.other)
 	{
-		const String	&pair  = info.other.GetNth(i);
-
-		String		 key   = pair.Head(pair.Find(":") + 1);
-		String		 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
 		if (value == NIL) continue;
 
