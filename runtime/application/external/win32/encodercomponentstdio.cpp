@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -90,6 +90,18 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 	hProcess = processInfo.hProcess;
 
+	/* Check process handle.
+	 */
+	if (hProcess == NIL)
+	{
+		errorState  = True;
+		errorString = String("Unable to run encoder ").Append(command).Append(".");
+
+		return False;
+	}
+
+	/* Open pipe handle.
+	 */
 	driver_stdin = new DriverWin32(wPipe);
 	out = new OutStream(STREAM_DRIVER, driver_stdin);
 

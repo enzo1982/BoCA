@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -22,9 +22,11 @@ using namespace smooth::IO;
 
 BoCA::AS::EncoderComponentExternalStdIO::EncoderComponentExternalStdIO(ComponentSpecs *specs) : EncoderComponentExternal(specs)
 {
-	out   = NIL;
+	out	     = NIL;
 
-	wPipe = NIL;
+	driver_stdin = NIL;
+
+	wPipe	     = NIL;
 }
 
 BoCA::AS::EncoderComponentExternalStdIO::~EncoderComponentExternalStdIO()
@@ -108,6 +110,9 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 		errorState  = True;
 		errorString = String("Encoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
+
+		if	(exitCode == 126) errorString = String("Permission denied to execute \"").Append(String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter())).Append("\".");
+		else if (exitCode == 127) errorString = String("External encoder \"").Append(String(specs->external_command).Replace("/", Directory::GetDirectoryDelimiter())).Append("\" not found.");
 
 		return False;
 	}

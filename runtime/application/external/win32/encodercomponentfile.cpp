@@ -113,6 +113,16 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	ShellExecuteExA(&execInfo);
 
+	/* Check process handle.
+	 */
+	if (execInfo.hProcess == NIL)
+	{
+		errorState  = True;
+		errorString = String("Unable to run encoder ").Append(command).Append(".");
+
+		return False;
+	}
+
 	/* Wait until the encoder exits
 	 */
 	unsigned long	 exitCode = 0;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -74,6 +74,23 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	}
 
 	ShellExecuteExA(&execInfo);
+
+	/* Check process handle.
+	 */
+	if (execInfo.hProcess == NIL)
+	{
+		errorState  = True;
+		errorString = String("Unable to run decoder ").Append(command).Append(".");
+
+		/* Remove temporary file if necessary.
+		 */
+		if (String::IsUnicode(streamURI))
+		{
+			File(encFileName).Delete();
+		}
+
+		return Error();
+	}
 
 	/* Wait until the encoder exits
 	 */
@@ -231,6 +248,23 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	}
 
 	ShellExecuteExA(&execInfo);
+
+	/* Check process handle.
+	 */
+	if (execInfo.hProcess == NIL)
+	{
+		errorState  = True;
+		errorString = String("Unable to run decoder ").Append(command).Append(".");
+
+		/* Remove temporary file if necessary.
+		 */
+		if (String::IsUnicode(track.origFilename))
+		{
+			File(encFileName).Delete();
+		}
+
+		return False;
+	}
 
 	/* Wait until the encoder exits
 	 */

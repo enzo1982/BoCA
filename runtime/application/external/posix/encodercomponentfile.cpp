@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -118,6 +118,9 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 		errorState  = True;
 		errorString = String("Encoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
+
+		if	(exitCode == 126) errorString = String("Permission denied to execute ").Append(command).Append(".");
+		else if (exitCode == 127) errorString = String("External encoder ").Append(command).Append(" not found.");
 
 		return False;
 	}
