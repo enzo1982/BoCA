@@ -166,14 +166,14 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 			String	 value	= String(offset / chapterFormat.rate / 60 / 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 / 60)).Append(":")
 					 .Append(offset / chapterFormat.rate / 60 % 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 % 60)).Append(":")
 					 .Append(offset / chapterFormat.rate % 60      < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate % 60)).Append(".")
-					 .Append(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) < 100 ? "00" :
-						(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) <  10 ?  "0" : "")).Append(String::FromInt(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate)));
+					 .Append(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) < 100 ?
+						(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) <  10 ?  "00" : "0") : "").Append(String::FromInt(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate)));
 
-			{ RenderTagItem(String("CHAPTER").Append(i < 100 ? "00" : (i < 10 ? "0" : "")).Append(String::FromInt(i + 1)), value, buffer); numItems++; }
+			{ RenderTagItem(String("CHAPTER").Append(i < 100 ? (i < 10 ? "00" : "0") : "").Append(String::FromInt(i + 1)), value, buffer); numItems++; }
 
 			if (chapterInfo.title != NIL)
 			{
-				{ RenderTagItem(String("CHAPTER").Append(i < 100 ? "00" : (i < 10 ? "0" : "")).Append(String::FromInt(i + 1)).Append("NAME"), chapterInfo.title, buffer); numItems++; }
+				{ RenderTagItem(String("CHAPTER").Append(i < 100 ? (i < 10 ? "00" : "0") : "").Append(String::FromInt(i + 1)).Append("NAME"), chapterInfo.title, buffer); numItems++; }
 			}
 
 			if	(chapterTrack.length	   >= 0) offset += chapterTrack.length;
