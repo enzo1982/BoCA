@@ -72,24 +72,24 @@ const Array<String> &BoCA::DeviceInfoCDParanoia::FindDrives()
 
 	for (Int i = 0; deviceNames[i] != NIL; i++)
 	{
-		glob_t	*fileData = new glob_t;
+		glob_t	 fileData = { 0 };
 
-		if (glob(deviceNames[i], 0, NIL, fileData) == 0)
+		if (glob(deviceNames[i], 0, NIL, &fileData) == 0)
 		{
-			for (UnsignedInt n = 0; n < fileData->gl_pathc; n++)
+			for (UnsignedInt n = 0; n < fileData.gl_pathc; n++)
 			{
-				cdrom_drive	*cd = cdda_identify(fileData->gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
+				cdrom_drive	*cd = cdda_identify(fileData.gl_pathv[n], CDDA_MESSAGE_FORGETIT, NIL);
 
 				if (cd != NIL)
 				{
-					driveNames.Add(fileData->gl_pathv[n]);
+					driveNames.Add(fileData.gl_pathv[n]);
 
 					cdda_close(cd);
 				}
 			}
-		}
 
-		globfree(fileData);
+			globfree(&fileData);
+		}
 	}
 
 	initialized = True;
