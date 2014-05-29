@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,7 +28,14 @@ namespace smooth
 		const Short	 SC_NONE	= 0;
 		const Short	 SC_ALT		= 1;
 		const Short	 SC_CTRL	= 2;
-		const Short	 SC_SHIFT	= 4;
+		const Short	 SC_CMD		= 4;
+		const Short	 SC_SHIFT	= 8;
+
+#ifndef __APPLE__
+		const Short	 SC_CONTROL	= SC_CTRL;
+#else
+		const Short	 SC_CONTROL	= SC_CMD;
+#endif
 
 		class SMOOTHAPI Shortcut : public Widget
 		{
