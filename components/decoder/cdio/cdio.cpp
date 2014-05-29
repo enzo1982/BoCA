@@ -17,7 +17,12 @@
 #include "cdio.h"
 #include "config.h"
 
+#ifndef PARANOIA_CB_CACHEERR
+#	define PARANOIA_CB_CACHEERR 13
+#endif
+
 using namespace smooth::IO;
+using namespace smooth::GUI::Dialogs;
 
 const String &BoCA::DecoderCDIO::GetComponentSpecs()
 {
@@ -49,6 +54,16 @@ Void smooth::AttachDLL(Void *instance)
 Void smooth::DetachDLL()
 {
 }
+
+namespace BoCA
+{
+	static int	 numCacheErrors = 0;
+
+	void paranoiaCallback(long int offset, paranoia_cb_mode_t state)
+	{
+		if (state == PARANOIA_CB_CACHEERR) numCacheErrors++;
+	}
+};
 
 UnsignedInt64	 BoCA::DecoderCDIO::lastRead = 0;
 
@@ -305,6 +320,33 @@ Bool BoCA::DecoderCDIO::Deactivate()
 {
 	if (cd == NIL) return False;
 
+	Config	*config = Config::Get();
+
+	/* Check for drive cache errors.
+	 */
+	if (numCacheErrors > 0)
+	{
+		Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
+
+		if (!noCacheWarning)
+		{
+			MessageDlg	*msgBox = new MessageDlg("The CD-ROM drive appears to be seeking impossibly quickly.\n"
+								 "This could be due to timer bugs, a drive that really is improbably fast,\n"
+								 "or, most likely, a bug in cdparanoia's cache modelling.\n\n"
+								 "Please consider using another drive for ripping audio CDs and send a bug\n"
+								 "report to support@freac.org to assist developers in correcting the problem.", "Warning", Message::Buttons::Ok, Message::Icon::Warning, "Do not display this warning again", &noCacheWarning);
+
+			msgBox->ShowDialog();
+
+			config->SetIntValue("Ripper", "NoCacheWarning", noCacheWarning);
+			config->SaveSettings();
+
+			Object::DeleteObject(msgBox);
+		}
+
+		numCacheErrors = 0;
+	}
+
 	if (paranoia != NIL)
 	{
 		cdio_paranoia_free(paranoia);
@@ -357,7 +399,7 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 	{
 		if (paranoia != NIL)
 		{
-			cdio_paranoia_read(paranoia, NIL);
+			cdio_paranoia_read(paranoia, &paranoiaCallback);
 			cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
 		}
 		else
@@ -393,7 +435,7 @@ Int BoCA::DecoderCDIO::ReadData(Buffer<UnsignedByte> &data, Int size)
 	 */
 	if (paranoia != NIL)
 	{
-		int16_t	*audio = cdio_paranoia_read(paranoia, NIL);
+		int16_t	*audio = cdio_paranoia_read(paranoia, &paranoiaCallback);
 
 		memcpy(data + prependBytes, audio, data.Size());
 	}
