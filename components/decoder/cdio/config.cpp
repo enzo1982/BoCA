@@ -17,9 +17,6 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
 	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
 
-	jitter		= False;
-	swapchannels	= False;
-
 	readISRC	= config->GetIntValue("Ripper", "ReadISRC", False);
 
 	cdparanoia	= config->GetIntValue("Ripper", "CDParanoia", False);
@@ -116,18 +113,10 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	ToggleParanoia();
 
-	check_jitter		= new CheckBox(i18n->TranslateString("Activate jitter correction"), Point(10, 40), Size(157, 0), &jitter);
-	check_jitter->Deactivate();
-
-	check_swapchannels	= new CheckBox(i18n->TranslateString("Swap left/right channel"), Point(176, 40), Size(157, 0), &swapchannels);
-	check_swapchannels->Deactivate();
-
 	group_ripping->Add(check_paranoia);
 	group_ripping->Add(combo_paranoia_mode);
-	group_ripping->Add(check_jitter);
-	group_ripping->Add(check_swapchannels);
 
-	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(359, 11), Size(178, 68));
+	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(359, 11), Size(178, 42));
 
 	check_autoRead	= new CheckBox(i18n->TranslateString("Read CD contents on insert"), Point(10, 14), Size(157, 0), &autoRead);
 	check_autoRead->onAction.Connect(&ConfigureCDIO::ToggleAutoRead, this);
@@ -144,7 +133,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	Add(group_automatization);
 //	Add(group_cdinfo);
 
-	SetSize(Size(544, 219/*270*/));
+	SetSize(Size(544, 193/*244*/));
 }
 
 BoCA::ConfigureCDIO::~ConfigureCDIO()
@@ -163,8 +152,6 @@ BoCA::ConfigureCDIO::~ConfigureCDIO()
 	DeleteObject(group_ripping);
 	DeleteObject(check_paranoia);
 	DeleteObject(combo_paranoia_mode);
-	DeleteObject(check_jitter);
-	DeleteObject(check_swapchannels);
 
 	DeleteObject(group_automatization);
 	DeleteObject(check_autoRead);

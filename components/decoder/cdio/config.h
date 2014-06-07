@@ -38,8 +38,6 @@ namespace BoCA
 			GroupBox	*group_ripping;
 			CheckBox	*check_paranoia;
 			ComboBox	*combo_paranoia_mode;
-			CheckBox	*check_jitter;
-			CheckBox	*check_swapchannels;
 
 			GroupBox	*group_automatization;
 			CheckBox	*check_autoRead;
@@ -52,8 +50,6 @@ namespace BoCA
 			Bool		 spinup;
 			Bool		 useoffset;
 			Bool		 cdparanoia;
-			Bool		 jitter;
-			Bool		 swapchannels;
 
 			Bool		 autoRead;
 			Bool		 autoRip;
