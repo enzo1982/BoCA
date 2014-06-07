@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -35,6 +35,7 @@ namespace BoCA
 			String				 videoPageHTML;
 
 			String				 videoFile;
+			String				 videoDecoder;
 
 			String				 videoTitle;
 			String				 videoDescription;
@@ -61,6 +62,7 @@ namespace BoCA
 							~Video();
 
 			Bool				 QueryMetadata();
+			const String			&GetDecoderID();
 
 			Bool				 Download();
 			Bool				 CancelDownload();
@@ -77,7 +79,6 @@ namespace BoCA
 			const String			&GetVideoFile() const			{ return videoFile; }
 
 			const String			&GetVideoSiteName() const		{ return videoSite->GetName(); }
-			const String			&GetDecoderID() const			{ return videoSite->GetDecoderID(); }
 
 			const String			&GetVideoTitle() const			{ return videoTitle; }
 			const String			&GetVideoDescription() const		{ return videoDescription; }

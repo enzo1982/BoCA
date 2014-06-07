@@ -1,7 +1,9 @@
 <VideoSite>
   <name>ClipFish.de</name>
   <version>1.0</version>
-  <decoder>avconv-flv_audio-dec</decoder>
+  <decoders>
+    <decoder>avconv-flv_audio-dec</decoder>
+  </decoders>
 
   <script type="text/javascript">
     <![CDATA[

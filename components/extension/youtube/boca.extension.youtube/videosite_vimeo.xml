@@ -1,7 +1,9 @@
 <VideoSite>
   <name>Vimeo</name>
   <version>1.0</version>
-  <decoder>avconv-m4v_audio-dec</decoder>
+  <decoders>
+    <decoder>avconv-m4v_audio-dec</decoder>
+  </decoders>
 
   <script type="text/javascript">
     <![CDATA[

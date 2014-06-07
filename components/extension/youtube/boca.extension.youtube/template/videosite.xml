@@ -2,11 +2,13 @@
   -- with regular expressions in order to understand what is happening here.
   -->
 <VideoSite>
-  <name>YouTube</name>			 <!-- name of the video site, eg. YouTube -->
-  <version>1.0</version>		 <!-- must be 1.0 for now -->
-  <decoder>avconv-flv_audio-in</decoder> <!-- or another decoder if the site does not use FLV format -->
+  <name>YouTube</name>			   <!-- name of the video site, eg. YouTube -->
+  <version>1.0</version>		   <!-- must be 1.0 for now -->
+  <decoders>
+    <decoder>avconv-flv_audio-in</decoder> <!-- or another decoder if the site does not use FLV format -->
+  </decoders>
 
-  <script type="text/javascript">	 <!-- this is where the action is -->
+  <script type="text/javascript">	   <!-- this is where the action is -->
     <![CDATA[
       function canHandleURL(URL) {
 	/* This function simply returns true or false depending on

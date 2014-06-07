@@ -64,6 +64,44 @@ Bool BoCA::VideoSite::CanHandleURL(const String &URL)
 	return result->BooleanValue();
 }
 
+String BoCA::VideoSite::GetDecoderID(const String &html)
+{
+	if (decoders.Length() == 1) return decoders.GetFirst();
+
+	/* Lock the V8 engine to our thread.
+	 */
+	v8::Locker		 locker(isolate);
+	v8::Isolate::Scope	 isolateScope(isolate);
+
+	/* Use our own handle scope for this.
+	 */
+	v8::HandleScope		 handleScope(isolate);
+
+	/* Enter the created context for calling the function.
+	 */
+	v8::Context::Scope	 contextScope(isolate, context);
+
+	/* Get context from persistent handle.
+	 */
+	v8::Local<v8::Context>	 context = v8::Local<v8::Context>::New(isolate, this->context);
+
+	/* Get function handle.
+	 */
+	v8::Handle<v8::String>	 func_name = v8::String::New("getDecoderID");
+	v8::Handle<v8::Value>	 func_val = context->Global()->Get(func_name);
+
+	v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(func_val);
+
+	/* Set up arguments and call the function.
+	 */
+	const int		 argc = 1;
+	v8::Handle<v8::Value>	 argv[argc] = { v8::String::New(html.ConvertTo("ISO-8859-1")) };
+
+	v8::Handle<v8::Value>	 result = func->Call(context->Global(), argc, argv);
+
+	return (char *) *v8::String::AsciiValue(result);
+}
+
 String BoCA::VideoSite::GetVideoURL(const String &html)
 {
 	/* Lock the V8 engine to our thread.
@@ -258,10 +296,18 @@ Int BoCA::VideoSite::ParseXML(const String &fileName)
 	{
 		XML::Node	*node = root->GetNthNode(i);
 
-		if 	(node->GetName() == "name")    name    = node->GetContent();
-		else if (node->GetName() == "version") version = node->GetContent();
-		else if (node->GetName() == "decoder") decoder = node->GetContent();
-		else if (node->GetName() == "script")  script  = node->GetContent();
+		if 	(node->GetName() == "name")	name	= node->GetContent();
+		else if (node->GetName() == "version")	version	= node->GetContent();
+		else if (node->GetName() == "decoders")
+		{
+			for (Int j = 0; j < node->GetNOfNodes(); j++)
+			{
+				XML::Node	*nodeDecoder = node->GetNthNode(j);
+
+				decoders.Add(nodeDecoder->GetContent());
+			}
+		}
+		else if (node->GetName() == "script")	script	= node->GetContent();
 	}
 
 	delete document;

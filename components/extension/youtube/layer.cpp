@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -245,7 +245,12 @@ Void BoCA::LayerYouTube::LoadVideoSites()
 		{
 			sites.Add(site);
 
-			if (!boca.ComponentExists(site->GetDecoderID())) missingDecoders = True;
+			const Array<String>	&decoders = site->GetDecoders();
+
+			foreach (const String &decoder, decoders)
+			{
+				if (!boca.ComponentExists(decoder)) missingDecoders = True;
+			}
 		}
 		else
 		{
@@ -792,7 +797,7 @@ Bool BoCA::LayerYouTube::StartDownload(const String &URL)
 
 	for (Int j = 0; j < boca.GetNumberOfComponents(); j++)
 	{
-		if (boca.GetComponentID(j) != videoSite->GetDecoderID()) continue;
+		if (boca.GetComponentID(j) != video->GetDecoderID()) continue;
 
 		const Array<AS::FileFormat *>	&formats = boca.GetComponentFormats(j);
 

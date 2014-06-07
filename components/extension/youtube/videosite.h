@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -43,7 +43,7 @@ namespace BoCA
 			String				 name;
 			String				 version;
 
-			String				 decoder;
+			Array<String>			 decoders;
 
 			String				 script;
 
@@ -63,13 +63,14 @@ namespace BoCA
 			Bool				 CanHandleURL(const String &);
 
 			String				 GetVideoURL(const String &);
+			String				 GetDecoderID(const String &);
 
 			Metadata			 QueryMetadata(const String &);
 		accessors:
 			const String			&GetName() const	{ return name; }
 			const String			&GetVersion() const	{ return version; }
 
-			const String			&GetDecoderID() const	{ return decoder; }
+			const Array<String>		&GetDecoders() const	{ return decoders; }
 	};
 };
 

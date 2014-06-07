@@ -168,6 +168,17 @@ Bool BoCA::Video::DownloadPage()
 	return True;
 }
 
+const String &BoCA::Video::GetDecoderID()
+{
+	if (videoDecoder != NIL) return videoDecoder;
+
+	DownloadPage();
+
+	videoDecoder = videoSite->GetDecoderID(videoPageHTML);
+
+	return videoDecoder;
+}
+
 Bool BoCA::Video::QueryMetadata()
 {
 	if (metadataQueried) return True;
