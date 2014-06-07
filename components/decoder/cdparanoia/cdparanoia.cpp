@@ -216,6 +216,9 @@ BoCA::DecoderCDParanoia::DecoderCDParanoia()
 	drive		= NIL;
 	paranoia	= NIL;
 
+	nextSector	= 0;
+	sectorsLeft	= 0;
+
 	readOffset	= 0;
 
 	skipSamples	= 0;
