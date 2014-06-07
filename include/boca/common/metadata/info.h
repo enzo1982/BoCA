@@ -90,6 +90,10 @@ namespace BoCA
 			 */
 			Array<String>		 other;
 
+			/* Helper functions:
+			 */
+			static Bool		 IsISRC(const String &);
+
 			/* Class constructors / destructor:
 			 */
 						 Info();

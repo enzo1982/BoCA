@@ -200,7 +200,14 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			else			     info.title = title;
 		}
 
-		if (line.StartsWith("ISRC ")) info.isrc = line.Tail(line.Length() - line.FindLast(" ") - 1);
+		if (line.StartsWith("ISRC "))
+		{
+			/* Check if the ISRC is valid.
+			 */
+			String	 isrc = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (Info::IsISRC(isrc)) info.isrc = isrc;
+		}
 
 		/* Track sample offset.
 		 */

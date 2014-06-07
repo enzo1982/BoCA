@@ -233,11 +233,7 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 		/* Check if the ISRC is valid.
 		 */
-		if (data.isrc[0] >= 'A' && data.isrc[0] <= 'Z' &&
-		    data.isrc[1] >= 'A' && data.isrc[1] <= 'Z')
-		{
-			info.isrc = data.isrc;
-		}
+		if (Info::IsISRC(data.isrc)) info.isrc = data.isrc;
 	}
 
 	track.SetInfo(info);

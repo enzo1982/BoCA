@@ -213,11 +213,7 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 			{
 				/* Check if the ISRC is valid.
 				 */
-				if (isrc[0] >= 'A' && isrc[0] <= 'Z' &&
-				    isrc[1] >= 'A' && isrc[1] <= 'Z')
-				{
-					info.isrc = isrc;
-				}
+				if (Info::IsISRC(isrc)) info.isrc = isrc;
 
 				free(isrc);
 			}
