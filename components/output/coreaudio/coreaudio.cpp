@@ -174,7 +174,7 @@ Int BoCA::OutputCoreAudio::CanWrite()
 
 	samplesBufferMutex->Lock();
 
-	Int	 canWrite = 2048 * format.channels * (format.bits / 8) - samplesBuffer.Size();
+	Int	 canWrite = format.rate * format.channels * (format.bits / 8) / 4 - samplesBuffer.Size();
 
 	samplesBufferMutex->Release();
 
