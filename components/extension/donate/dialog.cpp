@@ -37,11 +37,11 @@ BoCA::DonateDialog::DonateDialog()
 
 	text_intro		= new Text(i18n->TranslateString("Please support this project!"), Point(7, 12));
 	text_intro->SetFont(Font(Font::Default, 12, Font::Bold));
-	text_intro->SetX((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 9 - text_intro->GetUnscaledTextWidth()) / 2);
+	text_intro->SetX((Math::Max(text_intro->GetUnscaledTextWidth(), Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth())) + 9 - text_intro->GetUnscaledTextWidth()) / 2);
 
 	text_thanks		= new Text(i18n->TranslateString("Thank you very much!"), Point(7, text_donate->GetUnscaledTextHeight() + text_donate_other->GetUnscaledTextHeight() + 129));
 	text_thanks->SetFont(Font(Font::Default, 12, Font::Bold));
-	text_thanks->SetX((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 9 - text_thanks->GetUnscaledTextWidth()) / 2);
+	text_thanks->SetX((Math::Max(text_intro->GetUnscaledTextWidth(), Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth())) + 9 - text_thanks->GetUnscaledTextWidth()) / 2);
 
 	mainWnd->Add(text_intro);
 	mainWnd->Add(text_donate);
@@ -56,9 +56,9 @@ BoCA::DonateDialog::DonateDialog()
 	image_10.SetBackgroundColor(Setup::BackgroundColor);
 	image_other.SetBackgroundColor(Setup::BackgroundColor);
 
-	link_donate_5		= new Hyperlink(NIL, image_5, String("file:///").Append(Utilities::GetBoCADirectory().Replace("\\", "/")).Append("boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_5.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 - 100, text_donate->GetUnscaledTextHeight() + 56));
-	link_donate_10		= new Hyperlink(NIL, image_10, String("file:///").Append(Utilities::GetBoCADirectory().Replace("\\", "/")).Append("boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_10.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 - 30, text_donate->GetUnscaledTextHeight() + 56));
-	link_donate_other	= new Hyperlink(NIL, image_other, String("file:///").Append(Utilities::GetBoCADirectory().Replace("\\", "/")).Append("boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_other.html"), Point((Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21) / 2 + 40, text_donate->GetUnscaledTextHeight() + 56));
+	link_donate_5		= new Hyperlink(NIL, image_5, String("file:///").Append(Utilities::GetBoCADirectory().Replace("\\", "/")).Append("boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_5.html"), Point((Math::Max(text_intro->GetUnscaledTextWidth(), Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth())) + 21) / 2 - 100, text_donate->GetUnscaledTextHeight() + 56));
+	link_donate_10		= new Hyperlink(NIL, image_10, String("file:///").Append(Utilities::GetBoCADirectory().Replace("\\", "/")).Append("boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_10.html"), Point((Math::Max(text_intro->GetUnscaledTextWidth(), Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth())) + 21) / 2 - 30, text_donate->GetUnscaledTextHeight() + 56));
+	link_donate_other	= new Hyperlink(NIL, image_other, String("file:///").Append(Utilities::GetBoCADirectory().Replace("\\", "/")).Append("boca.extension.donate/donate_").Append(i18n->TranslateString("usd")).Append("_other.html"), Point((Math::Max(text_intro->GetUnscaledTextWidth(), Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth())) + 21) / 2 + 40, text_donate->GetUnscaledTextHeight() + 56));
 
 	mainWnd->Add(link_donate_5);
 	mainWnd->Add(link_donate_10);
@@ -83,7 +83,7 @@ BoCA::DonateDialog::DonateDialog()
 
 	Rect	 workArea = Screen::GetActiveScreenWorkArea();
 
-	Size	 wndSize  = Size(Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth()) + 21, text_donate->GetUnscaledTextHeight() + text_donate_other->GetUnscaledTextHeight() + 236);
+	Size	 wndSize  = Size(Math::Max(text_intro->GetUnscaledTextWidth(), Math::Max(text_donate->GetUnscaledTextWidth(), text_donate_other->GetUnscaledTextWidth())) + 21, text_donate->GetUnscaledTextHeight() + text_donate_other->GetUnscaledTextHeight() + 236);
 	Point	 wndPos	  = workArea.GetPosition() + Point((workArea.GetSize().cx - wndSize.cx) / 2, (workArea.GetSize().cy - wndSize.cy) / 2);
 
 	mainWnd->SetMetrics(wndPos, wndSize);

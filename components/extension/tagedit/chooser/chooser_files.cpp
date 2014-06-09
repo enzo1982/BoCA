@@ -142,7 +142,7 @@ Void BoCA::ChooserFiles::OnChangeSize(const Size &nSize)
 
 	edit_directory->SetWidth(clientSize.cx - edit_directory->GetX() - 8);
 	list_files->SetSize(Size(clientSize.cx - list_files->GetX() - 8, clientSize.cy - 72));
-	text_nofiles->SetPosition(list_files->GetPosition() + Point((list_files->GetWidth() - text_nofiles->GetUnscaledTextWidth()) / 2, (list_files->GetHeight() - text_nofiles->GetUnscaledTextHeight()) / 2));
+	text_nofiles->SetPosition(list_files->GetPosition() + Point((list_files->GetWidth() - text_nofiles->GetUnscaledTextWidth()) / 2, (list_files->GetHeight() - 13 - text_nofiles->GetUnscaledTextHeight()) / 2 + 13));
 }
 
 /* Called when application language is changed.

@@ -1,5 +1,5 @@
- /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2013 Robert Kausch <robert.kausch@bonkenc.org>
+ /* BoCA - BonkEnc Component Architecture
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,13 +12,19 @@
 
 BoCA::LayerLengthStatus::LayerLengthStatus()
 {
+	String	 resourcesPath;
+
+#ifndef __WIN32__
+	if (Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac")).Exists()) resourcesPath = "../share/freac/";
+#endif
+
 	tracks.EnableLocking();
 	tracks_selected.EnableLocking();
 	tracks_unselected.EnableLocking();
 
-	display_selected	= new LengthDisplay(ImageLoader::Load("freac.pci:18"));
-	display_unselected	= new LengthDisplay(ImageLoader::Load("freac.pci:19"));
-	display_all		= new LengthDisplay(ImageLoader::Load("freac.pci:20"));
+	display_selected	= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("freac.pci:18")));
+	display_unselected	= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("freac.pci:19")));
+	display_all		= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("freac.pci:20")));
 
 	Add(display_selected);
 	Add(display_unselected);

@@ -45,7 +45,9 @@ BoCA::LayerTagBasic::LayerTagBasic() : Editor("Basic")
 	edit_comment		= new MultiEdit(NIL, text_comment->GetPosition() + Point(7, -3), Size(300, 50));
 	edit_comment->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
 
-	edit_ntracks		= new EditBox(NIL, Point(28, text_title->GetY() - 3), Size(18, 0), 2);
+	Int	 numFieldWidth = Font().GetUnscaledTextSizeX("00") + 6;
+
+	edit_ntracks		= new EditBox(NIL, Point(10 + numFieldWidth, text_title->GetY() - 3), Size(numFieldWidth, 0), 2);
 	edit_ntracks->SetOrientation(OR_UPPERRIGHT);
 	edit_ntracks->SetFlags(EDB_NUMERIC);
 	edit_ntracks->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -53,7 +55,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Editor("Basic")
 	text_ntracks		= new Text("/", edit_ntracks->GetPosition() + Point(10, 3));
 	text_ntracks->SetOrientation(OR_UPPERRIGHT);
 
-	edit_track		= new EditBox(NIL, edit_ntracks->GetPosition() + Point(32, 0), Size(18, 0), 2);
+	edit_track		= new EditBox(NIL, edit_ntracks->GetPosition() + Point(14 + numFieldWidth, 0), Size(numFieldWidth, 0), 2);
 	edit_track->SetOrientation(OR_UPPERRIGHT);
 	edit_track->SetFlags(EDB_NUMERIC);
 	edit_track->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -61,7 +63,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Editor("Basic")
 	text_track		= new Text(NIL, edit_track->GetPosition() + Point(35, 3));
 	text_track->SetOrientation(OR_UPPERRIGHT);
 
-	edit_ndiscs		= new EditBox(NIL, Point(28, text_album->GetY() - 3), Size(18, 0), 2);
+	edit_ndiscs		= new EditBox(NIL, Point(10 + numFieldWidth, text_album->GetY() - 3), Size(numFieldWidth, 0), 2);
 	edit_ndiscs->SetOrientation(OR_UPPERRIGHT);
 	edit_ndiscs->SetFlags(EDB_NUMERIC);
 	edit_ndiscs->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -69,7 +71,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Editor("Basic")
 	text_ndiscs		= new Text("/", edit_ndiscs->GetPosition() + Point(10, 3));
 	text_ndiscs->SetOrientation(OR_UPPERRIGHT);
 
-	edit_disc		= new EditBox(NIL, edit_ndiscs->GetPosition() + Point(32, 0), Size(18, 0), 2);
+	edit_disc		= new EditBox(NIL, edit_ndiscs->GetPosition() + Point(14 + numFieldWidth, 0), Size(numFieldWidth, 0), 2);
 	edit_disc->SetOrientation(OR_UPPERRIGHT);
 	edit_disc->SetFlags(EDB_NUMERIC);
 	edit_disc->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);
@@ -77,7 +79,7 @@ BoCA::LayerTagBasic::LayerTagBasic() : Editor("Basic")
 	text_disc		= new Text(NIL, edit_disc->GetPosition() + Point(30, 3));
 	text_disc->SetOrientation(OR_UPPERRIGHT);
 
-	edit_year		= new EditBox(NIL, Point(60, text_genre->GetY() - 3), Size(50, 0), 4);
+	edit_year		= new EditBox(NIL, Point(24 + 2 * numFieldWidth, text_genre->GetY() - 3), Size(14 + 2 * numFieldWidth, 0), 4);
 	edit_year->SetOrientation(OR_UPPERRIGHT);
 	edit_year->SetFlags(EDB_NUMERIC);
 	edit_year->onInput.Connect(&LayerTagBasic::OnModifyTrack, this);

@@ -16,12 +16,12 @@ BoCA::ConfigureResample::ConfigureResample()
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
 
-	group_converter		= new GroupBox(i18n->TranslateString("Converter"), Point(7, 11), Size(399, 59));
-	group_samplerate	= new GroupBox(i18n->TranslateString("Output samplerate"), Point(7, 82), Size(399, 43));
+	group_converter		= new GroupBox(i18n->TranslateString("Converter"), Point(7, 11), Size(450, 59));
+	group_samplerate	= new GroupBox(i18n->TranslateString("Output samplerate"), Point(7, 82), Size(450, 43));
 
 	text_converter		= new Text(i18n->TranslateString("Converter").Append(":"), Point(17, 27));
 
-	combo_converter		= new ComboBox(Point(24 + text_converter->GetUnscaledTextWidth(), 24), Size(325, 0));
+	combo_converter		= new ComboBox(Point(24 + text_converter->GetUnscaledTextWidth(), 24), Size(423 - text_converter->GetUnscaledTextWidth(), 0));
 
 	for (Int i = 0; true; i++)
 	{
@@ -35,7 +35,7 @@ BoCA::ConfigureResample::ConfigureResample()
 	combo_converter->SelectNthEntry(config->GetIntValue("Resample", "Converter", SRC_SINC_MEDIUM_QUALITY) - SRC_SINC_BEST_QUALITY);
 	combo_converter->onSelectEntry.Connect(&ConfigureResample::SetConverter, this);
 
-	text_description	= new Text("Description", Point(72, 49));
+	text_description	= new Text("Description", Point(24 + text_converter->GetUnscaledTextWidth(), 49));
 	text_samplerate		= new Text(i18n->TranslateString("Samplerate").Append(":"), Point(17, 98));
 
 	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0), 6);
@@ -72,7 +72,7 @@ BoCA::ConfigureResample::ConfigureResample()
 	Add(text_samplerate);
 	Add(edit_samplerate);
 
-	SetSize(Size(413, 171));
+	SetSize(Size(464, 171));
 }
 
 BoCA::ConfigureResample::~ConfigureResample()

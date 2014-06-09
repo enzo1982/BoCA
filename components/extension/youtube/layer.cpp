@@ -342,7 +342,7 @@ Void BoCA::LayerYouTube::OnChangeSize(const Size &nSize)
 	Rect	 clientRect = Rect(GetPosition(), GetSize());
 	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
-	edit_url->SetWidth(clientSize.cx - text_url->GetUnscaledTextWidth() - 110);
+	edit_url->SetWidth(clientSize.cx - text_url->GetUnscaledTextWidth() - button_add_url->GetWidth() - 30);
 
 	list_downloads->SetWidth(clientSize.cx - 15);
 
@@ -400,6 +400,8 @@ Void BoCA::LayerYouTube::OnChangeLanguageSettings()
 	edit_url->SetX(text_url->GetUnscaledTextWidth() + 15);
 
 	button_add_url->SetText(i18n->TranslateString("Download"));
+	button_add_url->SetWidth(Math::Max(80, button_add_url->GetUnscaledTextWidth() + 13));
+	button_add_url->SetX(button_add_url->GetWidth() + 8);
 
 	check_auto_download->SetText(i18n->TranslateString("Automatically download URLs copied to clipboard"));
 	check_auto_download->SetWidth(check_auto_download->GetUnscaledTextWidth() + 20);

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,11 +20,11 @@ BoCA::ConfigureMPG123::ConfigureMPG123()
 
 	String	 selectedDecoder = config->GetStringValue("mpg123", "Decoder", NIL);
 
-	group_decoding	= new GroupBox(i18n->TranslateString("Decoder"), Point(7, 11), Size(250, 41));
+	group_decoding	= new GroupBox(i18n->TranslateString("Decoder"), Point(7, 11), Size(286, 41));
 
 	text_decoder	= new Text(i18n->TranslateString("Active decoder:"), Point(10, 15));
 
-	combo_decoder	= new ComboBox(Point(17 + text_decoder->GetUnscaledTextWidth(), 12), Size(223 - text_decoder->GetUnscaledTextWidth(), 0));
+	combo_decoder	= new ComboBox(Point(17 + text_decoder->GetUnscaledTextWidth(), 12), Size(259 - text_decoder->GetUnscaledTextWidth(), 0));
 	combo_decoder->AddEntry(i18n->TranslateString("auto select"));
 
 	const char	**decoders = ex_mpg123_supported_decoders();
@@ -39,7 +39,7 @@ BoCA::ConfigureMPG123::ConfigureMPG123()
 
 	Add(group_decoding);
 
-	SetSize(Size(264, 169));
+	SetSize(Size(300, 169));
 }
 
 BoCA::ConfigureMPG123::~ConfigureMPG123()

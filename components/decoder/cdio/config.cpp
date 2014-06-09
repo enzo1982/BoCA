@@ -25,9 +25,9 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	i18n->SetContext("Ripper");
 
-	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(344, 121));
+	group_drive	= new GroupBox(i18n->TranslateString("Active CD-ROM drive"), Point(7, 11), Size(354, 121));
 
-	combo_drive	= new ComboBox(Point(10, 12), Size(324, 0));
+	combo_drive	= new ComboBox(Point(10, 12), Size(334, 0));
 
 	AS::Registry		&boca = AS::Registry::Get();
 	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdio-info");
@@ -54,32 +54,38 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	spinup	  = driveSpinUpTimes.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0)) > 0;
 	setspeed  = driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 
-	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(157, 0), &setspeed);
+	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(162, 0), &setspeed);
 	check_speed->onAction.Connect(&ConfigureCDIO::ToggleSetSpeed, this);
 
-	combo_speed		= new ComboBox(Point(176, 39), Size(158, 0));
+	check_spinup		= new CheckBox(i18n->TranslateString("Spin up before ripping:"), Point(10, 67), Size(162, 0), &spinup);
+	check_spinup->onAction.Connect(&ConfigureCDIO::ToggleSpinUp, this);
+
+	check_offset		= new CheckBox(i18n->TranslateString("Use read offset:"), Point(10, 94), Size(162, 0), &useoffset);
+	check_offset->onAction.Connect(&ConfigureCDIO::ToggleUseOffset, this);
+
+	Int	 maxTextSize = Math::Max(Math::Max(check_speed->GetUnscaledTextWidth(), check_spinup->GetUnscaledTextWidth()), check_offset->GetUnscaledTextWidth());
+
+	check_speed->SetWidth(maxTextSize + 21);
+	check_spinup->SetWidth(maxTextSize + 21);
+	check_offset->SetWidth(maxTextSize + 21);
+
+	combo_speed		= new ComboBox(Point(39 + maxTextSize, 39), Size(305 - maxTextSize, 0));
 	combo_speed->onSelectEntry.Connect(&ConfigureCDIO::SelectSpeed, this);
 
 	for (Int i = 48; i > 0; i -= 4) combo_speed->AddEntry(String::FromInt(i).Append("x"));
 
-	check_spinup		= new CheckBox(i18n->TranslateString("Spin up before ripping:"), Point(10, 67), Size(157, 0), &spinup);
-	check_spinup->onAction.Connect(&ConfigureCDIO::ToggleSpinUp, this);
+	text_spinup_seconds	= new Text(i18n->TranslateString("%1 seconds").Replace("%1", "00"), Point(275, 69));
+	text_spinup_seconds->SetX(343 - text_spinup_seconds->GetUnscaledTextWidth());
 
-	text_spinup_seconds	= new Text(i18n->TranslateString("%1 seconds").Replace("%1", "00"), Point(270, 69));
-	text_spinup_seconds->SetX(333 - text_spinup_seconds->GetUnscaledTextWidth());
-
-	slider_spinup		= new Slider(Point(176, 67), Size(86, 0), OR_HORZ, NIL, 1, 30);
-	slider_spinup->SetWidth(149 - text_spinup_seconds->GetUnscaledTextWidth());
+	slider_spinup		= new Slider(Point(39 + maxTextSize, 67), Size(86, 0), OR_HORZ, NIL, 1, 30);
+	slider_spinup->SetWidth(335 - slider_spinup->GetX() - text_spinup_seconds->GetUnscaledTextWidth());
 	slider_spinup->onValueChange.Connect(&ConfigureCDIO::ChangeSpinUpTime, this);
 
-	check_offset		= new CheckBox(i18n->TranslateString("Use read offset:"), Point(10, 94), Size(157, 0), &useoffset);
-	check_offset->onAction.Connect(&ConfigureCDIO::ToggleUseOffset, this);
-
-	edit_offset		= new EditBox(NIL, Point(176, 93), Size(36, 0), 5);
+	edit_offset		= new EditBox(NIL, Point(39 + maxTextSize, 93), Size(36, 0), 5);
 	edit_offset->SetFlags(EDB_NUMERIC);
 	edit_offset->onInput.Connect(&ConfigureCDIO::ChangeOffset, this);
 
-	text_offset_samples	= new Text(i18n->TranslateString("samples"), Point(220, 96));
+	text_offset_samples	= new Text(i18n->TranslateString("samples"), Point(edit_offset->GetX() + edit_offset->GetWidth() + 8, 96));
 
 	SelectDrive();
 
@@ -93,18 +99,18 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	group_drive->Add(edit_offset);
 	group_drive->Add(text_offset_samples);
 
-	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 144), Size(344, 39));
+	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 144), Size(354, 39));
 
-	check_readISRC		= new CheckBox(i18n->TranslateString("Read ISRC when adding tracks to joblist"), Point(10, 11), Size(323, 0), &readISRC);
+	check_readISRC		= new CheckBox(i18n->TranslateString("Read ISRC when adding tracks to joblist"), Point(10, 11), Size(333, 0), &readISRC);
 
 	group_cdinfo->Add(check_readISRC);
 
-	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 144/*195*/), Size(344, 68));
+	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 195), Size(354, 42));
 
-	check_paranoia		= new CheckBox(i18n->TranslateString("Activate cdparanoia mode:"), Point(10, 14), Size(157, 0), &cdparanoia);
+	check_paranoia		= new CheckBox(i18n->TranslateString("Activate cdparanoia mode:"), Point(10, 14), Size(162, 0), &cdparanoia);
 	check_paranoia->onAction.Connect(&ConfigureCDIO::ToggleParanoia, this);
 
-	combo_paranoia_mode	= new ComboBox(Point(176, 13), Size(158, 0));
+	combo_paranoia_mode	= new ComboBox(Point(181, 13), Size(163, 0));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("Overlap only"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No verify"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No scratch repair"));
@@ -116,12 +122,12 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	group_ripping->Add(check_paranoia);
 	group_ripping->Add(combo_paranoia_mode);
 
-	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(359, 11), Size(178, 42));
+	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(369, 11), Size(190, 68));
 
-	check_autoRead	= new CheckBox(i18n->TranslateString("Read CD contents on insert"), Point(10, 14), Size(157, 0), &autoRead);
+	check_autoRead	= new CheckBox(i18n->TranslateString("Read CD contents on insert"), Point(10, 14), Size(170, 0), &autoRead);
 	check_autoRead->onAction.Connect(&ConfigureCDIO::ToggleAutoRead, this);
 
-	check_autoRip	= new CheckBox(i18n->TranslateString("Start ripping automatically"), check_autoRead->GetPosition() + Point(0, 26), Size(157, 0), &autoRip);
+	check_autoRip	= new CheckBox(i18n->TranslateString("Start ripping automatically"), check_autoRead->GetPosition() + Point(0, 26), Size(170, 0), &autoRip);
 
 	group_automatization->Add(check_autoRead);
 	group_automatization->Add(check_autoRip);
@@ -131,9 +137,9 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	Add(group_drive);
 	Add(group_ripping);
 	Add(group_automatization);
-//	Add(group_cdinfo);
+	Add(group_cdinfo);
 
-	SetSize(Size(544, 193/*244*/));
+	SetSize(Size(566, 244));
 }
 
 BoCA::ConfigureCDIO::~ConfigureCDIO()
