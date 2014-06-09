@@ -7,8 +7,12 @@ CPP	= gcc
 CPPOPTS	= -g0 -Os -fno-exceptions -I.. -I../expat
 AR	= ar
 
+ifeq ($(BUILD_FREEBSD),True)
+	CPP = clang
+endif
+
 ifneq ($(BUILD_WIN32),True)
-	CCOPTS += -fPIC
+	CPPOPTS += -fPIC
 endif
 
 ifeq ($(BUILD_OSX),True)

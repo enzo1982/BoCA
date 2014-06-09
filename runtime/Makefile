@@ -37,6 +37,11 @@ CCOPTS	  = -pipe -g0 -Wall -Os -fvisibility=hidden -fno-exceptions -DBOCA_CDK_BU
 LD	  = gcc
 LDOPTS	  = -pipe -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
+ifeq ($(BUILD_FREEBSD),True)
+	CC = clang
+	LD = clang
+endif
+
 ifeq ($(BUILD_OSX),True)
 	LDOPTS += -Wl,-x
 

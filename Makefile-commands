@@ -7,6 +7,11 @@ CCOPTS = -pipe -g0 -Wall -Os -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE
 LD     = gcc
 LDOPTS = -pipe -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
+ifeq ($(BUILD_FREEBSD),True)
+	CC = clang
+	LD = clang
+endif
+
 ifneq ($(EXCEPTION),True)
 	CCOPTS += -fno-exceptions
 endif

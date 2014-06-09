@@ -7,6 +7,10 @@ CC	= gcc
 CCOPTS	= -g0 -Os -fno-exceptions -I. -I../zlib -DHAVE_CONFIG_H -DID3LIB_LINKOPTION=LINKOPTION_STATIC
 AR	= ar
 
+ifeq ($(BUILD_FREEBSD),True)
+	CC = clang
+endif
+
 ifneq ($(BUILD_WIN32),True)
 	CCOPTS += -fPIC
 endif

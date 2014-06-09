@@ -7,6 +7,10 @@ CC	= gcc
 CCOPTS	= -g0 -Os -fno-exceptions -I. -DHAVE_EXPAT_CONFIG_H
 AR	= ar
 
+ifeq ($(BUILD_FREEBSD),True)
+	CC = clang
+endif
+
 ifneq ($(BUILD_WIN32),True)
 	CCOPTS += -fPIC
 endif
