@@ -26,7 +26,7 @@
 
 	metadata.thumbnail   = (html.match(/pic: '(.*?)'/) ? RegExp.$1 : null);
 
-	metadata.uploader    = (html.match(/<p class="v_user"><a .*?>(.*?)<\/a>/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/<div class="v_user">[\s\n\r]*<a .*?>(.*?)<\/a>/) ? RegExp.$1 : null);
 
 	return metadata;
       }

@@ -25,7 +25,7 @@
 	metadata.description = (html.match(/<meta property="og:description" content="((?:.|\n|\r)*?)".*?\/>/) ? RegExp.$1 : null);
 
 	metadata.date	     = (html.match(/<meta property="video:release_date" content="(.*?)T.*?".*?\/>/) ? RegExp.$1 : null);
-	metadata.thumbnail   = (html.match(/<link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/>/) ? "http://www.dailymotion.com" + RegExp.$1 : null);
+	metadata.thumbnail   = (html.match(/<link rel="thumbnail" type="image\/jpeg" href="(.*?)" \/>/) ? RegExp.$1 : null);
 
 	metadata.uploader    = (html.match(/<meta name="author" content="(.*?)".*?\/>/) ? RegExp.$1 : null);
 

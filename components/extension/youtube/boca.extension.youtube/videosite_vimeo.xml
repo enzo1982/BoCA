@@ -24,7 +24,7 @@
 	var metadata = new Metadata();
 
 	metadata.title	     = (html.match(/"title":"(.*?)"[\},]/) ? RegExp.$1.replace(/\\/g, "") : null);
-	metadata.description = (html.match(/<div class="description"(?:.*?)>((?:.|\n|\r)*?)<\/div>/) ? RegExp.$1 : null);
+	metadata.description = (html.match(/<div (?:.*?)itemprop="description"(?:.*?)>((?:.|\n|\r)*?)<\/div>/) ? RegExp.$1 : null);
 
 	metadata.date	     = (html.match(/<meta itemprop="uploadDate" content="(.*?)T(?:.*?)">/) ? RegExp.$1 : null);
 	metadata.thumbnail   = (html.match(/<meta itemprop="thumbnailUrl" content="(.*?)">/) ? RegExp.$1 : null);

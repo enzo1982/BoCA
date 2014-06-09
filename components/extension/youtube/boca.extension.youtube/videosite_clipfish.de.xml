@@ -29,7 +29,7 @@
 	metadata.date	     = (html.match(/(?:Upload:|Jahr:)\s*<span.*?>(.*?)<\/span>/) ? RegExp.$1 : null);
 	metadata.thumbnail   = (devxml.match(/<imageurl>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/imageurl>/) ? RegExp.$1 : null);
 
-	metadata.uploader    = (html.match(/<a .*?class="cf-video-info-nickname.*?".*?><span .*?>(.*?)<\/span><\/a>/) ? RegExp.$1 : null);
+	metadata.uploader    = (html.match(/<h2 .*?class="cf-box-top-headermodule.*?".*?>(.*?)<\/h2>/) ? RegExp.$1 : null);
 
 	return metadata;
       }
