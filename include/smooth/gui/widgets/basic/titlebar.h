@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,6 +37,7 @@ namespace smooth
 			private:
 				Bool			 paintActive;
 				Point			 startMousePos;
+#ifdef __WIN32__
 			protected:
 				Hotspot			*minHotspot;
 				Hotspot			*maxHotspot;
@@ -45,6 +46,7 @@ namespace smooth
 				Hotspot			*dragHotspot;
 
 				Shortcut		*closeShortcut;
+#endif
 			public:
 				static const Short	 classID;
 

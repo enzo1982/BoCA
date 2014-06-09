@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -59,6 +59,15 @@ namespace smooth
 
 				Int				 SetCursorPos(Int nPos)		{ return cursor->SetCursorPos(nPos); }
 				Int				 GetCursorPos() const		{ return cursor->GetCursorPos(); }
+
+				Int				 GetUnscaledTextWidth() const	{ return cursor->GetUnscaledTextWidth(); }
+				Int				 GetScaledTextWidth() const	{ return cursor->GetScaledTextHeight(); }
+
+				Int				 GetUnscaledTextHeight() const	{ return cursor->GetUnscaledTextWidth(); }
+				Int				 GetScaledTextHeight() const	{ return cursor->GetScaledTextHeight(); }
+
+				const Size			&GetUnscaledTextSize() const	{ return cursor->GetUnscaledTextSize(); }
+				const Size			&GetScaledTextSize() const	{ return cursor->GetScaledTextSize(); }
 			signals:
 				Signal1<Void, const String &>	 onInput;
 				Signal1<Void, const String &>	 onEnter;

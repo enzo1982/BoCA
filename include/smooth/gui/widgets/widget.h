@@ -189,22 +189,22 @@ namespace smooth
 				virtual Int			 SetFont(const Font &);
 				virtual const Font		&GetFont() const				{ return font; }
 
-				Int				 GetUnscaledTextWidth() const			{ return unscaledTextSize.cx; }
-				Int				 GetScaledTextWidth() const			{ return scaledTextSize.cx; }
+				virtual Int			 GetUnscaledTextWidth() const			{ return unscaledTextSize.cx; }
+				virtual Int			 GetScaledTextWidth() const			{ return scaledTextSize.cx; }
 
-				Int				 GetUnscaledTextHeight() const			{ return unscaledTextSize.cy; }
-				Int				 GetScaledTextHeight() const			{ return scaledTextSize.cy; }
+				virtual Int			 GetUnscaledTextHeight() const			{ return unscaledTextSize.cy; }
+				virtual Int			 GetScaledTextHeight() const			{ return scaledTextSize.cy; }
 
-				const Size			&GetUnscaledTextSize() const			{ return unscaledTextSize; }
-				const Size			&GetScaledTextSize() const			{ return scaledTextSize; }
+				virtual const Size		&GetUnscaledTextSize() const			{ return unscaledTextSize; }
+				virtual const Size		&GetScaledTextSize() const			{ return scaledTextSize; }
 
 				virtual Int			 SetOrientation(Int);
 				virtual Int			 GetOrientation() const				{ return orientation; }
 
 				virtual Rect			 GetVisibleArea() const;
 
-				Int				 SetBackgroundColor(const Color &);
-				const Color			&GetBackgroundColor() const;
+				virtual Int			 SetBackgroundColor(const Color &);
+				virtual const Color		&GetBackgroundColor() const;
 
 				virtual Bool			 IsBackgroundColorSet() const;
 
