@@ -3,17 +3,22 @@
 <component>
   <name>Tom's Audiokompressor</name>
   <version>1.0</version>
-  <id>tak-dec</id>
+  <id>avconv-tak-dec</id>
   <type>decoder</type>
-  <replace>avconv-tak-dec</replace>
   <format>
     <name>Tom's Audio</name>
     <extension>tak</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>
   <external>
-    <command ignoreExitCode="true">takc</command>
-    <arguments>-d %OPTIONS %INFILE -</arguments>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>

@@ -16,9 +16,12 @@ install: uninstall
 	cp boca_decoder_avconv_mac.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_mkv_audio.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_mov_audio.1.0.xml $(PREFIX)/$(LIB)/boca
+	cp boca_decoder_avconv_mpc.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_mpg_audio.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_purevoice.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_realaudio.1.0.xml $(PREFIX)/$(LIB)/boca
+	cp boca_decoder_avconv_tak.1.0.xml $(PREFIX)/$(LIB)/boca
+	cp boca_decoder_avconv_wavpack.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_webm_audio.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_wma.1.0.xml $(PREFIX)/$(LIB)/boca
 	cp boca_decoder_avconv_wmv_audio.1.0.xml $(PREFIX)/$(LIB)/boca
@@ -63,9 +66,12 @@ uninstall:
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_mac.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_mkv_audio.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_mov_audio.1.0.xml
+	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_mpc.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_mpg_audio.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_purevoice.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_realaudio.1.0.xml
+	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_tak.1.0.xml
+	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_wavpack.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_webm_audio.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_wma.1.0.xml
 	rm -f $(PREFIX)/$(LIB)/boca/boca_decoder_avconv_wmv_audio.1.0.xml
