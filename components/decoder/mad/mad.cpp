@@ -383,13 +383,12 @@ mad_flow BoCA::MADInputCallback(void *client_data, mad_stream *stream)
 	Int	 bytes = Math::Min((Int64) 131072, filter->finished ? 1440 : filter->driver->GetSize() - filter->driver->GetPos());
 	Int	 backup = stream->bufend - stream->next_frame;
 
-	filter->inputBuffer.Resize(bytes + backup);
-
-	if (filter->finished) filter->inputBuffer.Zero();
-
 	memmove(filter->inputBuffer, stream->next_frame, backup);
 
+	filter->inputBuffer.Resize(bytes + backup);
+
 	if (!filter->finished) filter->driver->ReadData(filter->inputBuffer + backup, bytes);
+	else		       memset(filter->inputBuffer + backup, 0, bytes);
 
 	filter->readDataMutex->Release();
 
