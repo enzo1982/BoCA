@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -33,6 +33,7 @@ const String &BoCA::EncoderBlade::GetComponentSpecs()
 		    <format>							\
 		      <name>MPEG 1 Audio Layer 3</name>				\
 		      <extension>mp3</extension>				\
+		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>		\
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>	\
 		    </format>							\
 		  </component>							\

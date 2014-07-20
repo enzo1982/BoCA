@@ -39,6 +39,7 @@ const String &BoCA::DecoderMAD::GetComponentSpecs()
 		      <extension>mp1</extension>				\
 		      <extension>mp2</extension>				\
 		      <extension>mp3</extension>				\
+		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>		\
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>	\
 		    </format>							\
 		  </component>							\

@@ -31,6 +31,7 @@ const String &BoCA::EncoderLAME::GetComponentSpecs()
 		    <format>							\
 		      <name>MPEG 1 Audio Layer 3</name>				\
 		      <extension>mp3</extension>				\
+		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>		\
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>	\
 		    </format>							\
 		  </component>							\
