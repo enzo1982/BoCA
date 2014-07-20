@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -28,7 +28,7 @@ namespace BoCA
 				Track			 track;
 				Format			 format;
 
-				virtual Int		 RenderTag(const String &, const Track &, Buffer<UnsignedByte> &);
+				virtual Int		 RenderTags(const String &, const Track &, Buffer<UnsignedByte> &, Buffer<UnsignedByte> &);
 			public:
 							 EncoderComponentExternal(ComponentSpecs *);
 				virtual			~EncoderComponentExternal();

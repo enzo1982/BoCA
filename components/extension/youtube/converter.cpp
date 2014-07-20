@@ -84,8 +84,6 @@ Int BoCA::Converter::ParseXML(const String &fileName)
 		else if (node->GetName() == "decoder") decoder = node->GetContent();
 		else if (node->GetName() == "format")
 		{
-			format.SetTagMode(TAG_MODE_NONE);
-
 			for (Int j = 0; j < node->GetNOfNodes(); j++)
 			{
 				XML::Node	*node2 = node->GetNthNode(j);
@@ -94,16 +92,20 @@ Int BoCA::Converter::ParseXML(const String &fileName)
 				else if (node2->GetName() == "extension") format.AddExtension(node2->GetContent());
 				else if (node2->GetName() == "tag")
 				{
-					format.SetTagFormat(node2->GetContent());
+					AS::TagFormat	 tagFormat;
 
-					if (node2->GetAttributeByName("id") != NIL) format.SetTaggerID(node2->GetAttributeByName("id")->GetContent());
+					tagFormat.SetName(node2->GetContent());
+
+					if (node2->GetAttributeByName("id") != NIL) tagFormat.SetTagger(node2->GetAttributeByName("id")->GetContent());
 
 					if (node2->GetAttributeByName("mode") != NIL)
 					{
-						if	(node2->GetAttributeByName("mode")->GetContent() == "prepend")	format.SetTagMode(TAG_MODE_PREPEND);
-						else if (node2->GetAttributeByName("mode")->GetContent() == "append")	format.SetTagMode(TAG_MODE_APPEND);
-						else if (node2->GetAttributeByName("mode")->GetContent() == "other")	format.SetTagMode(TAG_MODE_OTHER);
+						if	(node2->GetAttributeByName("mode")->GetContent() == "prepend")	tagFormat.SetMode(TAG_MODE_PREPEND);
+						else if (node2->GetAttributeByName("mode")->GetContent() == "append")	tagFormat.SetMode(TAG_MODE_APPEND);
+						else if (node2->GetAttributeByName("mode")->GetContent() == "other")	tagFormat.SetMode(TAG_MODE_OTHER);
 					}
+
+					format.AddTagFormat(tagFormat);
 				}
 			}
 		}

@@ -60,7 +60,7 @@ BoCA::ChooserFiles::ChooserFiles() : Chooser("Files")
 	 */
 	for (Int i = 0; i < 26; i++)
 	{
-		char		 name[4] = { 'A' + i, ':', '\\', 0};
+		char		 name[4] = { char('A' + i), ':', '\\', 0};
 		Directory	 drive(name);
 
 		if (drive.Exists())
@@ -480,69 +480,63 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 	Int	 error	     = Error();
 	String	 errorString = "Unknown error";
 
-	/* Get tagger mode, format and ID
+	/* Create decoder component.
 	 */
-	DecoderComponent		*decoder = ChooserFilesUtilities::CreateDecoderComponent(track.origFilename);
-	const Array<FileFormat *>	&formats = decoder->GetFormats();
+	DecoderComponent	*decoder = ChooserFilesUtilities::CreateDecoderComponent(track.origFilename);
 
-	Int	 tagMode = TAG_MODE_NONE;
-	String	 tagFormat;
-	String	 taggerID;
-
+	/* Loop over supported formats.
+	 */
 	String	 lcURI = track.origFilename.ToLower();
 
-	foreach (FileFormat *format, formats)
+	foreach (FileFormat *format, decoder->GetFormats())
 	{
 		foreach (const String &extension, format->GetExtensions())
 		{
-			if (lcURI.EndsWith(String(".").Append(extension)))
-			{
-				tagMode	  = format->GetTagMode();
-				tagFormat = format->GetTagFormat();
-				taggerID  = format->GetTaggerID();
+			if (!lcURI.EndsWith(String(".").Append(extension))) continue;
 
-				break;
+			/* Update tags.
+			 */
+			const Array<TagFormat>	&tagFormats = format->GetTagFormats();
+
+			foreach (const TagFormat &tagFormat, tagFormats)
+			{
+				Registry	&boca	= AS::Registry::Get();
+				TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(tagFormat.GetTagger());
+
+				if (tagger != NIL)
+				{
+					foreach (TagSpec *spec, tagger->GetTagSpecs())
+					{
+						if (spec->GetName() != tagFormat.GetName()) continue;
+
+						/* Set to Success() by default, so we won't report
+						 * an error if the tag type is simply deactivated.
+						 */
+						error = Success();
+
+						if (config->GetIntValue("Tags", String("Enable").Append(tagFormat.GetName().Replace(" ", NIL)), spec->IsDefault()))
+						{
+							error	    = tagger->UpdateStreamInfo(track.origFilename, track);
+							errorString = tagger->GetErrorString();
+						}
+
+						break;
+					}
+
+					boca.DeleteComponent(tagger);
+				}
+				else
+				{
+					error	    = Error();
+					errorString = "Not supported";
+				}
 			}
+
+			break;
 		}
 	}
 
 	Registry::Get().DeleteComponent(decoder);
-
-	/* Update tag.
-	 */
-	if (tagMode != TAG_MODE_NONE)
-	{
-		Registry	&boca = AS::Registry::Get();
-		TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
-
-		if (tagger != NIL)
-		{
-			foreach (TagSpec *spec, tagger->GetTagSpecs())
-			{
-				if (spec->GetName() != tagFormat) continue;
-
-				/* Set to Success() by default, so we won't report
-				 * an error if the tag type is simply deactivated.
-				 */
-				error = Success();
-
-				if (config->GetIntValue("Tags", String("Enable").Append(String(tagFormat).Replace(" ", NIL)), spec->IsDefault()))
-				{
-					error	    = tagger->UpdateStreamInfo(track.origFilename, track);
-					errorString = tagger->GetErrorString();
-				}
-
-				break;
-			}
-
-			boca.DeleteComponent(tagger);
-		}
-		else
-		{
-			error	    = Error();
-			errorString = "Not supported";
-		}
-	}
 
 	/* Check for error.
 	 */

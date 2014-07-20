@@ -73,17 +73,35 @@ namespace BoCA
 
 	namespace AS
 	{
+		class BOCA_DLL_EXPORT TagFormat
+		{
+			private:
+				String			 name;
+				String			 tagger;
+				TagMode			 mode;
+			public:
+							 TagFormat(Int n = 0) : mode(TAG_MODE_NONE)	{ }
+							~TagFormat()					{ }
+
+				const String		&GetName() const				{ return name; }
+				Void			 SetName(const String &nName)			{ name = nName; }
+
+				const String		&GetTagger() const				{ return tagger; }
+				Void			 SetTagger(const String &nTagger)		{ tagger = nTagger; }
+
+				TagMode			 GetMode() const				{ return mode; }
+				Void			 SetMode(TagMode nMode)				{ mode = nMode; }
+		};
+
 		class BOCA_DLL_EXPORT FileFormat
 		{
 			private:
 				String			 name;
-				Array<String>		 extensions;
 
-				String			 taggerID;
-				String			 tagFormat;
-				TagMode			 tagMode;
+				Array<String>		 extensions;
+				Array<TagFormat>	 tagFormats;
 			public:
-							 FileFormat() : tagMode(TAG_MODE_NONE)		{ }
+							 FileFormat(Int n = 0)				{ }
 							~FileFormat()					{ }
 
 				const String		&GetName() const				{ return name; }
@@ -92,14 +110,8 @@ namespace BoCA
 				const Array<String>	&GetExtensions() const				{ return extensions; }
 				Void			 AddExtension(const String &nExt)		{ extensions.Add(nExt); }
 
-				const String		&GetTaggerID() const				{ return taggerID; }
-				Void			 SetTaggerID(const String &nTaggerID)		{ taggerID = nTaggerID; }
-
-				const String		&GetTagFormat() const				{ return tagFormat; }
-				Void			 SetTagFormat(const String &nTagFormat)		{ tagFormat = nTagFormat; }
-
-				TagMode			 GetTagMode() const				{ return tagMode; }
-				Void			 SetTagMode(TagMode nTagMode)			{ tagMode = nTagMode; }
+				const Array<TagFormat>	&GetTagFormats() const				{ return tagFormats; }
+				Void			 AddTagFormat(const TagFormat &nFormat)		{ tagFormats.Add(nFormat); }
 		};
 
 		class BOCA_DLL_EXPORT TagSpec

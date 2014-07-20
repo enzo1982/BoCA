@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -66,41 +66,36 @@ BoCA::ConfigLayer *BoCA::AS::DecoderComponentExternal::GetConfigurationLayer()
 
 Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track &track) const
 {
-	/* Get tagger mode and ID
+	/* Loop over supported formats.
 	 */
-	Int	 tagMode = TAG_MODE_NONE;
-	String	 taggerID;
-
 	String	 lcURI = streamURI.ToLower();
 
 	foreach (FileFormat *format, specs->formats)
 	{
 		foreach (const String &extension, format->GetExtensions())
 		{
-			if (lcURI.EndsWith(String(".").Append(extension)))
+			if (!lcURI.EndsWith(String(".").Append(extension))) continue;
+
+			/* Read supported tag formats.
+			 */
+			const Array<TagFormat>	&tagFormats = format->GetTagFormats();
+
+			foreach (const TagFormat &tagFormat, tagFormats)
 			{
-				tagMode	  = format->GetTagMode();
-				taggerID  = format->GetTaggerID();
+				AS::Registry		&boca	= AS::Registry::Get();
+				AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(tagFormat.GetTagger());
 
-				break;
+				if (tagger != NIL)
+				{
+					tagger->ParseStreamInfo(streamURI, track);
+
+					boca.DeleteComponent(tagger);
+				}
 			}
+
+			break;
 		}
 	}
 
-	/* Read tag if requested
-	 */
-	if (tagMode != TAG_MODE_NONE)
-	{
-		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
-
-		if (tagger != NIL)
-		{
-			tagger->ParseStreamInfo(streamURI, track);
-
-			boca.DeleteComponent(tagger);
-		}
-	}
-
-	return tagMode;
+	return Success();
 }

@@ -172,17 +172,16 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 		return False;
 	}
 
-	/* Create tag buffer
+	/* Create tag buffers
 	 */
-	Buffer<UnsignedByte>	 tagBuffer;
-	Int			 tagMode = RenderTag(encFileName, track, tagBuffer);
+	Buffer<UnsignedByte>	 tagBufferPrepend;
+	Buffer<UnsignedByte>	 tagBufferAppend;
 
-	/* Prepend tag
+	RenderTags(encFileName, track, tagBufferPrepend, tagBufferAppend);
+
+	/* Prepend tags
 	 */
-	if (tagMode == TAG_MODE_PREPEND)
-	{
-		driver->WriteData(tagBuffer, tagBuffer.Size());
-	}
+	driver->WriteData(tagBufferPrepend, tagBufferPrepend.Size());
 
 	/* Stream contents of created file to output driver
 	 */
@@ -199,12 +198,9 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 		bytesLeft -= Math::Min(1024, bytesLeft);
 	}
 
-	/* Append tag
+	/* Append tags
 	 */
-	if (tagMode == TAG_MODE_APPEND)
-	{
-		driver->WriteData(tagBuffer, tagBuffer.Size());
-	}
+	driver->WriteData(tagBufferAppend, tagBufferAppend.Size());
 
 	in.Close();
 

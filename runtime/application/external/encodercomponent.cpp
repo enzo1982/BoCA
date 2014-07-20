@@ -41,60 +41,74 @@ BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()
 	return configLayer;
 }
 
-Int BoCA::AS::EncoderComponentExternal::RenderTag(const String &streamURI, const Track &track, Buffer<UnsignedByte> &tagBuffer)
+Int BoCA::AS::EncoderComponentExternal::RenderTags(const String &streamURI, const Track &track, Buffer<UnsignedByte> &tagBufferPrepend, Buffer<UnsignedByte> &tagBufferAppend)
 {
 	Config	*config = Config::Get();
 
-	/* Get tagger mode, format and ID
+	/* Only render tags if at least artist and title are set.
 	 */
-	Int	 tagMode = TAG_MODE_NONE;
-	String	 tagFormat;
-	String	 taggerID;
+	const Info	&info = track.GetInfo();
 
+	if (info.artist == NIL && info.title == NIL) return Success();
+
+	/* Loop over supported formats.
+	 */
 	String	 lcURI = streamURI.ToLower();
 
 	foreach (FileFormat *format, specs->formats)
 	{
 		foreach (const String &extension, format->GetExtensions())
 		{
-			if (lcURI.EndsWith(String(".").Append(extension)))
+			if (!lcURI.EndsWith(String(".").Append(extension))) continue;
+
+			/* Render supported tag formats.
+			 */
+			const Array<TagFormat>	&tagFormats = format->GetTagFormats();
+
+			foreach (const TagFormat &tagFormat, tagFormats)
 			{
-				tagMode	  = format->GetTagMode();
-				tagFormat = format->GetTagFormat();
-				taggerID  = format->GetTaggerID();
+				AS::Registry		&boca	= AS::Registry::Get();
+				AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(tagFormat.GetTagger());
 
-				break;
-			}
-		}
-	}
-
-	/* Create tag if requested
-	 */
-	const Info	&info = track.GetInfo();
-
-	if (tagMode != TAG_MODE_NONE && (info.artist != NIL || info.title != NIL))
-	{
-		AS::Registry		&boca = AS::Registry::Get();
-		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID(taggerID);
-
-		if (tagger != NIL)
-		{
-			foreach (TagSpec *spec, tagger->GetTagSpecs())
-			{
-				if (spec->GetName() != tagFormat) continue;
-
-				if (config->GetIntValue("Tags", String("Enable").Append(String(tagFormat).Replace(" ", NIL)), spec->IsDefault()))
+				if (tagger != NIL)
 				{
-					if (tagMode == TAG_MODE_OTHER)	tagger->RenderStreamInfo(streamURI, track);
-					else				tagger->RenderBuffer(tagBuffer, track);
-				}
+					foreach (TagSpec *spec, tagger->GetTagSpecs())
+					{
+						if (spec->GetName() != tagFormat.GetName()) continue;
 
-				break;
+						if (config->GetIntValue("Tags", String("Enable").Append(tagFormat.GetName().Replace(" ", NIL)), spec->IsDefault()))
+						{
+							Buffer<UnsignedByte>	 tagBuffer;
+
+							if (tagFormat.GetMode() == TAG_MODE_OTHER) tagger->RenderStreamInfo(streamURI, track);
+							else					   tagger->RenderBuffer(tagBuffer, track);
+
+							/* Add tag to prepend or append buffer.
+							 */
+							if (tagFormat.GetMode() == TAG_MODE_PREPEND)
+							{
+								tagBufferPrepend.Resize(tagBufferPrepend.Size() + tagBuffer.Size());
+
+								memcpy((UnsignedByte *) tagBufferPrepend + tagBufferPrepend.Size() - tagBuffer.Size(), (UnsignedByte *) tagBuffer, tagBuffer.Size());
+							}
+							else if (tagFormat.GetMode() == TAG_MODE_APPEND)
+							{
+								tagBufferAppend.Resize(tagBufferAppend.Size() + tagBuffer.Size());
+
+								memcpy((UnsignedByte *) tagBufferAppend + tagBufferAppend.Size() - tagBuffer.Size(), (UnsignedByte *) tagBuffer, tagBuffer.Size());
+							}
+						}
+
+						break;
+					}
+
+					boca.DeleteComponent(tagger);
+				}
 			}
 
-			boca.DeleteComponent(tagger);
+			break;
 		}
 	}
 
-	return tagMode;
+	return Success();
 }
