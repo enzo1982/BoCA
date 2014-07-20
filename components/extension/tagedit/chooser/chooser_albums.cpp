@@ -103,7 +103,8 @@ Void BoCA::ChooserAlbums::OnChangeLanguageSettings()
 
 	list_albums->RemoveAllTabs();
 
-	list_albums->AddTab(i18n->TranslateString("Title"));
+	list_albums->AddTab(i18n->TranslateString("Artist"), 120);
+	list_albums->AddTab(i18n->TranslateString("Album"));
 
 	/* Show all widgets again.
 	 */
@@ -177,7 +178,7 @@ Void BoCA::ChooserAlbums::OnModifyTrack(const Track &track)
 		if (albums.Get(list_albums->GetNthEntry(i)->GetHandle()).GetTrackID() == track.GetTrackID())
 		{
 			const Info	&info = track.GetInfo();
-			String		 jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.album.Length() > 0 ? info.album : I18n::Get()->TranslateString("unknown album")).Append("\t");
+			String		 jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append("\t").Append(info.album.Length() > 0 ? info.album : I18n::Get()->TranslateString("unknown album")).Append("\t");
 
 			list_albums->GetNthEntry(i)->SetText(jlEntry);
 
@@ -425,7 +426,7 @@ Void BoCA::ChooserAlbums::AddToAlbumList(const Track &track)
 		/* Add to album list.
 		 */
 		const Info	&info = album.GetInfo();
-		String		 jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.album.Length() > 0 ? info.album : I18n::Get()->TranslateString("unknown album")).Append("\t");
+		String		 jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append("\t").Append(info.album.Length() > 0 ? info.album : I18n::Get()->TranslateString("unknown album")).Append("\t");
 
 		albums.Add(album, list_albums->AddEntry(jlEntry)->GetHandle());
 	}

@@ -105,6 +105,7 @@ Void BoCA::ChooserTracks::OnChangeLanguageSettings()
 
 	list_tracks->RemoveAllTabs();
 
+	list_tracks->AddTab(i18n->TranslateString("Artist"), 120);
 	list_tracks->AddTab(i18n->TranslateString("Title"));
 	list_tracks->AddTab(i18n->TranslateString("Track"), 50, OR_RIGHT);
 	list_tracks->AddTab(i18n->TranslateString("Length"), 80, OR_RIGHT);
@@ -202,7 +203,7 @@ Void BoCA::ChooserTracks::OnApplicationAddTrack(const Track &track)
 	String		 jlEntry;
 
 	if (info.artist == NIL && info.title == NIL) jlEntry = String(track.origFilename).Append("\t");
-	else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
+	else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append("\t").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
 
 	jlEntry.Append(info.track > 0 ? (info.track < 10 ? String("0").Append(String::FromInt(info.track)) : String::FromInt(info.track)) : String()).Append("\t").Append(track.GetLengthString()).Append("\t").Append(track.GetFileSizeString());
 
@@ -223,7 +224,7 @@ Void BoCA::ChooserTracks::OnApplicationModifyTrack(const Track &track)
 			String		 jlEntry;
 
 			if (info.artist == NIL && info.title == NIL) jlEntry = String(track.origFilename).Append("\t");
-			else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append(" - ").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
+			else					     jlEntry = String(info.artist.Length() > 0 ? info.artist : I18n::Get()->TranslateString("unknown artist")).Append("\t").Append(info.title.Length() > 0 ? info.title : I18n::Get()->TranslateString("unknown title")).Append("\t");
 
 			jlEntry.Append(info.track > 0 ? (info.track < 10 ? String("0").Append(String::FromInt(info.track)) : String::FromInt(info.track)) : String()).Append("\t").Append(track.GetLengthString()).Append("\t").Append(track.GetFileSizeString());
 
