@@ -436,7 +436,8 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			{
 				for (Int i = 0; places[i] != NIL; i++)
 				{
-					String	 file = String(places[i]).Replace("%APPDIR", GUI::Application::GetApplicationDirectory()).Replace("%COMMAND", external_command).Replace("\\\\", "\\");
+					String	 delimiter = Directory::GetDirectoryDelimiter();
+					String	 file	   = String(places[i]).Replace("%APPDIR", GUI::Application::GetApplicationDirectory()).Replace("%COMMAND", external_command).Replace(String(delimiter).Append(delimiter), delimiter);
 
 					if (File(file).Exists()) { external_command = file; break; }
 				}
