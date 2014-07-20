@@ -104,7 +104,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			RenderWMAStringItem(g_wszWMTrackNumber, String::FromInt(info.track), pHeaderInfo);
 		}
 
-		if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
+		if (info.disc > 0)
 		{
 			String	 discString = String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
 

@@ -192,8 +192,6 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	info.track	= trackNumber;
 	info.numTracks	= info.mcdi.GetNumberOfAudioTracks();
-	info.disc	= 1;
-	info.numDiscs	= 1;
 
 	/* Read CDText and cdplayer.ini
 	 */

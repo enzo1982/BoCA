@@ -80,7 +80,7 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		{ RenderAPEItem("Track", trackString, buffer); numItems++; }
 	}
 
-	if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
+	if (info.disc > 0)
 	{
 		String	 discString = String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
 

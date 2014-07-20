@@ -225,7 +225,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		{ ID3_Frame frame(ID3FID_TRACKNUM); SetStringField(frame, ID3FN_TEXT, trackString); container.AddFrame(frame); }
 	}
 
-	if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
+	if (info.disc > 0)
 	{
 		String	 discString = String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc));
 

@@ -127,9 +127,9 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		ex_MP4TagsSetTrack(mp4Tags, &mp4Track);
 	}
 
-	if (info.disc > 0 && (info.numDiscs > 1 || info.disc > 1))
+	if (info.disc > 0)
 	{
-		MP4TagDisk	 mp4Disk = { (uint16_t) info.disc, (uint16_t) info.numDiscs };
+		MP4TagDisk	 mp4Disk = { (uint16_t) info.disc, (uint16_t) (info.numDiscs > 0 ? info.numDiscs : info.disc) };
 
 		ex_MP4TagsSetDisk(mp4Tags, &mp4Disk);
 	}

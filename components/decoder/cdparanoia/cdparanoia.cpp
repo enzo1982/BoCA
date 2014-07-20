@@ -195,8 +195,6 @@ Error BoCA::DecoderCDParanoia::GetStreamInfo(const String &streamURI, Track &tra
 
 	info.track	= trackNumber;
 	info.numTracks	= info.mcdi.GetNumberOfAudioTracks();
-	info.disc	= 1;
-	info.numDiscs	= 1;
 
 	track.SetInfo(info);
 
