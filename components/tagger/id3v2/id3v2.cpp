@@ -28,7 +28,7 @@ const String &BoCA::TaggerID3v2::GetComponentSpecs()
 	      <name>MPEG 1 Audio Layer 3</name>			\
 	      <extension>mp3</extension>			\
 	    </format>						\
-	    <tagformat>						\
+	    <tagspec>						\
 	      <name>ID3v2</name>				\
 	      <coverart supported=\"true\"/>			\
 	      <encodings free=\"true\">				\
@@ -37,7 +37,7 @@ const String &BoCA::TaggerID3v2::GetComponentSpecs()
 		<encoding default=\"true\">UTF-16LE</encoding>	\
 		<encoding>UTF-16BE</encoding>			\
 	      </encodings>					\
-	    </tagformat>					\
+	    </tagspec>						\
 	  </component>						\
 								\
 	";

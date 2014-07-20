@@ -100,7 +100,7 @@ BoCA::AS::ComponentSpecs::~ComponentSpecs()
 	if (library != NIL) delete library;
 
 	foreach (FileFormat *format, formats) delete format;
-	foreach (TagFormat *format, tag_formats) delete format;
+	foreach (TagSpec *spec, tag_specs) delete spec;
 
 	foreach (Parameter *parameter, external_parameters)
 	{
@@ -360,32 +360,32 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 			formats.Add(format);
 		}
-		else if (node->GetName() == "tagformat")
+		else if (node->GetName() == "tagspec")
 		{
-			TagFormat	*format = new TagFormat();
+			TagSpec	*spec = new TagSpec();
 
-			format->SetDefault(True);
+			spec->SetDefault(True);
 
-			format->SetCoverArtSupported(False);
-			format->SetCoverArtDefault(True);
+			spec->SetCoverArtSupported(False);
+			spec->SetCoverArtDefault(True);
 
-			format->SetFreeEncodingSupported(False);
+			spec->SetFreeEncodingSupported(False);
 
-			if (node->GetAttributeByName("default") != NIL) format->SetDefault(node->GetAttributeByName("default")->GetContent() == "true");
+			if (node->GetAttributeByName("default") != NIL) spec->SetDefault(node->GetAttributeByName("default")->GetContent() == "true");
 
 			for (Int j = 0; j < node->GetNOfNodes(); j++)
 			{
 				XML::Node	*node2 = node->GetNthNode(j);
 
-				if	(node2->GetName() == "name")	 format->SetName(node2->GetContent());
+				if	(node2->GetName() == "name")	 spec->SetName(node2->GetContent());
 				else if	(node2->GetName() == "coverart")
 				{
-					if (node2->GetAttributeByName("supported") != NIL) format->SetCoverArtSupported(node2->GetAttributeByName("supported")->GetContent() == "true");
-					if (node2->GetAttributeByName("default")   != NIL) format->SetCoverArtDefault(node2->GetAttributeByName("default")->GetContent() == "true");
+					if (node2->GetAttributeByName("supported") != NIL) spec->SetCoverArtSupported(node2->GetAttributeByName("supported")->GetContent() == "true");
+					if (node2->GetAttributeByName("default")   != NIL) spec->SetCoverArtDefault(node2->GetAttributeByName("default")->GetContent() == "true");
 				}
 				else if (node2->GetName() == "encodings")
 				{
-					if (node2->GetAttributeByName("free") != NIL) format->SetFreeEncodingSupported(node2->GetAttributeByName("free")->GetContent() == "true");
+					if (node2->GetAttributeByName("free") != NIL) spec->SetFreeEncodingSupported(node2->GetAttributeByName("free")->GetContent() == "true");
 
 					for (Int k = 0; k < node2->GetNOfNodes(); k++)
 					{
@@ -393,20 +393,20 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 						if (node3->GetName() == "encoding")
 						{
-							format->AddEncoding(node3->GetContent());
+							spec->AddEncoding(node3->GetContent());
 
-							if (format->GetEncodings().Length() == 1) format->SetDefaultEncoding(node3->GetContent());
+							if (spec->GetEncodings().Length() == 1) spec->SetDefaultEncoding(node3->GetContent());
 
 							if (node3->GetAttributeByName("default") != NIL)
 							{
-								if (node3->GetAttributeByName("default")->GetContent() == "true") format->SetDefaultEncoding(node3->GetContent());
+								if (node3->GetAttributeByName("default")->GetContent() == "true") spec->SetDefaultEncoding(node3->GetContent());
 							}
 						}
 					}
 				}
 			}
 
-			tag_formats.Add(format);
+			tag_specs.Add(spec);
 		}
 		else if (node->GetName() == "external" && external_command == NIL)
 		{

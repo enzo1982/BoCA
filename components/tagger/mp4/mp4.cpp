@@ -35,13 +35,13 @@ const String &BoCA::TaggerMP4::GetComponentSpecs()
 		      <extension>mp4</extension>		\
 		      <extension>3gp</extension>		\
 		    </format>					\
-		    <tagformat>					\
+		    <tagspec>					\
 		      <name>MP4 Metadata</name>			\
 		      <coverart supported=\"true\"/>		\
 		      <encodings>				\
 			<encoding>UTF-8</encoding>		\
 		      </encodings>				\
-		    </tagformat>				\
+		    </tagspec>					\
 		  </component>					\
 								\
 		";
@@ -178,7 +178,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	 */
 	uint8_t	 mediaType = 1;					 //  1 == Music
 
-	if	(track.outfile.EndsWith(".m4b")) mediaType = 2;	 //  2 == Audiobook
+	if	(track.outfile.EndsWith(".m4b")) mediaType =  2; //  2 == Audiobook
 	else if (track.outfile.EndsWith(".m4r")) mediaType = 14; // 14 == Ringtone
 
 	ex_MP4TagsSetMediaType(mp4Tags, &mediaType);

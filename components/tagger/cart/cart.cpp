@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -29,13 +29,13 @@ const String &BoCA::TaggerCart::GetComponentSpecs()
 	      <name>Windows Wave Files</name>				\
 	      <extension>wav</extension>				\
 	    </format>							\
-	    <tagformat default=\"false\">				\
+	    <tagspec default=\"false\">					\
 	      <name>RIFF Cart Tag</name>				\
 	      <encodings>						\
 		<encoding default=\"true\">ISO-8859-1</encoding>	\
 		<encoding>UTF-8</encoding>				\
 	      </encodings>						\
-	    </tagformat>						\
+	    </tagspec>							\
 	  </component>							\
 									\
 	";

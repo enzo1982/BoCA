@@ -25,13 +25,13 @@ const String &BoCA::TaggerVorbis::GetComponentSpecs()
 	    <version>1.0</version>				\
 	    <id>vorbis-tag</id>					\
 	    <type>tagger</type>					\
-	    <tagformat>						\
+	    <tagspec>						\
 	      <name>Vorbis Comment</name>			\
 	      <coverart supported=\"true\" default=\"false\"/>	\
 	      <encodings>					\
 		<encoding>UTF-8</encoding>			\
 	      </encodings>					\
-	    </tagformat>					\
+	    </tagspec>						\
 	  </component>						\
 								\
 	";
@@ -66,10 +66,10 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	if	(info.label  != NIL) { RenderTagItem("ORGANIZATION", info.label, buffer);	  numItems++; }
 	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);		  numItems++; }
 
-	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);	    numItems++; }
+	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);	     numItems++; }
 	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL", String(info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
 
-	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)), buffer);	    numItems++; }
+	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)), buffer);	     numItems++; }
 	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL", String(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderTagItem("COMMENT", info.comment, buffer);						  numItems++; }

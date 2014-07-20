@@ -517,16 +517,16 @@ Int BoCA::ChooserFiles::SaveFileTag(const Track &track)
 
 		if (tagger != NIL)
 		{
-			foreach (TagFormat *tag, tagger->GetTagFormats())
+			foreach (TagSpec *spec, tagger->GetTagSpecs())
 			{
-				if (tag->GetName() != tagFormat) continue;
+				if (spec->GetName() != tagFormat) continue;
 
-				/* Set to Success() by default, so we won't report an
-				 * error if the tag format is simply deactivated.
+				/* Set to Success() by default, so we won't report
+				 * an error if the tag type is simply deactivated.
 				 */
 				error = Success();
 
-				if (config->GetIntValue("Tags", String("Enable").Append(String(tagFormat).Replace(" ", NIL)), tag->IsDefault()))
+				if (config->GetIntValue("Tags", String("Enable").Append(String(tagFormat).Replace(" ", NIL)), spec->IsDefault()))
 				{
 					error	    = tagger->UpdateStreamInfo(track.origFilename, track);
 					errorString = tagger->GetErrorString();

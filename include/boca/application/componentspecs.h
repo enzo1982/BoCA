@@ -83,26 +83,26 @@ namespace BoCA
 				String			 tagFormat;
 				TagMode			 tagMode;
 			public:
-							 FileFormat() : tagMode(TAG_MODE_NONE)	{ }
-							~FileFormat()				{ }
+							 FileFormat() : tagMode(TAG_MODE_NONE)		{ }
+							~FileFormat()					{ }
 
-				const String		&GetName() const			{ return name; }
-				Void			 SetName(const String &nName)		{ name = nName; }
+				const String		&GetName() const				{ return name; }
+				Void			 SetName(const String &nName)			{ name = nName; }
 
-				const Array<String>	&GetExtensions() const			{ return extensions; }
-				Void			 AddExtension(const String &nExt)	{ extensions.Add(nExt); }
+				const Array<String>	&GetExtensions() const				{ return extensions; }
+				Void			 AddExtension(const String &nExt)		{ extensions.Add(nExt); }
 
-				const String		&GetTaggerID() const			{ return taggerID; }
-				Void			 SetTaggerID(const String &nTaggerID)	{ taggerID = nTaggerID; }
+				const String		&GetTaggerID() const				{ return taggerID; }
+				Void			 SetTaggerID(const String &nTaggerID)		{ taggerID = nTaggerID; }
 
-				const String		&GetTagFormat() const			{ return tagFormat; }
-				Void			 SetTagFormat(const String &nTagFormat)	{ tagFormat = nTagFormat; }
+				const String		&GetTagFormat() const				{ return tagFormat; }
+				Void			 SetTagFormat(const String &nTagFormat)		{ tagFormat = nTagFormat; }
 
-				TagMode			 GetTagMode() const			{ return tagMode; }
-				Void			 SetTagMode(TagMode nTagMode)		{ tagMode = nTagMode; }
+				TagMode			 GetTagMode() const				{ return tagMode; }
+				Void			 SetTagMode(TagMode nTagMode)			{ tagMode = nTagMode; }
 		};
 
-		class BOCA_DLL_EXPORT TagFormat
+		class BOCA_DLL_EXPORT TagSpec
 		{
 			private:
 				String			 name;
@@ -116,32 +116,32 @@ namespace BoCA
 				Bool			 supportsCoverArt;
 				Bool			 coverArtDefault;
 			public:
-							 TagFormat() : defaultEnabled(True),
-								       supportsFreeEncoding(True),
-								       supportsCoverArt(False),
-								       coverArtDefault(True)	{ }
-							~TagFormat()				{ }
+							 TagSpec(Int n = 0) : defaultEnabled(True),
+									      supportsFreeEncoding(True),
+									      supportsCoverArt(False),
+									      coverArtDefault(True)	{ }
+							~TagSpec()					{ }
 
-				const String		&GetName() const			{ return name; }
-				Void			 SetName(const String &nName)		{ name = nName; }
+				const String		&GetName() const				{ return name; }
+				Void			 SetName(const String &nName)			{ name = nName; }
 
-				Bool			 IsDefault() const			{ return defaultEnabled; }
-				Void			 SetDefault(Bool nDefault)		{ defaultEnabled = nDefault; }
+				Bool			 IsDefault() const				{ return defaultEnabled; }
+				Void			 SetDefault(Bool nDefault)			{ defaultEnabled = nDefault; }
 
-				Bool			 IsCoverArtSupported() const		{ return supportsCoverArt; }
-				Void			 SetCoverArtSupported(Bool nCoverArt)	{ supportsCoverArt = nCoverArt; }
+				Bool			 IsCoverArtSupported() const			{ return supportsCoverArt; }
+				Void			 SetCoverArtSupported(Bool nCoverArt)		{ supportsCoverArt = nCoverArt; }
 
-				Bool			 IsCoverArtDefault() const		{ return coverArtDefault; }
-				Void			 SetCoverArtDefault(Bool nCoverArt)	{ coverArtDefault = nCoverArt; }
+				Bool			 IsCoverArtDefault() const			{ return coverArtDefault; }
+				Void			 SetCoverArtDefault(Bool nCoverArt)		{ coverArtDefault = nCoverArt; }
 
-				Bool			 IsFreeEncodingSupported() const	{ return supportsFreeEncoding; }
-				Void			 SetFreeEncodingSupported(Bool nAnyEnc)	{ supportsFreeEncoding = nAnyEnc; }
+				Bool			 IsFreeEncodingSupported() const		{ return supportsFreeEncoding; }
+				Void			 SetFreeEncodingSupported(Bool nAnyEnc)		{ supportsFreeEncoding = nAnyEnc; }
 
-				const Array<String>	&GetEncodings() const			{ return encodings; }
-				Void			 AddEncoding(const String &nEnc)	{ encodings.Add(nEnc); }
+				const Array<String>	&GetEncodings() const				{ return encodings; }
+				Void			 AddEncoding(const String &nEnc)		{ encodings.Add(nEnc); }
 
-				const String		&GetDefaultEncoding() const		{ return defaultEncoding; }
-				Void			 SetDefaultEncoding(const String &nDE)	{ defaultEncoding = nDE; }
+				const String		&GetDefaultEncoding() const			{ return defaultEncoding; }
+				Void			 SetDefaultEncoding(const String &nDE)		{ defaultEncoding = nDE; }
 		};
 
 		class BOCA_DLL_EXPORT Option
@@ -151,17 +151,17 @@ namespace BoCA
 				String			 alias;
 				String			 value;
 			public:
-							 Option() : type(OPTION_TYPE_OPTION)	{ }
-							~Option()				{ }
+							 Option(Int n = 0) : type(OPTION_TYPE_OPTION)	{ }
+							~Option()					{ }
 
-				OptionType		 GetType() const			{ return type; }
-				Void			 SetType(OptionType nType)		{ type = nType; }
+				OptionType		 GetType() const				{ return type; }
+				Void			 SetType(OptionType nType)			{ type = nType; }
 
-				const String		&GetAlias() const			{ return alias; }
-				Void			 SetAlias(const String &nAlias)		{ alias = nAlias; }
+				const String		&GetAlias() const				{ return alias; }
+				Void			 SetAlias(const String &nAlias)			{ alias = nAlias; }
 
-				const String		&GetValue() const			{ return value; }
-				Void			 SetValue(const String &nValue)		{ value = nValue; }
+				const String		&GetValue() const				{ return value; }
+				Void			 SetValue(const String &nValue)			{ value = nValue; }
 		};
 
 		class BOCA_DLL_EXPORT Parameter
@@ -175,31 +175,31 @@ namespace BoCA
 				String			 defaultValue;
 				Array<Option *>		 options;
 			public:
-							 Parameter() : type(PARAMETER_TYPE_SWITCH),
-								       enabled(False),
-								       stepSize(1.0)		{ }
-							~Parameter()				{ }
+							 Parameter(Int n = 0) : type(PARAMETER_TYPE_SWITCH),
+										enabled(False),
+										stepSize(1.0)		{ }
+							~Parameter()					{ }
 
-				ParameterType		 GetType() const			{ return type; }
-				Void			 SetType(ParameterType nType)		{ type = nType; }
+				ParameterType		 GetType() const				{ return type; }
+				Void			 SetType(ParameterType nType)			{ type = nType; }
 
-				const String		&GetName() const			{ return name; }
-				Void			 SetName(const String &nName)		{ name = nName; }
+				const String		&GetName() const				{ return name; }
+				Void			 SetName(const String &nName)			{ name = nName; }
 
-				const String		&GetArgument() const			{ return argument; }
-				Void			 SetArgument(const String &nArgument)	{ argument = nArgument; }
+				const String		&GetArgument() const				{ return argument; }
+				Void			 SetArgument(const String &nArgument)		{ argument = nArgument; }
 
-				Bool			 GetEnabled() const			{ return enabled; }
-				Void			 SetEnabled(Bool nEnabled)		{ enabled = nEnabled; }
+				Bool			 GetEnabled() const				{ return enabled; }
+				Void			 SetEnabled(Bool nEnabled)			{ enabled = nEnabled; }
 
-				Float			 GetStepSize() const			{ return stepSize; }
-				Void			 SetStepSize(Float nStepSize)		{ stepSize = nStepSize; }
+				Float			 GetStepSize() const				{ return stepSize; }
+				Void			 SetStepSize(Float nStepSize)			{ stepSize = nStepSize; }
 
-				const String		&GetDefault() const			{ return defaultValue; }
-				Void			 SetDefault(const String &nDefault)	{ defaultValue = nDefault; }
+				const String		&GetDefault() const				{ return defaultValue; }
+				Void			 SetDefault(const String &nDefault)		{ defaultValue = nDefault; }
 
-				const Array<Option *>	&GetOptions() const			{ return options; }
-				Void			 AddOption(Option *nOption)		{ options.Add(nOption); }
+				const Array<Option *>	&GetOptions() const				{ return options; }
+				Void			 AddOption(Option *nOption)			{ options.Add(nOption); }
 		};
 
 		class BOCA_DLL_EXPORT ComponentSpecs
@@ -240,7 +240,7 @@ namespace BoCA
 				Array<Parameter *>	 external_parameters;
 
 				Array<FileFormat *>	 formats;
-				Array<TagFormat *>	 tag_formats;
+				Array<TagSpec *>	 tag_specs;
 
 							 ComponentSpecs();
 							~ComponentSpecs();

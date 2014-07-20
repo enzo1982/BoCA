@@ -291,9 +291,9 @@ const Array<BoCA::AS::FileFormat *> &BoCA::AS::Registry::GetComponentFormats(Int
 	return componentSpecs.GetNth(n)->formats;
 }
 
-const Array<BoCA::AS::TagFormat *> &BoCA::AS::Registry::GetComponentTagFormats(Int n)
+const Array<BoCA::AS::TagSpec *> &BoCA::AS::Registry::GetComponentTagSpecs(Int n)
 {
-	return componentSpecs.GetNth(n)->tag_formats;
+	return componentSpecs.GetNth(n)->tag_specs;
 }
 
 Bool BoCA::AS::Registry::ComponentExists(const String &id)

@@ -45,7 +45,7 @@ namespace BoCA
 				const String			&GetComponentID(Int);
 				ComponentType			 GetComponentType(Int);
 				const Array<FileFormat *>	&GetComponentFormats(Int);
-				const Array<TagFormat *>	&GetComponentTagFormats(Int);
+				const Array<TagSpec *>		&GetComponentTagSpecs(Int);
 
 				Bool				 ComponentExists(const String &);
 

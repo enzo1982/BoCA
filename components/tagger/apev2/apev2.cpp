@@ -30,13 +30,13 @@ const String &BoCA::TaggerAPEv2::GetComponentSpecs()
 	      <extension>ape</extension>		\
 	      <extension>mac</extension>		\
 	    </format>					\
-	    <tagformat>					\
+	    <tagspec>					\
 	      <name>APEv2</name>			\
 	      <coverart supported=\"true\"/>		\
 	      <encodings>				\
 		<encoding>UTF-8</encoding>		\
 	      </encodings>				\
-	    </tagformat>				\
+	    </tagspec>					\
 	  </component>					\
 							\
 	";

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -79,11 +79,11 @@ Int BoCA::AS::EncoderComponentExternal::RenderTag(const String &streamURI, const
 
 		if (tagger != NIL)
 		{
-			foreach (TagFormat *tag, tagger->GetTagFormats())
+			foreach (TagSpec *spec, tagger->GetTagSpecs())
 			{
-				if (tag->GetName() != tagFormat) continue;
+				if (spec->GetName() != tagFormat) continue;
 
-				if (config->GetIntValue("Tags", String("Enable").Append(String(tagFormat).Replace(" ", NIL)), tag->IsDefault()))
+				if (config->GetIntValue("Tags", String("Enable").Append(String(tagFormat).Replace(" ", NIL)), spec->IsDefault()))
 				{
 					if (tagMode == TAG_MODE_OTHER)	tagger->RenderStreamInfo(streamURI, track);
 					else				tagger->RenderBuffer(tagBuffer, track);

@@ -31,13 +31,13 @@ const String &BoCA::TaggerWMA::GetComponentSpecs()
 		      <name>Windows Media Audio Files</name>	\
 		      <extension>wma</extension>		\
 		    </format>					\
-		    <tagformat>					\
+		    <tagspec>					\
 		      <name>WMA Metadata</name>			\
 		      <coverart supported=\"true\"/>		\
 		      <encodings>				\
 			<encoding>UTF-16LE</encoding>		\
 		      </encodings>				\
-		    </tagformat>				\
+		    </tagspec>					\
 		  </component>					\
 								\
 		";

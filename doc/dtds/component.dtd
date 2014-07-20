@@ -2,7 +2,7 @@
 
 <!ENTITY % BoCA.Version "-//DTD BoCA 1.0 Draft//EN">
 
-<!ELEMENT component (name, version, id, type, require*, replace*, conflict*, precede*, succeed*, format*, tagformat*, external*)>
+<!ELEMENT component (name, version, id, type, require*, replace*, conflict*, precede*, succeed*, format*, tagspec*, external*)>
 
 	<!ELEMENT name (#PCDATA)>
 
@@ -26,8 +26,8 @@
 		<!ATTLIST tag id   CDATA #REQUIRED
 			      mode CDATA #REQUIRED>
 
-	<!ELEMENT tagformat (name, coverart?, encodings?)>
-	<!ATTLIST tagformat default NMTOKEN #IMPLIED>
+	<!ELEMENT tagspec (name, coverart?, encodings?)>
+	<!ATTLIST tagspec default NMTOKEN #IMPLIED>
 
 		<!ELEMENT coverart (#PCDATA)>
 		<!ATTLIST coverart supported NMTOKEN #IMPLIED

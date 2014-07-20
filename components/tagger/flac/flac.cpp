@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,45 +21,45 @@ const String &BoCA::TaggerFLAC::GetComponentSpecs()
 
 	if (flacdll != NIL)
 	{
-		componentSpecs = "							\
-											\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
-		  <component>								\
-		    <name>FLAC Audio Tagger</name>					\
-		    <version>1.0</version>						\
-		    <id>flac-tag</id>							\
-		    <type>tagger</type>							\
-		    <require>vorbis-tag</require>					\
-		    <format>								\
-		      <name>FLAC Audio Files</name>					\
-		      <extension>flac</extension>					\
-		    </format>								\
-											\
+		componentSpecs = "				\
+								\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+		  <component>					\
+		    <name>FLAC Audio Tagger</name>		\
+		    <version>1.0</version>			\
+		    <id>flac-tag</id>				\
+		    <type>tagger</type>				\
+		    <require>vorbis-tag</require>		\
+		    <format>					\
+		      <name>FLAC Audio Files</name>		\
+		      <extension>flac</extension>		\
+		    </format>					\
+								\
 		";
 
 		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1)
 		{
-			componentSpecs.Append("						\
-											\
-			    <format>							\
-			      <name>Ogg FLAC Files</name>				\
-			      <extension>oga</extension>				\
-			    </format>							\
-											\
+			componentSpecs.Append("			\
+								\
+			    <format>				\
+			      <name>Ogg FLAC Files</name>	\
+			      <extension>oga</extension>	\
+			    </format>				\
+								\
 			");
 		}
 
-		componentSpecs.Append("							\
-											\
-		    <tagformat>								\
-		      <name>FLAC Metadata</name>					\
-		      <coverart supported=\"true\"/>					\
-		      <encodings>							\
-			<encoding>UTF-8</encoding>					\
-		      </encodings>							\
-		    </tagformat>							\
-		  </component>								\
-											\
+		componentSpecs.Append("				\
+								\
+		    <tagspec>					\
+		      <name>FLAC Metadata</name>		\
+		      <coverart supported=\"true\"/>		\
+		      <encodings>				\
+			<encoding>UTF-8</encoding>		\
+		      </encodings>				\
+		    </tagspec>					\
+		  </component>					\
+								\
 		");
 	}
 

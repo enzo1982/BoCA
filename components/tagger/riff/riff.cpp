@@ -29,13 +29,13 @@ const String &BoCA::TaggerRIFF::GetComponentSpecs()
 	      <name>Windows Wave Files</name>				\
 	      <extension>wav</extension>				\
 	    </format>							\
-	    <tagformat>							\
+	    <tagspec>							\
 	      <name>RIFF INFO Tag</name>				\
 	      <encodings>						\
 		<encoding default=\"true\">ISO-8859-1</encoding>	\
 		<encoding>UTF-8</encoding>				\
 	      </encodings>						\
-	    </tagformat>						\
+	    </tagspec>							\
 	  </component>							\
 									\
 	";
