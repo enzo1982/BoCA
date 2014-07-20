@@ -22,7 +22,6 @@ namespace BoCA
 	class BOCA_DLL_EXPORT Picture
 	{
 		public:
-
 			S::Byte			 type;
 
 			String			 mime;

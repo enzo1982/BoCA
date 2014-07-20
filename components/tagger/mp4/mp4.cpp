@@ -153,7 +153,20 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	 */
 	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToMP4Metadata", True))
 	{
+		/* Put front and back covers first.
+		 */
+		Array<Picture>	 pictures;
+
 		foreach (const Picture &picInfo, track.pictures)
+		{
+			if	(picInfo.type == 3) pictures.InsertAtPos(0, picInfo);
+			else if	(picInfo.type == 4) pictures.InsertAtPos((pictures.Length() > 0 && pictures.GetFirst().type == 3) ? 1 : 0, picInfo);
+			else			    pictures.Add(picInfo);
+		}
+
+		/* Add cover art to tag.
+		 */
+		foreach (const Picture &picInfo, pictures)
 		{
 			MP4TagArtwork	 artwork = { const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data), (uint32_t) picInfo.data.Size(), picInfo.mime == "image/png" ? MP4_ART_PNG : MP4_ART_JPEG };
 
@@ -286,7 +299,9 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 					 buffer[4] == 0x0D && buffer[5] == 0x0A &&
 					 buffer[6] == 0x1A && buffer[7] == 0x0A) picture.mime = "image/png";
 
-				picture.type = 0;
+				if	(i == 0) picture.type = 3; // Cover (front)
+				else if (i == 1) picture.type = 4; // Cover (back)
+				else		 picture.type = 0; // Other
 
 				track.pictures.Add(picture);
 			}

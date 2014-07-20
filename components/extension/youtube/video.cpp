@@ -217,7 +217,7 @@ Bool BoCA::Video::QueryMetadata()
 		while (streamURL != NIL);
 
 		videoThumbnail.mime = "image/jpeg";
-		videoThumbnail.type = 0;
+		videoThumbnail.type = 16;
 		videoThumbnail.data = buffer;
 	}
 

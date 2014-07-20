@@ -326,9 +326,9 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 				 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
 				 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
 
-			if	(id.EndsWith("(FRONT)")) picture.type = 3;
-			else if (id.EndsWith("(BACK)"))	 picture.type = 4;
-			else				 picture.type = 0;
+			if	(id.EndsWith("(FRONT)")) picture.type = 3; // Cover (front)
+			else if (id.EndsWith("(BACK)"))	 picture.type = 4; // Cover (back)
+			else				 picture.type = 0; // Other
 
 			track.pictures.Add(picture);
 		}

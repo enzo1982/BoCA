@@ -370,10 +370,15 @@ Void BoCA::LayerTagBasic::AddCover()
 			 buffer[4] == 0x0D && buffer[5] == 0x0A &&
 			 buffer[6] == 0x1A && buffer[7] == 0x0A) picture.mime = "image/png";
 
-		picture.type = 0;
+		if	(track.pictures.Length() == 0) picture.type = 3; // Cover (front)
+		else if (track.pictures.Length() == 1) picture.type = 4; // Cover (back)
+		else				       picture.type = 0; // Other
+
 		picture.data = buffer;
 
 		track.pictures.Add(picture);
+
+		image_covers->SelectNthEntry(image_covers->Length() - 1);
 
 		onModifyTrack.Emit(track);
 	}
@@ -392,16 +397,20 @@ Void BoCA::LayerTagBasic::RemoveCover()
 
 	track.pictures.RemoveNth(index);
 
-	onModifyTrack.Emit(track);
+	combo_cover_type->onSelectEntry.Disconnect(&LayerTagBasic::OnModifyTrack, this);
 
 	combo_cover_type->SelectNthEntry(0);
 	edit_cover_desc->SetText(NIL);
+
+	combo_cover_type->onSelectEntry.Connect(&LayerTagBasic::OnModifyTrack, this);
 
 	button_cover_remove->Deactivate();
 	text_cover_type->Deactivate();
 	combo_cover_type->Deactivate();
 	text_cover_desc->Deactivate();
 	edit_cover_desc->Deactivate();
+
+	onModifyTrack.Emit(track);
 }
 
 Void BoCA::LayerTagBasic::SelectCover(ListEntry *entry)

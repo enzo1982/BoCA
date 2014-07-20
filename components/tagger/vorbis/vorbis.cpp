@@ -233,6 +233,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 	/* Parse individual comment items.
 	 */
 	Int	 numItems    = in.InputNumber(4);
+	Int	 numCovers   = 0;
 	Int	 itemsOffset = in.GetPos();
 	Info	 info	     = track.GetInfo();
 
@@ -329,9 +330,13 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 				 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
 				 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
 
-			picture.type = 0;
+			if	(numCovers == 0) picture.type = 3; // Cover (front)
+			else if (numCovers == 1) picture.type = 4; // Cover (back)
+			else			 picture.type = 0; // Other
 
 			track.pictures.Add(picture);
+
+			numCovers++;
 		}
 	}
 
