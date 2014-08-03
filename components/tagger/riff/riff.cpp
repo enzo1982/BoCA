@@ -29,6 +29,14 @@ const String &BoCA::TaggerRIFF::GetComponentSpecs()
 	      <name>Windows Wave Files</name>				\
 	      <extension>wav</extension>				\
 	    </format>							\
+	    <format>							\
+	      <name>Sony Wave64 Files</name>				\
+	      <extension>w64</extension>				\
+	    </format>							\
+	    <format>							\
+	      <name>RIFF 64 Audio Files</name>				\
+	      <extension>rf64</extension>				\
+	    </format>							\
 	    <tagspec>							\
 	      <name>RIFF INFO Tag</name>				\
 	      <encodings>						\
@@ -179,43 +187,110 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 Error BoCA::TaggerRIFF::ParseStreamInfo(const String &fileName, Track &track)
 {
 	InStream	 in(STREAM_FILE, fileName, IS_READ);
-	Bool		 error = False;
 
 	/* Read RIFF chunk.
 	 */
-	if (in.InputString(4) != "RIFF") error = True;
+	String		 riff = in.InputString(4);
 
-	in.RelSeek(8);
-
-	String		 chunk;
-
-	while (!error && chunk != "LIST")
+	if (riff == "RIFF" || riff == "RF64")
 	{
-		if (in.GetPos() >= in.Size()) break;
+		in.RelSeek(8);
 
-		/* Read next chunk.
-		 */
-		chunk = in.InputString(4);
+		Bool	 error = False;
+		String	 chunk;
+		Int64	 dSize = 0;
 
-		Int	 cSize = in.InputNumber(4);
-
-		if (chunk == "LIST")
+		while (!error && chunk != "LIST")
 		{
-			Buffer<UnsignedByte>	 buffer(cSize + 8);
+			if (in.GetPos() >= in.Size()) break;
 
-			in.RelSeek(-8);
-			in.InputData(buffer, cSize + 8);
-
-			if (ParseBuffer(buffer, track) != Success()) error = True;
-		}
-		else
-		{
-			/* Skip chunk.
+			/* Read next chunk.
 			 */
-			in.RelSeek(cSize);
+			chunk = in.InputString(4);
+
+			UnsignedInt	 cSize = in.InputNumber(4);
+
+			if (chunk == "LIST")
+			{
+				Buffer<UnsignedByte>	 buffer(cSize + 8);
+
+				in.RelSeek(-8);
+				in.InputData(buffer, cSize + 8);
+
+				if (ParseBuffer(buffer, track) != Success()) error = True;
+			}
+			else if (chunk == "ds64")
+			{
+				in.RelSeek(8);
+
+				dSize = in.InputNumber(8);
+
+				in.RelSeek(cSize - 16);
+			}
+			else if (chunk == "data")
+			{
+				if (cSize != UnsignedInt(-1)) in.RelSeek(cSize + cSize % 2);
+				else			      in.RelSeek(dSize + dSize % 2);
+			}
+			else
+			{
+				/* Skip chunk.
+				 */
+				in.RelSeek(cSize + cSize % 2);
+			}
 		}
+
+		if (!error) return Success();
+	}
+	else if (riff == "riff")
+	{
+		static unsigned char	 guidRIFF[16] = { 'r', 'i', 'f', 'f', 0x2E, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB, 0x04, 0xC1, 0x00, 0x00 };
+		static unsigned char	 guidLIST[16] = { 'l', 'i', 's', 't', 0x2F, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB, 0x04, 0xC1, 0x00, 0x00 };
+
+		in.RelSeek(-4);
+
+		Bool		 error = False;
+		unsigned char	 guid[16];
+
+		in.InputData(guid, 16);
+
+		if (memcmp(guid, guidRIFF, 16) != 0) error = True;
+
+		in.RelSeek(24);
+
+		while (!error && memcmp(guid, guidLIST, 16) != 0)
+		{
+			if (in.GetPos() >= in.Size()) break;
+
+			/* Read next chunk.
+			 */
+			in.InputData(guid, 16);
+
+			Int64	 cSize = in.InputNumber(8);
+
+			if (memcmp(guid, guidLIST, 16) == 0)
+			{
+				Buffer<UnsignedByte>	 buffer(cSize - 16);
+
+				buffer[0] = 'L'; buffer[4] =  cSize	   & 255;
+				buffer[1] = 'I'; buffer[5] = (cSize >>  8) & 255;
+				buffer[2] = 'S'; buffer[6] = (cSize >> 16) & 255;
+				buffer[3] = 'T'; buffer[7] = (cSize >> 24) & 255;
+
+				in.InputData(buffer + 8, cSize - 24);
+
+				if (ParseBuffer(buffer, track) != Success()) error = True;
+			}
+			else
+			{
+				/* Skip chunk.
+				 */
+				in.RelSeek(cSize - 24 + (cSize % 8 > 0 ? 8 - (cSize % 8) : 0));
+			}
+		}
+
+		if (!error) return Success();
 	}
 
-	if (error) return Error();
-	else	   return Success();
+	return Error();
 }
