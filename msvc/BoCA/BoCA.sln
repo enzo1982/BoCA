@@ -221,6 +221,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder voAAC", "BoCA 
 		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder Sndfile", "BoCA Encoder Sndfile\BoCA Encoder Sndfile.vcxproj", "{4C1AB73D-202E-493D-93EC-ABD92D43D1F6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -487,6 +492,10 @@ Global
 		{F79A69FE-F6A3-4326-B492-A34574468179}.Debug|Win32.Build.0 = Debug|Win32
 		{F79A69FE-F6A3-4326-B492-A34574468179}.Release|Win32.ActiveCfg = Release|Win32
 		{F79A69FE-F6A3-4326-B492-A34574468179}.Release|Win32.Build.0 = Release|Win32
+		{4C1AB73D-202E-493D-93EC-ABD92D43D1F6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C1AB73D-202E-493D-93EC-ABD92D43D1F6}.Debug|Win32.Build.0 = Debug|Win32
+		{4C1AB73D-202E-493D-93EC-ABD92D43D1F6}.Release|Win32.ActiveCfg = Release|Win32
+		{4C1AB73D-202E-493D-93EC-ABD92D43D1F6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

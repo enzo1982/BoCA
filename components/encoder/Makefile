@@ -23,6 +23,7 @@ ifeq ($(BUILD_WIN32),True)
 	cd mac && $(MAKE)
 endif
 	cd opus && $(MAKE)
+	cd sndfile && $(MAKE)
 	cd speex && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
 	cd twinvq && $(MAKE)
@@ -53,6 +54,7 @@ ifeq ($(BUILD_WIN32),True)
 	cd mac && $(MAKE) clean
 endif
 	cd opus && $(MAKE) clean
+	cd sndfile && $(MAKE) clean
 	cd speex && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
 	cd twinvq && $(MAKE) clean
@@ -75,12 +77,12 @@ endif
 	cd flac && $(MAKE) install
 	cd lame && $(MAKE) install
 	cd opus && $(MAKE) install
+	cd sndfile && $(MAKE) install
 	cd speex && $(MAKE) install
 ifneq ($(BUILD_OSX),True)
 	cd voaacenc && $(MAKE) install
 endif
 	cd vorbis && $(MAKE) install
-	cd wave && $(MAKE) install
 
 uninstall:
 ifeq ($(BUILD_OSX),True)
@@ -93,9 +95,9 @@ endif
 	cd flac && $(MAKE) uninstall
 	cd lame && $(MAKE) uninstall
 	cd opus && $(MAKE) uninstall
+	cd sndfile && $(MAKE) uninstall
 	cd speex && $(MAKE) uninstall
 ifneq ($(BUILD_OSX),True)
 	cd voaacenc && $(MAKE) uninstall
 endif
 	cd vorbis && $(MAKE) uninstall
-	cd wave && $(MAKE) uninstall
