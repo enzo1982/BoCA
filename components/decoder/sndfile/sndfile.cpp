@@ -25,10 +25,14 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 										\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
 		  <component>							\
-		    <name>LibSndFile Input</name>				\
+		    <name>SndFile Input Component</name>			\
 		    <version>1.0</version>					\
 		    <id>sndfile-dec</id>					\
 		    <type>decoder</type>					\
+		    <replace>aiff-dec</replace>					\
+		    <replace>au-dec</replace>					\
+		    <replace>voc-dec</replace>					\
+		    <replace>wave-dec</replace>					\
 		    <format>							\
 		      <name>Windows Wave Files</name>				\
 		      <extension>wav</extension>				\
@@ -68,6 +72,13 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		    <format>							\
 		      <name>Sound Forge Wave64</name>				\
 		      <extension>w64</extension>				\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+		    </format>							\
+		    <format>							\
+		      <name>RIFF 64 Audio Files</name>				\
+		      <extension>rf64</extension>				\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
 		    </format>							\
 		    <format>							\
 		      <name>Portable Voice Format</name>			\
@@ -80,6 +91,14 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		    <format>							\
 		      <name>Apple Core Audio</name>				\
 		      <extension>caf</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Psion WVE Format</name>				\
+		      <extension>wve</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Audio Visual Research Format</name>			\
+		      <extension>avr</extension>				\
 		    </format>							\
 		  </component>							\
 										\
@@ -317,6 +336,8 @@ BoCA::DecoderSndFile::~DecoderSndFile()
 
 Bool BoCA::DecoderSndFile::Activate()
 {
+	/* Open input file.
+	 */
 #ifdef __WIN32__
 	if (Setup::enableUnicode) file = _wfopen(track.origFilename, L"rb");
 	else			  file = fopen(track.origFilename, "rb");
@@ -326,6 +347,8 @@ Bool BoCA::DecoderSndFile::Activate()
 
 	if (file == NIL) return False;
 
+	/* Open sndfile handle.
+	 */
 	SF_INFO	 sinfo;
 
 	memset(&sinfo, 0, sizeof(SF_INFO));
@@ -341,6 +364,8 @@ Bool BoCA::DecoderSndFile::Activate()
 
 Bool BoCA::DecoderSndFile::Deactivate()
 {
+	/* Close sndfile handle.
+	 */
 	ex_sf_close(sndf);
 
 	fclose(file);
