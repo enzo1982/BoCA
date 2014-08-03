@@ -90,7 +90,7 @@ Bool BoCA::EncoderWave::Deactivate()
 
 	/* Write data size to header.
 	 */
-	Int	 dataSize = driver->GetSize() - 44;
+	UnsignedInt	 dataSize = driver->GetSize() - 44;
 
 	driver->Seek(40);
 
@@ -139,7 +139,7 @@ Bool BoCA::EncoderWave::Deactivate()
 
 	/* Write file size to header.
 	 */
-	Int	 fileSize = driver->GetSize() - 8;
+	UnsignedInt	 fileSize = driver->GetSize() - 8;
 
 	driver->Seek(4);
 

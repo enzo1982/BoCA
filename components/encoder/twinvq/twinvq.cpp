@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -178,15 +178,15 @@ Bool BoCA::EncoderTwinVQ::Deactivate()
 	 */
 	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
-	Int			 bytesLeft = in.Size();
+	Int64			 bytesLeft = in.Size();
 
 	while (bytesLeft)
 	{
-		in.InputData(buffer, Math::Min(1024, bytesLeft));
+		in.InputData(buffer, Math::Min(Int64(1024), bytesLeft));
 
-		driver->WriteData(buffer, Math::Min(1024, bytesLeft));
+		driver->WriteData(buffer, Math::Min(Int64(1024), bytesLeft));
 
-		bytesLeft -= Math::Min(1024, bytesLeft);
+		bytesLeft -= Math::Min(Int64(1024), bytesLeft);
 	}
 
 	in.Close();

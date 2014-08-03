@@ -262,15 +262,15 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 		 */
 		InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READ);
 		Buffer<UnsignedByte>	 buffer(1024);
-		Int			 bytesLeft = in.Size();
+		Int64			 bytesLeft = in.Size();
 
 		while (bytesLeft)
 		{
-			in.InputData(buffer, Math::Min(1024, bytesLeft));
+			in.InputData(buffer, Math::Min(Int64(1024), bytesLeft));
 
-			driver->WriteData(buffer, Math::Min(1024, bytesLeft));
+			driver->WriteData(buffer, Math::Min(Int64(1024), bytesLeft));
 
-			bytesLeft -= Math::Min(1024, bytesLeft);
+			bytesLeft -= Math::Min(Int64(1024), bytesLeft);
 		}
 
 		in.Close();
