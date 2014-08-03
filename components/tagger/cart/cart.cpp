@@ -29,6 +29,10 @@ const String &BoCA::TaggerCart::GetComponentSpecs()
 	      <name>Windows Wave Files</name>				\
 	      <extension>wav</extension>				\
 	    </format>							\
+	    <format>							\
+	      <name>RIFF 64 Audio Files</name>				\
+	      <extension>rf64</extension>				\
+	    </format>							\
 	    <tagspec default=\"false\">					\
 	      <name>RIFF Cart Tag</name>				\
 	      <encodings>						\
@@ -285,43 +289,61 @@ Error BoCA::TaggerCart::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 Error BoCA::TaggerCart::ParseStreamInfo(const String &fileName, Track &track)
 {
 	InStream	 in(STREAM_FILE, fileName, IS_READ);
-	Bool		 error = False;
 
 	/* Read RIFF chunk.
 	 */
-	if (in.InputString(4) != "RIFF") error = True;
+	String		 riff = in.InputString(4);
 
-	in.RelSeek(8);
-
-	String		 chunk;
-
-	while (!error && chunk != "cart")
+	if (riff == "RIFF" || riff == "RF64")
 	{
-		if (in.GetPos() >= in.Size()) break;
+		in.RelSeek(8);
 
-		/* Read next chunk.
-		 */
-		chunk = in.InputString(4);
+		Bool	 error = False;
+		String	 chunk;
+		Int64	 dSize = 0;
 
-		Int	 cSize = in.InputNumber(4);
-
-		if (chunk == "cart")
+		while (!error && chunk != "cart")
 		{
-			Buffer<UnsignedByte>	 buffer(cSize + 8);
+			if (in.GetPos() >= in.Size()) break;
 
-			in.RelSeek(-8);
-			in.InputData(buffer, cSize + 8);
-
-			if (ParseBuffer(buffer, track) != Success()) error = True;
-		}
-		else
-		{
-			/* Skip chunk.
+			/* Read next chunk.
 			 */
-			in.RelSeek(cSize);
+			chunk = in.InputString(4);
+
+			UnsignedInt	 cSize = in.InputNumber(4);
+
+			if (chunk == "cart")
+			{
+				Buffer<UnsignedByte>	 buffer(cSize + 8);
+
+				in.RelSeek(-8);
+				in.InputData(buffer, cSize + 8);
+
+				if (ParseBuffer(buffer, track) != Success()) error = True;
+			}
+			else if (chunk == "ds64")
+			{
+				in.RelSeek(8);
+
+				dSize = in.InputNumber(8);
+
+				in.RelSeek(cSize - 16);
+			}
+			else if (chunk == "data")
+			{
+				if (cSize != UnsignedInt(-1)) in.RelSeek(cSize + cSize % 2);
+				else			      in.RelSeek(dSize + dSize % 2);
+			}
+			else
+			{
+				/* Skip chunk.
+				 */
+				in.RelSeek(cSize + cSize % 2);
+			}
 		}
+
+		if (!error) return Success();
 	}
 
-	if (error) return Error();
-	else	   return Success();
+	return Error();
 }
