@@ -53,6 +53,7 @@
 #include "smooth/system/console.h"
 #include "smooth/system/cpu.h"
 #include "smooth/system/dynamicloader.h"
+#include "smooth/system/event.h"
 #include "smooth/system/screen.h"
 #include "smooth/system/system.h"
 #include "smooth/system/timer.h"
