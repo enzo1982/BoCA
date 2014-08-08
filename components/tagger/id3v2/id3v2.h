@@ -18,7 +18,7 @@ namespace BoCA
 	class TaggerID3v2 : public CS::TaggerComponent
 	{
 		private:
-			static const String	 genres[148];
+			static const String	 genres[192];
 			static String		 dummyString;
 
 			Int			 ParseContainer(const ID3_Container &, Track &);

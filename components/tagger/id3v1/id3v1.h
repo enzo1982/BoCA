@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,7 +17,7 @@ namespace BoCA
 	class TaggerID3v1 : public CS::TaggerComponent
 	{
 		private:
-			static const String	 genres[148];
+			static const String	 genres[192];
 
 			const String		&GetID3CategoryName(UnsignedInt);
 			UnsignedInt		 GetID3CategoryID(const String &);

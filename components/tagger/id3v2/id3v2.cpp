@@ -45,7 +45,7 @@ const String &BoCA::TaggerID3v2::GetComponentSpecs()
 	return componentSpecs;
 }
 
-const String	 BoCA::TaggerID3v2::genres[148] =
+const String	 BoCA::TaggerID3v2::genres[192] =
       { "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz",
 	"Metal", "New Age", "Oldies", "Other", "Pop", "R&B", "Rap", "Reggae", "Rock", "Techno",
 	"Industrial", "Alternative", "Ska", "Death Metal", "Pranks", "Soundtrack", "Euro-Techno",
@@ -65,7 +65,13 @@ const String	 BoCA::TaggerID3v2::genres[148] =
 	"Drum Solo", "A Capella", "Euro-House", "Dance Hall", "Goa", "Drum & Bass", "Club-House",
 	"Hardcore", "Terror", "Indie", "BritPop", "Negerpunk", "Polsk Punk", "Beat",
 	"Christian Gangsta Rap", "Heavy Metal", "Black Metal", "Crossover", "Contemporary Christian",
-	"Christian Rock", "Merengue", "Salsa", "Thrash Metal", "Anime", "JPop", "Synthpop" };
+	"Christian Rock", "Merengue", "Salsa", "Thrash Metal", "Anime", "JPop", "Synthpop", "Abstract",
+	"Art Rock", "Baroque", "Bhangra", "Big Beat", "Breakbeat", "Chillout", "Downtempo", "Dub", "EBM",
+	"Eclectic", "Electro", "Electroclash", "Emo", "Experimental", "Garage", "Global", "IDM",
+	"Illbient", "Industro-Goth", "Jam Band", "Krautrock", "Leftfield", "Lounge", "Math Rock",
+	"New Romantic", "Nu-Breakz", "Post-Punk", "Post-Rock", "Psytrance", "Shoegaze", "Space Rock",
+	"Trop Rock", "World Music", "Neoclassical", "Audiobook", "Audio Theatre", "Neue Deutsche Welle",
+	"Podcast", "Indie Rock", "G-Funk", "Dubstep", "Garage Rock", "Psybient" };
 
 String		 BoCA::TaggerID3v2::dummyString;
 
@@ -810,6 +816,6 @@ const String &BoCA::TaggerID3v2::GetID3CategoryName(UnsignedInt id)
 {
 	static const String	 empty;
 
-	if (id > 147) return empty;
+	if (id > 191) return empty;
 	else	      return genres[id];
 }

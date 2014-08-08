@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -14,6 +14,7 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 {
 	list->AddEntry(NIL);
 	list->AddEntry("A Cappella");
+	list->AddEntry("Abstract");
 	list->AddEntry("Acid");
 	list->AddEntry("Acid Jazz");
 	list->AddEntry("Acid Punk");
@@ -22,21 +23,29 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 	list->AddEntry("Alternative");
 	list->AddEntry("Ambient");
 	list->AddEntry("Anime");
+	list->AddEntry("Art Rock");
+	list->AddEntry("Audio Theatre");
+	list->AddEntry("Audiobook");
 	list->AddEntry("Avantgarde");
 	list->AddEntry("Ballad");
+	list->AddEntry("Baroque");
 	list->AddEntry("Bass");
 	list->AddEntry("Beat");
 	list->AddEntry("Bebob");
+	list->AddEntry("Bhangra");
 	list->AddEntry("Big Band");
+	list->AddEntry("Big Beat");
 	list->AddEntry("Black Metal");
 	list->AddEntry("Bluegrass");
 	list->AddEntry("Blues");
 	list->AddEntry("Booty Bass");
+	list->AddEntry("Breakbeat");
 	list->AddEntry("BritPop");
 	list->AddEntry("Cabaret");
 	list->AddEntry("Celtic");
 	list->AddEntry("Chamber Music");
 	list->AddEntry("Chanson");
+	list->AddEntry("Chillout");
 	list->AddEntry("Chorus");
 	list->AddEntry("Christian Gangsta Rap");
 	list->AddEntry("Christian Rap");
@@ -56,16 +65,25 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 	list->AddEntry("Darkwave");
 	list->AddEntry("Death Metal");
 	list->AddEntry("Disco");
+	list->AddEntry("Downtempo");
 	list->AddEntry("Dream");
 	list->AddEntry("Drum & Bass");
 	list->AddEntry("Drum Solo");
+	list->AddEntry("Dub");
+	list->AddEntry("Dubstep");
 	list->AddEntry("Duet");
 	list->AddEntry("Easy Listening");
+	list->AddEntry("EBM");
+	list->AddEntry("Eclectic");
+	list->AddEntry("Electro");
+	list->AddEntry("Electroclash");
 	list->AddEntry("Electronic");
+	list->AddEntry("Emo");
 	list->AddEntry("Ethnic");
 	list->AddEntry("Eurodance");
 	list->AddEntry("Euro-House");
 	list->AddEntry("Euro-Techno");
+	list->AddEntry("Experimental");
 	list->AddEntry("Fast-Fusion");
 	list->AddEntry("Folk");
 	list->AddEntry("Folk/Rock");
@@ -73,8 +91,12 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 	list->AddEntry("Freestyle");
 	list->AddEntry("Funk");
 	list->AddEntry("Fusion");
+	list->AddEntry("G-Funk");
 	list->AddEntry("Game");
 	list->AddEntry("Gangsta Rap");
+	list->AddEntry("Garage");
+	list->AddEntry("Garage Rock");
+	list->AddEntry("Global");
 	list->AddEntry("Goa");
 	list->AddEntry("Gospel");
 	list->AddEntry("Gothic");
@@ -86,17 +108,26 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 	list->AddEntry("Hip-Hop");
 	list->AddEntry("House");
 	list->AddEntry("Humour");
+	list->AddEntry("IDM");
+	list->AddEntry("Illbient");
 	list->AddEntry("Indie");
+	list->AddEntry("Indie Rock");
 	list->AddEntry("Industrial");
+	list->AddEntry("Industro-Goth");
 	list->AddEntry("Instrumental");
 	list->AddEntry("Instrumental Pop");
 	list->AddEntry("Instrumental Rock");
+	list->AddEntry("Jam Band");
 	list->AddEntry("Jazz");
 	list->AddEntry("Jazz+Funk");
 	list->AddEntry("JPop");
 	list->AddEntry("Jungle");
+	list->AddEntry("Krautrock");
 	list->AddEntry("Latin");
+	list->AddEntry("Leftfield");
 	list->AddEntry("Lo-Fi");
+	list->AddEntry("Lounge");
+	list->AddEntry("Math Rock");
 	list->AddEntry("Meditative");
 	list->AddEntry("Merengue");
 	list->AddEntry("Metal");
@@ -104,24 +135,33 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 	list->AddEntry("National Folk");
 	list->AddEntry("Native American");
 	list->AddEntry("Negerpunk");
+	list->AddEntry("Neoclassical");
+	list->AddEntry("Neue Deutsche Welle");
 	list->AddEntry("New Age");
+	list->AddEntry("New Romantic");
 	list->AddEntry("New Wave");
 	list->AddEntry("Noise");
+	list->AddEntry("Nu-Breakz");
 	list->AddEntry("Oldies");
 	list->AddEntry("Opera");
 	list->AddEntry("Other");
+	list->AddEntry("Podcast");
 	list->AddEntry("Polka");
 	list->AddEntry("Polsk Punk");
 	list->AddEntry("Pop");
 	list->AddEntry("Pop/Funk");
 	list->AddEntry("Pop-Folk");
 	list->AddEntry("Porn Groove");
+	list->AddEntry("Post-Punk");
+	list->AddEntry("Post-Rock");
 	list->AddEntry("Power Ballad");
 	list->AddEntry("Pranks");
 	list->AddEntry("Primus");
 	list->AddEntry("Progressive Rock");
+	list->AddEntry("Psybient");
 	list->AddEntry("Psychedelic");
 	list->AddEntry("Psychedelic Rock");
+	list->AddEntry("Psytrance");
 	list->AddEntry("Punk");
 	list->AddEntry("Punk Rock");
 	list->AddEntry("R&B");
@@ -137,6 +177,7 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 	list->AddEntry("Salsa");
 	list->AddEntry("Samba");
 	list->AddEntry("Satire");
+	list->AddEntry("Shoegaze");
 	list->AddEntry("Showtunes");
 	list->AddEntry("Ska");
 	list->AddEntry("Slow Jam");
@@ -147,6 +188,7 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 	list->AddEntry("Soundtrack");
 	list->AddEntry("Southern Rock");
 	list->AddEntry("Space");
+	list->AddEntry("Space Rock");
 	list->AddEntry("Speech");
 	list->AddEntry("Swing");
 	list->AddEntry("Symphonic Rock");
@@ -162,5 +204,7 @@ Void BoCA::TagUtilities::FillGenreList(List *list)
 	list->AddEntry("Trance");
 	list->AddEntry("Tribal");
 	list->AddEntry("Trip-Hop");
+	list->AddEntry("Trop Rock");
 	list->AddEntry("Vocal");
+	list->AddEntry("World Music");
 }
