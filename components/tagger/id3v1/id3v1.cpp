@@ -92,7 +92,8 @@ Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 	{ out.OutputString(info.artist.Head(Math::Min(30, info.artist.Length()))); for (Int i = 0; i < 30 - info.artist.Length(); i++) out.OutputNumber(0, 1); }
 	{ out.OutputString(info.album.Head(Math::Min(30, info.album.Length())));   for (Int i = 0; i < 30 - info.album.Length(); i++) out.OutputNumber(0, 1); }
 
-	{ out.OutputString(String().FillN('0', 4 - String::FromInt(info.year).Length())); out.OutputString(String::FromInt(info.year).Tail(Math::Min(4, String::FromInt(info.year).Length()))); }
+	if (info.year > 0) { out.OutputString(String().FillN('0', 4 - String::FromInt(info.year).Length())); out.OutputString(String::FromInt(info.year).Tail(Math::Min(4, String::FromInt(info.year).Length()))); }
+	else		   { out.OutputNumber(0, 4); }
 
 	String		 comment;
 
