@@ -129,6 +129,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	const char *(*BoCA_GetComponentName)() = (const char *(*)()) library->GetFunctionAddress("BoCA_GetComponentName");
 
+	if (BoCA_GetComponentName == NIL) return False;
+
 	componentName = BoCA_GetComponentName();
 
 	/* Get component function pointers.
