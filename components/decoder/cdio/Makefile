@@ -11,7 +11,11 @@ BOCA_PATH = ../../..
 OBJECTS	  = cdio.o config.o
 
 # Enter additional defines here:
-DEFINE	  =
+ifeq ($(wildcard /usr/include/cdio/paranoia/paranoia.h),)
+ifneq ($(wildcard /usr/include/cdio/paranoia.h),)
+	DEFINE = -DHAVE_OLD_PARANOIA_INCLUDE=1
+endif
+endif
 
 # Enter additional library dependencies here:
 LIBS	  = -lcdio -lcdio_cdda -lcdio_paranoia

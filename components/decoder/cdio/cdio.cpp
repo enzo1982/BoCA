@@ -12,7 +12,12 @@
 #include <smooth/dll.h>
 
 #include <cdio/cdio.h>
-#include <cdio/paranoia/paranoia.h>
+
+#if HAVE_OLD_PARANOIA_INCLUDE
+#	include <cdio/paranoia.h>
+#else
+#	include <cdio/paranoia/paranoia.h>
+#endif
 
 #include "cdio.h"
 #include "config.h"

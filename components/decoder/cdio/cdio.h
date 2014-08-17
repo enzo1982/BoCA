@@ -11,7 +11,12 @@
 #include <boca.h>
 
 #include <cdio/cdio.h>
-#include <cdio/paranoia/paranoia.h>
+
+#if HAVE_OLD_PARANOIA_INCLUDE
+#	include <cdio/paranoia.h>
+#else
+#	include <cdio/paranoia/paranoia.h>
+#endif
 
 BoCA_BEGIN_COMPONENT(DecoderCDIO)
 
