@@ -84,6 +84,7 @@ Int BoCA::Video::DownloaderThread(String targetFileName)
 			protocol->DownloadToFile(targetFileName);
 
 			cacheURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
+			cacheURL.Replace("https://", "http://");
 
 			delete protocol;
 		}
@@ -146,6 +147,7 @@ Bool BoCA::Video::DownloadPage()
 		protocol->DownloadToBuffer(buffer);
 
 		pageURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
+		pageURL.Replace("https://", "http://");
 
 		delete protocol;
 
@@ -211,6 +213,7 @@ Bool BoCA::Video::QueryMetadata()
 			protocol->DownloadToBuffer(buffer);
 
 			streamURL = ((Protocols::HTTP *) protocol)->GetResponseHeaderField("Location");
+			streamURL.Replace("https://", "http://");
 
 			delete protocol;
 		}
