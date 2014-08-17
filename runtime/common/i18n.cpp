@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -39,4 +39,19 @@ Void BoCA::I18n::Free()
 
 		instance = NIL;
 	}
+}
+
+String BoCA::I18n::AddColon(const String &string)
+{
+	return TranslateString("%1:", "Characters").Replace("%1", string);
+}
+
+String BoCA::I18n::AddEllipsis(const String &string)
+{
+	return TranslateString("%1...", "Characters").Replace("%1", string);
+}
+
+String BoCA::I18n::AddBrackets(const String &string, const String &bracketed)
+{
+	return TranslateString("%1 (%2)", "Characters").Replace("%1", string).Replace("%2", bracketed);
 }
