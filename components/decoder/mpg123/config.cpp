@@ -22,7 +22,7 @@ BoCA::ConfigureMPG123::ConfigureMPG123()
 
 	group_decoding	= new GroupBox(i18n->TranslateString("Decoder"), Point(7, 11), Size(286, 41));
 
-	text_decoder	= new Text(i18n->TranslateString("Active decoder:"), Point(10, 15));
+	text_decoder	= new Text(i18n->AddColon(i18n->TranslateString("Active decoder")), Point(10, 15));
 
 	combo_decoder	= new ComboBox(Point(17 + text_decoder->GetUnscaledTextWidth(), 12), Size(259 - text_decoder->GetUnscaledTextWidth(), 0));
 	combo_decoder->AddEntry(i18n->TranslateString("auto select"));

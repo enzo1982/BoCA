@@ -30,10 +30,10 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	group_mode		= new GroupBox(i18n->TranslateString("Encoding Mode"), Point(7, 11), Size(168, 65));
 
-	option_mode_vbr		= new OptionBox(String("VBR (").Append(i18n->TranslateString("Variable Bitrate")).Append(")"), Point(10, 13), Size(148, 0), &mode, 0);
+	option_mode_vbr		= new OptionBox(i18n->AddBrackets("VBR", i18n->TranslateString("Variable Bitrate")), Point(10, 13), Size(148, 0), &mode, 0);
 	option_mode_vbr->onAction.Connect(&ConfigureVorbis::SetMode, this);
 
-	option_mode_abr		= new OptionBox(String("ABR (").Append(i18n->TranslateString("Average Bitrate")).Append(")"), Point(10, 38), Size(148, 0), &mode, 1);
+	option_mode_abr		= new OptionBox(i18n->AddBrackets("ABR", i18n->TranslateString("Average Bitrate")), Point(10, 38), Size(148, 0), &mode, 1);
 	option_mode_abr->onAction.Connect(&ConfigureVorbis::SetMode, this);
 
 	group_mode->Add(option_mode_vbr);
@@ -49,7 +49,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 88), Size(344, 42));
 
-	text_quality		= new Text(i18n->TranslateString("Quality").Append(":"), Point(10, 16));
+	text_quality		= new Text(i18n->AddColon(i18n->TranslateString("Quality")), Point(10, 16));
 
 	slider_quality		= new Slider(Point(text_quality->GetUnscaledTextWidth() + 18, 14), Size(289 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, -20, 100);
 	slider_quality->onValueChange.Connect(&ConfigureVorbis::SetQuality, this);
@@ -62,7 +62,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 88), Size(344, 96));
 
-	check_abrmin		= new CheckBox(i18n->TranslateString("Minimum bitrate:"), Point(10, 14), Size(), &setABRMin);
+	check_abrmin		= new CheckBox(i18n->AddColon(i18n->TranslateString("Minimum bitrate")), Point(10, 14), Size(), &setABRMin);
 	check_abrmin->onAction.Connect(&ConfigureVorbis::ToggleABRMin, this);
 
 	slider_abrmin		= new Slider(Point(38, 14), Size(228, 0), OR_HORZ, &abrMin, 32, 320);
@@ -72,9 +72,9 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	edit_abrmin->SetFlags(EDB_NUMERIC);
 	edit_abrmin->onInput.Connect(&ConfigureVorbis::SetABRMinByEditBox, this);
 
-	text_abrmin_kbps	= new Text("kbps", Point(311, 16));
+	text_abrmin_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(311, 16));
 
-	check_abrnom		= new CheckBox(i18n->TranslateString("Average bitrate:"), Point(10, 41), Size(), &setABRNom);
+	check_abrnom		= new CheckBox(i18n->AddColon(i18n->TranslateString("Average bitrate")), Point(10, 41), Size(), &setABRNom);
 	check_abrnom->onAction.Connect(&ConfigureVorbis::ToggleABRNom, this);
 
 	slider_abrnom		= new Slider(Point(38, 41), Size(228, 0), OR_HORZ, &abrNom, 32, 320);
@@ -84,9 +84,9 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	edit_abrnom->SetFlags(EDB_NUMERIC);
 	edit_abrnom->onInput.Connect(&ConfigureVorbis::SetABRNomByEditBox, this);
 
-	text_abrnom_kbps	= new Text("kbps", Point(311, 43));
+	text_abrnom_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(311, 43));
 
-	check_abrmax		= new CheckBox(i18n->TranslateString("Maximum bitrate:"), Point(10, 68), Size(), &setABRMax);
+	check_abrmax		= new CheckBox(i18n->AddColon(i18n->TranslateString("Maximum bitrate")), Point(10, 68), Size(), &setABRMax);
 	check_abrmax->onAction.Connect(&ConfigureVorbis::ToggleABRMax, this);
 
 	slider_abrmax		= new Slider(Point(38, 68), Size(228, 0), OR_HORZ, &abrMax, 32, 320);
@@ -96,7 +96,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	edit_abrmax->SetFlags(EDB_NUMERIC);
 	edit_abrmax->onInput.Connect(&ConfigureVorbis::SetABRMaxByEditBox, this);
 
-	text_abrmax_kbps	= new Text("kbps", Point(311, 70));
+	text_abrmax_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(311, 70));
 
 	Int	 maxTextSize = Math::Max(Math::Max(check_abrmin->GetUnscaledTextWidth(), check_abrnom->GetUnscaledTextWidth()), check_abrmax->GetUnscaledTextWidth());
 

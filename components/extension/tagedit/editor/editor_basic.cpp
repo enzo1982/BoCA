@@ -263,11 +263,11 @@ Void BoCA::LayerTagBasic::OnChangeLanguageSettings()
 
 	group_info->SetText(i18n->TranslateString("Title information"));
 
-	text_artist->SetText(i18n->TranslateString("Artist").Append(":"));
-	text_title->SetText(i18n->TranslateString("Title").Append(":"));
-	text_album->SetText(i18n->TranslateString("Album").Append(":"));
-	text_genre->SetText(i18n->TranslateString("Genre").Append(":"));
-	text_comment->SetText(i18n->TranslateString("Comment").Append(":"));
+	text_artist->SetText(i18n->AddColon(i18n->TranslateString("Artist")));
+	text_title->SetText(i18n->AddColon(i18n->TranslateString("Title")));
+	text_album->SetText(i18n->AddColon(i18n->TranslateString("Album")));
+	text_genre->SetText(i18n->AddColon(i18n->TranslateString("Genre")));
+	text_comment->SetText(i18n->AddColon(i18n->TranslateString("Comment")));
 
 	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_artist->GetUnscaledTextWidth(), text_genre->GetUnscaledTextWidth()), text_title->GetUnscaledTextWidth()), Math::Max(text_album->GetUnscaledTextWidth(), text_comment->GetUnscaledTextWidth()));
 
@@ -277,9 +277,9 @@ Void BoCA::LayerTagBasic::OnChangeLanguageSettings()
 	edit_genre->SetX(text_genre->GetX() + maxTextSize + 7);
 	edit_comment->SetX(text_comment->GetX() + maxTextSize + 7);
 
-	text_track->SetText(i18n->TranslateString("Track").Append(":"));
-	text_disc->SetText(i18n->TranslateString("Disc").Append(":"));
-	text_year->SetText(i18n->TranslateString("Year").Append(":"));
+	text_track->SetText(i18n->AddColon(i18n->TranslateString("Track")));
+	text_disc->SetText(i18n->AddColon(i18n->TranslateString("Disc")));
+	text_year->SetText(i18n->AddColon(i18n->TranslateString("Year")));
 
 	Int	 maxTextSize2 = Math::Max(Math::Max(text_track->GetUnscaledTextWidth(), text_disc->GetUnscaledTextWidth()), text_year->GetUnscaledTextWidth());
 
@@ -289,9 +289,9 @@ Void BoCA::LayerTagBasic::OnChangeLanguageSettings()
 
 	group_cover->SetText(i18n->TranslateString("Cover art"));
 
-	text_covers->SetText(i18n->TranslateString("Covers").Append(":"));
-	text_cover_type->SetText(i18n->TranslateString("Type").Append(":"));
-	text_cover_desc->SetText(i18n->TranslateString("Description").Append(":"));
+	text_covers->SetText(i18n->AddColon(i18n->TranslateString("Covers")));
+	text_cover_type->SetText(i18n->AddColon(i18n->TranslateString("Type")));
+	text_cover_desc->SetText(i18n->AddColon(i18n->TranslateString("Description")));
 
 	Int	 maxTextSize3 = Math::Max(Math::Max(text_cover_type->GetUnscaledTextWidth(), text_covers->GetUnscaledTextWidth()), text_cover_desc->GetUnscaledTextWidth());
 

@@ -21,7 +21,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 
 	i18n->SetContext("Configuration");
 
-	text_parameters = new Text(i18n->TranslateString("Command line arguments:"), Point(6, 6));
+	text_parameters = new Text(i18n->AddColon(i18n->TranslateString("Command line arguments")), Point(6, 6));
 
 	list_parameters	= new ListBox(Point(6, 24), Size(250, 64));
 	list_parameters->SetFlags(LF_MULTICHECKBOX);
@@ -29,7 +29,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 	list_parameters->onMarkEntry.Connect(&ConfigLayerExternal::OnSelectParameter, this);
 	list_parameters->onMarkEntry.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
 
-	text_commandline = new Text(i18n->TranslateString("Resulting arguments string:"), Point(6, 156));
+	text_commandline = new Text(i18n->AddColon(i18n->TranslateString("Resulting arguments string")), Point(6, 156));
 
 	edit_commandline = new EditBox(NIL, Point(6, 174), Size(250, 0));
 	edit_commandline->Deactivate();

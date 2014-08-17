@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,13 +32,10 @@ namespace BoCA
 			Layer		*register_layer_filtering;
 
 			GroupBox	*basic_preset;
-			GroupBox	*basic_bitrate;
-			GroupBox	*basic_quality;
-			GroupBox	*basic_stereomode;
-
 			Text		*basic_text_preset;
 			ComboBox	*basic_combo_preset;
 
+			GroupBox	*basic_bitrate;
 			OptionBox	*basic_option_set_bitrate;
 			OptionBox	*basic_option_set_ratio;
 			Slider		*basic_slider_bitrate;
@@ -46,70 +43,73 @@ namespace BoCA
 			Text		*basic_text_ratio;
 			EditBox		*basic_edit_ratio;
 
+			GroupBox	*basic_quality;
 			CheckBox	*basic_check_set_quality;
 			Slider		*basic_slider_quality;
 			Text		*basic_text_quality;
 			Text		*basic_text_quality_better;
 			Text		*basic_text_quality_worse;
 
-			ComboBox	*basic_combo_stereomode;
-			CheckBox	*basic_check_forcejs;
-
 			GroupBox	*vbr_vbrmode;
-			GroupBox	*vbr_quality;
-			GroupBox	*vbr_abrbitrate;
-			GroupBox	*vbr_bitrate;
-
 			OptionBox	*vbr_option_cbr;
 			OptionBox	*vbr_option_abr;
 			OptionBox	*vbr_option_vbrmtrh;
 
+			GroupBox	*vbr_quality;
 			Text		*vbr_text_setquality;
 			Slider		*vbr_slider_quality;
 			Text		*vbr_text_quality;
 			Text		*vbr_text_quality_better;
 			Text		*vbr_text_quality_worse;
 
+			GroupBox	*vbr_abrbitrate;
 			Slider		*vbr_slider_abrbitrate;
 			EditBox		*vbr_edit_abrbitrate;
 			Text		*vbr_text_abrbitrate_kbps;
 
-			CheckBox	*vbr_check_set_min_brate;
-			CheckBox	*vbr_check_set_max_brate;
-			Slider		*vbr_slider_min_brate;
-			Slider		*vbr_slider_max_brate;
-			Text		*vbr_text_min_brate_kbps;
-			Text		*vbr_text_max_brate_kbps;
-
 			GroupBox	*misc_bits;
-			GroupBox	*misc_crc;
-			GroupBox	*misc_format;
-
 			CheckBox	*misc_check_original;
 			CheckBox	*misc_check_copyright;
 			CheckBox	*misc_check_private;
+
+			GroupBox	*misc_crc;
 			CheckBox	*misc_check_crc;
-			CheckBox	*misc_check_iso;
+
+			GroupBox	*misc_stereomode;
+			ComboBox	*misc_combo_stereomode;
+			CheckBox	*misc_check_forcejs;
+
+			GroupBox	*misc_bitrate;
+			CheckBox	*misc_check_set_min_brate;
+			CheckBox	*misc_check_set_max_brate;
+			Slider		*misc_slider_min_brate;
+			Slider		*misc_slider_max_brate;
+			Text		*misc_text_min_brate_kbps;
+			Text		*misc_text_max_brate_kbps;
 
 			GroupBox	*expert_ath;
-			GroupBox	*expert_psycho;
-
 			CheckBox	*expert_check_ath;
 			ComboBox	*expert_combo_athtype;
 
+			GroupBox	*expert_psycho;
 			CheckBox	*expert_check_tempmask;
 
-			GroupBox	*filtering_resample;
-			GroupBox	*filtering_misc;
-			GroupBox	*filtering_lowpass;
-			GroupBox	*filtering_highpass;
+			GroupBox	*expert_format;
+			CheckBox	*expert_check_iso;
 
+			GroupBox	*filtering_resample;
 			ComboBox	*filtering_combo_resample;
+
+			GroupBox	*filtering_misc;
 			CheckBox	*filtering_check_disable_all;
+
+			GroupBox	*filtering_lowpass;
 			CheckBox	*filtering_set_lowpass;
 			EditBox		*filtering_edit_lowpass;
 			CheckBox	*filtering_set_lowpass_width;
 			EditBox		*filtering_edit_lowpass_width;
+
+			GroupBox	*filtering_highpass;
 			CheckBox	*filtering_set_highpass;
 			EditBox		*filtering_edit_highpass;
 			CheckBox	*filtering_set_highpass_width;

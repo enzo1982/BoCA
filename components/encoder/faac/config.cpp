@@ -34,32 +34,6 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	layer_format		= new Layer(i18n->TranslateString("Format"));
 
-	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), Point(135, 11), Size(120, 65));
-
-	option_version_mpeg2	= new OptionBox("MPEG 2", Point(10, 13), Size(99, 0), &mpegVersion, 1);
-	option_version_mpeg2->onAction.Connect(&ConfigureFAAC::SetMPEGVersion, this);
-
-	option_version_mpeg4	= new OptionBox("MPEG 4", Point(10, 38), Size(99, 0), &mpegVersion, 0);
-	option_version_mpeg4->onAction.Connect(&ConfigureFAAC::SetMPEGVersion, this);
-
-	group_version->Add(option_version_mpeg2);
-	group_version->Add(option_version_mpeg4);
-
-	group_aactype		= new GroupBox(i18n->TranslateString("AAC object type"), Point(7, 88), Size(120, 90));
-
-	option_aactype_main	= new OptionBox("MAIN", Point(10, 13), Size(99, 0), &aacType, 1);
-	option_aactype_main->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
-
-	option_aactype_low	= new OptionBox("LC", Point(10, 38), Size(99, 0), &aacType, 2);
-	option_aactype_low->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
-
-	option_aactype_ltp	= new OptionBox("LTP", Point(10, 63), Size(99, 0), &aacType, 4);
-	option_aactype_ltp->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
-
-	group_aactype->Add(option_aactype_main);
-	group_aactype->Add(option_aactype_low);
-	group_aactype->Add(option_aactype_ltp);
-
 	group_mp4		= new GroupBox(i18n->TranslateString("File format"), Point(7, 11), Size(120, 65));
 
 	option_mp4		= new OptionBox("MP4", Point(10, 13), Size(99, 0), &fileFormat, 1);
@@ -78,31 +52,57 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	group_mp4->Add(option_mp4);
 	group_mp4->Add(option_aac);
 
-	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(263, 11), Size(120, 65));
+	group_aactype		= new GroupBox(i18n->TranslateString("AAC object type"), Point(7, 88), Size(120, 90));
 
-	option_extension_m4a	= new OptionBox(".m4a", Point(10, 13), Size(46, 0), &fileExtension, 0);
-	option_extension_m4b	= new OptionBox(".m4b", Point(10, 38), Size(46, 0), &fileExtension, 1);
-	option_extension_m4r	= new OptionBox(".m4r", Point(64, 13), Size(46, 0), &fileExtension, 2);
-	option_extension_mp4	= new OptionBox(".mp4", Point(64, 38), Size(46, 0), &fileExtension, 3);
+	option_aactype_main	= new OptionBox("MAIN", Point(10, 13), Size(99, 0), &aacType, 1);
+	option_aactype_main->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
 
-	group_extension->Add(option_extension_m4a);
-	group_extension->Add(option_extension_m4b);
-	group_extension->Add(option_extension_m4r);
-	group_extension->Add(option_extension_mp4);
+	option_aactype_low	= new OptionBox("LC", Point(10, 38), Size(99, 0), &aacType, 2);
+	option_aactype_low->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
+
+	option_aactype_ltp	= new OptionBox("LTP", Point(10, 63), Size(99, 0), &aacType, 4);
+	option_aactype_ltp->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
+
+	group_aactype->Add(option_aactype_main);
+	group_aactype->Add(option_aactype_low);
+	group_aactype->Add(option_aactype_ltp);
 
 	group_id3v2		= new GroupBox(i18n->TranslateString("Tags"), Point(135, 88), Size(279, 90));
 
 	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
 	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
 
-	text_note		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Note")), Point(10, 38));
+	text_note		= new Text(i18n->AddColon(i18n->TranslateString("Note")), Point(10, 38));
 	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
 
-	group_id3v2->SetWidth(text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22);
+	group_id3v2->SetSize(Size(Math::Max(240, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22), Math::Max(text_note->GetUnscaledTextHeight(), text_id3v2->GetUnscaledTextHeight()) + 48));
 
 	group_id3v2->Add(check_id3v2);
 	group_id3v2->Add(text_note);
 	group_id3v2->Add(text_id3v2);
+
+	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), Point(135, 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
+
+	option_version_mpeg2	= new OptionBox("MPEG 2", Point(10, 13), Size(group_version->GetWidth() - 21, 0), &mpegVersion, 1);
+	option_version_mpeg2->onAction.Connect(&ConfigureFAAC::SetMPEGVersion, this);
+
+	option_version_mpeg4	= new OptionBox("MPEG 4", Point(10, 38), Size(group_version->GetWidth() - 21, 0), &mpegVersion, 0);
+	option_version_mpeg4->onAction.Connect(&ConfigureFAAC::SetMPEGVersion, this);
+
+	group_version->Add(option_version_mpeg2);
+	group_version->Add(option_version_mpeg4);
+
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_version->GetWidth() + 143 + (group_id3v2->GetWidth() % 2), 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
+
+	option_extension_m4a	= new OptionBox(".m4a", Point(10, 13),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 0);
+	option_extension_m4b	= new OptionBox(".m4b", Point(10, 38),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 1);
+	option_extension_m4r	= new OptionBox(".m4r", Point(group_extension->GetWidth() / 2 + 4, 13), Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 2);
+	option_extension_mp4	= new OptionBox(".mp4", Point(group_extension->GetWidth() / 2 + 4, 38), Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 3);
+
+	group_extension->Add(option_extension_m4a);
+	group_extension->Add(option_extension_m4b);
+	group_extension->Add(option_extension_m4r);
+	group_extension->Add(option_extension_mp4);
 
 	i18n->SetContext("Encoders::AAC::Quality");
 
@@ -110,7 +110,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate / Quality"), Point(7, 11), Size(320, 65));
 
-	option_bitrate		= new OptionBox(i18n->TranslateString("Bitrate per channel:"), Point(10, 13), Size(150, 0), &setQuality, 0);
+	option_bitrate		= new OptionBox(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 13), Size(150, 0), &setQuality, 0);
 	option_bitrate->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
 	option_bitrate->SetWidth(option_bitrate->GetUnscaledTextWidth() + 19);
 
@@ -121,9 +121,9 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureFAAC::SetBitrateByEditBox, this);
 
-	text_bitrate_kbps	= new Text("kbps", Point(286, 15));
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(286, 15));
 
-	option_quality		= new OptionBox(i18n->TranslateString("Set quality:"), Point(10, 38), Size(150, 0), &setQuality, 1);
+	option_quality		= new OptionBox(i18n->AddColon(i18n->TranslateString("Set quality")), Point(10, 38), Size(150, 0), &setQuality, 1);
 	option_quality->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
 	option_quality->SetWidth(option_bitrate->GetUnscaledTextWidth() + 19);
 
@@ -134,7 +134,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	edit_quality->SetFlags(EDB_NUMERIC);
 	edit_quality->onInput.Connect(&ConfigureFAAC::SetQualityByEditBox, this);
 
-	text_quality_percent	= new Text("%", Point(286, 40));
+	text_quality_percent	= new Text(i18n->TranslateString("%1%", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(286, 40));
 
 	group_bitrate->Add(option_bitrate);
 	group_bitrate->Add(slider_bitrate);
@@ -159,7 +159,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	group_bandwidth		= new GroupBox(i18n->TranslateString("Maximum bandwidth"), Point(7, 88), Size(320, 43));
 
-	text_bandwidth		= new Text(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz):"), Point(11, 15));
+	text_bandwidth		= new Text(i18n->AddColon(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz)")), Point(11, 15));
 
 	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue("FAAC", "BandWidth", 22050)), Point(text_bandwidth->GetUnscaledTextWidth() + 19, 12), Size(291 - text_bandwidth->GetUnscaledTextWidth(), 0), 5);
 	edit_bandwidth->SetFlags(EDB_NUMERIC);
@@ -173,6 +173,8 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	SetFileFormat();
 
 	ToggleBitrateQuality();
+
+	tabwidget->SetSize(Size(Math::Max(525, group_id3v2->GetWidth() + 146), Math::Max(208, group_id3v2->GetHeight() + 118)));
 
 	Add(tabwidget);
 
@@ -190,7 +192,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	layer_quality->Add(group_tns);
 	layer_quality->Add(group_bandwidth);
 
-	SetSize(Size(539, 222));
+	SetSize(Size(Math::Max(539, group_id3v2->GetWidth() + 160), Math::Max(222, group_id3v2->GetHeight() + 132)));
 }
 
 BoCA::ConfigureFAAC::~ConfigureFAAC()

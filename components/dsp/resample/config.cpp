@@ -19,7 +19,7 @@ BoCA::ConfigureResample::ConfigureResample()
 	group_converter		= new GroupBox(i18n->TranslateString("Converter"), Point(7, 11), Size(450, 59));
 	group_samplerate	= new GroupBox(i18n->TranslateString("Output samplerate"), Point(7, 82), Size(450, 43));
 
-	text_converter		= new Text(i18n->TranslateString("Converter").Append(":"), Point(17, 27));
+	text_converter		= new Text(i18n->AddColon(i18n->TranslateString("Converter")), Point(17, 27));
 
 	combo_converter		= new ComboBox(Point(24 + text_converter->GetUnscaledTextWidth(), 24), Size(423 - text_converter->GetUnscaledTextWidth(), 0));
 
@@ -36,7 +36,7 @@ BoCA::ConfigureResample::ConfigureResample()
 	combo_converter->onSelectEntry.Connect(&ConfigureResample::SetConverter, this);
 
 	text_description	= new Text("Description", Point(24 + text_converter->GetUnscaledTextWidth(), 49));
-	text_samplerate		= new Text(i18n->TranslateString("Samplerate").Append(":"), Point(17, 98));
+	text_samplerate		= new Text(i18n->AddColon(i18n->TranslateString("Samplerate")), Point(17, 98));
 
 	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0), 6);
 	edit_samplerate->SetFlags(EDB_NUMERIC);

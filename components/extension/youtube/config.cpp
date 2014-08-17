@@ -34,7 +34,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 
 	group_downloads		= new GroupBox(i18n->TranslateString("Downloads"), Point(7, 64), Size(344, 41));
 
-	text_max_downloads	= new Text(i18n->TranslateString("Maximum number of simultaneous downloads:"), Point(10, 14));
+	text_max_downloads	= new Text(i18n->AddColon(i18n->TranslateString("Maximum number of simultaneous downloads")), Point(10, 14));
 
 	edit_max_downloads	= new EditBox(String::FromInt(maxDownloads), Point(text_max_downloads->GetUnscaledTextWidth() + 17, 11), Size(18, 0), 2);
 	edit_max_downloads->onInput.Connect(&ConfigureYouTube::EditMaxDownloads, this);
@@ -61,7 +61,7 @@ BoCA::ConfigureYouTube::ConfigureYouTube()
 	button_browse		= new Button(i18n->TranslateString("Browse"), NIL, Point(254, 38), Size(0, 0));
 	button_browse->onAction.Connect(&ConfigureYouTube::SelectOutputDir, this);
 
-	text_format		= new Text(i18n->TranslateString("Output format:"), Point(10, 70));
+	text_format		= new Text(i18n->AddColon(i18n->TranslateString("Output format")), Point(10, 70));
 
 	combo_format		= new ComboBox(Point(17 + text_format->GetUnscaledTextWidth(), 67), Size(317 - text_format->GetUnscaledTextWidth(), 0));
 	combo_format->AddEntry(i18n->TranslateString("keep original format"));
@@ -159,7 +159,7 @@ Void BoCA::ConfigureYouTube::SelectOutputDir()
 	DirSelection	*dialog = new DirSelection();
 
 	dialog->SetParentWindow(GetContainerWindow());
-	dialog->SetCaption(String("\n").Append(i18n->TranslateString("Select the folder to save downloaded video files to:")));
+	dialog->SetCaption(String("\n").Append(i18n->AddColon(i18n->TranslateString("Select the folder to save downloaded video files to"))));
 	dialog->SetDirName(edit_dir->GetText());
 
 	if (dialog->ShowDialog() == Success())

@@ -177,10 +177,10 @@ Void BoCA::LayerTagOther::OnChangeLanguageSettings()
 
 	group_original->SetText(i18n->TranslateString("Original information"));
 
-	text_oartist->SetText(i18n->TranslateString("Original artist").Append(":"));
-	text_oalbum->SetText(i18n->TranslateString("Original album").Append(":"));
-	text_otextwriter->SetText(i18n->TranslateString("Original lyrics writer").Append(":"));
-	text_oyear->SetText(i18n->TranslateString("Original release year").Append(":"));
+	text_oartist->SetText(i18n->AddColon(i18n->TranslateString("Original artist")));
+	text_oalbum->SetText(i18n->AddColon(i18n->TranslateString("Original album")));
+	text_otextwriter->SetText(i18n->AddColon(i18n->TranslateString("Original lyrics writer")));
+	text_oyear->SetText(i18n->AddColon(i18n->TranslateString("Original release year")));
 
 	Int	 maxTextSize = Math::Max(Math::Max(text_oartist->GetUnscaledTextWidth(), text_oalbum->GetUnscaledTextWidth()), Math::Max(text_otextwriter->GetUnscaledTextWidth(), text_oyear->GetUnscaledTextWidth()));
 
@@ -191,12 +191,12 @@ Void BoCA::LayerTagOther::OnChangeLanguageSettings()
 
 	group_web->SetText(i18n->TranslateString("Webpage URLs"));
 
-	text_wartist->SetText(i18n->TranslateString("Artist webpage").Append(":"));
-	text_wpublisher->SetText(i18n->TranslateString("Publisher webpage").Append(":"));
-	text_wradio->SetText(i18n->TranslateString("Internet radio station").Append(":"));
-	text_wsource->SetText(i18n->TranslateString("Audio source webpage").Append(":"));
-	text_wcopyright->SetText(i18n->TranslateString("Copyright information").Append(":"));
-	text_wcommercial->SetText(i18n->TranslateString("Commercial information").Append(":"));
+	text_wartist->SetText(i18n->AddColon(i18n->TranslateString("Artist webpage")));
+	text_wpublisher->SetText(i18n->AddColon(i18n->TranslateString("Publisher webpage")));
+	text_wradio->SetText(i18n->AddColon(i18n->TranslateString("Internet radio station")));
+	text_wsource->SetText(i18n->AddColon(i18n->TranslateString("Audio source webpage")));
+	text_wcopyright->SetText(i18n->AddColon(i18n->TranslateString("Copyright information")));
+	text_wcommercial->SetText(i18n->AddColon(i18n->TranslateString("Commercial information")));
 
 	Int	 maxTextSize2 = Math::Max(Math::Max(Math::Max(text_wartist->GetUnscaledTextWidth(), text_wcopyright->GetUnscaledTextWidth()), Math::Max(text_wpublisher->GetUnscaledTextWidth(), text_wcommercial->GetUnscaledTextWidth())), Math::Max(text_wradio->GetUnscaledTextWidth(), text_wsource->GetUnscaledTextWidth()));
 

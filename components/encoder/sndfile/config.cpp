@@ -19,12 +19,12 @@ BoCA::ConfigureSndFile::ConfigureSndFile()
 
 	group_format	= new GroupBox(i18n->TranslateString("Output format"), Point(7, 11), Size(328, 65));
 
-	text_format	= new Text(i18n->TranslateString("File format:"), Point(10, 13));
+	text_format	= new Text(i18n->AddColon(i18n->TranslateString("File format")), Point(10, 13));
 
 	combo_format	= new ComboBox(Point(88, 10), Size(230, 0));
 	combo_format->onSelectEntry.Connect(&ConfigureSndFile::SelectFormat, this);
 
-	text_subformat	= new Text(i18n->TranslateString("Audio format:"), Point(10, 39));
+	text_subformat	= new Text(i18n->AddColon(i18n->TranslateString("Audio format")), Point(10, 39));
 
 	combo_subformat	= new ComboBox(Point(88, 36), Size(230, 0));
 
@@ -60,8 +60,8 @@ Int BoCA::ConfigureSndFile::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("SndFile", "Format", formats.Get((Int) combo_format->GetSelectedEntry()));
-	config->SetIntValue("SndFile", "SubFormat", subformats.Get((Int) combo_subformat->GetSelectedEntry()));
+	config->SetIntValue("SndFile", "Format", formats.Get(combo_format->GetSelectedEntry()->GetHandle()));
+	config->SetIntValue("SndFile", "SubFormat", subformats.Get(combo_subformat->GetSelectedEntry()->GetHandle()));
 
 	return Success();
 }
@@ -91,7 +91,7 @@ Void BoCA::ConfigureSndFile::FillFormats()
 
 		ListEntry	*entry = combo_format->AddEntry(format_info.name);
 
-		formats.Add(format_info.format, (Int) entry);
+		formats.Add(format_info.format, entry->GetHandle());
 
 #ifdef __APPLE__
 		if (config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF) == format_info.format) combo_format->SelectEntry(entry);
@@ -117,11 +117,11 @@ Void BoCA::ConfigureSndFile::SelectFormat()
 
 	ListEntry	*entry = combo_subformat->AddEntry(i18n->TranslateString("auto select"));
 
-	subformats.Add(0, (Int) entry);
+	subformats.Add(0, entry->GetHandle());
 
 	if (config->GetIntValue("SndFile", "SubFormat", 0) == 0) combo_subformat->SelectEntry(entry);
 
-	int	 format = formats.Get((Int) combo_format->GetSelectedEntry());
+	int	 format = formats.Get(combo_format->GetSelectedEntry()->GetHandle());
 	int	 count	= 0;
 
 	ex_sf_command(NIL, SFC_GET_FORMAT_SUBTYPE_COUNT, &count, sizeof(int));
@@ -146,10 +146,10 @@ Void BoCA::ConfigureSndFile::SelectFormat()
 
 		info.channels	= 2;
 
-		if (!ex_sf_format_check(&info)) entry = combo_subformat->AddEntry(String(format_info.name).Append(" ").Append(i18n->AddBrackets(i18n->TranslateString("mono"))));
+		if (!ex_sf_format_check(&info)) entry = combo_subformat->AddEntry(i18n->AddBrackets(format_info.name, i18n->TranslateString("mono")));
 		else				entry = combo_subformat->AddEntry(format_info.name);
 
-		subformats.Add(format_info.format, (Int) entry);
+		subformats.Add(format_info.format, entry->GetHandle());
 
 		if (config->GetIntValue("SndFile", "SubFormat", 0) == format_info.format) combo_subformat->SelectEntry(entry);
 	}

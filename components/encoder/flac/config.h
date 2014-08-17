@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -55,6 +55,7 @@ namespace BoCA
 			Text		*text_apodization;
 			EditBox		*edit_apodization;
 			ListBox		*list_apodization;
+			Text		*text_apodization_note;
 			Text		*text_apodization_explain;
 
 			GroupBox	*group_lpc;

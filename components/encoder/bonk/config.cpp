@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,9 +12,6 @@
 
 BoCA::ConfigureBonk::ConfigureBonk()
 {
-	Point	 pos;
-	Size	 size;
-
 	Config	*config = Config::Get();
 
 	quant		= config->GetIntValue("Bonk", "Quantization", 8);
@@ -27,99 +24,72 @@ BoCA::ConfigureBonk::ConfigureBonk()
 
 	i18n->SetContext("Encoders::Bonk");
 
-	pos.x = 7;
-	pos.y = 11;
-	size.cx = 168;
-	size.cy = 43;
+	group_mode		= new GroupBox(i18n->TranslateString("Encoder mode"), Point(7, 11), Size(179, 43));
 
-	group_mode		= new GroupBox(i18n->TranslateString("Encoder mode"), pos, size);
-
-	pos.x += 176;
-
-	group_stereo		= new GroupBox(i18n->TranslateString("Stereo mode"), pos, size);
-
-	pos.x -= 176;
-	pos.y += 55;
-
-	group_quant		= new GroupBox(i18n->TranslateString("Quantization"), pos, size);
-
-	pos.x += 176;
-
-	group_downsampling	= new GroupBox(i18n->TranslateString("Downsampling ratio"), pos, size);
-
-	pos.x -= 176;
-	pos.y += 55;
-	size.cx += 176;
-
-	group_predictor		= new GroupBox(i18n->TranslateString("Predictor size"), pos, size);
-
-	pos.x = 17;
-	pos.y = 24;
-	size.cx = 147;
-	size.cy = 0;
-
-	check_lossless		= new CheckBox(i18n->TranslateString("Enable lossless encoding"), pos, size, &lossless);
+	check_lossless		= new CheckBox(i18n->TranslateString("Enable lossless encoding"), Point(10, 13), Size(158, 0), &lossless);
 	check_lossless->onAction.Connect(&ConfigureBonk::SetEncoderMode, this);
 
-	pos.x += 176;
+	group_mode->Add(check_lossless);
 
-	check_joint		= new CheckBox(i18n->TranslateString("Enable Joint Stereo"), pos, size, &jstereo);
+	group_stereo		= new GroupBox(i18n->TranslateString("Stereo mode"), Point(194, 11), Size(179, 43));
 
-	pos.x = 17;
-	pos.y += 55;
-	size.cx = 120;
-	size.cy = 0;
+	check_joint		= new CheckBox(i18n->TranslateString("Enable Joint Stereo"), Point(10, 13), Size(158, 0), &jstereo);
 
-	slider_quant		= new Slider(pos, size, OR_HORZ, &quant, 0, 40);
+	group_stereo->Add(check_joint);
+
+	group_quant		= new GroupBox(i18n->TranslateString("Quantization"), Point(7, 66), Size(179, 43));
+
+	slider_quant		= new Slider(Point(10, 13), Size(131, 0), OR_HORZ, &quant, 0, 40);
 	slider_quant->onValueChange.Connect(&ConfigureBonk::SetQuantization, this);
 
-	pos.x += 127;
-	pos.y += 2;
+	text_quant		= new Text("0.00", Point(148, 15));
 
-	text_quant		= new Text(NIL, pos);
+	text_quant->SetX(169 - text_quant->GetUnscaledTextWidth());
+	slider_quant->SetWidth(151 - text_quant->GetUnscaledTextWidth());
+
+	group_quant->Add(slider_quant);
+	group_quant->Add(text_quant);
+
 	SetQuantization();
 
-	pos.x += 49;
-	pos.y -= 2;
+	group_downsampling	= new GroupBox(i18n->TranslateString("Downsampling ratio"), Point(194, 66), Size(179, 43));
 
-	slider_downsampling	= new Slider(pos, size, OR_HORZ, &downsampling, 1, 10);
+	slider_downsampling	= new Slider(Point(10, 13), Size(131, 0), OR_HORZ, &downsampling, 1, 10);
 	slider_downsampling->onValueChange.Connect(&ConfigureBonk::SetDownsamplingRatio, this);
 
-	pos.x += 127;
-	pos.y += 2;
+	text_downsampling	= new Text("00:0", Point(148, 15));
 
-	text_downsampling	= new Text(NIL, pos);
+	text_downsampling->SetX(169 - text_downsampling->GetUnscaledTextWidth());
+	slider_downsampling->SetWidth(151 - text_downsampling->GetUnscaledTextWidth());
+
+	group_downsampling->Add(slider_downsampling);
+	group_downsampling->Add(text_downsampling);
+
 	SetDownsamplingRatio();
 
-	pos.x -= 303;
-	pos.y += 53;
-	size.cx += 176;
+	group_predictor		= new GroupBox(i18n->TranslateString("Predictor size"), Point(7, 121), Size(366, 43));
 
-	slider_predictor	= new Slider(pos, size, OR_HORZ, &predictor, 0, 512);
+	slider_predictor	= new Slider(Point(10, 13), Size(318, 0), OR_HORZ, &predictor, 0, 512);
 	slider_predictor->onValueChange.Connect(&ConfigureBonk::SetPredictorSize, this);
 
-	pos.x += 303;
-	pos.y += 2;
+	text_predictor		= new Text("00:0", Point(335, 15));
 
-	text_predictor		= new Text(NIL, pos);
+	text_predictor->SetX(356 - text_predictor->GetUnscaledTextWidth());
+	slider_predictor->SetWidth(338 - text_predictor->GetUnscaledTextWidth());
+
+	group_predictor->Add(slider_predictor);
+	group_predictor->Add(text_predictor);
+
 	SetPredictorSize();
 	SetEncoderMode();
 
 	Add(group_quant);
-	Add(slider_quant);
-	Add(text_quant);
 	Add(group_stereo);
-	Add(check_joint);
 	Add(group_mode);
-	Add(check_lossless);
 	Add(group_downsampling);
-	Add(slider_downsampling);
-	Add(text_downsampling);
 	Add(group_predictor);
-	Add(slider_predictor);
-	Add(text_predictor);
 
-	SetSize(Size(358, 171));
+	SetSize(Size(380, 171));
 }
 
 BoCA::ConfigureBonk::~ConfigureBonk()

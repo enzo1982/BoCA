@@ -76,10 +76,10 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
 	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
 
-	text_note		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Note")), Point(10, 38));
+	text_note		= new Text(i18n->AddColon(i18n->TranslateString("Note")), Point(10, 38));
 	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
 
-	group_id3v2->SetWidth(Math::Max(240, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22));
+	group_id3v2->SetSize(Size(Math::Max(240, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22), Math::Max(text_note->GetUnscaledTextHeight(), text_id3v2->GetUnscaledTextHeight()) + 48));
 
 	group_id3v2->Add(check_id3v2);
 	group_id3v2->Add(text_note);
@@ -114,7 +114,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(group_id3v2->GetWidth() + 128, 43));
 
-	text_bitrate		= new Text(i18n->TranslateString("%1:", "Characters").Replace("%1", i18n->TranslateString("Bitrate")), Point(10, 15));
+	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 15));
 
 	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 16, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureFDKAAC::SetBitrate, this);
@@ -123,7 +123,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureFDKAAC::SetBitrateByEditBox, this);
 
-	text_bitrate_kbps	= new Text("kbps", Point(group_bitrate->GetWidth() - 34, 15));
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(group_bitrate->GetWidth() - 34, 15));
 
 	group_bitrate->Add(text_bitrate);
 	group_bitrate->Add(slider_bitrate);
@@ -135,7 +135,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	SetObjectType();
 	SetBitrate();
 
-	tabwidget->SetWidth(group_id3v2->GetWidth() + 146);
+	tabwidget->SetSize(Size(group_id3v2->GetWidth() + 146, Math::Max(258, group_id3v2->GetHeight() + 118)));
 
 	Add(tabwidget);
 
@@ -150,7 +150,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	layer_quality->Add(group_bitrate);
 
-	SetSize(Size(group_id3v2->GetWidth() + 160, 272));
+	SetSize(Size(group_id3v2->GetWidth() + 160, Math::Max(272, group_id3v2->GetHeight() + 132)));
 }
 
 BoCA::ConfigureFDKAAC::~ConfigureFDKAAC()

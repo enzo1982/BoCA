@@ -52,13 +52,13 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	spinup	  = driveSpinUpTimes.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0)) > 0;
 	setspeed  = driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
 
-	check_speed		= new CheckBox(i18n->TranslateString("Set drive speed limit:"), Point(10, 40), Size(162, 0), &setspeed);
+	check_speed		= new CheckBox(i18n->AddColon(i18n->TranslateString("Set drive speed limit")), Point(10, 40), Size(162, 0), &setspeed);
 	check_speed->onAction.Connect(&ConfigureCDParanoia::ToggleSetSpeed, this);
 
-	check_spinup		= new CheckBox(i18n->TranslateString("Spin up before ripping:"), Point(10, 67), Size(162, 0), &spinup);
+	check_spinup		= new CheckBox(i18n->AddColon(i18n->TranslateString("Spin up before ripping")), Point(10, 67), Size(162, 0), &spinup);
 	check_spinup->onAction.Connect(&ConfigureCDParanoia::ToggleSpinUp, this);
 
-	check_offset		= new CheckBox(i18n->TranslateString("Use read offset:"), Point(10, 94), Size(162, 0), &useoffset);
+	check_offset		= new CheckBox(i18n->AddColon(i18n->TranslateString("Use read offset")), Point(10, 94), Size(162, 0), &useoffset);
 	check_offset->onAction.Connect(&ConfigureCDParanoia::ToggleUseOffset, this);
 
 	Int	 maxTextSize = Math::Max(Math::Max(check_speed->GetUnscaledTextWidth(), check_spinup->GetUnscaledTextWidth()), check_offset->GetUnscaledTextWidth());
@@ -99,7 +99,7 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 144), Size(354, 42));
 
-	check_paranoia		= new CheckBox(i18n->TranslateString("Activate cdparanoia mode:"), Point(10, 14), Size(162, 0), &cdparanoia);
+	check_paranoia		= new CheckBox(i18n->AddColon(i18n->TranslateString("Activate cdparanoia mode")), Point(10, 14), Size(162, 0), &cdparanoia);
 	check_paranoia->onAction.Connect(&ConfigureCDParanoia::ToggleParanoia, this);
 
 	combo_paranoia_mode	= new ComboBox(Point(181, 13), Size(163, 0));

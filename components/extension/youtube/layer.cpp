@@ -395,7 +395,7 @@ Void BoCA::LayerYouTube::OnChangeLanguageSettings()
 
 	/* Set texts and positions.
 	 */
-	text_url->SetText(i18n->TranslateString("Enter video URL here:"));
+	text_url->SetText(i18n->AddColon(i18n->TranslateString("Enter video URL here")));
 
 	edit_url->SetX(text_url->GetUnscaledTextWidth() + 15);
 
@@ -412,8 +412,8 @@ Void BoCA::LayerYouTube::OnChangeLanguageSettings()
 	check_auto_download->SetX(check_auto_download->GetWidth() + check_keep_files->GetWidth() + 16);
 	check_keep_files->SetX(check_keep_files->GetWidth() + 8);
 
-	text_downloads->SetText(i18n->TranslateString("Video downloads:"));
-	text_tracks->SetText(i18n->TranslateString("Downloaded tracks:"));
+	text_downloads->SetText(i18n->AddColon(i18n->TranslateString("Video downloads")));
+	text_tracks->SetText(i18n->AddColon(i18n->TranslateString("Downloaded tracks")));
 
 	list_tracks->RemoveAllTabs();
 
@@ -422,17 +422,17 @@ Void BoCA::LayerYouTube::OnChangeLanguageSettings()
 	list_tracks->AddTab(i18n->TranslateString("Length"), 80, OR_RIGHT);
 	list_tracks->AddTab(i18n->TranslateString("Size"), 80, OR_RIGHT);
 
-	text_source->SetText(i18n->TranslateString("Video URL:"));
-	text_title->SetText(i18n->TranslateString("Video title:"));
-	text_description->SetText(i18n->TranslateString("Video description:"));
+	text_source->SetText(i18n->AddColon(i18n->TranslateString("Video URL")));
+	text_title->SetText(i18n->AddColon(i18n->TranslateString("Video title")));
+	text_description->SetText(i18n->AddColon(i18n->TranslateString("Video description")));
 
 	link_source->SetX(129 + Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) + 8);
 	edit_title->SetX(129 + Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) + 8);
 	edit_description->SetX(129 + Math::Max(text_source->GetUnscaledTextWidth(), Math::Max(text_title->GetUnscaledTextWidth(), text_description->GetUnscaledTextWidth())) + 8);
 
-	text_site->SetText(i18n->TranslateString("Site name:"));
-	text_uploader->SetText(i18n->TranslateString("Uploaded by:"));
-	text_date->SetText(i18n->TranslateString("Uploaded on:"));
+	text_site->SetText(i18n->AddColon(i18n->TranslateString("Site name")));
+	text_uploader->SetText(i18n->AddColon(i18n->TranslateString("Uploaded by")));
+	text_date->SetText(i18n->AddColon(i18n->TranslateString("Uploaded on")));
 
 	text_site_value->SetX(200 - Math::Max(text_site->GetUnscaledTextWidth(), Math::Max(text_uploader->GetUnscaledTextWidth(), text_date->GetUnscaledTextWidth())) - 8);
 	text_uploader_value->SetX(200 - Math::Max(text_site->GetUnscaledTextWidth(), Math::Max(text_uploader->GetUnscaledTextWidth(), text_date->GetUnscaledTextWidth())) - 8);

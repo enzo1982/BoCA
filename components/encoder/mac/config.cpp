@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -19,7 +19,7 @@ BoCA::ConfigureMAC::ConfigureMAC()
 
 	group_compression	= new GroupBox(i18n->TranslateString("Compression"), Point(7, 11), Size(216, 39));
 
-	text_compression	= new Text(i18n->TranslateString("Compression mode:"), Point(9, 13));
+	text_compression	= new Text(i18n->AddColon(i18n->TranslateString("Compression mode")), Point(9, 13));
 
 	combo_compression	= new ComboBox(Point(text_compression->GetUnscaledTextWidth() + 17, 10), Size(189 - text_compression->GetUnscaledTextWidth(), 0));
 	combo_compression->AddEntry(i18n->TranslateString("Fast"));

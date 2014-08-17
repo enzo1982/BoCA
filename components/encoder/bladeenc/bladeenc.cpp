@@ -73,7 +73,7 @@ Bool BoCA::EncoderBlade::Activate()
 
 	if (format.rate != 32000 && format.rate != 44100 && format.rate != 48000)
 	{
-		errorString = "Bad sampling rate! BladeEnc supports only 32, 44.1 or 48kHz.";
+		errorString = "Bad sampling rate! BladeEnc supports only 32, 44.1 or 48 kHz.";
 		errorState  = True;
 
 		return False;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -30,7 +30,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	group_basic		= new GroupBox(i18n->TranslateString("Basic settings"), Point(7, 11), Size(228, 66));
 
-	text_mode		= new Text(i18n->TranslateString("Encoding mode:"), Point(7, 13));
+	text_mode		= new Text(i18n->AddColon(i18n->TranslateString("Encoding mode")), Point(7, 13));
 
 	combo_mode		= new ComboBox(Point(120, 10), Size(214, 0));
 	combo_mode->AddEntry(i18n->TranslateString("Auto"));
@@ -39,7 +39,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	combo_mode->SelectNthEntry(config->GetIntValue("Opus", "Mode", 0));
 	combo_mode->onSelectEntry.Connect(&ConfigureOpus::SetMode, this);
 
-	text_bandwidth		= new Text(i18n->TranslateString("Bandwidth:"), Point(7, 40));
+	text_bandwidth		= new Text(i18n->AddColon(i18n->TranslateString("Bandwidth")), Point(7, 40));
 
 	combo_bandwidth		= new ComboBox(Point(120, 37), Size(214, 0));
 	combo_bandwidth->AddEntry(i18n->TranslateString("Auto"));
@@ -80,7 +80,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 164), Size(344, 66));
 
-	text_bitrate		= new Text(i18n->TranslateString("Bitrate:"), Point(10, 13));
+	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 13));
 
 	slider_bitrate		= new Slider(Point(70, 11), Size(201, 0), OR_HORZ, &bitrate, 3, 255);
 	slider_bitrate->onValueChange.Connect(&ConfigureOpus::SetBitrate, this);
@@ -89,9 +89,9 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureOpus::SetBitrateByEditBox, this);
 
-	text_bitrate_kbps	= new Text(i18n->TranslateString("kbps"), Point(310, 13));
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(310, 13));
 
-	text_complexity		= new Text(i18n->TranslateString("Complexity:"), Point(10, 40));
+	text_complexity		= new Text(i18n->AddColon(i18n->TranslateString("Complexity")), Point(10, 40));
 
 	slider_complexity	= new Slider(Point(70, 38), Size(201, 0), OR_HORZ, &complexity, 0, 10);
 	slider_complexity->onValueChange.Connect(&ConfigureOpus::SetComplexity, this);
@@ -113,7 +113,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	group_stream		= new GroupBox(i18n->TranslateString("Stream"), Point(7, 242), Size(344, 40));
 
-	text_framesize		= new Text(i18n->TranslateString("Frame length:"), Point(10, 13));
+	text_framesize		= new Text(i18n->AddColon(i18n->TranslateString("Frame length")), Point(10, 13));
 
 	slider_framesize	= new Slider(Point(17 + text_framesize->GetUnscaledTextWidth(), 11), Size(254 - text_framesize->GetUnscaledTextWidth(), 0), OR_HORZ, &framesize, 0, 5);
 	slider_framesize->onValueChange.Connect(&ConfigureOpus::SetFrameSize, this);
@@ -128,7 +128,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	check_dtx		= new CheckBox(i18n->TranslateString("Enable discontinous transmission"), Point(10, 13), Size(324, 0), &enableDTX);
 
-	text_packet_loss	= new Text(i18n->TranslateString("Expected packet loss:"), Point(10, 40));
+	text_packet_loss	= new Text(i18n->AddColon(i18n->TranslateString("Expected packet loss")), Point(10, 40));
 
 	slider_packet_loss	= new Slider(Point(17 + text_packet_loss->GetUnscaledTextWidth(), 38), Size(254 - text_packet_loss->GetUnscaledTextWidth(), 0), OR_HORZ, &packet_loss, 0, 100);
 	slider_packet_loss->onValueChange.Connect(&ConfigureOpus::SetPacketLoss, this);
@@ -275,10 +275,14 @@ Void BoCA::ConfigureOpus::SetComplexity()
 
 Void BoCA::ConfigureOpus::SetFrameSize()
 {
-	text_framesize_value->SetText(String::FromFloat(Math::Min(2.5 * Math::Pow(2, framesize), 60.0)).Append(" ms"));
+	I18n	*i18n = I18n::Get();
+
+	text_framesize_value->SetText(i18n->TranslateString("%1 ms", "Technical").Replace("%1", String::FromFloat(Math::Min(2.5 * Math::Pow(2, framesize), 60.0))));
 }
 
 Void BoCA::ConfigureOpus::SetPacketLoss()
 {
-	text_packet_loss_value->SetText(String::FromInt(packet_loss).Append("%"));
+	I18n	*i18n = I18n::Get();
+
+	text_packet_loss_value->SetText(i18n->TranslateString("%1%", "Technical").Replace("%1", String::FromInt(packet_loss)));
 }

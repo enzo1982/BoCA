@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -47,11 +47,11 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	i18n->SetContext("Encoders::Speex");
 
-	group_profile		= new GroupBox(i18n->TranslateString("Profile"), Point(7, 11), Size(366, 43));
+	group_profile		= new GroupBox(i18n->TranslateString("Profile"), Point(7, 11), Size(406, 43));
 
-	text_profile		= new Text(i18n->TranslateString("Select encoding profile:"), Point(10, 16));
+	text_profile		= new Text(i18n->AddColon(i18n->TranslateString("Select encoding profile")), Point(10, 16));
 
-	combo_profile		= new ComboBox(Point(18 + text_profile->GetUnscaledTextWidth(), 13), Size(338 - text_profile->GetUnscaledTextWidth(), 0));
+	combo_profile		= new ComboBox(Point(18 + text_profile->GetUnscaledTextWidth(), 13), Size(378 - text_profile->GetUnscaledTextWidth(), 0));
 	combo_profile->AddEntry(i18n->TranslateString("Auto"));
 	combo_profile->AddEntry(i18n->TranslateString("Narrowband (8 kHz)"));
 	combo_profile->AddEntry(i18n->TranslateString("Wideband (16 kHz)"));
@@ -76,23 +76,28 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	group_vbr_mode->Add(option_vbr);
 	group_vbr_mode->Add(option_abr);
 
-	group_cbr_quality	= new GroupBox(i18n->TranslateString("CBR quality"), Point(143, 66), Size(230, 66));
+	group_cbr_quality	= new GroupBox(i18n->TranslateString("CBR quality"), Point(143, 66), Size(270, 66));
 
-	option_cbr_quality	= new OptionBox(i18n->TranslateString("Quality:"), Point(10, 14), Size(55, 0), &cbrmode, 0);
+	option_cbr_quality	= new OptionBox(i18n->AddColon(i18n->TranslateString("Quality")), Point(10, 14), Size(55, 0), &cbrmode, 0);
 	option_cbr_quality->onAction.Connect(&ConfigureSpeex::SetCBRMode, this);
 
-	slider_cbr_quality	= new Slider(Point(74, 14), Size(101, 0), OR_HORZ, &quality, 0, 10);
-	slider_cbr_quality->onValueChange.Connect(&ConfigureSpeex::SetQuality, this);
-
-	text_cbr_quality_value	= new Text(NIL, Point(182, 16));
-
-	option_cbr_bitrate	= new OptionBox(i18n->TranslateString("Bitrate:"), Point(10, 39), Size(55, 0), &cbrmode, 1);
+	option_cbr_bitrate	= new OptionBox(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 39), Size(55, 0), &cbrmode, 1);
 	option_cbr_bitrate->onAction.Connect(&ConfigureSpeex::SetCBRMode, this);
 
-	slider_cbr_bitrate	= new Slider(Point(74, 39), Size(101, 0), OR_HORZ, &bitrate, 4, 64);
+	Int	 maxTextSize = Math::Max(option_cbr_quality->GetUnscaledTextWidth(), option_cbr_bitrate->GetUnscaledTextWidth());
+
+	option_cbr_quality->SetWidth(maxTextSize + 21);
+	option_cbr_bitrate->SetWidth(maxTextSize + 21);
+
+	slider_cbr_quality	= new Slider(Point(maxTextSize + 39, 14), Size(176 - maxTextSize, 0), OR_HORZ, &quality, 0, 10);
+	slider_cbr_quality->onValueChange.Connect(&ConfigureSpeex::SetQuality, this);
+
+	text_cbr_quality_value	= new Text(NIL, Point(222, 16));
+
+	slider_cbr_bitrate	= new Slider(Point(maxTextSize + 39, 39), Size(176 - maxTextSize, 0), OR_HORZ, &bitrate, 4, 64);
 	slider_cbr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetBitrate, this);
 
-	text_cbr_bitrate_value	= new Text(NIL, Point(182, 41));
+	text_cbr_bitrate_value	= new Text(NIL, Point(222, 41));
 
 	group_cbr_quality->Add(option_cbr_quality);
 	group_cbr_quality->Add(slider_cbr_quality);
@@ -101,22 +106,25 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	group_cbr_quality->Add(slider_cbr_bitrate);
 	group_cbr_quality->Add(text_cbr_bitrate_value);
 
-	group_vbr_quality	= new GroupBox(i18n->TranslateString("VBR quality"), Point(143, 66), Size(230, 66));
+	group_vbr_quality	= new GroupBox(i18n->TranslateString("VBR quality"), Point(143, 66), Size(270, 66));
 
-	text_vbr_quality	= new Text(i18n->TranslateString("Quality:"), Point(10, 16));
+	text_vbr_quality	= new Text(i18n->AddColon(i18n->TranslateString("Quality")), Point(10, 16));
 
-	slider_vbr_quality	= new Slider(Point(text_vbr_quality->GetUnscaledTextWidth() + 18, 14), Size(157 - text_vbr_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &vbrq, 0, 100);
+	check_vbr_bitrate	= new CheckBox(i18n->AddColon(i18n->TranslateString("Max. bitrate")), Point(10, 39), Size(80, 0), &use_vbrmax);
+	check_vbr_bitrate->onAction.Connect(&ConfigureSpeex::ToggleVBRBitrate, this);
+	check_vbr_bitrate->SetWidth(check_vbr_bitrate->GetUnscaledTextWidth() + 21);
+
+	maxTextSize = Math::Max(text_vbr_quality->GetUnscaledTextWidth() - 21, check_vbr_bitrate->GetUnscaledTextWidth());
+
+	slider_vbr_quality	= new Slider(Point(maxTextSize + 39, 14), Size(176 - maxTextSize, 0), OR_HORZ, &vbrq, 0, 100);
 	slider_vbr_quality->onValueChange.Connect(&ConfigureSpeex::SetVBRQuality, this);
 
-	text_vbr_quality_value	= new Text(NIL, Point(182, 16));
+	text_vbr_quality_value	= new Text(NIL, Point(222, 16));
 
-	check_vbr_bitrate	= new CheckBox(i18n->TranslateString("Max. bitrate:"), Point(10, 39), Size(80, 0), &use_vbrmax);
-	check_vbr_bitrate->onAction.Connect(&ConfigureSpeex::ToggleVBRBitrate, this);
-
-	slider_vbr_bitrate	= new Slider(Point(93, 39), Size(82, 0), OR_HORZ, &vbrmax, 4, 64);
+	slider_vbr_bitrate	= new Slider(Point(maxTextSize + 39, 39), Size(176 - maxTextSize, 0), OR_HORZ, &vbrmax, 4, 64);
 	slider_vbr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetVBRBitrate, this);
 
-	text_vbr_bitrate_value	= new Text(NIL, Point(182, 41));
+	text_vbr_bitrate_value	= new Text(NIL, Point(222, 41));
 
 	group_vbr_quality->Add(text_vbr_quality);
 	group_vbr_quality->Add(slider_vbr_quality);
@@ -125,37 +133,37 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	group_vbr_quality->Add(slider_vbr_bitrate);
 	group_vbr_quality->Add(text_vbr_bitrate_value);
 
-	group_abr_bitrate	= new GroupBox(i18n->TranslateString("ABR target bitrate"), Point(143, 66), Size(230, 41));
+	group_abr_bitrate	= new GroupBox(i18n->TranslateString("ABR target bitrate"), Point(143, 66), Size(270, 41));
 
-	text_abr_bitrate	= new Text(i18n->TranslateString("Bitrate:"), Point(10, 16));
+	text_abr_bitrate	= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 16));
 
-	slider_abr_bitrate	= new Slider(Point(text_abr_bitrate->GetUnscaledTextWidth() + 18, 14), Size(157 - text_abr_bitrate->GetUnscaledTextWidth(), 0), OR_HORZ, &abr, 4, 64);
+	slider_abr_bitrate	= new Slider(Point(text_abr_bitrate->GetUnscaledTextWidth() + 18, 14), Size(197 - text_abr_bitrate->GetUnscaledTextWidth(), 0), OR_HORZ, &abr, 4, 64);
 	slider_abr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetABRBitrate, this);
 
-	text_abr_bitrate_value	= new Text(NIL, Point(182, 16));
+	text_abr_bitrate_value	= new Text(NIL, Point(222, 16));
 
 	group_abr_bitrate->Add(text_abr_bitrate);
 	group_abr_bitrate->Add(slider_abr_bitrate);
 	group_abr_bitrate->Add(text_abr_bitrate_value);
 
-	group_options		= new GroupBox(i18n->TranslateString("Options"), Point(7, 169), Size(167, 66));
+	group_options		= new GroupBox(i18n->TranslateString("Options"), Point(7, 169), Size(197, 66));
 
-	check_vad		= new CheckBox(i18n->TranslateString("Voice Activity Detection"), Point(10, 14), Size(147, 0), &use_vad);
+	check_vad		= new CheckBox(i18n->TranslateString("Voice Activity Detection"), Point(10, 14), Size(177, 0), &use_vad);
 	check_vad->onAction.Connect(&ConfigureSpeex::SetVAD, this);
 
-	check_dtx		= new CheckBox(i18n->TranslateString("Discontinued Transmission"), Point(10, 39), Size(147, 0), &use_dtx);
+	check_dtx		= new CheckBox(i18n->TranslateString("Discontinued Transmission"), Point(10, 39), Size(177, 0), &use_dtx);
 
 	group_options->Add(check_vad);
 	group_options->Add(check_dtx);
 
-	group_complexity	= new GroupBox(i18n->TranslateString("Algorithm complexity"), Point(182, 169), Size(191, 42));
+	group_complexity	= new GroupBox(i18n->TranslateString("Algorithm complexity"), Point(212, 169), Size(201, 42));
 
-	text_complexity		= new Text(i18n->TranslateString("Complexity:"), Point(10, 16));
+	text_complexity		= new Text(i18n->AddColon(i18n->TranslateString("Complexity")), Point(10, 16));
 
-	slider_complexity	= new Slider(Point(text_complexity->GetUnscaledTextWidth() + 18, 14), Size(144 - text_complexity->GetUnscaledTextWidth(), 0), OR_HORZ, &complexity, 1, 10);
+	slider_complexity	= new Slider(Point(text_complexity->GetUnscaledTextWidth() + 18, 14), Size(154 - text_complexity->GetUnscaledTextWidth(), 0), OR_HORZ, &complexity, 1, 10);
 	slider_complexity->onValueChange.Connect(&ConfigureSpeex::SetComplexity, this);
 
-	text_complexity_value	= new Text(NIL, Point(169, 16));
+	text_complexity_value	= new Text(NIL, Point(179, 16));
 
 	group_complexity->Add(text_complexity);
 	group_complexity->Add(slider_complexity);
@@ -183,7 +191,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	Add(group_options);
 	Add(group_complexity);
 
-	SetSize(Size(380, 242));
+	SetSize(Size(420, 242));
 }
 
 BoCA::ConfigureSpeex::~ConfigureSpeex()
@@ -304,7 +312,9 @@ Void BoCA::ConfigureSpeex::ToggleVBRBitrate()
 
 Void BoCA::ConfigureSpeex::SetVBRBitrate()
 {
-	text_vbr_bitrate_value->SetText(String::FromInt(vbrmax).Append(" kbps"));
+	I18n	*i18n = I18n::Get();
+
+	text_vbr_bitrate_value->SetText(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", String::FromInt(vbrmax)));
 }
 
 Void BoCA::ConfigureSpeex::SetCBRMode()
@@ -337,12 +347,16 @@ Void BoCA::ConfigureSpeex::SetQuality()
 
 Void BoCA::ConfigureSpeex::SetBitrate()
 {
-	text_cbr_bitrate_value->SetText(String::FromInt(bitrate).Append(" kbps"));
+	I18n	*i18n = I18n::Get();
+
+	text_cbr_bitrate_value->SetText(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", String::FromInt(bitrate)));
 }
 
 Void BoCA::ConfigureSpeex::SetABRBitrate()
 {
-	text_abr_bitrate_value->SetText(String::FromInt(abr).Append(" kbps"));
+	I18n	*i18n = I18n::Get();
+
+	text_abr_bitrate_value->SetText(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", String::FromInt(abr)));
 }
 
 Void BoCA::ConfigureSpeex::SetComplexity()
