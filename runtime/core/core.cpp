@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -38,7 +38,7 @@ Void BoCA::Init()
 
 	/* Set number of threads for OpenMP optimized encoders.
 	 */
-	Int	 numThreads = config->GetIntValue("OpenMP", "NumberOfThreads", 0);
+	Int	 numThreads = config->GetIntValue("Resources", "NumberOfThreads", 0);
 
 	if (numThreads == 0) numThreads = CPU().GetNumCores();
 

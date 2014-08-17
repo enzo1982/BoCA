@@ -57,7 +57,7 @@ DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
 
 	/* Try loading an OpenMP enabled version of the codec.
 	 */
-	if (Config::Get()->GetIntValue("OpenMP", "EnableOpenMP", True) && CPU().HasSSE3())
+	if (Config::Get()->GetIntValue("Resources", "EnableOpenMP", True) && CPU().HasSSE3())
 	{
 #ifdef __WIN32__
 		if (File(GUI::Application::GetApplicationDirectory().Append("codecs\\").Append(module).Append("-OpenMP.dll")).Exists())
