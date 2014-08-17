@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -51,9 +51,17 @@ namespace smooth
 				virtual			~MenuEntry();
 			accessors:
 				Int			 SetShortcut(Int, Int, Window *);
+				const Shortcut		*GetShortcut() const			{ return shortcut; }
+
+				const PopupMenu		*GetPopupMenu() const			{ return popup; }
+
+				Bool			*GetCheckVariable() const		{ return bVar; }
+
+				Int			*GetOptionVariable() const		{ return iVar; }
+				Int			 GetOptionCode() const			{ return iCode; }
 
 				Int			 SetBitmap(const Bitmap &);
-				const Bitmap		&GetBitmap() const		{ return bitmap; }
+				const Bitmap		&GetBitmap() const			{ return bitmap; }
 			slots:
 				Void			 InternalOnDeletePopup();
 		};
