@@ -461,6 +461,6 @@ Void BoCA::ChooserAlbums::UpdateAlbumList()
 {
 	if (dontUpdateAlbumList) return;
 
-	foreach (const Track &track, tracks) AddToAlbumList(track);
-	foreach (const Track &album, albums) RemoveFromAlbumList(album);
+	foreach	       (const Track &track, tracks) AddToAlbumList(track);
+	foreachreverse (const Track &album, albums) RemoveFromAlbumList(album);
 }
