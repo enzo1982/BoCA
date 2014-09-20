@@ -16,6 +16,17 @@ using namespace smooth::System;
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
+Void BoCA::Utilities::InfoMessage(const String &message, const String &replace1, const String &replace2)
+{
+	Config	*config	= Config::Get();
+	I18n	*i18n	= I18n::Get();
+
+	i18n->SetContext("Messages");
+
+	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Info"), Message::Buttons::Ok, Message::Icon::Information);
+	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Info")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
+}
+
 Void BoCA::Utilities::WarningMessage(const String &message, const String &replace1, const String &replace2)
 {
 	Config	*config	= Config::Get();
@@ -55,40 +66,19 @@ DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
 {
 	DynamicLoader	*loader = NIL;
 
-	/* Try loading an OpenMP enabled version of the codec.
+	/* Try loading a custom version of the codec.
 	 */
-	if (Config::Get()->GetIntValue("Resources", "EnableOpenMP", True) && CPU().HasSSE3())
-	{
 #ifdef __WIN32__
-		if (File(GUI::Application::GetApplicationDirectory().Append("codecs\\").Append(module).Append("-OpenMP.dll")).Exists())
+	if (File(GUI::Application::GetApplicationDirectory().Append("codecs\\").Append(module).Append(".dll")).Exists())
 #endif
 
-		loader = new DynamicLoader(String("codecs/").Append(module).Append("-OpenMP"));
+	loader = new DynamicLoader(String("codecs/").Append(module));
 
-		if (loader != NIL && loader->GetSystemModuleHandle() == NIL)
-		{
-			Object::DeleteObject(loader);
-
-			loader = NIL;
-		}
-	}
-
-	/* Try loading a standard version of the codec.
-	 */
-	if (loader == NIL)
+	if (loader != NIL && loader->GetSystemModuleHandle() == NIL)
 	{
-#ifdef __WIN32__
-		if (File(GUI::Application::GetApplicationDirectory().Append("codecs\\").Append(module).Append(".dll")).Exists())
-#endif
+		Object::DeleteObject(loader);
 
-		loader = new DynamicLoader(String("codecs/").Append(module));
-
-		if (loader != NIL && loader->GetSystemModuleHandle() == NIL)
-		{
-			Object::DeleteObject(loader);
-
-			loader = NIL;
-		}
+		loader = NIL;
 	}
 
 	/* Try loading a system-wide version of the codec.

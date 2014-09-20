@@ -230,7 +230,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	if (specs->debug)
 	{
-		Dialogs::QuickMessage("Click OK to close console window.", "Info", Dialogs::Message::Buttons::Ok, Dialogs::Message::Icon::Information);
+		BoCA::Utilities::InfoMessage("Click OK to close console window.");
 
 		FreeConsole();
 	}
@@ -392,7 +392,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 	if (specs->debug)
 	{
-		Dialogs::QuickMessage("Click OK to close console window.", "Info", Dialogs::Message::Buttons::Ok, Dialogs::Message::Icon::Information);
+		BoCA::Utilities::InfoMessage("Click OK to close console window.");
 
 		FreeConsole();
 	}
