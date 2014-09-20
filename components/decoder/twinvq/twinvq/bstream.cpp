@@ -64,7 +64,7 @@ CChunkChunk* LoadTwinChunk( BFILE *bfp )
 {
 	int chunkSize;
 
-	// ƒ`ƒƒƒ“ƒN ID ‚ğ“Ç‚ñ‚ÅAƒo[ƒWƒ‡ƒ“‚ğƒ`ƒFƒbƒN‚·‚é
+	// ãƒãƒ£ãƒ³ã‚¯ ID ã‚’èª­ã‚“ã§ã€ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 	char chunkID[KEYWORD_BYTES+VERSION_BYTES+1];
 	get_string ( chunkID, KEYWORD_BYTES+VERSION_BYTES, bfp );
 	TVQ_VERSION = ex_TvqCheckVersion( chunkID );
@@ -75,7 +75,7 @@ CChunkChunk* LoadTwinChunk( BFILE *bfp )
 		return NULL;
 	}
 
-	// ƒ`ƒƒƒ“ƒNƒTƒCƒY‚ğ“Ç‚ŞB
+	// ãƒãƒ£ãƒ³ã‚¯ã‚µã‚¤ã‚ºã‚’èª­ã‚€ã€‚
 	if ( get_bstm( &chunkSize, ELEM_BYTES * CHAR_BITS, bfp ) <= 0 ){
 #if DEBUG_PRINT > 0 
 		fprintf( stderr, "Header reading error: Failed to get header size.\n" );
@@ -83,7 +83,7 @@ CChunkChunk* LoadTwinChunk( BFILE *bfp )
 		return NULL;
 	};
 
-	// ƒ`ƒƒƒ“ƒNƒTƒCƒY•ª‚¾‚¯ƒf[ƒ^‚ğ“Ç‚Ş
+	// ãƒãƒ£ãƒ³ã‚¯ã‚µã‚¤ã‚ºåˆ†ã ã‘ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã‚€
 	char *chunkData = new char[chunkSize+1];
 	if ( get_string ( chunkData, chunkSize, bfp ) < chunkSize ) {
 #if DEBUG_PRINT > 0 
@@ -94,7 +94,7 @@ CChunkChunk* LoadTwinChunk( BFILE *bfp )
 		return NULL;
 	}
 
-	// TWIN ƒ`ƒƒƒ“ƒN‚ğ¶¬‚µAƒf[ƒ^‚ğ‘‚«‚Ş
+	// TWIN ãƒãƒ£ãƒ³ã‚¯ã‚’ç”Ÿæˆã—ã€ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãè¾¼ã‚€
 	CChunkChunk* TwinChunk = new CChunkChunk( chunkID );
 	TwinChunk->PutData( chunkSize, chunkData );
 
@@ -112,14 +112,14 @@ CChunkChunk* LoadTwinChunk( BFILE *bfp )
 CChunkChunk* TvqGetBsHeaderInfo(BFILE *bfp)             // Input:  bitstream file pointer
 {
 
-	// TwinVQ ƒwƒbƒ_‚ğƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚İAƒwƒbƒ_ƒf[ƒ^\‘¢‘Ì‚ğ“¾‚é
+	// TwinVQ ãƒ˜ãƒƒãƒ€ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã¿ã€ãƒ˜ãƒƒãƒ€ãƒ‡ãƒ¼ã‚¿æ§‹é€ ä½“ã‚’å¾—ã‚‹
 	CChunkChunk* twinChunk = LoadTwinChunk( bfp );
 	if ( twinChunk == NULL ) {
 		fprintf( stderr, "Failed to read header. Check the bitstream file.\n" );
 		return NULL;
 	}
 
-	// "DATA" ƒ`ƒƒƒ“ƒNƒwƒbƒ_‚ğ‹ó“Ç‚İ
+	// "DATA" ãƒãƒ£ãƒ³ã‚¯ãƒ˜ãƒƒãƒ€ã‚’ç©ºèª­ã¿
 	char lbuf[BUFSIZ];
 	get_string(lbuf, KEYWORD_BYTES, bfp);
 	if ( strcmp ( lbuf, "DATA" ) ) {

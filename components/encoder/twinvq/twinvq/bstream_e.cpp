@@ -71,9 +71,9 @@ int ChunkWriteToFile( CChunk& twinChunk, BFILE *bfp )
 	CChunk::CChunkData theData = twinChunk.GetData();
 	CChunk::CChunkData::iterator it;
 
-	put_string( twinChunk.GetID(), bfp ); // チャンクIDを記録
-	put_strm( twinChunk.GetSize(), CHAR_BITS * sizeof(unsigned long), bfp ); // チャンクサイズを記録
-	for ( it=theData.begin(); it!=theData.end(); it++ ) {					// チャンクデータを記録
+	put_string( twinChunk.GetID(), bfp ); // 繝√Ε繝ｳ繧ｯID繧定ｨ倬鹸
+	put_strm( twinChunk.GetSize(), CHAR_BITS * sizeof(unsigned long), bfp ); // 繝√Ε繝ｳ繧ｯ繧ｵ繧､繧ｺ繧定ｨ倬鹸
+	for ( it=theData.begin(); it!=theData.end(); it++ ) {					// 繝√Ε繝ｳ繧ｯ繝�繝ｼ繧ｿ繧定ｨ倬鹸
 		put_strm( *it, CHAR_BITS, bfp );
 	}
 

@@ -1,7 +1,7 @@
 /* (c)Copyright 1996-2000 NTT Cyber Space Laboratories */
 /*                Modified on 2000.09.06 by N. Iwakami */
 
-// Chunk1.cpp: CChunk ÉNÉâÉXÇÃÉCÉìÉvÉäÉÅÉìÉeÅ[ÉVÉáÉì
+// Chunk1.cpp: CChunk „ÇØ„É©„Çπ„ÅÆ„Ç§„É≥„Éó„É™„É°„É≥„ÉÜ„Éº„Ç∑„Éß„É≥
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -10,7 +10,7 @@
 #include "Chunk.h"
 
 //////////////////////////////////////////////////////////////////////
-// ç\íz/è¡ñ≈
+// ÊßãÁØâ/Ê∂àÊªÖ
 //////////////////////////////////////////////////////////////////////
 
 CChunk::CChunk( std::string ID )
@@ -59,7 +59,7 @@ std::string CChunk::GetRndString( int length )
 		length = GetSize();
 	}
 
-	if ( m_iter + length > m_data.end() ) {
+	if ( m_iter > m_data.end() - length ) {
 		return "";
 	}
 
@@ -79,7 +79,7 @@ std::vector<char> CChunk::GetVector( int size )
 		size = m_data.end() - m_iter;
 	}
 
-	if ( m_iter + size > m_data.end() ) {
+	if ( m_iter > m_data.end() - size ) {
 		return retval;
 	}
 
@@ -111,7 +111,11 @@ void CChunk::PutNInt(unsigned int inputData, int size)
 	int ibyte;
 	char data_tmp;
 
-	// ÉfÅ[É^èëÇ´çûÇ›
+	if ( size > (signed) sizeof(int) ) {
+		throw err_FailPut();
+	}
+
+	// „Éá„Éº„ÇøÊõ∏„ÅçËæº„Åø
 	for ( ibyte=0; ibyte<size; ibyte++ ) {
 		data_tmp = (char)( ( inputData >> ( 8 * (size-ibyte-1) ) ) & mask );
 		m_data.push_back( data_tmp );
@@ -134,11 +138,11 @@ void CChunk::cnk_delete()
 }
 
 //////////////////////////////////////////////////////////////////////
-// CStringChunk ÉNÉâÉX
+// CStringChunk „ÇØ„É©„Çπ
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
-// ç\íz/è¡ñ≈
+// ÊßãÁØâ/Ê∂àÊªÖ
 //////////////////////////////////////////////////////////////////////
 
 
@@ -149,11 +153,11 @@ CStringChunk::~CStringChunk()
 
 
 //////////////////////////////////////////////////////////////////////
-// CChunkChunk ÉNÉâÉX
+// CChunkChunk „ÇØ„É©„Çπ
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
-// ç\íz/è¡ñ≈
+// ÊßãÁØâ/Ê∂àÊªÖ
 //////////////////////////////////////////////////////////////////////
 
 /*
@@ -171,14 +175,15 @@ CChunkChunk::~CChunkChunk()
 CChunk* CChunkChunk::GetNextChunk(int idSize)
 {
 	std::string id;
-	if ( (id = this->GetRndString(idSize)) != "" ){ // É`ÉÉÉìÉN ID ÇéÊìæ
-		CChunk* subChunk = new CChunk( id );		// ÉTÉuÉ`ÉÉÉìÉNÇçÏê¨
+	if ( (id = this->GetRndString(idSize)) != "" ){ // „ÉÅ„É£„É≥„ÇØ ID „ÇíÂèñÂæó
+		CChunk* subChunk = new CChunk( id );		// „Çµ„Éñ„ÉÅ„É£„É≥„ÇØ„Çí‰ΩúÊàê
 
-		int size = this->GetNInt(sizeof(unsigned long));	// ì¸óÕÉ`ÉÉÉìÉNÇÃÉTÉCÉYÇéÊìæ
+		int size = this->GetNInt(sizeof(unsigned long));	// ÂÖ•Âäõ„ÉÅ„É£„É≥„ÇØ„ÅÆ„Çµ„Ç§„Ç∫„ÇíÂèñÂæó
 		if ( size > 0 ){
 			CChunk::CChunkData theData;
-			theData = this->GetVector( size );			// ÉTÉCÉYï™ÇÃÉfÅ[É^Çì«Çﬁ
-			subChunk->PutData( theData );						// ÉfÅ[É^ÇÉTÉuÉ`ÉÉÉìÉNÇ…èëÇ´çûÇﬁ
+			theData = this->GetVector( size );			// „Çµ„Ç§„Ç∫ÂàÜ„ÅÆ„Éá„Éº„Çø„ÇíË™≠„ÇÄ
+			if ( theData.size() == 0 ) throw err_FailGetChunk();	// „Éá„Éº„Çø„ÅÆÂèñÂæó„Å´Â§±Êïó„Åó„ÅüÂ†¥Âêà
+			subChunk->PutData( theData );						// „Éá„Éº„Çø„Çí„Çµ„Éñ„ÉÅ„É£„É≥„ÇØ„Å´Êõ∏„ÅçËæº„ÇÄ
 		}
 		return subChunk;
 	}
@@ -188,18 +193,18 @@ CChunk* CChunkChunk::GetNextChunk(int idSize)
 
 /*============================================================================*/
 /* Name:        CChunkChunk::AppendChunk                                      */
-/* Description: É`ÉÉÉìÉNÉfÅ[É^Ç…ÉTÉuÉ`ÉÉÉìÉNÇâ¡Ç¶ÇÈ                          */
-/* Return:      Ç»Çµ                                                          */
+/* Description: „ÉÅ„É£„É≥„ÇØ„Éá„Éº„Çø„Å´„Çµ„Éñ„ÉÅ„É£„É≥„ÇØ„ÇíÂä†„Åà„Çã                          */
+/* Return:      „Å™„Åó                                                          */
 /* Access:      public                                                        */
 /*============================================================================*/
 void CChunkChunk::PutChunk(CChunk& src)
 {
-	// ñ{ëÃÉ`ÉÉÉìÉNÇ…ÉTÉuÉ`ÉÉÉìÉNÇÃIDÇèëÇ´çûÇﬁ
+	// Êú¨‰Ωì„ÉÅ„É£„É≥„ÇØ„Å´„Çµ„Éñ„ÉÅ„É£„É≥„ÇØ„ÅÆID„ÇíÊõ∏„ÅçËæº„ÇÄ
 	std::string id = src.GetID();
 	PutData( id );
-	// ñ{ëÃÉ`ÉÉÉìÉNÇ…ÉTÉuÉ`ÉÉÉìÉNÇÃÉTÉCÉYÇèëÇ´çûÇﬁ
+	// Êú¨‰Ωì„ÉÅ„É£„É≥„ÇØ„Å´„Çµ„Éñ„ÉÅ„É£„É≥„ÇØ„ÅÆ„Çµ„Ç§„Ç∫„ÇíÊõ∏„ÅçËæº„ÇÄ
 	PutNInt( src.GetSize(), sizeof(long) );
-	// ñ{ëÃÉ`ÉÉÉìÉNÇ…ÉTÉuÉ`ÉÉÉìÉNÇÃÉfÅ[É^ÇèëÇ´çûÇﬁ
+	// Êú¨‰Ωì„ÉÅ„É£„É≥„ÇØ„Å´„Çµ„Éñ„ÉÅ„É£„É≥„ÇØ„ÅÆ„Éá„Éº„Çø„ÇíÊõ∏„ÅçËæº„ÇÄ
 	CChunk::CChunkData data = src.GetData();
 	PutData( data );
 }
@@ -207,18 +212,18 @@ void CChunkChunk::PutChunk(CChunk& src)
 
 
 //////////////////////////////////////////////////////////////////////
-// CCommChunk ÉNÉâÉX
+// CCommChunk „ÇØ„É©„Çπ
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
-// ç\íz/è¡ñ≈
+// ÊßãÁØâ/Ê∂àÊªÖ
 //////////////////////////////////////////////////////////////////////
 
 CCommChunk::CCommChunk( const CChunk& parent, string version ) : CChunk( parent )
 {
 	m_version = version;
 
-	// ÉfÅ[É^Çì«Ç›çûÇﬁ
+	// „Éá„Éº„Çø„ÇíË™≠„ÅøËæº„ÇÄ
 	this->cnk_rewind();
 	m_channelMode   = this->GetNInt();
 	m_bitRate       = this->GetNInt();
@@ -232,16 +237,16 @@ CCommChunk::CCommChunk(CommData channelMode,
 					   CommData securityLevel,
 					   string version) : CChunk( "COMM" )
 {
-	// ÉoÅ[ÉWÉáÉìÇÉZÉbÉg
+	// „Éê„Éº„Ç∏„Éß„É≥„Çí„Çª„ÉÉ„Éà
 	m_version = version;
 
-	// ÉfÅ[É^Çèâä˙âª
+	// „Éá„Éº„Çø„ÇíÂàùÊúüÂåñ
 	m_channelMode   = channelMode;
 	m_bitRate       = bitRate;
 	m_samplingRate  = samplingRate;
 	m_securityLevel = securityLevel;
 
-	// ÉfÅ[É^ÇÉ`ÉÉÉìÉNÇ…ÉRÉsÅ[
+	// „Éá„Éº„Çø„Çí„ÉÅ„É£„É≥„ÇØ„Å´„Ç≥„Éî„Éº
 	this->cnk_rewind();
 	this->PutNInt( m_channelMode );
 	this->PutNInt( m_bitRate );
@@ -257,11 +262,11 @@ CCommChunk::~CCommChunk()
 
 
 //////////////////////////////////////////////////////////////////////
-// CEncdChunk ÉNÉâÉX
+// CEncdChunk „ÇØ„É©„Çπ
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
-// ç\íz/è¡ñ≈
+// ÊßãÁØâ/Ê∂àÊªÖ
 //////////////////////////////////////////////////////////////////////
 
 CEncdChunk::CEncdChunk(std::string id,

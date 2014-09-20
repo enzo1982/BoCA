@@ -1,7 +1,7 @@
 /* (c)Copyright 1996-2000 NTT Cyber Space Laboratories */
 /*                Modified on 2000.09.06 by N. Iwakami */
 
-// Chunk1.h: CChunk ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
+// Chunk1.h: CChunk ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -18,8 +18,8 @@
 
 //////////////////////////////////////
 //////////////////////////////////////
-// CChunk ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^ƒtƒF[ƒX
-// CChunk ƒNƒ‰ƒX‚Íƒ`ƒƒƒ“ƒN‚ÌŠî–{\‘¢‚ğ’ñ‹Ÿ‚·‚éB¶‚Ìƒf[ƒ^‚ğ“üo—Í‚·‚é
+// CChunk ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ•ã‚§ãƒ¼ã‚¹
+// CChunk ã‚¯ãƒ©ã‚¹ã¯ãƒãƒ£ãƒ³ã‚¯ã®åŸºæœ¬æ§‹é€ ã‚’æä¾›ã™ã‚‹ã€‚ç”Ÿã®ãƒ‡ãƒ¼ã‚¿ã‚’å…¥å‡ºåŠ›ã™ã‚‹
 class CChunk
 {
 public:
@@ -31,43 +31,43 @@ private:
 	CChunkData::iterator m_iter;
 
 protected:
-	int   GetNInt( int size=sizeof(long) );			// Œ»İˆÊ’u‚©‚ç size ƒoƒCƒg®”‚ğæ“¾iƒfƒtƒHƒ‹ƒgFlong®”j
-	CChunkData GetVector( int size = 0 );			// Œ»İˆÊ’u‚©‚ç size ƒoƒCƒg•ª‚ÌƒxƒNƒgƒ‹‚ğæ“¾iƒfƒtƒHƒ‹ƒgFc‚è‘S•”j
-	std::string GetRndString( int length = 0 );		// Œ»İˆÊ’u‚©‚ç length ‚¾‚¯‚Ì•¶š—ñ‚ğæ“¾iƒfƒtƒHƒ‹ƒgFc‚è‘S•”j
+	int   GetNInt( int size=sizeof(long) );			// ç¾åœ¨ä½ç½®ã‹ã‚‰ size ãƒã‚¤ãƒˆæ•´æ•°ã‚’å–å¾—ï¼ˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆï¼šlongæ•´æ•°ï¼‰
+	CChunkData GetVector( int size = 0 );			// ç¾åœ¨ä½ç½®ã‹ã‚‰ size ãƒã‚¤ãƒˆåˆ†ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—ï¼ˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆï¼šæ®‹ã‚Šå…¨éƒ¨ï¼‰
+	std::string GetRndString( int length = 0 );		// ç¾åœ¨ä½ç½®ã‹ã‚‰ length ã ã‘ã®æ–‡å­—åˆ—ã‚’å–å¾—ï¼ˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆï¼šæ®‹ã‚Šå…¨éƒ¨ï¼‰
 
-	void PutNInt( unsigned int inputData, int size=sizeof(long) );	// Œ»İˆÊ’u‚©‚ç size ƒoƒCƒg®”‚ğ‘‚«‚İiƒfƒtƒHƒ‹ƒgFlong®”j
+	void PutNInt( unsigned int inputData, int size=sizeof(long) );	// ç¾åœ¨ä½ç½®ã‹ã‚‰ size ãƒã‚¤ãƒˆæ•´æ•°ã‚’æ›¸ãè¾¼ã¿ï¼ˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆï¼šlongæ•´æ•°ï¼‰
 
-	void  cnk_rewind();								// Œ»İˆÊ’u‚ğæ“ª‚É–ß‚·
-	void cnk_delete();								// ƒf[ƒ^‚ğÁ‹‚·‚é
-	const int   GetCurrentPosition()				// Œ»İˆÊ’u‚ğæ“¾‚·‚é
+	void  cnk_rewind();								// ç¾åœ¨ä½ç½®ã‚’å…ˆé ­ã«æˆ»ã™
+	void cnk_delete();								// ãƒ‡ãƒ¼ã‚¿ã‚’æ¶ˆå»ã™ã‚‹
+	const int   GetCurrentPosition()				// ç¾åœ¨ä½ç½®ã‚’å–å¾—ã™ã‚‹
 	{
 		return m_iter - m_data.begin();
 	};
 
-	// —áŠO
+	// ä¾‹å¤–
 	class err_FailPut { };
 
 public:
-	CChunk( std::string ID );	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	virtual ~CChunk();			// ƒfƒXƒgƒ‰ƒNƒ^
+	CChunk( std::string ID );	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	virtual ~CChunk();			// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 
-	// æ“¾Œnƒƒ“ƒoŠÖ”
-	const std::string& GetID() { return m_id; };		// ID ‚Ìæ“¾
-	const int GetSize() { return m_data.size(); };	// ƒ`ƒƒƒ“ƒNƒTƒCƒY‚Ìæ“¾
+	// å–å¾—ç³»ãƒ¡ãƒ³ãƒé–¢æ•°
+	const std::string& GetID() { return m_id; };		// ID ã®å–å¾—
+	const int GetSize() { return m_data.size(); };	// ãƒãƒ£ãƒ³ã‚¯ã‚µã‚¤ã‚ºã®å–å¾—
 	const CChunkData& GetData() { return m_data; };
 
-	// ‘‚«‚İŒnƒƒ“ƒoŠÖ”
-	int PutData( int size, char inputData[] );		// ƒf[ƒ^‚ğ’Ç‰ÁAƒLƒƒƒ‰ƒNƒ^”z—ñŒ^
-	int PutData( CChunkData& inputData );			// ƒf[ƒ^‚ğ’Ç‰ÁAƒxƒNƒgƒ‹Œ^
-	int PutData( std::string& theString );			// ƒf[ƒ^‚ğ’Ç‰ÁA•¶š—ñŒ^
+	// æ›¸ãè¾¼ã¿ç³»ãƒ¡ãƒ³ãƒé–¢æ•°
+	int PutData( int size, char inputData[] );		// ãƒ‡ãƒ¼ã‚¿ã‚’è¿½åŠ ã€ã‚­ãƒ£ãƒ©ã‚¯ã‚¿é…åˆ—å‹
+	int PutData( CChunkData& inputData );			// ãƒ‡ãƒ¼ã‚¿ã‚’è¿½åŠ ã€ãƒ™ã‚¯ãƒˆãƒ«å‹
+	int PutData( std::string& theString );			// ãƒ‡ãƒ¼ã‚¿ã‚’è¿½åŠ ã€æ–‡å­—åˆ—å‹
 
 	virtual std::string whatami() { return "Raw"; };
 
 };
 
 
-// CChunkChunk ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
-// •¶š—ñ‚Ì‚İ‚ğŠi”[‚·‚éƒ`ƒƒƒ“ƒNA”Ä—pƒ`ƒƒƒ“ƒNŒ^
+// CChunkChunk ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
+// æ–‡å­—åˆ—ã®ã¿ã‚’æ ¼ç´ã™ã‚‹ãƒãƒ£ãƒ³ã‚¯ã€æ±ç”¨ãƒãƒ£ãƒ³ã‚¯å‹
 //
 //////////////////////////////////////////////////////////////////////
 class CStringChunk : public CChunk  
@@ -82,8 +82,8 @@ public:
 };
 
 
-// CIntChunk ƒeƒ“ƒvƒŒ[ƒg
-// ®”‚ğ‚P‚Â‚¾‚¯Ši”[‚·‚éƒ`ƒƒƒ“ƒNŒ^‚Ìƒeƒ“ƒvƒŒ[ƒgA”Ä—pƒ`ƒƒƒ“ƒNŒ^
+// CIntChunk ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
+// æ•´æ•°ã‚’ï¼‘ã¤ã ã‘æ ¼ç´ã™ã‚‹ãƒãƒ£ãƒ³ã‚¯å‹ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã€æ±ç”¨ãƒãƒ£ãƒ³ã‚¯å‹
 //
 //////////////////////////////////////////////////////////////////////
 template <class TINT>
@@ -91,7 +91,7 @@ class CIntChunk : public CChunk
 {
 	int m_dataSize;
 public:
-	const TINT GetInt() { cnk_rewind(); return GetNInt(m_dataSize); };	// ®”ƒf[ƒ^‚ğæ“¾‚·‚é
+	const TINT GetInt() { cnk_rewind(); return GetNInt(m_dataSize); };	// æ•´æ•°ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹
 	void PutInt( TINT data ) { cnk_delete(); PutNInt( data, m_dataSize ); };
 
 	CIntChunk( const CChunk& parent ) : CChunk(parent) { m_dataSize = sizeof(TINT); };
@@ -105,29 +105,29 @@ public:
 };
 
 
-// CChunkChunk ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
-// ƒ`ƒƒƒ“ƒN‚ğŠi”[‚·‚éƒ`ƒƒƒ“ƒNA”Ä—pƒ`ƒƒƒ“ƒNŒ^
+// CChunkChunk ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
+// ãƒãƒ£ãƒ³ã‚¯ã‚’æ ¼ç´ã™ã‚‹ãƒãƒ£ãƒ³ã‚¯ã€æ±ç”¨ãƒãƒ£ãƒ³ã‚¯å‹
 //
 //////////////////////////////////////////////////////////////////////
 class CChunkChunk : public CChunk  
 {
 public:
-	CChunk* GetNextChunk( int idSize = 4 );	// Ÿ‚Ìƒ`ƒƒƒ“ƒN‚ğ•Ô‚·
-	void rewind() { cnk_rewind(); };		// Šª‚«–ß‚µ
+	CChunk* GetNextChunk( int idSize = 4 );	// æ¬¡ã®ãƒãƒ£ãƒ³ã‚¯ã‚’è¿”ã™
+	void rewind() { cnk_rewind(); };		// å·»ãæˆ»ã—
 	void PutChunk( CChunk& src );
 
-	CChunkChunk( const CChunk& parent ) : CChunk( parent ) { };	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^ECChunk ƒIƒuƒWƒFƒNƒg‚ğí‚É‚·‚é
-	CChunkChunk( std::string ID ) : CChunk( ID ) { };		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^EID ‚¾‚¯—^‚¦‹ó‚Ìƒ`ƒƒƒ“ƒN‚ğì¬‚·‚é
-	virtual ~CChunkChunk();									// ƒfƒXƒgƒ‰ƒNƒ^
+	CChunkChunk( const CChunk& parent ) : CChunk( parent ) { };	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ãƒ»CChunk ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç¨®ã«ã™ã‚‹
+	CChunkChunk( std::string ID ) : CChunk( ID ) { };		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ãƒ»ID ã ã‘ä¸ãˆç©ºã®ãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆã™ã‚‹
+	virtual ~CChunkChunk();									// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 
-	// —áŠO
-	class err_FailGetChunk { };		// ƒ`ƒƒƒ“ƒNæ“¾‚É¸”s
-	class err_FailPutChunk { };		// ƒ`ƒƒƒ“ƒN‘‚«‚İ‚É¸”s
+	// ä¾‹å¤–
+	class err_FailGetChunk { };		// ãƒãƒ£ãƒ³ã‚¯å–å¾—ã«å¤±æ•—
+	class err_FailPutChunk { };		// ãƒãƒ£ãƒ³ã‚¯æ›¸ãè¾¼ã¿ã«å¤±æ•—
 
 	std::string whatami() { return "Chunk"; };
 };
 
-// CCommChunk ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
+// CCommChunk ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 //
 //////////////////////////////////////////////////////////////////////
 class CCommChunk : public CChunk  
@@ -148,19 +148,19 @@ public:
 	CCommChunk( CommData channelMode, CommData bitRate, CommData samplingRate, CommData securityLevel, string version="TWIN97012000" );
 	virtual ~CCommChunk();
 
-	CommData GetChannelMode()  { return m_channelMode;  };		// ƒ`ƒƒƒlƒ‹ƒ‚[ƒh‚ğæ“¾
-	CommData GetBitRate()      { return m_bitRate;      };		// ƒrƒbƒgƒŒ[ƒg‚ğæ“¾
-	CommData GetSamplingRate() { return m_samplingRate; };		// ƒTƒ“ƒvƒŠƒ“ƒOü”g”‚ğæ“¾
-	CommData GetSecurityLevel()  { return m_securityLevel;  };	// ’Ç‰Áî•ñ‚ğæ“¾
+	CommData GetChannelMode()  { return m_channelMode;  };		// ãƒãƒ£ãƒãƒ«ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—
+	CommData GetBitRate()      { return m_bitRate;      };		// ãƒ“ãƒƒãƒˆãƒ¬ãƒ¼ãƒˆã‚’å–å¾—
+	CommData GetSamplingRate() { return m_samplingRate; };		// ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°å‘¨æ³¢æ•°ã‚’å–å¾—
+	CommData GetSecurityLevel()  { return m_securityLevel;  };	// è¿½åŠ æƒ…å ±ã‚’å–å¾—
 
-	// —áŠO
-	class err_FailConstruction { };							// ƒGƒ‰[FƒRƒ“ƒXƒgƒ‰ƒNƒVƒ‡ƒ“‚É¸”s
+	// ä¾‹å¤–
+	class err_FailConstruction { };							// ã‚¨ãƒ©ãƒ¼ï¼šã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚·ãƒ§ãƒ³ã«å¤±æ•—
 
 	std::string whatami() { return "COMM"; };
 };
 
 
-// CYearChunk ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
+// CYearChunk ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 //
 //////////////////////////////////////////////////////////////////////
 class CYearChunk : public CChunk  
@@ -188,7 +188,7 @@ public:
 	std::string whatami() { return "YEAR"; };
 };
 
-// CEncdChunk ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
+// CEncdChunk ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 //
 //////////////////////////////////////////////////////////////////////
 class CEncdChunk : public CChunk  
@@ -218,13 +218,13 @@ public:
 
 
 /////////////////////////////////////////////////////////
-// ”Ä—pƒ`ƒƒƒ“ƒNŒ^‚ğ—˜—p‚·‚éƒTƒuƒ`ƒƒƒ“ƒNŒ^‚ÌéŒ¾
+// æ±ç”¨ãƒãƒ£ãƒ³ã‚¯å‹ã‚’åˆ©ç”¨ã™ã‚‹ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯å‹ã®å®£è¨€
 /////////////////////////////////////////////////////////
-// TWIN ƒ`ƒƒƒ“ƒN
+// TWIN ãƒãƒ£ãƒ³ã‚¯
 typedef CChunkChunk			CTwinChunk;	// TWIN
 
-// •W€ƒ`ƒƒƒ“ƒN
-										// COMM ‚Í”Ä—pƒ`ƒƒƒ“ƒN‚Å‚Í‚È‚¢
+// æ¨™æº–ãƒãƒ£ãƒ³ã‚¯
+										// COMM ã¯æ±ç”¨ãƒãƒ£ãƒ³ã‚¯ã§ã¯ãªã„
 typedef CStringChunk		CNameChunk;	// NAME
 typedef CStringChunk		CComtChunk;	// COMT
 typedef CStringChunk		CAuthChunk;	// AUTH
@@ -233,10 +233,10 @@ typedef CStringChunk		CFileChunk;	// FILE
 typedef CIntChunk<unsigned long>	CDsizChunk;	// DSIZ
 typedef CChunk				CExtrChunk;	// EXTR
 
-// Šg’£ƒ`ƒƒƒ“ƒNE’Êí
+// æ‹¡å¼µãƒãƒ£ãƒ³ã‚¯ãƒ»é€šå¸¸
 typedef CStringChunk		CAlbmChunk;	// ALBM
-										// YEAR ‚Í”Ä—pƒ`ƒƒƒ“ƒN‚Å‚Í‚È‚¢
-										// ENCD ‚Í”Ä—pƒ`ƒƒƒ“ƒN‚Å‚Í‚È‚¢
+										// YEAR ã¯æ±ç”¨ãƒãƒ£ãƒ³ã‚¯ã§ã¯ãªã„
+										// ENCD ã¯æ±ç”¨ãƒãƒ£ãƒ³ã‚¯ã§ã¯ãªã„
 typedef CIntChunk<short>	CTracChunk;	// TRAC
 typedef CStringChunk		CLyrcChunk;	// LYRC
 typedef CChunk				CGuidChunk;	// GUID
@@ -253,10 +253,10 @@ typedef CStringChunk		CPrsnChunk;	// PRSN
 typedef CStringChunk		CLablChunk;	// LABL
 typedef CStringChunk		CNoteChunk;	// NOTE
 
-// Šg’£ƒ`ƒƒƒ“ƒNE•â•
+// æ‹¡å¼µãƒãƒ£ãƒ³ã‚¯ãƒ»è£œåŠ©
 typedef CChunkChunk			CScndChunk;	// SCND
 
-// —\–ñƒ`ƒƒƒ“ƒN
+// äºˆç´„ãƒãƒ£ãƒ³ã‚¯
 typedef CChunk				C_Id3Chunk;	// _ID3
 typedef CChunk				C_YmhChunk;	// _YMH
 typedef CChunk				C_NttChunk;	// _NTT

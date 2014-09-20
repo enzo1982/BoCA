@@ -1,7 +1,7 @@
 /* (c)Copyright 1996-2000 NTT Cyber Space Laboratories */
 /*                Modified on 2000.09.06 by N. Iwakami */
 
-// HeaderManager.h: CHeaderManager ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
+// HeaderManager.h: CHeaderManager ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -19,46 +19,46 @@
 class CHeaderManager  
 {
 public:
-	typedef std::map<std::string, CChunk> CChunkBank;	// ƒ`ƒƒƒ“ƒNƒoƒ“ƒNŒ^AID‚ğƒL[‚Éƒ`ƒƒƒ“ƒN‚ğŠi”[‚µ‚Ä‚¢‚éƒ}ƒbƒv
-	typedef std::string string;							// •¶š—ñŒ^
+	typedef std::map<std::string, CChunk> CChunkBank;	// ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯å‹ã€IDã‚’ã‚­ãƒ¼ã«ãƒãƒ£ãƒ³ã‚¯ã‚’æ ¼ç´ã—ã¦ã„ã‚‹ãƒãƒƒãƒ—
+	typedef std::string string;							// æ–‡å­—åˆ—å‹
 
 private:
-	// ƒƒ“ƒo•Ï”iƒNƒ‰ƒXj
-	CChunkBank m_primaryChunkBank;			// ’Êíƒ`ƒƒƒ“ƒN‚Ìƒ`ƒƒƒ“ƒNƒoƒ“ƒN
-	CChunkBank m_secondaryChunkBank;		// •â•ƒ`ƒƒƒ“ƒN‚Ìƒ`ƒƒƒ“ƒNƒoƒ“ƒN
-	string     m_chunkID;					// TWIN ƒ`ƒƒƒ“ƒN‚ÌIDA’Êí‚ÌID‚Æˆá‚¢ "TWIN"+<ƒo[ƒWƒ‡ƒ“¯•Êq>‚Å\¬‚³‚ê‚éB
+	// ãƒ¡ãƒ³ãƒå¤‰æ•°ï¼ˆã‚¯ãƒ©ã‚¹ï¼‰
+	CChunkBank m_primaryChunkBank;			// é€šå¸¸ãƒãƒ£ãƒ³ã‚¯ã®ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯
+	CChunkBank m_secondaryChunkBank;		// è£œåŠ©ãƒãƒ£ãƒ³ã‚¯ã®ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯
+	string     m_chunkID;					// TWIN ãƒãƒ£ãƒ³ã‚¯ã®IDã€é€šå¸¸ã®IDã¨é•ã„ "TWIN"+<ãƒãƒ¼ã‚¸ãƒ§ãƒ³è­˜åˆ¥å­>ã§æ§‹æˆã•ã‚Œã‚‹ã€‚
 
-	// ƒƒ“ƒoŠÖ”
-	CChunk GetChunk( CChunkBank *theBank, string id );						// ƒ`ƒƒƒ“ƒNƒoƒ“ƒN‚©‚çID‚Åƒ`ƒƒƒ“ƒN‚ğˆø‚«o‚·
-	void PickUpSubChunks ( CChunkBank* theChunkBank, CChunkChunk *inputChunk );	// ChunkŒ^‚Ìƒ`ƒƒƒ“ƒN‚©‚çƒTƒuƒ`ƒƒƒ“ƒN‚ğæ‚èo‚µƒ`ƒƒƒ“ƒNƒoƒ“ƒN‚É“o˜^‚·‚é
-	void Init( CChunkChunk& twinChunk );	// ‰Šú‰»‚·‚éBƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Ì‘ã‚í‚è‚Ég‚¤
-	CHeaderManager() { };					// ƒRƒ“ƒXƒgƒ‰ƒNƒ^Bƒ†[ƒU‚ÍŒÄ‚×‚È‚¢B‘ã‚í‚è‚É Create() ‚ğg‚¤B
-											// ‰Šú‰»‚ÌÛ‚ÉƒGƒ‰[‚ªo‚é‰Â”\«‚ª‚ ‚é‚½‚ß‚±‚Ì‚æ‚¤‚Èd—l‚É‚µ‚½B
+	// ãƒ¡ãƒ³ãƒé–¢æ•°
+	CChunk GetChunk( CChunkBank *theBank, string id );						// ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯ã‹ã‚‰IDã§ãƒãƒ£ãƒ³ã‚¯ã‚’å¼•ãå‡ºã™
+	void PickUpSubChunks ( CChunkBank* theChunkBank, CChunkChunk *inputChunk );	// Chunkå‹ã®ãƒãƒ£ãƒ³ã‚¯ã‹ã‚‰ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’å–ã‚Šå‡ºã—ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯ã«ç™»éŒ²ã™ã‚‹
+	void Init( CChunkChunk& twinChunk );	// åˆæœŸåŒ–ã™ã‚‹ã€‚ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®ä»£ã‚ã‚Šã«ä½¿ã†
+	CHeaderManager() { };					// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚ãƒ¦ãƒ¼ã‚¶ã¯å‘¼ã¹ãªã„ã€‚ä»£ã‚ã‚Šã« Create() ã‚’ä½¿ã†ã€‚
+											// åˆæœŸåŒ–ã®éš›ã«ã‚¨ãƒ©ãƒ¼ãŒå‡ºã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹ãŸã‚ã“ã®ã‚ˆã†ãªä»•æ§˜ã«ã—ãŸã€‚
 
-	// ƒNƒ‰ƒX‚Ì’†‚¾‚¯‚Åg‚í‚ê‚é—áŠO
-	class err_WrongChunkFormat { };		// ƒ`ƒƒƒ“ƒN‚Ì‘®‚ª³‚µ‚­‚È‚¢
+	// ã‚¯ãƒ©ã‚¹ã®ä¸­ã ã‘ã§ä½¿ã‚ã‚Œã‚‹ä¾‹å¤–
+	class err_WrongChunkFormat { };		// ãƒãƒ£ãƒ³ã‚¯ã®æ›¸å¼ãŒæ­£ã—ããªã„
 
 public:
-	CChunk GetPrimaryChunk( string id )   { return GetChunk( &m_primaryChunkBank,   id ); }; // ’Êíƒ`ƒƒƒ“ƒN‚ğˆø‚«o‚·
-	CChunk GetSecondaryChunk( string id ) { return GetChunk( &m_secondaryChunkBank, id ); }; // •â•ƒ`ƒƒƒ“ƒN‚ğˆø‚«o‚·
+	CChunk GetPrimaryChunk( string id )   { return GetChunk( &m_primaryChunkBank,   id ); }; // é€šå¸¸ãƒãƒ£ãƒ³ã‚¯ã‚’å¼•ãå‡ºã™
+	CChunk GetSecondaryChunk( string id ) { return GetChunk( &m_secondaryChunkBank, id ); }; // è£œåŠ©ãƒãƒ£ãƒ³ã‚¯ã‚’å¼•ãå‡ºã™
 	const string  GetID() { return m_chunkID; };
 
-	static CHeaderManager* Create( CChunkChunk& twinChunk );	// ƒ`ƒƒƒ“ƒNƒ}ƒl[ƒWƒƒ‚ğì‚èo‚·BƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Ì‘ã‚í‚è
-	virtual ~CHeaderManager();	// ƒfƒXƒgƒ‰ƒNƒ^
+	static CHeaderManager* Create( CChunkChunk& twinChunk );	// ãƒãƒ£ãƒ³ã‚¯ãƒãƒãƒ¼ã‚¸ãƒ£ã‚’ä½œã‚Šå‡ºã™ã€‚ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®ä»£ã‚ã‚Š
+	virtual ~CHeaderManager();	// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 
-	// —áŠO
-	class err_FailGetChunk { };			// ƒ`ƒƒƒ“ƒN‚Ìæ“¾‚É¸”s‚µ‚½
+	// ä¾‹å¤–
+	class err_FailGetChunk { };			// ãƒãƒ£ãƒ³ã‚¯ã®å–å¾—ã«å¤±æ•—ã—ãŸ
 
 };
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-// ƒwƒbƒ_ƒ}ƒl[ƒWƒƒ‚©‚ç‚Ìƒf[ƒ^“Ç‚İo‚µ‚Ìx‰‡ƒNƒ‰ƒX
+// ãƒ˜ãƒƒãƒ€ãƒãƒãƒ¼ã‚¸ãƒ£ã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿èª­ã¿å‡ºã—ã®æ”¯æ´ã‚¯ãƒ©ã‚¹
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-// CUniStringInfo ƒNƒ‰ƒX‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
-// Unified string information, •¶š—ñƒ`ƒƒƒ“ƒN‚Ì‘‡î•ñAƒwƒbƒ_ƒ}ƒl[ƒWƒƒ‚©‚çæ“¾‚·‚é‚±‚Æ‚ª‚Å‚«‚é
+// CUniStringInfo ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
+// Unified string information, æ–‡å­—åˆ—ãƒãƒ£ãƒ³ã‚¯ã®ç·åˆæƒ…å ±ã€ãƒ˜ãƒƒãƒ€ãƒãƒãƒ¼ã‚¸ãƒ£ã‹ã‚‰å–å¾—ã™ã‚‹ã“ã¨ãŒã§ãã‚‹
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////
 class CUniStringInfo
@@ -75,31 +75,31 @@ public:
 	};
 	
 private:
-	string m_id;				// ƒ`ƒƒƒ“ƒN ID
-	string m_primary;			// Šî–{•¶š—ñ
-	string m_secondary;			// •â••¶š—ñ
-	int m_primaryCharCode;		// Šî–{•¶š—ñ‚Ì•¶šƒR[ƒh
-	int m_secondaryCharCode;	// •â••¶š—ñ‚Ì•¶šƒR[ƒh
+	string m_id;				// ãƒãƒ£ãƒ³ã‚¯ ID
+	string m_primary;			// åŸºæœ¬æ–‡å­—åˆ—
+	string m_secondary;			// è£œåŠ©æ–‡å­—åˆ—
+	int m_primaryCharCode;		// åŸºæœ¬æ–‡å­—åˆ—ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰
+	int m_secondaryCharCode;	// è£œåŠ©æ–‡å­—åˆ—ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰
 
 	void PutPrimaryInfo( CStringChunk& theChunk );
 	void PutSecondaryInfo( CStringChunk& theChunk );
 
-	// “à•”‚Åg‚¤—áŠO
-	class err_ID { };					// ‰Šú‰»‚ÌÛAŠî–{ƒ`ƒƒƒ“ƒN‚Æ•â•ƒ`ƒƒƒ“ƒN‚Ì ID ‚ªH‚¢ˆá‚Á‚Ä‚¢‚é
-	class err_NoCharCode { };			// •â•ƒ`ƒƒƒ“ƒN‚É•¶šƒR[ƒhî•ñ‚ª‚È‚¢
+	// å†…éƒ¨ã§ä½¿ã†ä¾‹å¤–
+	class err_ID { };					// åˆæœŸåŒ–ã®éš›ã€åŸºæœ¬ãƒãƒ£ãƒ³ã‚¯ã¨è£œåŠ©ãƒãƒ£ãƒ³ã‚¯ã® ID ãŒé£Ÿã„é•ã£ã¦ã„ã‚‹
+	class err_NoCharCode { };			// è£œåŠ©ãƒãƒ£ãƒ³ã‚¯ã«æ–‡å­—ã‚³ãƒ¼ãƒ‰æƒ…å ±ãŒãªã„
 
 public:
-	const string& GetPrimaryInfo() { return m_primary; };				// Šî–{•¶š—ñ‚ğ•Ô‚·
-	const string& GetSecondaryInfo() { return m_secondary; };			// •â••¶š—ñ‚ğ•Ô‚·
-	const int GetPrimaryCharCode() { return m_primaryCharCode; };		// Šî–{•¶š—ñ‚Ì•¶šƒR[ƒh‚ğ•Ô‚·
-	const int GetSecondaryCharCode() { return m_secondaryCharCode; };	// •â••¶š—ñ‚Ì•¶šƒR[ƒh‚ğ•Ô‚·
+	const string& GetPrimaryInfo() { return m_primary; };				// åŸºæœ¬æ–‡å­—åˆ—ã‚’è¿”ã™
+	const string& GetSecondaryInfo() { return m_secondary; };			// è£œåŠ©æ–‡å­—åˆ—ã‚’è¿”ã™
+	const int GetPrimaryCharCode() { return m_primaryCharCode; };		// åŸºæœ¬æ–‡å­—åˆ—ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’è¿”ã™
+	const int GetSecondaryCharCode() { return m_secondaryCharCode; };	// è£œåŠ©æ–‡å­—åˆ—ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’è¿”ã™
 
-	CUniStringInfo( string id, string primary, string secondary="", int primCode=unknown_code, int scndCode=unknown_code ); // ƒRƒ“ƒXƒgƒ‰ƒNƒ^A•K—v‚Èî•ñ‚ğ‘S‚Ä—^‚¦‚é
-	CUniStringInfo( string id, CHeaderManager& theManager );	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^Aƒwƒbƒ_ƒ}ƒl[ƒWƒƒ‚©‚ç“Ç‚İo‚·
+	CUniStringInfo( string id, string primary, string secondary="", int primCode=unknown_code, int scndCode=unknown_code ); // ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€å¿…è¦ãªæƒ…å ±ã‚’å…¨ã¦ä¸ãˆã‚‹
+	CUniStringInfo( string id, CHeaderManager& theManager );	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€ãƒ˜ãƒƒãƒ€ãƒãƒãƒ¼ã‚¸ãƒ£ã‹ã‚‰èª­ã¿å‡ºã™
 	virtual ~CUniStringInfo();
 
-	// —áŠO
-	class err_FailConstruction { };		// ƒRƒ“ƒXƒgƒ‰ƒNƒg‚Ì¸”s
+	// ä¾‹å¤–
+	class err_FailConstruction { };		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ãƒˆã®å¤±æ•—
 };
 
 template<class T>

@@ -7,18 +7,18 @@
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-// ƒwƒbƒ_ƒ`ƒƒƒ“ƒNì¬‚Ì•â•ŠÖ”iƒ`ƒƒƒ“ƒNî•ñƒtƒ@ƒCƒ‹‚©‚çƒTƒuƒ`ƒƒƒ“ƒN‚ğì¬‚·‚éj
+// ãƒ˜ãƒƒãƒ€ãƒãƒ£ãƒ³ã‚¯ä½œæˆã®è£œåŠ©é–¢æ•°ï¼ˆãƒãƒ£ãƒ³ã‚¯æƒ…å ±ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆã™ã‚‹ï¼‰
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-// TRAC Œ^
+// TRAC å‹
 static
 int ReadTracChunk( FILE *fp, std::string id, CChunkChunk *theChunkChunk )
 {
-	// •K—v‚Èƒf[ƒ^‚Ì“Ç‚İ‚İ
+	// å¿…è¦ãªãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 	int trackNumber=0;
 
 	if ( fscanf( fp, "%d", &trackNumber ) == 1 ) {
-		// ƒTƒuƒ`ƒƒƒ“ƒN‚ğì¬E’Ç‰Á
+		// ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆãƒ»è¿½åŠ 
 		CTracChunk subChunk( id, trackNumber );
 		theChunkChunk->PutChunk( subChunk );
 	}
@@ -26,16 +26,16 @@ int ReadTracChunk( FILE *fp, std::string id, CChunkChunk *theChunkChunk )
 	return 0;
 }
 
-// YEAR Œ^
+// YEAR å‹
 static
 int ReadYearChunk( FILE *fp, std::string id, CChunkChunk *theChunkChunk )
 {
-	// •K—v‚Èƒf[ƒ^‚Ì“Ç‚İ‚İ
+	// å¿…è¦ãªãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 	int year = 0;
 	int month = 0;
 
 	if ( fscanf( fp, "%d %d", &year, &month ) == 2 ) {
-		// ƒTƒuƒ`ƒƒƒ“ƒN‚ğì¬E’Ç‰Á
+		// ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆãƒ»è¿½åŠ 
 		CYearChunk subChunk( id, year, month );
 		theChunkChunk->PutChunk( subChunk );
 	}
@@ -43,15 +43,15 @@ int ReadYearChunk( FILE *fp, std::string id, CChunkChunk *theChunkChunk )
 	return 0;
 }
 
-// ENCD Œ^
+// ENCD å‹
 static
 int ReadEncdChunk( FILE *fp, std::string id, CChunkChunk *theChunkChunk )
 {
-	// •K—v‚Èƒf[ƒ^‚Ì“Ç‚İ‚İ
+	// å¿…è¦ãªãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 	int year=0, month=0, day=0, hour=0, minute=0, timeZone=0;
 
 	if ( fscanf( fp, "%d %d %d %d %d %d", &year, &month, &day, &hour, &minute, &timeZone ) == 6 ) {
-		// ƒTƒuƒ`ƒƒƒ“ƒN‚ğì¬E’Ç‰Á
+		// ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆãƒ»è¿½åŠ 
 		CEncdChunk subChunk( id, year, month, day, hour, minute, timeZone );
 		theChunkChunk->PutChunk( subChunk );
 	}
@@ -59,19 +59,19 @@ int ReadEncdChunk( FILE *fp, std::string id, CChunkChunk *theChunkChunk )
 	return 0;
 }
 
-// ”Ä—pŒ^i•¶š—ñŒ^‚ğŠÜ‚Şj
+// æ±ç”¨å‹ï¼ˆæ–‡å­—åˆ—å‹ã‚’å«ã‚€ï¼‰
 static
 int ReadRawChunk( FILE *fp, std::string id, CChunkChunk *theChunkChunk ){
-	// ƒ`ƒƒƒ“ƒNì¬
+	// ãƒãƒ£ãƒ³ã‚¯ä½œæˆ
 	CChunk subChunk( id );
 
-	// •K—v‚Èƒf[ƒ^‚Ì“Ç‚İ‚İ
+	// å¿…è¦ãªãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 	char buf;
 	while ( fread( &buf, 1, sizeof(char), fp ) ){
 		subChunk.PutData( 1, &buf );
 	}
 
-	// ƒTƒuƒ`ƒƒƒ“ƒN‚ğ’Ç‰Á
+	// ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’è¿½åŠ 
 	theChunkChunk->PutChunk( subChunk );
 
 	return 0;
@@ -81,7 +81,7 @@ int ReadRawChunk( FILE *fp, std::string id, CChunkChunk *theChunkChunk ){
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-// ƒ`ƒƒƒ“ƒN“Ç‚İ‚İƒe[ƒuƒ‹
+// ãƒãƒ£ãƒ³ã‚¯èª­ã¿è¾¼ã¿ãƒ†ãƒ¼ãƒ–ãƒ«
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 #define ReadStringChunk ReadRawChunk
@@ -92,58 +92,58 @@ typedef struct {
 } CHUNK_READ_TABLE;
 
 static CHUNK_READ_TABLE primaryReadTable[] = {
-	{ (char *) "TRAC", ReadTracChunk },	// ƒgƒ‰ƒbƒN”Ô†
-	{ (char *) "YEAR", ReadYearChunk },	// ˜^‰¹‚³‚ê‚½”N
-	{ (char *) "ENCD", ReadEncdChunk },	// ƒGƒ“ƒR[ƒh‚Ì“ú•t
+	{ (char *) "TRAC", ReadTracChunk },	// ãƒˆãƒ©ãƒƒã‚¯ç•ªå·
+	{ (char *) "YEAR", ReadYearChunk },	// éŒ²éŸ³ã•ã‚ŒãŸå¹´
+	{ (char *) "ENCD", ReadEncdChunk },	// ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã®æ—¥ä»˜
 	{ (char *) "GUID", ReadRawChunk },	// Globally Unique Identifier
 	{ (char *) "ISRC", ReadRawChunk },	// International Standard Record Code
-	{ (char *) "ALBM", ReadStringChunk },	// ƒAƒ‹ƒoƒ€ƒ^ƒCƒgƒ‹
-	{ (char *) "LYRC", ReadStringChunk },	// ‰ÌŒ
-	{ (char *) "WORD", ReadStringChunk },	// ìŒÒ
-	{ (char *) "MUSC", ReadStringChunk },	// ì‹ÈÒ
-	{ (char *) "ARNG", ReadStringChunk },	// •Ò‹ÈÒ
-	{ (char *) "PROD", ReadStringChunk },	// ƒvƒƒfƒ…[ƒT[
-	{ (char *) "REMX", ReadStringChunk },	// ƒŠƒ~ƒbƒNƒX
-	{ (char *) "CDCT", ReadStringChunk },	// wŠöÒ
-	{ (char *) "SING", ReadStringChunk },	// ‰Ìè
-	{ (char *) "LABL", ReadStringChunk },	// ƒŒ[ƒxƒ‹
-	{ (char *) "NOTE", ReadStringChunk },	// ƒ‰ƒCƒi[ƒm[ƒc
-	{ (char *) "PRSN", ReadStringChunk },	// ‰‰‘tƒƒ“ƒo[
-	{ (char *) "BAND", ReadStringChunk },	// ƒoƒ“ƒh–¼
+	{ (char *) "ALBM", ReadStringChunk },	// ã‚¢ãƒ«ãƒãƒ ã‚¿ã‚¤ãƒˆãƒ«
+	{ (char *) "LYRC", ReadStringChunk },	// æ­Œè©
+	{ (char *) "WORD", ReadStringChunk },	// ä½œè©è€…
+	{ (char *) "MUSC", ReadStringChunk },	// ä½œæ›²è€…
+	{ (char *) "ARNG", ReadStringChunk },	// ç·¨æ›²è€…
+	{ (char *) "PROD", ReadStringChunk },	// ãƒ—ãƒ­ãƒ‡ãƒ¥ãƒ¼ã‚µãƒ¼
+	{ (char *) "REMX", ReadStringChunk },	// ãƒªãƒŸãƒƒã‚¯ã‚¹
+	{ (char *) "CDCT", ReadStringChunk },	// æŒ‡æ®è€…
+	{ (char *) "SING", ReadStringChunk },	// æ­Œæ‰‹
+	{ (char *) "LABL", ReadStringChunk },	// ãƒ¬ãƒ¼ãƒ™ãƒ«
+	{ (char *) "NOTE", ReadStringChunk },	// ãƒ©ã‚¤ãƒŠãƒ¼ãƒãƒ¼ãƒ„
+	{ (char *) "PRSN", ReadStringChunk },	// æ¼”å¥ãƒ¡ãƒ³ãƒãƒ¼
+	{ (char *) "BAND", ReadStringChunk },	// ãƒãƒ³ãƒ‰å
 	{ NULL },
 };
 
 static CHUNK_READ_TABLE secondaryReadTable[] = {
-	{ (char *) "NAME", ReadStringChunk },	// ‹È–¼
-	{ (char *) "AUTH", ReadStringChunk },	// ƒA[ƒeƒBƒXƒg
-	{ (char *) "COMT", ReadStringChunk },	// ƒRƒƒ“ƒg
-	{ (char *) "(c) ", ReadStringChunk },	// ’˜ìŒ 
+	{ (char *) "NAME", ReadStringChunk },	// æ›²å
+	{ (char *) "AUTH", ReadStringChunk },	// ã‚¢ãƒ¼ãƒ†ã‚£ã‚¹ãƒˆ
+	{ (char *) "COMT", ReadStringChunk },	// ã‚³ãƒ¡ãƒ³ãƒˆ
+	{ (char *) "(c) ", ReadStringChunk },	// è‘—ä½œæ¨©
 
-	{ (char *) "ALBM", ReadStringChunk },	// ƒAƒ‹ƒoƒ€ƒ^ƒCƒgƒ‹
-	{ (char *) "LYRC", ReadStringChunk },	// ‰ÌŒ
-	{ (char *) "WORD", ReadStringChunk },	// ìŒÒ
-	{ (char *) "MUSC", ReadStringChunk },	// ì‹ÈÒ
-	{ (char *) "ARNG", ReadStringChunk },	// •Ò‹ÈÒ
-	{ (char *) "PROD", ReadStringChunk },	// ƒvƒƒfƒ…[ƒT[
-	{ (char *) "REMX", ReadStringChunk },	// ƒŠƒ~ƒbƒNƒX
-	{ (char *) "CDCT", ReadStringChunk },	// wŠöÒ
-	{ (char *) "SING", ReadStringChunk },	// ‰Ìè
-	{ (char *) "LABL", ReadStringChunk },	// ƒŒ[ƒxƒ‹
-	{ (char *) "NOTE", ReadStringChunk },	// ƒ‰ƒCƒi[ƒm[ƒc
-	{ (char *) "PRSN", ReadStringChunk },	// ‰‰‘tƒƒ“ƒo[
-	{ (char *) "BAND", ReadStringChunk },	// ƒoƒ“ƒh–¼
+	{ (char *) "ALBM", ReadStringChunk },	// ã‚¢ãƒ«ãƒãƒ ã‚¿ã‚¤ãƒˆãƒ«
+	{ (char *) "LYRC", ReadStringChunk },	// æ­Œè©
+	{ (char *) "WORD", ReadStringChunk },	// ä½œè©è€…
+	{ (char *) "MUSC", ReadStringChunk },	// ä½œæ›²è€…
+	{ (char *) "ARNG", ReadStringChunk },	// ç·¨æ›²è€…
+	{ (char *) "PROD", ReadStringChunk },	// ãƒ—ãƒ­ãƒ‡ãƒ¥ãƒ¼ã‚µãƒ¼
+	{ (char *) "REMX", ReadStringChunk },	// ãƒªãƒŸãƒƒã‚¯ã‚¹
+	{ (char *) "CDCT", ReadStringChunk },	// æŒ‡æ®è€…
+	{ (char *) "SING", ReadStringChunk },	// æ­Œæ‰‹
+	{ (char *) "LABL", ReadStringChunk },	// ãƒ¬ãƒ¼ãƒ™ãƒ«
+	{ (char *) "NOTE", ReadStringChunk },	// ãƒ©ã‚¤ãƒŠãƒ¼ãƒãƒ¼ãƒ„
+	{ (char *) "PRSN", ReadStringChunk },	// æ¼”å¥ãƒ¡ãƒ³ãƒãƒ¼
+	{ (char *) "BAND", ReadStringChunk },	// ãƒãƒ³ãƒ‰å
 	{ NULL },
 };
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-// ƒwƒbƒ_ƒ`ƒƒƒ“ƒNì¬ŠÖ”
+// ãƒ˜ãƒƒãƒ€ãƒãƒ£ãƒ³ã‚¯ä½œæˆé–¢æ•°
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------*/
 /* Name:        PutTextChunk()                                                */
-/* Description: •¶š—ñƒ`ƒƒƒ“ƒN‚ğì¬‚µ‚Ä TWIN ƒ`ƒƒƒ“ƒN‚É•t‚¯‰Á‚¦‚é            */
-/* Return:      ‚È‚µ                                                          */
+/* Description: æ–‡å­—åˆ—ãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆã—ã¦ TWIN ãƒãƒ£ãƒ³ã‚¯ã«ä»˜ã‘åŠ ãˆã‚‹            */
+/* Return:      ãªã—                                                          */
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
@@ -156,26 +156,26 @@ void PutTextChunk( char* id, char* theData, CChunkChunk* twinChunk ) {
 
 /*----------------------------------------------------------------------------*/
 /* Name:        PutStandardChunks()                                           */
-/* Description: TWIN ƒ`ƒƒƒ“ƒN‚É•W€ƒ`ƒƒƒ“ƒN‚ğ•t‚¯‰Á‚¦‚é                       */
-/* Return:      (int) ƒGƒ‰[‚ª‚ ‚ê‚Î‚PA‚È‚¯‚ê‚Î‚O                            */
+/* Description: TWIN ãƒãƒ£ãƒ³ã‚¯ã«æ¨™æº–ãƒãƒ£ãƒ³ã‚¯ã‚’ä»˜ã‘åŠ ãˆã‚‹                       */
+/* Return:      (int) ã‚¨ãƒ©ãƒ¼ãŒã‚ã‚Œã°ï¼‘ã€ãªã‘ã‚Œã°ï¼                            */
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
 int PutStandardChunks( headerInfo* info, CChunkChunk* twinChunk )
 {
-	// COMM ƒ`ƒƒƒ“ƒN‚ğì¬‚µ‚Ä TWIN ƒ`ƒƒƒ“ƒN‚É•t‚¯‰Á‚¦‚é
+	// COMM ãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆã—ã¦ TWIN ãƒãƒ£ãƒ³ã‚¯ã«ä»˜ã‘åŠ ãˆã‚‹
 	std::string version = twinChunk->GetID();
 	CCommChunk theCommChunk( info->channelMode, info->bitRate, info->samplingRate, info->securityLevel );
 	twinChunk->PutChunk( theCommChunk );
 
-	// •W€•¶š—ñƒ`ƒƒƒ“ƒNî•ñ‚ğì¬‚µ‚Ä TWIN ƒ`ƒƒƒ“ƒN‚É•t‚¯‰Á‚¦‚é
+	// æ¨™æº–æ–‡å­—åˆ—ãƒãƒ£ãƒ³ã‚¯æƒ…å ±ã‚’ä½œæˆã—ã¦ TWIN ãƒãƒ£ãƒ³ã‚¯ã«ä»˜ã‘åŠ ãˆã‚‹
 	PutTextChunk( (char *) "NAME", info->Name, twinChunk );
 	PutTextChunk( (char *) "COMT", info->Comt, twinChunk );
 	PutTextChunk( (char *) "AUTH", info->Auth, twinChunk );
 	PutTextChunk( (char *) "(c) ", info->Cpyr, twinChunk );
 	PutTextChunk( (char *) "FILE", info->File, twinChunk );
 
-	// ƒf[ƒ^ƒTƒCƒYƒ`ƒƒƒ“ƒN‚ğì¬‚µ‚Ä•t‚¯‰Á‚¦‚é
+	// ãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚ºãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆã—ã¦ä»˜ã‘åŠ ãˆã‚‹
 	if ( info->Dsiz > 0 ) {
 		CDsizChunk dsizChunk( "DSIZ", info->Dsiz );
 		twinChunk->PutChunk( dsizChunk );
@@ -186,8 +186,8 @@ int PutStandardChunks( headerInfo* info, CChunkChunk* twinChunk )
 
 /*----------------------------------------------------------------------------*/
 /* Name:        PutChunkInfo()                                                */
-/* Description: ƒ`ƒƒƒ“ƒNî•ñ‚ğƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚İ twin ƒ`ƒƒƒ“ƒN‚É’Ç‰Á‚·‚é    */
-/* Return:      (int) ƒGƒ‰[‚ª‚ ‚ê‚Î‚PA‚È‚¯‚ê‚Î‚O                            */
+/* Description: ãƒãƒ£ãƒ³ã‚¯æƒ…å ±ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã¿ twin ãƒãƒ£ãƒ³ã‚¯ã«è¿½åŠ ã™ã‚‹    */
+/* Return:      (int) ã‚¨ãƒ©ãƒ¼ãŒã‚ã‚Œã°ï¼‘ã€ãªã‘ã‚Œã°ï¼                            */
 /* Access:      static                                                        */
 /*----------------------------------------------------------------------------*/
 static
@@ -198,11 +198,11 @@ int PutChunkInfo ( CHUNK_READ_TABLE theTable[], CChunkChunk *twinChunk, int mode
 	if ( mode >= 2 ) return 1;
 
 	while ( theTable->id ) {
-		/* ƒtƒ@ƒCƒ‹–¼‚ğì‚é */
+		/* ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ä½œã‚‹ */
 		std::string fileName = theTable->id;
 		std::string pathName = directory + infoDir[mode] + fileName;
 		
-		/* ƒtƒ@ƒCƒ‹–¼‚ğƒ`ƒFƒbƒN‚µAƒtƒ@ƒCƒ‹‚ª‚ ‚ê‚Îî•ñ‚ğæ‚è‚Ş */
+		/* ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ãƒã‚§ãƒƒã‚¯ã—ã€ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚Œã°æƒ…å ±ã‚’å–ã‚Šè¾¼ã‚€ */
 		FILE *fp;
 		if ( (fp=fopen(pathName.c_str(), "rb")) ) {
 			(*theTable->reader)( fp, theTable->id, twinChunk );
@@ -216,8 +216,8 @@ int PutChunkInfo ( CHUNK_READ_TABLE theTable[], CChunkChunk *twinChunk, int mode
 
 /*============================================================================*/
 /* Name:        TvqCreateHeaderChunk()                                        */
-/* Description: ƒwƒbƒ_ƒ`ƒƒƒ“ƒN‚ğì¬‚·‚éB                                    */
-/* Return:      ƒwƒbƒ_ƒ`ƒƒƒ“ƒNBì¬‚É¸”s‚µ‚½ê‡ NULL ‚ğ–ß‚·                */
+/* Description: ãƒ˜ãƒƒãƒ€ãƒãƒ£ãƒ³ã‚¯ã‚’ä½œæˆã™ã‚‹ã€‚                                    */
+/* Return:      ãƒ˜ãƒƒãƒ€ãƒãƒ£ãƒ³ã‚¯ã€‚ä½œæˆã«å¤±æ•—ã—ãŸå ´åˆ NULL ã‚’æˆ»ã™                */
 /* Access:      external                                                      */
 /*============================================================================*/
 CChunkChunk* TvqCreateHeaderChunk( headerInfo* setupInfo, std::string directory )

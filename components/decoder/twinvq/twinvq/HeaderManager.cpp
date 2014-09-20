@@ -1,15 +1,15 @@
 /* (c)Copyright 1996-2000 NTT Cyber Space Laboratories */
 /*                Modified on 2000.09.06 by N. Iwakami */
 
-// HeaderManager.cpp: CHeaderManager ƒNƒ‰ƒX‚ÌƒCƒ“ƒvƒŠƒƒ“ƒe[ƒVƒ‡ƒ“
+// HeaderManager.cpp: CHeaderManager ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ãƒ—ãƒªãƒ¡ãƒ³ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³
 //
 //////////////////////////////////////////////////////////////////////
 
 #include <iostream>
 #include "HeaderManager.h"
-
+#include <windows.h>
 //////////////////////////////////////////////////////////////////////
-// \’z/Á–Å
+// æ§‹ç¯‰/æ¶ˆæ»…
 //////////////////////////////////////////////////////////////////////
 
 CHeaderManager::~CHeaderManager()
@@ -19,19 +19,19 @@ CHeaderManager::~CHeaderManager()
 
 /*==============================================================================*/
 /* Name:        CHeaderManager::create()                                        */
-/* Description: ƒwƒbƒ_ƒ}ƒl[ƒWƒƒ‚ğ¶¬‚·‚éB                                    */
-/* Return:      ¶¬‚µ‚½ƒwƒbƒ_ƒ}ƒl[ƒWƒƒ‚Ö‚Ìƒ|ƒCƒ“ƒ^A¶¬‚É¸”s‚µ‚½ê‡‚Í NULL */
+/* Description: ãƒ˜ãƒƒãƒ€ãƒãƒãƒ¼ã‚¸ãƒ£ã‚’ç”Ÿæˆã™ã‚‹ã€‚                                    */
+/* Return:      ç”Ÿæˆã—ãŸãƒ˜ãƒƒãƒ€ãƒãƒãƒ¼ã‚¸ãƒ£ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€ç”Ÿæˆã«å¤±æ•—ã—ãŸå ´åˆã¯ NULL */
 /* Access:      public (static)                                                 */
 /*==============================================================================*/
 CHeaderManager* CHeaderManager::Create(CChunkChunk &twinChunk)
 {
 	try {
-		// ƒ`ƒƒƒ“ƒNƒ}ƒl[ƒWƒƒ‚ğ¶¬‚·‚éB
+		// ãƒãƒ£ãƒ³ã‚¯ãƒãƒãƒ¼ã‚¸ãƒ£ã‚’ç”Ÿæˆã™ã‚‹ã€‚
 		CHeaderManager* theManager = NULL;
 		theManager = new CHeaderManager;
 		theManager->Init( twinChunk );
 
-		// TWINƒ`ƒƒƒ“ƒN‚Ìƒwƒbƒ_‚ğæ“¾‚·‚é
+		// TWINãƒãƒ£ãƒ³ã‚¯ã®ãƒ˜ãƒƒãƒ€ã‚’å–å¾—ã™ã‚‹
 		theManager->m_chunkID = twinChunk.GetID();
 		if ( theManager->m_chunkID == "" ) {
 			delete theManager;
@@ -48,17 +48,17 @@ CHeaderManager* CHeaderManager::Create(CChunkChunk &twinChunk)
 
 /*============================================================================*/
 /* Name:        CHeaderManager::Init()                                        */
-/* Description: ƒwƒbƒ_ƒ}ƒl[ƒWƒƒ‚Ì‰Šú‰»‚ğ‚·‚éBCreate() ‚©‚ç‚Ì‚İŒÄ‚Î‚ê‚éB   */
-/* Return:      ‚È‚µ                                                          */
+/* Description: ãƒ˜ãƒƒãƒ€ãƒãƒãƒ¼ã‚¸ãƒ£ã®åˆæœŸåŒ–ã‚’ã™ã‚‹ã€‚Create() ã‹ã‚‰ã®ã¿å‘¼ã°ã‚Œã‚‹ã€‚   */
+/* Return:      ãªã—                                                          */
 /* Access:      external                                                      */
 /*============================================================================*/
 void CHeaderManager::Init(CChunkChunk &twinChunk)
 {
 	try {
-		// Šî–{ƒ`ƒƒƒ“ƒN‚ğŠî–{ƒ`ƒƒƒ“ƒNƒoƒ“ƒN‚Éû‚ß‚éB
+		// åŸºæœ¬ãƒãƒ£ãƒ³ã‚¯ã‚’åŸºæœ¬ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯ã«åã‚ã‚‹ã€‚
 		PickUpSubChunks( &m_primaryChunkBank, &twinChunk );
 
-		// •â•ƒ`ƒƒƒ“ƒN‚ª‚ ‚Á‚½‚ç•â•ƒ`ƒƒƒ“ƒNƒoƒ“ƒN‚Éû‚ß‚éB
+		// è£œåŠ©ãƒãƒ£ãƒ³ã‚¯ãŒã‚ã£ãŸã‚‰è£œåŠ©ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯ã«åã‚ã‚‹ã€‚
 		CChunkChunk scndChunk =  GetPrimaryChunk ( "SCND" );
 		PickUpSubChunks( &m_secondaryChunkBank, &scndChunk );
 	}
@@ -75,21 +75,21 @@ void CHeaderManager::Init(CChunkChunk &twinChunk)
 
 /*-------------------------------------------------------------------------------*/
 /* Name:        CHeaderManager::PickUpSubChunks()                                */
-/* Description: ƒ`ƒƒƒ“ƒN‚ğ“ü—Í‚µ‚ÄAƒTƒuƒ`ƒƒƒ“ƒN‚ğE‚¢o‚µƒ`ƒƒƒ“ƒNƒoƒ“ƒN‚É—a‚¯‚é */
-/* Return:      ‚È‚µ                                                             */
+/* Description: ãƒãƒ£ãƒ³ã‚¯ã‚’å…¥åŠ›ã—ã¦ã€ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’æ‹¾ã„å‡ºã—ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯ã«é ã‘ã‚‹ */
+/* Return:      ãªã—                                                             */
 /* Access:      static                                                           */
 /*-------------------------------------------------------------------------------*/
-void CHeaderManager::PickUpSubChunks(CChunkBank  *theChunkBank, // In/Out: ƒ`ƒƒƒ“ƒNƒoƒ“ƒN
-									 CChunkChunk *inputChunk)   // Input:  “ü—Íƒ`ƒƒƒ“ƒN
+void CHeaderManager::PickUpSubChunks(CChunkBank  *theChunkBank, // In/Out: ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯
+									 CChunkChunk *inputChunk)   // Input:  å…¥åŠ›ãƒãƒ£ãƒ³ã‚¯
 {
-	inputChunk->rewind(); // ƒ`ƒƒƒ“ƒN‚ğ‰ğÍ‚·‚é‘O‚É‚Ü‚«–ß‚µ‚ğs‚¤
+	inputChunk->rewind(); // ãƒãƒ£ãƒ³ã‚¯ã‚’è§£æã™ã‚‹å‰ã«ã¾ãæˆ»ã—ã‚’è¡Œã†
 
 	std::string id;
 	CChunk *subChunk;
 	try {
-		while ( (subChunk = inputChunk->GetNextChunk()) ) { // ƒ`ƒƒƒ“ƒN‚©‚çƒTƒuƒ`ƒƒƒ“ƒN‚ğæ‚èo‚·
+		while ( (subChunk = inputChunk->GetNextChunk()) ) { // ãƒãƒ£ãƒ³ã‚¯ã‹ã‚‰ã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’å–ã‚Šå‡ºã™
 			id = subChunk->GetID();
-			theChunkBank->insert( CChunkBank::value_type( id, *subChunk ) ); // æ‚èo‚µ‚½ƒTƒuƒ`ƒƒƒ“ƒN‚ğƒ`ƒƒƒ“ƒNƒoƒ“ƒN‚É“o˜^
+			theChunkBank->insert( CChunkBank::value_type( id, *subChunk ) ); // å–ã‚Šå‡ºã—ãŸã‚µãƒ–ãƒãƒ£ãƒ³ã‚¯ã‚’ãƒãƒ£ãƒ³ã‚¯ãƒãƒ³ã‚¯ã«ç™»éŒ²
 			delete subChunk;
 		}
 	}
@@ -105,23 +105,23 @@ CChunk CHeaderManager::GetChunk(CChunkBank *theChunkBank, string id)
 {
 	CChunkBank::iterator answer;
 
-	answer = theChunkBank->find( id );		// ƒ`ƒƒƒ“ƒN‚Ì‚ ‚é‚È‚µ‚ğ–â‚¢‡‚í‚¹‚éB
-	if ( answer != theChunkBank->end() ){	// ‚ ‚ê‚Î
-		return answer->second;				// ‚»‚Ìƒ`ƒƒƒ“ƒN‚ğ–ß‚·B
+	answer = theChunkBank->find( id );		// ãƒãƒ£ãƒ³ã‚¯ã®ã‚ã‚‹ãªã—ã‚’å•ã„åˆã‚ã›ã‚‹ã€‚
+	if ( answer != theChunkBank->end() ){	// ã‚ã‚Œã°
+		return answer->second;				// ãã®ãƒãƒ£ãƒ³ã‚¯ã‚’æˆ»ã™ã€‚
 	}
 
-	throw err_FailGetChunk(); // ƒ`ƒƒƒ“ƒN‚ª‚È‚¯‚ê‚Îˆ—‚ğ•úŠü‚·‚éB
+	throw err_FailGetChunk(); // ãƒãƒ£ãƒ³ã‚¯ãŒãªã‘ã‚Œã°å‡¦ç†ã‚’æ”¾æ£„ã™ã‚‹ã€‚
 
 }
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-// CUniStringInfo ƒNƒ‰ƒX‚ÌÀ‘•
+// CUniStringInfo ã‚¯ãƒ©ã‚¹ã®å®Ÿè£…
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
-// \’z/Á–Å
+// æ§‹ç¯‰/æ¶ˆæ»…
 //////////////////////////////////////////////////////////////////////
 
 CUniStringInfo::CUniStringInfo( string id, string primary, string secondary, int primCode, int scndCode )
@@ -135,13 +135,13 @@ CUniStringInfo::CUniStringInfo( string id, string primary, string secondary, int
 
 CUniStringInfo::CUniStringInfo( string id, CHeaderManager& theManager )
 {
-	// ID ‚ğİ’è‚·‚é
+	// ID ã‚’è¨­å®šã™ã‚‹
 	m_id = id;
 	m_primaryCharCode = unknown_code;
 	m_secondaryCharCode = unknown_code;
 
 	int flag = 0;
-	// Šî–{ƒ`ƒƒƒ“ƒNî•ñ‚ğƒRƒs[‚·‚é
+	// åŸºæœ¬ãƒãƒ£ãƒ³ã‚¯æƒ…å ±ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 	try {
 		CStringChunk primChunk( theManager.GetPrimaryChunk( m_id ) );
 		PutPrimaryInfo( primChunk );
@@ -152,7 +152,7 @@ CUniStringInfo::CUniStringInfo( string id, CHeaderManager& theManager )
 	}
 	if (flag) throw err_FailConstruction();
 
-	// •â•ƒ`ƒƒƒ“ƒNî•ñ‚ğƒRƒs[‚·‚é
+	// è£œåŠ©ãƒãƒ£ãƒ³ã‚¯æƒ…å ±ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 	try {
 		CStringChunk scndChunk( theManager.GetSecondaryChunk( m_id ) );
 		PutSecondaryInfo( scndChunk );
@@ -172,7 +172,7 @@ CUniStringInfo::~CUniStringInfo()
 
 void CUniStringInfo::PutPrimaryInfo(CStringChunk& theChunk)
 {
-	// ID ‚ğƒ`ƒFƒbƒN
+	// ID ã‚’ãƒã‚§ãƒƒã‚¯
 	if ( m_id == "" ) {
 		m_id = theChunk.GetID();
 	}
@@ -180,13 +180,13 @@ void CUniStringInfo::PutPrimaryInfo(CStringChunk& theChunk)
 		throw err_ID();
 	}
 
-	// ƒf[ƒ^‚ğ‘‚«‚İ
+	// ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãè¾¼ã¿
 	m_primary = theChunk.GetString();
 }
 
 void CUniStringInfo::PutSecondaryInfo(CStringChunk& theChunk)
 {
-	// ID ‚ğƒ`ƒFƒbƒN
+	// ID ã‚’ãƒã‚§ãƒƒã‚¯
 	if ( m_id == "" ) {
 		m_id = theChunk.GetID();
 	}
@@ -194,13 +194,13 @@ void CUniStringInfo::PutSecondaryInfo(CStringChunk& theChunk)
 		throw err_ID();
 	}
 
-	// ƒf[ƒ^‚ğ‘‚«‚İ
+	// ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãè¾¼ã¿
 	string secondary = theChunk.GetString();
-	if ( secondary.size() < 2 ) { // •¶šƒR[ƒhî•ñ‚ª‚ ‚é‚©‚Ç‚¤‚©ƒ`ƒFƒbƒN
+	if ( secondary.size() < 2 ) { // æ–‡å­—ã‚³ãƒ¼ãƒ‰æƒ…å ±ãŒã‚ã‚‹ã‹ã©ã†ã‹ãƒã‚§ãƒƒã‚¯
 		throw err_NoCharCode();
 	}
 
-	m_primaryCharCode = secondary[0] - '0';		// •¶šƒR[ƒhƒf[ƒ^
+	m_primaryCharCode = secondary[0] - '0';		// æ–‡å­—ã‚³ãƒ¼ãƒ‰ãƒ‡ãƒ¼ã‚¿
 	m_secondaryCharCode = secondary[1] - '0';
 
 	m_secondary = secondary.erase(0, 2);
