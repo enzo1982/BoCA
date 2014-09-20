@@ -233,6 +233,7 @@ namespace BoCA
 				String			 name;
 				String			 version;
 
+				Bool			 threadSafe;
 				Bool			 debug;
 
 				Array<String>		 requireComponents;

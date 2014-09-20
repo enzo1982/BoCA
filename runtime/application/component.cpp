@@ -48,6 +48,11 @@ BoCA::ComponentType BoCA::AS::Component::GetType() const
 	return specs->type;
 }
 
+Bool BoCA::AS::Component::IsThreadSafe() const
+{
+	return specs->threadSafe;
+}
+
 const Array<BoCA::AS::FileFormat *> &BoCA::AS::Component::GetFormats() const
 {
 	return specs->formats;

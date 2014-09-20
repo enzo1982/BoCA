@@ -7,10 +7,12 @@
 	<!ELEMENT name (#PCDATA)>
 
 	<!ELEMENT version (#PCDATA)>
-	<!ATTLIST version debug CDATA #IMPLIED>
+	<!ATTLIST version debug NMTOKEN #IMPLIED>
 
 	<!ELEMENT id (#PCDATA)>
+
 	<!ELEMENT type (#PCDATA)>
+	<!ATTLIST type threadSafe NMTOKEN #IMPLIED>
 
 	<!ELEMENT require (#PCDATA)>
 	<!ELEMENT replace (#PCDATA)>
@@ -23,8 +25,8 @@
 		<!ELEMENT extension (#PCDATA)>
 
 		<!ELEMENT tag (#PCDATA)>
-		<!ATTLIST tag id   CDATA #REQUIRED
-			      mode CDATA #REQUIRED>
+		<!ATTLIST tag id   NMTOKEN #REQUIRED
+			      mode NMTOKEN #REQUIRED>
 
 	<!ELEMENT tagspec (name, coverart?, encodings?)>
 	<!ATTLIST tagspec default NMTOKEN #IMPLIED>
@@ -42,7 +44,7 @@
 	<!ELEMENT external (command, arguments, mode, (informat?, outformat?), parameters?)>
 
 		<!ELEMENT command (#PCDATA)>
-		<!ATTLIST command ignoreExitCode CDATA #IMPLIED>
+		<!ATTLIST command ignoreExitCode NMTOKEN #IMPLIED>
 
 		<!ELEMENT arguments (#PCDATA)>
 		<!ELEMENT mode (#PCDATA)>

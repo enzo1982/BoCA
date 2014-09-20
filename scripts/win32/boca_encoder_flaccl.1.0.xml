@@ -4,7 +4,7 @@
   <name>FLACCL OpenCL FLAC Encoder</name>
   <version>1.0</version>
   <id>flaccl-enc</id>
-  <type>encoder</type>
+  <type threadSafe="false">encoder</type>
   <format>
     <name>FLAC Audio Files</name>
     <extension>flac</extension>

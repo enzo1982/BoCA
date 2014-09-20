@@ -34,7 +34,7 @@ const String &BoCA::EncoderTwinVQ::GetComponentSpecs()
 		    <name>TwinVQ VQF Encoder</name>		\
 		    <version>1.0</version>			\
 		    <id>twinvq-enc</id>				\
-		    <type>encoder</type>			\
+		    <type threadSafe=\"false\">encoder</type>	\
 		    <format>					\
 		      <name>TwinVQ VQF Audio</name>		\
 		      <extension>vqf</extension>		\

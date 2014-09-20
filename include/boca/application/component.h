@@ -38,6 +38,8 @@ namespace BoCA
 				const String			&GetID() const;
 				ComponentType			 GetType() const;
 
+				Bool				 IsThreadSafe() const;	
+
 				const Array<FileFormat *>	&GetFormats() const;
 				const Array<TagSpec *>		&GetTagSpecs() const;
 

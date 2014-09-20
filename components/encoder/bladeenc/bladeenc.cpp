@@ -29,7 +29,7 @@ const String &BoCA::EncoderBlade::GetComponentSpecs()
 		    <name>BladeEnc MP3 Encoder</name>				\
 		    <version>1.0</version>					\
 		    <id>bladeenc-enc</id>					\
-		    <type>encoder</type>					\
+		    <type threadSafe=\"false\">encoder</type>			\
 		    <format>							\
 		      <name>MPEG 1 Audio Layer 3</name>				\
 		      <extension>mp3</extension>				\

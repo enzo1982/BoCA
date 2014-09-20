@@ -13,11 +13,13 @@
 
 BoCA::AS::ComponentSpecs::ComponentSpecs()
 {
-	library	= NIL;
+	library	   = NIL;
 
-	type	= COMPONENT_TYPE_UNKNOWN;
-	mode	= COMPONENT_MODE_INTERNAL;
-	debug	= False;
+	type	   = COMPONENT_TYPE_UNKNOWN;
+	mode	   = COMPONENT_MODE_INTERNAL;
+
+	threadSafe = True;
+	debug	   = False;
 
 	external_ignoreExitCode = False;
 
@@ -312,6 +314,11 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			else if (node->GetContent() == "playlist")	type = COMPONENT_TYPE_PLAYLIST;
 			else if (node->GetContent() == "tagger")	type = COMPONENT_TYPE_TAGGER;
 			else						type = COMPONENT_TYPE_UNKNOWN;
+
+			if (node->GetAttributeByName("threadSafe") != NIL)
+			{
+				threadSafe = (node->GetAttributeByName("threadSafe")->GetContent() == "true");
+			}
 		}
 		else if (node->GetName() == "require")
 		{

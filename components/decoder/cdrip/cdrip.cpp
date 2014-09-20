@@ -31,7 +31,7 @@ const String &BoCA::DecoderCDRip::GetComponentSpecs()
 		    <name>CDRip Ripper Component</name>		\
 		    <version>1.0</version>			\
 		    <id>cdrip-dec</id>				\
-		    <type>decoder</type>	\
+		    <type threadSafe=\"false\">decoder</type>	\
 		    <require>cdrip-info</require>		\
 		    <format>					\
 		      <name>Windows CD Audio Track</name>	\

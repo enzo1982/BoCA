@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -34,7 +34,7 @@ const String &BoCA::DecoderTwinVQ::GetComponentSpecs()
 		    <name>TwinVQ VQF Decoder</name>		\
 		    <version>1.0</version>			\
 		    <id>twinvq-dec</id>				\
-		    <type>decoder</type>			\
+		    <type threadSafe=\"false\">decoder</type>	\
 		    <format>					\
 		      <name>TwinVQ VQF Audio</name>		\
 		      <extension>vqf</extension>		\
