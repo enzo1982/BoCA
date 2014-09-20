@@ -8,14 +8,6 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth.h>
-
-#ifdef __WIN32__
-#  include <windows.h>
-#else
-#  include <stdlib.h>
-#endif
-
 #include <boca/core/core.h>
 
 #include <boca/application/registry.h>
@@ -30,33 +22,6 @@
 
 Void BoCA::Init()
 {
-	static Bool	 initialized = False;
-
-	if (initialized) return;
-
-	BoCA::Config	*config = BoCA::Config::Get();
-
-	/* Set number of threads for OpenMP optimized encoders.
-	 */
-	Int	 numThreads = config->GetIntValue("Resources", "NumberOfThreads", 0);
-
-	if (numThreads == 0) numThreads = CPU().GetNumCores();
-
-#ifdef __WIN32__
-	if (GetEnvironmentVariableA("OMP_NUM_THREADS", NIL, 0) == 0) SetEnvironmentVariableA("OMP_NUM_THREADS", String::FromInt(numThreads));
-#else
-	if (getenv("OMP_NUM_THREADS") == NIL) setenv("OMP_NUM_THREADS", String::FromInt(numThreads), True);
-#endif
-
-	/* Work around an Intel Compiler bug.
-	 */
-#ifdef __WIN32__
-	SetEnvironmentVariableA("KMP_AFFINITY", "none");
-#else
-	setenv("KMP_AFFINITY", "none", True);
-#endif
-
-	initialized = True;
 }
 
 Void BoCA::Free()
