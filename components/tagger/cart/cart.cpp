@@ -157,9 +157,9 @@ Int BoCA::TaggerCart::RenderStringItem(const String &value, Int bufferSize, Buff
 
 	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - bufferSize, bufferSize);
 
-	Int		 stringSize = (value != NIL) ? strlen(value) : 0;
+	Int		 stringSize = (value.Trim() != NIL) ? strlen(value.Trim()) : 0;
 
-	out.OutputString(stringSize <= bufferSize ? value : value.Head(bufferSize));
+	out.OutputString(stringSize <= bufferSize ? value.Trim() : value.Trim().Head(bufferSize));
 
 	for (Int i = 0; i < bufferSize - stringSize; i++) out.OutputNumber(0, 1);
 
@@ -221,8 +221,8 @@ Error BoCA::TaggerCart::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 	{
 		/* Artist and title.
 		 */
-		info.title  = in.InputString(64);
-		info.artist = in.InputString(64);
+		info.title  = in.InputString(64).Trim();
+		info.artist = in.InputString(64).Trim();
 
 		/* Cut number.
 		 */

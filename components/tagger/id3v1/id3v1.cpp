@@ -94,9 +94,9 @@ Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 	const Info	&info = track.GetInfo();
 	String		 prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "ID3v1Encoding", "ISO-8859-1"));
 
-	{ out.OutputString(info.title.Head(Math::Min(30, info.title.Length())));   for (Int i = 0; i < 30 - info.title.Length(); i++) out.OutputNumber(0, 1); }
-	{ out.OutputString(info.artist.Head(Math::Min(30, info.artist.Length()))); for (Int i = 0; i < 30 - info.artist.Length(); i++) out.OutputNumber(0, 1); }
-	{ out.OutputString(info.album.Head(Math::Min(30, info.album.Length())));   for (Int i = 0; i < 30 - info.album.Length(); i++) out.OutputNumber(0, 1); }
+	{ out.OutputString(info.title.Trim().Head(Math::Min(30, info.title.Trim().Length())));   for (Int i = 0; i < 30 - info.title.Trim().Length(); i++) out.OutputNumber(0, 1); }
+	{ out.OutputString(info.artist.Trim().Head(Math::Min(30, info.artist.Trim().Length()))); for (Int i = 0; i < 30 - info.artist.Trim().Length(); i++) out.OutputNumber(0, 1); }
+	{ out.OutputString(info.album.Trim().Head(Math::Min(30, info.album.Trim().Length())));   for (Int i = 0; i < 30 - info.album.Trim().Length(); i++) out.OutputNumber(0, 1); }
 
 	if (info.year > 0) { out.OutputString(String().FillN('0', 4 - String::FromInt(info.year).Length())); out.OutputString(String::FromInt(info.year).Tail(Math::Min(4, String::FromInt(info.year).Length()))); }
 	else		   { out.OutputNumber(0, 4); }
@@ -108,14 +108,14 @@ Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	if (info.track > 0)
 	{
-		{ out.OutputString(comment.Head(Math::Min(28, comment.Length()))); for (Int i = 0; i < 28 - comment.Length(); i++) out.OutputNumber(0, 1); }
+		{ out.OutputString(comment.Trim().Head(Math::Min(28, comment.Trim().Length()))); for (Int i = 0; i < 28 - comment.Trim().Length(); i++) out.OutputNumber(0, 1); }
 
 		out.OutputNumber(0, 1);
 		out.OutputNumber(info.track, 1);
 	}
 	else
 	{
-		{ out.OutputString(comment.Head(Math::Min(30, comment.Length()))); for (Int i = 0; i < 30 - comment.Length(); i++) out.OutputNumber(0, 1); }
+		{ out.OutputString(comment.Trim().Head(Math::Min(30, comment.Trim().Length()))); for (Int i = 0; i < 30 - comment.Trim().Length(); i++) out.OutputNumber(0, 1); }
 	}
 
 	out.OutputNumber(GetID3CategoryID(info.genre), 1);
@@ -140,11 +140,11 @@ Error BoCA::TaggerID3v1::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		Info	 info = track.GetInfo();
 
-		info.title	= in.InputString(30);
-		info.artist	= in.InputString(30);
-		info.album	= in.InputString(30);
-		info.year	= in.InputString(4).ToInt();
-		info.comment	= in.InputString(28);
+		info.title	= in.InputString(30).Trim();
+		info.artist	= in.InputString(30).Trim();
+		info.album	= in.InputString(30).Trim();
+		info.year	= in.InputString( 4).Trim().ToInt();
+		info.comment	= in.InputString(28).Trim();
 
 		if (in.InputNumber(1) == 0)
 		{
@@ -156,7 +156,7 @@ Error BoCA::TaggerID3v1::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		{
 			in.RelSeek(-29);
 
-			info.comment = in.InputString(30);
+			info.comment = in.InputString(30).Trim();
 		}
 
 		info.genre	= GetID3CategoryName(in.InputNumber(1));

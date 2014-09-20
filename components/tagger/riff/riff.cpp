@@ -118,7 +118,7 @@ Int BoCA::TaggerRIFF::RenderTagHeader(Buffer<UnsignedByte> &buffer)
 
 Int BoCA::TaggerRIFF::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
 {
-	Int		 stringSize = strlen(value) + 1;
+	Int		 stringSize = strlen(value.Trim()) + 1;
 	Int		 bufferSize = stringSize + (stringSize & 1) + 8;
 
 	buffer.Resize(buffer.Size() + bufferSize);
@@ -127,7 +127,7 @@ Int BoCA::TaggerRIFF::RenderTagItem(const String &id, const String &value, Buffe
 
 	out.OutputString(id);
 	out.OutputNumber(stringSize, 4);
-	out.OutputString(value);
+	out.OutputString(value.Trim());
 	out.OutputNumber(0, 1 + (stringSize & 1));
 
 	return Success();
@@ -157,7 +157,7 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 
 		String	 id	= in.InputString(4);
 		Int	 length	= in.InputNumber(4);
-		String	 value  = in.InputString(length - 1);
+		String	 value  = in.InputString(length - 1).Trim();
 
 		if	(id == "IART") info.artist  = value;
 		else if (id == "INAM") info.title   = value;

@@ -201,7 +201,7 @@ Int BoCA::TaggerVorbis::RenderTagHeader(const String &vendorString, Int numItems
 
 Int BoCA::TaggerVorbis::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
 {
-	Int		 size = id.Length() + strlen(value) + 5;
+	Int		 size = id.Length() + strlen(value.Trim()) + 5;
 
 	buffer.Resize(buffer.Size() + size);
 
@@ -210,7 +210,7 @@ Int BoCA::TaggerVorbis::RenderTagItem(const String &id, const String &value, Buf
 	out.OutputNumber(size - 4, 4);
 	out.OutputString(id);
 	out.OutputNumber('=', 1);
-	out.OutputString(value);
+	out.OutputString(value.Trim());
 
 	return Success();
 }
@@ -250,7 +250,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		String	 comment = in.InputString(length);
 
 		String	 id	 = comment.Head(comment.Find("=")).ToUpper();
-		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1);
+		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1).Trim();
 
 		if	(id == "ARTIST")       info.artist    = value;
 		else if (id == "TITLE")	       info.title     = value;
@@ -359,7 +359,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		String	 comment = in.InputString(length);
 
 		String	 id	 = comment.Head(comment.Find("=")).ToUpper();
-		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1);
+		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1).Trim();
 
 		if (id.StartsWith("CHAPTER") && currentConfig->GetIntValue("Tags", "ReadChapters", True))
 		{

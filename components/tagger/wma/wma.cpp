@@ -169,21 +169,30 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 		{
 			foreach (const Picture &picInfo, track.pictures)
 			{
-				WM_PICTURE	 picture;
+				WM_PICTURE	 picture = { 0 };
 
-				picture.pwszMIMEType	= new WCHAR [picInfo.mime.Length() + 1];
-				picture.bPictureType	= picInfo.type;
-				picture.pwszDescription	= new WCHAR [picInfo.description.Length() + 1];
-				picture.dwDataLen	= picInfo.data.Size();
-				picture.pbData		= (BYTE *) const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data);
+				picture.bPictureType = picInfo.type;
+				picture.dwDataLen    = picInfo.data.Size();
+				picture.pbData	     = (BYTE *) const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data);
 
-				wcsncpy(picture.pwszMIMEType, picInfo.mime, picInfo.mime.Length() + 1);
-				wcsncpy(picture.pwszDescription, picInfo.description, picInfo.description.Length() + 1);
+				if (picInfo.mime != NIL)
+				{
+					picture.pwszMIMEType = new WCHAR [picInfo.mime.Length() + 1];
+
+					wcsncpy(picture.pwszMIMEType, picInfo.mime, picInfo.mime.Length() + 1);
+				}
+
+				if (picInfo.description != NIL)
+				{
+					picture.pwszDescription = new WCHAR [picInfo.description.Length() + 1];
+
+					wcsncpy(picture.pwszDescription, picInfo.description, picInfo.description.Length() + 1);
+				}
 
 				hr = pHeaderInfo->AddAttribute(0, g_wszWMPicture, NIL, WMT_TYPE_BINARY, 0, (BYTE *) &picture, sizeof(WM_PICTURE));
 
-				delete [] picture.pwszMIMEType;
-				delete [] picture.pwszDescription;
+				if (picInfo.mime != NIL)	delete [] picture.pwszMIMEType;
+				if (picInfo.description != NIL)	delete [] picture.pwszDescription;
 			}
 		}
 
@@ -220,7 +229,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 Error BoCA::TaggerWMA::RenderWMAStringItem(const String &id, const String &value, Void *headerInfo)
 {
-	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) value, wcslen(value) * 2 + 2);
+	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) value.Trim(), wcslen(value.Trim()) * 2 + 2);
 
 	if (hr == S_OK) return Success();
 	else		return Error();
@@ -285,61 +294,59 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			hr = pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, &type, NIL, pbValue, &cbLength);
 
-			if	(String(name) == g_wszWMAuthor)			 info.artist  = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMTitle)			 info.title   = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMAlbumTitle)		 info.album   = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMYear)			 info.year    = String((LPWSTR) pbValue).ToInt();
-			else if (String(name) == g_wszWMGenre)			 info.genre   = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMDescription)		 info.comment = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMPublisher)		 info.label   = (LPWSTR) pbValue;
-			else if (String(name) == g_wszWMISRC)			 info.isrc    = (LPWSTR) pbValue;
+			String			 value = String((LPWSTR) pbValue).Trim();
 
-			else if (String(name) == g_wszWMContentGroupDescription) info.other.Add(String(INFO_CONTENTGROUP).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMSubTitle)		 info.other.Add(String(INFO_SUBTITLE).Append(":").Append((LPWSTR) pbValue));
+			if	(String(name) == g_wszWMAuthor)			 info.artist  = value;
+			else if (String(name) == g_wszWMTitle)			 info.title   = value;
+			else if (String(name) == g_wszWMAlbumTitle)		 info.album   = value;
+			else if (String(name) == g_wszWMYear)			 info.year    = value.ToInt();
+			else if (String(name) == g_wszWMGenre)			 info.genre   = value;
+			else if (String(name) == g_wszWMDescription)		 info.comment = value;
+			else if (String(name) == g_wszWMPublisher)		 info.label   = value;
+			else if (String(name) == g_wszWMISRC)			 info.isrc    = value;
 
-			else if (String(name) == g_wszWMConductor)		 info.other.Add(String(INFO_CONDUCTOR).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMComposer)		 info.other.Add(String(INFO_COMPOSER).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMWriter)			 info.other.Add(String(INFO_LYRICIST).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMContentGroupDescription) info.other.Add(String(INFO_CONTENTGROUP).Append(":").Append(value));
+			else if (String(name) == g_wszWMSubTitle)		 info.other.Add(String(INFO_SUBTITLE).Append(":").Append(value));
 
-			else if (String(name) == g_wszWMOriginalArtist)		 info.other.Add(String(INFO_ORIG_ARTIST).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.other.Add(String(INFO_ORIG_ALBUM).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMOriginalLyricist)	 info.other.Add(String(INFO_ORIG_LYRICIST).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMOriginalReleaseYear)	 info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMConductor)		 info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
+			else if (String(name) == g_wszWMComposer)		 info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
+			else if (String(name) == g_wszWMWriter)			 info.other.Add(String(INFO_LYRICIST).Append(":").Append(value));
 
-			else if (String(name) == g_wszWMBeatsPerMinute)		 info.other.Add(String(INFO_BPM).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMInitialKey)		 info.other.Add(String(INFO_INITIALKEY).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMOriginalArtist)		 info.other.Add(String(INFO_ORIG_ARTIST).Append(":").Append(value));
+			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.other.Add(String(INFO_ORIG_ALBUM).Append(":").Append(value));
+			else if (String(name) == g_wszWMOriginalLyricist)	 info.other.Add(String(INFO_ORIG_LYRICIST).Append(":").Append(value));
+			else if (String(name) == g_wszWMOriginalReleaseYear)	 info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append(value));
 
-			else if (String(name) == g_wszWMRadioStationName)	 info.other.Add(String(INFO_RADIOSTATION).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMRadioStationOwner)	 info.other.Add(String(INFO_RADIOOWNER).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMBeatsPerMinute)		 info.other.Add(String(INFO_BPM).Append(":").Append(value));
+			else if (String(name) == g_wszWMInitialKey)		 info.other.Add(String(INFO_INITIALKEY).Append(":").Append(value));
 
-			else if (String(name) == g_wszWMAuthorURL)		 info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMAudioSourceURL)		 info.other.Add(String(INFO_WEB_SOURCE).Append(":").Append((LPWSTR) pbValue));
-			else if (String(name) == g_wszWMCopyrightURL)		 info.other.Add(String(INFO_WEB_COPYRIGHT).Append(":").Append((LPWSTR) pbValue));
+			else if (String(name) == g_wszWMRadioStationName)	 info.other.Add(String(INFO_RADIOSTATION).Append(":").Append(value));
+			else if (String(name) == g_wszWMRadioStationOwner)	 info.other.Add(String(INFO_RADIOOWNER).Append(":").Append(value));
+
+			else if (String(name) == g_wszWMAuthorURL)		 info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append(value));
+			else if (String(name) == g_wszWMAudioSourceURL)		 info.other.Add(String(INFO_WEB_SOURCE).Append(":").Append(value));
+			else if (String(name) == g_wszWMCopyrightURL)		 info.other.Add(String(INFO_WEB_COPYRIGHT).Append(":").Append(value));
 
 			else if (String(name) == g_wszWMTrack)
 			{
 				if	(type == WMT_TYPE_DWORD)  info.track = 1 + ((DWORD *) pbValue)[0];
-				else if (type == WMT_TYPE_STRING) info.track = 1 + String((LPWSTR) pbValue).ToInt();
+				else if (type == WMT_TYPE_STRING) info.track = 1 + value.ToInt();
 			}
 			else if (String(name) == g_wszWMTrackNumber)
 			{
 				if	(type == WMT_TYPE_DWORD)  info.track = ((DWORD *) pbValue)[0];
 				else if (type == WMT_TYPE_STRING)
 				{
-					String	 trackString = (LPWSTR) pbValue;
+					info.track = value.ToInt();
 
-					info.track = trackString.ToInt();
-
-					if (trackString.Find("/") >= 0) info.numTracks = trackString.Tail(trackString.Length() - trackString.Find("/") - 1).ToInt();
+					if (value.Find("/") >= 0) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 				}
 			}
 			else if (String(name) == g_wszWMPartOfSet)
 			{
-				String	 discString = (LPWSTR) pbValue;
+				info.disc = value.ToInt();
 
-				info.disc = discString.ToInt();
-
-				if (discString.Find("/") >= 0) info.numDiscs = discString.Tail(discString.Length() - discString.Find("/") - 1).ToInt();
+				if (value.Find("/") >= 0) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 			}
 			else if (String(name) == g_wszWMSharedUserRating)
 			{
@@ -392,7 +399,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				else if (picture.mime.ToLower() == "png")				      picture.mime = "image/png";
 
 				picture.type = picData->bPictureType;
-				picture.description = picData->pwszDescription;
+				picture.description = String(picData->pwszDescription).Trim();
 
 				picture.data.Set(picData->pbData, picData->dwDataLen);
 
@@ -450,7 +457,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				 */
 				Info	 info = track.GetInfo();
 
-				info.title = pwszMarkerName;
+				info.title = String(pwszMarkerName).Trim();
 				info.track = i + 1;
 
 				rTrack.SetInfo(info);

@@ -120,11 +120,11 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	String	 prevOutFormat = String::SetOutputFormat("UTF-8");
 
-	if (info.artist != NIL) ex_MP4TagsSetArtist(mp4Tags, info.artist);
-	if (info.title  != NIL) ex_MP4TagsSetName(mp4Tags, info.title);
-	if (info.album  != NIL) ex_MP4TagsSetAlbum(mp4Tags, info.album);
+	if (info.artist != NIL) ex_MP4TagsSetArtist(mp4Tags, info.artist.Trim());
+	if (info.title  != NIL) ex_MP4TagsSetName(mp4Tags, info.title.Trim());
+	if (info.album  != NIL) ex_MP4TagsSetAlbum(mp4Tags, info.album.Trim());
 	if (info.year    >   0) ex_MP4TagsSetReleaseDate(mp4Tags, String::FromInt(info.year));
-	if (info.genre  != NIL) ex_MP4TagsSetGenre(mp4Tags, info.genre);
+	if (info.genre  != NIL) ex_MP4TagsSetGenre(mp4Tags, info.genre.Trim());
 
 	if (info.track > 0)
 	{
@@ -140,8 +140,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		ex_MP4TagsSetDisk(mp4Tags, &mp4Disk);
 	}
 
-	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	ex_MP4TagsSetComments(mp4Tags, info.comment);
-	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				ex_MP4TagsSetComments(mp4Tags, currentConfig->GetStringValue("Tags", "DefaultComment", NIL));
+	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	ex_MP4TagsSetComments(mp4Tags, info.comment.Trim());
+	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				ex_MP4TagsSetComments(mp4Tags, currentConfig->GetStringValue("Tags", "DefaultComment", NIL).Trim());
 
 	/* Save other text info.
 	 */
@@ -152,7 +152,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 		if (value == NIL) continue;
 
-		if (key == String(INFO_COMPOSER).Append(":")) ex_MP4TagsSetComposer(mp4Tags, value);
+		if (key == String(INFO_COMPOSER).Append(":")) ex_MP4TagsSetComposer(mp4Tags, value.Trim());
 	}
 
 	/* Save cover art.
@@ -205,7 +205,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 			const Info	&chapterInfo   = chapterTrack.GetInfo();
 			const Format	&chapterFormat = chapterTrack.GetFormat();
 
-			const char	*chapterTitle  = chapterInfo.title;
+			const char	*chapterTitle  = chapterInfo.title.Trim();
 
 			memset(chapterList[i].title, 0, MP4V2_CHAPTER_TITLE_MAX + 1);
 
@@ -263,15 +263,15 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	String	 prevInFormat = String::SetInputFormat("UTF-8");
 
-	if	(mp4Tags->name	      != NIL) info.title    = mp4Tags->name;
-	if	(mp4Tags->artist      != NIL) info.artist   = mp4Tags->artist;
-	if	(mp4Tags->releaseDate != NIL) info.year     = String(mp4Tags->releaseDate).ToInt();
-	if	(mp4Tags->album	      != NIL) info.album    = mp4Tags->album;
-	if	(mp4Tags->comments    != NIL) info.comment  = mp4Tags->comments;
+	if	(mp4Tags->name	      != NIL) info.title    = String(mp4Tags->name).Trim();
+	if	(mp4Tags->artist      != NIL) info.artist   = String(mp4Tags->artist).Trim();
+	if	(mp4Tags->releaseDate != NIL) info.year     = String(mp4Tags->releaseDate).Trim().ToInt();
+	if	(mp4Tags->album	      != NIL) info.album    = String(mp4Tags->album).Trim();
+	if	(mp4Tags->comments    != NIL) info.comment  = String(mp4Tags->comments).Trim();
 
-	if	(mp4Tags->composer    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(mp4Tags->composer));
+	if	(mp4Tags->composer    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(String(mp4Tags->composer).Trim()));
 
-	if	(mp4Tags->genre	      != NIL) info.genre    = mp4Tags->genre;
+	if	(mp4Tags->genre	      != NIL) info.genre    = String(mp4Tags->genre).Trim();
 	else if (mp4Tags->genreType   != NIL) info.genre    = GetID3CategoryName(*mp4Tags->genreType - 1);
 
 	if (mp4Tags->track != NIL)
@@ -351,7 +351,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 			 */
 			Info	 info = track.GetInfo();
 
-			info.title = chapterList[i].title;
+			info.title = String(chapterList[i].title).Trim();
 			info.track = i + 1;
 
 			rTrack.SetInfo(info);

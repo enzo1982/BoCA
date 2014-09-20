@@ -329,25 +329,22 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 			/* Set the description field and try to stay compatible with
 			 * iTunes which expects it to be in a single byte encoding.
 			 */
-			String		 encoding = currentConfig->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
-
-			if (encoding != "UTF-8" && !String::IsUnicode(picInfo.description))
+			if (picInfo.description != NIL)
 			{
-				currentConfig->SetStringValue("Tags", "ID3v2Encoding", "ISO-8859-1");
+				String	 encoding = currentConfig->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
+
+				if (encoding != "UTF-8" && !String::IsUnicode(picInfo.description)) currentConfig->SetStringValue("Tags", "ID3v2Encoding", "ISO-8859-1");
 
 				SetStringField(frame_picture, ID3FN_DESCRIPTION, picInfo.description);
 
 				currentConfig->SetStringValue("Tags", "ID3v2Encoding", encoding);
 			}
-			else
-			{
-				SetStringField(frame_picture, ID3FN_DESCRIPTION, picInfo.description);
-			}
 
 			/* Set picture data.
 			 */
+			if (picInfo.mime != NIL) SetASCIIField(frame_picture, ID3FN_MIMETYPE, picInfo.mime.ConvertTo("ISO-8859-1"));
+
 			SetIntegerField(frame_picture, ID3FN_PICTURETYPE, picInfo.type);
-			SetASCIIField(frame_picture, ID3FN_MIMETYPE, picInfo.mime.ConvertTo("ISO-8859-1"));
 			SetBinaryField(frame_picture, ID3FN_DATA, picInfo.data);
 
 			container.AddFrame(frame_picture);
@@ -679,7 +676,7 @@ String BoCA::TaggerID3v2::GetStringField(const ID3_Frame &frame, ID3_FieldID fie
 		}
 	}
 
-	return result;
+	return result.Trim();
 }
 
 Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, const String &string)
@@ -705,9 +702,9 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 	{
 		field->SetEncoding(encoding);
 
-		if	(encoding == ID3TE_UTF16LE) field->Set((unicode_t *) string.ConvertTo("UTF-16LE"));
-		else if (encoding == ID3TE_UTF16BE) field->Set((unicode_t *) string.ConvertTo("UTF-16BE"));
-		else				    field->Set((char *) string);
+		if	(encoding == ID3TE_UTF16LE) field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16LE"));
+		else if (encoding == ID3TE_UTF16BE) field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16BE"));
+		else				    field->Set((char *) string.Trim());
 
 		String::SetOutputFormat(prevOutFormat.ConvertTo("ISO-8859-1"));
 
@@ -735,7 +732,7 @@ String BoCA::TaggerID3v2::GetASCIIField(const ID3_Frame &frame, ID3_FieldID fiel
 		result.ImportFrom("ISO-8859-1", aBuffer);
 	}
 
-	return result;
+	return result.Trim();
 }
 
 Int BoCA::TaggerID3v2::SetASCIIField(ID3_Frame &frame, ID3_FieldID fieldType, const String &string)
@@ -746,7 +743,7 @@ Int BoCA::TaggerID3v2::SetASCIIField(ID3_Frame &frame, ID3_FieldID fieldType, co
 
 	if (field != NIL)
 	{
-		field->Set((char *) string);
+		field->Set((char *) string.Trim());
 
 		return Success();
 	}

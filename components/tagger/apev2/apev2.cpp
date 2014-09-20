@@ -144,7 +144,9 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 			else if	(picInfo.type == 4) itemName.Append(" (back)");
 			else			    itemName.Append(" (other)");
 
-			strncpy((char *) (unsigned char *) picBuffer, "c:\\music\\cover.jpg", 19);
+			if (picInfo.mime == "image/png") strncpy((char *) (unsigned char *) picBuffer, "c:\\music\\cover.png", 19);
+			else				 strncpy((char *) (unsigned char *) picBuffer, "c:\\music\\cover.jpg", 19);
+
 			memcpy(picBuffer + 19, picInfo.data, picInfo.data.Size());
 
 			RenderAPEBinaryItem(itemName, picBuffer, buffer);
@@ -204,17 +206,17 @@ Int BoCA::TaggerAPEv2::RenderAPEFooter(Int tagSize, Int numItems, Buffer<Unsigne
 
 Int BoCA::TaggerAPEv2::RenderAPEItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
 {
-	Int		 size = id.Length() + strlen(value) + 9;
+	Int		 size = id.Length() + strlen(value.Trim()) + 9;
 
 	buffer.Resize(buffer.Size() + size);
 
 	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - size, size);
 
-	out.OutputNumber(strlen(value), 4);
+	out.OutputNumber(strlen(value.Trim()), 4);
 	out.OutputNumber(0, 4);
 	out.OutputString(id);
 	out.OutputNumber(0, 1);
-	out.OutputString(value);
+	out.OutputString(value.Trim());
 
 	return Success();
 }
@@ -262,9 +264,9 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		ParseAPEItem(buffer, offset, &id, &value);
 
-		id = id.ToUpper();
+		if (id.ToUpper() == "!BINARY") ParseAPEBinaryItem(buffer, offset, &id, item);
 
-		if (id == "!BINARY") ParseAPEBinaryItem(buffer, offset, &id, item);
+		id = id.ToUpper();
 
 		if	(id == "ARTIST")    info.artist  = value;
 		else if (id == "TITLE")	    info.title   = value;
@@ -435,7 +437,7 @@ Bool BoCA::TaggerAPEv2::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &of
 	}
 	while (lastChar != 0);
 
-	*value = in.InputString(valueBytes);
+	*value = in.InputString(valueBytes).Trim();
 
 	offset += in.GetPos();
 
