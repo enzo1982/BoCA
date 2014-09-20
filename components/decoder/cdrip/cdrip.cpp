@@ -31,7 +31,7 @@ const String &BoCA::DecoderCDRip::GetComponentSpecs()
 		    <name>CDRip Ripper Component</name>		\
 		    <version>1.0</version>			\
 		    <id>cdrip-dec</id>				\
-		    <type>decoder</type>			\
+		    <type>decoder</type>	\
 		    <require>cdrip-info</require>		\
 		    <format>					\
 		      <name>Windows CD Audio Track</name>	\
@@ -61,7 +61,7 @@ Int			 BoCA::DecoderCDRip::cdPlayerDiscID = -1;
 BoCA::CDText		 BoCA::DecoderCDRip::cdText;
 Int			 BoCA::DecoderCDRip::cdTextDiscID   = -1;
 
-UnsignedInt64		 BoCA::DecoderCDRip::lastRead	    = 0;
+Array<UnsignedInt64>	 BoCA::DecoderCDRip::lastRead;
 
 Bool BoCA::DecoderCDRip::CanOpenStream(const String &streamURI)
 {
@@ -255,6 +255,8 @@ BoCA::DecoderCDRip::DecoderCDRip()
 	prependSamples	= 0;
 
 	dataBufferSize	= 0;
+
+	lastRead.EnableLocking();
 }
 
 BoCA::DecoderCDRip::~DecoderCDRip()
@@ -265,6 +267,8 @@ BoCA::DecoderCDRip::~DecoderCDRip()
 Bool BoCA::DecoderCDRip::Activate()
 {
 	Config	*config = Config::Get();
+
+	if (lastRead.Length() == 0) for (Int i = 0; i < ex_CR_GetNumCDROM(); i++) lastRead.Add(0);
 
 	/* Get paranoia mode.
 	 */
@@ -393,7 +397,7 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 	Int		 spinUpTime = config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
 	UnsignedInt64	 startTime  = S::System::System::Clock();
 
-	while (spinUpTime > 0 && startTime - lastRead > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))
+	while (spinUpTime > 0 && startTime - lastRead.GetNth(track.drive) > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))
 	{
 		Buffer<UnsignedByte>	 buffer(dataBufferSize);
 
@@ -432,7 +436,7 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	ex_CR_RipChunk(data + prependBytes, &lSize, abort);
 
-	lastRead = S::System::System::Clock();
+	lastRead.SetNth(track.drive, S::System::System::Clock());
 
 	/* Strip samples to skip from the beginning.
 	 */

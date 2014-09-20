@@ -62,15 +62,17 @@ Void smooth::DetachDLL()
 
 namespace BoCA
 {
-	static int	 numCacheErrors = 0;
-
 	void paranoiaCallback(long int offset, paranoia_cb_mode_t state)
 	{
-		if (state == PARANOIA_CB_CACHEERR) numCacheErrors++;
+		if (state == PARANOIA_CB_CACHEERR) DecoderCDIO::readDecoder->numCacheErrors++;
 	}
 };
 
-UnsignedInt64	 BoCA::DecoderCDIO::lastRead = 0;
+Array<UnsignedInt64>	 BoCA::DecoderCDIO::lastRead;
+
+Threads::Mutex		 BoCA::DecoderCDIO::readMutex;
+BoCA::DecoderCDIO	*BoCA::DecoderCDIO::readDecoder = NIL;
+
 
 Bool BoCA::DecoderCDIO::CanOpenStream(const String &streamURI)
 {
@@ -251,6 +253,10 @@ BoCA::DecoderCDIO::DecoderCDIO()
 
 	skipSamples	= 0;
 	prependSamples	= 0;
+
+	numCacheErrors	= 0;
+
+	lastRead.EnableLocking();
 }
 
 BoCA::DecoderCDIO::~DecoderCDIO()
@@ -265,6 +271,8 @@ Bool BoCA::DecoderCDIO::Activate()
 
 	if (info != NIL)
 	{
+		if (lastRead.Length() == 0) for (Int i = 0; i < info->GetNumberOfDevices(); i++) lastRead.Add(0);
+
 		cd = cdio_open(info->GetNthDeviceInfo(track.drive).path, DRIVER_UNKNOWN);
 
 		boca.DeleteComponent(info);
@@ -345,8 +353,6 @@ Bool BoCA::DecoderCDIO::Deactivate()
 
 			Object::DeleteObject(msgBox);
 		}
-
-		numCacheErrors = 0;
 	}
 
 	if (paranoia != NIL)
@@ -397,11 +403,17 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 	Int		 spinUpTime = config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
 	UnsignedInt64	 startTime  = S::System::System::Clock();
 
-	while (spinUpTime > 0 && startTime - lastRead > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))
+	while (spinUpTime > 0 && startTime - lastRead.GetNth(track.drive) > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))
 	{
 		if (paranoia != NIL)
 		{
+			readMutex.Lock();
+			readDecoder = this;
+
 			cdio_paranoia_read(paranoia, &paranoiaCallback);
+
+			readMutex.Release();
+
 			cdio_paranoia_seek(paranoia, startSector, SEEK_SET);
 		}
 		else
@@ -437,7 +449,12 @@ Int BoCA::DecoderCDIO::ReadData(Buffer<UnsignedByte> &data, Int size)
 	 */
 	if (paranoia != NIL)
 	{
+		readMutex.Lock();
+		readDecoder = this;
+
 		int16_t	*audio = cdio_paranoia_read(paranoia, &paranoiaCallback);
+
+		readMutex.Release();
 
 		memcpy(data + prependBytes, audio, data.Size());
 	}
@@ -449,7 +466,7 @@ Int BoCA::DecoderCDIO::ReadData(Buffer<UnsignedByte> &data, Int size)
 	nextSector  += sectors;
 	sectorsLeft -= sectors;
 
-	lastRead = S::System::System::Clock();
+	lastRead.SetNth(track.drive, S::System::System::Clock());
 
 	/* Strip samples to skip from the beginning.
 	 */

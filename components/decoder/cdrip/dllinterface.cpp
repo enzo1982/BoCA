@@ -16,6 +16,7 @@ CR_GETTOCENTRY			 ex_CR_GetTocEntry		= NIL;
 CR_OPENRIPPER			 ex_CR_OpenRipper		= NIL;
 CR_CLOSERIPPER			 ex_CR_CloseRipper		= NIL;
 CR_RIPCHUNK			 ex_CR_RipChunk			= NIL;
+CR_GETNUMCDROM			 ex_CR_GetNumCDROM		= NIL;
 CR_SETACTIVECDROM		 ex_CR_SetActiveCDROM		= NIL;
 CR_GETCDROMPARAMETERS		 ex_CR_GetCDROMParameters	= NIL;
 CR_SETCDROMPARAMETERS		 ex_CR_SetCDROMParameters	= NIL;
@@ -40,6 +41,7 @@ Bool LoadCDRipDLL()
 	ex_CR_OpenRipper		= (CR_OPENRIPPER) cdripdll->GetFunctionAddress("CR_OpenRipper");
 	ex_CR_CloseRipper		= (CR_CLOSERIPPER) cdripdll->GetFunctionAddress("CR_CloseRipper");
 	ex_CR_RipChunk			= (CR_RIPCHUNK) cdripdll->GetFunctionAddress("CR_RipChunk");
+	ex_CR_GetNumCDROM		= (CR_GETNUMCDROM) cdripdll->GetFunctionAddress("CR_GetNumCDROM");
 	ex_CR_SetActiveCDROM		= (CR_SETACTIVECDROM) cdripdll->GetFunctionAddress("CR_SetActiveCDROM");
 	ex_CR_GetCDROMParameters	= (CR_GETCDROMPARAMETERS) cdripdll->GetFunctionAddress("CR_GetCDROMParameters");
 	ex_CR_SetCDROMParameters	= (CR_SETCDROMPARAMETERS) cdripdll->GetFunctionAddress("CR_SetCDROMParameters");
@@ -54,6 +56,7 @@ Bool LoadCDRipDLL()
 	    ex_CR_OpenRipper			== NIL ||
 	    ex_CR_CloseRipper			== NIL ||
 	    ex_CR_RipChunk			== NIL ||
+	    ex_CR_GetNumCDROM			== NIL ||
 	    ex_CR_SetActiveCDROM		== NIL ||
 	    ex_CR_GetCDROMParameters		== NIL ||
 	    ex_CR_SetCDROMParameters		== NIL ||

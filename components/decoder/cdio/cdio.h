@@ -24,42 +24,49 @@ namespace BoCA
 {
 	class DecoderCDIO : public CS::DecoderComponent
 	{
+		friend void	 paranoiaCallback(long int, paranoia_cb_mode_t);
+
 		private:
-			static UnsignedInt64	 lastRead;
+			static Threads::Mutex		 readMutex;
+			static DecoderCDIO		*readDecoder;
 
-			ConfigLayer		*configLayer;
+			static Array<UnsignedInt64>	 lastRead;
 
-			CdIo_t			*cd;
+			ConfigLayer			*configLayer;
 
-			cdrom_drive_t		*drive;
-			cdrom_paranoia_t	*paranoia;
+			CdIo_t				*cd;
 
-			Int			 nextSector;
-			Int			 sectorsLeft;
+			cdrom_drive_t			*drive;
+			cdrom_paranoia_t		*paranoia;
 
-			Int			 readOffset;
+			Int				 nextSector;
+			Int				 sectorsLeft;
 
-			Int			 skipSamples;
-			Int			 prependSamples;
+			Int				 readOffset;
 
-			Bool			 GetTrackSectors(Int &, Int &);
+			Int				 skipSamples;
+			Int				 prependSamples;
+
+			Int				 numCacheErrors;
+
+			Bool				 GetTrackSectors(Int &, Int &);
 		public:
-			static const String	&GetComponentSpecs();
+			static const String		&GetComponentSpecs();
 
-						 DecoderCDIO();
-						~DecoderCDIO();
+							 DecoderCDIO();
+							~DecoderCDIO();
 
-			Bool			 CanOpenStream(const String &);
-			Error			 GetStreamInfo(const String &, Track &);
+			Bool				 CanOpenStream(const String &);
+			Error				 GetStreamInfo(const String &, Track &);
 
-			Bool			 Activate();
-			Bool			 Deactivate();
+			Bool				 Activate();
+			Bool				 Deactivate();
 
-			Bool			 Seek(Int64);
+			Bool				 Seek(Int64);
 
-			Int			 ReadData(Buffer<UnsignedByte> &, Int);
+			Int				 ReadData(Buffer<UnsignedByte> &, Int);
 
-			ConfigLayer		*GetConfigurationLayer();
+			ConfigLayer			*GetConfigurationLayer();
 	};
 };
 

@@ -21,40 +21,47 @@ namespace BoCA
 {
 	class DecoderCDParanoia : public CS::DecoderComponent
 	{
+		friend void	 paranoiaCallback(long, int);
+
 		private:
-			static UnsignedInt64	 lastRead;
+			static Threads::Mutex		 readMutex;
+			static DecoderCDParanoia	*readDecoder;
 
-			ConfigLayer		*configLayer;
+			static Array<UnsignedInt64>	 lastRead;
 
-			cdrom_drive		*drive;
-			cdrom_paranoia		*paranoia;
+			ConfigLayer			*configLayer;
 
-			Int			 nextSector;
-			Int			 sectorsLeft;
+			cdrom_drive			*drive;
+			cdrom_paranoia			*paranoia;
 
-			Int			 readOffset;
+			Int				 nextSector;
+			Int				 sectorsLeft;
 
-			Int			 skipSamples;
-			Int			 prependSamples;
+			Int				 readOffset;
 
-			Bool			 GetTrackSectors(Int &, Int &);
+			Int				 skipSamples;
+			Int				 prependSamples;
+
+			Int				 numCacheErrors;
+
+			Bool				 GetTrackSectors(Int &, Int &);
 		public:
-			static const String	&GetComponentSpecs();
+			static const String		&GetComponentSpecs();
 
-						 DecoderCDParanoia();
-						~DecoderCDParanoia();
+							 DecoderCDParanoia();
+							~DecoderCDParanoia();
 
-			Bool			 CanOpenStream(const String &);
-			Error			 GetStreamInfo(const String &, Track &);
+			Bool				 CanOpenStream(const String &);
+			Error				 GetStreamInfo(const String &, Track &);
 
-			Bool			 Activate();
-			Bool			 Deactivate();
+			Bool				 Activate();
+			Bool				 Deactivate();
 
-			Bool			 Seek(Int64);
+			Bool				 Seek(Int64);
 
-			Int			 ReadData(Buffer<UnsignedByte> &, Int);
+			Int				 ReadData(Buffer<UnsignedByte> &, Int);
 
-			ConfigLayer		*GetConfigurationLayer();
+			ConfigLayer			*GetConfigurationLayer();
 	};
 };
 

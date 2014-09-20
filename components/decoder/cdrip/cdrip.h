@@ -21,43 +21,43 @@ namespace BoCA
 	class DecoderCDRip : public CS::DecoderComponent
 	{
 		private:
-			static CDText		 cdText;
-			static Int		 cdTextDiscID;
+			static CDText			 cdText;
+			static Int			 cdTextDiscID;
 
-			static CDPlayerIni	 cdPlayer;
-			static Int		 cdPlayerDiscID;
+			static CDPlayerIni		 cdPlayer;
+			static Int			 cdPlayerDiscID;
 
-			static UnsignedInt64	 lastRead;
+			static Array<UnsignedInt64>	 lastRead;
 
-			ConfigLayer		*configLayer;
+			ConfigLayer			*configLayer;
 
-			Int			 dataBufferSize;
+			Int				 dataBufferSize;
 
-			Int			 readOffset;
+			Int				 readOffset;
 
-			Int			 skipSamples;
-			Int			 prependSamples;
+			Int				 skipSamples;
+			Int				 prependSamples;
 
-			Int			 ComputeDiscID();
+			Int				 ComputeDiscID();
 
-			Bool			 GetTrackSectors(Int &, Int &);
+			Bool				 GetTrackSectors(Int &, Int &);
 		public:
-			static const String	&GetComponentSpecs();
+			static const String		&GetComponentSpecs();
 
-						 DecoderCDRip();
-						~DecoderCDRip();
+							 DecoderCDRip();
+							~DecoderCDRip();
 
-			Bool			 CanOpenStream(const String &);
-			Error			 GetStreamInfo(const String &, Track &);
+			Bool				 CanOpenStream(const String &);
+			Error				 GetStreamInfo(const String &, Track &);
 
-			Bool			 Activate();
-			Bool			 Deactivate();
+			Bool				 Activate();
+			Bool				 Deactivate();
 
-			Bool			 Seek(Int64);
+			Bool				 Seek(Int64);
 
-			Int			 ReadData(Buffer<UnsignedByte> &, Int);
+			Int				 ReadData(Buffer<UnsignedByte> &, Int);
 
-			ConfigLayer		*GetConfigurationLayer();
+			ConfigLayer			*GetConfigurationLayer();
 	};
 };
 
