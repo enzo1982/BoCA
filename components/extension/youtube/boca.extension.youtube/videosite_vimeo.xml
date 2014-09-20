@@ -27,7 +27,7 @@
 	metadata.description = (html.match(/<div (?:.*?)itemprop="description"(?:.*?)>((?:.|\n|\r)*?)<\/div>/) ? RegExp.$1 : null);
 
 	metadata.date	     = (html.match(/<meta itemprop="uploadDate" content="(.*?)T(?:.*?)">/) ? RegExp.$1 : null);
-	metadata.thumbnail   = (html.match(/<meta itemprop="thumbnailUrl" content="(.*?)">/) ? RegExp.$1 : null);
+	metadata.thumbnail   = (html.match(/<link itemprop="thumbnailUrl" href="(.*?)">/) ? RegExp.$1 : null);
 
 	metadata.uploader    = (html.match(/"user":\{(?:.*?)"name":"(.*?)"[\},]/) ? RegExp.$1.replace(/\\/g, "") : null);
 
