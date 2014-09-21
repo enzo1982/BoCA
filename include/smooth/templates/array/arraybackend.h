@@ -193,6 +193,31 @@ namespace smooth
 				return True;
 			}
 
+			Bool Switch(Int index1, Int index2)
+			{
+				if (index1 > greatestIndex ||
+				    index2 > greatestIndex) return False;
+
+				return SwitchNth(GetEntryNumberByIndex(index1), GetEntryNumberByIndex(index2));
+			}
+
+			Bool SwitchNth(Int n, Int m)
+			{
+				if (nOfEntries <= n || n < 0 ||
+				    nOfEntries <= m || m < 0) return False;
+
+				LockForWrite();
+
+				ArrayEntry<s> *backup = entries[n];
+
+				entries[n] = entries[m];
+				entries[m] = backup;
+
+				Unlock();
+
+				return True;
+			}
+
 			Bool Remove(Int index)
 			{
 				if (index > greatestIndex) return False;

@@ -36,6 +36,8 @@ namespace smooth
 		const Short	 WF_NOTASKBUTTON	= 8;
 		const Short	 WF_THINBORDER		= 16;
 
+		const Short	 WF_NOTITLE		= 32768;
+
 		const Short	 WO_SEPARATOR		= 1;
 		const Short	 WO_NOSEPARATOR		= 2;
 
