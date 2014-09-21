@@ -14,7 +14,9 @@ OBJECTS	  = twinvq/bfile.o twinvq/bfile_e.o twinvq/bstream_e.o twinvq/Chunk.o tw
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  =
+ifeq ($(BUILD_X86),True)
+	LIBS = -lstdc++.static
+endif
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =
@@ -25,6 +27,9 @@ INSTCMD1  =
 INSTCMD2  = 
 UINSTCMD1 =
 UINSTCMD2 =
+
+# Additional compilation options
+EXCEPTION = True
 
 ## Do not change anything below this line. ##
 

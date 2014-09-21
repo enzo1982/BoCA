@@ -14,7 +14,9 @@ OBJECTS	  = twinvq/bfile.o twinvq/bstream.o twinvq/Chunk.o twinvq/HeaderManager.
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  =
+ifeq ($(BUILD_X86),True)
+	LIBS = -lstdc++.static
+endif
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =
