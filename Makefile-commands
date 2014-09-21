@@ -5,7 +5,11 @@ include $(BOCA_PATH)/Makefile-options
 CC     = gcc
 CCOPTS = -pipe -g0 -Wall -Os -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
 LD     = gcc
-LDOPTS = -pipe -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+LDOPTS = -pipe -L$(BOCA_PATH)/$(LIBDIR) $(LIBS)
+
+ifeq (,$(findstring -lstdc++,$(LIBS)))
+	LDOPTS += -lstdc++
+endif
 
 ifeq ($(BUILD_FREEBSD),True)
 	CC = clang
