@@ -46,19 +46,19 @@ ifeq ($(BUILD_OSX),True)
 	LDOPTS += -Wl,-x
 
 ifeq ($(BUILD_X86),True)
-	CCOPTS += -arch i386
+	CCOPTS += -arch i386 -Xarch_i386 -march=prescott
 	LDOPTS += -arch i386
 endif
 ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -arch x86_64
+	CCOPTS += -arch x86_64 -Xarch_x86_64 -march=core2
 	LDOPTS += -arch x86_64
 endif
 ifeq ($(BUILD_PPC),True)
-	CCOPTS += -arch ppc
+	CCOPTS += -arch ppc -Xarch_ppc -mcpu=G4
 	LDOPTS += -arch ppc
 endif
 ifeq ($(BUILD_PPC64),True)
-	CCOPTS += -arch ppc64
+	CCOPTS += -arch ppc64 -Xarch_ppc64 -mcpu=G5
 	LDOPTS += -arch ppc64
 endif
 else
