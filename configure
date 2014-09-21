@@ -1,0 +1,33 @@
+#!/bin/sh
+echo "There is no need to run configure for building the fre:ac Component Development"
+echo "Kit. Just make sure the following prerequisites are met before running make:"
+echo
+echo "  All operating systems:"
+echo
+echo "    - Get, build and install the latest version of the smooth Class Library;"
+echo "      it can be obtained via CVS using:"
+echo
+echo "      cvs -d:pserver:anonymous@smooth.cvs.sf.net:/cvsroot/smooth co -P smooth"
+echo
+echo "  On OS X, Linux, *BSD, Solaris, Hurd:"
+echo
+echo "    - libasound2 development package (Linux only)"
+echo "    - libcdio and libcdio-paranoia development packages (except OpenBSD)"
+echo "    - libcdparanoia development package (except OS X, NetBSD, Solaris, Hurd)"
+echo "    - libflac development package"
+echo "    - libopus development package"
+echo "    - libspeex development package"
+echo "    - libvorbis development package"
+echo
+echo "  On OS X:"
+echo
+echo "    - Building the fre:ac CDK is tested on OS X Leopard 10.5.8 only using"
+echo "      the Xcode 3.1 Command Line Tools (no Xcode project file provided)"
+echo
+echo "  On Windows:"
+echo
+echo "    - Please use MinGW (http://www.mingw.org/) or Visual Studio 2010"
+echo "      with the msvc/BoCA/BoCA.sln project file to build the fre:ac CDK"
+echo
+echo "When all prerequisites are met, simply run \"make && make install\"."
+echo
