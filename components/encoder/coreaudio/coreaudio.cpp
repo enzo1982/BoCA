@@ -382,6 +382,31 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 		}
 	}
 
+	/* Update ID3v2 tag with correct chapter marks.
+	 */
+	if (!config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", 0))
+	{
+		const Info	&info = track.GetInfo();
+
+		if (info.artist != NIL || info.title != NIL)
+		{
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+			if (tagger != NIL)
+			{
+				Buffer<unsigned char>	 id3Buffer;
+
+				tagger->RenderBuffer(id3Buffer, track);
+
+				driver->Seek(0);
+				driver->WriteData(id3Buffer, id3Buffer.Size());
+
+				boca.DeleteComponent(tagger);
+			}
+		}
+	}
+
 	return True;
 }
 

@@ -118,6 +118,8 @@ Bool BoCA::EncoderBlade::Activate()
 
 	packageSize = samplesSize * (format.bits / 8);
 
+	/* Write ID3v2 tag if requested.
+	 */
 	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
@@ -151,6 +153,8 @@ Bool BoCA::EncoderBlade::Deactivate()
 
 	ex_beCloseStream(handle);
 
+	/* Write ID3v1 tag if requested.
+	 */
 	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
@@ -162,6 +166,26 @@ Bool BoCA::EncoderBlade::Deactivate()
 
 			tagger->RenderBuffer(id3Buffer, track);
 
+			driver->WriteData(id3Buffer, id3Buffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
+	}
+
+	/* Update ID3v2 tag with correct chapter marks.
+	 */
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->RenderBuffer(id3Buffer, track);
+
+			driver->Seek(0);
 			driver->WriteData(id3Buffer, id3Buffer.Size());
 
 			boca.DeleteComponent(tagger);

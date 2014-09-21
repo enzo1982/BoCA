@@ -339,6 +339,26 @@ Bool BoCA::EncoderLAME::Deactivate()
 		}
 	}
 
+	/* Update ID3v2 tag with correct chapter marks.
+	 */
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->RenderBuffer(id3Buffer, track);
+
+			driver->Seek(0);
+			driver->WriteData(id3Buffer, id3Buffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
+	}
+
 	/* Write Xing or Info header.
 	 */
 	Buffer<unsigned char>	 buffer(2880);	// Maximum frame size

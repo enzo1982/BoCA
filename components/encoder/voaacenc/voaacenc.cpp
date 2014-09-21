@@ -197,7 +197,8 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 Bool BoCA::EncoderVOAAC::Deactivate()
 {
-	Config	*config = Config::Get();
+	Config		*config = Config::Get();
+	const Info	&info = track.GetInfo();
 
 	/* Output remaining samples to encoder.
 	 */
@@ -276,6 +277,53 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 		in.Close();
 
 		File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+	}
+
+	/* Write ID3v1 tag if requested.
+	 */
+	if (!config->GetIntValue("VOAACEnc", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v1", False))
+	{
+		const Info	&info = track.GetInfo();
+
+		if (info.artist != NIL || info.title != NIL)
+		{
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v1-tag");
+
+			if (tagger != NIL)
+			{
+				Buffer<unsigned char>	 id3Buffer;
+
+				tagger->RenderBuffer(id3Buffer, track);
+
+				driver->WriteData(id3Buffer, id3Buffer.Size());
+
+				boca.DeleteComponent(tagger);
+			}
+		}
+	}
+
+	/* Update ID3v2 tag with correct chapter marks.
+	 */
+	if (!config->GetIntValue("VOAACEnc", "MP4Container", 1))
+	{
+		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("VOAACEnc", "AllowID3v2", 0))
+		{
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+			if (tagger != NIL)
+			{
+				Buffer<unsigned char>	 id3Buffer;
+
+				tagger->RenderBuffer(id3Buffer, track);
+
+				driver->Seek(0);
+				driver->WriteData(id3Buffer, id3Buffer.Size());
+
+				boca.DeleteComponent(tagger);
+			}
+		}
 	}
 
 	return True;

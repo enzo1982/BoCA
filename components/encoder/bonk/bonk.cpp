@@ -83,6 +83,8 @@ Bool BoCA::EncoderBonk::Activate()
 
 	encoder	= ex_bonk_encoder_create();
 
+	/* Write ID3v2 tag if requested.
+	 */
 	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
@@ -116,6 +118,9 @@ Bool BoCA::EncoderBonk::Deactivate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
+	Config		*config = Config::Get();
+	const Info	&info = track.GetInfo();
+
 	Int	 bytes = ex_bonk_encoder_finish(encoder, dataBuffer, dataBuffer.Size());
 
 	if (bytes > dataBuffer.Size())
@@ -138,6 +143,26 @@ Bool BoCA::EncoderBonk::Deactivate()
 	}
 
 	ex_bonk_encoder_close(encoder);
+
+	/* Update ID3v2 tag with correct chapter marks.
+	 */
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->RenderBuffer(id3Buffer, track);
+
+			driver->Seek(2);
+			driver->WriteData(id3Buffer, id3Buffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
+	}
 
 	return True;
 }
