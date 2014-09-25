@@ -28,6 +28,8 @@ namespace BoCA
 			vorbis_dsp_state	 vd;
 			vorbis_block		 vb;
 
+			short			 convBuffer[6144];
+
 			Int			 skipSamples;
 		public:
 			static const String	&GetComponentSpecs();

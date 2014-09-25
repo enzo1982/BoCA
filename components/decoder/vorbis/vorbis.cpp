@@ -379,9 +379,6 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	while (ex_ogg_sync_pageout(&oy, &og) == 1)
 	{
-		static short	 convbuffer[6144];
-		static int	 convsize = 6144 / vi.channels;
-
 		ex_ogg_stream_pagein(&os, &og);
 
 		while (ex_ogg_stream_packetout(&os, &op) == 1)
@@ -394,11 +391,11 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 			while ((samples = ex_vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
 			{
-				Int	 bout = (samples < convsize ? samples : convsize);
+				Int	 bout = Math::Min(samples, sizeof(convBuffer) / vi.channels / 2);
 
 				for (Int i = 0; i < vi.channels; i++)
 				{
-					short	*ptr = convbuffer + i;
+					short	*ptr = convBuffer + i;
 					float	*mono = pcm[i];
 
 					for (Int j = 0; j < bout; j++)
@@ -422,7 +419,7 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data, Int size)
 						data.Resize(dataBufferLen);
 					}
 
-					memcpy(((unsigned char *) data) + size, convbuffer + skipSamples * vi.channels, (bout - skipSamples) * vi.channels * 2);
+					memcpy(((unsigned char *) data) + size, convBuffer + skipSamples * vi.channels, (bout - skipSamples) * vi.channels * 2);
 
 					size += ((bout - skipSamples) * vi.channels * 2);
 				}
