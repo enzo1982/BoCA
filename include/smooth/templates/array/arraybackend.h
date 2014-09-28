@@ -193,15 +193,15 @@ namespace smooth
 				return True;
 			}
 
-			Bool Switch(Int index1, Int index2)
+			Bool Move(Int index1, Int index2)
 			{
 				if (index1 > greatestIndex ||
 				    index2 > greatestIndex) return False;
 
-				return SwitchNth(GetEntryNumberByIndex(index1), GetEntryNumberByIndex(index2));
+				return MoveNth(GetEntryNumberByIndex(index1), GetEntryNumberByIndex(index2));
 			}
 
-			Bool SwitchNth(Int n, Int m)
+			Bool MoveNth(Int n, Int m)
 			{
 				if (nOfEntries <= n || n < 0 ||
 				    nOfEntries <= m || m < 0) return False;
@@ -210,7 +210,9 @@ namespace smooth
 
 				ArrayEntry<s> *backup = entries[n];
 
-				entries[n] = entries[m];
+				if (m < n) memmove(entries + m + 1, entries + m, (n - m) * sizeof(ArrayEntry<s> *));
+				else	   memmove(entries + n, entries + n + 1, (m - n) * sizeof(ArrayEntry<s> *));
+
 				entries[m] = backup;
 
 				Unlock();

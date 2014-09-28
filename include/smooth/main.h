@@ -31,6 +31,11 @@ namespace smooth
 using namespace smooth;
 
 #if defined __WIN32__
+
+#if defined(__i386__) && (defined(__GNUC__) || defined(__clang__))
+int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLine, int iCmdShow) __attribute__((force_align_arg_pointer));
+#endif
+
 int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLine, int iCmdShow)
 {
 	Int		 retValue = -1;
