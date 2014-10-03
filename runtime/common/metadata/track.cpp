@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -131,18 +131,12 @@ String BoCA::Track::GetLengthString() const
 
 	secondsString = String::FromInt(seconds / 60).Append(":").Append(seconds % 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 60));
 
-	String	 lengthString;
+	String		 lengthString;
+	static wchar_t	 sign[2] = { 0x2248, 0 };
 
 	if	(length >= 0)	    lengthString = secondsString;
-	else if (approxLength >= 0) lengthString = String("~ ").Append(secondsString);
+	else if (approxLength >= 0) lengthString = String(sign).Append(" ").Append(secondsString);
 	else			    lengthString = "?";
-
-	if (Setup::enableUnicode)
-	{
-		static wchar_t	 sign[2] = { 0x2248, 0 };
-
-		lengthString.Replace("~", sign);
-	}
 
 	return lengthString;
 }

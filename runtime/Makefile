@@ -83,15 +83,14 @@ endif
 endif
 endif
 
-ifneq ($(BUILD_WIN32),True)
-	CCOPTS += -fPIC
-endif
-
 ifeq ($(BUILD_WIN32),True)
+	CCOPTS += -DUNICODE -D_UNICODE
 	LDOPTS += -lsmooth -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 else ifeq ($(BUILD_OSX),True)
+	CCOPTS += -fPIC
 	LDOPTS += -L$(PREFIX)/lib -lsmooth-$(SMOOTHVER) -Wl,-dylib_install_name,libboca-$(VERSION).0$(SHARED)
 else
+	CCOPTS += -fPIC
 	LDOPTS += -L$(PREFIX)/lib -lsmooth-$(SMOOTHVER) -Wl,-soname,libboca-$(VERSION)$(SHARED).0 -Wl,-rpath,.
 
 	ifneq ($(BUILD_LINUX),True)

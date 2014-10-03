@@ -52,30 +52,12 @@ String GetCommonFilesDirectory()
 	String	 commonFilesDir;
 
 	ITEMIDLIST	*idlist;
-	OSVERSIONINFOA	 vInfo;
-
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-	GetVersionExA(&vInfo);
+	Buffer<wchar_t>	 buffer(32768 + 1);
 
 	SHGetSpecialFolderLocation(NIL, CSIDL_PROGRAM_FILES_COMMON, &idlist);
+	SHGetPathFromIDList(idlist, buffer);
 
-	if (Setup::enableUnicode)
-	{
-		Buffer<wchar_t>	 buffer(32768 + 1);
-
-		SHGetPathFromIDListW(idlist, buffer);
-
-		commonFilesDir = buffer;
-	}
-	else
-	{
-		Buffer<char>	 buffer(MAX_PATH + 1);
-
-		SHGetPathFromIDListA(idlist, buffer);
-
-		commonFilesDir = buffer;
-	}
+	commonFilesDir = buffer;
 
 	CoTaskMemFree(idlist);
 

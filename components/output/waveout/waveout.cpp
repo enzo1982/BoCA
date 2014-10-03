@@ -104,11 +104,9 @@ Bool BoCA::OutputWaveOut::Activate()
 		String	 e  = String("Unknown MMSYSTEM error.");
 		String	 e2 = String("Unknown error.");
 
-		char	 waveOutErrorA[MAXERRORLENGTH];
-		wchar_t	 waveOutErrorW[MAXERRORLENGTH];
+		wchar_t	 waveOutError[MAXERRORLENGTH];
 
-		if	(!Setup::enableUnicode && waveOutGetErrorTextA(mr, waveOutErrorA, MAXERRORLENGTH) == MMSYSERR_NOERROR) e = waveOutErrorA;
-		else if ( Setup::enableUnicode && waveOutGetErrorTextW(mr, waveOutErrorW, MAXERRORLENGTH) == MMSYSERR_NOERROR) e = waveOutErrorW;
+		if (waveOutGetErrorText(mr, waveOutError, MAXERRORLENGTH) == MMSYSERR_NOERROR) e = waveOutError;
 
 		switch (mr)
 		{

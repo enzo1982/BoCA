@@ -111,17 +111,12 @@ const String &BoCA::LayerLengthStatus::GetTotalLengthString(const Array<Track> &
 		}
 	}
 
-	string = String(unknown ? "> " : NIL).Append(approx ? "~ " : NIL)
+	static wchar_t	 sign[2] = { 0x2248, 0 };
+
+	string = String(unknown ? "> " : NIL).Append(approx ? String(sign).Append(" ") : String())
 		.Append(seconds >= 3600 ? String(seconds / 3600	     < 10 ? "0" : NIL).Append(String::FromInt(seconds / 3600	 )).Append(":") : String())
 					 .Append(seconds % 3600 / 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 3600 / 60)).Append(":")
 					 .Append(seconds % 3600 % 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 3600 % 60));
-
-	if (Setup::enableUnicode)
-	{
-		static wchar_t	 sign[2] = { 0x2248, 0 };
-
-		string.Replace("~", sign);
-	}
 
 	return string;
 }

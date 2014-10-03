@@ -138,8 +138,7 @@ Bool BoCA::EncoderSndFile::Activate()
 	String	 fileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"); 
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode) file = _wfopen(fileName, L"wb");
-	else			  file = fopen(fileName, "wb");
+	file = _wfopen(fileName, L"wb");
 #else
 	file = fopen(fileName.ConvertTo("UTF-8"), "wb");
 #endif

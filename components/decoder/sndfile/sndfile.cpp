@@ -133,8 +133,7 @@ Bool BoCA::DecoderSndFile::CanOpenStream(const String &streamURI)
 	FILE	*file = 0;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
-	else			  file = fopen(streamURI, "rb");
+	file = _wfopen(streamURI, L"rb");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
@@ -162,8 +161,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 	FILE	*file = 0;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode) file = _wfopen(streamURI, L"rb");
-	else			  file = fopen(streamURI, "rb");
+	file = _wfopen(streamURI, L"rb");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
@@ -339,8 +337,7 @@ Bool BoCA::DecoderSndFile::Activate()
 	/* Open input file.
 	 */
 #ifdef __WIN32__
-	if (Setup::enableUnicode) file = _wfopen(track.origFilename, L"rb");
-	else			  file = fopen(track.origFilename, "rb");
+	file = _wfopen(track.origFilename, L"rb");
 #else
 	file = fopen(track.origFilename.ConvertTo("UTF-8"), "rb");
 #endif

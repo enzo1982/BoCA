@@ -140,17 +140,16 @@ String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string)
 
 	for (Int k = 0, b = 0; k < string.Length(); k++)
 	{
-		if	(string[k] == '\"')			      { rVal[k + b] = '\''; rVal[k + ++b] = '\''; }
-		else if (string[k] == '?')				b--;
-		else if (string[k] == '|')				rVal[k + b] = '_';
-		else if (string[k] == '*')				b--;
-		else if (string[k] == '<')				rVal[k + b] = '(';
-		else if (string[k] == '>')				rVal[k + b] = ')';
-		else if (string[k] == ':')				b--;
-		else if (string[k] == '/')				rVal[k + b] = '-';
-		else if (string[k] == '\\')				rVal[k + b] = '-';
-		else if (string[k] >= 256  && !Setup::enableUnicode)	rVal[k + b] = '#';
-		else							rVal[k + b] = string[k];
+		if	(string[k] == '\"') { rVal[k + b] = '\''; rVal[k + ++b] = '\''; }
+		else if (string[k] == '?')    b--;
+		else if (string[k] == '|')    rVal[k + b] = '_';
+		else if (string[k] == '*')    b--;
+		else if (string[k] == '<')    rVal[k + b] = '(';
+		else if (string[k] == '>')    rVal[k + b] = ')';
+		else if (string[k] == ':')    b--;
+		else if (string[k] == '/')    rVal[k + b] = '-';
+		else if (string[k] == '\\')   rVal[k + b] = '-';
+		else			      rVal[k + b] = string[k];
 	}
 
 	return rVal;

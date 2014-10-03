@@ -61,13 +61,11 @@ endif
 endif
 endif
 
-ifneq ($(BUILD_WIN32),True)
-	CCOPTS += -fPIC
-endif
-
 ifeq ($(BUILD_WIN32),True)
+	CCOPTS += -DUNICODE -D_UNICODE
 	LDOPTS += -lsmooth -lboca -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 else
+	CCOPTS += -fPIC
 	LDOPTS += -L$(PREFIX)/lib -lsmooth-$(SMOOTHVER) -lboca-$(VERSION)
 
 	ifneq ($(BUILD_LINUX),True)
