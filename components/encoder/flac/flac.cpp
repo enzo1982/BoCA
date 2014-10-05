@@ -312,8 +312,8 @@ Bool BoCA::EncoderFLAC::FixChapterMarks()
 	/* Fill buffer with Vorbis Comment block.
 	 */
 	Buffer<UnsignedByte>	 buffer;
-	Int			 position;
-	ogg_page		 og;
+	Int			 position = 0;
+	ogg_page		 og	  = { 0 };
 
 	if (config->GetIntValue("FLAC", "FileFormat", 0) == 0 || *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0)
 	{

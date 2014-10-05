@@ -198,8 +198,7 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 Bool BoCA::EncoderVOAAC::Deactivate()
 {
-	Config		*config = Config::Get();
-	const Info	&info = track.GetInfo();
+	Config	*config = Config::Get();
 
 	/* Output remaining samples to encoder.
 	 */

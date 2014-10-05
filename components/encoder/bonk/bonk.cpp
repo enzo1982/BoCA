@@ -119,8 +119,7 @@ Bool BoCA::EncoderBonk::Deactivate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	Config		*config = Config::Get();
-	const Info	&info = track.GetInfo();
+	Config	*config = Config::Get();
 
 	Int	 bytes = ex_bonk_encoder_finish(encoder, dataBuffer, dataBuffer.Size());
 
