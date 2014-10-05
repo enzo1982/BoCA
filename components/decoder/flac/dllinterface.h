@@ -11,10 +11,10 @@
 #include <smooth.h>
 
 #include <ogg/ogg.h>
-#include <flac/stream_encoder.h>
+#include <FLAC/stream_encoder.h>
 
 #undef callbacks
-#include <flac/metadata.h>
+#include <FLAC/metadata.h>
 
 using namespace smooth;
 using namespace smooth::System;

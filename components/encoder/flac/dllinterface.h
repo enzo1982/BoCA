@@ -11,7 +11,7 @@
 #include <smooth.h>
 
 #include <ogg/ogg.h>
-#include <flac/stream_encoder.h>
+#include <FLAC/stream_encoder.h>
 
 using namespace smooth;
 using namespace smooth::System;

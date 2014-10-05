@@ -11,7 +11,7 @@
 #include <smooth.h>
 
 #undef callbacks
-#include <flac/metadata.h>
+#include <FLAC/metadata.h>
 
 using namespace smooth;
 using namespace smooth::System;
