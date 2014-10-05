@@ -159,7 +159,8 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 	const Info		&info = track.GetInfo();
 	Buffer<unsigned char>	 vcBuffer;
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableFLACMetadata", True))
+	if (((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
+	     (info.artist != NIL || info.title != NIL)) && config->GetIntValue("Tags", "EnableFLACMetadata", True))
 	{
 		FLAC__StreamMetadata	*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 

@@ -363,7 +363,8 @@ Bool BoCA::EncoderSndFile::Deactivate()
 	{
 		/* Write ID3v2 tag if requested.
 		 */
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v2", True))
+		if (((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
+		     (info.artist != NIL || info.title != NIL)) && config->GetIntValue("Tags", "EnableID3v2", True))
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");

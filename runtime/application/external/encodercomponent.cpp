@@ -49,7 +49,8 @@ Int BoCA::AS::EncoderComponentExternal::RenderTags(const String &streamURI, cons
 	 */
 	const Info	&info = track.GetInfo();
 
-	if (info.artist == NIL && info.title == NIL) return Success();
+	if ((track.tracks.Length() == 0 || !config->GetIntValue("Tags", "WriteChapters", True)) &&
+	    (info.artist == NIL && info.title == NIL)) return Success();
 
 	/* Loop over supported formats.
 	 */

@@ -234,8 +234,9 @@ Bool BoCA::EncoderOpus::Activate()
 
 			tagger->SetVendorString(String(opusVersion).Append("\n"));
 
-			if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableVorbisComment", True)) tagger->RenderBuffer(vcBuffer, track);
-			else													   tagger->RenderBuffer(vcBuffer, Track());
+			if (((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
+			     (info.artist != NIL || info.title != NIL)) && config->GetIntValue("Tags", "EnableVorbisComment", True)) tagger->RenderBuffer(vcBuffer, track);
+			else													     tagger->RenderBuffer(vcBuffer, Track());
 
 			boca.DeleteComponent(tagger);
 		}
@@ -404,7 +405,7 @@ Int BoCA::EncoderOpus::WriteOggPackets(Bool flush)
 
 Bool BoCA::EncoderOpus::FixChapterMarks()
 {
-	if (track.tracks.Length() == 0) return True;
+	if (track.tracks.Length() == 0 || !BoCA::Config::Get()->GetIntValue("Tags", "WriteChapters", True)) return True;
 
 	driver->Seek(0);
 
