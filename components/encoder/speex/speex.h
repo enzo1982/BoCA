@@ -37,6 +37,7 @@ namespace BoCA
 			Buffer<spx_int16_t>	 samplesBuffer;
 
 			Int			 EncodeFrames(Buffer<signed short> &, Buffer<unsigned char> &, Bool);
+			Bool			 FixChapterMarks();
 
 			Int			 WriteOggPackets(Bool);
 		public:

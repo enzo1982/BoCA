@@ -66,11 +66,13 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
+	LoadOggDLL();
 	LoadFLACDLL();
 }
 
 Void smooth::DetachDLL()
 {
+	FreeOggDLL();
 	FreeFLACDLL();
 }
 
@@ -266,6 +268,10 @@ Bool BoCA::EncoderFLAC::Deactivate()
 
 	for (Int i = 0; i < metadata.Length(); i++) ex_FLAC__metadata_object_delete(metadata.GetNth(i));
 
+	/* Fix chapter marks in Vorbis Comments.
+	 */
+	FixChapterMarks();
+
 	return True;
 }
 
@@ -294,6 +300,128 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 	ex_FLAC__stream_encoder_process_interleaved(encoder, buffer, size / (format.bits / 8) / format.channels);
 
 	return bytesWritten;
+}
+
+Bool BoCA::EncoderFLAC::FixChapterMarks()
+{
+	if (track.tracks.Length() == 0) return True;
+
+	Config	*config = Config::Get();
+
+	/* Fill buffer with Vorbis Comment block.
+	 */
+	Buffer<UnsignedByte>	 buffer;
+	Int			 position;
+	ogg_page		 og;
+
+	if (config->GetIntValue("FLAC", "FileFormat", 0) == 0 || *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0)
+	{
+		driver->Seek(4);
+
+		/* Find Vorbis Comment block and read it into buffer.
+		 */
+		UnsignedByte	 header[4] = { 0 };
+
+		while (!(header[0] & 0x80))
+		{
+			driver->ReadData(header, 4);
+
+			Int	 size = header[1] << 16 | header[2] << 8 | header[3];
+
+			if ((header[0] & 0x7F) == 4)
+			{
+				buffer.Resize(size);
+				position = driver->GetPos();
+
+				driver->ReadData(buffer, size);
+
+				break;
+			}
+
+			driver->Seek(driver->GetPos() + size);
+		}
+	}
+	else if (ex_ogg_page_checksum_set != NIL)
+	{
+		driver->Seek(0);
+
+		/* Skip first Ogg page and read second into buffer.
+		 */
+		for (Int i = 0; i < 2; i++)
+		{
+			driver->Seek(driver->GetPos() + 26);
+
+			Int		 dataSize    = 0;
+			UnsignedByte	 segments    = 0;
+			UnsignedByte	 segmentSize = 0;
+
+			driver->ReadData(&segments, 1);
+
+			for (Int i = 0; i < segments; i++) { driver->ReadData(&segmentSize, 1); dataSize += segmentSize; }
+
+			buffer.Resize(27 + segments + dataSize);
+			position = driver->GetPos() - segments - 27;
+
+			driver->Seek(position);
+			driver->ReadData(buffer, buffer.Size());
+
+			og.header     = buffer;
+			og.header_len = 27 + segments;
+			og.body	      = buffer + og.header_len;
+			og.body_len   = dataSize;
+		}
+	}
+
+	/* Update chapter marks.
+	 */
+	if (buffer.Size() > 0)
+	{
+		Int64	 offset = 0;
+
+		for (Int i = 0; i < track.tracks.Length(); i++)
+		{
+			const Track	&chapterTrack  = track.tracks.GetNth(i);
+			const Format	&chapterFormat = chapterTrack.GetFormat();
+
+			for (Int b = 0; b < buffer.Size() - 23; b++)
+			{
+				if (buffer[b + 0] != 'C' || buffer[b + 1] != 'H' || buffer[b + 2] != 'A' || buffer[b +  3] != 'P' ||
+				    buffer[b + 4] != 'T' || buffer[b + 5] != 'E' || buffer[b + 6] != 'R' || buffer[b + 10] != '=') continue;
+
+				String	 id;
+
+				id[0] = buffer[b + 7];
+				id[1] = buffer[b + 8];
+				id[2] = buffer[b + 9];
+
+				if (id.ToInt() != i + 1) continue;
+
+				String	 value	= String(offset / chapterFormat.rate / 60 / 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 / 60)).Append(":")
+						 .Append(offset / chapterFormat.rate / 60 % 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 % 60)).Append(":")
+						 .Append(offset / chapterFormat.rate % 60      < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate % 60)).Append(".")
+						 .Append(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) < 100 ?
+							(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) <  10 ?  "00" : "0") : "").Append(String::FromInt(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate)));
+
+				for (Int p = 0; p < 12; p++) buffer[b + 11 + p] = value[p];
+
+				break;
+			}
+
+			if	(chapterTrack.length	   >= 0) offset += chapterTrack.length;
+			else if (chapterTrack.approxLength >= 0) offset += chapterTrack.approxLength;
+		}
+
+		/* Write page back to file.
+		 */
+		if (config->GetIntValue("FLAC", "FileFormat", 0) == 1 && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1) ex_ogg_page_checksum_set(&og);
+
+		driver->Seek(position);
+		driver->WriteData(buffer, buffer.Size());
+	}
+
+	driver->Seek(driver->GetSize());
+
+	return True;
 }
 
 String BoCA::EncoderFLAC::GetOutputFileExtension()
