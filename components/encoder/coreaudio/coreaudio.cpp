@@ -83,7 +83,6 @@ BoCA::EncoderCoreAudio::EncoderCoreAudio()
 	configLayer    = NIL;
 
 	audioFile      = NIL;
-	audioFile      = NIL;
 	converter      = NIL;
 
 	buffers	       = NIL;
@@ -185,7 +184,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	CA::CFURLRef	 fileNameURL	= CA::CFURLCreateWithFileSystemPath(NULL, fileNameString, CA::kCFURLPOSIXPathStyle, False);
 #endif
 
-	CA::UInt32	 fileType = config->GetIntValue("CoreAudio", "MP4Container", 1) ? CA::kAudioFileM4AType : CA::kAudioFileAAC_ADTSType;
+	CA::UInt32	 fileType	= config->GetIntValue("CoreAudio", "MP4Container", 1) ? CA::kAudioFileM4AType : CA::kAudioFileAAC_ADTSType;
 
 	CA::AudioFileCreateWithURL(fileNameURL, fileType, &destinationFormat, CA::kAudioFileFlags_EraseFile, &audioFile);
 

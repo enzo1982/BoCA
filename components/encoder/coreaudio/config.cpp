@@ -76,7 +76,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 	combo_codec		= new ComboBox(Point(text_codec->GetUnscaledTextSize().cx + 17, 12), Size(group_codec->GetWidth() - text_codec->GetUnscaledTextSize().cx - 27, 0));
 
 	/* Query supported formats from Core Audio
-	 * ans add them to the combo box list.
+	 * and add them to the combo box list.
 	 */
 	CA::UInt32	 size = 0;
 
