@@ -18,7 +18,7 @@ BoCA::AS::EncoderComponent::~EncoderComponent()
 {
 }
 
-Int BoCA::AS::EncoderComponent::GetPackageSize()
+Int BoCA::AS::EncoderComponent::GetPackageSize() const
 {
 	return specs->func_GetPackageSize(component);
 }
@@ -33,7 +33,7 @@ Bool BoCA::AS::EncoderComponent::SetAudioTrackInfo(const Track &track)
 	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
-String BoCA::AS::EncoderComponent::GetOutputFileExtension()
+String BoCA::AS::EncoderComponent::GetOutputFileExtension() const
 {
 	String	 extension = specs->func_GetOutputFileExtension(component);
 
@@ -41,7 +41,7 @@ String BoCA::AS::EncoderComponent::GetOutputFileExtension()
 	else			return specs->formats.GetFirst()->GetExtensions().GetFirst();
 }
 
-Int BoCA::AS::EncoderComponent::GetNumberOfPasses()
+Int BoCA::AS::EncoderComponent::GetNumberOfPasses() const
 {
 	return specs->func_GetNumberOfPasses(component);
 }

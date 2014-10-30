@@ -28,8 +28,8 @@ namespace BoCA
 
 				virtual Bool	 SetAudioTrackInfo(const Track &);
 
-				virtual String	 GetOutputFileExtension();
-				virtual Int	 GetNumberOfPasses();
+				virtual String	 GetOutputFileExtension() const;
+				virtual Int	 GetNumberOfPasses() const;
 
 				virtual Bool	 Activate();
 				virtual Bool	 Deactivate();
@@ -37,7 +37,7 @@ namespace BoCA
 				virtual Int	 WriteData(Buffer<UnsignedByte> &buffer, Int size);
 				virtual Bool	 NextPass();
 
-				virtual Int	 GetPackageSize();
+				virtual Int	 GetPackageSize() const;
 				virtual Int	 SetDriver(IO::Driver *);
 
 		};

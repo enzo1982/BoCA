@@ -44,7 +44,7 @@ namespace BoCA
 						 EncoderWMA();
 						~EncoderWMA();
 
-			Int			 GetNumberOfPasses();
+			Int			 GetNumberOfPasses() const;
 
 			Bool			 Activate();
 			Bool			 Deactivate();

@@ -41,7 +41,7 @@ namespace BoCA
 
 			Int			 EncodeFrames(Buffer<int16_t> &, Buffer<unsigned char> &, Bool);
 
-			Int			 GetSampleRateIndex(Int);
+			Int			 GetSampleRateIndex(Int) const;
 		public:
 			static const String	&GetComponentSpecs();
 
@@ -53,7 +53,7 @@ namespace BoCA
 
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
-			String			 GetOutputFileExtension();
+			String			 GetOutputFileExtension() const;
 
 			ConfigLayer		*GetConfigurationLayer();
 	};

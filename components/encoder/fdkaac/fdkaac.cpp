@@ -436,7 +436,7 @@ Int BoCA::EncoderFDKAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<uns
 	return dataLength;
 }
 
-Int BoCA::EncoderFDKAAC::GetSampleRateIndex(Int sampleRate)
+Int BoCA::EncoderFDKAAC::GetSampleRateIndex(Int sampleRate) const
 {
 	Int	 sampleRates[12] = { 96000, 88200, 64000, 48000, 44100, 32000,
 				     24000, 22050, 16000, 12000, 11025,  8000 };
@@ -449,7 +449,7 @@ Int BoCA::EncoderFDKAAC::GetSampleRateIndex(Int sampleRate)
 	return -1;
 }
 
-String BoCA::EncoderFDKAAC::GetOutputFileExtension()
+String BoCA::EncoderFDKAAC::GetOutputFileExtension() const
 {
 	Config	*config = Config::Get();
 

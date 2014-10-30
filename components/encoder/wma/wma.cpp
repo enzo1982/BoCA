@@ -83,7 +83,7 @@ BoCA::EncoderWMA::~EncoderWMA()
 	CoUninitialize();
 }
 
-Int BoCA::EncoderWMA::GetNumberOfPasses()
+Int BoCA::EncoderWMA::GetNumberOfPasses() const
 {
 	/* 2-pass encoding is not supported, yet.
 	 */

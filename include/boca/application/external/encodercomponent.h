@@ -35,7 +35,7 @@ namespace BoCA
 
 				virtual Bool		 SetAudioTrackInfo(const Track &nTrack)	{ track = nTrack; format = nTrack.GetFormat(); return True; }
 
-				virtual String		 GetOutputFileExtension();
+				virtual String		 GetOutputFileExtension() const;
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 			accessors:

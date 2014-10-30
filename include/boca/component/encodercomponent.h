@@ -36,11 +36,11 @@ namespace BoCA
 
 				/* Returns the configured output file extension.
 				 */
-				virtual String	 GetOutputFileExtension();
+				virtual String	 GetOutputFileExtension() const;
 
 				/* Returns the number of passes needed by the encoder.
 				 */
-				virtual Int	 GetNumberOfPasses();
+				virtual Int	 GetNumberOfPasses() const;
 
 				/* Activate/deactivate filter.
 				 */

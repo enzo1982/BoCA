@@ -25,12 +25,12 @@ Bool BoCA::CS::EncoderComponent::SetAudioTrackInfo(const Track &nTrack)
 	return True;
 }
 
-String BoCA::CS::EncoderComponent::GetOutputFileExtension()
+String BoCA::CS::EncoderComponent::GetOutputFileExtension() const
 {
 	return NIL;
 }
 
-Int BoCA::CS::EncoderComponent::GetNumberOfPasses()
+Int BoCA::CS::EncoderComponent::GetNumberOfPasses() const
 {
 	return 1;
 }

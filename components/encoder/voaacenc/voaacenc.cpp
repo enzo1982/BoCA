@@ -420,7 +420,7 @@ Int BoCA::EncoderVOAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<unsi
 	return dataLength;
 }
 
-Int BoCA::EncoderVOAAC::GetSampleRateIndex(Int sampleRate)
+Int BoCA::EncoderVOAAC::GetSampleRateIndex(Int sampleRate) const
 {
 	Int	 sampleRates[12] = { 96000, 88200, 64000, 48000, 44100, 32000,
 				     24000, 22050, 16000, 12000, 11025,  8000 };
@@ -433,7 +433,7 @@ Int BoCA::EncoderVOAAC::GetSampleRateIndex(Int sampleRate)
 	return -1;
 }
 
-String BoCA::EncoderVOAAC::GetOutputFileExtension()
+String BoCA::EncoderVOAAC::GetOutputFileExtension() const
 {
 	Config	*config = Config::Get();
 

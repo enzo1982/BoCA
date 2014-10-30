@@ -449,7 +449,7 @@ Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data, Int size)
 	return totalOutBytes;
 }
 
-Int BoCA::EncoderCoreAudio::GetOutputSampleRate(Int inputRate)
+Int BoCA::EncoderCoreAudio::GetOutputSampleRate(Int inputRate) const
 {
 	Config	*config = Config::Get();
 
@@ -493,7 +493,7 @@ Int BoCA::EncoderCoreAudio::GetOutputSampleRate(Int inputRate)
 	return outputRate;
 }
 
-String BoCA::EncoderCoreAudio::GetOutputFileExtension()
+String BoCA::EncoderCoreAudio::GetOutputFileExtension() const
 {
 	Config	*config = Config::Get();
 

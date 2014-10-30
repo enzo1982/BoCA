@@ -35,7 +35,7 @@ namespace BoCA
 			Int			 packetsWritten;
 			Int			 totalSamples;
 
-			Int			 GetOutputSampleRate(Int);
+			Int			 GetOutputSampleRate(Int) const;
 		public:
 			static const String	&GetComponentSpecs();
 
@@ -47,7 +47,7 @@ namespace BoCA
 
 			Int			 WriteData(Buffer<UnsignedByte> &, Int);
 
-			String			 GetOutputFileExtension();
+			String			 GetOutputFileExtension() const;
 
 			ConfigLayer		*GetConfigurationLayer();
 	};

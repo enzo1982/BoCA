@@ -29,7 +29,7 @@ BoCA::AS::EncoderComponentExternal::~EncoderComponentExternal()
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
-String BoCA::AS::EncoderComponentExternal::GetOutputFileExtension()
+String BoCA::AS::EncoderComponentExternal::GetOutputFileExtension() const
 {
 	return specs->formats.GetFirst()->GetExtensions().GetFirst();
 }

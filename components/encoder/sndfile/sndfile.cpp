@@ -474,7 +474,7 @@ Int BoCA::EncoderSndFile::SelectBestSubFormat(const Format &format, Int fileForm
 	return 0;
 }
 
-String BoCA::EncoderSndFile::GetOutputFileExtension()
+String BoCA::EncoderSndFile::GetOutputFileExtension() const
 {
 	Config	*config = Config::Get();
 

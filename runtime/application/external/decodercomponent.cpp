@@ -47,7 +47,7 @@ Bool BoCA::AS::DecoderComponentExternal::CanOpenStream(const String &streamURI)
 	return False;
 }
 
-Int BoCA::AS::DecoderComponentExternal::GetPackageSize()
+Int BoCA::AS::DecoderComponentExternal::GetPackageSize() const
 {
 	return packageSize;
 }

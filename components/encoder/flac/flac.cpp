@@ -425,7 +425,7 @@ Bool BoCA::EncoderFLAC::FixChapterMarks()
 	return True;
 }
 
-String BoCA::EncoderFLAC::GetOutputFileExtension()
+String BoCA::EncoderFLAC::GetOutputFileExtension() const
 {
 	Config	*config = Config::Get();
 

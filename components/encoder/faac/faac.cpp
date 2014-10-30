@@ -410,7 +410,7 @@ Int BoCA::EncoderFAAC::EncodeFrames(Buffer<int32_t> &samplesBuffer, Buffer<unsig
 	return dataLength;
 }
 
-Int BoCA::EncoderFAAC::GetSampleRateIndex(Int sampleRate)
+Int BoCA::EncoderFAAC::GetSampleRateIndex(Int sampleRate) const
 {
 	Int	 sampleRates[12] = { 96000, 88200, 64000, 48000, 44100, 32000,
 				     24000, 22050, 16000, 12000, 11025,  8000 };
@@ -423,7 +423,7 @@ Int BoCA::EncoderFAAC::GetSampleRateIndex(Int sampleRate)
 	return -1;
 }
 
-String BoCA::EncoderFAAC::GetOutputFileExtension()
+String BoCA::EncoderFAAC::GetOutputFileExtension() const
 {
 	Config	*config = Config::Get();
 

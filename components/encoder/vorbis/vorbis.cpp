@@ -377,7 +377,7 @@ Bool BoCA::EncoderVorbis::FixChapterMarks()
 	return True;
 }
 
-String BoCA::EncoderVorbis::GetOutputFileExtension()
+String BoCA::EncoderVorbis::GetOutputFileExtension() const
 {
 	Config	*config = Config::Get();
 
