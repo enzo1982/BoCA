@@ -14,6 +14,7 @@ ifeq ($(BUILD_OSX),True)
 endif
 ifeq ($(BUILD_WIN32),True)
 	cd coreaudio && $(MAKE)
+	cd coreaudioconnect && $(MAKE)
 endif
 	cd faac && $(MAKE)
 	cd fdkaac && $(MAKE)
@@ -45,6 +46,7 @@ ifeq ($(BUILD_OSX),True)
 endif
 ifeq ($(BUILD_WIN32),True)
 	cd coreaudio && $(MAKE) clean
+	cd coreaudioconnect && $(MAKE) clean
 endif
 	cd faac && $(MAKE) clean
 	cd fdkaac && $(MAKE) clean
