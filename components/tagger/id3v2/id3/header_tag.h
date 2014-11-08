@@ -125,7 +125,7 @@ class ID3_TagHeader : public ID3_Header
 		// id3v2 tag header signature:  $49 44 33 MM mm GG ss ss ss ss
 		// MM = major version (will never be 0xFF)
 		// mm = minor version (will never be 0xFF)
-		// ff = flags byte 
+		// ff = flags byte
 		// ss = size bytes (less than $80)
 		static const char	*const ID;
 

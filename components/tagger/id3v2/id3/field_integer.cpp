@@ -46,7 +46,7 @@ void ID3_FieldImpl::SetInteger(uint32 val)
   if (this->GetType() == ID3FTY_INTEGER)
   {
     this->Clear();
-    
+
     _integer = val;
     _changed = true;
   }
@@ -54,7 +54,7 @@ void ID3_FieldImpl::SetInteger(uint32 val)
 
 /** \fn uint32 ID3_Field::Get() const
  ** \brief Returns the value of the integer field.
- ** 
+ **
  ** \code
  **   uint32 picType = myFrame.GetField(ID3FN_PICTURETYPE)->Get();
  ** \endcode

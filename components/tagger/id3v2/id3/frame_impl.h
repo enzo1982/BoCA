@@ -54,7 +54,7 @@ class ID3_FrameImpl
 
 		// Destructor.
 		virtual			~ID3_FrameImpl();
-  
+
 		void			 Clear();
 
 		bool			 SetID(ID3_FrameID id);

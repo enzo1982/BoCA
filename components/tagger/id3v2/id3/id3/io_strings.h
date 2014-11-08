@@ -51,21 +51,21 @@ namespace dami
       virtual ~StringReader() { ; }
 
       virtual void close() { ; }
-      virtual int_type peekChar() 
-      { 
+      virtual int_type peekChar()
+      {
         if (!this->atEnd())
         {
           return _string[_cur];
         }
         return END_OF_READER;
       }
-    
+
       /** Read up to \c len chars into buf and advance the internal position
        ** accordingly.  Returns the number of characters read into buf.
        **/
       size_type readChars(char buf[], size_type len)
-      { 
-        return this->readChars((char_type*) buf, len); 
+      {
+        return this->readChars((char_type*) buf, len);
       }
       virtual size_type readChars(char_type buf[], size_type len)
       {
@@ -74,22 +74,22 @@ namespace dami
         _cur += size;
         return size;
       }
-      
-      virtual pos_type getCur() 
-      { 
+
+      virtual pos_type getCur()
+      {
         return _cur;
       }
-      
+
       virtual pos_type getBeg()
       {
         return 0;
       }
-      
+
       virtual pos_type getEnd()
       {
         return _string.size();
       }
-      
+
       /** Set the value of the internal position for reading.
        **/
       virtual pos_type setCur(pos_type pos)
@@ -121,21 +121,21 @@ namespace dami
       virtual ~BStringReader() { ; }
 
       virtual void close() { ; }
-      virtual int_type peekChar() 
-      { 
+      virtual int_type peekChar()
+      {
         if (!this->atEnd())
         {
           return _string[_cur];
         }
         return END_OF_READER;
       }
-    
+
       /** Read up to \c len chars into buf and advance the internal position
        ** accordingly.  Returns the number of characters read into buf.
        **/
       size_type readChars(char buf[], size_type len)
-      { 
-        return this->readChars((char_type*) buf, len); 
+      {
+        return this->readChars((char_type*) buf, len);
       }
       virtual size_type readChars(char_type buf[], size_type len)
       {
@@ -144,22 +144,22 @@ namespace dami
         _cur += size;
         return size;
       }
-      
-      virtual pos_type getCur() 
-      { 
+
+      virtual pos_type getCur()
+      {
         return _cur;
       }
-      
+
       virtual pos_type getBeg()
       {
         return 0;
       }
-      
+
       virtual pos_type getEnd()
       {
         return _string.size();
       }
-      
+
       /** Set the value of the internal position for reading.
        **/
       virtual pos_type setCur(pos_type pos)
@@ -192,7 +192,7 @@ namespace dami
       void close() { ; }
       void flush() { ; }
       virtual size_type writeChars(const char buf[], size_type len)
-      { 
+      {
         _string.append(reinterpret_cast<const String::value_type *>(buf), len);
         return len;
       }
@@ -218,7 +218,7 @@ namespace dami
       void close() { ; }
       void flush() { ; }
       virtual size_type writeChars(const char buf[], size_type len)
-      { 
+      {
         _string.append(reinterpret_cast<const BString::value_type *>(buf), len);
         return len;
       }

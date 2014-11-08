@@ -47,7 +47,7 @@ class ID3_OStreamWriter : public ID3_Writer
 
   virtual void close() { ; }
   virtual void flush() { _stream.flush(); }
-  
+
   virtual int_type writeChar(char_type ch)
   {
     _stream.put(ch);
@@ -58,7 +58,7 @@ class ID3_OStreamWriter : public ID3_Writer
    ** accordingly.  Returns the number of characters write into buf.
    **/
   virtual size_type writeChars(const char buf[], size_type len)
-  { 
+  {
     _stream.write(buf, len);
     return len;
   }
@@ -76,15 +76,15 @@ class ID3_OFStreamWriter : public ID3_OStreamWriter
 {
   ofstream& _file;
  public:
-  ID3_OFStreamWriter(ofstream& writer) 
+  ID3_OFStreamWriter(ofstream& writer)
     : ID3_OStreamWriter(writer), _file(writer) { ; }
-    
-  virtual void close() 
-  { 
+
+  virtual void close()
+  {
     _file.close();
   }
 };
-  
+
 class ID3_IOStreamWriter : public ID3_Writer
 {
   iostream& _stream;
@@ -97,7 +97,7 @@ class ID3_IOStreamWriter : public ID3_Writer
 
   virtual void close() { ; }
   virtual void flush() { _stream.flush(); }
-  
+
   virtual int_type writeChar(char_type ch)
   {
     _stream.put(ch);
@@ -108,7 +108,7 @@ class ID3_IOStreamWriter : public ID3_Writer
    ** accordingly.  Returns the number of characters write into buf.
    **/
   virtual size_type writeChars(const char buf[], size_type len)
-  { 
+  {
     _stream.write(buf, len);
     return len;
   }
@@ -126,15 +126,15 @@ class ID3_FStreamWriter : public ID3_IOStreamWriter
 {
   fstream& _file;
  public:
-  ID3_FStreamWriter(fstream& writer) 
+  ID3_FStreamWriter(fstream& writer)
     : ID3_IOStreamWriter(writer), _file(writer) { ; }
-    
-  virtual void close() 
-  { 
+
+  virtual void close()
+  {
     _file.close();
   }
 };
-  
+
 class ID3_MemoryWriter : public ID3_Writer
 {
   const char_type* _beg;
@@ -159,12 +159,12 @@ class ID3_MemoryWriter : public ID3_Writer
   virtual ~ID3_MemoryWriter() { ; }
   virtual void close() { ; }
   virtual void flush() { ; }
-    
+
   /** Write up to \c len chars from buf and advance the internal position
    ** accordingly.  Returns the number of characters written from buf.
    **/
   virtual size_type writeChars(const char buf[], size_type len)
-  { 
+  {
     return this->writeChars(reinterpret_cast<const char_type *>(buf), len);
   }
   virtual size_type writeChars(const char_type buf[], size_type len)
@@ -175,17 +175,17 @@ class ID3_MemoryWriter : public ID3_Writer
     _cur += size;
     return size;
   }
-    
-  virtual pos_type getCur() 
-  { 
-    return _cur - _beg; 
+
+  virtual pos_type getCur()
+  {
+    return _cur - _beg;
   }
-    
+
   virtual pos_type getBeg()
   {
     return _beg - _beg;
   }
-    
+
   virtual pos_type getEnd()
   {
     return _end - _beg;

@@ -33,7 +33,7 @@
  **/
 
 #ifndef _SIZED_TYPES_H_
-#define _SIZED_TYPES_H_ 
+#define _SIZED_TYPES_H_
 
 #include <limits.h>
 

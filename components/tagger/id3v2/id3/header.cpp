@@ -45,7 +45,7 @@ bool ID3_Header::SetSpec(ID3_V2Spec spec)
 		{  4,     4,     2,     false, 10,  false }, // ID3V2_3_0
 		{  4,     4,     2,     false, 6,   false }  // ID3V2_4_0
 	};
-  
+
 	bool	 changed = false;
 
 	if (spec < ID3V2_EARLIEST || spec > ID3V2_LATEST)

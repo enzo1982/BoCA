@@ -63,12 +63,12 @@ class ID3_Frame
 					 ID3_Frame(const ID3_Frame &);
 
 		virtual			~ID3_Frame();
-		  
+
 		void			 Clear();
 
 		bool			 SetID(ID3_FrameID id);
 		ID3_FrameID		 GetID() const;
-		  
+
 		ID3_Field		*GetField(ID3_FieldID name) const;
 
 		size_t			 NumFields() const;

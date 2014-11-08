@@ -139,14 +139,14 @@ ID3_ENUM(ID3_TextEnc)
 {
   ID3TE_NONE = -1,
   ID3TE_ISO8859_1,
-  ID3TE_UTF16LE,
+  ID3TE_UTF16,
   ID3TE_UTF16BE,
   ID3TE_UTF8,
   ID3TE_NUMENCODINGS,
 };
 
 #define ID3TE_IS_SINGLE_BYTE_ENC(enc)    ((enc) == ID3TE_ISO8859_1 || (enc) == ID3TE_UTF8)
-#define ID3TE_IS_DOUBLE_BYTE_ENC(enc)    ((enc) == ID3TE_UTF16LE || (enc) == ID3TE_UTF16BE)
+#define ID3TE_IS_DOUBLE_BYTE_ENC(enc)    ((enc) == ID3TE_UTF16 || (enc) == ID3TE_UTF16BE)
 
 /** Enumeration of the various id3 specifications
  **/
@@ -373,12 +373,12 @@ ID3_ENUM(ID3_FieldFlags)
   ID3FF_LIST	      = 1 << 1,  /*null (according to encoding) seperates listitems*/
   ID3FF_NLIST	      = 1 << 2,  /*null (according to encoding) seperates listitems,
 				  *preceded by one item count byte*/
-  ID3FF_ENCODABLE     = 1 << 3,  /*possible to encode in valid encodings, 
+  ID3FF_ENCODABLE     = 1 << 3,  /*possible to encode in valid encodings,
                                   *if not set then string is encoded by ID3TE_ISO8859_1 */
-  ID3FF_HASLINKEDSIZE = 1 << 4   /*used together with _linked_field. 
+  ID3FF_HASLINKEDSIZE = 1 << 4   /*used together with _linked_field.
                                   *if _linked_field is NOT set, than this field contains
                                   *a size for other fields to use, if _linked_field is set,
-                                  *than it's size comes from the last field which had this 
+                                  *than it's size comes from the last field which had this
                                   *flag but didn't have _linked_field set*/
 };
 

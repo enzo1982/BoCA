@@ -41,1267 +41,1128 @@ using namespace dami;
  */
 static ID3_FieldDef ID3FD_Unimplemented[] =
 {
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
-const ID3_FieldDef* ID3_FieldDef::DEFAULT = ID3FD_Unimplemented;
+const ID3_FieldDef *ID3_FieldDef::DEFAULT = ID3FD_Unimplemented;
 
 static ID3_FieldDef ID3FD_Binary[] =
 {
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_URL[] =
 {
-  {
-    ID3FN_URL,                          // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_URL,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_UserURL[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DESCRIPTION,                  // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_URL,                          // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DESCRIPTION,		// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_URL,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Text[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_TEXT,                         // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ENCODABLE,                    // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_TEXT,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_ENCODABLE,		// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
-
 
 static ID3_FieldDef ID3FD_UserText[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DESCRIPTION,                  // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_TEXT,                         // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ENCODABLE,                    // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DESCRIPTION,		// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_TEXT,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_ENCODABLE,		// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
-
 
 static ID3_FieldDef ID3FD_GeneralText[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_LANGUAGE,                     // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    3,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DESCRIPTION,                  // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_TEXT,                         // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ENCODABLE,                    // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_LANGUAGE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		3,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DESCRIPTION,		// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_TEXT,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_ENCODABLE,		// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_TermsOfUse[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_LANGUAGE,                     // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    3,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_TEXT,                         // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ENCODABLE,                    // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_LANGUAGE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		3,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_TEXT,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_ENCODABLE,		// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_LinkedInfo[] =
 {
-  {
-    ID3FN_ID,                           // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    3,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_2_1,                          // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_ID,                           // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_URL,                          // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_TEXT,                         // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_ID,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		3,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_2_1,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_ID,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_URL,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_TEXT,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Picture[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_IMAGEFORMAT,                  // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    3,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_2_1,                          // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_MIMETYPE,                     // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_PICTURETYPE,                  // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DESCRIPTION,                  // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_IMAGEFORMAT,		// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		3,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_2_1,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_MIMETYPE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_PICTURETYPE,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DESCRIPTION,		// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Chapter[] =
 {
-  {
-    ID3FN_ID,                           // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_STARTTIME,                    // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_ENDTIME,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_STARTOFFSET,                  // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_ENDOFFSET,                    // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_FRAMES,                       // FIELD NAME
-    ID3FTY_FRAMES,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_ID,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_STARTTIME,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_ENDTIME,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_STARTOFFSET,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_ENDOFFSET,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_FRAMES,			// FIELD NAME
+		ID3FTY_FRAMES,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_TableOfContents[] =
 {
-  {
-    ID3FN_ID,                           // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_FLAGS,                        // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_CHAPTERS,                     // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NLIST,                        // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_FRAMES,                       // FIELD NAME
-    ID3FTY_FRAMES,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_ID,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_FLAGS,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_CHAPTERS,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NLIST,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_FRAMES,			// FIELD NAME
+		ID3FTY_FRAMES,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_GEO[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_MIMETYPE,                     // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_FILENAME,                     // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DESCRIPTION,                  // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_MIMETYPE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_FILENAME,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DESCRIPTION,		// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_AudioEncryption[] =
 {
-  {
-    ID3FN_OWNER,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_OFFSET,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    2,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_LENGTH,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    2,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_OWNER,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_OFFSET,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		2,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_LENGTH,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		2,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_AudioSeekPoint[] =
 {
-  {
-    ID3FN_OFFSET,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_LENGTH,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_NUMBER,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    2,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_NUMBITS,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_OFFSET,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_LENGTH,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_NUMBER,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		2,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_NUMBITS,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_UFI[] =
 {
-  {
-    ID3FN_OWNER,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_OWNER,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_PlayCounter[] =
 {
-  {
-    ID3FN_COUNTER,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_COUNTER,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Popularimeter[] =
 {
-  {
-    ID3FN_EMAIL,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_RATING,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_COUNTER,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_EMAIL,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_RATING,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_COUNTER,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Private[] =
 {
-  {
-    ID3FN_OWNER,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_OWNER,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
-
 
 static ID3_FieldDef ID3FD_Registration[] =
 {
-  {
-    ID3FN_OWNER,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_ID,                           // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_3_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_OWNER,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_ID,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_3_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_TextList[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_TEXT,                         // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_LIST | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_TEXT,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_LIST | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_EventTiming[] =
 {
-  {
-    ID3FN_TIMESTAMPFORMAT,              // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TIMESTAMPFORMAT,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_SyncTempo[] =
 {
-  {
-    ID3FN_TIMESTAMPFORMAT,              // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TIMESTAMPFORMAT,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Reverb[] =
 {
-  {
-    ID3FN_REVERBL,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    2,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_REVERBR,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    2,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  {
-    ID3FN_REVERBBOUNCESL,               // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  {
-    ID3FN_REVERBBOUNCESR,               // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  {
-    ID3FN_REVERBFEEDBACKL2L,            // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  {
-    ID3FN_REVERBFEEDBACKL2R,            // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  {
-    ID3FN_REVERBFEEDBACKR2R,            // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  {
-    ID3FN_REVERBFEEDBACKR2L,            // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  {
-    ID3FN_PREMIXL2R,                    // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  {
-    ID3FN_PREMIXR2L,                    // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-   },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_REVERBL,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		2,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_REVERBR,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		2,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_REVERBBOUNCESL,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_REVERBBOUNCESR,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_REVERBFEEDBACKL2L,	// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_REVERBFEEDBACKL2R,	// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_REVERBFEEDBACKR2R,	// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_REVERBFEEDBACKR2L,	// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_PREMIXL2R,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_PREMIXR2L,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Signature[] =
 {
-  {
-    ID3FN_ID,                           // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_4_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_4_0,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_ID,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_4_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_4_0,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Commercial[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_PRICE,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_8DATE,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    8,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_URL,                          // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DELIVERY,                     // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_SELLER,                       // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DESCRIPTION,                  // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_MIMETYPE,                     // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_PRICE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_8DATE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		8,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_URL,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DELIVERY,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_SELLER,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DESCRIPTION,		// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_MIMETYPE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Owner[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_PRICE,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_8DATE,                        // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    8,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_SELLER,                       // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ENCODABLE,                    // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_PRICE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_8DATE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		8,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_SELLER,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_ENCODABLE,		// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Seek[] =
 {
-  {
-    ID3FN_OFFSET,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_OFFSET,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Position[] =
 {
-  {
-    ID3FN_TIMESTAMPFORMAT,              // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_OFFSET,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TIMESTAMPFORMAT,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_OFFSET,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_Buffer[] =
 {
-  {
-    ID3FN_LENGTH,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    3,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_FLAGS,                        // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_OFFSET,                       // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    4,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_LENGTH,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		3,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_FLAGS,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_OFFSET,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		4,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_CDM[] =
 {
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_2_1,                          // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  }
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_2_1,			// INITIAL SPEC
+		ID3V2_2_1,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
 
 static ID3_FieldDef ID3FD_SyncLyrics[] =
 {
-  {
-    ID3FN_TEXTENC,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_LANGUAGE,                     // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    3,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_TIMESTAMPFORMAT,              // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_CONTENTTYPE,                  // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DESCRIPTION,                  // FIELD NAME
-    ID3FTY_TEXTSTRING,                  // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_CSTR | ID3FF_ENCODABLE,       // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_DATA,                         // FIELD NAME
-    ID3FTY_BINARY,                      // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
+	{
+		ID3FN_TEXTENC,			// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_LANGUAGE,			// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		3,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_TIMESTAMPFORMAT,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_CONTENTTYPE,		// FIELD NAME
+		ID3FTY_INTEGER,			// FIELD TYPE
+		1,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DESCRIPTION,		// FIELD NAME
+		ID3FTY_TEXTSTRING,		// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_CSTR | ID3FF_ENCODABLE,	// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{
+		ID3FN_DATA,			// FIELD NAME
+		ID3FTY_BINARY,			// FIELD TYPE
+		0,				// FIXED LEN
+		ID3V2_EARLIEST,			// INITIAL SPEC
+		ID3V2_LATEST,			// ENDING SPEC
+		ID3FF_NONE,			// FLAGS
+		ID3FN_NOFIELD			// LINKED FIELD
+	},
+	{ ID3FN_NOFIELD }
 };
-
-
-/*
- * Currently unused
- */
-#if defined _UNDEFINED_
-static ID3_FieldDef ID3FD_Volume1[] =
-{
-  {
-    ID3FN_VOLUMEADJ,                    // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_NUMBITS,                      // FIELD NAME
-    ID3FTY_INTEGER,                     // FIELD TYPE
-    1,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_NONE,                         // FLAGS
-    ID3FN_NOFIELD                       // LINKED FIELD
-  },
-  {
-    ID3FN_VOLCHGRIGHT,                  // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,                   // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_VOLCHGLEFT,                   // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,                   // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_PEAKVOLRIGHT,                 // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_PEAKVOLLEFT,                  // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_EARLIEST,                     // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_VOLCHGRIGHTBACK,              // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_VOLCHGLEFTBACK,               // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_PEAKVOLRIGHTBACK,             // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_PEAKVOLLEFTBACK,              // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_VOLCHGCENTER,                 // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_PEAKVOLCENTER,                // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_VOLCHGBASS,                   // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  {
-    ID3FN_PEAKVOLBASS,                  // FIELD NAME
-    ID3FTY_BITFIELD,                    // FIELD TYPE
-    0,                                  // FIXED LEN
-    ID3V2_2_1,                          // INITIAL SPEC
-    ID3V2_LATEST,                       // ENDING SPEC
-    ID3FF_ADJUSTEDBY,  maybe this should be changed in ID3FF_OPTIONAL and ID3FF_USED, which should be set when used since this field is optional                // FLAGS
-    ID3FN_NUMBITS                       // LINKED FIELD
-  },
-  { ID3FN_NOFIELD }
-};
-#endif /* _UNDEFINED_ */
 
 // **** Currently Implemented Frames
 // APIC  PIC  ID3FID_PICTURE           Attached picture
@@ -1385,147 +1246,157 @@ static ID3_FieldDef ID3FD_Volume1[] =
 // SYTC  STC  ID3FID_SYNCEDTEMPO       Synchronized tempo codes
 //       CRM  ID3FID_METACRYPTO        Encrypted meta frame
 
-ID3_Frame* convertEQUA(ID3_Frame* oldframe, ID3_V2Spec tospec)
+ID3_Frame *convertEQUA(ID3_Frame *oldframe, ID3_V2Spec tospec)
 {
-  return NULL;
-}
-ID3_Frame* convertIPLS(ID3_Frame* oldframe, ID3_V2Spec tospec)
-{
-  if (tospec == ID3V2_4_0)
-  {
-    ID3_Frame* newframe = new ID3_Frame(ID3FID_INVOLVEDPEOPLE2);
-    newframe->GetField(ID3FN_TEXTENC)->SetEncoding(oldframe->GetField(ID3FN_TEXTENC)->GetEncoding());
-    newframe->GetField(ID3FN_TEXT)->SetText(oldframe->GetField(ID3FN_TEXT)->GetText());
-    return newframe;
-  }
-  else return NULL;
-}
-ID3_Frame* convertRVAD(ID3_Frame* oldframe, ID3_V2Spec tospec)
-{
-  return NULL;
-}
-ID3_Frame* convertTDAT(ID3_Frame* oldframe, ID3_V2Spec tospec)
-{
-  return NULL;
-}
-ID3_Frame* convertTIME(ID3_Frame* oldframe, ID3_V2Spec tospec)
-{
-  return NULL;
-}
-ID3_Frame* convertTORY(ID3_Frame* oldframe, ID3_V2Spec tospec)
-{
-  return NULL;
-}
-ID3_Frame* convertTRDA(ID3_Frame* oldframe, ID3_V2Spec tospec)
-{
-  return NULL;
-}
-ID3_Frame* convertTYER(ID3_Frame* oldframe, ID3_V2Spec tospec)
-{
-  return NULL;
+	return NULL;
 }
 
-static  ID3_FrameDef ID3_FrameDefs[] =
+ID3_Frame *convertIPLS(ID3_Frame *oldframe, ID3_V2Spec tospec)
 {
-  //                          short  long    born            died          replace      tag    file
-  // frame id                 id     id      tag             tag           id           discrd discrd field defs             description
-  {ID3FID_AUDIOCRYPTO,        "CRA", "AENC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_AudioEncryption, "Audio encryption"},
-  {ID3FID_PICTURE,            "PIC", "APIC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Picture,         "Attached picture"},
-  {ID3FID_AUDIOSEEKPOINT,     ""   , "ASPI", ID3V2_4_0	   , ID3V2_LATEST, NULL,        false, false, ID3FD_AudioSeekPoint,  "Audio seek point index"},
-  {ID3FID_CHAPTER,            ""   , "CHAP", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Chapter,         "Chapter"},
-  {ID3FID_COMMENT,            "COM", "COMM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,     "Comments"},
-  {ID3FID_COMMERCIAL,         ""   , "COMR", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Commercial,      "Commercial"},
-  {ID3FID_TOC,                ""   , "CTOC", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TableOfContents, "Table of contents"},
-  {ID3FID_CRYPTOREG,          ""   , "ENCR", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Registration,    "Encryption method registration"},
-  {ID3FID_EQUALIZATION2,      ""   , "EQU2", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Unimplemented,   "Equalisation (2)"},
-  {ID3FID_EQUALIZATION,       "EQU", "EQUA", ID3V2_EARLIEST, ID3V2_3_0   , convertEQUA, false, true,  ID3FD_Unimplemented,   "Equalization"},
-  {ID3FID_EVENTTIMING,        "ETC", "ETCO", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_EventTiming,     "Event timing codes"},
-  {ID3FID_GENERALOBJECT,      "GEO", "GEOB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GEO,             "General encapsulated object"},
-  {ID3FID_GROUPINGREG,        ""   , "GRID", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Registration,    "Group identification registration"},
-  {ID3FID_INVOLVEDPEOPLE,     "IPL", "IPLS", ID3V2_EARLIEST, ID3V2_3_0   , convertIPLS, false, false, ID3FD_TextList,        "Involved people list"},
-  {ID3FID_LINKEDINFO,         "LNK", "LINK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_LinkedInfo,      "Linked information"},
-  {ID3FID_CDID,               "MCI", "MCDI", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Binary,          "Music CD identifier"},
-  {ID3FID_MPEGLOOKUP,         "MLL", "MLLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Unimplemented,   "MPEG location lookup table"},
-  {ID3FID_OWNERSHIP,          ""   , "OWNE", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Owner,           "Ownership frame"},
-  {ID3FID_PRIVATE,            ""   , "PRIV", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Private,         "Private frame"},
-  {ID3FID_PLAYCOUNTER,        "CNT", "PCNT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_PlayCounter,     "Play counter"},
-  {ID3FID_POPULARIMETER,      "POP", "POPM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Popularimeter,   "Popularimeter"},
-  {ID3FID_POSITIONSYNC,       ""   , "POSS", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, true,  ID3FD_Position,        "Position synchronisation frame"},
-  {ID3FID_BUFFERSIZE,         "BUF", "RBUF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Buffer,          "Recommended buffer size"},
-  {ID3FID_VOLUMEADJ2,         ""   , "RVA2", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Unimplemented,   "Relative volume adjustment (2)"},
-  {ID3FID_VOLUMEADJ,          "RVA", "RVAD", ID3V2_EARLIEST, ID3V2_3_0   , convertRVAD, false, true,  ID3FD_Unimplemented,   "Relative volume adjustment"},
-  {ID3FID_REVERB,             "REV", "RVRB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Reverb,          "Reverb"},
-  {ID3FID_SEEKFRAME,          ""   , "SEEK", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Seek,            "Seek frame"},
-  {ID3FID_SIGNATURE,          ""   , "SIGN", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Signature,       "Signature frame"},
-  {ID3FID_SYNCEDLYRICS,       "SLT", "SYLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_SyncLyrics,      "Synchronized lyric/text"},
-  {ID3FID_SYNCEDTEMPO,        "STC", "SYTC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_SyncTempo,       "Synchronized tempo codes"},
-  {ID3FID_ALBUM,              "TAL", "TALB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Album/Movie/Show title"},
-  {ID3FID_BPM,                "TBP", "TBPM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "BPM (beats per minute)"},
-  {ID3FID_COMPOSER,           "TCM", "TCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Composer"},
-  {ID3FID_CONTENTTYPE,        "TCO", "TCON", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Content type"},
-  {ID3FID_COPYRIGHT,          "TCR", "TCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Copyright message"},
-  {ID3FID_DATE,               "TDA", "TDAT", ID3V2_EARLIEST, ID3V2_3_0   , convertTDAT, false, false, ID3FD_Text,            "Date"},
-  {ID3FID_ENCODINGTIME,       ""   , "TDEN", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Encoding time"},
-  {ID3FID_PLAYLISTDELAY,      "TDY", "TDLY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Playlist delay"},
-  {ID3FID_ORIGRELEASETIME,    ""   , "TDOR", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original release time"},
-  {ID3FID_RECORDINGTIME,      ""   , "TDRC", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Recording time"},
-  {ID3FID_RELEASETIME,        ""   , "TDRL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Release time"},
-  {ID3FID_TAGGINGTIME,        ""   , "TDTG", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Tagging time"},
-  {ID3FID_ENCODEDBY,          "TEN", "TENC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Text,            "Encoded by"},
-  {ID3FID_LYRICIST,           "TXT", "TEXT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Lyricist/Text writer"},
-  {ID3FID_FILETYPE,           "TFT", "TFLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "File type"},
-  {ID3FID_TIME,               "TIM", "TIME", ID3V2_EARLIEST, ID3V2_3_0   , convertTIME, false, false, ID3FD_Text,            "Time"},
-  {ID3FID_INVOLVEDPEOPLE2,    ""   , "TIPL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TextList,        "Involved people list"},
-  {ID3FID_CONTENTGROUP,       "TT1", "TIT1", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Content group description"},
-  {ID3FID_TITLE,              "TT2", "TIT2", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Title/songname/content description"},
-  {ID3FID_SUBTITLE,           "TT3", "TIT3", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Subtitle/Description refinement"},
-  {ID3FID_INITIALKEY,         "TKE", "TKEY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Initial key"},
-  {ID3FID_LANGUAGE,           "TLA", "TLAN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Language(s)"},
-  {ID3FID_SONGLEN,            "TLE", "TLEN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Text,            "Length"},
-  {ID3FID_MUSICIANCREDITLIST, ""   , "TMCL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TextList,        "Musician credits list"},
-  {ID3FID_MEDIATYPE,          "TMT", "TMED", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Media type"},
-  {ID3FID_MOOD,               ""   , "TMOO", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Mood"},
-  {ID3FID_ORIGALBUM,          "TOT", "TOAL", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original album/movie/show title"},
-  {ID3FID_ORIGFILENAME,       "TOF", "TOFN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original filename"},
-  {ID3FID_ORIGLYRICIST,       "TOL", "TOLY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original lyricist(s)/text writer(s)"},
-  {ID3FID_ORIGARTIST,         "TOA", "TOPE", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original artist(s)/performer(s)"},
-  {ID3FID_ORIGYEAR,           "TOR", "TORY", ID3V2_EARLIEST, ID3V2_3_0   , convertTORY, false, false, ID3FD_Text,            "Original release year"},
-  {ID3FID_FILEOWNER,          ""   , "TOWN", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "File owner/licensee"},
-  {ID3FID_LEADARTIST,         "TP1", "TPE1", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Lead performer(s)/Soloist(s)"},
-  {ID3FID_BAND,               "TP2", "TPE2", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Band/orchestra/accompaniment"},
-  {ID3FID_CONDUCTOR,          "TP3", "TPE3", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Conductor/performer refinement"},
-  {ID3FID_MIXARTIST,          "TP4", "TPE4", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Interpreted, remixed, or otherwise modified by"},
-  {ID3FID_PARTINSET,          "TPA", "TPOS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Part of a set"},
-  {ID3FID_PRODUCEDNOTICE,     ""   , "TPRO", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Produced notice"},
-  {ID3FID_PUBLISHER,          "TPB", "TPUB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Publisher"},
-  {ID3FID_TRACKNUM,           "TRK", "TRCK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Track number/Position in set"},
-  {ID3FID_RECORDINGDATES,     "TRD", "TRDA", ID3V2_EARLIEST, ID3V2_3_0   , convertTRDA, false, false, ID3FD_Text,            "Recording dates"},
-  {ID3FID_NETRADIOSTATION,    "TRN", "TRSN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Internet radio station name"},
-  {ID3FID_NETRADIOOWNER,      "TRO", "TRSO", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Internet radio station owner"},
-  {ID3FID_SIZE,               "TSI", "TSIZ", ID3V2_EARLIEST, ID3V2_3_0   , NULL,        false, true,  ID3FD_Text,            "Size"},
-  {ID3FID_ALBUMSORTORDER,     ""   , "TSOA", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Album sort order"},
-  {ID3FID_PERFORMERSORTORDER, ""   , "TSOP", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Performer sort order"},
-  {ID3FID_TITLESORTORDER,     ""   , "TSOT", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Title sort order"},
-  {ID3FID_ISRC,               "TRC", "TSRC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "ISRC (international standard recording code)"},//http://www.ifpi.org/isrc/isrc_handbook.html
-  {ID3FID_ENCODERSETTINGS,    "TSS", "TSSE", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Software/Hardware and settings used for encoding"},
-  {ID3FID_SETSUBTITLE,        ""   , "TSST", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Set subtitle"},
-  {ID3FID_USERTEXT,           "TXX", "TXXX", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UserText,        "User defined text information"},
-  {ID3FID_YEAR,               "TYE", "TYER", ID3V2_EARLIEST, ID3V2_3_0   , convertTYER, false, false, ID3FD_Text,            "Year"},
-  {ID3FID_UNIQUEFILEID,       "UFI", "UFID", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UFI,             "Unique file identifier"},
-  {ID3FID_TERMSOFUSE,         ""   , "USER", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TermsOfUse,      "Terms of use"},
-  {ID3FID_UNSYNCEDLYRICS,     "ULT", "USLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,     "Unsynchronized lyric/text transcription"},
-  {ID3FID_WWWCOMMERCIALINFO,  "WCM", "WCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Commercial information"},
-  {ID3FID_WWWCOPYRIGHT,       "WCP", "WCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Copyright/Legal infromation"},
-  {ID3FID_WWWAUDIOFILE,       "WAF", "WOAF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official audio file webpage"},
-  {ID3FID_WWWARTIST,          "WAR", "WOAR", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official artist/performer webpage"},
-  {ID3FID_WWWAUDIOSOURCE,     "WAS", "WOAS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official audio source webpage"},
-  {ID3FID_WWWRADIOPAGE,       "WRA", "WORS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official internet radio station homepage"},
-  {ID3FID_WWWPAYMENT,         "WPY", "WPAY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Payment"},
-  {ID3FID_WWWPUBLISHER,       "WPB", "WPUB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official publisher webpage"},
-  {ID3FID_WWWUSER,            "WXX", "WXXX", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UserURL,         "User defined URL link"},
-  {ID3FID_METACRYPTO,         "CRM", ""    , ID3V2_EARLIEST, ID3V2_2_1   , NULL,        false, false, ID3FD_Unimplemented,   "Encrypted meta frame"},
-  {ID3FID_METACOMPRESSION,    "CDM", ""    , ID3V2_2_1     , ID3V2_2_1   , NULL,        false, false, ID3FD_CDM,             "Compressed data meta frame"},
-  {ID3FID_NOFRAME}
+	if (tospec == ID3V2_4_0)
+	{
+		ID3_Frame	*newframe = new ID3_Frame(ID3FID_INVOLVEDPEOPLE2);
+
+		newframe->GetField(ID3FN_TEXTENC)->SetEncoding(oldframe->GetField(ID3FN_TEXTENC)->GetEncoding());
+		newframe->GetField(ID3FN_TEXT)->SetText(oldframe->GetField(ID3FN_TEXT)->GetText());
+
+		return newframe;
+	}
+
+	return NULL;
+}
+
+ID3_Frame *convertRVAD(ID3_Frame *oldframe, ID3_V2Spec tospec)
+{
+	return NULL;
+}
+
+ID3_Frame *convertTDAT(ID3_Frame *oldframe, ID3_V2Spec tospec)
+{
+	return NULL;
+}
+
+ID3_Frame *convertTIME(ID3_Frame *oldframe, ID3_V2Spec tospec)
+{
+	return NULL;
+}
+
+ID3_Frame *convertTORY(ID3_Frame *oldframe, ID3_V2Spec tospec)
+{
+	return NULL;
+}
+
+ID3_Frame *convertTRDA(ID3_Frame *oldframe, ID3_V2Spec tospec)
+{
+	return NULL;
+}
+
+ID3_Frame *convertTYER(ID3_Frame *oldframe, ID3_V2Spec tospec)
+{
+	return NULL;
+}
+
+static ID3_FrameDef ID3_FrameDefs[] =
+{
+	//                          short  long    born            died          replace      tag    file
+	// frame id                 id     id      tag             tag           id           discrd discrd field defs             description
+	{ID3FID_AUDIOCRYPTO,        "CRA", "AENC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_AudioEncryption, "Audio encryption"},
+	{ID3FID_PICTURE,            "PIC", "APIC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Picture,         "Attached picture"},
+	{ID3FID_AUDIOSEEKPOINT,     ""   , "ASPI", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_AudioSeekPoint,  "Audio seek point index"},
+	{ID3FID_CHAPTER,            ""   , "CHAP", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Chapter,         "Chapter"},
+	{ID3FID_COMMENT,            "COM", "COMM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,     "Comments"},
+	{ID3FID_COMMERCIAL,         ""   , "COMR", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Commercial,      "Commercial"},
+	{ID3FID_TOC,                ""   , "CTOC", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TableOfContents, "Table of contents"},
+	{ID3FID_CRYPTOREG,          ""   , "ENCR", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Registration,    "Encryption method registration"},
+	{ID3FID_EQUALIZATION2,      ""   , "EQU2", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Unimplemented,   "Equalisation (2)"},
+	{ID3FID_EQUALIZATION,       "EQU", "EQUA", ID3V2_EARLIEST, ID3V2_3_0   , convertEQUA, false, true,  ID3FD_Unimplemented,   "Equalization"},
+	{ID3FID_EVENTTIMING,        "ETC", "ETCO", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_EventTiming,     "Event timing codes"},
+	{ID3FID_GENERALOBJECT,      "GEO", "GEOB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GEO,             "General encapsulated object"},
+	{ID3FID_GROUPINGREG,        ""   , "GRID", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Registration,    "Group identification registration"},
+	{ID3FID_INVOLVEDPEOPLE,     "IPL", "IPLS", ID3V2_EARLIEST, ID3V2_3_0   , convertIPLS, false, false, ID3FD_TextList,        "Involved people list"},
+	{ID3FID_LINKEDINFO,         "LNK", "LINK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_LinkedInfo,      "Linked information"},
+	{ID3FID_CDID,               "MCI", "MCDI", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Binary,          "Music CD identifier"},
+	{ID3FID_MPEGLOOKUP,         "MLL", "MLLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Unimplemented,   "MPEG location lookup table"},
+	{ID3FID_OWNERSHIP,          ""   , "OWNE", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Owner,           "Ownership frame"},
+	{ID3FID_PRIVATE,            ""   , "PRIV", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Private,         "Private frame"},
+	{ID3FID_PLAYCOUNTER,        "CNT", "PCNT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_PlayCounter,     "Play counter"},
+	{ID3FID_POPULARIMETER,      "POP", "POPM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Popularimeter,   "Popularimeter"},
+	{ID3FID_POSITIONSYNC,       ""   , "POSS", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, true,  ID3FD_Position,        "Position synchronisation frame"},
+	{ID3FID_BUFFERSIZE,         "BUF", "RBUF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Buffer,          "Recommended buffer size"},
+	{ID3FID_VOLUMEADJ2,         ""   , "RVA2", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Unimplemented,   "Relative volume adjustment (2)"},
+	{ID3FID_VOLUMEADJ,          "RVA", "RVAD", ID3V2_EARLIEST, ID3V2_3_0   , convertRVAD, false, true,  ID3FD_Unimplemented,   "Relative volume adjustment"},
+	{ID3FID_REVERB,             "REV", "RVRB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Reverb,          "Reverb"},
+	{ID3FID_SEEKFRAME,          ""   , "SEEK", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Seek,            "Seek frame"},
+	{ID3FID_SIGNATURE,          ""   , "SIGN", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Signature,       "Signature frame"},
+	{ID3FID_SYNCEDLYRICS,       "SLT", "SYLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_SyncLyrics,      "Synchronized lyric/text"},
+	{ID3FID_SYNCEDTEMPO,        "STC", "SYTC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_SyncTempo,       "Synchronized tempo codes"},
+	{ID3FID_ALBUM,              "TAL", "TALB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Album/Movie/Show title"},
+	{ID3FID_BPM,                "TBP", "TBPM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "BPM (beats per minute)"},
+	{ID3FID_COMPOSER,           "TCM", "TCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Composer"},
+	{ID3FID_CONTENTTYPE,        "TCO", "TCON", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Content type"},
+	{ID3FID_COPYRIGHT,          "TCR", "TCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Copyright message"},
+	{ID3FID_DATE,               "TDA", "TDAT", ID3V2_EARLIEST, ID3V2_3_0   , convertTDAT, false, false, ID3FD_Text,            "Date"},
+	{ID3FID_ENCODINGTIME,       ""   , "TDEN", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Encoding time"},
+	{ID3FID_PLAYLISTDELAY,      "TDY", "TDLY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Playlist delay"},
+	{ID3FID_ORIGRELEASETIME,    ""   , "TDOR", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original release time"},
+	{ID3FID_RECORDINGTIME,      ""   , "TDRC", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Recording time"},
+	{ID3FID_RELEASETIME,        ""   , "TDRL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Release time"},
+	{ID3FID_TAGGINGTIME,        ""   , "TDTG", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Tagging time"},
+	{ID3FID_ENCODEDBY,          "TEN", "TENC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Text,            "Encoded by"},
+	{ID3FID_LYRICIST,           "TXT", "TEXT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Lyricist/Text writer"},
+	{ID3FID_FILETYPE,           "TFT", "TFLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "File type"},
+	{ID3FID_TIME,               "TIM", "TIME", ID3V2_EARLIEST, ID3V2_3_0   , convertTIME, false, false, ID3FD_Text,            "Time"},
+	{ID3FID_INVOLVEDPEOPLE2,    ""   , "TIPL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TextList,        "Involved people list"},
+	{ID3FID_CONTENTGROUP,       "TT1", "TIT1", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Content group description"},
+	{ID3FID_TITLE,              "TT2", "TIT2", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Title/songname/content description"},
+	{ID3FID_SUBTITLE,           "TT3", "TIT3", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Subtitle/Description refinement"},
+	{ID3FID_INITIALKEY,         "TKE", "TKEY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Initial key"},
+	{ID3FID_LANGUAGE,           "TLA", "TLAN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Language(s)"},
+	{ID3FID_SONGLEN,            "TLE", "TLEN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Text,            "Length"},
+	{ID3FID_MUSICIANCREDITLIST, ""   , "TMCL", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TextList,        "Musician credits list"},
+	{ID3FID_MEDIATYPE,          "TMT", "TMED", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Media type"},
+	{ID3FID_MOOD,               ""   , "TMOO", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Mood"},
+	{ID3FID_ORIGALBUM,          "TOT", "TOAL", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original album/movie/show title"},
+	{ID3FID_ORIGFILENAME,       "TOF", "TOFN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original filename"},
+	{ID3FID_ORIGLYRICIST,       "TOL", "TOLY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original lyricist(s)/text writer(s)"},
+	{ID3FID_ORIGARTIST,         "TOA", "TOPE", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Original artist(s)/performer(s)"},
+	{ID3FID_ORIGYEAR,           "TOR", "TORY", ID3V2_EARLIEST, ID3V2_3_0   , convertTORY, false, false, ID3FD_Text,            "Original release year"},
+	{ID3FID_FILEOWNER,          ""   , "TOWN", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "File owner/licensee"},
+	{ID3FID_LEADARTIST,         "TP1", "TPE1", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Lead performer(s)/Soloist(s)"},
+	{ID3FID_BAND,               "TP2", "TPE2", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Band/orchestra/accompaniment"},
+	{ID3FID_CONDUCTOR,          "TP3", "TPE3", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Conductor/performer refinement"},
+	{ID3FID_MIXARTIST,          "TP4", "TPE4", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Interpreted, remixed, or otherwise modified by"},
+	{ID3FID_PARTINSET,          "TPA", "TPOS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Part of a set"},
+	{ID3FID_PRODUCEDNOTICE,     ""   , "TPRO", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Produced notice"},
+	{ID3FID_PUBLISHER,          "TPB", "TPUB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Publisher"},
+	{ID3FID_TRACKNUM,           "TRK", "TRCK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Track number/Position in set"},
+	{ID3FID_RECORDINGDATES,     "TRD", "TRDA", ID3V2_EARLIEST, ID3V2_3_0   , convertTRDA, false, false, ID3FD_Text,            "Recording dates"},
+	{ID3FID_NETRADIOSTATION,    "TRN", "TRSN", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Internet radio station name"},
+	{ID3FID_NETRADIOOWNER,      "TRO", "TRSO", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Internet radio station owner"},
+	{ID3FID_SIZE,               "TSI", "TSIZ", ID3V2_EARLIEST, ID3V2_3_0   , NULL,        false, true,  ID3FD_Text,            "Size"},
+	{ID3FID_ALBUMSORTORDER,     ""   , "TSOA", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Album sort order"},
+	{ID3FID_PERFORMERSORTORDER, ""   , "TSOP", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Performer sort order"},
+	{ID3FID_TITLESORTORDER,     ""   , "TSOT", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Title sort order"},
+	{ID3FID_ISRC,               "TRC", "TSRC", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "ISRC (international standard recording code)"},//http://www.ifpi.org/isrc/isrc_handbook.html
+	{ID3FID_ENCODERSETTINGS,    "TSS", "TSSE", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Software/Hardware and settings used for encoding"},
+	{ID3FID_SETSUBTITLE,        ""   , "TSST", ID3V2_4_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Set subtitle"},
+	{ID3FID_USERTEXT,           "TXX", "TXXX", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UserText,        "User defined text information"},
+	{ID3FID_YEAR,               "TYE", "TYER", ID3V2_EARLIEST, ID3V2_3_0   , convertTYER, false, false, ID3FD_Text,            "Year"},
+	{ID3FID_UNIQUEFILEID,       "UFI", "UFID", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UFI,             "Unique file identifier"},
+	{ID3FID_TERMSOFUSE,         ""   , "USER", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TermsOfUse,      "Terms of use"},
+	{ID3FID_UNSYNCEDLYRICS,     "ULT", "USLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,     "Unsynchronized lyric/text transcription"},
+	{ID3FID_WWWCOMMERCIALINFO,  "WCM", "WCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Commercial information"},
+	{ID3FID_WWWCOPYRIGHT,       "WCP", "WCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Copyright/Legal infromation"},
+	{ID3FID_WWWAUDIOFILE,       "WAF", "WOAF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official audio file webpage"},
+	{ID3FID_WWWARTIST,          "WAR", "WOAR", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official artist/performer webpage"},
+	{ID3FID_WWWAUDIOSOURCE,     "WAS", "WOAS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official audio source webpage"},
+	{ID3FID_WWWRADIOPAGE,       "WRA", "WORS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official internet radio station homepage"},
+	{ID3FID_WWWPAYMENT,         "WPY", "WPAY", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Payment"},
+	{ID3FID_WWWPUBLISHER,       "WPB", "WPUB", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official publisher webpage"},
+	{ID3FID_WWWUSER,            "WXX", "WXXX", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_UserURL,         "User defined URL link"},
+	{ID3FID_METACRYPTO,         "CRM", ""    , ID3V2_EARLIEST, ID3V2_2_1   , NULL,        false, false, ID3FD_Unimplemented,   "Encrypted meta frame"},
+	{ID3FID_METACOMPRESSION,    "CDM", ""    , ID3V2_2_1     , ID3V2_2_1   , NULL,        false, false, ID3FD_CDM,             "Compressed data meta frame"},
+	{ID3FID_NOFRAME}
 };
 
 /** \class ID3_Field field.h id3/field.h
@@ -1621,23 +1492,24 @@ ID3_FieldImpl::~ID3_FieldImpl()
 // returns whether field should be parsed, set's it's brand new fixed size
 bool ID3_FieldImpl::SetLinkedSize(size_t newfixedsize)
 {
-  // check whether it has a fixed size flag and a _linked_field
-  if (this->HasFlag(ID3FF_HASLINKEDSIZE) && _linked_field != ID3FN_NOFIELD)
-  {
-    // check whether it has a fixed size flag and a _linked_field
-    if (newfixedsize != 0)
-    {
-      _fixed_size = newfixedsize;
-      ID3D_NOTICE( "ID3_FieldImpl::SetLinkedSize(): used linked_fixed_size = " << newfixedsize );
-      return true;
-    }
-    else
-    {
-      //this field should not exist or be parsed!
-      return false;
-    }
-  }
-  return true;
+	// check whether it has a fixed size flag and a _linked_field
+	if (this->HasFlag(ID3FF_HASLINKEDSIZE) && _linked_field != ID3FN_NOFIELD)
+	{
+		// check whether it has a fixed size flag and a _linked_field
+		if (newfixedsize != 0)
+		{
+			_fixed_size = newfixedsize;
+			ID3D_NOTICE( "ID3_FieldImpl::SetLinkedSize(): used linked_fixed_size = " << newfixedsize );
+			return true;
+		}
+		else
+		{
+			//this field should not exist or be parsed!
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /** Clears any data and frees any memory associated with the field
@@ -1647,51 +1519,37 @@ bool ID3_FieldImpl::SetLinkedSize(size_t newfixedsize)
  **/
 void ID3_FieldImpl::Clear()
 {
-  switch (_type)
-  {
-    case ID3FTY_INTEGER:
-    {
-      _integer = 0;
-      break;
-    }
-    case ID3FTY_BINARY:
-    {
-      _binary.erase();
-      if (_fixed_size > 0)
-      {
-        _binary.assign(_fixed_size, '\0');
-      }
-      break;
-    }
-    case ID3FTY_TEXTSTRING:
-    {
-      _text.erase();
-      if (_fixed_size > 0)
-      {
-        if (ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding()))
-        {
-          _text.assign(_fixed_size * 2, '\0');
-        }
-        else if (ID3TE_IS_SINGLE_BYTE_ENC(this->GetEncoding()))
-        {
-          _text.assign(_fixed_size, '\0');
-        }
-      }
-      break;
-    }
-    case ID3FTY_FRAMES:
-    {
-      ID3_Container::Clear();
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-  _changed    = true;
+	switch (_type)
+	{
+		case ID3FTY_INTEGER:
+			_integer = 0;
 
-  return ;
+			break;
+		case ID3FTY_BINARY:
+			_binary.erase();
+
+			if (_fixed_size > 0) _binary.assign(_fixed_size, '\0');
+
+			break;
+		case ID3FTY_TEXTSTRING:
+			_text.erase();
+
+			if (_fixed_size > 0)
+			{
+				if	(ID3TE_IS_DOUBLE_BYTE_ENC(this->GetEncoding())) _text.assign(_fixed_size * 2, '\0');
+				else if (ID3TE_IS_SINGLE_BYTE_ENC(this->GetEncoding())) _text.assign(_fixed_size, '\0');
+			}
+
+			break;
+		case ID3FTY_FRAMES:
+			ID3_Container::Clear();
+
+			break;
+	}
+
+	_changed = true;
+
+	return;
 }
 
 bool ID3_FieldImpl::HasChanged() const
@@ -1719,134 +1577,104 @@ bool ID3_FieldImpl::HasChanged() const
  **/
 size_t ID3_FieldImpl::BinSize() const
 {
-  if (_fixed_size > 0)
-  {
-    return _fixed_size;
-  }
-  size_t size = this->Size();
-  if (_type == ID3FTY_TEXTSTRING)
-  {
-    ID3_TextEnc enc = this->GetEncoding();
-    if (ID3TE_IS_DOUBLE_BYTE_ENC(enc) && size > 0)
-    {
-      size++;
-    }
-    if (_flags & ID3FF_CSTR)
-    {
-      size++;
-    }
-    if (ID3TE_IS_DOUBLE_BYTE_ENC(enc))
-    {
-      size *= 2; // FIXME: I guess this is wrong
-    }
-  }
-  return size;
+	if (_fixed_size > 0) return _fixed_size;
+
+	size_t	 size = this->Size();
+
+	if (_type == ID3FTY_TEXTSTRING)
+	{
+		ID3_TextEnc	 enc = this->GetEncoding();
+
+		if (ID3TE_IS_DOUBLE_BYTE_ENC(enc) && size > 0) size++;
+
+		if (_flags & ID3FF_CSTR) size++;
+
+		if (ID3TE_IS_DOUBLE_BYTE_ENC(enc)) size *= 2; // FIXME: I guess this is wrong
+	}
+
+	return size;
 }
 
 size_t ID3_FieldImpl::Size() const
 {
-  size_t size = 0;
-  // check to see if we are within the legal limit for this field 0 means
-  // arbitrary length field
-  if (_fixed_size > 0)
-  {
-    size = _fixed_size;
-  }
-  else if (_type == ID3FTY_INTEGER)
-  {
-    size = sizeof(uint32);
-  }
-  else if (_type == ID3FTY_TEXTSTRING)
-  {
-    size = _text.size();
-  }
-  else if (_type == ID3FTY_BINARY)
-  {
-    size = _binary.size();
-  }
-  else if (_type == ID3FTY_FRAMES)
-  {
-    size = ID3_Container::Size();
-  }
-  else
-  {
-    size = 0;
-  }
+	size_t	 size = 0;
 
-  return size;
+	// check to see if we are within the legal limit for this field 0 means
+	// arbitrary length field
+	if	(_fixed_size > 0)	     size = _fixed_size;
+	else if (_type == ID3FTY_INTEGER)    size = sizeof(uint32);
+	else if (_type == ID3FTY_TEXTSTRING) size = _text.size();
+	else if (_type == ID3FTY_BINARY)     size = _binary.size();
+	else if (_type == ID3FTY_FRAMES)     size = ID3_Container::Size();
+	else				     size = 0;
+
+	return size;
 }
 
-bool ID3_FieldImpl::Parse(ID3_Reader& reader)
+bool ID3_FieldImpl::Parse(ID3_Reader &reader)
 {
-  bool success = false;
-  switch (this->GetType())
-  {
-    case ID3FTY_INTEGER:
-    {
-      success = this->ParseInteger(reader);
-      break;
-    }
+	bool	 success = false;
 
-    case ID3FTY_BINARY:
-    {
-      success = this->ParseBinary(reader);
-      break;
-    }
+	switch (this->GetType())
+	{
+		case ID3FTY_INTEGER:
+			success = this->ParseInteger(reader);
 
-    case ID3FTY_TEXTSTRING:
-    {
-      success = this->ParseText(reader);
-      break;
-    }
+			break;
+		case ID3FTY_BINARY:
+			success = this->ParseBinary(reader);
 
-    case ID3FTY_FRAMES:
-    {
-      success = this->ParseFrames(reader);
-      break;
-    }
+			break;
+		case ID3FTY_TEXTSTRING:
+			success = this->ParseText(reader);
 
-    default:
-    {
-      ID3D_WARNING( "ID3_FieldImpl::Parse(): unknown field type" );
-      break;
-    }
-  }
-  return success;
+			break;
+		case ID3FTY_FRAMES:
+			success = this->ParseFrames(reader);
+
+			break;
+		default:
+			ID3D_WARNING( "ID3_FieldImpl::Parse(): unknown field type" );
+
+			break;
+	}
+
+	return success;
 }
 
 ID3_FrameDef *ID3_FindFrameDef(ID3_FrameID id)
 {
-  ID3_FrameDef  *info   = NULL;
+	ID3_FrameDef	*info = NULL;
 
-  for (size_t cur = 0; ID3_FrameDefs[cur].eID != ID3FID_NOFRAME; cur++)
-  {
-    if (ID3_FrameDefs[cur].eID == id)
-    {
-      info = &ID3_FrameDefs[cur];
-      break;
-    }
-  }
+	for (size_t cur = 0; ID3_FrameDefs[cur].eID != ID3FID_NOFRAME; cur++)
+	{
+		if (ID3_FrameDefs[cur].eID == id)
+		{
+			info = &ID3_FrameDefs[cur];
 
-  return info;
+			break;
+		}
+	}
+
+	return info;
 }
 
 ID3_FrameID ID3_FindFrameID(const char *id)
 {
-  ID3_FrameID fid = ID3FID_NOFRAME;
+	ID3_FrameID	 fid = ID3FID_NOFRAME;
 
-  for (size_t cur = 0; ID3_FrameDefs[cur].eID != ID3FID_NOFRAME; ++cur)
-  {
-    if (((strcmp(ID3_FrameDefs[cur].sShortTextID, id) == 0) &&
-         strlen(id) == 3) ||
-        ((strcmp(ID3_FrameDefs[cur].sLongTextID,  id) == 0) &&
-         strlen(id) == 4))
-    {
-      fid = ID3_FrameDefs[cur].eID;
-      break;
-    }
-  }
+	for (size_t cur = 0; ID3_FrameDefs[cur].eID != ID3FID_NOFRAME; ++cur)
+	{
+		if (((strcmp(ID3_FrameDefs[cur].sShortTextID, id) == 0) && strlen(id) == 3) ||
+		    ((strcmp(ID3_FrameDefs[cur].sLongTextID,  id) == 0) && strlen(id) == 4))
+		{
+			fid = ID3_FrameDefs[cur].eID;
 
-  return fid;
+			break;
+		}
+	}
+
+	return fid;
 }
 
 ID3_Err ID3_FieldImpl::Render(ID3_Writer &writer) const

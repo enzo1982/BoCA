@@ -44,9 +44,9 @@ class ID3_IStreamReader : public ID3_Reader
   ID3_IStreamReader(istream& reader) : _stream(reader) { ; }
   virtual ~ID3_IStreamReader() { ; }
   virtual void close() { ; }
-  
+
   virtual int_type peekChar() { return _stream.peek(); }
-    
+
   /** Read up to \c len chars into buf and advance the internal position
    ** accordingly.  Returns the number of characters read into buf.
    **/
@@ -62,33 +62,33 @@ class ID3_IStreamReader : public ID3_Reader
 
   virtual pos_type getBeg() { return 0; }
   virtual pos_type getCur() { return _stream.tellg(); }
-  virtual pos_type getEnd() 
-  { 
+  virtual pos_type getEnd()
+  {
     pos_type cur = this->getCur();
     _stream.seekg(0, ios::end);
     pos_type end = this->getCur();
     this->setCur(cur);
     return end;
   }
-    
+
   /** Set the value of the internal position for reading.
    **/
   virtual pos_type setCur(pos_type pos) { _stream.seekg(pos); return pos; }
 };
-  
+
 class ID3_IFStreamReader : public ID3_IStreamReader
 {
   ifstream& _file;
  public:
   ID3_IFStreamReader(ifstream& reader)
     : ID3_IStreamReader(reader), _file(reader) { ; }
-    
-  virtual void close() 
-  { 
+
+  virtual void close()
+  {
     _file.close();
   }
 };
-  
+
 class ID3_MemoryReader : public ID3_Reader
 {
   const char_type* _beg;
@@ -116,16 +116,16 @@ class ID3_MemoryReader : public ID3_Reader
   };
   virtual ~ID3_MemoryReader() { ; }
   virtual void close() { ; }
-    
-  virtual int_type peekChar() 
-  { 
+
+  virtual int_type peekChar()
+  {
     if (!this->atEnd())
     {
-      return *_cur; 
+      return *_cur;
     }
     return END_OF_READER;
   }
-    
+
   /** Read up to \c len chars into buf and advance the internal position
    ** accordingly.  Returns the number of characters read into buf.
    **/
@@ -142,21 +142,21 @@ class ID3_MemoryReader : public ID3_Reader
     return size;
   }
 
-  virtual pos_type getCur() 
-  { 
-    return _cur - _beg; 
+  virtual pos_type getCur()
+  {
+    return _cur - _beg;
   }
-    
+
   virtual pos_type getBeg()
   {
     return _beg - _beg;
   }
-    
+
   virtual pos_type getEnd()
   {
     return _end - _beg;
   }
-    
+
   /** Set the value of the internal position for reading.
    **/
   virtual pos_type setCur(pos_type pos)

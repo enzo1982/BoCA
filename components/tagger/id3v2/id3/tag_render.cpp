@@ -44,12 +44,12 @@ using namespace dami;
 void id3::v1::render(ID3_Writer &writer, const ID3_TagImpl &tag)
 {
 	writer.writeChars("TAG", 3);
-  
+
 	io::writeTrailingSpaces(writer, id3::v2::getTitle(tag),  ID3_V1_LEN_TITLE);
 	io::writeTrailingSpaces(writer, id3::v2::getArtist(tag), ID3_V1_LEN_ARTIST);
 	io::writeTrailingSpaces(writer, id3::v2::getAlbum(tag),  ID3_V1_LEN_ALBUM);
 	io::writeTrailingSpaces(writer, id3::v2::getYear(tag),   ID3_V1_LEN_YEAR);
-  
+
 	size_t	 track = id3::v2::getTrackNum(tag);
 	String	 comment = id3::v2::getV1Comment(tag);
 
@@ -92,7 +92,7 @@ ID3_Err id3::v2::render(ID3_Writer &writer, const ID3_TagImpl &tag)
 	hdr.SetExtended(tag.GetExtended());
 	hdr.SetExperimental(tag.GetExperimental());
 	hdr.SetFooter(tag.GetFooter());
-    
+
 	/* Set up the encryption and grouping IDs.
 	 */
 
@@ -136,15 +136,15 @@ ID3_Err id3::v2::render(ID3_Writer &writer, const ID3_TagImpl &tag)
 
 		return ID3E_InvalidFrameSize;
 	}
-  
+
 	/* Zero the remainder of the buffer so that our padding bytes are zero.
 	 */
 	luint	 nPadding = tag.PaddingSize(frmSize);
 
 	ID3D_NOTICE("id3::v2::render(): padding size = " << nPadding);
-  
+
 	hdr.SetDataSize(frmSize + tag.GetExtendedBytes() + nPadding);
-  
+
 	err = hdr.Render(writer);
 
 	if (err != ID3E_NoError) return err;
@@ -196,17 +196,17 @@ size_t ID3_TagImpl::Size() const
 size_t ID3_TagImpl::PaddingSize(size_t curSize) const
 {
 	luint	 newSize = 0;
-  
+
 	/* If padding is switched off.
 	 */
 	if (!_is_padded) return 0;
-    
+
 	/* If the old tag was large enough to hold the new tag, then we will simply
 	 * pad out the difference - that way the new tag can be written without
 	 * shuffling the rest of the song file around.
 	 */
 	if ((this->GetPrependedBytes()-ID3_TagHeader::SIZE > 0) &&
-	    (this->GetPrependedBytes()-ID3_TagHeader::SIZE >= curSize) && 
+	    (this->GetPrependedBytes()-ID3_TagHeader::SIZE >= curSize) &&
 	    (this->GetPrependedBytes()-ID3_TagHeader::SIZE - curSize) < ID3_PADMAX)
 	{
 		newSize = this->GetPrependedBytes() - ID3_TagHeader::SIZE;
@@ -214,17 +214,17 @@ size_t ID3_TagImpl::PaddingSize(size_t curSize) const
 	else
 	{
 		luint	 tempSize = curSize + ID3_GetDataSize(*this) + this->GetAppendedBytes() + ID3_TagHeader::SIZE;
-    
+
 		/* This method of automatic padding rounds the COMPLETE FILE up to the
 		 * nearest 2K.  If the file will already be an even multiple of 2K (with
 		 * the tag included) then we just add another 2K of padding.
 		 */
 		tempSize = ((tempSize / ID3_PADMULTIPLE) + 1) * ID3_PADMULTIPLE;
-    
+
 		/* The size of the new tag is the new filesize minus the audio data.
 		 */
 		newSize = tempSize - ID3_GetDataSize(*this) - this->GetAppendedBytes () - ID3_TagHeader::SIZE;
 	}
-  
+
 	return newSize - curSize;
 }

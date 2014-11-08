@@ -461,13 +461,13 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
   }
 
   // read xing/vbr header if present
-  // derived from code in vbrheadersdk.zip 
+  // derived from code in vbrheadersdk.zip
   // from http://www.xingtech.com/developer/mp3/
 
   const size_t VBR_HEADER_MIN_SIZE = 8;     // "xing" + flags are fixed
   const size_t VBR_HEADER_MAX_SIZE = 120;   // frames, bytes, toc and scale are optional
 
-  if (mp3size >= vbr_header_offest + VBR_HEADER_MIN_SIZE) 
+  if (mp3size >= vbr_header_offest + VBR_HEADER_MIN_SIZE)
   {
     char vbrheaderdata[VBR_HEADER_MAX_SIZE+1]; //+1 to hold the 0 char
     unsigned char *pvbrdata = (unsigned char *)vbrheaderdata;
@@ -475,7 +475,7 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
     int vbr_scale = 0;
     int vbr_flags = 0;
 
-    // get fixed part of vbr header 
+    // get fixed part of vbr header
     // and check if valid
 
     beg = vbr_header_offest;
@@ -500,22 +500,22 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
                               + ((vbr_flags & TOC_FLAG)? 100:0)
                               + ((vbr_flags & SCALE_FLAG)? 4:0);
 
-      if (mp3size >= vbr_header_offest + vbr_header_size) 
+      if (mp3size >= vbr_header_offest + vbr_header_size)
       {
-        reader.readChars(&vbrheaderdata[VBR_HEADER_MIN_SIZE], vbr_header_size - VBR_HEADER_MIN_SIZE); 
+        reader.readChars(&vbrheaderdata[VBR_HEADER_MIN_SIZE], vbr_header_size - VBR_HEADER_MIN_SIZE);
         vbrheaderdata[vbr_header_size] = '\0';
 
         // get frames, bytes, toc and scale
 
         if (vbr_flags & FRAMES_FLAG)
         {
-          vbr_frames = ExtractI4(pvbrdata); 
+          vbr_frames = ExtractI4(pvbrdata);
           pvbrdata +=4;
         }
 
         if (vbr_flags & BYTES_FLAG)
         {
-          vbr_filesize = ExtractI4(pvbrdata); 
+          vbr_filesize = ExtractI4(pvbrdata);
           pvbrdata +=4;
         }
 
@@ -530,7 +530,7 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
 
         if (vbr_flags & SCALE_FLAG)
         {
-          vbr_scale = ExtractI4(pvbrdata); 
+          vbr_scale = ExtractI4(pvbrdata);
           pvbrdata +=4;
         }
 

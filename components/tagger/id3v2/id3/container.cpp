@@ -141,9 +141,9 @@ size_t ID3_Container::Size() const
 	return _impl->Size();
 }
 
-void ID3_Container::AddFrame(const ID3_Frame& frame)
+void ID3_Container::AddFrame(const ID3_Frame &frame)
 {
-  _impl->AddFrame(frame);
+	_impl->AddFrame(frame);
 }
 
 /** Attaches a frame to the tag; the tag doesn't take responsibility for
@@ -165,9 +165,9 @@ void ID3_Container::AddFrame(const ID3_Frame& frame)
  ** \param pFrame A pointer to the frame that is being added to the tag.
  ** \sa ID3_Frame
  **/
-void ID3_Container::AddFrame(const ID3_Frame* frame)
+void ID3_Container::AddFrame(const ID3_Frame *frame)
 {
-  _impl->AddFrame(frame);
+	_impl->AddFrame(frame);
 }
 
 /** Attaches a frame to the tag; the tag takes responsibility for
@@ -186,7 +186,7 @@ void ID3_Container::AddFrame(const ID3_Frame* frame)
  **/
 bool ID3_Container::AttachFrame(ID3_Frame *frame)
 {
-  return _impl->AttachFrame(frame);
+	return _impl->AttachFrame(frame);
 }
 
 
@@ -212,97 +212,99 @@ bool ID3_Container::AttachFrame(ID3_Frame *frame)
  **/
 ID3_Frame* ID3_Container::RemoveFrame(const ID3_Frame *frame)
 {
-  return _impl->RemoveFrame(frame);
+	return _impl->RemoveFrame(frame);
 }
 
 
 /// Finds frame with given frame id
-  /** Returns a pointer to the next ID3_Frame with the given ID3_FrameID;
-   ** returns NULL if no such frame found.
-   **
-   ** If there are multiple frames in the tag with the same ID (which, for some
-   ** frames, is allowed), then subsequent calls to Find() will return
-   ** subsequent frame pointers, wrapping if necessary.
-   **
-   ** \code
-   **   ID3_Frame *myFrame;
-   **   if (myFrame = myTag.Find(ID3FID_TITLE))
-   **   {
-   **     // do something with the frame, like copy
-   **     // the contents into a buffer, display the
-   **     // contents in a window, etc.
-   **     // ...
-   **   }
-   ** \endcode
-   **
-   ** You may optionally supply to more parameters ot this method, being an
-   ** ID3_FieldID and a value of some sort.  Depending on the field name/ID you
-   ** supply, you may supply an integer, a char* or a unicode_t* as the third
-   ** parameter.  If you supply an ID3_FrameID, you must also supply a data
-   ** value to compare against.
-   **
-   ** This method will then return the first frame that has a matching frame
-   ** ID, and which has a field with the same name as that which you supplied
-   ** in the second parameter, whose calue matches that which you supplied as
-   ** the third parameter.  For example:
-   **
-   ** \code
-   **   ID3_Frame *myFrame;
-   **   if (myFrame = myTag.Find(ID3FID_TITLE, ID3FN_TEXT, "Nirvana"))
-   **   {
-   **     // found it, do something with it.
-   **     // ...
-   **   }
-   ** \endcode
-   **
-   ** This example will return the first TITLE frame and whose TEXT field is
-   ** 'Nirvana'.  Currently there is no provision for things like 'contains',
-   ** 'greater than', or 'less than'.  If there happens to be more than one of
-   ** these frames, subsequent calls to the Find() method will return
-   ** subsequent frames and will wrap around to the beginning.
-   **
-   ** Another example...
-   **
-   ** \code
-   **   ID3_Frame *myFrame;
-   **   if (myFrame = myTag.Find(ID3FID_COMMENT, ID3FN_TEXTENC, ID3TE_UNICODE))
-   **   {
-   **     // found it, do something with it.
-   **     // ...
-   **   }
-   ** \endcode
-   **
-   ** This returns the first COMMENT frame that uses Unicode as its text
-   ** encdoing.
-   **
-   ** @name   Find
-   ** @param  id The ID of the frame that is to be located
-   ** @return A pointer to the first frame found that has the given frame id,
-   **         or NULL if no such frame.
-   **/
+/** Returns a pointer to the next ID3_Frame with the given ID3_FrameID;
+ ** returns NULL if no such frame found.
+ **
+ ** If there are multiple frames in the tag with the same ID (which, for some
+ ** frames, is allowed), then subsequent calls to Find() will return
+ ** subsequent frame pointers, wrapping if necessary.
+ **
+ ** \code
+ **   ID3_Frame *myFrame;
+ **   if (myFrame = myTag.Find(ID3FID_TITLE))
+ **   {
+ **     // do something with the frame, like copy
+ **     // the contents into a buffer, display the
+ **     // contents in a window, etc.
+ **     // ...
+ **   }
+ ** \endcode
+ **
+ ** You may optionally supply to more parameters ot this method, being an
+ ** ID3_FieldID and a value of some sort.  Depending on the field name/ID you
+ ** supply, you may supply an integer, a char* or a unicode_t* as the third
+ ** parameter.  If you supply an ID3_FrameID, you must also supply a data
+ ** value to compare against.
+ **
+ ** This method will then return the first frame that has a matching frame
+ ** ID, and which has a field with the same name as that which you supplied
+ ** in the second parameter, whose calue matches that which you supplied as
+ ** the third parameter.  For example:
+ **
+ ** \code
+ **   ID3_Frame *myFrame;
+ **   if (myFrame = myTag.Find(ID3FID_TITLE, ID3FN_TEXT, "Nirvana"))
+ **   {
+ **     // found it, do something with it.
+ **     // ...
+ **   }
+ ** \endcode
+ **
+ ** This example will return the first TITLE frame and whose TEXT field is
+ ** 'Nirvana'.  Currently there is no provision for things like 'contains',
+ ** 'greater than', or 'less than'.  If there happens to be more than one of
+ ** these frames, subsequent calls to the Find() method will return
+ ** subsequent frames and will wrap around to the beginning.
+ **
+ ** Another example...
+ **
+ ** \code
+ **   ID3_Frame *myFrame;
+ **   if (myFrame = myTag.Find(ID3FID_COMMENT, ID3FN_TEXTENC, ID3TE_UNICODE))
+ **   {
+ **     // found it, do something with it.
+ **     // ...
+ **   }
+ ** \endcode
+ **
+ ** This returns the first COMMENT frame that uses Unicode as its text
+ ** encdoing.
+ **
+ ** @name   Find
+ ** @param  id The ID of the frame that is to be located
+ ** @return A pointer to the first frame found that has the given frame id,
+ **         or NULL if no such frame.
+ **/
 ID3_Frame* ID3_Container::Find(ID3_FrameID id) const
 {
-  return _impl->Find(id);
+	return _impl->Find(id);
 }
 
 /// Finds frame with given frame id, fld id, and integer data
 ID3_Frame* ID3_Container::Find(ID3_FrameID id, ID3_FieldID fld, uint32 data) const
 {
-  return _impl->Find(id, fld, data);
+	return _impl->Find(id, fld, data);
 }
 
 /// Finds frame with given frame id, fld id, and ascii data
-ID3_Frame* ID3_Container::Find(ID3_FrameID id, ID3_FieldID fld, const char* data) const
+ID3_Frame* ID3_Container::Find(ID3_FrameID id, ID3_FieldID fld, const char *data) const
 {
-  String str(data);
-  return _impl->Find(id, fld, str);
+	String	 str(data);
+
+	return _impl->Find(id, fld, str);
 }
 
 /// Finds frame with given frame id, fld id, and unicode data
-ID3_Frame* ID3_Container::Find(ID3_FrameID id, ID3_FieldID fld, const unicode_t* data) const
+ID3_Frame *ID3_Container::Find(ID3_FrameID id, ID3_FieldID fld, const unicode_t *data) const
 {
-  WString str = toWString(data, ucslen(data));
-  return _impl->Find(id, fld, str);
+	WString	 str = toWString(data, ucslen(data));
+
+	return _impl->Find(id, fld, str);
 }
 
 /** Returns the number of frames present in the tag object.
@@ -314,77 +316,77 @@ ID3_Frame* ID3_Container::Find(ID3_FrameID id, ID3_FieldID fld, const unicode_t*
  **/
 size_t ID3_Container::NumFrames() const
 {
-  return _impl->NumFrames();
+	return _impl->NumFrames();
 }
 
-ID3_Container& ID3_Container::operator=( const ID3_Container &rContainer )
+ID3_Container &ID3_Container::operator=( const ID3_Container &rContainer )
 {
-  if (this != &rContainer)
-  {
-    *_impl = rContainer;
-  }
-  return *this;
+	if (this != &rContainer) *_impl = rContainer;
+
+	return *this;
 }
 
 ID3_V2Spec ID3_Container::GetSpec() const
 {
-  return _impl->GetSpec();
+	return _impl->GetSpec();
 }
 
 bool ID3_Container::SetSpec(ID3_V2Spec spec)
 {
-  //a user cannot set a spec lower than ID3V2_3_0, it's obsolete!
-  ID3_V2Spec spec2use = spec < ID3V2_3_0 ? ID3V2_LATEST : spec;
-  _impl->UserUpdatedSpec = _impl->GetSpec() != spec2use;
-  return _impl->SetSpec(spec2use);
+	//a user cannot set a spec lower than ID3V2_3_0, it's obsolete!
+	ID3_V2Spec	 spec2use = spec < ID3V2_3_0 ? ID3V2_LATEST : spec;
+
+	_impl->UserUpdatedSpec = _impl->GetSpec() != spec2use;
+
+	return _impl->SetSpec(spec2use);
 }
 
 
 namespace
 {
-  class IteratorImpl : public ID3_Container::Iterator
-  {
-    ID3_ContainerImpl::iterator _cur;
-    ID3_ContainerImpl::iterator _end;
-  public:
-    IteratorImpl(ID3_ContainerImpl& container)
-      : _cur(container.begin()), _end(container.end())
-    {
-    }
+	class IteratorImpl : public ID3_Container::Iterator
+	{
+		ID3_ContainerImpl::iterator	 _cur;
+		ID3_ContainerImpl::iterator	 _end;
 
-    ID3_Frame* GetNext()
-    {
-      ID3_Frame* next = NULL;
-      while (next == NULL && _cur != _end)
-      {
-        next = *_cur;
-        ++_cur;
-      }
-      return next;
-    }
-  };
+		public:
+					 IteratorImpl(ID3_ContainerImpl &container) : _cur(container.begin()), _end(container.end()) { }
 
+			ID3_Frame	*GetNext()
+			{
+				ID3_Frame	*next = NULL;
 
-  class ConstIteratorImpl : public ID3_Container::ConstIterator
-  {
-    ID3_ContainerImpl::const_iterator _cur;
-    ID3_ContainerImpl::const_iterator _end;
-  public:
-    ConstIteratorImpl(ID3_ContainerImpl& container)
-      : _cur(container.begin()), _end(container.end())
-    {
-    }
-    const ID3_Frame* GetNext()
-    {
-      ID3_Frame* next = NULL;
-      while (next == NULL && _cur != _end)
-      {
-        next = *_cur;
-        ++_cur;
-      }
-      return next;
-    }
-  };
+				while (next == NULL && _cur != _end)
+				{
+					next = *_cur;
+					++_cur;
+				}
+
+				return next;
+			}
+	};
+
+	class ConstIteratorImpl : public ID3_Container::ConstIterator
+	{
+		ID3_ContainerImpl::const_iterator	 _cur;
+		ID3_ContainerImpl::const_iterator	 _end;
+
+		public:
+					 ConstIteratorImpl(ID3_ContainerImpl& container) : _cur(container.begin()), _end(container.end()) { }
+
+			const ID3_Frame	*GetNext()
+			{
+				ID3_Frame	*next = NULL;
+
+				while (next == NULL && _cur != _end)
+				{
+					next = *_cur;
+					++_cur;
+				}
+
+				return next;
+			}
+	};
 }
 
 ID3_Container::Iterator *ID3_Container::CreateIterator()

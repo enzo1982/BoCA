@@ -38,7 +38,7 @@
 
 using namespace dami;
 
-namespace 
+namespace
 {
 	ID3_Err renderFields(ID3_Writer &writer, const ID3_FrameImpl &frame)
 	{
@@ -51,9 +51,9 @@ namespace
 
 			if (fld != NULL && fld->InScope(frame.GetSpec()))
 			{
-				if (fld->GetID() == ID3FN_TEXTENC)  
+				if (fld->GetID() == ID3FN_TEXTENC)
 				{
-					enc = static_cast<ID3_TextEnc>(fld->Get());  
+					enc = static_cast<ID3_TextEnc>(fld->Get());
 					ID3D_NOTICE( "id3::v2::renderFields(): found encoding = " << enc );
 				}
 				else
@@ -70,7 +70,7 @@ namespace
 		return ID3E_NoError;
 	}
 }
-  
+
 ID3_V2Spec ID3_FrameImpl::MinSpec() const
 {
 	ID3_V2Spec	 minSpec = ID3V2_EARLIEST;
@@ -142,7 +142,7 @@ ID3_Err ID3_FrameImpl::Render(ID3_Writer& writer) const
 	// 	ID3D_WARNING("ID3_FrameImpl::Render(): no field data");
 	// 	return;
 	// }
-  
+
 	/* Determine which flags need to be set.
 	 */
 	uchar		 eID = this->GetEncryptionID(),
@@ -163,8 +163,8 @@ ID3_Err ID3_FrameImpl::Render(ID3_Writer& writer) const
 	hdr.SetEncryption(eID > 0);
 	hdr.SetGrouping(gID > 0);
 	hdr.SetCompression(origSize > fldSize);
-	hdr.SetDataSize(fldSize + ((hdr.GetCompression() ? 4 : 0) + 
-				   (hdr.GetEncryption()  ? 1 : 0) + 
+	hdr.SetDataSize(fldSize + ((hdr.GetCompression() ? 4 : 0) +
+				   (hdr.GetEncryption()  ? 1 : 0) +
 				   (hdr.GetGrouping()    ? 1 : 0)));
 
 	/* Write out the header.

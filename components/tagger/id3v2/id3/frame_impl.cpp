@@ -112,7 +112,7 @@ void ID3_FrameImpl::_InitFields()
 			_fields.push_back(fld);
 			_bitset.set(fld->GetID());
 		}
-    
+
 		_changed = true;
 	}
 }
@@ -203,12 +203,12 @@ size_t ID3_FrameImpl::Size()
 bool ID3_FrameImpl::HasChanged() const
 {
 	bool	 changed = _changed;
-  
+
 	for (const_iterator fi = _fields.begin(); fi != _fields.end(); ++fi)
 	{
 		if (*fi && (*fi)->InScope(this->GetSpec())) changed = (*fi)->HasChanged();
 	}
-  
+
 	return changed;
 }
 
@@ -237,7 +237,7 @@ ID3_FrameImpl &ID3_FrameImpl::operator=(const ID3_Frame &rFrame)
 	this->SetSpec(rFrame.GetSpec());
 
 	_changed = false;
-  
+
 	return *this;
 }
 

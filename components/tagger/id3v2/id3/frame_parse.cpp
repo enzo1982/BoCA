@@ -62,7 +62,7 @@ namespace
 			++iLoop;
 
 			if (rdr.atEnd())
-			{ 
+			{
 				/* There's no remaining data to parse!
 				 */
 				ID3D_WARNING("ID3_FrameImpl::Parse(): out of data at postion " << rdr.getCur());
@@ -77,7 +77,7 @@ namespace
 				}
 
 				return false;
-			} 
+			}
 
 			if (NULL == fp)
 			{
@@ -88,13 +88,13 @@ namespace
 				continue;
 			}
 
-			if (!fp->InScope(spec)) 
+			if (!fp->InScope(spec))
 			{
 				ID3D_NOTICE("ID3_FrameImpl::Parse(): field is not in scope");
 
 				/* Continue with the rest of the fields.
 				 */
-				continue; 
+				continue;
 			}
 
 			if (!fp->SetLinkedSize(linked_fixed_size))
@@ -117,8 +117,8 @@ namespace
 			ID3D_NOTICE("ID3_FrameImpl::Parse(): parsing field, cur = " << beg);
 			ID3D_NOTICE("ID3_FrameImpl::Parse(): parsing field, end = " << rdr.getEnd());
 
-			if (!fp->Parse(rdr) || rdr.getCur() == beg) 
-			{ 
+			if (!fp->Parse(rdr) || rdr.getCur() == beg)
+			{
 				/* Nothing to parse! Ack! Parse error...
 				 */
 				ID3D_WARNING("ID3_FrameImpl::Parse(): no data parsed, bad parse");
@@ -126,9 +126,9 @@ namespace
 				return false;
 			}
 
-			if (fp->GetID() == ID3FN_TEXTENC)  
+			if (fp->GetID() == ID3FN_TEXTENC)
 			{
-				enc = static_cast<ID3_TextEnc>(fp->Get());  
+				enc = static_cast<ID3_TextEnc>(fp->Get());
 
 				ID3D_NOTICE("ID3_FrameImpl::Parse(): found encoding = " << enc);
 			}
@@ -187,13 +187,13 @@ namespace
 		}
 
 		et.setExitPos(rdr.getCur());
-    
+
 		return true;
 	}
 };
 
-bool ID3_FrameImpl::Parse(ID3_Reader &reader) 
-{ 
+bool ID3_FrameImpl::Parse(ID3_Reader &reader)
+{
 	io::ExitTrigger	 et(reader);
 
 	ID3D_NOTICE("ID3_FrameImpl::Parse(): reader.getBeg() = " << reader.getBeg());
@@ -204,11 +204,11 @@ bool ID3_FrameImpl::Parse(ID3_Reader &reader)
 
 	_hdr.SetSpec(this->GetSpec());
 
-	if (!_hdr.Parse(reader) || reader.getCur() == beg)  
-	{ 
+	if (!_hdr.Parse(reader) || reader.getCur() == beg)
+	{
 		ID3D_WARNING("ID3_FrameImpl::Parse(): no header to parse");
 
-		return false; 
+		return false;
 	}
 
 	ID3D_NOTICE("ID3_FrameImpl::Parse(): after hdr, getCur() = " << reader.getCur());
@@ -239,7 +239,7 @@ bool ID3_FrameImpl::Parse(ID3_Reader &reader)
 	ID3D_NOTICE("ID3_FrameImpl::Parse(): window getBeg() = " << wr.getBeg());
 	ID3D_NOTICE("ID3_FrameImpl::Parse(): window getCur() = " << wr.getCur());
 	ID3D_NOTICE("ID3_FrameImpl::Parse(): window getEnd() = " << wr.getEnd());
-  
+
 	unsigned long	 origSize = 0;
 
 	if (_hdr.GetCompression())
@@ -269,8 +269,8 @@ bool ID3_FrameImpl::Parse(ID3_Reader &reader)
 
 	/* Set the type of frame based on the parsed header.
 	 */
-	this->_ClearFields(); 
-	this->_InitFields(); 
+	this->_ClearFields();
+	this->_InitFields();
 
 	bool	 success = false;
 
@@ -292,4 +292,4 @@ bool ID3_FrameImpl::Parse(ID3_Reader &reader)
 	_changed = false;
 
 	return true;
-} 
+}

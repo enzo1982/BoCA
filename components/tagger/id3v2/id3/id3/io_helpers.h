@@ -46,14 +46,14 @@ namespace dami
       ID3_Reader::pos_type _pos;
       bool _locked;
      public:
-      ExitTrigger(ID3_Reader& rdr) 
+      ExitTrigger(ID3_Reader& rdr)
         : _reader(rdr), _pos(rdr.getCur()), _locked(true)
       { ; }
-      ExitTrigger(ID3_Reader& rdr, ID3_Reader::pos_type pos) 
+      ExitTrigger(ID3_Reader& rdr, ID3_Reader::pos_type pos)
         : _reader(rdr), _pos(pos), _locked(true)
       { ; }
       virtual ~ExitTrigger() { if (_locked) _reader.setCur(_pos); }
-    
+
       void release() { _locked = false; }
       void update() { _pos = _reader.getCur(); }
       void setExitPos(ID3_Reader::pos_type pos) { _pos = pos; }
@@ -61,8 +61,8 @@ namespace dami
 
     String      readString(ID3_Reader&);
     String      readText(ID3_Reader&, size_t);
-    String      readUnicodeString(ID3_Reader&);
-    String      readUnicodeText(ID3_Reader&, size_t);
+    String      readUnicodeString(ID3_Reader&, ID3_TextEnc);
+    String      readUnicodeText(ID3_Reader&, size_t, ID3_TextEnc);
     BString     readAllBinary(ID3_Reader&);
     BString     readBinary(ID3_Reader&, size_t);
     uint32      readLENumber(ID3_Reader&, size_t);

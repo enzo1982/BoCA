@@ -64,14 +64,14 @@ class ID3_Reader
 		virtual pos_type	 setCur(pos_type pos) = 0;
 
 		/** Read a single character and advance the internal position. Note that the
-		 ** interal position may advance more than one byte for a single character 
+		 ** interal position may advance more than one byte for a single character
 		 ** read. Returns END_OF_READER if there isn't a character to read.
 		 **/
-		virtual int_type	 readChar() 
+		virtual int_type	 readChar()
 		{
 			if (this->atEnd())
-			{ 
-				return END_OF_READER; 
+			{
+				return END_OF_READER;
 			}
 
 			char_type	 ch;
@@ -81,7 +81,7 @@ class ID3_Reader
 			return ch;
 		}
 
-		/** Return the next character to be read without advancing the internal 
+		/** Return the next character to be read without advancing the internal
 		 ** position. Returns END_OF_READER if there isn't a character to read.
 		 **/
 		virtual int_type	 peekChar() = 0;
@@ -98,7 +98,7 @@ class ID3_Reader
 		}
 
 		/** Skip up to \c len chars in the stream and advance the internal position
-		 ** accordingly. Returns the number of characters actually skipped (may be 
+		 ** accordingly. Returns the number of characters actually skipped (may be
 		 ** less than requested).
 		 **/
 		virtual size_type	 skipChars(size_type len)

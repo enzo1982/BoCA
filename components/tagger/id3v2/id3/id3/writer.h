@@ -41,7 +41,7 @@ class ID3_Writer
   typedef  int32 off_type;
   typedef  int16 int_type;
   static const int_type END_OF_WRITER;
-  
+
   /** Close the writer.  Any further actions on the writer should fail. **/
   virtual void close() = 0;
 
@@ -52,7 +52,7 @@ class ID3_Writer
   virtual pos_type getBeg() { return static_cast<pos_type>(0); }
 
   /** Return the first position that can't be written to.  A return value of
-   ** -1 indicates no (reasonable) limit to the writer. 
+   ** -1 indicates no (reasonable) limit to the writer.
    **/
   virtual pos_type getEnd() { return static_cast<pos_type>(-1); }
 
@@ -70,11 +70,11 @@ class ID3_Writer
    ** character write.  Returns END_OF_WRITER if there isn't a character to
    ** write.
    **/
-  virtual int_type writeChar(char_type ch) 
+  virtual int_type writeChar(char_type ch)
   {
     if (this->atEnd())
-    { 
-      return END_OF_WRITER; 
+    {
+      return END_OF_WRITER;
     }
     this->writeChars(&ch, 1);
     return ch;

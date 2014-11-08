@@ -44,7 +44,7 @@ namespace dami
     {
       String     getString(const ID3_Frame*, ID3_FieldID);
       String     getStringAtIndex(const ID3_Frame*, ID3_FieldID, size_t);
-      
+
       String     getFrameText(const ID3_TagImpl&, ID3_FrameID);
       ID3_Frame* setFrameText(ID3_TagImpl&, ID3_FrameID, String);
       size_t     removeFrames(ID3_TagImpl&, ID3_FrameID);
@@ -58,17 +58,17 @@ namespace dami
       String     getAlbum(const ID3_TagImpl&);
       ID3_Frame* setAlbum(ID3_TagImpl&, String);
       size_t     removeAlbums(ID3_TagImpl&);
-      
+
       ID3_Frame* hasTitle(const ID3_TagImpl&);
       String     getTitle(const ID3_TagImpl&);
       ID3_Frame* setTitle(ID3_TagImpl&, String);
       size_t     removeTitles(ID3_TagImpl&);
-      
+
       ID3_Frame* hasYear(const ID3_TagImpl&);
       String     getYear(const ID3_TagImpl&);
       ID3_Frame* setYear(ID3_TagImpl&, String);
       size_t     removeYears(ID3_TagImpl&);
-      
+
       ID3_Frame* hasV1Comment(const ID3_TagImpl&);
       //      ID3_Frame* hasComment(const ID3_TagImpl&, String desc);
       ID3_Frame* hasComment(const ID3_TagImpl&);
@@ -77,34 +77,34 @@ namespace dami
       ID3_Frame* setComment(ID3_TagImpl&, String, String, String);
       size_t     removeComments(ID3_TagImpl&, String);
       size_t     removeAllComments(ID3_TagImpl&);
-      
+
       ID3_Frame* hasTrack(const ID3_TagImpl&);
       String     getTrack(const ID3_TagImpl&);
       size_t     getTrackNum(const ID3_TagImpl&);
       ID3_Frame* setTrack(ID3_TagImpl&, uchar ucTrack, uchar ucTotal);
       size_t     removeTracks(ID3_TagImpl&);
-      
+
       ID3_Frame* hasGenre(const ID3_TagImpl&);
       String     getGenre(const ID3_TagImpl&);
       size_t     getGenreNum(const ID3_TagImpl&);
       ID3_Frame* setGenre(ID3_TagImpl&, size_t ucGenre);
       size_t     removeGenres(ID3_TagImpl&);
-      
+
       ID3_Frame* hasLyrics(const ID3_TagImpl&);
       String     getLyrics(const ID3_TagImpl&);
       ID3_Frame* setLyrics(ID3_TagImpl&, String, String, String);
       size_t     removeLyrics(ID3_TagImpl&);
-      
+
       String     getLyricist(const ID3_TagImpl&);
       ID3_Frame* setLyricist(ID3_TagImpl&, String);
       size_t     removeLyricists(ID3_TagImpl&);
-      
+
       ID3_Frame* hasSyncLyrics(const ID3_TagImpl&, String lang, String desc);
-      ID3_Frame* setSyncLyrics(ID3_TagImpl&, BString, ID3_TimeStampFormat, 
+      ID3_Frame* setSyncLyrics(ID3_TagImpl&, BString, ID3_TimeStampFormat,
                                String, String, ID3_ContentType);
       BString    getSyncLyrics(const ID3_TagImpl& tag, String lang, String desc);
     };
   };
 };
-      
+
 #endif /* _ID3LIB_HELPERS_H_ */

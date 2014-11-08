@@ -81,7 +81,7 @@ namespace dami
 
 	String	 toString(uint32 val);
 	WString	 toWString(const unicode_t[], size_t);
-  
+
 	size_t	 ucslen(const unicode_t *unicode);
 	String	 convert(String data, ID3_TextEnc, ID3_TextEnc);
 
@@ -98,5 +98,5 @@ namespace dami
 	ID3_Err	 openReadableFile(String, fstream &);
 	ID3_Err	 openReadableFile(String, ifstream &);
 };
-  
+
 #endif /* _ID3LIB_UTILS_H_ */

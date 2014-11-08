@@ -123,7 +123,7 @@ String dami::renderNumber(uint32 val, size_t size)
 
 #if defined(HAVE_ICONV_H)
 
-namespace 
+namespace
 {
 	String convert_i(iconv_t cd, String source)
 	{
@@ -148,7 +148,7 @@ namespace
 		{
 			errno = 0;
 
-			size_t	 nconv = iconv(cd, &source_str, &source_size, 
+			size_t	 nconv = iconv(cd, &source_str, &source_size,
 						   &target_str, &target_size);
 
 			if (nconv == (size_t) -1 && errno != EINVAL && errno != E2BIG)
@@ -185,7 +185,7 @@ namespace
 			case ID3TE_ISO8859_1:
 				format = ID3_ICONV_FORMAT_ASCII;
 				break;
-			case ID3TE_UTF16LE:
+			case ID3TE_UTF16:
 				format = ID3_ICONV_FORMAT_UTF16LE;
 				break;
 			case ID3TE_UTF16BE:
@@ -214,7 +214,7 @@ String dami::convert(String data, ID3_TextEnc sourceEnc, ID3_TextEnc targetEnc)
 #else
 		const char	*targetFormat = getFormat(targetEnc);
 		const char	*sourceFormat = getFormat(sourceEnc);
-   
+
 		iconv_t		 cd = iconv_open(targetFormat, sourceFormat);
 
 		if (cd != (iconv_t) -1)
@@ -330,20 +330,20 @@ size_t dami::getFileSize(ofstream &file)
 ID3_Err dami::openWritableFile(String name, fstream &file)
 {
 	if (!exists(name)) return ID3E_NoFile;
-    
+
 	if (file.is_open()) file.close();
 
 	file.open(name.c_str(), ios::in | ios::out | ios::binary | NOCREATE);
 
 	if (!file) return ID3E_ReadOnly;
-    
+
 	return ID3E_NoError;
 }
 
 ID3_Err dami::openWritableFile(String name, ofstream &file)
 {
 	if (!exists(name)) return ID3E_NoFile;
-    
+
 	if (file.is_open()) file.close();
 
 	file.open(name.c_str(), ios::in | ios::out | ios::binary | NOCREATE);
@@ -360,7 +360,7 @@ ID3_Err dami::openReadableFile(String name, fstream &file)
 	file.open(name.c_str(), ios::in | ios::binary | NOCREATE);
 
 	if (!file) return ID3E_NoFile;
-    
+
 	return ID3E_NoError;
 }
 
@@ -371,7 +371,7 @@ ID3_Err dami::openReadableFile(String name, ifstream &file)
 	file.open(name.c_str(), ios::in | ios::binary | NOCREATE);
 
 	if (!file) return ID3E_NoFile;
-    
+
 	return ID3E_NoError;
 }
 
