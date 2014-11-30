@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -166,7 +166,7 @@ namespace smooth
 			{
 				if (slotsN == NIL) return Error();
 
-				for (Int i = 0; i < slotsN->Length(); i++)
+				for (Int i = slotsN->Length() - 1; i >= 0; i--)
 				{
 					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst))
 					{
@@ -183,7 +183,7 @@ namespace smooth
 			{
 				if (slotsN == NIL) return Error();
 
-				for (Int i = 0; i < slotsN->Length(); i++)
+				for (Int i = slotsN->Length() - 1; i >= 0; i--)
 				{
 					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc))
 					{
@@ -200,7 +200,7 @@ namespace smooth
 			{
 				if (slotsN == NIL) return Error();
 
-				for (Int i = 0; i < slotsN->Length(); i++)
+				for (Int i = slotsN->Length() - 1; i >= 0; i--)
 				{
 					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig))
 					{
@@ -218,7 +218,7 @@ namespace smooth
 			{
 				if (slots0 == NIL) return Error();
 
-				for (Int i = 0; i < slots0->Length(); i++)
+				for (Int i = slots0->Length() - 1; i >= 0; i--)
 				{
 					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == SlotClass0<oClassTYPE, slotReturnTYPE>(proc, inst))
 					{
@@ -235,7 +235,7 @@ namespace smooth
 			{
 				if (slots0 == NIL) return Error();
 
-				for (Int i = 0; i < slots0->Length(); i++)
+				for (Int i = slots0->Length() - 1; i >= 0; i--)
 				{
 					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == SlotGlobal0<slotReturnTYPE>(proc))
 					{
@@ -252,7 +252,7 @@ namespace smooth
 			{
 				if (slots0 == NIL) return Error();
 
-				for (Int i = 0; i < slots0->Length(); i++)
+				for (Int i = slots0->Length() - 1; i >= 0; i--)
 				{
 					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == SlotSignal0<slotReturnTYPE>(sig))
 					{
