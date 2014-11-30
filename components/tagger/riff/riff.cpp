@@ -157,23 +157,27 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 
 		String	 id	= in.InputString(4);
 		Int	 length	= in.InputNumber(4);
-		String	 value  = in.InputString(length - 1).Trim();
 
-		if	(id == "IART") info.artist  = value;
-		else if (id == "INAM") info.title   = value;
-		else if (id == "IPRD") info.album   = value;
-		else if (id == "ITRK") info.track   = value.ToInt();
-		else if (id == "ICRD") info.year    = value.Head(4).ToInt();
-		else if (id == "IGNR") info.genre   = value;
-		else if (id == "ICMT") info.comment = value;
+		if (length > 0)
+		{
+			String	 value = in.InputString(length - 1).Trim();
 
-		else if (id == "IURL") info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append(value));
+			if	(id == "IART") info.artist  = value;
+			else if (id == "INAM") info.title   = value;
+			else if (id == "IPRD") info.album   = value;
+			else if (id == "ITRK") info.track   = value.ToInt();
+			else if (id == "ICRD") info.year    = value.Head(4).ToInt();
+			else if (id == "IGNR") info.genre   = value;
+			else if (id == "ICMT") info.comment = value;
 
-		else if (id == "ITOC") info.offsets = value;
+			else if (id == "IURL") info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append(value));
 
-		/* Read final null character(s).
-		 */
-		in.InputNumber(1 + (length & 1));
+			else if (id == "ITOC") info.offsets = value;
+
+			/* Read final null character(s).
+			 */
+			in.InputNumber(1 + (length & 1));
+		}
 	}
 
 	track.SetInfo(info);
