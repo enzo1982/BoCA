@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,6 +13,7 @@
 #	include <mmreg.h>
 #else
 #	define WAVE_FORMAT_PCM	      0x0001
+#	define WAVE_FORMAT_IEEE_FLOAT 0x0003
 #	define WAVE_FORMAT_EXTENSIBLE 0xFFFE
 #endif
 
@@ -69,7 +70,8 @@ Bool BoCA::DecoderWave::CanOpenStream(const String &streamURI)
 		{
 			Int	 waveFormat = in.InputNumber(2);
 
-			if (waveFormat == WAVE_FORMAT_PCM ||
+			if (waveFormat == WAVE_FORMAT_PCM	 ||
+			    waveFormat == WAVE_FORMAT_IEEE_FLOAT ||
 			    waveFormat == WAVE_FORMAT_EXTENSIBLE) return True;
 
 			/* Skip rest of chunk.
@@ -117,7 +119,8 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			Int	 waveFormat = f_in->InputNumber(2);
 
-			if (waveFormat != WAVE_FORMAT_PCM &&
+			if (waveFormat != WAVE_FORMAT_PCM	 &&
+			    waveFormat != WAVE_FORMAT_IEEE_FLOAT &&
 			    waveFormat != WAVE_FORMAT_EXTENSIBLE) { errorState = True; errorString = "Unsupported audio format"; }
 
 			Format	 format = track.GetFormat();
@@ -127,7 +130,7 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 
 			f_in->RelSeek(6);
 
-			format.order	= BYTE_INTEL;
+			format.order	= (waveFormat == WAVE_FORMAT_IEEE_FLOAT) ? BYTE_NATIVE : BYTE_INTEL;
 			format.bits	= (unsigned short) f_in->InputNumber(2);
 
 			track.SetFormat(format);
@@ -138,7 +141,12 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 		}
 		else if (chunk == "data")
 		{
-			track.length	= (unsigned long) cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
+			Format	 format = track.GetFormat();
+
+			track.length	= (unsigned long) cSize / format.channels / (format.bits / 8);
+			format.bits	= Math::Min(32, format.bits);
+
+			track.SetFormat(format);
 		}
 		else
 		{
@@ -178,9 +186,12 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderWave::DecoderWave()
 {
-	packageSize = 0;
+	packageSize	= 0;
 
-	dataOffset  = 0;
+	floatFormat	= False;
+	floatFormatBits	= 32;
+
+	dataOffset	= 0;
 }
 
 BoCA::DecoderWave::~DecoderWave()
@@ -197,13 +208,30 @@ Bool BoCA::DecoderWave::Activate()
 
 	do
 	{
-		/* Read next chunk
+		/* Read next chunk.
 		 */
 		chunk = in->InputString(4);
 
 		Int	 cSize = in->InputNumber(4);
 
-		if (chunk != "data") in->RelSeek(cSize + cSize % 2);
+		if (chunk == "fmt ")
+		{
+			Int	 waveFormat = in->InputNumber(2);
+
+			if (waveFormat == WAVE_FORMAT_IEEE_FLOAT) floatFormat = True;
+
+			in->RelSeek(12);
+
+			floatFormatBits	= (unsigned short) in->InputNumber(2);
+
+			/* Skip rest of chunk.
+			 */
+			in->RelSeek(cSize - 16 + cSize % 2);
+		}
+		else if (chunk != "data")
+		{
+			in->RelSeek(cSize + cSize % 2);
+		}
 	}
 	while (chunk != "data");
 
@@ -230,11 +258,38 @@ Bool BoCA::DecoderWave::Seek(Int64 samplePosition)
 
 Int BoCA::DecoderWave::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	if (driver->GetPos() == driver->GetSize()) return -1;
+
+	/* Read data.
+	 */
+	if (floatFormat && floatFormatBits == 64) size *= 2;
 
 	data.Resize(size);
 
 	size = driver->ReadData(data, size);
+
+	/* Convert float to integer.
+	 */
+	if (floatFormat && floatFormatBits == 32)
+	{
+		if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, 4);
+
+		for (Int i = 0; i < size / 4; i++) ((Int32 *) (unsigned char *) data)[i] = Math::Min(Int64( 0x7FFFFFFF),
+											   Math::Max(Int64(~0x7FFFFFFF), Int64(((ShortFloat *) (unsigned char *) data)[i] * 0x80000000)));
+	}
+	else if (floatFormat && floatFormatBits == 64)
+	{
+		if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, 8);
+
+		for (Int i = 0; i < size / 8; i++) ((Int32 *) (unsigned char *) data)[i] = Math::Min(Int64( 0x7FFFFFFF),
+											   Math::Max(Int64(~0x7FFFFFFF), Int64(((Float *)      (unsigned char *) data)[i] * 0x80000000)));
+
+		size /= 2;
+
+		data.Resize(size);
+	}
 
 	return size;
 }
