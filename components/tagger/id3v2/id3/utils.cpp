@@ -43,7 +43,7 @@
 /* Check if we have all unicodes
  */
 #if defined HAVE_ICONV_H
-#	if (defined(ID3_ICONV_FORMAT_UTF16BE) && defined(ID3_ICONV_FORMAT_UTF16LE) && defined(ID3_ICONV_FORMAT_UTF8) && defined(ID3_ICONV_FORMAT_ASCII))
+#	if (defined(ID3_ICONV_FORMAT_UTF16BE) && defined(ID3_ICONV_FORMAT_UTF16) && defined(ID3_ICONV_FORMAT_UTF8) && defined(ID3_ICONV_FORMAT_ASCII))
 #		include <iconv.h>
 #		include <errno.h>
 #	else
@@ -186,7 +186,7 @@ namespace
 				format = ID3_ICONV_FORMAT_ASCII;
 				break;
 			case ID3TE_UTF16:
-				format = ID3_ICONV_FORMAT_UTF16LE;
+				format = ID3_ICONV_FORMAT_UTF16;
 				break;
 			case ID3TE_UTF16BE:
 				format = ID3_ICONV_FORMAT_UTF16BE;
