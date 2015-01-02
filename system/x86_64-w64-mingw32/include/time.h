@@ -121,6 +121,7 @@ extern "C" {
   _CRTIMP char *__cdecl _strtime(char *_Buffer) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
   __time32_t __cdecl _time32(__time32_t *_Time);
   __time32_t __cdecl _mktime32(struct tm *_Tm);
+  __time32_t __cdecl _mkgmtime32(struct tm *_Tm);
 #if defined (_POSIX_) || defined(__GNUC__)
   void __cdecl tzset(void) __MINGW_ATTRIB_DEPRECATED_MSVC2005;
 #endif
@@ -228,6 +229,7 @@ __CRT_INLINE char *__cdecl ctime(const time_t *_Time) { return _ctime64(_Time); 
 __CRT_INLINE struct tm *__cdecl gmtime(const time_t *_Time) { return _gmtime64(_Time); }
 __CRT_INLINE struct tm *__cdecl localtime(const time_t *_Time) { return _localtime64(_Time); }
 __CRT_INLINE time_t __cdecl mktime(struct tm *_Tm) { return _mktime64(_Tm); }
+__CRT_INLINE time_t __cdecl _mkgmtime(struct tm *_Tm) { return _mkgmtime64(_Tm); }
 __CRT_INLINE time_t __cdecl time(time_t *_Time) { return _time64(_Time); }
 #else
 __CRT_INLINE double __cdecl difftime(time_t _Time1,time_t _Time2)
@@ -236,6 +238,7 @@ __CRT_INLINE char *__cdecl ctime(const time_t *_Time) { return _ctime32(_Time); 
 __CRT_INLINE struct tm *__cdecl localtime(const time_t *_Time) { return _localtime32(_Time); }
 __CRT_INLINE time_t __cdecl mktime(struct tm *_Tm) { return _mktime32(_Tm); }
 __CRT_INLINE struct tm *__cdecl gmtime(const time_t *_Time) { return _gmtime32(_Time); }
+__CRT_INLINE time_t __cdecl _mkgmtime(struct tm *_Tm) { return _mkgmtime32(_Tm); }
 __CRT_INLINE time_t __cdecl time(time_t *_Time) { return _time32(_Time); }
 #endif /* !_USE_32BIT_TIME_T */
 #endif /* !__CRT__NO_INLINE */
