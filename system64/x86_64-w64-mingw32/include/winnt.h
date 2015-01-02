@@ -1760,7 +1760,7 @@ extern "C" {
 #define YieldProcessor _mm_pause
 #define MemoryBarrier _mm_mfence
 #else
-#define YieldProcessor __buildpause()
+#define YieldProcessor __buildpause
 VOID MemoryBarrier(VOID);
 FORCEINLINE VOID MemoryBarrier(VOID)
 __buildmemorybarrier()
@@ -4141,10 +4141,10 @@ __buildmemorybarrier()
 #define XSTATE_GSSE (2)
 #define XSTATE_AVX (XSTATE_GSSE)
 
-#define XSTATE_MASK_LEGACY_FLOATING_POINT (1ui64U << (XSTATE_LEGACY_FLOATING_POINT))
-#define XSTATE_MASK_LEGACY_SSE (1ui64U << (XSTATE_LEGACY_SSE))
+#define XSTATE_MASK_LEGACY_FLOATING_POINT (1ULL << (XSTATE_LEGACY_FLOATING_POINT))
+#define XSTATE_MASK_LEGACY_SSE (1ULL << (XSTATE_LEGACY_SSE))
 #define XSTATE_MASK_LEGACY (XSTATE_MASK_LEGACY_FLOATING_POINT | XSTATE_MASK_LEGACY_SSE)
-#define XSTATE_MASK_GSSE (1ui64U << (XSTATE_GSSE))
+#define XSTATE_MASK_GSSE (1LLU << (XSTATE_GSSE))
 #define XSTATE_MASK_AVX (XSTATE_MASK_GSSE)
 
 #define MAXIMUM_XSTATE_FEATURES (64)

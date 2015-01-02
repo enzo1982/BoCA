@@ -8,7 +8,7 @@
 #define SAL_HXX
 
 #ifdef __GNUC__
-#  define __inner_checkReturn
+#  define __inner_checkReturn __attribute__((warn_unused_result))
 #elif defined(_MSC_VER)
 #  define __inner_checkReturn __declspec("SAL_checkReturn")
 #else
