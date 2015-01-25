@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -104,8 +104,11 @@ Bool BoCA::DeviceInfoCDRip::OpenNthDeviceTray(Int n)
 
 	if (n < nDrives)
 	{
-		ex_CR_SetActiveCDROM(n);
-		ex_CR_EjectCD(True);
+		CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
+
+		ex_CR_EjectCD(cd, True);
+
+		ex_CR_CloseCDROM(cd);
 
 		return True;
 	}
@@ -119,8 +122,11 @@ Bool BoCA::DeviceInfoCDRip::CloseNthDeviceTray(Int n)
 
 	if (n < nDrives)
 	{
-		ex_CR_SetActiveCDROM(n);
-		ex_CR_EjectCD(False);
+		CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
+
+		ex_CR_EjectCD(cd, False);
+
+		ex_CR_CloseCDROM(cd);
 
 		return True;
 	}
@@ -191,20 +197,21 @@ const BoCA::MCDI &BoCA::DeviceInfoCDRip::GetNthDeviceMCDI(Int n)
 
 	if (n < nDrives)
 	{
-		ex_CR_SetActiveCDROM(n);
-		ex_CR_ReadToc();
+		CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
 
-		Int			 numTocEntries = ex_CR_GetNumTocEntries();
+		ex_CR_ReadToc(cd);
+
+		Int			 numTocEntries = ex_CR_GetNumTocEntries(cd);
 		Buffer<UnsignedByte>	 buffer(4 + 8 * numTocEntries + 8);
 
 		((UnsignedInt16 *) (UnsignedByte *) buffer)[0] = htons(buffer.Size() - 2);
 
-		buffer[2] = ex_CR_GetTocEntry(0).btTrackNumber;
-		buffer[3] = ex_CR_GetTocEntry(numTocEntries - 1).btTrackNumber;
+		buffer[2] = ex_CR_GetTocEntry(cd, 0).btTrackNumber;
+		buffer[3] = ex_CR_GetTocEntry(cd, numTocEntries - 1).btTrackNumber;
 
 		for (Int i = 0; i <= numTocEntries; i++)
 		{
-			TOCENTRY	 entry = ex_CR_GetTocEntry(i);
+			TOCENTRY	 entry = ex_CR_GetTocEntry(cd, i);
 
 			buffer[4 + 8 * i + 0] = 0;
 			buffer[4 + 8 * i + 1] = entry.btFlag;
@@ -219,6 +226,8 @@ const BoCA::MCDI &BoCA::DeviceInfoCDRip::GetNthDeviceMCDI(Int n)
 		}
 
 		mcdi.SetData(buffer);
+
+		ex_CR_CloseCDROM(cd);
 	}
 
 	lastDrive  = n;
@@ -237,11 +246,12 @@ Void BoCA::DeviceInfoCDRip::CollectDriveInfo()
 
 	for (Int i = 0; i < nDrives; i++)
 	{
-		ex_CR_SetActiveCDROM(i);
-
+		CDROMDRIVE	*cd = ex_CR_OpenCDROM(i);
 		CDROMPARAMS	 params;
 
-		ex_CR_GetCDROMParameters(&params);
+		if (cd == NIL) continue;
+
+		ex_CR_GetCDROMParameters(cd, &params);
 
 		Device	 drive;
 
@@ -252,6 +262,8 @@ Void BoCA::DeviceInfoCDRip::CollectDriveInfo()
 		drive.canOpenTray = True;
 
 		devices.Add(drive);
+
+		ex_CR_CloseCDROM(cd);
 	}
 
 	initialized = True;

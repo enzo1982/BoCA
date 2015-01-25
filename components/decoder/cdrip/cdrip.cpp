@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -31,10 +31,11 @@ const String &BoCA::DecoderCDRip::GetComponentSpecs()
 		    <name>CDRip Ripper Component</name>		\
 		    <version>1.0</version>			\
 		    <id>cdrip-dec</id>				\
-		    <type threadSafe=\"false\">decoder</type>	\
+		    <type>decoder</type>			\
 		    <require>cdrip-info</require>		\
 		    <format>					\
 		      <name>Windows CD Audio Track</name>	\
+		      <lossless>true</lossless>			\
 		      <extension>cda</extension>		\
 		    </format>					\
 		  </component>					\
@@ -196,10 +197,10 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	/* Read CDText and cdplayer.ini
 	 */
 	{
-		Int	 discid = ComputeDiscID();
+		Int	 discid = ComputeDiscID(track.drive);
 
-		if (config->GetIntValue("Ripper", "ReadCDText", True)	  && cdTextDiscID   != discid) { cdText.ReadCDText();   cdTextDiscID   = discid; }
-		if (config->GetIntValue("Ripper", "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(); cdPlayerDiscID = discid; }
+		if (config->GetIntValue("Ripper", "ReadCDText", True)	   && cdTextDiscID   != discid) { cdText.ReadCDText(track.drive);   cdTextDiscID   = discid; }
+		if (config->GetIntValue("Ripper", "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(track.drive); cdPlayerDiscID = discid; }
 
 		if (config->GetIntValue("Ripper", "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 		{
@@ -225,13 +226,20 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	if (config->GetIntValue("Ripper", "ReadISRC", 0))
 	{
-		ISRC	 data;
+		CDROMDRIVE	*cd = ex_CR_OpenCDROM(track.drive);
 
-		ex_CR_ReadAndGetISRC(&data, track.cdTrack);
+		if (cd != NIL)
+		{
+			ISRC	 data;
 
-		/* Check if the ISRC is valid.
-		 */
-		if (Info::IsISRC(data.isrc)) info.isrc = data.isrc;
+			ex_CR_ReadAndGetISRC(cd, &data, track.cdTrack);
+
+			/* Check if the ISRC is valid.
+			 */
+			if (Info::IsISRC(data.isrc)) info.isrc = data.isrc;
+
+			ex_CR_CloseCDROM(cd);
+		}
 	}
 
 	track.SetInfo(info);
@@ -289,10 +297,13 @@ Bool BoCA::DecoderCDRip::Activate()
 
 	/* Change drive parameters.
 	 */
+	cd = ex_CR_OpenCDROM(track.drive);
+
+	if (cd == NIL) return False;
+
 	CDROMPARAMS	 params;
 
-	ex_CR_SetActiveCDROM(track.drive);
-	ex_CR_GetCDROMParameters(&params);
+	ex_CR_GetCDROMParameters(cd, &params);
 
 	params.nRippingMode		= config->GetIntValue("Ripper", "CDParanoia", False);
 	params.nParanoiaMode		= nParanoiaMode;
@@ -308,11 +319,11 @@ Bool BoCA::DecoderCDRip::Activate()
 	 */
 	if (params.nSpeed == 0) params.nSpeed = 64;
 
-	ex_CR_SetCDROMParameters(&params);
+	ex_CR_SetCDROMParameters(cd, &params);
 
 	/* Lock tray if requested.
 	 */
-	if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(True);
+	if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(cd, True);
 
 	/* Call seek to initialize ripper to start of track.
 	 */
@@ -327,7 +338,7 @@ Bool BoCA::DecoderCDRip::Deactivate()
 
 	/* Check for drive cache errors.
 	 */
-	if (ex_CR_GetNumberOfCacheErrors() > 0)
+	if (ex_CR_GetNumberOfCacheErrors(cd) > 0)
 	{
 		Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
 
@@ -348,11 +359,13 @@ Bool BoCA::DecoderCDRip::Deactivate()
 		}
 	}
 
-	ex_CR_CloseRipper();
+	ex_CR_CloseRipper(cd);
 
 	/* Unlock tray if previously locked.
 	 */
-	if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(False);
+	if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(cd, False);
+
+	ex_CR_CloseCDROM(cd);
 
 	return True;
 }
@@ -361,7 +374,7 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 {
 	Config	*config = Config::Get();
 
-	ex_CR_CloseRipper();
+	ex_CR_CloseRipper(cd);
 
 	Int	 startSector = 0;
 	Int	 endSector   = 0;
@@ -388,7 +401,7 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 	 */
 	LONG	 lDataBufferSize = 0;
 
-	ex_CR_OpenRipper(&lDataBufferSize, startSector, endSector);
+	ex_CR_OpenRipper(cd, &lDataBufferSize, startSector, endSector);
 
 	dataBufferSize = lDataBufferSize;
 
@@ -404,10 +417,10 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 		BOOL	 abort = false;
 		LONG	 lSize = dataBufferSize;
 
-		ex_CR_RipChunk(buffer, &lSize, abort);
+		ex_CR_RipChunk(cd, buffer, &lSize, abort);
 
-		ex_CR_CloseRipper();
-		ex_CR_OpenRipper(&lDataBufferSize, startSector, endSector);
+		ex_CR_CloseRipper(cd);
+		ex_CR_OpenRipper(cd, &lDataBufferSize, startSector, endSector);
 	}
 
 	return True;
@@ -434,7 +447,7 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data, Int size)
 	BOOL	 abort = false;
 	LONG	 lSize = size;
 
-	ex_CR_RipChunk(data + prependBytes, &lSize, abort);
+	ex_CR_RipChunk(cd, data + prependBytes, &lSize, abort);
 
 	lastRead.SetNth(track.drive, S::System::System::Clock());
 
@@ -451,15 +464,15 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector)
 {
-	ex_CR_ReadToc();
+	ex_CR_ReadToc(cd);
 
-	Int	 numTocEntries = ex_CR_GetNumTocEntries();
+	Int	 numTocEntries = ex_CR_GetNumTocEntries(cd);
 
 	if (track.cdTrack == 0)
 	{
 		/* Special handling for hidden track one audio.
 		 */
-		TOCENTRY	 entry = ex_CR_GetTocEntry(0);
+		TOCENTRY	 entry = ex_CR_GetTocEntry(cd, 0);
 
 		if (!(entry.btFlag & CDROMDATAFLAG))
 		{
@@ -475,8 +488,8 @@ Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector)
 		 */
 		for (Int i = 0; i < numTocEntries; i++)
 		{
-			TOCENTRY	 entry	   = ex_CR_GetTocEntry(i);
-			TOCENTRY	 nextentry = ex_CR_GetTocEntry(i + 1);
+			TOCENTRY	 entry	   = ex_CR_GetTocEntry(cd, i);
+			TOCENTRY	 nextentry = ex_CR_GetTocEntry(cd, i + 1);
 
 			if (!(entry.btFlag & CDROMDATAFLAG) && (entry.btTrackNumber == track.cdTrack))
 			{
@@ -511,19 +524,25 @@ static int cddb_sum(int n)
 	return ret;
 }
 
-Int BoCA::DecoderCDRip::ComputeDiscID()
+Int BoCA::DecoderCDRip::ComputeDiscID(Int drive)
 {
-	Int	 numTocEntries = ex_CR_GetNumTocEntries();
+	CDROMDRIVE	*cd = ex_CR_OpenCDROM(drive);
+
+	if (cd == NIL) return -1;
+
+	Int	 numTocEntries = ex_CR_GetNumTocEntries(cd);
 	Int	 n = 0;
 
 	for (Int i = 0; i < numTocEntries; i++)
 	{
-		Int	 offset = ex_CR_GetTocEntry(i).dwStartSector + 150;
+		Int	 offset = ex_CR_GetTocEntry(cd, i).dwStartSector + 150;
 
 		n += cddb_sum(offset / 75);
 	}
 
-	Int	 t = ex_CR_GetTocEntry(numTocEntries).dwStartSector / 75 - ex_CR_GetTocEntry(0).dwStartSector / 75;
+	Int	 t = ex_CR_GetTocEntry(cd, numTocEntries).dwStartSector / 75 - ex_CR_GetTocEntry(cd, 0).dwStartSector / 75;
+
+	ex_CR_CloseCDROM(cd);
 
 	return ((n % 0xff) << 24 | t << 8 | numTocEntries);
 }

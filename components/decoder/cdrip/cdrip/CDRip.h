@@ -1,6 +1,6 @@
  /* CDRip Ripping Library
   * Copyright (C) 1999-2002 Albert L. Faber
-  * Portions Copyright (C) 2002-2013 Robert Kausch <robert.kausch@cdrip.org>
+  * Portions Copyright (C) 2002-2015 Robert Kausch <robert.kausch@cdrip.org>
   *  
   * This program is free software; you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
@@ -199,6 +199,10 @@ typedef struct
 }
 ISRC;
 
+// Anonymous CDROM drive structure
+struct CDROMDRIVE;
+
+// CDROM parameters structure
 typedef struct
 {
 	char		 lpszCDROMID[255];	// CD-ROM ID, must be unique to index settings in INI file
@@ -260,98 +264,96 @@ extern "C"
 	// Get the number of detected CD-ROM drives
 	DLLEXPORT LONG CRCCONV CR_GetNumCDROM();
 
-	// Get the active CDROM drive index (0 ... GetNumCDROM() - 1)
-	DLLEXPORT LONG CRCCONV CR_GetActiveCDROM();
+	// Open a CDROM drive for subsequent action (0 ... GetNumCDROM() - 1)
+	DLLEXPORT CDROMDRIVE * CRCCONV CR_OpenCDROM(LONG nActiveDrive);
 
-	// Get the active CDROM drive (0 ... GetNumCDROM() - 1)
-	DLLEXPORT void CRCCONV CR_SetActiveCDROM(LONG nActiveDrive);
+	// Close a previously opened CDROM drive
+	DLLEXPORT CDEX_ERR CRCCONV CR_CloseCDROM(CDROMDRIVE *pDrive);
 
 	// Select the DRIVETYPE of the active drive
-	DLLEXPORT CDEX_ERR CRCCONV CR_SelectCDROMType(DRIVETYPE cdType);
+	DLLEXPORT CDEX_ERR CRCCONV CR_SelectCDROMType(CDROMDRIVE *pCDRom, DRIVETYPE cdType);
 
 	// Get the Selected CDROM type
-	DLLEXPORT DRIVETYPE CRCCONV CR_GetCDROMType();
+	DLLEXPORT DRIVETYPE CRCCONV CR_GetCDROMType(CDROMDRIVE *pCDRom);
 
 	// Get the CDROM parameters of the active drive
-	DLLEXPORT CDEX_ERR CRCCONV CR_GetCDROMParameters(CDROMPARAMS *pParam);
+	DLLEXPORT CDEX_ERR CRCCONV CR_GetCDROMParameters(CDROMDRIVE *pCDRom, CDROMPARAMS *pParam);
 
 	// Set the CDROM parameters of the active drive
-	DLLEXPORT CDEX_ERR CRCCONV CR_SetCDROMParameters(CDROMPARAMS *pParam);
+	DLLEXPORT CDEX_ERR CRCCONV CR_SetCDROMParameters(CDROMDRIVE *pCDRom, CDROMPARAMS *pParam);
 
 	// Start ripping section, output is fetched to WriteBufferFunc
 	// Data is extracted from dwStartSector to dwEndSector
-	DLLEXPORT CDEX_ERR CRCCONV CR_OpenRipper(LONG *plBufferSize, LONG dwStartSector, LONG dwEndSector);
+	DLLEXPORT CDEX_ERR CRCCONV CR_OpenRipper(CDROMDRIVE *pCDRom, LONG *plBufferSize, LONG dwStartSector, LONG dwEndSector);
 
 	// Close the ripper, has to be called when the ripping process is completed (i.e 100%)
 	// Or it can be called to abort the current ripping section
-	DLLEXPORT CDEX_ERR CRCCONV CR_CloseRipper();
+	DLLEXPORT CDEX_ERR CRCCONV CR_CloseRipper(CDROMDRIVE *pCDRom);
 
 	// Indicates how far the ripping process is right now
 	// Returns 100% when the ripping is completed
-	DLLEXPORT LONG CRCCONV CR_GetPercentCompleted();
+	DLLEXPORT LONG CRCCONV CR_GetPercentCompleted(CDROMDRIVE *pCDRom);
 
 	// Returns the peak value of the ripped section (0..2^15)
-	DLLEXPORT LONG CRCCONV CR_GetPeakValue();
+	DLLEXPORT LONG CRCCONV CR_GetPeakValue(CDROMDRIVE *pCDRom);
 
 	// Get number of Jitter errors that have occured during the ripping
 	// This function must be called before CloseRipper is called!
-	DLLEXPORT LONG CRCCONV CR_GetNumberOfJitterErrors();
-	DLLEXPORT void CRCCONV CR_GetLastJitterErrorPosition(DWORD &dwStartSector, DWORD &dwEndSector);
+	DLLEXPORT LONG CRCCONV CR_GetNumberOfJitterErrors(CDROMDRIVE *pCDRom);
+	DLLEXPORT void CRCCONV CR_GetLastJitterErrorPosition(CDROMDRIVE *pCDRom, DWORD &dwStartSector, DWORD &dwEndSector);
 
 	// Get the jitter position of the extracted track
-	DLLEXPORT LONG CRCCONV CR_GetJitterPosition();
+	DLLEXPORT LONG CRCCONV CR_GetJitterPosition(CDROMDRIVE *pCDRom);
 
 	// Get number of cache errors that have occured during the ripping
 	// This function must be called before CloseRipper is called!
-	DLLEXPORT LONG CRCCONV CR_GetNumberOfCacheErrors();
+	DLLEXPORT LONG CRCCONV CR_GetNumberOfCacheErrors(CDROMDRIVE *pCDRom);
 
 	// Rip a chunk from the CD, pbtStream contains the ripped data, pNumBytes the
 	// number of bytes that have been ripped and corrected for jitter (if enabled)
-	DLLEXPORT CDEX_ERR CRCCONV CR_RipChunk(BYTE *pbtStream, LONG *pNumBytes, BOOL &bAbort);
+	DLLEXPORT CDEX_ERR CRCCONV CR_RipChunk(CDROMDRIVE *pCDRom, BYTE *pbtStream, LONG *pNumBytes, BOOL &bAbort);
 
 	// Normalize the stream (i.e. multiply by dScaleFactor)
-	DLLEXPORT void CRCCONV CR_NormalizeChunk(SHORT *pbsStream, LONG nNumSamples, DOUBLE dScaleFactor);
+	DLLEXPORT void CRCCONV CR_NormalizeChunk(CDROMDRIVE *pCDRom, SHORT *pbsStream, LONG nNumSamples, DOUBLE dScaleFactor);
 
 	// Read the table of contents
-	DLLEXPORT CDEX_ERR CRCCONV CR_ReadToc();
+	DLLEXPORT CDEX_ERR CRCCONV CR_ReadToc(CDROMDRIVE *pCDRom);
 
 	// Read CD Text entry
-	DLLEXPORT CDEX_ERR CRCCONV CR_ReadCDText(BYTE *pbtBuffer, int nBufferSize, LPINT pnCDTextSize);
+	DLLEXPORT CDEX_ERR CRCCONV CR_ReadCDText(CDROMDRIVE *pCDRom, BYTE *pbtBuffer, int nBufferSize, LPINT pnCDTextSize);
 
 	// Get the number of TOC entries, including the lead out
-	DLLEXPORT LONG CRCCONV CR_GetNumTocEntries();
+	DLLEXPORT LONG CRCCONV CR_GetNumTocEntries(CDROMDRIVE *pCDRom);
 
 	// Get the TOC entry
-	DLLEXPORT TOCENTRY CRCCONV CR_GetTocEntry(LONG nTocEntry);
+	DLLEXPORT TOCENTRY CRCCONV CR_GetTocEntry(CDROMDRIVE *pCDRom, LONG nTocEntry);
 
 	// Get Media Catalog Number
-	DLLEXPORT CDEX_ERR CRCCONV CR_ReadAndGetMCN(MCN *mcn);
+	DLLEXPORT CDEX_ERR CRCCONV CR_ReadAndGetMCN(CDROMDRIVE *pCDRom, MCN *mcn);
 
 	// Get ISRC
-	DLLEXPORT CDEX_ERR CRCCONV CR_ReadAndGetISRC(ISRC *isrc, int track);
+	DLLEXPORT CDEX_ERR CRCCONV CR_ReadAndGetISRC(CDROMDRIVE *pCDRom, ISRC *isrc, int track);
 
 	// Checks if the unit is ready (i.e. is the CD media present)
-	DLLEXPORT BOOL CRCCONV CR_IsUnitReady();
+	DLLEXPORT BOOL CRCCONV CR_IsUnitReady(CDROMDRIVE *pCDRom);
 
 	// Checks if the Media is loaded
-	DLLEXPORT CDEX_ERR CRCCONV CR_IsMediaLoaded(CDMEDIASTATUS &IsMediaLoaded);
+	DLLEXPORT CDEX_ERR CRCCONV CR_IsMediaLoaded(CDROMDRIVE *pCDRom, CDMEDIASTATUS &IsMediaLoaded);
 
 	// Eject the CD, bEject == TRUE => the CD will be ejected, bEject == FALSE => the CD will be loaded
-	DLLEXPORT BOOL CRCCONV CR_EjectCD(BOOL bEject);
+	DLLEXPORT BOOL CRCCONV CR_EjectCD(CDROMDRIVE *pCDRom, BOOL bEject);
 
 	// Get debug information
-	DLLEXPORT CDSTATUSINFO CRCCONV CR_GetCDStatusInfo();
+	DLLEXPORT CDSTATUSINFO CRCCONV CR_GetCDStatusInfo(CDROMDRIVE *pCDRom);
 
 	// Lock/unlock the CD Tray
-	DLLEXPORT void CRCCONV CR_LockCD(BOOL bLock);
+	DLLEXPORT void CRCCONV CR_LockCD(CDROMDRIVE *pCDRom, BOOL bLock);
 
-	DLLEXPORT void CRCCONV CR_GetSubChannelTrackInfo(int &nReadIndex, int &nReadTrack, DWORD &dwReadPos);
+	DLLEXPORT void CRCCONV CR_GetSubChannelTrackInfo(CDROMDRIVE *pCDRom, int &nReadIndex, int &nReadTrack, DWORD &dwReadPos);
 
-	DLLEXPORT DWORD CRCCONV CR_GetCurrentRipSector();
+	DLLEXPORT CDEX_ERR CRCCONV CR_ScanForC2Errors(CDROMDRIVE *pCDRom, DWORD dwStartSector, DWORD dwNumSectors, DWORD &dwErrors, DWORD *pdwErrorSectors);
 
-	DLLEXPORT CDEX_ERR CRCCONV CR_ScanForC2Errors(DWORD dwStartSector, DWORD dwNumSectors, DWORD &dwErrors, DWORD *pdwErrorSectors);
-
-	DLLEXPORT CDEX_ERR CRCCONV CR_GetDetailedDriveInfo(LPSTR lpszInfo, DWORD dwInfoSize);
+	DLLEXPORT CDEX_ERR CRCCONV CR_GetDetailedDriveInfo(CDROMDRIVE *pCDRom, LPSTR lpszInfo, DWORD dwInfoSize);
 } // extern "C"
 
 #pragma pack(pop)

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -35,8 +35,12 @@ BoCA::CDText::~CDText()
 {
 }
 
-Int BoCA::CDText::ReadCDText()
+Int BoCA::CDText::ReadCDText(Int drive)
 {
+	CDROMDRIVE	*cd = ex_CR_OpenCDROM(drive);
+
+	if (cd == NIL) return Error();
+
 	cdInfo.Clear();
 
 	const int	 nBufferSize	= 4 + 8 * sizeof(cdTextPackage) * 256;
@@ -44,9 +48,9 @@ Int BoCA::CDText::ReadCDText()
 	int		 nCDTextSize	= 0;
 	char		*lpZero		= NIL;
 
-	ex_CR_ReadCDText(pbtBuffer, nBufferSize, &nCDTextSize);
+	ex_CR_ReadCDText(cd, pbtBuffer, nBufferSize, &nCDTextSize);
 
-	if (nCDTextSize < 4) { delete [] pbtBuffer; return Error(); }
+	if (nCDTextSize < 4) { delete [] pbtBuffer; ex_CR_CloseCDROM(cd); return Error(); }
 
 	int		 nNumPacks		= (nCDTextSize - 4) / sizeof(cdTextPackage);
 	cdTextPackage	*pCDtextPacks		= NIL;
@@ -92,6 +96,8 @@ Int BoCA::CDText::ReadCDText()
 	}
 
 	delete [] pbtBuffer;
+
+	ex_CR_CloseCDROM(cd);
 
 	return Success();
 }

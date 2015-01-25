@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -21,16 +21,20 @@ BoCA::CDPlayerIni::~CDPlayerIni()
 {
 }
 
-Int BoCA::CDPlayerIni::ReadCDInfo()
+Int BoCA::CDPlayerIni::ReadCDInfo(Int drive)
 {
+	CDROMDRIVE	*cd = ex_CR_OpenCDROM(drive);
+
+	if (cd == NIL) return Error();
+
 	cdInfo.Clear();
 
-	Int	 numTocEntries = ex_CR_GetNumTocEntries();
+	Int	 numTocEntries = ex_CR_GetNumTocEntries(cd);
 	Int	 discID = 0;
 
 	for (Int i = 0; i < numTocEntries; i++)
 	{
-		int	 startSector = ex_CR_GetTocEntry(i).dwStartSector + 150;
+		int	 startSector = ex_CR_GetTocEntry(cd, i).dwStartSector + 150;
 
 		int	 minutes = startSector / 75 / 60;
 		int	 seconds = startSector / 75 % 60;
@@ -41,8 +45,8 @@ Int BoCA::CDPlayerIni::ReadCDInfo()
 
 	if (numTocEntries < 3)
 	{
-		discID += ex_CR_GetTocEntry(0).dwStartSector;
-		discID += ex_CR_GetTocEntry(numTocEntries).dwStartSector;
+		discID += ex_CR_GetTocEntry(cd, 0).dwStartSector;
+		discID += ex_CR_GetTocEntry(cd, numTocEntries).dwStartSector;
 	}
 
 	String	 discIDString = DiscIDToString(discID);
@@ -101,6 +105,8 @@ Int BoCA::CDPlayerIni::ReadCDInfo()
 	}
 
 	delete in;
+
+	ex_CR_CloseCDROM(cd);
 
 	return Success();
 }
