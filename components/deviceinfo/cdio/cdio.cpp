@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -60,6 +60,22 @@ const Array<String> &BoCA::DeviceInfoCDIO::FindDrives()
 
 #ifndef __APPLE__
 	if (initialized) return driveNames;
+#else
+	/* Do not query drives again if the last request
+	 * was less than a quarter of a second ago.
+	 */
+	static UnsignedInt64	 lastAccess = 0;
+
+	{
+		UnsignedInt64	 clockValue = S::System::System::Clock();
+
+		if (clockValue - lastAccess < 250)
+		{
+			lastAccess = clockValue;
+
+			return driveNames;
+		}
+	}
 #endif
 
 	driveNames.RemoveAll();
@@ -116,6 +132,10 @@ const Array<String> &BoCA::DeviceInfoCDIO::FindDrives()
 
 #ifndef __NetBSD__
 	cdio_free_device_list(deviceNames);
+#endif
+
+#ifdef __APPLE__
+	lastAccess = S::System::System::Clock();
 #endif
 
 	initialized = True;
