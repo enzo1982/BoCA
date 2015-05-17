@@ -137,7 +137,7 @@ namespace smooth
 
 				Int				 Raise();
 
-				Int				 Stay();
+				Int				 WaitUntilClosed();
 				Int				 Close();
 
 				Bool				 IsInUse() const			{ return (created && !destroyed); }
