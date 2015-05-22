@@ -33,7 +33,7 @@ BoCA::CoverDisplay::CoverDisplay(const Bitmap &cover)
 	window->SetMinimumSize(window->GetSize());
 	window->SetMaximumSize(window->GetSize());
 
-	window->SetFlags(window->GetFlags() | WF_NOTASKBUTTON);
+	window->SetFlags(window->GetFlags() | WF_NOTASKBUTTON | WF_MODAL);
 }
 
 BoCA::CoverDisplay::~CoverDisplay()
