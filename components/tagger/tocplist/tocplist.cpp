@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -168,7 +168,7 @@ Bool BoCA::TaggerTOCPList::ReadTrack(XML::Node *track, Buffer<UnsignedByte> &mcd
 		{
 			if	(node->GetContent() == "Data")		       data    = track->GetNthNode(++i)->GetName() == "true" ? True : False;
 			else if (node->GetContent() == "Pre-Emphasis Enabled") preemp  = track->GetNthNode(++i)->GetName() == "true" ? True : False;
-			else if (node->GetContent() == "Point")		       number   = track->GetNthNode(++i)->GetContent().ToInt();
+			else if (node->GetContent() == "Point")		       number  = track->GetNthNode(++i)->GetContent().ToInt();
 			else if (node->GetContent() == "Start Block")	       address = track->GetNthNode(++i)->GetContent().ToInt() - 150;
 		}
 	}
