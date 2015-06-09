@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,13 @@ namespace smooth
 		class WindowBackend;
 		class Layer;
 	};
+
+#ifdef __APPLE__
+	namespace System
+	{
+		class EventCocoa;
+	};
+#endif
 };
 
 #include "../widgets/widget.h"
@@ -47,6 +54,10 @@ namespace smooth
 
 		class SMOOTHAPI Window : public Widget
 		{
+#ifdef __APPLE__
+			friend class System::EventCocoa;
+#endif
+
 			private:
 				Int				 order;
 			protected:

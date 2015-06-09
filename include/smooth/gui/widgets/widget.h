@@ -61,6 +61,12 @@ namespace smooth
 				Point				 pos;
 				Size				 size;
 
+				mutable Point			 realPos;
+				mutable Size			 realSize;
+
+				mutable Bool			 realPosValid;
+				mutable Bool			 realSizeValid;
+
 				Bool				 registered;
 			protected:
 				Bool				 visible;
@@ -105,6 +111,7 @@ namespace smooth
 				PopupMenu			*contextMenu;
 
 				Void				 ComputeTextSize();
+				Void				 InvalidateMetrics();
 
 				Void				 SetFocusByKeyboard();
 
