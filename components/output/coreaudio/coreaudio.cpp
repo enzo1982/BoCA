@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -120,6 +120,11 @@ Bool BoCA::OutputCoreAudio::Activate()
 
 	if (CA::AudioUnitSetProperty(audioUnit, CA::kAudioUnitProperty_SetRenderCallback, CA::kAudioUnitScope_Input, 0, &audioCallback, sizeof(audioCallback)) != 0) return False;
 
+	/* Preallocate sample buffer.
+	 */
+	samplesBuffer.Resize((format.rate / 4 + 2048) * format.channels * (format.bits / 8));
+	samplesBuffer.Resize(0);
+
 	/* Start audio unit.
 	 */
 	if (CA::AudioOutputUnitStart(audioUnit) != 0) return False;
@@ -174,7 +179,7 @@ Int BoCA::OutputCoreAudio::CanWrite()
 
 	samplesBufferMutex->Lock();
 
-	Int	 canWrite = format.rate * format.channels * (format.bits / 8) / 4 - samplesBuffer.Size();
+	Int	 canWrite = (format.rate / 4 + 2048) * format.channels * (format.bits / 8) - samplesBuffer.Size();
 
 	samplesBufferMutex->Release();
 
