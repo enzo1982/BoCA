@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,6 +16,8 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
 	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
+
+	autoEject	= config->GetIntValue("Ripper", "EjectAfterRipping", False);
 
 	readISRC	= config->GetIntValue("Ripper", "ReadISRC", False);
 
@@ -122,15 +124,17 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	group_ripping->Add(check_paranoia);
 	group_ripping->Add(combo_paranoia_mode);
 
-	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(369, 11), Size(190, 68));
+	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(369, 11), Size(190, 94));
 
 	check_autoRead	= new CheckBox(i18n->TranslateString("Read CD contents on insert"), Point(10, 14), Size(170, 0), &autoRead);
 	check_autoRead->onAction.Connect(&ConfigureCDIO::ToggleAutoRead, this);
 
 	check_autoRip	= new CheckBox(i18n->TranslateString("Start ripping automatically"), check_autoRead->GetPosition() + Point(0, 26), Size(170, 0), &autoRip);
+	check_autoEject	= new CheckBox(i18n->TranslateString("Eject disk after ripping"), check_autoRip->GetPosition() + Point(0, 26), Size(170, 0), &autoEject);
 
 	group_automatization->Add(check_autoRead);
 	group_automatization->Add(check_autoRip);
+	group_automatization->Add(check_autoEject);
 
 	ToggleAutoRead();
 
@@ -162,6 +166,7 @@ BoCA::ConfigureCDIO::~ConfigureCDIO()
 	DeleteObject(group_automatization);
 	DeleteObject(check_autoRead);
 	DeleteObject(check_autoRip);
+	DeleteObject(check_autoEject);
 
 	DeleteObject(group_cdinfo);
 	DeleteObject(check_readISRC);
@@ -284,6 +289,8 @@ Int BoCA::ConfigureCDIO::SaveSettings()
 
 	config->SetIntValue("Ripper", "AutoReadContents", autoRead);
 	config->SetIntValue("Ripper", "AutoRip", autoRip);
+
+	config->SetIntValue("Ripper", "EjectAfterRipping", autoEject);
 
 	config->SetIntValue("Ripper", "ReadISRC", readISRC);
 

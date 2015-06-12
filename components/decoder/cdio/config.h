@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -42,6 +42,7 @@ namespace BoCA
 			GroupBox	*group_automatization;
 			CheckBox	*check_autoRead;
 			CheckBox	*check_autoRip;
+			CheckBox	*check_autoEject;
 
 			GroupBox	*group_cdinfo;
 			CheckBox	*check_readISRC;
@@ -53,6 +54,7 @@ namespace BoCA
 
 			Bool		 autoRead;
 			Bool		 autoRip;
+			Bool		 autoEject;
 
 			Bool		 readISRC;
 
