@@ -172,12 +172,6 @@ Bool BoCA::DeviceInfoCDIO::OpenNthDeviceTray(Int n)
 
 	/* Eject.
 	 */
-#ifdef __APPLE__
-	cdio_eject_media_drive(driveNames.GetNth(n));
-
-	S::System::System::Sleep(250);
-#endif
-
 	if (cdio_eject_media_drive(driveNames.GetNth(n)) == DRIVER_OP_SUCCESS) return True;
 	else								       return False;
 }
