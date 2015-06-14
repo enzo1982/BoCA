@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -31,11 +31,9 @@ BoCA::ConfigureWinamp::ConfigureWinamp()
 	button_output_about->onAction.Connect(&ConfigureWinamp::AboutOutputPlugin, this);
 	button_output_about->Deactivate();
 
-	for (Int l = 0; l < winamp_out_modules.Length(); l++)
+	for (Int i = 0; i < winamp_out_modules.Length(); i++)
 	{
-		ListEntry	*entry = list_output->AddEntry(winamp_out_modules.GetNth(l)->description);
-
-		if (l == config->GetIntValue("WinampOut", "OutputPlugin", 0)) entry->SetMark(True);
+		list_output->AddEntry(winamp_out_modules.GetNth(i)->description, config->GetIntValue("WinampOut", "OutputPlugin", 0) == i);
 	}
 
 	Add(list_output);
