@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>OptimFROG Audio Decoder</name>
+  <name>OptimFROG Lossless Decoder</name>
   <version>1.0</version>
   <id>ofr-dec</id>
   <type>decoder</type>
   <format>
     <name>OptimFROG Files</name>
+    <lossless>true</lossless>
     <extension>ofr</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>

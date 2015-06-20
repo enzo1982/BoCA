@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>WavPack Lossless Decompressor</name>
+  <name>WavPack Audio Decoder</name>
   <version>1.0</version>
   <id>avconv-wv-dec</id>
   <type>decoder</type>

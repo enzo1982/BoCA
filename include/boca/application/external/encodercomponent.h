@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -36,6 +36,9 @@ namespace BoCA
 				virtual Bool		 SetAudioTrackInfo(const Track &nTrack)	{ track = nTrack; format = nTrack.GetFormat(); return True; }
 
 				virtual String		 GetOutputFileExtension() const;
+				virtual Int		 GetNumberOfPasses() const;
+
+				virtual Bool		 IsLossless() const;
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 			accessors:

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>OptimFROG Audio Encoder</name>
+  <name>OptimFROG Lossless Encoder</name>
   <version>1.0</version>
   <id>ofr-enc</id>
   <type>encoder</type>

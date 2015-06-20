@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>WavPack Lossless Compressor</name>
+  <name>WavPack Audio Encoder</name>
   <version>1.0</version>
   <id>wv-enc</id>
   <type>encoder</type>
@@ -16,7 +16,7 @@
     <mode>stdio</mode>
     <informat>wave</informat>
     <parameters>
-      <range name="Enable hybrid compression" argument="-b%VALUE" default="256" step="8">
+      <range name="Enable lossy compression" argument="-b%VALUE" default="256" step="8">
 	<min alias="64 kbps">64</min>
 	<max alias="720 kbps">720</max>
       </range>

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,6 +32,16 @@ BoCA::AS::EncoderComponentExternal::~EncoderComponentExternal()
 String BoCA::AS::EncoderComponentExternal::GetOutputFileExtension() const
 {
 	return specs->formats.GetFirst()->GetExtensions().GetFirst();
+}
+
+Int BoCA::AS::EncoderComponentExternal::GetNumberOfPasses() const
+{
+	return 1;
+}
+
+Bool BoCA::AS::EncoderComponentExternal::IsLossless() const
+{
+	return specs->formats.GetFirst()->IsLossless();
 }
 
 BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()

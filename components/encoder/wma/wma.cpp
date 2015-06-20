@@ -94,6 +94,8 @@ Bool BoCA::EncoderWMA::IsLossless() const
 {
 	Config	*config = Config::Get();
 
+	if (config->GetIntValue("WMA", "Uncompressed", False)) return True;
+
 	/* Create profile manager and get codec info.
 	 */
 	IWMProfileManager	*pProfileManager = NIL;
