@@ -7,6 +7,7 @@
   <type>encoder</type>
   <format>
     <name>FLAC Audio Files</name>
+    <lossless>true</lossless>
     <extension>flac</extension>
     <tag id="flac-tag" mode="other">FLAC Metadata</tag>
   </format>

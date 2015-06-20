@@ -99,6 +99,8 @@ using namespace smooth;
 		BOCA_EXPORT char *BoCA_##componentName##_GetOutputFileExtension(void *component)					{ return ((BoCA::componentName *) component)->GetOutputFileExtension(); }								\
 		BOCA_EXPORT int BoCA_##componentName##_GetNumberOfPasses(void *component)						{ return ((BoCA::componentName *) component)->GetNumberOfPasses(); }									\
 																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_IsLossless(const void *component)						{ return ((const BoCA::componentName *) component)->IsLossless(); }									\
+																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
 																																		\

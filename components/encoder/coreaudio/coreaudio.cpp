@@ -98,6 +98,15 @@ BoCA::EncoderCoreAudio::~EncoderCoreAudio()
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
+Bool BoCA::EncoderCoreAudio::IsLossless() const
+{
+	Config	*config = Config::Get();
+
+	if (config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'alac') return True;
+
+	return False;
+}
+
 Bool BoCA::EncoderCoreAudio::Activate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();

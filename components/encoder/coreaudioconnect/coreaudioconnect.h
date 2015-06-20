@@ -35,7 +35,8 @@ namespace BoCA
 						 EncoderCoreAudioConnect();
 						~EncoderCoreAudioConnect();
 
-			Bool			 IsReady();
+			Bool			 IsReady() const;
+			Bool			 IsLossless() const;
 
 			Bool			 Activate();
 			Bool			 Deactivate();

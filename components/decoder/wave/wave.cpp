@@ -33,6 +33,7 @@ const String &BoCA::DecoderWave::GetComponentSpecs()
 	    <type>decoder</type>					\
 	    <format>							\
 	      <name>Windows Wave Files</name>				\
+	      <lossless>true</lossless>					\
 	      <extension>wav</extension>				\
 	      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 	      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\

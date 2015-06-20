@@ -35,6 +35,7 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 		    <type>encoder</type>						\
 		    <format>								\
 		      <name>FLAC Audio</name>						\
+		      <lossless>true</lossless>						\
 		      <extension>flac</extension>					\
 		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>		\
 		    </format>								\
@@ -47,6 +48,7 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 											\
 			    <format>							\
 			      <name>Ogg FLAC Files</name>				\
+			      <lossless>true</lossless>					\
 			      <extension>oga</extension>				\
 			      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
 			    </format>							\

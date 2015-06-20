@@ -35,6 +35,11 @@ Int BoCA::CS::EncoderComponent::GetNumberOfPasses() const
 	return 1;
 }
 
+Bool BoCA::CS::EncoderComponent::IsLossless() const
+{
+	return False;
+}
+
 Bool BoCA::CS::EncoderComponent::NextPass()
 {
 	return False;

@@ -32,6 +32,7 @@ const String &BoCA::EncoderMAC::GetComponentSpecs()
 		    <type>encoder</type>					\
 		    <format>							\
 		      <name>Monkey's Audio</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>ape</extension>				\
 		      <extension>mac</extension>				\
 		      <tag id=\"apev2-tag\" mode=\"append\">APEv2</tag>		\

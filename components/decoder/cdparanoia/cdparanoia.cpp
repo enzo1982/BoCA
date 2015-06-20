@@ -39,6 +39,7 @@ const String &BoCA::DecoderCDParanoia::GetComponentSpecs()
 	    <require>cdparanoia-info</require>		\
 	    <format>					\
 	      <name>Windows CD Audio Track</name>	\
+	      <lossless>true</lossless>			\
 	      <extension>cda</extension>		\
 	    </format>					\
 	  </component>					\

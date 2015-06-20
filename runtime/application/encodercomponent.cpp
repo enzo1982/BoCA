@@ -46,6 +46,12 @@ Int BoCA::AS::EncoderComponent::GetNumberOfPasses() const
 	return specs->func_GetNumberOfPasses(component);
 }
 
+Bool BoCA::AS::EncoderComponent::IsLossless() const
+{
+	if (specs->func_IsLossless(component))	return True;
+	else					return specs->formats.GetFirst()->IsLossless();
+}
+
 Bool BoCA::AS::EncoderComponent::Activate()
 {
 	SetDriver(driver);

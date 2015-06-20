@@ -165,8 +165,15 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			/* Set approxLength, because WMA duration is not always 100% accurate.
 			 */
+			Format	 format = track.GetFormat();
+
 			track.length = -1;
-			track.approxLength = *(QWORD *) pbValue * track.GetFormat().rate / 10000000;
+			track.approxLength = *(QWORD *) pbValue * format.rate / 10000000;
+
+			/* Try to guess if this is a lossless file.
+			 */
+			if (((Float) track.fileSize) / track.approxLength / format.channels / (format.bits / 8) > 0.35) track.lossless = True;
+			else												track.lossless = False;
 
 			delete [] pbValue;
 		}

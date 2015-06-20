@@ -69,6 +69,8 @@ namespace BoCA
 			String		 outfile;
 			String		 origFilename;
 
+			Bool		 lossless;
+
 					 Track();
 					 Track(int);
 					 Track(const Track &);

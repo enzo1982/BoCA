@@ -7,6 +7,7 @@
   <type>decoder</type>
   <format>
     <name>Shorten Audio</name>
+    <lossless>true</lossless>
     <extension>shn</extension>
   </format>
   <external>

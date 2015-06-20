@@ -62,6 +62,13 @@ BoCA::EncoderBonk::~EncoderBonk()
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
+Bool BoCA::EncoderBonk::IsLossless() const
+{
+	Config	*config = Config::Get();
+
+	return config->GetIntValue("Bonk", "Lossless", 0);
+}
+
 Bool BoCA::EncoderBonk::Activate()
 {
 	const Format	&format = track.GetFormat();

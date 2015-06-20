@@ -8,6 +8,7 @@
   <replace>avconv-tak-dec</replace>
   <format>
     <name>Tom's Audio</name>
+    <lossless>true</lossless>
     <extension>tak</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>

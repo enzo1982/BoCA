@@ -8,6 +8,7 @@
   <replace>avconv-alac-dec</replace>
   <format>
     <name>Apple Lossless Files</name>
+    <lossless>true</lossless>
     <extension>m4a</extension>
     <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>

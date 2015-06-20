@@ -42,6 +42,10 @@ namespace BoCA
 				 */
 				virtual Int	 GetNumberOfPasses() const;
 
+				/* Returns true if the output format is lossless.
+				 */
+				virtual Bool	 IsLossless() const;
+
 				/* Activate/deactivate filter.
 				 */
 				virtual Bool	 Activate() = 0;

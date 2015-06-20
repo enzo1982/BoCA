@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -25,6 +25,7 @@ typedef bool				(BONKCONV *BONKDECODERINIT)			(void *, unsigned char *, int, uns
 typedef int				(BONKCONV *BONKDECODERDECODEPACKET)		(void *, unsigned char *, int, signed short *, int);
 typedef int				(BONKCONV *BONKDECODERFINISH)			(void *);
 typedef bool				(BONKCONV *BONKDECODERCLOSE)			(void *);
+typedef bool				(BONKCONV *BONKDECODERGETSTREAMINFO)		(void *, bool *, bool *);
 typedef bool				(BONKCONV *BONKDECODERGETID3DATA)		(void *, unsigned char **, int *);
 typedef bool				(BONKCONV *BONKDECODERINITSEEKTABLE)		(void *, unsigned char *, int);
 typedef bool				(BONKCONV *BONKDECODERSEEKTO)			(void *, int);
@@ -35,6 +36,7 @@ extern BONKDECODERINIT			 ex_bonk_decoder_init;
 extern BONKDECODERDECODEPACKET		 ex_bonk_decoder_decode_packet;
 extern BONKDECODERFINISH		 ex_bonk_decoder_finish;
 extern BONKDECODERCLOSE			 ex_bonk_decoder_close;
+extern BONKDECODERGETSTREAMINFO		 ex_bonk_decoder_get_stream_info;
 extern BONKDECODERGETID3DATA		 ex_bonk_decoder_get_id3_data;
 extern BONKDECODERINITSEEKTABLE		 ex_bonk_decoder_init_seektable;
 extern BONKDECODERSEEKTO		 ex_bonk_decoder_seek_to;

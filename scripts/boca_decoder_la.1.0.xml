@@ -7,6 +7,7 @@
   <type>decoder</type>
   <format>
     <name>La Audio Files</name>
+    <lossless>true</lossless>
     <extension>la</extension>
     <tag id="id3v1-tag" mode="append">ID3v1</tag>
   </format>

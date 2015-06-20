@@ -42,6 +42,8 @@ namespace BoCA
 						 EncoderCoreAudio();
 						~EncoderCoreAudio();
 
+			Bool			 IsLossless() const;
+
 			Bool			 Activate();
 			Bool			 Deactivate();
 

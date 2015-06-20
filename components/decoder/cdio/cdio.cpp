@@ -43,6 +43,7 @@ const String &BoCA::DecoderCDIO::GetComponentSpecs()
 	    <replace>cdparanoia-dec</replace>		\
 	    <format>					\
 	      <name>Windows CD Audio Track</name>	\
+	      <lossless>true</lossless>			\
 	      <extension>cda</extension>		\
 	    </format>					\
 	  </component>					\
@@ -220,7 +221,7 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 				 */
 				if (Info::IsISRC(isrc)) info.isrc = isrc;
 
-				free(isrc);
+				cdio_free(isrc);
 			}
 
 			cdio_destroy(cd);

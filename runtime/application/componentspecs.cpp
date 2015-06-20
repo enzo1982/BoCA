@@ -65,6 +65,8 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_GetOutputFileExtension	= NIL;
 	func_GetNumberOfPasses		= NIL;
 
+	func_IsLossless			= NIL;
+
 	func_Activate			= NIL;
 	func_Deactivate			= NIL;
 
@@ -176,6 +178,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_GetOutputFileExtension	= (char *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetOutputFileExtension"));
 	func_GetNumberOfPasses		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfPasses"));
+
+	func_IsLossless			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsLossless"));
 
 	func_Activate			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Activate"));
 	func_Deactivate			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Deactivate"));
@@ -349,6 +353,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				XML::Node	*node2 = node->GetNthNode(j);
 
 				if	(node2->GetName() == "name")	  format->SetName(node2->GetContent());
+				else if (node2->GetName() == "lossless")  format->SetLossless(node2->GetContent() == "true");
 				else if (node2->GetName() == "extension") format->AddExtension(node2->GetContent());
 				else if (node2->GetName() == "tag")
 				{

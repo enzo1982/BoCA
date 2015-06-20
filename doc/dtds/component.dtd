@@ -20,8 +20,9 @@
 	<!ELEMENT precede (#PCDATA)>
 	<!ELEMENT succeed (#PCDATA)>
 
-	<!ELEMENT format (name, extension+, tag*)>
+	<!ELEMENT format (name, lossless?, extension+, tag*)>
 
+		<!ELEMENT lossless (#PCDATA)>
 		<!ELEMENT extension (#PCDATA)>
 
 		<!ELEMENT tag (#PCDATA)>

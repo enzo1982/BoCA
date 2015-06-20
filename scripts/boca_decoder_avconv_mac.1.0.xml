@@ -7,6 +7,7 @@
   <type>decoder</type>
   <format>
     <name>Monkey's Audio Files</name>
+    <lossless>true</lossless>
     <extension>ape</extension>
     <extension>mac</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>

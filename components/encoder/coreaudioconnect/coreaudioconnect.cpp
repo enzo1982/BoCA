@@ -114,9 +114,18 @@ BoCA::EncoderCoreAudioConnect::~EncoderCoreAudioConnect()
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
-Bool BoCA::EncoderCoreAudioConnect::IsReady()
+Bool BoCA::EncoderCoreAudioConnect::IsReady() const
 {
 	return ready;
+}
+
+Bool BoCA::EncoderCoreAudioConnect::IsLossless() const
+{
+	Config	*config = Config::Get();
+
+	if (config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'alac') return True;
+
+	return False;
 }
 
 Bool BoCA::EncoderCoreAudioConnect::Activate()

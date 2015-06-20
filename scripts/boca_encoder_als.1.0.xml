@@ -7,6 +7,7 @@
   <type>encoder</type>
   <format>
     <name>MPEG-4 ALS Files</name>
+    <lossless>true</lossless>
     <extension>mp4</extension>
     <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>

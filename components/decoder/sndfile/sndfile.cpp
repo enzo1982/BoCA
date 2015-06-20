@@ -35,12 +35,14 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		    <replace>wave-dec</replace>					\
 		    <format>							\
 		      <name>Windows Wave Files</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>wav</extension>				\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
 		    </format>							\
 		    <format>							\
 		      <name>Apple Audio Files</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>aif</extension>				\
 		      <extension>aiff</extension>				\
 		      <extension>aifc</extension>				\
@@ -49,55 +51,67 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		    </format>							\
 		    <format>							\
 		      <name>Sun Audio Files</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>au</extension>					\
 		      <extension>snd</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Paris Audio Files</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>paf</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Amiga Audio Files</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>iff</extension>				\
 		      <extension>svx</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>IRCAM Sound Files</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>sf</extension>					\
 		    </format>							\
 		    <format>							\
 		      <name>Creative Voice Files</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>voc</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Sound Forge Wave64</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>w64</extension>				\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 		    </format>							\
 		    <format>							\
 		      <name>RIFF 64 Audio Files</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>rf64</extension>				\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
 		    </format>							\
 		    <format>							\
 		      <name>Portable Voice Format</name>			\
+		      <lossless>true</lossless>					\
 		      <extension>pvf</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>HMM Toolkit Format</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>htk</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Apple Core Audio</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>caf</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Psion WVE Format</name>				\
+		      <lossless>true</lossless>					\
 		      <extension>wve</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Audio Visual Research Format</name>			\
+		      <lossless>true</lossless>					\
 		      <extension>avr</extension>				\
 		    </format>							\
 		  </component>							\

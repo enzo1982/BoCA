@@ -90,6 +90,45 @@ Int BoCA::EncoderWMA::GetNumberOfPasses() const
 	return 1;
 }
 
+Bool BoCA::EncoderWMA::IsLossless() const
+{
+	Config	*config = Config::Get();
+
+	/* Create profile manager and get codec info.
+	 */
+	IWMProfileManager	*pProfileManager = NIL;
+	IWMCodecInfo3		*pCodecInfo	 = NIL;
+
+	HRESULT	 hr = ex_WMCreateProfileManager(&pProfileManager);
+
+	hr = pProfileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo);
+
+	Int	 defaultCodec = GetDefaultCodec(pCodecInfo);
+
+	/* Get and check codec name.
+	 */
+	DWORD	 nameLen = 0;
+
+	hr = pCodecInfo->GetCodecName(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", defaultCodec), NIL, &nameLen);
+
+	WCHAR	*name = new WCHAR [nameLen];
+
+	hr = pCodecInfo->GetCodecName(WMMEDIATYPE_Audio, config->GetIntValue("WMA", "Codec", defaultCodec), name, &nameLen);
+
+	Bool	 result = False;
+
+	if (String(name).Contains("Lossless")) result = True;
+
+	delete [] name;
+
+	/* Release profile manager and codec info.
+	 */
+	pCodecInfo->Release();
+	pProfileManager->Release();
+
+	return result;
+}
+
 Bool BoCA::EncoderWMA::Activate()
 {
 	Config	*config = Config::Get();
@@ -293,7 +332,7 @@ ConfigLayer *BoCA::EncoderWMA::GetConfigurationLayer()
 
 /* Select default codec to be used when no codec is set.
  */
-Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo)
+Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo) const
 {
 	Int	 index	   = -1;
 
@@ -325,7 +364,7 @@ Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo)
 /* This method will return the format best matching
  * our requirements for a specified codec.
  */
-IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWORD codecIndex, const Format &format)
+IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWORD codecIndex, const Format &format) const
 {
 	Config	*config = Config::Get();
 

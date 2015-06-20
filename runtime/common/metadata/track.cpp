@@ -31,6 +31,8 @@ BoCA::Track::Track()
 	cdTrack		= -1;
 
 	discid		= 0;
+
+	lossless	= False;
 }
 
 BoCA::Track::Track(int nil)
@@ -50,6 +52,8 @@ BoCA::Track::Track(int nil)
 	cdTrack		= -1;
 
 	discid		= 0;
+
+	lossless	= False;
 }
 
 BoCA::Track::Track(const Track &oTrack)
@@ -105,6 +109,8 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 
 	outfile		= oTrack.outfile;
 	origFilename	= oTrack.origFilename;
+
+	lossless	= oTrack.lossless;
 
 	return *this;
 }

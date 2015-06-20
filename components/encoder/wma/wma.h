@@ -34,8 +34,8 @@ namespace BoCA
 
 			Buffer<signed short>	 samplesBuffer;
 
-			Int			 GetDefaultCodec(IWMCodecInfo3 *);
-			IWMStreamConfig		*GetBestCodecFormat(IWMCodecInfo3 *, DWORD, const Format &);
+			Int			 GetDefaultCodec(IWMCodecInfo3 *) const;
+			IWMStreamConfig		*GetBestCodecFormat(IWMCodecInfo3 *, DWORD, const Format &) const;
 
 			Bool			 SetInputFormat(IWMWriter *, const Format &);
 		public:
@@ -45,6 +45,8 @@ namespace BoCA
 						~EncoderWMA();
 
 			Int			 GetNumberOfPasses() const;
+
+			Bool			 IsLossless() const;
 
 			Bool			 Activate();
 			Bool			 Deactivate();

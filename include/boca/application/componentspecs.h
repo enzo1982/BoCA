@@ -97,15 +97,19 @@ namespace BoCA
 		{
 			private:
 				String			 name;
+				Bool			 lossless;
 
 				Array<String>		 extensions;
 				Array<TagFormat>	 tagFormats;
 			public:
-							 FileFormat(Int n = 0)				{ }
+							 FileFormat(Int n = 0) : lossless(False)	{ }
 							~FileFormat()					{ }
 
 				const String		&GetName() const				{ return name; }
 				Void			 SetName(const String &nName)			{ name = nName; }
+
+				const Bool		&IsLossless() const				{ return lossless; }
+				Void			 SetLossless(Bool nLossless)			{ lossless = nLossless; }
 
 				const Array<String>	&GetExtensions() const				{ return extensions; }
 				Void			 AddExtension(const String &nExt)		{ extensions.Add(nExt); }
@@ -302,6 +306,8 @@ namespace BoCA
 
 				char			*(*func_GetOutputFileExtension)(void *);
 				int			 (*func_GetNumberOfPasses)(void *);
+
+				bool			 (*func_IsLossless)(void *);
 
 				bool			 (*func_Activate)(void *);
 				bool			 (*func_Deactivate)(void *);

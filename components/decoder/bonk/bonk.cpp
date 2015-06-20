@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -82,6 +82,13 @@ Error BoCA::DecoderBonk::GetStreamInfo(const String &streamURI, Track &track)
 
 	track.length = length / format.channels;
 	track.fileSize = in->Size();
+
+	bool		 lossless = False;
+	bool		 mid_side = False;
+
+	ex_bonk_decoder_get_stream_info(decoder, &lossless, &mid_side);
+
+	track.lossless = lossless;
 
 	unsigned char	*id3tag = NIL;
 	int		 id3tag_size = 0;

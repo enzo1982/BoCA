@@ -42,6 +42,8 @@ Error BoCA::AS::DecoderComponent::GetStreamInfo(const String &streamURI, Track &
 {
 	track.origFilename = streamURI;
 
+	track.lossless	   = specs->formats.GetFirst()->IsLossless();
+
 	return specs->func_GetStreamInfo(component, streamURI, &track);
 }
 
