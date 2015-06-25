@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -179,7 +179,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_MP4Free(escBuffer);
 
-			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
 
 			format.bits	= 16;
 
@@ -198,7 +198,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 					String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
 					const Array<String>	&values	     = valueString.Trim().Explode(" ");
 
-					track.length = Math::Round((Int64) Number::FromHexString(values.GetNth(3)) * format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+					track.length = Math::Round((Int64) Number::FromHexString(values.GetNth(3)) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
 
 					String::ExplodeFinish();
 				}
@@ -423,7 +423,7 @@ Bool BoCA::DecoderFAAD2::Activate()
 				String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
 				const Array<String>	&values	     = valueString.Trim().Explode(" ");
 
-				delaySamples	 = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+				delaySamples	 = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * Float(track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
 				delaySamplesLeft = delaySamples;
 
 				String::ExplodeFinish();

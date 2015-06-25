@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -121,7 +121,7 @@ Bool BoCA::EncoderSpeex::Activate()
 
 	if (vbr)
 	{
-		float		 vbrq = config->GetIntValue("Speex", "VBRQuality", 80) / 10;
+		float		 vbrq = config->GetIntValue("Speex", "VBRQuality", 80) / 10.0;
 		spx_int32_t	 vbrmax = config->GetIntValue("Speex", "VBRMaxBitrate", -48) * 1000;
 
 		ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR_QUALITY, &vbrq);

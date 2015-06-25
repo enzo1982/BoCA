@@ -257,6 +257,8 @@ BoCA::DecoderCDRip::DecoderCDRip()
 
 	packageSize	= 0;
 
+	cd		= NIL;
+
 	readOffset	= 0;
 
 	skipSamples	= 0;

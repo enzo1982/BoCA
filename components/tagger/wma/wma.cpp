@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -189,7 +189,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 					wcsncpy(picture.pwszDescription, picInfo.description, picInfo.description.Length() + 1);
 				}
 
-				hr = pHeaderInfo->AddAttribute(0, g_wszWMPicture, NIL, WMT_TYPE_BINARY, 0, (BYTE *) &picture, sizeof(WM_PICTURE));
+				pHeaderInfo->AddAttribute(0, g_wszWMPicture, NIL, WMT_TYPE_BINARY, 0, (BYTE *) &picture, sizeof(WM_PICTURE));
 
 				if (picInfo.mime != NIL)	delete [] picture.pwszMIMEType;
 				if (picInfo.description != NIL)	delete [] picture.pwszDescription;
@@ -559,7 +559,7 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 				    nameStr == g_wszWMTrackNumber		||
 				    nameStr == g_wszWMPartOfSet			||
 				    nameStr == g_wszWMMCDI			||
-				    nameStr == g_wszWMPicture) hr = pHeaderInfo->DeleteAttribute(0, indices[i]);
+				    nameStr == g_wszWMPicture) pHeaderInfo->DeleteAttribute(0, indices[i]);
 			}
 
 			delete [] name;

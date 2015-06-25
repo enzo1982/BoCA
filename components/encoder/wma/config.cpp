@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -15,16 +15,21 @@ BoCA::ConfigureWMA::ConfigureWMA()
 {
 	Config	*config = Config::Get();
 
-	uncompressed = config->GetIntValue("WMA", "Uncompressed", False);
-	autoselect = config->GetIntValue("WMA", "AutoSelectFormat", True);
+	uncompressed	= config->GetIntValue("WMA", "Uncompressed", False);
+	autoselect	= config->GetIntValue("WMA", "AutoSelectFormat", True);
 
-	useVBR = config->GetIntValue("WMA", "EnableVBR", True);
-	use2Pass = config->GetIntValue("WMA", "Enable2Pass", False);
+	useVBR		= config->GetIntValue("WMA", "EnableVBR", True);
+	use2Pass	= config->GetIntValue("WMA", "Enable2Pass", False);
 
-	useVBRSetting = useVBR;
+	useVBRSetting	= useVBR;
 	use2PassSetting = use2Pass;
 
-	quality = config->GetIntValue("WMA", "Quality", 90) / 5;
+	supportCBR1Pass = False;
+	supportVBR1Pass = False;
+	supportCBR2Pass = False;
+	supportVBR2Pass = False;
+
+	quality		= config->GetIntValue("WMA", "Quality", 90) / 5;
 
 	/* Init the Microsoft COM library.
 	 */
