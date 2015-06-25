@@ -2045,7 +2045,7 @@ static URI_INLINE UriBool URI_FUNC(PushPathSegment)(URI_TYPE(ParserState) * stat
 
 	/* First segment ever? */
 	if (state->uri->pathHead == NULL) {
-		/* First segement ever, set head and tail */
+		/* First segment ever, set head and tail */
 		state->uri->pathHead = segment;
 		state->uri->pathTail = segment;
 	} else {
@@ -2079,10 +2079,8 @@ int URI_FUNC(ParseUriEx)(URI_TYPE(ParserState) * state, const URI_CHAR * first, 
 		return state->errorCode;
 	}
 	if (afterUriReference != afterLast) {
-		if (state->errorPos == NULL) {
-			state->errorPos = afterUriReference;
-		}
-		return URI_ERROR_SYNTAX;
+		URI_FUNC(StopSyntax)(state, afterUriReference);
+		return state->errorCode;
 	}
 	return URI_SUCCESS;
 }
