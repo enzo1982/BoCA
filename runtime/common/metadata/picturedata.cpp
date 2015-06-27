@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -72,9 +72,7 @@ Bool BoCA::PictureData::Set(Void *data, Int size)
 
 	memcpy(*buffer, data, size);
 
-	Hash::CRC32	 crcProcessor(*buffer);
-
-	crc = crcProcessor.Compute();
+	crc = Hash::CRC32::Compute(*buffer);
 
 	if (referenceStore.Get(crc) == 0)
 	{
