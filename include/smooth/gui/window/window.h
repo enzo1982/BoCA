@@ -57,6 +57,13 @@ namespace smooth
 #ifdef __APPLE__
 			friend class System::EventCocoa;
 #endif
+			enums:
+				enum ProgressIndicatorState
+				{
+					ProgressIndicatorNone	= 0,
+					ProgressIndicatorNormal,
+					ProgressIndicatorPaused
+				};
 
 			private:
 				Int				 order;
@@ -118,6 +125,8 @@ namespace smooth
 
 				Int				 SetDefaultStatusText(const String &);
 				Int				 RestoreDefaultStatusText();
+
+				Int				 SetProgressIndicator(ProgressIndicatorState, Float = -1.0);
 
 				const Array<String>		&GetDroppedFiles() const;
 

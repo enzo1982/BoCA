@@ -34,6 +34,7 @@
 #define slots		public
 #define accessors	public
 #define constants	public
+#define enums		public
 
 #define abstract
 #define sealed
