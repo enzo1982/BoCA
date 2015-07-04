@@ -72,7 +72,6 @@ namespace smooth
 
 				WindowBackend			*backend;
 
-				Int				 stay;
 				Bool				 maximized;
 				Bool				 minimized;
 
