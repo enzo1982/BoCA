@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -30,6 +30,7 @@ namespace BoCA
 		COMPONENT_TYPE_OUTPUT,
 		COMPONENT_TYPE_DEVICEINFO,
 		COMPONENT_TYPE_PLAYLIST,
+		COMPONENT_TYPE_VERIFIER,
 
 		NUM_COMPONENT_TYPES
 	};
@@ -278,8 +279,12 @@ namespace BoCA
 				const void		*(*func_GetErrorString)(const void *);
 
 				bool			 (*func_CanOpenStream)(void *, const wchar_t *);
-				int			 (*func_GetStreamInfo)(void *, const wchar_t *, void *);
+				bool			 (*func_CanVerifyTrack)(void *, const void *);
 
+				int			 (*func_GetStreamInfo)(void *, const wchar_t *, void *);
+				void			 (*func_GetFormatInfo)(void *, void *);
+
+				bool			 (*func_SetAudioTrackInfo)(void *, const void *);
 				void			 (*func_SetVendorString)(void *, const wchar_t *);
 
 				int			 (*func_ParseBuffer)(void *, const void *, void *);
@@ -301,9 +306,6 @@ namespace BoCA
 				int			 (*func_SetPause)(void *, bool);
 				bool			 (*func_IsPlaying)(void *);
 
-				bool			 (*func_SetAudioTrackInfo)(void *, const void *);
-				void			 (*func_GetFormatInfo)(void *, void *);
-
 				char			*(*func_GetOutputFileExtension)(void *);
 				int			 (*func_GetNumberOfPasses)(void *);
 
@@ -318,8 +320,11 @@ namespace BoCA
 				int			 (*func_ReadData)(void *, void *, int);
 				int			 (*func_WriteData)(void *, void *, int);
 				int			 (*func_TransformData)(void *, void *, int);
+				int			 (*func_ProcessData)(void *, void *);
 
 				int			 (*func_Flush)(void *, void *);
+
+				int			 (*func_Verify)(void *);
 
 				void			*(*func_GetMainTabLayer)(void *);
 				void			*(*func_GetStatusBarLayer)(void *);

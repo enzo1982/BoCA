@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -31,6 +31,7 @@ using namespace smooth;
 # include "boca/component/outputcomponent.h"
 # include "boca/component/playlistcomponent.h"
 # include "boca/component/taggercomponent.h"
+# include "boca/component/verifiercomponent.h"
 #else
 # ifdef __WIN32__
 #  define BOCA_EXPORT __declspec (dllimport)
@@ -51,6 +52,7 @@ using namespace smooth;
 #include "boca/application/outputcomponent.h"
 #include "boca/application/playlistcomponent.h"
 #include "boca/application/taggercomponent.h"
+#include "boca/application/verifiercomponent.h"
 #include "boca/application/registry.h"
 
 #include "boca/common/config.h"
@@ -181,6 +183,19 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_RenderStreamInfo(void *component, const wchar_t *file, const void *track)	{ return ((BoCA::componentName *) component)->RenderStreamInfo(file, *((const BoCA::Track *) track)); }					\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_UpdateStreamInfo(void *component, const wchar_t *file, const void *track)	{ return ((BoCA::componentName *) component)->UpdateStreamInfo(file, *((const BoCA::Track *) track)); }					\
+	}
+
+#define BoCA_DEFINE_VERIFIER_COMPONENT(componentName)										 																		\
+	extern "C" {																																\
+		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((BoCA::Track *) track)); }						\
+		BOCA_EXPORT bool BoCA_##componentName##_CanVerifyTrack(void *component, const void *track)				{ return ((BoCA::componentName *) component)->CanVerifyTrack(*((BoCA::Track *) track)); }									\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
+		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
+																																		\
+		BOCA_EXPORT int BoCA_##componentName##_ProcessData(void *component, void *buffer)					{ return ((BoCA::componentName *) component)->ProcessData(*((Buffer<UnsignedByte> *) buffer)); }					\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_Verify(void *component)								{ return ((BoCA::componentName *) component)->Verify(); }										\
 	}
 
 #define BoCA_END_COMPONENT(componentName)										 																			\

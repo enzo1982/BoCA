@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -64,12 +64,15 @@ namespace BoCA
 			 */
 			Int		 discid;
 
-			/* Other information:
+			/* Lossless format information:
+			 */
+			Bool		 lossless;
+			String		 md5;
+
+			/* Filename information:
 			 */
 			String		 outfile;
 			String		 origFilename;
-
-			Bool		 lossless;
 
 					 Track();
 					 Track(int);

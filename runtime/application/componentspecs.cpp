@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -36,8 +36,12 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_GetErrorString		= NIL;
 
 	func_CanOpenStream		= NIL;
-	func_GetStreamInfo		= NIL;
+	func_CanVerifyTrack		= NIL;
 
+	func_GetStreamInfo		= NIL;
+	func_GetFormatInfo		= NIL;
+
+	func_SetAudioTrackInfo		= NIL;
 	func_SetVendorString		= NIL;
 
 	func_ParseBuffer		= NIL;
@@ -59,9 +63,6 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_SetPause			= NIL;
 	func_IsPlaying			= NIL;
 
-	func_SetAudioTrackInfo		= NIL;
-	func_GetFormatInfo		= NIL;
-
 	func_GetOutputFileExtension	= NIL;
 	func_GetNumberOfPasses		= NIL;
 
@@ -76,8 +77,11 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_ReadData			= NIL;
 	func_WriteData			= NIL;
 	func_TransformData		= NIL;
+	func_ProcessData		= NIL;
 
 	func_Flush			= NIL;
+
+	func_Verify			= NIL;
 
 	func_GetMainTabLayer		= NIL;
 	func_GetStatusBarLayer		= NIL;
@@ -150,8 +154,12 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_GetErrorString		= (const void *(*)(const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorString"));
 
 	func_CanOpenStream		= (bool (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanOpenStream"));
-	func_GetStreamInfo		= (int (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStreamInfo"));
+	func_CanVerifyTrack		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanVerifyTrack"));
 
+	func_GetStreamInfo		= (int (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStreamInfo"));
+	func_GetFormatInfo		= (void (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetFormatInfo"));
+
+	func_SetAudioTrackInfo		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetAudioTrackInfo"));
 	func_SetVendorString		= (void (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetVendorString"));
 
 	func_ParseBuffer		= (int (*)(void *, const void *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ParseBuffer"));
@@ -173,9 +181,6 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_SetPause			= (int (*)(void *, bool))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetPause"));
 	func_IsPlaying			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsPlaying"));
 
-	func_SetAudioTrackInfo		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetAudioTrackInfo"));
-	func_GetFormatInfo		= (void (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetFormatInfo"));
-
 	func_GetOutputFileExtension	= (char *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetOutputFileExtension"));
 	func_GetNumberOfPasses		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfPasses"));
 
@@ -190,8 +195,11 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_ReadData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
 	func_WriteData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
 	func_TransformData		= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_TransformData"));
+	func_ProcessData		= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ProcessData"));
 
 	func_Flush			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Flush"));
+
+	func_Verify			= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Verify"));
 
 	func_GetMainTabLayer		= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetMainTabLayer"));
 	func_GetStatusBarLayer		= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStatusBarLayer"));
@@ -317,6 +325,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			else if (node->GetContent() == "extension")	type = COMPONENT_TYPE_EXTENSION;
 			else if (node->GetContent() == "playlist")	type = COMPONENT_TYPE_PLAYLIST;
 			else if (node->GetContent() == "tagger")	type = COMPONENT_TYPE_TAGGER;
+			else if (node->GetContent() == "verifier")	type = COMPONENT_TYPE_VERIFIER;
 			else						type = COMPONENT_TYPE_UNKNOWN;
 
 			if (node->GetAttributeByName("threadSafe") != NIL)

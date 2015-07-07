@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -13,6 +13,7 @@
 
 #include "component.h"
 #include "decodercomponent.h"
+#include "verifiercomponent.h"
 #include "deviceinfocomponent.h"
 
 namespace BoCA
@@ -53,6 +54,7 @@ namespace BoCA
 				Bool				 DeleteComponent(Component *);
 
 				DecoderComponent		*CreateDecoderForStream(const String &);
+				VerifierComponent		*CreateVerifierForTrack(const Track &);
 				DeviceInfoComponent		*CreateDeviceInfoComponent();
 		};
 	};

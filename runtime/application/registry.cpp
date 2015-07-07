@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -17,6 +17,7 @@
 #include <boca/application/outputcomponent.h>
 #include <boca/application/playlistcomponent.h>
 #include <boca/application/taggercomponent.h>
+#include <boca/application/verifiercomponent.h>
 
 #include <boca/application/external/decodercomponentfile.h>
 #include <boca/application/external/decodercomponentstdio.h>
@@ -338,6 +339,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 				return new PlaylistComponent(specs);
 			case COMPONENT_TYPE_TAGGER:
 				return new TaggerComponent(specs);
+			case COMPONENT_TYPE_VERIFIER:
+				return new VerifierComponent(specs);
 			default:
 				return new Component(specs);
 		}
@@ -415,6 +418,27 @@ BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const Str
 		if (component != NIL)
 		{
 			if (component->CanOpenStream(streamURI)) return component;
+
+			DeleteComponent(component);
+		}
+	}
+
+	return NIL;
+}
+
+BoCA::AS::VerifierComponent *BoCA::AS::Registry::CreateVerifierForTrack(const Track &track)
+{
+	/* Try all verifiers.
+	 */
+	for (Int i = 0; i < GetNumberOfComponents(); i++)
+	{
+		if (GetComponentType(i) != COMPONENT_TYPE_VERIFIER) continue;
+
+		VerifierComponent	*component = (VerifierComponent *) CreateComponentByID(GetComponentID(i));
+
+		if (component != NIL)
+		{
+			if (component->CanVerifyTrack(track)) return component;
 
 			DeleteComponent(component);
 		}
