@@ -29,7 +29,7 @@
 	<option>8192</option>
 	<option>16384</option>
       </selection>
-      <switch name="Add MD5 checksum" argument="-md5"/>
+      <switch name="Add MD5 checksum" argument="-md5" enabled="true"/>
     </parameters>
   </external>
 </component>
