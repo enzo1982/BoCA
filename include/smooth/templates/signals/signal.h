@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -280,15 +280,10 @@ namespace smooth
 
 				ProtectParent();
 
-				EmitUnprotected(SIGNALS_ARGUMENT_PARAMETERS);
-
-				UnprotectParent();
-			}
-
-			Void EmitUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST) const
-			{
 				for (Int i = 0; slotsN != NIL && i < slotsN->Length(); i++) ((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
 				for (Int j = 0; slots0 != NIL && j < slots0->Length(); j++) ((SlotBase0<Void> *) slots0->GetNth(j))->Emit();
+
+				UnprotectParent();
 			}
 
 			Int GetNOfConnectedSlots() const

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -80,11 +80,6 @@ namespace smooth
 			returnTYPE Call(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
 				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::Emit(SIGNALS_ARGUMENT_PARAMETERS);
-			}
-
-			returnTYPE CallUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST)
-			{
-				return SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>::EmitUnprotected(SIGNALS_ARGUMENT_PARAMETERS);
 			}
 	};
 };
