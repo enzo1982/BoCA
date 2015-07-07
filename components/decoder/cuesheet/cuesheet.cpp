@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -83,16 +83,16 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		 */
 		if (line.StartsWith("REM GENRE "))
 		{
-			if (line.Find("\"") >= 0) info.genre = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			  info.genre = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			if (line.Contains("\"")) info.genre = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 info.genre = line.Tail(line.Length() - line.FindLast(" ") - 1);
 		}
 
 		if (line.StartsWith("REM DATE ")) info.year = line.Tail(line.Length() - line.FindLast(" ") - 1).ToInt();
 
 		if (line.StartsWith("REM COMMENT "))
 		{
-			if (line.Find("\"") >= 0) info.comment = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			  info.comment = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			if (line.Contains("\"")) info.comment = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 info.comment = line.Tail(line.Length() - line.FindLast(" ") - 1);
 		}
 
 		/* Parse Replay Gain comments.
@@ -128,8 +128,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 				trackMode = False;
 			}
 
-			if (line.Find("\"") >= 0) iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
-			else			  iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1));
+			if (line.Contains("\"")) iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
+			else			 iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1));
 
 			iTrack.origFilename = File(iTrack.origFilename);
 
@@ -170,16 +170,16 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		 */
 		if (line.StartsWith("PERFORMER "))
 		{
-			if (line.Find("\"") >= 0) info.artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			  info.artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			if (line.Contains("\"")) info.artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 info.artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
 		}
 
 		if (line.StartsWith("SONGWRITER "))
 		{
 			String	 songwriter;
 
-			if (line.Find("\"") >= 0) songwriter = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			  songwriter = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			if (line.Contains("\"")) songwriter = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 songwriter = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
 			for (Int i = 0; i < info.other.Length(); i++)
 			{
@@ -193,8 +193,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			String	 title;
 
-			if (line.Find("\"") >= 0) title = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			  title = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			if (line.Contains("\"")) title = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 title = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
 			if (!trackMode && !dataMode) info.album = title;
 			else			     info.title = title;

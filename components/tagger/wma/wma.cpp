@@ -339,14 +339,14 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				{
 					info.track = value.ToInt();
 
-					if (value.Find("/") >= 0) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
+					if (value.Contains("/")) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 				}
 			}
 			else if (String(name) == g_wszWMPartOfSet)
 			{
 				info.disc = value.ToInt();
 
-				if (value.Find("/") >= 0) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
+				if (value.Contains("/")) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 			}
 			else if (String(name) == g_wszWMSharedUserRating)
 			{

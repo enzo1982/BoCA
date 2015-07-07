@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -332,7 +332,7 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 	result.Replace("\r", " ");
 	result.Replace("\t", " ");
 
-	while (result.Find("  ") >= 0) result.Replace("  ", " ");
+	while (result.Contains("  ")) result.Replace("  ", " ");
 
 	/* Breaks
 	 */
@@ -360,7 +360,7 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 	result.Replace("<p>", "\n");
 	result.Replace("</p>", "\n");
 
-	while ((offset = result.Find("<p ")) >= 0)
+	while ((offset = result.Contains("<p ")))
 	{
 		Int	 length = result.Tail(result.Length() - offset).Find(">");
 
@@ -375,7 +375,7 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 	result.Replace("<a>", NIL);
 	result.Replace("</a>", NIL);
 
-	while ((offset = result.Find("<a ")) >= 0)
+	while ((offset = result.Contains("<a ")))
 	{
 		Int	 length = result.Tail(result.Length() - offset).Find(">") + 1;
 
@@ -565,7 +565,7 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 
 	/* Unicode
 	 */
-	while ((offset = result.Find("&#")) >= 0)
+	while ((offset = result.Contains("&#")))
 	{
 		/* Entities
 		 */
@@ -579,7 +579,7 @@ String BoCA::VideoSite::ReplaceInnerHTML(const String &text)
 		result[result.Length() - length] = 0;
 	}
 
-	while ((offset = result.Find("\\u")) >= 0)
+	while ((offset = result.Contains("\\u")))
 	{
 		/* Escapes
 		 */

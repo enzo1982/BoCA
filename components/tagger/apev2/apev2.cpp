@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -286,13 +286,13 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		{
 			info.track = value.ToInt();
 
-			if (value.Find("/") >= 0) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
+			if (value.Contains("/")) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 		}
 		else if (id == "DISC")
 		{
 			info.disc = value.ToInt();
 
-			if (value.Find("/") >= 0) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
+			if (value.Contains("/")) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 		}
 		else if (id.StartsWith("REPLAYGAIN"))
 		{

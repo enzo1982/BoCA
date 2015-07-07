@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -457,7 +457,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			info.track = trackString.ToInt();
 
-			if (trackString.Find("/") >= 0) info.numTracks = trackString.Tail(trackString.Length() - trackString.Find("/") - 1).ToInt();
+			if (trackString.Contains("/")) info.numTracks = trackString.Tail(trackString.Length() - trackString.Find("/") - 1).ToInt();
 		}
 		else if (frame.GetID() == ID3FID_PARTINSET)
 		{
@@ -465,7 +465,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			info.disc = discString.ToInt();
 
-			if (discString.Find("/") >= 0) info.numDiscs = discString.Tail(discString.Length() - discString.Find("/") - 1).ToInt();
+			if (discString.Contains("/")) info.numDiscs = discString.Tail(discString.Length() - discString.Find("/") - 1).ToInt();
 		}
 		else if (frame.GetID() == ID3FID_POPULARIMETER)
 		{

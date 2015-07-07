@@ -191,9 +191,9 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 		if (memcmp(pictures.GetNth(i).data, picture.data, picture.data.Size()) == 0) return True;
 	}
 
-	if	(file.Find("front") >= 0) picture.type = 0x03; // Cover (front)
-	else if (file.Find("back")  >= 0) picture.type = 0x04; // Cover (back)
-	else if (file.Find("disc")  >= 0) picture.type = 0x06; // Media
+	if	(file.Contains("front")) picture.type = 0x03; // Cover (front)
+	else if (file.Contains("back"))	 picture.type = 0x04; // Cover (back)
+	else if (file.Contains("disc"))	 picture.type = 0x06; // Media
 
 	pictures.Add(picture);
 
