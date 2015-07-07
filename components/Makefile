@@ -10,6 +10,7 @@ all:
 	cd output && $(MAKE)
 	cd playlist && $(MAKE)
 	cd tagger && $(MAKE)
+	cd verifier && $(MAKE)
 
 clean:
 	cd decoder && $(MAKE) clean
@@ -21,6 +22,7 @@ clean:
 	cd output && $(MAKE) clean
 	cd playlist && $(MAKE) clean
 	cd tagger && $(MAKE) clean
+	cd verifier && $(MAKE) clean
 
 install:
 	cd decoder && $(MAKE) install
@@ -32,6 +34,7 @@ install:
 	cd output && $(MAKE) install
 	cd playlist && $(MAKE) install
 	cd tagger && $(MAKE) install
+	cd verifier && $(MAKE) install
 
 uninstall:
 	cd decoder && $(MAKE) uninstall
@@ -43,3 +46,4 @@ uninstall:
 	cd output && $(MAKE) uninstall
 	cd playlist && $(MAKE) uninstall
 	cd tagger && $(MAKE) uninstall
+	cd verifier && $(MAKE) uninstall
