@@ -36,6 +36,9 @@ namespace smooth
 
 		class SMOOTHAPI ListBox : public List
 		{
+			constants:
+				static const Int	 ScrollToTop	= -1;
+				static const Int	 ScrollToBottom	= -1;
 			private:
 				Scrollbar		*scrollbar;
 				Int			 scrollbarPos;
@@ -54,8 +57,10 @@ namespace smooth
 				virtual Int		 Paint(Int);
 
 				Int			 AddTab(const String &tabName, Int tabWidth = 0, Int tabOrientation = OR_LEFT)	{ return header->AddTab(tabName, tabWidth, tabOrientation); }
-
 				Int			 RemoveAllTabs()								{ return header->RemoveAllTabs(); }
+
+				Int			 ScrollUp(Int = ScrollToTop);
+				Int			 ScrollDown(Int = ScrollToBottom);
 
 				Int			 DragSelectedEntry(Bool);
 
