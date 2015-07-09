@@ -150,6 +150,7 @@
     <ClCompile Include="..\..\..\runtime\application\external\posix\encodercomponentstdio.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\..\runtime\application\verifiercomponent.cpp" />
     <ClCompile Include="..\..\..\runtime\common\config.cpp" />
     <ClCompile Include="..\..\..\runtime\common\configlayer.cpp" />
     <ClCompile Include="..\..\..\runtime\common\i18n.cpp" />
@@ -203,12 +204,17 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
+    <ClCompile Include="..\..\..\runtime\component\verifiercomponent.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
     <ClCompile Include="..\..\..\runtime\core\core.cpp" />
     <ClCompile Include="..\..\..\runtime\core\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\boca.h" />
     <ClInclude Include="..\..\..\include\boca\application\playlistcomponent.h" />
+    <ClInclude Include="..\..\..\include\boca\application\verifiercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\component.h" />
     <ClInclude Include="..\..\..\include\boca\component\decodercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\deviceinfocomponent.h" />
@@ -249,6 +255,7 @@
     <ClInclude Include="..\..\..\include\boca\application\external\encodercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\application\external\encodercomponentfile.h" />
     <ClInclude Include="..\..\..\include\boca\application\external\encodercomponentstdio.h" />
+    <ClInclude Include="..\..\..\include\boca\component\verifiercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\core\core.h" />
     <ClInclude Include="..\..\..\include\boca\core\definitions.h" />
   </ItemGroup>
