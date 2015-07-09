@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -260,7 +260,12 @@ Int BoCA::DecoderMPG123::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	inBytes += size;
 
-	ex_mpg123_decode(context, data, size, samples, samples.Size(), &samplesDone);
+	if (ex_mpg123_decode(context, data, size, samples, samples.Size(), &samplesDone) == MPG123_NEW_FORMAT)
+	{
+		/* Call mpg123_decode again after MPG123_NEW_FORMAT to get decoded data.
+		 */
+		ex_mpg123_decode(context, NIL, 0, samples, samples.Size(), &samplesDone);
+	}
 
 	data.Resize(0);
 
