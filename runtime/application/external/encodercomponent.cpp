@@ -83,6 +83,8 @@ Int BoCA::AS::EncoderComponentExternal::RenderTags(const String &streamURI, cons
 
 				if (tagger != NIL)
 				{
+					tagger->SetConfiguration(GetConfiguration());
+
 					foreach (TagSpec *spec, tagger->GetTagSpecs())
 					{
 						if (spec->GetName() != tagFormat.GetName()) continue;
