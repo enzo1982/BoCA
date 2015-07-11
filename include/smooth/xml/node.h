@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,6 +42,7 @@ namespace smooth
 				String				 content;
 			public:
 								 Node(const String &, const String & = NIL);
+								 Node(const Node &);
 								~Node();
 
 				Int				 GetNodeID() const;
@@ -53,7 +54,8 @@ namespace smooth
 				const String			&GetContent() const;
 				Int				 SetContent(const String &);
 
-/* Functions for attribute access */
+				/* Functions for attribute access.
+				 */
 				Int				 GetNOfAttributes() const;
 				Attribute			*GetNthAttribute(Int) const;
 				Attribute			*GetAttributeByName(const String &) const;
@@ -62,7 +64,8 @@ namespace smooth
 				Int				 RemoveAttribute(Attribute *);
 				Int				 RemoveAttributeByName(const String &);
 
-/* Functions for subnode access */
+				/* Functions for subnode access.
+				 */
 				Int				 GetNOfNodes() const;
 				Node				*GetNthNode(Int) const;
 				Node				*GetNodeByName(const String &) const;
