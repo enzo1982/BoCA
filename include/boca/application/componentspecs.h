@@ -278,6 +278,7 @@ namespace BoCA
 				bool			 (*func_GetErrorState)(const void *);
 				const void		*(*func_GetErrorString)(const void *);
 
+				const void		*(*func_GetConfiguration)(void *);
 				bool			 (*func_SetConfiguration)(void *, const void *);
 
 				bool			 (*func_CanOpenStream)(void *, const wchar_t *);

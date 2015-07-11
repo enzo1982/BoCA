@@ -50,6 +50,7 @@ namespace BoCA
 				virtual Bool			 GetErrorState() const;
 				virtual const String		&GetErrorString() const;
 
+				const Config			*GetConfiguration() const;
 				Bool				 SetConfiguration(const Config *);
 		};
 	};

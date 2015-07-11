@@ -210,6 +210,7 @@ using namespace smooth;
 		BOCA_EXPORT bool BoCA_##componentName##_GetErrorState(const void *component)						{ return ((const BoCA::componentName *) component)->GetErrorState(); }									\
 		BOCA_EXPORT const void *BoCA_##componentName##_GetErrorString(const void *component)					{ return &((const BoCA::componentName *) component)->GetErrorString(); }								\
 																																		\
+		BOCA_EXPORT const void *BoCA_##componentName##_GetConfiguration(void *component)					{ return ((BoCA::componentName *) component)->GetConfiguration(); }									\
 		BOCA_EXPORT bool BoCA_##componentName##_SetConfiguration(void *component, const void *configuration)			{ return ((BoCA::componentName *) component)->SetConfiguration((const BoCA::Config *) configuration); }					\
 	}
 

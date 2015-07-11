@@ -78,6 +78,11 @@ const String &BoCA::AS::Component::GetErrorString() const
 	return *((const String *) specs->func_GetErrorString(component));
 }
 
+const BoCA::Config *BoCA::AS::Component::GetConfiguration() const
+{
+	return (const Config *) specs->func_GetConfiguration(component);
+}
+
 Bool BoCA::AS::Component::SetConfiguration(const Config *configuration)
 {
 	return specs->func_SetConfiguration(component, configuration);
