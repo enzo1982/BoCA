@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,6 +12,8 @@
 
 BoCA::CS::Component::Component()
 {
+	configuration	= NIL;
+
 	errorState	= False;
 	errorString	= "Unknown error";
 }
@@ -23,4 +25,17 @@ BoCA::CS::Component::~Component()
 BoCA::ConfigLayer *BoCA::CS::Component::GetConfigurationLayer()
 {
 	return NIL;
+}
+
+const BoCA::Config *BoCA::CS::Component::GetConfiguration() const
+{
+	if (configuration != NIL) return configuration;
+	else			  return Config::Get();
+}
+
+Bool BoCA::CS::Component::SetConfiguration(const Config *nConfiguration)
+{
+	configuration = nConfiguration;
+
+	return True;
 }

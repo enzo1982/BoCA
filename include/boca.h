@@ -201,11 +201,16 @@ using namespace smooth;
 #define BoCA_END_COMPONENT(componentName)										 																			\
 	extern "C" {																																\
 		BOCA_EXPORT const char *BoCA_##componentName##_GetComponentSpecs()							{ return BoCA::componentName::GetComponentSpecs(); }											\
+																																		\
 		BOCA_EXPORT void *BoCA_##componentName##_Create()									{ return new BoCA::componentName(); }													\
 		BOCA_EXPORT bool BoCA_##componentName##_Delete(void *component)								{ delete ((BoCA::componentName *) component); return True; }										\
+																																		\
 		BOCA_EXPORT void *BoCA_##componentName##_GetConfigurationLayer(void *component)						{ return ((BoCA::componentName *) component)->GetConfigurationLayer(); }								\
+																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_GetErrorState(const void *component)						{ return ((const BoCA::componentName *) component)->GetErrorState(); }									\
 		BOCA_EXPORT const void *BoCA_##componentName##_GetErrorString(const void *component)					{ return &((const BoCA::componentName *) component)->GetErrorString(); }								\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_SetConfiguration(void *component, const void *configuration)			{ return ((BoCA::componentName *) component)->SetConfiguration((const BoCA::Config *) configuration); }					\
 	}
 
 #endif

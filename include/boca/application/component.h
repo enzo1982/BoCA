@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,6 +12,8 @@
 #define H_BOCA_AS_COMPONENT
 
 #include "componentspecs.h"
+
+#include "../common/config.h"
 #include "../common/configlayer.h"
 
 using namespace smooth::GUI;
@@ -47,6 +49,8 @@ namespace BoCA
 
 				virtual Bool			 GetErrorState() const;
 				virtual const String		&GetErrorString() const;
+
+				Bool				 SetConfiguration(const Config *);
 		};
 	};
 };

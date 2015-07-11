@@ -35,6 +35,8 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_GetErrorState		= NIL;
 	func_GetErrorString		= NIL;
 
+        func_SetConfiguration		= NIL;
+
 	func_CanOpenStream		= NIL;
 	func_CanVerifyTrack		= NIL;
 
@@ -152,6 +154,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_GetErrorState		= (bool (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorState"));
 	func_GetErrorString		= (const void *(*)(const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetErrorString"));
+
+	func_SetConfiguration		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetConfiguration"));
 
 	func_CanOpenStream		= (bool (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanOpenStream"));
 	func_CanVerifyTrack		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanVerifyTrack"));

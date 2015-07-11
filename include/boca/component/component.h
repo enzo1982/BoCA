@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,9 +11,8 @@
 #ifndef H_BOCA_COMPONENT
 #define H_BOCA_COMPONENT
 
-#include <smooth.h>
+#include "../common/config.h"
 #include "../common/configlayer.h"
-#include "../core/definitions.h"
 
 #ifdef CS
 #	undef CS
@@ -28,6 +27,8 @@ namespace BoCA
 	{
 		abstract class BOCA_DLL_EXPORT Component
 		{
+			private:
+				const Config		*configuration;
 			protected:
 				Bool			 errorState;
 				String			 errorString;
@@ -39,6 +40,9 @@ namespace BoCA
 
 				Bool			 GetErrorState() const	{ return errorState; }
 				const String		&GetErrorString() const	{ return errorString; }
+
+				const Config		*GetConfiguration() const;
+				Bool			 SetConfiguration(const Config *);
 		};
 	};
 };
