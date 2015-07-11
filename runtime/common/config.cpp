@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -10,7 +10,18 @@
 
 #include <boca/common/config.h>
 
-BoCA::Config *BoCA::Config::instance = NIL;
+namespace BoCA
+{
+	class ApplicationConfig : public Config
+	{
+		public:
+			 ApplicationConfig();
+			~ApplicationConfig();
+	};
+};
+
+BoCA::Config		*BoCA::Config::instance = NIL;
+Array<BoCA::Config *>	 BoCA::Config::copies;
 
 BoCA::Config::Config()
 {
@@ -18,31 +29,29 @@ BoCA::Config::Config()
 
 	saveSettingsOnExit = True;
 
-	String	 programsDir = S::System::System::GetProgramFilesDirectory();
+	config = NIL;
 
-	if (Application::GetApplicationDirectory().ToUpper().StartsWith(programsDir.ToUpper()))
+	persistentIntIDs.EnableLocking();
+	persistentIntValues.EnableLocking();
+}
+
+BoCA::Config::Config(const Config &iConfig)
+{
+	enable_console	   = iConfig.enable_console;
+
+	saveSettingsOnExit = False;
+
+	config = new Configuration(*iConfig.config);
+
+	for (Int i = 0; i < persistentIntIDs.Length(); i++)
 	{
-		configDir = S::System::System::GetApplicationDataDirectory();
+		const String &nthID = persistentIntIDs.GetNth(i);
 
-		if (configDir != NIL)
-		{
-#if defined __WIN32__ || defined __HAIKU__
-			configDir.Append("freac").Append(Directory::GetDirectoryDelimiter());
-#else
-			configDir.Append(".freac").Append(Directory::GetDirectoryDelimiter());
-#endif
-		}
+		String	 section = nthID.Head(nthID.Find("::"));
+		String	 name	 = nthID.Tail(nthID.Length() - nthID.Find("::") - 2);
 
-		Directory(configDir).Create();
+		config->SetIntValue(section, name, *persistentIntValues.GetNth(i));
 	}
-	else
-	{
-		configDir = Application::GetApplicationDirectory();
-	}
-
-	config = new Configuration(String(configDir).Append("boca").Append(Directory::GetDirectoryDelimiter()).Append("boca.xml"), True);
-
-	LoadSettings();
 
 	persistentIntIDs.EnableLocking();
 	persistentIntValues.EnableLocking();
@@ -52,7 +61,7 @@ BoCA::Config::~Config()
 {
 	if (saveSettingsOnExit) SaveSettings();
 
-	delete config;
+	if (config != NIL) delete config;
 
 	foreach (Int *value, persistentIntValues) delete value;
 
@@ -64,19 +73,47 @@ BoCA::Config *BoCA::Config::Get()
 {
 	if (instance == NIL)
 	{
-		instance = new Config();
+		instance = new ApplicationConfig();
 	}
 
 	return instance;
 }
 
-Void BoCA::Config::Free()
+BoCA::Config *BoCA::Config::Copy(const Config *config)
 {
-	if (instance != NIL)
+	Config	*copy = NIL;
+
+	if (config != NIL) copy = new Config(*config);
+	else		   copy = new Config(*Get());
+
+	copies.Add(copy);
+
+	return copy;
+}
+
+Void BoCA::Config::Free(Config *config)
+{
+	if (config != NIL)
+	{
+		for (Int i = 0; i < copies.Length(); i++)
+		{
+			if (copies.GetNth(i) == config)
+			{
+				copies.RemoveNth(i);
+
+				delete config;
+
+				break;
+			}
+		}
+	}
+	else if (instance != NIL)
 	{
 		delete instance;
 
 		instance = NIL;
+
+		foreach (Config *copy, copies) delete copy;
 	}
 }
 
@@ -99,7 +136,7 @@ Int BoCA::Config::SetStringValue(const String &section, const String &name, cons
 	return config->SetStringValue(section, name, value);
 }
 
-Int BoCA::Config::GetIntValue(const String &section, const String &name, Int defaultValue)
+Int BoCA::Config::GetIntValue(const String &section, const String &name, Int defaultValue) const
 {
 	Int	 index = FindPersistentIntValueIndex(section, name);
 
@@ -108,12 +145,12 @@ Int BoCA::Config::GetIntValue(const String &section, const String &name, Int def
 	return config->GetIntValue(section, name, defaultValue);
 }
 
-String BoCA::Config::GetStringValue(const String &section, const String &name, const String &defaultValue)
+String BoCA::Config::GetStringValue(const String &section, const String &name, const String &defaultValue) const
 {
 	return config->GetStringValue(section, name, defaultValue);
 }
 
-Int BoCA::Config::FindPersistentIntValueIndex(const String &section, const String &name)
+Int BoCA::Config::FindPersistentIntValueIndex(const String &section, const String &name) const
 {
 	String	 id = String(section).Append("::").Append(name);
 
@@ -228,4 +265,37 @@ String BoCA::Config::GetConfigurationName() const
 Int BoCA::Config::SetConfigurationName(const String &nConfig)
 {
 	return config->SetConfigurationName(String("BoCA::").Append(nConfig));
+}
+
+BoCA::ApplicationConfig::ApplicationConfig()
+{
+	String	 programsDir = S::System::System::GetProgramFilesDirectory();
+
+	if (Application::GetApplicationDirectory().ToUpper().StartsWith(programsDir.ToUpper()))
+	{
+		configDir = S::System::System::GetApplicationDataDirectory();
+
+		if (configDir != NIL)
+		{
+#if defined __WIN32__ || defined __HAIKU__
+			configDir.Append("freac").Append(Directory::GetDirectoryDelimiter());
+#else
+			configDir.Append(".freac").Append(Directory::GetDirectoryDelimiter());
+#endif
+		}
+
+		Directory(configDir).Create();
+	}
+	else
+	{
+		configDir = Application::GetApplicationDirectory();
+	}
+
+	config = new Configuration(String(configDir).Append("boca").Append(Directory::GetDirectoryDelimiter()).Append("boca.xml"), True);
+
+	LoadSettings();
+}
+
+BoCA::ApplicationConfig::~ApplicationConfig()
+{
 }
