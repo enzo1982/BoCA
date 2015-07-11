@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -87,15 +87,16 @@ namespace BoCA
 
 BoCA::EncoderOpus::EncoderOpus()
 {
-	configLayer  = NIL;
+	configLayer	= NIL;
 
-	encoder	     = NIL;
-	resampler    = NIL;
+	encoder		= NIL;
+	resampler	= NIL;
+	resamplerConfig	= NIL;
 
-	frameSize    = 0;
+	frameSize	= 0;
 
-	numPackets   = 0;
-	totalSamples = 0;
+	numPackets	= 0;
+	totalSamples	= 0;
 
 	memset(&os, 0, sizeof(os));
 	memset(&og, 0, sizeof(og));
@@ -109,7 +110,7 @@ BoCA::EncoderOpus::~EncoderOpus()
 
 Bool BoCA::EncoderOpus::Activate()
 {
-	Config		*config = Config::Get();
+	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 	Info		 info = track.GetInfo();
 
@@ -135,14 +136,12 @@ Bool BoCA::EncoderOpus::Activate()
 		return False;
 	}
 
-	Int	 prevSampleRate = config->GetIntValue("Resample", "Samplerate", 44100);
+	resamplerConfig = Config::Copy(config);
+	resamplerConfig->SetIntValue("Resample", "Samplerate", 48000);
 
-	config->SetIntValue("Resample", "Samplerate", 48000);
-
+	resampler->SetConfiguration(resamplerConfig);
 	resampler->SetAudioTrackInfo(track);
 	resampler->Activate();
-
-	config->SetIntValue("Resample", "Samplerate", prevSampleRate);
 
 	if (resampler->GetErrorState() == True)
 	{
@@ -232,6 +231,7 @@ Bool BoCA::EncoderOpus::Activate()
 		{
 			const char	*opusVersion = ex_opus_get_version_string();
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->SetVendorString(String(opusVersion).Append("\n"));
 
 			if (((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
@@ -303,6 +303,8 @@ Bool BoCA::EncoderOpus::Deactivate()
 	AS::Registry	&boca = AS::Registry::Get();
 
 	boca.DeleteComponent(resampler);
+
+	Config::Free(resamplerConfig);
 
 	return True;
 }
@@ -405,7 +407,7 @@ Int BoCA::EncoderOpus::WriteOggPackets(Bool flush)
 
 Bool BoCA::EncoderOpus::FixChapterMarks()
 {
-	if (track.tracks.Length() == 0 || !BoCA::Config::Get()->GetIntValue("Tags", "WriteChapters", True)) return True;
+	if (track.tracks.Length() == 0 || !GetConfiguration()->GetIntValue("Tags", "WriteChapters", True)) return True;
 
 	driver->Seek(0);
 
@@ -493,7 +495,7 @@ Bool BoCA::EncoderOpus::FixChapterMarks()
 
 String BoCA::EncoderOpus::GetOutputFileExtension() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	switch (config->GetIntValue("Opus", "FileExtension", 0))
 	{

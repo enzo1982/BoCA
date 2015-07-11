@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -64,7 +64,7 @@ BoCA::EncoderBonk::~EncoderBonk()
 
 Bool BoCA::EncoderBonk::IsLossless() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	return config->GetIntValue("Bonk", "Lossless", 0);
 }
@@ -82,7 +82,7 @@ Bool BoCA::EncoderBonk::Activate()
 		return False;
 	}
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	packageSize = int(1024.0 * format.rate / 44100) * format.channels * (config->GetIntValue("Bonk", "Lossless", 0) ? 1 : config->GetIntValue("Bonk", "Downsampling", 2)) * (format.bits / 8);
 
@@ -102,6 +102,7 @@ Bool BoCA::EncoderBonk::Activate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(id3Buffer, track);
 
 			ex_bonk_encoder_set_id3_data(encoder, id3Buffer, id3Buffer.Size());
@@ -126,7 +127,7 @@ Bool BoCA::EncoderBonk::Deactivate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	Int	 bytes = ex_bonk_encoder_finish(encoder, dataBuffer, dataBuffer.Size());
 
@@ -162,6 +163,7 @@ Bool BoCA::EncoderBonk::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->Seek(2);

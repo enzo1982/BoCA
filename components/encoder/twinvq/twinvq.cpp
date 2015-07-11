@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -75,7 +75,7 @@ BoCA::EncoderTwinVQ::~EncoderTwinVQ()
 
 Bool BoCA::EncoderTwinVQ::Activate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	const Format	&format = track.GetFormat();
 	const Info	&info = track.GetInfo();
@@ -126,7 +126,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 
 	if (info.artist != NIL || info.title != NIL)
 	{
-		Config	*currentConfig = Config::Get();
+		const Config	*currentConfig = GetConfiguration();
 
 		if	(info.artist != NIL) strncpy(setupInfo.Auth, info.artist, Math::Min(info.artist.Length() + 1, sizeof(setupInfo.Auth)));
 		if	(info.title  != NIL) strncpy(setupInfo.Name, info.title,  Math::Min(info.title.Length() + 1,  sizeof(setupInfo.Name)));

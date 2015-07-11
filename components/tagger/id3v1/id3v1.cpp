@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -83,7 +83,7 @@ BoCA::TaggerID3v1::~TaggerID3v1()
 
 Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	Config		*currentConfig = Config::Get();
+	const Config	*currentConfig = GetConfiguration();
 
 	buffer.Resize(128);
 

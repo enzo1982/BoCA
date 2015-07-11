@@ -53,7 +53,7 @@ BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()
 
 Int BoCA::AS::EncoderComponentExternal::RenderTags(const String &streamURI, const Track &track, Buffer<UnsignedByte> &tagBufferPrepend, Buffer<UnsignedByte> &tagBufferAppend)
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Only render tags if at least artist and title are set.
 	 */

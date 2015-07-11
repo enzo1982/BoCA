@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -92,7 +92,7 @@ Int BoCA::EncoderWMA::GetNumberOfPasses() const
 
 Bool BoCA::EncoderWMA::IsLossless() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (config->GetIntValue("WMA", "Uncompressed", False)) return True;
 
@@ -133,7 +133,7 @@ Bool BoCA::EncoderWMA::IsLossless() const
 
 Bool BoCA::EncoderWMA::Activate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	HRESULT	 hr = ex_WMCreateWriter(NIL, &m_pWriter);
 
@@ -222,7 +222,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 		return True;
 	}
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	HRESULT	 hr = m_pWriter->EndWriting();
 
@@ -259,6 +259,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 
 			if (tagger != NIL)
 			{
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
 
 				boca.DeleteComponent(tagger);
@@ -368,7 +369,7 @@ Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo) const
  */
 IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWORD codecIndex, const Format &format) const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	HRESULT		 hr = S_OK;
 

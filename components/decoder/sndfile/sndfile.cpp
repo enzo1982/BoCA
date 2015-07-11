@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -252,6 +252,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (cartTagger != NIL)
 		{
+			cartTagger->SetConfiguration(GetConfiguration());
 			cartTagger->ParseStreamInfo(streamURI, track);
 
 			boca.DeleteComponent(cartTagger);
@@ -263,6 +264,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (riffTagger != NIL)
 		{
+			riffTagger->SetConfiguration(GetConfiguration());
 			riffTagger->ParseStreamInfo(streamURI, track);
 
 			boca.DeleteComponent(riffTagger);
@@ -274,6 +276,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (tocTagger != NIL)
 		{
+			tocTagger->SetConfiguration(GetConfiguration());
 			tocTagger->ParseStreamInfo(streamURI, track);
 
 			boca.DeleteComponent(tocTagger);
@@ -309,6 +312,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 					if (tagger != NIL)
 					{
+						tagger->SetConfiguration(GetConfiguration());
 						tagger->ParseBuffer(buffer, track);
 
 						boca.DeleteComponent(tagger);

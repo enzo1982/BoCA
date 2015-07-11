@@ -72,7 +72,7 @@ BoCA::TaggerWMA::~TaggerWMA()
 
 Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &track)
 {
-	Config			*currentConfig = Config::Get();
+	const Config		*currentConfig = GetConfiguration();
 
 	IWMMetadataEditor	*metadataEditor = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
@@ -253,7 +253,7 @@ Error BoCA::TaggerWMA::RenderWMABinaryItem(const String &id, const Buffer<Unsign
 
 Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 {
-	Config			*currentConfig = Config::Get();
+	const Config		*currentConfig = GetConfiguration();
 
 	IWMMetadataEditor	*metadataEditor = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;

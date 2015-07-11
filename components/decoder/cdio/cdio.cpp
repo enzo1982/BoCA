@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -205,7 +205,7 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Read ISRC if requested.
 	 */
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (config->GetIntValue("Ripper", "ReadISRC", 0))
 	{
@@ -283,7 +283,7 @@ Bool BoCA::DecoderCDIO::Activate()
 
 	/* Set ripping speed.
 	 */
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	Int	 speed = config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 
@@ -331,12 +331,11 @@ Bool BoCA::DecoderCDIO::Deactivate()
 {
 	if (cd == NIL) return False;
 
-	Config	*config = Config::Get();
-
 	/* Check for drive cache errors.
 	 */
 	if (numCacheErrors > 0)
 	{
+		Config	*config		= Config::Get();
 		Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
 
 		if (!noCacheWarning)
@@ -369,7 +368,7 @@ Bool BoCA::DecoderCDIO::Deactivate()
 
 Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	Int	 startSector = 0;
 	Int	 endSector   = 0;

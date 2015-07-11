@@ -116,6 +116,8 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (tagger != NIL)
 		{
+			tagger->SetConfiguration(GetConfiguration());
+
 			if (tagger->ParseStreamInfo(streamURI, track) == Success()) foundTag = True;
 
 			boca.DeleteComponent(tagger);
@@ -127,6 +129,7 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 
 			if (tagger != NIL)
 			{
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->ParseStreamInfo(streamURI, track);
 
 				boca.DeleteComponent(tagger);

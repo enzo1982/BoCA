@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -431,6 +431,7 @@ FLAC__bool BoCA::FLACStreamDecoderEofCallback(const FLAC__StreamDecoder *decoder
 void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
 {
 	DecoderFLAC	*filter = (DecoderFLAC *) client_data;
+	const Config	*config = filter->GetConfiguration();
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO)
 	{
@@ -469,13 +470,14 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 
 			if (tagger != NIL)
 			{
+				tagger->SetConfiguration(filter->GetConfiguration());
 				tagger->ParseBuffer(vcBuffer, *filter->infoTrack);
 
 				boca.DeleteComponent(tagger);
 			}
 		}
 	}
-	else if (metadata->type == FLAC__METADATA_TYPE_PICTURE && Config::Get()->GetIntValue("Tags", "CoverArtReadFromTags", True))
+	else if (metadata->type == FLAC__METADATA_TYPE_PICTURE && config->GetIntValue("Tags", "CoverArtReadFromTags", True))
 	{
 		Picture	 picture;
 

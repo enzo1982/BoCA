@@ -54,7 +54,7 @@ BoCA::TaggerAPEv2::~TaggerAPEv2()
 
 Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	Config		*currentConfig = Config::Get();
+	const Config	*currentConfig = GetConfiguration();
 	String		 prevOutFormat = String::SetOutputFormat("UTF-8");
 
 	const Info	&info = track.GetInfo();
@@ -240,7 +240,7 @@ Int BoCA::TaggerAPEv2::RenderAPEBinaryItem(const String &id, const Buffer<Unsign
 
 Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track)
 {
-	Config		*currentConfig = Config::Get();
+	const Config	*currentConfig = GetConfiguration();
 
 	Int		 numItems = 0;
 	Int		 offset = 32;

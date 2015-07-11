@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -49,7 +49,7 @@ BoCA::TaggerVorbis::~TaggerVorbis()
 
 Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	Config		*currentConfig = Config::Get();
+	const Config	*currentConfig = GetConfiguration();
 	String		 prevOutFormat = String::SetOutputFormat("UTF-8");
 
 	const Info	&info = track.GetInfo();
@@ -217,7 +217,7 @@ Int BoCA::TaggerVorbis::RenderTagItem(const String &id, const String &value, Buf
 
 Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &track)
 {
-	Config		*currentConfig = Config::Get();
+	const Config	*currentConfig = GetConfiguration();
 
 	InStream	 in(STREAM_BUFFER, buffer, buffer.Size());
 

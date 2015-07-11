@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -124,7 +124,7 @@ Bool BoCA::EncoderVOAAC::Activate()
 		return False;
 	}
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	unsigned long	 samplesSize = 1024 * format.channels;
 	unsigned long	 bufferSize  = samplesSize * 4;
@@ -184,6 +184,7 @@ Bool BoCA::EncoderVOAAC::Activate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -198,7 +199,7 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 Bool BoCA::EncoderVOAAC::Deactivate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Output remaining samples to encoder.
 	 */
@@ -253,6 +254,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 				if (tagger != NIL)
 				{
+					tagger->SetConfiguration(GetConfiguration());
 					tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
 
 					boca.DeleteComponent(tagger);
@@ -295,6 +297,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -317,6 +320,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->Seek(0);
@@ -359,7 +363,7 @@ Int BoCA::EncoderVOAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 Int BoCA::EncoderVOAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<unsigned char> &outBuffer, Bool flush)
 {
-	Config		*config = Config::Get();
+	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
 	/* Pad end of stream with empty samples.
@@ -435,7 +439,7 @@ Int BoCA::EncoderVOAAC::GetSampleRateIndex(Int sampleRate) const
 
 String BoCA::EncoderVOAAC::GetOutputFileExtension() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (config->GetIntValue("VOAACEnc", "MP4Container", 1))
 	{

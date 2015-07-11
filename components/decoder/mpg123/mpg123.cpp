@@ -147,6 +147,8 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (tagger != NIL)
 		{
+			tagger->SetConfiguration(GetConfiguration());
+
 			if (tagger->ParseStreamInfo(streamURI, track) == Success()) foundTag = True;
 
 			boca.DeleteComponent(tagger);
@@ -158,6 +160,7 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 
 			if (tagger != NIL)
 			{
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->ParseStreamInfo(streamURI, track);
 
 				boca.DeleteComponent(tagger);
@@ -208,7 +211,7 @@ Bool BoCA::DecoderMPG123::Activate()
 
 	context = ex_mpg123_new(NIL, NIL);
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	String	 selectedDecoder = config->GetStringValue("mpg123", "Decoder", NIL);
 

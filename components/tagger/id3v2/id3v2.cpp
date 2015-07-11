@@ -210,7 +210,7 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 
 Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &track, Bool isChapter)
 {
-	Config		*currentConfig = Config::Get();
+	const Config	*currentConfig = GetConfiguration();
 
 	const Info	&info = track.GetInfo();
 
@@ -331,13 +331,18 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 			 */
 			if (picInfo.description != NIL)
 			{
-				String	 encoding = currentConfig->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
+				Config	*singleByteConfig = Config::Copy(currentConfig);
+				String	 encoding	  = singleByteConfig->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
 
-				if (encoding != "UTF-8" && !String::IsUnicode(picInfo.description)) currentConfig->SetStringValue("Tags", "ID3v2Encoding", "ISO-8859-1");
+				if (encoding != "UTF-8" && !String::IsUnicode(picInfo.description)) singleByteConfig->SetStringValue("Tags", "ID3v2Encoding", "ISO-8859-1");
+
+				SetConfiguration(singleByteConfig);
 
 				SetStringField(frame_picture, ID3FN_DESCRIPTION, picInfo.description);
 
-				currentConfig->SetStringValue("Tags", "ID3v2Encoding", encoding);
+				SetConfiguration(currentConfig);
+
+				Config::Free(singleByteConfig);
 			}
 
 			/* Set picture data.
@@ -403,7 +408,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &track)
 {
-	Config	*currentConfig = Config::Get();
+	const Config	*currentConfig = GetConfiguration();
 
 	Info	 info = track.GetInfo();
 
@@ -683,8 +688,10 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 {
 	if (string == NIL) return Error();
 
+	const Config	*config = GetConfiguration();
+
 	ID3_TextEnc	 encoding   = ID3TE_NONE;
-	String		 encodingID = Config::Get()->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
+	String		 encodingID = config->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
 
 	if	(encodingID == "UTF-8")				      encoding = ID3TE_UTF8;
 	else if (encodingID == "ISO-8859-1")			      encoding = ID3TE_ISO8859_1;

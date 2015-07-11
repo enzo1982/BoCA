@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -113,7 +113,7 @@ Bool BoCA::EncoderFLAC::Activate()
 		return False;
 	}
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	srand(clock());
 
@@ -128,25 +128,26 @@ Bool BoCA::EncoderFLAC::Activate()
 
 		metadata.Add(vorbiscomment);
 
-		/* Disable writing cover art to Vorbis comment tags for FLAC files.
-		 */
-		Bool	 writeVorbisCoverArt = config->GetIntValue("Tags", "CoverArtWriteToVorbisComment", False);
-
-		if (writeVorbisCoverArt) config->SetIntValue("Tags", "CoverArtWriteToVorbisComment", False);
-
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("vorbis-tag");
 
 		if (tagger != NIL)
 		{
+			/* Disable writing cover art to Vorbis comment tags for FLAC files.
+			 */
+			Config	*taggerConfig = Config::Copy(config);
+
+			taggerConfig->SetIntValue("Tags", "CoverArtWriteToVorbisComment", False);
+
+			tagger->SetConfiguration(taggerConfig);
 			tagger->SetVendorString(*ex_FLAC__VENDOR_STRING);
 
 			tagger->RenderBuffer(vcBuffer, track);
 
 			boca.DeleteComponent(tagger);
-		}
 
-		if (writeVorbisCoverArt) config->SetIntValue("Tags", "CoverArtWriteToVorbisComment", True);
+			Config::Free(taggerConfig);
+		}
 
 		/* Process output comment tag and add it to FLAC metadata.
 		 */
@@ -307,9 +308,9 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 Bool BoCA::EncoderFLAC::FixChapterMarks()
 {
-	if (track.tracks.Length() == 0 || !BoCA::Config::Get()->GetIntValue("Tags", "WriteChapters", True)) return True;
+	if (track.tracks.Length() == 0 || !GetConfiguration()->GetIntValue("Tags", "WriteChapters", True)) return True;
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Fill buffer with Vorbis Comment block.
 	 */
@@ -429,7 +430,7 @@ Bool BoCA::EncoderFLAC::FixChapterMarks()
 
 String BoCA::EncoderFLAC::GetOutputFileExtension() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	switch (config->GetIntValue("FLAC", "FileFormat", 0))
 	{

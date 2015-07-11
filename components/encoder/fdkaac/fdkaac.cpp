@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -120,7 +120,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 		return False;
 	}
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	ex_aacEncOpen(&handle, 0x07, format.channels);
 
@@ -180,6 +180,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -194,7 +195,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 Bool BoCA::EncoderFDKAAC::Deactivate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Output remaining samples to encoder.
 	 */
@@ -249,6 +250,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 				if (tagger != NIL)
 				{
+					tagger->SetConfiguration(GetConfiguration());
 					tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
 
 					boca.DeleteComponent(tagger);
@@ -291,6 +293,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -313,6 +316,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->Seek(0);
@@ -355,7 +359,7 @@ Int BoCA::EncoderFDKAAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 Int BoCA::EncoderFDKAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<unsigned char> &outBuffer, Bool flush)
 {
-	Config		*config = Config::Get();
+	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
 	/* Pad end of stream with empty samples.
@@ -451,7 +455,7 @@ Int BoCA::EncoderFDKAAC::GetSampleRateIndex(Int sampleRate) const
 
 String BoCA::EncoderFDKAAC::GetOutputFileExtension() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (config->GetIntValue("FDKAAC", "MP4Container", 1))
 	{

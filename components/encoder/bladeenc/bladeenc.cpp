@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -87,7 +87,7 @@ Bool BoCA::EncoderBlade::Activate()
 		return False;
 	}
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	beConfig.dwConfig			= BE_CONFIG_MP3;
 	beConfig.format.mp3.dwSampleRate	= format.rate;
@@ -130,6 +130,7 @@ Bool BoCA::EncoderBlade::Activate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -143,7 +144,7 @@ Bool BoCA::EncoderBlade::Activate()
 
 Bool BoCA::EncoderBlade::Deactivate()
 {
-	Config		*config = Config::Get();
+	const Config	*config = GetConfiguration();
 	const Info	&info = track.GetInfo();
 
 	unsigned long	 bytes = 0;
@@ -165,6 +166,7 @@ Bool BoCA::EncoderBlade::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -184,6 +186,7 @@ Bool BoCA::EncoderBlade::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->Seek(0);

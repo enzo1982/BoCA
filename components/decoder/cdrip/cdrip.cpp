@@ -79,7 +79,7 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (component == NIL) return Error();
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	track.isCDTrack	= True;
 
@@ -276,7 +276,7 @@ BoCA::DecoderCDRip::~DecoderCDRip()
 
 Bool BoCA::DecoderCDRip::Activate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (lastRead.Length() == 0) for (Int i = 0; i < ex_CR_GetNumCDROM(); i++) lastRead.Add(0);
 
@@ -336,12 +336,13 @@ Bool BoCA::DecoderCDRip::Activate()
 
 Bool BoCA::DecoderCDRip::Deactivate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Check for drive cache errors.
 	 */
 	if (ex_CR_GetNumberOfCacheErrors(cd) > 0)
 	{
+		Config	*config		= Config::Get();
 		Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
 
 		if (!noCacheWarning)
@@ -374,7 +375,7 @@ Bool BoCA::DecoderCDRip::Deactivate()
 
 Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	ex_CR_CloseRipper(cd);
 

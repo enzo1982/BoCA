@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -100,7 +100,7 @@ BoCA::EncoderCoreAudio::~EncoderCoreAudio()
 
 Bool BoCA::EncoderCoreAudio::IsLossless() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'alac') return True;
 
@@ -121,7 +121,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 		return False;
 	}
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Fill out source format description.
 	 */
@@ -249,6 +249,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -263,7 +264,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 Bool BoCA::EncoderCoreAudio::Deactivate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Convert final frames.
 	 */
@@ -342,6 +343,7 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 			if (tagger != NIL)
 			{
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
 
 				boca.DeleteComponent(tagger);
@@ -383,6 +385,7 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -405,6 +408,7 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->Seek(0);
@@ -459,7 +463,7 @@ Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 Int BoCA::EncoderCoreAudio::GetOutputSampleRate(Int inputRate) const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Get supported sample rate ranges for selected codec.
 	 */
@@ -503,7 +507,7 @@ Int BoCA::EncoderCoreAudio::GetOutputSampleRate(Int inputRate) const
 
 String BoCA::EncoderCoreAudio::GetOutputFileExtension() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (config->GetIntValue("CoreAudio", "MP4Container", 1))
 	{

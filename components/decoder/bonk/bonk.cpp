@@ -106,6 +106,7 @@ Error BoCA::DecoderBonk::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (tagger != NIL)
 		{
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->ParseBuffer(buffer, track);
 
 			boca.DeleteComponent(tagger);

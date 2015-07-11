@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -121,7 +121,7 @@ Bool BoCA::EncoderCoreAudioConnect::IsReady() const
 
 Bool BoCA::EncoderCoreAudioConnect::IsLossless() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'alac') return True;
 
@@ -140,7 +140,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 		return False;
 	}
 
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Send Setup command.
 	 */
@@ -179,6 +179,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -193,7 +194,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 
 Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	/* Send Finish command.
 	 */
@@ -218,6 +219,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 			if (tagger != NIL)
 			{
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
 
 				boca.DeleteComponent(tagger);
@@ -259,6 +261,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -281,6 +284,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->Seek(0);
@@ -311,7 +315,7 @@ Int BoCA::EncoderCoreAudioConnect::WriteData(Buffer<UnsignedByte> &data, Int siz
 
 String BoCA::EncoderCoreAudioConnect::GetOutputFileExtension() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	if (config->GetIntValue("CoreAudio", "MP4Container", 1))
 	{

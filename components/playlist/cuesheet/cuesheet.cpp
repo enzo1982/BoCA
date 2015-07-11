@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -41,8 +41,8 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 {
 	if (trackList.Length() == 0) return Error();
 
-	BoCA::Config	*config = BoCA::Config::Get();
-	BoCA::I18n	*i18n	= BoCA::I18n::Get();
+	const Config	*config = GetConfiguration();
+	I18n		*i18n	= I18n::Get();
 
 	/* Create cue sheet file.
 	 */

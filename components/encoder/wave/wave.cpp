@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -85,7 +85,7 @@ Bool BoCA::EncoderWave::Deactivate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	Config		*config = Config::Get();
+	const Config	*config = GetConfiguration();
 	const Info	&info = track.GetInfo();
 
 	/* Write data size to header.
@@ -110,6 +110,7 @@ Bool BoCA::EncoderWave::Deactivate()
 		{
 			Buffer<unsigned char>	 tagBuffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(tagBuffer, track);
 
 			driver->WriteData(tagBuffer, tagBuffer.Size());
@@ -129,6 +130,7 @@ Bool BoCA::EncoderWave::Deactivate()
 		{
 			Buffer<unsigned char>	 tagBuffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(tagBuffer, track);
 
 			driver->WriteData(tagBuffer, tagBuffer.Size());

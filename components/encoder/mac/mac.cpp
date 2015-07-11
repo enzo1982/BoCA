@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -70,6 +70,8 @@ BoCA::EncoderMAC::~EncoderMAC()
 
 Bool BoCA::EncoderMAC::Activate()
 {
+	const Config	*config = GetConfiguration();
+
 	int	 nRetVal = 0;
 
 	const Format	&format = track.GetFormat();
@@ -90,13 +92,15 @@ Bool BoCA::EncoderMAC::Activate()
 	waveFormat.wBitsPerSample	= format.bits;
 	waveFormat.cbSize		= 0;
 
-	ex_APECompress_Start(hAPECompress, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (Config::Get()->GetIntValue("MAC", "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
+	ex_APECompress_Start(hAPECompress, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (config->GetIntValue("MAC", "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
 
 	return True;
 }
 
 Bool BoCA::EncoderMAC::Deactivate()
 {
+	const Config	*config = GetConfiguration();
+
 	/* Finish encoding and destroy the encoder.
 	 */
 	ex_APECompress_Finish(hAPECompress, NIL, 0, 0);
@@ -122,7 +126,7 @@ Bool BoCA::EncoderMAC::Deactivate()
 
 	const Info	&info = track.GetInfo();
 
-	if ((info.artist != NIL || info.title != NIL) && Config::Get()->GetIntValue("Tags", "EnableAPEv2", True))
+	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableAPEv2", True))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("apev2-tag");
@@ -131,6 +135,7 @@ Bool BoCA::EncoderMAC::Deactivate()
 		{
 			Buffer<unsigned char>	 tagBuffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(tagBuffer, track);
 
 			driver->WriteData(tagBuffer, tagBuffer.Size());

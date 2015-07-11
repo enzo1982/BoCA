@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -68,7 +68,7 @@ BoCA::EncoderLAME::~EncoderLAME()
 
 Bool BoCA::EncoderLAME::Activate()
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	int	 effrate;
 
@@ -290,6 +290,7 @@ Bool BoCA::EncoderLAME::Activate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -307,7 +308,7 @@ Bool BoCA::EncoderLAME::Activate()
 
 Bool BoCA::EncoderLAME::Deactivate()
 {
-	Config		*config = Config::Get();
+	const Config	*config = GetConfiguration();
 	const Info	&info = track.GetInfo();
 
 	/* Flush buffers and write remaining data.
@@ -332,6 +333,7 @@ Bool BoCA::EncoderLAME::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -351,6 +353,7 @@ Bool BoCA::EncoderLAME::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->Seek(0);

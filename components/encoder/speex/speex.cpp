@@ -82,7 +82,7 @@ BoCA::EncoderSpeex::~EncoderSpeex()
 
 Bool BoCA::EncoderSpeex::Activate()
 {
-	Config		*config = Config::Get();
+	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 	const Info	&info = track.GetInfo();
 
@@ -190,6 +190,7 @@ Bool BoCA::EncoderSpeex::Activate()
 
 		if (tagger != NIL)
 		{
+			tagger->SetConfiguration(GetConfiguration());
 			tagger->SetVendorString(String("Encoded with Speex ").Append(speexVersion));
 
 			if (((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
@@ -344,7 +345,7 @@ Int BoCA::EncoderSpeex::WriteOggPackets(Bool flush)
 
 Bool BoCA::EncoderSpeex::FixChapterMarks()
 {
-	if (track.tracks.Length() == 0 || !BoCA::Config::Get()->GetIntValue("Tags", "WriteChapters", True)) return True;
+	if (track.tracks.Length() == 0 || !GetConfiguration()->GetIntValue("Tags", "WriteChapters", True)) return True;
 
 	driver->Seek(0);
 

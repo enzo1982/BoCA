@@ -130,7 +130,7 @@ BoCA::EncoderSndFile::~EncoderSndFile()
 
 Bool BoCA::EncoderSndFile::Activate()
 {
-	Config		*config = Config::Get();
+	const Config		*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
 	/* Open output file.
@@ -245,7 +245,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 
 	/* Write metadata.
 	 */
-	Config		*config = Config::Get();
+	const Config	*config = GetConfiguration();
 	const Info	&info	= track.GetInfo();
 
 #ifdef __APPLE__
@@ -267,6 +267,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 			{
 				Buffer<unsigned char>	 tagBuffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(tagBuffer, track);
 
 				driver->WriteData(tagBuffer, tagBuffer.Size());
@@ -286,6 +287,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 			{
 				Buffer<unsigned char>	 tagBuffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(tagBuffer, track);
 
 				driver->WriteData(tagBuffer, tagBuffer.Size());
@@ -330,6 +332,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 			{
 				Buffer<unsigned char>	 tagBuffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(tagBuffer, track);
 
 				unsigned char	 guid[16] = { 'l', 'i', 's', 't', 0x2F, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB, 0x04, 0xC1, 0x00, 0x00 };
@@ -373,6 +376,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
+				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData((unsigned char *) "ID3 ", 4);
@@ -476,7 +480,7 @@ Int BoCA::EncoderSndFile::SelectBestSubFormat(const Format &format, Int fileForm
 
 String BoCA::EncoderSndFile::GetOutputFileExtension() const
 {
-	Config	*config = Config::Get();
+	const Config	*config = GetConfiguration();
 
 	SF_FORMAT_INFO	 format_info;
 

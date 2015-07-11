@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -60,7 +60,9 @@ BoCA::OutputWinamp::~OutputWinamp()
 
 Bool BoCA::OutputWinamp::Activate()
 {
-	plugin = winamp_out_modules.GetNth(Config::Get()->GetIntValue("WinampOut", "OutputPlugin", 0));
+	const Config	*config = GetConfiguration();
+
+	plugin = winamp_out_modules.GetNth(config->GetIntValue("WinampOut", "OutputPlugin", 0));
 
 	return (plugin->Open(track.GetFormat().rate, track.GetFormat().channels, track.GetFormat().bits, 0, 0) >= 0);
 }

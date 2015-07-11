@@ -218,6 +218,8 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 			if (tagger != NIL)
 			{
+				tagger->SetConfiguration(GetConfiguration());
+
 				if (String::IsUnicode(streamURI)) tagger->ParseStreamInfo(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"), track);
 				else				  tagger->ParseStreamInfo(streamURI, track);
 
@@ -310,6 +312,8 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 			if (tagger != NIL)
 			{
+				tagger->SetConfiguration(GetConfiguration());
+
 				if (tagger->ParseStreamInfo(streamURI, track) == Success()) foundTag = True;
 
 				boca.DeleteComponent(tagger);
@@ -321,6 +325,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 				if (tagger != NIL)
 				{
+					tagger->SetConfiguration(GetConfiguration());
 					tagger->ParseStreamInfo(streamURI, track);
 
 					boca.DeleteComponent(tagger);
