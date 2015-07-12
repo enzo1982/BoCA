@@ -16,11 +16,13 @@
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
+    <md5 stream="stderr" prefix="MD5=">-v 40 -i %INFILE</md5>
   </external>
   <external>
     <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
+    <md5 stream="stderr" prefix="MD5=">-v 40 -i %INFILE</md5>
   </external>
 </component>
