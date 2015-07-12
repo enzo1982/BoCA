@@ -17,5 +17,6 @@
     <arguments>-d %OPTIONS %INFILE -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
+    <md5 prefix="MD5:">-fi %INFILE</md5>
   </external>
 </component>

@@ -16,5 +16,6 @@
     <arguments>%OPTIONS %INFILE -o -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
+    <md5 require="lossless" prefix="original md5:">-s %INFILE</md5>
   </external>
 </component>
