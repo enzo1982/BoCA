@@ -327,7 +327,7 @@ namespace BoCA
 
 				int			 (*func_Flush)(void *, void *);
 
-				int			 (*func_Verify)(void *);
+				bool			 (*func_Verify)(void *);
 
 				void			*(*func_GetMainTabLayer)(void *);
 				void			*(*func_GetStatusBarLayer)(void *);

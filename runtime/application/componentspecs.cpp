@@ -205,7 +205,7 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_Flush			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Flush"));
 
-	func_Verify			= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Verify"));
+	func_Verify			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Verify"));
 
 	func_GetMainTabLayer		= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetMainTabLayer"));
 	func_GetStatusBarLayer		= (void *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStatusBarLayer"));
