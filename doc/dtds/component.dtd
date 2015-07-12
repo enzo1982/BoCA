@@ -80,3 +80,7 @@
 
 				<!ELEMENT max (#PCDATA)>
 				<!ATTLIST max alias CDATA #IMPLIED>
+
+		<!ELEMENT md5 (#PCDATA)>
+		<!ATTLIST md5 require CDATA #IMPLIED
+			      prefix  CDATA #IMPLIED>

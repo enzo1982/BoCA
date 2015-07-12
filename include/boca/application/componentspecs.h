@@ -255,6 +255,10 @@ namespace BoCA
 				String			 external_informat;
 				String			 external_outformat;
 
+				String			 external_md5_arguments;
+				String			 external_md5_require;
+				String			 external_md5_prefix;
+
 				Array<Parameter *>	 external_parameters;
 
 				Array<FileFormat *>	 formats;

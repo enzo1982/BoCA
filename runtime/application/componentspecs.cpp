@@ -449,10 +449,14 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				{
 					external_command = node2->GetContent();
 
-					if (node2->GetAttributeByName("ignoreExitCode") != NIL)
-					{
-						external_ignoreExitCode = (node2->GetAttributeByName("ignoreExitCode")->GetContent() == "true");
-					}
+					if (node2->GetAttributeByName("ignoreExitCode") != NIL) external_ignoreExitCode = (node2->GetAttributeByName("ignoreExitCode")->GetContent() == "true");
+				}
+				else if (node2->GetName() == "md5")
+				{
+					external_md5_arguments = node2->GetContent();
+
+					if (node2->GetAttributeByName("require") != NIL) external_md5_require = node2->GetAttributeByName("require")->GetContent();
+					if (node2->GetAttributeByName("prefix")	 != NIL) external_md5_prefix  = node2->GetAttributeByName("prefix")->GetContent();
 				}
 				else if (node2->GetName() == "arguments")  external_arguments	= node2->GetContent();
 				else if (node2->GetName() == "informat")   external_informat	= node2->GetContent();

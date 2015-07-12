@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -26,6 +26,112 @@ BoCA::AS::DecoderComponentExternalFile::DecoderComponentExternalFile(ComponentSp
 
 BoCA::AS::DecoderComponentExternalFile::~DecoderComponentExternalFile()
 {
+}
+
+String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
+{
+	if (specs->external_md5_arguments == NIL) return NIL;
+
+	/* Set up security attributes
+	 */
+	SECURITY_ATTRIBUTES	 secAttr;
+
+	ZeroMemory(&secAttr, sizeof(secAttr));
+
+	secAttr.nLength		= sizeof(secAttr);
+	secAttr.bInheritHandle	= True;
+
+	HANDLE	 rPipe = NIL;
+	HANDLE	 wPipe = NIL;
+
+	CreatePipe(&rPipe, &wPipe, &secAttr, 131072);
+	SetHandleInformation(rPipe, HANDLE_FLAG_INHERIT, 0);
+
+	/* Start 3rd party command line decoder
+	 */
+	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String(specs->external_md5_arguments).Replace("%INFILE", String("\"").Append(encFileName).Append("\""));
+
+	if (specs->debug) AllocConsole();
+
+	STARTUPINFOA		 startupInfo;
+
+	ZeroMemory(&startupInfo, sizeof(startupInfo));
+
+	startupInfo.cb		= sizeof(startupInfo);
+	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
+	startupInfo.hStdInput	= NIL;
+	startupInfo.hStdOutput	= wPipe;
+	startupInfo.hStdError	= NIL;
+
+	PROCESS_INFORMATION	 processInfo;
+
+	ZeroMemory(&processInfo, sizeof(processInfo));
+
+	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+
+	HANDLE	 hProcess = processInfo.hProcess;
+
+	/* Check process handle.
+	 */
+	if (hProcess == NIL) return NIL;
+
+	/* Close stdio pipe write handle.
+	 */
+	CloseHandle(wPipe);
+
+	/* Read output into buffer.
+	 */
+	Buffer<char>		 buffer(4096);
+	Int			 bytesReadTotal = 0;
+	DWORD			 bytesRead = 0;
+
+	do
+	{
+		if (!ReadFile(rPipe, buffer + bytesReadTotal, 4096 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
+
+		bytesReadTotal += bytesRead;
+	}
+	while (bytesReadTotal < 4096);
+
+	String	 output = (char *) buffer;
+
+	CloseHandle(rPipe);
+
+	TerminateProcess(hProcess, 0);
+
+	/* Wait until the decoder exits.
+	 */
+	unsigned long	 exitCode = 0;
+
+	while (True)
+	{
+		GetExitCodeProcess(hProcess, &exitCode);
+
+		if (exitCode != STILL_ACTIVE) break;
+
+		S::System::System::Sleep(10);
+	}
+
+	if (specs->debug)
+	{
+		BoCA::Utilities::InfoMessage("Click OK to close console window.");
+
+		FreeConsole();
+	}
+
+	/* Extract MD5 from output.
+	 */
+	String	 md5;
+
+	if (output.Contains(specs->external_md5_require) &&
+	    output.Contains(specs->external_md5_prefix)) md5 = output.SubString(output.Find(specs->external_md5_prefix) + specs->external_md5_prefix.Length(),
+										output.Length() - output.Find(specs->external_md5_prefix) - specs->external_md5_prefix.Length()).Trim().Head(32).ToLower();
+
+	if (md5.Length() != 32 || md5.Contains("\n") || md5.Contains(" ")) md5 = NIL;
+
+	return md5;
 }
 
 Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &streamURI, Track &track)
@@ -92,7 +198,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		return Error();
 	}
 
-	/* Wait until the encoder exits
+	/* Wait until the decoder exits
 	 */
 	unsigned long	 exitCode = 0;
 
@@ -104,6 +210,10 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 		S::System::System::Sleep(10);
 	}
+
+	/* Query MD5.
+	 */
+	track.md5 = GetMD5(encFileName);
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -266,7 +376,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 		return False;
 	}
 
-	/* Wait until the encoder exits
+	/* Wait until the decoder exits
 	 */
 	unsigned long	 exitCode = 0;
 

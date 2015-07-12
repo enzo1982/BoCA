@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -33,6 +33,58 @@ BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()
 {
 }
 
+
+String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName)
+{
+	if (specs->external_md5_arguments == NIL) return NIL;
+
+	/* Start 3rd party command line decoder
+	 */
+	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String(specs->external_md5_arguments).Replace("%INFILE", String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+													 .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+													 .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+													 .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
+
+	FILE	*rPipe = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? NIL : " 2> /dev/null"), "r");
+
+	/* Read output into buffer.
+	 */
+	Buffer<char>	 buffer(4096);
+	Int		 bytesReadTotal = 0;
+	Int		 bytesRead = 0;
+
+	do
+	{
+		bytesRead = fread(buffer + bytesReadTotal, 1, 4096 - bytesReadTotal, rPipe);
+
+		if (bytesRead != 4096 - bytesReadTotal && (ferror(rPipe) || bytesRead == 0)) break;
+
+		bytesReadTotal += bytesRead;
+	}
+	while (bytesReadTotal < 4096);
+
+	String	 output = (char *) buffer;
+
+	/* Wait until the decoder exits.
+	 */
+	unsigned long	 exitStatus = pclose(rPipe);
+	unsigned long	 exitCode   = WIFEXITED(exitStatus)   ? WEXITSTATUS(exitStatus) : -1;
+	unsigned long	 exitSignal = WIFSIGNALED(exitStatus) ? WTERMSIG(exitStatus)	: -1;
+
+	/* Extract MD5 from output.
+	 */
+	String	 md5;
+
+	if (output.Contains(specs->external_md5_require) &&
+	    output.Contains(specs->external_md5_prefix)) md5 = output.SubString(output.Find(specs->external_md5_prefix) + specs->external_md5_prefix.Length(),
+										output.Length() - output.Find(specs->external_md5_prefix) - specs->external_md5_prefix.Length()).Trim().Head(32).ToLower();
+
+	if (md5.Length() != 32 || md5.Contains("\n") || md5.Contains(" ")) md5 = NIL;
+
+	return md5;
+}
+
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
 	String	 encFileName = streamURI;
@@ -47,7 +99,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		File(streamURI).Copy(encFileName);
 	}
 
-	/* Start 3rd party command line encoder
+	/* Start 3rd party command line decoder
 	 */
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
@@ -167,6 +219,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	unsigned long	 exitCode   = WIFEXITED(exitStatus)   ? WEXITSTATUS(exitStatus) : -1;
 	unsigned long	 exitSignal = WIFSIGNALED(exitStatus) ? WTERMSIG(exitStatus)	: -1;
 
+	/* Query MD5.
+	 */
+	track.md5 = GetMD5(encFileName);
+
 	/* Remove temporary copy if necessary.
 	 */
 	if (String::IsUnicode(streamURI))
@@ -210,7 +266,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 		File(track.origFilename).Copy(encFileName);
 	}
 
-	/* Start 3rd party command line encoder.
+	/* Start 3rd party command line decoder.
 	 */
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
