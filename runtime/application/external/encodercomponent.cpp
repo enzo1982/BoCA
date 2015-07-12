@@ -18,10 +18,12 @@
 
 BoCA::AS::EncoderComponentExternal::EncoderComponentExternal(ComponentSpecs *specs) : EncoderComponent(specs)
 {
+	configuration	= NIL;
+
 	errorState	= False;
 	errorString	= "Unknown error";
 
-	configLayer = NIL;
+	configLayer	= NIL;
 }
 
 BoCA::AS::EncoderComponentExternal::~EncoderComponentExternal()
@@ -49,6 +51,19 @@ BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()
 	if (configLayer == NIL && specs->external_parameters.Length() > 0) configLayer = new ConfigLayerExternal(specs);
 
 	return configLayer;
+}
+
+const BoCA::Config *BoCA::AS::EncoderComponentExternal::GetConfiguration() const
+{
+	if (configuration != NIL) return configuration;
+	else			  return Config::Get();
+}
+
+Bool BoCA::AS::EncoderComponentExternal::SetConfiguration(const Config *nConfiguration)
+{
+	configuration = nConfiguration;
+
+	return True;
 }
 
 Int BoCA::AS::EncoderComponentExternal::RenderTags(const String &streamURI, const Track &track, Buffer<UnsignedByte> &tagBufferPrepend, Buffer<UnsignedByte> &tagBufferAppend)

@@ -20,6 +20,8 @@ namespace BoCA
 		class EncoderComponentExternal : public EncoderComponent
 		{
 			private:
+				const Config		*configuration;
+
 				ConfigLayer		*configLayer;
 			protected:
 				Bool			 errorState;
@@ -44,6 +46,9 @@ namespace BoCA
 			accessors:
 				Bool			 GetErrorState() const	{ return errorState; }
 				const String		&GetErrorString() const	{ return errorString; }
+
+				const Config		*GetConfiguration() const;
+				Bool			 SetConfiguration(const Config *);
 		};
 	};
 };

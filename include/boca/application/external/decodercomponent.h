@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -20,6 +20,8 @@ namespace BoCA
 		class DecoderComponentExternal : public DecoderComponent
 		{
 			private:
+				const Config		*configuration;
+
 				ConfigLayer		*configLayer;
 			protected:
 				Bool			 errorState;
@@ -47,6 +49,9 @@ namespace BoCA
 			accessors:
 				Bool			 GetErrorState() const			{ return errorState; }
 				const String		&GetErrorString() const			{ return errorString; }
+
+				const Config		*GetConfiguration() const;
+				Bool			 SetConfiguration(const Config *);
 		};
 	};
 };

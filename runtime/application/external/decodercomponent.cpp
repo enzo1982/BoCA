@@ -16,6 +16,8 @@
 
 BoCA::AS::DecoderComponentExternal::DecoderComponentExternal(ComponentSpecs *specs) : DecoderComponent(specs)
 {
+	configuration	= NIL;
+
 	errorState	= False;
 	errorString	= "Unknown error";
 
@@ -62,6 +64,19 @@ BoCA::ConfigLayer *BoCA::AS::DecoderComponentExternal::GetConfigurationLayer()
 	if (configLayer == NIL && specs->external_parameters.Length() > 0) configLayer = new ConfigLayerExternal(specs);
 
 	return configLayer;
+}
+
+const BoCA::Config *BoCA::AS::DecoderComponentExternal::GetConfiguration() const
+{
+	if (configuration != NIL) return configuration;
+	else			  return Config::Get();
+}
+
+Bool BoCA::AS::DecoderComponentExternal::SetConfiguration(const Config *nConfiguration)
+{
+	configuration = nConfiguration;
+
+	return True;
 }
 
 Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track &track) const
