@@ -243,6 +243,8 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	track.origFilename = streamURI;
 	track.fileSize	   = File(streamURI).GetFileSize();
 
+	track.lossless	   = specs->formats.GetFirst()->IsLossless();
+
 	/* Read RIFF chunk
 	 */
 	if (in->InputString(4) != "RIFF") { errorState = True; errorString = "Unknown file type"; }
