@@ -35,22 +35,22 @@ BoCA::Config::Config()
 	persistentIntValues.EnableLocking();
 }
 
-BoCA::Config::Config(const Config &iConfig)
+BoCA::Config::Config(const Config &oConfig)
 {
-	enable_console	   = iConfig.enable_console;
+	enable_console	   = oConfig.enable_console;
 
 	saveSettingsOnExit = False;
 
-	config = new Configuration(*iConfig.config);
+	config = new Configuration(*oConfig.config);
 
-	for (Int i = 0; i < persistentIntIDs.Length(); i++)
+	for (Int i = 0; i < oConfig.persistentIntIDs.Length(); i++)
 	{
-		const String &nthID = persistentIntIDs.GetNth(i);
+		const String &nthID = oConfig.persistentIntIDs.GetNth(i);
 
 		String	 section = nthID.Head(nthID.Find("::"));
 		String	 name	 = nthID.Tail(nthID.Length() - nthID.Find("::") - 2);
 
-		config->SetIntValue(section, name, *persistentIntValues.GetNth(i));
+		config->SetIntValue(section, name, *oConfig.persistentIntValues.GetNth(i));
 	}
 
 	persistentIntIDs.EnableLocking();
