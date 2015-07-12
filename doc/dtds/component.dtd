@@ -82,5 +82,6 @@
 				<!ATTLIST max alias CDATA #IMPLIED>
 
 		<!ELEMENT md5 (#PCDATA)>
-		<!ATTLIST md5 require CDATA #IMPLIED
-			      prefix  CDATA #IMPLIED>
+		<!ATTLIST md5 stream  NMTOKEN #IMPLIED
+			      require CDATA   #IMPLIED
+			      prefix  CDATA   #IMPLIED>

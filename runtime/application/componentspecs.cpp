@@ -23,6 +23,8 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 
 	external_ignoreExitCode = False;
 
+	external_md5_stderr = False;
+
 	/* Init component function pointers.
 	 */
 	func_GetComponentSpecs		= NIL;
@@ -316,10 +318,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 		{
 			version = node->GetContent();
 
-			if (node->GetAttributeByName("debug") != NIL)
-			{
-				debug = (node->GetAttributeByName("debug")->GetContent() == "true");
-			}
+			if (node->GetAttributeByName("debug") != NIL) debug = (node->GetAttributeByName("debug")->GetContent() == "true");
 		}
 		else if (node->GetName() == "type")
 		{
@@ -334,10 +333,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			else if (node->GetContent() == "verifier")	type = COMPONENT_TYPE_VERIFIER;
 			else						type = COMPONENT_TYPE_UNKNOWN;
 
-			if (node->GetAttributeByName("threadSafe") != NIL)
-			{
-				threadSafe = (node->GetAttributeByName("threadSafe")->GetContent() == "true");
-			}
+			if (node->GetAttributeByName("threadSafe") != NIL) threadSafe = (node->GetAttributeByName("threadSafe")->GetContent() == "true");
 		}
 		else if (node->GetName() == "require")
 		{
@@ -455,8 +451,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				{
 					external_md5_arguments = node2->GetContent();
 
-					if (node2->GetAttributeByName("require") != NIL) external_md5_require = node2->GetAttributeByName("require")->GetContent();
-					if (node2->GetAttributeByName("prefix")	 != NIL) external_md5_prefix  = node2->GetAttributeByName("prefix")->GetContent();
+					if (node2->GetAttributeByName("stream")	 != NIL) external_md5_stderr  = (node2->GetAttributeByName("stream")->GetContent() == "stderr");
+					if (node2->GetAttributeByName("require") != NIL) external_md5_require =  node2->GetAttributeByName("require")->GetContent();
+					if (node2->GetAttributeByName("prefix")	 != NIL) external_md5_prefix  =  node2->GetAttributeByName("prefix")->GetContent();
 				}
 				else if (node2->GetName() == "arguments")  external_arguments	= node2->GetContent();
 				else if (node2->GetName() == "informat")   external_informat	= node2->GetContent();

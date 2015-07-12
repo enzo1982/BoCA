@@ -67,8 +67,8 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
 	startupInfo.hStdInput	= NIL;
-	startupInfo.hStdOutput	= wPipe;
-	startupInfo.hStdError	= NIL;
+	startupInfo.hStdOutput	= specs->external_md5_stderr ? NIL : wPipe;
+	startupInfo.hStdError	= specs->external_md5_stderr ? wPipe : NIL;
 
 	PROCESS_INFORMATION	 processInfo;
 
@@ -100,7 +100,7 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 	}
 	while (bytesReadTotal < 4096);
 
-	String	 output = (char *) buffer;
+	String	 output = (bytesReadTotal > 0 ? (char *) buffer : NIL);
 
 	CloseHandle(rPipe);
 

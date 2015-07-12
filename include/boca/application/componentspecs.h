@@ -256,6 +256,7 @@ namespace BoCA
 				String			 external_outformat;
 
 				String			 external_md5_arguments;
+				Bool			 external_md5_stderr;
 				String			 external_md5_require;
 				String			 external_md5_prefix;
 

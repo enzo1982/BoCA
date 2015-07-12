@@ -43,7 +43,7 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 													 .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
 													 .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
 
-	FILE	*rPipe = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? NIL : " 2> /dev/null"), "r");
+	FILE	*rPipe = popen(String(command).Append(" ").Append(arguments).Append(specs->external_md5_stderr ? "2>&1" : (specs->debug ? NIL : " 2> /dev/null")), "r");
 
 	/* Read output into buffer.
 	 */
@@ -61,7 +61,7 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 	}
 	while (bytesReadTotal < 4096);
 
-	String	 output = (char *) buffer;
+	String	 output = (bytesReadTotal > 0 ? (char *) buffer : NIL);
 
 	/* Wait until the decoder exits.
 	 */
