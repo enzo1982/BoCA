@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>AC3 Audio Decoder</name>
+  <version>1.0</version>
+  <id>avconv-ac3-dec</id>
+  <type>decoder</type>
+  <format>
+    <name>AC3 Files</name>
+    <extension>ac3</extension>
+  </format>
+  <external>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+    <parameters>
+      <switch name="Downmix multi-channel audio to stereo" argument="-ac 2"/>
+    </parameters>
+  </external>
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+    <parameters>
+      <switch name="Downmix multi-channel audio to stereo" argument="-ac 2"/>
+    </parameters>
+  </external>
+</component>
