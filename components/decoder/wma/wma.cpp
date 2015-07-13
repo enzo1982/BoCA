@@ -76,6 +76,8 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 
 	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
 
+	if (!FAILED(hr)) hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &m_pReaderAdvanced);
+
 	if (!FAILED(hr)) hr = m_pReader->Open(streamURI, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
@@ -96,11 +98,19 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 		 */
 		for (DWORD i = 0; i < cOutputs; i++)
 		{
-			IWMOutputMediaProps	*pProps = NIL;
+			/* Enable high definition output.
+			 */
+			BOOL	 enableDiscreteOutput = TRUE;
+			DWORD	 speakerConfig	      = 0;
+
+			m_pReaderAdvanced->SetOutputSetting(i, g_wszEnableDiscreteOutput, WMT_TYPE_BOOL, (BYTE *) &enableDiscreteOutput, sizeof(WMT_TYPE_BOOL));
+			m_pReaderAdvanced->SetOutputSetting(i, g_wszSpeakerConfig, WMT_TYPE_DWORD, (BYTE *) &speakerConfig, sizeof(WMT_TYPE_DWORD));
 
 			/* Set the first output format as it is
 			 * the one with the highest quality.
 			 */
+			IWMOutputMediaProps	*pProps = NIL;
+
 			if (!FAILED(m_pReader->GetOutputFormat(i, 0, &pProps)))
 			{
 				if (!FAILED(m_pReader->SetOutputProps(i, pProps)))
@@ -188,6 +198,7 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
 
+	m_pReaderAdvanced->Release();
 	m_pReader->Release();
 	readerCallback->Release();
 
@@ -238,7 +249,7 @@ Bool BoCA::DecoderWMA::Activate()
 {
 	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
 
-	if (!FAILED(hr)) hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced, (void **) &m_pReaderAdvanced);
+	if (!FAILED(hr)) hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &m_pReaderAdvanced);
 
 	readerCallback = new WMAReader();
 	readerCallback->SetReaderAdvanced(m_pReaderAdvanced);
@@ -265,11 +276,19 @@ Bool BoCA::DecoderWMA::Activate()
 	 */
 	for (DWORD i = 0; i < cOutputs; i++)
 	{
-		IWMOutputMediaProps	*pProps = NIL;
+		/* Enable high definition output.
+		 */
+		BOOL	 enableDiscreteOutput = TRUE;
+		DWORD	 speakerConfig	      = 0;
+
+		m_pReaderAdvanced->SetOutputSetting(i, g_wszEnableDiscreteOutput, WMT_TYPE_BOOL, (BYTE *) &enableDiscreteOutput, sizeof(WMT_TYPE_BOOL));
+		m_pReaderAdvanced->SetOutputSetting(i, g_wszSpeakerConfig, WMT_TYPE_DWORD, (BYTE *) &speakerConfig, sizeof(WMT_TYPE_DWORD));
 
 		/* Set the first output format as it is
 		 * the one with the highest quality.
 		 */
+		IWMOutputMediaProps	*pProps = NIL;
+
 		if (!FAILED(m_pReader->GetOutputFormat(i, 0, &pProps)))
 		{
 			if (!FAILED(m_pReader->SetOutputProps(i, pProps)))
