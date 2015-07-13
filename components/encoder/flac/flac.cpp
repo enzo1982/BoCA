@@ -103,15 +103,7 @@ BoCA::EncoderFLAC::~EncoderFLAC()
 Bool BoCA::EncoderFLAC::Activate()
 {
 	const Format	&format = track.GetFormat();
-	const Info	&info = track.GetInfo();
-
-	if (format.channels > 2)
-	{
-		errorString = "This encoder does not support more than 2 channels!";
-		errorState  = True;
-
-		return False;
-	}
+	const Info	&info	= track.GetInfo();
 
 	const Config	*config = GetConfiguration();
 
