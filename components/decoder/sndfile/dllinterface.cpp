@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -18,6 +18,7 @@ SF_READ_SHORT	 ex_sf_read_short	= NIL;
 SF_READ_INT	 ex_sf_read_int		= NIL;
 SF_GET_STRING	 ex_sf_get_string	= NIL;
 SF_COMMAND	 ex_sf_command		= NIL;
+SF_STRERROR	 ex_sf_strerror		= NIL;
 
 DynamicLoader *sndfiledll	= NIL;
 
@@ -34,6 +35,7 @@ Bool LoadSndFileDLL()
 	ex_sf_read_int		= (SF_READ_INT) sndfiledll->GetFunctionAddress("sf_read_int");
 	ex_sf_get_string	= (SF_GET_STRING) sndfiledll->GetFunctionAddress("sf_get_string");
 	ex_sf_command		= (SF_COMMAND) sndfiledll->GetFunctionAddress("sf_command");
+	ex_sf_strerror		= (SF_STRERROR) sndfiledll->GetFunctionAddress("sf_strerror");
 
 	if (ex_sf_open_fd	== NIL ||
 	    ex_sf_close		== NIL ||
@@ -41,7 +43,8 @@ Bool LoadSndFileDLL()
 	    ex_sf_read_short	== NIL ||
 	    ex_sf_read_int	== NIL ||
 	    ex_sf_get_string	== NIL ||
-	    ex_sf_command	== NIL) { FreeSndFileDLL(); return False; }
+	    ex_sf_command	== NIL ||
+	    ex_sf_strerror	== NIL) { FreeSndFileDLL(); return False; }
 
 	return True;
 }
