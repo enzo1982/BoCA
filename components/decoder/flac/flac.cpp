@@ -443,7 +443,7 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 
 		filter->infoTrack->length = metadata->data.stream_info.total_samples;
 
-		for (Int i = 0; i < 16; i++) filter->infoTrack->md5.Append(Number((Int64) metadata->data.stream_info.md5sum[i]).ToHexString());
+		for (Int i = 0; i < 16; i++) filter->infoTrack->md5.Append(Number((Int64) metadata->data.stream_info.md5sum[i]).ToHexString(2));
 
 		filter->infoTrack->SetFormat(format);
 	}
