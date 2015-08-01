@@ -119,6 +119,8 @@ BoCA::EncoderSndFile::EncoderSndFile()
 {
 	configLayer = NIL;
 
+	fileFormat  = 0;
+
 	file	    = 0;
 	sndf	    = NIL;
 }
@@ -130,7 +132,7 @@ BoCA::EncoderSndFile::~EncoderSndFile()
 
 Bool BoCA::EncoderSndFile::Activate()
 {
-	const Config		*config = GetConfiguration();
+	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
 	/* Open output file.
@@ -148,9 +150,9 @@ Bool BoCA::EncoderSndFile::Activate()
 	/* Get selected file format.
 	 */
 #ifdef __APPLE__
-	Int	 fileFormat = config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF);
+	fileFormat = config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF);
 #else
-	Int	 fileFormat = config->GetIntValue("SndFile", "Format", SF_FORMAT_WAV);
+	fileFormat = config->GetIntValue("SndFile", "Format", SF_FORMAT_WAV);
 #endif
 
 	/* Fill format info structure.
@@ -247,12 +249,6 @@ Bool BoCA::EncoderSndFile::Deactivate()
 	 */
 	const Config	*config = GetConfiguration();
 	const Info	&info	= track.GetInfo();
-
-#ifdef __APPLE__
-	Int	 fileFormat = config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF);
-#else
-	Int	 fileFormat = config->GetIntValue("SndFile", "Format", SF_FORMAT_WAV);
-#endif
 
 	if (fileFormat == SF_FORMAT_WAV || fileFormat == SF_FORMAT_RF64)
 	{
@@ -414,9 +410,18 @@ Int BoCA::EncoderSndFile::WriteData(Buffer<UnsignedByte> &data, Int size)
 	static Endianness	 endianness = CPU().GetEndianness();
 
 	const Format	&format = track.GetFormat();
-	int		 bytes	= 0;
 
-	data.Resize(size);
+	/* Reorder channels.
+	 */
+	if (fileFormat == SF_FORMAT_AIFF ||
+	    fileFormat == SF_FORMAT_CAF)
+	{
+		if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_1, Channel::AIFF_5_1);
+	}
+
+	/* Hand data to libsndfile.
+	 */
+	int	 bytes	= 0;
 
 	if (format.bits == 8)
 	{

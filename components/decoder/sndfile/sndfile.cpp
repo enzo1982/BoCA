@@ -342,6 +342,8 @@ BoCA::DecoderSndFile::DecoderSndFile()
 {
 	packageSize = 0;
 
+	fileFormat  = 0;
+
 	file	    = 0;
 	sndf	    = NIL;
 }
@@ -374,6 +376,8 @@ Bool BoCA::DecoderSndFile::Activate()
 
 	ex_sf_command(sndf, SFC_SET_SCALE_FLOAT_INT_READ, NIL, SF_TRUE);
 
+	fileFormat = sinfo.format & SF_FORMAT_TYPEMASK;
+
 	return True;
 }
 
@@ -400,7 +404,7 @@ Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	const Format	&format = track.GetFormat();
 
-	/* Set size to a sample number a multiple of the number of channels.
+	/* Set size to a multiple of the number of channels.
 	 */
 	size -= size % (format.bits / 8 * format.channels);
 
@@ -435,6 +439,14 @@ Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data, Int size)
 	else if (format.bits == 32)
 	{
 		size = ex_sf_read_int(sndf, (int *) (UnsignedByte *) data, size / 4) * 4;
+	}
+
+	/* Reorder channels.
+	 */
+	if (fileFormat == SF_FORMAT_AIFF ||
+	    fileFormat == SF_FORMAT_CAF)
+	{
+		if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::AIFF_5_1, Channel::Default_5_1);
 	}
 
 	if (size == 0)	return -1;
