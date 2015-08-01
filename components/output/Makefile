@@ -27,6 +27,7 @@ ifeq ($(BUILD_QNX),True)
 	cd qsa && $(MAKE)
 endif
 ifeq ($(BUILD_WIN32),True)
+	cd directsound && $(MAKE)
 	cd waveout && $(MAKE)
 	cd winamp && $(MAKE)
 endif
@@ -54,6 +55,7 @@ ifeq ($(BUILD_QNX),True)
 	cd qsa && $(MAKE) clean
 endif
 ifeq ($(BUILD_WIN32),True)
+	cd directsound && $(MAKE) clean
 	cd waveout && $(MAKE) clean
 	cd winamp && $(MAKE) clean
 endif
