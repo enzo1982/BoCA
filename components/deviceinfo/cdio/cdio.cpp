@@ -329,9 +329,13 @@ Void BoCA::DeviceInfoCDIO::CollectDriveInfo()
 
 		Device	 drive;
 
-		drive.type = DEVICE_CDROM;
-		drive.name = String(device.psz_vendor).Append(" ").Append(device.psz_model).Append(" ").Append(device.psz_revision);
-		drive.path = driveName;
+		drive.type	  = DEVICE_CDROM;
+
+		drive.vendor	  = String(device.psz_vendor).Trim();
+		drive.model	  = String(device.psz_model).Trim();
+		drive.revision	  = String(device.psz_revision).Trim();
+
+		drive.path	  = driveName;
 
 		drive.canOpenTray = True;
 

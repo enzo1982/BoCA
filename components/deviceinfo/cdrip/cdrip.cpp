@@ -255,9 +255,12 @@ Void BoCA::DeviceInfoCDRip::CollectDriveInfo()
 
 		Device	 drive;
 
-		drive.type = DEVICE_CDROM;
-		drive.name = params.lpszCDROMID;
-		drive.path = String::FromInt(params.btAdapterID).Append(":").Append(String::FromInt(params.btTargetID)).Append(":").Append(String::FromInt(params.btLunID));
+		drive.type	  = DEVICE_CDROM;
+
+		drive.vendor	  = String(params.lpszCDROMID).SubString(0,  8).Trim();
+		drive.model	  = String(params.lpszCDROMID).SubString(8, 16).Trim();
+
+		drive.path	  = String::FromInt(params.btAdapterID).Append(":").Append(String::FromInt(params.btTargetID)).Append(":").Append(String::FromInt(params.btLunID));
 
 		drive.canOpenTray = True;
 

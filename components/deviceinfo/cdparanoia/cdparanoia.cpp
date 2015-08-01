@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -313,9 +313,13 @@ Void BoCA::DeviceInfoCDParanoia::CollectDriveInfo()
 
 		Device	 drive;
 
-		drive.type = DEVICE_CDROM;
-		drive.name = cd->drive_model;
-		drive.path = driveName;
+		drive.type	  = DEVICE_CDROM;
+
+		drive.vendor	  = String(cd->drive_model).Head(String(cd->drive_model).Find(" ")).Trim();
+		drive.model	  = String(cd->drive_model).SubString(String(cd->drive_model).Find(" "), String(cd->drive_model).FindLast(" ") - String(cd->drive_model).Find(" ") - 1).Trim();
+		drive.revision	  = String(cd->drive_model).Tail(String(cd->drive_model).Length() - String(cd->drive_model).FindLast(" ") - 1).Trim();
+
+		drive.path	  = driveName;
 
 		drive.canOpenTray = True;
 
