@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -79,13 +79,8 @@ Void FreeOggDLL()
 
 Bool LoadVorbisDLL()
 {
-	vorbisdll = BoCA::Utilities::LoadCodecDLL("vorbis");
-
-#ifdef __WIN32__
-	vorbisencdll = vorbisdll;
-#else
+	vorbisdll    = BoCA::Utilities::LoadCodecDLL("vorbis");
 	vorbisencdll = BoCA::Utilities::LoadCodecDLL("vorbisenc");
-#endif
 
 	if (vorbisdll == NIL || vorbisencdll == NIL) return False;
 
@@ -134,10 +129,7 @@ Bool LoadVorbisDLL()
 Void FreeVorbisDLL()
 {
 	BoCA::Utilities::FreeCodecDLL(vorbisdll);
-
-#ifndef __WIN32__
 	BoCA::Utilities::FreeCodecDLL(vorbisencdll);
-#endif
 
 	vorbisdll    = NIL;
 	vorbisencdll = NIL;
