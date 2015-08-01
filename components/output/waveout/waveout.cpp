@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -9,6 +9,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "waveout.h"
+
+#include <mmreg.h>
 
 const String &BoCA::OutputWaveOut::GetComponentSpecs()
 {
@@ -80,24 +82,37 @@ Bool BoCA::OutputWaveOut::Activate()
 
 	/* Init wave format descriptor.
 	 */
-	WAVEFORMATEX	 wfx;
+	WAVEFORMATEXTENSIBLE	 wfx;
 
-	ZeroMemory(&wfx, sizeof(WAVEFORMATEX));
+	ZeroMemory(&wfx, sizeof(WAVEFORMATEXTENSIBLE));
 
-	wfx.nSamplesPerSec	= format.rate;
-	wfx.wBitsPerSample	= format.bits;
-	wfx.nChannels		= format.channels;
+	wfx.Format.nSamplesPerSec	= format.rate;
+	wfx.Format.wBitsPerSample	= format.bits;
+	wfx.Format.nChannels		= format.channels;
 
-	wfx.cbSize		= 0;
-	wfx.wFormatTag		= WAVE_FORMAT_PCM;
-	wfx.nBlockAlign		= (wfx.wBitsPerSample >> 3) * wfx.nChannels;
-	wfx.nAvgBytesPerSec	= wfx.nBlockAlign * wfx.nSamplesPerSec;
+	wfx.Format.cbSize		= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+	wfx.Format.wFormatTag		= WAVE_FORMAT_EXTENSIBLE;
+	wfx.Format.nBlockAlign		= (wfx.Format.wBitsPerSample >> 3) * wfx.Format.nChannels;
+	wfx.Format.nAvgBytesPerSec	= wfx.Format.nBlockAlign * wfx.Format.nSamplesPerSec;
+
+	wfx.SubFormat			= KSDATAFORMAT_SUBTYPE_PCM;
+
+	wfx.Samples.wValidBitsPerSample = wfx.Format.wBitsPerSample;
+
+	if	(format.channels == 1) wfx.dwChannelMask = SPEAKER_FRONT_CENTER;
+	else if (format.channels == 2) wfx.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
+	else if (format.channels == 3) wfx.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER;
+	else if (format.channels == 4) wfx.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT;
+	else if (format.channels == 5) wfx.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT;
+	else if (format.channels == 6) wfx.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER | SPEAKER_LOW_FREQUENCY | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT;
+	else if (format.channels == 7) wfx.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER | SPEAKER_LOW_FREQUENCY | SPEAKER_BACK_CENTER | SPEAKER_SIDE_LEFT | SPEAKER_SIDE_RIGHT;
+	else if (format.channels == 8) wfx.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER | SPEAKER_LOW_FREQUENCY | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT | SPEAKER_SIDE_LEFT | SPEAKER_SIDE_RIGHT;
 
 	/* Open audio device.
 	 */
 	hEvent = CreateEvent(0, 0, 0, 0);
 
-	MMRESULT	 mr = waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, (DWORD) (Int64) hEvent, 0, CALLBACK_EVENT);
+	MMRESULT	 mr = waveOutOpen(&hWaveOut, WAVE_MAPPER, (WAVEFORMATEX *) &wfx, (DWORD) (Int64) hEvent, 0, CALLBACK_EVENT);
 
 	if (mr)
 	{
@@ -144,7 +159,7 @@ Bool BoCA::OutputWaveOut::Activate()
 		return False;
 	}
 
-	buf_size = MulDiv(2000, wfx.nAvgBytesPerSec, 1000);
+	buf_size = MulDiv(2000, wfx.Format.nAvgBytesPerSec, 1000);
 
 	maxblock = 0x10000;
 	minblock = 0x100;

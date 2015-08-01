@@ -14,7 +14,7 @@ OBJECTS	  = waveout.o
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  = -lwinmm
+LIBS	  = -lwinmm -lksguid
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =
