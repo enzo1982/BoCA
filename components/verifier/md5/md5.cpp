@@ -55,7 +55,23 @@ Bool BoCA::VerifierMD5::Deactivate()
 
 Int BoCA::VerifierMD5::ProcessData(Buffer<UnsignedByte> &data)
 {
+	/* Find system byte order.
+	 */
+	static Int	 systemByteOrder = CPU().GetEndianness() == EndianLittle ? BYTE_INTEL : BYTE_RAW;
+
+	const Format	&format = track.GetFormat();
+
+	/* Switch byte order to Intel.
+	 */
+	if (systemByteOrder != BYTE_INTEL) BoCA::Utilities::SwitchBufferByteOrder(data, format.bits / 8);
+
+	/* Calculate MD5.
+	 */
 	md5.Feed(data);
+
+	/* Switch back to native byte order.
+	 */
+	if (systemByteOrder != BYTE_INTEL) BoCA::Utilities::SwitchBufferByteOrder(data, format.bits / 8);
 
 	return data.Size();
 }
