@@ -11,6 +11,8 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <dsound.h>
+
 #include "wma.h"
 
 using namespace smooth::IO;
@@ -101,7 +103,7 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 			/* Enable high definition output.
 			 */
 			BOOL	 enableDiscreteOutput = TRUE;
-			DWORD	 speakerConfig	      = 0;
+			DWORD	 speakerConfig	      = DSSPEAKER_DIRECTOUT;
 
 			m_pReaderAdvanced->SetOutputSetting(i, g_wszEnableDiscreteOutput, WMT_TYPE_BOOL, (BYTE *) &enableDiscreteOutput, sizeof(WMT_TYPE_BOOL));
 			m_pReaderAdvanced->SetOutputSetting(i, g_wszSpeakerConfig, WMT_TYPE_DWORD, (BYTE *) &speakerConfig, sizeof(WMT_TYPE_DWORD));
