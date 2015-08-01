@@ -269,11 +269,25 @@ Int BoCA::Config::SetConfigurationName(const String &nConfig)
 
 BoCA::ApplicationConfig::ApplicationConfig()
 {
-	String	 programsDir = S::System::System::GetProgramFilesDirectory();
+	String	 applicationDir	    = Application::GetApplicationDirectory();
 
-	if (Application::GetApplicationDirectory().ToUpper().StartsWith(programsDir.ToUpper()))
+	String	 programFilesDir    = S::System::System::GetProgramFilesDirectory();
+	String	 applicationDataDir = S::System::System::GetApplicationDataDirectory();
+
+	configDir = applicationDir;
+
+	/* Check if configuration file exists.
+	 */
+	File	 configFile = String(configDir).Append("boca").Append(Directory::GetDirectoryDelimiter()).Append("boca.xml");
+
+	if (!applicationDir.ToUpper().StartsWith(programFilesDir.ToUpper()) && !configFile.Exists()) configFile.Create();
+
+	/* Use application data directory if configuration still
+	 * does not exist or installed in program files directory.
+	 */
+	if (applicationDir.ToUpper().StartsWith(programFilesDir.ToUpper()) || !configFile.Exists())
 	{
-		configDir = S::System::System::GetApplicationDataDirectory();
+		configDir =  applicationDataDir;
 
 		if (configDir != NIL)
 		{
@@ -285,10 +299,6 @@ BoCA::ApplicationConfig::ApplicationConfig()
 		}
 
 		Directory(configDir).Create();
-	}
-	else
-	{
-		configDir = Application::GetApplicationDirectory();
 	}
 
 	config = new Configuration(String(configDir).Append("boca").Append(Directory::GetDirectoryDelimiter()).Append("boca.xml"), True);
