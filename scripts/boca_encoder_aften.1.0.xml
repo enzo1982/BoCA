@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Aften A/52 (AC3) Encoder</name>
+  <name>Aften A/52 (AC-3) Encoder</name>
   <version>1.0</version>
   <id>aften-enc</id>
   <type>encoder</type>
+  <replace>avconv-ac3-enc</replace>
   <format>
-    <name>AC3 Files</name>
+    <name>AC-3 Files</name>
     <extension>ac3</extension>
   </format>
   <external>

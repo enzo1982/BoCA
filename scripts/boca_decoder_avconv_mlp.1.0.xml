@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>DTS Audio Decoder</name>
+  <name>MLP Audio Decoder</name>
   <version>1.0</version>
-  <id>avconv-dts-dec</id>
+  <id>avconv-mlp-dec</id>
   <type>decoder</type>
   <format>
-    <name>DTS Files</name>
+    <name>MLP Files</name>
     <lossless>true</lossless>
-    <extension>dts</extension>
+    <extension>mlp</extension>
   </format>
   <external>
     <command>avconv</command>
