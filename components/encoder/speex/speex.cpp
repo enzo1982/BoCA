@@ -86,6 +86,14 @@ Bool BoCA::EncoderSpeex::Activate()
 	const Format	&format = track.GetFormat();
 	const Info	&info = track.GetInfo();
 
+	if (format.channels > 2)
+	{
+		errorString = "This encoder does not support more than 2 channels!";
+		errorState  = True;
+
+		return False;
+	}
+
 	srand(clock());
 
 	ex_ogg_stream_init(&os, rand());
