@@ -434,5 +434,17 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data, Int size)
 		if (ex_ogg_page_eos(&og)) break;
 	}
 
+	data.Resize(size);
+
+	const Format	&format	= track.GetFormat();
+
+	/* Change to default channel order.
+	 */
+	if	(format.channels == 3) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_3_0, Channel::Default_3_0);
+	else if (format.channels == 5) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_5_0, Channel::Default_5_0);
+	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_5_1, Channel::Default_5_1);
+	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_6_1, Channel::Default_6_1);
+	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_7_1, Channel::Default_7_1);
+
 	return size;
 }

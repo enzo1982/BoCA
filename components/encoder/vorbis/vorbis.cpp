@@ -81,15 +81,7 @@ BoCA::EncoderVorbis::~EncoderVorbis()
 Bool BoCA::EncoderVorbis::Activate()
 {
 	const Format	&format = track.GetFormat();
-	const Info	&info = track.GetInfo();
-
-	if (format.channels > 2)
-	{
-		errorString = "This encoder does not support more than 2 channels!";
-		errorState  = True;
-
-		return False;
-	}
+	const Info	&info	= track.GetInfo();
 
 	const Config	*config = GetConfiguration();
 
@@ -208,6 +200,14 @@ Int BoCA::EncoderVorbis::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	const Format	&format	= track.GetFormat();
 
+	/* Change to Vorbis channel order.
+	 */
+	if	(format.channels == 3) Utilities::ChangeChannelOrder(data, format, Channel::Default_3_0, Channel::Vorbis_3_0);
+	else if (format.channels == 5) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_0, Channel::Vorbis_5_0);
+	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_1, Channel::Vorbis_5_1);
+	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Default_6_1, Channel::Vorbis_6_1);
+	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Default_7_1, Channel::Vorbis_7_1);
+
 	/* Convert samples to 16 bit.
 	 */
 	Int	 samples_size = size / (format.bits / 8);
@@ -228,22 +228,12 @@ Int BoCA::EncoderVorbis::WriteData(Buffer<UnsignedByte> &data, Int size)
 	 */
 	float	**buffer = ex_vorbis_analysis_buffer(&vd, samples_size / format.channels);
 
-	if (format.channels == 1)
+	for (Int i = 0; i < samples_size / format.channels; i++)
 	{
-		for (Int i = 0; i < samples_size; i++)
+		for (Int c = 0; c < format.channels; c++)
 		{
-			if (endianness == EndianLittle) { buffer[0][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 2 + 1] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 2 + 0])) / 32768.f; }
-			else				{ buffer[0][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 2 + 0] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 2 + 1])) / 32768.f; }
-		}
-	}
-	else if (format.channels == 2)
-	{
-		for (Int i = 0; i < samples_size / 2; i++)
-		{
-			if (endianness == EndianLittle) { buffer[0][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 4 + 1] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 4 + 0])) / 32768.f;
-							  buffer[1][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 4 + 3] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 4 + 2])) / 32768.f; }
-			else				{ buffer[0][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 4 + 0] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 4 + 1])) / 32768.f;
-							  buffer[1][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 4 + 2] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 4 + 3])) / 32768.f; }
+			if (endianness == EndianLittle) { buffer[c][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 2 * format.channels + 2 * c + 1] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 2 * format.channels + 2 * c + 0])) / 32768.f; }
+			else				{ buffer[c][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 2 * format.channels + 2 * c + 0] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 2 * format.channels + 2 * c + 1])) / 32768.f; }
 		}
 	}
 
