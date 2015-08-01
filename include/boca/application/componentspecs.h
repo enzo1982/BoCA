@@ -309,6 +309,8 @@ namespace BoCA
 
 				__int64			 (*func_GetInBytes)(const void *);
 
+				bool			 (*func_Finish)(void *);
+
 				int			 (*func_CanWrite)(void *);
 
 				int			 (*func_SetPause)(void *, bool);

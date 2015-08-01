@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -50,6 +50,11 @@ Bool BoCA::AS::OutputComponent::Deactivate()
 Int BoCA::AS::OutputComponent::WriteData(Buffer<UnsignedByte> &buffer, Int size)
 {
 	return specs->func_WriteData(component, &buffer, size);
+}
+
+Bool BoCA::AS::OutputComponent::Finish()
+{
+	return specs->func_Finish(component);
 }
 
 Int BoCA::AS::OutputComponent::CanWrite()

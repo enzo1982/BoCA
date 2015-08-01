@@ -63,6 +63,8 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 
 	func_GetInBytes			= NIL;
 
+	func_Finish			= NIL;
+
 	func_CanWrite			= NIL;
 
 	func_SetPause			= NIL;
@@ -183,6 +185,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_SetDriver			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetDriver"));
 
 	func_GetInBytes			= (__int64 (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetInBytes"));
+
+	func_Finish			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Finish"));
 
 	func_CanWrite			= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanWrite"));
 

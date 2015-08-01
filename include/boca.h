@@ -154,6 +154,7 @@ using namespace smooth;
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer, int size)				{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer), size); }					\
+		BOCA_EXPORT bool BoCA_##componentName##_Finish(void *component)								{ return ((BoCA::componentName *) component)->Finish(); }										\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
 																																		\
