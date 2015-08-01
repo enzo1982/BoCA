@@ -223,6 +223,7 @@ ID3_TagImpl &ID3_TagImpl::operator=(const ID3_Tag &rTag)
 {
 	this->Clear();
 
+	this->SetSpec(rTag.GetSpec());
 	this->SetUnsync(rTag.GetUnsync());
 	this->SetExtended(rTag.GetExtendedHeader());
 	this->SetExperimental(rTag.GetExperimental());
