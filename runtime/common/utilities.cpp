@@ -264,3 +264,29 @@ Bool BoCA::Utilities::SwitchBufferByteOrder(Buffer<UnsignedByte> &buffer, Int by
 
 	return True;
 }
+
+/* This function changes the order of channels of audio
+ * samples in a buffer from inLayout to outLayout.
+ */
+Bool BoCA::Utilities::ChangeChannelOrder(Buffer<UnsignedByte> &buffer, const Format &format, const Channel::Layout inLayout, const Channel::Layout outLayout)
+{
+	Int	 bytesPerSample = format.bits / 8;
+
+	/* Fail if buffer does not include full samples.
+	 */
+	if (buffer.Size() % (bytesPerSample * format.channels) != 0) return False;
+
+	/* Change channel order.
+	 */
+	UnsignedByte	*intermediate = new UnsignedByte [bytesPerSample * 256];
+
+	for (Int i = 0; i < buffer.Size(); i += bytesPerSample * format.channels)
+	{
+		for (Int c = 0; c < format.channels; c++) memcpy(intermediate + inLayout[c] * bytesPerSample, buffer + i + c * bytesPerSample, bytesPerSample);
+		for (Int c = 0; c < format.channels; c++) memcpy(buffer + i + c * bytesPerSample, intermediate + outLayout[c] * bytesPerSample, bytesPerSample);
+	}
+
+	delete [] intermediate;
+
+	return True;
+}
