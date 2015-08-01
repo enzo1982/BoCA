@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -98,6 +98,13 @@ Int BoCA::OutputALSA::WriteData(Buffer<UnsignedByte> &data, Int size)
 	const Format		&format = track.GetFormat();
 	snd_pcm_sframes_t	 frames = -1;
 
+	/* Change to ALSA channel order.
+	 */
+	if	(format.channels == 5) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_0, Channel::ALSA_5_0);
+	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_1, Channel::ALSA_5_1);
+
+	/* Output samples.
+	 */
 	if (format.bits == 24)
 	{
 		/* Convert 24 bit samples to 32 bit.
