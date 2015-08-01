@@ -38,7 +38,9 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	{
 		for (Int i = 0; i < info->GetNumberOfDevices(); i++)
 		{
-			combo_drive->AddEntry(info->GetNthDeviceInfo(i).name);
+			const Device	&device = info->GetNthDeviceInfo(i);
+
+			combo_drive->AddEntry(String(device.vendor).Append(" ").Append(device.model).Append(" ").Append(device.revision).Trim());
 
 			driveOffsetUsed.Add(config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), 0));
 			driveOffsets.Add(config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
