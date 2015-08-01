@@ -105,6 +105,14 @@ Bool BoCA::EncoderFLAC::Activate()
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
 
+	if (format.channels > 8)
+	{
+		errorString = "This encoder does not support more than 8 channels!";
+		errorState  = True;
+
+		return False;
+	}
+
 	const Config	*config = GetConfiguration();
 
 	srand(clock());
@@ -300,9 +308,9 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 Bool BoCA::EncoderFLAC::FixChapterMarks()
 {
-	if (track.tracks.Length() == 0 || !GetConfiguration()->GetIntValue("Tags", "WriteChapters", True)) return True;
-
 	const Config	*config = GetConfiguration();
+
+	if (track.tracks.Length() == 0 || !config->GetIntValue("Tags", "WriteChapters", True)) return True;
 
 	/* Fill buffer with Vorbis Comment block.
 	 */
