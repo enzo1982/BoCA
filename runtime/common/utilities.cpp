@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -131,7 +131,7 @@ String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
 		tempDir[tempDir.Length()] = rVal[j];
 	}
 
-	return tempDir.Append(".temp");
+	return tempDir.Append("-").Append(Number(Int64(fileName.ComputeCRC32())).ToHexString()).Append(".temp");
 }
 
 String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string)
