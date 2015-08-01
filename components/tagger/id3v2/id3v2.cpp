@@ -211,16 +211,34 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &track, Bool isChapter)
 {
 	const Config	*currentConfig = GetConfiguration();
+	String		 encodingID    = currentConfig->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
 
+	if (encodingID == "UTF-16BE" || encodingID == "UTF-8") container.SetSpec(ID3V2_4_0);
+	else						       container.SetSpec(ID3V2_3_0);
+
+	/* Save basic information.
+	 */
 	const Info	&info = track.GetInfo();
 
-	if (info.artist != NIL) { ID3_Frame frame(ID3FID_LEADARTIST);  SetStringField(frame, ID3FN_TEXT, info.artist);		      container.AddFrame(frame); }
-	if (info.title  != NIL) { ID3_Frame frame(ID3FID_TITLE);       SetStringField(frame, ID3FN_TEXT, info.title);		      container.AddFrame(frame); }
-	if (info.album  != NIL) { ID3_Frame frame(ID3FID_ALBUM);       SetStringField(frame, ID3FN_TEXT, info.album);		      container.AddFrame(frame); }
-	if (info.year    >   0) { ID3_Frame frame(ID3FID_YEAR);	       SetStringField(frame, ID3FN_TEXT, String::FromInt(info.year)); container.AddFrame(frame); }
-	if (info.genre  != NIL) { ID3_Frame frame(ID3FID_CONTENTTYPE); SetStringField(frame, ID3FN_TEXT, info.genre);		      container.AddFrame(frame); }
-	if (info.label  != NIL) { ID3_Frame frame(ID3FID_PUBLISHER);   SetStringField(frame, ID3FN_TEXT, info.label);		      container.AddFrame(frame); }
-	if (info.isrc   != NIL) { ID3_Frame frame(ID3FID_ISRC);	       SetStringField(frame, ID3FN_TEXT, info.isrc);		      container.AddFrame(frame); }
+	if (info.artist != NIL) { ID3_Frame frame(ID3FID_LEADARTIST);  SetStringField(frame, ID3FN_TEXT, info.artist); container.AddFrame(frame); }
+	if (info.title  != NIL) { ID3_Frame frame(ID3FID_TITLE);       SetStringField(frame, ID3FN_TEXT, info.title);  container.AddFrame(frame); }
+	if (info.album  != NIL) { ID3_Frame frame(ID3FID_ALBUM);       SetStringField(frame, ID3FN_TEXT, info.album);  container.AddFrame(frame); }
+	if (info.genre  != NIL) { ID3_Frame frame(ID3FID_CONTENTTYPE); SetStringField(frame, ID3FN_TEXT, info.genre);  container.AddFrame(frame); }
+	if (info.label  != NIL) { ID3_Frame frame(ID3FID_PUBLISHER);   SetStringField(frame, ID3FN_TEXT, info.label);  container.AddFrame(frame); }
+	if (info.isrc   != NIL) { ID3_Frame frame(ID3FID_ISRC);	       SetStringField(frame, ID3FN_TEXT, info.isrc);   container.AddFrame(frame); }
+
+	if (info.year > 0)
+	{
+		ID3_Frame	 frame;
+
+		if (container.GetSpec() == ID3V2_4_0) frame = ID3_Frame(ID3FID_RECORDINGTIME);
+		else				      frame = ID3_Frame(ID3FID_YEAR);
+
+		SetStringField(frame, ID3FN_TEXT, String::FromInt(info.year));
+
+		container.AddFrame(frame);
+	}
+
 
 	if (info.track > 0)
 	{
@@ -424,7 +442,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_TITLE)		    info.title	 = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_ALBUM)		    info.album	 = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_YEAR)		    info.year	 = GetStringField(frame, ID3FN_TEXT).ToInt();
-		else if (frame.GetID() == ID3FID_RELEASETIME)	    info.year	 = GetStringField(frame, ID3FN_TEXT).Head(4).ToInt();
+		else if (frame.GetID() == ID3FID_RECORDINGTIME)	    info.year	 = GetStringField(frame, ID3FN_TEXT).Head(4).ToInt();
 		else if (frame.GetID() == ID3FID_COMMENT)	    info.comment = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_PUBLISHER)	    info.label	 = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_ISRC)		    info.isrc	 = GetStringField(frame, ID3FN_TEXT);
