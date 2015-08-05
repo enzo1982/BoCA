@@ -338,11 +338,11 @@ Bool BoCA::AS::DecoderComponentExternalFile::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::AS::DecoderComponentExternalFile::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::AS::DecoderComponentExternalFile::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (in->GetPos() == in->Size()) return -1;
 
-	size = Math::Min((Int64) 2048, in->Size() - in->GetPos());
+	Int	 size = Math::Min((Int64) 2048, in->Size() - in->GetPos());
 
 	/* Hand data over from the input file
 	 */

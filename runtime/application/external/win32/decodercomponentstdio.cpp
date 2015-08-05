@@ -550,11 +550,11 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data)
 {
 	/* Hand data over from the input file.
 	 */
-	size = 12288;
+	Int	 size = 12288;
 
 	data.Resize(size);
 

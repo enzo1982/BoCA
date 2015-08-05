@@ -31,7 +31,7 @@ namespace BoCA
 				virtual Bool	 Activate();
 				virtual Bool	 Deactivate();
 
-				virtual Int	 WriteData(Buffer<UnsignedByte> &buffer, Int size);
+				virtual Int	 WriteData(Buffer<UnsignedByte> &);
 
 				virtual Bool	 Finish();
 

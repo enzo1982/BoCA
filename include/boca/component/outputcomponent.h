@@ -41,7 +41,7 @@ namespace BoCA
 
 				/* Write data from buffer.
 				 */
-				virtual Int	 WriteData(Buffer<UnsignedByte> &, Int) = 0;
+				virtual Int	 WriteData(Buffer<UnsignedByte> &) = 0;
 
 				/* Play till the end of available data, then stop.
 				 */

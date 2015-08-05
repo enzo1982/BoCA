@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -71,9 +71,9 @@ Bool BoCA::AS::DecoderComponent::Seek(Int64 samplePosition)
 	return specs->func_Seek(component, samplePosition);
 }
 
-Int BoCA::AS::DecoderComponent::ReadData(Buffer<UnsignedByte> &buffer, Int size)
+Int BoCA::AS::DecoderComponent::ReadData(Buffer<UnsignedByte> &buffer)
 {
-	return specs->func_ReadData(component, &buffer, size);
+	return specs->func_ReadData(component, &buffer);
 }
 
 Int64 BoCA::AS::DecoderComponent::GetInBytes() const

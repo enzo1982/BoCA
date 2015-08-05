@@ -39,7 +39,7 @@ namespace BoCA
 
 				virtual Bool	 Seek(Int64);
 
-				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int);
+				virtual Int	 ReadData(Buffer<UnsignedByte> &);
 		};
 	};
 };

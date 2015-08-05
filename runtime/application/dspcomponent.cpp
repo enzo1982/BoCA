@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2008 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -43,9 +43,9 @@ Bool BoCA::AS::DSPComponent::Deactivate()
 	return specs->func_Deactivate(component);
 }
 
-Int BoCA::AS::DSPComponent::TransformData(Buffer<UnsignedByte> &buffer, Int size)
+Int BoCA::AS::DSPComponent::TransformData(Buffer<UnsignedByte> &buffer)
 {
-	return specs->func_TransformData(component, &buffer, size);
+	return specs->func_TransformData(component, &buffer);
 }
 
 Int BoCA::AS::DSPComponent::Flush(Buffer<UnsignedByte> &buffer)

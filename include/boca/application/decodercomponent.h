@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -38,7 +38,7 @@ namespace BoCA
 
 				virtual Bool	 Seek(Int64);
 
-				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int);
+				virtual Int	 ReadData(Buffer<UnsignedByte> &);
 
 				virtual Int	 GetPackageSize() const;
 				virtual Int	 SetDriver(IO::Driver *);

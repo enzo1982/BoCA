@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -209,7 +209,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 	return True;
 }
 
-Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -231,8 +231,8 @@ Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &dat
 
 	/* Hand data over to the encoder using the stdio pipe
 	 */
-	out->OutputData(data, size);
+	out->OutputData(data, data.Size());
 	out->Flush();
 
-	return size;
+	return data.Size();
 }

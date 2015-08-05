@@ -47,9 +47,9 @@ Bool BoCA::AS::OutputComponent::Deactivate()
 	return specs->func_Deactivate(component);
 }
 
-Int BoCA::AS::OutputComponent::WriteData(Buffer<UnsignedByte> &buffer, Int size)
+Int BoCA::AS::OutputComponent::WriteData(Buffer<UnsignedByte> &buffer)
 {
-	return specs->func_WriteData(component, &buffer, size);
+	return specs->func_WriteData(component, &buffer);
 }
 
 Bool BoCA::AS::OutputComponent::Finish()

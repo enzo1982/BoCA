@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2010 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -32,9 +32,9 @@ namespace BoCA
 				virtual Bool	 Activate();
 				virtual Bool	 Deactivate();
 
-				virtual Int	 TransformData(Buffer<UnsignedByte> &buffer, Int size);
+				virtual Int	 TransformData(Buffer<UnsignedByte> &);
 
-				virtual Int	 Flush(Buffer<UnsignedByte> &buffer);
+				virtual Int	 Flush(Buffer<UnsignedByte> &);
 
 				virtual Int	 GetPackageSize();
 		};

@@ -204,9 +204,9 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_Seek			= (bool (*)(void *, __int64))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Seek"));
 	func_NextPass			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_NextPass"));
 
-	func_ReadData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
-	func_WriteData			= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
-	func_TransformData		= (int (*)(void *, void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_TransformData"));
+	func_ReadData			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadData"));
+	func_WriteData			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WriteData"));
+	func_TransformData		= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_TransformData"));
 	func_ProcessData		= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ProcessData"));
 
 	func_Flush			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Flush"));

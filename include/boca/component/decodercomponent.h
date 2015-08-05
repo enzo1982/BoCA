@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -55,7 +55,7 @@ namespace BoCA
 
 				/* Read data into buffer.
 				 */
-				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int) = 0;
+				virtual Int	 ReadData(Buffer<UnsignedByte> &) = 0;
 			accessors:
 				Int64		 GetInBytes() const { return inBytes; }
 		};

@@ -327,9 +327,9 @@ namespace BoCA
 				bool			 (*func_Seek)(void *, __int64);
 				bool			 (*func_NextPass)(void *);
 
-				int			 (*func_ReadData)(void *, void *, int);
-				int			 (*func_WriteData)(void *, void *, int);
-				int			 (*func_TransformData)(void *, void *, int);
+				int			 (*func_ReadData)(void *, void *);
+				int			 (*func_WriteData)(void *, void *);
+				int			 (*func_TransformData)(void *, void *);
 				int			 (*func_ProcessData)(void *, void *);
 
 				int			 (*func_Flush)(void *, void *);
