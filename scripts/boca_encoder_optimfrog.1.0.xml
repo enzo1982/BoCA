@@ -13,8 +13,8 @@
   </format>
   <external>
     <command>ofr</command>
-    <arguments>--encode %OPTIONS %INFILE --output %OUTFILE</arguments>
-    <mode>file</mode>
+    <arguments>--encode --incorrectheader %OPTIONS - --output %OUTFILE</arguments>
+    <mode>stdio</mode>
     <informat>wave</informat>
     <parameters>
       <selection name="Encoding mode" argument="--mode %VALUE" default="normal">
