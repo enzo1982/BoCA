@@ -20,7 +20,7 @@ BoCA::CoverDisplay::CoverDisplay(const Bitmap &cover)
 	if (size.cx > monitor.right  - monitor.left - 40) { size.cy = size.cy * (monitor.right  - monitor.left - 40) / size.cx; size.cx = monitor.right  - monitor.left - 40; }
 	if (size.cy > monitor.bottom - monitor.top  - 40) { size.cx = size.cx * (monitor.bottom - monitor.top  - 40) / size.cy; size.cy = monitor.bottom - monitor.top  - 40; }
 
-	window		= new GUI::Window(NIL, Point(monitor.left, monitor.top) + Point((monitor.right - monitor.left - size.cx - 4) / 2, (monitor.bottom - monitor.top - size.cx - 4) / 2), size);
+	window		= new GUI::Window(" ", Point(monitor.left, monitor.top) + Point((monitor.right - monitor.left - size.cx - 4) / 2, (monitor.bottom - monitor.top - size.cx - 4) / 2), size);
 	window->SetSize(size + Size(window->GetFrameWidth(), window->GetFrameWidth()));
 
 	image_cover	= new Image(cover, Point(-1, -1), size);
