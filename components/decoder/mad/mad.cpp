@@ -230,7 +230,7 @@ Bool BoCA::DecoderMAD::Deactivate()
 	return True;
 }
 
-Int BoCA::DecoderMAD::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderMAD::ReadData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -248,7 +248,7 @@ Int BoCA::DecoderMAD::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	samplesBufferMutex->Lock();
 
-	size = samplesBuffer.Size() * (format.bits / 8);
+	Int	 size = samplesBuffer.Size() * (format.bits / 8);
 
 	data.Resize(size);
 

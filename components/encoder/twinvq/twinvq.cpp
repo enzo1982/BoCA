@@ -196,13 +196,13 @@ Bool BoCA::EncoderTwinVQ::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderTwinVQ::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderTwinVQ::WriteData(Buffer<UnsignedByte> &data)
 {
 	const Format	&format = track.GetFormat();
 
-	samplesBuffer.Resize(size / (format.bits / 8));
+	samplesBuffer.Resize(data.Size() / (format.bits / 8));
 
-	for (int i = 0; i < size / (format.bits / 8); i++)
+	for (int i = 0; i < data.Size() / (format.bits / 8); i++)
 	{
 		if	(format.bits ==  8) samplesBuffer[i] =	     (				   data [i] - 128) * 256;
 		else if (format.bits == 16) samplesBuffer[i] =	      ((short *) (unsigned char *) data)[i];
@@ -213,7 +213,7 @@ Int BoCA::EncoderTwinVQ::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	for (int ch = 0; ch < format.channels; ch++)
 	{
-		for (int i = 0; i < int(size / (format.bits / 8) / format.channels); i++)
+		for (int i = 0; i < int(data.Size() / (format.bits / 8) / format.channels); i++)
 		{
 			frame[ch * int(frame.Size() / format.channels) + i] = (float) samplesBuffer[i * format.channels + ch];
 		}
@@ -222,7 +222,7 @@ Int BoCA::EncoderTwinVQ::WriteData(Buffer<UnsignedByte> &data, Int size)
 	ex_TvqEncodeFrame(frame, &index);
 	TvqWriteBsFrame(&index, bfp);
 
-	return size;
+	return data.Size();
 }
 
 ConfigLayer *BoCA::EncoderTwinVQ::GetConfigurationLayer()

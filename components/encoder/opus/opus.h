@@ -50,7 +50,7 @@ namespace BoCA
 			Bool			 Activate();
 			Bool			 Deactivate();
 
-			Int			 WriteData(Buffer<UnsignedByte> &, Int);
+			Int			 WriteData(Buffer<UnsignedByte> &);
 
 			String			 GetOutputFileExtension() const;
 

@@ -176,7 +176,7 @@ Bool BoCA::EncoderBonk::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderBonk::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderBonk::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -187,9 +187,9 @@ Int BoCA::EncoderBonk::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	if (format.bits != 16)
 	{
-		samplesBuffer.Resize(size);
+		samplesBuffer.Resize(data.Size());
 
-		for (Int i = 0; i < size / (format.bits / 8); i++)
+		for (Int i = 0; i < data.Size() / (format.bits / 8); i++)
 		{
 			if	(format.bits ==  8				) samplesBuffer[i] =	   (				data [i] - 128) * 256;
 			else if (format.bits == 32				) samplesBuffer[i] = (int) (((long *) (unsigned char *) data)[i]	/ 65536);
@@ -198,11 +198,11 @@ Int BoCA::EncoderBonk::WriteData(Buffer<UnsignedByte> &data, Int size)
 			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
 		}
 
-		bytes = ex_bonk_encoder_encode_packet(encoder, samplesBuffer, size / (format.bits / 8), dataBuffer, dataBuffer.Size());
+		bytes = ex_bonk_encoder_encode_packet(encoder, samplesBuffer, data.Size() / (format.bits / 8), dataBuffer, dataBuffer.Size());
 	}
 	else
 	{
-		bytes = ex_bonk_encoder_encode_packet(encoder, (short *) (unsigned char *) data, size / (format.bits / 8), dataBuffer, dataBuffer.Size());
+		bytes = ex_bonk_encoder_encode_packet(encoder, (short *) (unsigned char *) data, data.Size() / (format.bits / 8), dataBuffer, dataBuffer.Size());
 	}
 
 	driver->WriteData(dataBuffer, bytes);

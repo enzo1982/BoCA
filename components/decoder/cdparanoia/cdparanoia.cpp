@@ -390,7 +390,7 @@ Bool BoCA::DecoderCDParanoia::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderCDParanoia::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderCDParanoia::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (inBytes >= track.fileSize) return -1;
 

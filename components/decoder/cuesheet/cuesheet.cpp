@@ -381,7 +381,7 @@ Bool BoCA::DecoderCueSheet::Deactivate()
 	return False;
 }
 
-Int BoCA::DecoderCueSheet::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderCueSheet::ReadData(Buffer<UnsignedByte> &data)
 {
 	return -1;
 }

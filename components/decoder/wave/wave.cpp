@@ -259,7 +259,7 @@ Bool BoCA::DecoderWave::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderWave::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderWave::ReadData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -267,11 +267,9 @@ Int BoCA::DecoderWave::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	/* Read data.
 	 */
-	if (floatFormat && floatFormatBits == 64) size *= 2;
+	if (floatFormat && floatFormatBits == 64) data.Resize(data.Size() * 2);
 
-	data.Resize(size);
-
-	size = driver->ReadData(data, size);
+	Int	 size = driver->ReadData(data, data.Size());
 
 	/* Convert float to integer.
 	 */

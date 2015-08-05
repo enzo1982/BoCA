@@ -57,7 +57,7 @@ namespace BoCA
 
 			Bool				 Seek(Int64);
 
-			Int				 ReadData(Buffer<UnsignedByte> &, Int);
+			Int				 ReadData(Buffer<UnsignedByte> &);
 
 			ConfigLayer			*GetConfigurationLayer();
 	};

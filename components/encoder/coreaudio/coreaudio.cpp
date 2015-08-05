@@ -422,14 +422,14 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data)
 {
 	/* Configure buffer.
 	 */
-	buffer.Resize(buffer.Size() + size);
+	buffer.Resize(buffer.Size() + data.Size());
 
-	memmove(buffer, buffer + bytesConsumed, buffer.Size() - bytesConsumed - size);
-	memcpy(buffer + buffer.Size() - bytesConsumed - size, data, size);
+	memmove(buffer, buffer + bytesConsumed, buffer.Size() - bytesConsumed - data.Size());
+	memcpy(buffer + buffer.Size() - bytesConsumed - data.Size(), data, data.Size());
 
 	buffer.Resize(buffer.Size() - bytesConsumed);
 

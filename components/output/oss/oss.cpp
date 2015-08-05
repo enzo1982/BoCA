@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -103,7 +103,7 @@ Bool BoCA::OutputOSS::Deactivate()
 	return True;
 }
 
-Int BoCA::OutputOSS::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::OutputOSS::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -115,39 +115,39 @@ Int BoCA::OutputOSS::WriteData(Buffer<UnsignedByte> &data, Int size)
 	{
 		/* Convert 24 bit samples to 16 bit.
 		 */
-		Buffer<Int16>	 samples(size / (format.bits / 8));
+		Buffer<Int16>	 samples(data.Size() / (format.bits / 8));
 
 		if (endianness == EndianLittle) for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i    ] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) / 256;
 		else				for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i + 2] + (data[3 * i + 1] << 8) + (data[3 * i	 ] << 16)) / 256;
 
-		bytes = write(device_fd, samples, size / (format.bits / 8) * sizeof(Int16));
+		bytes = write(device_fd, samples, data.Size() / (format.bits / 8) * sizeof(Int16));
 	}
 	else if (format.bits == 32)
 	{
 		/* Convert 32 bit samples to 16 bit.
 		 */
-		Buffer<Int16>	 samples(size / (format.bits / 8));
+		Buffer<Int16>	 samples(data.Size() / (format.bits / 8));
 
 		for (Int i = 0; i < samples.Size(); i++) samples[i] = (Int16) ((long *) (unsigned char *) data)[i] / 65536;
 
-		bytes = write(device_fd, samples, size / (format.bits / 8) * sizeof(Int16));
+		bytes = write(device_fd, samples, data.Size() / (format.bits / 8) * sizeof(Int16));
 	}
 #else
 	if (format.bits == 24)
 	{
 		/* Convert 24 bit samples to 32 bit.
 		 */
-		Buffer<Int32>	 samples(size / (format.bits / 8));
+		Buffer<Int32>	 samples(data.Size() / (format.bits / 8));
 
 		if (endianness == EndianLittle) for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i    ] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) * 256;
 		else				for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i + 2] + (data[3 * i + 1] << 8) + (data[3 * i	 ] << 16)) * 256;
 
-		bytes = write(device_fd, samples, size / (format.bits / 8) * sizeof(Int32));
+		bytes = write(device_fd, samples, data.Size() / (format.bits / 8) * sizeof(Int32));
 	}
 #endif
 	else
 	{
-		bytes = write(device_fd, data, size);
+		bytes = write(device_fd, data, data.Size());
 	}
 
 	if (bytes < 0) return 0;

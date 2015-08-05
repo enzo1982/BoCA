@@ -279,7 +279,7 @@ Bool BoCA::EncoderFLAC::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -289,9 +289,9 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 	 */
 	const Format	&format = track.GetFormat();
 
-	buffer.Resize(size / (format.bits / 8));
+	buffer.Resize(data.Size() / (format.bits / 8));
 
-	for (Int i = 0; i < size / (format.bits / 8); i++)
+	for (Int i = 0; i < data.Size() / (format.bits / 8); i++)
 	{
 		if	(format.bits ==  8				) buffer[i] =				   data [i] - 128;
 		else if (format.bits == 16				) buffer[i] = ((Short *) (unsigned char *) data)[i];
@@ -301,7 +301,7 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data, Int size)
 		else if (format.bits == 24 && endianness == EndianBig	) buffer[i] = (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 256;
 	}
 
-	ex_FLAC__stream_encoder_process_interleaved(encoder, buffer, size / (format.bits / 8) / format.channels);
+	ex_FLAC__stream_encoder_process_interleaved(encoder, buffer, data.Size() / (format.bits / 8) / format.channels);
 
 	return bytesWritten;
 }

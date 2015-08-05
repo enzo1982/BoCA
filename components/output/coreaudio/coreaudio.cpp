@@ -156,19 +156,19 @@ Bool BoCA::OutputCoreAudio::Deactivate()
 	return True;
 }
 
-Int BoCA::OutputCoreAudio::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::OutputCoreAudio::WriteData(Buffer<UnsignedByte> &data)
 {
 	samplesBufferMutex->Lock();
 
 	Int	 bytes = samplesBuffer.Size();
 
-	samplesBuffer.Resize(bytes + size);
+	samplesBuffer.Resize(bytes + data.Size());
 
-	memcpy(samplesBuffer + bytes, data, size);
+	memcpy(samplesBuffer + bytes, data, data.Size());
 
 	samplesBufferMutex->Release();
 
-	return size;
+	return data.Size();
 }
 
 Int BoCA::OutputCoreAudio::CanWrite()

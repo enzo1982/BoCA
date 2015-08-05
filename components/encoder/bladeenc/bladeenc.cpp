@@ -199,7 +199,7 @@ Bool BoCA::EncoderBlade::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderBlade::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderBlade::WriteData(Buffer<UnsignedByte> &data)
 {
 	unsigned long	 bytes = 0;
 
@@ -207,7 +207,7 @@ Int BoCA::EncoderBlade::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	if (format.bits != 16)
 	{
-		for (int i = 0; i < size / (format.bits / 8); i++)
+		for (int i = 0; i < data.Size() / (format.bits / 8); i++)
 		{
 			if	(format.bits ==  8) samplesBuffer[i] =	     (				  data [i] - 128) * 256;
 			else if (format.bits == 32) samplesBuffer[i] = (int) (((long *) (unsigned char *) data)[i]	  / 65536);
@@ -215,11 +215,11 @@ Int BoCA::EncoderBlade::WriteData(Buffer<UnsignedByte> &data, Int size)
 			else if (format.bits == 24) samplesBuffer[i] = (int) ((data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256);
 		}
 
-		ex_beEncodeChunk(handle, size / (format.bits / 8), samplesBuffer, outBuffer, &bytes);
+		ex_beEncodeChunk(handle, data.Size() / (format.bits / 8), samplesBuffer, outBuffer, &bytes);
 	}
 	else
 	{
-		ex_beEncodeChunk(handle, size / (format.bits / 8), (short *) (unsigned char *) data, outBuffer, &bytes);
+		ex_beEncodeChunk(handle, data.Size() / (format.bits / 8), (short *) (unsigned char *) data, outBuffer, &bytes);
 	}
 
 	driver->WriteData(outBuffer, bytes);

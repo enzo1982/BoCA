@@ -309,11 +309,11 @@ Bool BoCA::EncoderOpus::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	size = resampler->TransformData(data, size);
+	Int	 size = resampler->TransformData(data);
 
 	/* Convert samples to 16 bit.
 	 */

@@ -505,7 +505,7 @@ Bool BoCA::DecoderFDKAAC::Seek(Int64 samplePosition)
 	return False;
 }
 
-Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 {
 	static Int	 maxFrameSize = 2048;
 
@@ -585,11 +585,11 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 	}
 	else
 	{
-		if (size <= 0) return -1;
+		if (data.Size() <= 0) return -1;
 
-		dataBuffer.Resize(size);
+		dataBuffer.Resize(data.Size());
 
-		size = driver->ReadData(dataBuffer, size);
+		Int	 size = driver->ReadData(dataBuffer, data.Size());
 
 		inBytes += size;
 

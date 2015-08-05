@@ -159,13 +159,13 @@ Bool BoCA::EncoderMAC::Deactivate()
  	return True;
 }
 
-Int BoCA::EncoderMAC::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderMAC::WriteData(Buffer<UnsignedByte> &data)
 {
 	/* Hand data over to the encoder.
 	 */
-	ex_APECompress_AddData(hAPECompress, data, size);
+	ex_APECompress_AddData(hAPECompress, data, data.Size());
 
-	return size;
+	return data.Size();
 }
 
 ConfigLayer *BoCA::EncoderMAC::GetConfigurationLayer()

@@ -145,8 +145,9 @@ Bool BoCA::OutputDirectSound::Deactivate()
 	return True;
 }
 
-Int BoCA::OutputDirectSound::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::OutputDirectSound::WriteData(Buffer<UnsignedByte> &data)
 {
+	Int	 size	      = data.Size();
 	Int	 bytesWritten = 0;
 
 	/* Loop until all bytes are fed to the buffer.
@@ -207,7 +208,7 @@ Bool BoCA::OutputDirectSound::Finish()
 
 	memset(buffer, 0, bufferSize);
 
-	WriteData(buffer, bufferSize);
+	WriteData(buffer);
 
 	/* Stop playing the buffer as we must have
 	 * reached the null samples at this point.

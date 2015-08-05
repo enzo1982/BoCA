@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -251,7 +251,7 @@ Bool BoCA::DecoderTwinVQ::Deactivate()
 	return True;
 }
 
-Int BoCA::DecoderTwinVQ::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderTwinVQ::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (TvqReadBsFrame(&index, bfp) != 0)
 	{

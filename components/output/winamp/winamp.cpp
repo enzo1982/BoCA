@@ -74,11 +74,11 @@ Bool BoCA::OutputWinamp::Deactivate()
 	return True;
 }
 
-Int BoCA::OutputWinamp::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::OutputWinamp::WriteData(Buffer<UnsignedByte> &data)
 {
-	plugin->Write((char *) (UnsignedByte *) data, size);
+	plugin->Write((char *) (UnsignedByte *) data, data.Size());
 
-	return size;
+	return data.Size();
 }
 
 ConfigLayer *BoCA::OutputWinamp::GetConfigurationLayer()

@@ -102,11 +102,11 @@ Bool BoCA::DSPResample::Deactivate()
 	return True;
 }
 
-Int BoCA::DSPResample::TransformData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DSPResample::TransformData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	if (state == NIL) return size;
+	if (state == NIL) return data.Size();
 
 	const Format	&format = track.GetFormat();
 
@@ -114,7 +114,7 @@ Int BoCA::DSPResample::TransformData(Buffer<UnsignedByte> &data, Int size)
 
 	src_data.end_of_input	= 0;
 	src_data.src_ratio	= ratio;
-	src_data.input_frames	= size / (format.bits / 8) / format.channels;
+	src_data.input_frames	= data.Size() / (format.bits / 8) / format.channels;
 	src_data.output_frames	= src_data.input_frames * src_data.src_ratio + 2;
 
 	inBuffer.Resize(src_data.input_frames * format.channels);
@@ -127,16 +127,16 @@ Int BoCA::DSPResample::TransformData(Buffer<UnsignedByte> &data, Int size)
 	 */
 	if (format.bits == 8)
 	{
-		shortBuffer.Resize(size);
+		shortBuffer.Resize(data.Size());
 
-		for (Int i = 0; i < size; i++) shortBuffer[i] = (data[i] - 128) * 256;
+		for (Int i = 0; i < data.Size(); i++) shortBuffer[i] = (data[i] - 128) * 256;
 	}
 
 	if (format.bits == 24)
 	{
-		intBuffer.Resize(size / (format.bits / 8));
+		intBuffer.Resize(data.Size() / (format.bits / 8));
 
-		for (Int i = 0; i < size / (format.bits / 8); i++)
+		for (Int i = 0; i < data.Size() / (format.bits / 8); i++)
 		{
 			if (endianness == EndianLittle) intBuffer[i] = (int) (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8);
 			if (endianness == EndianBig   ) intBuffer[i] = (int) (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8);

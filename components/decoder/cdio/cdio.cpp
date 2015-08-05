@@ -427,7 +427,7 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderCDIO::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderCDIO::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (inBytes >= track.fileSize) return -1;
 

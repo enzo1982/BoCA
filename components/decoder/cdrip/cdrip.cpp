@@ -429,7 +429,7 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (inBytes >= track.fileSize) return -1;
 
@@ -448,7 +448,7 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data, Int size)
 	/* Rip chunk.
 	 */
 	BOOL	 abort = false;
-	LONG	 lSize = size;
+	LONG	 lSize = dataBufferSize;
 
 	ex_CR_RipChunk(cd, data + prependBytes, &lSize, abort);
 

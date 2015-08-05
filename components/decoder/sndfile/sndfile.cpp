@@ -398,7 +398,7 @@ Bool BoCA::DecoderSndFile::Seek(Int64 samplePosition)
 	else						      return False;
 }
 
-Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -406,7 +406,7 @@ Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	/* Set size to a multiple of the number of channels.
 	 */
-	size -= size % (format.bits / 8 * format.channels);
+	Int	 size = data.Size() - data.Size() % (format.bits / 8 * format.channels);
 
 	data.Resize(size);
 

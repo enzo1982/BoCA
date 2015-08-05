@@ -289,10 +289,10 @@ Bool BoCA::EncoderWMA::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data)
 {
 	INSSBuffer	*pSample = NIL;
-	HRESULT		 hr	 = m_pWriter->AllocateSample(size, &pSample);
+	HRESULT		 hr	 = m_pWriter->AllocateSample(data.Size(), &pSample);
 
 	if (FAILED(hr)) return -1;
 
@@ -300,9 +300,9 @@ Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	if (!FAILED(pSample->GetBuffer(&buffer)))
 	{
-		memcpy(buffer, data, size);
+		memcpy(buffer, data, data.Size());
 
-		pSample->SetLength(size);
+		pSample->SetLength(data.Size());
 
 		const Format	&format = track.GetFormat();
 		QWORD		 cnsSampleTime = samplesWritten * 10000000 / format.channels / format.rate;
@@ -313,10 +313,10 @@ Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 		if (FAILED(hr)) return -1;
 
-		samplesWritten += size / (format.bits / 8);
+		samplesWritten += data.Size() / (format.bits / 8);
 	}
 
-	return size;
+	return data.Size();
 }
 
 Bool BoCA::EncoderWMA::NextPass()

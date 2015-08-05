@@ -230,9 +230,11 @@ Bool BoCA::OutputWaveOut::Deactivate()
 	return True;
 }
 
-Int BoCA::OutputWaveOut::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::OutputWaveOut::WriteData(Buffer<UnsignedByte> &data)
 {
-	UnsignedByte	*_data = (UnsignedByte *) data;
+	UnsignedByte	*_data	      = (UnsignedByte *) data;
+
+	Int		 size	      = data.Size();
 	Int		 bytesWritten = 0;
 
 	EnterCriticalSection(&sync);

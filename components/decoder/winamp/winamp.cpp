@@ -378,7 +378,7 @@ Bool BoCA::DecoderWinamp::Deactivate()
 	return True;
 }
 
-Int BoCA::DecoderWinamp::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderWinamp::ReadData(Buffer<UnsignedByte> &data)
 {
 	/* Give the plugin one second to send more samples.
 	 */
@@ -392,7 +392,7 @@ Int BoCA::DecoderWinamp::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	/* Copy samples to output buffer.
 	 */
-	size = samplesBuffer.Size();
+	Int	 size = samplesBuffer.Size();
 
 	data.Resize(size);
 

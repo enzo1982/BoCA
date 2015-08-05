@@ -91,7 +91,7 @@ Bool BoCA::OutputALSA::Deactivate()
 	return True;
 }
 
-Int BoCA::OutputALSA::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::OutputALSA::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -109,16 +109,16 @@ Int BoCA::OutputALSA::WriteData(Buffer<UnsignedByte> &data, Int size)
 	{
 		/* Convert 24 bit samples to 32 bit.
 		 */
-		Buffer<Int32>	 samples(size / (format.bits / 8));
+		Buffer<Int32>	 samples(data.Size() / (format.bits / 8));
 
 		if (endianness == EndianLittle) for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i    ] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) * 256;
 		else				for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i + 2] + (data[3 * i + 1] << 8) + (data[3 * i	 ] << 16)) * 256;
 
-		frames = snd_pcm_writei(playback_handle, samples, size / format.channels / (format.bits / 8));
+		frames = snd_pcm_writei(playback_handle, samples, data.Size() / format.channels / (format.bits / 8));
 	}
 	else
 	{
-		frames = snd_pcm_writei(playback_handle, data, size / format.channels / (format.bits / 8));
+		frames = snd_pcm_writei(playback_handle, data, data.Size() / format.channels / (format.bits / 8));
 	}
 
 	if (frames < 0) return 0;

@@ -491,7 +491,7 @@ Bool BoCA::DecoderFAAD2::Seek(Int64 samplePosition)
 	return False;
 }
 
-Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 {
 	const Format	&format = track.GetFormat();
 
@@ -544,11 +544,11 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data, Int size)
 	}
 	else
 	{
-		if (size <= 0) return -1;
+		if (data.Size() <= 0) return -1;
 
-		dataBuffer.Resize(size + backBuffer.Size());
+		dataBuffer.Resize(data.Size() + backBuffer.Size());
 
-		size = driver->ReadData(dataBuffer + backBuffer.Size(), size);
+		Int	 size = driver->ReadData(dataBuffer + backBuffer.Size(), data.Size());
 
 		inBytes += size;
 

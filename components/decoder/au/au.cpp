@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -121,13 +121,11 @@ Bool BoCA::DecoderSunAu::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderSunAu::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderSunAu::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (driver->GetPos() == driver->GetSize()) return -1;
 
-	data.Resize(size);
-
-	size = driver->ReadData(data, size);
+	Int	 size = driver->ReadData(data, data.Size());
 
 	/* Convert 8 bit samples to unsigned.
 	 */

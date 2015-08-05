@@ -243,14 +243,14 @@ Bool BoCA::EncoderSpeex::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderSpeex::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderSpeex::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
 	/* Convert samples to 16 bit.
 	 */
 	const Format	&format	 = track.GetFormat();
-	Int		 samples = size / format.channels / (format.bits / 8);
+	Int		 samples = data.Size() / format.channels / (format.bits / 8);
 	Int		 offset	 = samplesBuffer.Size();
 
 	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);

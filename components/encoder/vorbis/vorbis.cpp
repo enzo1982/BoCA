@@ -194,7 +194,7 @@ Bool BoCA::EncoderVorbis::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderVorbis::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderVorbis::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -210,7 +210,7 @@ Int BoCA::EncoderVorbis::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	/* Convert samples to 16 bit.
 	 */
-	Int	 samples_size = size / (format.bits / 8);
+	Int	 samples_size = data.Size() / (format.bits / 8);
 
 	samplesBuffer.Resize(samples_size);
 

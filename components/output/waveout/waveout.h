@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -51,7 +51,7 @@ namespace BoCA
 			Bool			 Activate();
 			Bool			 Deactivate();
 
-			Int			 WriteData(Buffer<UnsignedByte> &, Int);
+			Int			 WriteData(Buffer<UnsignedByte> &);
 
 			Int			 CanWrite();
 

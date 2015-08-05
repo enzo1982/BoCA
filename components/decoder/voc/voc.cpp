@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -118,13 +118,10 @@ Bool BoCA::DecoderVoc::Deactivate()
 	return True;
 }
 
-Int BoCA::DecoderVoc::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderVoc::ReadData(Buffer<UnsignedByte> &data)
 {
-	data.Resize(size);
-
-	size = driver->ReadData(data, size);
-
-	int	 outSize = size;
+	Int	 size	 = driver->ReadData(data, data.Size());
+	Int	 outSize = size;
 
 	if (size > bytesLeft)
 	{

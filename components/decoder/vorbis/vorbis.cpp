@@ -362,13 +362,12 @@ Bool BoCA::DecoderVorbis::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data)
 {
-	if (size <= 0) return -1;
+	if (data.Size() <= 0) return -1;
 
-	char	*buffer = ex_ogg_sync_buffer(&oy, size);
-
-	size = driver->ReadData((unsigned char *) buffer, size);
+	char	*buffer = ex_ogg_sync_buffer(&oy, data.Size());
+	Int	 size	= driver->ReadData((unsigned char *) buffer, data.Size());
 
 	inBytes += size;
 

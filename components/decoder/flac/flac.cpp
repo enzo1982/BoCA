@@ -251,7 +251,7 @@ Bool BoCA::DecoderFLAC::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -267,7 +267,7 @@ Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data, Int size)
 
 	samplesBufferMutex->Lock();
 
-	size = samplesBuffer.Size() * (track.GetFormat().bits / 8);
+	Int	 size = samplesBuffer.Size() * (track.GetFormat().bits / 8);
 
 	data.Resize(size);
 

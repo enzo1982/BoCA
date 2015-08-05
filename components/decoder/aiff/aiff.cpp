@@ -273,13 +273,11 @@ Bool BoCA::DecoderAIFF::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderAIFF::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderAIFF::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (driver->GetPos() == driver->GetSize()) return -1;
 
-	data.Resize(size);
-
-	size = driver->ReadData(data, size);
+	Int	 size = driver->ReadData(data, data.Size());
 
 	/* Convert 8 bit samples to unsigned.
 	 */

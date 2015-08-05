@@ -298,19 +298,19 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderCoreAudioConnect::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderCoreAudioConnect::WriteData(Buffer<UnsignedByte> &data)
 {
 	/* Send Encode command.
 	 */
 	comm->command = CommCommandEncode;
-	comm->length  = size;
+	comm->length  = data.Size();
 
-	memcpy(comm->data, data, size);
+	memcpy(comm->data, data, data.Size());
 
 	ProcessConnectorCommand();
 
 	if (comm->status != CommStatusReady) return -1;
-	else				     return size;
+	else				     return data.Size();
 }
 
 String BoCA::EncoderCoreAudioConnect::GetOutputFileExtension() const

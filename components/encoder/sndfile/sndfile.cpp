@@ -405,7 +405,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderSndFile::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderSndFile::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
@@ -425,31 +425,31 @@ Int BoCA::EncoderSndFile::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 	if (format.bits == 8)
 	{
-		Buffer<short>	 buffer(size);
+		Buffer<short>	 buffer(data.Size());
 
-		for (Int i = 0; i < size; i++) buffer[i] = (data[i] - 128) << 8;
+		for (Int i = 0; i < data.Size(); i++) buffer[i] = (data[i] - 128) << 8;
 
-		bytes = ex_sf_write_short(sndf, buffer, size);
+		bytes = ex_sf_write_short(sndf, buffer, data.Size());
 	}
 	else if	(format.bits == 16)
 	{
-		bytes = ex_sf_write_short(sndf, (short *) (UnsignedByte *) data, size / 2) * 2;
+		bytes = ex_sf_write_short(sndf, (short *) (UnsignedByte *) data, data.Size() / 2) * 2;
 	}
 	else if (format.bits == 24)
 	{
-		Buffer<int>	 buffer(size / 3);
+		Buffer<int>	 buffer(data.Size() / 3);
 
-		for (Int i = 0; i < size / 3; i++)
+		for (Int i = 0; i < data.Size() / 3; i++)
 		{
 			if (endianness == EndianLittle)	{ buffer[i] = (int) (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8); }
 			else				{ buffer[i] = (int) (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8); }
 		}
 
-		bytes = ex_sf_write_int(sndf, buffer, size / 3) * 3;
+		bytes = ex_sf_write_int(sndf, buffer, data.Size() / 3) * 3;
 	}
 	else if (format.bits == 32)
 	{
-		bytes = ex_sf_write_int(sndf, (int *) (UnsignedByte *) data, size / 4) * 4;
+		bytes = ex_sf_write_int(sndf, (int *) (UnsignedByte *) data, data.Size() / 4) * 4;
 	}
 
 	return bytes;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2013 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -95,9 +95,9 @@ Bool BoCA::OutputQSA::Deactivate()
 	return True;
 }
 
-Int BoCA::OutputQSA::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::OutputQSA::WriteData(Buffer<UnsignedByte> &data)
 {
-	ssize_t	 bytes = snd_pcm_write(playback_handle, data, size);
+	ssize_t	 bytes = snd_pcm_write(playback_handle, data, data.Size());
 
 	if (bytes < 0) return 0;
 

@@ -153,11 +153,11 @@ Bool BoCA::EncoderWave::Deactivate()
 	return True;
 }
 
-Int BoCA::EncoderWave::WriteData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::EncoderWave::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
 	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, track.GetFormat().bits / 8);
 
-	return driver->WriteData(data, size);
+	return driver->WriteData(data, data.Size());
 }

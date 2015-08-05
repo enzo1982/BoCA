@@ -167,11 +167,11 @@ Bool BoCA::DecoderMAC::Seek(Int64 samplePosition)
 	else									    return False;
 }
 
-Int BoCA::DecoderMAC::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderMAC::ReadData(Buffer<UnsignedByte> &data)
 {
-	if (size <= 0) return -1;
+	if (data.Size() <= 0) return -1;
 
-	inBytes += size;
+	inBytes += data.Size();
 
 	int	 nBlockAlign = ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BLOCK_ALIGN, 0, 0);
 	int	 nTotalBlocks = ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0);

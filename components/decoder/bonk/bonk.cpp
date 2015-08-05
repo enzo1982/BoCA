@@ -159,9 +159,9 @@ Bool BoCA::DecoderBonk::Deactivate()
 	return True;
 }
 
-Int BoCA::DecoderBonk::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderBonk::ReadData(Buffer<UnsignedByte> &data)
 {
-	size = driver->ReadData(dataBuffer, size >= 0 ? size : 0);
+	Int	 size = driver->ReadData(dataBuffer, data.Size());
 
 	data.Resize(131072);
 

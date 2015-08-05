@@ -397,7 +397,7 @@ Bool BoCA::DecoderWMA::Seek(Int64 samplePosition)
 	return True;
 }
 
-Int BoCA::DecoderWMA::ReadData(Buffer<UnsignedByte> &data, Int size)
+Int BoCA::DecoderWMA::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (!readerCallback->IsActive() && samplesBuffer.Size() <= 0) return -1;
 
