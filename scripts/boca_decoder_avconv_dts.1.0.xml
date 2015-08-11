@@ -21,7 +21,7 @@
   </external>
   <external>
     <command>ffmpeg</command>
-    <arguments>-i %INFILE %OPTIONS -ac 2 -f wav -</arguments>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
     <parameters>
