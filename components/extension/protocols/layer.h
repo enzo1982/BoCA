@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -34,6 +34,8 @@ namespace BoCA
 			EditBox		*edit_errors;
 			ComboBox	*combo_errors;
 			Button		*button_details;
+
+			Bool		 needReselect;
 		slots:
 			Void		 OnChangeSize(const Size &);
 
@@ -45,6 +47,8 @@ namespace BoCA
 		public:
 					 LayerProtocols();
 					~LayerProtocols();
+
+			Int		 Show();
 	};
 };
 

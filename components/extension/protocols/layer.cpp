@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2012 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,6 +12,8 @@
 
 BoCA::LayerProtocols::LayerProtocols() : Layer("Protocols")
 {
+	needReselect	= False;
+
 	text_protocol	= new Text("Protocol:", Point(7, 11));
 
 	combo_protocol	= new ComboBox(Point(358, 8), Size(350, 0));
@@ -83,28 +85,68 @@ Void BoCA::LayerProtocols::OnChangeSize(const Size &nSize)
 	combo_errors->SetWidth(clientSize.cx - text_errors->GetUnscaledTextWidth() - 142);
 }
 
+Int BoCA::LayerProtocols::Show()
+{
+	if (needReselect) SelectProtocol();
+
+	needReselect = False;
+
+	return Layer::Show();
+}
+
 Void BoCA::LayerProtocols::UpdateProtocolList()
 {
+	/* Save selected protocol name.
+	 */
+	String	 name;
+
+	if (combo_protocol->GetSelectedEntry() != NIL) name = combo_protocol->GetSelectedEntry()->GetText();
+
+	/* Update protocol combo list.
+	 */
+	Surface	*surface = GetDrawSurface();
+
+	if (IsVisible()) surface->StartPaint(Rect(combo_protocol->GetRealPosition(), combo_protocol->GetRealSize()));
+
 	combo_protocol->RemoveAllEntries();
 
 	const Array<Protocol *>	&protocols = Protocol::Get();
 
 	foreach (Protocol *protocol, protocols)
 	{
-		combo_protocol->AddEntry(protocol->GetName());
+		ListEntry	*entry = combo_protocol->AddEntry(protocol->GetName());
+
+		if (protocol->GetName() == name)
+		{
+			combo_protocol->SelectEntry(entry);
+			combo_protocol->Paint(SP_PAINT);
+		}
 	}
+
+	if (IsVisible()) surface->EndPaint();
 }
 
 Void BoCA::LayerProtocols::UpdateProtocol(const String &name)
 {
 	if (combo_protocol->GetSelectedEntry() == NIL) return;
 
-	if (name == combo_protocol->GetSelectedEntry()->GetText()) SelectProtocol();
+	if (name == combo_protocol->GetSelectedEntry()->GetText())
+	{
+		if (!IsVisible()) { needReselect = True; return; }
+
+		SelectProtocol();
+	}
 }
 
 Void BoCA::LayerProtocols::SelectProtocol()
 {
+	Surface	*surface = GetDrawSurface();
+
+	if (IsVisible()) surface->StartPaint(Rect(edit_protocol->GetRealPosition(), edit_protocol->GetRealSize()));
+
 	edit_protocol->SetText(Protocol::Get(combo_protocol->GetSelectedEntry()->GetText())->GetProtocolText());
+
+	if (IsVisible()) surface->EndPaint();
 }
 
 Void BoCA::LayerProtocols::ShowDetails()
