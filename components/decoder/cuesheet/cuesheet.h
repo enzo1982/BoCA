@@ -17,6 +17,8 @@ namespace BoCA
 	class DecoderCueSheet : public CS::DecoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			Bool			 AddTrack(const Track &, Array<Track> &) const;
 		public:
 			static const String	&GetComponentSpecs();
@@ -31,6 +33,8 @@ namespace BoCA
 			Bool			 Deactivate();
 
 			Int			 ReadData(Buffer<UnsignedByte> &);
+
+			ConfigLayer		*GetConfigurationLayer();
 	};
 };
 

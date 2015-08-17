@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "cuesheet.h"
+#include "config.h"
 
 using namespace smooth::IO;
 
@@ -42,6 +43,8 @@ Bool BoCA::DecoderCueSheet::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track)
 {
+	const Config	*config = GetConfiguration();
+
 	Track		 iTrack;
 	Format		 format = track.GetFormat();
 	Info		 info;
@@ -68,7 +71,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 	 */
 	String		 prevInputFormat = String::SetInputFormat("ISO-8859-1");
 
-	Int		 bom[3] = { file->InputNumber(1), file->InputNumber(1), file->InputNumber(1) };
+	Int		 bom[3] = { (Int) file->InputNumber(1), (Int) file->InputNumber(1), (Int) file->InputNumber(1) };
 
 	if (bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF) String::SetInputFormat("UTF-8");
 	else							file->Seek(0);
@@ -128,35 +131,66 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 				trackMode = False;
 			}
 
+			/* Get referenced file name.
+			 */
 			if (line.Contains("\"")) iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
 			else			 iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1));
 
 			iTrack.origFilename = File(iTrack.origFilename);
 
+			/* Look for compressed files in place of referenced Wave, Wave64, RF64 or AIFF files.
+			 */
+			if (!File(iTrack.origFilename).Exists() && config->GetIntValue("CueSheet", "LookForAlternativeFiles", False) &&
+			    (iTrack.origFilename.ToLower().EndsWith(".wav") || iTrack.origFilename.ToLower().EndsWith(".w64")  || iTrack.origFilename.ToLower().EndsWith(".rf64") ||
+			     iTrack.origFilename.ToLower().EndsWith(".aif") || iTrack.origFilename.ToLower().EndsWith(".aiff") || iTrack.origFilename.ToLower().EndsWith(".aifc")))
+			{
+				const char	*extensions[]  = { "wav", "w64", "rf64", "aif", "aiff", "aifc", "flac", "ape", "ofr", "tak", "tta", "wv", "m4a", "wma", "mp3", "ogg", "oga", "opus", "spx", NIL };
+				const String	 fileNameNoExt = iTrack.origFilename.SubString(0, iTrack.origFilename.FindLast(".") + 1);
+
+				for (Int i = 0; extensions[i] != NIL; i++)
+				{
+					const String	 fileName = fileNameNoExt.Append(extensions[i]);
+
+					if (File(fileName).Exists())
+					{
+						iTrack.origFilename = fileName;
+
+						break;
+					}
+				}
+			}
+
+			/* Check file existence.
+			 */
 			if (!File(iTrack.origFilename).Exists())
 			{
 				errorState  = True;
-				errorString = "File not found";
+				errorString = "File referenced in cue sheet not found";
 
 				break;
 			}
 
-			AS::DecoderComponent	*decoder = AS::Registry::Get().CreateDecoderForStream(iTrack.origFilename);
+			/* Create decoder component.
+			 */
+			AS::Registry		&boca	 = AS::Registry::Get();
+			AS::DecoderComponent	*decoder = boca.CreateDecoderForStream(iTrack.origFilename);
 
 			if (decoder == NIL)
 			{
 				errorState  = True;
-				errorString = "Unknown file type";
+				errorString = "Unknown file type referenced in cue sheet";
 
 				break;
 			}
 
+			/* Get stream info.
+			 */
 			Track	 infoTrack;
 
 			errorState  = decoder->GetStreamInfo(iTrack.origFilename, infoTrack);
 			errorString = decoder->GetErrorString();
 
-			AS::Registry::Get().DeleteComponent(decoder);
+			boca.DeleteComponent(decoder);
 
 			if (errorState) break;
 
@@ -365,10 +399,12 @@ Bool BoCA::DecoderCueSheet::AddTrack(const Track &track, Array<Track> &tracks) c
 
 BoCA::DecoderCueSheet::DecoderCueSheet()
 {
+	configLayer = NIL;
 }
 
 BoCA::DecoderCueSheet::~DecoderCueSheet()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::DecoderCueSheet::Activate()
@@ -384,4 +420,11 @@ Bool BoCA::DecoderCueSheet::Deactivate()
 Int BoCA::DecoderCueSheet::ReadData(Buffer<UnsignedByte> &data)
 {
 	return -1;
+}
+
+ConfigLayer *BoCA::DecoderCueSheet::GetConfigurationLayer()
+{
+	if (configLayer == NIL) configLayer = new ConfigureCueSheet();
+
+	return configLayer;
 }
