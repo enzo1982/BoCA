@@ -173,7 +173,7 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 		 */
 		if (!FAILED(hr)) hr = GetHeaderAttribute(pHeaderInfo, g_wszWMDuration, &pbValue);
 
-		if (!FAILED(hr) && pbValue != NIL)
+		if (!FAILED(hr) && pbValue != NIL && *(QWORD *) pbValue != 0)
 		{
 			/* Set approxLength, because WMA duration is not always 100% accurate.
 			 */
@@ -417,7 +417,7 @@ Int BoCA::DecoderWMA::ReadData(Buffer<UnsignedByte> &data)
 
 	/* Update inBytes to indicate progress.
 	 */
-	inBytes += track.fileSize * data.Size() / (track.approxLength * track.GetFormat().channels * (track.GetFormat().bits / 8));
+	if (track.approxLength > 0) inBytes += track.fileSize * data.Size() / (track.approxLength * track.GetFormat().channels * (track.GetFormat().bits / 8));
 
 	return data.Size();
 }
