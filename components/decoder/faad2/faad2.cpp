@@ -544,11 +544,11 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 	}
 	else
 	{
-		if (data.Size() <= 0) return -1;
-
 		dataBuffer.Resize(data.Size() + backBuffer.Size());
 
 		Int	 size = driver->ReadData(dataBuffer + backBuffer.Size(), data.Size());
+
+		if (size <= 0) return -1;
 
 		inBytes += size;
 

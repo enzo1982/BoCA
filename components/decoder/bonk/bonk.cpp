@@ -163,6 +163,8 @@ Int BoCA::DecoderBonk::ReadData(Buffer<UnsignedByte> &data)
 {
 	Int	 size = driver->ReadData(dataBuffer, data.Size());
 
+	if (size <= 0) return -1;
+
 	data.Resize(131072);
 
 	Int	 nSamples = ex_bonk_decoder_decode_packet(decoder, dataBuffer, size, (signed short *) (unsigned char *) data, data.Size());

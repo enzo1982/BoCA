@@ -183,12 +183,12 @@ Bool BoCA::DecoderLAME::Deactivate()
 
 Int BoCA::DecoderLAME::ReadData(Buffer<UnsignedByte> &data)
 {
-	if (data.Size() <= 0) return -1;
-
 	pcm_l.Resize(data.Size() * 64);
 	pcm_r.Resize(data.Size() * 64);
 
 	Int	 size = driver->ReadData(data, data.Size());
+
+	if (size <= 0) return -1;
 
 	inBytes += size;
 

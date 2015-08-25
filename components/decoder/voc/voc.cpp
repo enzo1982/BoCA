@@ -121,6 +121,9 @@ Bool BoCA::DecoderVoc::Deactivate()
 Int BoCA::DecoderVoc::ReadData(Buffer<UnsignedByte> &data)
 {
 	Int	 size	 = driver->ReadData(data, data.Size());
+
+	if (size <= 0) return -1;
+
 	Int	 outSize = size;
 
 	if (size > bytesLeft)

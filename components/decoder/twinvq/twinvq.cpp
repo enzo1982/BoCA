@@ -253,25 +253,20 @@ Bool BoCA::DecoderTwinVQ::Deactivate()
 
 Int BoCA::DecoderTwinVQ::ReadData(Buffer<UnsignedByte> &data)
 {
-	if (TvqReadBsFrame(&index, bfp) != 0)
+	if (TvqReadBsFrame(&index, bfp) == 0) return -1;
+
+	ex_TvqDecodeFrame(&index, frame);
+
+	data.Resize(frameSize * track.GetFormat().channels * 2);
+
+	for (Int ch = 0; ch < track.GetFormat().channels; ch++)
 	{
-		ex_TvqDecodeFrame(&index, frame);
-
-		data.Resize(frameSize * track.GetFormat().channels * 2);
-
-		for (Int ch = 0; ch < track.GetFormat().channels; ch++)
+		for (Int i = 0; i < frameSize; i++)
 		{
-			for (Int i = 0; i < frameSize; i++)
-			{
-				register float sample = Math::Min(Math::Max((frame + ch * frameSize)[i], -32700.), 32700.);
+			register float sample = Math::Min(Math::Max((frame + ch * frameSize)[i], -32700.), 32700.);
 
-				((short *) (UnsignedByte *) data)[i * track.GetFormat().channels + ch] = (short) (sample + (sample >= 0. ? 0.5 : -0.5));
-			}
+			((short *) (UnsignedByte *) data)[i * track.GetFormat().channels + ch] = (short) (sample + (sample >= 0. ? 0.5 : -0.5));
 		}
-	}
-	else
-	{
-		return -1;
 	}
 
 	inBytes = ftell(bfp->fp);

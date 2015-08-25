@@ -332,12 +332,12 @@ Bool BoCA::DecoderSpeex::Seek(Int64 samplePosition)
 
 Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data)
 {
-	if (data.Size() <= 0) return -1;
-
 	const Format	&format = track.GetFormat();
 
 	char	*buffer = ex_ogg_sync_buffer(&oy, data.Size());
 	Int	 size	= driver->ReadData((unsigned char *) buffer, data.Size());
+
+	if (size <= 0) return -1;
 
 	inBytes += size;
 

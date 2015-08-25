@@ -585,11 +585,11 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 	}
 	else
 	{
-		if (data.Size() <= 0) return -1;
-
 		dataBuffer.Resize(data.Size());
 
 		Int	 size = driver->ReadData(dataBuffer, data.Size());
+
+		if (size <= 0) return -1;
 
 		inBytes += size;
 

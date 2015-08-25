@@ -250,14 +250,14 @@ Bool BoCA::DecoderMPG123::Seek(Int64 samplePosition)
 
 Int BoCA::DecoderMPG123::ReadData(Buffer<UnsignedByte> &data)
 {
-	if (data.Size() <= 0) return -1;
-
 	const Format	&format = track.GetFormat();
 
 	Buffer<unsigned char>	 samples(data.Size() * 128);
 	size_t			 samplesDone;
 
 	Int	 size = driver->ReadData(data, data.Size());
+
+	if (size <= 0) return -1;
 
 	inBytes += size;
 
