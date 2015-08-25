@@ -1,5 +1,5 @@
  /* BonkEnc Audio Encoder
-  * Copyright (C) 2001-2009 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2001-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -26,27 +26,43 @@ namespace BoCA
 	class LayerLengthStatus : public Layer
 	{
 		private:
-			Array<Track>	 tracks;
-			Array<Track>	 tracks_selected;
-			Array<Track>	 tracks_unselected;
+			S::System::Timer	 timer;
 
-			LengthDisplay	*display_all;
-			LengthDisplay	*display_selected;
-			LengthDisplay	*display_unselected;
+			Array<Track>		 tracks;
+			Int64			 seconds;
+			Int			 approx;
+			Int			 unknown;
 
-			Void		 UpdateLengthDisplays();
+			Array<Track>		 tracks_selected;
+			Int64			 seconds_selected;
+			Int			 approx_selected;
+			Int			 unknown_selected;
 
-			const String	&GetTotalLengthString(const Array<Track> &);
+			Array<Track>		 tracks_unselected;
+			Int64			 seconds_unselected;
+			Int			 approx_unselected;
+			Int			 unknown_unselected;
+
+			LengthDisplay		*display_all;
+			LengthDisplay		*display_selected;
+			LengthDisplay		*display_unselected;
+
+			Void			 UpdateLengthDisplays();
+
+			Void			 AddTrack(const Track &, Int64 &, Int &, Int &);
+			Void			 RemoveTrack(const Track &, Int64 &, Int &, Int &);
+
+			const String		&GetLengthString(Int64, Int, Int);
 		slots:
-			Void		 OnApplicationAddTrack(const Track &);
-			Void		 OnApplicationRemoveTrack(const Track &);
-			Void		 OnApplicationMarkTrack(const Track &);
-			Void		 OnApplicationUnmarkTrack(const Track &);
+			Void			 OnApplicationAddTrack(const Track &);
+			Void			 OnApplicationRemoveTrack(const Track &);
+			Void			 OnApplicationMarkTrack(const Track &);
+			Void			 OnApplicationUnmarkTrack(const Track &);
 
-			Void		 OnApplicationRemoveAllTracks();
+			Void			 OnApplicationRemoveAllTracks();
 		public:
-					 LayerLengthStatus();
-					~LayerLengthStatus();
+						 LayerLengthStatus();
+						~LayerLengthStatus();
 	};
 };
 

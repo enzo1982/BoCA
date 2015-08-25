@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -18,9 +18,23 @@ BoCA::LayerLengthStatus::LayerLengthStatus()
 	if (Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac")).Exists()) resourcesPath = "../share/freac/";
 #endif
 
+	timer.onInterval.Connect(&LayerLengthStatus::UpdateLengthDisplays, this);
+
 	tracks.EnableLocking();
 	tracks_selected.EnableLocking();
 	tracks_unselected.EnableLocking();
+
+	seconds			= 0;
+	approx			= 0;
+	unknown			= 0;
+
+	seconds_selected	= 0;
+	approx_selected		= 0;
+	unknown_selected	= 0;
+
+	seconds_unselected	= 0;
+	approx_unselected	= 0;
+	unknown_unselected	= 0;
 
 	display_selected	= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("freac.pci:18")));
 	display_unselected	= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("freac.pci:19")));
@@ -57,6 +71,15 @@ BoCA::LayerLengthStatus::~LayerLengthStatus()
 
 Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 {
+	/* Update every 25ms only.
+	 */
+	static Int64	 lastInvoked = 0;
+
+	if (S::System::System::Clock() - lastInvoked < 25) { timer.Start(25); return; }
+	else						     timer.Stop();
+
+	/* Update displayed values.
+	 */
 	Surface	*surface = GetDrawSurface();
 
 	if (IsRegistered())
@@ -64,9 +87,9 @@ Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 		surface->StartPaint(Rect(container->GetRealPosition(), container->GetRealSize()));
 	}
 
-	display_selected->SetText(GetTotalLengthString(tracks_selected));
-	display_unselected->SetText(GetTotalLengthString(tracks_unselected));
-	display_all->SetText(GetTotalLengthString(tracks));
+	display_selected->SetText(GetLengthString(seconds_selected, approx_selected, unknown_selected));
+	display_unselected->SetText(GetLengthString(seconds_unselected, approx_unselected, unknown_unselected));
+	display_all->SetText(GetLengthString(seconds, approx, unknown));
 
 	display_selected->SetPosition(Point(0, 0));
 	display_unselected->SetPosition(Point(display_selected->GetWidth() + 3, 0));
@@ -80,37 +103,55 @@ Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 
 		surface->EndPaint();
 	}
+
+	/* Update invocation time.
+	 */
+	lastInvoked = S::System::System::Clock();
 }
 
-const String &BoCA::LayerLengthStatus::GetTotalLengthString(const Array<Track> &tracks)
+Void BoCA::LayerLengthStatus::AddTrack(const Track &track, Int64 &seconds, Int &approx, Int &unknown)
+{
+	const Format	&format = track.GetFormat();
+
+	if (track.length >= 0 && format.rate > 0)
+	{
+		seconds += track.length / format.rate;
+	}
+	else if (track.approxLength >= 0 && format.rate > 0)
+	{
+		seconds += track.approxLength / format.rate;
+
+		approx++;
+	}
+	else
+	{
+		unknown++;
+	}
+}
+
+Void BoCA::LayerLengthStatus::RemoveTrack(const Track &track, Int64 &seconds, Int &approx, Int &unknown)
+{
+	const Format	&format = track.GetFormat();
+
+	if (track.length >= 0 && format.rate > 0)
+	{
+		seconds -= track.length / format.rate;
+	}
+	else if (track.approxLength >= 0 && format.rate > 0)
+	{
+		seconds -= track.approxLength / format.rate;
+
+		approx--;
+	}
+	else
+	{
+		unknown--;
+	}
+}
+
+const String &BoCA::LayerLengthStatus::GetLengthString(Int64 seconds, Int approx, Int unknown)
 {
 	static String	 string;
-
-	Int		 seconds = 0;
-	Bool		 approx	 = False;
-	Bool		 unknown = False;
-
-	for (Int i = 0; i < tracks.Length(); i++)
-	{
-		const Track	&track	= tracks.GetNth(i);
-		const Format	&format = track.GetFormat();
-
-		if (track.length >= 0 && format.rate > 0)
-		{
-			seconds += track.length / format.rate;
-		}
-		else if (track.approxLength >= 0 && format.rate > 0)
-		{
-			seconds += track.approxLength / format.rate;
-
-			approx = True;
-		}
-		else
-		{
-			unknown = True;
-		}
-	}
-
 	static wchar_t	 sign[2] = { 0x2248, 0 };
 
 	string = String(unknown ? "> " : NIL).Append(approx ? String(sign).Append(" ") : String())
@@ -127,8 +168,11 @@ const String &BoCA::LayerLengthStatus::GetTotalLengthString(const Array<Track> &
  */
 Void BoCA::LayerLengthStatus::OnApplicationAddTrack(const Track &track)
 {
-	tracks.Add(track);
-	tracks_selected.Add(track);
+	tracks.Add(track, track.GetTrackID());
+	tracks_selected.Add(track, track.GetTrackID());
+
+	AddTrack(track, seconds, approx, unknown);
+	AddTrack(track, seconds_selected, approx_selected, unknown_selected);
 
 	UpdateLengthDisplays();
 }
@@ -139,35 +183,13 @@ Void BoCA::LayerLengthStatus::OnApplicationAddTrack(const Track &track)
  */
 Void BoCA::LayerLengthStatus::OnApplicationRemoveTrack(const Track &track)
 {
-	for (Int i = 0; i < tracks.Length(); i++)
-	{
-		if (tracks.GetNth(i).GetTrackID() == track.GetTrackID())
-		{
-			tracks.RemoveNth(i);
+	tracks.Remove(track.GetTrackID());
+	tracks_selected.Remove(track.GetTrackID());
+	tracks_unselected.Remove(track.GetTrackID());
 
-			break;
-		}
-	}
-
-	for (Int i = 0; i < tracks_selected.Length(); i++)
-	{
-		if (tracks_selected.GetNth(i).GetTrackID() == track.GetTrackID())
-		{
-			tracks_selected.RemoveNth(i);
-
-			break;
-		}
-	}
-
-	for (Int i = 0; i < tracks_unselected.Length(); i++)
-	{
-		if (tracks_unselected.GetNth(i).GetTrackID() == track.GetTrackID())
-		{
-			tracks_unselected.RemoveNth(i);
-
-			break;
-		}
-	}
+	RemoveTrack(track, seconds, approx, unknown);
+	RemoveTrack(track, seconds_selected, approx_selected, unknown_selected);
+	RemoveTrack(track, seconds_unselected, approx_unselected, unknown_unselected);
 
 	UpdateLengthDisplays();
 }
@@ -178,17 +200,11 @@ Void BoCA::LayerLengthStatus::OnApplicationRemoveTrack(const Track &track)
  */
 Void BoCA::LayerLengthStatus::OnApplicationMarkTrack(const Track &track)
 {
-	tracks_selected.Add(track);
+	tracks_selected.Add(track, track.GetTrackID());
+	tracks_unselected.Remove(track.GetTrackID());
 
-	for (Int i = 0; i < tracks_unselected.Length(); i++)
-	{
-		if (tracks_unselected.GetNth(i).GetTrackID() == track.GetTrackID())
-		{
-			tracks_unselected.RemoveNth(i);
-
-			break;
-		}
-	}
+	AddTrack(track, seconds_selected, approx_selected, unknown_selected);
+	RemoveTrack(track, seconds_unselected, approx_unselected, unknown_unselected);
 
 	UpdateLengthDisplays();
 }
@@ -199,17 +215,11 @@ Void BoCA::LayerLengthStatus::OnApplicationMarkTrack(const Track &track)
  */
 Void BoCA::LayerLengthStatus::OnApplicationUnmarkTrack(const Track &track)
 {
-	tracks_unselected.Add(track);
+	tracks_unselected.Add(track, track.GetTrackID());
+	tracks_selected.Remove(track.GetTrackID());
 
-	for (Int i = 0; i < tracks_selected.Length(); i++)
-	{
-		if (tracks_selected.GetNth(i).GetTrackID() == track.GetTrackID())
-		{
-			tracks_selected.RemoveNth(i);
-
-			break;
-		}
-	}
+	AddTrack(track, seconds_unselected, approx_unselected, unknown_unselected);
+	RemoveTrack(track, seconds_selected, approx_selected, unknown_selected);
 
 	UpdateLengthDisplays();
 }
@@ -223,6 +233,18 @@ Void BoCA::LayerLengthStatus::OnApplicationRemoveAllTracks()
 	tracks.RemoveAll();
 	tracks_selected.RemoveAll();
 	tracks_unselected.RemoveAll();
+
+	seconds		   = 0;
+	approx		   = 0;
+	unknown		   = 0;
+
+	seconds_selected   = 0;
+	approx_selected	   = 0;
+	unknown_selected   = 0;
+
+	seconds_unselected = 0;
+	approx_unselected  = 0;
+	unknown_unselected = 0;
 
 	UpdateLengthDisplays();
 }
