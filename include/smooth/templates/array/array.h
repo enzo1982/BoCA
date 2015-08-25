@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,6 @@
 #ifndef H_OBJSMOOTH_ARRAY
 #define H_OBJSMOOTH_ARRAY
 
-#include "arrayentry.h"
 #include "arraybackend.h"
 
 namespace smooth

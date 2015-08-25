@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,100 +11,40 @@
 #ifndef H_OBJSMOOTH_ARRAY_BACKEND
 #define H_OBJSMOOTH_ARRAY_BACKEND
 
-#include "arrayentry.h"
-#include "../buffer.h"
-#include "../../threads/rwlock.h"
+#include "../../misc/array.h"
 
 #include <memory.h>
 #include <string.h>
 
 namespace smooth
 {
-	template <class s> class ArrayBackend
+	template <class s> class ArrayEntry
+	{
+		public:
+			s	 value;
+
+				 ArrayEntry(const s &iValue) : value(iValue) { }
+	};
+
+	template <class s> class ArrayBackend : public IndexArray
 	{
 		private:
 			static s		 nullValue;
 
-			Int			 nOfEntries;
-			Int			 greatestIndex;
-
-			mutable Int		 lastAccessedEntry;
-
 			Buffer<ArrayEntry<s> *>	 entries;
-
-			mutable Bool		 lockingEnabled;
-			mutable Threads::RWLock	*lock;
-
-			Bool IndexAvailable(Int index) const
-			{
-				if (index > greatestIndex) return True;
-
-				if (GetEntryNumberByIndex(index) == -1) return True;
-				else					return False;
-			}
-
-			Int GetEntryNumberByIndex(Int index) const
-			{
-				if (nOfEntries == 0) return -1;
-
-				LockForRead();
-
-				if	(lastAccessedEntry < nOfEntries				  && entries[lastAccessedEntry    ]->GetIndex() == index) { Unlock(); return   lastAccessedEntry; }
-				else if (lastAccessedEntry > 0 && lastAccessedEntry <= nOfEntries && entries[lastAccessedEntry - 1]->GetIndex() == index) { Unlock(); return --lastAccessedEntry; }
-				else if (lastAccessedEntry + 1 < nOfEntries			  && entries[lastAccessedEntry + 1]->GetIndex() == index) { Unlock(); return ++lastAccessedEntry; }
-
-				for (Int i = 0; i < nOfEntries; i++)
-				{
-					if (entries[i]->GetIndex() == index)
-					{
-						lastAccessedEntry = i;
-
-						Unlock();
-
-						return lastAccessedEntry;
-					}
-				}
-
-				Unlock();
-
-				return -1;
-			}
-
 		public:
 			ArrayBackend()
 			{
-				nOfEntries	  = 0;
-				greatestIndex	  = 0;
-
-				lastAccessedEntry = 0;
-
-				lockingEnabled	  = False;
-				lock		  = NIL;
 			}
 
-			ArrayBackend(const ArrayBackend<s> &oArray)
+			ArrayBackend(const ArrayBackend<s> &oArray) : IndexArray()
 			{
-				nOfEntries	  = 0;
-				greatestIndex	  = 0;
-
-				lastAccessedEntry = 0;
-
-				lockingEnabled	  = False;
-				lock		  = NIL;
-
 				*this = oArray;
 			}
 
 			virtual	~ArrayBackend()
 			{
 				RemoveAll();
-
-				if (lock != NIL)
-				{
-					delete lock;
-
-					lock = NIL;
-				}
 			}
 
 			ArrayBackend<s> &operator =(const ArrayBackend<s> &oArray)
@@ -130,15 +70,11 @@ namespace smooth
 
 				LockForWrite();
 
-				if (greatestIndex < index) greatestIndex = index;
+				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
-				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 2 ? 8 : nOfEntries * 2);
+				entries[nOfEntries] = new ArrayEntry<s>(value);
 
-				ArrayEntry<s>	*entry = new ArrayEntry<s>(value);
-
-				entry->SetIndex(index);
-
-				entries[nOfEntries++] = entry;
+				IndexArray::InsertAtPos(nOfEntries, index);
 
 				Unlock();
 
@@ -168,37 +104,23 @@ namespace smooth
 
 			Bool InsertAtPos(Int position, const s &value, Int index)
 			{
-				if (nOfEntries < position && position >= 0) return False;
+				if (position > nOfEntries || position < 0) return False;
 
 				if (!IndexAvailable(index)) return False;
 
 				LockForWrite();
 
-				if (greatestIndex < index) greatestIndex = index;
-
-				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 2 ? 8 : nOfEntries * 2);
+				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
 				memmove(entries + position + 1, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s> *));
 
-				ArrayEntry<s>	*entry = new ArrayEntry<s>(value);
+				entries[position] = new ArrayEntry<s>(value);
 
-				entry->SetIndex(index);
-
-				entries[position] = entry;
-
-				nOfEntries++;
+				IndexArray::InsertAtPos(position, index);
 
 				Unlock();
 
 				return True;
-			}
-
-			Bool Move(Int index1, Int index2)
-			{
-				if (index1 > greatestIndex ||
-				    index2 > greatestIndex) return False;
-
-				return MoveNth(GetEntryNumberByIndex(index1), GetEntryNumberByIndex(index2));
 			}
 
 			Bool MoveNth(Int n, Int m)
@@ -208,28 +130,25 @@ namespace smooth
 
 				LockForWrite();
 
-				ArrayEntry<s> *backup = entries[n];
+				ArrayEntry<s>	*backupEntry = entries[n];
 
 				if (m < n) memmove(entries + m + 1, entries + m, (n - m) * sizeof(ArrayEntry<s> *));
 				else	   memmove(entries + n, entries + n + 1, (m - n) * sizeof(ArrayEntry<s> *));
 
-				entries[m] = backup;
+				entries[m] = backupEntry;
+
+				IndexArray::MoveNth(n, m);
 
 				Unlock();
 
 				return True;
 			}
 
-			Bool Remove(Int index)
-			{
-				if (index > greatestIndex) return False;
-
-				return RemoveNth(GetEntryNumberByIndex(index));
-			}
-
 			Bool RemoveNth(Int n)
 			{
 				if (nOfEntries <= n || n < 0) return False;
+
+				if (nOfEntries == 1) return RemoveAll();
 
 				LockForWrite();
 
@@ -237,7 +156,7 @@ namespace smooth
 
 				memmove(entries + n, entries + n + 1, (nOfEntries - n - 1) * sizeof(ArrayEntry<s> *));
 
-				nOfEntries--;
+				IndexArray::RemoveNth(n);
 
 				Unlock();
 
@@ -252,10 +171,9 @@ namespace smooth
 
 				for (Int i = 0; i < nOfEntries; i++) delete entries[i];
 
-				nOfEntries		= 0;
-				greatestIndex	 	= 0;
+				entries.Free();
 
-				lastAccessedEntry	= 0;
+				IndexArray::RemoveAll();
 
 				Unlock();
 
@@ -288,7 +206,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					const s	&entry = entries[n]->GetValue();
+					const s	&entry = entries[n]->value;
 
 					lastAccessedEntry = n;
 
@@ -308,7 +226,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					s	&entry = entries[n]->GetValueReference();
+					s	&entry = entries[n]->value;
 
 					lastAccessedEntry = n;
 
@@ -328,7 +246,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					const s	&entry = entries[n]->GetValueReference();
+					const s	&entry = entries[n]->value;
 
 					lastAccessedEntry = n;
 
@@ -348,36 +266,18 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					Bool	 result = entries[n]->SetValue(value);
+					entries[n]->value = value;
 
 					lastAccessedEntry = n;
 
 					Unlock();
 
-					return result;
+					return True;
 				}
 
 				Unlock();
 
 				return False;
-			}
-
-			Int GetNthIndex(Int n) const
-			{
-				LockForRead();
-
-				if (nOfEntries > n && n >= 0)
-				{
-					Int	 index = entries[n]->GetIndex();
-
-					Unlock();
-
-					return index;
-				}
-
-				Unlock();
-
-				return -1;
 			}
 
 			const s &GetFirst() const
@@ -386,7 +286,7 @@ namespace smooth
 
 				if (nOfEntries > 0)
 				{
-					const s	&entry = entries[0]->GetValue();
+					const s	&entry = entries[0]->value;
 
 					lastAccessedEntry = 0;
 
@@ -406,7 +306,7 @@ namespace smooth
 
 				if (nOfEntries > 0)
 				{
-					const s	&entry = entries[nOfEntries - 1]->GetValue();
+					const s	&entry = entries[nOfEntries - 1]->value;
 
 					lastAccessedEntry = nOfEntries - 1;
 
@@ -426,7 +326,7 @@ namespace smooth
 
 				if (lastAccessedEntry < nOfEntries - 1)
 				{
-					const s	&entry = entries[++lastAccessedEntry]->GetValue();
+					const s	&entry = entries[++lastAccessedEntry]->value;
 
 					Unlock();
 
@@ -444,7 +344,7 @@ namespace smooth
 
 				if (lastAccessedEntry > 0)
 				{
-					const s	&entry = entries[--lastAccessedEntry]->GetValue();
+					const s	&entry = entries[--lastAccessedEntry]->value;
 
 					Unlock();
 
@@ -454,54 +354,6 @@ namespace smooth
 				Unlock();
 
 				return nullValue;
-			}
-
-			inline Int Length() const
-			{
-				LockForRead();
-
-				Int	 nOfEntriesTemp = nOfEntries;
-
-				Unlock();
-
-				return nOfEntriesTemp;
-			}
-
-			inline Bool EnableLocking() const
-			{
-				lockingEnabled = True;
-
-				if (lock == NIL) lock = new Threads::RWLock();
-
-				return True;
-			}
-
-			inline Bool DisableLocking() const
-			{
-				lockingEnabled = False;
-
-				return True;
-			}
-
-			inline Void LockForRead() const
-			{
-				if (!lockingEnabled) return;
-
-				lock->LockForRead();
-			}
-
-			inline Void LockForWrite() const
-			{
-				if (!lockingEnabled) return;
-
-				lock->LockForWrite();
-			}
-
-			inline Void Unlock() const
-			{
-				if (!lockingEnabled) return;
-
-				lock->Release();
 			}
 	};
 };

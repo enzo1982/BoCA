@@ -16,7 +16,6 @@ namespace smooth
 	namespace Threads
 	{
 		class Mutex;
-		class Semaphore;
 		class RWLock;
 	};
 };
@@ -30,12 +29,11 @@ namespace smooth
 		class SMOOTHAPI RWLock
 		{
 			private:
-				static const Short	 maxReadLocks;
-
-				volatile Bool		 writeLocked;
+				volatile Int		 readLocked;
+				volatile Int		 writeLocked;
 
 				Mutex			*exclusiveAccessMutex;
-				Semaphore		*sharedAccessSemaphore;
+				Mutex			*sharedAccessMutex;
 			public:
 							 RWLock();
 							 RWLock(const RWLock &);
