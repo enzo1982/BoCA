@@ -131,7 +131,7 @@ String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
 		tempDir[tempDir.Length()] = rVal[j];
 	}
 
-	return tempDir.Append("-").Append(Number(Int64(fileName.ComputeCRC32())).ToHexString()).Append(".temp");
+	return tempDir.Append("-").Append(Number(Int64(fileName.ComputeCRC32())).ToHexString(8)).Append(".temp");
 }
 
 String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string)
