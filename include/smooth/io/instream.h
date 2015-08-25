@@ -66,8 +66,8 @@ namespace smooth
 
 				Bool			 SetPackageSize		(Int);
 
-				Bool			 AddFilter		(Filter *);
-				Bool			 RemoveFilter		(Filter *);
+				Bool			 SetFilter		(Filter *);
+				Bool			 RemoveFilter		();
 
 				Bool			 Close			();
 

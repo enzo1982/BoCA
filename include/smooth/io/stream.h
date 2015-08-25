@@ -29,7 +29,7 @@ namespace smooth
 {
 	namespace IO
 	{
-		class SMOOTHAPI Stream
+		abstract class SMOOTHAPI Stream
 		{
 			protected:
 				static Int		 defaultPackageSize;
@@ -58,20 +58,24 @@ namespace smooth
 				Bool			 bitBuffer[128];
 
 				Driver			*driver;
-				Array<Filter *, Void *>	 filters;
+				Filter			*filter;
 
 				mutable Short		 lastError;
 			public:
 				static Bool		 SetDefaultPackageSize	(Int);
 
-				Int64			 Size() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return size; }
-				Int64			 GetPos() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return currentFilePos; }
+							 Stream();
+				virtual			~Stream();
 
+				virtual Bool		 SetFilter(Filter *) = 0;
+				virtual Bool		 RemoveFilter()	     = 0;
+			accessors:
 				Short			 GetStreamType() const	{ return streamType; }
 				Short			 GetLastError() const	{ return lastError; }
 
-							 Stream			();
-				virtual			~Stream			();
+				Int64			 Size() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return size; }
+				Int64			 GetPos() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return currentFilePos; }
+
 		};
 	};
 };
