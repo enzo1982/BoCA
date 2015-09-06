@@ -25,44 +25,30 @@ BoCA::Protocol::~Protocol()
 {
 }
 
-Int BoCA::Protocol::Write(const String &message)
+Int BoCA::Protocol::Write(const String &message, MessageType messageType)
 {
 	UnsignedInt64	 ticks = S::System::System::Clock() - startTicks;
+
+	mutex.Lock();
 
 	messages.Add(String(ticks / 1000 / 60 / 60 <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 / 60 / 60)).Append(":")
 		    .Append(ticks / 1000 / 60 % 60 <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 / 60 % 60)).Append(":")
 		    .Append(ticks / 1000 % 60	   <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 % 60     )).Append(".")
 		    .Append(ticks % 1000	   < 100 ? (ticks % 1000 < 10 ? "00" : "0") : "").Append(String::FromInt(ticks % 1000	       )).Append(" - ").Append(message));
 
+	if	(messageType == MessageTypeWarning) warnings.Add(message);
+	else if (messageType == MessageTypeError)   errors.Add(message);
+
 	onUpdateProtocol.Emit(name);
+
+	mutex.Release();
 
 	return Success();
 }
 
-Int BoCA::Protocol::WriteWarning(const String &message)
-{
-	warnings.Add(message);
-
-	return Write(message);
-}
-
-Int BoCA::Protocol::WriteError(const String &message)
-{
-	errors.Add(message);
-
-	return Write(message);
-}
-
 String BoCA::Protocol::GetProtocolText() const
 {
-	String	 text;
-
-	foreach (const String &message, messages)
-	{
-		text.Append(message).Append("\n");
-	}
-
-	return text;
+	return String::Implode(messages, "\n");
 }
 
 BoCA::Protocol *BoCA::Protocol::Get(const String &name)
@@ -109,10 +95,7 @@ const Array<BoCA::Protocol *> &BoCA::Protocol::Get()
 
 Void BoCA::Protocol::Free()
 {
-	foreach (Protocol *protocol, protocols)
-	{
-		delete protocol;
-	}
+	foreach (Protocol *protocol, protocols) delete protocol;
 
 	protocols.RemoveAll();
 	onUpdateProtocolList.Emit();
