@@ -24,7 +24,7 @@
 #define STDC_HEADERS 1
 
 /* And now the rest of the boys */
-#define CXX_HAS_BUGGY_FOR_LOOPS 1
+/* #undef CXX_HAS_BUGGY_FOR_LOOPS */
 /* #undef CXX_HAS_NO_BOOL */
 /* #undef ID3_ENABLE_DEBUG */
 /* #undef ID3_DISABLE_ASSERT */
