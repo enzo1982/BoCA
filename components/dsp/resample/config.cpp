@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -16,12 +16,14 @@ BoCA::ConfigureResample::ConfigureResample()
 	Config	*config = Config::Get();
 	I18n	*i18n = I18n::Get();
 
-	group_converter		= new GroupBox(i18n->TranslateString("Converter"), Point(7, 11), Size(450, 59));
-	group_samplerate	= new GroupBox(i18n->TranslateString("Output samplerate"), Point(7, 82), Size(450, 43));
+	i18n->SetContext("DSP::Resample");
+
+	group_converter		= new GroupBox(i18n->TranslateString("Converter"), Point(7, 11), Size(480, 59));
+	group_samplerate	= new GroupBox(i18n->TranslateString("Output sampling rate"), Point(7, 82), Size(480, 43));
 
 	text_converter		= new Text(i18n->AddColon(i18n->TranslateString("Converter")), Point(17, 27));
 
-	combo_converter		= new ComboBox(Point(24 + text_converter->GetUnscaledTextWidth(), 24), Size(423 - text_converter->GetUnscaledTextWidth(), 0));
+	combo_converter		= new ComboBox(Point(24 + text_converter->GetUnscaledTextWidth(), 24), Size(453 - text_converter->GetUnscaledTextWidth(), 0));
 
 	for (Int i = 0; true; i++)
 	{
@@ -35,8 +37,8 @@ BoCA::ConfigureResample::ConfigureResample()
 	combo_converter->SelectNthEntry(config->GetIntValue("Resample", "Converter", SRC_SINC_MEDIUM_QUALITY) - SRC_SINC_BEST_QUALITY);
 	combo_converter->onSelectEntry.Connect(&ConfigureResample::SetConverter, this);
 
-	text_description	= new Text("Description", Point(24 + text_converter->GetUnscaledTextWidth(), 49));
-	text_samplerate		= new Text(i18n->AddColon(i18n->TranslateString("Samplerate")), Point(17, 98));
+	text_description	= new Text(NIL, Point(24 + text_converter->GetUnscaledTextWidth(), 49));
+	text_samplerate		= new Text(i18n->AddColon(i18n->TranslateString("Sampling rate")), Point(17, 98));
 
 	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0), 6);
 	edit_samplerate->SetFlags(EDB_NUMERIC);
@@ -72,7 +74,7 @@ BoCA::ConfigureResample::ConfigureResample()
 	Add(text_samplerate);
 	Add(edit_samplerate);
 
-	SetSize(Size(464, 171));
+	SetSize(Size(494, 171));
 }
 
 BoCA::ConfigureResample::~ConfigureResample()
