@@ -70,78 +70,80 @@ Bool BoCA::EncoderLAME::Activate()
 {
 	const Config	*config = GetConfiguration();
 
-	int	 effrate;
-
 	const Format	&format = track.GetFormat();
-	const Info	&info = track.GetInfo();
+	const Info	&info	= track.GetInfo();
 
-	if (config->GetIntValue("LAME", "Resample", -1) > 0)	effrate = config->GetIntValue("LAME", "Resample", -1);
-	else							effrate = format.rate;
-
-	switch (effrate)
+	if (config->GetIntValue("LAME", "Resample", -1) >= 0)
 	{
-		case 8000:
-		case 11025:
-		case 12000:
-		case 16000:
-		case 22050:
-		case 24000:
-			if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 4) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 192 || config->GetIntValue("LAME", "Bitrate", 192) == 224 || config->GetIntValue("LAME", "Bitrate", 192) == 256 || config->GetIntValue("LAME", "Bitrate", 192) == 320))
-			{
-				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
+		Int	 effectiveRate = config->GetIntValue("LAME", "Resample", -1);
+
+		if (effectiveRate == 0) effectiveRate = format.rate;
+
+		switch (effectiveRate)
+		{
+			case 8000:
+			case 11025:
+			case 12000:
+			case 16000:
+			case 22050:
+			case 24000:
+				if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 4) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 192 || config->GetIntValue("LAME", "Bitrate", 192) == 224 || config->GetIntValue("LAME", "Bitrate", 192) == 256 || config->GetIntValue("LAME", "Bitrate", 192) == 320))
+				{
+					errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
+					errorState  = True;
+
+					return False;
+				}
+
+				if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 320))
+				{
+					errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
+					errorState  = True;
+
+					return False;
+				}
+
+				if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 320))
+				{
+					errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
+					errorState  = True;
+
+					return False;
+				}
+				break;
+			case 32000:
+			case 44100:
+			case 48000:
+				if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 4) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 8 || config->GetIntValue("LAME", "Bitrate", 192) == 16 || config->GetIntValue("LAME", "Bitrate", 192) == 24 || config->GetIntValue("LAME", "Bitrate", 192) == 144))
+				{
+					errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
+					errorState  = True;
+
+					return False;
+				}
+
+				if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 144))
+				{
+					errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
+					errorState  = True;
+
+					return False;
+				}
+
+				if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 144))
+				{
+					errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
+					errorState  = True;
+
+					return False;
+				}
+				break;
+			default:
+				errorString = "Bad sampling rate! The selected sampling rate is not supported.";
 				errorState  = True;
 
 				return False;
-			}
-
-			if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 320))
-			{
-				errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
-				errorState  = True;
-
-				return False;
-			}
-
-			if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 320))
-			{
-				errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
-				errorState  = True;
-
-				return False;
-			}
-			break;
-		case 32000:
-		case 44100:
-		case 48000:
-			if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 4) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 8 || config->GetIntValue("LAME", "Bitrate", 192) == 16 || config->GetIntValue("LAME", "Bitrate", 192) == 24 || config->GetIntValue("LAME", "Bitrate", 192) == 144))
-			{
-				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
-				errorState  = True;
-
-				return False;
-			}
-
-			if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 144))
-			{
-				errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
-				errorState  = True;
-
-				return False;
-			}
-
-			if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 144))
-			{
-				errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
-				errorState  = True;
-
-				return False;
-			}
-			break;
-		default:
-			errorString = "Bad sampling rate! The selected sampling rate is not supported.";
-			errorState  = True;
-
-			return False;
+		}
 	}
 
 	if (format.channels > 2)
