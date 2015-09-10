@@ -24,7 +24,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	quality			= 9 - config->GetIntValue("LAME", "Quality", 3);
 	forcejs			= config->GetIntValue("LAME", "ForceJS", 0);
 	vbrmode			= config->GetIntValue("LAME", "VBRMode", 4);
-	vbrquality		= 90 - config->GetIntValue("LAME", "VBRQuality", 50);
+	vbrquality		= 99 - config->GetIntValue("LAME", "VBRQuality", 50);
 	abrbitrate		= config->GetIntValue("LAME", "ABRBitrate", 192);
 	set_min_vbr_brate	= config->GetIntValue("LAME", "SetMinVBRBitrate", 0);
 	min_vbr_brate		= GetMinVBRSliderValue();
@@ -144,7 +144,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	vbr_text_setquality		= new Text(i18n->AddColon(i18n->TranslateString("Quality")), Point(11, 13));
 
-	vbr_slider_quality		= new Slider(Point(18 + vbr_text_setquality->GetUnscaledTextWidth(), 11), Size(229 - vbr_text_setquality->GetUnscaledTextWidth(), 0), OR_HORZ, &vbrquality, 0, 90);
+	vbr_slider_quality		= new Slider(Point(18 + vbr_text_setquality->GetUnscaledTextWidth(), 11), Size(229 - vbr_text_setquality->GetUnscaledTextWidth(), 0), OR_HORZ, &vbrquality, 0, 99);
 	vbr_slider_quality->onValueChange.Connect(&ConfigureLAME::SetVBRQuality, this);
 
 	vbr_text_quality		= new Text(NIL, Point(255, 13));
@@ -525,7 +525,7 @@ Int BoCA::ConfigureLAME::SaveSettings()
 	config->SetIntValue("LAME", "StereoMode", misc_combo_stereomode->GetSelectedEntryNumber());
 	config->SetIntValue("LAME", "ForceJS", forcejs);
 	config->SetIntValue("LAME", "VBRMode", vbrmode);
-	config->SetIntValue("LAME", "VBRQuality", 90 - vbrquality);
+	config->SetIntValue("LAME", "VBRQuality", 99 - vbrquality);
 	config->SetIntValue("LAME", "ABRBitrate", abrbitrate);
 	config->SetIntValue("LAME", "SetMinVBRBitrate", set_min_vbr_brate);
 	config->SetIntValue("LAME", "MinVBRBitrate", GetMinVBRBitrate());
@@ -798,9 +798,9 @@ Void BoCA::ConfigureLAME::SetStereoMode()
 
 Void BoCA::ConfigureLAME::SetVBRQuality()
 {
-	String	 txt = String::FromFloat(9 - ((double) vbrquality) / 10);
+	String	 txt = String::FromFloat(9.9 - vbrquality / 10.0);
 
-	if (vbrquality % 10 == 0) txt.Append(".0");
+	if ((vbrquality + 1) % 10 == 0) txt.Append(".0");
 
 	vbr_text_quality->SetText(txt);
 }

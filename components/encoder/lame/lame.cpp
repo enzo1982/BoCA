@@ -180,7 +180,7 @@ Bool BoCA::EncoderLAME::Activate()
 			if (config->GetIntValue("LAME", "VBRMode", 4) == vbr_off)
 			{
 				if (config->GetIntValue("LAME", "SetBitrate", 1)) ex_lame_set_brate(context, config->GetIntValue("LAME", "Bitrate", 192));
-				else						  ex_lame_set_compression_ratio(context, ((double) config->GetIntValue("LAME", "Ratio", 1100)) / 100);
+				else						  ex_lame_set_compression_ratio(context, config->GetIntValue("LAME", "Ratio", 1100) / 100.0);
 			}
 
 			/* Set quality.
@@ -229,11 +229,11 @@ Bool BoCA::EncoderLAME::Activate()
 					break;
 				case vbr_rh:
 					ex_lame_set_VBR(context, vbr_rh);
-					ex_lame_set_VBR_quality(context, config->GetIntValue("LAME", "VBRQuality", 50) / 10);
+					ex_lame_set_VBR_quality(context, config->GetIntValue("LAME", "VBRQuality", 50) / 10.0);
 					break;
 				case vbr_mtrh:
 					ex_lame_set_VBR(context, vbr_mtrh);
-					ex_lame_set_VBR_quality(context, config->GetIntValue("LAME", "VBRQuality", 50) / 10);
+					ex_lame_set_VBR_quality(context, config->GetIntValue("LAME", "VBRQuality", 50) / 10.0);
 					break;
 			}
 
