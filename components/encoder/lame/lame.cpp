@@ -103,7 +103,7 @@ Bool BoCA::EncoderLAME::Activate()
 					return False;
 				}
 
-				if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 320))
+				if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 192 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 224 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 256 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 320))
 				{
 					errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
 					errorState  = True;
@@ -130,7 +130,7 @@ Bool BoCA::EncoderLAME::Activate()
 					return False;
 				}
 
-				if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MaxVBRBitrate", 128) == 144))
+				if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 8 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 16 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 24 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 144))
 				{
 					errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
 					errorState  = True;
@@ -238,7 +238,7 @@ Bool BoCA::EncoderLAME::Activate()
 			}
 
 			if (config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && config->GetIntValue("LAME", "SetMinVBRBitrate", 0)) ex_lame_set_VBR_min_bitrate_kbps(context, config->GetIntValue("LAME", "MinVBRBitrate", 128));
-			if (config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && config->GetIntValue("LAME", "SetMaxVBRBitrate", 0)) ex_lame_set_VBR_max_bitrate_kbps(context, config->GetIntValue("LAME", "MaxVBRBitrate", 128));
+			if (config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && config->GetIntValue("LAME", "SetMaxVBRBitrate", 0)) ex_lame_set_VBR_max_bitrate_kbps(context, config->GetIntValue("LAME", "MaxVBRBitrate", 256));
 
 			/* Set ATH.
 			 */
