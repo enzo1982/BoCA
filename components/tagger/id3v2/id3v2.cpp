@@ -239,7 +239,6 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		container.AddFrame(frame);
 	}
 
-
 	if (info.track > 0)
 	{
 		String	 trackString = String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track));
@@ -289,13 +288,28 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		else if	(key == String(INFO_ORIG_ARTIST).Append(":"))	 { ID3_Frame frame(ID3FID_ORIGARTIST);	      SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == String(INFO_ORIG_ALBUM).Append(":"))	 { ID3_Frame frame(ID3FID_ORIGALBUM);	      SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == String(INFO_ORIG_LYRICIST).Append(":"))	 { ID3_Frame frame(ID3FID_ORIGLYRICIST);      SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == String(INFO_ORIG_YEAR).Append(":"))	 { ID3_Frame frame(ID3FID_ORIGYEAR);	      SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+
+		else if (key == String(INFO_ORIG_YEAR).Append(":"))
+		{
+			ID3_Frame	 frame;
+
+			if (container.GetSpec() == ID3V2_4_0) frame = ID3_Frame(ID3FID_ORIGRELEASETIME);
+			else				      frame = ID3_Frame(ID3FID_ORIGYEAR);
+
+			SetStringField(frame, ID3FN_TEXT, String::FromInt(info.year));
+
+			container.AddFrame(frame);
+		}
 
 		else if	(key == String(INFO_BPM).Append(":"))		 { ID3_Frame frame(ID3FID_BPM);		      SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == String(INFO_INITIALKEY).Append(":"))	 { ID3_Frame frame(ID3FID_INITIALKEY);	      SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
+		else if	(key == String(INFO_COPYRIGHT).Append(":"))	 { ID3_Frame frame(ID3FID_COPYRIGHT);	      SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+
 		else if	(key == String(INFO_RADIOSTATION).Append(":"))	 { ID3_Frame frame(ID3FID_NETRADIOSTATION);   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == String(INFO_RADIOOWNER).Append(":"))	 { ID3_Frame frame(ID3FID_NETRADIOOWNER);     SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+
+		else if (key == String(INFO_USERTEXT).Append(":"))	 { ID3_Frame frame(ID3FID_USERTEXT);	      SetStringField(frame, ID3FN_TEXT, value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
 
 		else if	(key == String(INFO_WEB_ARTIST).Append(":"))	 { ID3_Frame frame(ID3FID_WWWARTIST);	      SetASCIIField(frame, ID3FN_URL, value);	container.AddFrame(frame); }
 		else if	(key == String(INFO_WEB_PUBLISHER).Append(":"))	 { ID3_Frame frame(ID3FID_WWWPUBLISHER);      SetASCIIField(frame, ID3FN_URL, value);	container.AddFrame(frame); }
@@ -303,6 +317,8 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		else if	(key == String(INFO_WEB_SOURCE).Append(":"))	 { ID3_Frame frame(ID3FID_WWWAUDIOSOURCE);    SetASCIIField(frame, ID3FN_URL, value);	container.AddFrame(frame); }
 		else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))	 { ID3_Frame frame(ID3FID_WWWCOPYRIGHT);      SetASCIIField(frame, ID3FN_URL, value);	container.AddFrame(frame); }
 		else if	(key == String(INFO_WEB_COMMERCIAL).Append(":")) { ID3_Frame frame(ID3FID_WWWCOMMERCIALINFO); SetASCIIField(frame, ID3FN_URL, value);	container.AddFrame(frame); }
+
+		else if (key == String(INFO_WEB_USERURL).Append(":"))	 { ID3_Frame frame(ID3FID_WWWUSER);	      SetASCIIField(frame, ID3FN_URL, value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
 	}
 
 	/* Save Replay Gain info.
@@ -460,9 +476,12 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_ORIGALBUM)	    info.other.Add(String(INFO_ORIG_ALBUM).Append(":").Append(GetStringField(frame, ID3FN_TEXT)));
 		else if (frame.GetID() == ID3FID_ORIGLYRICIST)	    info.other.Add(String(INFO_ORIG_LYRICIST).Append(":").Append(GetStringField(frame, ID3FN_TEXT)));
 		else if (frame.GetID() == ID3FID_ORIGYEAR)	    info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append(GetStringField(frame, ID3FN_TEXT)));
+		else if (frame.GetID() == ID3FID_ORIGRELEASETIME)   info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append(GetStringField(frame, ID3FN_TEXT).Head(4)));
 
 		else if (frame.GetID() == ID3FID_BPM)		    info.other.Add(String(INFO_BPM).Append(":").Append(GetStringField(frame, ID3FN_TEXT)));
 		else if (frame.GetID() == ID3FID_INITIALKEY)	    info.other.Add(String(INFO_INITIALKEY).Append(":").Append(GetStringField(frame, ID3FN_TEXT)));
+
+		else if (frame.GetID() == ID3FID_COPYRIGHT)	    info.other.Add(String(INFO_COPYRIGHT).Append(":").Append(GetStringField(frame, ID3FN_TEXT)));
 
 		else if (frame.GetID() == ID3FID_NETRADIOSTATION)   info.other.Add(String(INFO_RADIOSTATION).Append(":").Append(GetStringField(frame, ID3FN_TEXT)));
 		else if (frame.GetID() == ID3FID_NETRADIOOWNER)     info.other.Add(String(INFO_RADIOOWNER).Append(":").Append(GetStringField(frame, ID3FN_TEXT)));
@@ -473,6 +492,8 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_WWWAUDIOSOURCE)    info.other.Add(String(INFO_WEB_SOURCE).Append(":").Append(GetASCIIField(frame, ID3FN_URL)));
 		else if (frame.GetID() == ID3FID_WWWCOPYRIGHT)	    info.other.Add(String(INFO_WEB_COPYRIGHT).Append(":").Append(GetASCIIField(frame, ID3FN_URL)));
 		else if (frame.GetID() == ID3FID_WWWCOMMERCIALINFO) info.other.Add(String(INFO_WEB_COMMERCIAL).Append(":").Append(GetASCIIField(frame, ID3FN_URL)));
+
+		else if (frame.GetID() == ID3FID_WWWUSER)	    info.other.Add(String(INFO_WEB_USERURL).Append(":").Append(GetStringField(frame, ID3FN_DESCRIPTION)).Append(":|:").Append(GetASCIIField(frame, ID3FN_URL)));
 
 		else if (frame.GetID() == ID3FID_TRACKNUM)
 		{
@@ -505,6 +526,8 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			else if (description.ToLower() == "replaygain_track_peak") info.track_peak = value;
 			else if (description.ToLower() == "replaygain_album_gain") info.album_gain = value;
 			else if (description.ToLower() == "replaygain_album_peak") info.album_peak = value;
+
+			else							   info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(value));
 		}
 		else if (frame.GetID() == ID3FID_CONTENTTYPE)
 		{

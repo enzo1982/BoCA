@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -35,8 +35,12 @@ namespace BoCA
 	const char * const INFO_BPM		= (char *) "BPM (beats per minute)";
 	const char * const INFO_INITIALKEY	= (char *) "Initial key";
 
+	const char * const INFO_COPYRIGHT	= (char *) "Copyright";
+
 	const char * const INFO_RADIOSTATION	= (char *) "Internet radio station name";
 	const char * const INFO_RADIOOWNER	= (char *) "Internet radio station owner";
+
+	const char * const INFO_USERTEXT	= (char *) "User defined text";
 
 	const char * const INFO_WEB_ARTIST	= (char *) "Official artist webpage";
 	const char * const INFO_WEB_PUBLISHER	= (char *) "Official publisher webpage";
@@ -44,6 +48,8 @@ namespace BoCA
 	const char * const INFO_WEB_SOURCE	= (char *) "Official audio source webpage";
 	const char * const INFO_WEB_COPYRIGHT	= (char *) "Copyright information webpage";
 	const char * const INFO_WEB_COMMERCIAL	= (char *) "Commercial information  webpage";
+
+	const char * const INFO_WEB_USERURL	= (char *) "User defined URL";
 
 	class BOCA_DLL_EXPORT Info
 	{
