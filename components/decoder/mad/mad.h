@@ -42,6 +42,8 @@ namespace BoCA
 
 			Int			 delaySamplesLeft;
 
+			Int			 offset;
+
 			Mutex			*readDataMutex;
 			Mutex			*samplesBufferMutex;
 			Thread			*decoderThread;

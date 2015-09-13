@@ -95,6 +95,7 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 	size_t			 samplesDone;
 
 	mpg123_handle	*context = ex_mpg123_new(NIL, NIL);
+	Int		 offset	 = f_in->GetPos();
 
 	ex_mpg123_open_feed(context);
 
@@ -125,7 +126,7 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 			ex_mpg123_info(context, &mp3data);
 
 			if	(numFrames	 > 0) track.length = numFrames * ex_mpg123_spf(context) - delaySamples - padSamples;
-			else if (mp3data.bitrate > 0) track.approxLength = track.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate;
+			else if (mp3data.bitrate > 0) track.approxLength = (track.fileSize - offset) / (mp3data.bitrate * 1000 / 8) * format.rate;
 
 			break;
 		}

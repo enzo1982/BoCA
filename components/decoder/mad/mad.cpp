@@ -111,8 +111,9 @@ Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 	SkipID3v2Tag(f_in);
 	ParseVBRHeaders(f_in);
 
+	offset = f_in->GetPos();
 	driver = ioDriver;
-	driver->Seek(f_in->GetPos());
+	driver->Seek(offset);
 
 	readDataMutex = new Mutex();
 	samplesBufferMutex = new Mutex();
@@ -443,7 +444,7 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, ma
 	format.channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
 	format.rate	= header->samplerate;
 
-	filter->infoTrack->approxLength = filter->infoTrack->fileSize / (header->bitrate / 8) * format.rate;
+	filter->infoTrack->approxLength = (filter->infoTrack->fileSize - filter->offset) / (header->bitrate / 8) * format.rate;
 
 	filter->infoTrack->SetFormat(format);
 

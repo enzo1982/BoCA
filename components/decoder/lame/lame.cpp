@@ -77,6 +77,7 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 	Buffer<short>		 pcm_r(buffer.Size() * 64);
 
 	hip_t	 context = ex_hip_decode_init();
+	Int	 offset	 = f_in->GetPos();
 
 	do
 	{
@@ -94,7 +95,7 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 			format.rate	= mp3data.samplerate;
 
 			if	(mp3data.nsamp	 > 0) track.length = mp3data.nsamp - delaySamples - padSamples;
-			else if (mp3data.bitrate > 0) track.approxLength = track.fileSize / (mp3data.bitrate * 1000 / 8) * format.rate;
+			else if (mp3data.bitrate > 0) track.approxLength = (track.fileSize - offset) / (mp3data.bitrate * 1000 / 8) * format.rate;
 
 			break;
 		}
