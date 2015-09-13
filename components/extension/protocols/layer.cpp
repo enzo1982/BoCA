@@ -153,5 +153,5 @@ Void BoCA::LayerProtocols::ShowDetails()
 {
 // TODO: Implement error detail view
 
-	Dialogs::QuickMessage("Not implemented, yet!", "Error", Dialogs::Message::Buttons::Ok, Dialogs::Message::Icon::Hand);
+	Dialogs::QuickMessage("Not implemented, yet!", "Error", Dialogs::Message::Buttons::Ok, Dialogs::Message::Icon::Error);
 }

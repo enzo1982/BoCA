@@ -34,7 +34,7 @@ Void BoCA::Utilities::WarningMessage(const String &message, const String &replac
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Warning"), Message::Buttons::Ok, Message::Icon::Exclamation);
+	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Warning"), Message::Buttons::Ok, Message::Icon::Warning);
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Warning")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
@@ -45,7 +45,7 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Hand);
+	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Error);
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
