@@ -87,18 +87,30 @@ Bool BoCA::EncoderVorbis::Activate()
 
 	srand(clock());
 
+	int	 error = -1;
+
 	ex_vorbis_info_init(&vi);
 
 	switch (config->GetIntValue("Vorbis", "Mode", 0))
 	{
 		case 0:
-			ex_vorbis_encode_init_vbr(&vi, format.channels, format.rate, ((double) config->GetIntValue("Vorbis", "Quality", 60)) / 100);
+			error = ex_vorbis_encode_init_vbr(&vi, format.channels, format.rate, ((double) config->GetIntValue("Vorbis", "Quality", 60)) / 100);
 			break;
 		case 1:
-			ex_vorbis_encode_init(&vi, format.channels, format.rate, config->GetIntValue("Vorbis", "SetMinBitrate", False) ? config->GetIntValue("Vorbis", "MinBitrate",  32) * 1000 : -1,
-										 config->GetIntValue("Vorbis", "SetBitrate",    True)  ? config->GetIntValue("Vorbis", "Bitrate",    192) * 1000 : -1,
-										 config->GetIntValue("Vorbis", "SetMaxBitrate", False) ? config->GetIntValue("Vorbis", "MaxBitrate", 320) * 1000 : -1);
+			error = ex_vorbis_encode_init(&vi, format.channels, format.rate, config->GetIntValue("Vorbis", "SetMinBitrate", False) ? config->GetIntValue("Vorbis", "MinBitrate",  32) * 1000 : -1,
+											 config->GetIntValue("Vorbis", "SetBitrate",    True)  ? config->GetIntValue("Vorbis", "Bitrate",    192) * 1000 : -1,
+											 config->GetIntValue("Vorbis", "SetMaxBitrate", False) ? config->GetIntValue("Vorbis", "MaxBitrate", 320) * 1000 : -1);
 			break;
+	}
+
+	if (error != 0)
+	{
+		errorString = "Could not initialize Vorbis encoder! Please check the configuration!";
+		errorState  = True;
+
+		ex_vorbis_info_clear(&vi);
+
+		return False;
 	}
 
 	ex_vorbis_comment_init(&vc);
