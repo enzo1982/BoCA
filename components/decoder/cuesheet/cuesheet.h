@@ -19,6 +19,8 @@ namespace BoCA
 		private:
 			ConfigLayer		*configLayer;
 
+			Void			 UpdateInfoWithAlbumInfo(Info &, const Info &) const;
+
 			Bool			 AddTrack(const Track &, Array<Track> &) const;
 		public:
 			static const String	&GetComponentSpecs();

@@ -49,6 +49,9 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 	Format		 format = track.GetFormat();
 	Info		 info;
 
+	Track		 albumTrack;
+	Info		 albumInfo;
+
 	Bool		 trackMode = False;
 	Bool		 dataMode = False;
 
@@ -88,6 +91,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			if (line.Contains("\"")) info.genre = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
 			else			 info.genre = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!trackMode && !dataMode) albumInfo.genre = info.genre;
 		}
 
 		if (line.StartsWith("REM DATE ")) info.year = line.Tail(line.Length() - line.FindLast(" ") - 1).ToInt();
@@ -96,14 +101,16 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			if (line.Contains("\"")) info.comment = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
 			else			 info.comment = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!trackMode && !dataMode) albumInfo.comment = info.comment;
 		}
 
 		/* Parse Replay Gain comments.
 		 */
-		if	(line.StartsWith("REM REPLAYGAIN_ALBUM_GAIN ")) info.album_gain = line.Tail(line.Length() - 26);
-		else if (line.StartsWith("REM REPLAYGAIN_ALBUM_PEAK ")) info.album_peak = line.Tail(line.Length() - 26);
-		else if (line.StartsWith("REM REPLAYGAIN_TRACK_GAIN ")) info.track_gain = line.Tail(line.Length() - 26);
-		else if (line.StartsWith("REM REPLAYGAIN_TRACK_PEAK ")) info.track_peak = line.Tail(line.Length() - 26);
+		if	(line.StartsWith("REM REPLAYGAIN_ALBUM_GAIN ")) { info.album_gain = line.Tail(line.Length() - 26); albumInfo.album_gain = info.album_gain; }
+		else if (line.StartsWith("REM REPLAYGAIN_ALBUM_PEAK ")) { info.album_peak = line.Tail(line.Length() - 26); albumInfo.album_peak = info.album_peak; }
+		else if (line.StartsWith("REM REPLAYGAIN_TRACK_GAIN "))	  info.track_gain = line.Tail(line.Length() - 26);
+		else if (line.StartsWith("REM REPLAYGAIN_TRACK_PEAK "))	  info.track_peak = line.Tail(line.Length() - 26);
 
 		/* Skip other comments.
 		 */
@@ -195,6 +202,11 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (errorState) break;
 
 			format = infoTrack.GetFormat();
+			info   = infoTrack.GetInfo();
+
+			UpdateInfoWithAlbumInfo(info, albumInfo);
+
+			if (infoTrack.tracks.Length() > 0) albumTrack.tracks = infoTrack.tracks;
 
 			if	(infoTrack.length	>= 0) { discLength += infoTrack.length;	      iTrack.length	  = infoTrack.length;	    }
 			else if (infoTrack.approxLength >= 0) { discLength += infoTrack.approxLength; iTrack.approxLength = infoTrack.approxLength; }
@@ -206,6 +218,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			if (line.Contains("\"")) info.artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
 			else			 info.artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!trackMode && !dataMode) albumInfo.artist = info.artist;
 		}
 
 		if (line.StartsWith("SONGWRITER "))
@@ -221,6 +235,16 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			}
 
 			info.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
+
+			if (!trackMode && !dataMode)
+			{
+				for (Int i = 0; i < albumInfo.other.Length(); i++)
+				{
+					if (albumInfo.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) albumInfo.other.RemoveNth(i);
+				}
+
+				albumInfo.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
+			}
 		}
 
 		if (line.StartsWith("TITLE "))
@@ -232,6 +256,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			if (!trackMode && !dataMode) info.album = title;
 			else			     info.title = title;
+
+			if (!trackMode && !dataMode) albumInfo.album = info.album;
 		}
 
 		if (line.StartsWith("ISRC "))
@@ -313,6 +339,13 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			dataMode  = !line.EndsWith(" AUDIO");
 
 			info.track = line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1).ToInt();
+
+			if (albumTrack.tracks.Length() >= info.track)
+			{
+				info = albumTrack.tracks.GetNth(info.track - 1).GetInfo();
+
+				UpdateInfoWithAlbumInfo(info, albumInfo);
+			}
 		}
 	}
 
@@ -384,6 +417,30 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 	}
 
 	return Success();
+}
+
+Void BoCA::DecoderCueSheet::UpdateInfoWithAlbumInfo(Info &info, const Info &albumInfo) const
+{
+	if (albumInfo.artist  != NIL) info.artist  = albumInfo.artist;
+	if (albumInfo.album   != NIL) info.album   = albumInfo.album;
+	if (albumInfo.genre   != NIL) info.genre   = albumInfo.genre;
+	if (albumInfo.comment != NIL) info.comment = albumInfo.comment;
+
+	for (Int i = 0; i < albumInfo.other.Length(); i++)
+	{
+		if (albumInfo.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":")))
+		{
+			for (Int j = 0; j < info.other.Length(); j++)
+			{
+				if (info.other.GetNth(j).StartsWith(String(INFO_COMPOSER).Append(":"))) info.other.RemoveNth(j);
+			}
+
+			info.other.Add(albumInfo.other.GetNth(i));
+		}
+	}
+
+	if (albumInfo.album_gain != NIL) info.album_gain = albumInfo.album_gain;
+	if (albumInfo.album_peak != NIL) info.album_peak = albumInfo.album_peak;
 }
 
 Bool BoCA::DecoderCueSheet::AddTrack(const Track &track, Array<Track> &tracks) const
