@@ -249,23 +249,19 @@ Bool BoCA::DecoderLAME::SkipID3v2Tag(InStream *in)
 
 Bool BoCA::DecoderLAME::ParseVBRHeaders(InStream *in)
 {
-	/* Check for a LAME header and extract
-	 * the number of samples if it exists.
+	/* Check for a LAME header and extract the number of samples if it exists.
 	 */
-	Buffer<UnsignedByte>	 buffer(228);
+	Buffer<UnsignedByte>	 buffer(192);
 
-	/* Read data and seek back to before
-	 * the Xing header.
+	/* Read data and seek back to before the Xing header.
 	 */
-	in->RelSeek(156);
-	in->InputData(buffer, 228);
-	in->RelSeek(-228);
-	in->RelSeek(-156);
+	in->InputData(buffer, 192);
+	in->RelSeek(-192);
 
-	if (buffer[0] == 'L' && buffer[1] == 'A' && buffer[2] == 'M' && buffer[3] == 'E')
+	if (buffer[0x9C] == 'L' && buffer[0x9D] == 'A' && buffer[0x9E] == 'M' && buffer[0x9F] == 'E')
 	{
-		delaySamples = ( buffer[21]	    << 4) | ((buffer[22] & 0xF0) >> 4);
-		padSamples   = ((buffer[22] & 0x0F) << 8) | ( buffer[23]	     );
+		delaySamples = ( buffer[0xB1]	      << 4) | ((buffer[0xB2] & 0xF0) >> 4);
+		padSamples   = ((buffer[0xB2] & 0x0F) << 8) | ( buffer[0xB3]		 );
 
 		delaySamplesLeft += delaySamples;
 

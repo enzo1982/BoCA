@@ -36,6 +36,8 @@ namespace BoCA
 
 			Bool			 SkipID3v2Tag(IO::InStream *);
 			Bool			 ParseVBRHeaders(IO::InStream *);
+
+			Int			 GetMPEGFrameSize(const Buffer<UnsignedByte> &);
 		public:
 			static const String	&GetComponentSpecs();
 
