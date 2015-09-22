@@ -19,18 +19,14 @@ BoCA::ConfigureCueSheet::ConfigureCueSheet()
 
 	i18n->SetContext("Decoders::CueSheet");
 
-	lookForAlternatives	= config->GetIntValue("CueSheet", "LookForAlternativeFiles", False);
-
 	readInfoTags		= config->GetIntValue("CueSheet", "ReadInformationTags", True);
 	preferCueSheets		= config->GetIntValue("CueSheet", "PreferCueSheets", True);
 
-	group_alternatives	= new GroupBox(i18n->TranslateString("Alternative files"), Point(7, 11), Size(552, 41));
+	lookForAlternatives	= config->GetIntValue("CueSheet", "LookForAlternativeFiles", False);
 
-	check_alternatives	= new CheckBox(i18n->TranslateString("Look for compressed alternatives if referenced Wave files cannot be located"), Point(10, 14), Size(532, 0), &lookForAlternatives);
+	ignoreErrors		= config->GetIntValue("CueSheet", "IgnoreErrors", False);
 
-	group_alternatives->Add(check_alternatives);
-
-	group_information	= new GroupBox(i18n->TranslateString("Title information"), Point(7, 64), Size(552, 64));
+	group_information	= new GroupBox(i18n->TranslateString("Title information"), Point(7, 11), Size(552, 64));
 
 	check_read_tags		= new CheckBox(i18n->TranslateString("Read tags from referenced files"), Point(10, 14), Size(532, 0), &readInfoTags);
 	check_read_tags->onAction.Connect(&ConfigureCueSheet::ToggleReadTags, this);
@@ -42,20 +38,36 @@ BoCA::ConfigureCueSheet::ConfigureCueSheet()
 	group_information->Add(check_read_tags);
 	group_information->Add(check_prefer_cue);
 
-	Add(group_alternatives);
-	Add(group_information);
+	group_alternatives	= new GroupBox(i18n->TranslateString("Alternative files"), Point(7, 87), Size(552, 41));
 
-	SetSize(Size(566, 135));
+	check_alternatives	= new CheckBox(i18n->TranslateString("Look for compressed alternatives if referenced Wave files cannot be located"), Point(10, 14), Size(532, 0), &lookForAlternatives);
+
+	group_alternatives->Add(check_alternatives);
+
+	group_errors		= new GroupBox(i18n->TranslateString("Error handling"), Point(7, 140), Size(552, 41));
+
+	check_ignore_errors	= new CheckBox(i18n->TranslateString("Ignore errors during cue sheet processing"), Point(10, 14), Size(532, 0), &ignoreErrors);
+
+	group_errors->Add(check_ignore_errors);
+
+	Add(group_information);
+	Add(group_alternatives);
+	Add(group_errors);
+
+	SetSize(Size(566, 188));
 }
 
 BoCA::ConfigureCueSheet::~ConfigureCueSheet()
 {
-	DeleteObject(group_alternatives);
-	DeleteObject(check_alternatives);
-
 	DeleteObject(group_information);
 	DeleteObject(check_read_tags);
 	DeleteObject(check_prefer_cue);
+
+	DeleteObject(group_alternatives);
+	DeleteObject(check_alternatives);
+
+	DeleteObject(group_errors);
+	DeleteObject(check_ignore_errors);
 }
 
 Void BoCA::ConfigureCueSheet::ToggleReadTags()
@@ -68,10 +80,12 @@ Int BoCA::ConfigureCueSheet::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("CueSheet", "LookForAlternativeFiles", lookForAlternatives);
-
 	config->SetIntValue("CueSheet", "ReadInformationTags", readInfoTags);
 	config->SetIntValue("CueSheet", "PreferCueSheets", preferCueSheets);
+
+	config->SetIntValue("CueSheet", "LookForAlternativeFiles", lookForAlternatives);
+
+	config->SetIntValue("CueSheet", "IgnoreErrors", ignoreErrors);
 
 	return Success();
 }

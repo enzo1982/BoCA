@@ -45,10 +45,12 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 {
 	const Config	*config		     = GetConfiguration();
 
-	Bool		 lookForAlternatives = config->GetIntValue("CueSheet", "LookForAlternativeFiles", False);
-
 	Bool		 readInfoTags	     = config->GetIntValue("CueSheet", "ReadInformationTags", True);
 	Bool		 preferCueSheets     = config->GetIntValue("CueSheet", "PreferCueSheets", True);
+
+	Bool		 lookForAlternatives = config->GetIntValue("CueSheet", "LookForAlternativeFiles", False);
+
+	Bool		 ignoreErrors	     = config->GetIntValue("CueSheet", "IgnoreErrors", False);
 
 	Track		 iTrack;
 	Format		 format		     = track.GetFormat();
@@ -187,6 +189,10 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 				errorState  = True;
 				errorString = "File referenced in cue sheet not found";
 
+				if (ignoreErrors) errorState = False;
+
+				track = NIL;
+
 				break;
 			}
 
@@ -200,6 +206,10 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 				errorState  = True;
 				errorString = "Unknown file type referenced in cue sheet";
 
+				if (ignoreErrors) errorState = False;
+
+				track = NIL;
+
 				break;
 			}
 
@@ -212,7 +222,14 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			boca.DeleteComponent(decoder);
 
-			if (errorState) break;
+			if (errorState)
+			{
+				if (ignoreErrors) errorState = False;
+
+				track = NIL;
+
+				break;
+			}
 
 			format = infoTrack.GetFormat();
 

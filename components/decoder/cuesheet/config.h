@@ -24,17 +24,22 @@ namespace BoCA
 	class ConfigureCueSheet : public ConfigLayer
 	{
 		private:
-			GroupBox	*group_alternatives;
-			CheckBox	*check_alternatives;
-
 			GroupBox	*group_information;
 			CheckBox	*check_read_tags;
 			CheckBox	*check_prefer_cue;
 
-			Bool		 lookForAlternatives;
+			GroupBox	*group_alternatives;
+			CheckBox	*check_alternatives;
+
+			GroupBox	*group_errors;
+			CheckBox	*check_ignore_errors;
 
 			Bool		 readInfoTags;
 			Bool		 preferCueSheets;
+
+			Bool		 lookForAlternatives;
+
+			Bool		 ignoreErrors;
 		public:
 					 ConfigureCueSheet();
 					~ConfigureCueSheet();
