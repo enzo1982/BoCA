@@ -358,7 +358,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 	{
 		offsets = offsets.Append("+").Append(Number((Int64) offset).ToHexString()).ToUpper();
 
-		/* Add offset string to all track.
+		/* Add offset string to all tracks.
 		 */
 		for (Int i = 0; i < track.tracks.Length(); i++)
 		{
@@ -369,6 +369,18 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			iTrack.SetInfo(info);
 		}
+	}
+
+	/* Set number of tracks.
+	 */
+	for (Int i = 0; i < track.tracks.Length(); i++)
+	{
+		Track	&iTrack = track.tracks.GetNthReference(i);
+		Info	 info = iTrack.GetInfo();
+
+		info.numTracks = track.tracks.Length();
+
+		iTrack.SetInfo(info);
 	}
 
 	return Success();
