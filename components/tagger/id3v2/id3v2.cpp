@@ -73,8 +73,6 @@ const String	 BoCA::TaggerID3v2::genres[192] =
 	"Trop Rock", "World Music", "Neoclassical", "Audiobook", "Audio Theatre", "Neue Deutsche Welle",
 	"Podcast", "Indie Rock", "G-Funk", "Dubstep", "Garage Rock", "Psybient" };
 
-String		 BoCA::TaggerID3v2::dummyString;
-
 BoCA::TaggerID3v2::TaggerID3v2()
 {
 }
