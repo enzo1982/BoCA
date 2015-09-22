@@ -43,19 +43,24 @@ Bool BoCA::DecoderCueSheet::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track)
 {
-	const Config	*config = GetConfiguration();
+	const Config	*config		     = GetConfiguration();
+
+	Bool		 lookForAlternatives = config->GetIntValue("CueSheet", "LookForAlternativeFiles", False);
+
+	Bool		 readInfoTags	     = config->GetIntValue("CueSheet", "ReadInformationTags", True);
+	Bool		 preferCueSheets     = config->GetIntValue("CueSheet", "PreferCueSheets", True);
 
 	Track		 iTrack;
-	Format		 format = track.GetFormat();
+	Format		 format		     = track.GetFormat();
 	Info		 info;
 
 	Track		 albumTrack;
 	Info		 albumInfo;
 
-	Bool		 trackMode = False;
-	Bool		 dataMode = False;
+	Bool		 trackMode	     = False;
+	Bool		 dataMode	     = False;
 
-	Int		 discLength = 0;
+	Int		 discLength	     = 0;
 
 	/* Standard format for audio discs.
 	 */
@@ -89,20 +94,28 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		 */
 		if (line.StartsWith("REM GENRE "))
 		{
-			if (line.Contains("\"")) info.genre = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 info.genre = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			String	 genre;
 
-			if (!trackMode && !dataMode) albumInfo.genre = info.genre;
+			if (line.Contains("\"")) genre = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 genre = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!readInfoTags || preferCueSheets) info.genre = genre;
+
+			if (!trackMode && !dataMode) albumInfo.genre = genre;
 		}
 
 		if (line.StartsWith("REM DATE ")) info.year = line.Tail(line.Length() - line.FindLast(" ") - 1).ToInt();
 
 		if (line.StartsWith("REM COMMENT "))
 		{
-			if (line.Contains("\"")) info.comment = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 info.comment = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			String	 comment;
 
-			if (!trackMode && !dataMode) albumInfo.comment = info.comment;
+			if (line.Contains("\"")) comment = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 comment = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!readInfoTags || preferCueSheets) info.comment = comment;
+
+			if (!trackMode && !dataMode) albumInfo.comment = comment;
 		}
 
 		/* Parse Replay Gain comments.
@@ -147,7 +160,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			/* Look for compressed files in place of referenced Wave, Wave64, RF64 or AIFF files.
 			 */
-			if (!File(iTrack.origFilename).Exists() && config->GetIntValue("CueSheet", "LookForAlternativeFiles", False) &&
+			if (!File(iTrack.origFilename).Exists() && lookForAlternatives &&
 			    (iTrack.origFilename.ToLower().EndsWith(".wav") || iTrack.origFilename.ToLower().EndsWith(".w64")  || iTrack.origFilename.ToLower().EndsWith(".rf64") ||
 			     iTrack.origFilename.ToLower().EndsWith(".aif") || iTrack.origFilename.ToLower().EndsWith(".aiff") || iTrack.origFilename.ToLower().EndsWith(".aifc")))
 			{
@@ -202,9 +215,19 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (errorState) break;
 
 			format = infoTrack.GetFormat();
-			info   = infoTrack.GetInfo();
 
-			UpdateInfoWithAlbumInfo(info, albumInfo);
+			if (readInfoTags)
+			{
+				info = infoTrack.GetInfo();
+
+				if (preferCueSheets) UpdateInfoWithAlbumInfo(info, albumInfo);
+			}
+			else
+			{
+				info = Info();
+
+				UpdateInfoWithAlbumInfo(info, albumInfo);
+			}
 
 			if (infoTrack.tracks.Length() > 0) albumTrack.tracks = infoTrack.tracks;
 
@@ -216,10 +239,14 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		 */
 		if (line.StartsWith("PERFORMER "))
 		{
-			if (line.Contains("\"")) info.artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 info.artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			String	 artist;
 
-			if (!trackMode && !dataMode) albumInfo.artist = info.artist;
+			if (line.Contains("\"")) artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!readInfoTags || preferCueSheets) info.artist = artist;
+
+			if (!trackMode && !dataMode) albumInfo.artist = artist;
 		}
 
 		if (line.StartsWith("SONGWRITER "))
@@ -229,12 +256,15 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (line.Contains("\"")) songwriter = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
 			else			 songwriter = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
-			for (Int i = 0; i < info.other.Length(); i++)
+			if (!readInfoTags || preferCueSheets)
 			{
-				if (info.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) info.other.RemoveNth(i);
-			}
+				for (Int i = 0; i < info.other.Length(); i++)
+				{
+					if (info.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) info.other.RemoveNth(i);
+				}
 
-			info.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
+				info.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
+			}
 
 			if (!trackMode && !dataMode)
 			{
@@ -254,10 +284,13 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (line.Contains("\"")) title = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
 			else			 title = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
-			if (!trackMode && !dataMode) info.album = title;
-			else			     info.title = title;
+			if (!readInfoTags || preferCueSheets)
+			{
+				if (!trackMode && !dataMode) info.album = title;
+				else			     info.title = title;
+			}
 
-			if (!trackMode && !dataMode) albumInfo.album = info.album;
+			if (!trackMode && !dataMode) albumInfo.album = title;
 		}
 
 		if (line.StartsWith("ISRC "))
@@ -338,14 +371,25 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			trackMode =  line.EndsWith(" AUDIO");
 			dataMode  = !line.EndsWith(" AUDIO");
 
-			info.track = line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1).ToInt();
+			Int	 track = line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1).ToInt();
 
-			if (albumTrack.tracks.Length() >= info.track)
+			if (albumTrack.tracks.Length() >= track)
 			{
-				info = albumTrack.tracks.GetNth(info.track - 1).GetInfo();
+				if (readInfoTags)
+				{
+					info = albumTrack.tracks.GetNth(track - 1).GetInfo();
 
-				UpdateInfoWithAlbumInfo(info, albumInfo);
+					if (preferCueSheets) UpdateInfoWithAlbumInfo(info, albumInfo);
+				}
+				else
+				{
+					info = Info();
+
+					UpdateInfoWithAlbumInfo(info, albumInfo);
+				}
 			}
+
+			info.track = track;
 		}
 	}
 

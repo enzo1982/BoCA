@@ -27,12 +27,21 @@ namespace BoCA
 			GroupBox	*group_alternatives;
 			CheckBox	*check_alternatives;
 
+			GroupBox	*group_information;
+			CheckBox	*check_read_tags;
+			CheckBox	*check_prefer_cue;
+
 			Bool		 lookForAlternatives;
+
+			Bool		 readInfoTags;
+			Bool		 preferCueSheets;
 		public:
 					 ConfigureCueSheet();
 					~ConfigureCueSheet();
 
 			Int		 SaveSettings();
+		slots:
+			Void		 ToggleReadTags();
 	};
 };
 
