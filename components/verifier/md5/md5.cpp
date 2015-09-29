@@ -39,8 +39,8 @@ BoCA::VerifierMD5::~VerifierMD5()
 
 Bool BoCA::VerifierMD5::CanVerifyTrack(const Track &track)
 {
-	if (track.md5 != NIL) return True;
-	else		      return False;
+	if (track.md5 != NIL && track.md5 != String().FillN('0', 32)) return True;
+	else							      return False;
 }
 
 Bool BoCA::VerifierMD5::Activate()
