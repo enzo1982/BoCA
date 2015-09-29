@@ -175,6 +175,7 @@ BoCA::DecoderMAD::DecoderMAD()
 	stop		   = False;
 	finished	   = False;
 
+	numBytes	   = 0;
 	numFrames	   = 0;
 
 	delaySamples	   = 0;
@@ -327,6 +328,7 @@ Bool BoCA::DecoderMAD::ParseVBRHeaders(InStream *in)
 
 	if (GetXingHeader(&data, buffer))
 	{
+		numBytes  = data.bytes - frameSize;
 		numFrames = data.frames;
 
 		/* Check for a LAME header and extract length information.
@@ -338,26 +340,37 @@ Bool BoCA::DecoderMAD::ParseVBRHeaders(InStream *in)
 
 			delaySamplesLeft += delaySamples;
 		}
-
-		return True;
 	}
 	else if (buffer[0x24] == 'V' && buffer[0x25] == 'B' && buffer[0x26] == 'R' && buffer[0x27] == 'I')
 	{
+		numBytes     = ((buffer[0x2E] << 24) | (buffer[0x2F] << 16) | (buffer[0x30] << 8) | (buffer[0x31])) - frameSize;
 		numFrames    = ((buffer[0x32] << 24) | (buffer[0x33] << 16) | (buffer[0x34] << 8) | (buffer[0x35])) - 1;
 
 		delaySamples = 576;
 		padSamples   = ((buffer[0x2A] << 8) | (buffer[0x2B])) - delaySamples;
 
 		delaySamplesLeft += delaySamples;
+	}
+	else
+	{
+		/* Seek back to before the frame if no Xing or VBRI header was found.
+		 */
+		in->RelSeek(-frameSize);
 
-		return True;
+		return False;
 	}
 
-	/* Seek back to before the frame if no Xing or VBRI header was found.
+	/* Sanity check for header vs. actual file size (account
+	 * for possible ID3v1 and addtional 4kB of other tags).
 	 */
-	in->RelSeek(-frameSize);
+	if (numBytes > 0 && in->Size() - in->GetPos() > numBytes * 1.01 + 128 + 4096)
+	{
+		numFrames  = 0;
 
-	return False;
+		padSamples = 0;
+	}
+
+	return True;
 }
 
 Int BoCA::DecoderMAD::GetMPEGFrameSize(const Buffer<UnsignedByte> &header)

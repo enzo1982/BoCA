@@ -25,6 +25,7 @@ namespace BoCA
 			Buffer<short>		 pcm_l;
 			Buffer<short>		 pcm_r;
 
+			Int			 numBytes;
 			Int			 numFrames;
 
 			Int			 delaySamples;

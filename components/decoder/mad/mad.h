@@ -35,6 +35,7 @@ namespace BoCA
 
 			Track			*infoTrack;
 
+			Int			 numBytes;
 			Int			 numFrames;
 
 			Int			 delaySamples;
