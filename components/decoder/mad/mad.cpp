@@ -175,6 +175,8 @@ BoCA::DecoderMAD::DecoderMAD()
 	stop		   = False;
 	finished	   = False;
 
+	offset		   = 0;
+
 	numBytes	   = 0;
 	numFrames	   = 0;
 
