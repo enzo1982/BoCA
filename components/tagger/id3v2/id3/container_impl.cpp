@@ -36,12 +36,11 @@ ID3_FrameDef	*ID3_FindFrameDef(ID3_FrameID id);
 int ID3_strncasecmp(const char *s1, const char *s2, int n)
 {
 	// this routine is borrowed from half-life
-	int c1, c2;
 
 	while (true)
 	{
-		c1 = *s1++;
-		c2 = *s2++;
+		int	 c1 = *s1++;
+		int	 c2 = *s2++;
 
 		if (!n--) return 0; // strings are equal until end point n
 
@@ -400,8 +399,6 @@ bool ID3_ContainerImpl::AttachFrame(ID3_Frame *frame)
 	}
 
 	if (frame) delete frame;
-
-	frame = NULL;
 
 	return false;
 }

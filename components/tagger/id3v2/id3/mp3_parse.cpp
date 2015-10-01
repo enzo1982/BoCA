@@ -471,9 +471,6 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
   {
     char vbrheaderdata[VBR_HEADER_MAX_SIZE+1]; //+1 to hold the 0 char
     unsigned char *pvbrdata = (unsigned char *)vbrheaderdata;
-    int vbr_filesize = 0;
-    int vbr_scale = 0;
-    int vbr_flags = 0;
 
     // get fixed part of vbr header
     // and check if valid
@@ -488,6 +485,10 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
         pvbrdata[2] == 'n' &&
         pvbrdata[3] == 'g')
     {
+      int vbr_filesize = 0;
+      int vbr_scale = 0;
+      int vbr_flags = 0;
+
       // get vbr flags
       pvbrdata += 4;
       vbr_flags = ExtractI4(pvbrdata);

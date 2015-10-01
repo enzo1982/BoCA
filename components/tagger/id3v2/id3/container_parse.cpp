@@ -38,8 +38,6 @@ bool id3::v2::parseFrames(ID3_ContainerImpl &container, ID3_Reader &rdr)
 	ID3_Reader::pos_type	 beg = rdr.getCur();
 	io::ExitTrigger		 et(rdr, beg);
 	ID3_Reader::pos_type	 last_pos = beg;
-	size_t			 totalSize = 0;
-	size_t			 frameSize = 0;
 
 	while (!rdr.atEnd() && rdr.peekChar() != '\0')
 	{
@@ -54,12 +52,9 @@ bool id3::v2::parseFrames(ID3_ContainerImpl &container, ID3_Reader &rdr)
 		f->SetSpec(container.GetSpec());
 
 		bool		 goodParse = f->Parse(rdr);
-
-		frameSize = rdr.getCur() - last_pos;
+		size_t		 frameSize = rdr.getCur() - last_pos;
 
 		ID3D_NOTICE("id3::v2::parseFrames(): frameSize = " << frameSize);
-
-		totalSize += frameSize;
 
 		if (frameSize == 0)
 		{

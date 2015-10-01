@@ -134,7 +134,6 @@ void ID3_TagImpl::ParseFile()
  */
 void ID3_TagImpl::ParseReader(ID3_Reader &reader)
 {
-	size_t			 mp3_core_size;
 	size_t			 bytes_till_sync;
 
 	io::WindowedReader	 wr(reader);
@@ -379,7 +378,7 @@ void ID3_TagImpl::ParseReader(ID3_Reader &reader)
 
 		/* Now get the mp3 header.
 		 */
-		mp3_core_size = (_file_size - _appended_bytes) - (_prepended_bytes + bytes_till_sync);
+		size_t	 mp3_core_size = (_file_size - _appended_bytes) - (_prepended_bytes + bytes_till_sync);
 
 		if (mp3_core_size >= 4)
 		{
