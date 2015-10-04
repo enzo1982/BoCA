@@ -184,12 +184,11 @@ Void BoCA::LayerLengthStatus::OnApplicationAddTrack(const Track &track)
 Void BoCA::LayerLengthStatus::OnApplicationRemoveTrack(const Track &track)
 {
 	tracks.Remove(track.GetTrackID());
-	tracks_selected.Remove(track.GetTrackID());
-	tracks_unselected.Remove(track.GetTrackID());
 
 	RemoveTrack(track, seconds, approx, unknown);
-	RemoveTrack(track, seconds_selected, approx_selected, unknown_selected);
-	RemoveTrack(track, seconds_unselected, approx_unselected, unknown_unselected);
+
+	if	(tracks_selected.Remove(track.GetTrackID()))   RemoveTrack(track, seconds_selected, approx_selected, unknown_selected);
+	else if (tracks_unselected.Remove(track.GetTrackID())) RemoveTrack(track, seconds_unselected, approx_unselected, unknown_unselected);
 
 	UpdateLengthDisplays();
 }
