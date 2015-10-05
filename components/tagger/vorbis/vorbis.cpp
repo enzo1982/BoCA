@@ -263,9 +263,11 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		else if (id == "TRACKNUMBER")  info.track     = value.ToInt();
 		else if (id == "TRACKTOTAL")   info.numTracks = value.ToInt();
+		else if (id == "TOTALTRACKS")  info.numTracks = value.ToInt();
 
 		else if (id == "DISCNUMBER")   info.disc      = value.ToInt();
 		else if (id == "DISCTOTAL")    info.numDiscs  = value.ToInt();
+		else if (id == "TOTALDISCS")   info.numDiscs  = value.ToInt();
 
 		else if (id == "PERFORMER")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
 		else if (id == "COMPOSER")     info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
