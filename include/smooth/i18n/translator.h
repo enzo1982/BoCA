@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -47,6 +47,8 @@ namespace smooth
 				virtual				~Translator();
 
 				Int				 SetInternalLanguageInfo(const String &, const String &, const String &, Bool);
+
+				String				 GetUserDefaultLanguageCode();
 				Int				 SelectUserDefaultLanguage();
 
 				virtual Int			 ActivateLanguage(const String &);
@@ -63,6 +65,7 @@ namespace smooth
 				const String			&GetNthLanguageEncoding(Int) const;
 				const String			&GetNthLanguageURL(Int) const;
 				Bool				 IsNthLanguageRightToLeft(Int) const;
+				Bool				 IsNthLanguageIncomplete(Int) const;
 
 				const String			&GetActiveLanguageName() const;
 				const String			&GetActiveLanguageID() const;
@@ -70,6 +73,7 @@ namespace smooth
 				const String			&GetActiveLanguageEncoding() const;
 				const String			&GetActiveLanguageURL() const;
 				Bool				 IsActiveLanguageRightToLeft() const;
+				Bool				 IsActiveLanguageIncomplete() const;
 		};
 	};
 };
