@@ -94,6 +94,7 @@ BoCA::EncoderOpus::EncoderOpus()
 	resamplerConfig	= NIL;
 
 	frameSize	= 0;
+	sampleRate	= 48000;
 
 	numPackets	= 0;
 	totalSamples	= 0;
@@ -122,6 +123,14 @@ Bool BoCA::EncoderOpus::Activate()
 		return False;
 	}
 
+	/* Get best sample rate.
+	 */
+	if	(format.rate <=  8000) sampleRate =  8000;
+	else if (format.rate <= 12000) sampleRate = 12000;
+	else if (format.rate <= 16000) sampleRate = 16000;
+	else if (format.rate <= 24000) sampleRate = 24000;
+	else			       sampleRate = 48000;
+
 	/* Create and init resampler component.
 	 */
 	AS::Registry	&boca = AS::Registry::Get();
@@ -137,7 +146,7 @@ Bool BoCA::EncoderOpus::Activate()
 	}
 
 	resamplerConfig = Config::Copy(config);
-	resamplerConfig->SetIntValue("Resample", "Samplerate", 48000);
+	resamplerConfig->SetIntValue("Resample", "Samplerate", sampleRate);
 
 	resampler->SetConfiguration(resamplerConfig);
 	resampler->SetAudioTrackInfo(track);
@@ -165,7 +174,7 @@ Bool BoCA::EncoderOpus::Activate()
 	 */
 	int	 error = 0;
 
-	encoder = ex_opus_encoder_create(48000, format.channels, OPUS_APPLICATION_AUDIO, &error);
+	encoder = ex_opus_encoder_create(sampleRate, format.channels, OPUS_APPLICATION_AUDIO, &error);
 
 	/* Set encoder parameters.
 	 */
@@ -186,7 +195,7 @@ Bool BoCA::EncoderOpus::Activate()
 
 	ex_opus_encoder_ctl(encoder, OPUS_GET_LOOKAHEAD(&preSkip));
 
-	frameSize    = Math::Round(48000.0 / (1000000.0 / config->GetIntValue("Opus", "FrameSize", 20000)));
+	frameSize    = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue("Opus", "FrameSize", 20000)));
 	totalSamples = preSkip;
 	numPackets   = 0;
 
@@ -198,7 +207,7 @@ Bool BoCA::EncoderOpus::Activate()
 
 	setup.version_id	= 1;
 	setup.nb_channels	= format.channels;
-	setup.preskip		= preSkip;
+	setup.preskip		= preSkip * (48000 / sampleRate);
 	setup.sample_rate	= format.rate;
 	setup.output_gain	= 0;
 	setup.channel_mapping	= 0;
@@ -368,8 +377,8 @@ Int BoCA::EncoderOpus::EncodeFrames(Buffer<signed short> &samplesBuffer, Buffer<
 		op.packet     = dataBuffer;
 		op.bytes      = dataLength;
 		op.b_o_s      = 0;
-		op.e_o_s      = (flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= frameSize * format.channels) ? 1 : 0;
-		op.granulepos = (flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= frameSize * format.channels) ? totalSamples - nullSamples : totalSamples;
+		op.e_o_s      =  (flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= frameSize * format.channels) ? 1 : 0;
+		op.granulepos = ((flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= frameSize * format.channels) ? totalSamples - nullSamples : totalSamples) * (48000 / sampleRate);
 		op.packetno   = numPackets++;
 
 		ex_ogg_stream_packetin(&os, &op);

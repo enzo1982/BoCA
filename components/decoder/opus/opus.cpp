@@ -196,6 +196,15 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 					format.channels = setup->nb_channels;
 
+					if (setup->sample_rate != 0)
+					{
+						if	(setup->sample_rate <=  8000) format.rate =  8000;
+						else if	(setup->sample_rate <= 12000) format.rate = 12000;
+						else if	(setup->sample_rate <= 16000) format.rate = 16000;
+						else if	(setup->sample_rate <= 24000) format.rate = 24000;
+						else				      format.rate = 48000;
+					}
+
 					preSkip = setup->preskip;
 
 					track.length = -1;
@@ -218,7 +227,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 				if (packetNum == 3)
 				{
 					int			 error	 = 0;
-					OpusDecoder		*decoder = ex_opus_decoder_create(48000, format.channels, &error);
+					OpusDecoder		*decoder = ex_opus_decoder_create(format.rate, format.channels, &error);
 
 					if (error == 0)
 					{
@@ -259,7 +268,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 		if (seek == 0) break;
 		if (seek <  0 || ex_ogg_page_serialno(&og) != os.serialno) continue;
 
-		track.length = ex_ogg_page_granulepos(&og) - preSkip;
+		track.length = (ex_ogg_page_granulepos(&og) - preSkip) / (48000 / format.rate);
 
 		if (ex_ogg_page_eos(&og)) break;
 	}
@@ -292,6 +301,8 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 BoCA::DecoderOpus::DecoderOpus()
 {
 	decoder	    = NIL;
+
+	sampleRate  = 48000;
 
 	packageSize = 0;
 
@@ -347,10 +358,19 @@ Bool BoCA::DecoderOpus::Activate()
 					OpusHeader	*setup = (OpusHeader *) op.packet;
 					int		 error = 0;
 
-					decoder = ex_opus_decoder_create(48000, setup->nb_channels, &error);
+					if (setup->sample_rate != 0)
+					{
+						if	(setup->sample_rate <=  8000) sampleRate =  8000;
+						else if	(setup->sample_rate <= 12000) sampleRate = 12000;
+						else if	(setup->sample_rate <= 16000) sampleRate = 16000;
+						else if	(setup->sample_rate <= 24000) sampleRate = 24000;
+						else				      sampleRate = 48000;
+					}
 
-					preSkip	    = setup->preskip;
-					preSkipLeft = setup->preskip;
+					decoder = ex_opus_decoder_create(sampleRate, setup->nb_channels, &error);
+
+					preSkip	    = setup->preskip / (48000 / sampleRate);
+					preSkipLeft = setup->preskip / (48000 / sampleRate);
 				}
 
 				if (packetNum >= 1) done = True;
@@ -376,9 +396,9 @@ Bool BoCA::DecoderOpus::Deactivate()
 
 Bool BoCA::DecoderOpus::Seek(Int64 samplePosition)
 {
-	while (ex_ogg_page_granulepos(&og) - preSkip <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
+	while (ex_ogg_page_granulepos(&og) / (48000 / sampleRate) - preSkip <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
 	{
-		skipSamples = preSkip + samplePosition - ex_ogg_page_granulepos(&og);
+		skipSamples = preSkip + samplePosition - ex_ogg_page_granulepos(&og) / (48000 / sampleRate);
 
 		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
 		{

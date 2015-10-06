@@ -30,6 +30,7 @@ namespace BoCA
 			OpusEncoder		*encoder;
 
 			Int			 frameSize;
+			Int			 sampleRate;
 
 			Int			 numPackets;
 			Int			 totalSamples;

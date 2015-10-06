@@ -25,6 +25,8 @@ namespace BoCA
 
 			OpusDecoder		*decoder;
 
+			Int			 sampleRate;
+
 			Int			 preSkip;
 			Int			 preSkipLeft;
 
