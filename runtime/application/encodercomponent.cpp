@@ -37,8 +37,8 @@ String BoCA::AS::EncoderComponent::GetOutputFileExtension() const
 {
 	String	 extension = specs->func_GetOutputFileExtension(component);
 
-	if (extension != NIL)	return extension;
-	else			return specs->formats.GetFirst()->GetExtensions().GetFirst();
+	if (extension != NIL) return extension;
+	else		      return specs->formats.GetFirst()->GetExtensions().GetFirst();
 }
 
 Int BoCA::AS::EncoderComponent::GetNumberOfPasses() const
@@ -46,10 +46,16 @@ Int BoCA::AS::EncoderComponent::GetNumberOfPasses() const
 	return specs->func_GetNumberOfPasses(component);
 }
 
+Bool BoCA::AS::EncoderComponent::IsThreadSafe() const
+{
+	if (!specs->threadSafe) return False;
+	else			return specs->func_IsThreadSafe(component);
+}
+
 Bool BoCA::AS::EncoderComponent::IsLossless() const
 {
-	if (specs->func_IsLossless(component))	return True;
-	else					return specs->formats.GetFirst()->IsLossless();
+	if (specs->func_IsLossless(component)) return True;
+	else				       return specs->formats.GetFirst()->IsLossless();
 }
 
 Bool BoCA::AS::EncoderComponent::Activate()

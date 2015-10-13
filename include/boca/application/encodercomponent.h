@@ -31,6 +31,8 @@ namespace BoCA
 				virtual String	 GetOutputFileExtension() const;
 				virtual Int	 GetNumberOfPasses() const;
 
+				virtual Bool	 IsThreadSafe() const;
+
 				virtual Bool	 IsLossless() const;
 
 				virtual Bool	 Activate();

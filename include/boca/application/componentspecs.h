@@ -319,6 +319,8 @@ namespace BoCA
 				char			*(*func_GetOutputFileExtension)(void *);
 				int			 (*func_GetNumberOfPasses)(void *);
 
+				bool			 (*func_IsThreadSafe)(void *);
+
 				bool			 (*func_IsLossless)(void *);
 
 				bool			 (*func_Activate)(void *);

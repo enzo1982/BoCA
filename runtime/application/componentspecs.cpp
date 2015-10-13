@@ -73,6 +73,8 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_GetOutputFileExtension	= NIL;
 	func_GetNumberOfPasses		= NIL;
 
+	func_IsThreadSafe		= NIL;
+
 	func_IsLossless			= NIL;
 
 	func_Activate			= NIL;
@@ -195,6 +197,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_GetOutputFileExtension	= (char *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetOutputFileExtension"));
 	func_GetNumberOfPasses		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfPasses"));
+
+	func_IsThreadSafe		= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsThreadSafe"));
 
 	func_IsLossless			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsLossless"));
 

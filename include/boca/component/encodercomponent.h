@@ -42,6 +42,10 @@ namespace BoCA
 				 */
 				virtual Int	 GetNumberOfPasses() const;
 
+				/* Returns true if the encoder is thread safe.
+				 */
+				virtual Bool	 IsThreadSafe() const;
+
 				/* Returns true if the output format is lossless.
 				 */
 				virtual Bool	 IsLossless() const;
