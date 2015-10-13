@@ -31,7 +31,9 @@ namespace BoCA
 			static DynamicLoader	*LoadCodecDLL(const String &);
 			static Bool		 FreeCodecDLL(DynamicLoader *);
 
+			static Bool		 SwitchByteOrder(UnsignedByte *, Int);
 			static Bool		 SwitchBufferByteOrder(Buffer<UnsignedByte> &, Int);
+
 			static Bool		 ChangeChannelOrder(Buffer<UnsignedByte> &, const Format &, const Channel::Layout, const Channel::Layout);
 
 			static String		 GetNonUnicodeTempFileName(const String &);

@@ -247,6 +247,23 @@ String BoCA::Utilities::GetCDTrackFileName(const Track &track)
 	return fileName;
 }
 
+/* This function changes the byte order of the first argument
+ * from big-endian to little-endian and vice versa.
+ */
+Bool BoCA::Utilities::SwitchByteOrder(UnsignedByte *value, Int bytes)
+{
+	if (value == NIL) return False;
+
+	for (Int i = 0; i < bytes / 2; i++)
+	{
+		value[i] ^= value[bytes - 1 - i];
+		value[bytes - 1 - i] ^= value[i];
+		value[i] ^= value[bytes - 1 - i];
+	}
+
+	return True;
+}
+
 /* This function changes the byte order of audio samples in
  * a buffer from big-endian to little-endian and vice versa.
  */
