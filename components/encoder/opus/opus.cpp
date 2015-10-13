@@ -111,6 +111,8 @@ BoCA::EncoderOpus::~EncoderOpus()
 
 Bool BoCA::EncoderOpus::Activate()
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 	Info		 info = track.GetInfo();
@@ -211,6 +213,13 @@ Bool BoCA::EncoderOpus::Activate()
 	setup.sample_rate	= format.rate;
 	setup.output_gain	= 0;
 	setup.channel_mapping	= 0;
+
+	if (endianness != EndianLittle)
+	{
+		BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.preskip, sizeof(setup.preskip));
+		BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.sample_rate, sizeof(setup.sample_rate));
+		BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.output_gain, sizeof(setup.output_gain));
+	}
 
 	ogg_packet	 header = { (unsigned char *) &setup, 19, 1, 0, 0, numPackets };
 

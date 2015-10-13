@@ -143,6 +143,8 @@ Bool BoCA::DecoderOpus::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 	Format		 format;
 
@@ -193,6 +195,13 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 				if (packetNum == 0)
 				{
 					OpusHeader	*setup = (OpusHeader *) op.packet;
+
+					if (endianness != EndianLittle)
+					{
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->preskip, sizeof(setup->preskip));
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->sample_rate, sizeof(setup->sample_rate));
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->output_gain, sizeof(setup->output_gain));
+					}
 
 					format.channels = setup->nb_channels;
 
@@ -323,6 +332,8 @@ BoCA::DecoderOpus::~DecoderOpus()
 
 Bool BoCA::DecoderOpus::Activate()
 {
+	static Endianness	 endianness = CPU().GetEndianness();
+
 	ex_ogg_sync_init(&oy);
 
 	Bool	 initialized = False;
@@ -356,7 +367,13 @@ Bool BoCA::DecoderOpus::Activate()
 				if (packetNum == 0)
 				{
 					OpusHeader	*setup = (OpusHeader *) op.packet;
-					int		 error = 0;
+
+					if (endianness != EndianLittle)
+					{
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->preskip, sizeof(setup->preskip));
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->sample_rate, sizeof(setup->sample_rate));
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->output_gain, sizeof(setup->output_gain));
+					}
 
 					if (setup->sample_rate != 0)
 					{
@@ -366,6 +383,8 @@ Bool BoCA::DecoderOpus::Activate()
 						else if	(setup->sample_rate <= 24000) sampleRate = 24000;
 						else				      sampleRate = 48000;
 					}
+
+					int	 error = 0;
 
 					decoder = ex_opus_decoder_create(sampleRate, setup->nb_channels, &error);
 
