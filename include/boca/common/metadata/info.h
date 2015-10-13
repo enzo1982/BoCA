@@ -98,6 +98,8 @@ namespace BoCA
 
 			/* Helper functions:
 			 */
+			Bool			 HasBasicInfo() const;
+
 			static Bool		 IsISRC(const String &);
 
 			/* Class constructors / destructor:
