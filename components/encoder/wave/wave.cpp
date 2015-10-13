@@ -101,7 +101,7 @@ Bool BoCA::EncoderWave::Deactivate()
 
 	/* Write RIFF tag if requested.
 	 */
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFINFOTag", True))
+	if (config->GetIntValue("Tags", "EnableRIFFINFOTag", True) && info.HasBasicInfo())
 	{
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
@@ -121,7 +121,7 @@ Bool BoCA::EncoderWave::Deactivate()
 
 	/* Write CART tag if requested.
 	 */
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFCartTag", True))
+	if (config->GetIntValue("Tags", "EnableRIFFCartTag", True) && info.HasBasicInfo())
 	{
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("cart-tag");

@@ -251,8 +251,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 	{
 		const Info	&info = track.GetInfo();
 
-		if ((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
-		    (info.artist != NIL || info.title != NIL))
+		if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("wma-tag");

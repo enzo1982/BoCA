@@ -170,8 +170,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	{
 		const Info	&info = track.GetInfo();
 
-		if ((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
-		    (info.artist != NIL || info.title != NIL))
+		if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
@@ -242,8 +241,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 		{
 			const Info	&info = track.GetInfo();
 
-			if ((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
-			    (info.artist != NIL || info.title != NIL))
+			if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
 			{
 				AS::Registry		&boca = AS::Registry::Get();
 				AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
@@ -284,7 +282,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 	{
 		const Info	&info = track.GetInfo();
 
-		if (info.artist != NIL || info.title != NIL)
+		if (info.HasBasicInfo())
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v1-tag");

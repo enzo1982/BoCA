@@ -150,9 +150,8 @@ Bool BoCA::EncoderVorbis::Activate()
 			tagger->SetConfiguration(GetConfiguration());
 			tagger->SetVendorString(vendor);
 
-			if (((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
-			     (info.artist != NIL || info.title != NIL)) && config->GetIntValue("Tags", "EnableVorbisComment", True)) tagger->RenderBuffer(vcBuffer, track);
-			else													     tagger->RenderBuffer(vcBuffer, Track());
+			if (config->GetIntValue("Tags", "EnableVorbisComment", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))) tagger->RenderBuffer(vcBuffer, track);
+			else																					    tagger->RenderBuffer(vcBuffer, Track());
 
 			boca.DeleteComponent(tagger);
 		}

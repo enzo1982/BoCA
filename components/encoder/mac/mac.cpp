@@ -136,7 +136,7 @@ Bool BoCA::EncoderMAC::Deactivate()
 
 	const Info	&info = track.GetInfo();
 
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableAPEv2", True))
+	if (config->GetIntValue("Tags", "EnableAPEv2", True) && info.HasBasicInfo())
 	{
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("apev2-tag");

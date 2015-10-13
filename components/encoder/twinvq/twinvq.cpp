@@ -124,7 +124,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 	setupInfo.samplingRate = int(format.rate / 1000);
 	setupInfo.bitRate = config->GetIntValue("TwinVQ", "Bitrate", 48) * format.channels;
 
-	if (info.artist != NIL || info.title != NIL)
+	if (info.HasBasicInfo())
 	{
 		const Config	*currentConfig = GetConfiguration();
 

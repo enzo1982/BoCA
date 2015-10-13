@@ -282,8 +282,7 @@ Bool BoCA::EncoderLAME::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
-	     (info.artist != NIL || info.title != NIL)) && config->GetIntValue("Tags", "EnableID3v2", True))
+	if (config->GetIntValue("Tags", "EnableID3v2", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
 	{
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
@@ -326,7 +325,7 @@ Bool BoCA::EncoderLAME::Deactivate()
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (config->GetIntValue("Tags", "EnableID3v1", False) && info.HasBasicInfo())
 	{
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v1-tag");

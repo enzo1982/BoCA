@@ -199,7 +199,7 @@ Bool BoCA::EncoderSndFile::Activate()
 	{
 		Info	 info = track.GetInfo();
 
-		if (info.artist != NIL || info.title != NIL)
+		if (info.HasBasicInfo())
 		{
 			if (info.artist	!= NIL) ex_sf_set_string(sndf, SF_STR_ARTIST, info.artist);
 			if (info.title	!= NIL) ex_sf_set_string(sndf, SF_STR_TITLE, info.title);
@@ -254,7 +254,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 	{
 		/* Write RIFF tag if requested.
 		 */
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFINFOTag", True))
+		if (config->GetIntValue("Tags", "EnableRIFFINFOTag", True) && info.HasBasicInfo())
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
@@ -274,7 +274,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 
 		/* Write CART tag if requested.
 		 */
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFCartTag", True))
+		if (config->GetIntValue("Tags", "EnableRIFFCartTag", True) && info.HasBasicInfo())
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("cart-tag");
@@ -319,7 +319,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 	{
 		/* Write RIFF tag if requested.
 		 */
-		if ((info.artist != NIL || info.title != NIL) && config->GetIntValue("Tags", "EnableRIFFINFOTag", True))
+		if (config->GetIntValue("Tags", "EnableRIFFINFOTag", True) && info.HasBasicInfo())
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
@@ -362,8 +362,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 	{
 		/* Write ID3v2 tag if requested.
 		 */
-		if (((track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)) ||
-		     (info.artist != NIL || info.title != NIL)) && config->GetIntValue("Tags", "EnableID3v2", True))
+		if (config->GetIntValue("Tags", "EnableID3v2", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
