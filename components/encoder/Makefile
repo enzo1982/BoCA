@@ -23,6 +23,7 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	cd mac && $(MAKE)
 endif
+	cd meh && $(MAKE)
 	cd opus && $(MAKE)
 	cd sndfile && $(MAKE)
 	cd speex && $(MAKE)
@@ -55,6 +56,7 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	cd mac && $(MAKE) clean
 endif
+	cd meh && $(MAKE) clean
 	cd opus && $(MAKE) clean
 	cd sndfile && $(MAKE) clean
 	cd speex && $(MAKE) clean
@@ -78,6 +80,7 @@ endif
 	cd fdkaac && $(MAKE) install
 	cd flac && $(MAKE) install
 	cd lame && $(MAKE) install
+	cd meh && $(MAKE) install
 	cd opus && $(MAKE) install
 	cd sndfile && $(MAKE) install
 	cd speex && $(MAKE) install
@@ -96,6 +99,7 @@ endif
 	cd fdkaac && $(MAKE) uninstall
 	cd flac && $(MAKE) uninstall
 	cd lame && $(MAKE) uninstall
+	cd meh && $(MAKE) uninstall
 	cd opus && $(MAKE) uninstall
 	cd sndfile && $(MAKE) uninstall
 	cd speex && $(MAKE) uninstall
