@@ -138,6 +138,7 @@ Error BoCA::PlaylistVCLT::WritePlaylist(const String &file)
 		if (info.artist	!= NIL) out.OutputString(String("ARTIST=").Append(info.artist).Append("\n"));
 		if (info.title	!= NIL) out.OutputString(String("TITLE=").Append(info.title).Append("\n"));
 		if (info.album	!= NIL) out.OutputString(String("ALBUM=").Append(info.album).Append("\n"));
+		if (info.track	 >   0) out.OutputString(String("TRACKNUMBER=").Append(String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track))).Append("\n"));
 
 		out.OutputString("==\n");
 	}
