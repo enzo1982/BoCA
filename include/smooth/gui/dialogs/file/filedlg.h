@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -52,6 +52,7 @@ namespace smooth
 					Short			 mode;
 
 					String			 defExt;
+					String			 defPath;
 					String			 defFile;
 				public:
 								 FileSelectionBase();
@@ -61,6 +62,8 @@ namespace smooth
 				accessors:
 					Int			 SetMode(Short);
 					Int			 SetFlags(Short);
+
+					Int			 SetInitialPath(const String &);
 					Int			 SetDefaultExtension(const String &);
 
 					Int			 AddFilter(const String &, const String &);
