@@ -153,6 +153,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\runtime\application\verifiercomponent.cpp" />
+    <ClCompile Include="..\..\..\runtime\common\communication\engine.cpp" />
     <ClCompile Include="..\..\..\runtime\common\config.cpp" />
     <ClCompile Include="..\..\..\runtime\common\configlayer.cpp" />
     <ClCompile Include="..\..\..\runtime\common\i18n.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="..\..\..\include\boca.h" />
     <ClInclude Include="..\..\..\include\boca\application\playlistcomponent.h" />
     <ClInclude Include="..\..\..\include\boca\application\verifiercomponent.h" />
+    <ClInclude Include="..\..\..\include\boca\common\communication\engine.h" />
     <ClInclude Include="..\..\..\include\boca\component\component.h" />
     <ClInclude Include="..\..\..\include\boca\component\decodercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\component\deviceinfocomponent.h" />

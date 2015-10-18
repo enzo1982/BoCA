@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2011 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -12,7 +12,6 @@
 #define H_BOCA_COMMUNICATION_JOBLIST
 
 #include <smooth.h>
-#include "../../core/definitions.h"
 #include "../metadata/track.h"
 
 using namespace smooth;

@@ -66,6 +66,7 @@ using namespace smooth;
 #include "boca/common/metadata/track.h"
 
 #include "boca/common/communication/application.h"
+#include "boca/common/communication/engine.h"
 #include "boca/common/communication/joblist.h"
 #include "boca/common/communication/menu.h"
 #include "boca/common/communication/settings.h"
