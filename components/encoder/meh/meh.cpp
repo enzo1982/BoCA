@@ -35,6 +35,8 @@ const String &BoCA::EncoderMultiEncoderHub::GetComponentSpecs()
 
 BoCA::EncoderMultiEncoderHub::EncoderMultiEncoderHub()
 {
+	finished    = False;
+
 	configLayer = NIL;
 }
 
@@ -119,6 +121,8 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
+	finished = False;
+
 	/* Instantiate encoders.
 	 */
 	AS::Registry		&boca	    = AS::Registry::Get();
@@ -165,6 +169,15 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 
 			encoders.Add(encoder);
 			streams.Add(stream);
+
+			/* Set up mutexes, buffers and threads.
+			 */
+			if ((config->GetIntValue("Settings", "EncodeToSingleFile", False) || !IsThreadSafe()) && CPU().GetNumLogicalCPUs() > 1)
+			{
+				mutexes.Add(new Threads::Mutex());
+				buffers.Add(new Buffer<UnsignedByte>);
+				threads.Add(NonBlocking1<Int>(&EncoderMultiEncoderHub::EncodeThread, this).Call(threads.Length()));
+			}
 		}
 	}
 
@@ -175,12 +188,27 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 
 Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 {
+	/* Signal encoder threads that we are done.
+	 */
+	finished = True;
+
 	/* Free encoders.
 	 */
 	AS::Registry	&boca = AS::Registry::Get();
 
 	for (Int i = encoders.Length() - 1; i >= 0; i--)
 	{
+		/* Delete mutexes, buffers and threads.
+		 */
+		if (threads.Length() > 0)
+		{
+			threads.GetNth(i)->Wait();
+
+			delete threads.GetNth(i);
+			delete buffers.GetNth(i);
+			delete mutexes.GetNth(i);
+		}
+
 		/* Finish and delete encoder and stream.
 		 */
 		AS::EncoderComponent	*encoder = encoders.GetNth(i);
@@ -204,6 +232,10 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 	encoders.RemoveAll();
 	streams.RemoveAll();
 
+	mutexes.RemoveAll();
+	buffers.RemoveAll();
+	threads.RemoveAll();
+
 	return True;
 }
 
@@ -211,7 +243,26 @@ Int BoCA::EncoderMultiEncoderHub::WriteData(Buffer<UnsignedByte> &data)
 {
 	/* Hand data to encoders.
 	 */
-	foreach (OutStream *stream, streams) stream->OutputData(data, data.Size());
+	if (threads.Length() == 0)
+	{
+		foreach (OutStream *stream, streams) stream->OutputData(data, data.Size());
+	}
+	else
+	{
+		for (Int i = 0; i < threads.Length(); i++)
+		{
+			Threads::Mutex		*mutex	= mutexes.GetNth(i);
+			Buffer<UnsignedByte>	*buffer = buffers.GetNth(i);
+
+			mutex->Lock();
+
+			buffer->Resize(data.Size());
+
+			memcpy(*buffer, data, data.Size());
+
+			mutex->Release();
+		}
+	}
 
 	return data.Size();
 }
@@ -223,6 +274,27 @@ String BoCA::EncoderMultiEncoderHub::GetOutputFileExtension() const
 	if (!config->GetIntValue("Settings", "EncodeToSingleFile", False)) return "[FILETYPE]";
 
 	return NIL;
+}
+
+Void BoCA::EncoderMultiEncoderHub::EncodeThread(Int n)
+{
+	Threads::Mutex		*mutex	= mutexes.GetNth(n);
+	Buffer<UnsignedByte>	*buffer = buffers.GetNth(n);
+
+	OutStream		*stream = streams.GetNth(n);
+
+	while (!finished)
+	{
+		while (buffer->Size() == 0 && !finished) S::System::System::Sleep(0);
+
+		mutex->Lock();
+
+		stream->OutputData(*buffer, buffer->Size());
+
+		buffer->Resize(0);
+
+		mutex->Release();
+	}
 }
 
 ConfigLayer *BoCA::EncoderMultiEncoderHub::GetConfigurationLayer()

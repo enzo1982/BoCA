@@ -21,6 +21,14 @@ namespace BoCA
 
 			Array<IO::OutStream *>		 streams;
 			Array<AS::EncoderComponent *>	 encoders;
+
+			Array<Threads::Mutex *>		 mutexes;
+			Array<Buffer<UnsignedByte> *>	 buffers;
+			Array<Threads::Thread *>	 threads;
+
+			Bool				 finished;
+
+			Void				 EncodeThread(Int);
 		public:
 			static const String		&GetComponentSpecs();
 
