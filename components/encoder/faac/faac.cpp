@@ -103,9 +103,9 @@ Bool BoCA::EncoderFAAC::Activate()
 {
 	const Format	&format = track.GetFormat();
 
-	if (format.channels > 2)
+	if (format.channels > 6)
 	{
-		errorString = "This encoder does not support more than 2 channels!";
+		errorString = "This encoder does not support more than 6 channels!";
 		errorState  = True;
 
 		return False;
@@ -334,11 +334,18 @@ Int BoCA::EncoderFAAC::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
+	const Format	&format	= track.GetFormat();
+
+	/* Change to AAC channel order.
+	 */
+	if	(format.channels == 3) Utilities::ChangeChannelOrder(data, format, Channel::Default_3_0, Channel::AAC_3_0);
+	else if (format.channels == 5) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_0, Channel::AAC_5_0);
+	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_1, Channel::AAC_5_1);
+
 	/* Convert samples to 16 or 24 bit.
 	 */
-	const Format	&format	 = track.GetFormat();
-	Int		 samples = data.Size() / format.channels / (format.bits / 8);
-	Int		 offset	 = samplesBuffer.Size();
+	Int	 samples = data.Size() / format.channels / (format.bits / 8);
+	Int	 offset	 = samplesBuffer.Size();
 
 	if (format.bits <= 16) samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels / 2);
 	else		       samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);

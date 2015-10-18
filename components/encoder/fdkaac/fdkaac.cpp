@@ -104,9 +104,9 @@ Bool BoCA::EncoderFDKAAC::Activate()
 {
 	const Format	&format = track.GetFormat();
 
-	if (format.channels > 2)
+	if (format.channels > 6)
 	{
-		errorString = "This encoder does not support more than 2 channels!";
+		errorString = "This encoder does not support more than 6 channels!";
 		errorState  = True;
 
 		return False;
@@ -126,6 +126,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	ex_aacEncoder_SetParam(handle, AACENC_SAMPLERATE, format.rate);
 	ex_aacEncoder_SetParam(handle, AACENC_CHANNELMODE, format.channels);
+	ex_aacEncoder_SetParam(handle, AACENC_CHANNELORDER, 1);
 
 	ex_aacEncoder_SetParam(handle, AACENC_AOT, config->GetIntValue("FDKAAC", "MPEGVersion", 0) + config->GetIntValue("FDKAAC", "AACType", AOT_SBR));
 	ex_aacEncoder_SetParam(handle, AACENC_BITRATE, config->GetIntValue("FDKAAC", "Bitrate", 96) * 1000);

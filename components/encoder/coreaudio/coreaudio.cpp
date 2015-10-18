@@ -113,9 +113,9 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	const Format	&format = track.GetFormat();
 
-	if (format.channels > 2)
+	if (format.channels > 8)
 	{
-		errorString = "This encoder does not support more than 2 channels!";
+		errorString = "This encoder does not support more than 8 channels!";
 		errorState  = True;
 
 		return False;
@@ -422,6 +422,16 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data)
 {
+	const Format	&format	= track.GetFormat();
+
+	/* Change to AAC channel order.
+	 */
+	if	(format.channels == 3) Utilities::ChangeChannelOrder(data, format, Channel::Default_3_0, Channel::AAC_3_0);
+	else if (format.channels == 5) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_0, Channel::AAC_5_0);
+	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_1, Channel::AAC_5_1);
+	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Default_6_1, Channel::AAC_6_1);
+	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Default_7_1, Channel::AAC_7_1);
+
 	/* Configure buffer.
 	 */
 	buffer.Resize(buffer.Size() + data.Size());
