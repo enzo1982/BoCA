@@ -5,7 +5,6 @@
   <version>1.0</version>
   <id>alac-dec</id>
   <type>decoder</type>
-  <replace>avconv-alac-dec</replace>
   <format>
     <name>Apple Lossless Files</name>
     <lossless>true</lossless>
