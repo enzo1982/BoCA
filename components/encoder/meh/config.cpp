@@ -116,7 +116,8 @@ Void BoCA::ConfigureMultiEncoderHub::AddEncoders()
 
 		for (Int i = 0; i < boca.GetNumberOfComponents(); i++)
 		{
-			if (boca.GetComponentType(i) != COMPONENT_TYPE_ENCODER) continue;
+			if (boca.GetComponentType(i) != COMPONENT_TYPE_ENCODER ||
+			    boca.GetComponentID(i)   == "meh-enc") continue;
 
 			entryNumber++;
 
@@ -196,7 +197,8 @@ Void BoCA::ConfigureMultiEncoderHub::OnConfigureEncoder()
 
 	for (Int i = 0; i < boca.GetNumberOfComponents(); i++)
 	{
-		if (boca.GetComponentType(i) != COMPONENT_TYPE_ENCODER) continue;
+		if (boca.GetComponentType(i) != COMPONENT_TYPE_ENCODER ||
+		    boca.GetComponentID(i)   == "meh-enc") continue;
 
 		if (list_selected->GetSelectedEntry()->GetText() == boca.GetComponentName(i))
 		{
