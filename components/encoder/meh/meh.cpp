@@ -128,7 +128,7 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 
 	if (fileNamePattern.EndsWith(".[FILETYPE]")) fileNamePattern[fileNamePattern.Length() - 11] = 0;
 
-	if (config->GetIntValue("meh!", "SeparateFolders", False))
+	if (config->GetIntValue("meh!", "SeparateFolders", False) && !config->GetIntValue("Settings", "EncodeToSingleFile", False))
 	{
 		String	 pre;
 		String	 post = fileNamePattern;
@@ -148,8 +148,14 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 
 		if (encoder != NIL)
 		{
+			/* Set up encoder and stream.
+			 */
+			Track	 encoderTrack = track;
+
+			encoderTrack.outfile.Append(".").Append(encoder->GetOutputFileExtension());
+
 			encoder->SetConfiguration(config);
-			encoder->SetAudioTrackInfo(track);
+			encoder->SetAudioTrackInfo(encoderTrack);
 
 			String		 fileName = String(fileNamePattern).Replace("[FILETYPE]", encoder->GetOutputFileExtension().ToUpper()).Append(".").Append(encoder->GetOutputFileExtension());
 			OutStream	*stream	  = new OutStream(STREAM_FILE, Utilities::CreateDirectoryForFile(fileName), OS_REPLACE);
@@ -173,12 +179,18 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 	 */
 	AS::Registry	&boca = AS::Registry::Get();
 
-	for (Int i = 0; i < encoders.Length(); i++)
+	for (Int i = encoders.Length() - 1; i >= 0; i--)
 	{
+		/* Finish and delete encoder and stream.
+		 */
 		AS::EncoderComponent	*encoder = encoders.GetNth(i);
 		OutStream		*stream	 = streams.GetNth(i);
 
-		encoder->SetAudioTrackInfo(track);
+		Track	 encoderTrack = track;
+
+		encoderTrack.outfile.Append(".").Append(encoder->GetOutputFileExtension());
+
+		encoder->SetAudioTrackInfo(encoderTrack);
 
 		stream->RemoveFilter();
 
@@ -188,6 +200,9 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 
 		delete stream;
 	}
+
+	encoders.RemoveAll();
+	streams.RemoveAll();
 
 	return True;
 }
