@@ -41,6 +41,11 @@ Int BoCA::AS::EncoderComponentExternal::GetNumberOfPasses() const
 	return 1;
 }
 
+Bool BoCA::AS::EncoderComponentExternal::IsThreadSafe() const
+{
+	return True;
+}
+
 Bool BoCA::AS::EncoderComponentExternal::IsLossless() const
 {
 	return specs->formats.GetFirst()->IsLossless();
