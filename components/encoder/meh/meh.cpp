@@ -36,13 +36,18 @@ const String &BoCA::EncoderMultiEncoderHub::GetComponentSpecs()
 BoCA::EncoderMultiEncoderHub::EncoderMultiEncoderHub()
 {
 	finished    = False;
+	cancelled   = False;
 
 	configLayer = NIL;
+
+	Engine::Get()->onCancelConversion.Connect(&EncoderMultiEncoderHub::OnCancelConversion, this);
 }
 
 BoCA::EncoderMultiEncoderHub::~EncoderMultiEncoderHub()
 {
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
+
+	Engine::Get()->onCancelConversion.Disconnect(&EncoderMultiEncoderHub::OnCancelConversion, this);
 
 	/* Delete empty folders if <filetype> was used in path.
 	 */
@@ -121,30 +126,15 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
-	finished = False;
+	finished  = False;
+	cancelled = False;
 
 	/* Instantiate encoders.
 	 */
 	AS::Registry		&boca	    = AS::Registry::Get();
 	const Array<String>	&encoderIDs = config->GetStringValue("meh!", "Encoders", "flac-enc,lame-enc").Explode(",");
 
-	String	 fileNamePattern = track.outfile;
-
-	if (fileNamePattern.EndsWith(".[FILETYPE]")) fileNamePattern[fileNamePattern.Length() - 11] = 0;
-
-	if (config->GetIntValue("meh!", "SeparateFolders", False) && !config->GetIntValue("Settings", "EncodeToSingleFile", False))
-	{
-		String	 pre;
-		String	 post = fileNamePattern;
-
-		if (fileNamePattern.Contains(Directory::GetDirectoryDelimiter()))
-		{
-			pre  = fileNamePattern.Head(fileNamePattern.FindLast(Directory::GetDirectoryDelimiter()) + 1);
-			post = fileNamePattern.Tail(fileNamePattern.Length() - fileNamePattern.FindLast(Directory::GetDirectoryDelimiter()) - 1);
-		}
-
-		fileNamePattern = String(pre).Append("[FILETYPE]").Append(Directory::GetDirectoryDelimiter()).Append(post);
-	}
+	String	 fileNamePattern = GetFileNamePattern();
 
 	foreach (const String &encoderID, encoderIDs)
 	{
@@ -154,15 +144,16 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 		{
 			/* Set up encoder and stream.
 			 */
-			Track	 encoderTrack = track;
-
-			encoderTrack.outfile.Append(".").Append(encoder->GetOutputFileExtension());
-
 			encoder->SetConfiguration(config);
+
+			Track	 encoderTrack = track;
+			String	 fileName     = String(fileNamePattern).Replace("[FILETYPE]", encoder->GetOutputFileExtension().ToUpper()).Append(".").Append(encoder->GetOutputFileExtension());
+
+			encoderTrack.outfile = fileName;
+
 			encoder->SetAudioTrackInfo(encoderTrack);
 
-			String		 fileName = String(fileNamePattern).Replace("[FILETYPE]", encoder->GetOutputFileExtension().ToUpper()).Append(".").Append(encoder->GetOutputFileExtension());
-			OutStream	*stream	  = new OutStream(STREAM_FILE, Utilities::CreateDirectoryForFile(fileName), OS_REPLACE);
+			OutStream	*stream = new OutStream(STREAM_FILE, Utilities::CreateDirectoryForFile(fileName), OS_REPLACE);
 
 			stream->SetPackageSize(32768 * format.channels * (format.bits / 8));
 			stream->SetFilter(encoder);
@@ -188,6 +179,8 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 
 Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 {
+	const Config	*config = GetConfiguration();
+
 	/* Signal encoder threads that we are done.
 	 */
 	finished = True;
@@ -195,6 +188,8 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 	/* Free encoders.
 	 */
 	AS::Registry	&boca = AS::Registry::Get();
+
+	String	 fileNamePattern = GetFileNamePattern();
 
 	for (Int i = encoders.Length() - 1; i >= 0; i--)
 	{
@@ -215,8 +210,9 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 		OutStream		*stream	 = streams.GetNth(i);
 
 		Track	 encoderTrack = track;
+		String	 fileName     = String(fileNamePattern).Replace("[FILETYPE]", encoder->GetOutputFileExtension().ToUpper()).Append(".").Append(encoder->GetOutputFileExtension());
 
-		encoderTrack.outfile.Append(".").Append(encoder->GetOutputFileExtension());
+		encoderTrack.outfile = fileName;
 
 		encoder->SetAudioTrackInfo(encoderTrack);
 
@@ -224,9 +220,21 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 
 		if (encoder->GetErrorState()) { errorState = True; errorString = encoder->GetErrorString(); }
 
+		delete stream;
+
 		boca.DeleteComponent(encoder);
 
-		delete stream;
+		if (cancelled)
+		{
+			File(encoderTrack.outfile).Delete();
+
+			if (config->GetIntValue("meh!", "SeparateFolders", False) && !config->GetIntValue("Settings", "EncodeToSingleFile", False))
+			{
+				encoderTrack.outfile[encoderTrack.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
+
+				Directory(encoderTrack.outfile).Delete();
+			}
+		}
 	}
 
 	encoders.RemoveAll();
@@ -276,6 +284,31 @@ String BoCA::EncoderMultiEncoderHub::GetOutputFileExtension() const
 	return NIL;
 }
 
+String BoCA::EncoderMultiEncoderHub::GetFileNamePattern() const
+{
+	const Config	*config = GetConfiguration();
+
+	String	 fileNamePattern = track.outfile;
+
+	if (fileNamePattern.EndsWith(".[FILETYPE]")) fileNamePattern[fileNamePattern.Length() - 11] = 0;
+
+	if (config->GetIntValue("meh!", "SeparateFolders", False) && !config->GetIntValue("Settings", "EncodeToSingleFile", False))
+	{
+		String	 pre;
+		String	 post = fileNamePattern;
+
+		if (fileNamePattern.Contains(Directory::GetDirectoryDelimiter()))
+		{
+			pre  = fileNamePattern.Head(fileNamePattern.FindLast(Directory::GetDirectoryDelimiter()) + 1);
+			post = fileNamePattern.Tail(fileNamePattern.Length() - fileNamePattern.FindLast(Directory::GetDirectoryDelimiter()) - 1);
+		}
+
+		fileNamePattern = String(pre).Append("[FILETYPE]").Append(Directory::GetDirectoryDelimiter()).Append(post);
+	}
+
+	return fileNamePattern;
+}
+
 Void BoCA::EncoderMultiEncoderHub::EncodeThread(Int n)
 {
 	Threads::Mutex		*mutex	= mutexes.GetNth(n);
@@ -295,6 +328,14 @@ Void BoCA::EncoderMultiEncoderHub::EncodeThread(Int n)
 
 		mutex->Release();
 	}
+}
+
+Void BoCA::EncoderMultiEncoderHub::OnCancelConversion(const Track &cancelledTrack)
+{
+	const Config	*config = GetConfiguration();
+
+	if ((config->GetIntValue("Settings", "EncodeToSingleFile", False) && cancelledTrack.outfile == track.outfile) ||
+									     cancelledTrack.GetTrackID() == track.GetTrackID()) cancelled = True;
 }
 
 ConfigLayer *BoCA::EncoderMultiEncoderHub::GetConfigurationLayer()

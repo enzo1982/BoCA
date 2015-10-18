@@ -27,6 +27,9 @@ namespace BoCA
 			Array<Threads::Thread *>	 threads;
 
 			Bool				 finished;
+			Bool				 cancelled;
+
+			String				 GetFileNamePattern() const;
 
 			Void				 EncodeThread(Int);
 		public:
@@ -47,6 +50,8 @@ namespace BoCA
 			String				 GetOutputFileExtension() const;
 
 			ConfigLayer			*GetConfigurationLayer();
+		slots:
+			Void				 OnCancelConversion(const Track &);
 	};
 };
 
