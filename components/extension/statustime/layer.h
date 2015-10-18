@@ -26,8 +26,6 @@ namespace BoCA
 	class LayerLengthStatus : public Layer
 	{
 		private:
-			S::System::Timer	 timer;
-
 			Array<Track>		 tracks;
 			Int64			 seconds;
 			Int			 approx;

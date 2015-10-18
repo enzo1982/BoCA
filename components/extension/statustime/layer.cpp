@@ -18,8 +18,6 @@ BoCA::LayerLengthStatus::LayerLengthStatus()
 	if (Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac")).Exists()) resourcesPath = "../share/freac/";
 #endif
 
-	timer.onInterval.Connect(&LayerLengthStatus::UpdateLengthDisplays, this);
-
 	tracks.EnableLocking();
 	tracks_selected.EnableLocking();
 	tracks_unselected.EnableLocking();
@@ -71,13 +69,6 @@ BoCA::LayerLengthStatus::~LayerLengthStatus()
 
 Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 {
-	/* Update every 25ms only.
-	 */
-	static Int64	 lastInvoked = 0;
-
-	if (S::System::System::Clock() - lastInvoked < 25) { timer.Start(25); return; }
-	else						     timer.Stop();
-
 	/* Update displayed values.
 	 */
 	Surface	*surface = GetDrawSurface();
@@ -103,10 +94,6 @@ Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 
 		surface->EndPaint();
 	}
-
-	/* Update invocation time.
-	 */
-	lastInvoked = S::System::System::Clock();
 }
 
 Void BoCA::LayerLengthStatus::AddTrack(const Track &track, Int64 &seconds, Int &approx, Int &unknown)
