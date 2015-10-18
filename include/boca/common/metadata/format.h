@@ -58,6 +58,8 @@ namespace BoCA
 		const Layout		 AAC_3_0     = { FrontCenter, FrontLeft, FrontRight };
 		const Layout		 AAC_5_0     = { FrontCenter, FrontLeft, FrontRight, RearLeft, RearRight };
 		const Layout		 AAC_5_1     = { FrontCenter, FrontLeft, FrontRight, RearLeft, RearRight, LFE };
+		const Layout		 AAC_6_1     = { FrontCenter, FrontLeft, FrontRight, SideLeft, SideRight, RearCenter, LFE };
+		const Layout		 AAC_7_1     = { FrontCenter, FrontLeft, FrontRight, SideLeft, SideRight, RearLeft, RearRight, LFE };
 
 		const Layout		 AIFF_3_1    = { FrontLeft, FrontCenter, FrontRight, LFE };
 		const Layout		 AIFF_5_1    = { FrontLeft, RearLeft, FrontCenter, FrontRight, RearRight, LFE };
