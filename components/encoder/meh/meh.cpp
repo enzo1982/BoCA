@@ -49,17 +49,23 @@ BoCA::EncoderMultiEncoderHub::~EncoderMultiEncoderHub()
 
 	Engine::Get()->onCancelConversion.Disconnect(&EncoderMultiEncoderHub::OnCancelConversion, this);
 
+	/* Delete output file if it still exists.
+	 */
+	if (track.outfile != NIL)
+	{
+		File(track.outfile).Delete();
+
+		if (track.outfile.Contains(Directory::GetDirectoryDelimiter())) track.outfile[track.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
+	}
+
 	/* Delete empty folders if <filetype> was used in path.
 	 */
-	File(track.outfile).Delete();
-
-	track.outfile[track.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
-
 	while (track.outfile.Contains("[FILETYPE]"))
 	{
 		Directory(track.outfile).Delete();
 
-		track.outfile[track.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
+		if (track.outfile.Contains(Directory::GetDirectoryDelimiter())) track.outfile[track.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
+		else								break;
 	}
 }
 
