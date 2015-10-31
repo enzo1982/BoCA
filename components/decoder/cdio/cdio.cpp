@@ -13,6 +13,10 @@
 
 #include <cdio/cdio.h>
 
+#if LIBCDIO_VERSION_NUM < 93
+#	define cdio_free(p) free(p)
+#endif
+
 #if HAVE_OLD_PARANOIA_INCLUDE
 #	include <cdio/paranoia.h>
 #else
