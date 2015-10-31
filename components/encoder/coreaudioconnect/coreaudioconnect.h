@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
-#include <windows.h>
 
 #include "connector/communication.h"
 
@@ -22,11 +21,23 @@ namespace BoCA
 		private:
 			ConfigLayer		*configLayer;
 
+			String			 fileName;
+			String			 mappingName;
+
+#ifdef __WIN32__
 			HANDLE			 connector;
 			HANDLE			 mapping;
+#else
+			pid_t			 connector;
+			int			 mapping;
+#endif
 
 			CoreAudioCommBuffer	*comm;
+			Bool			 connected;
 			Bool			 ready;
+
+			Bool			 Connect();
+			Bool			 Disconnect();
 
 			Bool			 ProcessConnectorCommand();
 		public:

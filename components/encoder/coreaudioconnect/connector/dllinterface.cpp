@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -10,7 +10,26 @@
 
 #include "dllinterface.h"
 
+#include <wchar.h>
 #include <shlobj.h>
+
+#ifdef __WINE__
+#	define wchar_t char
+#	define wstring(s) s
+
+#	define wcslen(x)    strlen(x)
+#	define wcscpy(x, y) strcpy(x, y)
+#	define wcscat(x, y) strcat(x, y)
+
+#	define GetEnvironmentVariableW GetEnvironmentVariableA
+#	define SetEnvironmentVariableW SetEnvironmentVariableA
+
+#	define SHGetPathFromIDListW SHGetPathFromIDListA
+
+#	define LoadLibraryW LoadLibraryA
+#else
+#	define wstring(s) L##s
+#endif
 
 namespace CA
 {
@@ -48,11 +67,11 @@ const wchar_t *GetCommonFilesDirectory()
 	ITEMIDLIST	*idlist;
 
 	SHGetSpecialFolderLocation(NULL, CSIDL_PROGRAM_FILES_COMMON, &idlist);
-	SHGetPathFromIDList(idlist, commonFilesDir);
+	SHGetPathFromIDListW(idlist, commonFilesDir);
 
 	CoTaskMemFree(idlist);
 
-	if (wcslen(commonFilesDir) > 0 && commonFilesDir[wcslen(commonFilesDir) - 1] != '\\') wcscat(commonFilesDir, L"\\");
+	if (wcslen(commonFilesDir) > 0 && commonFilesDir[wcslen(commonFilesDir) - 1] != '\\') wcscat(commonFilesDir, wstring("\\"));
 
 	return commonFilesDir;
 }
@@ -62,16 +81,16 @@ bool LoadCoreFoundationDLL()
 	wchar_t	 aasDir[32768];
 
 	wcscpy(aasDir, GetCommonFilesDirectory());
-	wcscat(aasDir, L"Apple\\Apple Application Support\\");
+	wcscat(aasDir, wstring("Apple\\Apple Application Support\\"));
 
 	/* Add Apple Application Services directory to path.
 	 */
 	wchar_t	 buffer[32768];
 
-	GetEnvironmentVariableW(L"PATH", buffer, 32768);
-	SetEnvironmentVariableW(L"PATH", wcscat(wcscat(buffer, L";"), aasDir));
+	GetEnvironmentVariableW(wstring("PATH"), buffer, 32768);
+	SetEnvironmentVariableW(wstring("PATH"), wcscat(wcscat(buffer, wstring(";")), aasDir));
 
-	corefoundationdll = LoadLibraryW(wcscat(aasDir, L"CoreFoundation.dll"));
+	corefoundationdll = LoadLibraryW(wcscat(aasDir, wstring("CoreFoundation.dll")));
 
 	if (corefoundationdll == NULL) return false;
 
@@ -98,16 +117,16 @@ bool LoadCoreAudioDLL()
 	wchar_t	 aasDir[32768];
 
 	wcscpy(aasDir, GetCommonFilesDirectory());
-	wcscat(aasDir, L"Apple\\Apple Application Support\\");
+	wcscat(aasDir, wstring("Apple\\Apple Application Support\\"));
 
 	/* Add Apple Application Services directory to path.
 	 */
 	wchar_t	 buffer[32768];
 
-	GetEnvironmentVariableW(L"PATH", buffer, 32768);
-	SetEnvironmentVariableW(L"PATH", wcscat(wcscat(buffer, L";"), aasDir));
+	GetEnvironmentVariableW(wstring("PATH"), buffer, 32768);
+	SetEnvironmentVariableW(wstring("PATH"), wcscat(wcscat(buffer, wstring(";")), aasDir));
 
-	coreaudiodll	  = LoadLibrary(wcscat(aasDir, L"CoreAudioToolbox.dll"));
+	coreaudiodll	  = LoadLibraryW(wcscat(aasDir, wstring("CoreAudioToolbox.dll")));
 
 	if (coreaudiodll == NULL) return false;
 

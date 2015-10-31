@@ -9,7 +9,16 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth.h>
-#include <windows.h>
+
+#ifdef __WIN32__
+#	include <windows.h>
+#else
+#	include <sys/mman.h>
+#	include <sys/wait.h>
+#	include <unistd.h>
+#	include <fcntl.h>
+#	include <pthread.h>
+#endif
 
 #include "coreaudioconnect.h"
 #include "config.h"
@@ -57,65 +66,32 @@ const String &BoCA::EncoderCoreAudioConnect::GetComponentSpecs()
 
 BoCA::EncoderCoreAudioConnect::EncoderCoreAudioConnect()
 {
+#ifdef __WIN32__
+	connector   = NIL;
+	mapping	    = NIL;
+#else
+	connector   = -1;
+	mapping	    = -1;
+#endif
+
+	comm	    = NIL;
+	connected   = False;
+	ready	    = False;
+
 	configLayer = NIL;
-
-	/* Create file mapping and map view to communication buffer.
-	 */
-	String	 mappingName = String("freac:").Append(Number((Int64) GetCurrentProcessId()).ToHexString()).Append("-").Append(Number((Int64) GetCurrentThreadId()).ToHexString());
-
-	mapping	= CreateFileMappingA(INVALID_HANDLE_VALUE, NIL, PAGE_READWRITE, 0, sizeof(CoreAudioCommBuffer), mappingName);
-	comm	= (CoreAudioCommBuffer *) MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-
-	/* Start connector process.
-	 */
-	SHELLEXECUTEINFOA	 execInfo;
-
-	ZeroMemory(&execInfo, sizeof(execInfo));
-
-	execInfo.cbSize	      = sizeof(execInfo);
-	execInfo.fMask	      = SEE_MASK_NOCLOSEPROCESS;
-	execInfo.lpVerb	      = "open";
-	execInfo.lpDirectory  = GUI::Application::GetApplicationDirectory();
-	execInfo.nShow	      = SW_HIDE;
-	execInfo.lpFile	      = GUI::Application::GetApplicationDirectory().Append("boca\\boca_encoder_coreaudioconnect.1.0.exe");
-	execInfo.lpParameters = mappingName;
-
-	ShellExecuteExA(&execInfo);
-
-	connector = execInfo.hProcess;
-
-	/* Send Hello command.
-	 */
-	comm->command = CommCommandHello;
-	comm->length  = sizeof(CoreAudioCommHello);
-
-	((CoreAudioCommHello *) &comm->data)->version = 1;
-
-	ProcessConnectorCommand();
-
-	if (comm->status == CommStatusReady) ready = True;
-	else				     ready = False;
 }
 
 BoCA::EncoderCoreAudioConnect::~EncoderCoreAudioConnect()
 {
-	/* Send Quit command.
-	 */
-	comm->command = CommCommandQuit;
-	comm->length  = 0;
-
-	ProcessConnectorCommand();
-
-	/* Unmap view and close file mapping.
-	 */
-	UnmapViewOfFile(comm);
-	CloseHandle(mapping);
+	if (connected) Disconnect();
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderCoreAudioConnect::IsReady() const
 {
+	if (!connected) const_cast<EncoderCoreAudioConnect *>(this)->Connect();
+
 	return ready;
 }
 
@@ -144,6 +120,8 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 
 	/* Send Setup command.
 	 */
+	if (!connected) Connect();
+
 	comm->command = CommCommandSetup;
 	comm->length  = sizeof(CoreAudioCommSetup);
 
@@ -155,13 +133,21 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 	((CoreAudioCommSetup *) &comm->data)->rate     = format.rate;
 	((CoreAudioCommSetup *) &comm->data)->bits     = format.bits;
 
-	char	*outfile = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out").ConvertTo("UTF-8");
+	fileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out");
+
+#ifndef __WIN32__
+	fileName = fileName.Tail(fileName.Length() - fileName.FindLast(Directory::GetDirectoryDelimiter()) - 1);
+#endif
+
+	char	*outfile = fileName.ConvertTo("UTF-8");
 
 	memcpy(((CoreAudioCommSetup *) &comm->data)->file, outfile, strlen(outfile) + 1);
 
 	ProcessConnectorCommand();
 
 	if (comm->status != CommStatusReady) return False;
+
+	fileName.ImportFrom("UTF-8", ((CoreAudioCommSetup *) &comm->data)->file);
 
 	/* Write ID3v2 tag if requested.
 	 */
@@ -197,6 +183,8 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	/* Send Finish command.
 	 */
+	if (!connected) Connect();
+
 	comm->command = CommCommandFinish;
 	comm->length  = 0;
 
@@ -218,7 +206,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(GetConfiguration());
-				tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
+				tagger->RenderStreamInfo(fileName, track);
 
 				boca.DeleteComponent(tagger);
 			}
@@ -227,7 +215,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	/* Stream contents of created MP4 file to output driver
 	 */
-	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READ);
+	InStream		 in(STREAM_FILE, fileName, IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
 	Int64			 bytesLeft = in.Size();
 
@@ -242,7 +230,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	in.Close();
 
-	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+	File(fileName).Delete();
 
 	/* Write ID3v1 tag if requested.
 	 */
@@ -310,6 +298,8 @@ Int BoCA::EncoderCoreAudioConnect::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Send Encode command.
 	 */
+	if (!connected) Connect();
+
 	comm->command = CommCommandEncode;
 	comm->length  = data.Size();
 
@@ -344,39 +334,149 @@ ConfigLayer *BoCA::EncoderCoreAudioConnect::GetConfigurationLayer()
 {
 	if (configLayer == NIL)
 	{
-		/* Send Codecs command.
-		 */
-		comm->command = CommCommandCodecs;
-		comm->length  = sizeof(CoreAudioCommCodecs);
+		static CoreAudioCommCodecs	 codecs;
+		static Bool			 initialized = False;
 
-		ProcessConnectorCommand();
-
-		if (comm->status == CommStatusReady)
+		if (!initialized)
 		{
-			CoreAudioCommCodecs	 codecs;
+			/* Send Codecs command.
+			 */
+			if (!connected) Connect();
 
-			memcpy(&codecs, comm->data, comm->length);
+			comm->command = CommCommandCodecs;
+			comm->length  = sizeof(CoreAudioCommCodecs);
 
-			configLayer = new ConfigureCoreAudio(codecs);
+			ProcessConnectorCommand();
+
+			if (comm->status == CommStatusReady) memcpy(&codecs, comm->data, comm->length);
+			else				     codecs.codecs[0] = 0;
+
+			initialized = True;
 		}
+
+		configLayer = new ConfigureCoreAudio(codecs);
 	}
 
 	return configLayer;
 }
 
+Bool BoCA::EncoderCoreAudioConnect::Connect()
+{
+	static multithread (int)	 count = 0;
+
+	if (connected) return False;
+
+	/* Create shared memory object and map view to communication buffer.
+	 */
+#ifdef __WIN32__
+	mappingName = String("freac:").Append(Number((Int64) GetCurrentProcessId()).ToHexString()).Append("-").Append(Number((Int64) GetCurrentThreadId()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
+
+	mapping	    = CreateFileMappingA(INVALID_HANDLE_VALUE, NIL, PAGE_READWRITE, 0, sizeof(CoreAudioCommBuffer), mappingName);
+	comm	    = (CoreAudioCommBuffer *) MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+#else
+	mappingName = String("/freac:").Append(Number((Int64) getpid()).ToHexString()).Append("-").Append(Number((Int64) pthread_self()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
+
+	mapping	    = shm_open(mappingName, O_CREAT | O_EXCL | O_RDWR, 0666);
+
+	ftruncate(mapping, sizeof(CoreAudioCommBuffer));
+
+	comm	    = (CoreAudioCommBuffer *) mmap(NULL, sizeof(CoreAudioCommBuffer), PROT_READ | PROT_WRITE, MAP_SHARED, mapping, 0);
+#endif
+
+	/* Start connector process.
+	 */
+#ifdef __WIN32__
+	SHELLEXECUTEINFOA	 execInfo;
+
+	ZeroMemory(&execInfo, sizeof(execInfo));
+
+	execInfo.cbSize	      = sizeof(execInfo);
+	execInfo.fMask	      = SEE_MASK_NOCLOSEPROCESS;
+	execInfo.lpVerb	      = "open";
+	execInfo.lpDirectory  = GUI::Application::GetApplicationDirectory();
+	execInfo.nShow	      = SW_HIDE;
+	execInfo.lpFile	      = GUI::Application::GetApplicationDirectory().Append("boca\\boca_encoder_coreaudioconnect.1.0.exe");
+	execInfo.lpParameters = mappingName;
+
+	ShellExecuteExA(&execInfo);
+
+	connector = execInfo.hProcess;
+#else
+	connector = fork();
+
+	if (!connector) { execl("/bin/sh", "sh", "-c", (char *) String("wine ").Append(Utilities::GetBoCADirectory()).Append("/boca_encoder_coreaudioconnect.1.0 ").Append(mappingName).Append(" 2> /dev/null"), NULL); exit(0); }
+#endif
+
+	connected = True;
+
+	/* Send Hello command.
+	 */
+	comm->command = CommCommandHello;
+	comm->length  = sizeof(CoreAudioCommHello);
+
+	((CoreAudioCommHello *) &comm->data)->version = 1;
+
+	ProcessConnectorCommand();
+
+	if (comm->status == CommStatusReady) ready = True;
+	else				     ready = False;
+
+	return True;
+}
+
+Bool BoCA::EncoderCoreAudioConnect::Disconnect()
+{
+	if (!connected) return False;
+
+	/* Send Quit command.
+	 */
+	comm->command = CommCommandQuit;
+	comm->length  = 0;
+
+	ProcessConnectorCommand();
+
+	/* Wait until the connector exits.
+	 */
+#ifdef __WIN32__
+	while (WaitForSingleObject(connector, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+#else
+	int	 status = 0;
+
+	waitpid(connector, &status, 0);
+#endif
+
+	/* Unmap view and close shared memory object.
+	 */
+#ifdef __WIN32__
+	UnmapViewOfFile(comm);
+	CloseHandle(mapping);
+#else
+	munmap(comm, sizeof(CoreAudioCommBuffer));
+	close(mapping);
+
+	shm_unlink(mappingName);
+#endif
+
+	return True;
+}
+
 Bool BoCA::EncoderCoreAudioConnect::ProcessConnectorCommand()
 {
+	if (!connected) return False;
+
 	comm->status = CommStatusIssued;
 
 	while (comm->status == CommStatusIssued || comm->status == CommStatusProcessing)
 	{
 		/* Check if the connector still exists.
 		 */
-		unsigned long	 exitCode = 0;
+#ifdef __WIN32__
+		if (WaitForSingleObject(connector, 0) != WAIT_TIMEOUT) break;
+#else
+		int	 status = 0;
 
-		GetExitCodeProcess(connector, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
+		if (waitpid(connector, &status, WNOHANG) != 0) break;
+#endif
 
 		/* Sleep for some milliseconds.
 		 */

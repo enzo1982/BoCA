@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2014 Robert Kausch <robert.kausch@bonkenc.org>
+  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@bonkenc.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the "GNU General Public License".
@@ -11,7 +11,15 @@
 #include "dllinterface.h"
 #include "communication.h"
 
-#include <algorithm>
+#ifdef __WINE__
+#	include <sys/mman.h>
+#	include <unistd.h>
+#	include <fcntl.h>
+#endif
+
+#ifndef min
+#	define min(n, m) ((n) < (m) ? (n) : (m))
+#endif
 
 static CoreAudioCommSetup	 setup		= { 0 };
 
@@ -108,7 +116,7 @@ CA::OSStatus AudioConverterComplexInputDataProc(CA::AudioConverterRef inAudioCon
 	static unsigned char	*suppliedData	  = NULL;
 	static unsigned int	 suppliedDataSize = 0;
 
-	suppliedDataSize = std::min(bufferSize - bytesConsumed, (unsigned int) *ioNumberDataPackets * setup.channels * (setup.bits / 8));
+	suppliedDataSize = min(bufferSize - bytesConsumed, (unsigned int) *ioNumberDataPackets * setup.channels * (setup.bits / 8));
 	suppliedData	 = (unsigned char *) realloc(suppliedData, suppliedDataSize);
 
 	memcpy(suppliedData, buffer + bytesConsumed, suppliedDataSize);
@@ -127,15 +135,21 @@ CA::OSStatus AudioConverterComplexInputDataProc(CA::AudioConverterRef inAudioCon
 
 int main(int argc, char *argv[])
 {
-	/* Open file mapping.
+	/* Open shared memory object and map view to communication buffer.
 	 */
+#ifndef __WINE__
 	HANDLE	 mapping = OpenFileMappingA(FILE_MAP_ALL_ACCESS, false, argv[1]);
 
 	if (mapping == NULL) return 1;
 
-	/* Map view to communication buffer.
-	 */
 	CoreAudioCommBuffer	*comm = (CoreAudioCommBuffer *) MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+#else
+	int	 mapping = shm_open(argv[1], O_RDWR, 0666);
+
+	if (mapping == -1) return 1;
+
+	CoreAudioCommBuffer	*comm = (CoreAudioCommBuffer *) mmap(NULL, sizeof(CoreAudioCommBuffer), PROT_READ | PROT_WRITE, MAP_SHARED, mapping, 0);
+#endif
 
 	/* Load Core Audio DLLs.
 	 */
@@ -229,6 +243,17 @@ int main(int argc, char *argv[])
 						}
 					}
 
+					/* Get Windows compatible file name.
+					 */
+#ifdef __WINE__
+					char	 buffer[32768] = { 0 };
+
+					GetTempPathA(sizeof(buffer), buffer);
+
+					strcat(buffer, setup.file);
+					strcpy(setup.file, buffer);
+#endif
+
 					/* Create audio file object for output file.
 					 */
 					CA::CFStringRef	 fileNameString	= CA::CFStringCreateWithCString(NULL, setup.file, CA::kCFStringEncodingUTF8);
@@ -239,6 +264,16 @@ int main(int argc, char *argv[])
 
 					CA::CFRelease(fileNameURL);
 					CA::CFRelease(fileNameString);
+
+					/* Get Unix compatible file name.
+					 */
+#ifdef __WINE__
+					wchar_t	 fileName[32768];
+
+					MultiByteToWideChar(CP_ACP, 0, setup.file, -1, fileName, sizeof(fileName) / sizeof(wchar_t));
+
+					strcpy(((CoreAudioCommSetup *) comm->data)->file, wine_get_unix_file_name(fileName));
+#endif
 
 					/* Get magic cookie and supply it to audio file.
 					 */
@@ -409,10 +444,15 @@ int main(int argc, char *argv[])
 	FreeCoreFoundationDLL();
 	FreeCoreAudioDLL();
 
-	/* Close file mapping handle.
+	/* Unmap view and close shared memory object.
 	 */
+#ifndef __WINE__
 	UnmapViewOfFile(comm);
 	CloseHandle(mapping);
+#else
+	munmap(comm, sizeof(CoreAudioCommBuffer));
+	close(mapping);
+#endif
 
 	return 0;
 }
