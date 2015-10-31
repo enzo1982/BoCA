@@ -52,7 +52,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 	secAttr.nLength		= sizeof(secAttr);
 	secAttr.bInheritHandle	= True;
 
-	CreatePipe(&rPipe, &wPipe, &secAttr, 131072);
+	CreatePipe(&rPipe, &wPipe, &secAttr, 32768 * format.channels * (format.bits / 8));
 	SetHandleInformation(wPipe, HANDLE_FLAG_INHERIT, 0);
 
 	/* Start 3rd party command line encoder
@@ -125,6 +125,12 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 	out->Flush();
 
+	/* Sleep for 1/8th second to avoid locking up in WriteData
+	 * when the encoder exits because of invalid parameters or
+	 * audio format as process exit is detected with some delay.
+	 */
+	S::System::System::Sleep(125);
+
 	return True;
 }
 
@@ -140,16 +146,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 	/* Wait until the encoder exits
 	 */
-	unsigned long	 exitCode = 0;
-
-	while (True)
-	{
-		GetExitCodeProcess(hProcess, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
-
-		S::System::System::Sleep(10);
-	}
+	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	if (specs->debug)
 	{
@@ -160,6 +157,10 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 	/* Check if anything went wrong
 	 */
+	unsigned long	 exitCode = 0;
+
+	GetExitCodeProcess(hProcess, &exitCode);
+
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		/* Remove output file
@@ -217,11 +218,7 @@ Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &dat
 
 	/* Check if external encoder still exists.
 	 */
-	unsigned long	 exitCode = 0;
-
-	GetExitCodeProcess(hProcess, &exitCode);
-
-	if (exitCode != STILL_ACTIVE)
+	if (WaitForSingleObject(hProcess, 0) != WAIT_TIMEOUT)
 	{
 		errorState  = True;
 		errorString = "Encoder quit prematurely.";

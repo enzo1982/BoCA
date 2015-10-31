@@ -108,16 +108,7 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 
 	/* Wait until the decoder exits.
 	 */
-	unsigned long	 exitCode = 0;
-
-	while (True)
-	{
-		GetExitCodeProcess(hProcess, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
-
-		S::System::System::Sleep(10);
-	}
+	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	if (specs->debug)
 	{
@@ -325,16 +316,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Wait until the decoder exits.
 	 */
-	unsigned long	 exitCode = 0;
-
-	while (True)
-	{
-		GetExitCodeProcess(hProcess, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
-
-		S::System::System::Sleep(10);
-	}
+	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	if (specs->debug)
 	{
@@ -360,6 +342,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Check if anything went wrong.
 	 */
+	unsigned long	 exitCode = 0;
+
+	GetExitCodeProcess(hProcess, &exitCode);
+
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		errorState  = True;
@@ -387,6 +373,8 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 		File(track.origFilename).Copy(encFileName);
 	}
 
+	const Format	&format = track.GetFormat();
+
 	/* Set up security attributes
 	 */
 	SECURITY_ATTRIBUTES	 secAttr;
@@ -396,7 +384,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 	secAttr.nLength		= sizeof(secAttr);
 	secAttr.bInheritHandle	= True;
 
-	CreatePipe(&rPipe, &wPipe, &secAttr, 131072);
+	CreatePipe(&rPipe, &wPipe, &secAttr, 32768 * format.channels * (format.bits / 8));
 	SetHandleInformation(rPipe, HANDLE_FLAG_INHERIT, 0);
 
 	/* Start 3rd party command line decoder.
@@ -491,16 +479,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 	/* Wait until the decoder exits.
 	 */
-	unsigned long	 exitCode = 0;
-
-	while (True)
-	{
-		GetExitCodeProcess(hProcess, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
-
-		S::System::System::Sleep(10);
-	}
+	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	if (specs->debug)
 	{
@@ -515,6 +494,12 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 	{
 		File(encFileName).Delete();
 	}
+
+	/* Check if anything went wrong.
+	 */
+	unsigned long	 exitCode = 0;
+
+	GetExitCodeProcess(hProcess, &exitCode);
 
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{

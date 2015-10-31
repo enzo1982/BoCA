@@ -125,21 +125,16 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	/* Wait until the encoder exits
 	 */
-	unsigned long	 exitCode = 0;
-
-	while (True)
-	{
-		GetExitCodeProcess(execInfo.hProcess, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
-
-		S::System::System::Sleep(10);
-	}
+	while (WaitForSingleObject(execInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	File(wavFileName).Delete();
 
 	/* Check if anything went wrong
 	 */
+	unsigned long	 exitCode = 0;
+
+	GetExitCodeProcess(execInfo.hProcess, &exitCode);
+
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		/* Remove output file

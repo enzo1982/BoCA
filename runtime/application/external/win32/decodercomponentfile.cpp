@@ -103,16 +103,7 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 
 	/* Wait until the decoder exits.
 	 */
-	unsigned long	 exitCode = 0;
-
-	while (True)
-	{
-		GetExitCodeProcess(hProcess, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
-
-		S::System::System::Sleep(10);
-	}
+	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	if (specs->debug)
 	{
@@ -200,16 +191,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 	/* Wait until the decoder exits
 	 */
-	unsigned long	 exitCode = 0;
-
-	while (True)
-	{
-		GetExitCodeProcess(execInfo.hProcess, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
-
-		S::System::System::Sleep(10);
-	}
+	while (WaitForSingleObject(execInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	/* Query MD5.
 	 */
@@ -224,6 +206,10 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 	/* Check if anything went wrong
 	 */
+	unsigned long	 exitCode = 0;
+
+	GetExitCodeProcess(execInfo.hProcess, &exitCode);
+
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		/* Remove temporary WAVE file
@@ -380,16 +366,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 
 	/* Wait until the decoder exits
 	 */
-	unsigned long	 exitCode = 0;
-
-	while (True)
-	{
-		GetExitCodeProcess(execInfo.hProcess, &exitCode);
-
-		if (exitCode != STILL_ACTIVE) break;
-
-		S::System::System::Sleep(10);
-	}
+	while (WaitForSingleObject(execInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -400,6 +377,10 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 
 	/* Check if anything went wrong
 	 */
+	unsigned long	 exitCode = 0;
+
+	GetExitCodeProcess(execInfo.hProcess, &exitCode);
+
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
 		/* Remove temporary WAVE file
