@@ -250,6 +250,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			if	(infoTrack.length	>= 0) { discLength += infoTrack.length;	      iTrack.length	  = infoTrack.length;	    }
 			else if (infoTrack.approxLength >= 0) { discLength += infoTrack.approxLength; iTrack.approxLength = infoTrack.approxLength; }
+
+			iTrack.lossless = infoTrack.lossless;
 		}
 
 		/* Regular metadata...
@@ -518,6 +520,8 @@ Bool BoCA::DecoderCueSheet::AddTrack(const Track &track, Array<Track> &tracks) c
 	rTrack.approxLength = track.approxLength;
 
 	rTrack.fileSize	    = track.length * track.GetFormat().channels * (track.GetFormat().bits / 8);
+
+	rTrack.lossless	    = track.lossless;
 
 	rTrack.SetFormat(track.GetFormat());
 	rTrack.SetInfo(track.GetInfo());
