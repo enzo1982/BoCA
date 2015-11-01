@@ -402,9 +402,11 @@ Bool BoCA::EncoderCoreAudioConnect::Connect()
 
 	connector = execInfo.hProcess;
 #else
+	const char	*cmd = String("wine ").Append(Utilities::GetBoCADirectory()).Append("/boca_encoder_coreaudioconnect.1.0 ").Append(mappingName).Append(" 2> /dev/null");
+
 	connector = fork();
 
-	if (!connector) { execl("/bin/sh", "sh", "-c", (char *) String("wine ").Append(Utilities::GetBoCADirectory()).Append("/boca_encoder_coreaudioconnect.1.0 ").Append(mappingName).Append(" 2> /dev/null"), NULL); exit(0); }
+	if (!connector) { execl("/bin/sh", "sh", "-c", cmd, NULL); exit(0); }
 #endif
 
 	connected = True;
