@@ -12,7 +12,7 @@
 #include "dllinterface.h"
 
 SF_FORMAT_CHECK	 ex_sf_format_check	= NIL;
-SF_OPEN_FD	 ex_sf_open_fd		= NIL;
+SF_OPEN_VIRTUAL	 ex_sf_open_virtual	= NIL;
 SF_CLOSE	 ex_sf_close		= NIL;
 SF_WRITE_SHORT	 ex_sf_write_short	= NIL;
 SF_WRITE_INT	 ex_sf_write_int	= NIL;
@@ -29,7 +29,7 @@ Bool LoadSndFileDLL()
 	if (sndfiledll == NIL) return False;
 
 	ex_sf_format_check	= (SF_FORMAT_CHECK) sndfiledll->GetFunctionAddress("sf_format_check");
-	ex_sf_open_fd		= (SF_OPEN_FD) sndfiledll->GetFunctionAddress("sf_open_fd");
+	ex_sf_open_virtual	= (SF_OPEN_VIRTUAL) sndfiledll->GetFunctionAddress("sf_open_virtual");
 	ex_sf_close		= (SF_CLOSE) sndfiledll->GetFunctionAddress("sf_close");
 	ex_sf_write_short	= (SF_WRITE_SHORT) sndfiledll->GetFunctionAddress("sf_write_short");
 	ex_sf_write_int		= (SF_WRITE_INT) sndfiledll->GetFunctionAddress("sf_write_int");
@@ -38,7 +38,7 @@ Bool LoadSndFileDLL()
 	ex_sf_strerror		= (SF_STRERROR) sndfiledll->GetFunctionAddress("sf_strerror");
 
 	if (ex_sf_format_check	== NIL ||
-	    ex_sf_open_fd	== NIL ||
+	    ex_sf_open_virtual	== NIL ||
 	    ex_sf_close		== NIL ||
 	    ex_sf_write_short	== NIL ||
 	    ex_sf_write_int	== NIL ||

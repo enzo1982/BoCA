@@ -115,13 +115,21 @@ Void smooth::DetachDLL()
 	FreeSndFileDLL();
 }
 
+namespace BoCA
+{
+	sf_count_t	 sf_vio_get_filelen_callback(void *);
+	sf_count_t	 sf_vio_seek_callback(sf_count_t, int, void *);
+	sf_count_t	 sf_vio_read_callback(void *, sf_count_t, void *);
+	sf_count_t	 sf_vio_write_callback(const void *, sf_count_t, void *);
+	sf_count_t	 sf_vio_tell_callback(void *);
+};
+
 BoCA::EncoderSndFile::EncoderSndFile()
 {
 	configLayer = NIL;
 
 	fileFormat  = 0;
 
-	file	    = 0;
 	sndf	    = NIL;
 }
 
@@ -134,18 +142,6 @@ Bool BoCA::EncoderSndFile::Activate()
 {
 	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
-
-	/* Open output file.
-	 */
-	String	 fileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"); 
-
-#ifdef __WIN32__
-	file = _wfopen(fileName, L"wb");
-#else
-	file = fopen(fileName.ConvertTo("UTF-8"), "wb");
-#endif
-
-	if (file == NIL) return False;
 
 	/* Get selected file format.
 	 */
@@ -180,16 +176,22 @@ Bool BoCA::EncoderSndFile::Activate()
 
 		errorState = True;
 
-		fclose(file);
-
 		return False;
 	}
 
 	/* Open sndfile handle.
 	 */
-	sndf = ex_sf_open_fd(fileno(file), SFM_WRITE, &sinfo, False);
+	SF_VIRTUAL_IO	 vio;
 
-	if (sndf == NIL) { fclose(file); return False; }
+	vio.get_filelen	= sf_vio_get_filelen_callback;
+	vio.seek	= sf_vio_seek_callback;
+	vio.read	= sf_vio_read_callback;
+	vio.write	= sf_vio_write_callback;
+	vio.tell	= sf_vio_tell_callback;
+
+	sndf = ex_sf_open_virtual(&vio, SFM_WRITE, &sinfo, this);
+
+	if (sndf == NIL) return False;
 
 	ex_sf_command(sndf, SFC_SET_SCALE_INT_FLOAT_WRITE, NIL, SF_TRUE);
 
@@ -223,27 +225,6 @@ Bool BoCA::EncoderSndFile::Deactivate()
 	/* Close sndfile handle.
 	 */
 	ex_sf_close(sndf);
-
-	fclose(file);
-
-	/* Stream contents of created file to output driver
-	 */
-	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READ);
-	Buffer<UnsignedByte>	 buffer(1024);
-	Int64			 bytesLeft = in.Size();
-
-	while (bytesLeft)
-	{
-		in.InputData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-		driver->WriteData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-		bytesLeft -= Math::Min(Int64(1024), bytesLeft);
-	}
-
-	in.Close();
-
-	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
 
 	/* Write metadata.
 	 */
@@ -504,4 +485,43 @@ ConfigLayer *BoCA::EncoderSndFile::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureSndFile();
 
 	return configLayer;
+}
+
+sf_count_t BoCA::sf_vio_get_filelen_callback(void *user_data)
+{
+	EncoderSndFile	*filter = (EncoderSndFile *) user_data;
+
+	return filter->driver->GetSize();
+}
+
+sf_count_t BoCA::sf_vio_seek_callback(sf_count_t offset, int whence, void *user_data)
+{
+	EncoderSndFile	*filter = (EncoderSndFile *) user_data;
+
+	if	(whence == SEEK_CUR) filter->driver->Seek(filter->driver->GetPos()  + offset);
+	else if	(whence == SEEK_SET) filter->driver->Seek(			      offset);
+	else if	(whence == SEEK_END) filter->driver->Seek(filter->driver->GetSize() + offset);
+
+	return filter->driver->GetPos();
+}
+
+sf_count_t BoCA::sf_vio_read_callback(void *ptr, sf_count_t count, void *user_data)
+{
+	EncoderSndFile	*filter = (EncoderSndFile *) user_data;
+
+	return filter->driver->ReadData((UnsignedByte *) ptr, count);
+}
+
+sf_count_t BoCA::sf_vio_write_callback(const void * ptr, sf_count_t count, void *user_data)
+{
+	EncoderSndFile	*filter = (EncoderSndFile *) user_data;
+
+	return filter->driver->WriteData((UnsignedByte *) ptr, count);
+}
+
+sf_count_t BoCA::sf_vio_tell_callback(void *user_data)
+{
+	EncoderSndFile	*filter = (EncoderSndFile *) user_data;
+
+	return filter->driver->GetPos();
 }
