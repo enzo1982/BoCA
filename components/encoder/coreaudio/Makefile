@@ -7,13 +7,13 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
 OBJECTS	  = config.o coreaudio.o dllinterface.o
 
 # Enter additional defines here:
-DEFINE	  = -I . -Wno-multichar
+DEFINE	  = -I$(SRCDIR) -Wno-multichar
 
 # Enter additional library dependencies here:
 ifeq ($(BUILD_WIN32),True)
@@ -34,5 +34,4 @@ UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands

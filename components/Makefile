@@ -1,49 +1,53 @@
 ########## BoCA directory makefile ##########
 
+BOCA_PATH = ..
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
+
 all:
-	cd decoder && $(MAKE)
-	cd deviceinfo && $(MAKE)
-	cd dsp && $(MAKE)
-	cd encoder && $(MAKE)
-	cd extension && $(MAKE)
-	cd other && $(MAKE)
-	cd output && $(MAKE)
-	cd playlist && $(MAKE)
-	cd tagger && $(MAKE)
-	cd verifier && $(MAKE)
+	$(call makein,decoder)
+	$(call makein,deviceinfo)
+	$(call makein,dsp)
+	$(call makein,encoder)
+	$(call makein,extension)
+	$(call makein,other)
+	$(call makein,output)
+	$(call makein,playlist)
+	$(call makein,tagger)
+	$(call makein,verifier)
 
 clean:
-	cd decoder && $(MAKE) clean
-	cd deviceinfo && $(MAKE) clean
-	cd dsp && $(MAKE) clean
-	cd encoder && $(MAKE) clean
-	cd extension && $(MAKE) clean
-	cd other && $(MAKE) clean
-	cd output && $(MAKE) clean
-	cd playlist && $(MAKE) clean
-	cd tagger && $(MAKE) clean
-	cd verifier && $(MAKE) clean
+	$(call cleanin,decoder)
+	$(call cleanin,deviceinfo)
+	$(call cleanin,dsp)
+	$(call cleanin,encoder)
+	$(call cleanin,extension)
+	$(call cleanin,other)
+	$(call cleanin,output)
+	$(call cleanin,playlist)
+	$(call cleanin,tagger)
+	$(call cleanin,verifier)
 
 install:
-	cd decoder && $(MAKE) install
-	cd deviceinfo && $(MAKE) install
-	cd dsp && $(MAKE) install
-	cd encoder && $(MAKE) install
-	cd extension && $(MAKE) install
-	cd other && $(MAKE) install
-	cd output && $(MAKE) install
-	cd playlist && $(MAKE) install
-	cd tagger && $(MAKE) install
-	cd verifier && $(MAKE) install
+	$(call makein,decoder,install)
+	$(call makein,deviceinfo,install)
+	$(call makein,dsp,install)
+	$(call makein,encoder,install)
+	$(call makein,extension,install)
+	$(call makein,other,install)
+	$(call makein,output,install)
+	$(call makein,playlist,install)
+	$(call makein,tagger,install)
+	$(call makein,verifier,install)
 
 uninstall:
-	cd decoder && $(MAKE) uninstall
-	cd deviceinfo && $(MAKE) uninstall
-	cd dsp && $(MAKE) uninstall
-	cd encoder && $(MAKE) uninstall
-	cd extension && $(MAKE) uninstall
-	cd other && $(MAKE) uninstall
-	cd output && $(MAKE) uninstall
-	cd playlist && $(MAKE) uninstall
-	cd tagger && $(MAKE) uninstall
-	cd verifier && $(MAKE) uninstall
+	$(call makein,decoder,uninstall)
+	$(call makein,deviceinfo,uninstall)
+	$(call makein,dsp,uninstall)
+	$(call makein,encoder,uninstall)
+	$(call makein,extension,uninstall)
+	$(call makein,other,uninstall)
+	$(call makein,output,uninstall)
+	$(call makein,playlist,uninstall)
+	$(call makein,tagger,uninstall)
+	$(call makein,verifier,uninstall)

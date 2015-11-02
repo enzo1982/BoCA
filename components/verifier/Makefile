@@ -2,16 +2,16 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
-	cd md5 && $(MAKE)
+	$(call makein,md5)
 
 clean:
-	cd md5 && $(MAKE) clean
+	$(call cleanin,md5)
 
 install:
-	cd md5 && $(MAKE) install
+	$(call makein,md5,install)
 
 uninstall:
-	cd md5 && $(MAKE) uninstall
+	$(call makein,md5,uninstall)

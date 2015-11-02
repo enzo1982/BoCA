@@ -2,62 +2,62 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
-	cd apev2 && $(MAKE)
-	cd cart && $(MAKE)
-	cd flac && $(MAKE)
-	cd id3v1 && $(MAKE)
-	cd id3v2 && $(MAKE)
-	cd mp4 && $(MAKE)
-	cd riff && $(MAKE)
+	$(call makein,apev2)
+	$(call makein,cart)
+	$(call makein,flac)
+	$(call makein,id3v1)
+	$(call makein,id3v2)
+	$(call makein,mp4)
+	$(call makein,riff)
 ifeq ($(BUILD_OSX),True)
-	cd tocplist && $(MAKE)
+	$(call makein,tocplist)
 endif
-	cd vorbis && $(MAKE)
+	$(call makein,vorbis)
 ifeq ($(BUILD_WIN32),True)
-	cd wma && $(MAKE)
+	$(call makein,wma)
 endif
 
 clean:
-	cd apev2 && $(MAKE) clean
-	cd cart && $(MAKE) clean
-	cd flac && $(MAKE) clean
-	cd id3v1 && $(MAKE) clean
-	cd id3v2 && $(MAKE) clean
-	cd mp4 && $(MAKE) clean
-	cd riff && $(MAKE) clean
+	$(call cleanin,apev2)
+	$(call cleanin,cart)
+	$(call cleanin,flac)
+	$(call cleanin,id3v1)
+	$(call cleanin,id3v2)
+	$(call cleanin,mp4)
+	$(call cleanin,riff)
 ifeq ($(BUILD_OSX),True)
-	cd tocplist && $(MAKE) clean
+	$(call cleanin,tocplist)
 endif
-	cd vorbis && $(MAKE) clean
+	$(call cleanin,vorbis)
 ifeq ($(BUILD_WIN32),True)
-	cd wma && $(MAKE) clean
+	$(call cleanin,wma)
 endif
 
 install:
-	cd apev2 && $(MAKE) install
-	cd cart && $(MAKE) install
-	cd flac && $(MAKE) install
-	cd id3v1 && $(MAKE) install
-	cd id3v2 && $(MAKE) install
-	cd mp4 && $(MAKE) install
-	cd riff && $(MAKE) install
+	$(call makein,apev2,install)
+	$(call makein,cart,install)
+	$(call makein,flac,install)
+	$(call makein,id3v1,install)
+	$(call makein,id3v2,install)
+	$(call makein,mp4,install)
+	$(call makein,riff,install)
 ifeq ($(BUILD_OSX),True)
-	cd tocplist && $(MAKE) install
+	$(call makein,tocplist,install)
 endif
-	cd vorbis && $(MAKE) install
+	$(call makein,vorbis,install)
 
 uninstall:
-	cd apev2 && $(MAKE) uninstall
-	cd cart && $(MAKE) uninstall
-	cd flac && $(MAKE) uninstall
-	cd id3v1 && $(MAKE) uninstall
-	cd id3v2 && $(MAKE) uninstall
-	cd mp4 && $(MAKE) uninstall
-	cd riff && $(MAKE) uninstall
+	$(call makein,apev2,uninstall)
+	$(call makein,cart,uninstall)
+	$(call makein,flac,uninstall)
+	$(call makein,id3v1,uninstall)
+	$(call makein,id3v2,uninstall)
+	$(call makein,mp4,uninstall)
+	$(call makein,riff,uninstall)
 ifeq ($(BUILD_OSX),True)
-	cd tocplist && $(MAKE) uninstall
+	$(call makein,tocplist,uninstall)
 endif
-	cd vorbis && $(MAKE) uninstall
+	$(call makein,vorbis,uninstall)

@@ -7,7 +7,7 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
 OBJECTS	  = config.o coreaudioconnect.o
@@ -19,16 +19,15 @@ DEFINE	  = -Wno-multichar
 LIBS	  =
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd connector && $(MAKE) -j 4
+ALLCMD1   = $(call makein,connector)
 ALLCMD2   =
-CLEANCMD1 = cd connector && $(MAKE) clean
+CLEANCMD1 = $(call cleanin,connector)
 CLEANCMD2 =
-INSTCMD1  =
-INSTCMD2  = 
-UINSTCMD1 =
+INSTCMD1  = $(INSTALL) $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(EXECUTABLE) $(DESTDIR)$(libdir)/boca
+INSTCMD2  =
+UINSTCMD1 = rm -f $(DESTDIR)$(libdir)/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(EXECUTABLE)
 UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands

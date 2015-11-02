@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = dllinterface.o fdkaac.o
 
 # Enter additional defines here:
-DEFINE	  = -I .
+DEFINE	  = -I$(SRCDIR)
 
 # Enter additional library dependencies here:
 LIBS	  =
@@ -28,5 +28,4 @@ UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands

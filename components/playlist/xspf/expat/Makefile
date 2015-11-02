@@ -1,10 +1,12 @@
-include ../../../../Makefile-options
+BOCA_PATH = ../../../..
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 OBJECTS	= xmlparse.o xmlrole.o xmltok.o
 TARGET	= libexpat.a
 
 CC	= gcc
-CCOPTS	= -g0 -Os -fno-exceptions -I. -DHAVE_EXPAT_CONFIG_H
+CCOPTS	= -I$(SRCDIR) -DHAVE_EXPAT_CONFIG_H
 AR	= ar
 
 ifeq ($(BUILD_FREEBSD),True)
@@ -15,32 +17,13 @@ ifneq ($(BUILD_WIN32),True)
 	CCOPTS += -fPIC
 endif
 
-ifeq ($(BUILD_OSX),True)
-ifeq ($(BUILD_X86),True)
-	CCOPTS += -arch i386
-endif
-ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -arch x86_64
-endif
-ifeq ($(BUILD_PPC),True)
-	CCOPTS += -arch ppc
-endif
-ifeq ($(BUILD_PPC64),True)
-	CCOPTS += -arch ppc64
-endif
-else ifeq ($(BUILD_X86),True)
-	CCOPTS += -m32
-else ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -m64
-endif
+all: $(TARGET)
 
-all : $(TARGET)
-
-$(TARGET) : $(OBJECTS)
+$(TARGET): $(OBJECTS)
 	$(AR) rs $@ $(OBJECTS)
 
-clean :
+clean:
 	rm -f $(TARGET) $(OBJECTS)
 
 .c.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(CFLAGS) -c $< -o $@

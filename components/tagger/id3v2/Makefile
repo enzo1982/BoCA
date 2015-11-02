@@ -13,16 +13,16 @@ BOCA_PATH = ../../..
 OBJECTS	  = id3v2.o
 
 # Enter additional defines here:
-DEFINE	  = -I id3 -DID3LIB_LINKOPTION=LINKOPTION_STATIC
+DEFINE	  = -I$(SRCDIR)/id3 -DID3LIB_LINKOPTION=LINKOPTION_STATIC
 
 # Enter additional library dependencies here:
 LIBS	  = id3/libid3.a zlib/libz.a -lstdc++
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd zlib && $(MAKE) -j 4
-ALLCMD2   = cd id3 && $(MAKE) -j 4
-CLEANCMD1 = cd zlib && $(MAKE) clean
-CLEANCMD2 = cd id3 && $(MAKE) clean
+ALLCMD1   = $(call makein,zlib)
+ALLCMD2   = $(call makein,id3)
+CLEANCMD1 = $(call cleanin,zlib)
+CLEANCMD2 = $(call cleanin,id3)
 INSTCMD1  =
 INSTCMD2  = 
 UINSTCMD1 =
@@ -30,5 +30,4 @@ UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands

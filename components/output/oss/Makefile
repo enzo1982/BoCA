@@ -7,7 +7,7 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
 OBJECTS	  = oss.o
@@ -34,5 +34,4 @@ UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands

@@ -2,20 +2,20 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	cd cdio && $(MAKE)
+	$(call makein,cdio)
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	cd cdparanoia && $(MAKE)
+	$(call makein,cdparanoia)
 endif
 endif
 endif
@@ -24,21 +24,21 @@ endif
 endif
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd cdrip && $(MAKE)
+	$(call makein,cdrip)
 endif
 
 clean:
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	cd cdio && $(MAKE) clean
+	$(call cleanin,cdio)
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	cd cdparanoia && $(MAKE) clean
+	$(call cleanin,cdparanoia)
 endif
 endif
 endif
@@ -47,21 +47,21 @@ endif
 endif
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd cdrip && $(MAKE) clean
+	$(call cleanin,cdrip)
 endif
 
 install:
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	cd cdio && $(MAKE) install
+	$(call makein,cdio,install)
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	cd cdparanoia && $(MAKE) install
+	$(call makein,cdparanoia,install)
 endif
 endif
 endif
@@ -74,14 +74,14 @@ uninstall:
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	cd cdio && $(MAKE) uninstall
+	$(call makein,cdio,uninstall)
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	cd cdparanoia && $(MAKE) uninstall
+	$(call makein,cdparanoia,uninstall)
 endif
 endif
 endif

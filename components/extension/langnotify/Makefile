@@ -7,7 +7,7 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
 OBJECTS	  = dialog.o langnotify.o
@@ -23,12 +23,11 @@ ALLCMD1   =
 ALLCMD2   =
 CLEANCMD1 =
 CLEANCMD2 =
-INSTCMD1  = cp -r boca.extension.langnotify $(PREFIX)/$(LIB)/boca
-INSTCMD2  = chmod -R a=rX,u=rwX $(PREFIX)/$(LIB)/boca/boca.extension.langnotify
-UINSTCMD1 = rm -f -r $(PREFIX)/$(LIB)/boca/boca.extension.langnotify
+INSTCMD1  = cp -r $(SRCDIR)/boca.extension.langnotify $(DESTDIR)$(libdir)/boca
+INSTCMD2  = chmod -R a=rX,u=rwX $(DESTDIR)$(libdir)/boca/boca.extension.langnotify
+UINSTCMD1 = rm -f -r $(DESTDIR)$(libdir)/boca/boca.extension.langnotify
 UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands

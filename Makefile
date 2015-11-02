@@ -1,27 +1,33 @@
 ########## BoCA directory makefile ##########
 
-include Makefile-options
+BOCA_PATH = .
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
-	cd runtime && $(MAKE) -j 4
-	cd components && $(MAKE) -j 4
+	mkdir -p $(BOCA_PATH)/$(BINDIR) $(BOCA_PATH)/$(LIBDIR)
+
+	$(call makein,runtime)
+	$(call makein,components)
 
 clean:
-	cd runtime && $(MAKE) clean
-	cd components && $(MAKE) clean
+	$(call cleanin,runtime)
+	$(call cleanin,components)
 
-install:
+	rmdir $(BOCA_PATH)/$(BINDIR) $(BOCA_PATH)/$(LIBDIR) || true
+
+install: all
 ifneq ($(BUILD_WIN32),True)
-	cd include && $(MAKE) install
-	cd runtime && $(MAKE) install
-	cd scripts && $(MAKE) install
-	cd components && $(MAKE) install
+	$(call makein,include,install)
+	$(call makein,runtime,install)
+	$(call makein,scripts,install)
+	$(call makein,components,install)
 endif
 
 uninstall:
 ifneq ($(BUILD_WIN32),True)
-	cd include && $(MAKE) uninstall
-	cd runtime && $(MAKE) uninstall
-	cd scripts && $(MAKE) uninstall
-	cd components && $(MAKE) uninstall
+	$(call makein,include,uninstall)
+	$(call makein,runtime,uninstall)
+	$(call makein,scripts,uninstall)
+	$(call makein,components,uninstall)
 endif

@@ -2,23 +2,24 @@
 
 BOCA_PATH = ..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
 
 clean:
 
-install: uninstall
+install: all
 ifneq ($(BUILD_WIN32),True)
-	cp -r boca $(PREFIX)/$(INCLUDE)
-	cp boca.h $(PREFIX)/$(INCLUDE)
+	$(INSTALL) -d $(DESTDIR)$(includedir)
 
-	chmod -R a=rX,u=rwX $(PREFIX)/$(INCLUDE)/boca
-	chmod a=r,u=rw $(PREFIX)/$(INCLUDE)/boca.h
+	cp -r $(SRCDIR)/boca $(DESTDIR)$(includedir)
+	chmod -R a=rX,u=rwX $(DESTDIR)$(includedir)/boca
+
+	$(INSTALL_DATA) $(SRCDIR)/boca.h $(DESTDIR)$(includedir)
 endif
 
 uninstall:
 ifneq ($(BUILD_WIN32),True)
-	rm -f $(PREFIX)/$(INCLUDE)/boca.h
-	rm -f -r $(PREFIX)/$(INCLUDE)/boca
+	rm -f $(DESTDIR)$(includedir)/boca.h
+	rm -f -r $(DESTDIR)$(includedir)/boca
 endif

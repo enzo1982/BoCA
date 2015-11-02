@@ -2,13 +2,13 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
-	cd external && $(MAKE)
+	$(call makein,external)
 
 clean:
-	cd external && $(MAKE) clean
+	$(call cleanin,external)
 
 install:
 

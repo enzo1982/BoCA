@@ -8,7 +8,7 @@ SMOOTHVER = 0.8.71
 
 BOCA_PATH = ../../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Disable PowerPC builds of this component on OS X for now.
 ifeq ($(BUILD_OSX),True)
@@ -34,12 +34,11 @@ ALLCMD1   =
 ALLCMD2   =
 CLEANCMD1 =
 CLEANCMD2 =
-INSTCMD1  = cp -r boca.extension.youtube $(PREFIX)/$(LIB)/boca
-INSTCMD2  = chmod -R a=rX,u=rwX $(PREFIX)/$(LIB)/boca/boca.extension.youtube
-UINSTCMD1 = rm -f -r $(PREFIX)/$(LIB)/boca/boca.extension.youtube
+INSTCMD1  = cp -r $(SRCDIR)/boca.extension.youtube $(DESTDIR)$(libdir)/boca
+INSTCMD2  = chmod -R a=rX,u=rwX $(DESTDIR)$(libdir)/boca/boca.extension.youtube
+UINSTCMD1 = rm -f -r $(DESTDIR)$(libdir)/boca/boca.extension.youtube
 UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands

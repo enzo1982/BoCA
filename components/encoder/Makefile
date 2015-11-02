@@ -2,108 +2,108 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
 ifeq ($(BUILD_WIN32),True)
-	cd bladeenc && $(MAKE)
+	$(call makein,bladeenc)
 endif
-	cd bonk && $(MAKE)
+	$(call makein,bonk)
 ifeq ($(BUILD_OSX),True)
-	cd coreaudio && $(MAKE)
+	$(call makein,coreaudio)
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd coreaudio && $(MAKE)
-	cd coreaudioconnect && $(MAKE)
+	$(call makein,coreaudio)
+	$(call makein,coreaudioconnect)
 endif
-	cd faac && $(MAKE)
-	cd fdkaac && $(MAKE)
-	cd flac && $(MAKE)
-	cd lame && $(MAKE)
+	$(call makein,faac)
+	$(call makein,fdkaac)
+	$(call makein,flac)
+	$(call makein,lame)
 ifeq ($(BUILD_WIN32),True)
-	cd mac && $(MAKE)
+	$(call makein,mac)
 endif
-	cd meh && $(MAKE)
-	cd opus && $(MAKE)
-	cd sndfile && $(MAKE)
-	cd speex && $(MAKE)
+	$(call makein,meh)
+	$(call makein,opus)
+	$(call makein,sndfile)
+	$(call makein,speex)
 ifeq ($(BUILD_WIN32),True)
-	cd twinvq && $(MAKE)
+	$(call makein,twinvq)
 endif
-	cd voaacenc && $(MAKE)
-	cd vorbis && $(MAKE)
-	cd wave && $(MAKE)
+	$(call makein,voaacenc)
+	$(call makein,vorbis)
+	$(call makein,wave)
 ifeq ($(BUILD_WIN32),True)
-	cd wma && $(MAKE)
+	$(call makein,wma)
 endif
 
 clean:
 ifeq ($(BUILD_WIN32),True)
-	cd bladeenc && $(MAKE) clean
+	$(call cleanin,bladeenc)
 endif
-	cd bonk && $(MAKE) clean
+	$(call cleanin,bonk)
 ifeq ($(BUILD_OSX),True)
-	cd coreaudio && $(MAKE) clean
+	$(call cleanin,coreaudio)
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd coreaudio && $(MAKE) clean
-	cd coreaudioconnect && $(MAKE) clean
+	$(call cleanin,coreaudio)
+	$(call cleanin,coreaudioconnect)
 endif
-	cd faac && $(MAKE) clean
-	cd fdkaac && $(MAKE) clean
-	cd flac && $(MAKE) clean
-	cd lame && $(MAKE) clean
+	$(call cleanin,faac)
+	$(call cleanin,fdkaac)
+	$(call cleanin,flac)
+	$(call cleanin,lame)
 ifeq ($(BUILD_WIN32),True)
-	cd mac && $(MAKE) clean
+	$(call cleanin,mac)
 endif
-	cd meh && $(MAKE) clean
-	cd opus && $(MAKE) clean
-	cd sndfile && $(MAKE) clean
-	cd speex && $(MAKE) clean
+	$(call cleanin,meh)
+	$(call cleanin,opus)
+	$(call cleanin,sndfile)
+	$(call cleanin,speex)
 ifeq ($(BUILD_WIN32),True)
-	cd twinvq && $(MAKE) clean
+	$(call cleanin,twinvq)
 endif
-	cd voaacenc && $(MAKE) clean
-	cd vorbis && $(MAKE) clean
-	cd wave && $(MAKE) clean
+	$(call cleanin,voaacenc)
+	$(call cleanin,vorbis)
+	$(call cleanin,wave)
 ifeq ($(BUILD_WIN32),True)
-	cd wma && $(MAKE) clean
+	$(call cleanin,wma)
 endif
 
 install:
 ifeq ($(BUILD_OSX),True)
-	cd coreaudio && $(MAKE) install
+	$(call makein,coreaudio,install)
 endif
 ifneq ($(BUILD_OSX),True)
-	cd faac && $(MAKE) install
+	$(call makein,faac,install)
 endif
-	cd fdkaac && $(MAKE) install
-	cd flac && $(MAKE) install
-	cd lame && $(MAKE) install
-	cd meh && $(MAKE) install
-	cd opus && $(MAKE) install
-	cd sndfile && $(MAKE) install
-	cd speex && $(MAKE) install
+	$(call makein,fdkaac,install)
+	$(call makein,flac,install)
+	$(call makein,lame,install)
+	$(call makein,meh,install)
+	$(call makein,opus,install)
+	$(call makein,sndfile,install)
+	$(call makein,speex,install)
 ifneq ($(BUILD_OSX),True)
-	cd voaacenc && $(MAKE) install
+	$(call makein,voaacenc,install)
 endif
-	cd vorbis && $(MAKE) install
+	$(call makein,vorbis,install)
 
 uninstall:
 ifeq ($(BUILD_OSX),True)
-	cd coreaudio && $(MAKE) uninstall
+	$(call makein,coreaudio,uninstall)
 endif
 ifneq ($(BUILD_OSX),True)
-	cd faac && $(MAKE) uninstall
+	$(call makein,faac,uninstall)
 endif
-	cd fdkaac && $(MAKE) uninstall
-	cd flac && $(MAKE) uninstall
-	cd lame && $(MAKE) uninstall
-	cd meh && $(MAKE) uninstall
-	cd opus && $(MAKE) uninstall
-	cd sndfile && $(MAKE) uninstall
-	cd speex && $(MAKE) uninstall
+	$(call makein,fdkaac,uninstall)
+	$(call makein,flac,uninstall)
+	$(call makein,lame,uninstall)
+	$(call makein,meh,uninstall)
+	$(call makein,opus,uninstall)
+	$(call makein,sndfile,uninstall)
+	$(call makein,speex,uninstall)
 ifneq ($(BUILD_OSX),True)
-	cd voaacenc && $(MAKE) uninstall
+	$(call makein,voaacenc,uninstall)
 endif
-	cd vorbis && $(MAKE) uninstall
+	$(call makein,vorbis,uninstall)

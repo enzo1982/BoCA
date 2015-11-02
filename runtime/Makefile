@@ -8,7 +8,7 @@ SMOOTHVER = 0.8.72
 
 BOCA_PATH = ..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
 OBJECTS	  = application/external/configlayer.o application/external/decodercomponent.o application/external/encodercomponent.o application/component.o application/componentspecs.o application/decodercomponent.o application/deviceinfocomponent.o application/dspcomponent.o application/encodercomponent.o application/extensioncomponent.o application/outputcomponent.o application/playlistcomponent.o application/registry.o application/taggercomponent.o application/verifiercomponent.o common/communication/application.o common/communication/engine.o common/communication/joblist.o common/communication/menu.o common/communication/settings.o common/metadata/device.o common/metadata/format.o common/metadata/info.o common/metadata/mcdi.o common/metadata/picture.o common/metadata/picturedata.o common/metadata/track.o common/config.o common/configlayer.o common/i18n.o common/protocol.o common/utilities.o component/component.o component/decodercomponent.o component/deviceinfocomponent.o component/dspcomponent.o component/encodercomponent.o component/extensioncomponent.o component/outputcomponent.o component/playlistcomponent.o component/taggercomponent.o component/verifiercomponent.o core/core.o core/main.o
@@ -30,101 +30,71 @@ CLEANCMD1 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-
 CC	  = gcc
-CCOPTS	  = -pipe -g0 -Wall -Os -fvisibility=hidden -fno-exceptions -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(PREFIX)\" -I$(BOCA_PATH)/include
+CCOPTS	  = -fvisibility=hidden -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(prefix)\" -I$(SRCDIR)/$(BOCA_PATH)/include
 LD	  = gcc
-LDOPTS	  = -pipe -L$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+LDOPTS	  = -L$(SRCDIR)/$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_FREEBSD),True)
 	CC = clang
 	LD = clang
 endif
 
-ifeq ($(BUILD_OSX),True)
-	LDOPTS += -Wl,-x
-
-ifeq ($(BUILD_X86),True)
-	CCOPTS += -arch i386 -Xarch_i386 -march=prescott
-	LDOPTS += -arch i386
-endif
-ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -arch x86_64 -Xarch_x86_64 -march=core2
-	LDOPTS += -arch x86_64
-endif
-ifeq ($(BUILD_PPC),True)
-	CCOPTS += -arch ppc -Xarch_ppc -mcpu=G4
-	LDOPTS += -arch ppc
-endif
-ifeq ($(BUILD_PPC64),True)
-	CCOPTS += -arch ppc64 -Xarch_ppc64 -mcpu=G5
-	LDOPTS += -arch ppc64
-endif
-else
-	LDOPTS += -s
-
-ifeq ($(BUILD_X86),True)
-	CCOPTS += -m32
-	LDOPTS += -m32
-else ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -m64
-	LDOPTS += -m64
-endif
-endif
-
-ifneq ($(BUILD_WIN32),True)
-ifneq ($(BUILD_SOLARIS),True)
-ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_HAIKU),True)
-	CCOPTS += -pthread
-endif
-endif
-endif
-endif
-
 ifeq ($(BUILD_WIN32),True)
 	CCOPTS += -DUNICODE -D_UNICODE
 	LDOPTS += -lsmooth -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
-else ifeq ($(BUILD_OSX),True)
-	CCOPTS += -fPIC
-	LDOPTS += -L$(PREFIX)/lib -lsmooth-$(SMOOTHVER) -Wl,-dylib_install_name,libboca-$(VERSION).0$(SHARED)
 else
 	CCOPTS += -fPIC
-	LDOPTS += -L$(PREFIX)/lib -lsmooth-$(SMOOTHVER) -Wl,-soname,libboca-$(VERSION)$(SHARED).0 -Wl,-rpath,.
 
-	ifneq ($(BUILD_LINUX),True)
 	ifneq ($(BUILD_SOLARIS),True)
-	ifneq ($(BUILD_OSX),True)
 	ifneq ($(BUILD_HAIKU),True)
-		ifeq ($(BUILD_NETBSD),True)
-			CCOPTS += -I/usr/pkg/include
-		else
-			CCOPTS += -I/usr/local/include
+		ifneq ($(BUILD_QNX),True)
+			CCOPTS += -pthread
+		endif
+
+		ifneq ($(BUILD_LINUX),True)
+		ifneq ($(BUILD_OSX),True)
+			ifeq ($(BUILD_NETBSD),True)
+				CCOPTS += -I/usr/pkg/include
+			else
+				CCOPTS += -I/usr/local/include
+			endif
+		endif
 		endif
 	endif
 	endif
-	endif
+
+	LDOPTS += -L$(prefix)/lib -lsmooth-$(SMOOTHVER)
+
+	ifeq ($(BUILD_OSX),True)
+		LDOPTS += -Wl,-dylib_install_name,libboca-$(VERSION).0$(SHARED)
+	else
+		LDOPTS += -Wl,-soname,libboca-$(VERSION)$(SHARED).0
 	endif
 endif
 
-all: $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED)
+all: folders $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED)
+
+folders:
+ifeq ($(BUILD_WIN32),True)
+	mkdir -p application/external/win32
+else
+	mkdir -p application/external/posix
+endif
+	mkdir -p common/communication common/metadata component core
 
 $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED): $(OBJECTS)
-	mkdir -p $(BOCA_PATH)/$(BINDIR)
-	mkdir -p $(BOCA_PATH)/$(LIBDIR)
-
 ifeq ($(BUILD_WIN32),True)
-	$(LD) --shared -o $@ $(OBJECTS) -Wl,--out-implib,$(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS)
+	$(LD) --shared -o $@ $(OBJECTS) -Wl,--out-implib,$(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS) $(LDFLAGS)
 else
 ifneq ($(BUILD_OSX),True)
-	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS)
 else
-	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS)
 endif
 
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
-	ln -s $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
+	ln -fs ../$(BINDIR)/boca.$(VERSION)$(SHARED) $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
 endif
 
 clean:
@@ -132,62 +102,72 @@ clean:
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_WIN32),True)
+	rmdir application/external/win32 || true
+else
+	rmdir application/external/posix || true
+endif
+
+	rmdir application/external application common/communication common/metadata common component core || true
+
+ifeq ($(BUILD_WIN32),True)
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca.a
 else
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
 endif
 
-install: uninstall
+install: all
 ifneq ($(BUILD_WIN32),True)
-	mkdir -p $(PREFIX)/$(LIB)/boca
-	cp $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/boca
-	ln -s $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libboca-$(VERSION)$(SHARED)
+	$(INSTALL) -d $(DESTDIR)$(libdir)/boca
+	$(INSTALL_DATA) $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/boca
+	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_OSX),True)
-	ln -s $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libboca-$(VERSION).0$(SHARED)
+	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION).0$(SHARED)
 else
-	ln -s $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libboca-$(VERSION)$(SHARED).0
+	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED).0
 endif
 
-ifeq ($(BUILD_LINUX),True)
-	/sbin/ldconfig
-else ifeq ($(BUILD_GNU),True)
-	/sbin/ldconfig
-else ifeq ($(BUILD_FREEBSD),True)
-	/sbin/ldconfig
-else ifeq ($(BUILD_NETBSD),True)
-	/sbin/ldconfig
-else ifeq ($(BUILD_OPENBSD),True)
-	/sbin/ldconfig
+ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_HAIKU),True)
+ifneq ($(BUILD_QNX),True)
+	/sbin/ldconfig 2> /dev/null || true
+endif
+endif
+endif
 endif
 endif
 
 uninstall:
 ifneq ($(BUILD_WIN32),True)
 ifeq ($(BUILD_OSX),True)
-	rm -f $(PREFIX)/$(LIB)/libboca-$(VERSION).0$(SHARED)
+	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION).0$(SHARED)
 else
-	rm -f $(PREFIX)/$(LIB)/libboca-$(VERSION)$(SHARED).0
+	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED).0
 endif
 
-	rm -f $(PREFIX)/$(LIB)/libboca-$(VERSION)$(SHARED)
-	rm -f $(PREFIX)/$(LIB)/boca/boca.$(VERSION)$(SHARED)
+	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED)
+	rm -f $(DESTDIR)$(libdir)/boca/boca.$(VERSION)$(SHARED)
 
-ifeq ($(BUILD_LINUX),True)
-	/sbin/ldconfig
-else ifeq ($(BUILD_GNU),True)
-	/sbin/ldconfig
-else ifeq ($(BUILD_FREEBSD),True)
-	/sbin/ldconfig
-else ifeq ($(BUILD_NETBSD),True)
-	/sbin/ldconfig
-else ifeq ($(BUILD_OPENBSD),True)
-	/sbin/ldconfig
+ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_HAIKU),True)
+ifneq ($(BUILD_QNX),True)
+	/sbin/ldconfig 2> /dev/null || true
+endif
+endif
+endif
 endif
 endif
 
 .c.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(CFLAGS) -c $< -o $@
 
 .cpp.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
+
+.m.o:
+	$(CC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
+
+.mm.o:
+	$(CC) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@

@@ -12,7 +12,7 @@ OBJECTS	  = config.o dllinterface.o opus.o
 
 # Enter additional defines here:
 ifeq ($(BUILD_WIN32),True)
-	DEFINE	  = -I .
+	DEFINE	  = -I$(SRCDIR)
 endif
 
 # Enter additional library dependencies here:
@@ -30,5 +30,4 @@ UINSTCMD2 =
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands

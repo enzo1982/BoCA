@@ -2,34 +2,34 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
-	cd donate && $(MAKE)
-	cd langnotify && $(MAKE)
-	cd protocols && $(MAKE)
-	cd statustime && $(MAKE)
-	cd tagedit && $(MAKE)
-	cd youtube && $(MAKE)
+	$(call makein,donate)
+	$(call makein,langnotify)
+	$(call makein,protocols)
+	$(call makein,statustime)
+	$(call makein,tagedit)
+	$(call makein,youtube)
 
 clean:
-	cd donate && $(MAKE) clean
-	cd langnotify && $(MAKE) clean
-	cd protocols && $(MAKE) clean
-	cd statustime && $(MAKE) clean
-	cd tagedit && $(MAKE) clean
-	cd youtube && $(MAKE) clean
+	$(call cleanin,donate)
+	$(call cleanin,langnotify)
+	$(call cleanin,protocols)
+	$(call cleanin,statustime)
+	$(call cleanin,tagedit)
+	$(call cleanin,youtube)
 
 install:
-	cd donate && $(MAKE) install
-	cd langnotify && $(MAKE) install
-	cd statustime && $(MAKE) install
-	cd tagedit && $(MAKE) install
-	cd youtube && $(MAKE) install
+	$(call makein,donate,install)
+	$(call makein,langnotify,install)
+	$(call makein,statustime,install)
+	$(call makein,tagedit,install)
+	$(call makein,youtube,install)
 
 uninstall:
-	cd donate && $(MAKE) uninstall
-	cd langnotify && $(MAKE) uninstall
-	cd statustime && $(MAKE) uninstall
-	cd tagedit && $(MAKE) uninstall
-	cd youtube && $(MAKE) uninstall
+	$(call makein,donate,uninstall)
+	$(call makein,langnotify,uninstall)
+	$(call makein,statustime,uninstall)
+	$(call makein,tagedit,uninstall)
+	$(call makein,youtube,uninstall)

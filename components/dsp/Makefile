@@ -2,16 +2,16 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
-	cd resample && $(MAKE)
+	$(call makein,resample)
 
 clean:
-	cd resample && $(MAKE) clean
+	$(call cleanin,resample)
 
 install:
-	cd resample && $(MAKE) install
+	$(call makein,resample,install)
 
 uninstall:
-	cd resample && $(MAKE) uninstall
+	$(call makein,resample,uninstall)

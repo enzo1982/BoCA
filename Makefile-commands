@@ -1,11 +1,11 @@
 ########## BoCA commands makefile ##########
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 CC     = gcc
-CCOPTS = -pipe -g0 -Wall -Os -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(BOCA_PATH)/include
+CCOPTS = -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(SRCDIR)/$(BOCA_PATH)/include
 LD     = gcc
-LDOPTS = -pipe -L$(BOCA_PATH)/$(LIBDIR) $(LIBS)
+LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -L$(SRCDIR)/$(BOCA_PATH)/$(LIBDIR) $(LIBS)
 
 ifeq (,$(findstring -lstdc++,$(LIBS)))
 	LDOPTS += -lstdc++
@@ -16,71 +16,43 @@ ifeq ($(BUILD_FREEBSD),True)
 	LD = clang
 endif
 
-ifneq ($(EXCEPTION),True)
-	CCOPTS += -fno-exceptions
-endif
-
-ifeq ($(BUILD_OSX),True)
-	LDOPTS += -Wl,-x
-
-ifeq ($(BUILD_X86),True)
-	CCOPTS += -arch i386 -Xarch_i386 -march=prescott
-	LDOPTS += -arch i386
-endif
-ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -arch x86_64 -Xarch_x86_64 -march=core2
-	LDOPTS += -arch x86_64
-endif
-ifeq ($(BUILD_PPC),True)
-	CCOPTS += -arch ppc -Xarch_ppc -mcpu=G4
-	LDOPTS += -arch ppc
-endif
-ifeq ($(BUILD_PPC64),True)
-	CCOPTS += -arch ppc64 -Xarch_ppc64 -mcpu=G5
-	LDOPTS += -arch ppc64
-endif
-else
-	LDOPTS += -s
-
-ifeq ($(BUILD_X86),True)
-	CCOPTS += -m32
-	LDOPTS += -m32
-else ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -m64
-	LDOPTS += -m64
-endif
-endif
-
-ifneq ($(BUILD_WIN32),True)
-ifneq ($(BUILD_SOLARIS),True)
-ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_HAIKU),True)
-	CCOPTS += -pthread
-endif
-endif
-endif
-endif
-
 ifeq ($(BUILD_WIN32),True)
 	CCOPTS += -DUNICODE -D_UNICODE
 	LDOPTS += -lsmooth -lboca -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 else
 	CCOPTS += -fPIC
-	LDOPTS += -L$(PREFIX)/lib -lsmooth-$(SMOOTHVER) -lboca-$(VERSION)
 
-	ifneq ($(BUILD_LINUX),True)
-		ifeq ($(BUILD_SOLARIS),True)
-			LDOPTS += -Wl,-rpath,.
-		else ifeq ($(BUILD_OSX),True)
-			LDOPTS += -Wl,-rpath,. -Wl,-headerpad,80
-		else ifeq ($(BUILD_NETBSD),True)
-			CCOPTS += -I/usr/pkg/include
-			LDOPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,.
-		else ifeq ($(BUILD_HAIKU),True)
-			LDOPTS += -L/boot/common/lib -Wl,-rpath,.
-		else
-			CCOPTS += -I/usr/local/include
-			LDOPTS += -L/usr/local/lib -Wl,-rpath,.
+	ifneq ($(BUILD_SOLARIS),True)
+	ifneq ($(BUILD_HAIKU),True)
+		ifneq ($(BUILD_QNX),True)
+			CCOPTS += -pthread
+		endif
+
+		ifneq ($(BUILD_LINUX),True)
+		ifneq ($(BUILD_OSX),True)
+			ifeq ($(BUILD_NETBSD),True)
+				CCOPTS += -I/usr/pkg/include
+			else
+				CCOPTS += -I/usr/local/include
+			endif
+		endif
+		endif
+	endif
+	endif
+
+	LDOPTS += -L$(prefix)/lib -lsmooth-$(SMOOTHVER) -lboca-$(VERSION)
+
+	ifeq ($(BUILD_OSX),True)
+		LDOPTS += -Wl,-headerpad,80
+	else ifeq ($(BUILD_NETBSD),True)
+		LDOPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib
+	else ifeq ($(BUILD_HAIKU),True)
+		LDOPTS += -L/boot/common/lib
+	else
+		ifneq ($(BUILD_LINUX),True)
+		ifneq ($(BUILD_SOLARIS),True)
+			LDOPTS += -L/usr/local/lib
+		endif
 		endif
 	endif
 endif
@@ -94,9 +66,9 @@ allcmds:
 $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) : $(OBJECTS)
 	mkdir -p $(BOCA_PATH)/$(BINDIR)
 ifneq ($(BUILD_OSX),True)
-	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS)
 else
-	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS)
 endif
 
 clean:
@@ -104,24 +76,29 @@ clean:
 	$(CLEANCMD1)
 	$(CLEANCMD2)
 
-install: uninstall
+install: all
 ifneq ($(BUILD_WIN32),True)
-	mkdir -p $(PREFIX)/$(LIB)/boca
-	cp $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/boca
-	chmod a=r,u=rw $(PREFIX)/$(LIB)/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
+	$(INSTALL) -d $(DESTDIR)$(libdir)/boca
+	$(INSTALL_DATA) $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/boca
 endif
 	$(INSTCMD1)
 	$(INSTCMD2)
 
 uninstall:
 ifneq ($(BUILD_WIN32),True)
-	rm -f $(PREFIX)/$(LIB)/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
+	rm -f $(DESTDIR)$(libdir)/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
 endif
 	$(UINSTCMD1)
 	$(UINSTCMD2)
 
 .c.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(CFLAGS) -c $< -o $@
 
 .cpp.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
+
+.m.o:
+	$(CC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
+
+.mm.o:
+	$(CC) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@

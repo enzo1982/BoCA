@@ -2,36 +2,36 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
-	cd cuesheet && $(MAKE)
-	cd m3u && $(MAKE)
-	cd pls && $(MAKE)
-	cd vclt && $(MAKE)
-	cd wpl && $(MAKE)
-	cd xspf && $(MAKE)
+	$(call makein,cuesheet)
+	$(call makein,m3u)
+	$(call makein,pls)
+	$(call makein,vclt)
+	$(call makein,wpl)
+	$(call makein,xspf)
 
 clean:
-	cd cuesheet && $(MAKE) clean
-	cd m3u && $(MAKE) clean
-	cd pls && $(MAKE) clean
-	cd vclt && $(MAKE) clean
-	cd wpl && $(MAKE) clean
-	cd xspf && $(MAKE) clean
+	$(call cleanin,cuesheet)
+	$(call cleanin,m3u)
+	$(call cleanin,pls)
+	$(call cleanin,vclt)
+	$(call cleanin,wpl)
+	$(call cleanin,xspf)
 
 install:
-	cd cuesheet && $(MAKE) install
-	cd m3u && $(MAKE) install
-	cd pls && $(MAKE) install
-	cd vclt && $(MAKE) install
-	cd wpl && $(MAKE) install
-	cd xspf && $(MAKE) install
+	$(call makein,cuesheet,install)
+	$(call makein,m3u,install)
+	$(call makein,pls,install)
+	$(call makein,vclt,install)
+	$(call makein,wpl,install)
+	$(call makein,xspf,install)
 
 uninstall:
-	cd cuesheet && $(MAKE) uninstall
-	cd m3u && $(MAKE) uninstall
-	cd pls && $(MAKE) uninstall
-	cd vclt && $(MAKE) uninstall
-	cd wpl && $(MAKE) uninstall
-	cd xspf && $(MAKE) uninstall
+	$(call makein,cuesheet,uninstall)
+	$(call makein,m3u,uninstall)
+	$(call makein,pls,uninstall)
+	$(call makein,vclt,uninstall)
+	$(call makein,wpl,uninstall)
+	$(call makein,xspf,uninstall)

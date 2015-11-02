@@ -2,106 +2,106 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
 ifeq ($(BUILD_LINUX),True)
-	cd alsa && $(MAKE)
+	$(call makein,alsa)
 endif
 ifeq ($(BUILD_OSX),True)
-	cd coreaudio && $(MAKE)
+	$(call makein,coreaudio)
 endif
 ifeq ($(BUILD_FREEBSD),True)
-	cd oss && $(MAKE)
+	$(call makein,oss)
 endif
 ifeq ($(BUILD_OPENBSD),True)
-	cd oss && $(MAKE)
+	$(call makein,oss)
 endif
 ifeq ($(BUILD_NETBSD),True)
-	cd oss && $(MAKE)
+	$(call makein,oss)
 endif
 ifeq ($(BUILD_SOLARIS),True)
-	cd oss && $(MAKE)
+	$(call makein,oss)
 endif
 ifeq ($(BUILD_QNX),True)
-	cd qsa && $(MAKE)
+	$(call makein,qsa)
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd directsound && $(MAKE)
-	cd waveout && $(MAKE)
-	cd winamp && $(MAKE)
+	$(call makein,directsound)
+	$(call makein,waveout)
+	$(call makein,winamp)
 endif
 
 clean:
 ifeq ($(BUILD_LINUX),True)
-	cd alsa && $(MAKE) clean
+	$(call cleanin,alsa)
 endif
 ifeq ($(BUILD_OSX),True)
-	cd coreaudio && $(MAKE) clean
+	$(call cleanin,coreaudio)
 endif
 ifeq ($(BUILD_FREEBSD),True)
-	cd oss && $(MAKE) clean
+	$(call cleanin,oss)
 endif
 ifeq ($(BUILD_OPENBSD),True)
-	cd oss && $(MAKE) clean
+	$(call cleanin,oss)
 endif
 ifeq ($(BUILD_NETBSD),True)
-	cd oss && $(MAKE) clean
+	$(call cleanin,oss)
 endif
 ifeq ($(BUILD_SOLARIS),True)
-	cd oss && $(MAKE) clean
+	$(call cleanin,oss)
 endif
 ifeq ($(BUILD_QNX),True)
-	cd qsa && $(MAKE) clean
+	$(call cleanin,qsa)
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd directsound && $(MAKE) clean
-	cd waveout && $(MAKE) clean
-	cd winamp && $(MAKE) clean
+	$(call cleanin,directsound)
+	$(call cleanin,waveout)
+	$(call cleanin,winamp)
 endif
 
 install:
 ifeq ($(BUILD_LINUX),True)
-	cd alsa && $(MAKE) install
+	$(call makein,alsa,install)
 endif
 ifeq ($(BUILD_OSX),True)
-	cd coreaudio && $(MAKE) install
+	$(call makein,coreaudio,install)
 endif
 ifeq ($(BUILD_FREEBSD),True)
-	cd oss && $(MAKE) install
+	$(call makein,oss,install)
 endif
 ifeq ($(BUILD_OPENBSD),True)
-	cd oss && $(MAKE) install
+	$(call makein,oss,install)
 endif
 ifeq ($(BUILD_NETBSD),True)
-	cd oss && $(MAKE) install
+	$(call makein,oss,install)
 endif
 ifeq ($(BUILD_SOLARIS),True)
-	cd oss && $(MAKE) install
+	$(call makein,oss,install)
 endif
 ifeq ($(BUILD_QNX),True)
-	cd qsa && $(MAKE) install
+	$(call makein,qsa,install)
 endif
 
 uninstall:
 ifeq ($(BUILD_LINUX),True)
-	cd alsa && $(MAKE) uninstall
+	$(call makein,alsa,uninstall)
 endif
 ifeq ($(BUILD_OSX),True)
-	cd coreaudio && $(MAKE) uninstall
+	$(call makein,coreaudio,uninstall)
 endif
 ifeq ($(BUILD_FREEBSD),True)
-	cd oss && $(MAKE) uninstall
+	$(call makein,oss,uninstall)
 endif
 ifeq ($(BUILD_OPENBSD),True)
-	cd oss && $(MAKE) uninstall
+	$(call makein,oss,uninstall)
 endif
 ifeq ($(BUILD_NETBSD),True)
-	cd oss && $(MAKE) uninstall
+	$(call makein,oss,uninstall)
 endif
 ifeq ($(BUILD_SOLARIS),True)
-	cd oss && $(MAKE) uninstall
+	$(call makein,oss,uninstall)
 endif
 ifeq ($(BUILD_QNX),True)
-	cd qsa && $(MAKE) uninstall
+	$(call makein,qsa,uninstall)
 endif

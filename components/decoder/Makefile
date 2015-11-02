@@ -2,23 +2,23 @@
 
 BOCA_PATH = ../..
 
-include $(BOCA_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 all:
-	cd aiff && $(MAKE)
-	cd au && $(MAKE)
-	cd bonk && $(MAKE)
+	$(call makein,aiff)
+	$(call makein,au)
+	$(call makein,bonk)
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	cd cdio && $(MAKE)
+	$(call makein,cdio)
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	cd cdparanoia && $(MAKE)
+	$(call makein,cdparanoia)
 endif
 endif
 endif
@@ -27,47 +27,47 @@ endif
 endif
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd cdrip && $(MAKE)
+	$(call makein,cdrip)
 endif
-	cd cuesheet && $(MAKE)
-	cd faad2 && $(MAKE)
-	cd fdkaac && $(MAKE)
-	cd flac && $(MAKE)
-	cd lame && $(MAKE)
+	$(call makein,cuesheet)
+	$(call makein,faad2)
+	$(call makein,fdkaac)
+	$(call makein,flac)
+	$(call makein,lame)
 ifeq ($(BUILD_WIN32),True)
-	cd mac && $(MAKE)
+	$(call makein,mac)
 endif
-	cd mad && $(MAKE)
-	cd mpg123 && $(MAKE)
-	cd opus && $(MAKE)
-	cd sndfile && $(MAKE)
-	cd speex && $(MAKE)
+	$(call makein,mad)
+	$(call makein,mpg123)
+	$(call makein,opus)
+	$(call makein,sndfile)
+	$(call makein,speex)
 ifeq ($(BUILD_WIN32),True)
-	cd twinvq && $(MAKE)
+	$(call makein,twinvq)
 endif
-	cd voc && $(MAKE)
-	cd vorbis && $(MAKE)
-	cd wave && $(MAKE)
+	$(call makein,voc)
+	$(call makein,vorbis)
+	$(call makein,wave)
 ifeq ($(BUILD_WIN32),True)
-	cd winamp && $(MAKE)
-	cd wma && $(MAKE)
+	$(call makein,winamp)
+	$(call makein,wma)
 endif
 
 clean:
-	cd aiff && $(MAKE) clean
-	cd au && $(MAKE) clean
-	cd bonk && $(MAKE) clean
+	$(call cleanin,aiff)
+	$(call cleanin,au)
+	$(call cleanin,bonk)
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	cd cdio && $(MAKE) clean
+	$(call cleanin,cdio)
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	cd cdparanoia && $(MAKE) clean
+	$(call cleanin,cdparanoia)
 endif
 endif
 endif
@@ -76,44 +76,44 @@ endif
 endif
 endif
 ifeq ($(BUILD_WIN32),True)
-	cd cdrip && $(MAKE) clean
+	$(call cleanin,cdrip)
 endif
-	cd cuesheet && $(MAKE) clean
-	cd faad2 && $(MAKE) clean
-	cd fdkaac && $(MAKE) clean
-	cd flac && $(MAKE) clean
-	cd lame && $(MAKE) clean
+	$(call cleanin,cuesheet)
+	$(call cleanin,faad2)
+	$(call cleanin,fdkaac)
+	$(call cleanin,flac)
+	$(call cleanin,lame)
 ifeq ($(BUILD_WIN32),True)
-	cd mac && $(MAKE) clean
+	$(call cleanin,mac)
 endif
-	cd mad && $(MAKE) clean
-	cd mpg123 && $(MAKE) clean
-	cd opus && $(MAKE) clean
-	cd sndfile && $(MAKE) clean
-	cd speex && $(MAKE) clean
+	$(call cleanin,mad)
+	$(call cleanin,mpg123)
+	$(call cleanin,opus)
+	$(call cleanin,sndfile)
+	$(call cleanin,speex)
 ifeq ($(BUILD_WIN32),True)
-	cd twinvq && $(MAKE) clean
+	$(call cleanin,twinvq)
 endif
-	cd voc && $(MAKE) clean
-	cd vorbis && $(MAKE) clean
-	cd wave && $(MAKE) clean
+	$(call cleanin,voc)
+	$(call cleanin,vorbis)
+	$(call cleanin,wave)
 ifeq ($(BUILD_WIN32),True)
-	cd winamp && $(MAKE) clean
-	cd wma && $(MAKE) clean
+	$(call cleanin,winamp)
+	$(call cleanin,wma)
 endif
 
 install:
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	cd cdio && $(MAKE) install
+	$(call makein,cdio,install)
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	cd cdparanoia && $(MAKE) install
+	$(call makein,cdparanoia,install)
 endif
 endif
 endif
@@ -121,32 +121,32 @@ endif
 endif
 endif
 endif
-	cd cuesheet && $(MAKE) install
-	cd faad2 && $(MAKE) install
-	cd fdkaac && $(MAKE) install
-	cd flac && $(MAKE) install
+	$(call makein,cuesheet,install)
+	$(call makein,faad2,install)
+	$(call makein,fdkaac,install)
+	$(call makein,flac,install)
 ifneq ($(BUILD_OSX),True)
-	cd lame && $(MAKE) install
-	cd mad && $(MAKE) install
+	$(call makein,lame,install)
+	$(call makein,mad,install)
 endif
-	cd mpg123 && $(MAKE) install
-	cd opus && $(MAKE) install
-	cd sndfile && $(MAKE) install
-	cd speex && $(MAKE) install
-	cd vorbis && $(MAKE) install
+	$(call makein,mpg123,install)
+	$(call makein,opus,install)
+	$(call makein,sndfile,install)
+	$(call makein,speex,install)
+	$(call makein,vorbis,install)
 
 uninstall:
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	cd cdio && $(MAKE) uninstall
+	$(call makein,cdio,uninstall)
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	cd cdparanoia && $(MAKE) uninstall
+	$(call makein,cdparanoia,uninstall)
 endif
 endif
 endif
@@ -154,16 +154,16 @@ endif
 endif
 endif
 endif
-	cd cuesheet && $(MAKE) uninstall
-	cd faad2 && $(MAKE) uninstall
-	cd fdkaac && $(MAKE) uninstall
-	cd flac && $(MAKE) uninstall
+	$(call makein,cuesheet,uninstall)
+	$(call makein,faad2,uninstall)
+	$(call makein,fdkaac,uninstall)
+	$(call makein,flac,uninstall)
 ifneq ($(BUILD_OSX),True)
-	cd lame && $(MAKE) uninstall
-	cd mad && $(MAKE) uninstall
+	$(call makein,lame,uninstall)
+	$(call makein,mad,uninstall)
 endif
-	cd mpg123 && $(MAKE) uninstall
-	cd opus && $(MAKE) uninstall
-	cd sndfile && $(MAKE) uninstall
-	cd speex && $(MAKE) uninstall
-	cd vorbis && $(MAKE) uninstall
+	$(call makein,mpg123,uninstall)
+	$(call makein,opus,uninstall)
+	$(call makein,sndfile,uninstall)
+	$(call makein,speex,uninstall)
+	$(call makein,vorbis,uninstall)

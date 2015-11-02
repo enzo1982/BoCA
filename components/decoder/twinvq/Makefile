@@ -19,9 +19,9 @@ ifeq ($(BUILD_X86),True)
 endif
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   =
+ALLCMD1   = mkdir -p twinvq
 ALLCMD2   =
-CLEANCMD1 =
+CLEANCMD1 = rmdir twinvq || true
 CLEANCMD2 =
 INSTCMD1  =
 INSTCMD2  = 
@@ -33,5 +33,4 @@ EXCEPTION = True
 
 ## Do not change anything below this line. ##
 
-include $(BOCA_PATH)/Makefile-directories
-include $(BOCA_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-commands
