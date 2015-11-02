@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -50,7 +50,7 @@ enum
 
 // structure definitions
 
-class SMOOTHAPI PCIIO
+class PCIIO
 {
 	private:
 		int				 majorversion;	// major version of PIC file format
@@ -115,10 +115,10 @@ class SMOOTHAPI PCIIO
 		S::GUI::Bitmap			&GetBitmap();
 };
 
-SMOOTHAPI PCIOut	 CreatePCI(const S::String &);		// creates a new PCI file
-SMOOTHAPI PCIOut	 OpenPCIForOutput(const S::String &);	// opens a PCI file
-SMOOTHAPI PCIIn		 OpenPCIForInput(const S::String &);	// opens a PCI file
-SMOOTHAPI bool		 ClosePCI(PCIIn);			// closes a PCI file
-SMOOTHAPI bool		 ClosePCI(PCIOut);			// closes a PCI file
+PCIOut	 CreatePCI(const S::String &);		// creates a new PCI file
+PCIOut	 OpenPCIForOutput(const S::String &);	// opens a PCI file
+PCIIn	 OpenPCIForInput(const S::String &);	// opens a PCI file
+bool	 ClosePCI(PCIIn);			// closes a PCI file
+bool	 ClosePCI(PCIOut);			// closes a PCI file
 
 #endif

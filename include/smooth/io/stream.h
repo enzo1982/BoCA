@@ -69,6 +69,11 @@ namespace smooth
 
 				virtual Bool		 SetFilter(Filter *) = 0;
 				virtual Bool		 RemoveFilter()	     = 0;
+
+				virtual Bool		 Close()	     = 0;
+
+				virtual Bool		 Seek(Int64)	     = 0;
+				virtual Bool		 RelSeek(Int64)	     = 0;
 			accessors:
 				Short			 GetStreamType() const	{ return streamType; }
 				Short			 GetLastError() const	{ return lastError; }
