@@ -118,6 +118,7 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 	callbacks.seek	= FLACIOCallbackSeek;
 	callbacks.tell	= FLACIOCallbackTell;
 	callbacks.eof	= FLACIOCallbackEof;
+	callbacks.close	= NIL;
 
 	FLAC__bool		 success = false;
 	FLAC__Metadata_Chain	*chain	 = ex_FLAC__metadata_chain_new();

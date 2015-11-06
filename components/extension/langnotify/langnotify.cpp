@@ -36,7 +36,9 @@ BoCA::LanguageNotifier::LanguageNotifier()
 
 	dialog = NIL;
 
-	if (checkedLanguage++) return;
+	if (checkedLanguage) return;
+
+	checkedLanguage = True;
 
 	/* Check if user default language is supported.
 	 */

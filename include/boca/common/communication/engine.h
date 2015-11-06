@@ -27,8 +27,6 @@ namespace BoCA
 
 							 Engine();
 							~Engine();
-
-			Bool				 locked;
 		public:
 			/* Returns a new or existing instance of Engine
 			 */

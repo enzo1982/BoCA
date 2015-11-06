@@ -129,10 +129,10 @@ Error BoCA::PlaylistVCLT::WritePlaylist(const String &file)
 			Int	 seconds = length / format.rate % 3600 % 60;
 			Int	 msecs	 = Math::Round(Math::Fract(Float(length) / format.rate) * 1000);
 
-			out.OutputString(String("LENGTH=").Append(hours > 0 ? String(			  hours   < 10 ? "0" : NIL).Append(String::FromInt(hours)).Append(":") : String())
-							  .Append(	      String(			  minutes < 10 ? "0" : NIL).Append(String::FromInt(minutes))).Append(":")
-							  .Append(	      String(			  seconds < 10 ? "0" : NIL).Append(String::FromInt(seconds))).Append(".")
-							  .Append(	      String(msecs < 100 ? "00" : msecs   < 10 ? "0" : NIL).Append(String::FromInt(msecs))).Append("\n"));
+			out.OutputString(String("LENGTH=").Append(hours > 0 ? String(			 hours   <  10 ? "0" : NIL).Append(String::FromInt(hours)).Append(":") : String())
+							  .Append(	      String(			 minutes <  10 ? "0" : NIL).Append(String::FromInt(minutes))).Append(":")
+							  .Append(	      String(			 seconds <  10 ? "0" : NIL).Append(String::FromInt(seconds))).Append(".")
+							  .Append(	      String(msecs < 10 ? "00" : msecs   < 100 ? "0" : NIL).Append(String::FromInt(msecs))).Append("\n"));
 		}
 
 		if (info.artist	!= NIL) out.OutputString(String("ARTIST=").Append(info.artist).Append("\n"));
