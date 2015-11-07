@@ -37,6 +37,20 @@ BoCA::AS::EncoderComponentExternalStdIO::~EncoderComponentExternalStdIO()
 
 Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 {
+	/* Check number of channels.
+	 */
+	Int	 channels = specs->formats.GetFirst()->GetNumberOfChannels();
+
+	if (format.channels > channels)
+	{
+		errorString = String("This encoder does not support more than ").Append(String::FromInt(channels)).Append(" channels!");
+		errorState  = True;
+
+		return False;
+	}
+
+	/* Build output file name.
+	 */
 	encFileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".").Append(GetOutputFileExtension());
 
 	/* Remove temporary file if it exists.

@@ -393,6 +393,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 					format->AddTagFormat(tagFormat);
 				}
+				else if (node2->GetName() == "channels")  format->SetNumberOfChannels(node2->GetContent().ToInt());
 			}
 
 			formats.Add(format);

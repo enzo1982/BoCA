@@ -104,8 +104,11 @@ namespace BoCA
 
 				Array<String>		 extensions;
 				Array<TagFormat>	 tagFormats;
+
+				Int			 channels;
 			public:
-							 FileFormat(Int n = 0) : lossless(False)	{ }
+							 FileFormat(Int n = 0) : lossless(False),
+										 channels(255)		{ }
 							~FileFormat()					{ }
 
 				const String		&GetName() const				{ return name; }
@@ -119,6 +122,9 @@ namespace BoCA
 
 				const Array<TagFormat>	&GetTagFormats() const				{ return tagFormats; }
 				Void			 AddTagFormat(const TagFormat &nFormat)		{ tagFormats.Add(nFormat); }
+
+				const Int		&GetNumberOfChannels() const			{ return channels; }
+				Void			 SetNumberOfChannels(Int nChannels)		{ channels = nChannels; }
 		};
 
 		class BOCA_DLL_EXPORT TagSpec

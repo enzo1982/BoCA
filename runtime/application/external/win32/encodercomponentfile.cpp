@@ -31,6 +31,18 @@ BoCA::AS::EncoderComponentExternalFile::~EncoderComponentExternalFile()
 
 Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 {
+	/* Check number of channels.
+	 */
+	Int	 channels = specs->formats.GetFirst()->GetNumberOfChannels();
+
+	if (format.channels > channels)
+	{
+		errorString = String("This encoder does not support more than ").Append(String::FromInt(channels)).Append(" channels!");
+		errorState  = True;
+
+		return False;
+	}
+
 	/* Create temporary WAVE file
 	 */
 	nOfSamples = 0;
