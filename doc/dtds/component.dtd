@@ -7,12 +7,12 @@
 	<!ELEMENT name (#PCDATA)>
 
 	<!ELEMENT version (#PCDATA)>
-	<!ATTLIST version debug NMTOKEN #IMPLIED>
+	<!ATTLIST version debug (true|false) "false">
 
 	<!ELEMENT id (#PCDATA)>
 
 	<!ELEMENT type (#PCDATA)>
-	<!ATTLIST type threadSafe NMTOKEN #IMPLIED>
+	<!ATTLIST type threadSafe (true|false) "true">
 
 	<!ELEMENT require (#PCDATA)>
 	<!ELEMENT replace (#PCDATA)>
@@ -20,32 +20,34 @@
 	<!ELEMENT precede (#PCDATA)>
 	<!ELEMENT succeed (#PCDATA)>
 
-	<!ELEMENT format (name, lossless?, extension+, tag*)>
+	<!ELEMENT format (name, lossless?, extension+, tag*, channels?)>
 
 		<!ELEMENT lossless (#PCDATA)>
 		<!ELEMENT extension (#PCDATA)>
 
 		<!ELEMENT tag (#PCDATA)>
-		<!ATTLIST tag id   NMTOKEN #REQUIRED
-			      mode NMTOKEN #REQUIRED>
+		<!ATTLIST tag id   NMTOKEN		  #REQUIRED
+			      mode (prepend|append|other) #REQUIRED>
+
+		<!ELEMENT channels (#PCDATA)>
 
 	<!ELEMENT tagspec (name, coverart?, encodings?)>
-	<!ATTLIST tagspec default NMTOKEN #IMPLIED>
+	<!ATTLIST tagspec default (true|false) "true">
 
 		<!ELEMENT coverart (#PCDATA)>
-		<!ATTLIST coverart supported NMTOKEN #IMPLIED
-				   default   NMTOKEN #IMPLIED>
+		<!ATTLIST coverart supported (true|false) "false"
+				   default   (true|false) "true">
 
 		<!ELEMENT encodings (encoding*)>
-		<!ATTLIST encodings free NMTOKEN #IMPLIED>
+		<!ATTLIST encodings free (true|false) "false">
 
 			<!ELEMENT encoding (#PCDATA)>
-			<!ATTLIST encoding default NMTOKEN #IMPLIED>
+			<!ATTLIST encoding default (true|false) #IMPLIED>
 
 	<!ELEMENT external (command, arguments, mode, (informat?, outformat?), parameters?)>
 
 		<!ELEMENT command (#PCDATA)>
-		<!ATTLIST command ignoreExitCode NMTOKEN #IMPLIED>
+		<!ATTLIST command ignoreExitCode (true|false) "false">
 
 		<!ELEMENT arguments (#PCDATA)>
 		<!ELEMENT mode (#PCDATA)>
@@ -55,14 +57,14 @@
 		<!ELEMENT parameters (switch | selection | range)*>
 
 			<!ELEMENT switch (#PCDATA)>
-			<!ATTLIST switch name	  CDATA	  #REQUIRED
-					 argument CDATA	  #REQUIRED
-					 enabled  NMTOKEN #IMPLIED>
+			<!ATTLIST switch name	  CDATA	#REQUIRED
+					 argument CDATA	#REQUIRED
+					 enabled  (true|false) "false">
 
 			<!ELEMENT selection (option+)>
 			<!ATTLIST selection name     CDATA   #REQUIRED
 					    argument CDATA   #REQUIRED
-					    enabled  NMTOKEN #IMPLIED
+					    enabled  (true|false) "false"
 					    default  NMTOKEN #IMPLIED>
 
 				<!ELEMENT option (#PCDATA)>
@@ -71,7 +73,7 @@
 			<!ELEMENT range (min, max)>
 			<!ATTLIST range name	 CDATA	 #REQUIRED
 					argument CDATA	 #REQUIRED
-					enabled	 NMTOKEN #IMPLIED
+					enabled	 (true|false) "false"
 					default	 NMTOKEN #IMPLIED
 					step	 NMTOKEN #IMPLIED>
 
@@ -82,6 +84,6 @@
 				<!ATTLIST max alias CDATA #IMPLIED>
 
 		<!ELEMENT md5 (#PCDATA)>
-		<!ATTLIST md5 stream  NMTOKEN #IMPLIED
-			      require CDATA   #IMPLIED
-			      prefix  CDATA   #IMPLIED>
+		<!ATTLIST md5 stream  (stdout|stderr) "stdout"
+			      require CDATA #IMPLIED
+			      prefix  CDATA #IMPLIED>
