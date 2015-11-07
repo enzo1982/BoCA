@@ -9,6 +9,7 @@
   <format>
     <name>AC-3 Files</name>
     <extension>ac3</extension>
+    <channels>6</channels>
   </format>
   <external>
     <command>aften</command>

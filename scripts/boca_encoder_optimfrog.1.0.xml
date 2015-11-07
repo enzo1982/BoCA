@@ -10,6 +10,7 @@
     <lossless>true</lossless>
     <extension>ofr</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>
+    <channels>2</channels>
   </format>
   <external>
     <command>ofr</command>

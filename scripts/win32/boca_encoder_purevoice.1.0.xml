@@ -9,6 +9,7 @@
     <name>PureVoice</name>
     <extension>qcp</extension>
     <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
+    <channels>1</channels>
   </format>
   <external>
     <command>pvconv</command>

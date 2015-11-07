@@ -9,6 +9,7 @@
     <name>MPEG Audio Layer 3</name>
     <extension>mp3</extension>
     <tag id="id3v1-tag" mode="append">ID3v1</tag>
+    <channels>2</channels>
   </format>
   <external>
     <command>mp3hdEncoder</command>

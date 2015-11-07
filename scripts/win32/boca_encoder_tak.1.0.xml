@@ -10,6 +10,7 @@
     <lossless>true</lossless>
     <extension>tak</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>
+    <channels>6</channels>
   </format>
   <external>
     <command>takc</command>

@@ -10,6 +10,7 @@
     <extension>mp2</extension>
     <tag id="id3v1-tag" mode="append">ID3v1</tag>
     <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
+    <channels>2</channels>
   </format>
   <external>
     <command>twolame</command>

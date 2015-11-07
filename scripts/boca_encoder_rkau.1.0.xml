@@ -9,6 +9,7 @@
     <name>RK Audio</name>
     <lossless>true</lossless>
     <extension>rka</extension>
+    <channels>2</channels>
   </format>
   <external>
     <command>rkau</command>

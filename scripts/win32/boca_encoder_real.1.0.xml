@@ -9,6 +9,7 @@
     <name>RealAudio Files</name>
     <extension>ra</extension>
     <extension>rm</extension>
+    <channels>6</channels>
   </format>
   <external>
     <command>helix/producer</command>
