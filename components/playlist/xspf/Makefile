@@ -30,7 +30,13 @@ DEFINE	  += -I$(SRCDIR)
 endif
 
 # Enter additional library dependencies here:
-LIBS	  = -lstdc++
+ifeq ($(USE_BUNDLED_LIBXSPF),True)
+LIBS	  = xspf/libxspf.a
+else
+LIBS	  = -lxspf
+endif
+
+LIBS	  += -lstdc++
 
 ifeq ($(USE_BUNDLED_LIBEXPAT),True)
 LIBS	  += expat/libexpat.a
@@ -42,12 +48,6 @@ ifeq ($(USE_BUNDLED_LIBURIPARSER),True)
 LIBS	  += uriparser/liburiparser.a
 else
 LIBS	  += -luriparser
-endif
-
-ifeq ($(USE_BUNDLED_LIBXSPF),True)
-LIBS	  += xspf/libxspf.a
-else
-LIBS	  += -lxspf
 endif
 
 # Enter addition commands for targets all and clean here:

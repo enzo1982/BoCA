@@ -8,7 +8,7 @@ TARGET	= libxspf.a
 CPPOPTS	= -I$(SRCDIR)/..
 AR	= ar
 
-ifeq (USE_BUNDLED_LIBEXPAT,True)
+ifeq ($(USE_BUNDLED_LIBEXPAT),True)
 	CPPOPTS += -I$(SRCDIR)/../expat
 endif
 
