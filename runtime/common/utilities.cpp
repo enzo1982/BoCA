@@ -143,6 +143,8 @@ String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string)
 	for (Int k = 0, b = 0; k < string.Length(); k++)
 	{
 		if	(string[k] == '\"') { rVal[k + b] = '\''; rVal[k + ++b] = '\''; }
+		else if (string[k] == '\n')   b--;
+		else if (string[k] == '\r')   b--;
 		else if (string[k] == '?')    b--;
 		else if (string[k] == '|')    rVal[k + b] = '_';
 		else if (string[k] == '*')    b--;
@@ -151,6 +153,7 @@ String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string)
 		else if (string[k] == ':')    b--;
 		else if (string[k] == '/')    rVal[k + b] = '-';
 		else if (string[k] == '\\')   rVal[k + b] = '-';
+		else if (string[k] == '\t')   rVal[k + b] = ' ';
 		else			      rVal[k + b] = string[k];
 	}
 
