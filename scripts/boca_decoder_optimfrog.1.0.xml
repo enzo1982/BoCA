@@ -13,7 +13,7 @@
   </format>
   <external>
     <command>ofr</command>
-    <arguments>--decode %OPTIONS %INFILE --output -</arguments>
+    <arguments>--decode %OPTIONS --writefreshheader %INFILE --output -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
