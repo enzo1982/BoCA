@@ -18,6 +18,15 @@ echo "    - libflac development package"
 echo "    - libopus development package"
 echo "    - libspeex development package"
 echo "    - libvorbis development package"
+echo "    - libexpat development package"
+echo "    - liburiparser development package"
+echo
+echo "    - The XSPF playlist component uses a bundled version of libxspf. If you"
+echo "      prefer linking against a library installed on your system, please build"
+echo "      with \"make config=systemlibxspf\"."
+echo
+echo "      To build using bundled version of the expat and uriparser libraries,"
+echo "      please build with \"make config=bundledlibexpat,bundledliburiparser\"."
 echo
 echo "  On OS X:"
 echo
@@ -26,7 +35,7 @@ echo "      the Xcode 3.1 Command Line Tools (no Xcode project file provided)"
 echo
 echo "  On Windows:"
 echo
-echo "    - Please use MinGW (http://www.mingw.org/) or Visual Studio 2010"
+echo "    - Please use MinGW (http://www.mingw.org/) or Visual Studio 2015"
 echo "      with the msvc/BoCA/BoCA.sln project file to build the fre:ac CDK"
 echo
 echo "When all prerequisites are met, simply run \"make && make install\"."

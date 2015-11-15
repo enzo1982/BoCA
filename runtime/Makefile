@@ -30,15 +30,8 @@ CLEANCMD1 =
 
 ## Do not change anything below this line. ##
 
-CC	  = gcc
 CCOPTS	  = -fvisibility=hidden -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(prefix)\" -I$(SRCDIR)/$(BOCA_PATH)/include
-LD	  = gcc
 LDOPTS	  = -L$(SRCDIR)/$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
-
-ifeq ($(BUILD_FREEBSD),True)
-	CC = clang
-	LD = clang
-endif
 
 ifeq ($(BUILD_WIN32),True)
 	CCOPTS += -DUNICODE -D_UNICODE
@@ -101,6 +94,7 @@ clean:
 	rm -f $(OBJECTS)
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED)
 
+ifneq ($(SRCDIR),$(CURDIR))
 ifeq ($(BUILD_WIN32),True)
 	rmdir application/external/win32 || true
 else
@@ -108,6 +102,7 @@ else
 endif
 
 	rmdir application/external application common/communication common/metadata common component core || true
+endif
 
 ifeq ($(BUILD_WIN32),True)
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca.a
@@ -131,7 +126,9 @@ ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
 ifneq ($(BUILD_QNX),True)
-	/sbin/ldconfig 2> /dev/null || true
+ifeq ($(DESTDIR),)
+	$(LDCONFIG) 2> /dev/null || true
+endif
 endif
 endif
 endif
@@ -153,7 +150,9 @@ ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
 ifneq ($(BUILD_QNX),True)
-	/sbin/ldconfig 2> /dev/null || true
+ifeq ($(DESTDIR),)
+	$(LDCONFIG) 2> /dev/null || true
+endif
 endif
 endif
 endif
@@ -164,10 +163,10 @@ endif
 	$(CC) $(CCOPTS) $(CFLAGS) -c $< -o $@
 
 .cpp.o:
-	$(CC) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
 
 .m.o:
-	$(CC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
+	$(OBJC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
 
 .mm.o:
-	$(CC) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@
+	$(OBJCXX) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@

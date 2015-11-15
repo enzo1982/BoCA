@@ -6,7 +6,10 @@ SMOOTHVER = 0.8.72
 SRCDIR = $(abspath $(dir $(firstword $(MAKEFILE_LIST))))
 
 vpath %.c   $(SRCDIR)
+vpath %.cc  $(SRCDIR)
 vpath %.cpp $(SRCDIR)
+vpath %.m   $(SRCDIR)
+vpath %.mm  $(SRCDIR)
 
 # Define makein and cleanin macros
 ifeq ($(SRCDIR),$(CURDIR))
@@ -82,10 +85,12 @@ else
 	else ifeq ($(UNAME),QNX)
 		BUILD_QNX = True
 	else ifeq ($(UNAME),Darwin)
+#		Set shared object extension
 		SHARED = .dylib
 
 		BUILD_OSX = True
 
+#		Build universal binaries
 		ifneq ($(BUILD_X86),False)
 			BUILD_X86 = True
 		endif
@@ -99,6 +104,20 @@ else
 endif
 
 # Set default commands
+ifndef OBJC
+	OBJC	= $(CC)
+endif
+
+ifndef OBJCXX
+	OBJCXX	= $(CC)
+endif
+
+ifeq ($(LD),ld)
+	LD	= $(CC)
+endif
+
+LDCONFIG	= /sbin/ldconfig
+
 INSTALL		= install
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA	= $(INSTALL) -m 644
@@ -123,7 +142,7 @@ else ifeq ($(BUILD_OSX),True)
 endif
 
 # Set install folders
-ifeq ($(prefix),)
+ifndef prefix
 	prefix = /usr/local
 
 	ifeq ($(BUILD_OSX),True)
@@ -150,9 +169,59 @@ ifeq ($(BUILD_HAIKU),True)
 	includedir = $(prefix)/develop/headers
 endif
 
+# Decide which libraries to use
+ifeq ($(findstring bundledlibexpat,$(config)),bundledlibexpat)
+	USE_BUNDLED_LIBEXPAT = True
+else ifeq ($(findstring systemlibexpat,$(config)),systemlibexpat)
+	USE_BUNDLED_LIBEXPAT = False
+else
+	ifeq ($(BUILD_WIN32),True)
+		USE_BUNDLED_LIBEXPAT = True
+	endif
+endif
+
+ifeq ($(findstring bundledliburiparser,$(config)),bundledliburiparser)
+	USE_BUNDLED_LIBURIPARSER = True
+else ifeq ($(findstring systemliburiparser,$(config)),systemliburiparser)
+	USE_BUNDLED_LIBURIPARSER = False
+else
+	ifeq ($(BUILD_WIN32),True)
+		USE_BUNDLED_LIBURIPARSER = True
+	endif
+endif
+
+ifeq ($(findstring bundledlibxspf,$(config)),bundledlibxspf)
+	USE_BUNDLED_LIBXSPF = True
+else ifeq ($(findstring systemlibxspf,$(config)),systemlibxspf)
+	USE_BUNDLED_LIBXSPF = False
+else
+	USE_BUNDLED_LIBXSPF = True
+endif
+
+ifeq ($(findstring bundledzlib,$(config)),bundledzlib)
+	USE_BUNDLED_ZLIB = True
+else ifeq ($(findstring systemzlib,$(config)),systemzlib)
+	USE_BUNDLED_ZLIB = False
+else
+	ifeq ($(BUILD_OSX),True)
+		USE_BUNDLED_ZLIB = True
+	else ifeq ($(BUILD_QNX),True)
+		USE_BUNDLED_ZLIB = True
+	else ifeq ($(BUILD_WIN32),True)
+		USE_BUNDLED_ZLIB = True
+	endif
+endif
+
 # Set release specific options
-ifeq ($(config),release)
-	config =
+ifeq ($(findstring release,$(config)),release)
+	ifeq ($(BUILD_FREEBSD),True)
+		override CC	= clang
+		override CXX	= clang
+		override OBJC	= clang
+		override OBJCXX	= clang
+
+		override LD	= clang
+	endif
 
 	override CFLAGS	     = -pipe -g0 -Wall -Os
 	override CXXFLAGS    =
@@ -206,4 +275,54 @@ ifeq ($(config),release)
 	endif
 	endif
 	endif
+
+	# Use V8 when building on a supported platform
+	ifeq ($(BUILD_X86),True)
+		USE_V8 = True
+	else ifeq ($(BUILD_X86_64),True)
+		USE_V8 = True
+	else ifeq ($(BUILD_ARM),True)
+		USE_V8 = True
+	else ifeq ($(BUILD_MIPS),True)
+		USE_V8 = True
+	endif
 endif
+
+# Set debug specific options
+ifeq ($(findstring debug,$(config)),debug)
+	override CFLAGS	     = -pipe -g -Wall
+	override CXXFLAGS    =
+	override OBJCFLAGS   =
+	override OBJCXXFLAGS =
+	override LDFLAGS     = -pipe
+
+	ifneq ($(EXCEPTION),True)
+		override CFLAGS += -fno-exceptions
+	endif
+
+	override CXXFLAGS    += $(CFLAGS)
+	override OBJCFLAGS   += $(CFLAGS)
+	override OBJCXXFLAGS += $(CFLAGS)
+
+	ifneq ($(BUILD_WIN32),True)
+	ifneq ($(BUILD_OSX),True)
+	ifneq ($(BUILD_LINUX),True)
+		override LDFLAGS += -Wl,-rpath,.
+	endif
+	endif
+	endif
+
+	# Use V8 when building on a supported platform
+	ifeq ($(BUILD_X86),True)
+		USE_V8 = True
+	else ifeq ($(BUILD_X86_64),True)
+		USE_V8 = True
+	else ifeq ($(BUILD_ARM),True)
+		USE_V8 = True
+	else ifeq ($(BUILD_MIPS),True)
+		USE_V8 = True
+	endif
+endif
+
+# Clear config variable
+config =

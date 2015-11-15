@@ -4,104 +4,44 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-all:
+FOLDERS = 
+
 ifeq ($(BUILD_LINUX),True)
-	$(call makein,alsa)
-endif
-ifeq ($(BUILD_OSX),True)
-	$(call makein,coreaudio)
-endif
-ifeq ($(BUILD_FREEBSD),True)
-	$(call makein,oss)
-endif
-ifeq ($(BUILD_OPENBSD),True)
-	$(call makein,oss)
-endif
-ifeq ($(BUILD_NETBSD),True)
-	$(call makein,oss)
-endif
-ifeq ($(BUILD_SOLARIS),True)
-	$(call makein,oss)
-endif
-ifeq ($(BUILD_QNX),True)
-	$(call makein,qsa)
-endif
-ifeq ($(BUILD_WIN32),True)
-	$(call makein,directsound)
-	$(call makein,waveout)
-	$(call makein,winamp)
+	FOLDERS += alsa
+else ifeq ($(BUILD_OSX),True)
+	FOLDERS += coreaudio
+else ifeq ($(BUILD_FREEBSD),True)
+	FOLDERS += oss
+else ifeq ($(BUILD_OPENBSD),True)
+	FOLDERS += oss
+else ifeq ($(BUILD_NETBSD),True)
+	FOLDERS += oss
+else ifeq ($(BUILD_SOLARIS),True)
+	FOLDERS += oss
+else ifeq ($(BUILD_QNX),True)
+	FOLDERS += qsa
+else ifeq ($(BUILD_WIN32),True)
+	FOLDERS += directsound waveout winamp
 endif
 
-clean:
-ifeq ($(BUILD_LINUX),True)
-	$(call cleanin,alsa)
-endif
-ifeq ($(BUILD_OSX),True)
-	$(call cleanin,coreaudio)
-endif
-ifeq ($(BUILD_FREEBSD),True)
-	$(call cleanin,oss)
-endif
-ifeq ($(BUILD_OPENBSD),True)
-	$(call cleanin,oss)
-endif
-ifeq ($(BUILD_NETBSD),True)
-	$(call cleanin,oss)
-endif
-ifeq ($(BUILD_SOLARIS),True)
-	$(call cleanin,oss)
-endif
-ifeq ($(BUILD_QNX),True)
-	$(call cleanin,qsa)
-endif
-ifeq ($(BUILD_WIN32),True)
-	$(call cleanin,directsound)
-	$(call cleanin,waveout)
-	$(call cleanin,winamp)
-endif
+.PHONY: $(FOLDERS)
 
-install:
-ifeq ($(BUILD_LINUX),True)
-	$(call makein,alsa,install)
-endif
-ifeq ($(BUILD_OSX),True)
-	$(call makein,coreaudio,install)
-endif
-ifeq ($(BUILD_FREEBSD),True)
-	$(call makein,oss,install)
-endif
-ifeq ($(BUILD_OPENBSD),True)
-	$(call makein,oss,install)
-endif
-ifeq ($(BUILD_NETBSD),True)
-	$(call makein,oss,install)
-endif
-ifeq ($(BUILD_SOLARIS),True)
-	$(call makein,oss,install)
-endif
-ifeq ($(BUILD_QNX),True)
-	$(call makein,qsa,install)
-endif
+all: $(FOLDERS)
 
-uninstall:
-ifeq ($(BUILD_LINUX),True)
-	$(call makein,alsa,uninstall)
-endif
-ifeq ($(BUILD_OSX),True)
-	$(call makein,coreaudio,uninstall)
-endif
-ifeq ($(BUILD_FREEBSD),True)
-	$(call makein,oss,uninstall)
-endif
-ifeq ($(BUILD_OPENBSD),True)
-	$(call makein,oss,uninstall)
-endif
-ifeq ($(BUILD_NETBSD),True)
-	$(call makein,oss,uninstall)
-endif
-ifeq ($(BUILD_SOLARIS),True)
-	$(call makein,oss,uninstall)
-endif
-ifeq ($(BUILD_QNX),True)
-	$(call makein,qsa,uninstall)
-endif
+$(FOLDERS):
+	+ $(call makein,$@)
+
+clean: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean):
+	$(call cleanin,$(subst ##clean,,$@))
+
+install: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##install)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##install):
+	$(call makein,$(subst ##install,,$@),install)
+
+uninstall: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall):
+	$(call makein,$(subst ##uninstall,,$@),uninstall)

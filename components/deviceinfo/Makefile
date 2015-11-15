@@ -4,88 +4,47 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-all:
+FOLDERS = 
+
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_OPENBSD),True)
-	$(call makein,cdio)
+	FOLDERS += cdio
 endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 ifneq ($(BUILD_HAIKU),True)
-	$(call makein,cdparanoia)
+	FOLDERS += cdparanoia
 endif
 endif
 endif
 endif
 endif
 endif
-endif
-ifeq ($(BUILD_WIN32),True)
-	$(call makein,cdrip)
+else ifeq ($(BUILD_WIN32),True)
+	FOLDERS += cdrip
 endif
 
-clean:
-ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_OPENBSD),True)
-	$(call cleanin,cdio)
-endif
-ifneq ($(BUILD_OSX),True)
-ifneq ($(BUILD_GNU),True)
-ifneq ($(BUILD_SOLARIS),True)
-ifneq ($(BUILD_NETBSD),True)
-ifneq ($(BUILD_HAIKU),True)
-	$(call cleanin,cdparanoia)
-endif
-endif
-endif
-endif
-endif
-endif
-endif
-ifeq ($(BUILD_WIN32),True)
-	$(call cleanin,cdrip)
-endif
+.PHONY: $(FOLDERS)
 
-install:
-ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_OPENBSD),True)
-	$(call makein,cdio,install)
-endif
-ifneq ($(BUILD_OSX),True)
-ifneq ($(BUILD_GNU),True)
-ifneq ($(BUILD_SOLARIS),True)
-ifneq ($(BUILD_NETBSD),True)
-ifneq ($(BUILD_HAIKU),True)
-	$(call makein,cdparanoia,install)
-endif
-endif
-endif
-endif
-endif
-endif
-endif
+all: $(FOLDERS)
 
-uninstall:
-ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_QNX),True)
-ifneq ($(BUILD_OPENBSD),True)
-	$(call makein,cdio,uninstall)
-endif
-ifneq ($(BUILD_OSX),True)
-ifneq ($(BUILD_GNU),True)
-ifneq ($(BUILD_SOLARIS),True)
-ifneq ($(BUILD_NETBSD),True)
-ifneq ($(BUILD_HAIKU),True)
-	$(call makein,cdparanoia,uninstall)
-endif
-endif
-endif
-endif
-endif
-endif
-endif
+$(FOLDERS):
+	+ $(call makein,$@)
+
+clean: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean):
+	$(call cleanin,$(subst ##clean,,$@))
+
+install: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##install)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##install):
+	$(call makein,$(subst ##install,,$@),install)
+
+uninstall: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall):
+	$(call makein,$(subst ##uninstall,,$@),uninstall)

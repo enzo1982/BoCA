@@ -7,14 +7,16 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 all:
 	mkdir -p $(BOCA_PATH)/$(BINDIR) $(BOCA_PATH)/$(LIBDIR)
 
-	$(call makein,runtime)
-	$(call makein,components)
+	+ $(call makein,runtime)
+	+ $(call makein,components)
 
 clean:
-	$(call cleanin,runtime)
-	$(call cleanin,components)
+	+ $(call cleanin,runtime)
+	+ $(call cleanin,components)
 
+ifneq ($(SRCDIR),$(CURDIR))
 	rmdir $(BOCA_PATH)/$(BINDIR) $(BOCA_PATH)/$(LIBDIR) || true
+endif
 
 install: all
 ifneq ($(BUILD_WIN32),True)

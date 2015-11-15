@@ -17,14 +17,16 @@ DEFINE	  =
 LIBS	  =
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = mkdir -p xing
-ALLCMD2   =
-CLEANCMD1 = rmdir xing || true
-CLEANCMD2 =
-INSTCMD1  =
-INSTCMD2  = 
-UINSTCMD1 =
-UINSTCMD2 =
+ifneq ($(SRCDIR),$(CURDIR))
+	ALLCMD1   = mkdir -p xing
+	ALLCMD2   =
+	CLEANCMD1 = rmdir xing || true
+	CLEANCMD2 =
+	INSTCMD1  =
+	INSTCMD2  = 
+	UINSTCMD1 =
+	UINSTCMD2 =
+endif
 
 ## Do not change anything below this line. ##
 

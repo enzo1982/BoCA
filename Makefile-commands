@@ -2,18 +2,11 @@
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-CC     = gcc
 CCOPTS = -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(SRCDIR)/$(BOCA_PATH)/include
-LD     = gcc
 LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -L$(SRCDIR)/$(BOCA_PATH)/$(LIBDIR) $(LIBS)
 
 ifeq (,$(findstring -lstdc++,$(LIBS)))
 	LDOPTS += -lstdc++
-endif
-
-ifeq ($(BUILD_FREEBSD),True)
-	CC = clang
-	LD = clang
 endif
 
 ifeq ($(BUILD_WIN32),True)
@@ -60,8 +53,8 @@ endif
 all: allcmds $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
 
 allcmds:
-	$(ALLCMD1)
-	$(ALLCMD2)
+	+ $(ALLCMD1)
+	+ $(ALLCMD2)
 
 $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) : $(OBJECTS)
 	mkdir -p $(BOCA_PATH)/$(BINDIR)
@@ -95,10 +88,10 @@ endif
 	$(CC) $(CCOPTS) $(CFLAGS) -c $< -o $@
 
 .cpp.o:
-	$(CC) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
 
 .m.o:
-	$(CC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
+	$(OBJC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
 
 .mm.o:
-	$(CC) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@
+	$(OBJCXX) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@

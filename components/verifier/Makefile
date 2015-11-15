@@ -4,14 +4,26 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-all:
-	$(call makein,md5)
+FOLDERS = md5
 
-clean:
-	$(call cleanin,md5)
+.PHONY: $(FOLDERS)
 
-install:
-	$(call makein,md5,install)
+all: $(FOLDERS)
 
-uninstall:
-	$(call makein,md5,uninstall)
+$(FOLDERS):
+	+ $(call makein,$@)
+
+clean: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean):
+	$(call cleanin,$(subst ##clean,,$@))
+
+install: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##install)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##install):
+	$(call makein,$(subst ##install,,$@),install)
+
+uninstall: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall):
+	$(call makein,$(subst ##uninstall,,$@),uninstall)

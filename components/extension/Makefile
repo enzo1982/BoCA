@@ -4,32 +4,34 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-all:
-	$(call makein,donate)
-	$(call makein,langnotify)
-	$(call makein,protocols)
-	$(call makein,statustime)
-	$(call makein,tagedit)
-	$(call makein,youtube)
+FOLDERS = donate langnotify statustime tagedit
 
-clean:
-	$(call cleanin,donate)
-	$(call cleanin,langnotify)
-	$(call cleanin,protocols)
-	$(call cleanin,statustime)
-	$(call cleanin,tagedit)
-	$(call cleanin,youtube)
+ifeq ($(USE_V8),True)
+	FOLDERS += youtube
+endif
 
-install:
-	$(call makein,donate,install)
-	$(call makein,langnotify,install)
-	$(call makein,statustime,install)
-	$(call makein,tagedit,install)
-	$(call makein,youtube,install)
+ifeq ($(BUILD_WIN32),True)
+	FOLDERS += protocols
+endif
 
-uninstall:
-	$(call makein,donate,uninstall)
-	$(call makein,langnotify,uninstall)
-	$(call makein,statustime,uninstall)
-	$(call makein,tagedit,uninstall)
-	$(call makein,youtube,uninstall)
+.PHONY: $(FOLDERS)
+
+all: $(FOLDERS)
+
+$(FOLDERS):
+	+ $(call makein,$@)
+
+clean: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean):
+	$(call cleanin,$(subst ##clean,,$@))
+
+install: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##install)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##install):
+	$(call makein,$(subst ##install,,$@),install)
+
+uninstall: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall):
+	$(call makein,$(subst ##uninstall,,$@),uninstall)

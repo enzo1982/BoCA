@@ -4,34 +4,26 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-all:
-	$(call makein,cuesheet)
-	$(call makein,m3u)
-	$(call makein,pls)
-	$(call makein,vclt)
-	$(call makein,wpl)
-	$(call makein,xspf)
+FOLDERS = cuesheet m3u pls vclt wpl xspf
 
-clean:
-	$(call cleanin,cuesheet)
-	$(call cleanin,m3u)
-	$(call cleanin,pls)
-	$(call cleanin,vclt)
-	$(call cleanin,wpl)
-	$(call cleanin,xspf)
+.PHONY: $(FOLDERS)
 
-install:
-	$(call makein,cuesheet,install)
-	$(call makein,m3u,install)
-	$(call makein,pls,install)
-	$(call makein,vclt,install)
-	$(call makein,wpl,install)
-	$(call makein,xspf,install)
+all: $(FOLDERS)
 
-uninstall:
-	$(call makein,cuesheet,uninstall)
-	$(call makein,m3u,uninstall)
-	$(call makein,pls,uninstall)
-	$(call makein,vclt,uninstall)
-	$(call makein,wpl,uninstall)
-	$(call makein,xspf,uninstall)
+$(FOLDERS):
+	+ $(call makein,$@)
+
+clean: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean):
+	$(call cleanin,$(subst ##clean,,$@))
+
+install: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##install)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##install):
+	$(call makein,$(subst ##install,,$@),install)
+
+uninstall: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##uninstall):
+	$(call makein,$(subst ##uninstall,,$@),uninstall)
