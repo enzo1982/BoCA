@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -50,9 +50,9 @@ namespace smooth
 				static Bool	 hasSSE4_1;
 				static Bool	 hasSSE4_2;
 				static Bool	 hasSSE4a;
-				static Bool	 hasSSE5;
 
 				static Bool	 hasAVX;
+				static Bool	 hasAVX2;
 
 				static Bool	 has3DNow;
 				static Bool	 has3DNowExt;
@@ -82,9 +82,9 @@ namespace smooth
 				Bool		 HasSSE4_1() const		{ return hasSSE4_1; }
 				Bool		 HasSSE4_2() const		{ return hasSSE4_2; }
 				Bool		 HasSSE4a() const		{ return hasSSE4a; }
-				Bool		 HasSSE5() const		{ return hasSSE5; }
 
 				Bool		 HasAVX() const			{ return hasAVX; }
+				Bool		 HasAVX2() const		{ return hasAVX2; }
 
 				Bool		 Has3DNow() const		{ return has3DNow; }
 				Bool		 Has3DNowExt() const		{ return has3DNowExt; }

@@ -324,9 +324,13 @@ namespace smooth
 			{
 				LockForRead();
 
-				if (lastAccessedEntry < nOfEntries - 1)
+				Int	 lastAccessed = lastAccessedEntry;
+
+				if (lastAccessed < nOfEntries - 1)
 				{
-					const s	&entry = entries[++lastAccessedEntry]->value;
+					const s	&entry = entries[++lastAccessed]->value;
+
+					lastAccessedEntry = lastAccessed;
 
 					Unlock();
 
@@ -342,9 +346,13 @@ namespace smooth
 			{
 				LockForRead();
 
-				if (lastAccessedEntry > 0)
+				Int	 lastAccessed = lastAccessedEntry;
+
+				if (lastAccessed > 0)
 				{
-					const s	&entry = entries[--lastAccessedEntry]->value;
+					const s	&entry = entries[--lastAccessed]->value;
+
+					lastAccessedEntry = lastAccessed;
 
 					Unlock();
 
