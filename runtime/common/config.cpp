@@ -33,6 +33,8 @@ BoCA::Config::Config()
 
 	config = NIL;
 
+	copies.EnableLocking();
+
 	persistentIntIDs.EnableLocking();
 	persistentIntValues.EnableLocking();
 }
