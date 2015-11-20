@@ -13,8 +13,8 @@
 #ifndef H_BOCA_UTILITIES
 #define H_BOCA_UTILITIES
 
-#include <smooth.h>
 #include "metadata/track.h"
+#include "metadata/channels.h"
 
 using namespace smooth;
 using namespace smooth::System;
