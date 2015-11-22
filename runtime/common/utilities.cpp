@@ -18,6 +18,8 @@ using namespace smooth::System;
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
+/* Print an informational message.
+ */
 Void BoCA::Utilities::InfoMessage(const String &message, const String &replace1, const String &replace2)
 {
 	Config	*config	= Config::Get();
@@ -29,6 +31,8 @@ Void BoCA::Utilities::InfoMessage(const String &message, const String &replace1,
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Info")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
+/* Print a warning message.
+ */
 Void BoCA::Utilities::WarningMessage(const String &message, const String &replace1, const String &replace2)
 {
 	Config	*config	= Config::Get();
@@ -40,6 +44,8 @@ Void BoCA::Utilities::WarningMessage(const String &message, const String &replac
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Warning")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
+/* Print an error message.
+ */
 Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1, const String &replace2)
 {
 	Config	*config	= Config::Get();
@@ -51,6 +57,8 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
+/* Returns to path to the BoCA components directory.
+ */
 String BoCA::Utilities::GetBoCADirectory()
 {
 	Directory	 bocaDirectory(GUI::Application::GetApplicationDirectory().Append("boca"));
@@ -64,6 +72,8 @@ String BoCA::Utilities::GetBoCADirectory()
 	return String(bocaDirectory).Append(Directory::GetDirectoryDelimiter());
 }
 
+/* Locates and loads a codec library.
+ */
 DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
 {
 	DynamicLoader	*loader = NIL;
@@ -104,6 +114,8 @@ DynamicLoader *BoCA::Utilities::LoadCodecDLL(const String &module)
 	return loader;
 }
 
+/* Free a previously loaded codec library.
+ */
 Bool BoCA::Utilities::FreeCodecDLL(DynamicLoader *loader)
 {
 	if (loader == NIL) return False;
@@ -113,6 +125,9 @@ Bool BoCA::Utilities::FreeCodecDLL(DynamicLoader *loader)
 	return True;
 }
 
+/* Computes a non-Unicode temporary file name for
+ * the passed file name.
+ */
 String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
 {
 	String	 rVal	= fileName;
@@ -136,30 +151,137 @@ String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
 	return tempDir.Append("-").Append(Number(Int64(fileName.ComputeCRC32())).ToHexString(8)).Append(".temp");
 }
 
-String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string)
+/* Replaces or strips characters not allowed in file names.
+ */
+String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string, Bool useUnicode, Bool replaceSlashes, Bool replaceSpaces)
 {
 	String	 rVal;
 
 	for (Int k = 0, b = 0; k < string.Length(); k++)
 	{
-		if	(string[k] == '\"') { rVal[k + b] = '\''; rVal[k + ++b] = '\''; }
-		else if (string[k] == '\n')   b--;
-		else if (string[k] == '\r')   b--;
-		else if (string[k] == '?')    b--;
-		else if (string[k] == '|')    rVal[k + b] = '_';
-		else if (string[k] == '*')    b--;
-		else if (string[k] == '<')    rVal[k + b] = '(';
-		else if (string[k] == '>')    rVal[k + b] = ')';
-		else if (string[k] == ':')    b--;
-		else if (string[k] == '/')    rVal[k + b] = '-';
-		else if (string[k] == '\\')   rVal[k + b] = '-';
-		else if (string[k] == '\t')   rVal[k + b] = ' ';
-		else			      rVal[k + b] = string[k];
+		if	(string[k] == '\"')		    { rVal[k + b] = '\''; rVal[k + ++b] = '\''; }
+		else if (string[k] == '\n')		      b--;
+		else if (string[k] == '\r')		      b--;
+		else if (string[k] == '?')		      b--;
+		else if (string[k] == '|')		      rVal[k + b] = '_';
+		else if (string[k] == '*')		      b--;
+		else if (string[k] == '<')		      rVal[k + b] = '(';
+		else if (string[k] == '>')		      rVal[k + b] = ')';
+		else if (string[k] == ':')		      b--;
+		else if (string[k] == '/'  && replaceSlashes) rVal[k + b] = '-';
+		else if (string[k] == '\\' && replaceSlashes) rVal[k + b] = '-';
+		else if (string[k] == ' '  && replaceSpaces)  rVal[k + b] = '_';
+		else if (string[k] == '\t' && replaceSpaces)  rVal[k + b] = '_';
+		else if (string[k] == '\t')		      rVal[k + b] = ' ';
+		else if (string[k] >= 256  && !useUnicode)    rVal[k + b] = '#';
+		else					      rVal[k + b] = string[k];
 	}
 
 	return rVal;
 }
 
+/* This function returns the absolute path corresponding to the passed
+ * path. It may differ from the passed one due to use of the <installdrive>
+ * placeholder or because the passed path is a relative one.
+ */
+String BoCA::Utilities::GetAbsolutePathName(const String &pathName)
+{
+	String	 rPathName = pathName;
+
+	/* Replace <installdrive> patter.
+	 */
+#ifdef __WIN32__
+	rPathName.Replace("<installdrive>", GUI::Application::GetApplicationDirectory().Head(2));
+
+	if ( rPathName[1] != ':' &&	   // Absolute local path
+	    !rPathName.StartsWith("\\\\")) // Network resource
+#else
+	rPathName.Replace("<installdrive>", NIL);
+
+	if (!rPathName.StartsWith("/") &&  // Absolute path
+	    !rPathName.StartsWith("~"))	   // Home directory
+#endif
+	{
+		rPathName = GUI::Application::GetApplicationDirectory().Append(rPathName);
+	}
+
+	return rPathName;
+}
+
+/* This function takes a file name and normalizes all the
+ * directory names included in the path by removing spaces
+ * and dots at the end. It also shortens each directory
+ * and the file name to a maximum of 248 characters.
+ */
+String BoCA::Utilities::NormalizeFileName(const String &fileName)
+{
+	String	 rFileName = fileName;
+	String	 dir	   = fileName;
+
+	Int	 maxLength = 248;
+
+	String	 tmpDir;
+	Int	 lastBS	   = 0;
+
+	for (Int i = 0; i < dir.Length(); i++)
+	{
+		if (dir[i] == '\\' || dir[i] == '/')
+		{
+			String	 tmpDir2 = tmpDir;
+
+			/* Shorten to at most maxLength characters.
+			 */
+			if (tmpDir.Length() - lastBS > maxLength)
+			{
+				tmpDir2 = String().CopyN(tmpDir, lastBS + maxLength);
+
+				i -= (tmpDir.Length() - lastBS - maxLength);
+			}
+
+			/* Replace trailing dots and spaces.
+			 */
+			while ((tmpDir2.Tail(tmpDir2.Length() - lastBS - 1) != ".." &&
+				tmpDir2.Tail(tmpDir2.Length() - lastBS - 1) != ".") &&
+			       (tmpDir2.EndsWith(".") || tmpDir2.EndsWith(" ")))
+			{
+				tmpDir2[tmpDir2.Length() - 1] = 0;
+
+				i--;
+			}
+
+			if (tmpDir2 != tmpDir)
+			{
+				rFileName.Replace(tmpDir, tmpDir2);
+
+				tmpDir = tmpDir2;
+				dir = rFileName;
+			}
+
+			lastBS = i;
+		}
+
+		tmpDir[i] = dir[i];
+	}
+
+	/* Shorten file name to maxLength characters.
+	 */
+	if (rFileName.Length() - lastBS > maxLength) rFileName = String().CopyN(rFileName, lastBS + maxLength);
+
+	/* Normalize directory delimiters.
+	 */
+	rFileName.Replace("\\",	Directory::GetDirectoryDelimiter());
+	rFileName.Replace("/",	Directory::GetDirectoryDelimiter());
+
+	/* Replace trailing spaces.
+	 */
+	while (rFileName.EndsWith(" ")) { rFileName[rFileName.Length() - 1] = 0; }
+
+	return rFileName;
+}
+
+/* Creates the folder corresponding to the file name
+ * passed in the first argument.
+ */
 String BoCA::Utilities::CreateDirectoryForFile(const String &fileName)
 {
 	File		 file(fileName);
@@ -170,6 +292,8 @@ String BoCA::Utilities::CreateDirectoryForFile(const String &fileName)
 	return file;
 }
 
+/* Computes a track file name relative to a base file name.
+ */
 String BoCA::Utilities::GetRelativeFileName(const String &trackFileName, const String &baseFileName)
 {
 	String	 compTrackFileName = trackFileName;
@@ -216,6 +340,9 @@ String BoCA::Utilities::GetRelativeFileName(const String &trackFileName, const S
 	return relativeFileName;
 }
 
+/* Gets the .cda file name corresponding to an audio
+ * CD track on Windows systems.
+ */
 String BoCA::Utilities::GetCDTrackFileName(const Track &track)
 {
 	/* Special handling for CD tracks on Windows.

@@ -40,10 +40,13 @@ namespace BoCA
 
 			static String		 GetNonUnicodeTempFileName(const String &);
 
-			static String		 ReplaceIncompatibleCharacters(const String &);
 			static String		 CreateDirectoryForFile(const String &);
+			static String		 ReplaceIncompatibleCharacters(const String &, Bool = True, Bool = True, Bool = False);
 
+			static String		 GetAbsolutePathName(const String &);
 			static String		 GetRelativeFileName(const String &, const String &);
+
+			static String		 NormalizeFileName(const String &);
 
 			static String		 GetCDTrackFileName(const Track &);
 	};
