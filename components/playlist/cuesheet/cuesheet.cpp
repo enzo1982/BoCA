@@ -134,7 +134,8 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 
 		out.OutputLine(String("  TRACK ").Append(i < 9 ? "0" : NIL).Append(String::FromInt(i + 1)).Append(" AUDIO"));
 		out.OutputLine(String("    TITLE \"").Append(info.title.Length() > 0 ? info.title : i18n->TranslateString("unknown title")).Append("\""));
-		out.OutputLine(String("    PERFORMER \"").Append(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown artist")).Append("\""));
+
+		if (!artistConsistent) out.OutputLine(String("    PERFORMER \"").Append(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown artist")).Append("\""));
 
 		if (info.isrc != NIL) out.OutputLine(String("    ISRC ").Append(info.isrc));
 
