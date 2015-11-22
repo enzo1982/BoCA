@@ -80,6 +80,7 @@ namespace smooth
 				if (oSignal.slotsN != NIL)
 				{
 					slotsN = new Array<Void *>();
+					slotsN->EnableLocking();
 
 					for (Int i = 0; i < oSignal.slotsN->Length(); i++)
 					{
@@ -90,6 +91,7 @@ namespace smooth
 				if (oSignal.slots0 != NIL)
 				{
 					slots0 = new Array<Void *>();
+					slots0->EnableLocking();
 
 					for (Int j = 0; j < oSignal.slots0->Length(); j++)
 					{
@@ -104,7 +106,11 @@ namespace smooth
 
 			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
 			{
-				if (slotsN == NIL) slotsN = new Array<Void *>();
+				if (slotsN == NIL)
+				{
+					slotsN = new Array<Void *>();
+					slotsN->EnableLocking();
+				}
 
 				slotsN->Add(new SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst));
 
@@ -113,7 +119,11 @@ namespace smooth
 
 			Int Connect(returnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
-				if (slotsN == NIL) slotsN = new Array<Void *>();
+				if (slotsN == NIL)
+				{
+					slotsN = new Array<Void *>();
+					slotsN->EnableLocking();
+				}
 
 				slotsN->Add(new SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc));
 
@@ -124,7 +134,11 @@ namespace smooth
 			{
 				if ((Signal *) sig == (Signal *) this) return Error();
 
-				if (slotsN == NIL) slotsN = new Array<Void *>();
+				if (slotsN == NIL)
+				{
+					slotsN = new Array<Void *>();
+					slotsN->EnableLocking();
+				}
 
 				slotsN->Add(new SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig));
 
@@ -133,7 +147,11 @@ namespace smooth
 
 			Int Connect(const returnTYPE value)
 			{
-				if (slots0 == NIL) slots0 = new Array<Void *>();
+				if (slots0 == NIL)
+				{
+					slots0 = new Array<Void *>();
+					slots0->EnableLocking();
+				}
 
 				slots0->Add(new SlotRValue0<returnTYPE>(value));
 
@@ -143,7 +161,11 @@ namespace smooth
 #ifndef SIGNALS_SIGNAL_ZERO
 			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
 			{
-				if (slots0 == NIL) slots0 = new Array<Void *>();
+				if (slots0 == NIL)
+				{
+					slots0 = new Array<Void *>();
+					slots0->EnableLocking();
+				}
 
 				slots0->Add(new SlotRClass0<oClassTYPE, returnTYPE>(proc, inst));
 
@@ -152,7 +174,11 @@ namespace smooth
 
 			Int Connect(returnTYPE (*proc)())
 			{
-				if (slots0 == NIL) slots0 = new Array<Void *>();
+				if (slots0 == NIL)
+				{
+					slots0 = new Array<Void *>();
+					slots0->EnableLocking();
+				}
 
 				slots0->Add(new SlotRGlobal0<returnTYPE>(proc));
 
@@ -163,7 +189,11 @@ namespace smooth
 			{
 				if ((Signal *) sig == (Signal *) this) return Error();
 
-				if (slots0 == NIL) slots0 = new Array<Void *>();
+				if (slots0 == NIL)
+				{
+					slots0 = new Array<Void *>();
+					slots0->EnableLocking();
+				}
 
 				slots0->Add(new SlotRSignal0<returnTYPE>(sig));
 
