@@ -21,6 +21,13 @@ namespace BoCA
 		private:
 			ConfigLayer			*configLayer;
 
+			static Config			*configuration;
+
+			static Array<Track>		 tracksToConvert;
+			static Array<Track>		 convertedTracks;
+
+			static Track			 playlistTrack;
+
 			Array<IO::OutStream *>		 streams;
 			Array<AS::EncoderComponent *>	 encoders;
 
@@ -28,10 +35,14 @@ namespace BoCA
 			Array<Buffer<UnsignedByte> *>	 buffers;
 			Array<Threads::Thread *>	 threads;
 
+			Int64				 trackLength;
+			Int64				 totalLength;
+
 			Bool				 finished;
 			Bool				 cancelled;
 
-			String				 GetFileNamePattern() const;
+			static String			 GetFileNamePattern(const Track &);
+			static String			 GetPlaylistFileName(const Track &);
 
 			Void				 EncodeThread(Int);
 		public:
@@ -53,6 +64,11 @@ namespace BoCA
 
 			ConfigLayer			*GetConfigurationLayer();
 		slots:
+			static Void			 OnStartConversion(const Array<Track> &);
+			static Void			 OnFinishConversion();
+			static Void			 OnCancelConversion();
+
+			Void				 OnFinishTrackConversion(const Track &);
 			Void				 OnCancelTrackConversion(const Track &);
 	};
 };
