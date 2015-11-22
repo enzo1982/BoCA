@@ -53,7 +53,7 @@ namespace BoCA
 
 			ConfigLayer			*GetConfigurationLayer();
 		slots:
-			Void				 OnCancelConversion(const Track &);
+			Void				 OnCancelTrackConversion(const Track &);
 	};
 };
 

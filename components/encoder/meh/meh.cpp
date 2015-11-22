@@ -42,14 +42,14 @@ BoCA::EncoderMultiEncoderHub::EncoderMultiEncoderHub()
 
 	configLayer = NIL;
 
-	Engine::Get()->onCancelConversion.Connect(&EncoderMultiEncoderHub::OnCancelConversion, this);
+	Engine::Get()->onCancelTrackConversion.Connect(&EncoderMultiEncoderHub::OnCancelTrackConversion, this);
 }
 
 BoCA::EncoderMultiEncoderHub::~EncoderMultiEncoderHub()
 {
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 
-	Engine::Get()->onCancelConversion.Disconnect(&EncoderMultiEncoderHub::OnCancelConversion, this);
+	Engine::Get()->onCancelTrackConversion.Disconnect(&EncoderMultiEncoderHub::OnCancelTrackConversion, this);
 
 	/* Delete output file if it still exists.
 	 */
@@ -338,7 +338,7 @@ Void BoCA::EncoderMultiEncoderHub::EncodeThread(Int n)
 	}
 }
 
-Void BoCA::EncoderMultiEncoderHub::OnCancelConversion(const Track &cancelledTrack)
+Void BoCA::EncoderMultiEncoderHub::OnCancelTrackConversion(const Track &cancelledTrack)
 {
 	const Config	*config = GetConfiguration();
 
