@@ -19,23 +19,23 @@ using namespace smooth::IO;
 
 const String &BoCA::TaggerVorbis::GetComponentSpecs()
 {
-	static String	 componentSpecs = "			\
-								\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
-	  <component>						\
-	    <name>Vorbis Comment Tagger</name>			\
-	    <version>1.0</version>				\
-	    <id>vorbis-tag</id>					\
-	    <type>tagger</type>					\
-	    <tagspec>						\
-	      <name>Vorbis Comment</name>			\
-	      <coverart supported=\"true\" default=\"false\"/>	\
-	      <encodings>					\
-		<encoding>UTF-8</encoding>			\
-	      </encodings>					\
-	    </tagspec>						\
-	  </component>						\
-								\
+	static String	 componentSpecs = "		\
+							\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
+	  <component>					\
+	    <name>Vorbis Comment Tagger</name>		\
+	    <version>1.0</version>			\
+	    <id>vorbis-tag</id>				\
+	    <type>tagger</type>				\
+	    <tagspec>					\
+	      <name>Vorbis Comment</name>		\
+	      <coverart supported=\"true\"/>		\
+	      <encodings>				\
+		<encoding>UTF-8</encoding>		\
+	      </encodings>				\
+	    </tagspec>					\
+	  </component>					\
+							\
 	";
 
 	return componentSpecs;
