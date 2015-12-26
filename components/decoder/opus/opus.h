@@ -25,7 +25,7 @@ namespace BoCA
 			ogg_page		 og;
 			ogg_packet		 op;
 
-			OpusDecoder		*decoder;
+			OpusMSDecoder		*decoder;
 
 			Int			 sampleRate;
 

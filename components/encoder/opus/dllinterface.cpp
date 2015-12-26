@@ -15,19 +15,19 @@
 
 using namespace BoCA;
 
-OGGSTREAMINIT		 ex_ogg_stream_init		= NIL;
-OGGSTREAMPACKETIN	 ex_ogg_stream_packetin		= NIL;
-OGGSTREAMFLUSH		 ex_ogg_stream_flush		= NIL;
-OGGSTREAMPAGEOUT	 ex_ogg_stream_pageout		= NIL;
-OGGPAGEEOS		 ex_ogg_page_eos		= NIL;
-OGGPAGECHECKSUMSET	 ex_ogg_page_checksum_set	= NIL;
-OGGSTREAMCLEAR		 ex_ogg_stream_clear		= NIL;
+OGGSTREAMINIT				 ex_ogg_stream_init				= NIL;
+OGGSTREAMPACKETIN			 ex_ogg_stream_packetin				= NIL;
+OGGSTREAMFLUSH				 ex_ogg_stream_flush				= NIL;
+OGGSTREAMPAGEOUT			 ex_ogg_stream_pageout				= NIL;
+OGGPAGEEOS				 ex_ogg_page_eos				= NIL;
+OGGPAGECHECKSUMSET			 ex_ogg_page_checksum_set			= NIL;
+OGGSTREAMCLEAR				 ex_ogg_stream_clear				= NIL;
 
-OPUSENCODERCREATE	 ex_opus_encoder_create		= NIL;
-OPUSENCODE		 ex_opus_encode			= NIL;
-OPUSENCODERCTL		 ex_opus_encoder_ctl		= NIL;
-OPUSENCODERDESTROY	 ex_opus_encoder_destroy	= NIL;
-OPUSGETVERSIONSTRING	 ex_opus_get_version_string	= NIL;
+OPUSMULTISTREAMSURROUNDENCODERCREATE	 ex_opus_multistream_surround_encoder_create	= NIL;
+OPUSMULTISTREAMENCODE			 ex_opus_multistream_encode			= NIL;
+OPUSMULTISTREAMENCODERCTL		 ex_opus_multistream_encoder_ctl		= NIL;
+OPUSMULTISTREAMENCODERDESTROY		 ex_opus_multistream_encoder_destroy		= NIL;
+OPUSGETVERSIONSTRING			 ex_opus_get_version_string			= NIL;
 
 DynamicLoader *oggdll	= NIL;
 DynamicLoader *opusdll	= NIL;
@@ -70,17 +70,17 @@ Bool LoadOpusDLL()
 
 	if (opusdll == NIL) return False;
 
-	ex_opus_encoder_create		= (OPUSENCODERCREATE) opusdll->GetFunctionAddress("opus_encoder_create");
-	ex_opus_encode			= (OPUSENCODE) opusdll->GetFunctionAddress("opus_encode");
-	ex_opus_encoder_ctl		= (OPUSENCODERCTL) opusdll->GetFunctionAddress("opus_encoder_ctl");
-	ex_opus_encoder_destroy		= (OPUSENCODERDESTROY) opusdll->GetFunctionAddress("opus_encoder_destroy");
-	ex_opus_get_version_string	= (OPUSGETVERSIONSTRING) opusdll->GetFunctionAddress("opus_get_version_string");
+	ex_opus_multistream_surround_encoder_create	= (OPUSMULTISTREAMSURROUNDENCODERCREATE) opusdll->GetFunctionAddress("opus_multistream_surround_encoder_create");
+	ex_opus_multistream_encode			= (OPUSMULTISTREAMENCODE) opusdll->GetFunctionAddress("opus_multistream_encode");
+	ex_opus_multistream_encoder_ctl			= (OPUSMULTISTREAMENCODERCTL) opusdll->GetFunctionAddress("opus_multistream_encoder_ctl");
+	ex_opus_multistream_encoder_destroy		= (OPUSMULTISTREAMENCODERDESTROY) opusdll->GetFunctionAddress("opus_multistream_encoder_destroy");
+	ex_opus_get_version_string			= (OPUSGETVERSIONSTRING) opusdll->GetFunctionAddress("opus_get_version_string");
 
-	if (ex_opus_encoder_create	== NIL ||
-	    ex_opus_encode		== NIL ||
-	    ex_opus_encoder_ctl		== NIL ||
-	    ex_opus_encoder_destroy	== NIL ||
-	    ex_opus_get_version_string	== NIL) { FreeOpusDLL(); return False; }
+	if (ex_opus_multistream_surround_encoder_create	== NIL ||
+	    ex_opus_multistream_encode			== NIL ||
+	    ex_opus_multistream_encoder_ctl		== NIL ||
+	    ex_opus_multistream_encoder_destroy		== NIL ||
+	    ex_opus_get_version_string			== NIL) { FreeOpusDLL(); return False; }
 
 	return True;
 }

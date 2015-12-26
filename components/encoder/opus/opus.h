@@ -29,7 +29,7 @@ namespace BoCA
 			ogg_page		 og;
 			ogg_packet		 op;
 
-			OpusEncoder		*encoder;
+			OpusMSEncoder		*encoder;
 
 			Int			 frameSize;
 			Int			 sampleRate;

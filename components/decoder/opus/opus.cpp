@@ -128,7 +128,7 @@ Bool BoCA::DecoderOpus::CanOpenStream(const String &streamURI)
 					 */
 					OpusHeader	*setup = (OpusHeader *) op.packet;
 
-					if (setup->version_id >> 4 == 0 && setup->nb_channels <= 2) result = True;
+					if (setup->version_id >> 4 == 0 && setup->channel_mapping <= 1 && setup->nb_channels <= 8) result = True;
 				}
 
 				done = True;
@@ -164,6 +164,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Get stream format.
 	 */
+	OpusHeader		*setup = NIL;
 	Buffer<UnsignedByte>	 comments;
 
 	Bool	 initialized = False;
@@ -196,7 +197,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 				 */
 				if (packetNum == 0)
 				{
-					OpusHeader	*setup = (OpusHeader *) op.packet;
+					setup = (OpusHeader *) op.packet;
 
 					if (endianness != EndianLittle)
 					{
@@ -237,16 +238,21 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 				 */
 				if (packetNum == 3)
 				{
-					int			 error	 = 0;
-					OpusDecoder		*decoder = ex_opus_decoder_create(format.rate, format.channels, &error);
+					int		 error	    = 0;
+					unsigned char	 mapping[2] = { 0, 1 };
+
+					OpusMSDecoder	*decoder    = NIL;
+
+					if (setup->channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup->nb_channels, 1,		  setup->nb_channels - 1, mapping,	     &error);
+					else				 decoder = ex_opus_multistream_decoder_create(format.rate, setup->nb_channels, setup->nb_streams, setup->nb_coupled,	  setup->stream_map, &error);
 
 					if (error == 0)
 					{
 						Buffer<signed short>	 samples(maxFrameSize * format.channels);
 
-						track.approxLength = track.fileSize / (op.bytes * 1.05) * ex_opus_decode(decoder, op.packet, op.bytes, samples, maxFrameSize, 0);
+						track.approxLength = track.fileSize / (op.bytes * 1.05) * ex_opus_multistream_decode(decoder, op.packet, op.bytes, samples, maxFrameSize, 0);
 
-						ex_opus_decoder_destroy(decoder);
+						ex_opus_multistream_decoder_destroy(decoder);
 					}
 				}
 
@@ -386,9 +392,11 @@ Bool BoCA::DecoderOpus::Activate()
 						else				      sampleRate = 48000;
 					}
 
-					int	 error = 0;
+					int		 error	    = 0;
+					unsigned char	 mapping[2] = { 0, 1 };
 
-					decoder = ex_opus_decoder_create(sampleRate, setup->nb_channels, &error);
+					if (setup->channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(sampleRate, setup->nb_channels, 1,		 setup->nb_channels - 1, mapping,	    &error);
+					else				 decoder = ex_opus_multistream_decoder_create(sampleRate, setup->nb_channels, setup->nb_streams, setup->nb_coupled,	 setup->stream_map, &error);
 
 					preSkip	    = setup->preskip / (48000 / sampleRate);
 					preSkipLeft = setup->preskip / (48000 / sampleRate);
@@ -408,7 +416,7 @@ Bool BoCA::DecoderOpus::Deactivate()
 {
 	ex_ogg_stream_clear(&os);
 
-	ex_opus_decoder_destroy(decoder);
+	ex_opus_multistream_decoder_destroy(decoder);
 
 	ex_ogg_sync_clear(&oy);
 
@@ -438,7 +446,7 @@ Bool BoCA::DecoderOpus::Seek(Int64 samplePosition)
 
 	preSkipLeft += skipSamples;
 
-	ex_opus_decoder_ctl(decoder, OPUS_RESET_STATE);
+	ex_opus_multistream_decoder_ctl(decoder, OPUS_RESET_STATE);
 
 	return True;
 }
@@ -473,7 +481,7 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data)
 				data.Resize(dataBufferLen);
 			}
 
-			Int	 frameSize = ex_opus_decode(decoder, op.packet, op.bytes, (signed short *) (unsigned char *) (data + size), maxFrameSize, 0);
+			Int	 frameSize = ex_opus_multistream_decode(decoder, op.packet, op.bytes, (signed short *) (unsigned char *) (data + size), maxFrameSize, 0);
 
 			if (frameSize > preSkipLeft)
 			{
@@ -487,6 +495,14 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data)
 
 		if (ex_ogg_page_eos(&og)) break;
 	}
+
+	/* Change to default channel order.
+	 */
+	if	(format.channels == 3) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_3_0, Channel::Default_3_0);
+	else if (format.channels == 5) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_5_0, Channel::Default_5_0);
+	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_5_1, Channel::Default_5_1);
+	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_6_1, Channel::Default_6_1);
+	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_7_1, Channel::Default_7_1);
 
 	return size;
 }

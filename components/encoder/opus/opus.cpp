@@ -119,9 +119,9 @@ Bool BoCA::EncoderOpus::Activate()
 	const Format	&format = track.GetFormat();
 	Info		 info = track.GetInfo();
 
-	if (format.channels > 2)
+	if (format.channels > 8)
 	{
-		errorString = "This encoder does not support more than 2 channels!";
+		errorString = "This encoder does not support more than 8 channels!";
 		errorState  = True;
 
 		return False;
@@ -174,48 +174,58 @@ Bool BoCA::EncoderOpus::Activate()
 
 	dataBuffer.Resize(maxPacketSize);
 
-	/* Force 48 kHz as this is Opus' internally used rate.
-	 */
-	int	 error = 0;
-
-	encoder = ex_opus_encoder_create(sampleRate, format.channels, OPUS_APPLICATION_AUDIO, &error);
-
-	/* Set encoder parameters.
-	 */
-	if (config->GetIntValue("Opus", "Mode", 0)	!= 0) ex_opus_encoder_ctl(encoder, OPUS_SET_SIGNAL(OPUS_SIGNAL_VOICE + config->GetIntValue("Opus", "Mode", 0) - 1));
-	if (config->GetIntValue("Opus", "Bandwidth", 0) != 0) ex_opus_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_BANDWIDTH_NARROWBAND + config->GetIntValue("Opus", "Bandwidth", 0) - 1));
-
-	ex_opus_encoder_ctl(encoder, OPUS_SET_BITRATE( config->GetIntValue("Opus", "Bitrate", 128) * 1000));
-	ex_opus_encoder_ctl(encoder, OPUS_SET_VBR(config->GetIntValue("Opus", "EnableVBR", True)));
-	ex_opus_encoder_ctl(encoder, OPUS_SET_VBR_CONSTRAINT(config->GetIntValue("Opus", "EnableConstrainedVBR", False)));
-	ex_opus_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(config->GetIntValue("Opus", "Complexity", 10)));
-	ex_opus_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(config->GetIntValue("Opus", "PacketLoss", 0)));
-	ex_opus_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue("Opus", "EnableDTX", True)));
-	ex_opus_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(0));
-
-	/* Get number of pre-skip samples.
-	 */
-	int	 preSkip = 0;
-
-	ex_opus_encoder_ctl(encoder, OPUS_GET_LOOKAHEAD(&preSkip));
-
-	frameSize    = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue("Opus", "FrameSize", 20000)));
-	totalSamples = preSkip;
-	numPackets   = 0;
-
 	/* Create Opus header.
 	 */
 	OpusHeader	 setup;
 
 	strncpy(setup.codec_id, "OpusHead", 8);
 
-	setup.version_id	= 1;
-	setup.nb_channels	= format.channels;
-	setup.preskip		= preSkip * (48000 / sampleRate);
-	setup.sample_rate	= format.rate;
-	setup.output_gain	= 0;
-	setup.channel_mapping	= 0;
+	setup.version_id  = 1;
+	setup.nb_channels = format.channels;
+	setup.sample_rate = format.rate;
+	setup.output_gain = 0;
 
+	if (format.channels <= 2) setup.channel_mapping = 0;
+	else			  setup.channel_mapping = 1;
+
+	/* Init Opus encoder.
+	 */
+	int	 error	 = 0;
+	int	 streams = 0;
+	int	 coupled = 0;
+
+	encoder = ex_opus_multistream_surround_encoder_create(setup.sample_rate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
+
+	setup.nb_streams = streams;
+	setup.nb_coupled = coupled;
+
+	/* Set encoder parameters.
+	 */
+	if (config->GetIntValue("Opus", "Mode", 0)	!= 0) ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_SIGNAL(OPUS_SIGNAL_VOICE + config->GetIntValue("Opus", "Mode", 0) - 1));
+	if (config->GetIntValue("Opus", "Bandwidth", 0) != 0) ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_BANDWIDTH_NARROWBAND + config->GetIntValue("Opus", "Bandwidth", 0) - 1));
+
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_BITRATE( config->GetIntValue("Opus", "Bitrate", 128) * 1000));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR(config->GetIntValue("Opus", "EnableVBR", True)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR_CONSTRAINT(config->GetIntValue("Opus", "EnableConstrainedVBR", False)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(config->GetIntValue("Opus", "Complexity", 10)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(config->GetIntValue("Opus", "PacketLoss", 0)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue("Opus", "EnableDTX", True)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(0));
+
+	/* Get number of pre-skip samples.
+	 */
+	int	 preSkip = 0;
+
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_GET_LOOKAHEAD(&preSkip));
+
+	setup.preskip = preSkip * (48000 / sampleRate);
+
+	frameSize     = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue("Opus", "FrameSize", 20000)));
+	totalSamples  = preSkip;
+	numPackets    = 0;
+
+	/* Adjust endianness of header fields.
+	 */
 	if (endianness != EndianLittle)
 	{
 		BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.preskip, sizeof(setup.preskip));
@@ -223,7 +233,9 @@ Bool BoCA::EncoderOpus::Activate()
 		BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.output_gain, sizeof(setup.output_gain));
 	}
 
-	ogg_packet	 header = { (unsigned char *) &setup, 19, 1, 0, 0, numPackets };
+	/* Write header packet.
+	 */
+	ogg_packet	 header = { (unsigned char *) &setup, 19 + (setup.channel_mapping == 0 ? 0 : 2 + setup.nb_channels), 1, 0, 0, numPackets };
 
 	ex_ogg_stream_packetin(&os, &header);
 
@@ -309,7 +321,7 @@ Bool BoCA::EncoderOpus::Deactivate()
 	 */
 	WriteOggPackets(True);
 
-	ex_opus_encoder_destroy(encoder);
+	ex_opus_multistream_encoder_destroy(encoder);
 
 	ex_ogg_stream_clear(&os);
 
@@ -332,13 +344,24 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
+	const Format	&format = track.GetFormat();
+
+	/* Change to Vorbis channel order.
+	 */
+	if	(format.channels == 3) Utilities::ChangeChannelOrder(data, format, Channel::Default_3_0, Channel::Vorbis_3_0);
+	else if (format.channels == 5) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_0, Channel::Vorbis_5_0);
+	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_1, Channel::Vorbis_5_1);
+	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Default_6_1, Channel::Vorbis_6_1);
+	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Default_7_1, Channel::Vorbis_7_1);
+
+	/* Resample data.
+	 */
 	Int	 size = resampler->TransformData(data);
 
 	/* Convert samples to 16 bit.
 	 */
-	const Format	&format	 = track.GetFormat();
-	Int		 samples = size / format.channels / (format.bits / 8);
-	Int		 offset	 = samplesBuffer.Size();
+	Int	 samples = size / format.channels / (format.bits / 8);
+	Int	 offset	 = samplesBuffer.Size();
 
 	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
 
@@ -380,7 +403,7 @@ Int BoCA::EncoderOpus::EncodeFrames(Buffer<signed short> &samplesBuffer, Buffer<
 
 	while (samplesBuffer.Size() - framesProcessed * frameSize * format.channels >= frameSize * format.channels)
 	{
-		Int	 dataLength = ex_opus_encode(encoder, samplesBuffer + framesProcessed * frameSize * format.channels, frameSize, dataBuffer, dataBuffer.Size());
+		Int	 dataLength = ex_opus_multistream_encode(encoder, samplesBuffer + framesProcessed * frameSize * format.channels, frameSize, dataBuffer, dataBuffer.Size());
 
 		totalSamples += frameSize;
 
