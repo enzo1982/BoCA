@@ -342,12 +342,15 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderSndFile::DecoderSndFile()
 {
-	packageSize = 0;
+	packageSize	= 0;
 
-	fileFormat  = 0;
+	fileFormat	= 0;
 
-	file	    = 0;
-	sndf	    = NIL;
+	floatFormat	= False;
+	floatFormatBits	= 32;
+
+	file		= 0;
+	sndf		= NIL;
 }
 
 BoCA::DecoderSndFile::~DecoderSndFile()
@@ -376,7 +379,8 @@ Bool BoCA::DecoderSndFile::Activate()
 
 	if (sndf == NIL) { fclose(file); return False; }
 
-	ex_sf_command(sndf, SFC_SET_SCALE_FLOAT_INT_READ, NIL, SF_TRUE);
+	if	((sinfo.format & SF_FORMAT_SUBMASK) == SF_FORMAT_FLOAT)	 { floatFormat = True; floatFormatBits = 32; }
+	else if ((sinfo.format & SF_FORMAT_SUBMASK) == SF_FORMAT_DOUBLE) { floatFormat = True; floatFormatBits = 64; }
 
 	fileFormat = sinfo.format & SF_FORMAT_TYPEMASK;
 
@@ -410,6 +414,8 @@ Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data)
 	 */
 	Int	 size = data.Size() - data.Size() % (format.bits / 8 * format.channels);
 
+	if (floatFormat && floatFormatBits == 64) size *= 2;
+
 	data.Resize(size);
 
 	if (format.bits == 8)
@@ -438,9 +444,31 @@ Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data)
 			else				{ data[i * 3 + 2] = (buffer[i] >>  8) & 0xFF; data[i * 3 + 1] = (buffer[i] >> 16) & 0xFF; data[i * 3 + 0] = (buffer[i] >> 24) & 0xFF; }
 		}
 	}
-	else if (format.bits == 32)
+	else if (format.bits == 32 && !floatFormat)
 	{
 		size = ex_sf_read_int(sndf, (int *) (UnsignedByte *) data, size / 4) * 4;
+	}
+	else if (floatFormat && floatFormatBits == 32)
+	{
+		size = ex_sf_read_float(sndf, (float *) (UnsignedByte *) data, size / 4) * 4;
+
+		/* Convert float to integer.
+		 */
+		for (Int i = 0; i < size / 4; i++) ((Int32 *) (unsigned char *) data)[i] = Math::Min(Int64( 0x7FFFFFFF),
+											   Math::Max(Int64(~0x7FFFFFFF), Int64(((ShortFloat *) (unsigned char *) data)[i] * 0x80000000)));
+	}
+	else if (floatFormat && floatFormatBits == 64)
+	{
+		size = ex_sf_read_double(sndf, (double *) (UnsignedByte *) data, size / 8) * 8;
+
+		/* Convert float to integer.
+		 */
+		for (Int i = 0; i < size / 8; i++) ((Int32 *) (unsigned char *) data)[i] = Math::Min(Int64( 0x7FFFFFFF),
+											   Math::Max(Int64(~0x7FFFFFFF), Int64(((Float *)      (unsigned char *) data)[i] * 0x80000000)));
+
+		size /= 2;
+
+		data.Resize(size);
 	}
 
 	/* Reorder channels.

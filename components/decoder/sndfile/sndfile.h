@@ -22,6 +22,9 @@ namespace BoCA
 		private:
 			Int			 fileFormat;
 
+			Bool			 floatFormat;
+			Int			 floatFormatBits;
+
 			FILE			*file;
 			SNDFILE			*sndf;
 		public:

@@ -18,6 +18,8 @@ SF_CLOSE	 ex_sf_close		= NIL;
 SF_SEEK		 ex_sf_seek		= NIL;
 SF_READ_SHORT	 ex_sf_read_short	= NIL;
 SF_READ_INT	 ex_sf_read_int		= NIL;
+SF_READ_FLOAT	 ex_sf_read_float	= NIL;
+SF_READ_DOUBLE	 ex_sf_read_double	= NIL;
 SF_GET_STRING	 ex_sf_get_string	= NIL;
 SF_COMMAND	 ex_sf_command		= NIL;
 SF_STRERROR	 ex_sf_strerror		= NIL;
@@ -35,6 +37,8 @@ Bool LoadSndFileDLL()
 	ex_sf_seek		= (SF_SEEK) sndfiledll->GetFunctionAddress("sf_seek");
 	ex_sf_read_short	= (SF_READ_SHORT) sndfiledll->GetFunctionAddress("sf_read_short");
 	ex_sf_read_int		= (SF_READ_INT) sndfiledll->GetFunctionAddress("sf_read_int");
+	ex_sf_read_float	= (SF_READ_FLOAT) sndfiledll->GetFunctionAddress("sf_read_float");
+	ex_sf_read_double	= (SF_READ_DOUBLE) sndfiledll->GetFunctionAddress("sf_read_double");
 	ex_sf_get_string	= (SF_GET_STRING) sndfiledll->GetFunctionAddress("sf_get_string");
 	ex_sf_command		= (SF_COMMAND) sndfiledll->GetFunctionAddress("sf_command");
 	ex_sf_strerror		= (SF_STRERROR) sndfiledll->GetFunctionAddress("sf_strerror");
@@ -44,6 +48,8 @@ Bool LoadSndFileDLL()
 	    ex_sf_seek		== NIL ||
 	    ex_sf_read_short	== NIL ||
 	    ex_sf_read_int	== NIL ||
+	    ex_sf_read_float	== NIL ||
+	    ex_sf_read_double	== NIL ||
 	    ex_sf_get_string	== NIL ||
 	    ex_sf_command	== NIL ||
 	    ex_sf_strerror	== NIL) { FreeSndFileDLL(); return False; }
