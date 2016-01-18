@@ -388,7 +388,8 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data)
 			float  **pcm;
 			int	 samples;
 
-			ex_vorbis_synthesis(&vb, &op);
+			if (ex_vorbis_synthesis(&vb, &op) != 0) continue;
+
 			ex_vorbis_synthesis_blockin(&vd, &vb);
 
 			while ((samples = ex_vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
