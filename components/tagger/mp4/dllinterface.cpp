@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -39,6 +39,7 @@ MP4TAGSSETDISK		 ex_MP4TagsSetDisk		= NIL;
 MP4TAGSSETCOMPILATION	 ex_MP4TagsSetCompilation	= NIL;
 MP4TAGSSETCOPYRIGHT	 ex_MP4TagsSetCopyright		= NIL;
 MP4TAGSSETMEDIATYPE	 ex_MP4TagsSetMediaType		= NIL;
+MP4TAGSSETTEMPO		 ex_MP4TagsSetTempo		= NIL;
 
 MP4TAGSADDARTWORK	 ex_MP4TagsAddArtwork		= NIL;
 MP4TAGSREMOVEARTWORK	 ex_MP4TagsRemoveArtwork	= NIL;
@@ -80,6 +81,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4TagsSetCompilation	= (MP4TAGSSETCOMPILATION) mp4v2dll->GetFunctionAddress("MP4TagsSetCompilation");
 	ex_MP4TagsSetCopyright		= (MP4TAGSSETCOPYRIGHT) mp4v2dll->GetFunctionAddress("MP4TagsSetCopyright");
 	ex_MP4TagsSetMediaType		= (MP4TAGSSETMEDIATYPE) mp4v2dll->GetFunctionAddress("MP4TagsSetMediaType");
+	ex_MP4TagsSetTempo		= (MP4TAGSSETTEMPO) mp4v2dll->GetFunctionAddress("MP4TagsSetTempo");
 
 	ex_MP4TagsAddArtwork		= (MP4TAGSADDARTWORK) mp4v2dll->GetFunctionAddress("MP4TagsAddArtwork");
 	ex_MP4TagsRemoveArtwork		= (MP4TAGSREMOVEARTWORK) mp4v2dll->GetFunctionAddress("MP4TagsRemoveArtwork");
@@ -113,6 +115,7 @@ Bool LoadMP4v2DLL()
 	    ex_MP4TagsSetCompilation	== NIL ||
 	    ex_MP4TagsSetCopyright	== NIL ||
 	    ex_MP4TagsSetMediaType	== NIL ||
+	    ex_MP4TagsSetTempo		== NIL ||
 
 	    ex_MP4TagsAddArtwork	== NIL ||
 	    ex_MP4TagsRemoveArtwork	== NIL ||

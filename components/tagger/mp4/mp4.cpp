@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -154,7 +154,14 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 		if (value == NIL) continue;
 
-		if (key == String(INFO_COMPOSER).Append(":")) ex_MP4TagsSetComposer(mp4Tags, value.Trim());
+		if	(key == String(INFO_COMPOSER).Append(":")) ex_MP4TagsSetComposer(mp4Tags, value.Trim());
+
+		else if (key == String(INFO_BPM).Append(":"))
+		{
+			uint16_t	 tempo = value.ToInt();
+
+			ex_MP4TagsSetTempo(mp4Tags, &tempo);
+		}
 	}
 
 	/* Save cover art.
@@ -272,6 +279,8 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 	if	(mp4Tags->comments    != NIL) info.comment  = String(mp4Tags->comments).Trim();
 
 	if	(mp4Tags->composer    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(String(mp4Tags->composer).Trim()));
+
+	if	(mp4Tags->tempo	      != NIL) info.other.Add(String(INFO_BPM).Append(":").Append(String::FromInt(*mp4Tags->tempo)));
 
 	if	(mp4Tags->genre	      != NIL) info.genre    = String(mp4Tags->genre).Trim();
 	else if (mp4Tags->genreType   != NIL) info.genre    = GetID3CategoryName(*mp4Tags->genreType - 1);

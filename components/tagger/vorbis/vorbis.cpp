@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -89,6 +89,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		if	(key == String(INFO_CONDUCTOR).Append(":")) { RenderTagItem("PERFORMER", value, buffer); numItems++; }
 		else if	(key == String(INFO_COMPOSER).Append(":"))  { RenderTagItem("COMPOSER",  value, buffer); numItems++; }
 		else if	(key == String(INFO_LYRICIST).Append(":"))  { RenderTagItem("LYRICIST",  value, buffer); numItems++; }
+
+		else if	(key == String(INFO_BPM).Append(":"))	    { RenderTagItem("BPM",	 value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -274,6 +276,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "PERFORMER")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
 		else if (id == "COMPOSER")     info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
 		else if (id == "LYRICIST")     info.other.Add(String(INFO_LYRICIST).Append(":").Append(value));
+
+		else if (id == "BPM")	       info.other.Add(String(INFO_BPM).Append(":").Append(value));
 
 		else if (id.StartsWith("REPLAYGAIN"))
 		{

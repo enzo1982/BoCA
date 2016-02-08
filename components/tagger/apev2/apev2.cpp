@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -107,6 +107,8 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		else if	(key == String(INFO_CONDUCTOR).Append(":")) { RenderAPEItem("Conductor", value, buffer); numItems++; }
 		else if	(key == String(INFO_COMPOSER).Append(":"))  { RenderAPEItem("Composer",  value, buffer); numItems++; }
+	
+		else if	(key == String(INFO_BPM).Append(":"))	    { RenderAPEItem("BPM",	 value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -283,6 +285,8 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		else if (id == "CONDUCTOR") info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
 		else if (id == "COMPOSER")  info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
+
+		else if (id == "BPM")	    info.other.Add(String(INFO_BPM).Append(":").Append(value));
 
 		else if (id == "TRACK")
 		{
