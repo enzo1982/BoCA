@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -52,6 +52,11 @@ namespace BoCA
 
 			Text				*text_isrc;
 			EditBox				*edit_isrc;
+
+			GroupBox			*group_tempo;
+
+			Text				*text_bpm;
+			EditBox				*edit_bpm;
 
 			Track				 track;
 

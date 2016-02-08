@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -72,6 +72,19 @@ BoCA::LayerTagDetails::LayerTagDetails() : Editor("Details")
 
 	Add(group_publisher);
 
+	group_tempo		= new GroupBox(NIL, Point(7, 87), Size(400, 39));
+
+	text_bpm		= new Text(NIL, Point(9, 13));
+
+	edit_bpm		= new EditBox(NIL, text_bpm->GetPosition() + Point(7, -3), Size(50, 0), 4);
+	edit_bpm->SetFlags(EDB_NUMERIC);
+	edit_bpm->onInput.Connect(&LayerTagDetails::OnModifyTrack, this);
+
+	group_tempo->Add(text_bpm);
+	group_tempo->Add(edit_bpm);
+
+	Add(group_tempo);
+
 	allowTrackRemoveByDeleteKey.Connect(&LayerTagDetails::AllowTrackRemoveByDeleteKey, this);
 
 	onChangeSize.Connect(&LayerTagDetails::OnChangeSize, this);
@@ -104,6 +117,10 @@ BoCA::LayerTagDetails::~LayerTagDetails()
 	DeleteObject(edit_publisher);
 	DeleteObject(text_isrc);
 	DeleteObject(edit_isrc);
+
+	DeleteObject(group_tempo);
+	DeleteObject(text_bpm);
+	DeleteObject(edit_bpm);
 }
 
 /* Called when layer size changes.
@@ -117,7 +134,7 @@ Void BoCA::LayerTagDetails::OnChangeSize(const Size &nSize)
 	group_details->SetWidth((clientSize.cx - 23) / 2);
 
 	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(text_band->GetUnscaledTextWidth(), text_conductor->GetUnscaledTextWidth()), text_remix->GetUnscaledTextWidth()), Math::Max(text_composer->GetUnscaledTextWidth(), text_textwriter->GetUnscaledTextWidth()));
-	Int	 maxTextSize2 = Math::Max(text_publisher->GetUnscaledTextWidth(), text_isrc->GetUnscaledTextWidth());
+	Int	 maxTextSize2 = Math::Max(Math::Max(text_publisher->GetUnscaledTextWidth(), text_isrc->GetUnscaledTextWidth()), text_bpm->GetUnscaledTextWidth());
 
 	edit_band->SetWidth(group_details->GetWidth() - 26 - maxTextSize);
 	edit_conductor->SetWidth(group_details->GetWidth() - 26 - maxTextSize);
@@ -130,6 +147,9 @@ Void BoCA::LayerTagDetails::OnChangeSize(const Size &nSize)
 
 	edit_publisher->SetWidth(group_details->GetWidth() - 26 - maxTextSize2);
 	edit_isrc->SetWidth(group_details->GetWidth() - 26 - maxTextSize2);
+
+	group_tempo->SetX((clientSize.cx / 2) + 4);
+	group_tempo->SetWidth((clientSize.cx - 24) / 2 + (clientSize.cx % 2));
 }
 
 /* Called when application language is changed.
@@ -171,10 +191,16 @@ Void BoCA::LayerTagDetails::OnChangeLanguageSettings()
 	text_publisher->SetText(i18n->AddColon(i18n->TranslateString("Publisher / label")));
 	text_isrc->SetText(i18n->AddColon(i18n->TranslateString("ISRC")));
 
-	Int	 maxTextSize2 = Math::Max(text_publisher->GetUnscaledTextWidth(), text_isrc->GetUnscaledTextWidth());
+	group_tempo->SetText(i18n->TranslateString("Tempo"));
+
+	text_bpm->SetText(i18n->AddColon(i18n->TranslateString("BPM")));
+
+	Int	 maxTextSize2 = Math::Max(Math::Max(text_publisher->GetUnscaledTextWidth(), text_isrc->GetUnscaledTextWidth()), text_bpm->GetUnscaledTextWidth());
 
 	edit_publisher->SetX(text_publisher->GetX() + maxTextSize2 + 7);
 	edit_isrc->SetX(text_isrc->GetX() + maxTextSize2 + 7);
+
+	edit_bpm->SetX(text_bpm->GetX() + maxTextSize2 + 7);
 
 	/* OnChangeSize will correct sizes of any other widgets.
 	 */
@@ -194,6 +220,7 @@ EditBox *BoCA::LayerTagDetails::GetActiveEditBox()
 	else if	(edit_textwriter->IsFocussed())	return edit_textwriter;
 	else if	(edit_publisher->IsFocussed())	return edit_publisher;
 	else if	(edit_isrc->IsFocussed())	return edit_isrc;
+	else if	(edit_bpm->IsFocussed())	return edit_bpm;
 
 	return NIL;
 }
@@ -227,6 +254,11 @@ Void BoCA::LayerTagDetails::OnSelectTrack(const Track &nTrack)
 	text_isrc->Activate();
 	edit_isrc->Activate();
 
+	group_tempo->Activate();
+
+	text_bpm->Activate();
+	edit_bpm->Activate();
+
 	const Info	&info = track.GetInfo();
 
 	edit_publisher->SetText(info.label);
@@ -241,6 +273,7 @@ Void BoCA::LayerTagDetails::OnSelectTrack(const Track &nTrack)
 		else if	(value.StartsWith(String(INFO_REMIX).Append(":")))	   { edit_remix->SetText(value.Tail(value.Length() - value.Find(":") - 1));	  }
 		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	   { edit_composer->SetText(value.Tail(value.Length() - value.Find(":") - 1));	  }
 		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   { edit_textwriter->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
+		else if	(value.StartsWith(String(INFO_BPM).Append(":")))	   { edit_bpm->SetText(value.Tail(value.Length() - value.Find(":") - 1));	  }
 	}
 
 	EditBox	*activeEditBox = GetActiveEditBox();
@@ -274,6 +307,11 @@ Void BoCA::LayerTagDetails::OnSelectAlbum(const Track &nTrack)
 
 	text_isrc->Deactivate();
 	edit_isrc->Deactivate();
+
+	group_tempo->Deactivate();
+
+	text_bpm->Deactivate();
+	edit_bpm->Deactivate();
 
 	const Info	&info = track.GetInfo();
 
@@ -309,8 +347,11 @@ Void BoCA::LayerTagDetails::OnSelectNone()
 	edit_publisher->SetText(NIL);
 	edit_isrc->SetText(NIL);
 
+	edit_bpm->SetText(NIL);
+
 	group_details->Deactivate();
 	group_publisher->Deactivate();
+	group_tempo->Deactivate();
 
 	surface->EndPaint();
 
@@ -333,6 +374,7 @@ Void BoCA::LayerTagDetails::OnModifyTrack()
 	Bool	 modified_remix		= False;
 	Bool	 modified_composer	= False;
 	Bool	 modified_textwriter	= False;
+	Bool	 modified_bpm		= False;
 
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
@@ -343,6 +385,7 @@ Void BoCA::LayerTagDetails::OnModifyTrack()
 		else if	(value.StartsWith(String(INFO_REMIX).Append(":")))	   { if (edit_remix->GetText()	     != NIL) { info.other.SetNth(i, String(INFO_REMIX).Append(":").Append(edit_remix->GetText()));		 modified_remix		= True; } else { info.other.RemoveNth(i); } }
 		else if	(value.StartsWith(String(INFO_COMPOSER).Append(":")))	   { if (edit_composer->GetText()    != NIL) { info.other.SetNth(i, String(INFO_COMPOSER).Append(":").Append(edit_composer->GetText()));	 modified_composer	= True; } else { info.other.RemoveNth(i); } }
 		else if	(value.StartsWith(String(INFO_LYRICIST).Append(":")))	   { if (edit_textwriter->GetText()  != NIL) { info.other.SetNth(i, String(INFO_LYRICIST).Append(":").Append(edit_textwriter->GetText()));	 modified_textwriter	= True; } else { info.other.RemoveNth(i); } }
+		else if	(value.StartsWith(String(INFO_BPM).Append(":")))	   { if (edit_bpm->GetText()	     != NIL) { info.other.SetNth(i, String(INFO_BPM).Append(":").Append(edit_bpm->GetText()));			 modified_bpm		= True; } else { info.other.RemoveNth(i); } }
 	}
 
 	if	(!modified_band	       && edit_band->GetText()	      != NIL) info.other.Add(String(INFO_BAND).Append(":").Append(edit_band->GetText()));
@@ -350,6 +393,7 @@ Void BoCA::LayerTagDetails::OnModifyTrack()
 	else if	(!modified_remix       && edit_remix->GetText()	      != NIL) info.other.Add(String(INFO_REMIX).Append(":").Append(edit_remix->GetText()));
 	else if	(!modified_composer    && edit_composer->GetText()    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(edit_composer->GetText()));
 	else if	(!modified_textwriter  && edit_textwriter->GetText()  != NIL) info.other.Add(String(INFO_LYRICIST).Append(":").Append(edit_textwriter->GetText()));
+	else if	(!modified_bpm	       && edit_bpm->GetText()	      != NIL) info.other.Add(String(INFO_BPM).Append(":").Append(edit_bpm->GetText()));
 
 	track.SetInfo(info);
 
