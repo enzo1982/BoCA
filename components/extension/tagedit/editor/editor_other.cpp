@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -262,21 +262,22 @@ Void BoCA::LayerTagOther::OnSelectTrack(const Track &nTrack)
 
 	const Info	&info = track.GetInfo();
 
-	for (Int i = 0; i < info.other.Length(); i++)
+	foreach (const String &pair, info.other)
 	{
-		const String	&value = info.other.GetNth(i);
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
-		if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))    { edit_oartist->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
-		else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))     { edit_oalbum->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
-		else if	(value.StartsWith(String(INFO_ORIG_LYRICIST).Append(":")))  { edit_otextwriter->SetText(value.Tail(value.Length() - value.Find(":") - 1)); }
-		else if	(value.StartsWith(String(INFO_ORIG_YEAR).Append(":")))	    { edit_oyear->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
+		if	(key == String(INFO_ORIG_ARTIST).Append(":"))    edit_oartist->SetText(value);
+		else if	(key == String(INFO_ORIG_ALBUM).Append(":"))     edit_oalbum->SetText(value);
+		else if	(key == String(INFO_ORIG_LYRICIST).Append(":"))  edit_otextwriter->SetText(value);
+		else if	(key == String(INFO_ORIG_YEAR).Append(":"))	 edit_oyear->SetText(value);
 
-		else if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	    { edit_wartist->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
-		else if	(value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")))  { edit_wpublisher->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
-		else if	(value.StartsWith(String(INFO_WEB_RADIO).Append(":")))	    { edit_wradio->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
-		else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	    { edit_wsource->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
-		else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")))  { edit_wcopyright->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
-		else if	(value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) { edit_wcommercial->SetText(value.Tail(value.Length() - value.Find(":") - 1)); }
+		else if	(key == String(INFO_WEB_ARTIST).Append(":"))	 edit_wartist->SetText(value);
+		else if	(key == String(INFO_WEB_PUBLISHER).Append(":"))  edit_wpublisher->SetText(value);
+		else if	(key == String(INFO_WEB_RADIO).Append(":"))	 edit_wradio->SetText(value);
+		else if	(key == String(INFO_WEB_SOURCE).Append(":"))	 edit_wsource->SetText(value);
+		else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))  edit_wcopyright->SetText(value);
+		else if	(key == String(INFO_WEB_COMMERCIAL).Append(":")) edit_wcommercial->SetText(value);
 	}
 
 	EditBox	*activeEditBox = GetActiveEditBox();
@@ -310,16 +311,17 @@ Void BoCA::LayerTagOther::OnSelectAlbum(const Track &nTrack)
 
 	const Info	&info = track.GetInfo();
 
-	for (Int i = 0; i < info.other.Length(); i++)
+	foreach (const String &pair, info.other)
 	{
-		const String	&value = info.other.GetNth(i);
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
-		if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	    { edit_wartist->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
-		else if	(value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")))  { edit_wpublisher->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
-		else if	(value.StartsWith(String(INFO_WEB_RADIO).Append(":")))	    { edit_wradio->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
-		else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	    { edit_wsource->SetText(value.Tail(value.Length() - value.Find(":") - 1));	   }
-		else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")))  { edit_wcopyright->SetText(value.Tail(value.Length() - value.Find(":") - 1));  }
-		else if	(value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) { edit_wcommercial->SetText(value.Tail(value.Length() - value.Find(":") - 1)); }
+		if	(key == String(INFO_WEB_ARTIST).Append(":"))	 edit_wartist->SetText(value);
+		else if	(key == String(INFO_WEB_PUBLISHER).Append(":"))  edit_wpublisher->SetText(value);
+		else if	(key == String(INFO_WEB_RADIO).Append(":"))	 edit_wradio->SetText(value);
+		else if	(key == String(INFO_WEB_SOURCE).Append(":"))	 edit_wsource->SetText(value);
+		else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))  edit_wcopyright->SetText(value);
+		else if	(key == String(INFO_WEB_COMMERCIAL).Append(":")) edit_wcommercial->SetText(value);
 	}
 
 	EditBox	*activeEditBox = GetActiveEditBox();
@@ -385,19 +387,22 @@ Void BoCA::LayerTagOther::OnModifyTrack()
 
 	for (Int i = 0; i < info.other.Length(); i++)
 	{
-		const String	&value = info.other.GetNth(i);
+		const String	&pair = info.other.GetNth(i);
 
-		if	(value.StartsWith(String(INFO_ORIG_ARTIST).Append(":")))    { if (edit_oartist->GetText()     != NIL) { info.other.SetNth(i, String(INFO_ORIG_ARTIST).Append(":").Append(edit_oartist->GetText()));	   modified_oartist	= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_ORIG_ALBUM).Append(":")))     { if (edit_oalbum->GetText()      != NIL) { info.other.SetNth(i, String(INFO_ORIG_ALBUM).Append(":").Append(edit_oalbum->GetText()));	   modified_oalbum	= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_ORIG_LYRICIST).Append(":")))  { if (edit_otextwriter->GetText() != NIL) { info.other.SetNth(i, String(INFO_ORIG_LYRICIST).Append(":").Append(edit_otextwriter->GetText()));  modified_otextwriter	= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_ORIG_YEAR).Append(":")))	    { if (edit_oyear->GetText()	      != NIL) { info.other.SetNth(i, String(INFO_ORIG_YEAR).Append(":").Append(edit_oyear->GetText()));		   modified_oyear	= True; } else { info.other.RemoveNth(i); } }
+		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
-		else if	(value.StartsWith(String(INFO_WEB_ARTIST).Append(":")))	    { if (edit_wartist->GetText()     != NIL) { info.other.SetNth(i, String(INFO_WEB_ARTIST).Append(":").Append(edit_wartist->GetText()));	   modified_wartist	= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_WEB_PUBLISHER).Append(":")))  { if (edit_wpublisher->GetText()  != NIL) { info.other.SetNth(i, String(INFO_WEB_PUBLISHER).Append(":").Append(edit_wpublisher->GetText()));   modified_wpublisher	= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_WEB_RADIO).Append(":")))	    { if (edit_wradio->GetText()      != NIL) { info.other.SetNth(i, String(INFO_WEB_RADIO).Append(":").Append(edit_wradio->GetText()));	   modified_wradio	= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_WEB_SOURCE).Append(":")))	    { if (edit_wsource->GetText()     != NIL) { info.other.SetNth(i, String(INFO_WEB_SOURCE).Append(":").Append(edit_wsource->GetText()));	   modified_wsource	= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_WEB_COPYRIGHT).Append(":")))  { if (edit_wcopyright->GetText()  != NIL) { info.other.SetNth(i, String(INFO_WEB_COPYRIGHT).Append(":").Append(edit_wcopyright->GetText()));   modified_wcopyright	= True; } else { info.other.RemoveNth(i); } }
-		else if	(value.StartsWith(String(INFO_WEB_COMMERCIAL).Append(":"))) { if (edit_wcommercial->GetText() != NIL) { info.other.SetNth(i, String(INFO_WEB_COMMERCIAL).Append(":").Append(edit_wcommercial->GetText())); modified_wcommercial	= True; } else { info.other.RemoveNth(i); } }
+		if	(key == String(INFO_ORIG_ARTIST).Append(":"))    { if (edit_oartist->GetText()     != NIL) { info.other.SetNth(i, String(INFO_ORIG_ARTIST).Append(":").Append(edit_oartist->GetText()));	modified_oartist	= True; } else { info.other.RemoveNth(i); } }
+		else if	(key == String(INFO_ORIG_ALBUM).Append(":"))     { if (edit_oalbum->GetText()      != NIL) { info.other.SetNth(i, String(INFO_ORIG_ALBUM).Append(":").Append(edit_oalbum->GetText()));		modified_oalbum		= True; } else { info.other.RemoveNth(i); } }
+		else if	(key == String(INFO_ORIG_LYRICIST).Append(":"))  { if (edit_otextwriter->GetText() != NIL) { info.other.SetNth(i, String(INFO_ORIG_LYRICIST).Append(":").Append(edit_otextwriter->GetText()));  modified_otextwriter	= True; } else { info.other.RemoveNth(i); } }
+		else if	(key == String(INFO_ORIG_YEAR).Append(":"))	 { if (edit_oyear->GetText()	   != NIL) { info.other.SetNth(i, String(INFO_ORIG_YEAR).Append(":").Append(edit_oyear->GetText()));		modified_oyear		= True; } else { info.other.RemoveNth(i); } }
+
+		else if	(key == String(INFO_WEB_ARTIST).Append(":"))	 { if (edit_wartist->GetText()     != NIL) { info.other.SetNth(i, String(INFO_WEB_ARTIST).Append(":").Append(edit_wartist->GetText()));		modified_wartist	= True; } else { info.other.RemoveNth(i); } }
+		else if	(key == String(INFO_WEB_PUBLISHER).Append(":"))  { if (edit_wpublisher->GetText()  != NIL) { info.other.SetNth(i, String(INFO_WEB_PUBLISHER).Append(":").Append(edit_wpublisher->GetText()));   modified_wpublisher	= True; } else { info.other.RemoveNth(i); } }
+		else if	(key == String(INFO_WEB_RADIO).Append(":"))	 { if (edit_wradio->GetText()      != NIL) { info.other.SetNth(i, String(INFO_WEB_RADIO).Append(":").Append(edit_wradio->GetText()));		modified_wradio		= True; } else { info.other.RemoveNth(i); } }
+		else if	(key == String(INFO_WEB_SOURCE).Append(":"))	 { if (edit_wsource->GetText()     != NIL) { info.other.SetNth(i, String(INFO_WEB_SOURCE).Append(":").Append(edit_wsource->GetText()));		modified_wsource	= True; } else { info.other.RemoveNth(i); } }
+		else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))  { if (edit_wcopyright->GetText()  != NIL) { info.other.SetNth(i, String(INFO_WEB_COPYRIGHT).Append(":").Append(edit_wcopyright->GetText()));   modified_wcopyright	= True; } else { info.other.RemoveNth(i); } }
+		else if	(key == String(INFO_WEB_COMMERCIAL).Append(":")) { if (edit_wcommercial->GetText() != NIL) { info.other.SetNth(i, String(INFO_WEB_COMMERCIAL).Append(":").Append(edit_wcommercial->GetText())); modified_wcommercial	= True; } else { info.other.RemoveNth(i); } }
 	}
 
 	if	(!modified_oartist     && edit_oartist->GetText()     != NIL) info.other.Add(String(INFO_ORIG_ARTIST).Append(":").Append(edit_oartist->GetText()));
