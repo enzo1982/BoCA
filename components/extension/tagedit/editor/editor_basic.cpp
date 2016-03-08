@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -15,7 +15,6 @@
 
 #include "../utilities.h"
 
-using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
 BoCA::LayerTagBasic::LayerTagBasic() : Editor("Basic")
@@ -352,34 +351,30 @@ Void BoCA::LayerTagBasic::AddCover()
 
 	if (dialog->ShowDialog() == Success())
 	{
-		String		 file = dialog->GetFileName();
+		String	 file = dialog->GetFileName();
+
+		/* Add entry to image box.
+		 */
 		ImageEntry	*entry = new ImageEntry(ImageLoader::Load(file), Size(70, 70));
 
 		entry->onLeftButtonDoubleClick.Connect(&LayerTagBasic::DisplayCover, this);
 
 		image_covers->Add(entry);
 
-		InStream		 in(STREAM_FILE, file, IS_READ);
-		Buffer<UnsignedByte>	 buffer(in.Size());
-
-		in.InputData(buffer, buffer.Size());
-
+		/* Add picture to track.
+		 */
 		Picture	 picture;
 
-		if	(buffer[0] == 0xFF && buffer[1] == 0xD8) picture.mime = "image/jpeg";
-		else if (buffer[0] == 0x89 && buffer[1] == 0x50 &&
-			 buffer[2] == 0x4E && buffer[3] == 0x47 &&
-			 buffer[4] == 0x0D && buffer[5] == 0x0A &&
-			 buffer[6] == 0x1A && buffer[7] == 0x0A) picture.mime = "image/png";
+		picture.LoadFromFile(file);
 
 		if	(track.pictures.Length() == 0) picture.type = 3; // Cover (front)
 		else if (track.pictures.Length() == 1) picture.type = 4; // Cover (back)
 		else				       picture.type = 0; // Other
 
-		picture.data = buffer;
-
 		track.pictures.Add(picture);
 
+		/* Select cover and send notifications.
+		 */
 		image_covers->SelectNthEntry(image_covers->Length() - 1);
 
 		onModifyTrack.Emit(track);
