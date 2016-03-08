@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -390,8 +390,11 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 				picture.mime = picData->pwszMIMEType;
 
-				if	(picture.mime.ToLower() == "jpeg" || picture.mime.ToLower() == "jpg") picture.mime = "image/jpeg";
-				else if (picture.mime.ToLower() == "png")				      picture.mime = "image/png";
+				if	(picData->pbData[0] == 0xFF && picData->pbData[1] == 0xD8) picture.mime = "image/jpeg";
+				else if (picData->pbData[0] == 0x89 && picData->pbData[1] == 0x50 &&
+					 picData->pbData[2] == 0x4E && picData->pbData[3] == 0x47 &&
+					 picData->pbData[4] == 0x0D && picData->pbData[5] == 0x0A &&
+					 picData->pbData[6] == 0x1A && picData->pbData[7] == 0x0A) picture.mime = "image/png";
 
 				picture.type = picData->bPictureType;
 				picture.description = String(picData->pwszDescription).Trim();

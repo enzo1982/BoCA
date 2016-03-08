@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -486,8 +486,11 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 		picture.type = metadata->data.picture.type;
 		picture.mime = metadata->data.picture.mime_type;
 
-		if	(picture.mime.ToLower() == "jpeg" || picture.mime.ToLower() == "jpg") picture.mime = "image/jpeg";
-		else if (picture.mime.ToLower() == "png")				      picture.mime = "image/png";
+		if	(metadata->data.picture.data[0] == 0xFF && metadata->data.picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+		else if (metadata->data.picture.data[0] == 0x89 && metadata->data.picture.data[1] == 0x50 &&
+			 metadata->data.picture.data[2] == 0x4E && metadata->data.picture.data[3] == 0x47 &&
+			 metadata->data.picture.data[4] == 0x0D && metadata->data.picture.data[5] == 0x0A &&
+			 metadata->data.picture.data[6] == 0x1A && metadata->data.picture.data[7] == 0x0A) picture.mime = "image/png";
 
 		picture.description.ImportFrom("UTF-8", (char *) metadata->data.picture.description);
 
