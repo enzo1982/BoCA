@@ -41,20 +41,26 @@ extern AACENCODER_SETPARAM		 ex_aacEncoder_SetParam;
 
 typedef MP4FileHandle			(*MP4CREATEEX)			(const char *, uint32_t, int, int, char *, uint32_t, char **, uint32_t);
 typedef void				(*MP4CLOSE)			(MP4FileHandle, uint32_t);
+typedef bool				(*MP4OPTIMIZE)			(const char *, const char *);
+
 typedef bool				(*MP4SETTRACKESCONFIGURATION)	(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t);
 typedef void				(*MP4SETAUDIOPROFILELEVEL)	(MP4FileHandle, uint8_t);
 typedef MP4TrackId			(*MP4ADDAUDIOTRACK)		(MP4FileHandle, uint32_t, MP4Duration, uint8_t);
 typedef bool				(*MP4WRITESAMPLE)		(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t, MP4Duration, MP4Duration, bool);
+
 typedef MP4ItmfItem *			(*MP4ITMFITEMALLOC)		(const char *, uint32_t);
 typedef void				(*MP4ITMFITEMFREE)		(MP4ItmfItem *);
 typedef bool				(*MP4ITMFADDITEM)		(MP4FileHandle, const MP4ItmfItem *);
 
 extern MP4CREATEEX			 ex_MP4CreateEx;
 extern MP4CLOSE				 ex_MP4Close;
+extern MP4OPTIMIZE			 ex_MP4Optimize;
+
 extern MP4SETTRACKESCONFIGURATION	 ex_MP4SetTrackESConfiguration;
 extern MP4SETAUDIOPROFILELEVEL		 ex_MP4SetAudioProfileLevel;
 extern MP4ADDAUDIOTRACK			 ex_MP4AddAudioTrack;
 extern MP4WRITESAMPLE			 ex_MP4WriteSample;
+
 extern MP4ITMFITEMALLOC			 ex_MP4ItmfItemAlloc;
 extern MP4ITMFITEMFREE			 ex_MP4ItmfItemFree;
 extern MP4ITMFADDITEM			 ex_MP4ItmfAddItem;

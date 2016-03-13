@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -257,6 +257,12 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 					boca.DeleteComponent(tagger);
 				}
 			}
+		}
+		else
+		{
+			/* Optimize file even when no tags are written.
+			 */
+			ex_MP4Optimize(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), NIL);
 		}
 
 		/* Stream contents of created MP4 file to output driver
