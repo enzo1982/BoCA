@@ -353,14 +353,6 @@ Void BoCA::LayerTagBasic::AddCover()
 	{
 		String	 file = dialog->GetFileName();
 
-		/* Add entry to image box.
-		 */
-		ImageEntry	*entry = new ImageEntry(ImageLoader::Load(file), Size(70, 70));
-
-		entry->onLeftButtonDoubleClick.Connect(&LayerTagBasic::DisplayCover, this);
-
-		image_covers->Add(entry);
-
 		/* Add picture to track.
 		 */
 		Picture	 picture;
@@ -372,6 +364,14 @@ Void BoCA::LayerTagBasic::AddCover()
 		else				       picture.type = 0; // Other
 
 		track.pictures.Add(picture);
+
+		/* Add entry to image box.
+		 */
+		ImageEntry	*entry = new ImageEntry(picture.GetBitmap(), Size(70, 70));
+
+		entry->onLeftButtonDoubleClick.Connect(&LayerTagBasic::DisplayCover, this);
+
+		image_covers->Add(entry);
 
 		/* Select cover and send notifications.
 		 */
