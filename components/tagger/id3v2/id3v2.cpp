@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -587,14 +587,17 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			Picture			 picture;
 			Buffer<UnsignedByte>	 buffer;
 
+			GetBinaryField(frame, ID3FN_DATA, buffer);
+
 			picture.description = GetStringField(frame, ID3FN_DESCRIPTION);
 			picture.type	    = GetIntegerField(frame, ID3FN_PICTURETYPE);
 			picture.mime	    = GetASCIIField(frame, ID3FN_MIMETYPE);
 
-			if	(picture.mime.ToLower() == "jpeg" || picture.mime.ToLower() == "jpg") picture.mime = "image/jpeg";
-			else if (picture.mime.ToLower() == "png")				      picture.mime = "image/png";
-
-			GetBinaryField(frame, ID3FN_DATA, buffer);
+			if	(buffer[0] == 0xFF && buffer[1] == 0xD8) picture.mime = "image/jpeg";
+			else if (buffer[0] == 0x89 && buffer[1] == 0x50 &&
+				 buffer[2] == 0x4E && buffer[3] == 0x47 &&
+				 buffer[4] == 0x0D && buffer[5] == 0x0A &&
+				 buffer[6] == 0x1A && buffer[7] == 0x0A) picture.mime = "image/png";
 
 			picture.data	    = buffer;
 
