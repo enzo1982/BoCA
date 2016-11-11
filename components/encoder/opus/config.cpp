@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -19,7 +19,8 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	fileExtension	= config->GetIntValue("Opus", "FileExtension", 0);
 	bitrate		= config->GetIntValue("Opus", "Bitrate", 128) / 2;
 	complexity	= config->GetIntValue("Opus", "Complexity", 10);
-	framesize	= Math::Round(Math::Log2(config->GetIntValue("Opus", "FrameSize", 20000) / 2500));
+	framesize	= config->GetIntValue("Opus", "FrameSize", 20000);
+	framesize	= Math::Round(framesize <= 10000 ? Math::Log2(framesize / 2500) : framesize / 20000 + 2);
 	packet_loss	= config->GetIntValue("Opus", "PacketLoss", 0);
 
 	enableVBR	= config->GetIntValue("Opus", "EnableVBR", True);
@@ -117,7 +118,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	text_framesize		= new Text(i18n->AddColon(i18n->TranslateString("Frame length")), Point(10, 13));
 
-	slider_framesize	= new Slider(Point(17 + text_framesize->GetUnscaledTextWidth(), 11), Size(254 - text_framesize->GetUnscaledTextWidth(), 0), OR_HORZ, &framesize, 0, 5);
+	slider_framesize	= new Slider(Point(17 + text_framesize->GetUnscaledTextWidth(), 11), Size(254 - text_framesize->GetUnscaledTextWidth(), 0), OR_HORZ, &framesize, 0, 8);
 	slider_framesize->onValueChange.Connect(&ConfigureOpus::SetFrameSize, this);
 
 	text_framesize_value	= new Text(NIL, Point(279, 13));
@@ -210,7 +211,7 @@ Int BoCA::ConfigureOpus::SaveSettings()
 
 	config->SetIntValue("Opus", "Bitrate", bitrate * 2);
 	config->SetIntValue("Opus", "Complexity", complexity);
-	config->SetIntValue("Opus", "FrameSize", Math::Min((Int) (2500 * Math::Pow(2, framesize)), 60000));
+	config->SetIntValue("Opus", "FrameSize", Math::Min(framesize <= 2 ? (Int) (2500 * Math::Pow(2, framesize)) : 20000 * (framesize - 2), 120000));
 	config->SetIntValue("Opus", "PacketLoss", packet_loss);
 
 	config->SetIntValue("Opus", "EnableVBR", enableVBR);
@@ -279,7 +280,7 @@ Void BoCA::ConfigureOpus::SetFrameSize()
 {
 	I18n	*i18n = I18n::Get();
 
-	text_framesize_value->SetText(i18n->TranslateString("%1 ms", "Technical").Replace("%1", String::FromFloat(Math::Min(2.5 * Math::Pow(2, framesize), 60.0))));
+	text_framesize_value->SetText(i18n->TranslateString("%1 ms", "Technical").Replace("%1", String::FromFloat(Math::Min(framesize <= 2 ? 2.5 * Math::Pow(2, framesize) : 20.0 * (framesize - 2), 120.0))));
 }
 
 Void BoCA::ConfigureOpus::SetPacketLoss()
