@@ -11,7 +11,9 @@ BOCA_PATH = ../../..
 OBJECTS	  = xing/dxhead.o config.o dllinterface.o mpg123.o
 
 # Enter additional defines here:
-DEFINE	  =
+ifeq ($(BUILD_WIN32),True)
+	DEFINE	  = -I$(SRCDIR)/mpg123
+endif
 
 # Enter additional library dependencies here:
 LIBS	  =
