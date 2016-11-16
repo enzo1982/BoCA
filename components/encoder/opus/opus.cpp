@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -194,7 +194,7 @@ Bool BoCA::EncoderOpus::Activate()
 	int	 streams = 0;
 	int	 coupled = 0;
 
-	encoder = ex_opus_multistream_surround_encoder_create(setup.sample_rate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
+	encoder = ex_opus_multistream_surround_encoder_create(sampleRate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
 
 	setup.nb_streams = streams;
 	setup.nb_coupled = coupled;
