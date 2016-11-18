@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -503,6 +503,8 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 Bool BoCA::AS::ComponentSpecs::ParseExternalParameters(XML::Node *root)
 {
+	external_parameters.RemoveAll();
+
 	for (Int i = 0; i < root->GetNOfNodes(); i++)
 	{
 		XML::Node	*node = root->GetNthNode(i);
