@@ -150,7 +150,7 @@ ifndef prefix
 	endif
 
 	ifeq ($(BUILD_HAIKU),True)
-		prefix = /boot/common
+		prefix = /system/non-packaged
 	endif
 endif
 
@@ -167,6 +167,7 @@ endif
 
 ifeq ($(BUILD_HAIKU),True)
 	includedir = $(prefix)/develop/headers
+	datadir	   = $(prefix)/data
 endif
 
 # Decide which libraries to use
@@ -185,7 +186,9 @@ ifeq ($(findstring bundledliburiparser,$(config)),bundledliburiparser)
 else ifeq ($(findstring systemliburiparser,$(config)),systemliburiparser)
 	USE_BUNDLED_LIBURIPARSER = False
 else
-	ifeq ($(BUILD_WIN32),True)
+	ifeq ($(BUILD_HAIKU),True)
+		USE_BUNDLED_LIBURIPARSER = True
+	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBURIPARSER = True
 	endif
 endif

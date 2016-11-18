@@ -299,7 +299,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 #elif defined __APPLE__
 	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/opt/local/bin/%COMMAND", "/sw/bin/%COMMAND", NIL };
 #elif defined __HAIKU__
-	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/boot/common/bin/%COMMAND", NIL };
+	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/system/bin/%COMMAND", "/system/non-packaged/bin/%COMMAND", NIL };
 #elif defined __NetBSD__
 	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/usr/pkg/bin/%COMMAND", NIL };
 #else
