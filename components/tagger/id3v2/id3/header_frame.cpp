@@ -36,7 +36,7 @@
 
 using namespace dami;
 
-void ID3_FrameHeader::SetUnknownFrame(const char* id)
+void ID3_FrameHeader::SetUnknownFrame(const char *id)
 {
 	Clear();
 
@@ -48,10 +48,10 @@ void ID3_FrameHeader::SetUnknownFrame(const char* id)
 		return;
 	}
 
-	_frame_def->eID = ID3FID_NOFRAME;
-	_frame_def->bTagDiscard = false;
+	_frame_def->eID		 = ID3FID_NOFRAME;
+	_frame_def->bTagDiscard	 = false;
 	_frame_def->bFileDiscard = false;
-	_frame_def->aeFieldDefs = ID3_FieldDef::DEFAULT;
+	_frame_def->aeFieldDefs	 = ID3_FieldDef::DEFAULT;
 	_frame_def->sDescription = NULL;
 
 	if (strlen(id) <= 3)
@@ -146,7 +146,7 @@ bool ID3_FrameHeader::Parse(ID3_Reader& reader)
 	return true;
 }
 
-ID3_Err ID3_FrameHeader::Render(ID3_Writer& writer) const
+ID3_Err ID3_FrameHeader::Render(ID3_Writer &writer) const
 {
 	if (_frame_def == NULL)
 	{
@@ -183,20 +183,14 @@ const char *ID3_FrameHeader::GetTextID() const
 
 	if (_info && _frame_def)
 	{
-		if (_info->frame_bytes_id == strlen(_frame_def->sShortTextID))
-		{
-			textID = _frame_def->sShortTextID;
-		}
-		else
-		{
-			textID = _frame_def->sLongTextID;
-		}
+		if (_info->frame_bytes_id == strlen(_frame_def->sShortTextID)) textID = _frame_def->sShortTextID;
+		else							       textID = _frame_def->sLongTextID;
 	}
 
 	return (const char *) textID;
 }
 
-ID3_FrameHeader& ID3_FrameHeader::operator=(const ID3_FrameHeader& hdr)
+ID3_FrameHeader &ID3_FrameHeader::operator =(const ID3_FrameHeader &hdr)
 {
 	if (this != &hdr)
 	{
@@ -216,10 +210,10 @@ ID3_FrameHeader& ID3_FrameHeader::operator=(const ID3_FrameHeader& hdr)
 				// TODO: throw something here...
 			}
 
-			_frame_def->eID = hdr._frame_def->eID;
-			_frame_def->bTagDiscard = hdr._frame_def->bTagDiscard;
+			_frame_def->eID		 = hdr._frame_def->eID;
+			_frame_def->bTagDiscard	 = hdr._frame_def->bTagDiscard;
 			_frame_def->bFileDiscard = hdr._frame_def->bFileDiscard;
-			_frame_def->aeFieldDefs = hdr._frame_def->aeFieldDefs;
+			_frame_def->aeFieldDefs	 = hdr._frame_def->aeFieldDefs;
 
 			strcpy(_frame_def->sShortTextID, hdr._frame_def->sShortTextID);
 			strcpy(_frame_def->sLongTextID, hdr._frame_def->sLongTextID);
@@ -235,10 +229,7 @@ ID3_FrameID ID3_FrameHeader::GetFrameID() const
 {
 	ID3_FrameID	 eID = ID3FID_NOFRAME;
 
-	if (_frame_def != NULL)
-	{
-		eID = _frame_def->eID;
-	}
+	if (_frame_def != NULL) eID = _frame_def->eID;
 
 	return eID;
 }
@@ -255,14 +246,15 @@ bool ID3_FrameHeader::Clear()
 	if (_dyn_frame_def)
 	{
 		delete _frame_def;
+
 		_dyn_frame_def = false;
-		changed = true;
+		changed	       = true;
 	}
 
 	if (_frame_def)
 	{
 		_frame_def = NULL;
-		changed = true;
+		changed	   = true;
 	}
 
 	return changed;
