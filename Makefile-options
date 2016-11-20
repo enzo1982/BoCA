@@ -186,7 +186,9 @@ ifeq ($(findstring bundledliburiparser,$(config)),bundledliburiparser)
 else ifeq ($(findstring systemliburiparser,$(config)),systemliburiparser)
 	USE_BUNDLED_LIBURIPARSER = False
 else
-	ifeq ($(BUILD_HAIKU),True)
+	ifeq ($(BUILD_OSX),True)
+		USE_BUNDLED_LIBURIPARSER = True
+	else ifeq ($(BUILD_HAIKU),True)
 		USE_BUNDLED_LIBURIPARSER = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBURIPARSER = True
