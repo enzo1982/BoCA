@@ -79,7 +79,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../components/decoder/mpg123;../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../components/decoder/mpg123;../../../components/decoder/mpg123/mpg123;../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;UNICODE;_UNICODE;BOCA_COMPONENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -129,6 +129,7 @@
     <ClInclude Include="..\..\..\components\decoder\mpg123\config.h" />
     <ClInclude Include="..\..\..\components\decoder\mpg123\dllinterface.h" />
     <ClInclude Include="..\..\..\components\decoder\mpg123\mpg123.h" />
+    <ClInclude Include="..\..\..\components\decoder\mpg123\mpg123\fmt123.h" />
     <ClInclude Include="..\..\..\components\decoder\mpg123\mpg123\mpg123.h" />
     <ClInclude Include="..\..\..\components\decoder\mpg123\xing\dxhead.h" />
   </ItemGroup>
