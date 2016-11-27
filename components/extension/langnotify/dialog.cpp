@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -70,7 +70,7 @@ BoCA::LanguageNotifierDialog::LanguageNotifierDialog(Bool incomplete)
 #endif
 
 #ifndef __WIN32__
-	if (Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac")).Exists()) location = Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac"));
+	if (Directory(S::System::System::GetResourcesDirectory().Append("freac")).Exists()) location = Directory(S::System::System::GetResourcesDirectory().Append("freac"));
 #endif
 
 	if (!incomplete) text_info = new TransparentText(String("Your native language does not seem to be supported by fre:ac yet.\n\nDid you know you can easily create your own translation and share\nit with other users?\n\nPlease have a look at the Readme.lang file in the lang subfolder\nof ").Append(location).Append(" for instructions on how to create a\ntranslation and submit it to the fre:ac project.\n\nIf you have any questions, please contact translate@freac.org."), Point(7, 45));
@@ -104,7 +104,7 @@ BoCA::LanguageNotifierDialog::LanguageNotifierDialog(Bool incomplete)
 	mainWnd->SetIcon(ImageLoader::Load("icons/freac.png"));
 
 #ifndef __WIN32__
-	if (Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac")).Exists()) mainWnd->SetIcon(ImageLoader::Load("../share/freac/icons/freac.png"));
+	if (Directory(S::System::System::GetResourcesDirectory().Append("freac")).Exists()) mainWnd->SetIcon(ImageLoader::Load(S::System::System::GetResourcesDirectory().Append("freac/icons/freac.png")));
 #endif
 
 	Rect	 workArea = Screen::GetActiveScreenWorkArea();

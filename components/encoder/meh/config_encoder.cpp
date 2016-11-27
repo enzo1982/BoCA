@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -46,7 +46,7 @@ BoCA::ConfigureEncoder::ConfigureEncoder(ConfigLayer *iLayer, const Point &pos)
 	String	 resourcesPath;
 
 #ifndef __WIN32__
-	if (Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac")).Exists()) resourcesPath = "../share/freac/";
+	if (Directory(S::System::System::GetResourcesDirectory().Append("freac")).Exists()) resourcesPath = S::System::System::GetResourcesDirectory().Append("freac/").Append(Directory::GetDirectoryDelimiter());
 #endif
 
 	mainWnd->SetFlags(mainWnd->GetFlags() | WF_NOTASKBUTTON | WF_MODAL);

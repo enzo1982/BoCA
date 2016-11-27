@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -80,7 +80,7 @@ BoCA::DonateDialog::DonateDialog()
 	mainWnd->SetIcon(ImageLoader::Load("icons/freac.png"));
 
 #ifndef __WIN32__
-	if (Directory(GUI::Application::GetApplicationDirectory().Append("../share/freac")).Exists()) mainWnd->SetIcon(ImageLoader::Load("../share/freac/icons/freac.png"));
+	if (Directory(S::System::System::GetResourcesDirectory().Append("freac")).Exists()) mainWnd->SetIcon(ImageLoader::Load(S::System::System::GetResourcesDirectory().Append("freac/icons/freac.png")));
 #endif
 
 	Rect	 workArea = Screen::GetActiveScreenWorkArea();
