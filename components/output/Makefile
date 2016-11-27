@@ -18,6 +18,8 @@ else ifeq ($(BUILD_NETBSD),True)
 	FOLDERS += oss
 else ifeq ($(BUILD_SOLARIS),True)
 	FOLDERS += oss
+else ifeq ($(BUILD_HAIKU),True)
+	FOLDERS += haiku
 else ifeq ($(BUILD_QNX),True)
 	FOLDERS += qsa
 else ifeq ($(BUILD_WIN32),True)
