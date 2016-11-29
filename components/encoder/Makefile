@@ -10,10 +10,14 @@ ifneq ($(BUILD_OSX),True)
 	FOLDERS += faac voaacenc
 endif
 
+ifeq ($(USE_WINE),True)
+	FOLDERS += coreaudioconnect
+endif
+
 ifeq ($(BUILD_OSX),True)
 	FOLDERS += coreaudio
 else ifeq ($(BUILD_WIN32),True)
-	FOLDERS += bladeenc bonk coreaudio coreaudioconnect mac twinvq wave wma
+	FOLDERS += bladeenc bonk coreaudio mac twinvq wave wma
 endif
 
 .PHONY: $(FOLDERS)
