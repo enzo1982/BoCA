@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,32 +23,31 @@ namespace smooth
 	class SMOOTHAPI DateTime
 	{
 		private:
-			Int	 days;
-			Int	 mseconds;
+			Void		*value;
 		public:
-				 DateTime();
-				~DateTime();
+					 DateTime(Void * = NIL);
+					~DateTime();
 
-			Bool	 SetYMD(Int, Int, Int);
-			Bool	 SetHMS(Int, Int, Int);
+			static DateTime	 Current();
 
-			Int	 GetYear() const;
-			Int	 GetMonth() const;
-			Int	 GetDay() const;
+			Bool		 SetYMD(Int, Int, Int);
+			Bool		 SetHMS(Int, Int, Int);
 
-			Bool	 SetYear(Int);
-			Bool	 SetMonth(Int);
-			Bool	 SetDay(Int);
+			Int		 GetYear() const;
+			Int		 GetMonth() const;
+			Int		 GetDay() const;
 
-			Int	 GetHour() const;
-			Int	 GetMinute() const;
-			Int	 GetSecond() const;
-			Int	 GetMSecond() const;
+			Bool		 SetYear(Int);
+			Bool		 SetMonth(Int);
+			Bool		 SetDay(Int);
 
-			Bool	 SetHour(Int);
-			Bool	 SetMinute(Int);
-			Bool	 SetSecond(Int);
-			Bool	 SetMSecond(Int);
+			Int		 GetHour() const;
+			Int		 GetMinute() const;
+			Int		 GetSecond() const;
+
+			Bool		 SetHour(Int);
+			Bool		 SetMinute(Int);
+			Bool		 SetSecond(Int);
 	};
 };
 
