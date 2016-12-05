@@ -63,20 +63,26 @@ Int BoCA::Picture::LoadFromFile(const String &fileName)
 
 	in.InputData(buffer, buffer.Size());
 
-	if	(buffer[0] == 0xFF && buffer[1] == 0xD8) mime = "image/jpeg";
-	else if (buffer[0] == 0x89 && buffer[1] == 0x50 &&
-		 buffer[2] == 0x4E && buffer[3] == 0x47 &&
-		 buffer[4] == 0x0D && buffer[5] == 0x0A &&
-		 buffer[6] == 0x1A && buffer[7] == 0x0A) mime = "image/png";
-
-	data = buffer;
 	type = 0x03; // Cover (front)
+
+	if (buffer.Size() >= 16)
+	{
+		if	(buffer[0] == 0xFF && buffer[1] == 0xD8) mime = "image/jpeg";
+		else if (buffer[0] == 0x89 && buffer[1] == 0x50 &&
+			 buffer[2] == 0x4E && buffer[3] == 0x47 &&
+			 buffer[4] == 0x0D && buffer[5] == 0x0A &&
+			 buffer[6] == 0x1A && buffer[7] == 0x0A) mime = "image/png";
+
+		if (buffer[0] != 0 && buffer[1] != 0) data = buffer;
+	}
 
 	return Success();
 }
 
 Int BoCA::Picture::SaveToFile(const String &fileName) const
 {
+	if (data.Size() == 0) return Error();
+
 	OutStream	 out(STREAM_FILE, String(fileName).Append(mime == "image/png" ? ".png" : ".jpg"), OS_REPLACE);
 
 	out.OutputData(data, data.Size());
@@ -86,6 +92,8 @@ Int BoCA::Picture::SaveToFile(const String &fileName) const
 
 Bitmap BoCA::Picture::GetBitmap() const
 {
+	if (data.Size() == 0) return NIL;
+
 	Int	 format = -1;
 
 	if	(mime == "image/jpeg" || mime == "image/jpg") format = IMAGE_FORMAT_JPEG;

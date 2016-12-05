@@ -593,15 +593,18 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			picture.type	    = GetIntegerField(frame, ID3FN_PICTURETYPE);
 			picture.mime	    = GetASCIIField(frame, ID3FN_MIMETYPE);
 
-			if	(buffer[0] == 0xFF && buffer[1] == 0xD8) picture.mime = "image/jpeg";
-			else if (buffer[0] == 0x89 && buffer[1] == 0x50 &&
-				 buffer[2] == 0x4E && buffer[3] == 0x47 &&
-				 buffer[4] == 0x0D && buffer[5] == 0x0A &&
-				 buffer[6] == 0x1A && buffer[7] == 0x0A) picture.mime = "image/png";
-
 			picture.data	    = buffer;
 
-			if (picture.data.Size() > 16 && picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+			if (picture.data.Size() >= 16)
+			{
+				if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+				else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
+					 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
+					 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
+					 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+
+				if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+			}
 		}
 	}
 

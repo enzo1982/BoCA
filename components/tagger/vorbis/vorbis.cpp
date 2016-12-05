@@ -312,13 +312,16 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 			picture.data.Set(buffer + picIn.GetPos(), dataSize);
 
-			if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
-			else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
-				 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
-				 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
-				 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+			if (picture.mime != "-->" && picture.data.Size() >= 16)
+			{
+				if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+				else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
+					 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
+					 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
+					 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
 
-			if (picture.mime != "-->") track.pictures.Add(picture);
+				if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+			}
 		}
 		else if (id == "COVERART" && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
 		{
@@ -330,19 +333,22 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 			Encoding::Base64(buffer).Decode(value);
 
-			picture.data = buffer;
-
-			if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
-			else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
-				 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
-				 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
-				 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
-
 			if	(numCovers == 0) picture.type = 3; // Cover (front)
 			else if (numCovers == 1) picture.type = 4; // Cover (back)
 			else			 picture.type = 0; // Other
 
-			track.pictures.Add(picture);
+			picture.data = buffer;
+
+			if (picture.data.Size() >= 16)
+			{
+				if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+				else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
+					 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
+					 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
+					 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+
+				if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+			}
 
 			numCovers++;
 		}
