@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>aacPlusEnc HE-AAC+ Encoder</name>
+  <version>1.0</version>
+  <id>aacplusenc-enc</id>
+  <type>encoder</type>
+  <format>
+    <name>Advanced Audio Files</name>
+    <extension>aac</extension>
+    <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
+  </format>
+  <external>
+    <command>aacplusenc</command>
+    <arguments>%INFILE %OUTFILE %OPTIONS</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Bitrate" argument="%VALUE" default="48" step="8" enabled="true">
+	<min alias="24 kbps">24</min>
+	<max alias="48 kbps">48</max>
+      </range>
+    </parameters>
+  </external>
+</component>
