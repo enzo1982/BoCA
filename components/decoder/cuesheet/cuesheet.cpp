@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -157,8 +157,12 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			/* Get referenced file name.
 			 */
-			if (line.Contains("\"")) iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
-			else			 iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(line.SubString(line.Find(" ") + 1, line.FindLast(" ") - line.Find(" ") - 1));
+			if (line.Contains("\"")) iTrack.origFilename = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 iTrack.origFilename = line.SubString(line.Find(" ")  + 1, line.FindLast(" ")  - line.Find(" ")  - 1);
+
+			if (!iTrack.origFilename.StartsWith("/")    &&
+			    !iTrack.origFilename.StartsWith("\\\\") &&
+			     iTrack.origFilename[1] != ':') iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(iTrack.origFilename);
 
 			iTrack.origFilename = File(iTrack.origFilename);
 
@@ -214,6 +218,14 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 				break;
 			}
+
+			/* Disable reading chapters.
+			 */
+			Config	*decoderConfig = Config::Copy(GetConfiguration());
+
+			decoderConfig->SetIntValue("Tags", "ReadChapters", False);
+
+			decoder->SetConfiguration(decoderConfig);
 
 			/* Get stream info.
 			 */
