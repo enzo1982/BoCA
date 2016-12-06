@@ -236,10 +236,11 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 	/* Parse individual comment items.
 	 */
-	Int	 numItems    = in.InputNumber(4);
-	Int	 numCovers   = 0;
-	Int	 itemsOffset = in.GetPos();
-	Info	 info	     = track.GetInfo();
+	Int	 numItems     = in.InputNumber(4);
+	Int	 numCovers    = 0;
+	Bool	 haveChapters = False;
+	Int	 itemsOffset  = in.GetPos();
+	Info	 info	      = track.GetInfo();
 
 	for (Int i = 0; i < numItems; i++)
 	{
@@ -290,67 +291,135 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		{
 			info.offsets = value;
 		}
-		else if (id == "METADATA_BLOCK_PICTURE" && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+		else if (id == "METADATA_BLOCK_PICTURE")
 		{
-			/* This is the official way to store cover art in Vorbis
-			 * comments. It is used by most newer software.
-			 */
-			Picture			 picture;
-			Buffer<UnsignedByte>	 buffer;
-
-			Encoding::Base64(buffer).Decode(value);
-
-			InStream		 picIn(STREAM_BUFFER, buffer, buffer.Size());
-
-			picture.type	    = picIn.InputNumberRaw(4);
-			picture.mime	    = picIn.InputString(picIn.InputNumberRaw(4));
-			picture.description = picIn.InputString(picIn.InputNumberRaw(4));
-
-			picIn.RelSeek(16);
-
-			Int	 dataSize = picIn.InputNumberRaw(4);
-
-			picture.data.Set(buffer + picIn.GetPos(), dataSize);
-
-			if (picture.mime != "-->" && picture.data.Size() >= 16)
+			if (currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
 			{
-				if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
-				else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
-					 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
-					 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
-					 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+				/* This is the official way to store cover art in Vorbis
+				 * comments. It is used by most newer software.
+				 */
+				Picture			 picture;
+				Buffer<UnsignedByte>	 buffer;
 
-				if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+				Encoding::Base64(buffer).Decode(value);
+
+				InStream		 picIn(STREAM_BUFFER, buffer, buffer.Size());
+
+				picture.type	    = picIn.InputNumberRaw(4);
+				picture.mime	    = picIn.InputString(picIn.InputNumberRaw(4));
+				picture.description = picIn.InputString(picIn.InputNumberRaw(4));
+
+				picIn.RelSeek(16);
+
+				Int	 dataSize = picIn.InputNumberRaw(4);
+
+				picture.data.Set(buffer + picIn.GetPos(), dataSize);
+
+				if (picture.mime != "-->" && picture.data.Size() >= 16)
+				{
+					if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+					else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
+						 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
+						 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
+						 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+
+					if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+				}
 			}
 		}
-		else if (id == "COVERART" && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+		else if (id == "COVERART")
 		{
-			/* This is an unofficial way to store cover art in Vorbis
-			 * comments. It is used by some existing software.
-			 */
-			Picture			 picture;
-			Buffer<UnsignedByte>	 buffer;
-
-			Encoding::Base64(buffer).Decode(value);
-
-			if	(numCovers == 0) picture.type = 3; // Cover (front)
-			else if (numCovers == 1) picture.type = 4; // Cover (back)
-			else			 picture.type = 0; // Other
-
-			picture.data = buffer;
-
-			if (picture.data.Size() >= 16)
+			if (currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
 			{
-				if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
-				else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
-					 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
-					 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
-					 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+				/* This is an unofficial way to store cover art in Vorbis
+				 * comments. It is used by some existing software.
+				 */
+				Picture			 picture;
+				Buffer<UnsignedByte>	 buffer;
 
-				if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+				Encoding::Base64(buffer).Decode(value);
+
+				if	(numCovers == 0) picture.type = 3; // Cover (front)
+				else if (numCovers == 1) picture.type = 4; // Cover (back)
+				else			 picture.type = 0; // Other
+
+				picture.data = buffer;
+
+				if (picture.data.Size() >= 16)
+				{
+					if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+					else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
+						 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
+						 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
+						 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+
+					if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+				}
+
+				numCovers++;
 			}
+		}
+		else if (id == "CUESHEET")
+		{
+			if (currentConfig->GetIntValue("Tags", "ReadEmbeddedCueSheets", True))
+			{
+				/* Output cuesheet to temporary file.
+				 */
+				String		 cuesheet = value.Replace("\r\n", "\n");
+				String		 cueFile  = S::System::System::GetTempDirectory().Append("cuesheet_temp_").Append(String::FromInt(S::System::System::Clock())).Append(".cue");
+				OutStream	 out(STREAM_FILE, cueFile, OS_REPLACE);
 
-			numCovers++;
+				const Array<String>	&lines = cuesheet.Explode("\n");
+
+				foreach (const String &line, lines)
+				{
+					if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.origFilename).Append("\" WAVE"));
+					else				    out.OutputLine(line);
+				}
+
+				String::ExplodeFinish();
+
+				out.Close();
+
+				/* Get cue sheet stream info.
+				 */
+				AS::Registry		&boca	 = AS::Registry::Get();
+				AS::DecoderComponent	*decoder = (AS::DecoderComponent *) boca.CreateComponentByID("cuesheet-dec");
+
+				if (decoder != NIL)
+				{
+					Track	 cueTrack;
+					Config	*cueConfig = Config::Copy(GetConfiguration());
+
+					cueConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+
+					cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
+					cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);
+					cueConfig->SetIntValue("CueSheet", "LookForAlternativeFiles", False);
+					cueConfig->SetIntValue("CueSheet", "IgnoreErrors", False);
+
+					decoder->SetConfiguration(cueConfig);
+					decoder->GetStreamInfo(cueFile, cueTrack);
+
+					boca.DeleteComponent(decoder);
+
+					if (cueTrack.tracks.Length() > 0) track.tracks = cueTrack.tracks;
+				}
+
+				File(cueFile).Delete();
+			}
+		}
+		else if (id.StartsWith("CHAPTER"))
+		{
+			/* Chapters are processed further down.
+			 */
+			haveChapters = True;
+		}
+		else
+		{
+			/* Save any other tags as user defined text.
+			 */
+			 info.other.Add(String(INFO_USERTEXT).Append(":").Append(id).Append(":|:").Append(value));
 		}
 	}
 
@@ -358,92 +427,98 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 	/* Read chapters.
 	 */
-	in.Seek(itemsOffset);
-
-	for (Int i = 0; i < numItems; i++)
+	if (haveChapters && currentConfig->GetIntValue("Tags", "ReadChapters", True) &&
+			  (!currentConfig->GetIntValue("Tags", "PreferCueSheetsToChapters", True) || track.tracks.Length() == 0))
 	{
-		/* Read and check next comment string length.
-		 */
-		Int	 length	 = in.InputNumber(4);
+		track.tracks.RemoveAll();
 
-		if (length < 0 || length > buffer.Size() - in.GetPos()) break;
+		in.Seek(itemsOffset);
 
-		/* Read and assign actual comment string.
-		 */
-		String	 comment = in.InputString(length);
-
-		String	 id	 = comment.Head(comment.Find("=")).ToUpper();
-		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1).Trim();
-
-		if (id.StartsWith("CHAPTER") && currentConfig->GetIntValue("Tags", "ReadChapters", True))
+		for (Int i = 0; i < numItems; i++)
 		{
-			const Format	&format = track.GetFormat();
-
-			Int	 chapter = id.SubString(7, 3).ToInt();
-			String	 field	 = id.Tail(id.Length() - 10);
-
-			/* Chapters must appear in order.
+			/* Read and check next comment string length.
 			 */
-			if (track.tracks.Length() > chapter ||
-			    track.tracks.Length() < chapter - 1)
-			{
-				track.tracks.RemoveAll();
+			Int	 length	 = in.InputNumber(4);
 
-				break;
-			}
+			if (length < 0 || length > buffer.Size() - in.GetPos()) break;
 
-			/* Fill track data and add to track list.
+			/* Read and assign actual comment string.
 			 */
-			if (track.tracks.Length() == chapter - 1)
+			String	 comment = in.InputString(length);
+
+			String	 id	 = comment.Head(comment.Find("=")).ToUpper();
+			String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1).Trim();
+
+			if (id.StartsWith("CHAPTER"))
 			{
-				Track	 nTrack;
-				Info	 info = track.GetInfo();
+				const Format	&format = track.GetFormat();
 
-				nTrack.origFilename = track.origFilename;
-				nTrack.pictures	    = track.pictures;
+				Int	 chapter = id.SubString(7, 3).ToInt();
+				String	 field	 = id.Tail(id.Length() - 10);
 
-				info.track = chapter;
+				/* Chapters must appear in order.
+				 */
+				if (track.tracks.Length() > chapter ||
+				    track.tracks.Length() < chapter - 1)
+				{
+					track.tracks.RemoveAll();
 
-				nTrack.SetInfo(info);
-				nTrack.SetFormat(format);
+					break;
+				}
 
-				track.tracks.Add(nTrack, chapter);
-			}
+				/* Fill track data and add to track list.
+				 */
+				if (track.tracks.Length() == chapter - 1)
+				{
+					Track	 nTrack;
+					Info	 info = track.GetInfo();
 
-			Track	&rTrack = track.tracks.GetReference(chapter);
+					nTrack.origFilename = track.origFilename;
+					nTrack.pictures	    = track.pictures;
 
-			/* Set track offset.
-			 */
-			if (field == NIL)
-			{
-				rTrack.sampleOffset = Math::Round(value.SubString(0, 2).ToInt() * 60 * 60 * format.rate +
-								  value.SubString(3, 2).ToInt() * 60	  * format.rate +
-								  value.SubString(6, 2).ToInt()		  * format.rate +
-								  value.SubString(9, 3).ToInt()		  * format.rate / 1000.0);
+					info.track = chapter;
 
-				rTrack.length	    = track.length - rTrack.sampleOffset;
-				rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
-			}
+					nTrack.SetInfo(info);
+					nTrack.SetFormat(format);
 
-			/* Set track title.
-			 */
-			if (field == "NAME")
-			{
-				Info	 info	= rTrack.GetInfo();
+					track.tracks.Add(nTrack, chapter);
+				}
 
-				info.title = value;
+				Track	&rTrack = track.tracks.GetReference(chapter);
 
-				rTrack.SetInfo(info);
-			}
+				/* Set track offset.
+				 */
+				if (field == NIL)
+				{
+					rTrack.sampleOffset = Math::Round(value.SubString(0, 2).ToInt() * 60 * 60 * format.rate +
+									  value.SubString(3, 2).ToInt() * 60	  * format.rate +
+									  value.SubString(6, 2).ToInt()		  * format.rate +
+									  value.SubString(9, 3).ToInt()		  * format.rate / 1000.0);
 
-			/* Update previous track length.
-			 */
-			if (chapter > 1)
-			{
-				Track	&pTrack = track.tracks.GetReference(chapter - 1);
+					rTrack.length	    = track.length - rTrack.sampleOffset;
+					rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
+				}
 
-				pTrack.length	= rTrack.sampleOffset - pTrack.sampleOffset;
-				pTrack.fileSize	= pTrack.length * format.channels * (format.bits / 8);
+				/* Set track title.
+				 */
+				if (field == "NAME")
+				{
+					Info	 info	= rTrack.GetInfo();
+
+					info.title = value;
+
+					rTrack.SetInfo(info);
+				}
+
+				/* Update previous track length.
+				 */
+				if (chapter > 1)
+				{
+					Track	&pTrack = track.tracks.GetReference(chapter - 1);
+
+					pTrack.length	= rTrack.sampleOffset - pTrack.sampleOffset;
+					pTrack.fileSize	= pTrack.length * format.channels * (format.bits / 8);
+				}
 			}
 		}
 	}

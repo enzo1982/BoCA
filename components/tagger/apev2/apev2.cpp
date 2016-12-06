@@ -311,37 +311,96 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		{
 			info.mcdi.SetData(item);
 		}
-		else if (id.StartsWith("COVER ART") && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+		else if (id.StartsWith("COVER ART"))
 		{
-			Picture	 picture;
-
-			/* Read and ignore file name. Then copy
-			 * picture data to Picture object.
-			 */
-			for (Int i = 0; i < item.Size(); i++)
+			if (currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
 			{
-				if (item[i] == 0)
-				{
-					picture.data.Set(item + i + 1, item.Size() - i - 1);
+				Picture	 picture;
 
-					break;
+				/* Read and ignore file name. Then copy
+				 * picture data to Picture object.
+				 */
+				for (Int i = 0; i < item.Size(); i++)
+				{
+					if (item[i] == 0)
+					{
+						picture.data.Set(item + i + 1, item.Size() - i - 1);
+
+						break;
+					}
+				}
+
+				if	(id.EndsWith("(FRONT)")) picture.type = 3; // Cover (front)
+				else if (id.EndsWith("(BACK)"))	 picture.type = 4; // Cover (back)
+				else				 picture.type = 0; // Other
+
+				if (picture.data.Size() >= 16)
+				{
+					if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
+					else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
+						 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
+						 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
+						 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+
+					if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
 				}
 			}
-
-			if	(id.EndsWith("(FRONT)")) picture.type = 3; // Cover (front)
-			else if (id.EndsWith("(BACK)"))	 picture.type = 4; // Cover (back)
-			else				 picture.type = 0; // Other
-
-			if (picture.data.Size() >= 16)
+		}
+		else if (id == "CUESHEET")
+		{
+			if (currentConfig->GetIntValue("Tags", "ReadEmbeddedCueSheets", True))
 			{
-				if	(picture.data[0] == 0xFF && picture.data[1] == 0xD8) picture.mime = "image/jpeg";
-				else if (picture.data[0] == 0x89 && picture.data[1] == 0x50 &&
-					 picture.data[2] == 0x4E && picture.data[3] == 0x47 &&
-					 picture.data[4] == 0x0D && picture.data[5] == 0x0A &&
-					 picture.data[6] == 0x1A && picture.data[7] == 0x0A) picture.mime = "image/png";
+				/* Output cuesheet to temporary file.
+				 */
+				String		 cuesheet = value.Replace("\r\n", "\n");
+				String		 cueFile  = S::System::System::GetTempDirectory().Append("cuesheet_temp_").Append(String::FromInt(S::System::System::Clock())).Append(".cue");
+				OutStream	 out(STREAM_FILE, cueFile, OS_REPLACE);
 
-				if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
+				const Array<String>	&lines = cuesheet.Explode("\n");
+
+				foreach (const String &line, lines)
+				{
+					if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.origFilename).Append("\" WAVE"));
+					else				    out.OutputLine(line);
+				}
+
+				String::ExplodeFinish();
+
+				out.Close();
+
+				/* Get cue sheet stream info.
+				 */
+				AS::Registry		&boca	 = AS::Registry::Get();
+				AS::DecoderComponent	*decoder = (AS::DecoderComponent *) boca.CreateComponentByID("cuesheet-dec");
+
+				if (decoder != NIL)
+				{
+					Track	 cueTrack;
+					Config	*cueConfig = Config::Copy(GetConfiguration());
+
+					cueConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+
+					cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
+					cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);
+					cueConfig->SetIntValue("CueSheet", "LookForAlternativeFiles", False);
+					cueConfig->SetIntValue("CueSheet", "IgnoreErrors", False);
+
+					decoder->SetConfiguration(cueConfig);
+					decoder->GetStreamInfo(cueFile, cueTrack);
+
+					boca.DeleteComponent(decoder);
+
+					if (cueTrack.tracks.Length() > 0) track.tracks = cueTrack.tracks;
+				}
+
+				File(cueFile).Delete();
 			}
+		}
+		else
+		{
+			/* Save any other tags as user defined text.
+			 */
+			 info.other.Add(String(INFO_USERTEXT).Append(":").Append(id).Append(":|:").Append(value));
 		}
 	}
 
