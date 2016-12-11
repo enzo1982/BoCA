@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -269,7 +269,7 @@ const BoCA::MCDI &BoCA::DeviceInfoCDIO::GetNthDeviceMCDI(Int n)
 			TOCTRACK	 tracks[100];
 		} __attribute__((__packed__)) TOC;
 
-		if (cdio_get_num_tracks(cd) != CDIO_INVALID_TRACK)
+		if (cdio_get_discmode(cd) != CDIO_DISC_MODE_ERROR && cdio_get_num_tracks(cd) != CDIO_INVALID_TRACK)
 		{
 			TOC	 toc;
 
