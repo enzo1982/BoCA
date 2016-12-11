@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -156,28 +156,20 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (trackNumber == 0)
 	{
-		trackLength = info.mcdi.GetNthEntryOffset(0);
-
-		if (info.mcdi.GetNthEntryType(0) == ENTRY_AUDIO) entryNumber = 0;
+		if (info.mcdi.GetNthEntryType(0) == ENTRY_AUDIO)
+		{
+			entryNumber = 0;
+			trackLength = info.mcdi.GetNthEntryOffset(0);
+		}
 	}
 	else
 	{
 		for (Int i = 0; i < info.mcdi.GetNumberOfEntries(); i++)
 		{
-			trackLength = info.mcdi.GetNthEntryOffset(i + 1) - info.mcdi.GetNthEntryOffset(i);
-
-			/* Strip 11400 sectors off of the track length if
-			 * we are the last audio track before a new session.
-			 */
-			if ((i > 0 && info.mcdi.GetNthEntryType(i) != info.mcdi.GetNthEntryType(i + 1) && info.mcdi.GetNthEntryTrackNumber(i + 1) != 0xAA) ||
-			    (i < info.mcdi.GetNumberOfEntries() - 1 && info.mcdi.GetNthEntryOffset(i + 2) - info.mcdi.GetNthEntryType(i + 1) <= 0))
-			{
-				trackLength -= 11400;
-			}
-
 			if (info.mcdi.GetNthEntryType(i) == ENTRY_AUDIO && info.mcdi.GetNthEntryTrackNumber(i) == trackNumber)
 			{
 				entryNumber = i;
+				trackLength = info.mcdi.GetNthEntryTrackLength(i);
 
 				break;
 			}
@@ -186,8 +178,8 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (entryNumber == -1) return Error();
 
-	track.length	= (trackLength * 1176) / (format.bits / 8);
-	track.fileSize	= trackLength * 1176 * format.channels;
+	track.length	= trackLength * samplesPerSector;
+	track.fileSize	= trackLength * bytesPerSector;
 
 	track.cdTrack	= trackNumber;
 	track.drive	= audiodrive;
@@ -265,6 +257,7 @@ BoCA::DecoderCDRip::DecoderCDRip()
 
 	skipSamples	= 0;
 	prependSamples	= 0;
+	appendSamples	= 0;
 
 	dataBufferSize	= 0;
 
@@ -383,32 +376,37 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 
 	Int	 startSector = 0;
 	Int	 endSector   = 0;
+	Bool	 lastTrack   = False;
 
-	if (!GetTrackSectors(startSector, endSector)) return False;
+	if (!GetTrackSectors(startSector, endSector, lastTrack)) return False;
 
-	startSector += samplePosition / 588;
+	startSector += samplePosition / samplesPerSector;
 
 	/* Calculate offset values.
 	 */
 	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
 
-	startSector += readOffset / 588;
-	endSector   += readOffset / 588;
+	startSector += readOffset / samplesPerSector;
+	endSector   += readOffset / samplesPerSector;
 
-	if	(readOffset % 588 < 0) { startSector--; skipSamples = 588 + readOffset % 588; }
-	else if (readOffset % 588 > 0) { endSector++;	skipSamples = 	    readOffset % 588; }
+	if	(readOffset % samplesPerSector < 0) {		      startSector--; skipSamples = samplesPerSector + readOffset % samplesPerSector; }
+	else if (readOffset % samplesPerSector > 0) { if (!lastTrack) endSector++;   skipSamples = 		      readOffset % samplesPerSector; }
 
-	if (startSector < 0) { prependSamples = -startSector * 588; startSector = 0; }
+	if (startSector < 0) { prependSamples = -startSector * samplesPerSector; startSector = 0; }
 
-	skipSamples += samplePosition % 588;
+	if (lastTrack && readOffset > 0) { appendSamples = readOffset; endSector -= readOffset / samplesPerSector; }
+
+	skipSamples += samplePosition % samplesPerSector;
 
 	/* Open ripper.
 	 */
-	LONG	 lDataBufferSize = 0;
+	LONG	 bufferSize = 0;
 
-	ex_CR_OpenRipper(cd, &lDataBufferSize, startSector, endSector);
+	ex_CR_OpenRipper(cd, &bufferSize, startSector, endSector);
 
-	dataBufferSize = lDataBufferSize;
+	dataBufferSize = bufferSize;
+
+	inBytes = 4 * samplePosition;
 
 	/* Wait for drive to spin up if requested.
 	 */
@@ -420,12 +418,12 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 		Buffer<UnsignedByte>	 buffer(dataBufferSize);
 
 		BOOL	 abort = false;
-		LONG	 lSize = dataBufferSize;
+		LONG	 bytes = dataBufferSize;
 
-		ex_CR_RipChunk(cd, buffer, &lSize, abort);
+		ex_CR_RipChunk(cd, buffer, &bytes, abort);
 
 		ex_CR_CloseRipper(cd);
-		ex_CR_OpenRipper(cd, &lDataBufferSize, startSector, endSector);
+		ex_CR_OpenRipper(cd, &bufferSize, startSector, endSector);
 	}
 
 	return True;
@@ -438,6 +436,7 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data)
 	/* Set up buffer respecting empty samples to prepend.
 	 */
 	Int	 prependBytes = 4 * prependSamples;
+	Int	 appendBytes  = 4 * appendSamples;
 	Int	 skipBytes    = 4 * skipSamples;
 
 	prependSamples = 0;
@@ -450,15 +449,27 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data)
 	/* Rip chunk.
 	 */
 	BOOL	 abort = false;
-	LONG	 lSize = dataBufferSize;
+	LONG	 bytes = dataBufferSize;
 
-	ex_CR_RipChunk(cd, data + prependBytes, &lSize, abort);
+	ex_CR_RipChunk(cd, data + prependBytes, &bytes, abort);
 
 	lastRead.SetNth(track.drive, S::System::System::Clock());
 
+	/* Append offset bytes to last track.
+	 */
+	if (bytes == 0)
+	{
+		data.Resize(prependBytes + appendBytes - skipBytes);
+		data.Zero();
+
+		inBytes += data.Size();
+
+		return data.Size();
+	}
+
 	/* Strip samples to skip from the beginning.
 	 */
-	Int	 dataBytes = lSize + prependBytes - skipBytes;
+	Int	 dataBytes = Math::Min(track.fileSize - inBytes, (Int64) bytes + prependBytes - skipBytes);
 
 	if (skipBytes > 0) memmove(data, data + skipBytes, dataBytes);
 
@@ -467,22 +478,26 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data)
 	return dataBytes;
 }
 
-Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector)
+Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector, Bool &lastTrack)
 {
-	ex_CR_ReadToc(cd);
+	AS::Registry		&boca	   = AS::Registry::Get();
+	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdrip-info");
 
-	Int	 numTocEntries = ex_CR_GetNumTocEntries(cd);
+	if (component == NIL) return False;
+
+	MCDI	 mcdi = component->GetNthDeviceMCDI(track.drive);
+
+	boca.DeleteComponent(component);
 
 	if (track.cdTrack == 0)
 	{
 		/* Special handling for hidden track one audio.
 		 */
-		TOCENTRY	 entry = ex_CR_GetTocEntry(cd, 0);
-
-		if (!(entry.btFlag & CDROMDATAFLAG))
+		if (mcdi.GetNthEntryType(0) == ENTRY_AUDIO)
 		{
 			startSector = 0;
-			endSector   = entry.dwStartSector;
+			endSector   = mcdi.GetNthEntryOffset(0) - 1;
+			lastTrack   = False;
 
 			return True;
 		}
@@ -491,15 +506,15 @@ Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector)
 	{
 		/* Handle regular tracks.
 		 */
-		for (Int i = 0; i < numTocEntries; i++)
+		for (Int i = 0; i < mcdi.GetNumberOfEntries(); i++)
 		{
-			TOCENTRY	 entry	   = ex_CR_GetTocEntry(cd, i);
-			TOCENTRY	 nextentry = ex_CR_GetTocEntry(cd, i + 1);
-
-			if (!(entry.btFlag & CDROMDATAFLAG) && (entry.btTrackNumber == track.cdTrack))
+			if (mcdi.GetNthEntryType(i) == ENTRY_AUDIO && mcdi.GetNthEntryTrackNumber(i) == track.cdTrack)
 			{
-				startSector = entry.dwStartSector;
-				endSector   = nextentry.dwStartSector;
+				startSector = mcdi.GetNthEntryOffset(i);
+				endSector   = startSector + mcdi.GetNthEntryTrackLength(i) - 1;
+
+				if (mcdi.GetNthEntryType(i + 1) == ENTRY_AUDIO) lastTrack  = False;
+				else						lastTrack  = True;
 
 				return True;
 			}

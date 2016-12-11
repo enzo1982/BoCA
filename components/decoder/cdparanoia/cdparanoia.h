@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -25,6 +25,9 @@ namespace BoCA
 	{
 		friend void	 paranoiaCallback(long, int);
 
+		constants:
+			static const UnsignedInt	 bytesPerSector	  = 2352;
+			static const UnsignedInt	 samplesPerSector =  588;
 		private:
 			static Threads::Mutex		 readMutex;
 			static DecoderCDParanoia	*readDecoder;
@@ -43,10 +46,11 @@ namespace BoCA
 
 			Int				 skipSamples;
 			Int				 prependSamples;
+			Int				 appendSamples;
 
 			Int				 numCacheErrors;
 
-			Bool				 GetTrackSectors(Int &, Int &);
+			Bool				 GetTrackSectors(Int &, Int &, Bool &);
 		public:
 			static const String		&GetComponentSpecs();
 
