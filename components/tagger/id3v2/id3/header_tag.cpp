@@ -206,7 +206,7 @@ void ID3_TagHeader::ParseExtended(ID3_Reader &reader)
 		io::readUInt28(reader);
 
 		const int	 extflagbytes = reader.readChar(); // Number of flag bytes
-		ID3_Flags	*extflags[1]; // ID3V2_4_0 has 1 flag byte, extflagbytes should be equal to 1
+		ID3_Flags	*extflags[1]  = { };		   // ID3V2_4_0 has 1 flag byte, extflagbytes should be equal to 1
 
 		for (i = 0; i < extflagbytes; ++i)
 		{

@@ -84,16 +84,16 @@ bool ValidFrameOwner(String owner)
 	else		  return false;
 }
 
-ID3_ContainerImpl::ID3_ContainerImpl() : _frames(),
-					 _cursor(_frames.begin()),
-					 _spec(ID3V2_DEFAULT)
+ID3_ContainerImpl::ID3_ContainerImpl() : _spec(ID3V2_DEFAULT),
+					 _frames(),
+					 _cursor(_frames.begin())
 {
 	this->Clear();
 }
 
-ID3_ContainerImpl::ID3_ContainerImpl(const ID3_Container &container) : _frames(),
-								       _cursor(_frames.begin()),
-								       _spec(ID3V2_DEFAULT)
+ID3_ContainerImpl::ID3_ContainerImpl(const ID3_Container &container) : _spec(ID3V2_DEFAULT),
+								       _frames(),
+								       _cursor(_frames.begin())
 {
 	*this = container;
 }

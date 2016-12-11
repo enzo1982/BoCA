@@ -1545,6 +1545,8 @@ void ID3_FieldImpl::Clear()
 			ID3_Container::Clear();
 
 			break;
+		default:
+			return;
 	}
 
 	_changed = true;

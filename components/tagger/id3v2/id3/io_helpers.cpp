@@ -293,7 +293,7 @@ uint32 io::readUInt28(ID3_Reader &reader)
 		if (reader.atEnd()) break;
 
 		// ...append the last 7 bits to the end of the temp integer...
-		val = (val << BITSUSED) | static_cast<uint32>(reader.readChar()) & MASK(BITSUSED);
+		val = (val << BITSUSED) | (static_cast<uint32>(reader.readChar()) & MASK(BITSUSED));
 	}
 
 	// We should always parse 4 characters

@@ -485,13 +485,11 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
         pvbrdata[2] == 'n' &&
         pvbrdata[3] == 'g')
     {
-      int vbr_filesize = 0;
-      int vbr_scale = 0;
-      int vbr_flags = 0;
+      pvbrdata += 4;
 
       // get vbr flags
-      pvbrdata += 4;
-      vbr_flags = ExtractI4(pvbrdata);
+      int vbr_flags = ExtractI4(pvbrdata);
+
       pvbrdata += 4;
 
       //  read entire vbr header
@@ -507,6 +505,7 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
         vbrheaderdata[vbr_header_size] = '\0';
 
         // get frames, bytes, toc and scale
+        int vbr_filesize = 0;
 
         if (vbr_flags & FRAMES_FLAG)
         {
@@ -531,7 +530,7 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
 
         if (vbr_flags & SCALE_FLAG)
         {
-          vbr_scale = ExtractI4(pvbrdata);
+          ExtractI4(pvbrdata); // Extract vbr_scale value
           pvbrdata +=4;
         }
 

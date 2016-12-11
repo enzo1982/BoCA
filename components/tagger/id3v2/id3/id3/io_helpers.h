@@ -36,48 +36,46 @@
 
 namespace dami
 {
-  namespace io
-  {
-    /**
-     **/
-    class ExitTrigger
-    {
-      ID3_Reader& _reader;
-      ID3_Reader::pos_type _pos;
-      bool _locked;
-     public:
-      ExitTrigger(ID3_Reader& rdr)
-        : _reader(rdr), _pos(rdr.getCur()), _locked(true)
-      { ; }
-      ExitTrigger(ID3_Reader& rdr, ID3_Reader::pos_type pos)
-        : _reader(rdr), _pos(pos), _locked(true)
-      { ; }
-      virtual ~ExitTrigger() { if (_locked) _reader.setCur(_pos); }
+	namespace io
+	{
+		/**
+		**/
+		class ExitTrigger
+		{
+			ID3_Reader		&_reader;
+			ID3_Reader::pos_type	 _pos;
+			bool			 _locked;
 
-      void release() { _locked = false; }
-      void update() { _pos = _reader.getCur(); }
-      void setExitPos(ID3_Reader::pos_type pos) { _pos = pos; }
-    };
+			public:
+					 ExitTrigger(ID3_Reader &rdr) : _reader(rdr), _pos(rdr.getCur()), _locked(true)			 { }
+					 ExitTrigger(ID3_Reader &rdr, ID3_Reader::pos_type pos) : _reader(rdr), _pos(pos), _locked(true) { }
 
-    String      readString(ID3_Reader&);
-    String      readText(ID3_Reader&, size_t);
-    String      readUnicodeString(ID3_Reader&, ID3_TextEnc);
-    String      readUnicodeText(ID3_Reader&, size_t, ID3_TextEnc);
-    BString     readAllBinary(ID3_Reader&);
-    BString     readBinary(ID3_Reader&, size_t);
-    uint32      readLENumber(ID3_Reader&, size_t);
-    uint32      readBENumber(ID3_Reader&, size_t);
-    String      readTrailingSpaces(ID3_Reader&, size_t);
-    uint32      readUInt28(ID3_Reader&);
+				virtual ~ExitTrigger()				{ if (_locked) _reader.setCur(_pos); }
 
-    size_t      writeString(ID3_Writer&, String);
-    size_t      writeText(ID3_Writer&, String);
-    size_t      writeUnicodeString(ID3_Writer&, String, ID3_TextEnc);
-    size_t      writeUnicodeText(ID3_Writer&, String, ID3_TextEnc);
-    size_t      writeBENumber(ID3_Writer&, uint32 val, size_t);
-    size_t      writeTrailingSpaces(ID3_Writer&, String, size_t);
-    size_t      writeUInt28(ID3_Writer&, uint32);
-  };
+				void	 release()				{ _locked = false; }
+				void	 update()				{ _pos = _reader.getCur(); }
+				void	 setExitPos(ID3_Reader::pos_type pos)	{ _pos = pos; }
+		};
+
+		String	 readString(ID3_Reader &);
+		String	 readText(ID3_Reader &, size_t);
+		String	 readUnicodeString(ID3_Reader &, ID3_TextEnc);
+		String	 readUnicodeText(ID3_Reader &, size_t, ID3_TextEnc);
+		BString	 readAllBinary(ID3_Reader &);
+		BString	 readBinary(ID3_Reader &, size_t);
+		uint32	 readLENumber(ID3_Reader &, size_t);
+		uint32	 readBENumber(ID3_Reader &, size_t);
+		String	 readTrailingSpaces(ID3_Reader &, size_t);
+		uint32	 readUInt28(ID3_Reader &);
+
+		size_t	 writeString(ID3_Writer &, String);
+		size_t	 writeText(ID3_Writer &, String);
+		size_t	 writeUnicodeString(ID3_Writer &, String, ID3_TextEnc);
+		size_t	 writeUnicodeText(ID3_Writer &, String, ID3_TextEnc);
+		size_t	 writeBENumber(ID3_Writer &, uint32 val, size_t);
+		size_t	 writeTrailingSpaces(ID3_Writer &, String, size_t);
+		size_t	 writeUInt28(ID3_Writer &, uint32);
+	};
 };
 
 #endif /* _ID3LIB_IO_HELPERS_H_ */

@@ -55,51 +55,52 @@ size_t ID3_FieldImpl::Set(const uchar *data, size_t len)
  **/
 size_t ID3_FieldImpl::SetBinary(BString data) //< data to assign to this field.
 {
-  size_t size = 0;
-  if (this->GetType() == ID3FTY_BINARY)
-  {
-    this->Clear();
-    size_t fixed = _fixed_size;
-    size = data.size();
-    if (fixed == 0)
-    {
-      _binary = data;
-    }
-    else
-    {
-      _binary.assign(data, 0, dami::min(size, fixed));
-      if (size < fixed)
-      {
-        _binary.append(fixed - size, '\0');
-      }
-    }
-    size = _binary.size();
-    _changed = true;
-  }
-  return size;
+	size_t	 size = 0;
+
+	if (this->GetType() == ID3FTY_BINARY)
+	{
+		this->Clear();
+
+		size_t	 fixed = _fixed_size;
+
+		size = data.size();
+
+		if (fixed == 0)
+		{
+			_binary = data;
+		}
+		else
+		{
+			_binary.assign(data, 0, dami::min(size, fixed));
+
+			if (size < fixed) _binary.append(fixed - size, '\0');
+		}
+
+		size = _binary.size();
+
+		_changed = true;
+	}
+
+	return size;
 }
 
 BString ID3_FieldImpl::GetBinary() const
 {
-  BString data;
-  if (this->GetType() == ID3FTY_BINARY)
-  {
-    data = _binary;
-  }
-  return data;
-}
+	BString	 data;
 
+	if (this->GetType() == ID3FTY_BINARY) data = _binary;
+
+	return data;
+}
 
 const uchar* ID3_FieldImpl::GetRawBinary() const
 {
-  const uchar* data = NULL;
-  if (this->GetType() == ID3FTY_BINARY)
-  {
-    data = _binary.data();
-  }
-  return data;
-}
+	const uchar	*data = NULL;
 
+	if (this->GetType() == ID3FTY_BINARY) data = _binary.data();
+
+	return data;
+}
 
 /** Copies the field's internal string to the buffer.
  **
@@ -111,9 +112,7 @@ const uchar* ID3_FieldImpl::GetRawBinary() const
  **   myFrame.GetField(ID3FN_DATA)->Get(buffer, sizeof(buffer));
  ** \endcode
  **/
-size_t ID3_FieldImpl::Get(uchar *buffer,	// Destination of retrieved string
-                          size_t max_bytes	// Max number of bytes to copy
-                          ) const
+size_t ID3_FieldImpl::Get(uchar *buffer, size_t max_bytes) const // Destination of retrieved string and max number of bytes to copy
 {
 	size_t	 bytes = 0;
 
@@ -121,15 +120,11 @@ size_t ID3_FieldImpl::Get(uchar *buffer,	// Destination of retrieved string
 	{
 		bytes = dami::min(max_bytes, this->Size());
 
-		if (NULL != buffer && bytes > 0)
-		{
-			::memcpy(buffer, _binary.data(), bytes);
-		}
+		if (buffer != NULL && bytes > 0) ::memcpy(buffer, _binary.data(), bytes);
 	}
 
 	return bytes;
 }
-
 
 /** Copies binary data from the file specified to the field.
  **
@@ -137,7 +132,7 @@ size_t ID3_FieldImpl::Get(uchar *buffer,	// Destination of retrieved string
  **   myFrame.GetField(ID3FN_DATA)->FromFile("mypic.jpg");
  ** \endcode
  **/
-void ID3_FieldImpl::FromFile(const char *info) //< Source filename
+void ID3_FieldImpl::FromFile(const char *info) // Source filename
 {
 	if (this->GetType() != ID3FTY_BINARY || NULL == info) return;
 
@@ -147,7 +142,7 @@ void ID3_FieldImpl::FromFile(const char *info) //< Source filename
 
 	::fseek(temp_file, 0, SEEK_END);
 
-	long	 fileSize = ::ftell(temp_file);
+	size_t	 fileSize = ::ftell(temp_file);
 
 	::fseek(temp_file, 0, SEEK_SET);
 
@@ -166,45 +161,43 @@ void ID3_FieldImpl::FromFile(const char *info) //< Source filename
 	::fclose(temp_file);
 }
 
-
 /** Copies binary data from the field to the specified file.
  **
  ** \code
  **   myFrame.GetField(ID3FN_DATA)->ToFile("output.bin");
  ** \endcode
  **/
-void ID3_FieldImpl::ToFile(const char *info //< Destination filename
-                           ) const
+void ID3_FieldImpl::ToFile(const char *info) const // < Destination filename
 {
-  if (this->GetType() != ID3FTY_BINARY || NULL == info)
-  {
-    return;
-  }
+	if (this->GetType() != ID3FTY_BINARY || info == NULL) return;
 
-  size_t size = this->Size();
-  if (size > 0)
-  {
-    FILE* temp_file = ::fopen(info, "wb");
-    if (temp_file != NULL)
-    {
-      ::fwrite(_binary.data(), 1, size, temp_file);
-      ::fclose(temp_file);
-    }
-  }
+	size_t	 size = this->Size();
 
-  return ;
+	if (size > 0)
+	{
+		FILE	*temp_file = ::fopen(info, "wb");
+
+		if (temp_file != NULL)
+		{
+			::fwrite(_binary.data(), 1, size, temp_file);
+			::fclose(temp_file);
+		}
+	}
+
+	return;
 }
-
 
 bool ID3_FieldImpl::ParseBinary(ID3_Reader& reader)
 {
-  // copy the remaining bytes, unless we're fixed length, in which case copy
-  // the minimum of the remaining bytes vs. the fixed length
-  _binary = io::readAllBinary(reader);
-  return true;
+	/* Copy the remaining bytes, unless we're fixed length, in which case
+	 * copy the minimum of the remaining bytes vs the fixed length.
+	 */
+	_binary = io::readAllBinary(reader);
+
+	return true;
 }
 
-void ID3_FieldImpl::RenderBinary(ID3_Writer& writer) const
+void ID3_FieldImpl::RenderBinary(ID3_Writer &writer) const
 {
-  writer.writeChars(this->GetRawBinary(), this->Size());
+	writer.writeChars(this->GetRawBinary(), this->Size());
 }

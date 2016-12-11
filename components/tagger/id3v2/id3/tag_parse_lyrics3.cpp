@@ -50,11 +50,6 @@ namespace
 		return val;
 	}
 
-	uint32 readIntegerString(ID3_Reader &reader)
-	{
-		return readIntegerString(reader, reader.remainingBytes());
-	}
-
 	bool isTimeStamp(ID3_Reader &reader)
 	{
 		ID3_Reader::pos_type	 cur = reader.getCur();
