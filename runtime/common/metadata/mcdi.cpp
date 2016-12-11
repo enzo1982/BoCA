@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -89,6 +89,21 @@ Int BoCA::MCDI::GetNthEntryTrackNumber(Int n) const
 	if (data.Size() < 2 + (8 * (n + 1))) return 0;
 
 	return data[4 + 8 * n + 2];
+}
+
+Int BoCA::MCDI::GetNthEntryTrackLength(Int n) const
+{
+	if (data.Size() < 2 + (8 * (n + 2))) return 0;
+
+	long	 sectors = GetNthEntryOffset(n + 1) - GetNthEntryOffset(n);
+
+	/* Strip 11400 sectors off of the track length if
+	 * it is the last track before a new session.
+	 */
+	if ((GetNthEntryType(n) != GetNthEntryType(n + 1) && GetNthEntryType(n + 1) != ENTRY_LEADOUT) ||
+	    (n < GetNumberOfEntries() - 1 && GetNthEntryOffset(n + 1) >= GetNthEntryOffset(n + 2))) sectors -= 11400;
+
+	return sectors;
 }
 
 Int BoCA::MCDI::GetNumberOfAudioTracks() const
