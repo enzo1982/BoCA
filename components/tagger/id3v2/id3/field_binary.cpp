@@ -142,7 +142,7 @@ void ID3_FieldImpl::FromFile(const char *info) // Source filename
 
 	::fseek(temp_file, 0, SEEK_END);
 
-	size_t	 fileSize = ::ftell(temp_file);
+	long	 fileSize = ::ftell(temp_file);
 
 	::fseek(temp_file, 0, SEEK_SET);
 
@@ -152,7 +152,7 @@ void ID3_FieldImpl::FromFile(const char *info) // Source filename
 
 		if (buffer != NULL)
 		{
-			if (::fread(buffer, 1, fileSize, temp_file) == fileSize) this->Set(buffer, fileSize);
+			if (::fread(buffer, 1, fileSize, temp_file) == (size_t) fileSize) this->Set(buffer, fileSize);
 
 			delete [] buffer;
 		}
