@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -73,13 +73,13 @@ Int BoCA::CDText::ReadCDText(Int drive)
 
 				if	(pCDtextPacks->packType == 0x80) // Album/Track title
 				{
-					if	(pCDtextPacks->trackNumber == 0) cdInfo.SetTitle(lpszBuffer);
-					else if (pCDtextPacks->trackNumber != 0) cdInfo.SetTrackTitle(pCDtextPacks->trackNumber, lpszBuffer);
+					if (pCDtextPacks->trackNumber == 0) cdInfo.SetTitle(lpszBuffer);
+					else				    cdInfo.SetTrackTitle(pCDtextPacks->trackNumber, lpszBuffer);
 				}
 				else if (pCDtextPacks->packType == 0x81) // Artist name
 				{
-					if	(pCDtextPacks->trackNumber == 0) cdInfo.SetArtist(lpszBuffer);
-					else if (pCDtextPacks->trackNumber != 0) cdInfo.SetTrackArtist(pCDtextPacks->trackNumber, lpszBuffer);
+					if (pCDtextPacks->trackNumber == 0) cdInfo.SetArtist(lpszBuffer);
+					else				    cdInfo.SetTrackArtist(pCDtextPacks->trackNumber, lpszBuffer);
 				}
 
 				nInsertPos -= nOut;

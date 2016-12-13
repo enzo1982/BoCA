@@ -546,7 +546,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			if	(genreID == NIL)			  info.genre = s_genre;
 			else if (s_genre.Length() > genreID.Length() + 2) info.genre = s_genre.Tail(s_genre.Length() - genreID.Length() - 2);
-			else if (genreID != NIL)			  info.genre = GetID3CategoryName(genreID.ToInt());
+			else						  info.genre = GetID3CategoryName(genreID.ToInt());
 		}
 		else if (frame.GetID() == ID3FID_CDID)
 		{

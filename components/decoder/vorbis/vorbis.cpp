@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -268,6 +268,8 @@ BoCA::DecoderVorbis::DecoderVorbis()
 	memset(&vc, 0, sizeof(vc));
 	memset(&vd, 0, sizeof(vd));
 	memset(&vb, 0, sizeof(vb));
+
+	memset(convBuffer, 0, sizeof(convBuffer));
 }
 
 BoCA::DecoderVorbis::~DecoderVorbis()
