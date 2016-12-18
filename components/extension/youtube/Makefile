@@ -4,7 +4,6 @@
 TARGET	  = youtube
 TYPE	  = extension
 VERSION	  = 1.0
-SMOOTHVER = 0.8.71
 
 BOCA_PATH = ../../..
 

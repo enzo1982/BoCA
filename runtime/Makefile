@@ -4,7 +4,6 @@
 TARGET	  = boca
 TYPE	  = runtime
 VERSION	  = 1.0
-SMOOTHVER = 0.8.72
 
 BOCA_PATH = ..
 
