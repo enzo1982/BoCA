@@ -10,7 +10,7 @@ BOCA_PATH = ../../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-# Disable PowerPC builds of this component on OS X for now.
+# Disable PowerPC builds of this component on macOS for now.
 ifeq ($(BUILD_OSX),True)
 	BUILD_PPC   = False
 	BUILD_PPC64 = False
