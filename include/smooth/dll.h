@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -88,9 +88,15 @@ extern "C"
 
 	static __attribute__((__destructor__)) void processDetach()
 	{
+#ifdef __HAIKU__
+		/* Do not call the cleanup functions on Haiku for now as they
+		 * might crash due to issues with the process cleanup code.
+		 */
+#else
 		DetachDLL();
 
 		Free();
+#endif
 	}
 #endif
 }

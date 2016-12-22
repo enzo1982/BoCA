@@ -69,7 +69,8 @@ namespace smooth
 			Int					 ImportFrom(const char *, const char *);
 			char					*ConvertTo(const char *) const;
 
-			Int					 ComputeCRC32() const;
+			UnsignedInt32				 ComputeCRC32() const;
+			UnsignedInt64				 ComputeCRC64() const;
 
 			String					 EncodeBase64() const;
 			String					 DecodeBase64() const;

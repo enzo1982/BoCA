@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -90,7 +90,6 @@
 
 #include "smooth/graphics/imageloader/imageloader.h"
 
-#include "smooth/i18n/charsetdetector.h"
 #include "smooth/i18n/number.h"
 #include "smooth/i18n/translator.h"
 
@@ -98,6 +97,7 @@
 #include "smooth/misc/encoding/urlencode.h"
 
 #include "smooth/misc/hash/crc32.h"
+#include "smooth/misc/hash/crc64.h"
 #include "smooth/misc/hash/md5.h"
 #include "smooth/misc/hash/sha1.h"
 
