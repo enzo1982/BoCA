@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -11,6 +11,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca/common/config.h>
+#include <boca/core/core.h>
 
 namespace BoCA
 {
@@ -282,7 +283,7 @@ BoCA::ApplicationConfig::ApplicationConfig()
 
 	/* Check if configuration file exists.
 	 */
-	File	 configFile = String(configDir).Append("boca").Append(Directory::GetDirectoryDelimiter()).Append("boca.xml");
+	File	 configFile = String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml");
 
 	if (!applicationDir.ToUpper().StartsWith(programFilesDir.ToUpper()) && !configFile.Exists()) configFile.Create();
 
@@ -291,21 +292,20 @@ BoCA::ApplicationConfig::ApplicationConfig()
 	 */
 	if (applicationDir.ToUpper().StartsWith(programFilesDir.ToUpper()) || !configFile.Exists())
 	{
-		configDir =  applicationDataDir;
+		configDir = applicationDataDir;
 
 		if (configDir != NIL)
 		{
-#if defined __WIN32__ || defined __HAIKU__
-			configDir.Append("freac").Append(Directory::GetDirectoryDelimiter());
-#else
-			configDir.Append(".freac").Append(Directory::GetDirectoryDelimiter());
+#if !defined(__WIN32__) && !defined(__HAIKU__)
+			configDir.Append(".");
 #endif
+			configDir.Append(BoCA::GetApplicationPrefix()).Append(Directory::GetDirectoryDelimiter());
 		}
 
 		Directory(configDir).Create();
 	}
 
-	config = new Configuration(String(configDir).Append("boca").Append(Directory::GetDirectoryDelimiter()).Append("boca.xml"), True);
+	config = new Configuration(configFile, True);
 
 	LoadSettings();
 }

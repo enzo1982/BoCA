@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -11,10 +11,11 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca/common/i18n.h>
+#include <boca/core/core.h>
 
 BoCA::I18n *BoCA::I18n::instance = NIL;
 
-BoCA::I18n::I18n() : S::I18n::Translator("freac")
+BoCA::I18n::I18n() : S::I18n::Translator(BoCA::GetApplicationPrefix())
 {
 	SetInternalLanguageInfo("English", "Robert Kausch <robert.kausch@freac.org>", "http://www.freac.org/", False);
 }

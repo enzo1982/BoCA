@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,6 +29,8 @@
 #include <boca/common/protocol.h>
 #include <boca/common/utilities.h>
 
+#include <boca/core/core.h>
+
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
 
 BoCA::AS::Registry &BoCA::AS::Registry::Get()
@@ -54,16 +56,34 @@ BoCA::AS::Registry::Registry()
 	Protocol	*debug = Protocol::Get("Debug output");
 
 	debug->Write("Initializing BoCA...");
-	debug->Write("  Querying native components...");
 
-	Directory		 dir(Utilities::GetBoCADirectory());
+	LoadComponents(Utilities::GetBoCADirectory(), "boca");
+
+	if (BoCA::GetApplicationPrefix() != "boca") LoadComponents(Utilities::GetBoCADirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append(BoCA::GetApplicationPrefix()), BoCA::GetApplicationPrefix());
+
+	CheckComponents();
+	OrderComponents();
+
+	debug->Write("BoCA is ready.");
+}
+
+BoCA::AS::Registry::~Registry()
+{
+	foreach (ComponentSpecs *cs, componentSpecs) delete cs;
+}
+
+Void BoCA::AS::Registry::LoadComponents(const Directory &dir, const String &prefix)
+{
+	Protocol	*debug = Protocol::Get("Debug output");
+
+	debug->Write(String("  Querying native components with prefix ").Append(prefix).Append("..."));
 
 #if defined __WIN32__
-	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.dll");
+	const Array<File>	&dllFiles = dir.GetFilesByPattern(prefix.Append("_*.dll"));
 #elif defined __APPLE__
-	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.dylib");
+	const Array<File>	&dllFiles = dir.GetFilesByPattern(prefix.Append("_*.dylib"));
 #else
-	const Array<File>	&dllFiles = dir.GetFilesByPattern("boca_*.so");
+	const Array<File>	&dllFiles = dir.GetFilesByPattern(prefix.Append("_*.so"));
 #endif
 
 	for (Int i = 0; i < dllFiles.Length(); i++)
@@ -85,9 +105,9 @@ BoCA::AS::Registry::Registry()
 		}
 	}
 
-	debug->Write("  Querying script components...");
+	debug->Write(String("  Querying script components with prefix ").Append(prefix).Append("..."));
 
-	const Array<File>	&xmlFiles = dir.GetFilesByPattern("boca_*.xml");
+	const Array<File>	&xmlFiles = dir.GetFilesByPattern(prefix.Append("_*.xml"));
 
 	for (Int i = 0; i < xmlFiles.Length(); i++)
 	{
@@ -107,16 +127,6 @@ BoCA::AS::Registry::Registry()
 			delete specs;
 		}
 	}
-
-	CheckComponents();
-	OrderComponents();
-
-	debug->Write("BoCA is ready.");
-}
-
-BoCA::AS::Registry::~Registry()
-{
-	foreach (ComponentSpecs *cs, componentSpecs) delete cs;
 }
 
 Void BoCA::AS::Registry::InsertComponent(ComponentSpecs *specs)

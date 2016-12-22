@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,11 +22,15 @@ namespace BoCA
 {
 	/* Should be called first, just after the BoCA library is loaded.
 	 */
-	BOCA_DLL_EXPORT Void	 Init();
+	BOCA_DLL_EXPORT Void		 Init(const String &);
 
 	/* Should be called last, just before the BoCA library is unloaded.
 	 */
-	BOCA_DLL_EXPORT Void	 Free();
+	BOCA_DLL_EXPORT Void		 Free();
+
+	/* Get the application prefix as passed to BoCA::Init().
+	 */
+	BOCA_DLL_EXPORT const String	&GetApplicationPrefix();
 };
 
 #endif
