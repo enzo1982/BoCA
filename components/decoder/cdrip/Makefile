@@ -7,6 +7,8 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
+
 # Enter object files here:
 OBJECTS	  = cdrip.o config.o dllinterface.o info/cdinfo.o info/cdplayerini.o info/cdtext.o
 

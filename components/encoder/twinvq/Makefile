@@ -7,6 +7,8 @@ VERSION	  = 1.0
 
 BOCA_PATH = ../../..
 
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
+
 # Enter object files here:
 OBJECTS	  = twinvq/bfile.o twinvq/bfile_e.o twinvq/bstream_e.o twinvq/Chunk.o twinvq/ChunkHelper.o config.o dllinterface.o twinvq.o
 
