@@ -6,10 +6,6 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 FOLDERS = 
 
-ifeq ($(BUILD_WIN32),True)
-	FOLDERS += external
-endif
-
 .PHONY: $(FOLDERS)
 
 all: $(FOLDERS)

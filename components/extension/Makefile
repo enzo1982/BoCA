@@ -4,15 +4,7 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-FOLDERS = donate langnotify statustime tagedit
-
-ifeq ($(USE_V8),True)
-	FOLDERS += youtube
-endif
-
-ifeq ($(BUILD_WIN32),True)
-	FOLDERS += protocols
-endif
+FOLDERS = statustime
 
 .PHONY: $(FOLDERS)
 
