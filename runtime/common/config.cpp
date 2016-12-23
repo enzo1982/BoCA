@@ -305,7 +305,7 @@ BoCA::ApplicationConfig::ApplicationConfig()
 		Directory(configDir).Create();
 	}
 
-	config = new Configuration(configFile, True);
+	config = new Configuration(String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml"), True);
 
 	LoadSettings();
 }

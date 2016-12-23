@@ -59,7 +59,11 @@ BoCA::AS::Registry::Registry()
 
 	LoadComponents(Utilities::GetBoCADirectory(), "boca");
 
-	if (BoCA::GetApplicationPrefix() != "boca") LoadComponents(Utilities::GetBoCADirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append(BoCA::GetApplicationPrefix()), BoCA::GetApplicationPrefix());
+	if (BoCA::GetApplicationPrefix() != "boca")
+	{
+		LoadComponents(Utilities::GetBoCADirectory(), BoCA::GetApplicationPrefix());
+		LoadComponents(Utilities::GetBoCADirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append(BoCA::GetApplicationPrefix()), BoCA::GetApplicationPrefix());
+	}
 
 	CheckComponents();
 	OrderComponents();
