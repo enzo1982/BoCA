@@ -20,8 +20,6 @@ else ifeq ($(BUILD_SOLARIS),True)
 	FOLDERS += oss
 else ifeq ($(BUILD_HAIKU),True)
 	FOLDERS += haiku
-else ifeq ($(BUILD_QNX),True)
-	FOLDERS += qsa
 else ifeq ($(BUILD_WIN32),True)
 	FOLDERS += directsound waveout winamp
 endif

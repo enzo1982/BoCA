@@ -82,8 +82,6 @@ else
 		BUILD_HAIKU = True
 	else ifeq ($(UNAME),GNU)
 		BUILD_GNU = True
-	else ifeq ($(UNAME),QNX)
-		BUILD_QNX = True
 	else ifeq ($(UNAME),Darwin)
 #		Set shared object extension
 		SHARED = .dylib
@@ -209,8 +207,6 @@ else ifeq ($(findstring systemzlib,$(config)),systemzlib)
 	USE_BUNDLED_ZLIB = False
 else
 	ifeq ($(BUILD_OSX),True)
-		USE_BUNDLED_ZLIB = True
-	else ifeq ($(BUILD_QNX),True)
 		USE_BUNDLED_ZLIB = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_ZLIB = True

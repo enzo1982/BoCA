@@ -40,9 +40,7 @@ else
 
 	ifneq ($(BUILD_SOLARIS),True)
 	ifneq ($(BUILD_HAIKU),True)
-		ifneq ($(BUILD_QNX),True)
-			CCOPTS += -pthread
-		endif
+		CCOPTS += -pthread
 
 		ifneq ($(BUILD_LINUX),True)
 		ifneq ($(BUILD_OSX),True)
@@ -124,10 +122,8 @@ endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
-ifneq ($(BUILD_QNX),True)
 ifeq ($(DESTDIR),)
 	$(LDCONFIG) 2> /dev/null || true
-endif
 endif
 endif
 endif
@@ -148,10 +144,8 @@ endif
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
-ifneq ($(BUILD_QNX),True)
 ifeq ($(DESTDIR),)
 	$(LDCONFIG) 2> /dev/null || true
-endif
 endif
 endif
 endif

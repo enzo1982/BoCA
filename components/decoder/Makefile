@@ -11,7 +11,6 @@ ifneq ($(BUILD_OSX),True)
 endif
 
 ifeq ($(BUILD_UNIX),True)
-ifneq ($(BUILD_QNX),True)
 ifneq ($(BUILD_HAIKU),True)
 ifneq ($(BUILD_OPENBSD),True)
 	FOLDERS += cdio
@@ -21,7 +20,6 @@ ifneq ($(BUILD_GNU),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_NETBSD),True)
 	FOLDERS += cdparanoia
-endif
 endif
 endif
 endif
