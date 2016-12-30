@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -158,7 +158,7 @@ Bool BoCA::EncoderMAC::Deactivate()
 
 	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
 
- 	return True;
+	return True;
 }
 
 Int BoCA::EncoderMAC::WriteData(Buffer<UnsignedByte> &data)

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -58,7 +58,7 @@ typedef int				 *FLAC_API_SUPPORTS_OGG_FLAC_TYPE;
 
 typedef FLAC__StreamDecoder *		(*FLAC__STREAM_DECODER_NEW)				();
 typedef void				(*FLAC__STREAM_DECODER_DELETE)				(FLAC__StreamDecoder *);
-typedef FLAC__bool	 		(*FLAC__STREAM_DECODER_SET_METADATA_RESPOND)		(FLAC__StreamDecoder *, FLAC__MetadataType);
+typedef FLAC__bool			(*FLAC__STREAM_DECODER_SET_METADATA_RESPOND)		(FLAC__StreamDecoder *, FLAC__MetadataType);
 typedef FLAC__StreamDecoderInitStatus	(*FLAC__STREAM_DECODER_INIT_STREAM)			(FLAC__StreamDecoder *, FLAC__StreamDecoderReadCallback, FLAC__StreamDecoderSeekCallback, FLAC__StreamDecoderTellCallback, FLAC__StreamDecoderLengthCallback, FLAC__StreamDecoderEofCallback, FLAC__StreamDecoderWriteCallback, FLAC__StreamDecoderMetadataCallback, FLAC__StreamDecoderErrorCallback, void *);
 typedef FLAC__StreamDecoderInitStatus	(*FLAC__STREAM_DECODER_INIT_OGG_STREAM)			(FLAC__StreamDecoder *, FLAC__StreamDecoderReadCallback, FLAC__StreamDecoderSeekCallback, FLAC__StreamDecoderTellCallback, FLAC__StreamDecoderLengthCallback, FLAC__StreamDecoderEofCallback, FLAC__StreamDecoderWriteCallback, FLAC__StreamDecoderMetadataCallback, FLAC__StreamDecoderErrorCallback, void *);
 typedef FLAC__bool			(*FLAC__STREAM_DECODER_FINISH)				(FLAC__StreamDecoder *);

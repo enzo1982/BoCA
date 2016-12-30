@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -78,7 +78,7 @@ using namespace smooth;
 		BOCA_EXPORT const char *BoCA_GetComponentName()										{ return (const char *) #componentName; }												\
 	}
 
-#define BoCA_DEFINE_DECODER_COMPONENT(componentName)										 																		\
+#define BoCA_DEFINE_DECODER_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
 		BOCA_EXPORT bool BoCA_##componentName##_CanOpenStream(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->CanOpenStream(file); }									\
@@ -97,7 +97,7 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)						{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
 	}
 
-#define BoCA_DEFINE_ENCODER_COMPONENT(componentName)											 																	\
+#define BoCA_DEFINE_ENCODER_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
 																																		\
@@ -118,7 +118,7 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)						{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
 	}
 
-#define BoCA_DEFINE_DEVICEINFO_COMPONENT(componentName)											 																	\
+#define BoCA_DEFINE_DEVICEINFO_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT int BoCA_##componentName##_GetNumberOfDevices(void *component)						{ return ((BoCA::componentName *) component)->GetNumberOfDevices(); }									\
 		BOCA_EXPORT const void *BoCA_##componentName##_GetNthDeviceInfo(void *component, int n)					{ return &((BoCA::componentName *) component)->GetNthDeviceInfo(n); }									\
@@ -130,7 +130,7 @@ using namespace smooth;
 		BOCA_EXPORT const void *BoCA_##componentName##_GetNthDeviceMCDI(void *component, int n)					{ return &((BoCA::componentName *) component)->GetNthDeviceMCDI(n); }									\
 	}
 
-#define BoCA_DEFINE_DSP_COMPONENT(componentName)											 																	\
+#define BoCA_DEFINE_DSP_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
 		BOCA_EXPORT void BoCA_##componentName##_GetFormatInfo(void *component, void *format)					{ return ((BoCA::componentName *) component)->GetFormatInfo(*((BoCA::Format *) format)); }						\
@@ -145,13 +145,13 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
 	}
 
-#define BoCA_DEFINE_EXTENSION_COMPONENT(componentName)										 																		\
+#define BoCA_DEFINE_EXTENSION_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT void *BoCA_##componentName##_GetMainTabLayer(void *component)						{ return ((BoCA::componentName *) component)->getMainTabLayer.Emit(); }									\
 		BOCA_EXPORT void *BoCA_##componentName##_GetStatusBarLayer(void *component)						{ return ((BoCA::componentName *) component)->getStatusBarLayer.Emit(); }								\
 	}
 
-#define BoCA_DEFINE_OUTPUT_COMPONENT(componentName)											 																	\
+#define BoCA_DEFINE_OUTPUT_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
 																																		\
@@ -169,7 +169,7 @@ using namespace smooth;
 		BOCA_EXPORT bool BoCA_##componentName##_IsPlaying(void *component)							{ return ((BoCA::componentName *) component)->IsPlaying(); }										\
 	}
 
-#define BoCA_DEFINE_PLAYLIST_COMPONENT(componentName)										 																		\
+#define BoCA_DEFINE_PLAYLIST_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT void BoCA_##componentName##_SetTrackList(void *component, const void *trackList)				{ return ((BoCA::componentName *) component)->SetTrackList(*((const Array<BoCA::Track> *) trackList)); }				\
 		BOCA_EXPORT bool BoCA_##componentName##_CanOpenFile(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->CanOpenFile(file); }									\
@@ -178,7 +178,7 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_WritePlaylist(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->WritePlaylist(file); }									\
 	}
 
-#define BoCA_DEFINE_TAGGER_COMPONENT(componentName)										 																		\
+#define BoCA_DEFINE_TAGGER_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT void BoCA_##componentName##_SetVendorString(void *component, const wchar_t *vendor)				{ return ((BoCA::componentName *) component)->SetVendorString(vendor); }								\
 																																		\
@@ -191,7 +191,7 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_UpdateStreamInfo(void *component, const wchar_t *file, const void *track)	{ return ((BoCA::componentName *) component)->UpdateStreamInfo(file, *((const BoCA::Track *) track)); }					\
 	}
 
-#define BoCA_DEFINE_VERIFIER_COMPONENT(componentName)										 																		\
+#define BoCA_DEFINE_VERIFIER_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((BoCA::Track *) track)); }						\
 		BOCA_EXPORT bool BoCA_##componentName##_CanVerifyTrack(void *component, const void *track)				{ return ((BoCA::componentName *) component)->CanVerifyTrack(*((BoCA::Track *) track)); }									\
@@ -204,7 +204,7 @@ using namespace smooth;
 		BOCA_EXPORT bool BoCA_##componentName##_Verify(void *component)								{ return ((BoCA::componentName *) component)->Verify(); }										\
 	}
 
-#define BoCA_END_COMPONENT(componentName)										 																			\
+#define BoCA_END_COMPONENT(componentName)																													\
 	extern "C" {																																\
 		BOCA_EXPORT const char *BoCA_##componentName##_GetComponentSpecs()							{ return BoCA::componentName::GetComponentSpecs(); }											\
 																																		\

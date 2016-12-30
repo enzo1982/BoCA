@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -445,7 +445,7 @@ Int BoCA::DecoderMAD::GetMPEGFrameSize(const Buffer<UnsignedByte> &header)
 	Int	 padding    = (header[2] & 0x02) >> 1; // padding
 	Int	 bitrate    = (header[2] & 0xf0) >> 4; // bitrate
 	Int	 sampleRate = (header[2] & 0x0c) >> 2; // samplerate
-    
+
 	/* Return frame size.
 	 */
 	return (((Float) mpegFrameSamples[version][layer] / 8.0 * (Float) (mpegBitrate[version][layer][bitrate] * 1000)) / (Float) mpegSampleRate[version][sampleRate]) + ((padding) ? mpegUnitSize[layer] : 0);

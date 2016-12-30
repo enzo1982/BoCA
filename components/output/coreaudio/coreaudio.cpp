@@ -104,7 +104,7 @@ Bool BoCA::OutputCoreAudio::Activate()
 
 	streamFormat.mFormatID		= CA::kAudioFormatLinearPCM;
 	streamFormat.mFormatFlags       = CA::kLinearPCMFormatFlagIsPacked | (format.bits > 8	      ? CA::kLinearPCMFormatFlagIsSignedInteger : 0) |
-					 				     (endianness == EndianBig ? CA::kLinearPCMFormatFlagIsBigEndian	: 0);
+									     (endianness == EndianBig ? CA::kLinearPCMFormatFlagIsBigEndian	: 0);
 	streamFormat.mSampleRate	= format.rate;
 	streamFormat.mChannelsPerFrame	= format.channels;
 	streamFormat.mBitsPerChannel	= format.bits;

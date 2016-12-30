@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -136,7 +136,7 @@ Error BoCA::PlaylistWPL::WritePlaylist(const String &file)
 	XML::Node	*itemCount = head->AddNode("meta");
 
 	itemCount->SetAttribute("name", "ItemCount");
- 	itemCount->SetAttribute("content", String::FromInt(trackList.Length()));
+	itemCount->SetAttribute("content", String::FromInt(trackList.Length()));
 
 	XML::Node	*body = smil->AddNode("body");
 	XML::Node	*seq  = body->AddNode("seq");

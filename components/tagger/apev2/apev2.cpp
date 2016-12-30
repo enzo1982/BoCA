@@ -107,7 +107,7 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		else if	(key == String(INFO_CONDUCTOR).Append(":")) { RenderAPEItem("Conductor", value, buffer); numItems++; }
 		else if	(key == String(INFO_COMPOSER).Append(":"))  { RenderAPEItem("Composer",  value, buffer); numItems++; }
-	
+
 		else if	(key == String(INFO_BPM).Append(":"))	    { RenderAPEItem("BPM",	 value, buffer); numItems++; }
 	}
 

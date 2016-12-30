@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -131,7 +131,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	sourceFormat.mFormatID		    = CA::kAudioFormatLinearPCM;
 	sourceFormat.mFormatFlags	    = CA::kLinearPCMFormatFlagIsPacked | (format.bits > 8	  ? CA::kLinearPCMFormatFlagIsSignedInteger : 0) |
-					 					 (endianness == EndianBig ? CA::kLinearPCMFormatFlagIsBigEndian	    : 0);
+										 (endianness == EndianBig ? CA::kLinearPCMFormatFlagIsBigEndian	    : 0);
 	sourceFormat.mSampleRate	    = format.rate;
 	sourceFormat.mChannelsPerFrame	    = format.channels;
 	sourceFormat.mBitsPerChannel	    = format.bits;

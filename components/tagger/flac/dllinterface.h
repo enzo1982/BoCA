@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -44,7 +44,7 @@ typedef FLAC__StreamMetadata *		(*FLAC__METADATA_ITERATOR_GET_BLOCK)				(const F
 typedef FLAC__bool			(*FLAC__METADATA_ITERATOR_DELETE_BLOCK)				(FLAC__Metadata_Iterator *, FLAC__bool);
 typedef FLAC__bool			(*FLAC__METADATA_ITERATOR_INSERT_BLOCK_AFTER)			(FLAC__Metadata_Iterator *, FLAC__StreamMetadata *);
 
-typedef FLAC__StreamMetadata *	 	(*FLAC__METADATA_OBJECT_NEW)					(FLAC__MetadataType);
+typedef FLAC__StreamMetadata *		(*FLAC__METADATA_OBJECT_NEW)					(FLAC__MetadataType);
 typedef FLAC__bool 			(*FLAC__METADATA_OBJECT_PICTURE_SET_MIME_TYPE)			(FLAC__StreamMetadata *, char *, FLAC__bool);
 typedef FLAC__bool 			(*FLAC__METADATA_OBJECT_PICTURE_SET_DESCRIPTION)		(FLAC__StreamMetadata *, FLAC__byte *, FLAC__bool);
 typedef FLAC__bool 			(*FLAC__METADATA_OBJECT_PICTURE_SET_DATA)			(FLAC__StreamMetadata *, FLAC__byte *, FLAC__uint32, FLAC__bool);

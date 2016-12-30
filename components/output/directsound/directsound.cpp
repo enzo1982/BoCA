@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -110,7 +110,7 @@ Bool BoCA::OutputDirectSound::Activate()
 
 	if (primaryBuffer->SetFormat((WAVEFORMATEX *) &wfx) != DS_OK)
 	{
-		primaryBuffer->Release(); 
+		primaryBuffer->Release();
 
 		directSound->Release();
 
@@ -125,7 +125,7 @@ Bool BoCA::OutputDirectSound::Activate()
 
 	if (directSound->CreateSoundBuffer(&soundBuffDesc, &workBuffer, NIL) != DS_OK)
 	{
-		primaryBuffer->Release(); 
+		primaryBuffer->Release();
 
 		directSound->Release();
 
@@ -139,8 +139,8 @@ Bool BoCA::OutputDirectSound::Deactivate()
 {
 	workBuffer->Stop();
 
-	workBuffer->Release(); 
-	primaryBuffer->Release(); 
+	workBuffer->Release();
+	primaryBuffer->Release();
 
 	directSound->Release();
 
