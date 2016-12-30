@@ -119,9 +119,6 @@
 #elif defined __APPLE__
 #	include "smooth/gui/dialogs/directory/dirdlg_cocoa.h"
 #	include "smooth/gui/dialogs/file/filedlg_cocoa.h"
-#elif defined __QNXNTO__
-#	include "smooth/gui/dialogs/directory/dirdlg_photon.h"
-#	include "smooth/gui/dialogs/file/filedlg_photon.h"
 #else
 #	include "smooth/gui/dialogs/directory/dirdlg_gtk.h"
 #	include "smooth/gui/dialogs/file/filedlg_gtk.h"
