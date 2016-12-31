@@ -130,9 +130,6 @@
 #elif defined(__GNU__)
 # define V8_OS_HURD 1
 # define V8_OS_POSIX 1
-#elif defined(__QNX__)
-# define V8_OS_QNX 1
-# define V8_OS_POSIX 1
 #elif defined(__HAIKU__)
 # define V8_OS_HAIKU 1
 # define V8_OS_POSIX 1
