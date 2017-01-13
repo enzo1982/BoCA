@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -101,7 +101,9 @@ using namespace smooth;
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
 																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_SetOutputFormat(void *component, int n)						{ return ((BoCA::componentName *) component)->SetOutputFormat(n); }									\
 		BOCA_EXPORT char *BoCA_##componentName##_GetOutputFileExtension(void *component)					{ return ((BoCA::componentName *) component)->GetOutputFileExtension(); }								\
+																																		\
 		BOCA_EXPORT int BoCA_##componentName##_GetNumberOfPasses(void *component)						{ return ((BoCA::componentName *) component)->GetNumberOfPasses(); }									\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_IsThreadSafe(const void *component)						{ return ((const BoCA::componentName *) component)->IsThreadSafe(); }									\

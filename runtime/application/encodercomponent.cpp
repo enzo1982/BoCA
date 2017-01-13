@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,6 +33,11 @@ Int BoCA::AS::EncoderComponent::SetDriver(IO::Driver *driver)
 Bool BoCA::AS::EncoderComponent::SetAudioTrackInfo(const Track &track)
 {
 	return specs->func_SetAudioTrackInfo(component, &track);
+}
+
+Bool BoCA::AS::EncoderComponent::SetOutputFormat(Int n)
+{
+	return specs->func_SetOutputFormat(component, n);
 }
 
 String BoCA::AS::EncoderComponent::GetOutputFileExtension() const

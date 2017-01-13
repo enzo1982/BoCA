@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -72,7 +72,9 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_SetPause			= NIL;
 	func_IsPlaying			= NIL;
 
+	func_SetOutputFormat		= NIL;
 	func_GetOutputFileExtension	= NIL;
+
 	func_GetNumberOfPasses		= NIL;
 
 	func_IsThreadSafe		= NIL;
@@ -197,7 +199,9 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_SetPause			= (int (*)(void *, bool))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetPause"));
 	func_IsPlaying			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsPlaying"));
 
+	func_SetOutputFormat		= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetOutputFormat"));
 	func_GetOutputFileExtension	= (char *(*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetOutputFileExtension"));
+
 	func_GetNumberOfPasses		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfPasses"));
 
 	func_IsThreadSafe		= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsThreadSafe"));
