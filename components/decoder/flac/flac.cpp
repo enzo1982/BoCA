@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ const String &BoCA::DecoderFLAC::GetComponentSpecs()
 		    <id>flac-dec</id>							\
 		    <type>decoder</type>						\
 		    <format>								\
-		      <name>FLAC Audio Files</name>					\
+		      <name>FLAC Files</name>						\
 		      <lossless>true</lossless>						\
 		      <extension>flac</extension>					\
 		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>		\

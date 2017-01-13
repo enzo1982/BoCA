@@ -6,7 +6,7 @@
   <id>divxaac-enc</id>
   <type>encoder</type>
   <format>
-    <name>AAC Audio Files</name>
+    <name>Raw AAC Files</name>
     <extension>aac</extension>
   </format>
   <external>

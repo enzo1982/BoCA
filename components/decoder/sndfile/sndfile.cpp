@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -36,7 +36,7 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		    <replace>voc-dec</replace>					\
 		    <replace>wave-dec</replace>					\
 		    <format>							\
-		      <name>Windows Wave Files</name>				\
+		      <name>Microsoft Wave Files</name>				\
 		      <lossless>true</lossless>					\
 		      <extension>wav</extension>				\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
@@ -52,15 +52,33 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		      <tag id=\"tocplist-tag\" mode=\"other\">.TOC.plist</tag>	\
 		    </format>							\
 		    <format>							\
+		      <name>Apple Core Audio Files</name>			\
+		      <lossless>true</lossless>					\
+		      <extension>caf</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Sony Media Wave64 Files</name>			\
+		      <lossless>true</lossless>					\
+		      <extension>w64</extension>				\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+		    </format>							\
+		    <format>							\
+		      <name>RIFF 64 Audio Files</name>				\
+		      <lossless>true</lossless>					\
+		      <extension>rf64</extension>				\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
+		    </format>							\
+		    <format>							\
 		      <name>Sun Audio Files</name>				\
 		      <lossless>true</lossless>					\
 		      <extension>au</extension>					\
 		      <extension>snd</extension>				\
 		    </format>							\
 		    <format>							\
-		      <name>Paris Audio Files</name>				\
+		      <name>Creative Voice Files</name>				\
 		      <lossless>true</lossless>					\
-		      <extension>paf</extension>				\
+		      <extension>voc</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Amiga Audio Files</name>				\
@@ -74,22 +92,9 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		      <extension>sf</extension>					\
 		    </format>							\
 		    <format>							\
-		      <name>Creative Voice Files</name>				\
+		      <name>Paris Audio Files</name>				\
 		      <lossless>true</lossless>					\
-		      <extension>voc</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Sound Forge Wave64</name>				\
-		      <lossless>true</lossless>					\
-		      <extension>w64</extension>				\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
-		    </format>							\
-		    <format>							\
-		      <name>RIFF 64 Audio Files</name>				\
-		      <lossless>true</lossless>					\
-		      <extension>rf64</extension>				\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
-		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
+		      <extension>paf</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Portable Voice Format</name>			\
@@ -97,19 +102,14 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		      <extension>pvf</extension>				\
 		    </format>							\
 		    <format>							\
+		      <name>Psion WVE Files</name>				\
+		      <lossless>true</lossless>					\
+		      <extension>wve</extension>				\
+		    </format>							\
+		    <format>							\
 		      <name>HMM Toolkit Format</name>				\
 		      <lossless>true</lossless>					\
 		      <extension>htk</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Apple Core Audio</name>				\
-		      <lossless>true</lossless>					\
-		      <extension>caf</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Psion WVE Format</name>				\
-		      <lossless>true</lossless>					\
-		      <extension>wve</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Audio Visual Research Format</name>			\

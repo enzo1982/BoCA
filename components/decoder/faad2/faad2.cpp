@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -39,7 +39,7 @@ const String &BoCA::DecoderFAAD2::GetComponentSpecs()
 			componentSpecs.Append("						\
 											\
 			    <format>							\
-			      <name>MP4 Audio Files</name>				\
+			      <name>MPEG-4 AAC Files</name>				\
 			      <extension>m4a</extension>				\
 			      <extension>m4b</extension>				\
 			      <extension>m4r</extension>				\
@@ -54,7 +54,7 @@ const String &BoCA::DecoderFAAD2::GetComponentSpecs()
 		componentSpecs.Append("							\
 											\
 		    <format>								\
-		      <name>Advanced Audio Files</name>					\
+		      <name>Raw AAC Files</name>					\
 		      <extension>aac</extension>					\
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
 		    </format>								\

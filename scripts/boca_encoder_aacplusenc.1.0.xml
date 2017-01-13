@@ -6,7 +6,7 @@
   <id>aacplusenc-enc</id>
   <type>encoder</type>
   <format>
-    <name>Advanced Audio Files</name>
+    <name>Raw AAC Files</name>
     <extension>aac</extension>
     <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
   </format>
