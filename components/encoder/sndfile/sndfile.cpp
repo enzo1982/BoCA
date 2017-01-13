@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 		    <type>encoder</type>					\
 		    <replace>wave-enc</replace>					\
 		    <format>							\
-		      <name>Windows Wave Files</name>				\
+		      <name>Microsoft Wave Files</name>				\
 		      <extension>wav</extension>				\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
@@ -47,13 +47,28 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
 		    </format>							\
 		    <format>							\
+		      <name>Apple Core Audio Files</name>			\
+		      <extension>caf</extension>				\
+		    </format>							\
+		    <format>							\
+		      <name>Sony Media Wave64 Files</name>			\
+		      <extension>w64</extension>				\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+		    </format>							\
+		    <format>							\
+		      <name>RIFF 64 Audio Files</name>				\
+		      <extension>rf64</extension>				\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
+		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
+		    </format>							\
+		    <format>							\
 		      <name>Sun Audio Files</name>				\
 		      <extension>au</extension>					\
 		      <extension>snd</extension>				\
 		    </format>							\
 		    <format>							\
-		      <name>Paris Audio Files</name>				\
-		      <extension>paf</extension>				\
+		      <name>Creative Voice Files</name>				\
+		      <extension>voc</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Amiga Audio Files</name>				\
@@ -65,35 +80,20 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 		      <extension>sf</extension>					\
 		    </format>							\
 		    <format>							\
-		      <name>Creative Voice Files</name>				\
-		      <extension>voc</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Sound Forge Wave64</name>				\
-		      <extension>w64</extension>				\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
-		    </format>							\
-		    <format>							\
-		      <name>RIFF 64 Audio Files</name>				\
-		      <extension>rf64</extension>				\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
-		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
+		      <name>Paris Audio Files</name>				\
+		      <extension>paf</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Portable Voice Format</name>			\
 		      <extension>pvf</extension>				\
 		    </format>							\
 		    <format>							\
+		      <name>Psion WVE Files</name>				\
+		      <extension>wve</extension>				\
+		    </format>							\
+		    <format>							\
 		      <name>HMM Toolkit Format</name>				\
 		      <extension>htk</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Apple Core Audio</name>				\
-		      <extension>caf</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Psion WVE Format</name>				\
-		      <extension>wve</extension>				\
 		    </format>							\
 		    <format>							\
 		      <name>Audio Visual Research Format</name>			\
@@ -463,6 +463,47 @@ Int BoCA::EncoderSndFile::SelectBestSubFormat(const Format &format, Int fileForm
 	}
 
 	return 0;
+}
+
+Bool BoCA::EncoderSndFile::SetOutputFormat(Int n)
+{
+	Config	*config = Config::Get();
+
+	SF_FORMAT_INFO	 format_info;
+
+	switch (n)
+	{
+		case  0: format_info.format = SF_FORMAT_WAV;   break;
+		case  1: format_info.format = SF_FORMAT_AIFF;  break;
+		case  2: format_info.format = SF_FORMAT_CAF;   break;
+		case  3: format_info.format = SF_FORMAT_W64;   break;
+		case  4: format_info.format = SF_FORMAT_RF64;  break;
+		case  5: format_info.format = SF_FORMAT_AU;    break;
+		case  6: format_info.format = SF_FORMAT_VOC;   break;
+		case  7: format_info.format = SF_FORMAT_SVX;   break;
+		case  9: format_info.format = SF_FORMAT_IRCAM; break;
+		case  8: format_info.format = SF_FORMAT_PAF;   break;
+		case 10: format_info.format = SF_FORMAT_PVF;   break;
+		case 12: format_info.format = SF_FORMAT_WVE;   break;
+		case 11: format_info.format = SF_FORMAT_HTK;   break;
+		case 13: format_info.format = SF_FORMAT_AVR;   break;
+		default:				       return False;
+	}
+
+	/* Check if output format is already set.
+	 */
+#ifdef __APPLE__
+	if (config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF) == format_info.format) return True;
+#else
+	if (config->GetIntValue("SndFile", "Format", SF_FORMAT_WAV)  == format_info.format) return True;
+#endif
+
+	/* Set new output format.
+	 */
+	config->SetIntValue("SndFile", "Format", format_info.format);
+	config->SetIntValue("SndFile", "SubFormat", 0);
+
+	return True;
 }
 
 String BoCA::EncoderSndFile::GetOutputFileExtension() const

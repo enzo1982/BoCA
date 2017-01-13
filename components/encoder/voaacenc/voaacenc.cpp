@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -40,12 +40,11 @@ const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 			componentSpecs.Append("						\
 											\
 			    <format>							\
-			      <name>MP4 Audio Files</name>				\
+			      <name>MPEG-4 AAC Files</name>				\
 			      <extension>m4a</extension>				\
 			      <extension>m4b</extension>				\
 			      <extension>m4r</extension>				\
 			      <extension>mp4</extension>				\
-			      <extension>3gp</extension>				\
 			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
 			    </format>							\
 											\
@@ -55,7 +54,7 @@ const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 		componentSpecs.Append("							\
 											\
 		    <format>								\
-		      <name>Advanced Audio Files</name>					\
+		      <name>Raw AAC Files</name>					\
 		      <extension>aac</extension>					\
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
 		    </format>								\
@@ -149,11 +148,11 @@ Bool BoCA::EncoderVOAAC::Activate()
 	params.sampleRate = format.rate;
 	params.nChannels  = format.channels;
 	params.bitRate	  = config->GetIntValue("VOAACEnc", "Bitrate", 128) * 1000;
-	params.adtsUsed	  = !config->GetIntValue("VOAACEnc", "MP4Container", 1);
+	params.adtsUsed	  = !config->GetIntValue("VOAACEnc", "MP4Container", True);
 
 	api.SetParam(handle, VO_PID_AAC_ENCPARAM, &params);
 
-	if (config->GetIntValue("VOAACEnc", "MP4Container", 1))
+	if (config->GetIntValue("VOAACEnc", "MP4Container", True))
 	{
 		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
@@ -174,7 +173,7 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (!config->GetIntValue("VOAACEnc", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("VOAACEnc", "AllowID3v2", 0))
+	if (!config->GetIntValue("VOAACEnc", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("VOAACEnc", "AllowID3v2", False))
 	{
 		if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
 		{
@@ -210,7 +209,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Finish MP4 writing.
 	 */
-	if (config->GetIntValue("VOAACEnc", "MP4Container", 1))
+	if (config->GetIntValue("VOAACEnc", "MP4Container", True))
 	{
 		/* Write iTunes metadata with gapless information.
 		 */
@@ -290,7 +289,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (!config->GetIntValue("VOAACEnc", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (!config->GetIntValue("VOAACEnc", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -315,7 +314,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (!config->GetIntValue("VOAACEnc", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("VOAACEnc", "AllowID3v2", 0))
+	if (!config->GetIntValue("VOAACEnc", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("VOAACEnc", "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
@@ -416,8 +415,8 @@ Int BoCA::EncoderVOAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<unsi
 
 			dataLength += output.Length;
 
-			if (config->GetIntValue("VOAACEnc", "MP4Container", 1)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, output.Length, frameSize, 0, true);
-			else							driver->WriteData(outBuffer, output.Length);
+			if (config->GetIntValue("VOAACEnc", "MP4Container", True)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, output.Length, frameSize, 0, true);
+			else							   driver->WriteData(outBuffer, output.Length);
 		}
 
 		framesProcessed++;
@@ -443,11 +442,21 @@ Int BoCA::EncoderVOAAC::GetSampleRateIndex(Int sampleRate) const
 	return -1;
 }
 
+Bool BoCA::EncoderVOAAC::SetOutputFormat(Int n)
+{
+	Config	*config = Config::Get();
+
+	if (n == 0 && mp4v2dll != NIL) config->SetIntValue("VOAACEnc", "MP4Container", True);
+	else			       config->SetIntValue("VOAACEnc", "MP4Container", False);
+
+	return True;
+}
+
 String BoCA::EncoderVOAAC::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("VOAACEnc", "MP4Container", 1))
+	if (config->GetIntValue("VOAACEnc", "MP4Container", True))
 	{
 		switch (config->GetIntValue("VOAACEnc", "MP4FileExtension", 0))
 		{

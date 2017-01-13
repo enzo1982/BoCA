@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,8 +20,8 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	mpegVersion	= config->GetIntValue("FDKAAC", "MPEGVersion", 0);
 	aacType		= config->GetIntValue("FDKAAC", "AACType", AOT_SBR);
 	bitrate		= config->GetIntValue("FDKAAC", "Bitrate", 96);
-	allowID3	= config->GetIntValue("FDKAAC", "AllowID3v2", 0);
-	fileFormat	= config->GetIntValue("FDKAAC", "MP4Container", 1);
+	allowID3	= config->GetIntValue("FDKAAC", "AllowID3v2", False);
+	fileFormat	= config->GetIntValue("FDKAAC", "MP4Container", True);
 	fileExtension	= config->GetIntValue("FDKAAC", "MP4FileExtension", 0);
 
 	I18n	*i18n = I18n::Get();

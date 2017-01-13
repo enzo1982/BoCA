@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -42,12 +42,11 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 			componentSpecs.Append("						\
 											\
 			    <format>							\
-			      <name>MP4 Audio Files</name>				\
+			      <name>MPEG-4 AAC Files</name>				\
 			      <extension>m4a</extension>				\
 			      <extension>m4b</extension>				\
 			      <extension>m4r</extension>				\
 			      <extension>mp4</extension>				\
-			      <extension>3gp</extension>				\
 			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
 			    </format>							\
 											\
@@ -57,7 +56,7 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 		componentSpecs.Append("							\
 											\
 		    <format>								\
-		      <name>Advanced Audio Files</name>					\
+		      <name>Raw AAC Files</name>					\
 		      <extension>aac</extension>					\
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
 		    </format>								\
@@ -133,9 +132,9 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	ex_aacEncoder_SetParam(handle, AACENC_AOT, config->GetIntValue("FDKAAC", "MPEGVersion", 0) + config->GetIntValue("FDKAAC", "AACType", AOT_SBR));
 	ex_aacEncoder_SetParam(handle, AACENC_BITRATE, config->GetIntValue("FDKAAC", "Bitrate", 96) * 1000);
 	ex_aacEncoder_SetParam(handle, AACENC_AFTERBURNER, 1);
-	ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, config->GetIntValue("FDKAAC", "MP4Container", 1) ? TT_MP4_RAW  : TT_MP4_ADTS);
+	ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, config->GetIntValue("FDKAAC", "MP4Container", True) ? TT_MP4_RAW : TT_MP4_ADTS);
 
-	if (!config->GetIntValue("FDKAAC", "MP4Container", 1))
+	if (!config->GetIntValue("FDKAAC", "MP4Container", True))
 	{
 		if (config->GetIntValue("FDKAAC", "AACType", AOT_SBR) == AOT_ER_AAC_LD ||
 		    config->GetIntValue("FDKAAC", "AACType", AOT_SBR) == AOT_ER_AAC_ELD) ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, TT_MP4_LOAS);
@@ -148,7 +147,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	outBuffer.Resize(aacInfo.maxOutBufBytes);
 
-	if (config->GetIntValue("FDKAAC", "MP4Container", 1))
+	if (config->GetIntValue("FDKAAC", "MP4Container", True))
 	{
 		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
@@ -169,7 +168,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (!config->GetIntValue("FDKAAC", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FDKAAC", "AllowID3v2", 0))
+	if (!config->GetIntValue("FDKAAC", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FDKAAC", "AllowID3v2", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -207,7 +206,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 	/* Finish MP4 writing.
 	 */
-	if (config->GetIntValue("FDKAAC", "MP4Container", 1))
+	if (config->GetIntValue("FDKAAC", "MP4Container", True))
 	{
 		/* Write iTunes metadata with gapless information.
 		 */
@@ -287,7 +286,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (!config->GetIntValue("FDKAAC", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (!config->GetIntValue("FDKAAC", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -312,7 +311,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (!config->GetIntValue("FDKAAC", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FDKAAC", "AllowID3v2", 0))
+	if (!config->GetIntValue("FDKAAC", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FDKAAC", "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
@@ -433,8 +432,8 @@ Int BoCA::EncoderFDKAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<uns
 
 			dataLength += outputInfo.numOutBytes;
 
-			if (config->GetIntValue("FDKAAC", "MP4Container", 1)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, outputInfo.numOutBytes, frameSize, 0, true);
-			else						      driver->WriteData(outBuffer, outputInfo.numOutBytes);
+			if (config->GetIntValue("FDKAAC", "MP4Container", True)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, outputInfo.numOutBytes, frameSize, 0, true);
+			else							 driver->WriteData(outBuffer, outputInfo.numOutBytes);
 		}
 
 		framesProcessed++;
@@ -460,11 +459,28 @@ Int BoCA::EncoderFDKAAC::GetSampleRateIndex(Int sampleRate) const
 	return -1;
 }
 
+Bool BoCA::EncoderFDKAAC::SetOutputFormat(Int n)
+{
+	Config	*config = Config::Get();
+
+	if (n == 0 && mp4v2dll != NIL)
+	{
+		config->SetIntValue("FDKAAC", "MP4Container", True);
+		config->SetIntValue("FDKAAC", "MPEGVersion", 0);
+	}
+	else
+	{
+		config->SetIntValue("FDKAAC", "MP4Container", False);
+	}
+
+	return True;
+}
+
 String BoCA::EncoderFDKAAC::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("FDKAAC", "MP4Container", 1))
+	if (config->GetIntValue("FDKAAC", "MP4Container", True))
 	{
 		switch (config->GetIntValue("FDKAAC", "MP4FileExtension", 0))
 		{

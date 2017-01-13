@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -41,12 +41,11 @@ const String &BoCA::EncoderFAAC::GetComponentSpecs()
 			componentSpecs.Append("						\
 											\
 			    <format>							\
-			      <name>MP4 Audio Files</name>				\
+			      <name>MPEG-4 AAC Files</name>				\
 			      <extension>m4a</extension>				\
 			      <extension>m4b</extension>				\
 			      <extension>m4r</extension>				\
 			      <extension>mp4</extension>				\
-			      <extension>3gp</extension>				\
 			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
 			    </format>							\
 											\
@@ -56,7 +55,7 @@ const String &BoCA::EncoderFAAC::GetComponentSpecs()
 		componentSpecs.Append("							\
 											\
 		    <format>								\
-		      <name>Advanced Audio Files</name>					\
+		      <name>Raw AAC Files</name>					\
 		      <extension>aac</extension>					\
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
 		    </format>								\
@@ -132,16 +131,16 @@ Bool BoCA::EncoderFAAC::Activate()
 
 	fConfig = ex_faacEncGetCurrentConfiguration(handle);
 
-	fConfig->mpegVersion	= config->GetIntValue("FAAC", "MP4Container", 1) ? MPEG4 : config->GetIntValue("FAAC", "MPEGVersion", 0);
+	fConfig->mpegVersion	= config->GetIntValue("FAAC", "MP4Container", True) ? MPEG4 : config->GetIntValue("FAAC", "MPEGVersion", 0);
 	fConfig->aacObjectType	= config->GetIntValue("FAAC", "AACType", 2);
-	fConfig->allowMidside	= config->GetIntValue("FAAC", "AllowJS", 1);
-	fConfig->useTns		= config->GetIntValue("FAAC", "UseTNS", 0);
+	fConfig->allowMidside	= config->GetIntValue("FAAC", "AllowJS", True);
+	fConfig->useTns		= config->GetIntValue("FAAC", "UseTNS", False);
 	fConfig->bandWidth	= config->GetIntValue("FAAC", "BandWidth", 22050);
 
-	if (config->GetIntValue("FAAC", "MP4Container", 1)) fConfig->outputFormat = 0; // Raw AAC frame headers
+	if (config->GetIntValue("FAAC", "MP4Container", True)) fConfig->outputFormat = 0; // Raw AAC frame headers
 
-	if (config->GetIntValue("FAAC", "SetQuality", 1))   fConfig->quantqual	  = config->GetIntValue("FAAC", "AACQuality", 100);
-	else						    fConfig->bitRate	  = config->GetIntValue("FAAC", "Bitrate", 96) * 1000;
+	if (config->GetIntValue("FAAC", "SetQuality", True))   fConfig->quantqual    = config->GetIntValue("FAAC", "AACQuality", 100);
+	else						       fConfig->bitRate	     = config->GetIntValue("FAAC", "Bitrate", 96) * 1000;
 
 	if (format.bits ==  8) fConfig->inputFormat = FAAC_INPUT_16BIT;
 	if (format.bits == 16) fConfig->inputFormat = FAAC_INPUT_16BIT;
@@ -150,7 +149,7 @@ Bool BoCA::EncoderFAAC::Activate()
 
 	ex_faacEncSetConfiguration(handle, fConfig);
 
-	if (config->GetIntValue("FAAC", "MP4Container", 1))
+	if (config->GetIntValue("FAAC", "MP4Container", True))
 	{
 		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
@@ -170,7 +169,7 @@ Bool BoCA::EncoderFAAC::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (!config->GetIntValue("FAAC", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", 0))
+	if (!config->GetIntValue("FAAC", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -208,7 +207,7 @@ Bool BoCA::EncoderFAAC::Deactivate()
 
 	/* Finish MP4 writing.
 	 */
-	if (config->GetIntValue("FAAC", "MP4Container", 1))
+	if (config->GetIntValue("FAAC", "MP4Container", True))
 	{
 		/* Write iTunes metadata with gapless information.
 		 */
@@ -288,7 +287,7 @@ Bool BoCA::EncoderFAAC::Deactivate()
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (!config->GetIntValue("FAAC", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (!config->GetIntValue("FAAC", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -313,7 +312,7 @@ Bool BoCA::EncoderFAAC::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (!config->GetIntValue("FAAC", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", 0))
+	if (!config->GetIntValue("FAAC", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("FAAC", "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
@@ -413,8 +412,8 @@ Int BoCA::EncoderFAAC::EncodeFrames(Buffer<int32_t> &samplesBuffer, Buffer<unsig
 		{
 			dataLength += bytes;
 
-			if (config->GetIntValue("FAAC", "MP4Container", 1)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, frameSize, 0, true);
-			else						    driver->WriteData(outBuffer, bytes);
+			if (config->GetIntValue("FAAC", "MP4Container", True)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, frameSize, 0, true);
+			else						       driver->WriteData(outBuffer, bytes);
 		}
 
 		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) framesProcessed++;
@@ -440,11 +439,28 @@ Int BoCA::EncoderFAAC::GetSampleRateIndex(Int sampleRate) const
 	return -1;
 }
 
+Bool BoCA::EncoderFAAC::SetOutputFormat(Int n)
+{
+	Config	*config = Config::Get();
+
+	if (n == 0 && mp4v2dll != NIL)
+	{
+		config->SetIntValue("FAAC", "MP4Container", True);
+		config->SetIntValue("FAAC", "MPEGVersion", 0);
+	}
+	else
+	{
+		config->SetIntValue("FAAC", "MP4Container", False);
+	}
+
+	return True;
+}
+
 String BoCA::EncoderFAAC::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("FAAC", "MP4Container", 1))
+	if (config->GetIntValue("FAAC", "MP4Container", True))
 	{
 		switch (config->GetIntValue("FAAC", "MP4FileExtension", 0))
 		{

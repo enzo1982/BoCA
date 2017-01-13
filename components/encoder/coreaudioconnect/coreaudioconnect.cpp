@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -45,18 +45,24 @@ const String &BoCA::EncoderCoreAudioConnect::GetComponentSpecs()
 		    <replace>voaacenc-enc</replace>				\
 		    <replace>avconv-alac-enc</replace>				\
 		    <format>							\
-		      <name>MP4 Audio Files</name>				\
+		      <name>MPEG-4 AAC Files</name>				\
 		      <extension>m4a</extension>				\
 		      <extension>m4b</extension>				\
 		      <extension>m4r</extension>				\
 		      <extension>mp4</extension>				\
-		      <extension>3gp</extension>				\
 		      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
 		    </format>							\
 		    <format>							\
-		      <name>Advanced Audio Files</name>				\
+		      <name>Raw AAC Files</name>				\
 		      <extension>aac</extension>				\
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>	\
+		    </format>							\
+		    <format>							\
+		      <name>Apple Lossless Files</name>				\
+		      <extension>m4a</extension>				\
+		      <extension>m4b</extension>				\
+		      <extension>mp4</extension>				\
+		      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
 		    </format>							\
 		  </component>							\
 										\
@@ -129,7 +135,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 
 	((CoreAudioCommSetup *) &comm->data)->codec    = config->GetIntValue("CoreAudio", "Codec", 'aac ');
 	((CoreAudioCommSetup *) &comm->data)->bitrate  = config->GetIntValue("CoreAudio", "Bitrate", 128) * 1000;
-	((CoreAudioCommSetup *) &comm->data)->format   = config->GetIntValue("CoreAudio", "MP4Container", 1);
+	((CoreAudioCommSetup *) &comm->data)->format   = config->GetIntValue("CoreAudio", "MP4Container", True);
 
 	((CoreAudioCommSetup *) &comm->data)->channels = format.channels;
 	((CoreAudioCommSetup *) &comm->data)->rate     = format.rate;
@@ -153,7 +159,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (!config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", 0))
+	if (!config->GetIntValue("CoreAudio", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -196,7 +202,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	/* Write metadata to file
 	 */
-	if (config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableMP4Metadata", True))
+	if (config->GetIntValue("CoreAudio", "MP4Container", True) && config->GetIntValue("Tags", "EnableMP4Metadata", True))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -236,7 +242,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (!config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (!config->GetIntValue("CoreAudio", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -261,7 +267,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (!config->GetIntValue("CoreAudio", "MP4Container", 1) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", 0))
+	if (!config->GetIntValue("CoreAudio", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
@@ -313,11 +319,24 @@ Int BoCA::EncoderCoreAudioConnect::WriteData(Buffer<UnsignedByte> &data)
 	else				     return data.Size();
 }
 
+Bool BoCA::EncoderCoreAudioConnect::SetOutputFormat(Int n)
+{
+	Config	*config = Config::Get();
+
+	if (n != 1) config->SetIntValue("CoreAudio", "MP4Container", True);
+	else	    config->SetIntValue("CoreAudio", "MP4Container", False);
+
+	if	(n != 2 && config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'alac') config->SetIntValue("CoreAudio", "Codec", 'aac ');
+	else if (n == 2)								config->SetIntValue("CoreAudio", "Codec", 'alac');
+
+	return True;
+}
+
 String BoCA::EncoderCoreAudioConnect::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("CoreAudio", "MP4Container", 1))
+	if (config->GetIntValue("CoreAudio", "MP4Container", True))
 	{
 		switch (config->GetIntValue("CoreAudio", "MP4FileExtension", 0))
 		{

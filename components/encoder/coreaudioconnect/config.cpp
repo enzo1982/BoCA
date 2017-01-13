@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -19,8 +19,8 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio(const CoreAudioCommCodecs &iFormats
 	formats		= iFormats;
 
 	bitrate		= config->GetIntValue("CoreAudio", "Bitrate", 128);
-	allowID3	= config->GetIntValue("CoreAudio", "AllowID3v2", 0);
-	fileFormat	= config->GetIntValue("CoreAudio", "MP4Container", 1);
+	allowID3	= config->GetIntValue("CoreAudio", "AllowID3v2", False);
+	fileFormat	= config->GetIntValue("CoreAudio", "MP4Container", True);
 	fileExtension	= config->GetIntValue("CoreAudio", "MP4FileExtension", 0);
 
 	I18n	*i18n = I18n::Get();
@@ -226,14 +226,28 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 	if	(bitrates.Length() == 2) { edit_bitrate->Activate();   slider_bitrate->SetRange(bitrates.GetNth(0), bitrates.GetNth(1)); }
 	else if (bitrates.Length() >  2) { edit_bitrate->Deactivate(); slider_bitrate->SetRange(-bitrates.Length() / 2, -1);		 }
 
-	if	(codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aac ' ||
+	if (codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'alac')
+	{
+		group_mp4->Deactivate();
+
+		fileFormat = 1;
+
+		option_extension_m4r->Deactivate();
+
+		if (fileExtension == 2) fileExtension = 0;
+	}
+	else if	(codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aac ' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aach' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacp' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacl' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aace' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacf' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacs')   group_mp4->Activate();
-	else if (codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'alac') { group_mp4->Deactivate(); fileFormat = 1; }
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacs')
+	{
+		group_mp4->Activate();
+
+		option_extension_m4r->Activate();
+	}
 
 	SetBitrate();
 	SetFileFormat();
