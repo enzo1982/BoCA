@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -446,8 +446,11 @@ Void BoCA::EncoderMultiEncoderHub::OnStartConversion(const Array<Track> &tracks)
 {
 	configuration	= Config::Copy();
 
+	if (configuration->GetStringValue("Settings", "Encoder", "lame-enc") != "meh-enc") return;
+
+	/* Set tracks to convert.
+	 */
 	tracksToConvert = tracks;
-	convertedTracks.RemoveAll();
 
 	/* Enable locking on playlist track arrays.
 	 */
@@ -493,7 +496,7 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 		}
 	}
 
-	if (configuration->GetIntValue("Settings", "EncodeToSingleFile", False)) playlistTracks.Add(playlistTrack);
+	if (tracksToConvert.Length() > 0 && configuration->GetIntValue("Settings", "EncodeToSingleFile", False)) playlistTracks.Add(playlistTrack);
 
 	/* Write playlists and cue sheets.
 	 */
@@ -574,11 +577,21 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 		String::ExplodeFinish();
 	}
 
+	/* Clear tracks to convert and converted tracks array.
+	 */
+	tracksToConvert.RemoveAll();
+	convertedTracks.RemoveAll();
+
 	Config::Free(configuration);
 }
 
 Void BoCA::EncoderMultiEncoderHub::OnCancelConversion()
 {
+	/* Clear tracks to convert and converted tracks array.
+	 */
+	tracksToConvert.RemoveAll();
+	convertedTracks.RemoveAll();
+
 	Config::Free(configuration);
 }
 
