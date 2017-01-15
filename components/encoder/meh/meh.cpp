@@ -462,6 +462,18 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 {
 	AS::Registry	&boca = AS::Registry::Get();
 
+	/* Get config values.
+	 */
+	Bool	 encodeToSingleFile	= configuration->GetIntValue("Settings", "EncodeToSingleFile", False);
+
+	Bool	 separateFolders	= configuration->GetIntValue("meh!", "SeparateFolders", False);
+
+	Bool	 createPlaylist		= configuration->GetIntValue("Playlist", "CreatePlaylist", False);
+	Bool	 createCueSheet		= configuration->GetIntValue("Playlist", "CreateCueSheet", False);
+
+	Bool	 useEncoderOutputDir	= configuration->GetIntValue("Playlist", "UseEncoderOutputDir", True);
+	Bool	 singlePlaylistFile	= configuration->GetIntValue("Playlist", "SinglePlaylistFile", False);
+
 	/* Compute playlist/cuesheet track list.
 	 */
 	Array<Track>	 playlistTracks;
@@ -473,7 +485,7 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 
 		if (track == NIL) continue;
 
-		if (!configuration->GetIntValue("Settings", "EncodeToSingleFile", False))
+		if (!encodeToSingleFile)
 		{
 			Track	 playlistTrack = track;
 
@@ -496,22 +508,58 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 		}
 	}
 
-	if (tracksToConvert.Length() > 0 && configuration->GetIntValue("Settings", "EncodeToSingleFile", False)) playlistTracks.Add(playlistTrack);
+	if (tracksToConvert.Length() > 0 && encodeToSingleFile) playlistTracks.Add(playlistTrack);
 
 	/* Write playlists and cue sheets.
 	 */
-	Bool	 createPlaylist	= configuration->GetIntValue("Playlist", "CreatePlaylist", False);
-	Bool	 createCueSheet	= configuration->GetIntValue("Playlist", "CreateCueSheet", False);
-
 	if ((createPlaylist && playlistTracks.Length() > 0) ||
 	    (createCueSheet && cuesheetTracks.Length() > 0))
 	{
 		String			 playlistID	   = configuration->GetStringValue("Playlist", "PlaylistFormat", "m3u-playlist-m3u8");
-
-		String			 playlistFileName  = GetPlaylistFileName(tracksToConvert.GetFirst());
 		String			 playlistExtension = playlistID.Tail(playlistID.Length() - playlistID.FindLast("-") - 1);
 
-		const Array<String>	&encoderIDs	   = configuration->GetStringValue("meh!", "Encoders", "flac-enc,lame-enc").Explode(",");
+		/* Split playlist tracks to individual playlists.
+		 */
+		Array<String>		 playlistFileNames;
+
+		Array<Array<Track> *>	 playlistTrackLists;
+		Array<Array<Track> *>	 cuesheetTrackLists;
+
+		if (encodeToSingleFile || singlePlaylistFile)
+		{
+			/* Set playlist filename so it is written to the same place as a single output file.
+			 */
+			if (encodeToSingleFile) playlistFileNames.Add(playlistTrack.outfile);
+			else			playlistFileNames.Add(GetPlaylistFileName(playlistTracks.GetFirst()));
+
+			playlistTrackLists.Add(new Array<Track>(playlistTracks));
+			cuesheetTrackLists.Add(new Array<Track>(cuesheetTracks));
+		}
+		else
+		{
+			foreach (const Track &track, playlistTracks)
+			{
+				/* Check if we already have a list for this playlist.
+				 */
+				String		 playlistFileName = GetPlaylistFileName(track);
+				UnsignedInt32	 playlistFileCRC  = playlistFileName.ComputeCRC32();
+
+				if (playlistFileNames.Add(playlistFileName, playlistFileCRC))
+				{
+					playlistTrackLists.Add(new Array<Track>(), playlistFileCRC);
+					cuesheetTrackLists.Add(new Array<Track>(), playlistFileCRC);
+				}
+
+				/* Find current lists and add track.
+				 */
+				playlistTrackLists.Get(playlistFileCRC)->Add(track);
+				cuesheetTrackLists.Get(playlistFileCRC)->Add(track);
+			}
+		}
+
+		/* Save playlists per encoder.
+		 */
+		const Array<String>	&encoderIDs = configuration->GetStringValue("meh!", "Encoders", "flac-enc,lame-enc").Explode(",");
 
 		foreach (const String &encoderID, encoderIDs)
 		{
@@ -529,25 +577,25 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 				boca.DeleteComponent(encoder);
 			}
 
-			/* Update playlist tracks.
+			/* Write playlists and cue sheets.
 			 */
-			String		 actualPlaylistFileName = String(playlistFileName).Replace("[FILETYPE]", formatExtension.ToUpper());
-
-			if (!configuration->GetIntValue("meh!", "SeparateFolders", False)	 ||
-			    !configuration->GetIntValue("Playlist", "UseEncoderOutputDir", True) ||
-			     configuration->GetIntValue("Settings", "EncodeToSingleFile", False)) actualPlaylistFileName.Append(".").Append(formatExtension);
-
-			Array<Track>	 actualPlaylistTracks	= playlistTracks;
-			Array<Track>	 actualCuesheetTracks	= cuesheetTracks;
-
-			foreach (Track &playlistTrack, actualPlaylistTracks) playlistTrack.origFilename = String(playlistTrack.origFilename).Replace("[FILETYPE]", formatExtension.ToUpper()).Append(".").Append(formatExtension);
-			foreach (Track &cuesheetTrack, actualCuesheetTracks) cuesheetTrack.origFilename = String(cuesheetTrack.origFilename).Replace("[FILETYPE]", formatExtension.ToUpper()).Append(".").Append(formatExtension);
-
-			/* Write playlist.
-			 */
-			if (createPlaylist)
+			for (Int i = 0; i < playlistFileNames.Length(); i++)
 			{
-				AS::PlaylistComponent	*playlist = (AS::PlaylistComponent *) boca.CreateComponentByID(playlistID.Head(playlistID.FindLast("-")));
+				/* Update playlist tracks.
+				 */
+				String		 actualPlaylistFileName = String(playlistFileNames.GetNth(i)).Replace("[FILETYPE]", formatExtension.ToUpper());
+
+				if (!separateFolders || !useEncoderOutputDir || encodeToSingleFile) actualPlaylistFileName.Append(".").Append(formatExtension);
+
+				Array<Track>	 actualPlaylistTracks	= *playlistTrackLists.GetNth(i);
+				Array<Track>	 actualCuesheetTracks	= *cuesheetTrackLists.GetNth(i);
+
+				foreach (Track &playlistTrack, actualPlaylistTracks) playlistTrack.origFilename = String(playlistTrack.origFilename).Replace("[FILETYPE]", formatExtension.ToUpper()).Append(".").Append(formatExtension);
+				foreach (Track &cuesheetTrack, actualCuesheetTracks) cuesheetTrack.origFilename = String(cuesheetTrack.origFilename).Replace("[FILETYPE]", formatExtension.ToUpper()).Append(".").Append(formatExtension);
+
+				/* Write playlist.
+				 */
+				AS::PlaylistComponent	*playlist = createPlaylist ? (AS::PlaylistComponent *) boca.CreateComponentByID(playlistID.Head(playlistID.FindLast("-"))) : NIL;
 
 				if (playlist != NIL)
 				{
@@ -556,13 +604,10 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 
 					boca.DeleteComponent(playlist);
 				}
-			}
 
-			/* Write cue sheet.
-			 */
-			if (createCueSheet)
-			{
-				AS::PlaylistComponent	*cuesheet = (AS::PlaylistComponent *) boca.CreateComponentByID("cuesheet-playlist");
+				/* Write cue sheet.
+				 */
+				AS::PlaylistComponent	*cuesheet = createCueSheet ? (AS::PlaylistComponent *) boca.CreateComponentByID("cuesheet-playlist") : NIL;
 
 				if (cuesheet != NIL)
 				{
@@ -575,6 +620,11 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 		}
 
 		String::ExplodeFinish();
+
+		/* Clean up playlist and cuesheet track lists.
+		 */
+		foreach (Array<Track> *trackList, playlistTrackLists) delete trackList;
+		foreach (Array<Track> *trackList, cuesheetTrackLists) delete trackList;
 	}
 
 	/* Clear tracks to convert and converted tracks array.
@@ -599,15 +649,21 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishTrackConversion(const Track &finished
 {
 	const Config	*config = GetConfiguration();
 
-	if ((config->GetIntValue("Settings", "EncodeToSingleFile", False) && finishedTrack.outfile == track.outfile) ||
-									     finishedTrack.GetTrackID() == track.GetTrackID())
+	/* Get config values.
+	 */
+	Bool	 encodeToSingleFile = config->GetIntValue("Settings", "EncodeToSingleFile", False);
+
+	/* Check if this conversion is the one being finished.
+	 */
+	if ((encodeToSingleFile && finishedTrack.outfile == track.outfile) ||
+				   finishedTrack.GetTrackID() == track.GetTrackID())
 	{
 		Track	 convertedTrack = finishedTrack;
 
 		convertedTrack.outfile = GetFileNamePattern(track);
 		convertedTrack.length  = trackLength;
 
-		if (config->GetIntValue("Settings", "EncodeToSingleFile", False))
+		if (encodeToSingleFile)
 		{
 			convertedTrack.sampleOffset = Math::Round((Float) (totalLength - trackLength) / convertedTrack.GetFormat().rate * 75);
 
@@ -622,8 +678,14 @@ Void BoCA::EncoderMultiEncoderHub::OnCancelTrackConversion(const Track &cancelle
 {
 	const Config	*config = GetConfiguration();
 
-	if ((config->GetIntValue("Settings", "EncodeToSingleFile", False) && cancelledTrack.outfile == track.outfile) ||
-									     cancelledTrack.GetTrackID() == track.GetTrackID()) cancelled = True;
+	/* Get config values.
+	 */
+	Bool	 encodeToSingleFile = config->GetIntValue("Settings", "EncodeToSingleFile", False);
+
+	/* Check if this conversion is the one being cancelled.
+	 */
+	if ((encodeToSingleFile && cancelledTrack.outfile == track.outfile) ||
+				   cancelledTrack.GetTrackID() == track.GetTrackID()) cancelled = True;
 }
 
 ConfigLayer *BoCA::EncoderMultiEncoderHub::GetConfigurationLayer()
