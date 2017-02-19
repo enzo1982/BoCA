@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,14 +18,15 @@
  *
  *	  Try using iterators in the future to solve this problem.
  */
-#define foreach(var, array)												   \
-	if (S::Int _index_ = 0)		       { }									   \
-	else				       for (S::Int _break_ = 0; !_break_ && _index_ < (array).Length(); --_break_) \
-					       for (var = (array).GetNthReference(_index_++); !_break_; ++_break_)
+#define foreach(var, array)											    \
+	if (S::False) { }											    \
+	else	      for (S::Int _break_ = 0, _index_ = -1; !_break_ && _index_ < (array).Length() - 1; --_break_) \
+		      for (var = (array).GetNthReference(++_index_); !_break_; ++_break_)
 
-#define foreachreverse(var, array)											   \
-	if (S::Int _index_ = (array).Length()) for (S::Int _break_ = 0; !_break_ && _index_ > 0; --_break_)		   \
-					       for (var = (array).GetNthReference(--_index_); !_break_; ++_break_)
+#define foreachreverse(var, array)										    \
+	if (S::False) { }											    \
+	else	      for (S::Int _break_ = 0, _index_ = (array).Length(); !_break_ && _index_ > 0; --_break_)	    \
+		      for (var = (array).GetNthReference(--_index_); !_break_; ++_break_)
 
 /* The forever macro is quite simple...
  */
