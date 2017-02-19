@@ -55,7 +55,7 @@ namespace dami
 
 class ID3_ContainerImpl
 {
-  	typedef std::list<ID3_Frame *> Frames;
+	typedef std::list<ID3_Frame *> Frames;
 
 	public:
 		typedef Frames::iterator	 iterator;

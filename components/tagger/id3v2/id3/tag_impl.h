@@ -72,7 +72,7 @@ namespace dami
 
 	namespace mm
 	{
-    		bool	 parse(ID3_TagImpl&, ID3_Reader&);
+		bool	 parse(ID3_TagImpl&, ID3_Reader&);
 	};
 };
 
