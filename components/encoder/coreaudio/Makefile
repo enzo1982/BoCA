@@ -15,6 +15,10 @@ OBJECTS	  = config.o coreaudio.o dllinterface.o
 # Enter additional defines here:
 DEFINE	  = -I$(SRCDIR) -Wno-multichar
 
+ifeq ($(BUILD_WIN32),True)
+	DEFINE += -DUNICODE
+endif
+
 # Enter additional library dependencies here:
 ifeq ($(BUILD_WIN32),True)
 	LIBS	= -lole32

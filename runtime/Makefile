@@ -33,7 +33,6 @@ CCOPTS	  = -fvisibility=hidden -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(prefix
 LDOPTS	  = -L$(SRCDIR)/$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_WIN32),True)
-	CCOPTS += -DUNICODE -D_UNICODE
 	LDOPTS += -lsmooth -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 else
 	CCOPTS += -fPIC

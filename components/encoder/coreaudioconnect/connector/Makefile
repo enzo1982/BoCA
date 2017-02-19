@@ -5,7 +5,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 OBJECTS	= dllinterface.o main.o
 TARGET	= $(BOCA_PATH)/$(BINDIR)/boca_encoder_coreaudioconnect.1.0$(EXECUTABLE)
 
-DEFINE	= -DUNICODE -D_UNICODE
+DEFINE	= -DUNICODE
 LIBS	= -lole32 -lshell32
 
 CCOPTS	= -Wno-multichar -I$(SRCDIR) -I $(BOCA_PATH)/include $(DEFINE)

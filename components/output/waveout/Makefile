@@ -11,7 +11,9 @@ BOCA_PATH = ../../..
 OBJECTS	  = waveout.o
 
 # Enter additional defines here:
-DEFINE	  =
+ifeq ($(BUILD_WIN32),True)
+	DEFINE	= -DUNICODE
+endif
 
 # Enter additional library dependencies here:
 LIBS	  = -lwinmm -lksguid
