@@ -26,7 +26,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 # ifndef FAACAPI
 #  define FAACAPI __stdcall
 # endif
