@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -48,7 +48,7 @@ typedef FLAC__StreamMetadata *		(*FLAC__METADATA_OBJECT_NEW)					(FLAC__Metadata
 typedef FLAC__bool 			(*FLAC__METADATA_OBJECT_PICTURE_SET_MIME_TYPE)			(FLAC__StreamMetadata *, char *, FLAC__bool);
 typedef FLAC__bool 			(*FLAC__METADATA_OBJECT_PICTURE_SET_DESCRIPTION)		(FLAC__StreamMetadata *, FLAC__byte *, FLAC__bool);
 typedef FLAC__bool 			(*FLAC__METADATA_OBJECT_PICTURE_SET_DATA)			(FLAC__StreamMetadata *, FLAC__byte *, FLAC__uint32, FLAC__bool);
-typedef FLAC__bool 			(*FLAC__METADATA_OBJECT_VORBISCOMMENT_RESIZE_COMMENTS)		(FLAC__StreamMetadata *, unsigned);
+typedef FLAC__bool 			(*FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT)		(FLAC__StreamMetadata *, FLAC__StreamMetadata_VorbisComment_Entry, FLAC__bool);
 
 typedef char *				 *FLAC__VENDOR_STRING_TYPE;
 
@@ -77,6 +77,6 @@ extern FLAC__METADATA_OBJECT_NEW				 ex_FLAC__metadata_object_new;
 extern FLAC__METADATA_OBJECT_PICTURE_SET_MIME_TYPE		 ex_FLAC__metadata_object_picture_set_mime_type;
 extern FLAC__METADATA_OBJECT_PICTURE_SET_DESCRIPTION		 ex_FLAC__metadata_object_picture_set_description;
 extern FLAC__METADATA_OBJECT_PICTURE_SET_DATA			 ex_FLAC__metadata_object_picture_set_data;
-extern FLAC__METADATA_OBJECT_VORBISCOMMENT_RESIZE_COMMENTS	 ex_FLAC__metadata_object_vorbiscomment_resize_comments;
+extern FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT	 ex_FLAC__metadata_object_vorbiscomment_append_comment;
 
 extern FLAC__VENDOR_STRING_TYPE					 ex_FLAC__VENDOR_STRING;

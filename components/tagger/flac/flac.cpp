@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -190,14 +190,16 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 
 		Int	 numComments = in.InputNumber(4);
 
-		ex_FLAC__metadata_object_vorbiscomment_resize_comments(vorbiscomment, numComments);
-
 		for (Int i = 0; i < numComments; i++)
 		{
-			vorbiscomment->data.vorbis_comment.comments[i].length = in.InputNumber(4);
-			vorbiscomment->data.vorbis_comment.comments[i].entry = vcBuffer + in.GetPos();
+			FLAC__StreamMetadata_VorbisComment_Entry	 entry;
 
-			in.RelSeek(vorbiscomment->data.vorbis_comment.comments[i].length);
+			entry.length = in.InputNumber(4);
+			entry.entry  = vcBuffer + in.GetPos();
+
+			ex_FLAC__metadata_object_vorbiscomment_append_comment(vorbiscomment, entry, true);
+
+			in.RelSeek(entry.length);
 		}
 
 		vorbiscomment->length = vcBuffer.Size();
