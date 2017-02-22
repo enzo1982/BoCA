@@ -182,9 +182,9 @@ Bool BoCA::EncoderFLAC::Activate()
 
 			metadata.Add(picture);
 
-			if (picInfo.description != NIL) ex_FLAC__metadata_object_picture_set_description(picture, (FLAC__byte *) picInfo.description.ConvertTo("UTF-8"), true);
+			if (picInfo.mime != NIL)	ex_FLAC__metadata_object_picture_set_mime_type(picture, picInfo.mime, true);
+			if (picInfo.description != NIL) ex_FLAC__metadata_object_picture_set_description(picture, (FLAC__byte *) picInfo.description.Trim().ConvertTo("UTF-8"), true);
 
-			ex_FLAC__metadata_object_picture_set_mime_type(picture, picInfo.mime, true);
 			ex_FLAC__metadata_object_picture_set_data(picture, const_cast<UnsignedByte *>((const UnsignedByte *) picInfo.data), picInfo.data.Size(), true);
 
 			picture->data.picture.type = (FLAC__StreamMetadata_Picture_Type) picInfo.type;
