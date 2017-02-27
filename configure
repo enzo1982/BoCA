@@ -14,10 +14,6 @@ echo
 echo "    - libasound2 development package (Linux only)"
 echo "    - libcdio and libcdio-paranoia development packages (except OpenBSD)"
 echo "    - libcdparanoia development package (except macOS, NetBSD, Solaris, Hurd)"
-echo "    - libflac development package"
-echo "    - libopus development package"
-echo "    - libspeex development package"
-echo "    - libvorbis development package"
 echo "    - libexpat development package"
 echo "    - liburiparser development package"
 echo

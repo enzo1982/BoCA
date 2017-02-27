@@ -11,9 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = config.o dllinterface.o flac.o
 
 # Enter additional defines here:
-ifeq ($(BUILD_WIN32),True)
-	DEFINE	  = -I$(SRCDIR)
-endif
+DEFINE	  = -I$(SRCDIR)
 
 # Enter additional library dependencies here:
 LIBS	  =
