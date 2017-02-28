@@ -13,7 +13,7 @@ echo "  On macOS, Linux, *BSD, Solaris, Hurd:"
 echo
 echo "    - libasound2 development package (Linux only)"
 echo "    - libcdio and libcdio-paranoia development packages (except OpenBSD)"
-echo "    - libcdparanoia development package (except macOS, NetBSD, Solaris, Hurd)"
+echo "    - libcdparanoia development package (OpenBSD only)"
 echo "    - libexpat development package"
 echo "    - liburiparser development package"
 echo
