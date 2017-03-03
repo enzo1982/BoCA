@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -81,16 +81,16 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	 */
 	foreach (const String &pair, info.other)
 	{
-		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 key   = pair.Head(pair.Find(":"));
 		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
 		if (value == NIL) continue;
 
-		if	(key == String(INFO_CONDUCTOR).Append(":")) { RenderTagItem("PERFORMER", value, buffer); numItems++; }
-		else if	(key == String(INFO_COMPOSER).Append(":"))  { RenderTagItem("COMPOSER",  value, buffer); numItems++; }
-		else if	(key == String(INFO_LYRICIST).Append(":"))  { RenderTagItem("LYRICIST",  value, buffer); numItems++; }
+		if	(key == INFO_CONDUCTOR) { RenderTagItem("PERFORMER", value, buffer); numItems++; }
+		else if	(key == INFO_COMPOSER)  { RenderTagItem("COMPOSER",  value, buffer); numItems++; }
+		else if	(key == INFO_LYRICIST)  { RenderTagItem("LYRICIST",  value, buffer); numItems++; }
 
-		else if	(key == String(INFO_BPM).Append(":"))	    { RenderTagItem("BPM",	 value, buffer); numItems++; }
+		else if	(key == INFO_BPM)	{ RenderTagItem("BPM",	     value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.

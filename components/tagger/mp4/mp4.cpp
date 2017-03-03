@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -149,14 +149,14 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	 */
 	foreach (const String &pair, info.other)
 	{
-		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 key   = pair.Head(pair.Find(":"));
 		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
 		if (value == NIL) continue;
 
-		if	(key == String(INFO_COMPOSER).Append(":")) ex_MP4TagsSetComposer(mp4Tags, value.Trim());
+		if	(key == INFO_COMPOSER) ex_MP4TagsSetComposer(mp4Tags, value.Trim());
 
-		else if (key == String(INFO_BPM).Append(":"))
+		else if (key == INFO_BPM)
 		{
 			uint16_t	 tempo = value.ToInt();
 
@@ -419,6 +419,8 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	ex_MP4TagsSetTrack(mp4Tags, NIL);
 	ex_MP4TagsSetDisk(mp4Tags, NIL);
 	ex_MP4TagsSetReleaseDate(mp4Tags, NIL);
+	ex_MP4TagsSetComposer(mp4Tags, NIL);
+	ex_MP4TagsSetTempo(mp4Tags, NIL);
 	ex_MP4TagsSetGenre(mp4Tags, NIL);
 	ex_MP4TagsSetGenreType(mp4Tags, NIL);
 	ex_MP4TagsSetComments(mp4Tags, NIL);

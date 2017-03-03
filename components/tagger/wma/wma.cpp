@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -127,32 +127,32 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 		 */
 		foreach (const String &pair, info.other)
 		{
-			String	 key   = pair.Head(pair.Find(":") + 1);
+			String	 key   = pair.Head(pair.Find(":"));
 			String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
 			if (value == NIL) continue;
 
-			if	(key == String(INFO_CONTENTGROUP).Append(":"))	RenderWMAStringItem(g_wszWMContentGroupDescription, value,			  pHeaderInfo);
-			else if	(key == String(INFO_SUBTITLE).Append(":"))	RenderWMAStringItem(g_wszWMSubTitle,		    value,			  pHeaderInfo);
+			if	(key == INFO_CONTENTGROUP)  RenderWMAStringItem(g_wszWMContentGroupDescription, value, pHeaderInfo);
+			else if	(key == INFO_SUBTITLE)	    RenderWMAStringItem(g_wszWMSubTitle,		value, pHeaderInfo);
 
-			else if	(key == String(INFO_CONDUCTOR).Append(":"))	RenderWMAStringItem(g_wszWMConductor,		    value,			  pHeaderInfo);
-			else if	(key == String(INFO_COMPOSER).Append(":"))	RenderWMAStringItem(g_wszWMComposer,		    value,			  pHeaderInfo);
-			else if	(key == String(INFO_LYRICIST).Append(":"))	RenderWMAStringItem(g_wszWMWriter,		    value,			  pHeaderInfo);
+			else if	(key == INFO_CONDUCTOR)	    RenderWMAStringItem(g_wszWMConductor,		value, pHeaderInfo);
+			else if	(key == INFO_COMPOSER)	    RenderWMAStringItem(g_wszWMComposer,		value, pHeaderInfo);
+			else if	(key == INFO_LYRICIST)	    RenderWMAStringItem(g_wszWMWriter,			value, pHeaderInfo);
 
-			else if	(key == String(INFO_ORIG_ARTIST).Append(":"))	RenderWMAStringItem(g_wszWMOriginalArtist,	    value,			  pHeaderInfo);
-			else if	(key == String(INFO_ORIG_ALBUM).Append(":"))	RenderWMAStringItem(g_wszWMOriginalAlbumTitle,      value,			  pHeaderInfo);
-			else if	(key == String(INFO_ORIG_LYRICIST).Append(":"))	RenderWMAStringItem(g_wszWMOriginalLyricist,	    value,			  pHeaderInfo);
-			else if	(key == String(INFO_ORIG_YEAR).Append(":"))	RenderWMAStringItem(g_wszWMOriginalReleaseYear,     value,			  pHeaderInfo);
+			else if	(key == INFO_ORIG_ARTIST)   RenderWMAStringItem(g_wszWMOriginalArtist,		value, pHeaderInfo);
+			else if	(key == INFO_ORIG_ALBUM)    RenderWMAStringItem(g_wszWMOriginalAlbumTitle,      value, pHeaderInfo);
+			else if	(key == INFO_ORIG_LYRICIST) RenderWMAStringItem(g_wszWMOriginalLyricist,	value, pHeaderInfo);
+			else if	(key == INFO_ORIG_YEAR)	    RenderWMAStringItem(g_wszWMOriginalReleaseYear,     value, pHeaderInfo);
 
-			else if	(key == String(INFO_BPM).Append(":"))		RenderWMAStringItem(g_wszWMBeatsPerMinute,	    value,			  pHeaderInfo);
-			else if	(key == String(INFO_INITIALKEY).Append(":"))	RenderWMAStringItem(g_wszWMInitialKey,		    value,			  pHeaderInfo);
+			else if	(key == INFO_BPM)	    RenderWMAStringItem(g_wszWMBeatsPerMinute,		value, pHeaderInfo);
+			else if	(key == INFO_INITIALKEY)    RenderWMAStringItem(g_wszWMInitialKey,		value, pHeaderInfo);
 
-			else if	(key == String(INFO_RADIOSTATION).Append(":"))	RenderWMAStringItem(g_wszWMRadioStationName,	    value,			  pHeaderInfo);
-			else if	(key == String(INFO_RADIOOWNER).Append(":"))	RenderWMAStringItem(g_wszWMRadioStationOwner,	    value,			  pHeaderInfo);
+			else if	(key == INFO_RADIOSTATION)  RenderWMAStringItem(g_wszWMRadioStationName,	value, pHeaderInfo);
+			else if	(key == INFO_RADIOOWNER)    RenderWMAStringItem(g_wszWMRadioStationOwner,	value, pHeaderInfo);
 
-			else if	(key == String(INFO_WEB_ARTIST).Append(":"))	RenderWMAStringItem(g_wszWMAuthorURL,		    value,			  pHeaderInfo);
-			else if	(key == String(INFO_WEB_SOURCE).Append(":"))	RenderWMAStringItem(g_wszWMAudioSourceURL,	    value,			  pHeaderInfo);
-			else if	(key == String(INFO_WEB_COPYRIGHT).Append(":"))	RenderWMAStringItem(g_wszWMCopyrightURL,	    value,			  pHeaderInfo);
+			else if	(key == INFO_WEB_ARTIST)    RenderWMAStringItem(g_wszWMAuthorURL,		value, pHeaderInfo);
+			else if	(key == INFO_WEB_SOURCE)    RenderWMAStringItem(g_wszWMAudioSourceURL,		value, pHeaderInfo);
+			else if	(key == INFO_WEB_COPYRIGHT) RenderWMAStringItem(g_wszWMCopyrightURL,		value, pHeaderInfo);
 		}
 
 		/* Save CD table of contents.
@@ -541,6 +541,9 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 				    nameStr == g_wszWMPublisher			||
 				    nameStr == g_wszWMISRC			||
 
+				    nameStr == g_wszWMContentGroupDescription	||
+				    nameStr == g_wszWMSubTitle			||
+
 				    nameStr == g_wszWMConductor			||
 				    nameStr == g_wszWMComposer			||
 				    nameStr == g_wszWMWriter			||
@@ -550,12 +553,19 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 				    nameStr == g_wszWMOriginalLyricist		||
 				    nameStr == g_wszWMOriginalReleaseYear	||
 
+				    nameStr == g_wszWMBeatsPerMinute		||
+				    nameStr == g_wszWMInitialKey		||
+
+				    nameStr == g_wszWMRadioStationName		||
+				    nameStr == g_wszWMRadioStationOwner		||
+
 				    nameStr == g_wszWMAuthorURL			||
 				    nameStr == g_wszWMAudioSourceURL		||
 				    nameStr == g_wszWMCopyrightURL		||
 
 				    nameStr == g_wszWMSharedUserRating		||
 
+				    nameStr == g_wszWMTrack			||
 				    nameStr == g_wszWMTrackNumber		||
 				    nameStr == g_wszWMPartOfSet			||
 				    nameStr == g_wszWMMCDI			||

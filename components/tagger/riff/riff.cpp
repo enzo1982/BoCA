@@ -84,12 +84,12 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	 */
 	foreach (const String &pair, info.other)
 	{
-		String	 key   = pair.Head(pair.Find(":") + 1);
+		String	 key   = pair.Head(pair.Find(":"));
 		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
 		if (value == NIL) continue;
 
-		if (key == String(INFO_WEB_ARTIST).Append(":")) RenderTagItem("IURL", value, buffer);
+		if (key == INFO_WEB_ARTIST) RenderTagItem("IURL", value, buffer);
 	}
 
 	/* Save CD table of contents.
