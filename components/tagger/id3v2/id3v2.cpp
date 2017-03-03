@@ -276,7 +276,9 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_CONTENTGROUP)   { ID3_Frame frame(ID3FID_CONTENTGROUP);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		if	(key == INFO_ALBUMARTIST)    { ID3_Frame frame(ID3FID_USERTEXT);	  SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "Album Artist"); if (info.GetOtherInfo(INFO_BAND) != value) container.AddFrame(frame); }
+
+		else if	(key == INFO_CONTENTGROUP)   { ID3_Frame frame(ID3FID_CONTENTGROUP);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_SUBTITLE)	     { ID3_Frame frame(ID3FID_SUBTITLE);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
 		else if	(key == INFO_BAND)	     { ID3_Frame frame(ID3FID_BAND);		  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
@@ -527,6 +529,8 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			else if (description.ToLower() == "replaygain_album_gain") info.album_gain = value;
 			else if (description.ToLower() == "replaygain_album_peak") info.album_peak = value;
 
+			else if (description.ToLower() == "album artist")	   info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(value));
+
 			else							   info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(value));
 		}
 		else if (frame.GetID() == ID3FID_CONTENTTYPE)
@@ -607,6 +611,10 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			}
 		}
 	}
+
+	/* Set album artist to band if only band is filled.
+	 */
+	if (info.HasOtherInfo(INFO_BAND) && !info.HasOtherInfo(INFO_ALBUMARTIST)) info.SetOtherInfo(INFO_ALBUMARTIST, info.GetOtherInfo(INFO_BAND));
 
 	track.SetInfo(info);
 

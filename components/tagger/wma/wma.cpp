@@ -132,7 +132,9 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 			if (value == NIL) continue;
 
-			if	(key == INFO_CONTENTGROUP)  RenderWMAStringItem(g_wszWMContentGroupDescription, value, pHeaderInfo);
+			if	(key == INFO_ALBUMARTIST)   RenderWMAStringItem(g_wszWMAlbumArtist,		value, pHeaderInfo);
+
+			else if	(key == INFO_CONTENTGROUP)  RenderWMAStringItem(g_wszWMContentGroupDescription, value, pHeaderInfo);
 			else if	(key == INFO_SUBTITLE)	    RenderWMAStringItem(g_wszWMSubTitle,		value, pHeaderInfo);
 
 			else if	(key == INFO_CONDUCTOR)	    RenderWMAStringItem(g_wszWMConductor,		value, pHeaderInfo);
@@ -299,6 +301,8 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			else if (String(name) == g_wszWMDescription)		 info.comment = value;
 			else if (String(name) == g_wszWMPublisher)		 info.label   = value;
 			else if (String(name) == g_wszWMISRC)			 info.isrc    = value;
+
+			else if (String(name) == g_wszWMAlbumArtist)		 info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(value));
 
 			else if (String(name) == g_wszWMContentGroupDescription) info.other.Add(String(INFO_CONTENTGROUP).Append(":").Append(value));
 			else if (String(name) == g_wszWMSubTitle)		 info.other.Add(String(INFO_SUBTITLE).Append(":").Append(value));
@@ -540,6 +544,8 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 				    nameStr == g_wszWMDescription		||
 				    nameStr == g_wszWMPublisher			||
 				    nameStr == g_wszWMISRC			||
+
+				    nameStr == g_wszWMAlbumArtist		||
 
 				    nameStr == g_wszWMContentGroupDescription	||
 				    nameStr == g_wszWMSubTitle			||

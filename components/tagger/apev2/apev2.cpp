@@ -103,12 +103,14 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_SUBTITLE)  { RenderAPEItem("Subtitle",  value, buffer); numItems++; }
+		if	(key == INFO_ALBUMARTIST) { RenderAPEItem("Album Artist", value, buffer); numItems++; }
 
-		else if	(key == INFO_CONDUCTOR) { RenderAPEItem("Conductor", value, buffer); numItems++; }
-		else if	(key == INFO_COMPOSER)  { RenderAPEItem("Composer",  value, buffer); numItems++; }
+		else if	(key == INFO_SUBTITLE)    { RenderAPEItem("Subtitle",     value, buffer); numItems++; }
 
-		else if	(key == INFO_BPM)	{ RenderAPEItem("BPM",	     value, buffer); numItems++; }
+		else if	(key == INFO_CONDUCTOR)   { RenderAPEItem("Conductor",    value, buffer); numItems++; }
+		else if	(key == INFO_COMPOSER)    { RenderAPEItem("Composer",     value, buffer); numItems++; }
+
+		else if	(key == INFO_BPM)	  { RenderAPEItem("BPM",	  value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -272,21 +274,23 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		id = id.ToUpper();
 
-		if	(id == "ARTIST")    info.artist  = value;
-		else if (id == "TITLE")	    info.title   = value;
-		else if (id == "ALBUM")	    info.album   = value;
-		else if (id == "YEAR")	    info.year	 = value.ToInt();
-		else if (id == "GENRE")	    info.genre   = value;
-		else if (id == "COMMENT")   info.comment = value;
-		else if (id == "PUBLISHER") info.label   = value;
-		else if (id == "ISRC")	    info.isrc	 = value;
+		if	(id == "ARTIST")       info.artist  = value;
+		else if (id == "TITLE")	       info.title   = value;
+		else if (id == "ALBUM")	       info.album   = value;
+		else if (id == "YEAR")	       info.year    = value.ToInt();
+		else if (id == "GENRE")	       info.genre   = value;
+		else if (id == "COMMENT")      info.comment = value;
+		else if (id == "PUBLISHER")    info.label   = value;
+		else if (id == "ISRC")	       info.isrc    = value;
 
-		else if (id == "SUBTITLE")  info.other.Add(String(INFO_SUBTITLE).Append(":").Append(value));
+		else if (id == "ALBUM ARTIST") info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(value));
 
-		else if (id == "CONDUCTOR") info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
-		else if (id == "COMPOSER")  info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
+		else if (id == "SUBTITLE")     info.other.Add(String(INFO_SUBTITLE).Append(":").Append(value));
 
-		else if (id == "BPM")	    info.other.Add(String(INFO_BPM).Append(":").Append(value));
+		else if (id == "CONDUCTOR")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
+		else if (id == "COMPOSER")     info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
+
+		else if (id == "BPM")	       info.other.Add(String(INFO_BPM).Append(":").Append(value));
 
 		else if (id == "TRACK")
 		{

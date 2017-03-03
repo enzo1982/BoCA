@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,6 +20,8 @@ using namespace smooth;
 
 namespace BoCA
 {
+	const char * const INFO_ALBUMARTIST	= (char *) "Album artist";
+
 	const char * const INFO_CONTENTGROUP	= (char *) "Content group description";
 	const char * const INFO_SUBTITLE	= (char *) "Subtitle/Description refinement";
 
@@ -101,6 +103,10 @@ namespace BoCA
 			/* Helper functions:
 			 */
 			Bool			 HasBasicInfo() const;
+			Bool			 HasOtherInfo(const String &) const;
+
+			String			 GetOtherInfo(const String &) const;
+			Bool			 SetOtherInfo(const String &, const String &);
 
 			static Bool		 IsISRC(const String &);
 

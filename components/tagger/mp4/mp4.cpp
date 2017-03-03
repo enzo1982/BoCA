@@ -154,7 +154,9 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_COMPOSER) ex_MP4TagsSetComposer(mp4Tags, value.Trim());
+		if	(key == INFO_ALBUMARTIST) ex_MP4TagsSetAlbumArtist(mp4Tags, value.Trim());
+
+		else if	(key == INFO_COMPOSER)    ex_MP4TagsSetComposer(mp4Tags,    value.Trim());
 
 		else if (key == INFO_BPM)
 		{
@@ -277,6 +279,8 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 	if	(mp4Tags->releaseDate != NIL) info.year     = String(mp4Tags->releaseDate).Trim().ToInt();
 	if	(mp4Tags->album	      != NIL) info.album    = String(mp4Tags->album).Trim();
 	if	(mp4Tags->comments    != NIL) info.comment  = String(mp4Tags->comments).Trim();
+
+	if	(mp4Tags->albumArtist != NIL) info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(String(mp4Tags->albumArtist).Trim()));
 
 	if	(mp4Tags->composer    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(String(mp4Tags->composer).Trim()));
 
@@ -419,6 +423,7 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	ex_MP4TagsSetTrack(mp4Tags, NIL);
 	ex_MP4TagsSetDisk(mp4Tags, NIL);
 	ex_MP4TagsSetReleaseDate(mp4Tags, NIL);
+	ex_MP4TagsSetAlbumArtist(mp4Tags, NIL);
 	ex_MP4TagsSetComposer(mp4Tags, NIL);
 	ex_MP4TagsSetTempo(mp4Tags, NIL);
 	ex_MP4TagsSetGenre(mp4Tags, NIL);

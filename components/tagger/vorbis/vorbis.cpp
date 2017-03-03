@@ -86,11 +86,13 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_CONDUCTOR) { RenderTagItem("PERFORMER", value, buffer); numItems++; }
-		else if	(key == INFO_COMPOSER)  { RenderTagItem("COMPOSER",  value, buffer); numItems++; }
-		else if	(key == INFO_LYRICIST)  { RenderTagItem("LYRICIST",  value, buffer); numItems++; }
+		if	(key == INFO_ALBUMARTIST) { RenderTagItem("ALBUMARTIST", value, buffer); numItems++; }
 
-		else if	(key == INFO_BPM)	{ RenderTagItem("BPM",	     value, buffer); numItems++; }
+		else if	(key == INFO_CONDUCTOR)   { RenderTagItem("PERFORMER",   value, buffer); numItems++; }
+		else if	(key == INFO_COMPOSER)    { RenderTagItem("COMPOSER",    value, buffer); numItems++; }
+		else if	(key == INFO_LYRICIST)    { RenderTagItem("LYRICIST",    value, buffer); numItems++; }
+
+		else if	(key == INFO_BPM)	  { RenderTagItem("BPM",	 value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -273,6 +275,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "DISCNUMBER")   info.disc      = value.ToInt();
 		else if (id == "DISCTOTAL")    info.numDiscs  = value.ToInt();
 		else if (id == "TOTALDISCS")   info.numDiscs  = value.ToInt();
+
+		else if (id == "ALBUMARTIST")  info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(value));
 
 		else if (id == "PERFORMER")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
 		else if (id == "COMPOSER")     info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -75,6 +75,44 @@ Bool BoCA::Info::HasBasicInfo() const
 {
 	if (artist != NIL || album != NIL || title != NIL || track > 0) return True;
 	else								return False;
+}
+
+Bool BoCA::Info::HasOtherInfo(const String &key) const
+{
+	foreach (const String &info, other)
+	{
+		if (info.Head(info.Find(":")) == key) return True;
+	}
+
+	return False;
+}
+
+String BoCA::Info::GetOtherInfo(const String &key) const
+{
+	foreach (const String &info, other)
+	{
+		if (info.Head(info.Find(":")) == key) return info.Tail(info.Length() - info.Find(":") - 1);
+	}
+
+	return NIL;
+}
+
+Bool BoCA::Info::SetOtherInfo(const String &key, const String &value)
+{
+	foreach (const String &info, other)
+	{
+		if (info.Head(info.Find(":")) == key)
+		{
+			if (value != NIL) other.SetNth(foreachindex, String(key).Append(":").Append(value));
+			else		  other.RemoveNth(foreachindex);
+
+			return True;
+		}
+	}
+
+	other.Add(String(key).Append(":").Append(value));
+
+	return True;
 }
 
 Bool BoCA::Info::IsISRC(const String &isrc)
