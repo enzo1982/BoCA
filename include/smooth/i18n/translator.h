@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,8 +38,8 @@ namespace smooth
 
 				Int				 AddLanguage(Language *);
 
-				Int				 LoadDescription(XML::Document *, Language *);
-				Int				 LoadData(XML::Document *, Language *);
+				Int				 LoadDescription(const XML::Document &, Language *);
+				Int				 LoadData(const XML::Document &, Language *);
 			public:
 				static Translator		*defaultTranslator;
 

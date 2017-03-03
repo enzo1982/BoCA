@@ -18,15 +18,15 @@
  *
  *	  Try using iterators in the future to solve this problem.
  */
-#define foreach(var, array)											    \
-	if (S::False) { }											    \
-	else	      for (S::Int _break_ = 0, _index_ = -1; !_break_ && _index_ < (array).Length() - 1; --_break_) \
-		      for (var = (array).GetNthReference(++_index_); !_break_; ++_break_)
+#define foreach(var, array)												      \
+	if (S::False) { }												      \
+	else	      for (S::Int _break_ = 0, foreachindex = -1; !_break_ && foreachindex < (array).Length() - 1; --_break_) \
+		      for (var = (array).GetNthReference(++foreachindex); !_break_; ++_break_)
 
-#define foreachreverse(var, array)										    \
-	if (S::False) { }											    \
-	else	      for (S::Int _break_ = 0, _index_ = (array).Length(); !_break_ && _index_ > 0; --_break_)	    \
-		      for (var = (array).GetNthReference(--_index_); !_break_; ++_break_)
+#define foreachreverse(var, array)											      \
+	if (S::False) { }												      \
+	else	      for (S::Int _break_ = 0, foreachindex = (array).Length(); !_break_ && foreachindex > 0; --_break_)      \
+		      for (var = (array).GetNthReference(--foreachindex); !_break_; ++_break_)
 
 /* The forever macro is quite simple...
  */
