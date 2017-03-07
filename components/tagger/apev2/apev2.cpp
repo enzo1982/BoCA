@@ -19,28 +19,29 @@ using namespace smooth::IO;
 
 const String &BoCA::TaggerAPEv2::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>APEv2 Tagger</name>			\
-	    <version>1.0</version>			\
-	    <id>apev2-tag</id>				\
-	    <type>tagger</type>				\
-	    <format>					\
-	      <name>Monkey's Audio</name>		\
-	      <extension>ape</extension>		\
-	      <extension>mac</extension>		\
-	    </format>					\
-	    <tagspec>					\
-	      <name>APEv2</name>			\
-	      <coverart supported=\"true\"/>		\
-	      <encodings>				\
-		<encoding>UTF-8</encoding>		\
-	      </encodings>				\
-	    </tagspec>					\
-	  </component>					\
-							\
+	static String	 componentSpecs = "			\
+								\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+	  <component>						\
+	    <name>APEv2 Tagger</name>				\
+	    <version>1.0</version>				\
+	    <id>apev2-tag</id>					\
+	    <type>tagger</type>					\
+	    <format>						\
+	      <name>Monkey's Audio</name>			\
+	      <extension>ape</extension>			\
+	      <extension>mac</extension>			\
+	    </format>						\
+	    <tagspec>						\
+	      <name>APEv2</name>				\
+	      <coverart supported=\"true\"/>			\
+	      <prependzero allowed=\"true\" default=\"true\"/>	\
+	      <encodings>					\
+		<encoding>UTF-8</encoding>			\
+	      </encodings>					\
+	    </tagspec>						\
+	  </component>						\
+								\
 	";
 
 	return componentSpecs;
@@ -59,6 +60,10 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 	const Config	*currentConfig = GetConfiguration();
 	String		 prevOutFormat = String::SetOutputFormat("UTF-8");
 
+	Bool		 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroAPEv2", True);
+
+	/* Save basic information.
+	 */
 	const Info	&info = track.GetInfo();
 
 	buffer.Resize(32);
@@ -75,18 +80,18 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	if (info.track > 0)
 	{
-		String	 trackString = String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track));
+		String	 trackString = String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track));
 
-		if (info.numTracks > 0) trackString.Append("/").Append(info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks));
+		if (info.numTracks > 0) trackString.Append("/").Append(prependZero && info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks));
 
 		{ RenderAPEItem("Track", trackString, buffer); numItems++; }
 	}
 
 	if (info.disc > 0)
 	{
-		String	 discString = String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
+		String	 discString = String(prependZero && info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
 
-		if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs));
+		if (info.numDiscs > 0) discString.Append("/").Append(prependZero && info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs));
 
 		{ RenderAPEItem("Disc", discString, buffer); numItems++; }
 	}

@@ -141,6 +141,7 @@ Bool BoCA::EncoderFLAC::Activate()
 			Config	*taggerConfig = Config::Copy(config);
 
 			taggerConfig->SetIntValue("Tags", "CoverArtWriteToVorbisComment", False);
+			taggerConfig->SetIntValue("Tags", "TrackPrependZeroVorbisComment", config->GetIntValue("Tags", "TrackPrependZeroFLACMetadata", True));
 
 			tagger->SetConfiguration(taggerConfig);
 			tagger->SetVendorString(*ex_FLAC__VENDOR_STRING);

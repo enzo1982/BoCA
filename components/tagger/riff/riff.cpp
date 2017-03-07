@@ -41,6 +41,7 @@ const String &BoCA::TaggerRIFF::GetComponentSpecs()
 	    </format>							\
 	    <tagspec>							\
 	      <name>RIFF INFO Tag</name>				\
+	      <prependzero allowed=\"true\" default=\"true\"/>		\
 	      <encodings>						\
 		<encoding default=\"true\">ISO-8859-1</encoding>	\
 		<encoding>UTF-8</encoding>				\
@@ -66,6 +67,10 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	const Config	*currentConfig = GetConfiguration();
 	String		 prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "RIFFINFOTagEncoding", "ISO-8859-1"));
 
+	Bool		 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroRIFFINFOTag", True);
+
+	/* Save basic information.
+	 */
 	const Info	&info = track.GetInfo();
 
 	buffer.Resize(12);
@@ -74,7 +79,7 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	if	(info.title  != NIL) RenderTagItem("INAM", info.title, buffer);
 	if	(info.album  != NIL) RenderTagItem("IPRD", info.album, buffer);
 	if	(info.genre  != NIL) RenderTagItem("IGNR", info.genre, buffer);
-	if	(info.track   >   0) RenderTagItem("ITRK", String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);
+	if	(info.track   >   0) RenderTagItem("ITRK", String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);
 	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year).Append("-01-01"), buffer);
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderTagItem("ICMT", info.comment, buffer);

@@ -19,23 +19,24 @@ using namespace smooth::IO;
 
 const String &BoCA::TaggerVorbis::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>Vorbis Comment Tagger</name>		\
-	    <version>1.0</version>			\
-	    <id>vorbis-tag</id>				\
-	    <type>tagger</type>				\
-	    <tagspec>					\
-	      <name>Vorbis Comment</name>		\
-	      <coverart supported=\"true\"/>		\
-	      <encodings>				\
-		<encoding>UTF-8</encoding>		\
-	      </encodings>				\
-	    </tagspec>					\
-	  </component>					\
-							\
+	static String	 componentSpecs = "			\
+								\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+	  <component>						\
+	    <name>Vorbis Comment Tagger</name>			\
+	    <version>1.0</version>				\
+	    <id>vorbis-tag</id>					\
+	    <type>tagger</type>					\
+	    <tagspec>						\
+	      <name>Vorbis Comment</name>			\
+	      <coverart supported=\"true\"/>			\
+	      <prependzero allowed=\"true\" default=\"true\"/>	\
+	      <encodings>					\
+		<encoding>UTF-8</encoding>			\
+	      </encodings>					\
+	    </tagspec>						\
+	  </component>						\
+								\
 	";
 
 	return componentSpecs;
@@ -54,6 +55,10 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	const Config	*currentConfig = GetConfiguration();
 	String		 prevOutFormat = String::SetOutputFormat("UTF-8");
 
+	Bool		 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroVorbisComment", True);
+
+	/* Save basic information.
+	 */
 	const Info	&info = track.GetInfo();
 
 	buffer.Resize(4 + strlen(vendorString) + 4);
@@ -68,11 +73,11 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	if	(info.label  != NIL) { RenderTagItem("ORGANIZATION", info.label, buffer);	  numItems++; }
 	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);		  numItems++; }
 
-	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);	     numItems++; }
-	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL", String(info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
+	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);	    numItems++; }
+	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL", String(prependZero && info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
 
-	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)), buffer);	     numItems++; }
-	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL", String(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
+	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(prependZero && info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)), buffer);	    numItems++; }
+	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL", String(prependZero && info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
 
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderTagItem("COMMENT", info.comment, buffer);						  numItems++; }
 	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderTagItem("COMMENT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
@@ -169,17 +174,17 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 			const Info	&chapterInfo   = chapterTrack.GetInfo();
 			const Format	&chapterFormat = chapterTrack.GetFormat();
 
-			String	 value	= String(offset / chapterFormat.rate / 60 / 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 / 60)).Append(":")
-					 .Append(offset / chapterFormat.rate / 60 % 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 % 60)).Append(":")
-					 .Append(offset / chapterFormat.rate % 60      < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate % 60)).Append(".")
+			String	 value	= String(offset / chapterFormat.rate / 60 / 60 < 10 ? "0" : NIL).Append(String::FromInt(offset / chapterFormat.rate / 60 / 60)).Append(":")
+					 .Append(offset / chapterFormat.rate / 60 % 60 < 10 ? "0" : NIL).Append(String::FromInt(offset / chapterFormat.rate / 60 % 60)).Append(":")
+					 .Append(offset / chapterFormat.rate % 60      < 10 ? "0" : NIL).Append(String::FromInt(offset / chapterFormat.rate % 60)).Append(".")
 					 .Append(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) < 100 ?
-						(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) <  10 ?  "00" : "0") : "").Append(String::FromInt(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate)));
+						(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) <  10 ?  "00" : "0") : NIL).Append(String::FromInt(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate)));
 
-			{ RenderTagItem(String("CHAPTER").Append(i + 1 < 100 ? (i + 1 < 10 ? "00" : "0") : "").Append(String::FromInt(i + 1)), value, buffer); numItems++; }
+			{ RenderTagItem(String("CHAPTER").Append(i + 1 < 100 ? (i + 1 < 10 ? "00" : "0") : NIL).Append(String::FromInt(i + 1)), value, buffer); numItems++; }
 
 			if (chapterInfo.title != NIL)
 			{
-				{ RenderTagItem(String("CHAPTER").Append(i + 1 < 100 ? (i + 1 < 10 ? "00" : "0") : "").Append(String::FromInt(i + 1)).Append("NAME"), chapterInfo.title, buffer); numItems++; }
+				{ RenderTagItem(String("CHAPTER").Append(i + 1 < 100 ? (i + 1 < 10 ? "00" : "0") : NIL).Append(String::FromInt(i + 1)).Append("NAME"), chapterInfo.title, buffer); numItems++; }
 			}
 
 			if	(chapterTrack.length	   >= 0) offset += chapterTrack.length;

@@ -38,6 +38,10 @@
 		<!ATTLIST coverart supported (true|false) "false"
 				   default   (true|false) "true">
 
+		<!ELEMENT prependzero (#PCDATA)>
+		<!ATTLIST prependzero allowed (true|false) "false"
+				      default (true|false) "false">
+
 		<!ELEMENT encodings (encoding*)>
 		<!ATTLIST encodings free (true|false) "false">
 

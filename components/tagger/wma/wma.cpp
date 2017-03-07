@@ -21,27 +21,28 @@ const String &BoCA::TaggerWMA::GetComponentSpecs()
 
 	if (wmvcoredll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Windows Media Tagger</name>		\
-		    <version>1.0</version>			\
-		    <id>wma-tag</id>				\
-		    <type>tagger</type>				\
-		    <format>					\
-		      <name>Windows Media Audio Files</name>	\
-		      <extension>wma</extension>		\
-		    </format>					\
-		    <tagspec>					\
-		      <name>WMA Metadata</name>			\
-		      <coverart supported=\"true\"/>		\
-		      <encodings>				\
-			<encoding>UTF-16LE</encoding>		\
-		      </encodings>				\
-		    </tagspec>					\
-		  </component>					\
-								\
+		componentSpecs = "					\
+									\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+		  <component>						\
+		    <name>Windows Media Tagger</name>			\
+		    <version>1.0</version>				\
+		    <id>wma-tag</id>					\
+		    <type>tagger</type>					\
+		    <format>						\
+		      <name>Windows Media Audio Files</name>		\
+		      <extension>wma</extension>			\
+		    </format>						\
+		    <tagspec>						\
+		      <name>WMA Metadata</name>				\
+		      <coverart supported=\"true\"/>			\
+		      <prependzero allowed=\"true\" default=\"false\"/>	\
+		      <encodings>					\
+			<encoding>UTF-16LE</encoding>			\
+		      </encodings>					\
+		    </tagspec>						\
+		  </component>						\
+									\
 		";
 	}
 
@@ -74,9 +75,11 @@ BoCA::TaggerWMA::~TaggerWMA()
 
 Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &track)
 {
-	const Config		*currentConfig = GetConfiguration();
+	const Config		*currentConfig	 = GetConfiguration();
 
-	IWMMetadataEditor	*metadataEditor = NIL;
+	Bool			 prependZero	 = currentConfig->GetIntValue("Tags", "TrackPrependZeroWMAMetadata", False);
+
+	IWMMetadataEditor	*metadataEditor	 = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
 
 	HRESULT	 hr = ex_WMCreateEditor(&metadataEditor);
@@ -91,6 +94,8 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		hr = metadataEditor2->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
 
+		/* Save basic information.
+		 */
 		const Info	&info = track.GetInfo();
 
 		if (info.artist != NIL) RenderWMAStringItem(g_wszWMAuthor,     info.artist,		   pHeaderInfo);
@@ -103,14 +108,14 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		if (info.track > 0)
 		{
-			RenderWMAStringItem(g_wszWMTrackNumber, String::FromInt(info.track), pHeaderInfo);
+			RenderWMAStringItem(g_wszWMTrackNumber, String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), pHeaderInfo);
 		}
 
 		if (info.disc > 0)
 		{
-			String	 discString = String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
+			String	 discString = String(prependZero && info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
 
-			if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs));
+			if (info.numDiscs > 0) discString.Append("/").Append(prependZero && info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs));
 
 			RenderWMAStringItem(g_wszWMPartOfSet, discString, pHeaderInfo);
 		}

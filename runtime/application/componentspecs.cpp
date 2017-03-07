@@ -411,6 +411,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			spec->SetCoverArtSupported(False);
 			spec->SetCoverArtDefault(True);
 
+			spec->SetPrependZeroAllowed(False);
+			spec->SetPrependZeroDefault(False);
+
 			spec->SetFreeEncodingSupported(False);
 
 			if (node->GetAttributeByName("default") != NIL) spec->SetDefault(node->GetAttributeByName("default")->GetContent() == "true");
@@ -424,6 +427,11 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				{
 					if (node2->GetAttributeByName("supported") != NIL) spec->SetCoverArtSupported(node2->GetAttributeByName("supported")->GetContent() == "true");
 					if (node2->GetAttributeByName("default")   != NIL) spec->SetCoverArtDefault(node2->GetAttributeByName("default")->GetContent() == "true");
+				}
+				else if	(node2->GetName() == "prependzero")
+				{
+					if (node2->GetAttributeByName("allowed") != NIL) spec->SetPrependZeroAllowed(node2->GetAttributeByName("allowed")->GetContent() == "true");
+					if (node2->GetAttributeByName("default") != NIL) spec->SetPrependZeroDefault(node2->GetAttributeByName("default")->GetContent() == "true");
 				}
 				else if (node2->GetName() == "encodings")
 				{

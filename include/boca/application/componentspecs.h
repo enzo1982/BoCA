@@ -140,11 +140,16 @@ namespace BoCA
 
 				Bool			 supportsCoverArt;
 				Bool			 coverArtDefault;
+
+				Bool			 allowsPrependZero;
+				Bool			 prependZeroDefault;
 			public:
 							 TagSpec(Int n = 0) : defaultEnabled(True),
 									      supportsFreeEncoding(True),
 									      supportsCoverArt(False),
-									      coverArtDefault(True)	{ }
+									      coverArtDefault(True),
+									      allowsPrependZero(False),
+									      prependZeroDefault(True)	{ }
 							~TagSpec()					{ }
 
 				const String		&GetName() const				{ return name; }
@@ -158,6 +163,12 @@ namespace BoCA
 
 				Bool			 IsCoverArtDefault() const			{ return coverArtDefault; }
 				Void			 SetCoverArtDefault(Bool nCoverArt)		{ coverArtDefault = nCoverArt; }
+
+				Bool			 IsPrependZeroAllowed() const			{ return allowsPrependZero; }
+				Void			 SetPrependZeroAllowed(Bool nPrependZero)	{ allowsPrependZero = nPrependZero; }
+
+				Bool			 IsPrependZeroDefault() const			{ return prependZeroDefault; }
+				Void			 SetPrependZeroDefault(Bool nPrependZero)	{ prependZeroDefault = nPrependZero; }
 
 				Bool			 IsFreeEncodingSupported() const		{ return supportsFreeEncoding; }
 				Void			 SetFreeEncodingSupported(Bool nAnyEnc)		{ supportsFreeEncoding = nAnyEnc; }

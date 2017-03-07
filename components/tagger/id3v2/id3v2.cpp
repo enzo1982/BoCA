@@ -33,6 +33,7 @@ const String &BoCA::TaggerID3v2::GetComponentSpecs()
 	    <tagspec>						\
 	      <name>ID3v2</name>				\
 	      <coverart supported=\"true\"/>			\
+	      <prependzero allowed=\"true\" default=\"false\"/>	\
 	      <encodings free=\"true\">				\
 		<encoding>ISO-8859-1</encoding>			\
 		<encoding>UTF-8</encoding>			\
@@ -216,6 +217,8 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	if (encodingID == "UTF-16BE" || encodingID == "UTF-8") container.SetSpec(ID3V2_4_0);
 	else						       container.SetSpec(ID3V2_3_0);
 
+	Bool		 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroID3v2", False);
+
 	/* Save basic information.
 	 */
 	const Info	&info = track.GetInfo();
@@ -241,18 +244,18 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	if (info.track > 0)
 	{
-		String	 trackString = String(info.track < 10 ? "0" : "").Append(String::FromInt(info.track));
+		String	 trackString = String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track));
 
-		if (info.numTracks > 0) trackString.Append("/").Append(info.numTracks < 10 ? "0" : "").Append(String::FromInt(info.numTracks));
+		if (info.numTracks > 0) trackString.Append("/").Append(prependZero && info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks));
 
 		{ ID3_Frame frame(ID3FID_TRACKNUM); SetStringField(frame, ID3FN_TEXT, trackString); container.AddFrame(frame); }
 	}
 
 	if (info.disc > 0)
 	{
-		String	 discString = String(info.disc < 10 ? "0" : "").Append(String::FromInt(info.disc));
+		String	 discString = String(prependZero && info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc));
 
-		if (info.numDiscs > 0) discString.Append("/").Append(info.numDiscs < 10 ? "0" : "").Append(String::FromInt(info.numDiscs));
+		if (info.numDiscs > 0) discString.Append("/").Append(prependZero && info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs));
 
 		{ ID3_Frame frame(ID3FID_PARTINSET); SetStringField(frame, ID3FN_TEXT, discString); container.AddFrame(frame); }
 	}
