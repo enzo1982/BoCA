@@ -270,6 +270,8 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		ParseAPEItem(buffer, offset, &id, &value);
 
+		if (value == NIL) continue;
+
 		if (id.ToUpper() == "!BINARY") ParseAPEBinaryItem(buffer, offset, &id, item);
 
 		id = id.ToUpper();
@@ -283,14 +285,14 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		else if (id == "PUBLISHER")    info.label   = value;
 		else if (id == "ISRC")	       info.isrc    = value;
 
-		else if (id == "ALBUM ARTIST") info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(value));
+		else if (id == "ALBUM ARTIST") info.SetOtherInfo(INFO_ALBUMARTIST, value);
 
-		else if (id == "SUBTITLE")     info.other.Add(String(INFO_SUBTITLE).Append(":").Append(value));
+		else if (id == "SUBTITLE")     info.SetOtherInfo(INFO_SUBTITLE,	   value);
 
-		else if (id == "CONDUCTOR")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
-		else if (id == "COMPOSER")     info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
+		else if (id == "CONDUCTOR")    info.SetOtherInfo(INFO_CONDUCTOR,   value);
+		else if (id == "COMPOSER")     info.SetOtherInfo(INFO_COMPOSER,	   value);
 
-		else if (id == "BPM")	       info.other.Add(String(INFO_BPM).Append(":").Append(value));
+		else if (id == "BPM")	       info.SetOtherInfo(INFO_BPM,	   value);
 
 		else if (id == "TRACK")
 		{

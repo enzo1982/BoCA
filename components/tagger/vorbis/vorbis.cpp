@@ -259,6 +259,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		String	 id	 = comment.Head(comment.Find("=")).ToUpper();
 		String	 value	 = comment.Tail(comment.Length() - comment.Find("=") - 1).Trim();
 
+		if (value == NIL) continue;
+
 		if	(id == "ARTIST")       info.artist    = value;
 		else if (id == "TITLE")	       info.title     = value;
 		else if (id == "ALBUM")	       info.album     = value;
@@ -276,13 +278,13 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "DISCTOTAL")    info.numDiscs  = value.ToInt();
 		else if (id == "TOTALDISCS")   info.numDiscs  = value.ToInt();
 
-		else if (id == "ALBUMARTIST")  info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(value));
+		else if (id == "ALBUMARTIST")  info.SetOtherInfo(INFO_ALBUMARTIST, value);
 
-		else if (id == "PERFORMER")    info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
-		else if (id == "COMPOSER")     info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
-		else if (id == "LYRICIST")     info.other.Add(String(INFO_LYRICIST).Append(":").Append(value));
+		else if (id == "PERFORMER")    info.SetOtherInfo(INFO_CONDUCTOR,   value);
+		else if (id == "COMPOSER")     info.SetOtherInfo(INFO_COMPOSER,	   value);
+		else if (id == "LYRICIST")     info.SetOtherInfo(INFO_LYRICIST,	   value);
 
-		else if (id == "BPM")	       info.other.Add(String(INFO_BPM).Append(":").Append(value));
+		else if (id == "BPM")	       info.SetOtherInfo(INFO_BPM,	   value);
 
 		else if (id.StartsWith("REPLAYGAIN"))
 		{

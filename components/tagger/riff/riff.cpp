@@ -172,7 +172,7 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 			else if (id == "IGNR") info.genre   = value;
 			else if (id == "ICMT") info.comment = value;
 
-			else if (id == "IURL") info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append(value));
+			else if (id == "IURL") info.SetOtherInfo(INFO_WEB_ARTIST, value);
 
 			else if (id == "ITOC") info.offsets = value;
 

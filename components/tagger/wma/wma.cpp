@@ -293,6 +293,14 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			String			 value = String((LPWSTR) pbValue).Trim();
 
+			if (value == NIL)
+			{
+				delete [] pbValue;
+				delete [] name;
+
+				continue;
+			}
+
 			if	(String(name) == g_wszWMAuthor)			 info.artist  = value;
 			else if (String(name) == g_wszWMTitle)			 info.title   = value;
 			else if (String(name) == g_wszWMAlbumTitle)		 info.album   = value;
@@ -302,29 +310,29 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			else if (String(name) == g_wszWMPublisher)		 info.label   = value;
 			else if (String(name) == g_wszWMISRC)			 info.isrc    = value;
 
-			else if (String(name) == g_wszWMAlbumArtist)		 info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(value));
+			else if (String(name) == g_wszWMAlbumArtist)		 info.SetOtherInfo(INFO_ALBUMARTIST,   value);
 
-			else if (String(name) == g_wszWMContentGroupDescription) info.other.Add(String(INFO_CONTENTGROUP).Append(":").Append(value));
-			else if (String(name) == g_wszWMSubTitle)		 info.other.Add(String(INFO_SUBTITLE).Append(":").Append(value));
+			else if (String(name) == g_wszWMContentGroupDescription) info.SetOtherInfo(INFO_CONTENTGROUP,  value);
+			else if (String(name) == g_wszWMSubTitle)		 info.SetOtherInfo(INFO_SUBTITLE,      value);
 
-			else if (String(name) == g_wszWMConductor)		 info.other.Add(String(INFO_CONDUCTOR).Append(":").Append(value));
-			else if (String(name) == g_wszWMComposer)		 info.other.Add(String(INFO_COMPOSER).Append(":").Append(value));
-			else if (String(name) == g_wszWMWriter)			 info.other.Add(String(INFO_LYRICIST).Append(":").Append(value));
+			else if (String(name) == g_wszWMConductor)		 info.SetOtherInfo(INFO_CONDUCTOR,     value);
+			else if (String(name) == g_wszWMComposer)		 info.SetOtherInfo(INFO_COMPOSER,      value);
+			else if (String(name) == g_wszWMWriter)			 info.SetOtherInfo(INFO_LYRICIST,      value);
 
-			else if (String(name) == g_wszWMOriginalArtist)		 info.other.Add(String(INFO_ORIG_ARTIST).Append(":").Append(value));
-			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.other.Add(String(INFO_ORIG_ALBUM).Append(":").Append(value));
-			else if (String(name) == g_wszWMOriginalLyricist)	 info.other.Add(String(INFO_ORIG_LYRICIST).Append(":").Append(value));
-			else if (String(name) == g_wszWMOriginalReleaseYear)	 info.other.Add(String(INFO_ORIG_YEAR).Append(":").Append(value));
+			else if (String(name) == g_wszWMOriginalArtist)		 info.SetOtherInfo(INFO_ORIG_ARTIST,   value);
+			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.SetOtherInfo(INFO_ORIG_ALBUM,    value);
+			else if (String(name) == g_wszWMOriginalLyricist)	 info.SetOtherInfo(INFO_ORIG_LYRICIST, value);
+			else if (String(name) == g_wszWMOriginalReleaseYear)	 info.SetOtherInfo(INFO_ORIG_YEAR,     value);
 
-			else if (String(name) == g_wszWMBeatsPerMinute)		 info.other.Add(String(INFO_BPM).Append(":").Append(value));
-			else if (String(name) == g_wszWMInitialKey)		 info.other.Add(String(INFO_INITIALKEY).Append(":").Append(value));
+			else if (String(name) == g_wszWMBeatsPerMinute)		 info.SetOtherInfo(INFO_BPM,	       value);
+			else if (String(name) == g_wszWMInitialKey)		 info.SetOtherInfo(INFO_INITIALKEY,    value);
 
-			else if (String(name) == g_wszWMRadioStationName)	 info.other.Add(String(INFO_RADIOSTATION).Append(":").Append(value));
-			else if (String(name) == g_wszWMRadioStationOwner)	 info.other.Add(String(INFO_RADIOOWNER).Append(":").Append(value));
+			else if (String(name) == g_wszWMRadioStationName)	 info.SetOtherInfo(INFO_RADIOSTATION,  value);
+			else if (String(name) == g_wszWMRadioStationOwner)	 info.SetOtherInfo(INFO_RADIOOWNER,    value);
 
-			else if (String(name) == g_wszWMAuthorURL)		 info.other.Add(String(INFO_WEB_ARTIST).Append(":").Append(value));
-			else if (String(name) == g_wszWMAudioSourceURL)		 info.other.Add(String(INFO_WEB_SOURCE).Append(":").Append(value));
-			else if (String(name) == g_wszWMCopyrightURL)		 info.other.Add(String(INFO_WEB_COPYRIGHT).Append(":").Append(value));
+			else if (String(name) == g_wszWMAuthorURL)		 info.SetOtherInfo(INFO_WEB_ARTIST,    value);
+			else if (String(name) == g_wszWMAudioSourceURL)		 info.SetOtherInfo(INFO_WEB_SOURCE,    value);
+			else if (String(name) == g_wszWMCopyrightURL)		 info.SetOtherInfo(INFO_WEB_COPYRIGHT, value);
 
 			else if (String(name) == g_wszWMTrack)
 			{

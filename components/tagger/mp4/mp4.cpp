@@ -280,11 +280,11 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 	if	(mp4Tags->album	      != NIL) info.album    = String(mp4Tags->album).Trim();
 	if	(mp4Tags->comments    != NIL) info.comment  = String(mp4Tags->comments).Trim();
 
-	if	(mp4Tags->albumArtist != NIL) info.other.Add(String(INFO_ALBUMARTIST).Append(":").Append(String(mp4Tags->albumArtist).Trim()));
+	if	(mp4Tags->albumArtist != NIL) info.SetOtherInfo(INFO_ALBUMARTIST, String(mp4Tags->albumArtist).Trim());
 
-	if	(mp4Tags->composer    != NIL) info.other.Add(String(INFO_COMPOSER).Append(":").Append(String(mp4Tags->composer).Trim()));
+	if	(mp4Tags->composer    != NIL) info.SetOtherInfo(INFO_COMPOSER,	  String(mp4Tags->composer).Trim());
 
-	if	(mp4Tags->tempo	      != NIL) info.other.Add(String(INFO_BPM).Append(":").Append(String::FromInt(*mp4Tags->tempo)));
+	if	(mp4Tags->tempo	      != NIL) info.SetOtherInfo(INFO_BPM,	  String::FromInt(*mp4Tags->tempo));
 
 	if	(mp4Tags->genre	      != NIL) info.genre    = String(mp4Tags->genre).Trim();
 	else if (mp4Tags->genreType   != NIL) info.genre    = GetID3CategoryName(*mp4Tags->genreType - 1);
