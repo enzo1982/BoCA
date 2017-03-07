@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ const String &BoCA::DecoderOpus::GetComponentSpecs()
 											\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
 		  <component>								\
-		    <name>Opus Audio Decoder</name>					\
+		    <name>Opus Audio Decoder %VERSION%</name>				\
 		    <version>1.0</version>						\
 		    <id>opus-dec</id>							\
 		    <type>decoder</type>						\
@@ -42,6 +42,8 @@ const String &BoCA::DecoderOpus::GetComponentSpecs()
 		  </component>								\
 											\
 		";
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(String(ex_opus_get_version_string()).Replace("libopus ", NIL)));
 	}
 
 	return componentSpecs;

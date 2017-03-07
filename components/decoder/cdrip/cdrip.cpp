@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,23 +26,27 @@ const String &BoCA::DecoderCDRip::GetComponentSpecs()
 
 	if (cdripdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>CDRip Ripper Component</name>		\
-		    <version>1.0</version>			\
-		    <id>cdrip-dec</id>				\
-		    <type>decoder</type>			\
-		    <require>cdrip-info</require>		\
-		    <format>					\
-		      <name>Windows CD Audio Track</name>	\
-		      <lossless>true</lossless>			\
-		      <extension>cda</extension>		\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "					\
+									\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+		  <component>						\
+		    <name>CDRip Ripper Component %VERSION%</name>	\
+		    <version>1.0</version>				\
+		    <id>cdrip-dec</id>					\
+		    <type>decoder</type>				\
+		    <require>cdrip-info</require>			\
+		    <format>						\
+		      <name>Windows CD Audio Track</name>		\
+		      <lossless>true</lossless>				\
+		      <extension>cda</extension>			\
+		    </format>						\
+		  </component>						\
+									\
 		";
+
+		LONG	 cdripVersion = ex_CR_GetCDRipVersion();
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(String::FromInt(cdripVersion / 100)).Append(".").Append(String::FromInt(cdripVersion % 100)));
 	}
 
 	return componentSpecs;

@@ -28,7 +28,7 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 										\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
 		  <component>							\
-		    <name>SndFile Output Component</name>			\
+		    <name>SndFile Output Component %VERSION%</name>		\
 		    <version>1.0</version>					\
 		    <id>sndfile-enc</id>					\
 		    <type>encoder</type>					\
@@ -102,6 +102,8 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 		  </component>							\
 										\
 		";
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(String(ex_sf_version_string()).Replace("libsndfile-", NIL)));
 	}
 
 	return componentSpecs;

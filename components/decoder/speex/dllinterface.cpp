@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -38,6 +38,7 @@ SPEEXDECODERCTL		 ex_speex_decoder_ctl		= NIL;
 SPEEXDECODEINT		 ex_speex_decode_int		= NIL;
 SPEEXDECODESTEREOINT	 ex_speex_decode_stereo_int	= NIL;
 SPEEXPACKETTOHEADER	 ex_speex_packet_to_header	= NIL;
+SPEEXLIBCTL		 ex_speex_lib_ctl		= NIL;
 SPEEXLIBGETMODE		 ex_speex_lib_get_mode		= NIL;
 
 DynamicLoader *oggdll	= NIL;
@@ -106,6 +107,7 @@ Bool LoadSpeexDLL()
 	ex_speex_decode_int		= (SPEEXDECODEINT) speexdll->GetFunctionAddress("speex_decode_int");
 	ex_speex_decode_stereo_int	= (SPEEXDECODESTEREOINT) speexdll->GetFunctionAddress("speex_decode_stereo_int");
 	ex_speex_packet_to_header	= (SPEEXPACKETTOHEADER) speexdll->GetFunctionAddress("speex_packet_to_header");
+	ex_speex_lib_ctl		= (SPEEXLIBCTL) speexdll->GetFunctionAddress("speex_lib_ctl");
 	ex_speex_lib_get_mode		= (SPEEXLIBGETMODE) speexdll->GetFunctionAddress("speex_lib_get_mode");
 
 	if (ex_speex_bits_init		== NIL ||
@@ -117,6 +119,7 @@ Bool LoadSpeexDLL()
 	    ex_speex_decode_int		== NIL ||
 	    ex_speex_decode_stereo_int	== NIL ||
 	    ex_speex_packet_to_header	== NIL ||
+	    ex_speex_lib_ctl		== NIL ||
 	    ex_speex_lib_get_mode	== NIL) { FreeSpeexDLL(); return False; }
 
 	return True;

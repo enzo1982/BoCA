@@ -37,24 +37,26 @@ using namespace smooth::GUI::Dialogs;
 
 const String &BoCA::DecoderCDIO::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>CDIO Ripper Component</name>		\
-	    <version>1.0</version>			\
-	    <id>cdio-dec</id>				\
-	    <type>decoder</type>			\
-	    <require>cdio-info</require>		\
-	    <replace>cdparanoia-dec</replace>		\
-	    <format>					\
-	      <name>Windows CD Audio Track</name>	\
-	      <lossless>true</lossless>			\
-	      <extension>cda</extension>		\
-	    </format>					\
-	  </component>					\
-							\
+	static String	 componentSpecs = "			\
+								\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+	  <component>						\
+	    <name>CDIO Ripper Component %VERSION%</name>	\
+	    <version>1.0</version>				\
+	    <id>cdio-dec</id>					\
+	    <type>decoder</type>				\
+	    <require>cdio-info</require>			\
+	    <replace>cdparanoia-dec</replace>			\
+	    <format>						\
+	      <name>Windows CD Audio Track</name>		\
+	      <lossless>true</lossless>				\
+	      <extension>cda</extension>			\
+	    </format>						\
+	  </component>						\
+								\
 	";
+
+	componentSpecs.Replace("%VERSION%", String("v").Append(String(cdio_version_string).Head(String(cdio_version_string).Find(" "))));
 
 	return componentSpecs;
 }

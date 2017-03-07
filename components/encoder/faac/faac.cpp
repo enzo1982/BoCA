@@ -28,7 +28,7 @@ const String &BoCA::EncoderFAAC::GetComponentSpecs()
 											\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
 		  <component>								\
-		    <name>FAAC MP4/AAC Encoder</name>					\
+		    <name>FAAC MP4/AAC Encoder %VERSION%</name>				\
 		    <version>1.0</version>						\
 		    <id>faac-enc</id>							\
 		    <type>encoder</type>						\
@@ -62,6 +62,15 @@ const String &BoCA::EncoderFAAC::GetComponentSpecs()
 		  </component>								\
 											\
 		");
+
+		unsigned long	 samplesSize;
+		unsigned long	 bufferSize;
+
+		faacEncHandle	 faac = ex_faacEncOpen(44100, 2, &samplesSize, &bufferSize);
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(ex_faacEncGetCurrentConfiguration(faac)->name));
+
+		ex_faacEncClose(faac);
 	}
 
 	return componentSpecs;

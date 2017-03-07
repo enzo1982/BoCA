@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -41,6 +41,8 @@ FLAC__STREAM_DECODER_GET_SAMPLE_RATE			 ex_FLAC__stream_decoder_get_sample_rate	
 FLAC__STREAM_DECODER_SEEK_ABSOLUTE			 ex_FLAC__stream_decoder_seek_absolute			= NIL;
 FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_METADATA	 ex_FLAC__stream_decoder_process_until_end_of_metadata	= NIL;
 FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_STREAM	 ex_FLAC__stream_decoder_process_until_end_of_stream	= NIL;
+
+FLAC__VERSION_STRING_TYPE				 ex_FLAC__VERSION_STRING				= NIL;
 
 DynamicLoader *oggdll	= NIL;
 DynamicLoader *flacdll	= NIL;
@@ -106,6 +108,8 @@ Bool LoadFLACDLL()
 	ex_FLAC__stream_decoder_process_until_end_of_metadata	= (FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_METADATA) flacdll->GetFunctionAddress("FLAC__stream_decoder_process_until_end_of_metadata");
 	ex_FLAC__stream_decoder_process_until_end_of_stream	= (FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_STREAM) flacdll->GetFunctionAddress("FLAC__stream_decoder_process_until_end_of_stream");
 
+	ex_FLAC__VERSION_STRING					= (FLAC__VERSION_STRING_TYPE) flacdll->GetFunctionAddress("FLAC__VERSION_STRING");
+
 	if (ex_FLAC_API_SUPPORTS_OGG_FLAC				== NIL ||
 
 	    ex_FLAC__stream_decoder_new					== NIL ||
@@ -119,7 +123,9 @@ Bool LoadFLACDLL()
 	    ex_FLAC__stream_decoder_get_sample_rate			== NIL ||
 	    ex_FLAC__stream_decoder_seek_absolute			== NIL ||
 	    ex_FLAC__stream_decoder_process_until_end_of_metadata	== NIL ||
-	    ex_FLAC__stream_decoder_process_until_end_of_stream		== NIL) { FreeFLACDLL(); return False; }
+	    ex_FLAC__stream_decoder_process_until_end_of_stream		== NIL ||
+
+	    ex_FLAC__VERSION_STRING					== NIL) { FreeFLACDLL(); return False; }
 
 	return True;
 }

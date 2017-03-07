@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -30,23 +30,25 @@ using namespace smooth::GUI::Dialogs;
 
 const String &BoCA::DecoderCDParanoia::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>cdparanoia Ripper Component</name>	\
-	    <version>1.0</version>			\
-	    <id>cdparanoia-dec</id>			\
-	    <type>decoder</type>			\
-	    <require>cdparanoia-info</require>		\
-	    <format>					\
-	      <name>Windows CD Audio Track</name>	\
-	      <lossless>true</lossless>			\
-	      <extension>cda</extension>		\
-	    </format>					\
-	  </component>					\
-							\
+	static String	 componentSpecs = "			\
+								\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
+	  <component>						\
+	    <name>cdparanoia Ripper Component %VERSION%</name>	\
+	    <version>1.0</version>				\
+	    <id>cdparanoia-dec</id>				\
+	    <type>decoder</type>				\
+	    <require>cdparanoia-info</require>			\
+	    <format>						\
+	      <name>Windows CD Audio Track</name>		\
+	      <lossless>true</lossless>				\
+	      <extension>cda</extension>			\
+	    </format>						\
+	  </component>						\
+								\
 	";
+
+	componentSpecs.Replace("%VERSION%", String("v").Append(cdda_version()));
 
 	return componentSpecs;
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -34,6 +34,7 @@ OPUSMULTISTREAMDECODERCREATE	 ex_opus_multistream_decoder_create	= NIL;
 OPUSMULTISTREAMDECODE		 ex_opus_multistream_decode		= NIL;
 OPUSMULTISTREAMDECODERCTL	 ex_opus_multistream_decoder_ctl	= NIL;
 OPUSMULTISTREAMDECODERDESTROY	 ex_opus_multistream_decoder_destroy	= NIL;
+OPUSGETVERSIONSTRING		 ex_opus_get_version_string		= NIL;
 
 DynamicLoader *oggdll	= NIL;
 DynamicLoader *opusdll	= NIL;
@@ -94,11 +95,13 @@ Bool LoadOpusDLL()
 	ex_opus_multistream_decode		= (OPUSMULTISTREAMDECODE) opusdll->GetFunctionAddress("opus_multistream_decode");
 	ex_opus_multistream_decoder_ctl		= (OPUSMULTISTREAMDECODERCTL) opusdll->GetFunctionAddress("opus_multistream_decoder_ctl");
 	ex_opus_multistream_decoder_destroy	= (OPUSMULTISTREAMDECODERDESTROY) opusdll->GetFunctionAddress("opus_multistream_decoder_destroy");
+	ex_opus_get_version_string		= (OPUSGETVERSIONSTRING) opusdll->GetFunctionAddress("opus_get_version_string");
 
 	if (ex_opus_multistream_decoder_create	== NIL ||
 	    ex_opus_multistream_decode		== NIL ||
 	    ex_opus_multistream_decoder_ctl	== NIL ||
-	    ex_opus_multistream_decoder_destroy	== NIL) { FreeOpusDLL(); return False; }
+	    ex_opus_multistream_decoder_destroy	== NIL ||
+	    ex_opus_get_version_string		== NIL) { FreeOpusDLL(); return False; }
 
 	return True;
 }

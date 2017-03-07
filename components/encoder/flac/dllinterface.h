@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -77,6 +77,7 @@ typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_INSERT_TRACK)			(FLAC__St
 
 typedef FLAC__bool 				(*FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT)		(FLAC__StreamMetadata *, FLAC__StreamMetadata_VorbisComment_Entry, FLAC__bool);
 
+typedef char *					 *FLAC__VERSION_STRING_TYPE;
 typedef char *					 *FLAC__VENDOR_STRING_TYPE;
 
 extern FLAC_API_SUPPORTS_OGG_FLAC_TYPE				 ex_FLAC_API_SUPPORTS_OGG_FLAC;
@@ -121,4 +122,5 @@ extern FLAC__METADATA_OBJECT_CUESHEET_INSERT_TRACK		 ex_FLAC__metadata_object_cu
 
 extern FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT	 ex_FLAC__metadata_object_vorbiscomment_append_comment;
 
+extern FLAC__VERSION_STRING_TYPE				 ex_FLAC__VERSION_STRING;
 extern FLAC__VENDOR_STRING_TYPE					 ex_FLAC__VENDOR_STRING;

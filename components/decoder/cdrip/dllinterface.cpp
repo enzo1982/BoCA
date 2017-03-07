@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,6 +27,7 @@ CR_LOCKCD			 ex_CR_LockCD			= NIL;
 CR_READCDTEXT			 ex_CR_ReadCDText		= NIL;
 CR_READANDGETISRC		 ex_CR_ReadAndGetISRC		= NIL;
 CR_GETNUMBEROFCACHEERRORS	 ex_CR_GetNumberOfCacheErrors	= NIL;
+CR_GETCDRIPVERSION		 ex_CR_GetCDRipVersion		= NIL;
 
 DynamicLoader *cdripdll	= NIL;
 
@@ -53,6 +54,7 @@ Bool LoadCDRipDLL()
 	ex_CR_ReadCDText		= (CR_READCDTEXT) cdripdll->GetFunctionAddress("CR_ReadCDText");
 	ex_CR_ReadAndGetISRC		= (CR_READANDGETISRC) cdripdll->GetFunctionAddress("CR_ReadAndGetISRC");
 	ex_CR_GetNumberOfCacheErrors	= (CR_GETNUMBEROFCACHEERRORS) cdripdll->GetFunctionAddress("CR_GetNumberOfCacheErrors");
+	ex_CR_GetCDRipVersion		= (CR_GETCDRIPVERSION) cdripdll->GetFunctionAddress("CR_GetCDRipVersion");
 
 	if (ex_CR_GetNumCDROM			== NIL ||
 	    ex_CR_OpenCDROM			== NIL ||
@@ -68,7 +70,8 @@ Bool LoadCDRipDLL()
 	    ex_CR_LockCD			== NIL ||
 	    ex_CR_ReadCDText			== NIL ||
 	    ex_CR_ReadAndGetISRC		== NIL ||
-	    ex_CR_GetNumberOfCacheErrors	== NIL) { FreeCDRipDLL(); return False; }
+	    ex_CR_GetNumberOfCacheErrors	== NIL ||
+	    ex_CR_GetCDRipVersion		== NIL) { FreeCDRipDLL(); return False; }
 
 	return True;
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -59,6 +59,7 @@ FLAC__METADATA_OBJECT_CUESHEET_INSERT_TRACK		 ex_FLAC__metadata_object_cuesheet_
 
 FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT	 ex_FLAC__metadata_object_vorbiscomment_append_comment		= NIL;
 
+FLAC__VERSION_STRING_TYPE				 ex_FLAC__VERSION_STRING					= NIL;
 FLAC__VENDOR_STRING_TYPE				 ex_FLAC__VENDOR_STRING						= NIL;
 
 DynamicLoader *oggdll	= NIL;
@@ -132,6 +133,7 @@ Bool LoadFLACDLL()
 
 	ex_FLAC__metadata_object_vorbiscomment_append_comment		= (FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT) flacdll->GetFunctionAddress("FLAC__metadata_object_vorbiscomment_append_comment");
 
+	ex_FLAC__VERSION_STRING						= (FLAC__VERSION_STRING_TYPE) flacdll->GetFunctionAddress("FLAC__VERSION_STRING");
 	ex_FLAC__VENDOR_STRING						= (FLAC__VENDOR_STRING_TYPE) flacdll->GetFunctionAddress("FLAC__VENDOR_STRING");
 
 	if (ex_FLAC_API_SUPPORTS_OGG_FLAC				== NIL ||
@@ -176,6 +178,7 @@ Bool LoadFLACDLL()
 
 	    ex_FLAC__metadata_object_vorbiscomment_append_comment	== NIL ||
 
+	    ex_FLAC__VERSION_STRING					== NIL ||
 	    ex_FLAC__VENDOR_STRING					== NIL) { FreeFLACDLL(); return False; }
 
 	return True;

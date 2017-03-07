@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ const String &BoCA::EncoderBlade::GetComponentSpecs()
 										\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
 		  <component>							\
-		    <name>BladeEnc MP3 Encoder</name>				\
+		    <name>BladeEnc MP3 Encoder %VERSION%</name>			\
 		    <version>1.0</version>					\
 		    <id>bladeenc-enc</id>					\
 		    <type threadSafe=\"false\">encoder</type>			\
@@ -41,6 +41,12 @@ const String &BoCA::EncoderBlade::GetComponentSpecs()
 		  </component>							\
 										\
 		";
+
+		BE_VERSION	 beVer;
+
+		ex_beVersion(&beVer);
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(String::FromInt(beVer.byMajorVersion)).Append(".").Append(String::FromInt(beVer.byMinorVersion)));
 	}
 
 	return componentSpecs;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ const String &BoCA::DecoderSpeex::GetComponentSpecs()
 											\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
 		  <component>								\
-		    <name>Speex Speech Decoder</name>					\
+		    <name>Speex Speech Decoder %VERSION%</name>				\
 		    <version>1.0</version>						\
 		    <id>speex-dec</id>							\
 		    <type>decoder</type>						\
@@ -41,6 +41,12 @@ const String &BoCA::DecoderSpeex::GetComponentSpecs()
 		  </component>								\
 											\
 		";
+
+		const char	*speexVersion = NIL;
+
+		ex_speex_lib_ctl(SPEEX_LIB_GET_VERSION_STRING, &speexVersion);
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(speexVersion));
 	}
 
 	return componentSpecs;

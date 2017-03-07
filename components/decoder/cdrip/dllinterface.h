@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -37,6 +37,7 @@ typedef void				(CRCCONV *CR_LOCKCD)				(CDROMDRIVE *, BOOL);
 typedef CDEX_ERR			(CRCCONV *CR_READCDTEXT)			(CDROMDRIVE *, BYTE *, int, LPINT);
 typedef CDEX_ERR			(CRCCONV *CR_READANDGETISRC)			(CDROMDRIVE *, ISRC *, int);
 typedef LONG				(CRCCONV *CR_GETNUMBEROFCACHEERRORS)		(CDROMDRIVE *);
+typedef LONG				(CRCCONV *CR_GETCDRIPVERSION)			();
 
 extern CR_GETNUMCDROM			 ex_CR_GetNumCDROM;
 extern CR_OPENCDROM			 ex_CR_OpenCDROM;
@@ -53,3 +54,4 @@ extern CR_LOCKCD			 ex_CR_LockCD;
 extern CR_READCDTEXT			 ex_CR_ReadCDText;
 extern CR_READANDGETISRC		 ex_CR_ReadAndGetISRC;
 extern CR_GETNUMBEROFCACHEERRORS	 ex_CR_GetNumberOfCacheErrors;
+extern CR_GETCDRIPVERSION		 ex_CR_GetCDRipVersion;

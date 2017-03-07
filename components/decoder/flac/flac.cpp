@@ -29,7 +29,7 @@ const String &BoCA::DecoderFLAC::GetComponentSpecs()
 											\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
 		  <component>								\
-		    <name>FLAC Audio Decoder</name>					\
+		    <name>FLAC Audio Decoder %VERSION%</name>				\
 		    <version>1.0</version>						\
 		    <id>flac-dec</id>							\
 		    <type>decoder</type>						\
@@ -61,6 +61,8 @@ const String &BoCA::DecoderFLAC::GetComponentSpecs()
 		  </component>								\
 											\
 		");
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(*ex_FLAC__VERSION_STRING));
 	}
 
 	return componentSpecs;

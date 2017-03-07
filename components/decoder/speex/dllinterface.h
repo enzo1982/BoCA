@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -70,6 +70,7 @@ typedef int			(*SPEEXDECODERCTL)		(void *, int, void *);
 typedef int			(*SPEEXDECODEINT)		(void *, SpeexBits *, spx_int16_t *);
 typedef void			(*SPEEXDECODESTEREOINT)		(spx_int16_t *, int, SpeexStereoState *);
 typedef SpeexHeader *		(*SPEEXPACKETTOHEADER)		(char *, int);
+typedef int			(*SPEEXLIBCTL)			(int, void *);
 typedef const SpeexMode *	(*SPEEXLIBGETMODE)		(int);
 
 extern SPEEXBITSINIT		 ex_speex_bits_init;
@@ -81,4 +82,5 @@ extern SPEEXDECODERCTL		 ex_speex_decoder_ctl;
 extern SPEEXDECODEINT		 ex_speex_decode_int;
 extern SPEEXDECODESTEREOINT	 ex_speex_decode_stereo_int;
 extern SPEEXPACKETTOHEADER	 ex_speex_packet_to_header;
+extern SPEEXLIBCTL		 ex_speex_lib_ctl;
 extern SPEEXLIBGETMODE		 ex_speex_lib_get_mode;

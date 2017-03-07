@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -15,10 +15,11 @@
 
 using namespace BoCA;
 
-HIP_DECODE_INIT		 ex_hip_decode_init	= NIL;
-HIP_DECODE_EXIT		 ex_hip_decode_exit	= NIL;
-HIP_DECODE		 ex_hip_decode		= NIL;
-HIP_DECODE_HEADERS	 ex_hip_decode_headers	= NIL;
+HIP_DECODE_INIT		 ex_hip_decode_init		= NIL;
+HIP_DECODE_EXIT		 ex_hip_decode_exit		= NIL;
+HIP_DECODE		 ex_hip_decode			= NIL;
+HIP_DECODE_HEADERS	 ex_hip_decode_headers		= NIL;
+GET_LAME_SHORT_VERSION	 ex_get_lame_short_version	= NIL;
 
 DynamicLoader *lamedll	= NIL;
 
@@ -36,11 +37,13 @@ Bool LoadLAMEDLL()
 	ex_hip_decode_exit		= (HIP_DECODE_EXIT) lamedll->GetFunctionAddress("hip_decode_exit");
 	ex_hip_decode			= (HIP_DECODE) lamedll->GetFunctionAddress("hip_decode");
 	ex_hip_decode_headers		= (HIP_DECODE_HEADERS) lamedll->GetFunctionAddress("hip_decode_headers");
+	ex_get_lame_short_version	= (GET_LAME_SHORT_VERSION) lamedll->GetFunctionAddress("get_lame_short_version");
 
 	if (ex_hip_decode_init		== NIL ||
 	    ex_hip_decode_exit		== NIL ||
 	    ex_hip_decode		== NIL ||
-	    ex_hip_decode_headers	== NIL) { FreeLAMEDLL(); return False; }
+	    ex_hip_decode_headers	== NIL ||
+	    ex_get_lame_short_version	== NIL) { FreeLAMEDLL(); return False; }
 
 	return True;
 }

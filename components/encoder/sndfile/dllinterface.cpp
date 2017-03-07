@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,14 +13,15 @@
 #include <boca.h>
 #include "dllinterface.h"
 
-SF_FORMAT_CHECK	 ex_sf_format_check	= NIL;
-SF_OPEN_VIRTUAL	 ex_sf_open_virtual	= NIL;
-SF_CLOSE	 ex_sf_close		= NIL;
-SF_WRITE_SHORT	 ex_sf_write_short	= NIL;
-SF_WRITE_INT	 ex_sf_write_int	= NIL;
-SF_SET_STRING	 ex_sf_set_string	= NIL;
-SF_COMMAND	 ex_sf_command		= NIL;
-SF_STRERROR	 ex_sf_strerror		= NIL;
+SF_FORMAT_CHECK		 ex_sf_format_check	= NIL;
+SF_OPEN_VIRTUAL		 ex_sf_open_virtual	= NIL;
+SF_CLOSE		 ex_sf_close		= NIL;
+SF_WRITE_SHORT		 ex_sf_write_short	= NIL;
+SF_WRITE_INT		 ex_sf_write_int	= NIL;
+SF_SET_STRING		 ex_sf_set_string	= NIL;
+SF_COMMAND		 ex_sf_command		= NIL;
+SF_STRERROR		 ex_sf_strerror		= NIL;
+SF_VERSION_STRING	 ex_sf_version_string	= NIL;
 
 DynamicLoader *sndfiledll	= NIL;
 
@@ -38,15 +39,17 @@ Bool LoadSndFileDLL()
 	ex_sf_set_string	= (SF_SET_STRING) sndfiledll->GetFunctionAddress("sf_set_string");
 	ex_sf_command		= (SF_COMMAND) sndfiledll->GetFunctionAddress("sf_command");
 	ex_sf_strerror		= (SF_STRERROR) sndfiledll->GetFunctionAddress("sf_strerror");
+	ex_sf_version_string	= (SF_VERSION_STRING) sndfiledll->GetFunctionAddress("sf_version_string");
 
-	if (ex_sf_format_check	== NIL ||
-	    ex_sf_open_virtual	== NIL ||
-	    ex_sf_close		== NIL ||
-	    ex_sf_write_short	== NIL ||
-	    ex_sf_write_int	== NIL ||
-	    ex_sf_set_string	== NIL ||
-	    ex_sf_command	== NIL ||
-	    ex_sf_strerror	== NIL) { FreeSndFileDLL(); return False; }
+	if (ex_sf_format_check		== NIL ||
+	    ex_sf_open_virtual		== NIL ||
+	    ex_sf_close			== NIL ||
+	    ex_sf_write_short		== NIL ||
+	    ex_sf_write_int		== NIL ||
+	    ex_sf_set_string		== NIL ||
+	    ex_sf_command		== NIL ||
+	    ex_sf_strerror		== NIL ||
+	    ex_sf_version_string	== NIL) { FreeSndFileDLL(); return False; }
 
 	return True;
 }

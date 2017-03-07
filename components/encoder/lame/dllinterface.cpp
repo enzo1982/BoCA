@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -47,6 +47,7 @@ LAME_INIT_PARAMS		 ex_lame_init_params			= NIL;
 LAME_ENCODE_BUFFER		 ex_lame_encode_buffer			= NIL;
 LAME_ENCODE_BUFFER_INTERLEAVED	 ex_lame_encode_buffer_interleaved	= NIL;
 LAME_ENCODE_FLUSH		 ex_lame_encode_flush			= NIL;
+GET_LAME_SHORT_VERSION		 ex_get_lame_short_version		= NIL;
 LAME_GET_LAMETAG_FRAME		 ex_lame_get_lametag_frame		= NIL;
 LAME_SET_BWRITEVBRTAG		 ex_lame_set_bWriteVbrTag		= NIL;
 
@@ -94,6 +95,7 @@ Bool LoadLAMEDLL()
 	ex_lame_encode_buffer			= (LAME_ENCODE_BUFFER) lamedll->GetFunctionAddress("lame_encode_buffer");
 	ex_lame_encode_buffer_interleaved	= (LAME_ENCODE_BUFFER_INTERLEAVED) lamedll->GetFunctionAddress("lame_encode_buffer_interleaved");
 	ex_lame_encode_flush			= (LAME_ENCODE_FLUSH) lamedll->GetFunctionAddress("lame_encode_flush");
+	ex_get_lame_short_version		= (GET_LAME_SHORT_VERSION) lamedll->GetFunctionAddress("get_lame_short_version");
 	ex_lame_get_lametag_frame		= (LAME_GET_LAMETAG_FRAME) lamedll->GetFunctionAddress("lame_get_lametag_frame");
 	ex_lame_set_bWriteVbrTag		= (LAME_SET_BWRITEVBRTAG) lamedll->GetFunctionAddress("lame_set_bWriteVbrTag");
 
@@ -129,6 +131,7 @@ Bool LoadLAMEDLL()
 	    ex_lame_encode_buffer		== NIL ||
 	    ex_lame_encode_buffer_interleaved	== NIL ||
 	    ex_lame_encode_flush		== NIL ||
+	    ex_get_lame_short_version		== NIL ||
 	    ex_lame_get_lametag_frame		== NIL ||
 	    ex_lame_set_bWriteVbrTag		== NIL) { FreeLAMEDLL(); return False; }
 
