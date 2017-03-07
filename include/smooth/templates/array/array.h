@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,23 +23,23 @@ namespace smooth
 
 			/* Methods for adding entries to the list.
 			 */
-			Int		 Add(const t &value)					{ return ArrayBackend<s>::Add((s) value); }
-			Bool		 Add(const t &value, Int index)				{ return ArrayBackend<s>::Add((s) value, index); }
+			Int		 Add(const t &value)					{ return ArrayBackend<s>::Add((const s &) value); }
+			Bool		 Add(const t &value, Int index)				{ return ArrayBackend<s>::Add((const s &) value, index); }
 
 			/* Methods for inserting entries at defined positions.
 			 */
-			Int		 InsertAfter(Int index, const t &value)			{ return ArrayBackend<s>::InsertAfter(index, (s) value); }
-			Bool		 InsertAfter(Int index, const t &value, Int nIndex)	{ return ArrayBackend<s>::InsertAfter(index, (s) value, nIndex); }
-			Int		 InsertAtPos(Int pos, const t &value)			{ return ArrayBackend<s>::InsertAtPos(pos, (s) value); }
-			Bool		 InsertAtPos(Int pos, const t &value, Int nIndex)	{ return ArrayBackend<s>::InsertAtPos(pos, (s) value, nIndex); }
+			Int		 InsertAfter(Int index, const t &value)			{ return ArrayBackend<s>::InsertAfter(index, (const s &) value); }
+			Bool		 InsertAfter(Int index, const t &value, Int nIndex)	{ return ArrayBackend<s>::InsertAfter(index, (const s &) value, nIndex); }
+			Int		 InsertAtPos(Int pos, const t &value)			{ return ArrayBackend<s>::InsertAtPos(pos, (const s &) value); }
+			Bool		 InsertAtPos(Int pos, const t &value, Int nIndex)	{ return ArrayBackend<s>::InsertAtPos(pos, (const s &) value, nIndex); }
 
 			/* Getter and setter methods.
 			 */
 			const t		&Get(Int index) const					{ return (const t &) ArrayBackend<s>::Get(index); }
-			Bool		 Set(Int index, const t &value)				{ return ArrayBackend<s>::Set(index, (s) value); }
+			Bool		 Set(Int index, const t &value)				{ return ArrayBackend<s>::Set(index, (const s &) value); }
 
 			const t		&GetNth(Int n) const					{ return (const t &) ArrayBackend<s>::GetNth(n); }
-			Bool		 SetNth(Int n, const t &value)				{ return ArrayBackend<s>::SetNth(n, (s) value); }
+			Bool		 SetNth(Int n, const t &value)				{ return ArrayBackend<s>::SetNth(n, (const s &) value); }
 
 			/* Shortcut getter methods.
 			 */

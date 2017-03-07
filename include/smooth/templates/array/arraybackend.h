@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,8 @@
 #include <memory.h>
 #include <string.h>
 
+#include <new>
+
 namespace smooth
 {
 	template <class s> class ArrayEntry
@@ -31,7 +33,7 @@ namespace smooth
 		private:
 			static s		 nullValue;
 
-			Buffer<ArrayEntry<s> *>	 entries;
+			Buffer<ArrayEntry<s> >	 entries;
 		public:
 			ArrayBackend()
 			{
@@ -72,7 +74,7 @@ namespace smooth
 
 				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
-				entries[nOfEntries] = new ArrayEntry<s>(value);
+				new (entries + nOfEntries) ArrayEntry<s>(value);
 
 				IndexArray::InsertAtPos(nOfEntries, index);
 
@@ -112,9 +114,9 @@ namespace smooth
 
 				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
-				memmove(entries + position + 1, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s> *));
+				memmove(entries + position + 1, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s>));
 
-				entries[position] = new ArrayEntry<s>(value);
+				new (entries + position) ArrayEntry<s>(value);
 
 				IndexArray::InsertAtPos(position, index);
 
@@ -130,12 +132,14 @@ namespace smooth
 
 				LockForWrite();
 
-				ArrayEntry<s>	*backupEntry = entries[n];
+				UnsignedByte	 backupEntry[sizeof(ArrayEntry<s>)];
 
-				if (m < n) memmove(entries + m + 1, entries + m, (n - m) * sizeof(ArrayEntry<s> *));
-				else	   memmove(entries + n, entries + n + 1, (m - n) * sizeof(ArrayEntry<s> *));
+				memcpy(backupEntry, entries + n, sizeof(ArrayEntry<s>));
 
-				entries[m] = backupEntry;
+				if (m < n) memmove(entries + m + 1, entries + m, (n - m) * sizeof(ArrayEntry<s>));
+				else	   memmove(entries + n, entries + n + 1, (m - n) * sizeof(ArrayEntry<s>));
+
+				memcpy(entries + m, backupEntry, sizeof(ArrayEntry<s>));
 
 				IndexArray::MoveNth(n, m);
 
@@ -152,9 +156,9 @@ namespace smooth
 
 				LockForWrite();
 
-				delete entries[n];
+				(entries + n)->~ArrayEntry<s>();
 
-				memmove(entries + n, entries + n + 1, (nOfEntries - n - 1) * sizeof(ArrayEntry<s> *));
+				memmove(entries + n, entries + n + 1, (nOfEntries - n - 1) * sizeof(ArrayEntry<s>));
 
 				IndexArray::RemoveNth(n);
 
@@ -169,7 +173,7 @@ namespace smooth
 
 				LockForWrite();
 
-				for (Int i = 0; i < nOfEntries; i++) delete entries[i];
+				for (Int i = 0; i < nOfEntries; i++) (entries + i)->~ArrayEntry<s>();
 
 				entries.Free();
 
@@ -206,7 +210,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					const s	&entry = entries[n]->value;
+					const s	&entry = (entries + n)->value;
 
 					lastAccessedEntry = n;
 
@@ -226,7 +230,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					s	&entry = entries[n]->value;
+					s	&entry = (entries + n)->value;
 
 					lastAccessedEntry = n;
 
@@ -246,7 +250,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					const s	&entry = entries[n]->value;
+					const s	&entry = (entries + n)->value;
 
 					lastAccessedEntry = n;
 
@@ -266,7 +270,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					entries[n]->value = value;
+					(entries + n)->value = value;
 
 					lastAccessedEntry = n;
 
@@ -286,7 +290,7 @@ namespace smooth
 
 				if (nOfEntries > 0)
 				{
-					const s	&entry = entries[0]->value;
+					const s	&entry = (entries + 0)->value;
 
 					lastAccessedEntry = 0;
 
@@ -306,7 +310,7 @@ namespace smooth
 
 				if (nOfEntries > 0)
 				{
-					const s	&entry = entries[nOfEntries - 1]->value;
+					const s	&entry = (entries + nOfEntries - 1)->value;
 
 					lastAccessedEntry = nOfEntries - 1;
 
@@ -328,7 +332,7 @@ namespace smooth
 
 				if (lastAccessed < nOfEntries - 1)
 				{
-					const s	&entry = entries[++lastAccessed]->value;
+					const s	&entry = (entries + ++lastAccessed)->value;
 
 					lastAccessedEntry = lastAccessed;
 
@@ -350,7 +354,7 @@ namespace smooth
 
 				if (lastAccessed > 0)
 				{
-					const s	&entry = entries[--lastAccessed]->value;
+					const s	&entry = (entries + --lastAccessed)->value;
 
 					lastAccessedEntry = lastAccessed;
 
@@ -366,6 +370,6 @@ namespace smooth
 	};
 };
 
-template <class s> s S::ArrayBackend<s>::nullValue = ARRAY_NULLVALUE;
+template <class s> s S::ArrayBackend<s>::nullValue = (s) 0;
 
 #endif
