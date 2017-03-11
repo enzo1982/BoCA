@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -59,7 +59,7 @@ BoCA::AS::Registry::Registry()
 
 	LoadComponents(Utilities::GetBoCADirectory(), "boca");
 
-	if (BoCA::GetApplicationPrefix() != "boca")
+	if (BoCA::GetApplicationPrefix() != NIL && BoCA::GetApplicationPrefix() != "boca")
 	{
 		LoadComponents(Utilities::GetBoCADirectory(), BoCA::GetApplicationPrefix());
 		LoadComponents(Utilities::GetBoCADirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append(BoCA::GetApplicationPrefix()), BoCA::GetApplicationPrefix());
