@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,7 @@
 #define H_OBJSMOOTH_PROTOCOL_HTTP
 
 #include "protocol.h"
+#include "../../io/outstream.h"
 
 namespace smooth
 {
@@ -32,12 +33,12 @@ namespace smooth
 
 			class SMOOTHAPI HTTP : public Protocol
 			{
+				friend size_t	 httpHeader(char *, size_t, size_t, void *);
+				friend size_t	 httpWrite(char *, size_t, size_t, void *);
+				friend int	 httpProgress(void *, double, double, double, double);
+
 				private:
 					Short			 mode;
-
-					String			 server;
-					String			 path;
-					Int			 port;
 
 					String			 proxy;
 					Int			 proxyPort;
@@ -51,16 +52,13 @@ namespace smooth
 
 					Array<Parameter>	 responseFields;
 
+					String			 file;
+					IO::OutStream		*out;
+
+					Int64			 ulStart;
+					Int64			 dlStart;
+
 					String			 content;
-
-					Error			 DecodeURL();
-
-					Buffer<UnsignedByte>	&ComposeHTTPRequest();
-
-					Void			 ComposeGETRequest();
-					Void			 ComposePOSTRequest();
-
-					String			 ComposeHeader();
 
 					String			 GetParametersURLEncoded() const;
 				public:
