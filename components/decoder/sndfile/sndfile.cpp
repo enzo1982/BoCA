@@ -210,6 +210,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 				case SF_FORMAT_PCM_U8:
 				case SF_FORMAT_PCM_S8:
 					format.bits = 8;
+					format.sign = False;
 					break;
 				case SF_FORMAT_PCM_24:
 					format.bits = 24;
@@ -426,7 +427,7 @@ Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data)
 
 		size = ex_sf_read_short(sndf, buffer, size);
 
-		for (Int i = 0; i < size; i++) data[i] = (buffer[i] >> 8) - 128;
+		for (Int i = 0; i < size; i++) data[i] = (buffer[i] >> 8) + 128;
 	}
 	else if	(format.bits == 16)
 	{

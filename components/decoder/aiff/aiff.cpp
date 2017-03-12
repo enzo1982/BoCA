@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -132,6 +132,8 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 
 			format.order	= BYTE_RAW;
 			format.bits	= (unsigned short) f_in->InputNumberRaw(2);
+
+			if (format.bits == 8) format.sign = False;
 
 			/* Read sample rate as 80 bit float.
 			 */

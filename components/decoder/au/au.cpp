@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -61,10 +61,10 @@ Error BoCA::DecoderSunAu::GetStreamInfo(const String &streamURI, Track &track)
 	track.length	= UnsignedInt32(f_in->InputNumberRaw(4));
 	format.bits	= UnsignedInt32(f_in->InputNumberRaw(4));
 
-	if	(format.bits == 2) format.bits =  8;
-	else if (format.bits == 3) format.bits = 16;
-	else if (format.bits == 4) format.bits = 24;
-	else if (format.bits == 5) format.bits = 32;
+	if	(format.bits == 2) { format.bits =  8; format.sign = False; }
+	else if (format.bits == 3)   format.bits = 16;
+	else if (format.bits == 4)   format.bits = 24;
+	else if (format.bits == 5)   format.bits = 32;
 	else			   { errorState = True; errorString = "Unsupported audio format"; }
 
 	if (!errorState)
