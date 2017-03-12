@@ -530,7 +530,6 @@ bool Mp3Info::Parse(ID3_Reader& reader, size_t mp3size)
 
         if (vbr_flags & SCALE_FLAG)
         {
-          ExtractI4(pvbrdata); // Extract vbr_scale value
           pvbrdata +=4;
         }
 
