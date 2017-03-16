@@ -11,7 +11,7 @@ echo "      cvs -d:pserver:anonymous@smooth.cvs.sf.net:/cvsroot/smooth co -P smo
 echo
 echo "  On macOS, Linux, *BSD, Solaris, Hurd:"
 echo
-echo "    - libasound2 development package (Linux only)"
+echo "    - libasound2 / libalsa2 development package (Linux only)"
 echo "    - libcdio and libcdio-paranoia development packages (except OpenBSD)"
 echo "    - libcdparanoia development package (OpenBSD only)"
 echo "    - libexpat development package"
