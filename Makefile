@@ -18,7 +18,7 @@ ifneq ($(SRCDIR),$(CURDIR))
 	rmdir $(BOCA_PATH)/$(BINDIR) $(BOCA_PATH)/$(LIBDIR) || true
 endif
 
-install: all
+install:
 ifneq ($(BUILD_WIN32),True)
 	$(call makein,include,install)
 	$(call makein,runtime,install)
