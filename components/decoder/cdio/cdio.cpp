@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -386,8 +386,8 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 	startSector += readOffset / samplesPerSector;
 	endSector   += readOffset / samplesPerSector;
 
-	if	(readOffset % samplesPerSector < 0) {		      startSector--; skipSamples = samplesPerSector + readOffset % samplesPerSector; }
-	else if (readOffset % samplesPerSector > 0) { if (!lastTrack) endSector++;   skipSamples = 		      readOffset % samplesPerSector; }
+	if	(readOffset % Int(samplesPerSector) < 0) {		   startSector--; skipSamples = samplesPerSector + readOffset % Int(samplesPerSector); }
+	else if (readOffset % Int(samplesPerSector) > 0) { if (!lastTrack) endSector++;   skipSamples = 		   readOffset % Int(samplesPerSector); }
 
 	if (startSector < 0) { prependSamples = -startSector * samplesPerSector; startSector = 0; }
 

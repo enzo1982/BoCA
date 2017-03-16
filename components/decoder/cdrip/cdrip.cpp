@@ -393,8 +393,8 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 	startSector += readOffset / samplesPerSector;
 	endSector   += readOffset / samplesPerSector;
 
-	if	(readOffset % samplesPerSector < 0) {		      startSector--; skipSamples = samplesPerSector + readOffset % samplesPerSector; }
-	else if (readOffset % samplesPerSector > 0) { if (!lastTrack) endSector++;   skipSamples = 		      readOffset % samplesPerSector; }
+	if	(readOffset % Int(samplesPerSector) < 0) {		   startSector--; skipSamples = samplesPerSector + readOffset % Int(samplesPerSector); }
+	else if (readOffset % Int(samplesPerSector) > 0) { if (!lastTrack) endSector++;   skipSamples = 		   readOffset % Int(samplesPerSector); }
 
 	if (startSector < 0) { prependSamples = -startSector * samplesPerSector; startSector = 0; }
 
