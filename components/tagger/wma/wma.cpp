@@ -511,14 +511,14 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &track)
 {
-	IWMMetadataEditor	*metadataEditor = NIL;
+	IWMMetadataEditor	*metadataEditor	 = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
 
 	HRESULT	 hr = ex_WMCreateEditor(&metadataEditor);
 
-	hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
+	if (hr == S_OK) hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
 
-	hr = metadataEditor2->OpenEx(fileName, GENERIC_READ | GENERIC_WRITE, 0);
+	if (hr == S_OK) hr = metadataEditor2->OpenEx(fileName, GENERIC_READ | GENERIC_WRITE, 0);
 
 	if (hr == S_OK)
 	{
@@ -597,12 +597,12 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 		delete [] indices;
 
 		pHeaderInfo->Release();
+
+		hr = metadataEditor2->Flush();
 	}
 
-	hr = metadataEditor2->Flush();
-
-	metadataEditor->Release();
-	metadataEditor2->Release();
+	if (metadataEditor2 != NIL) metadataEditor2->Release();
+	if (metadataEditor  != NIL) metadataEditor->Release();
 
 	if (hr == S_OK) RenderStreamInfo(fileName, track);
 
