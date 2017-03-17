@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>FLAC Command Line Encoder</name>
+  <version>1.0</version>
+  <id>flaccmd-enc</id>
+  <type>encoder</type>
+  <format>
+    <name>FLAC Files</name>
+    <lossless>true</lossless>
+    <extension>flac</extension>
+    <tag id="flac-tag" mode="other">FLAC Metadata</tag>
+    <channels>8</channels>
+  </format>
+  <external>
+    <command>flac</command>
+    <arguments>%OPTIONS --ignore-chunk-sizes - -o %OUTFILE</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Compression level" argument="-%VALUE" default="5">
+	<min alias="worst">0</min>
+	<max alias="best">8</max>
+      </range>
+      <range name="Block size" argument="-b %VALUE" default="4608" step="16">
+	<min alias="small">16</min>
+	<max alias="large">4608</max>
+      </range>
+      <range name="Prediction order" argument="-l %VALUE" default="8">
+	<min alias="min">1</min>
+	<max alias="max">12</max>
+      </range>
+      <range name="Rice partition order" argument="-r %VALUE" default="6">
+	<min alias="min">0</min>
+	<max alias="max">8</max>
+      </range>
+    </parameters>
+  </external>
+</component>
