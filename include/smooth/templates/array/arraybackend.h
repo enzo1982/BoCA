@@ -114,7 +114,7 @@ namespace smooth
 
 				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
-				memmove(entries + position + 1, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s>));
+				memmove((void *) (entries + position + 1), (void *) (entries + position), (nOfEntries - position) * sizeof(ArrayEntry<s>));
 
 				new (entries + position) ArrayEntry<s>(value);
 
@@ -134,12 +134,12 @@ namespace smooth
 
 				UnsignedByte	 backupEntry[sizeof(ArrayEntry<s>)];
 
-				memcpy(backupEntry, entries + n, sizeof(ArrayEntry<s>));
+				memcpy(backupEntry, (void *) (entries + n), sizeof(ArrayEntry<s>));
 
-				if (m < n) memmove(entries + m + 1, entries + m, (n - m) * sizeof(ArrayEntry<s>));
-				else	   memmove(entries + n, entries + n + 1, (m - n) * sizeof(ArrayEntry<s>));
+				if (m < n) memmove((void *) (entries + m + 1), (void *) (entries + m), (n - m) * sizeof(ArrayEntry<s>));
+				else	   memmove((void *) (entries + n), (void *) (entries + n + 1), (m - n) * sizeof(ArrayEntry<s>));
 
-				memcpy(entries + m, backupEntry, sizeof(ArrayEntry<s>));
+				memcpy((void *) (entries + m), backupEntry, sizeof(ArrayEntry<s>));
 
 				IndexArray::MoveNth(n, m);
 
@@ -158,7 +158,7 @@ namespace smooth
 
 				(entries + n)->~ArrayEntry<s>();
 
-				memmove(entries + n, entries + n + 1, (nOfEntries - n - 1) * sizeof(ArrayEntry<s>));
+				memmove((void *) (entries + n), (void *) (entries + n + 1), (nOfEntries - n - 1) * sizeof(ArrayEntry<s>));
 
 				IndexArray::RemoveNth(n);
 
