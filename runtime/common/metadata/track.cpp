@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,6 +13,7 @@
 #include <boca/common/metadata/track.h>
 #include <boca/common/config.h>
 #include <boca/common/i18n.h>
+#include <boca/common/utilities.h>
 
 Int BoCA::Track::nextTrackID = 0;
 
@@ -160,7 +161,9 @@ Bool BoCA::Track::LoadCoverArtFiles()
 {
 	if (isCDTrack) return False;
 
-	if (Config::Get()->GetIntValue("Tags", "CoverArtReadFromFiles", True))
+	Config	*config = Config::Get();
+
+	if (config->GetIntValue("Tags", "CoverArtReadFromFiles", True))
 	{
 		Directory		 directory = File(origFilename).GetFilePath();
 		const Array<File>	&jpgFiles = directory.GetFilesByPattern("*.jpg");
@@ -205,43 +208,81 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 
 Bool BoCA::Track::SaveCoverArtFiles(const String &directory)
 {
-	if (Config::Get()->GetIntValue("Tags", "CoverArtWriteToFiles", False))
+	Config	*config = Config::Get();
+	I18n	*i18n	= I18n::Get();
+
+	if (!config->GetIntValue("Tags", "CoverArtWriteToFiles", False)) return True;
+
+	foreach (const Picture &picture, pictures)
 	{
-		foreach (const Picture &picture, pictures)
+		String	 fileName = config->GetStringValue("Tags", "CoverArtFilenamePattern", "<artist> - <album>\\<type>");
+
+		switch (picture.type)
 		{
-			String	 fileName = Config::Get()->GetStringValue("Tags", "CoverArtFilenamePattern", "<artist> - <album>\\<type>");
-
-			switch (picture.type)
-			{
-				case  0: fileName.Replace("<type>", "other");		break;
-				case  1: fileName.Replace("<type>", "icon");		break;
-				case  2: fileName.Replace("<type>", "othericon");	break;
-				case  3: fileName.Replace("<type>", "front");		break;
-				case  4: fileName.Replace("<type>", "back");		break;
-				case  5: fileName.Replace("<type>", "leaflet");		break;
-				case  6: fileName.Replace("<type>", "disc");		break;
-				case  7: fileName.Replace("<type>", "leadartist");	break;
-				case  8: fileName.Replace("<type>", "artist");		break;
-				case  9: fileName.Replace("<type>", "conductor");	break;
-				case 10: fileName.Replace("<type>", "band");		break;
-				case 11: fileName.Replace("<type>", "composer");	break;
-				case 12: fileName.Replace("<type>", "writer");		break;
-				case 13: fileName.Replace("<type>", "location");	break;
-				case 14: fileName.Replace("<type>", "recording");	break;
-				case 15: fileName.Replace("<type>", "performing");	break;
-				case 16: fileName.Replace("<type>", "video");		break;
-				case 17: fileName.Replace("<type>", "fish");		break;
-				case 18: fileName.Replace("<type>", "illustration");	break;
-				case 19: fileName.Replace("<type>", "artistlogo");	break;
-				case 20: fileName.Replace("<type>", "publisherlogo");	break;
-				default: fileName.Replace("<type>", "unknown");		break;
-			}
-
-			fileName.Replace("<artist>", info.artist.Length() > 0 ? info.artist : BoCA::I18n::Get()->TranslateString("unknown artist"));
-			fileName.Replace("<album>", info.album.Length() > 0 ? info.album : BoCA::I18n::Get()->TranslateString("unknown album"));
-
-			picture.SaveToFile(String(directory).Append(Directory::GetDirectoryDelimiter()).Append(fileName));
+			case  0: fileName.Replace("<type>", "other");		break;
+			case  1: fileName.Replace("<type>", "icon");		break;
+			case  2: fileName.Replace("<type>", "othericon");	break;
+			case  3: fileName.Replace("<type>", "front");		break;
+			case  4: fileName.Replace("<type>", "back");		break;
+			case  5: fileName.Replace("<type>", "leaflet");		break;
+			case  6: fileName.Replace("<type>", "disc");		break;
+			case  7: fileName.Replace("<type>", "leadartist");	break;
+			case  8: fileName.Replace("<type>", "artist");		break;
+			case  9: fileName.Replace("<type>", "conductor");	break;
+			case 10: fileName.Replace("<type>", "band");		break;
+			case 11: fileName.Replace("<type>", "composer");	break;
+			case 12: fileName.Replace("<type>", "writer");		break;
+			case 13: fileName.Replace("<type>", "location");	break;
+			case 14: fileName.Replace("<type>", "recording");	break;
+			case 15: fileName.Replace("<type>", "performing");	break;
+			case 16: fileName.Replace("<type>", "video");		break;
+			case 17: fileName.Replace("<type>", "fish");		break;
+			case 18: fileName.Replace("<type>", "illustration");	break;
+			case 19: fileName.Replace("<type>", "artistlogo");	break;
+			case 20: fileName.Replace("<type>", "publisherlogo");	break;
+			default: fileName.Replace("<type>", "unknown");		break;
 		}
+
+		/* Replace standard fields.
+		 */
+		DateTime	 currentDateTime  = DateTime::Current();
+		String		 currentDate	  = String().FillN('0', 3 - Math::Floor(Math::Log10(currentDateTime.GetYear()))).Append(String::FromInt(currentDateTime.GetYear()))
+					    .Append(String().FillN('0', 1 - Math::Floor(Math::Log10(currentDateTime.GetMonth())))).Append(String::FromInt(currentDateTime.GetMonth()))
+					    .Append(String().FillN('0', 1 - Math::Floor(Math::Log10(currentDateTime.GetDay())))).Append(String::FromInt(currentDateTime.GetDay()));
+		String		 currentTime	  = String().FillN('0', 1 - Math::Floor(Math::Log10(currentDateTime.GetHour()))).Append(String::FromInt(currentDateTime.GetHour()))
+					    .Append(String().FillN('0', 1 - Math::Floor(Math::Log10(currentDateTime.GetMinute())))).Append(String::FromInt(currentDateTime.GetMinute()));
+
+		fileName.Replace("<artist>", Utilities::ReplaceIncompatibleCharacters(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown artist")));
+		fileName.Replace("<album>", Utilities::ReplaceIncompatibleCharacters(info.album.Length() > 0 ? info.album : i18n->TranslateString("unknown album")));
+		fileName.Replace("<genre>", Utilities::ReplaceIncompatibleCharacters(info.genre.Length() > 0 ? info.genre : i18n->TranslateString("unknown genre")));
+		fileName.Replace("<disc>", String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc < 0 ? 0 : info.disc)));
+		fileName.Replace("<year>", Utilities::ReplaceIncompatibleCharacters(info.year > 0 ? String::FromInt(info.year) : i18n->TranslateString("unknown year")));
+		fileName.Replace("<currentdate>", currentDate);
+		fileName.Replace("<currenttime>", currentTime);
+
+		/* Replace other text fields.
+		 */
+		foreach (const String &pair, info.other)
+		{
+			String	 key   = pair.Head(pair.Find(":"));
+			String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+
+			if (value == NIL) continue;
+
+			if	(key == INFO_ALBUMARTIST) fileName.Replace("<albumartist>", Utilities::ReplaceIncompatibleCharacters(value));
+			else if	(key == INFO_CONDUCTOR)	  fileName.Replace("<conductor>", Utilities::ReplaceIncompatibleCharacters(value));
+			else if	(key == INFO_COMPOSER)	  fileName.Replace("<composer>", Utilities::ReplaceIncompatibleCharacters(value));
+		}
+
+		if (info.artist.Length() > 0) fileName.Replace("<albumartist>", Utilities::ReplaceIncompatibleCharacters(info.artist));
+
+		fileName.Replace("<albumartist>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown album artist")));
+		fileName.Replace("<conductor>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown conductor")));
+		fileName.Replace("<composer>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown composer")));
+
+		/* Save cover art file.
+		 */
+		picture.SaveToFile(String(directory).Append(directory.EndsWith(Directory::GetDirectoryDelimiter()) ? NIL : Directory::GetDirectoryDelimiter()).Append(fileName));
 	}
 
 	return True;
