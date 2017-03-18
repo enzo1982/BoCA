@@ -21,10 +21,6 @@ extern "C" {
 #include "cdparanoia.h"
 #include "config.h"
 
-#ifndef PARANOIA_CB_CACHEERR
-#	define PARANOIA_CB_CACHEERR 13
-#endif
-
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
 
@@ -48,8 +44,11 @@ const String &BoCA::DecoderCDParanoia::GetComponentSpecs()
 								\
 	";
 
+#ifdef PARANOIA_CB_CACHEERR
 	componentSpecs.Replace("%VERSION%", String("v").Append(cdda_version()));
-
+#else
+	componentSpecs.Replace("%VERSION%", NIL);
+#endif
 	return componentSpecs;
 }
 
@@ -65,7 +64,9 @@ namespace BoCA
 {
 	void paranoiaCallback(long offset, int state)
 	{
+#ifdef PARANOIA_CB_CACHEERR
 		if (state == PARANOIA_CB_CACHEERR) DecoderCDParanoia::readDecoder->numCacheErrors++;
+#endif
 	}
 };
 
