@@ -197,8 +197,16 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 			{
 				if (items->size == 1)
 				{
-					String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
-					const Array<String>	&values	     = valueString.Trim().Explode(" ");
+					/* Read value as string.
+					 */
+					char	 value[items->elements[0].dataList.elements[0].valueSize + 1];
+
+					memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
+					memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
+
+					/* Parse value string.
+					 */
+					const Array<String>	&values = String(value).Trim().Explode(" ");
 
 					track.length = Math::Round((Int64) Number::FromHexString(values.GetNth(3)) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
 
@@ -427,8 +435,16 @@ Bool BoCA::DecoderFAAD2::Activate()
 		{
 			if (items->size == 1)
 			{
-				String			 valueString = (char *) items->elements[0].dataList.elements[0].value;
-				const Array<String>	&values	     = valueString.Trim().Explode(" ");
+				/* Read value as string.
+				 */
+				char	 value[items->elements[0].dataList.elements[0].valueSize + 1];
+
+				memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
+				memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
+
+				/* Parse value string.
+				 */
+				const Array<String>	&values = String(value).Trim().Explode(" ");
 
 				delaySamples	 = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * Float(track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
 				delaySamplesLeft = delaySamples;
