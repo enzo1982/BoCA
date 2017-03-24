@@ -30,7 +30,7 @@ const String &BoCA::DecoderLAME::GetComponentSpecs()
 		    <name>LAME MP3 Decoder %VERSION%</name>			\
 		    <version>1.0</version>					\
 		    <id>lame-dec</id>						\
-		    <type>decoder</type>					\
+		    <type threadSafe=\"false\">decoder</type>			\
 		    <format>							\
 		      <name>MPEG 1 Audio Layer 3</name>				\
 		      <extension>mp3</extension>				\
