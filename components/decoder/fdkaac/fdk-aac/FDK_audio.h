@@ -2,7 +2,7 @@
 /* -----------------------------------------------------------------------------------------------------------
 Software License for The Fraunhofer FDK AAC Codec Library for Android
 
-© Copyright  1995 - 2012 Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V.
+© Copyright  1995 - 2015 Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V.
   All rights reserved.
 
  1.    INTRODUCTION
@@ -134,15 +134,15 @@ typedef enum
 
   TT_MP4_LOAS          = 10, /**< Audio Sync Stream.         */
 
-  TT_DRM               = 12, /**< Digital Radio Mondial (DRM30/DRM+) bitstream format. */
-
-  TT_MP1_L1            = 16, /**< MPEG 1 Audio Layer 1 audio bitstream. */
-  TT_MP1_L2            = 17, /**< MPEG 1 Audio Layer 2 audio bitstream. */
-  TT_MP1_L3            = 18, /**< MPEG 1 Audio Layer 3 audio bitstream. */
-
-  TT_RSVD50            = 50 /**< */
+  TT_DRM               = 12  /**< Digital Radio Mondial (DRM30/DRM+) bitstream format. */
 
 } TRANSPORT_TYPE;
+
+#define TT_IS_PACKET(x) \
+       ( ((x) == TT_MP4_RAW) \
+      || ((x) == TT_DRM) \
+      || ((x) == TT_MP4_LATM_MCP0) \
+      || ((x) == TT_MP4_LATM_MCP1) )
 
 /**
  * Audio Object Type definitions.
@@ -197,74 +197,91 @@ typedef enum
   AOT_SAOC             = 43, /**< SAOC                                      */
   AOT_LD_MPEGS         = 44, /**< Low Delay MPEG Surround                   */
 
-  AOT_RSVD50           = 50,  /**< Interim AOT for Rsvd50                   */
-
   /* Pseudo AOTs */
-  AOT_MP2_AAC_MAIN     = 128, /**< Virtual AOT MP2 Main profile                           */
-  AOT_MP2_AAC_LC       = 129, /**< Virtual AOT MP2 Low Complexity profile                 */
-  AOT_MP2_AAC_SSR      = 130, /**< Virtual AOT MP2 Scalable Sampling Rate profile         */
-
-  AOT_MP2_SBR          = 132, /**< Virtual AOT MP2 Low Complexity Profile with SBR        */
-
-  AOT_DAB              = 134, /**< Virtual AOT for DAB (Layer2 with scalefactor CRC)      */
-  AOT_DABPLUS_AAC_LC   = 135, /**< Virtual AOT for DAB plus AAC-LC                        */
-  AOT_DABPLUS_SBR      = 136, /**< Virtual AOT for DAB plus HE-AAC                        */
-  AOT_DABPLUS_PS       = 137, /**< Virtual AOT for DAB plus HE-AAC v2                     */
-
-  AOT_PLAIN_MP1        = 140, /**< Virtual AOT for plain mp1                              */
-  AOT_PLAIN_MP2        = 141, /**< Virtual AOT for plain mp2                              */
-  AOT_PLAIN_MP3        = 142, /**< Virtual AOT for plain mp3                              */
-
   AOT_DRM_AAC          = 143, /**< Virtual AOT for DRM (ER-AAC-SCAL without SBR)          */
   AOT_DRM_SBR          = 144, /**< Virtual AOT for DRM (ER-AAC-SCAL with SBR)             */
-  AOT_DRM_MPEG_PS      = 145, /**< Virtual AOT for DRM (ER-AAC-SCAL with SBR and MPEG-PS) */
-  AOT_DRM_SURROUND     = 146, /**< Virtual AOT for DRM Surround (ER-AAC-SCAL (+SBR) +MPS) */
-
-  AOT_MP2_PS           = 156, /**< Virtual AOT MP2 Low Complexity Profile with SBR and PS */
-
-  AOT_MPEGS_RESIDUALS  = 256  /**< Virtual AOT for MPEG Surround residuals                */
+  AOT_DRM_MPEG_PS      = 145  /**< Virtual AOT for DRM (ER-AAC-SCAL with SBR and MPEG-PS) */
 
 } AUDIO_OBJECT_TYPE;
 
+#define CAN_DO_PS(aot) \
+  ((aot) == AOT_AAC_LC \
+|| (aot) == AOT_SBR \
+|| (aot) == AOT_PS \
+|| (aot) == AOT_ER_BSAC \
+|| (aot) == AOT_DRM_AAC)
+
+#define IS_USAC(aot) \
+  ((aot) == AOT_USAC)
+
+#define IS_LOWDELAY(aot) \
+  ((aot) == AOT_ER_AAC_LD \
+|| (aot) == AOT_ER_AAC_ELD)
+
 /** Channel Mode ( 1-7 equals MPEG channel configurations, others are arbitrary). */
 typedef enum {
-  MODE_INVALID    = -1,
-  MODE_UNKNOWN    = 0,
-  MODE_1          = 1,           /**< SCE                 */
-  MODE_2          = 2,           /**< CPE                 */
-  MODE_1_2        = 3,           /**< SCE,CPE             */
-  MODE_1_2_1      = 4,           /**< SCE,CPE,SCE         */
-  MODE_1_2_2      = 5,           /**< SCE,CPE,CPE         */
-  MODE_1_2_2_1    = 6,           /**< SCE,CPE,CPE,LFE     */
-  MODE_1_2_2_2_1  = 7,           /**< SCE,CPE,CPE,CPE,LFE */
+  MODE_INVALID                  = -1,
+  MODE_UNKNOWN                  =  0,
+  MODE_1                        =  1,       /**< C */
+  MODE_2                        =  2,       /**< L+R */
+  MODE_1_2                      =  3,       /**< C, L+R */
+  MODE_1_2_1                    =  4,       /**< C, L+R, Rear */
+  MODE_1_2_2                    =  5,       /**< C, L+R, LS+RS */
+  MODE_1_2_2_1                  =  6,       /**< C, L+R, LS+RS, LFE */
+  MODE_1_2_2_2_1                =  7,       /**< C, LC+RC, L+R, LS+RS, LFE */
 
-  MODE_1_1                      = 16,          /**< 2 SCEs (dual mono) */
-  MODE_1_1_1_1                  = 17,          /**< 4 SCEs */
-  MODE_1_1_1_1_1_1              = 18,          /**< 6 SCEs */
-  MODE_1_1_1_1_1_1_1_1          = 19,          /**< 8 SCEs */
-  MODE_1_1_1_1_1_1_1_1_1_1_1_1  = 20,          /**< 12 SCEs */
 
-  MODE_2_2                      = 21,          /**< 2 CPEs */
-  MODE_2_2_2                    = 22,          /**< 3 CPEs */
-  MODE_2_2_2_2                  = 23,          /**< 4 CPEs */
-  MODE_2_2_2_2_2_2              = 24,          /**< 6 CPEs */
+  MODE_1_1                      = 16,       /**< 2 SCEs (dual mono) */
+  MODE_1_1_1_1                  = 17,       /**< 4 SCEs */
+  MODE_1_1_1_1_1_1              = 18,       /**< 6 SCEs */
+  MODE_1_1_1_1_1_1_1_1          = 19,       /**< 8 SCEs */
+  MODE_1_1_1_1_1_1_1_1_1_1_1_1  = 20,       /**< 12 SCEs */
 
-  MODE_2_1                      = 30           /**< CPE,SCE (ARIB standard) */
+  MODE_2_2                      = 21,       /**< 2 CPEs */
+  MODE_2_2_2                    = 22,       /**< 3 CPEs */
+  MODE_2_2_2_2                  = 23,       /**< 4 CPEs */
+  MODE_2_2_2_2_2_2              = 24,       /**< 6 CPEs */
+
+  MODE_2_1                      = 30,       /**< CPE,SCE (ARIB standard B32) */
+
+  MODE_7_1_REAR_SURROUND        = 33,       /**< C, L+R, LS+RS, Lrear+Rrear, LFE */
+  MODE_7_1_FRONT_CENTER         = 34        /**< C, LC+RC, L+R, LS+RS, LFE */
 
 } CHANNEL_MODE;
 
-/** Speaker description tags */
+/**
+ * Speaker description tags.
+ * Do not change the enumeration values unless it keeps the following segmentation:
+ * - Bit 0-3: Horizontal postion (0: none, 1: front, 2: side, 3: back, 4: lfe)
+ * - Bit 4-7: Vertical position (0: normal, 1: top, 2: bottom)
+ */
 typedef enum {
-  ACT_NONE,
-  ACT_FRONT,
-  ACT_SIDE,
-  ACT_BACK,
-  ACT_LFE,
-  ACT_FRONT_TOP,
-  ACT_SIDE_TOP,
-  ACT_BACK_TOP,
-  ACT_TOP /* Ts */
+  ACT_NONE         = 0x00,
+  ACT_FRONT        = 0x01,  /*!< Front speaker position (at normal height) */
+  ACT_SIDE         = 0x02,  /*!< Side speaker position (at normal height) */
+  ACT_BACK         = 0x03,  /*!< Back speaker position (at normal height) */
+  ACT_LFE          = 0x04,  /*!< Low frequency effect speaker postion (front) */
+
+  ACT_TOP          = 0x10,  /*!< Top speaker area (for combination with speaker positions) */
+  ACT_FRONT_TOP    = 0x11,  /*!< Top front speaker = (ACT_FRONT|ACT_TOP) */
+  ACT_SIDE_TOP     = 0x12,  /*!< Top side speaker  = (ACT_SIDE |ACT_TOP) */
+  ACT_BACK_TOP     = 0x13,  /*!< Top back speaker  = (ACT_BACK |ACT_TOP) */
+
+  ACT_BOTTOM       = 0x20,  /*!< Bottom speaker area (for combination with speaker positions) */
+  ACT_FRONT_BOTTOM = 0x21,  /*!< Bottom front speaker = (ACT_FRONT|ACT_BOTTOM) */
+  ACT_SIDE_BOTTOM  = 0x22,  /*!< Bottom side speaker  = (ACT_SIDE |ACT_BOTTOM) */
+  ACT_BACK_BOTTOM  = 0x23   /*!< Bottom back speaker  = (ACT_BACK |ACT_BOTTOM) */
+
 } AUDIO_CHANNEL_TYPE;
+
+typedef enum
+{
+  SIG_UNKNOWN                 = -1,
+  SIG_IMPLICIT                =  0,
+  SIG_EXPLICIT_BW_COMPATIBLE  =  1,
+  SIG_EXPLICIT_HIERARCHICAL   =  2
+
+} SBR_PS_SIGNALING;
 
 /**
  * Audio Codec flags.
@@ -328,6 +345,10 @@ typedef struct {
 
   UCHAR      stereoConfigIndex; /**< USAC MPS stereo mode */
   UCHAR      sbrMode;           /**< USAC SBR mode */
+  SBR_PS_SIGNALING sbrSignaling;/**< 0: implicit signaling, 1: backwards compatible explicit signaling, 2: hierarcical explicit signaling */
+
+  UCHAR      sbrPresent;
+  UCHAR      psPresent;
 } CODER_CONFIG;
 
 /** MP4 Element IDs. */
