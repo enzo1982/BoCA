@@ -105,9 +105,17 @@ Bool BoCA::EncoderFDKAAC::Activate()
 {
 	const Format	&format = track.GetFormat();
 
-	if (format.channels > 6)
+	if (format.channels == 7)
 	{
-		errorString = "This encoder does not support more than 6 channels!";
+		errorString = "This encoder does not support 7 channel mode!";
+		errorState  = True;
+
+		return False;
+	}
+
+	if (format.channels > 8)
+	{
+		errorString = "This encoder does not support more than 8 channels!";
 		errorState  = True;
 
 		return False;
@@ -125,9 +133,22 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	ex_aacEncOpen(&handle, 0x07, format.channels);
 
+	Int	 channelMode = MODE_UNKNOWN;
+
+	switch (format.channels)
+	{
+		case 1: channelMode = MODE_1;	      break;
+		case 2: channelMode = MODE_2;	      break;
+		case 3: channelMode = MODE_1_2;	      break;
+		case 4: channelMode = MODE_1_2_1;     break;
+		case 5: channelMode = MODE_1_2_2;     break;
+		case 6: channelMode = MODE_1_2_2_1;   break;
+		case 8: channelMode = MODE_1_2_2_2_1; break;
+	}
+
 	ex_aacEncoder_SetParam(handle, AACENC_SAMPLERATE, format.rate);
-	ex_aacEncoder_SetParam(handle, AACENC_CHANNELMODE, format.channels);
-	ex_aacEncoder_SetParam(handle, AACENC_CHANNELORDER, 1);
+	ex_aacEncoder_SetParam(handle, AACENC_CHANNELMODE, channelMode);
+	ex_aacEncoder_SetParam(handle, AACENC_CHANNELORDER, 1 /* WAVE channel order */);
 
 	ex_aacEncoder_SetParam(handle, AACENC_AOT, config->GetIntValue("FDKAAC", "MPEGVersion", 0) + config->GetIntValue("FDKAAC", "AACType", AOT_SBR));
 	ex_aacEncoder_SetParam(handle, AACENC_BITRATE, config->GetIntValue("FDKAAC", "Bitrate", 96) * 1000);
