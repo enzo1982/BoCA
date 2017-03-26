@@ -199,7 +199,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 				{
 					/* Read value as string.
 					 */
-					char	 value[items->elements[0].dataList.elements[0].valueSize + 1];
+					Buffer<char>	 value(items->elements[0].dataList.elements[0].valueSize + 1);
 
 					memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
 					memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
@@ -437,7 +437,7 @@ Bool BoCA::DecoderFAAD2::Activate()
 			{
 				/* Read value as string.
 				 */
-				char	 value[items->elements[0].dataList.elements[0].valueSize + 1];
+				Buffer<char>	 value(items->elements[0].dataList.elements[0].valueSize + 1);
 
 				memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
 				memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
