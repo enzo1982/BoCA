@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -53,6 +53,7 @@ typedef MP4Duration			(*MP4GETTRACKDURATION)			(MP4FileHandle, MP4TrackId);
 typedef uint32_t			(*MP4GETTRACKTIMESCALE)			(MP4FileHandle, MP4TrackId);
 typedef MP4Timestamp			(*MP4GETSAMPLETIME)			(MP4FileHandle, MP4TrackId, MP4SampleId);
 typedef MP4SampleId			(*MP4GETSAMPLEIDFROMTIME)		(MP4FileHandle, MP4TrackId, MP4Timestamp, bool);
+typedef uint32_t			(*MP4GETSAMPLESIZE)			(MP4FileHandle, MP4TrackId, MP4SampleId);
 typedef bool				(*MP4READSAMPLE)			(MP4FileHandle, MP4TrackId, MP4SampleId, uint8_t **, uint32_t *, MP4Timestamp *, MP4Duration *, MP4Duration *, bool *);
 typedef MP4ItmfItemList *		(*MP4ITMFGETITEMSBYMEANING)		(MP4FileHandle, const char *, const char *);
 typedef void				(*MP4ITMFITEMLISTFREE)			(MP4ItmfItemList *);
@@ -69,6 +70,7 @@ extern MP4GETTRACKDURATION		 ex_MP4GetTrackDuration;
 extern MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale;
 extern MP4GETSAMPLETIME			 ex_MP4GetSampleTime;
 extern MP4GETSAMPLEIDFROMTIME		 ex_MP4GetSampleIdFromTime;
+extern MP4GETSAMPLESIZE			 ex_MP4GetSampleSize;
 extern MP4READSAMPLE			 ex_MP4ReadSample;
 extern MP4ITMFGETITEMSBYMEANING		 ex_MP4ItmfGetItemsByMeaning;
 extern MP4ITMFITEMLISTFREE		 ex_MP4ItmfItemListFree;

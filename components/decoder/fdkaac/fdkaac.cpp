@@ -168,14 +168,23 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (uint8_t **) &escBuffer, (uint32_t *) &escBufferSize);
 
-			ex_aacDecoder_ConfigRaw(handle, &escBuffer, &escBufferSize);
+			/* The FDK bitstream reader reads up to 4 bytes behind the buffer,
+			 * so allocate a larger buffer to prevent access violations.
+			 */
+			unsigned char	*escBuffer2 = new unsigned char [escBufferSize + 4];
+
+			memcpy(escBuffer2, escBuffer, escBufferSize);
+
+			ex_aacDecoder_ConfigRaw(handle, &escBuffer2, &escBufferSize);
+
+			delete [] escBuffer2;
 
 			ex_MP4Free(escBuffer);
 
 			/* Decode one frame to initialize decoder.
 			 */
-			unsigned char	*buffer	    = NIL;
-			unsigned int	 bufferSize = 0;
+			unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, 1);
+			unsigned char	*buffer	    = new unsigned char [bufferSize + 4];
 
 			ex_MP4ReadSample(mp4File, mp4Track, 1, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL);
 
@@ -183,7 +192,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_aacDecoder_Fill(handle, &buffer, &bufferSize, &bytesValid);
 
-			short	*outputBuffer = new short [16384];
+			short		*outputBuffer = new short [16384];
 
 			if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, 16384, 0) != AAC_DEC_OK)
 			{
@@ -192,8 +201,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 			}
 
 			delete [] outputBuffer;
-
-			ex_MP4Free(buffer);
+			delete [] buffer;
 
 			/* Get sample rate and number of channels.
 			 */
@@ -439,7 +447,16 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 		ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (uint8_t **) &escBuffer, (uint32_t *) &escBufferSize);
 
-		ex_aacDecoder_ConfigRaw(handle, &escBuffer, &escBufferSize);
+		/* The FDK bitstream reader reads up to 4 bytes behind the buffer,
+		 * so allocate a larger buffer to prevent access violations.
+		 */
+		unsigned char	*escBuffer2 = new unsigned char [escBufferSize + 4];
+
+		memcpy(escBuffer2, escBuffer, escBufferSize);
+
+		ex_aacDecoder_ConfigRaw(handle, &escBuffer2, &escBufferSize);
+
+		delete [] escBuffer2;
 
 		ex_MP4Free(escBuffer);
 
@@ -535,8 +552,11 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
-		unsigned char	*buffer	    = NIL;
-		unsigned int	 bufferSize = 0;
+		unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
+
+		dataBuffer.Resize(bufferSize + 4); // + 4 to account for FDK bitstream implementation overreading.
+
+		unsigned char	*buffer	    = dataBuffer;
 
 		if (ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL))
 		{
@@ -586,8 +606,6 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 				samplesRead += frameSize;
 			}
-
-			ex_MP4Free(buffer);
 		}
 		else
 		{
@@ -603,7 +621,7 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 	}
 	else
 	{
-		dataBuffer.Resize(data.Size());
+		dataBuffer.Resize(data.Size() + 4); // + 4 to account for FDK bitstream implementation overreading.
 
 		Int	 size = driver->ReadData(dataBuffer, data.Size());
 
