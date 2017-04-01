@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -192,9 +192,11 @@ namespace smooth
 			{
 				if (slotsN == NIL) return Error();
 
+				SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	 slot(proc, inst);
+
 				for (Int i = slotsN->Length() - 1; i >= 0; i--)
 				{
-					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst))
+					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == slot)
 					{
 						RemoveNthN(i);
 
@@ -209,9 +211,11 @@ namespace smooth
 			{
 				if (slotsN == NIL) return Error();
 
+				SIGNALS_SLOT_GLOBAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	 slot(proc);
+
 				for (Int i = slotsN->Length() - 1; i >= 0; i--)
 				{
-					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc))
+					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == slot)
 					{
 						RemoveNthN(i);
 
@@ -226,9 +230,11 @@ namespace smooth
 			{
 				if (slotsN == NIL) return Error();
 
+				SIGNALS_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	 slot(sig);
+
 				for (Int i = slotsN->Length() - 1; i >= 0; i--)
 				{
-					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig))
+					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN->GetNth(i))) == slot)
 					{
 						RemoveNthN(i);
 
@@ -244,9 +250,11 @@ namespace smooth
 			{
 				if (slots0 == NIL) return Error();
 
+				SlotClass0<oClassTYPE, slotReturnTYPE>	 slot(proc, inst);
+
 				for (Int i = slots0->Length() - 1; i >= 0; i--)
 				{
-					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == SlotClass0<oClassTYPE, slotReturnTYPE>(proc, inst))
+					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == slot)
 					{
 						RemoveNth0(i);
 
@@ -261,9 +269,11 @@ namespace smooth
 			{
 				if (slots0 == NIL) return Error();
 
+				SlotGlobal0<slotReturnTYPE>	 slot(proc);
+
 				for (Int i = slots0->Length() - 1; i >= 0; i--)
 				{
-					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == SlotGlobal0<slotReturnTYPE>(proc))
+					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == slot)
 					{
 						RemoveNth0(i);
 
@@ -278,9 +288,11 @@ namespace smooth
 			{
 				if (slots0 == NIL) return Error();
 
+				SlotSignal0<slotReturnTYPE>	 slot(sig);
+
 				for (Int i = slots0->Length() - 1; i >= 0; i--)
 				{
-					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == SlotSignal0<slotReturnTYPE>(sig))
+					if ((*((SlotBase0<Void> *) slots0->GetNth(i))) == slot)
 					{
 						RemoveNth0(i);
 
