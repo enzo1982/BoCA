@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -35,6 +35,7 @@ MP4GETTRACKDURATION		 ex_MP4GetTrackDuration			= NIL;
 MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale		= NIL;
 MP4GETSAMPLETIME		 ex_MP4GetSampleTime			= NIL;
 MP4GETSAMPLEIDFROMTIME		 ex_MP4GetSampleIdFromTime		= NIL;
+MP4GETSAMPLESIZE		 ex_MP4GetSampleSize			= NIL;
 MP4READSAMPLE			 ex_MP4ReadSample			= NIL;
 MP4ITMFGETITEMSBYMEANING	 ex_MP4ItmfGetItemsByMeaning		= NIL;
 MP4ITMFITEMLISTFREE		 ex_MP4ItmfItemListFree			= NIL;
@@ -100,6 +101,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4GetTrackTimeScale		= (MP4GETTRACKTIMESCALE) mp4v2dll->GetFunctionAddress("MP4GetTrackTimeScale");
 	ex_MP4GetSampleTime		= (MP4GETSAMPLETIME) mp4v2dll->GetFunctionAddress("MP4GetSampleTime");
 	ex_MP4GetSampleIdFromTime	= (MP4GETSAMPLEIDFROMTIME) mp4v2dll->GetFunctionAddress("MP4GetSampleIdFromTime");
+	ex_MP4GetSampleSize		= (MP4GETSAMPLESIZE) mp4v2dll->GetFunctionAddress("MP4GetSampleSize");
 	ex_MP4ReadSample		= (MP4READSAMPLE) mp4v2dll->GetFunctionAddress("MP4ReadSample");
 	ex_MP4ItmfGetItemsByMeaning	= (MP4ITMFGETITEMSBYMEANING) mp4v2dll->GetFunctionAddress("MP4ItmfGetItemsByMeaning");
 	ex_MP4ItmfItemListFree		= (MP4ITMFITEMLISTFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemListFree");
@@ -116,6 +118,7 @@ Bool LoadMP4v2DLL()
 	    ex_MP4GetTrackTimeScale		== NIL ||
 	    ex_MP4GetSampleTime			== NIL ||
 	    ex_MP4GetSampleIdFromTime		== NIL ||
+	    ex_MP4GetSampleSize			== NIL ||
 	    ex_MP4ReadSample			== NIL ||
 	    ex_MP4ItmfGetItemsByMeaning		== NIL ||
 	    ex_MP4ItmfItemListFree		== NIL) { FreeMP4v2DLL(); return False; }

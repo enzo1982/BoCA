@@ -520,8 +520,11 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 
 	if (!track.origFilename.ToLower().EndsWith(".aac"))
 	{
-		unsigned char	*buffer	    = NIL;
-		unsigned long	 bufferSize = 0;
+		unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
+
+		dataBuffer.Resize(bufferSize);
+
+		unsigned char	*buffer	    = dataBuffer;
 
 		if (!ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL)) return -1;
 
@@ -557,8 +560,6 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 
 			samplesRead += frameInfo.samples / format.channels;
 		}
-
-		ex_MP4Free(buffer);
 	}
 	else
 	{
