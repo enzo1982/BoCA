@@ -17,9 +17,6 @@
 #	endif
 #endif
 
-#include <wchar.h>
-#include <memory.h>
-
 #if defined __WIN32__
 #	include "definitions.win32.h"
 #else
