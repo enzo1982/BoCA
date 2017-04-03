@@ -99,7 +99,7 @@ Bool BoCA::DecoderFAAD2::CanOpenStream(const String &streamURI)
 
 		Int	 mp4Track = GetAudioTrack(mp4File);
 
-		if (mp4Track >= 0)
+		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
 			Int	 type = ex_MP4GetTrackAudioMpeg4Type(mp4File, mp4Track);
 
@@ -159,7 +159,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 		Int	 mp4Track = GetAudioTrack(mp4File);
 
-		if (mp4Track >= 0)
+		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
 			NeAACDecHandle			 handle	 = ex_NeAACDecOpen();
 			NeAACDecConfigurationPtr	 fConfig = ex_NeAACDecGetCurrentConfiguration(handle);

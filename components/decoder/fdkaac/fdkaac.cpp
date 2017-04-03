@@ -100,7 +100,7 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 
 		Int	 mp4Track = GetAudioTrack(mp4File);
 
-		if (mp4Track >= 0)
+		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
 			Int	 type = ex_MP4GetTrackAudioMpeg4Type(mp4File, mp4Track);
 
@@ -157,7 +157,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 		Int	 mp4Track = GetAudioTrack(mp4File);
 
-		if (mp4Track >= 0)
+		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
 			HANDLE_AACDECODER	 handle = ex_aacDecoder_Open(TT_MP4_RAW, 1);
 
