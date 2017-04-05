@@ -65,7 +65,7 @@ Bool BoCA::OutputDirectSound::Activate()
 	/* Set helper variables.
 	 */
 	firstBlock = True;
-	bufferSize = format.rate * format.channels * (format.bits / 8) / 4;
+	bufferSize = format.rate * format.channels * (format.bits / 8) / 2;
 
 	/* Init wave format descriptor.
 	 */
@@ -231,11 +231,22 @@ Bool BoCA::OutputDirectSound::Finish()
 
 Int BoCA::OutputDirectSound::CanWrite()
 {
-	return bufferSize;
+	if (workBuffer == NIL) return 0;
+
+	if (firstBlock) return bufferSize;
+
+	DWORD	 playCursor = 0;
+
+	workBuffer->GetCurrentPosition(&playCursor, NIL);
+
+	if (playCursor >= bufferPos) return playCursor - bufferPos;
+	else			     return playCursor - bufferPos + bufferSize;
 }
 
 Int BoCA::OutputDirectSound::SetPause(Bool pause)
 {
+	if (workBuffer == NIL) return Error();
+
 	if (pause) workBuffer->Stop();
 	else	   workBuffer->Play(0, 0, DSBPLAY_LOOPING);
 
