@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -67,6 +67,8 @@ namespace BoCA
 		accessors:
 			const String				&GetName() const	{ return name; }
 			String					 GetProtocolText() const;
+
+			const Array<String>			&GetMessages() const	{ return messages; }
 
 			const Array<String>			&GetWarnings() const	{ return warnings; }
 			const Array<String>			&GetErrors() const	{ return errors; }
