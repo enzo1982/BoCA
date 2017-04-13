@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -36,12 +36,14 @@ Int BoCA::LengthDisplay::Paint(Int message)
 				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 				surface->Frame(frame, FRAME_DOWN);
 
-				if (bitmap != NIL)
-				{
-					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), Rect(frame.GetPosition() + Point(2, 2) * surface->GetSurfaceDPI() / 96.0, bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0));
-				}
+				Size	 scaledBitmapSize = bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0;
+				Int	 bitmapOffset	  = bitmap != NIL ? (frame.GetHeight() - scaledBitmapSize.cy) / 2.0 : 2;
 
-				surface->SetText(text, frame + Point(5 + bitmap.GetSize().cx, 2) * surface->GetSurfaceDPI() / 96.0 - Point(2, 2), font);
+				if (bitmap != NIL) surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), Rect(frame.GetPosition() + Point(bitmapOffset, bitmapOffset), scaledBitmapSize));
+
+				Int	 textOffset	  = Math::Round((frame.GetHeight() - scaledTextSize.cy) / 2.0);
+
+				surface->SetText(text, frame + Point(scaledBitmapSize.cx + 2 * bitmapOffset - 1, textOffset - 1), font);
 			}
 
 			break;
