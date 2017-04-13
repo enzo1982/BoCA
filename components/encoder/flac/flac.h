@@ -25,31 +25,31 @@ namespace BoCA
 		friend FLAC__StreamEncoderTellStatus	 FLACStreamEncoderTellCallback(const FLAC__StreamEncoder *, FLAC__uint64 *, void *);
 
 		private:
-			ConfigLayer			*configLayer;
+			ConfigLayer				*configLayer;
 
-			FLAC__StreamEncoder		*encoder;
+			FLAC__StreamEncoder			*encoder;
 
-			Array<FLAC__StreamMetadata *>	 metadata;
+			Array<FLAC__StreamMetadata *, Void *>	 metadata;
 
-			Buffer<FLAC__int32>		 buffer;
-			Int				 bytesWritten;
+			Buffer<FLAC__int32>			 buffer;
+			Int					 bytesWritten;
 
-			Bool				 FixChapterMarks();
+			Bool					 FixChapterMarks();
 		public:
-			static const String		&GetComponentSpecs();
+			static const String			&GetComponentSpecs();
 
-							 EncoderFLAC();
-							~EncoderFLAC();
+								 EncoderFLAC();
+								~EncoderFLAC();
 
-			Bool				 Activate();
-			Bool				 Deactivate();
+			Bool					 Activate();
+			Bool					 Deactivate();
 
-			Int				 WriteData(Buffer<UnsignedByte> &);
+			Int					 WriteData(Buffer<UnsignedByte> &);
 
-			Bool				 SetOutputFormat(Int);
-			String				 GetOutputFileExtension() const;
+			Bool					 SetOutputFormat(Int);
+			String					 GetOutputFileExtension() const;
 
-			ConfigLayer			*GetConfigurationLayer();
+			ConfigLayer				*GetConfigurationLayer();
 	};
 };
 

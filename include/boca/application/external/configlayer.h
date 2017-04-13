@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -23,28 +23,28 @@ namespace BoCA
 		class ConfigLayerExternal : public ConfigLayer
 		{
 			protected:
-				ComponentSpecs		*specs;
+				ComponentSpecs			*specs;
 
-				Text			*text_parameters;
-				ListBox			*list_parameters;
+				Text				*text_parameters;
+				ListBox				*list_parameters;
 
-				Text			*text_commandline;
-				EditBox			*edit_commandline;
+				Text				*text_commandline;
+				EditBox				*edit_commandline;
 
-				Array<GroupBox *>	 groups_parameters;
-				Array<Widget *>		 widgets_parameters;
+				Array<GroupBox *, Void *>	 groups_parameters;
+				Array<Widget *, Void *>		 widgets_parameters;
 
-				GroupBox		*GetParameterGroupBox(const String &);
-				String			 GetArgumentsString();
+				GroupBox			*GetParameterGroupBox(const String &);
+				String				 GetArgumentsString();
 			public:
-							 ConfigLayerExternal(ComponentSpecs *);
-				virtual			~ConfigLayerExternal();
+								 ConfigLayerExternal(ComponentSpecs *);
+				virtual				~ConfigLayerExternal();
 
-				virtual Int		 SaveSettings();
+				virtual Int			 SaveSettings();
 			slots:
-				Void			 OnSelectParameter(ListEntry *);
-				Void			 OnUpdateParameterValue();
-				Void			 OnSliderValueChange();
+				Void				 OnSelectParameter(ListEntry *);
+				Void				 OnUpdateParameterValue();
+				Void				 OnSliderValueChange();
 		};
 	};
 };

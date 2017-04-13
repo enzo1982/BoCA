@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -19,57 +19,57 @@ namespace BoCA
 	class EncoderMultiEncoderHub : public CS::EncoderComponent
 	{
 		private:
-			ConfigLayer			*configLayer;
+			ConfigLayer				*configLayer;
 
-			static Config			*configuration;
+			static Config				*configuration;
 
-			static Array<Track>		 tracksToConvert;
-			static Array<Track>		 convertedTracks;
+			static Array<Track>			 tracksToConvert;
+			static Array<Track>			 convertedTracks;
 
-			static Track			 playlistTrack;
+			static Track				 playlistTrack;
 
-			Array<IO::OutStream *>		 streams;
-			Array<AS::EncoderComponent *>	 encoders;
+			Array<IO::OutStream *, Void *>		 streams;
+			Array<AS::EncoderComponent *, Void *>	 encoders;
 
-			Array<Threads::Mutex *>		 mutexes;
-			Array<Buffer<UnsignedByte> *>	 buffers;
-			Array<Threads::Thread *>	 threads;
+			Array<Threads::Mutex *, Void *>		 mutexes;
+			Array<Buffer<UnsignedByte> *, Void *>	 buffers;
+			Array<Threads::Thread *, Void *>	 threads;
 
-			Int64				 trackLength;
-			Int64				 totalLength;
+			Int64					 trackLength;
+			Int64					 totalLength;
 
-			Bool				 finished;
-			Bool				 cancelled;
+			Bool					 finished;
+			Bool					 cancelled;
 
-			static String			 GetFileNamePattern(const Track &);
-			static String			 GetPlaylistFileName(const Track &);
+			static String				 GetFileNamePattern(const Track &);
+			static String				 GetPlaylistFileName(const Track &);
 
-			Void				 EncodeThread(Int);
+			Void					 EncodeThread(Int);
 		public:
-			static const String		&GetComponentSpecs();
+			static const String			&GetComponentSpecs();
 
-							 EncoderMultiEncoderHub();
-							~EncoderMultiEncoderHub();
+								 EncoderMultiEncoderHub();
+								~EncoderMultiEncoderHub();
 
-			Bool				 IsThreadSafe() const;
+			Bool					 IsThreadSafe() const;
 
-			Bool				 IsLossless() const;
+			Bool					 IsLossless() const;
 
-			Bool				 Activate();
-			Bool				 Deactivate();
+			Bool					 Activate();
+			Bool					 Deactivate();
 
-			Int				 WriteData(Buffer<UnsignedByte> &);
+			Int					 WriteData(Buffer<UnsignedByte> &);
 
-			String				 GetOutputFileExtension() const;
+			String					 GetOutputFileExtension() const;
 
-			ConfigLayer			*GetConfigurationLayer();
+			ConfigLayer				*GetConfigurationLayer();
 		slots:
-			static Void			 OnStartConversion(const Array<Track> &);
-			static Void			 OnFinishConversion();
-			static Void			 OnCancelConversion();
+			static Void				 OnStartConversion(const Array<Track> &);
+			static Void				 OnFinishConversion();
+			static Void				 OnCancelConversion();
 
-			Void				 OnFinishTrackConversion(const Track &);
-			Void				 OnCancelTrackConversion(const Track &);
+			Void					 OnFinishTrackConversion(const Track &);
+			Void					 OnCancelTrackConversion(const Track &);
 	};
 };
 

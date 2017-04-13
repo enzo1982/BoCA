@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,8 +12,8 @@
 
 #include "dllinterface.h"
 
-Array<DynamicLoader *>	 winamp_out_plugins;
-Array<Out_Module *>	 winamp_out_modules;
+Array<DynamicLoader *, Void *>	 winamp_out_plugins;
+Array<Out_Module *, Void *>	 winamp_out_modules;
 
 Bool LoadWinampDLLs()
 {

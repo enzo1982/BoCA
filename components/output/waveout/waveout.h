@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,43 +22,43 @@ namespace BoCA
 	class OutputWaveOut : public CS::OutputComponent
 	{
 		private:
-			HWAVEOUT		 hWaveOut;
-			Array<WAVEHDR *>	 headers;
+			HWAVEOUT			 hWaveOut;
+			Array<WAVEHDR *, Void *>	 headers;
 
-			Thread			*thread;
-			Bool			 stop;
+			Thread				*thread;
+			Bool				 stop;
 
-			CRITICAL_SECTION	 sync;
+			CRITICAL_SECTION		 sync;
 
-			HANDLE			 hEvent;
-			char			*buffer;
-			UINT			 buf_size, buf_size_used;
-			UINT			 data_written, write_ptr;
-			UINT			 minblock, maxblock, avgblock;
-			DWORD			 last_time;
-			DWORD			 p_time;
+			HANDLE				 hEvent;
+			char				*buffer;
+			UINT				 buf_size, buf_size_used;
+			UINT				 data_written, write_ptr;
+			UINT				 minblock, maxblock, avgblock;
+			DWORD				 last_time;
+			DWORD				 p_time;
 
-			UINT			 n_playing;
-			Bool			 paused;
-			Bool			 needplay;
-			Bool			 newpause;
+			UINT				 n_playing;
+			Bool				 paused;
+			Bool				 needplay;
+			Bool				 newpause;
 
-			Void			 WorkerThread();
+			Void				 WorkerThread();
 		public:
-			static const String	&GetComponentSpecs();
+			static const String		&GetComponentSpecs();
 
-						 OutputWaveOut();
-						~OutputWaveOut();
+							 OutputWaveOut();
+							~OutputWaveOut();
 
-			Bool			 Activate();
-			Bool			 Deactivate();
+			Bool				 Activate();
+			Bool				 Deactivate();
 
-			Int			 WriteData(Buffer<UnsignedByte> &);
+			Int				 WriteData(Buffer<UnsignedByte> &);
 
-			Int			 CanWrite();
+			Int				 CanWrite();
 
-			Int			 SetPause(Bool);
-			Bool			 IsPlaying();
+			Int				 SetPause(Bool);
+			Bool				 IsPlaying();
 	};
 };
 

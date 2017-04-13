@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,7 +12,7 @@
 
 #include <boca/common/protocol.h>
 
-Array<BoCA::Protocol *>	 BoCA::Protocol::protocols;
+Array<BoCA::Protocol *>		 BoCA::Protocol::protocols;
 
 Signal0<Void>			 BoCA::Protocol::onUpdateProtocolList;
 Signal1<Void, const String &>	 BoCA::Protocol::onUpdateProtocol;

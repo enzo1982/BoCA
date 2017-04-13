@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,61 +28,61 @@ namespace BoCA
 		private:
 			/* Singleton class, therefore private constructor/destructor
 			 */
-			static Config		*instance;
-			static Array<Config *>	 copies;
+			static Config			*instance;
+			static Array<Config *, Void *>	 copies;
 
-						 Config();
-						 Config(const Config &);
-			virtual			~Config();
+							 Config();
+							 Config(const Config &);
+			virtual				~Config();
 
-			Array<String>		 persistentIntIDs;
-			Array<Int *>		 persistentIntValues;
+			Array<String>			 persistentIntIDs;
+			Array<Int *, Void *>		 persistentIntValues;
 
-			Bool			 saveSettingsOnExit;
+			Bool				 saveSettingsOnExit;
 
-			Int			 FindPersistentIntValueIndex(const String &, const String &) const;
+			Int				 FindPersistentIntValueIndex(const String &, const String &) const;
 		protected:
-			Configuration		*config;
+			Configuration			*config;
 		public:
-			String			 configDir;
+			String				 configDir;
 
-			Bool			 enable_console;
+			Bool				 enable_console;
 
-			Int			 SetIntValue(const String &, const String &, Int);
-			Int			 SetStringValue(const String &, const String &, const String &);
+			Int				 SetIntValue(const String &, const String &, Int);
+			Int				 SetStringValue(const String &, const String &, const String &);
 
-			Int			 GetIntValue(const String &, const String &, Int = 0) const;
-			String			 GetStringValue(const String &, const String &, const String & = NIL) const;
+			Int				 GetIntValue(const String &, const String &, Int = 0) const;
+			String				 GetStringValue(const String &, const String &, const String & = NIL) const;
 
-			Int			&GetPersistentIntValue(const String &, const String &, Int = 0);
+			Int				&GetPersistentIntValue(const String &, const String &, Int = 0);
 
-			Bool			 LoadSettings();
-			Bool			 SaveSettings();
+			Bool				 LoadSettings();
+			Bool				 SaveSettings();
 
-			Int			 AddConfiguration(const String &);
-			Int			 RemoveConfiguration(const String &);
+			Int				 AddConfiguration(const String &);
+			Int				 RemoveConfiguration(const String &);
 
-			Int			 GetNOfConfigurations() const;
-			String			 GetNthConfigurationName(Int) const;
+			Int				 GetNOfConfigurations() const;
+			String				 GetNthConfigurationName(Int) const;
 
-			Int			 SetActiveConfiguration(const String &);
+			Int				 SetActiveConfiguration(const String &);
 
-			String			 GetConfigurationName() const;
-			Int			 SetConfigurationName(const String &);
+			String				 GetConfigurationName() const;
+			Int				 SetConfigurationName(const String &);
 
-			Void			 SetSaveSettingsOnExit(Bool);
+			Void				 SetSaveSettingsOnExit(Bool);
 
 			/* Returns a new or existing instance of Config
 			 */
-			static Config		*Get();
+			static Config			*Get();
 
 			/* Returns a static copy of a Config instance
 			 */
-			static Config		*Copy(const Config * = NIL);
+			static Config			*Copy(const Config * = NIL);
 
 			/* Destroys an existing instance of Config
 			 */
-			static Void		 Free(Config * = NIL);
+			static Void			 Free(Config * = NIL);
 	};
 };
 
