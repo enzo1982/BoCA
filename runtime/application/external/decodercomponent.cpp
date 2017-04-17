@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -110,6 +110,10 @@ Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track
 					boca.DeleteComponent(tagger);
 				}
 			}
+
+			/* Set lossless flag for chapters.
+			 */
+			foreach (Track &chapter, track.tracks) chapter.lossless = track.lossless;
 
 			break;
 		}

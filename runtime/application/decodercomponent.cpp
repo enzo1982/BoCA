@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -46,7 +46,13 @@ Error BoCA::AS::DecoderComponent::GetStreamInfo(const String &streamURI, Track &
 
 	track.lossless	   = specs->formats.GetFirst()->IsLossless();
 
-	return specs->func_GetStreamInfo(component, streamURI, &track);
+	if (specs->func_GetStreamInfo(component, streamURI, &track) != Success()) return Error();
+
+	/* Set lossless flag for chapters.
+	 */
+	foreach (Track &chapter, track.tracks) chapter.lossless = track.lossless;
+
+	return Success();
 }
 
 Bool BoCA::AS::DecoderComponent::Activate()
