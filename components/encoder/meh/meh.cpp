@@ -326,13 +326,23 @@ Int BoCA::EncoderMultiEncoderHub::WriteData(Buffer<UnsignedByte> &data)
 			Threads::Mutex		*mutex	= mutexes.GetNth(i);
 			Buffer<UnsignedByte>	*buffer = buffers.GetNth(i);
 
-			mutex->Lock();
+			Bool	 done = False;
 
-			buffer->Resize(data.Size());
+			while (!done)
+			{
+				mutex->Lock();
 
-			memcpy(*buffer, data, data.Size());
+				if (buffer->Size() == 0)
+				{
+					buffer->Resize(data.Size());
 
-			mutex->Release();
+					memcpy(*buffer, data, data.Size());
+
+					done = True;
+				}
+
+				mutex->Release();
+			}
 		}
 	}
 
@@ -430,13 +440,14 @@ Void BoCA::EncoderMultiEncoderHub::EncodeThread(Int n)
 
 	while (!finished)
 	{
-		while (buffer->Size() == 0 && !finished) S::System::System::Sleep(0);
-
 		mutex->Lock();
 
-		stream->OutputData(*buffer, buffer->Size());
+		if (buffer->Size() > 0)
+		{
+			stream->OutputData(*buffer, buffer->Size());
 
-		buffer->Resize(0);
+			buffer->Resize(0);
+		}
 
 		mutex->Release();
 	}
