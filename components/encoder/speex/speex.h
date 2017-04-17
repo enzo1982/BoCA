@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -38,7 +38,7 @@ namespace BoCA
 			Buffer<unsigned char>	 dataBuffer;
 			Buffer<spx_int16_t>	 samplesBuffer;
 
-			Int			 EncodeFrames(Buffer<signed short> &, Buffer<unsigned char> &, Bool);
+			Int			 EncodeFrames(Bool);
 			Bool			 FixChapterMarks();
 
 			Int			 WriteOggPackets(Bool);

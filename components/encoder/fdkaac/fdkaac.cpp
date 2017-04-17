@@ -221,7 +221,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 	/* Output remaining samples to encoder.
 	 */
-	EncodeFrames(samplesBuffer, outBuffer, True);
+	EncodeFrames(True);
 
 	ex_aacEncClose(&handle);
 
@@ -381,10 +381,10 @@ Int BoCA::EncoderFDKAAC::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Output samples to encoder.
 	 */
-	return EncodeFrames(samplesBuffer, outBuffer, False);
+	return EncodeFrames(False);
 }
 
-Int BoCA::EncoderFDKAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<unsigned char> &outBuffer, Bool flush)
+Int BoCA::EncoderFDKAAC::EncodeFrames(Bool flush)
 {
 	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();

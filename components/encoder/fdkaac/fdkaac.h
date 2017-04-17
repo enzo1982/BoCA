@@ -36,7 +36,7 @@ namespace BoCA
 			Buffer<unsigned char>	 outBuffer;
 			Buffer<int16_t>		 samplesBuffer;
 
-			Int			 EncodeFrames(Buffer<int16_t> &, Buffer<unsigned char> &, Bool);
+			Int			 EncodeFrames(Bool);
 
 			Int			 GetSampleRateIndex(Int) const;
 		public:

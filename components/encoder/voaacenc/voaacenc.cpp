@@ -203,7 +203,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Output remaining samples to encoder.
 	 */
-	EncodeFrames(samplesBuffer, outBuffer, True);
+	EncodeFrames(True);
 
 	api.Uninit(handle);
 
@@ -363,10 +363,10 @@ Int BoCA::EncoderVOAAC::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Output samples to encoder.
 	 */
-	return EncodeFrames(samplesBuffer, outBuffer, False);
+	return EncodeFrames(False);
 }
 
-Int BoCA::EncoderVOAAC::EncodeFrames(Buffer<int16_t> &samplesBuffer, Buffer<unsigned char> &outBuffer, Bool flush)
+Int BoCA::EncoderVOAAC::EncodeFrames(Bool flush)
 {
 	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();

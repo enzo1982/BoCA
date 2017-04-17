@@ -210,7 +210,7 @@ Bool BoCA::EncoderFAAC::Deactivate()
 
 	/* Output remaining samples to encoder.
 	 */
-	EncodeFrames(samplesBuffer, outBuffer, True);
+	EncodeFrames(True);
 
 	ex_faacEncClose(handle);
 
@@ -378,10 +378,10 @@ Int BoCA::EncoderFAAC::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Output samples to encoder.
 	 */
-	return EncodeFrames(samplesBuffer, outBuffer, False);
+	return EncodeFrames(False);
 }
 
-Int BoCA::EncoderFAAC::EncodeFrames(Buffer<int32_t> &samplesBuffer, Buffer<unsigned char> &outBuffer, Bool flush)
+Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 {
 	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();

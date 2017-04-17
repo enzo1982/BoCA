@@ -317,7 +317,7 @@ Bool BoCA::EncoderOpus::Deactivate()
 
 	/* Output remaining samples to encoder.
 	 */
-	EncodeFrames(samplesBuffer, dataBuffer, True);
+	EncodeFrames(True);
 
 	/* Write any remaining Ogg packets.
 	 */
@@ -379,10 +379,10 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Output samples to encoder.
 	 */
-	return EncodeFrames(samplesBuffer, dataBuffer, False);
+	return EncodeFrames(False);
 }
 
-Int BoCA::EncoderOpus::EncodeFrames(Buffer<signed short> &samplesBuffer, Buffer<unsigned char> &dataBuffer, Bool flush)
+Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 {
 	const Format	&format = track.GetFormat();
 
