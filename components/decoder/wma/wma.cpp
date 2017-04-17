@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -329,7 +329,7 @@ Bool BoCA::DecoderWMA::Activate()
 	/* Some streams do not work with a user provided clock.
 	 * Detect this here and try without it in case of an error.
 	 */
-	while (readerCallback->IsActive() && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
+	while (readerCallback->IsActive() && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
 
 	if (!readerCallback->IsActive() && samplesBuffer.Size() <= 0)
 	{
@@ -403,7 +403,7 @@ Int BoCA::DecoderWMA::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (!readerCallback->IsActive() && samplesBuffer.Size() <= 0) return -1;
 
-	while (readerCallback->IsActive() && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
+	while (readerCallback->IsActive() && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
 
 	/* Copy any data from the sample buffer.
 	 */

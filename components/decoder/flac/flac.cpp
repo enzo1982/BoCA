@@ -265,7 +265,7 @@ Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data)
 
 	readDataMutex->Release();
 
-	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
+	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
 
 	readDataMutex->Lock();
 

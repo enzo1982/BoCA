@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -226,7 +226,7 @@ Error BoCA::DecoderWinamp::GetStreamInfo(const String &streamURI, Track &track)
 		 */
 		Int	 start = S::System::System::Clock();
 
-		while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
+		while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
 
 		/* Get track info and stop plugin.
 		 */
@@ -388,7 +388,7 @@ Int BoCA::DecoderWinamp::ReadData(Buffer<UnsignedByte> &data)
 
 	Int	 start = S::System::System::Clock();
 
-	while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(0);
+	while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
 
 	samplesBufferMutex->Lock();
 

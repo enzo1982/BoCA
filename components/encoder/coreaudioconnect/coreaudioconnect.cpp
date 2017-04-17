@@ -505,7 +505,7 @@ Bool BoCA::EncoderCoreAudioConnect::ProcessConnectorCommand()
 		/* Sleep for some milliseconds.
 		 */
 		if (comm->command == CommCommandEncode ||
-		    comm->command == CommCommandFinish)	S::System::System::Sleep(0);
+		    comm->command == CommCommandFinish)	S::System::System::Sleep(1);
 		else					S::System::System::Sleep(100);
 	}
 
