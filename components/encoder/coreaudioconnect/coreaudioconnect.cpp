@@ -462,7 +462,7 @@ Bool BoCA::EncoderCoreAudioConnect::Disconnect()
 	/* Wait until the connector exits.
 	 */
 #ifdef __WIN32__
-	while (WaitForSingleObject(connector, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+	while (WaitForSingleObject(connector, 0) == WAIT_TIMEOUT) S::System::System::Sleep(1);
 #else
 	int	 status = 0;
 
@@ -502,11 +502,9 @@ Bool BoCA::EncoderCoreAudioConnect::ProcessConnectorCommand()
 		if (waitpid(connector, &status, WNOHANG) != 0) break;
 #endif
 
-		/* Sleep for some milliseconds.
+		/* Sleep for one millisecond.
 		 */
-		if (comm->command == CommCommandEncode ||
-		    comm->command == CommCommandFinish)	S::System::System::Sleep(1);
-		else					S::System::System::Sleep(100);
+		S::System::System::Sleep(1);
 	}
 
 	return True;

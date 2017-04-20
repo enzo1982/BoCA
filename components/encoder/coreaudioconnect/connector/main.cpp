@@ -167,11 +167,9 @@ int main(int argc, char *argv[])
 	CA::UInt32		 dataSize	= 0;
 	CA::UInt32		 packetsWritten	= 0;
 
-	CA::UInt32		 sleepTime	= 100;
-
 	while (comm->command != CommCommandQuit)
 	{
-		while (comm->status != CommStatusIssued) Sleep(sleepTime);
+		while (comm->status != CommStatusIssued) Sleep(1);
 
 		switch (comm->command)
 		{
@@ -313,8 +311,6 @@ int main(int argc, char *argv[])
 
 				comm->status = CommStatusReady;
 
-				sleepTime = 1;
-
 				break;
 			case CommCommandEncode:
 				if (converter == NULL) { comm->status = CommStatusError; break; }
@@ -430,8 +426,6 @@ int main(int argc, char *argv[])
 				}
 
 				comm->status = CommStatusReady;
-
-				sleepTime = 100;
 
 				break;
 			case CommCommandQuit:
