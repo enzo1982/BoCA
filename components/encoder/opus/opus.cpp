@@ -174,7 +174,7 @@ Bool BoCA::EncoderOpus::Activate()
 
 	ex_ogg_stream_init(&os, rand());
 
-	dataBuffer.Resize(maxPacketSize);
+	dataBuffer.Resize(maxPacketSize * Math::Ceil(format.channels / 2.0));
 
 	/* Create Opus header.
 	 */
@@ -211,7 +211,7 @@ Bool BoCA::EncoderOpus::Activate()
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR_CONSTRAINT(config->GetIntValue("Opus", "EnableConstrainedVBR", False)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(config->GetIntValue("Opus", "Complexity", 10)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(config->GetIntValue("Opus", "PacketLoss", 0)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue("Opus", "EnableDTX", True)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue("Opus", "EnableDTX", False)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(0));
 
 	/* Get number of pre-skip samples.
