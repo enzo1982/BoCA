@@ -98,6 +98,7 @@ BoCA::EncoderOpus::EncoderOpus()
 	resamplerConfig	= NIL;
 
 	frameSize	= 0;
+	preSkip		= 0;
 	sampleRate	= 48000;
 
 	numPackets	= 0;
@@ -216,8 +217,6 @@ Bool BoCA::EncoderOpus::Activate()
 
 	/* Get number of pre-skip samples.
 	 */
-	int	 preSkip = 0;
-
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_GET_LOOKAHEAD(&preSkip));
 
 	setup.preskip = preSkip * (48000 / sampleRate);
@@ -390,9 +389,11 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 	 */
 	Int	 nullSamples = 0;
 
-	if (flush && (samplesBuffer.Size() / format.channels) % frameSize > 0)
+	if (flush)
 	{
-		nullSamples = frameSize - (samplesBuffer.Size() / format.channels) % frameSize;
+		nullSamples = preSkip;
+
+		if ((samplesBuffer.Size() / format.channels + preSkip) % frameSize > 0) nullSamples += frameSize - (samplesBuffer.Size() / format.channels + preSkip) % frameSize;
 
 		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
 

@@ -32,6 +32,8 @@ namespace BoCA
 			OpusMSEncoder		*encoder;
 
 			Int			 frameSize;
+			Int			 preSkip;
+
 			Int			 sampleRate;
 
 			Int			 numPackets;
