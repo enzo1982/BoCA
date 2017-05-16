@@ -185,7 +185,7 @@ Bool BoCA::EncoderSpeex::Activate()
 
 	ex_ogg_stream_packetin(&os, &header);
 
-	free(buffer);
+	ex_speex_header_free(buffer);
 
 	/* Write Vorbis comment header
 	 */
