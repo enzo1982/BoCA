@@ -401,6 +401,8 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 					boca.DeleteComponent(decoder);
 
+					Config::Free(cueConfig);
+
 					if (cueTrack.tracks.Length() > 0) track.tracks = cueTrack.tracks;
 				}
 
