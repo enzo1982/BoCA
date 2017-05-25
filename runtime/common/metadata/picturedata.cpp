@@ -15,6 +15,8 @@
 Array<Buffer<UnsignedByte> *, Void *>	 BoCA::PictureData::dataStore;
 Array<Short>				 BoCA::PictureData::referenceStore;
 
+Threads::Mutex				 BoCA::PictureData::mutex;
+
 BoCA::PictureData::PictureData()
 {
 	crc = 0;
@@ -46,6 +48,8 @@ Bool BoCA::PictureData::Clean()
 {
 	if (crc != 0)
 	{
+		mutex.Lock();
+
 		Short	&referenceCount = referenceStore.GetReference(crc);
 
 		if (referenceCount == 1)
@@ -59,6 +63,8 @@ Bool BoCA::PictureData::Clean()
 		{
 			referenceCount--;
 		}
+
+		mutex.Release();
 
 		crc = 0;
 	}
@@ -76,6 +82,8 @@ Bool BoCA::PictureData::Set(Void *data, Int size)
 
 	crc = Hash::CRC32::Compute(*buffer);
 
+	mutex.Lock();
+
 	if (referenceStore.Get(crc) == 0)
 	{
 		dataStore.Add(buffer, crc);
@@ -90,6 +98,8 @@ Bool BoCA::PictureData::Set(Void *data, Int size)
 		delete buffer;
 	}
 
+	mutex.Release();
+
 	return True;
 }
 
@@ -99,9 +109,13 @@ BoCA::PictureData &BoCA::PictureData::operator =(const PictureData &oPictureData
 
 	crc = oPictureData.crc;
 
+	mutex.Lock();
+
 	Short	&referenceCount = referenceStore.GetReference(crc);
 
 	referenceCount++;
+
+	mutex.Release();
 
 	return *this;
 }

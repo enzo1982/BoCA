@@ -26,6 +26,8 @@ namespace BoCA
 			static Array<Buffer<UnsignedByte> *, Void *>	 dataStore;
 			static Array<Short>				 referenceStore;
 
+			static Threads::Mutex				 mutex;
+
 			Int						 crc;
 		public:
 									 PictureData();
