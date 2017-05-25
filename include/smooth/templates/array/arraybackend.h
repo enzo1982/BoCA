@@ -16,8 +16,6 @@
 #include <memory.h>
 #include <string.h>
 
-#include <new>
-
 namespace smooth
 {
 	template <class s> class ArrayEntry
@@ -33,7 +31,7 @@ namespace smooth
 		private:
 			static s		 nullValue;
 
-			Buffer<ArrayEntry<s> >	 entries;
+			Buffer<ArrayEntry<s> *>	 entries;
 		public:
 			ArrayBackend()
 			{
@@ -74,7 +72,7 @@ namespace smooth
 
 				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
-				new (entries + nOfEntries) ArrayEntry<s>(value);
+				entries[nOfEntries] = new ArrayEntry<s>(value);
 
 				IndexArray::InsertAtPos(nOfEntries, index);
 
@@ -114,9 +112,9 @@ namespace smooth
 
 				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
-				memmove((void *) (entries + position + 1), (void *) (entries + position), (nOfEntries - position) * sizeof(ArrayEntry<s>));
+				memmove(entries + position + 1, entries + position, (nOfEntries - position) * sizeof(ArrayEntry<s> *));
 
-				new (entries + position) ArrayEntry<s>(value);
+				entries[position] = new ArrayEntry<s>(value);
 
 				IndexArray::InsertAtPos(position, index);
 
@@ -132,14 +130,12 @@ namespace smooth
 
 				LockForWrite();
 
-				UnsignedByte	 backupEntry[sizeof(ArrayEntry<s>)];
+				ArrayEntry<s>	*backupEntry = entries[n];
 
-				memcpy(backupEntry, (void *) (entries + n), sizeof(ArrayEntry<s>));
+				if (m < n) memmove(entries + m + 1, entries + m, (n - m) * sizeof(ArrayEntry<s> *));
+				else	   memmove(entries + n, entries + n + 1, (m - n) * sizeof(ArrayEntry<s> *));
 
-				if (m < n) memmove((void *) (entries + m + 1), (void *) (entries + m), (n - m) * sizeof(ArrayEntry<s>));
-				else	   memmove((void *) (entries + n), (void *) (entries + n + 1), (m - n) * sizeof(ArrayEntry<s>));
-
-				memcpy((void *) (entries + m), backupEntry, sizeof(ArrayEntry<s>));
+				entries[m] = backupEntry;
 
 				IndexArray::MoveNth(n, m);
 
@@ -156,9 +152,9 @@ namespace smooth
 
 				LockForWrite();
 
-				(entries + n)->~ArrayEntry<s>();
+				delete entries[n];
 
-				memmove((void *) (entries + n), (void *) (entries + n + 1), (nOfEntries - n - 1) * sizeof(ArrayEntry<s>));
+				memmove(entries + n, entries + n + 1, (nOfEntries - n - 1) * sizeof(ArrayEntry<s> *));
 
 				IndexArray::RemoveNth(n);
 
@@ -173,7 +169,7 @@ namespace smooth
 
 				LockForWrite();
 
-				for (Int i = 0; i < nOfEntries; i++) (entries + i)->~ArrayEntry<s>();
+				for (Int i = 0; i < nOfEntries; i++) delete entries[i];
 
 				entries.Free();
 
@@ -210,7 +206,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					const s	&entry = (entries + n)->value;
+					const s	&entry = entries[n]->value;
 
 					lastAccessedEntry = n;
 
@@ -230,7 +226,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					s	&entry = (entries + n)->value;
+					s	&entry = entries[n]->value;
 
 					lastAccessedEntry = n;
 
@@ -250,7 +246,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					const s	&entry = (entries + n)->value;
+					const s	&entry = entries[n]->value;
 
 					lastAccessedEntry = n;
 
@@ -270,7 +266,7 @@ namespace smooth
 
 				if (nOfEntries > n && n >= 0)
 				{
-					(entries + n)->value = value;
+					entries[n]->value = value;
 
 					lastAccessedEntry = n;
 
@@ -290,7 +286,7 @@ namespace smooth
 
 				if (nOfEntries > 0)
 				{
-					const s	&entry = (entries + 0)->value;
+					const s	&entry = entries[0]->value;
 
 					lastAccessedEntry = 0;
 
@@ -310,7 +306,7 @@ namespace smooth
 
 				if (nOfEntries > 0)
 				{
-					const s	&entry = (entries + nOfEntries - 1)->value;
+					const s	&entry = entries[nOfEntries - 1]->value;
 
 					lastAccessedEntry = nOfEntries - 1;
 
@@ -332,7 +328,7 @@ namespace smooth
 
 				if (lastAccessed < nOfEntries - 1)
 				{
-					const s	&entry = (entries + ++lastAccessed)->value;
+					const s	&entry = entries[++lastAccessed]->value;
 
 					lastAccessedEntry = lastAccessed;
 
@@ -354,7 +350,7 @@ namespace smooth
 
 				if (lastAccessed > 0)
 				{
-					const s	&entry = (entries + --lastAccessed)->value;
+					const s	&entry = entries[--lastAccessed]->value;
 
 					lastAccessedEntry = lastAccessed;
 
