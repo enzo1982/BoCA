@@ -224,7 +224,7 @@ Error BoCA::DecoderWinamp::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		/* Give the plugin one second to start sending samples.
 		 */
-		Int	 start = S::System::System::Clock();
+		UnsignedInt64	 start = S::System::System::Clock();
 
 		while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
 
@@ -386,7 +386,7 @@ Int BoCA::DecoderWinamp::ReadData(Buffer<UnsignedByte> &data)
 	 */
 	samplesBufferMutex->Release();
 
-	Int	 start = S::System::System::Clock();
+	UnsignedInt64	 start = S::System::System::Clock();
 
 	while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
 
