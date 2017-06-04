@@ -219,28 +219,40 @@ int main(int argc, char *argv[])
 
 					/* Create audio converter object.
 					 */
-					CA::OSStatus	 status = CA::AudioConverterNew(&sourceFormat, &destinationFormat, &converter);
-
-					if (status != 0) { comm->status = CommStatusError; break; }
+					if (CA::AudioConverterNew(&sourceFormat, &destinationFormat, &converter) != 0) { comm->status = CommStatusError; break; }
 
 					/* Set bitrate if format does support bitrates.
 					 */
-					CA::UInt32	 bitratesSize = 0;
+					CA::UInt32	 size = 0;
 
-					if (CA::AudioFormatGetPropertyInfo(CA::kAudioFormatProperty_AvailableEncodeBitRates, sizeof(destinationFormat.mFormatID), &destinationFormat.mFormatID, &bitratesSize) == 0)
+					if (CA::AudioConverterGetPropertyInfo(converter, CA::kAudioConverterApplicableEncodeBitRates, &size, NULL) == 0)
 					{
-						CA::UInt32	 bitrate = setup.bitrate;
+						/* Get applicable bitrate values.
+						 */
+						CA::UInt32		 bitrate       = setup.bitrate;
+						CA::AudioValueRange	*bitrateValues = (CA::AudioValueRange *) malloc(size);
 
-						status = CA::AudioConverterSetProperty(converter, CA::kAudioConverterEncodeBitRate, sizeof(CA::UInt32), &bitrate);
+						CA::AudioConverterGetProperty(converter, CA::kAudioConverterApplicableEncodeBitRates, &size, bitrateValues);
 
-						if (status != 0)
+						/* Find best supported bitrate.
+						 */
+						CA::Float64	 nearest = 0xFFFFFFFF;
+
+						for (unsigned int i = 0; i < size / sizeof(CA::AudioValueRange); i++)
 						{
-							CA::AudioConverterDispose(converter);
+							if (bitrate >= bitrateValues[i].mMinimum && bitrate <= bitrateValues[i].mMaximum)  nearest = bitrate;
 
-							comm->status = CommStatusError;
-
-							break;
+							if (abs(bitrate - bitrateValues[i].mMinimum) < abs(bitrate - nearest)) nearest = bitrateValues[i].mMinimum;
+							if (abs(bitrate - bitrateValues[i].mMaximum) < abs(bitrate - nearest)) nearest = bitrateValues[i].mMaximum;
 						}
+
+						bitrate = nearest;
+
+						free(bitrateValues);
+
+						/* Set bitrate on converter.
+						 */
+						CA::AudioConverterSetProperty(converter, CA::kAudioConverterEncodeBitRate, sizeof(CA::UInt32), &bitrate);
 					}
 
 					/* Get Windows compatible file name.

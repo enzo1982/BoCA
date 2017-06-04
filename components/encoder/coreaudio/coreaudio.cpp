@@ -159,9 +159,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Create audio converter object.
 	 */
-	CA::OSStatus	 status = CA::AudioConverterNew(&sourceFormat, &destinationFormat, &converter);
-
-	if (status != 0)
+	if (CA::AudioConverterNew(&sourceFormat, &destinationFormat, &converter) != 0)
 	{
 		errorString = "Could not create converter component!";
 		errorState  = True;
@@ -171,23 +169,36 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Set bitrate if format does support bitrates.
 	 */
-	CA::UInt32	 bitratesSize = 0;
+	CA::UInt32	 size = 0;
 
-	if (CA::AudioFormatGetPropertyInfo(CA::kAudioFormatProperty_AvailableEncodeBitRates, sizeof(destinationFormat.mFormatID), &destinationFormat.mFormatID, &bitratesSize) == 0)
+	if (CA::AudioConverterGetPropertyInfo(converter, CA::kAudioConverterApplicableEncodeBitRates, &size, NIL) == 0)
 	{
-		CA::UInt32	 bitrate = config->GetIntValue("CoreAudio", "Bitrate", 128) * 1000;
+		/* Get applicable bitrate values.
+		 */
+		CA::UInt32		 bitrate       = config->GetIntValue("CoreAudio", "Bitrate", 128) * 1000;
+		CA::AudioValueRange	*bitrateValues = new CA::AudioValueRange [size / sizeof(CA::AudioValueRange)];
 
-		status = CA::AudioConverterSetProperty(converter, CA::kAudioConverterEncodeBitRate, sizeof(CA::UInt32), &bitrate);
+		CA::AudioConverterGetProperty(converter, CA::kAudioConverterApplicableEncodeBitRates, &size, bitrateValues);
 
-		if (status != 0)
+		/* Find best supported bitrate.
+		 */
+		CA::Float64	 nearest = 0xFFFFFFFF;
+
+		for (UnsignedInt i = 0; i < size / sizeof(CA::AudioValueRange); i++)
 		{
-			CA::AudioConverterDispose(converter);
+			if (bitrate >= bitrateValues[i].mMinimum && bitrate <= bitrateValues[i].mMaximum)  nearest = bitrate;
 
-			errorString = "Selected bitrate is not supported for current sample format!";
-			errorState  = True;
-
-			return False;
+			if (Math::Abs(bitrate - bitrateValues[i].mMinimum) < Math::Abs(bitrate - nearest)) nearest = bitrateValues[i].mMinimum;
+			if (Math::Abs(bitrate - bitrateValues[i].mMaximum) < Math::Abs(bitrate - nearest)) nearest = bitrateValues[i].mMaximum;
 		}
+
+		bitrate = nearest;
+
+		delete [] bitrateValues;
+
+		/* Set bitrate on converter.
+		 */
+		CA::AudioConverterSetProperty(converter, CA::kAudioConverterEncodeBitRate, sizeof(CA::UInt32), &bitrate);
 	}
 
 	/* Create audio file object for output file.
