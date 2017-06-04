@@ -369,7 +369,8 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 			 */
 			Info	 info = track.GetInfo();
 
-			info.title = String(chapterList[i].title).Trim();
+			if (String(chapterList[i].title).Trim() != NIL) info.title = String(chapterList[i].title).Trim();
+
 			info.track = i + 1;
 
 			rTrack.SetInfo(info);
