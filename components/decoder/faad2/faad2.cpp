@@ -596,6 +596,15 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 
 					delaySamples	 = frameSize;
 					delaySamplesLeft = frameSize;
+
+					/* FAAD2 automatically skips the first frame, so
+					 * subtract it from the delay sample count.
+					 */
+					delaySamplesLeft -= frameSize;
+
+					/* Fix delay for LD/ELD object types.
+					 */
+					if (frameInfo.object_type == LD) delaySamplesLeft += frameSize;
 				}
 
 				samplesBuffer.Resize(samplesRead * format.channels + frameInfo.samples);

@@ -213,6 +213,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 				format.channels = streamInfo->numChannels;
 
 				track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
+				track.length   -= streamInfo->frameSize; // To account for encoder delay.
 
 				format.bits	= 16;
 			}
@@ -595,11 +596,7 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 					/* Add FDK decoder delay.
 					 */
-					delaySamplesLeft += frameSize;
-
-					/* No decoder delay for LD/ELD object types.
-					 */
-					if (streamInfo->aot == AOT_ER_AAC_LD || streamInfo->aot == AOT_ER_AAC_ELD) delaySamplesLeft -= frameSize;
+					delaySamplesLeft += streamInfo->outputDelay;
 
 					samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
 				}
@@ -654,14 +651,17 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 				frameSize = streamInfo->frameSize;
 
-				/* Set delay samples to minimum encoder delay plus decoder delay.
+				/* Set delay samples to minimum encoder delay.
 				 */
-				delaySamples	 = frameSize * 2;
-				delaySamplesLeft = frameSize * 2;
+				if (delaySamples == 0)
+				{
+					delaySamples	 = frameSize;
+					delaySamplesLeft = frameSize;
+				}
 
-				/* No decoder delay for LD/ELD object types.
+				/* Add FDK decoder delay.
 				 */
-				if (streamInfo->aot == AOT_ER_AAC_LD || streamInfo->aot == AOT_ER_AAC_ELD) delaySamplesLeft -= frameSize;
+				delaySamplesLeft += streamInfo->outputDelay;
 
 				samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
 			}
