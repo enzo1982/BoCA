@@ -147,7 +147,7 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 	params.sampleRate = format.rate;
 	params.nChannels  = format.channels;
-	params.bitRate	  = config->GetIntValue("VOAACEnc", "Bitrate", 128) * 1000;
+	params.bitRate	  = config->GetIntValue("VOAACEnc", "Bitrate", 96) * 1000 * format.channels;
 	params.adtsUsed	  = !config->GetIntValue("VOAACEnc", "MP4Container", True);
 
 	api.SetParam(handle, VO_PID_AAC_ENCPARAM, &params);

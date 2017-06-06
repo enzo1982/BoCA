@@ -135,7 +135,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 	comm->length  = sizeof(CoreAudioCommSetup);
 
 	((CoreAudioCommSetup *) &comm->data)->codec    = config->GetIntValue("CoreAudio", "Codec", 'aac ');
-	((CoreAudioCommSetup *) &comm->data)->bitrate  = config->GetIntValue("CoreAudio", "Bitrate", 128) * 1000;
+	((CoreAudioCommSetup *) &comm->data)->bitrate  = config->GetIntValue("CoreAudio", "Bitrate", 64) * 1000 * format.channels;
 	((CoreAudioCommSetup *) &comm->data)->format   = config->GetIntValue("CoreAudio", "MP4Container", True);
 
 	((CoreAudioCommSetup *) &comm->data)->channels = format.channels;

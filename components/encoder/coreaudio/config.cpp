@@ -17,7 +17,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 {
 	Config	*config = Config::Get();
 
-	bitrate		= config->GetIntValue("CoreAudio", "Bitrate", 128);
+	bitrate		= config->GetIntValue("CoreAudio", "Bitrate", 64);
 	allowID3	= config->GetIntValue("CoreAudio", "AllowID3v2", False);
 	fileFormat	= config->GetIntValue("CoreAudio", "MP4Container", True);
 	fileExtension	= config->GetIntValue("CoreAudio", "MP4FileExtension", 0);
@@ -116,12 +116,12 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 66), Size(group_id3v2->GetWidth(), 43));
 
-	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 15));
+	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 15));
 
-	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 97 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 1, 2560);
+	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 1, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureCoreAudio::SetBitrate, this);
 
-	edit_bitrate		= new EditBox(String::FromInt(bitrate), Point(group_bitrate->GetWidth() - 72, 12), Size(31, 0), 3);
+	edit_bitrate		= new EditBox(String::FromInt(bitrate), Point(group_bitrate->GetWidth() - 66, 12), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureCoreAudio::SetBitrateByEditBox, this);
 
@@ -219,16 +219,22 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 
 	for (UnsignedInt i = 0; i < size / sizeof(CA::AudioValueRange); i++)
 	{
+		if (bitrateValues[i].mMinimum / 1000 > 192 && bitrateValues[i].mMaximum / 1000 > 192) continue;
+		if (					      bitrateValues[i].mMaximum / 1000 > 192) bitrateValues[i].mMaximum = 192 * 1000;
+
 		bitrates.Add(bitrateValues[i].mMinimum / 1000);
 		bitrates.Add(bitrateValues[i].mMaximum / 1000);
-
-		if (bitrate == bitrates.GetNth(i * 2 + 1)) bitrate = -(size / sizeof(CA::AudioValueRange)) + i;
 	}
 
 	delete [] bitrateValues;
 
 	if (bitrates.Length() > 0) group_bitrate->Activate();
 	else			   group_bitrate->Deactivate();
+
+	for (Int i = 0; i < bitrates.Length() / 2; i++)
+	{
+		if (bitrate == bitrates.GetNth(i * 2 + 1)) bitrate = -(bitrates.Length() / 2) + i;
+	}
 
 	if	(bitrates.Length() == 2) { edit_bitrate->Activate();   slider_bitrate->SetRange(bitrates.GetNth(0), bitrates.GetNth(1)); }
 	else if (bitrates.Length() >  2) { edit_bitrate->Deactivate(); slider_bitrate->SetRange(-bitrates.Length() / 2, -1);		 }

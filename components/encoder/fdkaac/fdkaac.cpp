@@ -151,7 +151,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	ex_aacEncoder_SetParam(handle, AACENC_CHANNELORDER, 1 /* WAVE channel order */);
 
 	ex_aacEncoder_SetParam(handle, AACENC_AOT, config->GetIntValue("FDKAAC", "MPEGVersion", 0) + config->GetIntValue("FDKAAC", "AACType", AOT_SBR));
-	ex_aacEncoder_SetParam(handle, AACENC_BITRATE, config->GetIntValue("FDKAAC", "Bitrate", 96) * 1000);
+	ex_aacEncoder_SetParam(handle, AACENC_BITRATE, config->GetIntValue("FDKAAC", "Bitrate", 64) * 1000 * format.channels);
 	ex_aacEncoder_SetParam(handle, AACENC_AFTERBURNER, 1);
 	ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, config->GetIntValue("FDKAAC", "MP4Container", True) ? TT_MP4_RAW : TT_MP4_ADTS);
 

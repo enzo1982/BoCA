@@ -19,7 +19,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	mpegVersion	= config->GetIntValue("FDKAAC", "MPEGVersion", 0);
 	aacType		= config->GetIntValue("FDKAAC", "AACType", AOT_SBR);
-	bitrate		= config->GetIntValue("FDKAAC", "Bitrate", 96);
+	bitrate		= config->GetIntValue("FDKAAC", "Bitrate", 64);
 	allowID3	= config->GetIntValue("FDKAAC", "AllowID3v2", False);
 	fileFormat	= config->GetIntValue("FDKAAC", "MP4Container", True);
 	fileExtension	= config->GetIntValue("FDKAAC", "MP4FileExtension", 0);
@@ -116,9 +116,9 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(group_id3v2->GetWidth() + 128, 43));
 
-	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 15));
+	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 15));
 
-	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 16, 256);
+	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 8, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureFDKAAC::SetBitrate, this);
 
 	edit_bitrate		= new EditBox(NIL, Point(group_bitrate->GetWidth() - 66, 12), Size(25, 0), 3);
@@ -194,7 +194,7 @@ Int BoCA::ConfigureFDKAAC::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	if (bitrate <  16) bitrate =  16;
+	if (bitrate <	8) bitrate =   8;
 	if (bitrate > 256) bitrate = 256;
 
 	config->SetIntValue("FDKAAC", "MPEGVersion", mpegVersion);
@@ -237,23 +237,23 @@ Void BoCA::ConfigureFDKAAC::SetObjectType()
 	switch (aacType)
 	{
 		case AOT_AAC_LC:
-			slider_bitrate->SetRange(16, 256);
+			slider_bitrate->SetRange(8, 256);
 
 			break;
 		case AOT_SBR:
-			slider_bitrate->SetRange(16, 128);
+			slider_bitrate->SetRange(8, 64);
 
 			break;
 		case AOT_PS:
-			slider_bitrate->SetRange(16, 64);
+			slider_bitrate->SetRange(8, 32);
 
 			break;
 		case AOT_ER_AAC_LD:
-			slider_bitrate->SetRange(16, 256);
+			slider_bitrate->SetRange(8, 256);
 
 			break;
 		case AOT_ER_AAC_ELD:
-			slider_bitrate->SetRange(16, 256);
+			slider_bitrate->SetRange(8, 256);
 
 			break;
 	}

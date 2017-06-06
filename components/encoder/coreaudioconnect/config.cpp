@@ -18,7 +18,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio(const CoreAudioCommCodecs &iFormats
 
 	formats		= iFormats;
 
-	bitrate		= config->GetIntValue("CoreAudio", "Bitrate", 128);
+	bitrate		= config->GetIntValue("CoreAudio", "Bitrate", 64);
 	allowID3	= config->GetIntValue("CoreAudio", "AllowID3v2", False);
 	fileFormat	= config->GetIntValue("CoreAudio", "MP4Container", True);
 	fileExtension	= config->GetIntValue("CoreAudio", "MP4FileExtension", 0);
@@ -107,12 +107,12 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio(const CoreAudioCommCodecs &iFormats
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 66), Size(group_id3v2->GetWidth(), 43));
 
-	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 15));
+	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 15));
 
-	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 97 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 1, 2560);
+	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 1, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureCoreAudio::SetBitrate, this);
 
-	edit_bitrate		= new EditBox(String::FromInt(bitrate), Point(group_bitrate->GetWidth() - 72, 12), Size(31, 0), 3);
+	edit_bitrate		= new EditBox(String::FromInt(bitrate), Point(group_bitrate->GetWidth() - 66, 12), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureCoreAudio::SetBitrateByEditBox, this);
 

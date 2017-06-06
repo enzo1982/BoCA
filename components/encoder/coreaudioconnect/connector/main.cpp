@@ -61,6 +61,9 @@ void QueryCoreAudioCodecs(CoreAudioCommCodecs *comm)
 
 		for (CA::UInt32 j = 0; j < brSize / sizeof(CA::AudioValueRange) && j < 64; j++)
 		{
+			if (bitrateValues[j].mMinimum / 1000 > 192 && bitrateValues[j].mMaximum / 1000 > 192) continue;
+			if (					      bitrateValues[j].mMaximum / 1000 > 192) bitrateValues[j].mMaximum = 192 * 1000;
+
 			comm->bitrates[i][j * 2    ] = bitrateValues[j].mMinimum;
 			comm->bitrates[i][j * 2 + 1] = bitrateValues[j].mMaximum;
 		}

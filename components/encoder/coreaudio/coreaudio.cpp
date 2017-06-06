@@ -175,7 +175,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	{
 		/* Get applicable bitrate values.
 		 */
-		CA::UInt32		 bitrate       = config->GetIntValue("CoreAudio", "Bitrate", 128) * 1000;
+		CA::UInt32		 bitrate       = config->GetIntValue("CoreAudio", "Bitrate", 64) * 1000 * format.channels;
 		CA::AudioValueRange	*bitrateValues = new CA::AudioValueRange [size / sizeof(CA::AudioValueRange)];
 
 		CA::AudioConverterGetProperty(converter, CA::kAudioConverterApplicableEncodeBitRates, &size, bitrateValues);

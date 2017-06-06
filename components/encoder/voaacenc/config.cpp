@@ -17,7 +17,7 @@ BoCA::ConfigureVOAAC::ConfigureVOAAC()
 {
 	Config	*config = Config::Get();
 
-	bitrate		= config->GetIntValue("VOAACEnc", "Bitrate", 128);
+	bitrate		= config->GetIntValue("VOAACEnc", "Bitrate", 96);
 	allowID3	= config->GetIntValue("VOAACEnc", "AllowID3v2", False);
 	fileFormat	= config->GetIntValue("VOAACEnc", "MP4Container", True);
 	fileExtension	= config->GetIntValue("VOAACEnc", "MP4FileExtension", 0);
@@ -44,9 +44,9 @@ BoCA::ConfigureVOAAC::ConfigureVOAAC()
 
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(group_id3v2->GetWidth(), 43));
 
-	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 15));
+	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 15));
 
-	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 16, 192);
+	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 8, 128);
 	slider_bitrate->onValueChange.Connect(&ConfigureVOAAC::SetBitrate, this);
 
 	edit_bitrate		= new EditBox(NIL, Point(group_bitrate->GetWidth() - 66, 12), Size(25, 0), 3);
@@ -128,8 +128,8 @@ Int BoCA::ConfigureVOAAC::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	if (bitrate <  16) bitrate =  16;
-	if (bitrate > 192) bitrate = 192;
+	if (bitrate <	8) bitrate =   8;
+	if (bitrate > 128) bitrate = 128;
 
 	config->SetIntValue("VOAACEnc", "Bitrate", bitrate);
 	config->SetIntValue("VOAACEnc", "AllowID3v2", allowID3);
