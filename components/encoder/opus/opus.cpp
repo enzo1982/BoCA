@@ -153,6 +153,7 @@ Bool BoCA::EncoderOpus::Activate()
 	}
 
 	resamplerConfig = Config::Copy(config);
+	resamplerConfig->SetIntValue("Resample", "Converter", 2);
 	resamplerConfig->SetIntValue("Resample", "Samplerate", sampleRate);
 
 	resampler->SetConfiguration(resamplerConfig);
