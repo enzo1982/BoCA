@@ -173,7 +173,7 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_CanVerifyTrack		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanVerifyTrack"));
 
 	func_GetStreamInfo		= (int (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetStreamInfo"));
-	func_GetFormatInfo		= (void (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetFormatInfo"));
+	func_GetFormatInfo		= (const void *(*)(void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetFormatInfo"));
 
 	func_SetAudioTrackInfo		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetAudioTrackInfo"));
 	func_SetVendorString		= (void (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetVendorString"));

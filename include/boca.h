@@ -135,7 +135,7 @@ using namespace smooth;
 #define BoCA_DEFINE_DSP_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
-		BOCA_EXPORT void BoCA_##componentName##_GetFormatInfo(void *component, void *format)					{ return ((BoCA::componentName *) component)->GetFormatInfo(*((BoCA::Format *) format)); }						\
+		BOCA_EXPORT const void *BoCA_##componentName##_GetFormatInfo(void *component)						{ return &((BoCA::componentName *) component)->GetFormatInfo(); }									\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\

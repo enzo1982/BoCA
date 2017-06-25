@@ -309,7 +309,7 @@ namespace BoCA
 				bool			 (*func_CanVerifyTrack)(void *, const void *);
 
 				int			 (*func_GetStreamInfo)(void *, const wchar_t *, void *);
-				void			 (*func_GetFormatInfo)(void *, void *);
+				const void		*(*func_GetFormatInfo)(void *);
 
 				bool			 (*func_SetAudioTrackInfo)(void *, const void *);
 				void			 (*func_SetVendorString)(void *, const wchar_t *);

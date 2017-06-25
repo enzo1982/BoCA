@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@ BoCA::AS::DSPComponent::~DSPComponent()
 {
 }
 
-Int BoCA::AS::DSPComponent::GetPackageSize()
+Int BoCA::AS::DSPComponent::GetPackageSize() const
 {
 	return specs->func_GetPackageSize(component);
 }
@@ -30,9 +30,9 @@ Bool BoCA::AS::DSPComponent::SetAudioTrackInfo(const Track &track)
 	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
-Void BoCA::AS::DSPComponent::GetFormatInfo(Format &format)
+const BoCA::Format &BoCA::AS::DSPComponent::GetFormatInfo() const
 {
-	specs->func_GetFormatInfo(component, &format);
+	return *((const Format *) specs->func_GetFormatInfo(component));
 }
 
 Bool BoCA::AS::DSPComponent::Activate()

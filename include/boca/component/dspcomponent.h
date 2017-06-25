@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,23 +27,23 @@ namespace BoCA
 		abstract class BOCA_DLL_EXPORT DSPComponent : public Component
 		{
 			protected:
-				Track		 track;
-				Format		 format;
+				Track			 track;
+				Format			 format;
 			public:
-						 DSPComponent();
-				virtual		~DSPComponent();
+							 DSPComponent();
+				virtual			~DSPComponent();
 
-				virtual Bool	 SetAudioTrackInfo(const Track &);
-				virtual Void	 GetFormatInfo(Format &);
+				virtual Bool		 SetAudioTrackInfo(const Track &);
+				virtual const Format	&GetFormatInfo() const;
 
-				virtual Bool	 Activate() = 0;
-				virtual Bool	 Deactivate() = 0;
+				virtual Bool		 Activate() = 0;
+				virtual Bool		 Deactivate() = 0;
 
-				virtual Int	 TransformData(Buffer<UnsignedByte> &) = 0;
+				virtual Int		 TransformData(Buffer<UnsignedByte> &) = 0;
 
-				virtual Int	 Flush(Buffer<UnsignedByte> &);
+				virtual Int		 Flush(Buffer<UnsignedByte> &);
 
-				virtual Int	 GetPackageSize();
+				virtual Int		 GetPackageSize() const;
 		};
 	};
 };
