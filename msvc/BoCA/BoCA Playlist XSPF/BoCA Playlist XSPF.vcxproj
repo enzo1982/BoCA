@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\components\playlist\xspf\expat\loadlibrary.c" />
     <ClCompile Include="..\..\..\components\playlist\xspf\expat\xmlparse.c" />
     <ClCompile Include="..\..\..\components\playlist\xspf\expat\xmlrole.c" />
     <ClCompile Include="..\..\..\components\playlist\xspf\expat\xmltok.c" />

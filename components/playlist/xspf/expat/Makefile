@@ -2,7 +2,7 @@ BOCA_PATH = ../../../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-OBJECTS	= xmlparse.o xmlrole.o xmltok.o
+OBJECTS	= loadlibrary.o xmlparse.o xmlrole.o xmltok.o
 TARGET	= libexpat.a
 
 CCOPTS	= -I$(SRCDIR) -DHAVE_EXPAT_CONFIG_H
