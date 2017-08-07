@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	streamable_subset		= config->GetIntValue("FLAC", "StreamableSubset", 1);
 	do_mid_side_stereo		= config->GetIntValue("FLAC", "DoMidSideStereo", 1);
 	loose_mid_side_stereo		= config->GetIntValue("FLAC", "LooseMidSideStereo", 0);
-	blocksize			= config->GetIntValue("FLAC", "Blocksize", 4608) / 8;
+	blocksize			= config->GetIntValue("FLAC", "Blocksize", 4096) / 8;
 	max_lpc_order			= config->GetIntValue("FLAC", "MaxLPCOrder", 8);
 	qlp_coeff_precision		= config->GetIntValue("FLAC", "QLPCoeffPrecision", 0);
 	do_qlp_coeff_prec_search	= config->GetIntValue("FLAC", "DoQLPCoeffPrecSearch", 0);

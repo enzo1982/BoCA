@@ -196,7 +196,7 @@ Bool BoCA::EncoderFLAC::Activate()
 
 	FLAC__StreamMetadata	*padding = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_PADDING);
 
-	padding->length = 4096;
+	padding->length = 8192;
 
 	metadata.Add(padding);
 
@@ -221,7 +221,7 @@ Bool BoCA::EncoderFLAC::Activate()
 		ex_FLAC__stream_encoder_set_streamable_subset(encoder, config->GetIntValue("FLAC", "StreamableSubset", 1));
 		ex_FLAC__stream_encoder_set_do_mid_side_stereo(encoder, config->GetIntValue("FLAC", "DoMidSideStereo", 1));
 		ex_FLAC__stream_encoder_set_loose_mid_side_stereo(encoder, config->GetIntValue("FLAC", "LooseMidSideStereo", 0));
-		ex_FLAC__stream_encoder_set_blocksize(encoder, config->GetIntValue("FLAC", "Blocksize", 4608));
+		ex_FLAC__stream_encoder_set_blocksize(encoder, config->GetIntValue("FLAC", "Blocksize", 4096));
 		ex_FLAC__stream_encoder_set_apodization(encoder, config->GetStringValue("FLAC", "Apodization", "tukey(0.5)"));
 		ex_FLAC__stream_encoder_set_max_lpc_order(encoder, config->GetIntValue("FLAC", "MaxLPCOrder", 8));
 		ex_FLAC__stream_encoder_set_qlp_coeff_precision(encoder, config->GetIntValue("FLAC", "QLPCoeffPrecision", 0));
@@ -236,7 +236,7 @@ Bool BoCA::EncoderFLAC::Activate()
 		ex_FLAC__stream_encoder_set_compression_level(encoder, config->GetIntValue("FLAC", "Preset", 5));
 
 		if (config->GetIntValue("FLAC", "Preset", 5) < 3) ex_FLAC__stream_encoder_set_blocksize(encoder, 1152);
-		else						  ex_FLAC__stream_encoder_set_blocksize(encoder, 4608);
+		else						  ex_FLAC__stream_encoder_set_blocksize(encoder, 4096);
 	}
 
 	bytesWritten = 0;
