@@ -50,7 +50,7 @@ Error BoCA::AS::DecoderComponent::GetStreamInfo(const String &streamURI, Track &
 
 	/* Set lossless flag for chapters.
 	 */
-	foreach (Track &chapter, track.tracks) chapter.lossless = track.lossless;
+	if (track.lossless) foreach (Track &chapter, track.tracks) chapter.lossless = True;
 
 	return Success();
 }
