@@ -483,6 +483,19 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		}
 	}
 
+	/* Set lossless flag if all tracks are lossless.
+	 */
+	track.lossless = True;
+
+	foreach (const Track &iTrack, track.tracks)
+	{
+		if (iTrack.lossless) continue;
+
+		track.lossless = False;
+
+		break;
+	}
+
 	/* Set number of tracks.
 	 */
 	for (Int i = 0; i < track.tracks.Length(); i++)
