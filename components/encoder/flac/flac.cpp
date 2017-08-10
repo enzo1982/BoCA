@@ -123,6 +123,8 @@ Bool BoCA::EncoderFLAC::Activate()
 
 	encoder = ex_FLAC__stream_encoder_new();
 
+	/* Add Vorbis Comment metadata object.
+	 */
 	Buffer<unsigned char>	 vcBuffer;
 
 	if (config->GetIntValue("Tags", "EnableFLACMetadata", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
@@ -176,6 +178,26 @@ Bool BoCA::EncoderFLAC::Activate()
 		vorbiscomment->length = vcBuffer.Size();
 	}
 
+	/* Add seektable metadata object.
+	 */
+	Int64	 numSamples = track.length >= 0 ? track.length : track.approxLength;
+
+	if (numSamples >= 0)
+	{
+		FLAC__StreamMetadata	*seektable = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_SEEKTABLE);
+
+		/* Limit number Ogg FLAC seekpoints to 230 to fit in one Ogg page.
+		 */
+		if (config->GetIntValue("FLAC", "FileFormat", 0) == 1 && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 && numSamples / format.rate / 10 > 230) ex_FLAC__metadata_object_seektable_template_append_spaced_points(seektable, 230, numSamples);
+		else																     ex_FLAC__metadata_object_seektable_template_append_spaced_points_by_samples(seektable, 10 * format.rate, numSamples);
+
+		ex_FLAC__metadata_object_seektable_template_sort(seektable, true);
+
+		metadata.Add(seektable);
+	}
+
+	/* Add picture metadata object.
+	 */
 	if (config->GetIntValue("Tags", "CoverArtWriteToTags", True) && config->GetIntValue("Tags", "CoverArtWriteToFLACMetadata", True))
 	{
 		for (Int i = 0; i < track.pictures.Length(); i++)
@@ -194,6 +216,8 @@ Bool BoCA::EncoderFLAC::Activate()
 		}
 	}
 
+	/* Add padding metadata object.
+	 */
 	FLAC__StreamMetadata	*padding = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_PADDING);
 
 	padding->length = 8192;
