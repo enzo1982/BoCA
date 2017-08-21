@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -104,11 +104,11 @@ Void BoCA::LayerLengthStatus::AddTrack(const Track &track, Int64 &seconds, Int &
 
 	if (track.length >= 0 && format.rate > 0)
 	{
-		seconds += track.length / format.rate;
+		seconds += Math::Round(Float(track.length) / format.rate);
 	}
 	else if (track.approxLength >= 0 && format.rate > 0)
 	{
-		seconds += track.approxLength / format.rate;
+		seconds += Math::Round(Float(track.approxLength) / format.rate);
 
 		approx++;
 	}
