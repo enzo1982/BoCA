@@ -41,7 +41,6 @@ install:
 	$(INSTALL_DATA) $(SRCDIR)/boca_decoder_tta.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_encoder_aften.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_encoder_als.1.0.xml $(DESTDIR)$(libdir)/boca
-	$(INSTALL_DATA) $(SRCDIR)/boca_encoder_avconv_ac3.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_encoder_avconv_alac.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_encoder_avconv_wma.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_encoder_fhg.1.0.xml $(DESTDIR)$(libdir)/boca
@@ -95,7 +94,6 @@ uninstall:
 	rm -f $(DESTDIR)$(libdir)/boca/boca_decoder_wavpack.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_encoder_aften.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_encoder_als.1.0.xml
-	rm -f $(DESTDIR)$(libdir)/boca/boca_encoder_avconv_ac3.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_encoder_avconv_alac.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_encoder_avconv_wma.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_encoder_fhg.1.0.xml
