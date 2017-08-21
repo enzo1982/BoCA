@@ -5,9 +5,9 @@ echo
 echo "  All operating systems:"
 echo
 echo "    - Get, build and install the latest version of the smooth Class Library;"
-echo "      it can be obtained via CVS using:"
+echo "      it can be obtained via Git using:"
 echo
-echo "      cvs -d:pserver:anonymous@smooth.cvs.sf.net:/cvsroot/smooth co -P smooth"
+echo "      git clone https://github.com/enzo1982/smooth.git"
 echo
 echo "  On macOS, Linux, *BSD, Solaris, Hurd:"
 echo
