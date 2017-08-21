@@ -139,7 +139,9 @@ String BoCA::Track::GetLengthString() const
 	if	(length	      >= 0) seconds = Math::Round(Float(length)	      / format.rate);
 	else if (approxLength >= 0) seconds = Math::Round(Float(approxLength) / format.rate);
 
-	secondsString = String::FromInt(seconds / 60).Append(":").Append(seconds % 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 60));
+	secondsString = String(seconds >= 3600 ? String(seconds / 3600	    < 10 ? "0" : NIL).Append(String::FromInt(seconds / 3600	)).Append(":") : String())
+						.Append(seconds % 3600 / 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 3600 / 60)).Append(":")
+						.Append(seconds % 3600 % 60 < 10 ? "0" : NIL).Append(String::FromInt(seconds % 3600 % 60));
 
 	String		 lengthString;
 	static wchar_t	 sign[2] = { 0x2248, 0 };
