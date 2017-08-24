@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = config.o dllinterface.o faac.o
 
 # Enter additional defines here:
-DEFINE	  = -I$(SRCDIR)
+DEFINE	  = -I$(SRCDIR) -DFAACAPI=
 
 # Enter additional library dependencies here:
 LIBS	  =
