@@ -37,6 +37,8 @@ namespace BoCA
 			Int			 packetsWritten;
 			Int			 totalSamples;
 
+			Int			 EncodeFrames(Bool);
+
 			Int			 GetOutputSampleRate(Int) const;
 		public:
 			static const String	&GetComponentSpecs();

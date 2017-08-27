@@ -286,22 +286,10 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	/* Convert final frames.
 	 */
-	CA::UInt32				 packets = 1;
-	CA::AudioStreamPacketDescription	 packet;
+	EncodeFrames(True);
 
-	buffers->mBuffers[0].mDataByteSize = bufferSize;
-
-	while (CA::AudioConverterFillComplexBuffer(converter, &AudioConverterComplexInputDataProc, this, &packets, buffers, &packet) == 0)
-	{
-		if (buffers->mBuffers[0].mDataByteSize == 0) break;
-
-		CA::AudioFileWritePackets(audioFile, False, buffers->mBuffers[0].mDataByteSize, &packet, packetsWritten, &packets, buffers->mBuffers[0].mData);
-
-		packetsWritten += packets;
-
-		buffers->mBuffers[0].mDataByteSize = bufferSize;
-	}
-
+	/* Free buffers.
+	 */
 	delete [] (unsigned char *) buffers->mBuffers[0].mData;
 	delete [] (unsigned char *) buffers;
 
@@ -464,6 +452,13 @@ Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Convert frames.
 	 */
+	return EncodeFrames(False);
+}
+
+Int BoCA::EncoderCoreAudio::EncodeFrames(Bool flush)
+{
+	/* Encode samples.
+	 */
 	Int	 totalOutBytes = 0;
 
 	CA::UInt32				 packets = 1;
@@ -480,7 +475,7 @@ Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data)
 		packetsWritten += packets;
 		totalOutBytes  += buffers->mBuffers[0].mDataByteSize;
 
-		if (buffer.Size() - bytesConsumed < 65536) break;
+		if (!flush && buffer.Size() - bytesConsumed < 65536) break;
 
 		buffers->mBuffers[0].mDataByteSize = bufferSize;
 	}
