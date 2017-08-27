@@ -368,7 +368,6 @@ Int BoCA::EncoderVOAAC::WriteData(Buffer<UnsignedByte> &data)
 
 Int BoCA::EncoderVOAAC::EncodeFrames(Bool flush)
 {
-	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
 	/* Pad end of stream with empty samples.
@@ -415,8 +414,8 @@ Int BoCA::EncoderVOAAC::EncodeFrames(Bool flush)
 
 			dataLength += output.Length;
 
-			if (config->GetIntValue("VOAACEnc", "MP4Container", True)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, output.Length, frameSize, 0, true);
-			else							   driver->WriteData(outBuffer, output.Length);
+			if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, output.Length, frameSize, 0, true);
+			else		    driver->WriteData(outBuffer, output.Length);
 		}
 
 		framesProcessed++;

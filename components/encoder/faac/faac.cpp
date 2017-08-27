@@ -383,7 +383,6 @@ Int BoCA::EncoderFAAC::WriteData(Buffer<UnsignedByte> &data)
 
 Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 {
-	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
 	/* Pad end of stream with empty samples.
@@ -421,8 +420,8 @@ Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 		{
 			dataLength += bytes;
 
-			if (config->GetIntValue("FAAC", "MP4Container", True)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, frameSize, 0, true);
-			else						       driver->WriteData(outBuffer, bytes);
+			if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, frameSize, 0, true);
+			else		    driver->WriteData(outBuffer, bytes);
 		}
 
 		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) framesProcessed++;

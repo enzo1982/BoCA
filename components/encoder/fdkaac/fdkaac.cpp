@@ -386,7 +386,6 @@ Int BoCA::EncoderFDKAAC::WriteData(Buffer<UnsignedByte> &data)
 
 Int BoCA::EncoderFDKAAC::EncodeFrames(Bool flush)
 {
-	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
 	/* Pad end of stream with empty samples.
@@ -453,8 +452,8 @@ Int BoCA::EncoderFDKAAC::EncodeFrames(Bool flush)
 
 			dataLength += outputInfo.numOutBytes;
 
-			if (config->GetIntValue("FDKAAC", "MP4Container", True)) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, outputInfo.numOutBytes, frameSize, 0, true);
-			else							 driver->WriteData(outBuffer, outputInfo.numOutBytes);
+			if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, outputInfo.numOutBytes, frameSize, 0, true);
+			else		    driver->WriteData(outBuffer, outputInfo.numOutBytes);
 		}
 
 		framesProcessed++;
