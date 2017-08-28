@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,11 +33,6 @@ namespace BoCA
 			GroupBox	*group_version;
 			OptionBox	*option_version_mpeg2;
 			OptionBox	*option_version_mpeg4;
-
-			GroupBox	*group_aactype;
-			OptionBox	*option_aactype_main;
-			OptionBox	*option_aactype_low;
-			OptionBox	*option_aactype_ltp;
 
 			GroupBox	*group_id3v2;
 			CheckBox	*check_id3v2;
@@ -77,7 +72,6 @@ namespace BoCA
 			EditBox		*edit_bandwidth;
 
 			Int		 mpegVersion;
-			Int		 aacType;
 			Int		 bitrate;
 			Bool		 allowjs;
 			Bool		 usetns;
@@ -87,8 +81,6 @@ namespace BoCA
 			Int		 fileFormat;
 			Int		 fileExtension;
 		slots:
-			Void		 SetMPEGVersion();
-			Void		 SetObjectType();
 			Void		 SetBitrate();
 			Void		 SetBitrateByEditBox();
 			Void		 SetQuality();

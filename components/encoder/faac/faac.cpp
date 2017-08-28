@@ -141,7 +141,7 @@ Bool BoCA::EncoderFAAC::Activate()
 	fConfig = ex_faacEncGetCurrentConfiguration(handle);
 
 	fConfig->mpegVersion	= config->GetIntValue("FAAC", "MP4Container", True) ? MPEG4 : config->GetIntValue("FAAC", "MPEGVersion", 0);
-	fConfig->aacObjectType	= config->GetIntValue("FAAC", "AACType", 2);
+	fConfig->aacObjectType	= LOW;
 	fConfig->allowMidside	= config->GetIntValue("FAAC", "AllowJS", True);
 	fConfig->useTns		= config->GetIntValue("FAAC", "UseTNS", False);
 	fConfig->bandWidth	= config->GetIntValue("FAAC", "BandWidth", 22050);

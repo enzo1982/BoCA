@@ -18,7 +18,6 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	Config	*config = Config::Get();
 
 	mpegVersion	= config->GetIntValue("FAAC", "MPEGVersion", 0);
-	aacType		= config->GetIntValue("FAAC", "AACType", 2);
 	bitrate		= config->GetIntValue("FAAC", "Bitrate", 96);
 	allowjs		= config->GetIntValue("FAAC", "AllowJS", True);
 	usetns		= config->GetIntValue("FAAC", "UseTNS", False);
@@ -54,22 +53,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	group_mp4->Add(option_mp4);
 	group_mp4->Add(option_aac);
 
-	group_aactype		= new GroupBox(i18n->TranslateString("AAC object type"), Point(7, 88), Size(120, 90));
-
-	option_aactype_main	= new OptionBox("MAIN", Point(10, 13), Size(99, 0), &aacType, 1);
-	option_aactype_main->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
-
-	option_aactype_low	= new OptionBox("LC", Point(10, 38), Size(99, 0), &aacType, 2);
-	option_aactype_low->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
-
-	option_aactype_ltp	= new OptionBox("LTP", Point(10, 63), Size(99, 0), &aacType, 4);
-	option_aactype_ltp->onAction.Connect(&ConfigureFAAC::SetObjectType, this);
-
-	group_aactype->Add(option_aactype_main);
-	group_aactype->Add(option_aactype_low);
-	group_aactype->Add(option_aactype_ltp);
-
-	group_id3v2		= new GroupBox(i18n->TranslateString("Tags"), Point(135, 88), Size(279, 90));
+	group_id3v2		= new GroupBox(i18n->TranslateString("Tags"), Point(7, 88), Size(279, 90));
 
 	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
 	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
@@ -77,24 +61,21 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	text_note		= new Text(i18n->AddColon(i18n->TranslateString("Note")), Point(10, 38));
 	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
 
-	group_id3v2->SetSize(Size(Math::Max(240, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22), Math::Max(text_note->GetUnscaledTextHeight(), text_id3v2->GetUnscaledTextHeight()) + 48));
+	group_id3v2->SetSize(Size(Math::Max(368, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22), Math::Max(text_note->GetUnscaledTextHeight(), text_id3v2->GetUnscaledTextHeight()) + 48));
 
 	group_id3v2->Add(check_id3v2);
 	group_id3v2->Add(text_note);
 	group_id3v2->Add(text_id3v2);
 
-	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), Point(135, 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
+	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), Point(135, 11), Size(group_id3v2->GetWidth() / 2 - 68, 65));
 
 	option_version_mpeg2	= new OptionBox("MPEG 2", Point(10, 13), Size(group_version->GetWidth() - 21, 0), &mpegVersion, 1);
-	option_version_mpeg2->onAction.Connect(&ConfigureFAAC::SetMPEGVersion, this);
-
 	option_version_mpeg4	= new OptionBox("MPEG 4", Point(10, 38), Size(group_version->GetWidth() - 21, 0), &mpegVersion, 0);
-	option_version_mpeg4->onAction.Connect(&ConfigureFAAC::SetMPEGVersion, this);
 
 	group_version->Add(option_version_mpeg2);
 	group_version->Add(option_version_mpeg4);
 
-	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_version->GetWidth() + 143 + (group_id3v2->GetWidth() % 2), 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_version->GetWidth() + 143 + (group_id3v2->GetWidth() % 2), 11), Size(group_id3v2->GetWidth() / 2 - 68, 65));
 
 	option_extension_m4a	= new OptionBox(".m4a", Point(10, 13),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 0);
 	option_extension_m4b	= new OptionBox(".m4b", Point(10, 38),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 1);
@@ -147,15 +128,15 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	group_bitrate->Add(edit_quality);
 	group_bitrate->Add(text_quality_percent);
 
-	group_js		= new GroupBox(i18n->TranslateString("Stereo mode"), Point(335, 11), Size(179, 42));
+	group_js		= new GroupBox(i18n->TranslateString("Stereo mode"), Point(335, 11), Size(189, 42));
 
-	check_js		= new CheckBox(i18n->TranslateString("Allow Joint Stereo"), Point(10, 13), Size(158, 0), &allowjs);
+	check_js		= new CheckBox(i18n->TranslateString("Allow Joint Stereo"), Point(10, 13), Size(168, 0), &allowjs);
 
 	group_js->Add(check_js);
 
-	group_tns		= new GroupBox(i18n->TranslateString("Temporal Noise Shaping"), Point(335, 65), Size(179, 42));
+	group_tns		= new GroupBox(i18n->TranslateString("Temporal Noise Shaping"), Point(335, 65), Size(189, 42));
 
-	check_tns		= new CheckBox(i18n->TranslateString("Use Temporal Noise Shaping"), Point(10, 13), Size(158, 0), &usetns);
+	check_tns		= new CheckBox(i18n->TranslateString("Use Temporal Noise Shaping"), Point(10, 13), Size(168, 0), &usetns);
 
 	group_tns->Add(check_tns);
 
@@ -171,12 +152,11 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	SetBitrate();
 	SetQuality();
-	SetMPEGVersion();
 	SetFileFormat();
 
 	ToggleBitrateQuality();
 
-	tabwidget->SetSize(Size(Math::Max(525, group_id3v2->GetWidth() + 146), Math::Max(208, group_id3v2->GetHeight() + 118)));
+	tabwidget->SetSize(Size(Math::Max(535, group_id3v2->GetWidth() + 18), Math::Max(193, group_id3v2->GetHeight() + 118)));
 
 	Add(tabwidget);
 
@@ -184,7 +164,6 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	tabwidget->Add(layer_format);
 
 	layer_format->Add(group_version);
-	layer_format->Add(group_aactype);
 	layer_format->Add(group_mp4);
 	layer_format->Add(group_extension);
 	layer_format->Add(group_id3v2);
@@ -194,7 +173,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	layer_quality->Add(group_tns);
 	layer_quality->Add(group_bandwidth);
 
-	SetSize(Size(Math::Max(539, group_id3v2->GetWidth() + 160), Math::Max(222, group_id3v2->GetHeight() + 132)));
+	SetSize(tabwidget->GetSize() + Size(14, 14));
 }
 
 BoCA::ConfigureFAAC::~ConfigureFAAC()
@@ -206,10 +185,6 @@ BoCA::ConfigureFAAC::~ConfigureFAAC()
 	DeleteObject(group_version);
 	DeleteObject(option_version_mpeg2);
 	DeleteObject(option_version_mpeg4);
-	DeleteObject(group_aactype);
-	DeleteObject(option_aactype_main);
-	DeleteObject(option_aactype_low);
-	DeleteObject(option_aactype_ltp);
 	DeleteObject(group_mp4);
 	DeleteObject(option_mp4);
 	DeleteObject(option_aac);
@@ -252,7 +227,6 @@ Int BoCA::ConfigureFAAC::SaveSettings()
 	if (aacQuality > 500) aacQuality = 500;
 
 	config->SetIntValue("FAAC", "MPEGVersion", mpegVersion);
-	config->SetIntValue("FAAC", "AACType", aacType);
 	config->SetIntValue("FAAC", "Bitrate", bitrate);
 	config->SetIntValue("FAAC", "AllowJS", allowjs);
 	config->SetIntValue("FAAC", "UseTNS", usetns);
@@ -264,37 +238,6 @@ Int BoCA::ConfigureFAAC::SaveSettings()
 	config->SetIntValue("FAAC", "MP4FileExtension", fileExtension);
 
 	return Success();
-}
-
-Void BoCA::ConfigureFAAC::SetMPEGVersion()
-{
-	if (mpegVersion == 0) // MPEG4;
-	{
-		option_aactype_ltp->Activate();
-	}
-	else if (mpegVersion == 1) // MPEG2;
-	{
-		if (aacType == 4) // LTP
-		{
-			aacType = 2;
-
-			OptionBox::internalCheckValues.Emit();
-		}
-
-		option_aactype_ltp->Deactivate();
-	}
-}
-
-Void BoCA::ConfigureFAAC::SetObjectType()
-{
-	if (aacType == 4) // LTP
-	{
-		option_version_mpeg2->Deactivate();
-	}
-	else
-	{
-		option_version_mpeg2->Activate();
-	}
 }
 
 Void BoCA::ConfigureFAAC::SetBitrate()
@@ -325,8 +268,6 @@ Void BoCA::ConfigureFAAC::SetFileFormat()
 		group_id3v2->Deactivate();
 
 		group_extension->Activate();
-
-		option_aactype_ltp->Activate();
 
 		if (mpegVersion == 1) // MPEG2
 		{
