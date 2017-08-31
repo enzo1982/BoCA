@@ -1,54 +1,66 @@
-#ifndef APE_ALL_H
-#define APE_ALL_H
+#pragma once
 
 /*****************************************************************************************
-Cross platform building switch
+Platform
+ 
+One of the following platforms should be defined (either in code or as a project setting):
+PLATFORM_WINDOWS
+PLATFORM_APPLE
+PLATFORM_LINUX
 *****************************************************************************************/
-//#define BUILD_CROSS_PLATFORM
+#if !defined(PLATFORM_WINDOWS) && !defined(PLATFORM_APPLE) && !defined(PLATFORM_LINUX)
+	#pragma message("No platform set for MACLib, defaulting to Windows")
+	#define PLATFORM_WINDOWS
+#endif
 
 /*****************************************************************************************
 Global includes
 *****************************************************************************************/
-#ifndef BUILD_CROSS_PLATFORM
-    #ifndef NO_DEFINE_ENVIRONMENT_VARIABLES
-        #include "WindowsEnvironment.h"
-    #endif
-    #include <windows.h>
-#endif
+#include <stdint.h>
+#include <stdlib.h>
+#include <memory.h>
+#include <stdio.h>
+#include <math.h>
 
-#ifdef _WIN32
-    #include <mmsystem.h>
+#if defined(PLATFORM_WINDOWS)
+    #include <windows.h>
     #include <tchar.h>
+    #include <assert.h>
 #else
     #include <unistd.h>
     #include <time.h>
     #include <sys/time.h>
     #include <sys/types.h>
     #include <sys/stat.h>
+	#include <wchar.h>
     #include "NoWindows.h"
 #endif
+#define ape_max(a,b)    (((a) > (b)) ? (a) : (b))
+#define ape_min(a,b)    (((a) < (b)) ? (a) : (b))
 
-#include <stdlib.h>
-#include <memory.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
 #include "SmartPtr.h"
 
 /*****************************************************************************************
 Global compiler settings (useful for porting)
 *****************************************************************************************/
 // assembly code (helps performance, but limits portability)
-#ifndef BUILD_CROSS_PLATFORM
-    #define ENABLE_ASSEMBLY
+#ifndef PLATFORM_ARM
+    #ifndef PLATFORM_APPLE // doesn't compile on Mac
+        #define ENABLE_SSE_ASSEMBLY
+    #endif
+    #ifdef PLATFORM_WINDOWS // doesn't compile in gcc
+        #define ENABLE_MMX_ASSEMBLY
+    #endif
 #endif
 
-// BACKWARDS_COMPATIBILITY is only needed for decoding APE 3.92 or earlier files.  It
+// APE_BACKWARDS_COMPATIBILITY is only needed for decoding APE 3.92 or earlier files.  It
 // has not been possible to make these files for over 10 years, so it's unlikely
-// that disabling BACKWARDS_COMPATIBILITY would have any effect on a normal user.  For
-// porting or third party usage, it's probably best to not bother with BACKWARDS_COMPATIBILITY.
+// that disabling APE_BACKWARDS_COMPATIBILITY would have any effect on a normal user.  For
+// porting or third party usage, it's probably best to not bother with APE_BACKWARDS_COMPATIBILITY.
 // A future release of Monkey's Audio itself may remove support for these obsolete files.
-#define BACKWARDS_COMPATIBILITY
+#if defined(PLATFORM_WINDOWS)
+	#define APE_BACKWARDS_COMPATIBILITY
+#endif
 
 // compression modes
 #define ENABLE_COMPRESSION_MODE_FAST
@@ -56,20 +68,43 @@ Global compiler settings (useful for porting)
 #define ENABLE_COMPRESSION_MODE_HIGH
 #define ENABLE_COMPRESSION_MODE_EXTRA_HIGH
 
-/*****************************************************************************************
-Global types and macros
-*****************************************************************************************/
-#ifdef _WIN32
-    typedef unsigned __int32                            uint32;
-    typedef __int32                                     int32;
-    typedef unsigned __int16                            uint16;
-    typedef __int16                                     int16;
-    typedef unsigned __int8                             uint8;
-    typedef __int8                                      int8;
-    typedef char                                        str_ansi;
-    typedef unsigned char                               str_utf8;
-    typedef wchar_t                                     str_utf16;
+// 64 bit platform
+#if __x86_64__
+    #define PLATFORM_x64
+#endif
 
+/*****************************************************************************************
+Global types
+*****************************************************************************************/
+namespace APE
+{
+	// integer types
+#if defined(PLATFORM_x64)
+	typedef	intptr_t                                    int64; // native integer, can safely hold a pointer
+    typedef int32_t                                     int32;
+#else
+	typedef	intptr_t                                    int32; // native integer, can safely hold a pointer
+    typedef int64_t                                     int64;
+#endif
+    typedef intptr_t                                    intn;
+	typedef uint64_t                                    uint64;
+	typedef uint32_t                                    uint32;
+	typedef uint16_t                                    uint16;
+	typedef int16_t                                     int16;
+	typedef uint8_t                                     uint8;
+	typedef int8_t                                      int8;
+	
+	// string types
+	typedef char                                        str_ansi;
+	typedef unsigned char                               str_utf8;
+	typedef int16										str_utf16;
+	typedef wchar_t                                     str_utfn; // could be UTF-16 or UTF-32 depending on platform
+}
+
+/*****************************************************************************************
+Global macros
+*****************************************************************************************/
+#if defined(PLATFORM_WINDOWS)
     #define IO_USE_WIN_FILE_IO
     #define IO_HEADER_FILE                              "WinFileIO.h"
     #define IO_CLASS_NAME                               CWinFileIO
@@ -81,6 +116,13 @@ Global types and macros
     #define TICK_COUNT_TYPE                             unsigned long
     #define TICK_COUNT_READ(VARIABLE)                   VARIABLE = GetTickCount()
     #define TICK_COUNT_FREQ                             1000
+    #if !defined(ASSERT)
+        #if defined(_DEBUG)
+            #define ASSERT(e)                            assert(e)
+        #else
+            #define ASSERT(e)                            
+        #endif
+    #endif
 #else
     #define IO_USE_STD_LIB_FILE_IO
     #define IO_HEADER_FILE                              "StdLibFileIO.h"
@@ -94,18 +136,39 @@ Global types and macros
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
     #define __forceinline                                inline
+    #define ASSERT(e)                                    
 #endif
+
+/*****************************************************************************************
+WAVE format descriptor (binary compatible with Windows define, but in the APE namespace)
+*****************************************************************************************/
+namespace APE
+{
+#pragma pack(push, 1)
+	typedef struct tWAVEFORMATEX
+	{
+		WORD        wFormatTag;         /* format type */
+		WORD        nChannels;          /* number of channels (i.e. mono, stereo...) */
+		uint32      nSamplesPerSec;     /* sample rate */
+		uint32      nAvgBytesPerSec;    /* for buffer estimation */
+		WORD        nBlockAlign;        /* block size of data */
+		WORD        wBitsPerSample;     /* number of bits per sample of mono data */
+		WORD        cbSize;             /* the count in bytes of the size of */
+		/* extra information (after cbSize) */
+	} WAVEFORMATEX, *PWAVEFORMATEX, NEAR *NPWAVEFORMATEX, FAR *LPWAVEFORMATEX;
+#pragma pack(pop)
+}
 
 /*****************************************************************************************
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.11")
-#define MAC_NAME                                        _T("Monkey's Audio 4.11")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.11"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.11)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.11) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.11\nCopyrighted (c) 2000-2011 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.25")
+#define MAC_NAME                                        _T("Monkey's Audio 4.25")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.25"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.25)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.25) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.25\nCopyrighted (c) 2000-2017 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 
 /*****************************************************************************************
@@ -130,11 +193,11 @@ Macros
 
 #define CATCH_ERRORS(CODE) try { CODE } catch(...) { }
 
-#define RETURN_ON_ERROR(FUNCTION) {    int nRetVal = FUNCTION; if (nRetVal != 0) { return nRetVal; } }
-#define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nRetVal = FUNCTION; if (nRetVal != 0) { return VALUE; } }
+#define RETURN_ON_ERROR(FUNCTION) {    int nResult = FUNCTION; if (nResult != 0) { return nResult; } }
+#define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nResult = FUNCTION; if (nResult != 0) { return VALUE; } }
 #define RETURN_ON_EXCEPTION(CODE, VALUE) { try { CODE } catch(...) { return VALUE; } }
 
-#define THROW_ON_ERROR(CODE) { int nRetVal = CODE; if (nRetVal != 0) throw(nRetVal); }
+#define THROW_ON_ERROR(CODE) { int nResult = CODE; if (nResult != 0) throw(nResult); }
 
 #define EXPAND_1_TIMES(CODE) CODE
 #define EXPAND_2_TIMES(CODE) CODE CODE
@@ -234,6 +297,4 @@ Error Codes
     { ERROR_SKIPPED                               , _T("skipped") },                                \
     { ERROR_BAD_PARAMETER                         , _T("bad parameter") },                          \
     { ERROR_APE_COMPRESS_TOO_MUCH_DATA            , _T("APE compress too much data") },             \
-    { ERROR_UNDEFINED                             , _T("undefined") },                              \
-
-#endif // #ifndef APE_ALL_H
+    { ERROR_UNDEFINED                             , _T("undefined") },

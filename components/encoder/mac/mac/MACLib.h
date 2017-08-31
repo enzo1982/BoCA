@@ -1,6 +1,6 @@
 /*****************************************************************************************
 Monkey's Audio MACLib.h (include for using MACLib.lib in your projects)
-Copyright (C) 2000-2011 by Matthew T. Ashland   All Rights Reserved.
+Copyright (C) 2000-2013 by Matthew T. Ashland   All Rights Reserved.
 
 Overview:
 
@@ -30,8 +30,10 @@ mail at monkeysaudio dot com
 [ due to a large volume of email and spams, a response can not be guaranteed ]
 *****************************************************************************************/
 
-#ifndef APE_MACLIB_H
-#define APE_MACLIB_H
+#pragma once
+
+namespace APE
+{
 
 /*************************************************************************************************
 APE File Format Overview: (pieces in order -- only valid for the latest version APE files)
@@ -83,7 +85,7 @@ Defines
 #define MAC_FORMAT_FLAG_CREATE_WAV_HEADER    32    // create the wave header on decompression (not stored)
 
 #define CREATE_WAV_HEADER_ON_DECOMPRESSION    -1
-#define MAX_AUDIO_BYTES_UNKNOWN -1
+#define MAX_AUDIO_BYTES_UNKNOWN 0
 
 /*****************************************************************************************
 Progress callbacks
@@ -227,9 +229,10 @@ enum APE_DECOMPRESS_FIELDS
     APE_DECOMPRESS_CURRENT_BLOCK = 2000,        // current block location [ignored, ignored]
     APE_DECOMPRESS_CURRENT_MS = 2001,           // current millisecond location [ignored, ignored]
     APE_DECOMPRESS_TOTAL_BLOCKS = 2002,         // total blocks in the decompressors range [ignored, ignored]
-    APE_DECOMPRESS_LENGTH_MS = 2003,            // total blocks in the decompressors range [ignored, ignored]
+    APE_DECOMPRESS_LENGTH_MS = 2003,            // length of the decompressors range in milliseconds [ignored, ignored]
     APE_DECOMPRESS_CURRENT_BITRATE = 2004,      // current bitrate [ignored, ignored]
     APE_DECOMPRESS_AVERAGE_BITRATE = 2005,      // average bitrate (works with ranges) [ignored, ignored]
+    APE_DECOMPRESS_CURRENT_FRAME = 2006,        // current frame
 
     APE_INTERNAL_INFO = 3000,                   // for internal use -- don't use (returns APE_FILE_INFO *) [ignored, ignored]
 };
@@ -240,7 +243,6 @@ IAPEDecompress - interface for working with existing APE files (decoding, seekin
 class IAPEDecompress
 {
 public:
-
     // destructor (needed so implementation's destructor will be called)
     virtual ~IAPEDecompress() {}
     
@@ -285,7 +287,7 @@ public:
     //    int nParam2
     //        generic parameter... usage is listed in APE_DECOMPRESS_FIELDS
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int GetInfo(APE_DECOMPRESS_FIELDS Field, int nParam1 = 0, int nParam2 = 0) = 0;
+    virtual intn GetInfo(APE_DECOMPRESS_FIELDS Field, intn nParam1 = 0, intn nParam2 = 0) = 0;
 };
 
 /*************************************************************************************************
@@ -298,7 +300,6 @@ Usage:
 class IAPECompress
 {
 public:
-
     // destructor (needed so implementation's destructor will be called)
     virtual ~IAPECompress() {}
     
@@ -310,7 +311,7 @@ public:
     // Start(...) / StartEx(...) - starts encoding
     // 
     // Parameters:
-    //    CIO * pioOutput / const str_utf16 * pFilename
+    //    CIO * pioOutput / const str_utfn * pFilename
     //        the output... either a filename or an I/O source
     //    WAVEFORMATEX * pwfeInput
     //        format of the audio to encode (use FillWaveFormatEx() if necessary)
@@ -332,12 +333,12 @@ public:
     //        on decompression)
     //////////////////////////////////////////////////////////////////////////////////////////////
 
-    virtual int Start(const str_utf16 * pOutputFilename, const WAVEFORMATEX * pwfeInput, 
-        int nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, 
+    virtual int Start(const str_utfn * pOutputFilename, const WAVEFORMATEX * pwfeInput, 
+        unsigned int nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, 
         const void * pHeaderData = NULL, int nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
 
     virtual int StartEx(CIO * pioOutput, const WAVEFORMATEX * pwfeInput, 
-        int nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, 
+        unsigned int nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, 
         const void * pHeaderData = NULL, int nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
     
     /*********************************************************************************************
@@ -383,10 +384,10 @@ public:
     // Parameters:
     //    int nBytesAdded
     //        the number of bytes copied into the buffer
-    //    BOOL bProcess
+    //    bool bProcess
     //        whether MAC should process as much as possible of the buffer
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int UnlockBuffer(int nBytesAdded, BOOL bProcess = TRUE) = 0;
+    virtual int UnlockBuffer(unsigned int nBytesAdded, bool bProcess = true) = 0;
     
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -400,7 +401,7 @@ public:
     //    int * pBytesAdded
     //        returns the number of bytes added from the I/O source
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int AddDataFromInputSource(CInputSource * pInputSource, int nMaxBytes = -1, int * pBytesAdded = NULL) = 0;
+    virtual int AddDataFromInputSource(CInputSource * pInputSource, unsigned int nMaxBytes = 0, int * pBytesAdded = NULL) = 0;
     
     /*********************************************************************************************
     * Finish / Kill
@@ -429,6 +430,8 @@ public:
     virtual int Kill() = 0;
 };
 
+} // namespace APE
+
 /*************************************************************************************************
 Functions to create the interfaces
 
@@ -446,10 +449,10 @@ Usage example:
 *************************************************************************************************/
 extern "C"
 {
-    IAPEDecompress * __stdcall CreateIAPEDecompress(const str_utf16 * pFilename, int * pErrorCode = NULL);
-    IAPEDecompress * __stdcall CreateIAPEDecompressEx(CIO * pIO, int * pErrorCode = NULL);
-    IAPEDecompress * __stdcall CreateIAPEDecompressEx2(CAPEInfo * pAPEInfo, int nStartBlock = -1, int nFinishBlock = -1, int * pErrorCode = NULL);
-    IAPECompress * __stdcall CreateIAPECompress(int * pErrorCode = NULL);
+    APE::IAPEDecompress * __stdcall CreateIAPEDecompress(const APE::str_utfn * pFilename, int * pErrorCode = NULL);
+    APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx(APE::CIO * pIO, int * pErrorCode = NULL);
+    APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx2(APE::CAPEInfo * pAPEInfo, int nStartBlock = -1, int nFinishBlock = -1, int * pErrorCode = NULL);
+    APE::IAPECompress * __stdcall CreateIAPECompress(int * pErrorCode = NULL);
 }
 
 /*************************************************************************************************
@@ -458,24 +461,22 @@ Simple functions - see the SDK sample projects for usage examples
 extern "C"
 {
     // process whole files
-    DLLEXPORT int __stdcall CompressFile(const str_ansi * pInputFilename, const str_ansi * pOutputFilename, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, int * pPercentageDone = NULL, APE_PROGRESS_CALLBACK ProgressCallback = 0, int * pKillFlag = NULL);
-    DLLEXPORT int __stdcall DecompressFile(const str_ansi * pInputFilename, const str_ansi * pOutputFilename, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
-    DLLEXPORT int __stdcall ConvertFile(const str_ansi * pInputFilename, const str_ansi * pOutputFilename, int nCompressionLevel, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
-    DLLEXPORT int __stdcall VerifyFile(const str_ansi * pInputFilename, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag); 
+    DLLEXPORT int __stdcall CompressFile(const APE::str_ansi * pInputFilename, const APE::str_ansi * pOutputFilename, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, int * pPercentageDone = NULL, APE::APE_PROGRESS_CALLBACK ProgressCallback = 0, int * pKillFlag = NULL);
+    DLLEXPORT int __stdcall DecompressFile(const APE::str_ansi * pInputFilename, const APE::str_ansi * pOutputFilename, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
+    DLLEXPORT int __stdcall ConvertFile(const APE::str_ansi * pInputFilename, const APE::str_ansi * pOutputFilename, int nCompressionLevel, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
+    DLLEXPORT int __stdcall VerifyFile(const APE::str_ansi * pInputFilename, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag); 
 
-    DLLEXPORT int __stdcall CompressFileW(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, int * pPercentageDone = NULL, APE_PROGRESS_CALLBACK ProgressCallback = 0, int * pKillFlag = NULL);
-    DLLEXPORT int __stdcall DecompressFileW(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
-    DLLEXPORT int __stdcall ConvertFileW(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nCompressionLevel, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
-    DLLEXPORT int __stdcall VerifyFileW(const str_utf16 * pInputFilename, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag, BOOL bQuickVerifyIfPossible = FALSE); 
+    DLLEXPORT int __stdcall CompressFileW(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, int * pPercentageDone = NULL, APE::APE_PROGRESS_CALLBACK ProgressCallback = 0, int * pKillFlag = NULL);
+    DLLEXPORT int __stdcall DecompressFileW(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
+    DLLEXPORT int __stdcall ConvertFileW(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
+    DLLEXPORT int __stdcall VerifyFileW(const APE::str_utfn * pInputFilename, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag, bool bQuickVerifyIfPossible = false); 
 
-    DLLEXPORT int __stdcall CompressFileW2(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, IAPEProgressCallback * pProgressCallback = NULL);
-    DLLEXPORT int __stdcall DecompressFileW2(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, IAPEProgressCallback * pProgressCallback = NULL);
-    DLLEXPORT int __stdcall ConvertFileW2(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nCompressionLevel, IAPEProgressCallback * pProgressCallback = NULL);
-    DLLEXPORT int __stdcall VerifyFileW2(const str_utf16 * pInputFilename, IAPEProgressCallback * pProgressCallback = NULL, BOOL bQuickVerifyIfPossible = FALSE); 
+    DLLEXPORT int __stdcall CompressFileW2(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, APE::IAPEProgressCallback * pProgressCallback = NULL);
+    DLLEXPORT int __stdcall DecompressFileW2(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, APE::IAPEProgressCallback * pProgressCallback = NULL);
+    DLLEXPORT int __stdcall ConvertFileW2(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel, APE::IAPEProgressCallback * pProgressCallback = NULL);
+    DLLEXPORT int __stdcall VerifyFileW2(const APE::str_utfn * pInputFilename, APE::IAPEProgressCallback * pProgressCallback = NULL, bool bQuickVerifyIfPossible = false); 
 
     // helper functions
-    DLLEXPORT int __stdcall FillWaveFormatEx(WAVEFORMATEX * pWaveFormatEx, int nSampleRate = 44100, int nBitsPerSample = 16, int nChannels = 2);
-    DLLEXPORT int __stdcall FillWaveHeader(WAVE_HEADER * pWAVHeader, int nAudioBytes, WAVEFORMATEX * pWaveFormatEx, int nTerminatingBytes = 0);
+    DLLEXPORT int __stdcall FillWaveFormatEx(APE::WAVEFORMATEX * pWaveFormatEx, int nSampleRate = 44100, int nBitsPerSample = 16, int nChannels = 2);
+    DLLEXPORT int __stdcall FillWaveHeader(APE::WAVE_HEADER * pWAVHeader, int nAudioBytes, APE::WAVEFORMATEX * pWaveFormatEx, int nTerminatingBytes = 0);
 }
-
-#endif // #ifndef APE_MACLIB_H
