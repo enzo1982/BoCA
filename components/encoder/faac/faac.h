@@ -24,7 +24,6 @@ namespace BoCA
 
 			MP4FileHandle		 mp4File;
 			faacEncHandle		 handle;
-			faacEncConfigurationPtr	 fConfig;
 
 			Int			 mp4Track;
 			Int			 sampleId;

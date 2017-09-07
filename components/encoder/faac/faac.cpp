@@ -94,7 +94,6 @@ BoCA::EncoderFAAC::EncoderFAAC()
 
 	mp4File	     = NIL;
 	handle	     = NIL;
-	fConfig	     = NIL;
 
 	mp4Track     = -1;
 	sampleId     = 0;
@@ -138,7 +137,7 @@ Bool BoCA::EncoderFAAC::Activate()
 
 	outBuffer.Resize(bufferSize);
 
-	fConfig = ex_faacEncGetCurrentConfiguration(handle);
+	faacEncConfigurationPtr	 fConfig = ex_faacEncGetCurrentConfiguration(handle);
 
 	fConfig->mpegVersion	= config->GetIntValue("FAAC", "MP4Container", True) ? MPEG4 : config->GetIntValue("FAAC", "MPEGVersion", 0);
 	fConfig->aacObjectType	= LOW;
