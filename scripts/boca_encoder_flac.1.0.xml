@@ -22,7 +22,7 @@
 	<min alias="worst">0</min>
 	<max alias="best">8</max>
       </range>
-      <range name="Block size" argument="-b %VALUE" default="4608" step="16">
+      <range name="Block size" argument="-b %VALUE" default="4096" step="16">
 	<min alias="small">16</min>
 	<max alias="large">4608</max>
       </range>

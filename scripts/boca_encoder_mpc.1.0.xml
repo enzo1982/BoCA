@@ -30,7 +30,7 @@
 	<option alias="enhanced 2/6 dB">11</option>
 	<option alias="enhanced 2.5/9 dB">12</option>
 	<option alias="enhanced 3/12 dB">13</option>
-	<option alias="enhanced 3/∞ dB">15</option>
+	<option alias="enhanced 3/inf dB">15</option>
       </selection>
       <range name="Adaptive noise shaping order" argument="--ans %VALUE" default="6">
 	<min alias="off">0</min>
