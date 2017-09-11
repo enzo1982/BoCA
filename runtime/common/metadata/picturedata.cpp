@@ -38,7 +38,13 @@ Int BoCA::PictureData::Size() const
 {
 	if (crc != 0)
 	{
-		return dataStore.Get(crc)->Size();
+		mutex.Lock();
+
+		Int	 size = dataStore.Get(crc)->Size();
+
+		mutex.Release();
+
+		return size;
 	}
 
 	return 0;
@@ -139,10 +145,22 @@ Bool BoCA::PictureData::operator !=(const PictureData &oPictureData) const
 
 BoCA::PictureData::operator const Buffer<UnsignedByte> &() const
 {
-	return *dataStore.Get(crc);
+	mutex.Lock();
+
+	const Buffer<UnsignedByte>	&buffer = *dataStore.Get(crc);
+
+	mutex.Release();
+
+	return buffer;
 }
 
 BoCA::PictureData::operator const UnsignedByte *() const
 {
-	return *dataStore.Get(crc);
+	mutex.Lock();
+
+	const UnsignedByte	*data = *dataStore.Get(crc);
+
+	mutex.Release();
+
+	return data;
 }
