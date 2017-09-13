@@ -12,10 +12,12 @@
 
 #include <boca/common/metadata/picturedata.h>
 
+using namespace smooth::Threads;
+
 Array<Buffer<UnsignedByte> *, Void *>	 BoCA::PictureData::dataStore;
 Array<Short>				 BoCA::PictureData::referenceStore;
 
-Threads::Mutex				 BoCA::PictureData::mutex;
+Mutex					 BoCA::PictureData::mutex;
 
 BoCA::PictureData::PictureData()
 {
@@ -38,13 +40,9 @@ Int BoCA::PictureData::Size() const
 {
 	if (crc != 0)
 	{
-		mutex.Lock();
+		Lock	 lock(mutex);
 
-		Int	 size = dataStore.Get(crc)->Size();
-
-		mutex.Release();
-
-		return size;
+		return dataStore.Get(crc)->Size();
 	}
 
 	return 0;
@@ -54,8 +52,7 @@ Bool BoCA::PictureData::Clean()
 {
 	if (crc != 0)
 	{
-		mutex.Lock();
-
+		Lock	 lock(mutex);
 		Short	&referenceCount = referenceStore.GetReference(crc);
 
 		if (referenceCount == 1)
@@ -69,8 +66,6 @@ Bool BoCA::PictureData::Clean()
 		{
 			referenceCount--;
 		}
-
-		mutex.Release();
 
 		crc = 0;
 	}
@@ -88,7 +83,7 @@ Bool BoCA::PictureData::Set(Void *data, Int size)
 
 	crc = Hash::CRC32::Compute(*buffer);
 
-	mutex.Lock();
+	Lock	 lock(mutex);
 
 	if (referenceStore.Get(crc) == 0)
 	{
@@ -104,8 +99,6 @@ Bool BoCA::PictureData::Set(Void *data, Int size)
 		delete buffer;
 	}
 
-	mutex.Release();
-
 	return True;
 }
 
@@ -115,13 +108,10 @@ BoCA::PictureData &BoCA::PictureData::operator =(const PictureData &oPictureData
 
 	crc = oPictureData.crc;
 
-	mutex.Lock();
-
+	Lock	 lock(mutex);
 	Short	&referenceCount = referenceStore.GetReference(crc);
 
 	referenceCount++;
-
-	mutex.Release();
 
 	return *this;
 }
@@ -145,22 +135,14 @@ Bool BoCA::PictureData::operator !=(const PictureData &oPictureData) const
 
 BoCA::PictureData::operator const Buffer<UnsignedByte> &() const
 {
-	mutex.Lock();
+	Lock	 lock(mutex);
 
-	const Buffer<UnsignedByte>	&buffer = *dataStore.Get(crc);
-
-	mutex.Release();
-
-	return buffer;
+	return *dataStore.Get(crc);
 }
 
 BoCA::PictureData::operator const UnsignedByte *() const
 {
-	mutex.Lock();
+	Lock	 lock(mutex);
 
-	const UnsignedByte	*data = *dataStore.Get(crc);
-
-	mutex.Release();
-
-	return data;
+	return *dataStore.Get(crc);
 }
