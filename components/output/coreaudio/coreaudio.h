@@ -12,8 +12,6 @@
 
 #include <boca.h>
 
-using namespace smooth::Threads;
-
 BoCA_BEGIN_COMPONENT(OutputCoreAudio)
 
 namespace BoCA
@@ -28,7 +26,7 @@ namespace BoCA
 
 			Buffer<UnsignedByte>	 samplesBuffer;
 
-			Mutex			*samplesBufferMutex;
+			Threads::Mutex		*samplesBufferMutex;
 		public:
 			static const String	&GetComponentSpecs();
 

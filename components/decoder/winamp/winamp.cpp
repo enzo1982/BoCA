@@ -19,6 +19,7 @@
 #include "config.h"
 
 using namespace smooth::IO;
+using namespace smooth::Threads;
 
 const String &BoCA::DecoderWinamp::GetComponentSpecs()
 {

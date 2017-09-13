@@ -18,6 +18,7 @@
 #include "flac.h"
 
 using namespace smooth::IO;
+using namespace smooth::Threads;
 
 const String &BoCA::DecoderFLAC::GetComponentSpecs()
 {

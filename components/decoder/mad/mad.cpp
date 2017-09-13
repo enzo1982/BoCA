@@ -20,6 +20,7 @@
 #include "xing/dxhead.h"
 
 using namespace smooth::IO;
+using namespace smooth::Threads;
 
 const String &BoCA::DecoderMAD::GetComponentSpecs()
 {

@@ -16,8 +16,6 @@
 #include "sndfile.h"
 #include "config.h"
 
-using namespace smooth::IO;
-
 const String &BoCA::EncoderSndFile::GetComponentSpecs()
 {
 	static String	 componentSpecs;

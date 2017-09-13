@@ -15,8 +15,6 @@
 
 BoCA_BEGIN_COMPONENT(OutputWaveOut)
 
-using namespace smooth::Threads;
-
 namespace BoCA
 {
 	class OutputWaveOut : public CS::OutputComponent
@@ -25,7 +23,7 @@ namespace BoCA
 			HWAVEOUT			 hWaveOut;
 			Array<WAVEHDR *, Void *>	 headers;
 
-			Thread				*thread;
+			Threads::Thread			*thread;
 			Bool				 stop;
 
 			CRITICAL_SECTION		 sync;

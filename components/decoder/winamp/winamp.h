@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,8 +12,6 @@
 
 #include <boca.h>
 #include "dllinterface.h"
-
-using namespace smooth::Threads;
 
 BoCA_BEGIN_COMPONENT(DecoderWinamp)
 
@@ -29,7 +27,7 @@ namespace BoCA
 			ConfigLayer		*configLayer;
 
 			Buffer<Byte>		 samplesBuffer;
-			Mutex			*samplesBufferMutex;
+			Threads::Mutex		*samplesBufferMutex;
 			Int64			 samplesDone;
 
 			Track			*infoTrack;

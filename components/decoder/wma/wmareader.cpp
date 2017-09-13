@@ -12,6 +12,8 @@
 
 #include "wmareader.h"
 
+using namespace smooth::Threads;
+
 BoCA::WMAReader::WMAReader()
 {
 	m_cRef = 1;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,8 +14,6 @@
 #include "dllinterface.h"
 #include "wmareader.h"
 
-using namespace smooth::Threads;
-
 BoCA_BEGIN_COMPONENT(DecoderWMA)
 
 namespace BoCA
@@ -28,7 +26,7 @@ namespace BoCA
 			WMAReader		*readerCallback;
 
 			Buffer<UnsignedByte>	 samplesBuffer;
-			Mutex			 samplesBufferMutex;
+			Threads::Mutex		 samplesBufferMutex;
 
 			Bool			 userProvidedClock;
 
