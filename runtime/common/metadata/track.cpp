@@ -186,24 +186,22 @@ Bool BoCA::Track::LoadCoverArtFiles()
 
 Bool BoCA::Track::LoadCoverArtFile(const String &file)
 {
-	Picture	 picture;
+	Picture	 nPicture;
 
-	picture.LoadFromFile(file);
+	nPicture.LoadFromFile(file);
 
 	/* Check if the cover art is already in our list.
 	 */
-	for (Int i = 0; i < pictures.Length(); i++)
+	foreach (const Picture &picture, pictures)
 	{
-		if (pictures.GetNth(i).data.Size() != picture.data.Size()) continue;
-
-		if (memcmp(pictures.GetNth(i).data, picture.data, picture.data.Size()) == 0) return True;
+		if (picture.data == nPicture.data) return True;
 	}
 
-	if	(file.Contains("front")) picture.type = 0x03; // Cover (front)
-	else if (file.Contains("back"))	 picture.type = 0x04; // Cover (back)
-	else if (file.Contains("disc"))	 picture.type = 0x06; // Media
+	if	(file.Contains("front")) nPicture.type = 0x03; // Cover (front)
+	else if (file.Contains("back"))	 nPicture.type = 0x04; // Cover (back)
+	else if (file.Contains("disc"))	 nPicture.type = 0x06; // Media
 
-	pictures.Add(picture);
+	nPictures.Add(picture);
 
 	return True;
 }
