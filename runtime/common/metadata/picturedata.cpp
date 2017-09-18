@@ -38,36 +38,30 @@ BoCA::PictureData::~PictureData()
 
 Int BoCA::PictureData::Size() const
 {
-	if (crc != 0)
-	{
-		Lock	 lock(mutex);
+	if (crc == 0) return 0;
 
-		return dataStore.Get(crc)->Size();
-	}
+	Lock	 lock(mutex);
 
-	return 0;
+	return dataStore.Get(crc)->Size();
 }
 
 Bool BoCA::PictureData::Clean()
 {
-	if (crc != 0)
+	if (crc == 0) return True;
+
+	UnsignedInt32	 pCRC = crc;
+
+	crc = 0;
+
+	Lock	 lock(mutex);
+	Short	&referenceCount = referenceStore.GetReference(pCRC);
+
+	if (--referenceCount == 0)
 	{
-		Lock	 lock(mutex);
-		Short	&referenceCount = referenceStore.GetReference(crc);
+		delete dataStore.Get(pCRC);
 
-		if (referenceCount == 1)
-		{
-			delete dataStore.Get(crc);
-
-			dataStore.Remove(crc);
-			referenceStore.Remove(crc);
-		}
-		else
-		{
-			referenceCount--;
-		}
-
-		crc = 0;
+		dataStore.Remove(pCRC);
+		referenceStore.Remove(pCRC);
 	}
 
 	return True;
@@ -77,27 +71,31 @@ Bool BoCA::PictureData::Set(Void *data, Int size)
 {
 	Clean();
 
+	if (size == 0) return False;
+
 	Buffer<UnsignedByte>	*buffer = new Buffer<UnsignedByte>(size);
 
 	memcpy(*buffer, data, size);
 
-	crc = Hash::CRC32::Compute(*buffer);
+	UnsignedInt32	 nCRC = Hash::CRC32::Compute(*buffer);
 
 	Lock	 lock(mutex);
 
-	if (referenceStore.Get(crc) == 0)
+	if (referenceStore.Get(nCRC) == 0)
 	{
-		dataStore.Add(buffer, crc);
-		referenceStore.Add(1, crc);
+		dataStore.Add(buffer, nCRC);
+		referenceStore.Add(1, nCRC);
 	}
 	else
 	{
-		Short	&referenceCount = referenceStore.GetReference(crc);
+		Short	&referenceCount = referenceStore.GetReference(nCRC);
 
 		referenceCount++;
 
 		delete buffer;
 	}
+
+	crc = nCRC;
 
 	return True;
 }
@@ -106,12 +104,16 @@ BoCA::PictureData &BoCA::PictureData::operator =(const PictureData &oPictureData
 {
 	if (&oPictureData == this) return *this;
 
-	crc = oPictureData.crc;
+	Clean();
+
+	if (oPictureData.crc == 0) return *this;
 
 	Lock	 lock(mutex);
-	Short	&referenceCount = referenceStore.GetReference(crc);
+	Short	&referenceCount = referenceStore.GetReference(oPictureData.crc);
 
 	referenceCount++;
+
+	crc = oPictureData.crc;
 
 	return *this;
 }
@@ -135,6 +137,10 @@ Bool BoCA::PictureData::operator !=(const PictureData &oPictureData) const
 
 BoCA::PictureData::operator const Buffer<UnsignedByte> &() const
 {
+	static Buffer<UnsignedByte>	 zero;
+
+	if (crc == 0) return zero;
+
 	Lock	 lock(mutex);
 
 	return *dataStore.Get(crc);
@@ -142,6 +148,8 @@ BoCA::PictureData::operator const Buffer<UnsignedByte> &() const
 
 BoCA::PictureData::operator const UnsignedByte *() const
 {
+	if (crc == 0) return NIL;
+
 	Lock	 lock(mutex);
 
 	return *dataStore.Get(crc);

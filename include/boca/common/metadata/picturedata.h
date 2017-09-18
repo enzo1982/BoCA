@@ -28,7 +28,7 @@ namespace BoCA
 
 			static Threads::Mutex				 mutex;
 
-			Int						 crc;
+			UnsignedInt32					 crc;
 		public:
 									 PictureData();
 									 PictureData(const PictureData &);
