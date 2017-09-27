@@ -107,8 +107,8 @@ int GetOutputSampleRate(const CoreAudioCommSetup &setup)
 
 		/* Check if current sample rate range fits better than previous best.
 		 */
-		if (abs(setup.rate - sampleRates[i].mMinimum) < abs(setup.rate - outputRate)) outputRate = sampleRates[i].mMinimum;
-		if (abs(setup.rate - sampleRates[i].mMaximum) < abs(setup.rate - outputRate)) outputRate = sampleRates[i].mMaximum;
+		if (abs(setup.rate - (int) sampleRates[i].mMinimum) < abs(setup.rate - outputRate)) outputRate = sampleRates[i].mMinimum;
+		if (abs(setup.rate - (int) sampleRates[i].mMaximum) < abs(setup.rate - outputRate)) outputRate = sampleRates[i].mMaximum;
 	}
 
 	free(sampleRates);
@@ -245,8 +245,8 @@ int main(int argc, char *argv[])
 						{
 							if (bitrate >= bitrateValues[i].mMinimum && bitrate <= bitrateValues[i].mMaximum)  nearest = bitrate;
 
-							if (abs(bitrate - bitrateValues[i].mMinimum) < abs(bitrate - nearest)) nearest = bitrateValues[i].mMinimum;
-							if (abs(bitrate - bitrateValues[i].mMaximum) < abs(bitrate - nearest)) nearest = bitrateValues[i].mMaximum;
+							if (abs(int(bitrate - bitrateValues[i].mMinimum)) < abs(int(bitrate - nearest))) nearest = bitrateValues[i].mMinimum;
+							if (abs(int(bitrate - bitrateValues[i].mMaximum)) < abs(int(bitrate - nearest))) nearest = bitrateValues[i].mMaximum;
 						}
 
 						bitrate = nearest;
