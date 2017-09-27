@@ -16,6 +16,7 @@
 #include <cdio/cdio.h>
 
 #if LIBCDIO_VERSION_NUM < 93
+#	include <stdlib.h>
 #	define cdio_free(p) free(p)
 #endif
 
