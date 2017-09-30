@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,6 +28,11 @@ Int BoCA::AS::DeviceInfoComponent::GetNumberOfDevices()
 const BoCA::Device &BoCA::AS::DeviceInfoComponent::GetNthDeviceInfo(Int n)
 {
 	return *((const Device *) specs->func_GetNthDeviceInfo(component, n));
+}
+
+Bool BoCA::AS::DeviceInfoComponent::IsNthDeviceTrayOpen(Int n)
+{
+	return specs->func_IsNthDeviceTrayOpen(component, n);
 }
 
 Bool BoCA::AS::DeviceInfoComponent::OpenNthDeviceTray(Int n)

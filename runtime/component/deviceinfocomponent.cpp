@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -34,6 +34,11 @@ const BoCA::Device &BoCA::CS::DeviceInfoComponent::GetNthDeviceInfo(Int n)
 	/* Device list must be filled by component.
 	 */
 	return devices.GetNth(n);
+}
+
+Bool BoCA::CS::DeviceInfoComponent::IsNthDeviceTrayOpen(Int n)
+{
+	return False;
 }
 
 Bool BoCA::CS::DeviceInfoComponent::OpenNthDeviceTray(Int n)

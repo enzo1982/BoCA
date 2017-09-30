@@ -125,6 +125,8 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_GetNumberOfDevices(void *component)						{ return ((BoCA::componentName *) component)->GetNumberOfDevices(); }									\
 		BOCA_EXPORT const void *BoCA_##componentName##_GetNthDeviceInfo(void *component, int n)					{ return &((BoCA::componentName *) component)->GetNthDeviceInfo(n); }									\
 																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_IsNthDeviceTrayOpen(void *component, int n)					{ return ((BoCA::componentName *) component)->IsNthDeviceTrayOpen(n); }									\
+																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_OpenNthDeviceTray(void *component, int n)					{ return ((BoCA::componentName *) component)->OpenNthDeviceTray(n); }									\
 		BOCA_EXPORT bool BoCA_##componentName##_CloseNthDeviceTray(void *component, int n)					{ return ((BoCA::componentName *) component)->CloseNthDeviceTray(n); }									\
 																																		\

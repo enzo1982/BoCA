@@ -365,6 +365,8 @@ namespace BoCA
 				int			 (*func_GetNumberOfDevices)(void *);
 				const void		*(*func_GetNthDeviceInfo)(void *, int);
 
+				bool			 (*func_IsNthDeviceTrayOpen)(void *, int);
+
 				bool			 (*func_OpenNthDeviceTray)(void *, int);
 				bool			 (*func_CloseNthDeviceTray)(void *, int);
 

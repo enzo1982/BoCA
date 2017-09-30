@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -31,6 +31,8 @@ namespace BoCA
 
 				virtual Int			 GetNumberOfDevices();
 				virtual const Device		&GetNthDeviceInfo(Int);
+
+				virtual Bool			 IsNthDeviceTrayOpen(Int);
 
 				virtual Bool			 OpenNthDeviceTray(Int);
 				virtual Bool			 CloseNthDeviceTray(Int);

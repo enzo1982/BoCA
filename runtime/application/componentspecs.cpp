@@ -102,6 +102,8 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_GetNumberOfDevices		= NIL;
 	func_GetNthDeviceInfo		= NIL;
 
+	func_IsNthDeviceTrayOpen	= NIL;
+
 	func_OpenNthDeviceTray		= NIL;
 	func_CloseNthDeviceTray		= NIL;
 
@@ -228,6 +230,8 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_GetNumberOfDevices		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfDevices"));
 	func_GetNthDeviceInfo		= (const void *(*)(void *, int))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNthDeviceInfo"));
+
+	func_IsNthDeviceTrayOpen	= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_IsNthDeviceTrayOpen"));
 
 	func_OpenNthDeviceTray		= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_OpenNthDeviceTray"));
 	func_CloseNthDeviceTray		= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CloseNthDeviceTray"));
