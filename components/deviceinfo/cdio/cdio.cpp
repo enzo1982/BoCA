@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,6 +14,7 @@
 #include <smooth/dll.h>
 
 #include <cdio/cdio.h>
+#include <cdio/mmc.h>
 
 #include <unistd.h>
 #include <limits.h>
@@ -166,6 +167,22 @@ BoCA::DeviceInfoCDIO::DeviceInfoCDIO()
 
 BoCA::DeviceInfoCDIO::~DeviceInfoCDIO()
 {
+}
+
+Bool BoCA::DeviceInfoCDIO::IsNthDeviceTrayOpen(Int n)
+{
+	const Array<String>	&driveNames = FindDrives();
+	CdIo_t			*cd	    = cdio_open(driveNames.GetNth(n), DRIVER_UNKNOWN);
+
+	if (cd == NIL) return False;
+
+	/* Get tray status.
+	 */
+	Bool	 status = mmc_get_tray_status(cd);
+
+	cdio_destroy(cd);
+
+	return status;
 }
 
 Bool BoCA::DeviceInfoCDIO::OpenNthDeviceTray(Int n)

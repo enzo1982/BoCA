@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -100,40 +100,47 @@ BoCA::DeviceInfoCDRip::~DeviceInfoCDRip()
 {
 }
 
+Bool BoCA::DeviceInfoCDRip::IsNthDeviceTrayOpen(Int n)
+{
+	Int	 nDrives = ex_CR_GetNumCDROM();
+
+	if (n >= nDrives) return False;
+
+	CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
+	CDMEDIASTATUS	 status;
+
+	ex_CR_IsMediaLoaded(cd, status);
+	ex_CR_CloseCDROM(cd);
+
+	return (status == CDMEDIA_NOT_PRESENT_TRAY_OPEN);
+}
+
 Bool BoCA::DeviceInfoCDRip::OpenNthDeviceTray(Int n)
 {
 	Int	 nDrives = ex_CR_GetNumCDROM();
 
-	if (n < nDrives)
-	{
-		CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
+	if (n >= nDrives) return False;
 
-		ex_CR_EjectCD(cd, True);
+	CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
 
-		ex_CR_CloseCDROM(cd);
+	ex_CR_EjectCD(cd, True);
+	ex_CR_CloseCDROM(cd);
 
-		return True;
-	}
-
-	return False;
+	return True;
 }
 
 Bool BoCA::DeviceInfoCDRip::CloseNthDeviceTray(Int n)
 {
 	Int	 nDrives = ex_CR_GetNumCDROM();
 
-	if (n < nDrives)
-	{
-		CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
+	if (n >= nDrives) return False;
 
-		ex_CR_EjectCD(cd, False);
+	CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
 
-		ex_CR_CloseCDROM(cd);
+	ex_CR_EjectCD(cd, False);
+	ex_CR_CloseCDROM(cd);
 
-		return True;
-	}
-
-	return False;
+	return True;
 }
 
 const Array<String> &BoCA::DeviceInfoCDRip::GetNthDeviceTrackList(Int n)

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,6 +22,7 @@ CR_READTOC			 ex_CR_ReadToc			= NIL;
 CR_GETNUMTOCENTRIES		 ex_CR_GetNumTocEntries		= NIL;
 CR_GETTOCENTRY			 ex_CR_GetTocEntry		= NIL;
 CR_GETCDROMPARAMETERS		 ex_CR_GetCDROMParameters	= NIL;
+CR_ISMEDIALOADED		 ex_CR_IsMediaLoaded		= NIL;
 CR_EJECTCD			 ex_CR_EjectCD			= NIL;
 
 DynamicLoader *cdripdll	= NIL;
@@ -44,6 +45,7 @@ Bool LoadCDRipDLL()
 	ex_CR_GetNumTocEntries		= (CR_GETNUMTOCENTRIES) cdripdll->GetFunctionAddress("CR_GetNumTocEntries");
 	ex_CR_GetTocEntry		= (CR_GETTOCENTRY) cdripdll->GetFunctionAddress("CR_GetTocEntry");
 	ex_CR_GetCDROMParameters	= (CR_GETCDROMPARAMETERS) cdripdll->GetFunctionAddress("CR_GetCDROMParameters");
+	ex_CR_IsMediaLoaded		= (CR_ISMEDIALOADED) cdripdll->GetFunctionAddress("CR_IsMediaLoaded");
 	ex_CR_EjectCD			= (CR_EJECTCD) cdripdll->GetFunctionAddress("CR_EjectCD");
 
 	if (ex_CR_Init				== NIL ||
@@ -56,6 +58,7 @@ Bool LoadCDRipDLL()
 	    ex_CR_GetNumTocEntries		== NIL ||
 	    ex_CR_GetTocEntry			== NIL ||
 	    ex_CR_GetCDROMParameters		== NIL ||
+	    ex_CR_IsMediaLoaded			== NIL ||
 	    ex_CR_EjectCD			== NIL) { FreeCDRipDLL(); return False; }
 
 	return True;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -18,6 +18,7 @@ extern "C" {
 }
 
 #include <glob.h>
+#include <limits.h>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
 
@@ -122,31 +123,50 @@ BoCA::DeviceInfoCDParanoia::~DeviceInfoCDParanoia()
 {
 }
 
+Bool BoCA::DeviceInfoCDParanoia::IsNthDeviceTrayOpen(Int n)
+{
+	const Array<String>	&driveNames = FindDrives();
+	cdrom_drive		*cd	    = cdda_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
+
+	if (cd == NIL) return False;
+
+	cdda_open(cd);
+
+	/* Get tray status.
+	 */
+	Bool	 status = False;
+
+#if defined __linux__
+	status = (ioctl(cd->ioctl_fd, CDROM_DRIVE_STATUS, CDSL_CURRENT) == CDS_TRAY_OPEN);
+#endif
+
+	cdda_close(cd);
+
+	return status;
+}
+
 Bool BoCA::DeviceInfoCDParanoia::OpenNthDeviceTray(Int n)
 {
 	const Array<String>	&driveNames = FindDrives();
 	cdrom_drive		*cd	    = cdda_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
 
-	if (cd != NIL)
-	{
-		cdda_open(cd);
+	if (cd == NIL) return False;
 
-		/* Unlock tray, then eject.
-		 */
+	cdda_open(cd);
+
+	/* Unlock tray, then eject.
+	 */
 #if defined __linux__
-		ioctl(cd->ioctl_fd, CDROM_LOCKDOOR, 0);
-		ioctl(cd->ioctl_fd, CDROMEJECT);
+	ioctl(cd->ioctl_fd, CDROM_LOCKDOOR, 0);
+	ioctl(cd->ioctl_fd, CDROMEJECT);
 #else
-		ioctl(cd->ioctl_fd, CDIOCALLOW);
-		ioctl(cd->ioctl_fd, CDIOCEJECT);
+	ioctl(cd->ioctl_fd, CDIOCALLOW);
+	ioctl(cd->ioctl_fd, CDIOCEJECT);
 #endif
 
-		cdda_close(cd);
+	cdda_close(cd);
 
-		return True;
-	}
-
-	return False;
+	return True;
 }
 
 Bool BoCA::DeviceInfoCDParanoia::CloseNthDeviceTray(Int n)
@@ -154,24 +174,21 @@ Bool BoCA::DeviceInfoCDParanoia::CloseNthDeviceTray(Int n)
 	const Array<String>	&driveNames = FindDrives();
 	cdrom_drive		*cd	    = cdda_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
 
-	if (cd != NIL)
-	{
-		cdda_open(cd);
+	if (cd == NIL) return False;
 
-		/* Close tray.
-		 */
+	cdda_open(cd);
+
+	/* Close tray.
+	 */
 #if defined __linux__
-		ioctl(cd->ioctl_fd, CDROMCLOSETRAY);
+	ioctl(cd->ioctl_fd, CDROMCLOSETRAY);
 #else
-		ioctl(cd->ioctl_fd, CDIOCCLOSE);
+	ioctl(cd->ioctl_fd, CDIOCCLOSE);
 #endif
 
-		cdda_close(cd);
+	cdda_close(cd);
 
-		return True;
-	}
-
-	return False;
+	return True;
 }
 
 const Array<String> &BoCA::DeviceInfoCDParanoia::GetNthDeviceTrackList(Int n)
