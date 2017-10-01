@@ -24,6 +24,8 @@ namespace BoCA
 
 			mpg123_handle		*context;
 
+			Buffer<unsigned char>	 samples;
+
 			Int			 numBytes;
 			Int			 numFrames;
 

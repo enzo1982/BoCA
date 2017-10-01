@@ -77,8 +77,8 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 
 	Buffer<unsigned char>	 buffer(4096);
 
-	Buffer<short>		 pcm_l(buffer.Size() * 64);
-	Buffer<short>		 pcm_r(buffer.Size() * 64);
+	Buffer<short>		 pcm_l(buffer.Size() * 24);
+	Buffer<short>		 pcm_r(buffer.Size() * 24);
 
 	hip_t	 context = ex_hip_decode_init();
 	Int	 offset	 = f_in->GetPos();
@@ -188,16 +188,21 @@ Bool BoCA::DecoderLAME::Deactivate()
 
 Int BoCA::DecoderLAME::ReadData(Buffer<UnsignedByte> &data)
 {
-	pcm_l.Resize(data.Size() * 64);
-	pcm_r.Resize(data.Size() * 64);
-
+	/* Read input data.
+	 */
 	Int	 size = driver->ReadData(data, data.Size());
 
 	if (size <= 0) return -1;
 
 	inBytes += size;
 
+	/* Decode samples.
+	 */
 	const Format	&format	  = track.GetFormat();
+
+	pcm_l.Resize(data.Size() * 24);
+	pcm_r.Resize(data.Size() * 24);
+
 	Int		 nSamples = ex_hip_decode(context, data, size, pcm_l, pcm_r);
 
 	/* Try harder in case we got no data yet.

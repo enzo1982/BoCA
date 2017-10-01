@@ -93,9 +93,6 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 
 	Buffer<unsigned char>	 buffer(4096);
 
-	Buffer<unsigned char>	 samples(buffer.Size() * 128);
-	size_t			 samplesDone;
-
 	mpg123_handle	*context = ex_mpg123_new(NIL, NIL);
 	Int		 offset	 = f_in->GetPos();
 
@@ -105,7 +102,7 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		f_in->InputData((void *) buffer, buffer.Size());
 
-		int	 result = ex_mpg123_decode(context, buffer, buffer.Size(), samples, samples.Size(), &samplesDone);
+		int	 result = ex_mpg123_decode(context, buffer, buffer.Size(), NIL, 0, NIL);
 
 		if (result == MPG123_NEW_FORMAT)
 		{
@@ -254,16 +251,20 @@ Bool BoCA::DecoderMPG123::Seek(Int64 samplePosition)
 
 Int BoCA::DecoderMPG123::ReadData(Buffer<UnsignedByte> &data)
 {
-	const Format	&format = track.GetFormat();
-
-	Buffer<unsigned char>	 samples(data.Size() * 128);
-	size_t			 samplesDone;
-
+	/* Read input data.
+	 */
 	Int	 size = driver->ReadData(data, data.Size());
 
 	if (size <= 0) return -1;
 
 	inBytes += size;
+
+	/* Decode samples.
+	 */
+	const Format	&format	     = track.GetFormat();
+	size_t		 samplesDone = 0;
+
+	samples.Resize(size * 48);
 
 	if (ex_mpg123_decode(context, data, size, samples, samples.Size(), &samplesDone) == MPG123_NEW_FORMAT)
 	{
