@@ -20,8 +20,6 @@
 #include "opus.h"
 #include "config.h"
 
-using namespace smooth::IO;
-
 const String &BoCA::EncoderOpus::GetComponentSpecs()
 {
 	static String	 componentSpecs;
@@ -91,18 +89,17 @@ namespace BoCA
 
 BoCA::EncoderOpus::EncoderOpus()
 {
-	configLayer	= NIL;
+	configLayer  = NIL;
 
-	encoder		= NIL;
-	resampler	= NIL;
-	resamplerConfig	= NIL;
+	encoder	     = NIL;
+	resampler    = NIL;
 
-	frameSize	= 0;
-	preSkip		= 0;
-	sampleRate	= 48000;
+	frameSize    = 0;
+	preSkip	     = 0;
+	sampleRate   = 48000;
 
-	numPackets	= 0;
-	totalSamples	= 0;
+	numPackets   = 0;
+	totalSamples = 0;
 
 	memset(&os, 0, sizeof(os));
 	memset(&og, 0, sizeof(og));
@@ -138,37 +135,21 @@ Bool BoCA::EncoderOpus::Activate()
 	else if (format.rate <= 24000) sampleRate = 24000;
 	else			       sampleRate = 48000;
 
-	/* Create and init resampler component.
+	/* Create, init and start resampler.
 	 */
-	AS::Registry	&boca = AS::Registry::Get();
+	resampler = new Resampler(config, track, sampleRate);
 
-	resampler = (AS::DSPComponent *) boca.CreateComponentByID("resample-dsp");
-
-	if (resampler == NIL)
-	{
-		errorString = "Could not create resampler component!";
-		errorState  = True;
-
-		return False;
-	}
-
-	resamplerConfig = Config::Copy(config);
-	resamplerConfig->SetIntValue("Resample", "Converter", 2);
-	resamplerConfig->SetIntValue("Resample", "Samplerate", sampleRate);
-
-	resampler->SetConfiguration(resamplerConfig);
-	resampler->SetAudioTrackInfo(track);
-	resampler->Activate();
-
-	if (resampler->GetErrorState() == True)
+	if (resampler->GetErrorState())
 	{
 		errorString = resampler->GetErrorString();
 		errorState  = resampler->GetErrorState();
 
-		boca.DeleteComponent(resampler);
+		delete resampler;
 
 		return False;
 	}
+
+	resampler->Start();
 
 	/* Init Ogg stream.
 	 */
@@ -293,26 +274,43 @@ Bool BoCA::EncoderOpus::Deactivate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	Buffer<UnsignedByte>	 data;
+	/* Query remaining samples from resampler.
+	 */
+	Buffer<UnsignedByte>	 resampledData;
 
-	Int	 size = resampler->Flush(data);
+	for (Int i = 0; i < 2; i++)
+	{
+		while (!resampler->IsReady()) S::System::System::Sleep(1);
+
+		resampler->Lock();
+
+		const Buffer<UnsignedByte>	&samples = resampler->GetSamples();
+
+		resampledData.Resize(resampledData.Size() + samples.Size());
+
+		memcpy(resampledData + resampledData.Size() - samples.Size(), samples, samples.Size());
+
+		if (i == 0) resampler->Flush();
+
+		resampler->Release();
+	}
 
 	/* Convert samples to 16 bit.
 	 */
 	const Format	&format	 = track.GetFormat();
-	Int		 samples = size / format.channels / (format.bits / 8);
+	Int		 samples = resampledData.Size() / format.channels / (format.bits / 8);
 	Int		 offset	 = samplesBuffer.Size();
 
 	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
 
 	for (Int i = 0; i < samples * format.channels; i++)
 	{
-		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				  data [i] - 128) * 256;
-		else if (format.bits == 16				) samplesBuffer[offset + i] = (int)  ((short *) (unsigned char *) data)[i];
-		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((long *)  (unsigned char *) data)[i]	  / 65536);
+		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				  resampledData [i] - 128) * 256;
+		else if (format.bits == 16				) samplesBuffer[offset + i] = (int)  ((short *) (unsigned char *) resampledData)[i];
+		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((long *)  (unsigned char *) resampledData)[i]	   / 65536);
 
-		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((resampledData[3 * i + 2] << 24 | resampledData[3 * i + 1] << 16 | resampledData[3 * i    ] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((resampledData[3 * i    ] << 24 | resampledData[3 * i + 1] << 16 | resampledData[3 * i + 2] << 8) / 65536);
 	}
 
 	/* Output remaining samples to encoder.
@@ -331,15 +329,12 @@ Bool BoCA::EncoderOpus::Deactivate()
 	 */
 	FixChapterMarks();
 
-	/* Clean up resampler component.
+	/* Clean up resampler.
 	 */
-	AS::Registry	&boca = AS::Registry::Get();
+	resampler->Quit();
+	resampler->Wait();
 
-	resampler->Deactivate();
-
-	boca.DeleteComponent(resampler);
-
-	Config::Free(resamplerConfig);
+	delete resampler;
 
 	return True;
 }
@@ -358,26 +353,35 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Default_6_1, Channel::Vorbis_6_1);
 	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Default_7_1, Channel::Vorbis_7_1);
 
-	/* Resample data.
+	/* Query data from resampler.
 	 */
-	Int	 size = resampler->TransformData(data);
+	while (!resampler->IsReady()) S::System::System::Sleep(1);
+
+	resampler->Lock();
+
+	const Buffer<UnsignedByte>	&resampledData = resampler->GetSamples();
 
 	/* Convert samples to 16 bit.
 	 */
-	Int	 samples = size / format.channels / (format.bits / 8);
+	Int	 samples = resampledData.Size() / format.channels / (format.bits / 8);
 	Int	 offset	 = samplesBuffer.Size();
 
 	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
 
 	for (Int i = 0; i < samples * format.channels; i++)
 	{
-		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				  data [i] - 128) * 256;
-		else if (format.bits == 16				) samplesBuffer[offset + i] = (int)  ((short *) (unsigned char *) data)[i];
-		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((long *)  (unsigned char *) data)[i]	  / 65536);
+		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				  resampledData [i] - 128) * 256;
+		else if (format.bits == 16				) samplesBuffer[offset + i] = (int)  ((short *) (unsigned char *) resampledData)[i];
+		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((long *)  (unsigned char *) resampledData)[i]	   / 65536);
 
-		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((resampledData[3 * i + 2] << 24 | resampledData[3 * i + 1] << 16 | resampledData[3 * i    ] << 8) / 65536);
+		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((resampledData[3 * i    ] << 24 | resampledData[3 * i + 1] << 16 | resampledData[3 * i + 2] << 8) / 65536);
 	}
+
+	/* Resample new data.
+	 */
+	resampler->Resample(data);
+	resampler->Release();
 
 	/* Output samples to encoder.
 	 */
