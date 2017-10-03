@@ -2,8 +2,12 @@ BOCA_PATH = ../../../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
+ifeq ($(BUILD_X86_64),True)
+	X64 = 64
+endif
+
 OBJECTS	= dllinterface.o main.o
-TARGET	= $(BOCA_PATH)/$(BINDIR)/boca_encoder_coreaudioconnect.1.0$(EXECUTABLE)
+TARGET	= $(BOCA_PATH)/$(BINDIR)/boca_encoder_coreaudioconnect$(X64).1.0$(EXECUTABLE)
 
 DEFINE	= -DUNICODE
 LIBS	= -lole32 -lshell32

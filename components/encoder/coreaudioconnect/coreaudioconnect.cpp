@@ -388,62 +388,85 @@ Bool BoCA::EncoderCoreAudioConnect::Connect()
 
 	if (connected) return False;
 
-	/* Create shared memory object and map view to communication buffer.
+	/* Try 32 and 64 bit connector.
 	 */
+	Array<String>	 files;
+
 #ifdef __WIN32__
-	mappingName = String("freac:").Append(Number((Int64) GetCurrentProcessId()).ToHexString()).Append("-").Append(Number((Int64) GetCurrentThreadId()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
-
-	mapping	    = CreateFileMappingA(INVALID_HANDLE_VALUE, NIL, PAGE_READWRITE, 0, sizeof(CoreAudioCommBuffer), mappingName);
-	comm	    = (CoreAudioCommBuffer *) MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+	files.Add(GUI::Application::GetApplicationDirectory().Append("boca\\boca_encoder_coreaudioconnect.1.0.exe"));
+	files.Add(GUI::Application::GetApplicationDirectory().Append("boca\\boca_encoder_coreaudioconnect64.1.0.exe"));
 #else
-	mappingName = String("/freac:").Append(Number((Int64) getpid()).ToHexString()).Append("-").Append(Number((Int64) pthread_self()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
-
-	mapping	    = shm_open(mappingName, O_CREAT | O_EXCL | O_RDWR, 0666);
-
-	ftruncate(mapping, sizeof(CoreAudioCommBuffer));
-
-	comm	    = (CoreAudioCommBuffer *) mmap(NULL, sizeof(CoreAudioCommBuffer), PROT_READ | PROT_WRITE, MAP_SHARED, mapping, 0);
+	files.Add(Utilities::GetBoCADirectory().Append("/boca_encoder_coreaudioconnect.1.0"));
+	files.Add(Utilities::GetBoCADirectory().Append("/boca_encoder_coreaudioconnect64.1.0"));
 #endif
 
-	/* Start connector process.
-	 */
+	foreachreverse (const String &file, files) if (!File(file).Exists()) files.RemoveNth(foreachindex);
+
+	foreach (const String &file, files)
+	{
+		/* Disconnect any previously established connections.
+		 */
+		Disconnect();
+
+		/* Create shared memory object and map view to communication buffer.
+		 */
 #ifdef __WIN32__
-	SHELLEXECUTEINFOA	 execInfo;
+		mappingName = String("freac:").Append(Number((Int64) GetCurrentProcessId()).ToHexString()).Append("-").Append(Number((Int64) GetCurrentThreadId()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
 
-	ZeroMemory(&execInfo, sizeof(execInfo));
-
-	execInfo.cbSize	      = sizeof(execInfo);
-	execInfo.fMask	      = SEE_MASK_NOCLOSEPROCESS;
-	execInfo.lpVerb	      = "open";
-	execInfo.lpDirectory  = GUI::Application::GetApplicationDirectory();
-	execInfo.nShow	      = SW_HIDE;
-	execInfo.lpFile	      = GUI::Application::GetApplicationDirectory().Append("boca\\boca_encoder_coreaudioconnect.1.0.exe");
-	execInfo.lpParameters = mappingName;
-
-	ShellExecuteExA(&execInfo);
-
-	connector = execInfo.hProcess;
+		mapping	    = CreateFileMappingA(INVALID_HANDLE_VALUE, NIL, PAGE_READWRITE, 0, sizeof(CoreAudioCommBuffer), mappingName);
+		comm	    = (CoreAudioCommBuffer *) MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 #else
-	const char	*cmd = String("wine ").Append(Utilities::GetBoCADirectory()).Append("/boca_encoder_coreaudioconnect.1.0 ").Append(mappingName).Append(" 2> /dev/null");
+		mappingName = String("/freac:").Append(Number((Int64) getpid()).ToHexString()).Append("-").Append(Number((Int64) pthread_self()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
 
-	connector = fork();
+		mapping	    = shm_open(mappingName, O_CREAT | O_EXCL | O_RDWR, 0666);
 
-	if (!connector) { execl("/bin/sh", "sh", "-c", cmd, NULL); exit(0); }
+		ftruncate(mapping, sizeof(CoreAudioCommBuffer));
+
+		comm	    = (CoreAudioCommBuffer *) mmap(NULL, sizeof(CoreAudioCommBuffer), PROT_READ | PROT_WRITE, MAP_SHARED, mapping, 0);
 #endif
 
-	connected = True;
+		/* Start connector process.
+		 */
+#ifdef __WIN32__
+		SHELLEXECUTEINFOA	 execInfo;
 
-	/* Send Hello command.
-	 */
-	comm->command = CommCommandHello;
-	comm->length  = sizeof(CoreAudioCommHello);
+		ZeroMemory(&execInfo, sizeof(execInfo));
 
-	((CoreAudioCommHello *) &comm->data)->version = 1;
+		execInfo.cbSize	      = sizeof(execInfo);
+		execInfo.fMask	      = SEE_MASK_NOCLOSEPROCESS;
+		execInfo.lpVerb	      = "open";
+		execInfo.lpDirectory  = GUI::Application::GetApplicationDirectory();
+		execInfo.nShow	      = SW_HIDE;
+		execInfo.lpFile	      = file;
+		execInfo.lpParameters = mappingName;
 
-	ProcessConnectorCommand();
+		ShellExecuteExA(&execInfo);
 
-	if (comm->status == CommStatusReady) ready = True;
-	else				     ready = False;
+		connector = execInfo.hProcess;
+#else
+		const char	*cmd = String("wine ").Append(file).Append(" ").Append(mappingName).Append(" 2> /dev/null");
+
+		connector = fork();
+
+		if (!connector) { execl("/bin/sh", "sh", "-c", cmd, NULL); exit(0); }
+#endif
+
+		connected = True;
+
+		/* Send Hello command.
+		 */
+		comm->command = CommCommandHello;
+		comm->length  = sizeof(CoreAudioCommHello);
+
+		((CoreAudioCommHello *) &comm->data)->version = 1;
+
+		ProcessConnectorCommand();
+
+		if (comm->status == CommStatusReady) ready = True;
+		else				     ready = False;
+
+		if (ready) break;
+	}
 
 	return True;
 }
@@ -480,6 +503,8 @@ Bool BoCA::EncoderCoreAudioConnect::Disconnect()
 
 	shm_unlink(mappingName);
 #endif
+
+	connected = False;
 
 	return True;
 }
