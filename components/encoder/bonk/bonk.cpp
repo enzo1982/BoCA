@@ -70,7 +70,7 @@ Bool BoCA::EncoderBonk::IsLossless() const
 {
 	const Config	*config = GetConfiguration();
 
-	return config->GetIntValue("Bonk", "Lossless", 0);
+	return config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0);
 }
 
 Bool BoCA::EncoderBonk::Activate()
@@ -88,7 +88,7 @@ Bool BoCA::EncoderBonk::Activate()
 
 	const Config	*config = GetConfiguration();
 
-	packageSize = int(1024.0 * format.rate / 44100) * format.channels * (config->GetIntValue("Bonk", "Lossless", 0) ? 1 : config->GetIntValue("Bonk", "Downsampling", 2)) * (format.bits / 8);
+	packageSize = int(1024.0 * format.rate / 44100) * format.channels * (config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0) ? 1 : config->GetIntValue(ConfigureBonk::ConfigID, "Downsampling", 2)) * (format.bits / 8);
 
 	dataBuffer.Resize(131072);
 
@@ -118,10 +118,10 @@ Bool BoCA::EncoderBonk::Activate()
 
 	ex_bonk_encoder_init(encoder,
 		(unsigned int) Math::Max(track.length * format.channels, (Int64) 0), format.rate, format.channels,
-		config->GetIntValue("Bonk", "Lossless", 0), config->GetIntValue("Bonk", "JointStereo", 0),
-		config->GetIntValue("Bonk", "Predictor", 32), config->GetIntValue("Bonk", "Lossless", 0) ? 1 : config->GetIntValue("Bonk", "Downsampling", 2),
+		config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0), config->GetIntValue(ConfigureBonk::ConfigID, "JointStereo", 0),
+		config->GetIntValue(ConfigureBonk::ConfigID, "Predictor", 32), config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0) ? 1 : config->GetIntValue(ConfigureBonk::ConfigID, "Downsampling", 2),
 		int(1024.0 * format.rate / 44100),
-		0.05 * (double) config->GetIntValue("Bonk", "Quantization", 8));
+		0.05 * (double) config->GetIntValue(ConfigureBonk::ConfigID, "Quantization", 8));
 
 	return True;
 }

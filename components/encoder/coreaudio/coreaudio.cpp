@@ -110,7 +110,7 @@ Bool BoCA::EncoderCoreAudio::IsLossless() const
 {
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'alac') return True;
+	if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ') == 'alac') return True;
 
 	return False;
 }
@@ -149,7 +149,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	 */
 	CA::AudioStreamBasicDescription	 destinationFormat = { 0 };
 
-	destinationFormat.mFormatID	    = config->GetIntValue("CoreAudio", "Codec", 'aac ');
+	destinationFormat.mFormatID	    = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ');
 	destinationFormat.mSampleRate	    = GetOutputSampleRate(format.rate);
 	destinationFormat.mChannelsPerFrame = format.channels;
 
@@ -175,7 +175,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	{
 		/* Get applicable bitrate values.
 		 */
-		CA::UInt32		 bitrate       = config->GetIntValue("CoreAudio", "Bitrate", 64) * 1000 * format.channels;
+		CA::UInt32		 bitrate       = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64) * 1000 * format.channels;
 		CA::AudioValueRange	*bitrateValues = new CA::AudioValueRange [size / sizeof(CA::AudioValueRange)];
 
 		CA::AudioConverterGetProperty(converter, CA::kAudioConverterApplicableEncodeBitRates, &size, bitrateValues);
@@ -212,7 +212,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	CA::CFURLRef	 fileNameURL	= CA::CFURLCreateWithFileSystemPath(NULL, fileNameString, CA::kCFURLPOSIXPathStyle, False);
 #endif
 
-	CA::UInt32	 fileType	= config->GetIntValue("CoreAudio", "MP4Container", True) ? CA::kAudioFileM4AType : CA::kAudioFileAAC_ADTSType;
+	CA::UInt32	 fileType	= config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) ? CA::kAudioFileM4AType : CA::kAudioFileAAC_ADTSType;
 
 	CA::AudioFileCreateWithURL(fileNameURL, fileType, &destinationFormat, CA::kAudioFileFlags_EraseFile, &audioFile);
 
@@ -254,7 +254,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (!config->GetIntValue("CoreAudio", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", False))
+	if (!config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureCoreAudio::ConfigID, "AllowID3v2", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -303,8 +303,8 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 		Int	 divider = 1;
 		Int	 extra	 = 0;
 
-		if (config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'aach' ||
-		    config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'aacp') { divider = 2; extra = 480; }
+		if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ') == 'aach' ||
+		    config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ') == 'aacp') { divider = 2; extra = 480; }
 
 		CA::AudioFilePacketTableInfo	 pti;
 
@@ -337,7 +337,7 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	/* Write metadata to file
 	 */
-	if (config->GetIntValue("CoreAudio", "MP4Container", True) && config->GetIntValue("Tags", "EnableMP4Metadata", True))
+	if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) && config->GetIntValue("Tags", "EnableMP4Metadata", True))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -377,7 +377,7 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (!config->GetIntValue("CoreAudio", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (!config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -402,7 +402,7 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (!config->GetIntValue("CoreAudio", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("CoreAudio", "AllowID3v2", False))
+	if (!config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureCoreAudio::ConfigID, "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
@@ -489,7 +489,7 @@ Int BoCA::EncoderCoreAudio::GetOutputSampleRate(Int inputRate) const
 
 	/* Get supported sample rate ranges for selected codec.
 	 */
-	CA::UInt32	 format	= config->GetIntValue("CoreAudio", "Codec", 'aac ');
+	CA::UInt32	 format	= config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ');
 	CA::UInt32	 size	= 0;
 
 	CA::AudioFormatGetPropertyInfo(CA::kAudioFormatProperty_AvailableEncodeSampleRates, sizeof(format), &format, &size);
@@ -531,11 +531,11 @@ Bool BoCA::EncoderCoreAudio::SetOutputFormat(Int n)
 {
 	Config	*config = Config::Get();
 
-	if (n != 1) config->SetIntValue("CoreAudio", "MP4Container", True);
-	else	    config->SetIntValue("CoreAudio", "MP4Container", False);
+	if (n != 1) config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
+	else	    config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", False);
 
-	if	(n != 2 && config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'alac') config->SetIntValue("CoreAudio", "Codec", 'aac ');
-	else if (n == 2)								config->SetIntValue("CoreAudio", "Codec", 'alac');
+	if	(n != 2 && config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ') == 'alac') config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ');
+	else if (n == 2)										 config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'alac');
 
 	return True;
 }
@@ -544,9 +544,9 @@ String BoCA::EncoderCoreAudio::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("CoreAudio", "MP4Container", True))
+	if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True))
 	{
-		switch (config->GetIntValue("CoreAudio", "MP4FileExtension", 0))
+		switch (config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4FileExtension", 0))
 		{
 			default:
 			case  0: return "m4a";

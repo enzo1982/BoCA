@@ -148,9 +148,9 @@ Bool BoCA::EncoderSndFile::Activate()
 	/* Get selected file format.
 	 */
 #ifdef __APPLE__
-	fileFormat = config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF);
+	fileFormat = config->GetIntValue(ConfigureSndFile::ConfigID, "Format", SF_FORMAT_AIFF);
 #else
-	fileFormat = config->GetIntValue("SndFile", "Format", SF_FORMAT_WAV);
+	fileFormat = config->GetIntValue(ConfigureSndFile::ConfigID, "Format", SF_FORMAT_WAV);
 #endif
 
 	/* Fill format info structure.
@@ -159,11 +159,11 @@ Bool BoCA::EncoderSndFile::Activate()
 
 	memset(&sinfo, 0, sizeof(SF_INFO));
 
-	sinfo.format	 = fileFormat | config->GetIntValue("SndFile", "SubFormat", 0);
+	sinfo.format	 = fileFormat | config->GetIntValue(ConfigureSndFile::ConfigID, "SubFormat", 0);
 	sinfo.samplerate = format.rate;
 	sinfo.channels	 = format.channels;
 
-	if (config->GetIntValue("SndFile", "SubFormat", 0) == 0) sinfo.format |= SelectBestSubFormat(format, fileFormat);
+	if (config->GetIntValue(ConfigureSndFile::ConfigID, "SubFormat", 0) == 0) sinfo.format |= SelectBestSubFormat(format, fileFormat);
 
 	/* Check if selected format is supported.
 	 */
@@ -173,8 +173,8 @@ Bool BoCA::EncoderSndFile::Activate()
 
 		i18n->SetContext("Encoders::SndFile::Errors");
 
-		if (config->GetIntValue("SndFile", "SubFormat", 0) == 0) errorString = i18n->TranslateString("Could not find suitable audio format.");
-		else							 errorString = i18n->TranslateString("Unable to use selected audio format.");
+		if (config->GetIntValue(ConfigureSndFile::ConfigID, "SubFormat", 0) == 0) errorString = i18n->TranslateString("Could not find suitable audio format.");
+		else									  errorString = i18n->TranslateString("Unable to use selected audio format.");
 
 		errorState = True;
 
@@ -493,15 +493,15 @@ Bool BoCA::EncoderSndFile::SetOutputFormat(Int n)
 	/* Check if output format is already set.
 	 */
 #ifdef __APPLE__
-	if (config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF) == format_info.format) return True;
+	if (config->GetIntValue(ConfigureSndFile::ConfigID, "Format", SF_FORMAT_AIFF) == format_info.format) return True;
 #else
-	if (config->GetIntValue("SndFile", "Format", SF_FORMAT_WAV)  == format_info.format) return True;
+	if (config->GetIntValue(ConfigureSndFile::ConfigID, "Format", SF_FORMAT_WAV)  == format_info.format) return True;
 #endif
 
 	/* Set new output format.
 	 */
-	config->SetIntValue("SndFile", "Format", format_info.format);
-	config->SetIntValue("SndFile", "SubFormat", 0);
+	config->SetIntValue(ConfigureSndFile::ConfigID, "Format", format_info.format);
+	config->SetIntValue(ConfigureSndFile::ConfigID, "SubFormat", 0);
 
 	return True;
 }
@@ -513,9 +513,9 @@ String BoCA::EncoderSndFile::GetOutputFileExtension() const
 	SF_FORMAT_INFO	 format_info;
 
 #ifdef __APPLE__
-	format_info.format = config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF);
+	format_info.format = config->GetIntValue(ConfigureSndFile::ConfigID, "Format", SF_FORMAT_AIFF);
 #else
-	format_info.format = config->GetIntValue("SndFile", "Format", SF_FORMAT_WAV);
+	format_info.format = config->GetIntValue(ConfigureSndFile::ConfigID, "Format", SF_FORMAT_WAV);
 #endif
 
 	ex_sf_command(NIL, SFC_GET_FORMAT_INFO, &format_info, sizeof(format_info));

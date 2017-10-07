@@ -47,12 +47,12 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 {
 	const Config	*config		     = GetConfiguration();
 
-	Bool		 readInfoTags	     = config->GetIntValue("CueSheet", "ReadInformationTags", True);
-	Bool		 preferCueSheets     = config->GetIntValue("CueSheet", "PreferCueSheets", True);
+	Bool		 readInfoTags	     = config->GetIntValue(ConfigureCueSheet::ConfigID, "ReadInformationTags", True);
+	Bool		 preferCueSheets     = config->GetIntValue(ConfigureCueSheet::ConfigID, "PreferCueSheets", True);
 
-	Bool		 lookForAlternatives = config->GetIntValue("CueSheet", "LookForAlternativeFiles", False);
+	Bool		 lookForAlternatives = config->GetIntValue(ConfigureCueSheet::ConfigID, "LookForAlternativeFiles", False);
 
-	Bool		 ignoreErrors	     = config->GetIntValue("CueSheet", "IgnoreErrors", False);
+	Bool		 ignoreErrors	     = config->GetIntValue(ConfigureCueSheet::ConfigID, "IgnoreErrors", False);
 
 	Track		 iTrack;
 	Format		 format		     = track.GetFormat();

@@ -208,7 +208,7 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("Ripper", "ReadISRC", 0))
+	if (config->GetIntValue(ConfigureCDIO::ConfigID, "ReadISRC", 0))
 	{
 		CdIo_t	*cd = cdio_open(component->GetNthDeviceInfo(track.drive).path, DRIVER_UNKNOWN);
 
@@ -287,7 +287,7 @@ Bool BoCA::DecoderCDIO::Activate()
 	 */
 	const Config	*config = GetConfiguration();
 
-	Int	 speed = config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
+	Int	 speed = config->GetIntValue(ConfigureCDIO::ConfigID, String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 
 	if (speed > 0)	cdio_set_speed(cd, speed);
 	else		cdio_set_speed(cd, -1);
@@ -296,11 +296,11 @@ Bool BoCA::DecoderCDIO::Activate()
 	 */
 	paranoia = NIL;
 
-	if (config->GetIntValue("Ripper", "CDParanoia", False))
+	if (config->GetIntValue(ConfigureCDIO::ConfigID, "CDParanoia", False))
 	{
 		int	 paranoiaMode = PARANOIA_MODE_FULL ^ PARANOIA_MODE_NEVERSKIP;
 
-		switch (config->GetIntValue("Ripper", "CDParanoiaMode", 3))
+		switch (config->GetIntValue(ConfigureCDIO::ConfigID, "CDParanoiaMode", 3))
 		{
 			case 0:
 				paranoiaMode = PARANOIA_MODE_OVERLAP;
@@ -338,7 +338,7 @@ Bool BoCA::DecoderCDIO::Deactivate()
 	if (numCacheErrors > 0)
 	{
 		Config	*config		= Config::Get();
-		Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
+		Bool	 noCacheWarning = config->GetIntValue(ConfigureCDIO::ConfigID, "NoCacheWarning", False);
 
 		if (!noCacheWarning)
 		{
@@ -350,7 +350,7 @@ Bool BoCA::DecoderCDIO::Deactivate()
 
 			msgBox->ShowDialog();
 
-			config->SetIntValue("Ripper", "NoCacheWarning", noCacheWarning);
+			config->SetIntValue(ConfigureCDIO::ConfigID, "NoCacheWarning", noCacheWarning);
 			config->SaveSettings();
 
 			Object::DeleteObject(msgBox);
@@ -382,7 +382,7 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 
 	/* Calculate offset values.
 	 */
-	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+	readOffset = config->GetIntValue(ConfigureCDIO::ConfigID, String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue(ConfigureCDIO::ConfigID, String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
 
 	startSector += readOffset / samplesPerSector;
 	endSector   += readOffset / samplesPerSector;
@@ -409,7 +409,7 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 
 	/* Wait for drive to spin up if requested.
 	 */
-	Int		 spinUpTime = config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
+	Int		 spinUpTime = config->GetIntValue(ConfigureCDIO::ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
 	UnsignedInt64	 startTime  = S::System::System::Clock();
 
 	while (spinUpTime > 0 && startTime - lastRead.GetNth(track.drive) > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))

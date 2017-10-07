@@ -72,16 +72,52 @@ BoCA::EncoderLAME::~EncoderLAME()
 
 Bool BoCA::EncoderLAME::Activate()
 {
+	/* Get configuration.
+	 */
 	const Config	*config = GetConfiguration();
 
-	const Format	&format = track.GetFormat();
-	const Info	&info	= track.GetInfo();
+	Int	 preset		  = config->GetIntValue(ConfigureLAME::ConfigID, "Preset", 2);
+	Int	 resample	  = config->GetIntValue(ConfigureLAME::ConfigID, "Resample", -1);
+	Int	 vbrMode	  = config->GetIntValue(ConfigureLAME::ConfigID, "VBRMode", 4);
+	Bool	 setBitrate	  = config->GetIntValue(ConfigureLAME::ConfigID, "SetBitrate", 1);
+	Int	 bitrate	  = config->GetIntValue(ConfigureLAME::ConfigID, "Bitrate", 192);
+	Int	 ratio		  = config->GetIntValue(ConfigureLAME::ConfigID, "Ratio", 1100);
+	Bool	 setQuality	  = config->GetIntValue(ConfigureLAME::ConfigID, "SetQuality", 0);
+	Int	 quality	  = config->GetIntValue(ConfigureLAME::ConfigID, "Quality", 3);
+	Int	 abrBitrate	  = config->GetIntValue(ConfigureLAME::ConfigID, "ABRBitrate", 192);
+	Int	 vbrQuality	  = config->GetIntValue(ConfigureLAME::ConfigID, "VBRQuality", 50);
+	Bool	 setMinVBRBitrate = config->GetIntValue(ConfigureLAME::ConfigID, "SetMinVBRBitrate", 0);
+	Bool	 setMaxVBRBitrate = config->GetIntValue(ConfigureLAME::ConfigID, "SetMaxVBRBitrate", 0);
+	Int	 minVBRBitrate	  = config->GetIntValue(ConfigureLAME::ConfigID, "MinVBRBitrate", 128);
+	Int	 maxVBRBitrate	  = config->GetIntValue(ConfigureLAME::ConfigID, "MaxVBRBitrate", 256);
+	Bool	 copyrightBit	  = config->GetIntValue(ConfigureLAME::ConfigID, "Copyright", 0);
+	Bool	 originalBit	  = config->GetIntValue(ConfigureLAME::ConfigID, "Original", 1);
+	Bool	 privateBit	  = config->GetIntValue(ConfigureLAME::ConfigID, "Private", 0);
+	Bool	 crc		  = config->GetIntValue(ConfigureLAME::ConfigID, "CRC", 0);
+	Bool	 strictISO	  = config->GetIntValue(ConfigureLAME::ConfigID, "StrictISO", 0);
+	Int	 stereoMode	  = config->GetIntValue(ConfigureLAME::ConfigID, "StereoMode", 0);
+	Bool	 forceJS	  = config->GetIntValue(ConfigureLAME::ConfigID, "ForceJS", 0);
+	Bool	 enableATH	  = config->GetIntValue(ConfigureLAME::ConfigID, "EnableATH", 1);
+	Int	 athType	  = config->GetIntValue(ConfigureLAME::ConfigID, "ATHType", -1);
+	Bool	 useTNS		  = config->GetIntValue(ConfigureLAME::ConfigID, "UseTNS", 1);
+	Bool	 disableFiltering = config->GetIntValue(ConfigureLAME::ConfigID, "DisableFiltering", 0);
+	Bool	 setLowpass	  = config->GetIntValue(ConfigureLAME::ConfigID, "SetLowpass", 0);
+	Int	 lowpass	  = config->GetIntValue(ConfigureLAME::ConfigID, "Lowpass", 0);
+	Bool	 setHighpass	  = config->GetIntValue(ConfigureLAME::ConfigID, "SetHighpass", 0);
+	Int	 highpass	  = config->GetIntValue(ConfigureLAME::ConfigID, "Highpass", 0);
+	Bool	 setLowpassWidth  = config->GetIntValue(ConfigureLAME::ConfigID, "SetLowpassWidth", 0);
+	Int	 lowpassWidth	  = config->GetIntValue(ConfigureLAME::ConfigID, "LowpassWidth", 0);
+	Bool	 setHighpassWidth = config->GetIntValue(ConfigureLAME::ConfigID, "SetHighpassWidth", 0);
+	Int	 highpassWidth	  = config->GetIntValue(ConfigureLAME::ConfigID, "HighpassWidth", 0);
 
-	if (config->GetIntValue("LAME", "Resample", -1) >= 0)
+	/* Check settings.
+	 */
+	const Format	&format	  = track.GetFormat();
+	const Info	&info	  = track.GetInfo();
+
+	if (resample >= 0)
 	{
-		Int	 effectiveRate = config->GetIntValue("LAME", "Resample", -1);
-
-		if (effectiveRate == 0) effectiveRate = format.rate;
+		Int	 effectiveRate = (resample != 0 ? resample : format.rate);
 
 		switch (effectiveRate)
 		{
@@ -91,7 +127,7 @@ Bool BoCA::EncoderLAME::Activate()
 			case 16000:
 			case 22050:
 			case 24000:
-				if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 4) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 192 || config->GetIntValue("LAME", "Bitrate", 192) == 224 || config->GetIntValue("LAME", "Bitrate", 192) == 256 || config->GetIntValue("LAME", "Bitrate", 192) == 320))
+				if (setBitrate && vbrMode == vbr_off && (bitrate == 192 || bitrate == 224 || bitrate == 256 || bitrate == 320))
 				{
 					errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
 					errorState  = True;
@@ -99,7 +135,7 @@ Bool BoCA::EncoderLAME::Activate()
 					return False;
 				}
 
-				if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 192 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 224 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 256 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 320))
+				if (setMinVBRBitrate && vbrMode != vbr_off && (minVBRBitrate == 192 || minVBRBitrate == 224 || minVBRBitrate == 256 || minVBRBitrate == 320))
 				{
 					errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
 					errorState  = True;
@@ -107,7 +143,7 @@ Bool BoCA::EncoderLAME::Activate()
 					return False;
 				}
 
-				if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 192 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 224 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 256 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 320))
+				if (setMaxVBRBitrate && vbrMode != vbr_off && (maxVBRBitrate == 192 || maxVBRBitrate == 224 || maxVBRBitrate == 256 || maxVBRBitrate == 320))
 				{
 					errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
 					errorState  = True;
@@ -118,7 +154,7 @@ Bool BoCA::EncoderLAME::Activate()
 			case 32000:
 			case 44100:
 			case 48000:
-				if (config->GetIntValue("LAME", "SetBitrate", 1) && config->GetIntValue("LAME", "VBRMode", 4) == vbr_off && (config->GetIntValue("LAME", "Bitrate", 192) == 8 || config->GetIntValue("LAME", "Bitrate", 192) == 16 || config->GetIntValue("LAME", "Bitrate", 192) == 24 || config->GetIntValue("LAME", "Bitrate", 192) == 144))
+				if (setBitrate && vbrMode == vbr_off && (bitrate == 8 || bitrate == 16 || bitrate == 24 || bitrate == 144))
 				{
 					errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
 					errorState  = True;
@@ -126,7 +162,7 @@ Bool BoCA::EncoderLAME::Activate()
 					return False;
 				}
 
-				if (config->GetIntValue("LAME", "SetMinVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MinVBRBitrate", 128) == 8 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 16 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 24 || config->GetIntValue("LAME", "MinVBRBitrate", 128) == 144))
+				if (setMinVBRBitrate && vbrMode != vbr_off && (minVBRBitrate == 8 || minVBRBitrate == 16 || minVBRBitrate == 24 || minVBRBitrate == 144))
 				{
 					errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
 					errorState  = True;
@@ -134,7 +170,7 @@ Bool BoCA::EncoderLAME::Activate()
 					return False;
 				}
 
-				if (config->GetIntValue("LAME", "SetMaxVBRBitrate", 0) && config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && (config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 8 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 16 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 24 || config->GetIntValue("LAME", "MaxVBRBitrate", 256) == 144))
+				if (setMaxVBRBitrate && vbrMode != vbr_off && (maxVBRBitrate == 8 || maxVBRBitrate == 16 || maxVBRBitrate == 24 || maxVBRBitrate == 144))
 				{
 					errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
 					errorState  = True;
@@ -160,95 +196,97 @@ Bool BoCA::EncoderLAME::Activate()
 
 	outBuffer.Resize(131072);
 
+	/* Create and configure LAME encoder.
+	 */
 	context = ex_lame_init();
 
 	ex_lame_set_in_samplerate(context, format.rate);
 	ex_lame_set_num_channels(context, format.channels);
 
-	switch (config->GetIntValue("LAME", "Preset", 2))
+	switch (preset)
 	{
 		case 0:
-			ex_lame_set_copyright(context, config->GetIntValue("LAME", "Copyright", 0));
-			ex_lame_set_original(context, config->GetIntValue("LAME", "Original", 1));
-			ex_lame_set_extension(context, config->GetIntValue("LAME", "Private", 0));
-			ex_lame_set_error_protection(context, config->GetIntValue("LAME", "CRC", 0));
-			ex_lame_set_strict_ISO(context, config->GetIntValue("LAME", "StrictISO", 0));
+			ex_lame_set_copyright(context, copyrightBit);
+			ex_lame_set_original(context, originalBit);
+			ex_lame_set_extension(context, privateBit);
+			ex_lame_set_error_protection(context, crc);
+			ex_lame_set_strict_ISO(context, strictISO);
 
 			/* Set resampling.
 			 */
-			if	(config->GetIntValue("LAME", "Resample", -1) == 0) ex_lame_set_out_samplerate(context, format.rate);
-			else if (config->GetIntValue("LAME", "Resample", -1) >  0) ex_lame_set_out_samplerate(context, config->GetIntValue("LAME", "Resample", -1));
+			if	(resample == 0) ex_lame_set_out_samplerate(context, format.rate);
+			else if (resample >  0) ex_lame_set_out_samplerate(context, resample);
 
 			/* Set bitrate.
 			 */
-			if (config->GetIntValue("LAME", "VBRMode", 4) == vbr_off)
+			if (vbrMode == vbr_off)
 			{
-				if (config->GetIntValue("LAME", "SetBitrate", 1)) ex_lame_set_brate(context, config->GetIntValue("LAME", "Bitrate", 192));
-				else						  ex_lame_set_compression_ratio(context, config->GetIntValue("LAME", "Ratio", 1100) / 100.0);
+				if (setBitrate) ex_lame_set_brate(context, bitrate);
+				else		ex_lame_set_compression_ratio(context, ratio / 100.0);
 			}
 
 			/* Set quality.
 			 */
-			if (config->GetIntValue("LAME", "SetQuality", 0)) ex_lame_set_quality(context, config->GetIntValue("LAME", "Quality", 3));
+			if (setQuality) ex_lame_set_quality(context, quality);
 
 			/* Set audio filtering.
 			 */
-			if (config->GetIntValue("LAME", "DisableFiltering", 0))
+			if (disableFiltering)
 			{
 				ex_lame_set_lowpassfreq(context, -1);
 				ex_lame_set_highpassfreq(context, -1);
 			}
 			else
 			{
-				if (config->GetIntValue("LAME", "SetLowpass", 0)) ex_lame_set_lowpassfreq(context, config->GetIntValue("LAME", "Lowpass", 0));
-				if (config->GetIntValue("LAME", "SetHighpass", 0)) ex_lame_set_highpassfreq(context, config->GetIntValue("LAME", "Highpass", 0));
+				if (setLowpass)  ex_lame_set_lowpassfreq(context, lowpass);
+				if (setHighpass) ex_lame_set_highpassfreq(context, highpass);
 
-				if (config->GetIntValue("LAME", "SetLowpass", 0) && config->GetIntValue("LAME", "SetLowpassWidth", 0)) ex_lame_set_lowpasswidth(context, config->GetIntValue("LAME", "LowpassWidth", 0));
-				if (config->GetIntValue("LAME", "SetHighpass", 0) && config->GetIntValue("LAME", "SetHighpassWidth", 0)) ex_lame_set_highpasswidth(context, config->GetIntValue("LAME", "HighpassWidth", 0));
+				if (setLowpass  && setLowpassWidth)  ex_lame_set_lowpasswidth(context, lowpassWidth);
+				if (setHighpass && setHighpassWidth) ex_lame_set_highpasswidth(context, highpassWidth);
 			}
 
 			/* Set Stereo mode.
 			 */
-			if	(config->GetIntValue("LAME", "StereoMode", 0) == 1)	ex_lame_set_mode(context, MONO);
-			else if (config->GetIntValue("LAME", "StereoMode", 0) == 2)	ex_lame_set_mode(context, STEREO);
-			else if (config->GetIntValue("LAME", "StereoMode", 0) == 3)	ex_lame_set_mode(context, JOINT_STEREO);
-			else								ex_lame_set_mode(context, NOT_SET);
+			if	(stereoMode == 1) ex_lame_set_mode(context, MONO);
+			else if (stereoMode == 2) ex_lame_set_mode(context, STEREO);
+			else if (stereoMode == 3) ex_lame_set_mode(context, JOINT_STEREO);
+			else			  ex_lame_set_mode(context, NOT_SET);
 
-			if (config->GetIntValue("LAME", "StereoMode", 0) == 3)
+			if (stereoMode == 3)
 			{
-				if (config->GetIntValue("LAME", "ForceJS", 0))	ex_lame_set_force_ms(context, 1);
-				else						ex_lame_set_force_ms(context, 0);
+				if (forceJS) ex_lame_set_force_ms(context, 1);
+				else	     ex_lame_set_force_ms(context, 0);
 			}
 
 			/* Set VBR mode.
 			 */
-			switch (config->GetIntValue("LAME", "VBRMode", 4))
+			switch (vbrMode)
 			{
 				default:
 				case vbr_off:
 					break;
 				case vbr_abr:
 					ex_lame_set_VBR(context, vbr_abr);
-					ex_lame_set_VBR_mean_bitrate_kbps(context, config->GetIntValue("LAME", "ABRBitrate", 192));
+					ex_lame_set_VBR_mean_bitrate_kbps(context, abrBitrate);
 					break;
 				case vbr_rh:
 					ex_lame_set_VBR(context, vbr_rh);
-					ex_lame_set_VBR_quality(context, config->GetIntValue("LAME", "VBRQuality", 50) / 10.0);
+					ex_lame_set_VBR_quality(context, vbrQuality / 10.0);
 					break;
 				case vbr_mtrh:
 					ex_lame_set_VBR(context, vbr_mtrh);
-					ex_lame_set_VBR_quality(context, config->GetIntValue("LAME", "VBRQuality", 50) / 10.0);
+					ex_lame_set_VBR_quality(context, vbrQuality / 10.0);
 					break;
 			}
 
-			if (config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && config->GetIntValue("LAME", "SetMinVBRBitrate", 0)) ex_lame_set_VBR_min_bitrate_kbps(context, config->GetIntValue("LAME", "MinVBRBitrate", 128));
-			if (config->GetIntValue("LAME", "VBRMode", 4) != vbr_off && config->GetIntValue("LAME", "SetMaxVBRBitrate", 0)) ex_lame_set_VBR_max_bitrate_kbps(context, config->GetIntValue("LAME", "MaxVBRBitrate", 256));
+			if (vbrMode != vbr_off && setMinVBRBitrate) ex_lame_set_VBR_min_bitrate_kbps(context, minVBRBitrate);
+			if (vbrMode != vbr_off && setMaxVBRBitrate) ex_lame_set_VBR_max_bitrate_kbps(context, maxVBRBitrate);
 
 			/* Set ATH.
 			 */
-			if (config->GetIntValue("LAME", "EnableATH", 1))
+			if (enableATH)
 			{
-				if (config->GetIntValue("LAME", "ATHType", -1) != -1) ex_lame_set_ATHtype(context, config->GetIntValue("LAME", "ATHType", -1));
+				if (athType != -1) ex_lame_set_ATHtype(context, athType);
 			}
 			else
 			{
@@ -257,7 +295,7 @@ Bool BoCA::EncoderLAME::Activate()
 
 			/* Set TNS.
 			 */
-			ex_lame_set_useTemporal(context, config->GetIntValue("LAME", "UseTNS", 1));
+			ex_lame_set_useTemporal(context, useTNS);
 
 			break;
 		case 1:
@@ -270,7 +308,7 @@ Bool BoCA::EncoderLAME::Activate()
 			ex_lame_set_preset(context, EXTREME_FAST);
 			break;
 		case 4:
-			ex_lame_set_preset(context, config->GetIntValue("LAME", "ABRBitrate", 192));
+			ex_lame_set_preset(context, abrBitrate);
 			break;
 	}
 

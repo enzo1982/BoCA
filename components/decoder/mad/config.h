@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,15 +26,17 @@ namespace BoCA
 	class ConfigureMAD : public ConfigLayer
 	{
 		private:
-			GroupBox	*group_decoding;
-			CheckBox	*check_enable24bit;
+			GroupBox		*group_decoding;
+			CheckBox		*check_enable24bit;
 
-			Bool		 enable24bit;
+			Bool			 enable24bit;
 		public:
-					 ConfigureMAD();
-					~ConfigureMAD();
+			static const String	 ConfigID;
 
-			Int		 SaveSettings();
+						 ConfigureMAD();
+						~ConfigureMAD();
+
+			Int			 SaveSettings();
 	};
 };
 

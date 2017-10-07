@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,15 +13,17 @@
 #include "config.h"
 #include "dllinterface.h"
 
+const String	 BoCA::ConfigureWMA::ConfigID = "WMA";
+
 BoCA::ConfigureWMA::ConfigureWMA()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
-	uncompressed	= config->GetIntValue("WMA", "Uncompressed", False);
-	autoselect	= config->GetIntValue("WMA", "AutoSelectFormat", True);
+	uncompressed	= config->GetIntValue(ConfigID, "Uncompressed", False);
+	autoselect	= config->GetIntValue(ConfigID, "AutoSelectFormat", True);
 
-	useVBR		= config->GetIntValue("WMA", "EnableVBR", True);
-	use2Pass	= config->GetIntValue("WMA", "Enable2Pass", False);
+	useVBR		= config->GetIntValue(ConfigID, "EnableVBR", True);
+	use2Pass	= config->GetIntValue(ConfigID, "Enable2Pass", False);
 
 	useVBRSetting	= useVBR;
 	use2PassSetting = use2Pass;
@@ -31,7 +33,7 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	supportCBR2Pass = False;
 	supportVBR2Pass = False;
 
-	quality		= config->GetIntValue("WMA", "Quality", 90) / 5;
+	quality		= config->GetIntValue(ConfigID, "Quality", 90) / 5;
 
 	/* Init the Microsoft COM library.
 	 */
@@ -112,7 +114,7 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	combo_bitrate->AddEntry("128");
 	combo_bitrate->AddEntry("160");
 	combo_bitrate->AddEntry("192");
-	combo_bitrate->SelectEntry(String::FromInt(config->GetIntValue("WMA", "Bitrate", 128)));
+	combo_bitrate->SelectEntry(String::FromInt(config->GetIntValue(ConfigID, "Bitrate", 128)));
 
 	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(393, 42));
 
@@ -133,9 +135,9 @@ BoCA::ConfigureWMA::ConfigureWMA()
 
 	combo_codec->onSelectEntry.Connect(&ConfigureWMA::OnSelectCodec, this);
 
-	if (config->GetIntValue("WMA", "Codec", -1) >= 0) combo_codec->SelectNthEntry(config->GetIntValue("WMA", "Codec", -1));
+	if (config->GetIntValue(ConfigID, "Codec", -1) >= 0) combo_codec->SelectNthEntry(config->GetIntValue(ConfigID, "Codec", -1));
 
-	combo_format->SelectNthEntry(config->GetIntValue("WMA", "CodecFormat", 0));
+	combo_format->SelectNthEntry(config->GetIntValue(ConfigID, "CodecFormat", 0));
 
 	OnToggleCodec();
 	OnToggleFormat();
@@ -187,25 +189,25 @@ Int BoCA::ConfigureWMA::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("WMA", "Uncompressed", uncompressed);
-	config->SetIntValue("WMA", "Codec", combo_codec->GetSelectedEntryNumber());
+	config->SetIntValue(ConfigID, "Uncompressed", uncompressed);
+	config->SetIntValue(ConfigID, "Codec", combo_codec->GetSelectedEntryNumber());
 
-	config->SetIntValue("WMA", "AutoSelectFormat", autoselect);
-	config->SetIntValue("WMA", "CodecFormat", combo_format->GetSelectedEntryNumber());
+	config->SetIntValue(ConfigID, "AutoSelectFormat", autoselect);
+	config->SetIntValue(ConfigID, "CodecFormat", combo_format->GetSelectedEntryNumber());
 
 	if (autoselect)
 	{
-		config->SetIntValue("WMA", "EnableVBR", useVBRSetting);
-		config->SetIntValue("WMA", "Enable2Pass", use2PassSetting);
+		config->SetIntValue(ConfigID, "EnableVBR", useVBRSetting);
+		config->SetIntValue(ConfigID, "Enable2Pass", use2PassSetting);
 	}
 	else
 	{
-		config->SetIntValue("WMA", "EnableVBR", useVBR);
-		config->SetIntValue("WMA", "Enable2Pass", use2Pass);
+		config->SetIntValue(ConfigID, "EnableVBR", useVBR);
+		config->SetIntValue(ConfigID, "Enable2Pass", use2Pass);
 	}
 
-	config->SetIntValue("WMA", "Bitrate", combo_bitrate->GetSelectedEntry()->GetText().ToInt());
-	config->SetIntValue("WMA", "Quality", quality * 5);
+	config->SetIntValue(ConfigID, "Bitrate", combo_bitrate->GetSelectedEntry()->GetText().ToInt());
+	config->SetIntValue(ConfigID, "Quality", quality * 5);
 
 	return Success();
 }

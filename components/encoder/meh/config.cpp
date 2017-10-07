@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,11 +13,13 @@
 #include "config.h"
 #include "config_encoder.h"
 
+const String	 BoCA::ConfigureMultiEncoderHub::ConfigID = "meh!";
+
 BoCA::ConfigureMultiEncoderHub::ConfigureMultiEncoderHub()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
-	separateFolders = config->GetIntValue("meh!", "SeparateFolders", False);
+	separateFolders = config->GetIntValue(ConfigID, "SeparateFolders", False);
 
 	I18n	*i18n = I18n::Get();
 
@@ -97,10 +99,10 @@ BoCA::ConfigureMultiEncoderHub::~ConfigureMultiEncoderHub()
 
 Void BoCA::ConfigureMultiEncoderHub::AddEncoders()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
 	AS::Registry		&boca	    = AS::Registry::Get();
-	const Array<String>	&encoderIDs = config->GetStringValue("meh!", "Encoders", "flac-enc,lame-enc").Explode(",");
+	const Array<String>	&encoderIDs = config->GetStringValue(ConfigID, "Encoders", "flac-enc,lame-enc").Explode(",");
 
 	for (Int i = 0; i < boca.GetNumberOfComponents(); i++)
 	{
@@ -237,7 +239,7 @@ Int BoCA::ConfigureMultiEncoderHub::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("meh!", "SeparateFolders", separateFolders);
+	config->SetIntValue(ConfigID, "SeparateFolders", separateFolders);
 
 	AS::Registry	&boca	     = AS::Registry::Get();
 	Int		 entryNumber = 0;
@@ -253,7 +255,7 @@ Int BoCA::ConfigureMultiEncoderHub::SaveSettings()
 		encoders.Append(encoders.Length() > 0 ? "," : NIL).Append(boca.GetComponentID(i));
 	}
 
-	config->SetStringValue("meh!", "Encoders", encoders);
+	config->SetStringValue(ConfigID, "Encoders", encoders);
 
 	return Success();
 }

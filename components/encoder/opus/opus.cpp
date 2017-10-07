@@ -115,7 +115,6 @@ Bool BoCA::EncoderOpus::Activate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 	Info		 info = track.GetInfo();
 
@@ -126,6 +125,10 @@ Bool BoCA::EncoderOpus::Activate()
 
 		return False;
 	}
+
+	/* Get configuration.
+	 */
+	const Config	*config = GetConfiguration();
 
 	/* Get best sample rate.
 	 */
@@ -186,15 +189,15 @@ Bool BoCA::EncoderOpus::Activate()
 
 	/* Set encoder parameters.
 	 */
-	if (config->GetIntValue("Opus", "Mode", 0)	!= 0) ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_SIGNAL(OPUS_SIGNAL_VOICE + config->GetIntValue("Opus", "Mode", 0) - 1));
-	if (config->GetIntValue("Opus", "Bandwidth", 0) != 0) ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_BANDWIDTH_NARROWBAND + config->GetIntValue("Opus", "Bandwidth", 0) - 1));
+	if (config->GetIntValue(ConfigureOpus::ConfigID, "Mode", 0)	 != 0) ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_SIGNAL(OPUS_SIGNAL_VOICE + config->GetIntValue(ConfigureOpus::ConfigID, "Mode", 0) - 1));
+	if (config->GetIntValue(ConfigureOpus::ConfigID, "Bandwidth", 0) != 0) ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_BANDWIDTH_NARROWBAND + config->GetIntValue(ConfigureOpus::ConfigID, "Bandwidth", 0) - 1));
 
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_BITRATE( config->GetIntValue("Opus", "Bitrate", 128) * 1000));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR(config->GetIntValue("Opus", "EnableVBR", True)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR_CONSTRAINT(config->GetIntValue("Opus", "EnableConstrainedVBR", False)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(config->GetIntValue("Opus", "Complexity", 10)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(config->GetIntValue("Opus", "PacketLoss", 0)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue("Opus", "EnableDTX", False)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_BITRATE( config->GetIntValue(ConfigureOpus::ConfigID, "Bitrate", 128) * 1000));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR(config->GetIntValue(ConfigureOpus::ConfigID, "EnableVBR", True)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR_CONSTRAINT(config->GetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", False)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(config->GetIntValue(ConfigureOpus::ConfigID, "PacketLoss", 0)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue(ConfigureOpus::ConfigID, "EnableDTX", False)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(0));
 
 	/* Get number of pre-skip samples.
@@ -203,7 +206,7 @@ Bool BoCA::EncoderOpus::Activate()
 
 	setup.preskip = preSkip * (48000 / sampleRate);
 
-	frameSize     = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue("Opus", "FrameSize", 20000)));
+	frameSize     = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
 	totalSamples  = preSkip;
 	numPackets    = 0;
 
@@ -549,7 +552,7 @@ String BoCA::EncoderOpus::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	switch (config->GetIntValue("Opus", "FileExtension", 0))
+	switch (config->GetIntValue(ConfigureOpus::ConfigID, "FileExtension", 0))
 	{
 		default:
 		case  0: return "opus";

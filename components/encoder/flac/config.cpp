@@ -13,25 +13,27 @@
 #include "config.h"
 #include "dllinterface.h"
 
+const String	 BoCA::ConfigureFLAC::ConfigID = "FLAC";
+
 BoCA::ConfigureFLAC::ConfigureFLAC()
 {
 	Point	 pos;
 	Size	 size;
 
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
-	preset				= config->GetIntValue("FLAC", "Preset", 5);
-	file_format			= config->GetIntValue("FLAC", "FileFormat", 0);
-	streamable_subset		= config->GetIntValue("FLAC", "StreamableSubset", 1);
-	do_mid_side_stereo		= config->GetIntValue("FLAC", "DoMidSideStereo", 1);
-	loose_mid_side_stereo		= config->GetIntValue("FLAC", "LooseMidSideStereo", 0);
-	blocksize			= config->GetIntValue("FLAC", "Blocksize", 4096) / 8;
-	max_lpc_order			= config->GetIntValue("FLAC", "MaxLPCOrder", 8);
-	qlp_coeff_precision		= config->GetIntValue("FLAC", "QLPCoeffPrecision", 0);
-	do_qlp_coeff_prec_search	= config->GetIntValue("FLAC", "DoQLPCoeffPrecSearch", 0);
-	do_exhaustive_model_search	= config->GetIntValue("FLAC", "DoExhaustiveModelSearch", 0);
-	min_residual_partition_order	= config->GetIntValue("FLAC", "MinResidualPartitionOrder", 0);
-	max_residual_partition_order	= config->GetIntValue("FLAC", "MaxResidualPartitionOrder", 5);
+	preset				= config->GetIntValue(ConfigID, "Preset", 5);
+	file_format			= config->GetIntValue(ConfigID, "FileFormat", 0);
+	streamable_subset		= config->GetIntValue(ConfigID, "StreamableSubset", 1);
+	do_mid_side_stereo		= config->GetIntValue(ConfigID, "DoMidSideStereo", 1);
+	loose_mid_side_stereo		= config->GetIntValue(ConfigID, "LooseMidSideStereo", 0);
+	blocksize			= config->GetIntValue(ConfigID, "Blocksize", 4096) / 8;
+	max_lpc_order			= config->GetIntValue(ConfigID, "MaxLPCOrder", 8);
+	qlp_coeff_precision		= config->GetIntValue(ConfigID, "QLPCoeffPrecision", 0);
+	do_qlp_coeff_prec_search	= config->GetIntValue(ConfigID, "DoQLPCoeffPrecSearch", 0);
+	do_exhaustive_model_search	= config->GetIntValue(ConfigID, "DoExhaustiveModelSearch", 0);
+	min_residual_partition_order	= config->GetIntValue(ConfigID, "MinResidualPartitionOrder", 0);
+	max_residual_partition_order	= config->GetIntValue(ConfigID, "MaxResidualPartitionOrder", 5);
 
 	I18n	*i18n = I18n::Get();
 
@@ -128,7 +130,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	group_apodization	= new GroupBox(i18n->TranslateString("Signal processing"), Point(7, 11), Size(518, 56));
 
 	text_apodization	= new Text(i18n->AddColon(i18n->TranslateString("Window function(s)")), Point(9, 13));
-	edit_apodization	= new EditBox(config->GetStringValue("FLAC", "Apodization", "tukey(0.5)"), Point(16 + text_apodization->GetUnscaledTextWidth(), 10), Size(492 - text_apodization->GetUnscaledTextWidth(), 0));
+	edit_apodization	= new EditBox(config->GetStringValue(ConfigID, "Apodization", "tukey(0.5)"), Point(16 + text_apodization->GetUnscaledTextWidth(), 10), Size(492 - text_apodization->GetUnscaledTextWidth(), 0));
 
 	list_apodization	= new ListBox(pos, size);
 	list_apodization->AddEntry("bartlett");
@@ -309,19 +311,19 @@ Int BoCA::ConfigureFLAC::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("FLAC", "Preset", preset);
-	config->SetIntValue("FLAC", "FileFormat", file_format);
-	config->SetIntValue("FLAC", "StreamableSubset", streamable_subset);
-	config->SetIntValue("FLAC", "DoMidSideStereo", do_mid_side_stereo);
-	config->SetIntValue("FLAC", "LooseMidSideStereo", loose_mid_side_stereo);
-	config->SetIntValue("FLAC", "Blocksize", (streamable_subset ? blocksize * 8 : Math::Max(0, Math::Min(32768, (Int) edit_blocksize->GetText().ToInt()))));
-	config->SetStringValue("FLAC", "Apodization", edit_apodization->GetText());
-	config->SetIntValue("FLAC", "MaxLPCOrder", max_lpc_order);
-	config->SetIntValue("FLAC", "QLPCoeffPrecision", qlp_coeff_precision);
-	config->SetIntValue("FLAC", "DoQLPCoeffPrecSearch", do_qlp_coeff_prec_search);
-	config->SetIntValue("FLAC", "DoExhaustiveModelSearch", do_exhaustive_model_search);
-	config->SetIntValue("FLAC", "MinResidualPartitionOrder", min_residual_partition_order);
-	config->SetIntValue("FLAC", "MaxResidualPartitionOrder", max_residual_partition_order);
+	config->SetIntValue(ConfigID, "Preset", preset);
+	config->SetIntValue(ConfigID, "FileFormat", file_format);
+	config->SetIntValue(ConfigID, "StreamableSubset", streamable_subset);
+	config->SetIntValue(ConfigID, "DoMidSideStereo", do_mid_side_stereo);
+	config->SetIntValue(ConfigID, "LooseMidSideStereo", loose_mid_side_stereo);
+	config->SetIntValue(ConfigID, "Blocksize", (streamable_subset ? blocksize * 8 : Math::Max(0, Math::Min(32768, (Int) edit_blocksize->GetText().ToInt()))));
+	config->SetStringValue(ConfigID, "Apodization", edit_apodization->GetText());
+	config->SetIntValue(ConfigID, "MaxLPCOrder", max_lpc_order);
+	config->SetIntValue(ConfigID, "QLPCoeffPrecision", qlp_coeff_precision);
+	config->SetIntValue(ConfigID, "DoQLPCoeffPrecSearch", do_qlp_coeff_prec_search);
+	config->SetIntValue(ConfigID, "DoExhaustiveModelSearch", do_exhaustive_model_search);
+	config->SetIntValue(ConfigID, "MinResidualPartitionOrder", min_residual_partition_order);
+	config->SetIntValue(ConfigID, "MaxResidualPartitionOrder", max_residual_partition_order);
 
 	return Success();
 }

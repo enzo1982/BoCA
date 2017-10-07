@@ -12,14 +12,16 @@
 
 #include "config.h"
 
+const String	 BoCA::ConfigureCDParanoia::ConfigID = "Ripper";
+
 BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
-	autoRead	= config->GetIntValue("Ripper", "AutoReadContents", True);
-	autoRip		= config->GetIntValue("Ripper", "AutoRip", False);
+	autoRead	= config->GetIntValue(ConfigID, "AutoReadContents", True);
+	autoRip		= config->GetIntValue(ConfigID, "AutoRip", False);
 
-	cdparanoia	= config->GetIntValue("Ripper", "CDParanoia", False);
+	cdparanoia	= config->GetIntValue(ConfigID, "CDParanoia", False);
 
 	I18n	*i18n = I18n::Get();
 
@@ -42,21 +44,21 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 			combo_drive->AddEntry(String(device.vendor).Append(" ").Append(device.model).Append(" ").Append(device.revision).Trim());
 
-			driveOffsetUsed.Add(config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), 0));
-			driveOffsets.Add(config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
-			driveSpeeds.Add(config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
-			driveSpinUpTimes.Add(config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(i)), -5));
+			driveOffsetUsed.Add(config->GetIntValue(ConfigID, String("UseOffsetDrive").Append(String::FromInt(i)), 0));
+			driveOffsets.Add(config->GetIntValue(ConfigID, String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
+			driveSpeeds.Add(config->GetIntValue(ConfigID, String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
+			driveSpinUpTimes.Add(config->GetIntValue(ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(i)), -5));
 		}
 
 		boca.DeleteComponent(info);
 	}
 
-	combo_drive->SelectNthEntry(config->GetIntValue("Ripper", "ActiveDrive", 0));
+	combo_drive->SelectNthEntry(config->GetIntValue(ConfigID, "ActiveDrive", 0));
 	combo_drive->onSelectEntry.Connect(&ConfigureCDParanoia::SelectDrive, this);
 
-	useoffset = driveOffsetUsed.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
-	spinup	  = driveSpinUpTimes.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0)) > 0;
-	setspeed  = driveSpeeds.GetNth(config->GetIntValue("Ripper", "ActiveDrive", 0));
+	useoffset = driveOffsetUsed.GetNth(config->GetIntValue(ConfigID, "ActiveDrive", 0));
+	spinup	  = driveSpinUpTimes.GetNth(config->GetIntValue(ConfigID, "ActiveDrive", 0)) > 0;
+	setspeed  = driveSpeeds.GetNth(config->GetIntValue(ConfigID, "ActiveDrive", 0));
 
 	check_speed		= new CheckBox(i18n->AddColon(i18n->TranslateString("Set drive speed limit")), Point(10, 40), Size(162, 0), &setspeed);
 	check_speed->onAction.Connect(&ConfigureCDParanoia::ToggleSetSpeed, this);
@@ -113,7 +115,7 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No verify"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No scratch repair"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("Full cdparanoia mode"));
-	combo_paranoia_mode->SelectNthEntry(config->GetIntValue("Ripper", "CDParanoiaMode", 3));
+	combo_paranoia_mode->SelectNthEntry(config->GetIntValue(ConfigID, "CDParanoiaMode", 3));
 
 	ToggleParanoia();
 
@@ -266,21 +268,21 @@ Int BoCA::ConfigureCDParanoia::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	if (driveSpeeds.Length() >= 1) config->SetIntValue("Ripper", "ActiveDrive", combo_drive->GetSelectedEntryNumber());
+	if (driveSpeeds.Length() >= 1) config->SetIntValue(ConfigID, "ActiveDrive", combo_drive->GetSelectedEntryNumber());
 
 	for (Int i = 0; i < driveSpeeds.Length(); i++)
 	{
-		config->SetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(i)), driveOffsetUsed.GetNth(i));
-		config->SetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(i)), driveOffsets.GetNth(i));
-		config->SetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
-		config->SetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(i)), driveSpinUpTimes.GetNth(i));
+		config->SetIntValue(ConfigID, String("UseOffsetDrive").Append(String::FromInt(i)), driveOffsetUsed.GetNth(i));
+		config->SetIntValue(ConfigID, String("ReadOffsetDrive").Append(String::FromInt(i)), driveOffsets.GetNth(i));
+		config->SetIntValue(ConfigID, String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
+		config->SetIntValue(ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(i)), driveSpinUpTimes.GetNth(i));
 	}
 
-	config->SetIntValue("Ripper", "AutoReadContents", autoRead);
-	config->SetIntValue("Ripper", "AutoRip", autoRip);
+	config->SetIntValue(ConfigID, "AutoReadContents", autoRead);
+	config->SetIntValue(ConfigID, "AutoRip", autoRip);
 
-	config->SetIntValue("Ripper", "CDParanoia", cdparanoia);
-	config->SetIntValue("Ripper", "CDParanoiaMode", combo_paranoia_mode->GetSelectedEntryNumber());
+	config->SetIntValue(ConfigID, "CDParanoia", cdparanoia);
+	config->SetIntValue(ConfigID, "CDParanoiaMode", combo_paranoia_mode->GetSelectedEntryNumber());
 
 	return Success();
 }

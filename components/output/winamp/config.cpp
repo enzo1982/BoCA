@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,10 +13,12 @@
 #include "config.h"
 #include "dllinterface.h"
 
+const String	 BoCA::ConfigureWinamp::ConfigID = "WinampOut";
+
 BoCA::ConfigureWinamp::ConfigureWinamp()
 {
-	Config	*config = Config::Get();
-	I18n	*i18n = I18n::Get();
+	const Config	*config = Config::Get();
+	I18n		*i18n	= I18n::Get();
 
 	i18n->SetContext("Extensions::Winamp Adapter");
 
@@ -35,7 +37,7 @@ BoCA::ConfigureWinamp::ConfigureWinamp()
 
 	for (Int i = 0; i < winamp_out_modules.Length(); i++)
 	{
-		list_output->AddEntry(winamp_out_modules.GetNth(i)->description, config->GetIntValue("WinampOut", "OutputPlugin", 0) == i);
+		list_output->AddEntry(winamp_out_modules.GetNth(i)->description, config->GetIntValue(ConfigID, "OutputPlugin", 0) == i);
 	}
 
 	Add(list_output);
@@ -59,7 +61,7 @@ Int BoCA::ConfigureWinamp::SaveSettings()
 
 	for (Int i = 0; i < list_output->Length(); i++) if (list_output->GetNthEntry(i)->IsMarked()) plugin = i;
 
-	config->SetIntValue("WinampOut", "OutputPlugin", plugin);
+	config->SetIntValue(ConfigID, "OutputPlugin", plugin);
 
 	return Success();
 }

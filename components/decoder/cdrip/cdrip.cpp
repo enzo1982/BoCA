@@ -197,10 +197,10 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		Int	 discid = ComputeDiscID(track.drive);
 
-		if (config->GetIntValue("Ripper", "ReadCDText", True)	   && cdTextDiscID   != discid) { cdText.ReadCDText(track.drive);   cdTextDiscID   = discid; }
-		if (config->GetIntValue("Ripper", "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(track.drive); cdPlayerDiscID = discid; }
+		if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDText", True)	   && cdTextDiscID   != discid) { cdText.ReadCDText(track.drive);   cdTextDiscID   = discid; }
+		if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(track.drive); cdPlayerDiscID = discid; }
 
-		if (config->GetIntValue("Ripper", "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
+		if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 		{
 			const CDInfo	&cdInfo = cdText.GetCDInfo();
 
@@ -210,7 +210,7 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 			info.title  = cdInfo.GetTrackTitle(trackNumber);
 			info.album  = cdInfo.GetTitle();
 		}
-		else if (config->GetIntValue("Ripper", "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
+		else if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 		{
 			const CDInfo	&cdInfo = cdPlayer.GetCDInfo();
 
@@ -222,7 +222,7 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Read ISRC if requested.
 	 */
-	if (config->GetIntValue("Ripper", "ReadISRC", 0))
+	if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadISRC", 0))
 	{
 		CDROMDRIVE	*cd = ex_CR_OpenCDROM(track.drive);
 
@@ -283,7 +283,7 @@ Bool BoCA::DecoderCDRip::Activate()
 	 */
 	int	 nParanoiaMode = PARANOIA_MODE_FULL ^ PARANOIA_MODE_NEVERSKIP;
 
-	switch (config->GetIntValue("Ripper", "CDParanoiaMode", 3))
+	switch (config->GetIntValue(ConfigureCDRip::ConfigID, "CDParanoiaMode", 3))
 	{
 		case 0:
 			nParanoiaMode = PARANOIA_MODE_OVERLAP;
@@ -306,13 +306,13 @@ Bool BoCA::DecoderCDRip::Activate()
 
 	ex_CR_GetCDROMParameters(cd, &params);
 
-	params.nRippingMode		= config->GetIntValue("Ripper", "CDParanoia", False);
+	params.nRippingMode		= config->GetIntValue(ConfigureCDRip::ConfigID, "CDParanoia", False);
 	params.nParanoiaMode		= nParanoiaMode;
-	params.bSwapLefRightChannel	= config->GetIntValue("Ripper", "SwapChannels", False);
-	params.bJitterCorrection	= config->GetIntValue("Ripper", "JitterCorrection", False);
-//	params.bDetectJitterErrors	= config->GetIntValue("Ripper", "DetectJitterErrors", True);
-//	params.bDetectC2Errors		= config->GetIntValue("Ripper", "DetectC2Errors", True);
-	params.nSpeed			= config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
+	params.bSwapLefRightChannel	= config->GetIntValue(ConfigureCDRip::ConfigID, "SwapChannels", False);
+	params.bJitterCorrection	= config->GetIntValue(ConfigureCDRip::ConfigID, "JitterCorrection", False);
+//	params.bDetectJitterErrors	= config->GetIntValue(ConfigureCDRip::ConfigID, "DetectJitterErrors", True);
+//	params.bDetectC2Errors		= config->GetIntValue(ConfigureCDRip::ConfigID, "DetectC2Errors", True);
+	params.nSpeed			= config->GetIntValue(ConfigureCDRip::ConfigID, String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 	params.bEnableMultiRead		= False;
 	params.nMultiReadCount		= 0;
 
@@ -324,7 +324,7 @@ Bool BoCA::DecoderCDRip::Activate()
 
 	/* Lock tray if requested.
 	 */
-	if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(cd, True);
+	if (config->GetIntValue(ConfigureCDRip::ConfigID, "LockTray", True)) ex_CR_LockCD(cd, True);
 
 	/* Call seek to initialize ripper to start of track.
 	 */
@@ -342,7 +342,7 @@ Bool BoCA::DecoderCDRip::Deactivate()
 	if (ex_CR_GetNumberOfCacheErrors(cd) > 0)
 	{
 		Config	*config		= Config::Get();
-		Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
+		Bool	 noCacheWarning = config->GetIntValue(ConfigureCDRip::ConfigID, "NoCacheWarning", False);
 
 		if (!noCacheWarning)
 		{
@@ -354,7 +354,7 @@ Bool BoCA::DecoderCDRip::Deactivate()
 
 			msgBox->ShowDialog();
 
-			config->SetIntValue("Ripper", "NoCacheWarning", noCacheWarning);
+			config->SetIntValue(ConfigureCDRip::ConfigID, "NoCacheWarning", noCacheWarning);
 			config->SaveSettings();
 
 			Object::DeleteObject(msgBox);
@@ -365,7 +365,7 @@ Bool BoCA::DecoderCDRip::Deactivate()
 
 	/* Unlock tray if previously locked.
 	 */
-	if (config->GetIntValue("Ripper", "LockTray", True)) ex_CR_LockCD(cd, False);
+	if (config->GetIntValue(ConfigureCDRip::ConfigID, "LockTray", True)) ex_CR_LockCD(cd, False);
 
 	ex_CR_CloseCDROM(cd);
 
@@ -388,7 +388,7 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 
 	/* Calculate offset values.
 	 */
-	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+	readOffset = config->GetIntValue(ConfigureCDRip::ConfigID, String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue(ConfigureCDRip::ConfigID, String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
 
 	startSector += readOffset / samplesPerSector;
 	endSector   += readOffset / samplesPerSector;
@@ -414,7 +414,7 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 
 	/* Wait for drive to spin up if requested.
 	 */
-	Int		 spinUpTime = config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
+	Int		 spinUpTime = config->GetIntValue(ConfigureCDRip::ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
 	UnsignedInt64	 startTime  = S::System::System::Clock();
 
 	while (spinUpTime > 0 && startTime - lastRead.GetNth(track.drive) > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,19 +12,21 @@
 
 #include "config.h"
 
+const String	 BoCA::ConfigureVorbis::ConfigID = "Vorbis";
+
 BoCA::ConfigureVorbis::ConfigureVorbis()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
-	mode		= config->GetIntValue("Vorbis", "Mode", 0);
-	fileExtension	= config->GetIntValue("Vorbis", "FileExtension", 0);
-	quality		= config->GetIntValue("Vorbis", "Quality", 60);
-	setABRMin	= config->GetIntValue("Vorbis", "SetMinBitrate", False);
-	abrMin		= config->GetIntValue("Vorbis", "MinBitrate", 32);
-	setABRNom	= config->GetIntValue("Vorbis", "SetBitrate", True);
-	abrNom		= config->GetIntValue("Vorbis", "Bitrate", 192);
-	setABRMax	= config->GetIntValue("Vorbis", "SetMaxBitrate", False);
-	abrMax		= config->GetIntValue("Vorbis", "MaxBitrate", 320);
+	mode		= config->GetIntValue(ConfigID, "Mode", 0);
+	fileExtension	= config->GetIntValue(ConfigID, "FileExtension", 0);
+	quality		= config->GetIntValue(ConfigID, "Quality", 60);
+	setABRMin	= config->GetIntValue(ConfigID, "SetMinBitrate", False);
+	abrMin		= config->GetIntValue(ConfigID, "MinBitrate", 32);
+	setABRNom	= config->GetIntValue(ConfigID, "SetBitrate", True);
+	abrNom		= config->GetIntValue(ConfigID, "Bitrate", 192);
+	setABRMax	= config->GetIntValue(ConfigID, "SetMaxBitrate", False);
+	abrMax		= config->GetIntValue(ConfigID, "MaxBitrate", 320);
 
 	I18n	*i18n = I18n::Get();
 
@@ -189,20 +191,20 @@ Int BoCA::ConfigureVorbis::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("Vorbis", "Mode", mode);
+	config->SetIntValue(ConfigID, "Mode", mode);
 
-	config->SetIntValue("Vorbis", "FileExtension", fileExtension);
+	config->SetIntValue(ConfigID, "FileExtension", fileExtension);
 
-	config->SetIntValue("Vorbis", "Quality", quality);
+	config->SetIntValue(ConfigID, "Quality", quality);
 
-	config->SetIntValue("Vorbis", "SetMinBitrate", setABRMin);
-	config->SetIntValue("Vorbis", "MinBitrate", abrMin);
+	config->SetIntValue(ConfigID, "SetMinBitrate", setABRMin);
+	config->SetIntValue(ConfigID, "MinBitrate", abrMin);
 
-	config->SetIntValue("Vorbis", "SetBitrate", setABRNom);
-	config->SetIntValue("Vorbis", "Bitrate", abrNom);
+	config->SetIntValue(ConfigID, "SetBitrate", setABRNom);
+	config->SetIntValue(ConfigID, "Bitrate", abrNom);
 
-	config->SetIntValue("Vorbis", "SetMaxBitrate", setABRMax);
-	config->SetIntValue("Vorbis", "MaxBitrate", abrMax);
+	config->SetIntValue(ConfigID, "SetMaxBitrate", setABRMax);
+	config->SetIntValue(ConfigID, "MaxBitrate", abrMax);
 
 	return Success();
 }

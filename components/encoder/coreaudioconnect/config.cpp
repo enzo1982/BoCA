@@ -12,16 +12,18 @@
 
 #include "config.h"
 
+const String	 BoCA::ConfigureCoreAudio::ConfigID = "CoreAudio";
+
 BoCA::ConfigureCoreAudio::ConfigureCoreAudio(const CoreAudioCommCodecs &iFormats)
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
 	formats		= iFormats;
 
-	bitrate		= config->GetIntValue("CoreAudio", "Bitrate", 64);
-	allowID3	= config->GetIntValue("CoreAudio", "AllowID3v2", False);
-	fileFormat	= config->GetIntValue("CoreAudio", "MP4Container", True);
-	fileExtension	= config->GetIntValue("CoreAudio", "MP4FileExtension", 0);
+	bitrate		= config->GetIntValue(ConfigID, "Bitrate", 64);
+	allowID3	= config->GetIntValue(ConfigID, "AllowID3v2", False);
+	fileFormat	= config->GetIntValue(ConfigID, "MP4Container", True);
+	fileExtension	= config->GetIntValue(ConfigID, "MP4FileExtension", 0);
 
 	I18n	*i18n = I18n::Get();
 
@@ -95,7 +97,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio(const CoreAudioCommCodecs &iFormats
 
 		codecs.Add(formats.codecs[i]);
 
-		if ((UnsignedInt) config->GetIntValue("CoreAudio", "Codec", 'aac ') == formats.codecs[i]) combo_codec->SelectNthEntry(combo_codec->Length() - 1);
+		if ((UnsignedInt) config->GetIntValue(ConfigID, "Codec", 'aac ') == formats.codecs[i]) combo_codec->SelectNthEntry(combo_codec->Length() - 1);
 	}
 
 	combo_codec->onSelectEntry.Connect(&ConfigureCoreAudio::SetCodec, this);
@@ -175,7 +177,7 @@ Int BoCA::ConfigureCoreAudio::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("CoreAudio", "Codec", codecs.GetNth(combo_codec->GetSelectedEntryNumber()));
+	config->SetIntValue(ConfigID, "Codec", codecs.GetNth(combo_codec->GetSelectedEntryNumber()));
 
 	if (bitrates.Length() == 2)
 	{
@@ -183,12 +185,12 @@ Int BoCA::ConfigureCoreAudio::SaveSettings()
 		if (bitrate > bitrates.GetNth(1)) bitrate = bitrates.GetNth(1);
 	}
 
-	if	(bitrates.Length() == 2) config->SetIntValue("CoreAudio", "Bitrate", bitrate);
-	else if (bitrates.Length() >  2) config->SetIntValue("CoreAudio", "Bitrate", bitrates.GetNth((bitrates.Length() / 2 + bitrate) * 2 + 1));
+	if	(bitrates.Length() == 2) config->SetIntValue(ConfigID, "Bitrate", bitrate);
+	else if (bitrates.Length() >  2) config->SetIntValue(ConfigID, "Bitrate", bitrates.GetNth((bitrates.Length() / 2 + bitrate) * 2 + 1));
 
-	config->SetIntValue("CoreAudio", "MP4Container", fileFormat);
-	config->SetIntValue("CoreAudio", "MP4FileExtension", fileExtension);
-	config->SetIntValue("CoreAudio", "AllowID3v2", allowID3);
+	config->SetIntValue(ConfigID, "MP4Container", fileFormat);
+	config->SetIntValue(ConfigID, "MP4FileExtension", fileExtension);
+	config->SetIntValue(ConfigID, "AllowID3v2", allowID3);
 
 	return Success();
 }

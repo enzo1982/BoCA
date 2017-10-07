@@ -254,7 +254,7 @@ Bool BoCA::DecoderCDParanoia::Activate()
 	 */
 	const Config	*config = GetConfiguration();
 
-	Int	 speed = config->GetIntValue("Ripper", String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
+	Int	 speed = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
 
 	if (speed > 0)	cdda_speed_set(drive, speed);
 	else		cdda_speed_set(drive, -1);
@@ -263,11 +263,11 @@ Bool BoCA::DecoderCDParanoia::Activate()
 	 */
 	paranoia = NIL;
 
-	if (config->GetIntValue("Ripper", "CDParanoia", False))
+	if (config->GetIntValue(ConfigureCDParanoia::ConfigID, "CDParanoia", False))
 	{
 		int	 paranoiaMode = PARANOIA_MODE_FULL ^ PARANOIA_MODE_NEVERSKIP;
 
-		switch (config->GetIntValue("Ripper", "CDParanoiaMode", 3))
+		switch (config->GetIntValue(ConfigureCDParanoia::ConfigID, "CDParanoiaMode", 3))
 		{
 			case 0:
 				paranoiaMode = PARANOIA_MODE_OVERLAP;
@@ -301,7 +301,7 @@ Bool BoCA::DecoderCDParanoia::Deactivate()
 	if (numCacheErrors > 0)
 	{
 		Config	*config		= Config::Get();
-		Bool	 noCacheWarning = config->GetIntValue("Ripper", "NoCacheWarning", False);
+		Bool	 noCacheWarning = config->GetIntValue(ConfigureCDParanoia::ConfigID, "NoCacheWarning", False);
 
 		if (!noCacheWarning)
 		{
@@ -313,7 +313,7 @@ Bool BoCA::DecoderCDParanoia::Deactivate()
 
 			msgBox->ShowDialog();
 
-			config->SetIntValue("Ripper", "NoCacheWarning", noCacheWarning);
+			config->SetIntValue(ConfigureCDParanoia::ConfigID, "NoCacheWarning", noCacheWarning);
 			config->SaveSettings();
 
 			Object::DeleteObject(msgBox);
@@ -341,7 +341,7 @@ Bool BoCA::DecoderCDParanoia::Seek(Int64 samplePosition)
 
 	/* Calculate offset values.
 	 */
-	readOffset = config->GetIntValue("Ripper", String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue("Ripper", String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+	readOffset = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue(ConfigureCDParanoia::ConfigID, String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
 
 	startSector += readOffset / samplesPerSector;
 	endSector   += readOffset / samplesPerSector;
@@ -368,7 +368,7 @@ Bool BoCA::DecoderCDParanoia::Seek(Int64 samplePosition)
 
 	/* Wait for drive to spin up if requested.
 	 */
-	Int		 spinUpTime = config->GetIntValue("Ripper", String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
+	Int		 spinUpTime = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
 	UnsignedInt64	 startTime  = S::System::System::Clock();
 
 	while (spinUpTime > 0 && startTime - lastRead.GetNth(track.drive) > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))

@@ -188,8 +188,8 @@ Bool BoCA::EncoderFLAC::Activate()
 
 		/* Limit number Ogg FLAC seekpoints to 230 to fit in one Ogg page.
 		 */
-		if (config->GetIntValue("FLAC", "FileFormat", 0) == 1 && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 && numSamples / format.rate / 10 > 230) ex_FLAC__metadata_object_seektable_template_append_spaced_points(seektable, 230, numSamples);
-		else																     ex_FLAC__metadata_object_seektable_template_append_spaced_points_by_samples(seektable, 10 * format.rate, numSamples);
+		if (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0) == 1 && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 && numSamples / format.rate / 10 > 230) ex_FLAC__metadata_object_seektable_template_append_spaced_points(seektable, 230, numSamples);
+		else																		      ex_FLAC__metadata_object_seektable_template_append_spaced_points_by_samples(seektable, 10 * format.rate, numSamples);
 
 		ex_FLAC__metadata_object_seektable_template_sort(seektable, true);
 
@@ -240,27 +240,27 @@ Bool BoCA::EncoderFLAC::Activate()
 	ex_FLAC__stream_encoder_set_sample_rate(encoder, format.rate);
 	ex_FLAC__stream_encoder_set_bits_per_sample(encoder, format.bits == 32 ? 24 : format.bits);
 
-	if (config->GetIntValue("FLAC", "Preset", 5) < 0)
+	if (config->GetIntValue(ConfigureFLAC::ConfigID, "Preset", 5) < 0)
 	{
-		ex_FLAC__stream_encoder_set_streamable_subset(encoder, config->GetIntValue("FLAC", "StreamableSubset", 1));
-		ex_FLAC__stream_encoder_set_do_mid_side_stereo(encoder, config->GetIntValue("FLAC", "DoMidSideStereo", 1));
-		ex_FLAC__stream_encoder_set_loose_mid_side_stereo(encoder, config->GetIntValue("FLAC", "LooseMidSideStereo", 0));
-		ex_FLAC__stream_encoder_set_blocksize(encoder, config->GetIntValue("FLAC", "Blocksize", 4096));
-		ex_FLAC__stream_encoder_set_apodization(encoder, config->GetStringValue("FLAC", "Apodization", "tukey(0.5)"));
-		ex_FLAC__stream_encoder_set_max_lpc_order(encoder, config->GetIntValue("FLAC", "MaxLPCOrder", 8));
-		ex_FLAC__stream_encoder_set_qlp_coeff_precision(encoder, config->GetIntValue("FLAC", "QLPCoeffPrecision", 0));
-		ex_FLAC__stream_encoder_set_do_qlp_coeff_prec_search(encoder, config->GetIntValue("FLAC", "DoQLPCoeffPrecSearch", 0));
-		ex_FLAC__stream_encoder_set_do_exhaustive_model_search(encoder, config->GetIntValue("FLAC", "DoExhaustiveModelSearch", 0));
-		ex_FLAC__stream_encoder_set_min_residual_partition_order(encoder, config->GetIntValue("FLAC", "MinResidualPartitionOrder", 0));
-		ex_FLAC__stream_encoder_set_max_residual_partition_order(encoder, config->GetIntValue("FLAC", "MaxResidualPartitionOrder", 5));
+		ex_FLAC__stream_encoder_set_streamable_subset(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "StreamableSubset", 1));
+		ex_FLAC__stream_encoder_set_do_mid_side_stereo(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "DoMidSideStereo", 1));
+		ex_FLAC__stream_encoder_set_loose_mid_side_stereo(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "LooseMidSideStereo", 0));
+		ex_FLAC__stream_encoder_set_blocksize(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "Blocksize", 4096));
+		ex_FLAC__stream_encoder_set_apodization(encoder, config->GetStringValue(ConfigureFLAC::ConfigID, "Apodization", "tukey(0.5)"));
+		ex_FLAC__stream_encoder_set_max_lpc_order(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "MaxLPCOrder", 8));
+		ex_FLAC__stream_encoder_set_qlp_coeff_precision(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "QLPCoeffPrecision", 0));
+		ex_FLAC__stream_encoder_set_do_qlp_coeff_prec_search(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "DoQLPCoeffPrecSearch", 0));
+		ex_FLAC__stream_encoder_set_do_exhaustive_model_search(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "DoExhaustiveModelSearch", 0));
+		ex_FLAC__stream_encoder_set_min_residual_partition_order(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "MinResidualPartitionOrder", 0));
+		ex_FLAC__stream_encoder_set_max_residual_partition_order(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "MaxResidualPartitionOrder", 5));
 	}
 	else
 	{
 		ex_FLAC__stream_encoder_set_streamable_subset(encoder, true);
-		ex_FLAC__stream_encoder_set_compression_level(encoder, config->GetIntValue("FLAC", "Preset", 5));
+		ex_FLAC__stream_encoder_set_compression_level(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "Preset", 5));
 
-		if (config->GetIntValue("FLAC", "Preset", 5) < 3) ex_FLAC__stream_encoder_set_blocksize(encoder, 1152);
-		else						  ex_FLAC__stream_encoder_set_blocksize(encoder, 4096);
+		if (config->GetIntValue(ConfigureFLAC::ConfigID, "Preset", 5) < 3) ex_FLAC__stream_encoder_set_blocksize(encoder, 1152);
+		else								   ex_FLAC__stream_encoder_set_blocksize(encoder, 4096);
 	}
 
 	bytesWritten = 0;
@@ -269,7 +269,7 @@ Bool BoCA::EncoderFLAC::Activate()
 	 */
 	FLAC__StreamEncoderInitStatus	 status = FLAC__STREAM_ENCODER_INIT_STATUS_OK;
 
-	if (config->GetIntValue("FLAC", "FileFormat", 0) == 0 || *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0)
+	if (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0) == 0 || *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0)
 	{
 		status = ex_FLAC__stream_encoder_init_stream(encoder, &FLACStreamEncoderWriteCallback, &FLACStreamEncoderSeekCallback, &FLACStreamEncoderTellCallback, NIL, this);
 	}
@@ -346,7 +346,7 @@ Bool BoCA::EncoderFLAC::FixChapterMarks()
 	Int			 position = 0;
 	ogg_page		 og	  = { 0 };
 
-	if (config->GetIntValue("FLAC", "FileFormat", 0) == 0 || *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0)
+	if (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0) == 0 || *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0)
 	{
 		driver->Seek(4);
 
@@ -445,7 +445,7 @@ Bool BoCA::EncoderFLAC::FixChapterMarks()
 
 		/* Write page back to file.
 		 */
-		if (config->GetIntValue("FLAC", "FileFormat", 0) == 1 && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1) ex_ogg_page_checksum_set(&og);
+		if (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0) == 1 && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1) ex_ogg_page_checksum_set(&og);
 
 		driver->Seek(position);
 		driver->WriteData(buffer, buffer.Size());
@@ -460,7 +460,7 @@ Bool BoCA::EncoderFLAC::SetOutputFormat(Int n)
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("FLAC", "FileFormat", n);
+	config->SetIntValue(ConfigureFLAC::ConfigID, "FileFormat", n);
 
 	return True;
 }
@@ -469,7 +469,7 @@ String BoCA::EncoderFLAC::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	switch (config->GetIntValue("FLAC", "FileFormat", 0))
+	switch (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0))
 	{
 		default:
 		case  0: return "flac";

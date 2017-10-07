@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,40 +26,42 @@ namespace BoCA
 	class ConfigureVOAAC : public ConfigLayer
 	{
 		private:
-			GroupBox	*group_bitrate;
-			Text		*text_bitrate;
-			Slider		*slider_bitrate;
-			EditBox		*edit_bitrate;
-			Text		*text_bitrate_kbps;
+			GroupBox		*group_bitrate;
+			Text			*text_bitrate;
+			Slider			*slider_bitrate;
+			EditBox			*edit_bitrate;
+			Text			*text_bitrate_kbps;
 
-			GroupBox	*group_id3v2;
-			CheckBox	*check_id3v2;
-			Text		*text_note;
-			Text		*text_id3v2;
+			GroupBox		*group_id3v2;
+			CheckBox		*check_id3v2;
+			Text			*text_note;
+			Text			*text_id3v2;
 
-			GroupBox	*group_mp4;
-			OptionBox	*option_mp4;
-			OptionBox	*option_aac;
+			GroupBox		*group_mp4;
+			OptionBox		*option_mp4;
+			OptionBox		*option_aac;
 
-			GroupBox	*group_extension;
-			OptionBox	*option_extension_m4a;
-			OptionBox	*option_extension_m4b;
-			OptionBox	*option_extension_m4r;
-			OptionBox	*option_extension_mp4;
+			GroupBox		*group_extension;
+			OptionBox		*option_extension_m4a;
+			OptionBox		*option_extension_m4b;
+			OptionBox		*option_extension_m4r;
+			OptionBox		*option_extension_mp4;
 
-			Int		 bitrate;
-			Bool		 allowID3;
-			Int		 fileFormat;
-			Int		 fileExtension;
+			Int			 bitrate;
+			Bool			 allowID3;
+			Int			 fileFormat;
+			Int			 fileExtension;
 		slots:
-			Void		 SetBitrate();
-			Void		 SetBitrateByEditBox();
-			Void		 SetFileFormat();
+			Void			 SetBitrate();
+			Void			 SetBitrateByEditBox();
+			Void			 SetFileFormat();
 		public:
-					 ConfigureVOAAC();
-					~ConfigureVOAAC();
+			static const String	 ConfigID;
 
-			Int		 SaveSettings();
+						 ConfigureVOAAC();
+						~ConfigureVOAAC();
+
+			Int			 SaveSettings();
 	};
 };
 

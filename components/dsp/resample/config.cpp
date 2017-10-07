@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,10 +13,12 @@
 #include "config.h"
 #include "dllinterface.h"
 
+const String	 BoCA::ConfigureResample::ConfigID = "Resample";
+
 BoCA::ConfigureResample::ConfigureResample()
 {
-	Config	*config = Config::Get();
-	I18n	*i18n = I18n::Get();
+	const Config	*config = Config::Get();
+	I18n		*i18n	= I18n::Get();
 
 	i18n->SetContext("DSP::Resample");
 
@@ -36,13 +38,13 @@ BoCA::ConfigureResample::ConfigureResample()
 		combo_converter->AddEntry(name);
 	}
 
-	combo_converter->SelectNthEntry(config->GetIntValue("Resample", "Converter", SRC_SINC_MEDIUM_QUALITY) - SRC_SINC_BEST_QUALITY);
+	combo_converter->SelectNthEntry(config->GetIntValue(ConfigID, "Converter", SRC_SINC_MEDIUM_QUALITY) - SRC_SINC_BEST_QUALITY);
 	combo_converter->onSelectEntry.Connect(&ConfigureResample::SetConverter, this);
 
 	text_description	= new Text(NIL, Point(24 + text_converter->GetUnscaledTextWidth(), 49));
 	text_samplerate		= new Text(i18n->AddColon(i18n->TranslateString("Sampling rate")), Point(17, 98));
 
-	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue("Resample", "Samplerate", 44100)), Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0), 6);
+	edit_samplerate		= new EditBox(String::FromInt(config->GetIntValue(ConfigID, "Samplerate", 44100)), Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0), 6);
 	edit_samplerate->SetFlags(EDB_NUMERIC);
 
 	list_samplerate	= new ListBox(Point(24 + text_samplerate->GetUnscaledTextWidth(), 95), Size(70, 0));
@@ -96,8 +98,8 @@ Int BoCA::ConfigureResample::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("Resample", "Converter", combo_converter->GetSelectedEntryNumber() + SRC_SINC_BEST_QUALITY);
-	config->SetIntValue("Resample", "Samplerate", edit_samplerate->GetText().ToInt());
+	config->SetIntValue(ConfigID, "Converter", combo_converter->GetSelectedEntryNumber() + SRC_SINC_BEST_QUALITY);
+	config->SetIntValue(ConfigID, "Samplerate", edit_samplerate->GetText().ToInt());
 
 	return Success();
 }

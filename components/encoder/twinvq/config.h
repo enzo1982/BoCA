@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,19 +26,21 @@ namespace BoCA
 	class ConfigureTwinVQ : public ConfigLayer
 	{
 		private:
-			GroupBox	*group_bitrate;
-			ComboBox	*combo_bitrate;
-			Text		*text_bitrate;
-			Text		*text_bitrate_kbps;
+			GroupBox		*group_bitrate;
+			ComboBox		*combo_bitrate;
+			Text			*text_bitrate;
+			Text			*text_bitrate_kbps;
 
-			GroupBox	*group_precand;
-			ComboBox	*combo_precand;
-			Text		*text_precand;
+			GroupBox		*group_precand;
+			ComboBox		*combo_precand;
+			Text			*text_precand;
 		public:
-					 ConfigureTwinVQ();
-					~ConfigureTwinVQ();
+			static const String	 ConfigID;
 
-			Int		 SaveSettings();
+						 ConfigureTwinVQ();
+						~ConfigureTwinVQ();
+
+			Int			 SaveSettings();
 	};
 };
 

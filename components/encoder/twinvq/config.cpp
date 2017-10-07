@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,10 +12,12 @@
 
 #include "config.h"
 
+const String	 BoCA::ConfigureTwinVQ::ConfigID = "TwinVQ";
+
 BoCA::ConfigureTwinVQ::ConfigureTwinVQ()
 {
-	Config	*config = Config::Get();
-	I18n	*i18n = I18n::Get();
+	const Config	*config = Config::Get();
+	I18n		*i18n	= I18n::Get();
 
 	i18n->SetContext("Encoders::TwinVQ");
 
@@ -34,7 +36,7 @@ BoCA::ConfigureTwinVQ::ConfigureTwinVQ()
 	combo_bitrate->AddEntry("32");
 	combo_bitrate->AddEntry("48");
 
-	switch (config->GetIntValue("TwinVQ", "Bitrate", 48))
+	switch (config->GetIntValue(ConfigID, "Bitrate", 48))
 	{
 		case 24: combo_bitrate->SelectNthEntry(0); break;
 		case 32: combo_bitrate->SelectNthEntry(1); break;
@@ -56,7 +58,7 @@ BoCA::ConfigureTwinVQ::ConfigureTwinVQ()
 	combo_precand->AddEntry("16");
 	combo_precand->AddEntry("32");
 
-	switch (config->GetIntValue("TwinVQ", "PreselectionCandidates", 32))
+	switch (config->GetIntValue(ConfigID, "PreselectionCandidates", 32))
 	{
 		case 4:	 combo_precand->SelectNthEntry(0); break;
 		case 8:	 combo_precand->SelectNthEntry(1); break;
@@ -91,8 +93,8 @@ Int BoCA::ConfigureTwinVQ::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("TwinVQ", "Bitrate", combo_bitrate->GetSelectedEntry()->GetText().ToInt());
-	config->SetIntValue("TwinVQ", "PreselectionCandidates", combo_precand->GetSelectedEntry()->GetText().ToInt());
+	config->SetIntValue(ConfigID, "Bitrate", combo_bitrate->GetSelectedEntry()->GetText().ToInt());
+	config->SetIntValue(ConfigID, "PreselectionCandidates", combo_precand->GetSelectedEntry()->GetText().ToInt());
 
 	return Success();
 }

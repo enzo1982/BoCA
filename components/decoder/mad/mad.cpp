@@ -541,7 +541,7 @@ mad_flow BoCA::MADHeaderCallback(void *client_data, const mad_header *header, ma
 
 	Format	 format = filter->infoTrack->GetFormat();
 
-	format.bits	= config->GetIntValue("MAD", "Enable24Bit", False) ? 24 : 16;
+	format.bits	= config->GetIntValue(ConfigureMAD::ConfigID, "Enable24Bit", False) ? 24 : 16;
 	format.channels	= header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
 	format.rate	= header->samplerate;
 

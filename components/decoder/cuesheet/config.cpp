@@ -14,19 +14,21 @@
 
 using namespace smooth::GUI::Dialogs;
 
+const String	 BoCA::ConfigureCueSheet::ConfigID = "CueSheet";
+
 BoCA::ConfigureCueSheet::ConfigureCueSheet()
 {
-	Config	*config = Config::Get();
-	I18n	*i18n	= I18n::Get();
+	const Config	*config = Config::Get();
+	I18n		*i18n	= I18n::Get();
 
 	i18n->SetContext("Decoders::CueSheet");
 
-	readInfoTags		= config->GetIntValue("CueSheet", "ReadInformationTags", True);
-	preferCueSheets		= config->GetIntValue("CueSheet", "PreferCueSheets", True);
+	readInfoTags		= config->GetIntValue(ConfigID, "ReadInformationTags", True);
+	preferCueSheets		= config->GetIntValue(ConfigID, "PreferCueSheets", True);
 
-	lookForAlternatives	= config->GetIntValue("CueSheet", "LookForAlternativeFiles", False);
+	lookForAlternatives	= config->GetIntValue(ConfigID, "LookForAlternativeFiles", False);
 
-	ignoreErrors		= config->GetIntValue("CueSheet", "IgnoreErrors", False);
+	ignoreErrors		= config->GetIntValue(ConfigID, "IgnoreErrors", False);
 
 	group_information	= new GroupBox(i18n->TranslateString("Title information"), Point(7, 11), Size(552, 64));
 
@@ -82,12 +84,12 @@ Int BoCA::ConfigureCueSheet::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("CueSheet", "ReadInformationTags", readInfoTags);
-	config->SetIntValue("CueSheet", "PreferCueSheets", preferCueSheets);
+	config->SetIntValue(ConfigID, "ReadInformationTags", readInfoTags);
+	config->SetIntValue(ConfigID, "PreferCueSheets", preferCueSheets);
 
-	config->SetIntValue("CueSheet", "LookForAlternativeFiles", lookForAlternatives);
+	config->SetIntValue(ConfigID, "LookForAlternativeFiles", lookForAlternatives);
 
-	config->SetIntValue("CueSheet", "IgnoreErrors", ignoreErrors);
+	config->SetIntValue(ConfigID, "IgnoreErrors", ignoreErrors);
 
 	return Success();
 }

@@ -102,19 +102,19 @@ Bool BoCA::EncoderBlade::Activate()
 
 	if (format.channels == 2)
 	{
-		if (config->GetIntValue("BladeEnc", "DualChannel", 0))	beConfig.format.mp3.byMode = BE_MP3_MODE_DUALCHANNEL;
-		else							beConfig.format.mp3.byMode = BE_MP3_MODE_STEREO;
+		if (config->GetIntValue(ConfigureBlade::ConfigID, "DualChannel", 0)) beConfig.format.mp3.byMode = BE_MP3_MODE_DUALCHANNEL;
+		else								     beConfig.format.mp3.byMode = BE_MP3_MODE_STEREO;
 	}
 	else if (format.channels == 1)
 	{
 		beConfig.format.mp3.byMode = BE_MP3_MODE_MONO;
 	}
 
-	beConfig.format.mp3.wBitrate	= config->GetIntValue("BladeEnc", "Bitrate", 0);
-	beConfig.format.mp3.bCopyright	= config->GetIntValue("BladeEnc", "Copyright", 0);
-	beConfig.format.mp3.bCRC	= config->GetIntValue("BladeEnc", "CRC", 0);
-	beConfig.format.mp3.bOriginal	= config->GetIntValue("BladeEnc", "Original", 1);
-	beConfig.format.mp3.bPrivate	= config->GetIntValue("BladeEnc", "Private", 0);
+	beConfig.format.mp3.wBitrate	= config->GetIntValue(ConfigureBlade::ConfigID, "Bitrate", 0);
+	beConfig.format.mp3.bCopyright	= config->GetIntValue(ConfigureBlade::ConfigID, "Copyright", 0);
+	beConfig.format.mp3.bCRC	= config->GetIntValue(ConfigureBlade::ConfigID, "CRC", 0);
+	beConfig.format.mp3.bOriginal	= config->GetIntValue(ConfigureBlade::ConfigID, "Original", 1);
+	beConfig.format.mp3.bPrivate	= config->GetIntValue(ConfigureBlade::ConfigID, "Private", 0);
 
 	unsigned long	 bufferSize	= 0;
 	unsigned long	 samplesSize	= 0;

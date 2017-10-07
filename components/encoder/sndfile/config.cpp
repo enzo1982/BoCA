@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,6 +12,8 @@
 
 #include "config.h"
 #include "dllinterface.h"
+
+const String	 BoCA::ConfigureSndFile::ConfigID = "SndFile";
 
 BoCA::ConfigureSndFile::ConfigureSndFile()
 {
@@ -62,16 +64,16 @@ Int BoCA::ConfigureSndFile::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("SndFile", "Format", formats.Get(combo_format->GetSelectedEntry()->GetHandle()));
-	config->SetIntValue("SndFile", "SubFormat", subformats.Get(combo_subformat->GetSelectedEntry()->GetHandle()));
+	config->SetIntValue(ConfigID, "Format", formats.Get(combo_format->GetSelectedEntry()->GetHandle()));
+	config->SetIntValue(ConfigID, "SubFormat", subformats.Get(combo_subformat->GetSelectedEntry()->GetHandle()));
 
 	return Success();
 }
 
 Void BoCA::ConfigureSndFile::FillFormats()
 {
-	Config	*config = Config::Get();
-	int	 count	= 0;
+	const Config	*config = Config::Get();
+	int		 count	= 0;
 
 	ex_sf_command(NIL, SFC_GET_FORMAT_MAJOR_COUNT, &count, sizeof(int));
 
@@ -96,9 +98,9 @@ Void BoCA::ConfigureSndFile::FillFormats()
 		formats.Add(format_info.format, entry->GetHandle());
 
 #ifdef __APPLE__
-		if (config->GetIntValue("SndFile", "Format", SF_FORMAT_AIFF) == format_info.format) combo_format->SelectEntry(entry);
+		if (config->GetIntValue(ConfigID, "Format", SF_FORMAT_AIFF) == format_info.format) combo_format->SelectEntry(entry);
 #else
-		if (config->GetIntValue("SndFile", "Format", SF_FORMAT_WAV) == format_info.format) combo_format->SelectEntry(entry);
+		if (config->GetIntValue(ConfigID, "Format", SF_FORMAT_WAV) == format_info.format) combo_format->SelectEntry(entry);
 #endif
 	}
 
@@ -115,13 +117,13 @@ Void BoCA::ConfigureSndFile::SelectFormat()
 
 	i18n->SetContext("Encoders::SndFile");
 
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
 	ListEntry	*entry = combo_subformat->AddEntry(i18n->TranslateString("auto select"));
 
 	subformats.Add(0, entry->GetHandle());
 
-	if (config->GetIntValue("SndFile", "SubFormat", 0) == 0) combo_subformat->SelectEntry(entry);
+	if (config->GetIntValue(ConfigID, "SubFormat", 0) == 0) combo_subformat->SelectEntry(entry);
 
 	int	 format = formats.Get(combo_format->GetSelectedEntry()->GetHandle());
 	int	 count	= 0;
@@ -153,7 +155,7 @@ Void BoCA::ConfigureSndFile::SelectFormat()
 
 		subformats.Add(format_info.format, entry->GetHandle());
 
-		if (config->GetIntValue("SndFile", "SubFormat", 0) == format_info.format) combo_subformat->SelectEntry(entry);
+		if (config->GetIntValue(ConfigID, "SubFormat", 0) == format_info.format) combo_subformat->SelectEntry(entry);
 	}
 
 	combo_subformat->Paint(SP_PAINT);

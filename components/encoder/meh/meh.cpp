@@ -126,7 +126,7 @@ Bool BoCA::EncoderMultiEncoderHub::IsThreadSafe() const
 	/* Check if at least one downstream encoder is not thread safe.
 	 */
 	AS::Registry		&boca	    = AS::Registry::Get();
-	const Array<String>	&encoderIDs = config->GetStringValue("meh!", "Encoders", "flac-enc,lame-enc").Explode(",");
+	const Array<String>	&encoderIDs = config->GetStringValue(ConfigureMultiEncoderHub::ConfigID, "Encoders", "flac-enc,lame-enc").Explode(",");
 	Bool			 threadSafe = True;
 
 	foreach (const String &encoderID, encoderIDs)
@@ -155,7 +155,7 @@ Bool BoCA::EncoderMultiEncoderHub::IsLossless() const
 	/* Check if at least one downstream encoder is lossless.
 	 */
 	AS::Registry		&boca	    = AS::Registry::Get();
-	const Array<String>	&encoderIDs = config->GetStringValue("meh!", "Encoders", "flac-enc,lame-enc").Explode(",");
+	const Array<String>	&encoderIDs = config->GetStringValue(ConfigureMultiEncoderHub::ConfigID, "Encoders", "flac-enc,lame-enc").Explode(",");
 	Bool			 lossless   = False;
 
 	foreach (const String &encoderID, encoderIDs)
@@ -191,7 +191,7 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 	/* Instantiate encoders.
 	 */
 	AS::Registry		&boca	    = AS::Registry::Get();
-	const Array<String>	&encoderIDs = config->GetStringValue("meh!", "Encoders", "flac-enc,lame-enc").Explode(",");
+	const Array<String>	&encoderIDs = config->GetStringValue(ConfigureMultiEncoderHub::ConfigID, "Encoders", "flac-enc,lame-enc").Explode(",");
 
 	String	 fileNamePattern = GetFileNamePattern(track);
 
@@ -286,7 +286,7 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 		{
 			File(encoderTrack.outfile).Delete();
 
-			if (config->GetIntValue("meh!", "SeparateFolders", False) && !config->GetIntValue("Settings", "EncodeToSingleFile", False))
+			if (config->GetIntValue(ConfigureMultiEncoderHub::ConfigID, "SeparateFolders", False) && !config->GetIntValue("Settings", "EncodeToSingleFile", False))
 			{
 				encoderTrack.outfile[encoderTrack.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
 
@@ -369,7 +369,7 @@ String BoCA::EncoderMultiEncoderHub::GetFileNamePattern(const Track &track)
 
 	if (fileNamePattern.EndsWith(".[FILETYPE]")) fileNamePattern[fileNamePattern.Length() - 11] = 0;
 
-	if (configuration->GetIntValue("meh!", "SeparateFolders", False) && !configuration->GetIntValue("Settings", "EncodeToSingleFile", False))
+	if (configuration->GetIntValue(ConfigureMultiEncoderHub::ConfigID, "SeparateFolders", False) && !configuration->GetIntValue("Settings", "EncodeToSingleFile", False))
 	{
 		String	 pre;
 		String	 post = fileNamePattern;
@@ -477,7 +477,7 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 	 */
 	Bool	 encodeToSingleFile	= configuration->GetIntValue("Settings", "EncodeToSingleFile", False);
 
-	Bool	 separateFolders	= configuration->GetIntValue("meh!", "SeparateFolders", False);
+	Bool	 separateFolders	= configuration->GetIntValue(ConfigureMultiEncoderHub::ConfigID, "SeparateFolders", False);
 
 	Bool	 createPlaylist		= configuration->GetIntValue("Playlist", "CreatePlaylist", False);
 	Bool	 createCueSheet		= configuration->GetIntValue("Playlist", "CreateCueSheet", False);
@@ -570,7 +570,7 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion()
 
 		/* Save playlists per encoder.
 		 */
-		const Array<String>	&encoderIDs = configuration->GetStringValue("meh!", "Encoders", "flac-enc,lame-enc").Explode(",");
+		const Array<String>	&encoderIDs = configuration->GetStringValue(ConfigureMultiEncoderHub::ConfigID, "Encoders", "flac-enc,lame-enc").Explode(",");
 
 		foreach (const String &encoderID, encoderIDs)
 		{

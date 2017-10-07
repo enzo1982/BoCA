@@ -125,8 +125,15 @@ Bool BoCA::EncoderVOAAC::Activate()
 		return False;
 	}
 
+	/* Get configuration.
+	 */
 	const Config	*config = GetConfiguration();
 
+	Bool	 mp4Container = config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
+	Int	 bitrate      = config->GetIntValue(ConfigureVOAAC::ConfigID, "Bitrate", 96);
+
+	/* Create VO AAC encoder.
+	 */
 	unsigned long	 samplesSize = 1024 * format.channels;
 	unsigned long	 bufferSize  = samplesSize * 4;
 
@@ -143,16 +150,23 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 	api.Init(&handle, VO_AUDIO_CodingAAC, &userData);
 
+	/* Set encoder parameters.
+	 */
 	AACENC_PARAM	 params;
 
 	params.sampleRate = format.rate;
 	params.nChannels  = format.channels;
-	params.bitRate	  = config->GetIntValue("VOAACEnc", "Bitrate", 96) * 1000 * format.channels;
-	params.adtsUsed	  = !config->GetIntValue("VOAACEnc", "MP4Container", True);
+	params.bitRate	  = bitrate * 1000 * format.channels;
+	params.adtsUsed	  = !mp4Container;
 
 	api.SetParam(handle, VO_PID_AAC_ENCPARAM, &params);
 
-	if (config->GetIntValue("VOAACEnc", "MP4Container", True))
+	frameSize    = samplesSize / format.channels;
+	delaySamples = frameSize + 576;
+
+	/* Create MP4 container.
+	 */
+	if (mp4Container)
 	{
 		mp4File		= ex_MP4CreateEx(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
@@ -168,12 +182,9 @@ Bool BoCA::EncoderVOAAC::Activate()
 		totalSamples = 0;
 	}
 
-	frameSize    = samplesSize / format.channels;
-	delaySamples = frameSize + 576;
-
 	/* Write ID3v2 tag if requested.
 	 */
-	if (!config->GetIntValue("VOAACEnc", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("VOAACEnc", "AllowID3v2", False))
+	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureVOAAC::ConfigID, "AllowID3v2", False))
 	{
 		if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
 		{
@@ -209,7 +220,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Finish MP4 writing.
 	 */
-	if (config->GetIntValue("VOAACEnc", "MP4Container", True))
+	if (mp4File != NIL)
 	{
 		/* Write iTunes metadata with gapless information.
 		 */
@@ -289,7 +300,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (!config->GetIntValue("VOAACEnc", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -314,7 +325,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (!config->GetIntValue("VOAACEnc", "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue("VOAACEnc", "AllowID3v2", False))
+	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureVOAAC::ConfigID, "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
@@ -445,8 +456,8 @@ Bool BoCA::EncoderVOAAC::SetOutputFormat(Int n)
 {
 	Config	*config = Config::Get();
 
-	if (n == 0 && mp4v2dll != NIL) config->SetIntValue("VOAACEnc", "MP4Container", True);
-	else			       config->SetIntValue("VOAACEnc", "MP4Container", False);
+	if (n == 0 && mp4v2dll != NIL) config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
+	else			       config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", False);
 
 	return True;
 }
@@ -455,9 +466,9 @@ String BoCA::EncoderVOAAC::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("VOAACEnc", "MP4Container", True))
+	if (config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True))
 	{
-		switch (config->GetIntValue("VOAACEnc", "MP4FileExtension", 0))
+		switch (config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4FileExtension", 0))
 		{
 			default:
 			case  0: return "m4a";

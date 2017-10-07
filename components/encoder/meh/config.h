@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,37 +26,39 @@ namespace BoCA
 	class ConfigureMultiEncoderHub : public ConfigLayer
 	{
 		private:
-			GroupBox	*group_encoders;
+			GroupBox		*group_encoders;
 
-			Text		*text_available;
-			ListBox		*list_available;
-			Text		*text_selected;
-			ListBox		*list_selected;
+			Text			*text_available;
+			ListBox			*list_available;
+			Text			*text_selected;
+			ListBox			*list_selected;
 
-			Button		*btn_add;
-			Button		*btn_remove;
-			Button		*btn_configure;
+			Button			*btn_add;
+			Button			*btn_remove;
+			Button			*btn_configure;
 
-			GroupBox	*group_options;
+			GroupBox		*group_options;
 
-			CheckBox	*check_folders;
+			CheckBox		*check_folders;
 
-			Bool		 separateFolders;
+			Bool			 separateFolders;
 
-			Void		 AddEncoders();
+			Void			 AddEncoders();
 		public:
-					 ConfigureMultiEncoderHub();
-					~ConfigureMultiEncoderHub();
+			static const String	 ConfigID;
 
-			Int		 SaveSettings();
+						 ConfigureMultiEncoderHub();
+						~ConfigureMultiEncoderHub();
+
+			Int			 SaveSettings();
 		slots:
-			Void		 OnSelectAvailable();
-			Void		 OnSelectEncoder();
+			Void			 OnSelectAvailable();
+			Void			 OnSelectEncoder();
 
-			Void		 OnAddEncoder();
-			Void		 OnRemoveEncoder();
+			Void			 OnAddEncoder();
+			Void			 OnRemoveEncoder();
 
-			Void		 OnConfigureEncoder();
+			Void			 OnConfigureEncoder();
 	};
 };
 

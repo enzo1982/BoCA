@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -69,7 +69,7 @@ Bool BoCA::DSPResample::Activate()
 	const Format	&format = track.GetFormat();
 
 	this->format	  = format;
-	this->format.rate = config->GetIntValue("Resample", "Samplerate", 44100);
+	this->format.rate = config->GetIntValue(ConfigureResample::ConfigID, "Samplerate", 44100);
 
 	/* Init the resampler only if we actually need to resample.
 	 */
@@ -78,7 +78,7 @@ Bool BoCA::DSPResample::Activate()
 		int	 error;
 
 		ratio = Float(this->format.rate) / Float(format.rate);
-		state = ex_src_new(config->GetIntValue("Resample", "Converter", SRC_SINC_MEDIUM_QUALITY), format.channels, &error);
+		state = ex_src_new(config->GetIntValue(ConfigureResample::ConfigID, "Converter", SRC_SINC_MEDIUM_QUALITY), format.channels, &error);
 
 		if (state == NIL)
 		{

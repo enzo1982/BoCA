@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,16 +12,18 @@
 
 #include "config.h"
 
+const String	 BoCA::ConfigureBlade::ConfigID = "BladeEnc";
+
 BoCA::ConfigureBlade::ConfigureBlade()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
 	bitrate		= GetSliderValue();
-	crc		= config->GetIntValue("BladeEnc", "CRC", 0);
-	copyright	= config->GetIntValue("BladeEnc", "Copyright", 0);
-	original	= config->GetIntValue("BladeEnc", "Original", 1);
-	priv		= config->GetIntValue("BladeEnc", "Private", 0);
-	dualchannel	= config->GetIntValue("BladeEnc", "DualChannel", 0);
+	crc		= config->GetIntValue(ConfigID, "CRC", 0);
+	copyright	= config->GetIntValue(ConfigID, "Copyright", 0);
+	original	= config->GetIntValue(ConfigID, "Original", 1);
+	priv		= config->GetIntValue(ConfigID, "Private", 0);
+	dualchannel	= config->GetIntValue(ConfigID, "DualChannel", 0);
 
 	I18n	*i18n = I18n::Get();
 
@@ -93,12 +95,12 @@ Int BoCA::ConfigureBlade::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("BladeEnc", "Bitrate", GetBitrate());
-	config->SetIntValue("BladeEnc", "CRC", crc);
-	config->SetIntValue("BladeEnc", "Copyright", copyright);
-	config->SetIntValue("BladeEnc", "Original", original);
-	config->SetIntValue("BladeEnc", "Private", priv);
-	config->SetIntValue("BladeEnc", "DualChannel", dualchannel);
+	config->SetIntValue(ConfigID, "Bitrate", GetBitrate());
+	config->SetIntValue(ConfigID, "CRC", crc);
+	config->SetIntValue(ConfigID, "Copyright", copyright);
+	config->SetIntValue(ConfigID, "Original", original);
+	config->SetIntValue(ConfigID, "Private", priv);
+	config->SetIntValue(ConfigID, "DualChannel", dualchannel);
 
 	return Success();
 }

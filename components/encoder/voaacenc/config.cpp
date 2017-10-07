@@ -13,14 +13,16 @@
 #include "config.h"
 #include "dllinterface.h"
 
+const String	 BoCA::ConfigureVOAAC::ConfigID = "VOAACEnc";
+
 BoCA::ConfigureVOAAC::ConfigureVOAAC()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
-	bitrate		= config->GetIntValue("VOAACEnc", "Bitrate", 96);
-	allowID3	= config->GetIntValue("VOAACEnc", "AllowID3v2", False);
-	fileFormat	= config->GetIntValue("VOAACEnc", "MP4Container", True);
-	fileExtension	= config->GetIntValue("VOAACEnc", "MP4FileExtension", 0);
+	bitrate		= config->GetIntValue(ConfigID, "Bitrate", 96);
+	allowID3	= config->GetIntValue(ConfigID, "AllowID3v2", False);
+	fileFormat	= config->GetIntValue(ConfigID, "MP4Container", True);
+	fileExtension	= config->GetIntValue(ConfigID, "MP4FileExtension", 0);
 
 	I18n	*i18n = I18n::Get();
 
@@ -131,10 +133,10 @@ Int BoCA::ConfigureVOAAC::SaveSettings()
 	if (bitrate <	8) bitrate =   8;
 	if (bitrate > 128) bitrate = 128;
 
-	config->SetIntValue("VOAACEnc", "Bitrate", bitrate);
-	config->SetIntValue("VOAACEnc", "AllowID3v2", allowID3);
-	config->SetIntValue("VOAACEnc", "MP4Container", fileFormat);
-	config->SetIntValue("VOAACEnc", "MP4FileExtension", fileExtension);
+	config->SetIntValue(ConfigID, "Bitrate", bitrate);
+	config->SetIntValue(ConfigID, "AllowID3v2", allowID3);
+	config->SetIntValue(ConfigID, "MP4Container", fileFormat);
+	config->SetIntValue(ConfigID, "MP4FileExtension", fileExtension);
 
 	return Success();
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,29 +26,31 @@ namespace BoCA
 	class ConfigureCueSheet : public ConfigLayer
 	{
 		private:
-			GroupBox	*group_information;
-			CheckBox	*check_read_tags;
-			CheckBox	*check_prefer_cue;
+			GroupBox		*group_information;
+			CheckBox		*check_read_tags;
+			CheckBox		*check_prefer_cue;
 
-			GroupBox	*group_alternatives;
-			CheckBox	*check_alternatives;
+			GroupBox		*group_alternatives;
+			CheckBox		*check_alternatives;
 
-			GroupBox	*group_errors;
-			CheckBox	*check_ignore_errors;
+			GroupBox		*group_errors;
+			CheckBox		*check_ignore_errors;
 
-			Bool		 readInfoTags;
-			Bool		 preferCueSheets;
+			Bool			 readInfoTags;
+			Bool			 preferCueSheets;
 
-			Bool		 lookForAlternatives;
+			Bool			 lookForAlternatives;
 
-			Bool		 ignoreErrors;
+			Bool			 ignoreErrors;
 		public:
-					 ConfigureCueSheet();
-					~ConfigureCueSheet();
+			static const String	 ConfigID;
 
-			Int		 SaveSettings();
+						 ConfigureCueSheet();
+						~ConfigureCueSheet();
+
+			Int			 SaveSettings();
 		slots:
-			Void		 ToggleReadTags();
+			Void			 ToggleReadTags();
 	};
 };
 

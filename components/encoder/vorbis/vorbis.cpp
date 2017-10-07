@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -93,15 +93,15 @@ Bool BoCA::EncoderVorbis::Activate()
 
 	ex_vorbis_info_init(&vi);
 
-	switch (config->GetIntValue("Vorbis", "Mode", 0))
+	switch (config->GetIntValue(ConfigureVorbis::ConfigID, "Mode", 0))
 	{
 		case 0:
-			error = ex_vorbis_encode_init_vbr(&vi, format.channels, format.rate, ((double) config->GetIntValue("Vorbis", "Quality", 60)) / 100);
+			error = ex_vorbis_encode_init_vbr(&vi, format.channels, format.rate, ((double) config->GetIntValue(ConfigureVorbis::ConfigID, "Quality", 60)) / 100);
 			break;
 		case 1:
-			error = ex_vorbis_encode_init(&vi, format.channels, format.rate, config->GetIntValue("Vorbis", "SetMinBitrate", False) ? config->GetIntValue("Vorbis", "MinBitrate",  32) * 1000 : -1,
-											 config->GetIntValue("Vorbis", "SetBitrate",    True)  ? config->GetIntValue("Vorbis", "Bitrate",    192) * 1000 : -1,
-											 config->GetIntValue("Vorbis", "SetMaxBitrate", False) ? config->GetIntValue("Vorbis", "MaxBitrate", 320) * 1000 : -1);
+			error = ex_vorbis_encode_init(&vi, format.channels, format.rate, config->GetIntValue(ConfigureVorbis::ConfigID, "SetMinBitrate", False) ? config->GetIntValue(ConfigureVorbis::ConfigID, "MinBitrate",  32) * 1000 : -1,
+											 config->GetIntValue(ConfigureVorbis::ConfigID, "SetBitrate",    True)  ? config->GetIntValue(ConfigureVorbis::ConfigID, "Bitrate",    192) * 1000 : -1,
+											 config->GetIntValue(ConfigureVorbis::ConfigID, "SetMaxBitrate", False) ? config->GetIntValue(ConfigureVorbis::ConfigID, "MaxBitrate", 320) * 1000 : -1);
 			break;
 	}
 
@@ -385,7 +385,7 @@ String BoCA::EncoderVorbis::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
 
-	switch (config->GetIntValue("Vorbis", "FileExtension", 0))
+	switch (config->GetIntValue(ConfigureVorbis::ConfigID, "FileExtension", 0))
 	{
 		default:
 		case  0: return "ogg";

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,15 +12,17 @@
 
 #include "config.h"
 
+const String	 BoCA::ConfigureBonk::ConfigID = "Bonk";
+
 BoCA::ConfigureBonk::ConfigureBonk()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
-	quant		= config->GetIntValue("Bonk", "Quantization", 8);
-	predictor	= config->GetIntValue("Bonk", "Predictor", 32);
-	downsampling	= config->GetIntValue("Bonk", "Downsampling", 2);
-	jstereo		= config->GetIntValue("Bonk", "JointStereo", 0);
-	lossless	= config->GetIntValue("Bonk", "Lossless", 0);
+	quant		= config->GetIntValue(ConfigID, "Quantization", 8);
+	predictor	= config->GetIntValue(ConfigID, "Predictor", 32);
+	downsampling	= config->GetIntValue(ConfigID, "Downsampling", 2);
+	jstereo		= config->GetIntValue(ConfigID, "JointStereo", 0);
+	lossless	= config->GetIntValue(ConfigID, "Lossless", 0);
 
 	I18n	*i18n = I18n::Get();
 
@@ -115,11 +117,11 @@ Int BoCA::ConfigureBonk::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	config->SetIntValue("Bonk", "Quantization", quant);
-	config->SetIntValue("Bonk", "Predictor", predictor);
-	config->SetIntValue("Bonk", "Downsampling", downsampling);
-	config->SetIntValue("Bonk", "JointStereo", jstereo);
-	config->SetIntValue("Bonk", "Lossless", lossless);
+	config->SetIntValue(ConfigID, "Quantization", quant);
+	config->SetIntValue(ConfigID, "Predictor", predictor);
+	config->SetIntValue(ConfigID, "Downsampling", downsampling);
+	config->SetIntValue(ConfigID, "JointStereo", jstereo);
+	config->SetIntValue(ConfigID, "Lossless", lossless);
 
 	return Success();
 }

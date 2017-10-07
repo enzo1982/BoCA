@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,36 +14,38 @@
 
 #include "lame/lame.h"
 
+const String	 BoCA::ConfigureLAME::ConfigID = "LAME";
+
 BoCA::ConfigureLAME::ConfigureLAME()
 {
-	Config	*config = Config::Get();
+	const Config	*config = Config::Get();
 
-	preset			= config->GetIntValue("LAME", "Preset", 2);
-	set_bitrate		= config->GetIntValue("LAME", "SetBitrate", 1);
+	preset			= config->GetIntValue(ConfigID, "Preset", 2);
+	set_bitrate		= config->GetIntValue(ConfigID, "SetBitrate", 1);
 	bitrate			= GetSliderValue();
-	ratio			= config->GetIntValue("LAME", "Ratio", 1100);
-	set_quality		= config->GetIntValue("LAME", "SetQuality", 0);
-	quality			= 9 - config->GetIntValue("LAME", "Quality", 3);
-	forcejs			= config->GetIntValue("LAME", "ForceJS", 0);
-	vbrmode			= config->GetIntValue("LAME", "VBRMode", 4);
-	vbrquality		= 99 - config->GetIntValue("LAME", "VBRQuality", 50);
-	abrbitrate		= config->GetIntValue("LAME", "ABRBitrate", 192);
-	set_min_vbr_brate	= config->GetIntValue("LAME", "SetMinVBRBitrate", 0);
+	ratio			= config->GetIntValue(ConfigID, "Ratio", 1100);
+	set_quality		= config->GetIntValue(ConfigID, "SetQuality", 0);
+	quality			= 9 - config->GetIntValue(ConfigID, "Quality", 3);
+	forcejs			= config->GetIntValue(ConfigID, "ForceJS", 0);
+	vbrmode			= config->GetIntValue(ConfigID, "VBRMode", 4);
+	vbrquality		= 99 - config->GetIntValue(ConfigID, "VBRQuality", 50);
+	abrbitrate		= config->GetIntValue(ConfigID, "ABRBitrate", 192);
+	set_min_vbr_brate	= config->GetIntValue(ConfigID, "SetMinVBRBitrate", 0);
 	min_vbr_brate		= GetMinVBRSliderValue();
-	set_max_vbr_brate	= config->GetIntValue("LAME", "SetMaxVBRBitrate", 0);
+	set_max_vbr_brate	= config->GetIntValue(ConfigID, "SetMaxVBRBitrate", 0);
 	max_vbr_brate		= GetMaxVBRSliderValue();
-	set_original		= config->GetIntValue("LAME", "Original", 1);
-	set_copyright		= config->GetIntValue("LAME", "Copyright", 0);
-	set_private		= config->GetIntValue("LAME", "Private", 0);
-	set_crc			= config->GetIntValue("LAME", "CRC", 0);
-	set_iso			= config->GetIntValue("LAME", "StrictISO", 0);
-	disable_filtering	= config->GetIntValue("LAME", "DisableFiltering", 0);
-	set_lowpass		= config->GetIntValue("LAME", "SetLowpass", 0);
-	set_lowpass_width	= config->GetIntValue("LAME", "SetLowpassWidth", 0);
-	set_highpass		= config->GetIntValue("LAME", "SetHighpass", 0);
-	set_highpass_width	= config->GetIntValue("LAME", "SetHighpassWidth", 0);
-	enable_ath		= config->GetIntValue("LAME", "EnableATH", 1);
-	enable_tempmask		= config->GetIntValue("LAME", "UseTNS", 1);
+	set_original		= config->GetIntValue(ConfigID, "Original", 1);
+	set_copyright		= config->GetIntValue(ConfigID, "Copyright", 0);
+	set_private		= config->GetIntValue(ConfigID, "Private", 0);
+	set_crc			= config->GetIntValue(ConfigID, "CRC", 0);
+	set_iso			= config->GetIntValue(ConfigID, "StrictISO", 0);
+	disable_filtering	= config->GetIntValue(ConfigID, "DisableFiltering", 0);
+	set_lowpass		= config->GetIntValue(ConfigID, "SetLowpass", 0);
+	set_lowpass_width	= config->GetIntValue(ConfigID, "SetLowpassWidth", 0);
+	set_highpass		= config->GetIntValue(ConfigID, "SetHighpass", 0);
+	set_highpass_width	= config->GetIntValue(ConfigID, "SetHighpassWidth", 0);
+	enable_ath		= config->GetIntValue(ConfigID, "EnableATH", 1);
+	enable_tempmask		= config->GetIntValue(ConfigID, "UseTNS", 1);
 
 	I18n	*i18n = I18n::Get();
 
@@ -207,7 +209,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	misc_combo_stereomode->AddEntry(i18n->TranslateString("Mono"));
 	misc_combo_stereomode->AddEntry(i18n->TranslateString("Stereo"));
 	misc_combo_stereomode->AddEntry(i18n->TranslateString("Joint Stereo"));
-	misc_combo_stereomode->SelectNthEntry(config->GetIntValue("LAME", "StereoMode", 0));
+	misc_combo_stereomode->SelectNthEntry(config->GetIntValue(ConfigID, "StereoMode", 0));
 	misc_combo_stereomode->onSelectEntry.Connect(&ConfigureLAME::SetStereoMode, this);
 
 	misc_check_forcejs		= new CheckBox(i18n->TranslateString("Force Joint Stereo"), Point(137, 11), Size(121, 0), &forcejs);
@@ -263,7 +265,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	expert_combo_athtype->AddEntry("Roel Van Den Berghe");
 	expert_combo_athtype->AddEntry("Gabriel Bouvigne VBR");
 	expert_combo_athtype->AddEntry("John Dahlstrom");
-	expert_combo_athtype->SelectNthEntry(config->GetIntValue("LAME", "ATHType", -1) + 1);
+	expert_combo_athtype->SelectNthEntry(config->GetIntValue(ConfigID, "ATHType", -1) + 1);
 
 	if (!enable_ath) expert_combo_athtype->Deactivate();
 
@@ -299,11 +301,11 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "44.1"));
 	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "48"));
 
-	switch (config->GetIntValue("LAME", "Resample", -1))
+	switch (config->GetIntValue(ConfigID, "Resample", -1))
 	{
-		case -1:    filtering_combo_resample->SelectNthEntry(0);  break;
-		case 0:	    filtering_combo_resample->SelectNthEntry(1);  break;
-		case 8000:  filtering_combo_resample->SelectNthEntry(2);  break;
+		case    -1: filtering_combo_resample->SelectNthEntry(0);  break;
+		case	 0: filtering_combo_resample->SelectNthEntry(1);  break;
+		case  8000: filtering_combo_resample->SelectNthEntry(2);  break;
 		case 11025: filtering_combo_resample->SelectNthEntry(3);  break;
 		case 12000: filtering_combo_resample->SelectNthEntry(4);  break;
 		case 16000: filtering_combo_resample->SelectNthEntry(5);  break;
@@ -321,13 +323,13 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	filtering_set_highpass		= new CheckBox(i18n->AddColon(i18n->TranslateString("Set Highpass frequency (Hz)")), Point(10, 11), Size(180, 0), &set_highpass);
 	filtering_set_highpass->onAction.Connect(&ConfigureLAME::SetHighpass, this);
 
-	filtering_edit_highpass		= new EditBox(String::FromInt(config->GetIntValue("LAME", "Highpass", 0)), Point(199, 10), Size(37, 0), 5);
+	filtering_edit_highpass		= new EditBox(String::FromInt(config->GetIntValue(ConfigID, "Highpass", 0)), Point(199, 10), Size(37, 0), 5);
 	filtering_edit_highpass->SetFlags(EDB_NUMERIC);
 
 	filtering_set_highpass_width	= new CheckBox(i18n->AddColon(i18n->TranslateString("Set Highpass width (Hz)")), Point(10, 36), Size(180, 0), &set_highpass_width);
 	filtering_set_highpass_width->onAction.Connect(&ConfigureLAME::SetHighpassWidth, this);
 
-	filtering_edit_highpass_width	= new EditBox(String::FromInt(config->GetIntValue("LAME", "HighpassWidth", 0)), Point(199, 35), Size(37, 0), 5);
+	filtering_edit_highpass_width	= new EditBox(String::FromInt(config->GetIntValue(ConfigID, "HighpassWidth", 0)), Point(199, 35), Size(37, 0), 5);
 	filtering_edit_highpass_width->SetFlags(EDB_NUMERIC);
 
 	filtering_highpass->Add(filtering_set_highpass);
@@ -340,13 +342,13 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	filtering_set_lowpass		= new CheckBox(i18n->AddColon(i18n->TranslateString("Set Lowpass frequency (Hz)")), Point(10, 11), Size(180, 0), &set_lowpass);
 	filtering_set_lowpass->onAction.Connect(&ConfigureLAME::SetLowpass, this);
 
-	filtering_edit_lowpass		= new EditBox(String::FromInt(config->GetIntValue("LAME", "Lowpass", 0)), Point(199, 10), Size(37, 0), 5);
+	filtering_edit_lowpass		= new EditBox(String::FromInt(config->GetIntValue(ConfigID, "Lowpass", 0)), Point(199, 10), Size(37, 0), 5);
 	filtering_edit_lowpass->SetFlags(EDB_NUMERIC);
 
 	filtering_set_lowpass_width	= new CheckBox(i18n->AddColon(i18n->TranslateString("Set Lowpass width (Hz)")), Point(10, 36), Size(180, 0), &set_lowpass_width);
 	filtering_set_lowpass_width->onAction.Connect(&ConfigureLAME::SetLowpassWidth, this);
 
-	filtering_edit_lowpass_width	= new EditBox(String::FromInt(config->GetIntValue("LAME", "LowpassWidth", 0)), Point(199, 35), Size(37, 0), 5);
+	filtering_edit_lowpass_width	= new EditBox(String::FromInt(config->GetIntValue(ConfigID, "LowpassWidth", 0)), Point(199, 35), Size(37, 0), 5);
 	filtering_edit_lowpass_width->SetFlags(EDB_NUMERIC);
 
 	filtering_lowpass->Add(filtering_set_lowpass);
@@ -518,75 +520,56 @@ Int BoCA::ConfigureLAME::SaveSettings()
 		return Error();
 	}
 
-	config->SetIntValue("LAME", "Preset", preset);
-	config->SetIntValue("LAME", "SetBitrate", set_bitrate);
-	config->SetIntValue("LAME", "Bitrate", GetBitrate());
-	config->SetIntValue("LAME", "Ratio", (int) (basic_edit_ratio->GetText().ToFloat() * 100));
-	config->SetIntValue("LAME", "SetQuality", set_quality);
-	config->SetIntValue("LAME", "Quality", 9 - quality);
-	config->SetIntValue("LAME", "StereoMode", misc_combo_stereomode->GetSelectedEntryNumber());
-	config->SetIntValue("LAME", "ForceJS", forcejs);
-	config->SetIntValue("LAME", "VBRMode", vbrmode);
-	config->SetIntValue("LAME", "VBRQuality", 99 - vbrquality);
-	config->SetIntValue("LAME", "ABRBitrate", abrbitrate);
-	config->SetIntValue("LAME", "SetMinVBRBitrate", set_min_vbr_brate);
-	config->SetIntValue("LAME", "MinVBRBitrate", GetMinVBRBitrate());
-	config->SetIntValue("LAME", "SetMaxVBRBitrate", set_max_vbr_brate);
-	config->SetIntValue("LAME", "MaxVBRBitrate", GetMaxVBRBitrate());
-	config->SetIntValue("LAME", "CRC", set_crc);
-	config->SetIntValue("LAME", "Copyright", set_copyright);
-	config->SetIntValue("LAME", "Original", set_original);
-	config->SetIntValue("LAME", "Private", set_private);
-	config->SetIntValue("LAME", "StrictISO", set_iso);
-	config->SetIntValue("LAME", "DisableFiltering", disable_filtering);
-	config->SetIntValue("LAME", "SetLowpass", set_lowpass);
-	config->SetIntValue("LAME", "Lowpass", filtering_edit_lowpass->GetText().ToInt());
-	config->SetIntValue("LAME", "SetLowpassWidth", set_lowpass_width);
-	config->SetIntValue("LAME", "LowpassWidth", filtering_edit_lowpass_width->GetText().ToInt());
-	config->SetIntValue("LAME", "SetHighpass", set_highpass);
-	config->SetIntValue("LAME", "Highpass", filtering_edit_highpass->GetText().ToInt());
-	config->SetIntValue("LAME", "SetHighpassWidth", set_highpass_width);
-	config->SetIntValue("LAME", "HighpassWidth", filtering_edit_highpass_width->GetText().ToInt());
-	config->SetIntValue("LAME", "EnableATH", enable_ath);
-	config->SetIntValue("LAME", "ATHType", expert_combo_athtype->GetSelectedEntryNumber() - 1);
-	config->SetIntValue("LAME", "UseTNS", enable_tempmask);
+	config->SetIntValue(ConfigID, "Preset", preset);
+	config->SetIntValue(ConfigID, "SetBitrate", set_bitrate);
+	config->SetIntValue(ConfigID, "Bitrate", GetBitrate());
+	config->SetIntValue(ConfigID, "Ratio", (int) (basic_edit_ratio->GetText().ToFloat() * 100));
+	config->SetIntValue(ConfigID, "SetQuality", set_quality);
+	config->SetIntValue(ConfigID, "Quality", 9 - quality);
+	config->SetIntValue(ConfigID, "StereoMode", misc_combo_stereomode->GetSelectedEntryNumber());
+	config->SetIntValue(ConfigID, "ForceJS", forcejs);
+	config->SetIntValue(ConfigID, "VBRMode", vbrmode);
+	config->SetIntValue(ConfigID, "VBRQuality", 99 - vbrquality);
+	config->SetIntValue(ConfigID, "ABRBitrate", abrbitrate);
+	config->SetIntValue(ConfigID, "SetMinVBRBitrate", set_min_vbr_brate);
+	config->SetIntValue(ConfigID, "MinVBRBitrate", GetMinVBRBitrate());
+	config->SetIntValue(ConfigID, "SetMaxVBRBitrate", set_max_vbr_brate);
+	config->SetIntValue(ConfigID, "MaxVBRBitrate", GetMaxVBRBitrate());
+	config->SetIntValue(ConfigID, "CRC", set_crc);
+	config->SetIntValue(ConfigID, "Copyright", set_copyright);
+	config->SetIntValue(ConfigID, "Original", set_original);
+	config->SetIntValue(ConfigID, "Private", set_private);
+	config->SetIntValue(ConfigID, "StrictISO", set_iso);
+	config->SetIntValue(ConfigID, "DisableFiltering", disable_filtering);
+	config->SetIntValue(ConfigID, "SetLowpass", set_lowpass);
+	config->SetIntValue(ConfigID, "Lowpass", filtering_edit_lowpass->GetText().ToInt());
+	config->SetIntValue(ConfigID, "SetLowpassWidth", set_lowpass_width);
+	config->SetIntValue(ConfigID, "LowpassWidth", filtering_edit_lowpass_width->GetText().ToInt());
+	config->SetIntValue(ConfigID, "SetHighpass", set_highpass);
+	config->SetIntValue(ConfigID, "Highpass", filtering_edit_highpass->GetText().ToInt());
+	config->SetIntValue(ConfigID, "SetHighpassWidth", set_highpass_width);
+	config->SetIntValue(ConfigID, "HighpassWidth", filtering_edit_highpass_width->GetText().ToInt());
+	config->SetIntValue(ConfigID, "EnableATH", enable_ath);
+	config->SetIntValue(ConfigID, "ATHType", expert_combo_athtype->GetSelectedEntryNumber() - 1);
+	config->SetIntValue(ConfigID, "UseTNS", enable_tempmask);
+
+	Int	 resampleValue = -1;
 
 	switch (filtering_combo_resample->GetSelectedEntryNumber())
 	{
-		case 0:
-			config->SetIntValue("LAME", "Resample", -1);
-			break;
-		case 1:
-			config->SetIntValue("LAME", "Resample", 0);
-			break;
-		case 2:
-			config->SetIntValue("LAME", "Resample", 8000);
-			break;
-		case 3:
-			config->SetIntValue("LAME", "Resample", 11025);
-			break;
-		case 4:
-			config->SetIntValue("LAME", "Resample", 12000);
-			break;
-		case 5:
-			config->SetIntValue("LAME", "Resample", 16000);
-			break;
-		case 6:
-			config->SetIntValue("LAME", "Resample", 22050);
-			break;
-		case 7:
-			config->SetIntValue("LAME", "Resample", 24000);
-			break;
-		case 8:
-			config->SetIntValue("LAME", "Resample", 32000);
-			break;
-		case 9:
-			config->SetIntValue("LAME", "Resample", 44100);
-			break;
-		case 10:
-			config->SetIntValue("LAME", "Resample", 48000);
-			break;
+		case  1: resampleValue =     0; break;
+		case  2: resampleValue =  8000; break;
+		case  3: resampleValue = 11025; break;
+		case  4: resampleValue = 12000; break;
+		case  5: resampleValue = 16000; break;
+		case  6: resampleValue = 22050; break;
+		case  7: resampleValue = 24000; break;
+		case  8: resampleValue = 32000; break;
+		case  9: resampleValue = 44100; break;
+		case 10: resampleValue = 48000; break;
 	}
+
+	config->SetIntValue(ConfigID, "Resample", resampleValue);
 
 	return Success();
 }

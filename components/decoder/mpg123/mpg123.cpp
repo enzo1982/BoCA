@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -214,7 +214,7 @@ Bool BoCA::DecoderMPG123::Activate()
 
 	const Config	*config = GetConfiguration();
 
-	String	 selectedDecoder = config->GetStringValue("mpg123", "Decoder", NIL);
+	String	 selectedDecoder = config->GetStringValue(ConfigureMPG123::ConfigID, "Decoder", NIL);
 
 	if (selectedDecoder != NIL) ex_mpg123_decoder(context, selectedDecoder);
 

@@ -90,7 +90,6 @@ BoCA::EncoderSpeex::~EncoderSpeex()
 
 Bool BoCA::EncoderSpeex::Activate()
 {
-	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 	const Info	&info = track.GetInfo();
 
@@ -102,11 +101,19 @@ Bool BoCA::EncoderSpeex::Activate()
 		return False;
 	}
 
+	/* Get configuration.
+	 */
+	const Config	*config = GetConfiguration();
+
+	/* Init Ogg stream.
+	 */
 	srand(clock());
 
 	ex_ogg_stream_init(&os, rand());
 
-	Int	 modeID = config->GetIntValue("Speex", "Mode", -1);
+	/* Get Speex mode ID.
+	 */
+	Int	 modeID = config->GetIntValue(ConfigureSpeex::ConfigID, "Mode", -1);
 
 	if (modeID == -1)
 	{
@@ -118,17 +125,15 @@ Bool BoCA::EncoderSpeex::Activate()
 		else			       modeID = SPEEX_MODEID_UWB;
 	}
 
-	SpeexHeader	 speex_header;
-
-	ex_speex_init_header(&speex_header, format.rate, format.channels, ex_speex_lib_get_mode(modeID));
-
+	/* Create Speex encoder.
+	 */
 	encoder = ex_speex_encoder_init(ex_speex_lib_get_mode(modeID));
 
-	/* Set options
+	/* Set encoder options.
 	 */
-	spx_int32_t	 vbr = config->GetIntValue("Speex", "VBR", 0);
-	spx_int32_t	 abr = config->GetIntValue("Speex", "ABR", -16) * 1000;
-	spx_int32_t	 complexity = config->GetIntValue("Speex", "Complexity", 3);
+	spx_int32_t	 vbr = config->GetIntValue(ConfigureSpeex::ConfigID, "VBR", 0);
+	spx_int32_t	 abr = config->GetIntValue(ConfigureSpeex::ConfigID, "ABR", -16) * 1000;
+	spx_int32_t	 complexity = config->GetIntValue(ConfigureSpeex::ConfigID, "Complexity", 3);
 
 	ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR, &vbr);
 	ex_speex_encoder_ctl(encoder, SPEEX_SET_COMPLEXITY, &complexity);
@@ -137,8 +142,8 @@ Bool BoCA::EncoderSpeex::Activate()
 
 	if (vbr)
 	{
-		float		 vbrq = config->GetIntValue("Speex", "VBRQuality", 80) / 10.0;
-		spx_int32_t	 vbrmax = config->GetIntValue("Speex", "VBRMaxBitrate", -48) * 1000;
+		float		 vbrq = config->GetIntValue(ConfigureSpeex::ConfigID, "VBRQuality", 80) / 10.0;
+		spx_int32_t	 vbrmax = config->GetIntValue(ConfigureSpeex::ConfigID, "VBRMaxBitrate", -48) * 1000;
 
 		ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR_QUALITY, &vbrq);
 
@@ -146,9 +151,9 @@ Bool BoCA::EncoderSpeex::Activate()
 	}
 	else
 	{
-		spx_int32_t	 quality = config->GetIntValue("Speex", "Quality", 8);
-		spx_int32_t	 bitrate = config->GetIntValue("Speex", "Bitrate", -16) * 1000;
-		spx_int32_t	 vad = config->GetIntValue("Speex", "VAD", 0);
+		spx_int32_t	 quality = config->GetIntValue(ConfigureSpeex::ConfigID, "Quality", 8);
+		spx_int32_t	 bitrate = config->GetIntValue(ConfigureSpeex::ConfigID, "Bitrate", -16) * 1000;
+		spx_int32_t	 vad = config->GetIntValue(ConfigureSpeex::ConfigID, "VAD", 0);
 
 		if (quality > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_QUALITY, &quality);
 		if (bitrate > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_BITRATE, &bitrate);
@@ -156,14 +161,14 @@ Bool BoCA::EncoderSpeex::Activate()
 		ex_speex_encoder_ctl(encoder, SPEEX_SET_VAD, &vad);
 	}
 
-	if (vbr || abr > 0 || config->GetIntValue("Speex", "VAD", 0))
+	if (vbr || abr > 0 || config->GetIntValue(ConfigureSpeex::ConfigID, "VAD", 0))
 	{
-		spx_int32_t	 dtx = config->GetIntValue("Speex", "DTX", 0);
+		spx_int32_t	 dtx = config->GetIntValue(ConfigureSpeex::ConfigID, "DTX", 0);
 
 		ex_speex_encoder_ctl(encoder, SPEEX_SET_DTX, &dtx);
 	}
 
-	/* Get frame size
+	/* Get frame size and look-ahead.
 	 */
 	spx_int32_t	 rate = format.rate;
 
@@ -174,11 +179,17 @@ Bool BoCA::EncoderSpeex::Activate()
 	totalSamples = 0;
 	numPackets   = 0;
 
-	/* Write Speex header
+	/* Create Speex header.
 	 */
+	SpeexHeader	 speex_header;
+
+	ex_speex_init_header(&speex_header, format.rate, format.channels, ex_speex_lib_get_mode(modeID));
+
 	speex_header.frames_per_packet = 1;
 	speex_header.vbr	       = vbr;
 
+	/* Write Speex header.
+	 */
 	int		 bytes;
 	unsigned char	*buffer = (unsigned char *) ex_speex_header_to_packet(&speex_header, &bytes);
 	ogg_packet	 header = { buffer, bytes, 1, 0, 0, numPackets++ };
@@ -187,7 +198,7 @@ Bool BoCA::EncoderSpeex::Activate()
 
 	ex_speex_header_free(buffer);
 
-	/* Write Vorbis comment header
+	/* Write Vorbis comment header.
 	 */
 	{
 		char	*speexVersion = NIL;

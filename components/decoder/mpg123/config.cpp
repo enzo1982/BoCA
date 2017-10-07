@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,14 +13,16 @@
 #include "config.h"
 #include "dllinterface.h"
 
+const String	 BoCA::ConfigureMPG123::ConfigID = "mpg123";
+
 BoCA::ConfigureMPG123::ConfigureMPG123()
 {
-	Config	*config = Config::Get();
-	I18n	*i18n = I18n::Get();
+	const Config	*config = Config::Get();
+	I18n		*i18n	= I18n::Get();
 
 	i18n->SetContext("Decoders::mpg123");
 
-	String	 selectedDecoder = config->GetStringValue("mpg123", "Decoder", NIL);
+	String	 selectedDecoder = config->GetStringValue(ConfigID, "Decoder", NIL);
 
 	group_decoding	= new GroupBox(i18n->TranslateString("Decoder"), Point(7, 11), Size(286, 41));
 
@@ -57,8 +59,8 @@ Int BoCA::ConfigureMPG123::SaveSettings()
 
 	String	 selectedDecoder = combo_decoder->GetSelectedEntry()->GetText();
 
-	if (combo_decoder->GetSelectedEntryNumber() == 0) config->SetStringValue("mpg123", "Decoder", NIL);
-	else						  config->SetStringValue("mpg123", "Decoder", selectedDecoder);
+	if (combo_decoder->GetSelectedEntryNumber() == 0) config->SetStringValue(ConfigID, "Decoder", NIL);
+	else						  config->SetStringValue(ConfigID, "Decoder", selectedDecoder);
 
 	return Success();
 }

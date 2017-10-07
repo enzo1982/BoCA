@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -85,7 +85,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 	switch (format.rate)
 	{
 		case 22050:
-			if (config->GetIntValue("TwinVQ", "Bitrate", 48) == 48)
+			if (config->GetIntValue(ConfigureTwinVQ::ConfigID, "Bitrate", 48) == 48)
 			{
 				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
 				errorState  = True;
@@ -94,7 +94,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 			}
 			break;
 		case 44100:
-			if (config->GetIntValue("TwinVQ", "Bitrate", 48) != 48)
+			if (config->GetIntValue(ConfigureTwinVQ::ConfigID, "Bitrate", 48) != 48)
 			{
 				errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
 				errorState  = True;
@@ -124,7 +124,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 
 	setupInfo.channelMode = format.channels - 1;
 	setupInfo.samplingRate = int(format.rate / 1000);
-	setupInfo.bitRate = config->GetIntValue("TwinVQ", "Bitrate", 48) * format.channels;
+	setupInfo.bitRate = config->GetIntValue(ConfigureTwinVQ::ConfigID, "Bitrate", 48) * format.channels;
 
 	if (info.HasBasicInfo())
 	{
@@ -137,7 +137,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 		else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)			strncpy(setupInfo.Comt, currentConfig->GetStringValue("Tags", "DefaultComment", NIL), Math::Min(currentConfig->GetStringValue("Tags", "DefaultComment", NIL).Length() + 1, sizeof(setupInfo.Comt)));
 	}
 
-	encInfo.N_CAN_GLOBAL = config->GetIntValue("TwinVQ", "PreselectionCandidates", 32); // number of VQ pre-selection candidates
+	encInfo.N_CAN_GLOBAL = config->GetIntValue(ConfigureTwinVQ::ConfigID, "PreselectionCandidates", 32); // number of VQ pre-selection candidates
 
 	ex_TvqEncInitialize(&setupInfo, &encInfo, &index, 0);
 
