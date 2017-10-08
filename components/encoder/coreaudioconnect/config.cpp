@@ -91,6 +91,7 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio(const CoreAudioCommCodecs &iFormats
 		else if	(formats.codecs[i] == 'aacl') combo_codec->AddEntry("MPEG4 AAC Low Delay");
 		else if	(formats.codecs[i] == 'aace') combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay");
 		else if	(formats.codecs[i] == 'aacf') combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay SBR");
+		else if	(formats.codecs[i] == 'aacg') combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay v2");
 		else if	(formats.codecs[i] == 'aacs') combo_codec->AddEntry("MPEG4 AAC Spatial");
 		else if (formats.codecs[i] == 'alac') combo_codec->AddEntry("Apple Lossless Audio Codec");
 		else				      continue;
@@ -244,6 +245,7 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacl' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aace' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacf' ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacg' ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacs')
 	{
 		group_mp4->Activate();
