@@ -13,6 +13,7 @@
 #include <boca.h>
 
 #include "connector/communication.h"
+#include "connector/dllinterface.h"
 
 BoCA_BEGIN_COMPONENT(EncoderCoreAudioConnect)
 

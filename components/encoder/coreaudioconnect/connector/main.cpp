@@ -407,8 +407,8 @@ int main(int argc, char *argv[])
 						int	 divider = 1;
 						int	 extra	 = 0;
 
-						if (setup.codec == 'aach' ||
-						    setup.codec == 'aacp') { divider = 2; extra = 480; }
+						if (setup.codec == CA::kAudioFormatMPEG4AAC_HE ||
+						    setup.codec == CA::kAudioFormatMPEG4AAC_HE_V2) { divider = 2; extra = 480; }
 
 						CA::AudioFilePacketTableInfo	 pti;
 

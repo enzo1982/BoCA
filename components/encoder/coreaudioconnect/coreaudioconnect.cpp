@@ -108,7 +108,7 @@ Bool BoCA::EncoderCoreAudioConnect::IsLossless() const
 {
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue("CoreAudio", "Codec", 'aac ') == 'alac') return True;
+	if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC) == CA::kAudioFormatAppleLossless) return True;
 
 	return False;
 }
@@ -134,7 +134,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 	comm->command = CommCommandSetup;
 	comm->length  = sizeof(CoreAudioCommSetup);
 
-	((CoreAudioCommSetup *) &comm->data)->codec    = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ');
+	((CoreAudioCommSetup *) &comm->data)->codec    = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
 	((CoreAudioCommSetup *) &comm->data)->bitrate  = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64) * 1000 * format.channels;
 	((CoreAudioCommSetup *) &comm->data)->format   = config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
 
@@ -327,8 +327,8 @@ Bool BoCA::EncoderCoreAudioConnect::SetOutputFormat(Int n)
 	if (n != 1) config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
 	else	    config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", False);
 
-	if	(n != 2 && config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ') == 'alac') config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'aac ');
-	else if (n == 2)										 config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", 'alac');
+	if	(n != 2 && config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC) == CA::kAudioFormatAppleLossless) config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
+	else if (n == 2)															  config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatAppleLossless);
 
 	return True;
 }

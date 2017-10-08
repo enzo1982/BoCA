@@ -85,20 +85,20 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio(const CoreAudioCommCodecs &iFormats
 	 */
 	for (Int i = 0; i < 32 && formats.codecs[i] != 0; i++)
 	{
-		if	(formats.codecs[i] == 'aac ') combo_codec->AddEntry("MPEG4 AAC Low Complexity");
-		else if	(formats.codecs[i] == 'aach') combo_codec->AddEntry("MPEG4 AAC High Efficiency");
-		else if	(formats.codecs[i] == 'aacp') combo_codec->AddEntry("MPEG4 AAC High Efficiency v2");
-		else if	(formats.codecs[i] == 'aacl') combo_codec->AddEntry("MPEG4 AAC Low Delay");
-		else if	(formats.codecs[i] == 'aace') combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay");
-		else if	(formats.codecs[i] == 'aacf') combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay SBR");
-		else if	(formats.codecs[i] == 'aacg') combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay v2");
-		else if	(formats.codecs[i] == 'aacs') combo_codec->AddEntry("MPEG4 AAC Spatial");
-		else if (formats.codecs[i] == 'alac') combo_codec->AddEntry("Apple Lossless Audio Codec");
-		else				      continue;
+		if	(formats.codecs[i] == CA::kAudioFormatMPEG4AAC)		combo_codec->AddEntry("MPEG4 AAC Low Complexity");
+		else if	(formats.codecs[i] == CA::kAudioFormatMPEG4AAC_HE)	combo_codec->AddEntry("MPEG4 AAC High Efficiency");
+		else if	(formats.codecs[i] == CA::kAudioFormatMPEG4AAC_HE_V2)	combo_codec->AddEntry("MPEG4 AAC High Efficiency v2");
+		else if	(formats.codecs[i] == CA::kAudioFormatMPEG4AAC_LD)	combo_codec->AddEntry("MPEG4 AAC Low Delay");
+		else if	(formats.codecs[i] == CA::kAudioFormatMPEG4AAC_ELD)	combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay");
+		else if	(formats.codecs[i] == CA::kAudioFormatMPEG4AAC_ELD_SBR)	combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay SBR");
+		else if	(formats.codecs[i] == CA::kAudioFormatMPEG4AAC_ELD_V2)	combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay v2");
+		else if	(formats.codecs[i] == CA::kAudioFormatMPEG4AAC_Spatial)	combo_codec->AddEntry("MPEG4 AAC Spatial");
+		else if (formats.codecs[i] == CA::kAudioFormatAppleLossless)	combo_codec->AddEntry("Apple Lossless Audio Codec");
+		else								continue;
 
 		codecs.Add(formats.codecs[i]);
 
-		if ((UnsignedInt) config->GetIntValue(ConfigID, "Codec", 'aac ') == formats.codecs[i]) combo_codec->SelectNthEntry(combo_codec->Length() - 1);
+		if ((UnsignedInt) config->GetIntValue(ConfigID, "Codec", CA::kAudioFormatMPEG4AAC) == formats.codecs[i]) combo_codec->SelectNthEntry(combo_codec->Length() - 1);
 	}
 
 	combo_codec->onSelectEntry.Connect(&ConfigureCoreAudio::SetCodec, this);
@@ -229,7 +229,7 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 	if	(bitrates.Length() == 2) { edit_bitrate->Activate();   slider_bitrate->SetRange(bitrates.GetNth(0), bitrates.GetNth(1)); }
 	else if (bitrates.Length() >  2) { edit_bitrate->Deactivate(); slider_bitrate->SetRange(-bitrates.Length() / 2, -1);		 }
 
-	if (codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'alac')
+	if (codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatAppleLossless)
 	{
 		group_mp4->Deactivate();
 
@@ -239,14 +239,14 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 
 		if (fileExtension == 2) fileExtension = 0;
 	}
-	else if	(codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aac ' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aach' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacp' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacl' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aace' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacf' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacg' ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == 'aacs')
+	else if	(codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC	  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_HE	  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_HE_V2	  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_LD	  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_ELD	  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_ELD_SBR ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_ELD_V2  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_Spatial)
 	{
 		group_mp4->Activate();
 

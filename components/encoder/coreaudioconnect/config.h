@@ -17,6 +17,7 @@
 #include <boca.h>
 
 #include "connector/communication.h"
+#include "connector/dllinterface.h"
 
 using namespace smooth;
 using namespace smooth::GUI;
