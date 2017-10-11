@@ -106,9 +106,15 @@ Bool BoCA::EncoderCoreAudioConnect::IsReady() const
 
 Bool BoCA::EncoderCoreAudioConnect::IsLossless() const
 {
+	/* Get configuration.
+	 */
 	const Config	*config = GetConfiguration();
 
-	if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC) == CA::kAudioFormatAppleLossless) return True;
+	Int	 codec = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
+
+	/* Signal lossless for ALAC.
+	 */
+	if (codec == CA::kAudioFormatAppleLossless) return True;
 
 	return False;
 }
@@ -125,7 +131,13 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 		return False;
 	}
 
+	/* Get configuration.
+	 */
 	const Config	*config = GetConfiguration();
+
+	Int	 codec	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
+	Int	 kbps	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64);
+	Bool	 mp4Container = config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
 
 	/* Send Setup command.
 	 */
@@ -134,9 +146,9 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 	comm->command = CommCommandSetup;
 	comm->length  = sizeof(CoreAudioCommSetup);
 
-	((CoreAudioCommSetup *) &comm->data)->codec    = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
-	((CoreAudioCommSetup *) &comm->data)->bitrate  = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64) * 1000 * format.channels;
-	((CoreAudioCommSetup *) &comm->data)->format   = config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
+	((CoreAudioCommSetup *) &comm->data)->codec    = codec;
+	((CoreAudioCommSetup *) &comm->data)->bitrate  = kbps * 1000 * format.channels;
+	((CoreAudioCommSetup *) &comm->data)->format   = mp4Container;
 
 	((CoreAudioCommSetup *) &comm->data)->channels = format.channels;
 	((CoreAudioCommSetup *) &comm->data)->rate     = format.rate;
@@ -160,7 +172,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (!config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureCoreAudio::ConfigID, "AllowID3v2", False))
+	if (!mp4Container && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureCoreAudio::ConfigID, "AllowID3v2", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -188,7 +200,11 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 
 Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 {
+	/* Get configuration.
+	 */
 	const Config	*config = GetConfiguration();
+
+	Bool	 mp4Container = config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
 
 	/* Send Finish command.
 	 */
@@ -203,7 +219,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	/* Write metadata to file
 	 */
-	if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) && config->GetIntValue("Tags", "EnableMP4Metadata", True))
+	if (mp4Container && config->GetIntValue("Tags", "EnableMP4Metadata", True))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -243,7 +259,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (!config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (!mp4Container && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -268,7 +284,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (!config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True) && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureCoreAudio::ConfigID, "AllowID3v2", False))
+	if (!mp4Container && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureCoreAudio::ConfigID, "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
