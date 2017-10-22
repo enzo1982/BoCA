@@ -146,6 +146,8 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			Format	 format = track.GetFormat();
 
+			if ((unsigned long) cSize == 0xFFFFFFFF || cSize == 0) cSize = f_in->Size() - f_in->GetPos();
+
 			track.length	= (unsigned long) cSize / format.channels / (format.bits / 8);
 			format.bits	= Math::Min(32, format.bits);
 
