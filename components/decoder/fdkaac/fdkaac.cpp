@@ -81,9 +81,10 @@ Void smooth::DetachDLL()
 
 Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 {
-	Bool	 isValidFile = False;
+	Bool		 isValidFile = False;
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	if (mp4v2dll != NIL && !streamURI.ToLower().EndsWith(".aac"))
+	if (mp4v2dll != NIL && (in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
 		MP4FileHandle	 mp4File;
 
@@ -121,13 +122,11 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 	}
 	else
 	{
-		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
+		in.Seek(0);
 
-		SkipID3v2Tag(f_in);
+		SkipID3v2Tag(&in);
 
-		isValidFile = SyncOnAACHeader(f_in);
-
-		delete f_in;
+		isValidFile = SyncOnAACHeader(&in);
 	}
 
 	return isValidFile;
@@ -135,9 +134,10 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 {
-	Format	 format = track.GetFormat();
+	Format		 format = track.GetFormat();
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	if (!streamURI.ToLower().EndsWith(".aac"))
+	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
@@ -277,19 +277,17 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 	}
 	else
 	{
-		InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
+		in.Seek(0);
 
 		format.bits	= 16;
 
-		track.fileSize	= f_in->Size();
+		track.fileSize	= in.Size();
 		track.length	= -1;
 
-		SkipID3v2Tag(f_in);
+		SkipID3v2Tag(&in);
 
-		if (!SyncOnAACHeader(f_in))
+		if (!SyncOnAACHeader(&in))
 		{
-			delete f_in;
-
 			errorState  = True;
 			errorString = "No AAC file.";
 
@@ -301,10 +299,10 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 		/* Decode one frame to initialize decoder.
 		 */
-		unsigned int	 size = Math::Min((Int64) 32768, track.fileSize - f_in->GetPos());
+		unsigned int	 size = Math::Min((Int64) 32768, track.fileSize - in.GetPos());
 		unsigned char	*data = new unsigned char [size];
 
-		f_in->InputData((void *) data, size);
+		in.InputData((void *) data, size);
 
 		unsigned int	 bytesValid = size;
 
@@ -352,8 +350,6 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		 */
 		delete [] outputBuffer;
 		delete [] data;
-
-		delete f_in;
 
 		ex_aacDecoder_Close(handle);
 
@@ -422,7 +418,9 @@ BoCA::DecoderFDKAAC::~DecoderFDKAAC()
 
 Bool BoCA::DecoderFDKAAC::Activate()
 {
-	if (!track.origFilename.ToLower().EndsWith(".aac"))
+	InStream	 in(STREAM_DRIVER, driver);
+
+	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
 		if (String::IsUnicode(track.origFilename))
 		{
@@ -493,14 +491,12 @@ Bool BoCA::DecoderFDKAAC::Activate()
 	}
 	else
 	{
-		InStream	*in = new InStream(STREAM_DRIVER, driver);
+		in.Seek(0);
 
-		SkipID3v2Tag(in);
-		SyncOnAACHeader(in);
+		SkipID3v2Tag(&in);
+		SyncOnAACHeader(&in);
 
-		driver->Seek(in->GetPos());
-
-		delete in;
+		driver->Seek(in.GetPos());
 
 		handle = ex_aacDecoder_Open( adifFound ? TT_MP4_ADIF :
 					    (adtsFound ? TT_MP4_ADTS : TT_MP4_LOAS), 1);
@@ -511,16 +507,19 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 Bool BoCA::DecoderFDKAAC::Deactivate()
 {
+	/* Close decoder.
+	 */
 	ex_aacDecoder_Close(handle);
 
-	if (!track.origFilename.ToLower().EndsWith(".aac"))
-	{
-		ex_MP4Close(mp4File, 0);
+	if (mp4File == NIL) return True;
 
-		if (String::IsUnicode(track.origFilename))
-		{
-			File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
-		}
+	/* Close MP4 file.
+	 */
+	ex_MP4Close(mp4File, 0);
+
+	if (String::IsUnicode(track.origFilename))
+	{
+		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
 	}
 
 	return True;
@@ -528,17 +527,14 @@ Bool BoCA::DecoderFDKAAC::Deactivate()
 
 Bool BoCA::DecoderFDKAAC::Seek(Int64 samplePosition)
 {
-	if (!track.origFilename.ToLower().EndsWith(".aac"))
-	{
-		MP4Timestamp	 time = Math::Round(Float(samplePosition) / track.GetFormat().rate * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+	if (mp4File == NIL) return False;
 
-		sampleId	 = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
-		delaySamplesLeft = delaySamples + time - ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
+	MP4Timestamp	 time = Math::Round(Float(samplePosition) / track.GetFormat().rate * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
 
-		return True;
-	}
+	sampleId	 = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
+	delaySamplesLeft = delaySamples + time - ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
 
-	return False;
+	return True;
 }
 
 Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
@@ -551,7 +547,7 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 	samplesBuffer.Resize(0);
 
-	if (!track.origFilename.ToLower().EndsWith(".aac"))
+	if (mp4File != NIL)
 	{
 		unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
 
