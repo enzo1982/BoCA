@@ -26,23 +26,28 @@ Bool LoadWinampDLLs()
 	{
 		DynamicLoader	*dll = new DynamicLoader(out_dlls.GetNth(i));
 
-		if (dll != NIL)
-		{
-			Out_Module *(*proc)() = (Out_Module *(*)()) dll->GetFunctionAddress("winampGetOutModule");
+		if (dll == NIL) continue;
 
-			if (proc != NIL)
-			{
-				winamp_out_plugins.Add(dll);
-				winamp_out_modules.Add(proc());
+		/* Get winampGetOutModule function address.
+		 */
+		Out_Module *(*proc)() = (Out_Module *(*)()) dll->GetFunctionAddress("winampGetOutModule");
 
-				proc()->hDllInstance = (HINSTANCE) dll->GetSystemModuleHandle();
-				proc()->Init();
-			}
-			else
-			{
-				Object::DeleteObject(dll);
-			}
-		}
+		if (proc == NIL) { Object::DeleteObject(dll); continue; }
+
+		/* Get output module description.
+		 */
+		Out_Module	*module = proc();
+
+		if (module->version != OUT_VER &&
+		    module->version != OUT_VER_U) { Object::DeleteObject(dll); continue; }
+
+		/* Add module to list.
+		 */
+		winamp_out_plugins.Add(dll);
+		winamp_out_modules.Add(module);
+
+		module->hDllInstance = (HINSTANCE) dll->GetSystemModuleHandle();
+		module->Init();
 	}
 
 	return True;

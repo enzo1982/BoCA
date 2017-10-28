@@ -37,7 +37,8 @@ BoCA::ConfigureWinamp::ConfigureWinamp()
 
 	for (Int i = 0; i < winamp_out_modules.Length(); i++)
 	{
-		list_output->AddEntry(winamp_out_modules.GetNth(i)->description, config->GetIntValue(ConfigID, "OutputPlugin", 0) == i);
+		if (winamp_out_modules.GetNth(i)->version == OUT_VER) list_output->AddEntry(winamp_out_modules.GetNth(i)->description, config->GetIntValue(ConfigID, "OutputPlugin", 0) == i);
+		else						      list_output->AddEntry((wchar_t *) winamp_out_modules.GetNth(i)->description, config->GetIntValue(ConfigID, "OutputPlugin", 0) == i);
 	}
 
 	Add(list_output);
@@ -68,31 +69,28 @@ Int BoCA::ConfigureWinamp::SaveSettings()
 
 Void BoCA::ConfigureWinamp::SelectOutputPlugin()
 {
-	if (list_output->GetSelectedEntry() == NIL) return;
+	ListEntry	*selectedEntry = list_output->GetSelectedEntry();
+
+	if (selectedEntry == NIL) return;
 
 	button_output->Activate();
 	button_output_about->Activate();
 
-	if (list_output->GetSelectedEntry()->IsMarked())
+	if (selectedEntry->IsMarked())
 	{
-		for (Int i = 0; i < list_output->Length(); i++) list_output->GetNthEntry(i)->SetMark(False);
-
-		list_output->GetSelectedEntry()->SetMark(True);
-		list_output->Paint(SP_PAINT);
-		list_output->Paint(SP_MOUSEIN);
+		/* Unmark any other plugins.
+		 */
+		for (Int i = 0; i < list_output->Length(); i++) if (list_output->GetNthEntry(i) != selectedEntry) list_output->GetNthEntry(i)->SetMark(False);
 	}
 	else
 	{
+		/* Mark this plugin if no other plugin is marked.
+		 */
 		Bool	 selected = False;
 
 		for (Int i = 0; i < list_output->Length(); i++) if (list_output->GetNthEntry(i)->IsMarked()) selected = True;
 
-		if (!selected)
-		{
-			list_output->GetSelectedEntry()->SetMark(True);
-			list_output->Paint(SP_PAINT);
-			list_output->Paint(SP_MOUSEIN);
-		}
+		if (!selected) selectedEntry->SetMark(True);
 	}
 }
 

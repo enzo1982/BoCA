@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,7 +24,8 @@ BoCA::ConfigureWinamp::ConfigureWinamp()
 
 	for (Int k = 0; k < winamp_in_modules.Length(); k++)
 	{
-		list_input->AddEntry(winamp_in_modules.GetNth(k)->description);
+		if (winamp_in_modules.GetNth(k)->version == IN_VER_OLD) list_input->AddEntry(winamp_in_modules.GetNth(k)->description);
+		else							list_input->AddEntry((wchar_t *) winamp_in_modules.GetNth(k)->description);
 	}
 
 	button_input		= new Button(i18n->TranslateString("Configure"), NIL, Point(440, 7), Size());

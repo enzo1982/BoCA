@@ -131,12 +131,12 @@ namespace BoCA
 	void		 VSASetInfo(int, int);
 	void		 VSAAddPCMData(void *, int, int, int);
 	int		 VSAGetMode(int *, int *);
-	void		 VSAAdd(void *, int);
+	int		 VSAAdd(void *, int);
 	void		 SAVSAInit(int, int);
 	void		 SAVSADeInit();
 	void		 SAAddPCMData(void *, int, int, int);
 	int		 SAGetMode();
-	void		 SAAdd(void *, int, int);
+	int		 SAAdd(void *, int, int);
 	int		 dsp_isactive();
 	int		 dsp_dosamples(short int *, int, int, int, int);
 
@@ -473,7 +473,7 @@ void BoCA::SetInfo(int bitrate, int srate, int stereo, int synched)
 {
 }
 
-void BoCA::VSASetInfo(int nch, int srate)
+void BoCA::VSASetInfo(int srate, int nch)
 {
 }
 
@@ -486,8 +486,9 @@ int BoCA::VSAGetMode(int *specNch, int *waveNch)
 	return 0;
 }
 
-void BoCA::VSAAdd(void *data, int timestamp)
+int BoCA::VSAAdd(void *data, int timestamp)
 {
+	return 0;
 }
 
 void BoCA::SAVSAInit(int latency, int srate)
@@ -507,8 +508,9 @@ int BoCA::SAGetMode()
 	return 0;
 }
 
-void BoCA::SAAdd(void *data, int timestamp, int csa)
+int BoCA::SAAdd(void *data, int timestamp, int csa)
 {
+	return 0;
 }
 
 int BoCA::dsp_isactive()
