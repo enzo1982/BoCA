@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,6 +14,7 @@
 #define H_BOCA_TRACK
 
 #include <smooth.h>
+
 #include "picture.h"
 #include "format.h"
 #include "info.h"
@@ -94,7 +95,7 @@ namespace BoCA
 		accessors:
 			Int		 GetTrackID() const				{ return trackID; }
 
-			Void		 SetFormat(const Format &nFormat)		{ format = nFormat; }
+			Void		 SetFormat(const Format &nFormat)		{ format = nFormat; foreach (Track &track, tracks) track.SetFormat(format); }
 			const Format	&GetFormat() const				{ return format; }
 
 			Void		 SetInfo(const Info &nInfo)			{ info = nInfo; }
