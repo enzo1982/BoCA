@@ -76,6 +76,8 @@ Void BoCA::ConfigureWinamp::SelectOutputPlugin()
 	button_output->Activate();
 	button_output_about->Activate();
 
+	/* Make sure only one entry is marked at any time.
+	 */
 	if (selectedEntry->IsMarked())
 	{
 		/* Unmark any other plugins.

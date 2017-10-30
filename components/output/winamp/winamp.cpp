@@ -52,7 +52,7 @@ BoCA::OutputWinamp::OutputWinamp()
 {
 	configLayer = NIL;
 
-	plugin	    = NIL;
+	module	    = NIL;
 }
 
 BoCA::OutputWinamp::~OutputWinamp()
@@ -64,21 +64,21 @@ Bool BoCA::OutputWinamp::Activate()
 {
 	const Config	*config = GetConfiguration();
 
-	plugin = winamp_out_modules.GetNth(config->GetIntValue(ConfigureWinamp::ConfigID, "OutputPlugin", 0));
+	module = winamp_out_modules.GetNth(config->GetIntValue(ConfigureWinamp::ConfigID, "OutputPlugin", 0));
 
-	return (plugin->Open(track.GetFormat().rate, track.GetFormat().channels, track.GetFormat().bits, 0, 0) >= 0);
+	return (module->Open(track.GetFormat().rate, track.GetFormat().channels, track.GetFormat().bits, 0, 0) >= 0);
 }
 
 Bool BoCA::OutputWinamp::Deactivate()
 {
-	plugin->Close();
+	module->Close();
 
 	return True;
 }
 
 Int BoCA::OutputWinamp::WriteData(Buffer<UnsignedByte> &data)
 {
-	plugin->Write((char *) (UnsignedByte *) data, data.Size());
+	module->Write((char *) (UnsignedByte *) data, data.Size());
 
 	return data.Size();
 }
@@ -92,17 +92,17 @@ ConfigLayer *BoCA::OutputWinamp::GetConfigurationLayer()
 
 Int BoCA::OutputWinamp::CanWrite()
 {
-	return plugin->CanWrite();
+	return module->CanWrite();
 }
 
 Int BoCA::OutputWinamp::SetPause(Bool pause)
 {
-	plugin->Pause(pause);
+	module->Pause(pause);
 
 	return Success();
 }
 
 Bool BoCA::OutputWinamp::IsPlaying()
 {
-	return plugin->IsPlaying();
+	return module->IsPlaying();
 }

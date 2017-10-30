@@ -155,7 +155,7 @@ namespace BoCA
 
 Bool BoCA::DecoderWinamp::CanOpenStream(const String &streamURI)
 {
-	return (GetPluginForFile(streamURI) != NIL);
+	return (GetModuleForFile(streamURI) != NIL);
 }
 
 Error BoCA::DecoderWinamp::GetStreamInfo(const String &streamURI, Track &track)
@@ -167,36 +167,36 @@ Error BoCA::DecoderWinamp::GetStreamInfo(const String &streamURI, Track &track)
 
 	delete f_in;
 
-	/* Get the correct plugin and set callback functions.
+	/* Get the correct module and set callback functions.
 	 */
-	In_Module	*plugin = GetPluginForFile(streamURI);
+	In_Module	*module = GetModuleForFile(streamURI);
 
-	plugin->SetInfo			= SetInfo;
-	plugin->VSASetInfo		= VSASetInfo;
-	plugin->VSAAddPCMData		= VSAAddPCMData;
-	plugin->VSAGetMode		= VSAGetMode;
-	plugin->VSAAdd			= VSAAdd;
-	plugin->SAVSAInit		= SAVSAInit;
-	plugin->SAVSADeInit		= SAVSADeInit;
-	plugin->SAAddPCMData		= SAAddPCMData;
-	plugin->SAGetMode		= SAGetMode;
-	plugin->SAAdd			= SAAdd;
-	plugin->dsp_isactive		= dsp_isactive;
-	plugin->dsp_dosamples		= dsp_dosamples;
+	module->SetInfo			= SetInfo;
+	module->VSASetInfo		= VSASetInfo;
+	module->VSAAddPCMData		= VSAAddPCMData;
+	module->VSAGetMode		= VSAGetMode;
+	module->VSAAdd			= VSAAdd;
+	module->SAVSAInit		= SAVSAInit;
+	module->SAVSADeInit		= SAVSADeInit;
+	module->SAAddPCMData		= SAAddPCMData;
+	module->SAGetMode		= SAGetMode;
+	module->SAAdd			= SAAdd;
+	module->dsp_isactive		= dsp_isactive;
+	module->dsp_dosamples		= dsp_dosamples;
 
-	plugin->outMod			= new Out_Module();
+	module->outMod			= new Out_Module();
 
-	plugin->outMod->Open		= Out_Open;
-	plugin->outMod->Close		= Out_Close;
-	plugin->outMod->Flush		= Out_Flush;
-	plugin->outMod->Write		= Out_Write;
-	plugin->outMod->CanWrite	= Out_CanWrite;
-	plugin->outMod->IsPlaying	= Out_IsPlaying;
-	plugin->outMod->Pause		= Out_Pause;
-	plugin->outMod->SetVolume	= Out_SetVolume;
-	plugin->outMod->SetPan		= Out_SetPan;
-	plugin->outMod->GetOutputTime	= Out_GetOutputTime;
-	plugin->outMod->GetWrittenTime	= Out_GetWrittenTime;
+	module->outMod->Open		= Out_Open;
+	module->outMod->Close		= Out_Close;
+	module->outMod->Flush		= Out_Flush;
+	module->outMod->Write		= Out_Write;
+	module->outMod->CanWrite	= Out_CanWrite;
+	module->outMod->IsPlaying	= Out_IsPlaying;
+	module->outMod->Pause		= Out_Pause;
+	module->outMod->SetVolume	= Out_SetVolume;
+	module->outMod->SetPan		= Out_SetPan;
+	module->outMod->GetOutputTime	= Out_GetOutputTime;
+	module->outMod->GetWrittenTime	= Out_GetWrittenTime;
 
 	/* Create and setup mutex.
 	 */
@@ -214,27 +214,27 @@ Error BoCA::DecoderWinamp::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 
-		errorState = plugin->Play(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
+		errorState = module->Play(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
 	}
 	else
 	{
-		errorState = plugin->Play(streamURI);
+		errorState = module->Play(streamURI);
 	}
 
 	if (!errorState)
 	{
-		/* Give the plugin one second to start sending samples.
+		/* Give the module one second to start sending samples.
 		 */
 		UnsignedInt64	 start = S::System::System::Clock();
 
 		while (S::System::System::Clock() - start < 1000 && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
 
-		/* Get track info and stop plugin.
+		/* Get track info and stop module.
 		 */
 		int	 length_ms = -1;
 		char	*title	   = new char [1024];
 
-		plugin->GetFileInfo(NIL, title, &length_ms);
+		module->GetFileInfo(NIL, title, &length_ms);
 
 		track.approxLength = (Int) (Float(length_ms) * Float(track.GetFormat().rate) / 1000.0);
 
@@ -242,10 +242,10 @@ Error BoCA::DecoderWinamp::GetStreamInfo(const String &streamURI, Track &track)
 
 		delete [] title;
 
-		plugin->Stop();
+		module->Stop();
 	}
 
-	delete plugin->outMod;
+	delete module->outMod;
 	delete samplesBufferMutex;
 
 	/* Remove temporary copy if necessary.
@@ -293,7 +293,7 @@ BoCA::DecoderWinamp::DecoderWinamp()
 	packageSize	   = 0;
 
 	infoTrack	   = NIL;
-	plugin		   = NIL;
+	module		   = NIL;
 
 	samplesBufferMutex = NIL;
 
@@ -307,36 +307,36 @@ BoCA::DecoderWinamp::~DecoderWinamp()
 
 Bool BoCA::DecoderWinamp::Activate()
 {
-	/* Get the correct plugin and set callback functions.
+	/* Get the correct module and set callback functions.
 	 */
-	plugin = GetPluginForFile(track.origFilename);
+	module = GetModuleForFile(track.origFilename);
 
-	plugin->SetInfo			= SetInfo;
-	plugin->VSASetInfo		= VSASetInfo;
-	plugin->VSAAddPCMData		= VSAAddPCMData;
-	plugin->VSAGetMode		= VSAGetMode;
-	plugin->VSAAdd			= VSAAdd;
-	plugin->SAVSAInit		= SAVSAInit;
-	plugin->SAVSADeInit		= SAVSADeInit;
-	plugin->SAAddPCMData		= SAAddPCMData;
-	plugin->SAGetMode		= SAGetMode;
-	plugin->SAAdd			= SAAdd;
-	plugin->dsp_isactive		= dsp_isactive;
-	plugin->dsp_dosamples		= dsp_dosamples;
+	module->SetInfo			= SetInfo;
+	module->VSASetInfo		= VSASetInfo;
+	module->VSAAddPCMData		= VSAAddPCMData;
+	module->VSAGetMode		= VSAGetMode;
+	module->VSAAdd			= VSAAdd;
+	module->SAVSAInit		= SAVSAInit;
+	module->SAVSADeInit		= SAVSADeInit;
+	module->SAAddPCMData		= SAAddPCMData;
+	module->SAGetMode		= SAGetMode;
+	module->SAAdd			= SAAdd;
+	module->dsp_isactive		= dsp_isactive;
+	module->dsp_dosamples		= dsp_dosamples;
 
-	plugin->outMod			= new Out_Module();
+	module->outMod			= new Out_Module();
 
-	plugin->outMod->Open		= Out_Open;
-	plugin->outMod->Close		= Out_Close;
-	plugin->outMod->Flush		= Out_Flush;
-	plugin->outMod->Write		= Out_Write;
-	plugin->outMod->CanWrite	= Out_CanWrite;
-	plugin->outMod->IsPlaying	= Out_IsPlaying;
-	plugin->outMod->Pause		= Out_Pause;
-	plugin->outMod->SetVolume	= Out_SetVolume;
-	plugin->outMod->SetPan		= Out_SetPan;
-	plugin->outMod->GetOutputTime	= Out_GetOutputTime;
-	plugin->outMod->GetWrittenTime	= Out_GetWrittenTime;
+	module->outMod->Open		= Out_Open;
+	module->outMod->Close		= Out_Close;
+	module->outMod->Flush		= Out_Flush;
+	module->outMod->Write		= Out_Write;
+	module->outMod->CanWrite	= Out_CanWrite;
+	module->outMod->IsPlaying	= Out_IsPlaying;
+	module->outMod->Pause		= Out_Pause;
+	module->outMod->SetVolume	= Out_SetVolume;
+	module->outMod->SetPan		= Out_SetPan;
+	module->outMod->GetOutputTime	= Out_GetOutputTime;
+	module->outMod->GetWrittenTime	= Out_GetWrittenTime;
 
 	/* Create and setup mutex.
 	 */
@@ -352,11 +352,11 @@ Bool BoCA::DecoderWinamp::Activate()
 	{
 		File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
 
-		plugin->Play(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
+		module->Play(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
 	}
 	else
 	{
-		plugin->Play(track.origFilename);
+		module->Play(track.origFilename);
 	}
 
 	return True;
@@ -366,9 +366,9 @@ Bool BoCA::DecoderWinamp::Deactivate()
 {
 	samplesBufferMutex->Release();
 
-	plugin->Stop();
+	module->Stop();
 
-	delete plugin->outMod;
+	delete module->outMod;
 	delete samplesBufferMutex;
 
 	/* Remove temporary copy if necessary.
@@ -383,7 +383,7 @@ Bool BoCA::DecoderWinamp::Deactivate()
 
 Int BoCA::DecoderWinamp::ReadData(Buffer<UnsignedByte> &data)
 {
-	/* Give the plugin one second to send more samples.
+	/* Give the module one second to send more samples.
 	 */
 	samplesBufferMutex->Release();
 
@@ -420,9 +420,9 @@ ConfigLayer *BoCA::DecoderWinamp::GetConfigurationLayer()
 	return configLayer;
 }
 
-In_Module *BoCA::DecoderWinamp::GetPluginForFile(const String &file) const
+In_Module *BoCA::DecoderWinamp::GetModuleForFile(const String &file) const
 {
-	In_Module	*plugin = NIL;
+	In_Module	*module = NIL;
 
 	for (Int i = 0; i < winamp_in_plugins.Length(); i++)
 	{
@@ -445,7 +445,7 @@ In_Module *BoCA::DecoderWinamp::GetPluginForFile(const String &file) const
 					{
 						if (extension.ToLower() == file.Tail(extension.Length()).ToLower())
 						{
-							plugin = winamp_in_modules.GetNth(i);
+							module = winamp_in_modules.GetNth(i);
 
 							break;
 						}
@@ -456,7 +456,7 @@ In_Module *BoCA::DecoderWinamp::GetPluginForFile(const String &file) const
 					}
 				}
 
-				if (plugin != NIL) break;
+				if (module != NIL) break;
 			}
 
 			j += value.Length();
@@ -466,7 +466,7 @@ In_Module *BoCA::DecoderWinamp::GetPluginForFile(const String &file) const
 		}
 	}
 
-	return plugin;
+	return module;
 }
 
 void BoCA::SetInfo(int bitrate, int srate, int stereo, int synched)

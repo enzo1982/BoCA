@@ -32,9 +32,9 @@ namespace BoCA
 
 			Track			*infoTrack;
 
-			In_Module		*plugin;
+			In_Module		*module;
 
-			In_Module		*GetPluginForFile(const String &) const;
+			In_Module		*GetModuleForFile(const String &) const;
 		public:
 			static const String	&GetComponentSpecs();
 

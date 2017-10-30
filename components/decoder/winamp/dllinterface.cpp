@@ -47,7 +47,7 @@ Bool LoadWinampDLLs()
 		winamp_in_modules.Add(module);
 
 		module->hDllInstance = (HINSTANCE) dll->GetSystemModuleHandle();
-		module->hMainWindow = 0;
+		module->hMainWindow  = NULL;
 		module->Init();
 	}
 
