@@ -238,8 +238,9 @@ Void BoCA::ConfigureWMA::FillCodecComboBox()
 			combo_codec->AddEntry(name);
 
 			if ( String(name).Contains("Windows Media Audio") &&
-			    !String(name).Contains("Voice") &&
-			    !String(name).Contains("Lossless")) combo_codec->SelectNthEntry(i);
+			    !String(name).Contains("Voice")		  &&
+			    !String(name).Contains("Lossless")		  &&
+			    !String(name).Contains("Pro")) combo_codec->SelectNthEntry(i);
 
 			delete [] name;
 		}

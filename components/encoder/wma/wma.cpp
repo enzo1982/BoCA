@@ -354,8 +354,9 @@ Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo) const
 		hr = codecInfo->GetCodecName(WMMEDIATYPE_Audio, i, name, &nameLen);
 
 		if ( String(name).Contains("Windows Media Audio") &&
-		    !String(name).Contains("Voice") &&
-		    !String(name).Contains("Lossless")) index = i;
+		    !String(name).Contains("Voice")		  &&
+		    !String(name).Contains("Lossless")		  &&
+		    !String(name).Contains("Pro")) index = i;
 
 		delete [] name;
 	}
