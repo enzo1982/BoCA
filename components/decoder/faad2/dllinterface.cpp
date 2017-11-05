@@ -22,6 +22,7 @@ NEAACDECAUDIOSPECIFICCONFIG	 ex_NeAACDecAudioSpecificConfig		= NIL;
 NEAACDECDECODE			 ex_NeAACDecDecode			= NIL;
 NEAACDECCLOSE			 ex_NeAACDecClose			= NIL;
 NEAACDECGETERRORMESSAGE		 ex_NeAACDecGetErrorMessage		= NIL;
+NEAACDECGETVERSION		 ex_NeAACDecGetVersion			= NIL;
 
 MP4READ				 ex_MP4Read				= NIL;
 MP4CLOSE			 ex_MP4Close				= NIL;
@@ -62,6 +63,7 @@ Bool LoadFAAD2DLL()
 	ex_NeAACDecDecode			= (NEAACDECDECODE) faad2dll->GetFunctionAddress("NeAACDecDecode");
 	ex_NeAACDecClose			= (NEAACDECCLOSE) faad2dll->GetFunctionAddress("NeAACDecClose");
 	ex_NeAACDecGetErrorMessage		= (NEAACDECGETERRORMESSAGE) faad2dll->GetFunctionAddress("NeAACDecGetErrorMessage");
+	ex_NeAACDecGetVersion			= (NEAACDECGETVERSION) faad2dll->GetFunctionAddress("NeAACDecGetVersion");
 
 	if (ex_NeAACDecOpen			== NIL ||
 	    ex_NeAACDecInit			== NIL ||
@@ -71,7 +73,8 @@ Bool LoadFAAD2DLL()
 	    ex_NeAACDecAudioSpecificConfig	== NIL ||
 	    ex_NeAACDecDecode			== NIL ||
 	    ex_NeAACDecClose			== NIL ||
-	    ex_NeAACDecGetErrorMessage		== NIL) { FreeFAAD2DLL(); return False; }
+	    ex_NeAACDecGetErrorMessage		== NIL ||
+	    ex_NeAACDecGetVersion		== NIL) { FreeFAAD2DLL(); return False; }
 
 	return True;
 }

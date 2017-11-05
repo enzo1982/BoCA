@@ -27,7 +27,7 @@ const String &BoCA::DecoderFAAD2::GetComponentSpecs()
 											\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
 		  <component>								\
-		    <name>FAAD2 MP4/AAC Decoder</name>					\
+		    <name>FAAD2 MP4/AAC Decoder %VERSION%</name>			\
 		    <version>1.0</version>						\
 		    <id>faad2-dec</id>							\
 		    <type>decoder</type>						\
@@ -61,6 +61,12 @@ const String &BoCA::DecoderFAAD2::GetComponentSpecs()
 		  </component>								\
 											\
 		");
+
+		char	*faad2Version = NIL;
+
+		ex_NeAACDecGetVersion(&faad2Version, NIL);
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(faad2Version));
 	}
 
 	return componentSpecs;
