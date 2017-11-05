@@ -221,7 +221,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	/* Save basic information.
 	 */
-	const Info	&info = track.GetInfo();
+	Info	 info = track.GetInfo();
 
 	if (info.artist != NIL) { ID3_Frame frame(ID3FID_LEADARTIST);  SetStringField(frame, ID3FN_TEXT, info.artist); container.AddFrame(frame); }
 	if (info.title  != NIL) { ID3_Frame frame(ID3FID_TITLE);       SetStringField(frame, ID3FN_TEXT, info.title);  container.AddFrame(frame); }
@@ -270,6 +270,14 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ ID3_Frame frame(ID3FID_COMMENT); SetStringField(frame, ID3FN_TEXT, info.comment);						    container.AddFrame(frame); }
 	else if (!isChapter && currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)		{ ID3_Frame frame(ID3FID_COMMENT); SetStringField(frame, ID3FN_TEXT, currentConfig->GetStringValue("Tags", "DefaultComment", NIL)); container.AddFrame(frame); }
 
+	/* Set band to album artist if only album artist is filled.
+	 */
+	if (info.HasOtherInfo(INFO_ALBUMARTIST) && !info.HasOtherInfo(INFO_BAND))
+	{
+		info.SetOtherInfo(INFO_BAND, info.GetOtherInfo(INFO_ALBUMARTIST));
+		info.SetOtherInfo(INFO_ALBUMARTIST, NIL);
+	}
+
 	/* Save other text info.
 	 */
 	foreach (const String &pair, info.other)
@@ -279,7 +287,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST)    { ID3_Frame frame(ID3FID_USERTEXT);	  SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "Album Artist"); if (info.GetOtherInfo(INFO_BAND) != value) container.AddFrame(frame); }
+		if	(key == INFO_ALBUMARTIST)    { ID3_Frame frame(ID3FID_USERTEXT);	  SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "Album Artist"); container.AddFrame(frame); }
 
 		else if	(key == INFO_CONTENTGROUP)   { ID3_Frame frame(ID3FID_CONTENTGROUP);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_SUBTITLE)	     { ID3_Frame frame(ID3FID_SUBTITLE);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
@@ -626,7 +634,11 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 	/* Set album artist to band if only band is filled.
 	 */
-	if (info.HasOtherInfo(INFO_BAND) && !info.HasOtherInfo(INFO_ALBUMARTIST)) info.SetOtherInfo(INFO_ALBUMARTIST, info.GetOtherInfo(INFO_BAND));
+	if (info.HasOtherInfo(INFO_BAND) && !info.HasOtherInfo(INFO_ALBUMARTIST))
+	{
+		info.SetOtherInfo(INFO_ALBUMARTIST, info.GetOtherInfo(INFO_BAND));
+		info.SetOtherInfo(INFO_BAND, NIL);
+	}
 
 	track.SetInfo(info);
 
