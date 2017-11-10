@@ -23,7 +23,11 @@ DynamicLoader *macdll	= NIL;
 
 Bool LoadMACDLL()
 {
+#ifdef __WIN32__
 	macdll = BoCA::Utilities::LoadCodecDLL("MACDll");
+#else
+	macdll = BoCA::Utilities::LoadCodecDLL("mac");
+#endif
 
 	if (macdll == NIL) return False;
 

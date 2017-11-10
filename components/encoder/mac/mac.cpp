@@ -16,6 +16,10 @@
 #include "mac.h"
 #include "config.h"
 
+#ifndef WAVE_FORMAT_PCM
+#	define WAVE_FORMAT_PCM 1
+#endif
+
 using namespace smooth::IO;
 
 const String &BoCA::EncoderMAC::GetComponentSpecs()
@@ -56,7 +60,6 @@ Void smooth::DetachDLL()
 {
 	FreeMACDLL();
 }
-
 
 BoCA::EncoderMAC::EncoderMAC()
 {

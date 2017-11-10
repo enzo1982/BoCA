@@ -4,7 +4,7 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-FOLDERS = fdkaac flac lame meh opus sndfile speex vorbis
+FOLDERS = fdkaac flac lame mac meh opus sndfile speex vorbis
 
 ifneq ($(BUILD_OSX),True)
 	FOLDERS += faac voaacenc
@@ -17,7 +17,7 @@ endif
 ifeq ($(BUILD_OSX),True)
 	FOLDERS += coreaudio
 else ifeq ($(BUILD_WIN32),True)
-	FOLDERS += bladeenc bonk coreaudio mac wave wma
+	FOLDERS += bladeenc bonk coreaudio wave wma
 
 ifneq ($(BUILD_X86_64),True)
 	FOLDERS += twinvq

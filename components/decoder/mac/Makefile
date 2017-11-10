@@ -11,7 +11,11 @@ BOCA_PATH = ../../..
 OBJECTS	  = dllinterface.o mac.o
 
 # Enter additional defines here:
-DEFINE	  = -DPLATFORM_WINDOWS -D__forceinline=inline
+ifeq ($(BUILD_WIN32),True)
+	DEFINE = -DPLATFORM_WINDOWS
+else
+	DEFINE = -DPLATFORM_LINUX
+endif
 
 # Enter additional library dependencies here:
 LIBS	  =
