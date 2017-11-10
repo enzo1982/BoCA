@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,11 +27,9 @@ typedef void			(__stdcall *APECOMPRESS_DESTROY)	(APE_COMPRESS_HANDLE);
 typedef int			(__stdcall *APECOMPRESS_START)		(APE_COMPRESS_HANDLE, const char *, const WAVEFORMATEX *, int, int, const unsigned char, int);
 typedef int			(__stdcall *APECOMPRESS_ADDDATA)	(APE_COMPRESS_HANDLE, unsigned char *, int);
 typedef int			(__stdcall *APECOMPRESS_FINISH)		(APE_COMPRESS_HANDLE, unsigned char *, int, int);
-typedef int			(__stdcall *APEGETVERSIONNUMBER)	();
 
 extern APECOMPRESS_CREATE	 ex_APECompress_Create;
 extern APECOMPRESS_DESTROY	 ex_APECompress_Destroy;
 extern APECOMPRESS_START	 ex_APECompress_Start;
 extern APECOMPRESS_ADDDATA	 ex_APECompress_AddData;
 extern APECOMPRESS_FINISH	 ex_APECompress_Finish;
-extern APEGETVERSIONNUMBER	 ex_APEGetVersionNumber;

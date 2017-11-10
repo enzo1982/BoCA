@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -18,7 +18,6 @@ APECOMPRESS_DESTROY	 ex_APECompress_Destroy	= NIL;
 APECOMPRESS_START	 ex_APECompress_Start	= NIL;
 APECOMPRESS_ADDDATA	 ex_APECompress_AddData	= NIL;
 APECOMPRESS_FINISH	 ex_APECompress_Finish	= NIL;
-APEGETVERSIONNUMBER	 ex_APEGetVersionNumber	= NIL;
 
 DynamicLoader *macdll	= NIL;
 
@@ -33,14 +32,12 @@ Bool LoadMACDLL()
 	ex_APECompress_Start	= (APECOMPRESS_START) macdll->GetFunctionAddress("c_APECompress_Start");
 	ex_APECompress_AddData	= (APECOMPRESS_ADDDATA) macdll->GetFunctionAddress("c_APECompress_AddData");
 	ex_APECompress_Finish	= (APECOMPRESS_FINISH) macdll->GetFunctionAddress("c_APECompress_Finish");
-	ex_APEGetVersionNumber	= (APEGETVERSIONNUMBER) macdll->GetFunctionAddress("GetVersionNumber");
 
 	if (ex_APECompress_Create	== NIL ||
 	    ex_APECompress_Destroy	== NIL ||
 	    ex_APECompress_Start	== NIL ||
 	    ex_APECompress_AddData	== NIL ||
-	    ex_APECompress_Finish	== NIL ||
-	    ex_APEGetVersionNumber	== NIL) { FreeMACDLL(); return False; }
+	    ex_APECompress_Finish	== NIL) { FreeMACDLL(); return False; }
 
 	return True;
 }
