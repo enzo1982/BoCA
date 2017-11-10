@@ -24,10 +24,10 @@ extern DynamicLoader	*macdll;
 Bool			 LoadMACDLL();
 Void			 FreeMACDLL();
 
-typedef APE_DECOMPRESS_HANDLE	(__stdcall *APEDECOMPRESS_CREATE)	(const char *, int *);
+typedef APE_DECOMPRESS_HANDLE	(__stdcall *APEDECOMPRESS_CREATE)	(const str_ansi *, int *);
 typedef void			(__stdcall *APEDECOMPRESS_DESTROY)	(APE_DECOMPRESS_HANDLE);
 typedef int			(__stdcall *APEDECOMPRESS_SEEK)		(APE_DECOMPRESS_HANDLE, int);
-typedef int			(__stdcall *APEDECOMPRESS_GETDATA)	(APE_DECOMPRESS_HANDLE, char *, int, int *);
+typedef int			(__stdcall *APEDECOMPRESS_GETDATA)	(APE_DECOMPRESS_HANDLE, char *, intn, intn *);
 typedef int			(__stdcall *APEDECOMPRESS_GETINFO)	(APE_DECOMPRESS_HANDLE, APE_DECOMPRESS_FIELDS, int, int);
 
 extern APEDECOMPRESS_CREATE	 ex_APEDecompress_Create;

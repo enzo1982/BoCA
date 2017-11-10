@@ -14,6 +14,8 @@
 
 #include "mac/MACDll.h"
 
+using namespace APE;
+
 using namespace smooth;
 using namespace smooth::System;
 
@@ -24,7 +26,7 @@ Void			 FreeMACDLL();
 
 typedef APE_COMPRESS_HANDLE	(__stdcall *APECOMPRESS_CREATE)		(int *);
 typedef void			(__stdcall *APECOMPRESS_DESTROY)	(APE_COMPRESS_HANDLE);
-typedef int			(__stdcall *APECOMPRESS_START)		(APE_COMPRESS_HANDLE, const char *, const WAVEFORMATEX *, int, int, const unsigned char, int);
+typedef int			(__stdcall *APECOMPRESS_START)		(APE_COMPRESS_HANDLE, const char *, const APE::WAVEFORMATEX *, int, int, const void *, int);
 typedef int			(__stdcall *APECOMPRESS_ADDDATA)	(APE_COMPRESS_HANDLE, unsigned char *, int);
 typedef int			(__stdcall *APECOMPRESS_FINISH)		(APE_COMPRESS_HANDLE, unsigned char *, int, int);
 

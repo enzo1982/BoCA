@@ -45,12 +45,13 @@ Global compiler settings (useful for porting)
 *****************************************************************************************/
 // assembly code (helps performance, but limits portability)
 #ifndef PLATFORM_ARM
-    #ifndef PLATFORM_APPLE // doesn't compile on Mac
-        #define ENABLE_SSE_ASSEMBLY
-    #endif
-    #ifdef PLATFORM_WINDOWS // doesn't compile in gcc
-        #define ENABLE_MMX_ASSEMBLY
-    #endif
+	#define ENABLE_SSE_ASSEMBLY
+
+	#ifdef _MSC_VER // doesn't compile in gcc
+		#ifndef PLATFORM_x64
+			#define ENABLE_MMX_ASSEMBLY
+		#endif
+	#endif
 #endif
 
 // APE_BACKWARDS_COMPATIBILITY is only needed for decoding APE 3.92 or earlier files.  It
@@ -58,9 +59,9 @@ Global compiler settings (useful for porting)
 // that disabling APE_BACKWARDS_COMPATIBILITY would have any effect on a normal user.  For
 // porting or third party usage, it's probably best to not bother with APE_BACKWARDS_COMPATIBILITY.
 // A future release of Monkey's Audio itself may remove support for these obsolete files.
-#if defined(PLATFORM_WINDOWS)
+//#if defined(PLATFORM_WINDOWS)
 	#define APE_BACKWARDS_COMPATIBILITY
-#endif
+//#endif
 
 // compression modes
 #define ENABLE_COMPRESSION_MODE_FAST
@@ -87,6 +88,7 @@ namespace APE
     typedef int64_t                                     int64;
 #endif
     typedef intptr_t                                    intn;
+	typedef uintptr_t                                   uintn;
 	typedef uint64_t                                    uint64;
 	typedef uint32_t                                    uint32;
 	typedef uint16_t                                    uint16;
@@ -135,7 +137,7 @@ Global macros
     #define TICK_COUNT_TYPE                             unsigned long long
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
-    #define __forceinline                                inline
+    #define __forceinline                               __attribute__((always_inline))
     #define ASSERT(e)                                    
 #endif
 
@@ -163,13 +165,18 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.25")
-#define MAC_NAME                                        _T("Monkey's Audio 4.25")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.25"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.25)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.25) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.25\nCopyrighted (c) 2000-2017 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.27")
+#define MAC_NAME                                        _T("Monkey's Audio 4.27")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.27"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.27)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.27) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.27\nCopyrighted (c) 2000-2017 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
+#ifdef PLATFORM_WINDOWS
+	#define APE_FILENAME_SLASH '\\'
+#else
+	#define APE_FILENAME_SLASH '/'
+#endif
 
 /*****************************************************************************************
 Byte order
@@ -197,7 +204,7 @@ Macros
 #define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nResult = FUNCTION; if (nResult != 0) { return VALUE; } }
 #define RETURN_ON_EXCEPTION(CODE, VALUE) { try { CODE } catch(...) { return VALUE; } }
 
-#define THROW_ON_ERROR(CODE) { int nResult = CODE; if (nResult != 0) throw(nResult); }
+#define THROW_ON_ERROR(CODE) { intn nResult = CODE; if (nResult != 0) throw(nResult); }
 
 #define EXPAND_1_TIMES(CODE) CODE
 #define EXPAND_2_TIMES(CODE) CODE CODE
