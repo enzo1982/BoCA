@@ -21,7 +21,11 @@ else ifeq ($(BUILD_SOLARIS),True)
 else ifeq ($(BUILD_HAIKU),True)
 	FOLDERS += haiku
 else ifeq ($(BUILD_WIN32),True)
-	FOLDERS += directsound waveout winamp
+	FOLDERS += directsound waveout
+
+ifneq ($(BUILD_X86_64),True)
+	winamp
+endif
 endif
 
 .PHONY: $(FOLDERS)

@@ -19,7 +19,11 @@ else
 endif
 endif
 else ifeq ($(BUILD_WIN32),True)
-	FOLDERS += aiff au bonk cdrip mac twinvq voc wave winamp wma
+	FOLDERS += aiff au bonk cdrip mac voc wave wma
+
+ifneq ($(BUILD_X86_64),True)
+	FOLDERS += twinvq winamp
+endif
 endif
 
 .PHONY: $(FOLDERS)

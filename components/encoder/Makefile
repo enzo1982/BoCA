@@ -17,7 +17,11 @@ endif
 ifeq ($(BUILD_OSX),True)
 	FOLDERS += coreaudio
 else ifeq ($(BUILD_WIN32),True)
-	FOLDERS += bladeenc bonk coreaudio mac twinvq wave wma
+	FOLDERS += bladeenc bonk coreaudio mac wave wma
+
+ifneq ($(BUILD_X86_64),True)
+	FOLDERS += twinvq
+endif
 endif
 
 .PHONY: $(FOLDERS)
