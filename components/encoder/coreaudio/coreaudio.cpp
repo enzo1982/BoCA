@@ -327,11 +327,13 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	if (CA::AudioConverterGetProperty(converter, CA::kAudioConverterPrimeInfo, &size, &primeInfo) == 0)
 	{
-		Int	 divider = 1;
+		const Format	&format = track.GetFormat();
+
+		Float	 divider = Float(format.rate) / GetOutputSampleRate(format.rate);
 		Int	 extra	 = 0;
 
 		if (codec == CA::kAudioFormatMPEG4AAC_HE ||
-		    codec == CA::kAudioFormatMPEG4AAC_HE_V2) { divider = 2; extra = 480; }
+		    codec == CA::kAudioFormatMPEG4AAC_HE_V2) { divider *= 2.0; extra = 480; }
 
 		CA::AudioFilePacketTableInfo	 pti;
 

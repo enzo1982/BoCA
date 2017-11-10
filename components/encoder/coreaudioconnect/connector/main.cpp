@@ -404,11 +404,11 @@ int main(int argc, char *argv[])
 
 					if (CA::AudioConverterGetProperty(converter, CA::kAudioConverterPrimeInfo, &size, &primeInfo) == 0)
 					{
-						int	 divider = 1;
+						float	 divider = float(setup.rate) / GetOutputSampleRate(setup);
 						int	 extra	 = 0;
 
 						if (setup.codec == CA::kAudioFormatMPEG4AAC_HE ||
-						    setup.codec == CA::kAudioFormatMPEG4AAC_HE_V2) { divider = 2; extra = 480; }
+						    setup.codec == CA::kAudioFormatMPEG4AAC_HE_V2) { divider *= 2.0; extra = 480; }
 
 						CA::AudioFilePacketTableInfo	 pti;
 
