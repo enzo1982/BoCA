@@ -17,7 +17,7 @@ endif
 OBJECTS	  = config.o coreaudioconnect.o
 
 # Enter additional defines here:
-DEFINE	  = -Wno-multichar
+DEFINE	  = -Iconnector -Wno-multichar
 
 # Enter additional library dependencies here:
 LIBS	  =

@@ -17,7 +17,11 @@
 #include <boca.h>
 
 #include "connector/communication.h"
-#include "connector/dllinterface.h"
+
+namespace CA
+{
+#	include "CoreAudio/AudioFormat.h"
+};
 
 using namespace smooth;
 using namespace smooth::GUI;

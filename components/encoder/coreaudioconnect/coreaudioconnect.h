@@ -13,7 +13,11 @@
 #include <boca.h>
 
 #include "connector/communication.h"
-#include "connector/dllinterface.h"
+
+namespace CA
+{
+#	include "CoreAudio/AudioFormat.h"
+};
 
 BoCA_BEGIN_COMPONENT(EncoderCoreAudioConnect)
 
