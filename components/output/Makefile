@@ -24,7 +24,7 @@ else ifeq ($(BUILD_WIN32),True)
 	FOLDERS += directsound waveout
 
 ifneq ($(BUILD_X86_64),True)
-	winamp
+	FOLDERS += winamp
 endif
 endif
 
