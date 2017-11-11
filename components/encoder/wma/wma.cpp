@@ -143,7 +143,7 @@ Bool BoCA::EncoderWMA::Activate()
 
 	hr = ex_WMCreateWriterFileSink(&m_pWriterFileSink);
 
-	hr = m_pWriterFileSink->Open(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"));
+	hr = m_pWriterFileSink->Open(String(track.outfile).Append(".out"));
 
 	hr = m_pWriterAdvanced->AddSink(m_pWriterFileSink);
 
@@ -219,7 +219,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 {
 	if (errorState)
 	{
-		File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+		File(String(track.outfile).Append(".out")).Delete();
 
 		return True;
 	}
@@ -242,7 +242,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 
 	if (hr != S_OK)
 	{
-		File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+		File(String(track.outfile).Append(".out")).Delete();
 
 		return False;
 	}
@@ -261,7 +261,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(GetConfiguration());
-				tagger->RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), track);
+				tagger->RenderStreamInfo(String(track.outfile).Append(".out"), track);
 
 				boca.DeleteComponent(tagger);
 			}
@@ -270,7 +270,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 
 	/* Stream contents of created WMA file to output driver
 	 */
-	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READ);
+	InStream		 in(STREAM_FILE, String(track.outfile).Append(".out"), IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
 	Int64			 bytesLeft = in.Size();
 
@@ -285,7 +285,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 
 	in.Close();
 
-	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+	File(String(track.outfile).Append(".out")).Delete();
 
 	return True;
 }
