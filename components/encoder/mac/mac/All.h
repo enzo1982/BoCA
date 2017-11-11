@@ -87,8 +87,16 @@ namespace APE
 	typedef	intptr_t                                    int32; // native integer, can safely hold a pointer
     typedef int64_t                                     int64;
 #endif
-    typedef intptr_t                                    intn;
-	typedef uintptr_t                                   uintn;
+	// from GlobalIntTypes.h (JRiver code)
+	#define __int64 long long
+#if defined(PLATFORM_x64)
+	typedef __int64 intn;
+	typedef unsigned __int64 uintn;
+#else
+	typedef int intn;
+	typedef unsigned int uintn;
+#endif
+
 	typedef uint64_t                                    uint64;
 	typedef uint32_t                                    uint32;
 	typedef uint16_t                                    uint16;
@@ -165,12 +173,12 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.27")
-#define MAC_NAME                                        _T("Monkey's Audio 4.27")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.27"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.27)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.27) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.27\nCopyrighted (c) 2000-2017 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.28")
+#define MAC_NAME                                        _T("Monkey's Audio 4.28")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.28"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.28)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.28) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.28\nCopyrighted (c) 2000-2017 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #ifdef PLATFORM_WINDOWS
 	#define APE_FILENAME_SLASH '\\'
