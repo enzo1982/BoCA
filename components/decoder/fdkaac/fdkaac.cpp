@@ -86,20 +86,8 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 
 	if (mp4v2dll != NIL && (in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		MP4FileHandle	 mp4File;
-
-		if (String::IsUnicode(streamURI))
-		{
-			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
-
-			mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
-		}
-		else
-		{
-			mp4File = ex_MP4Read(streamURI);
-		}
-
-		Int	 mp4Track = GetAudioTrack(mp4File);
+		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
+		Int		 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
@@ -114,11 +102,6 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 		}
 
 		ex_MP4Close(mp4File, 0);
-
-		if (String::IsUnicode(streamURI))
-		{
-			File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
-		}
 	}
 	else
 	{
@@ -142,20 +125,8 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
 
-		MP4FileHandle	 mp4File;
-
-		if (String::IsUnicode(streamURI))
-		{
-			File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
-
-			mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"));
-		}
-		else
-		{
-			mp4File = ex_MP4Read(streamURI);
-		}
-
-		Int	 mp4Track = GetAudioTrack(mp4File);
+		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
+		Int		 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
@@ -262,17 +233,10 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(GetConfiguration());
-
-				if (String::IsUnicode(streamURI)) tagger->ParseStreamInfo(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in"), track);
-				else				  tagger->ParseStreamInfo(streamURI, track);
+				tagger->ParseStreamInfo(streamURI, track);
 
 				boca.DeleteComponent(tagger);
 			}
-		}
-
-		if (String::IsUnicode(streamURI))
-		{
-			File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in")).Delete();
 		}
 	}
 	else
@@ -422,17 +386,7 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		if (String::IsUnicode(track.origFilename))
-		{
-			File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
-
-			mp4File	= ex_MP4Read(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
-		}
-		else
-		{
-			mp4File	= ex_MP4Read(track.origFilename);
-		}
-
+		mp4File	 = ex_MP4Read(track.origFilename.ConvertTo("UTF-8"));
 		mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track == -1) return False;
@@ -516,11 +470,6 @@ Bool BoCA::DecoderFDKAAC::Deactivate()
 	/* Close MP4 file.
 	 */
 	ex_MP4Close(mp4File, 0);
-
-	if (String::IsUnicode(track.origFilename))
-	{
-		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
-	}
 
 	return True;
 }

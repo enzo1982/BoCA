@@ -102,20 +102,9 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 {
 	const Config	*currentConfig = GetConfiguration();
 
-	MP4FileHandle	 mp4File;
-	const Info	&info = track.GetInfo();
+	const Info	&info	 = track.GetInfo();
 
-	if (String::IsUnicode(fileName))
-	{
-		File(fileName).Copy(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"));
-
-		mp4File = ex_MP4Modify(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"), 0);
-	}
-	else
-	{
-		mp4File = ex_MP4Modify(fileName, 0);
-	}
-
+	MP4FileHandle	 mp4File = ex_MP4Modify(fileName.ConvertTo("UTF-8"), 0);
 	const MP4Tags	*mp4Tags = ex_MP4TagsAlloc();
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
@@ -235,17 +224,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	String::SetOutputFormat(prevOutFormat);
 
 	ex_MP4Close(mp4File, 0);
-
-	if (String::IsUnicode(fileName))
-	{
-		ex_MP4Optimize(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"), NIL);
-
-		File(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag")).Move(fileName);
-	}
-	else
-	{
-		ex_MP4Optimize(fileName, NIL);
-	}
+	ex_MP4Optimize(fileName.ConvertTo("UTF-8"), NIL);
 
 	return Success();
 }
@@ -254,20 +233,9 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 {
 	const Config	*currentConfig = GetConfiguration();
 
-	MP4FileHandle	 mp4File;
-	Info		 info = track.GetInfo();
+	Info		 info	 = track.GetInfo();
 
-	if (String::IsUnicode(fileName))
-	{
-		File(fileName).Copy(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"));
-
-		mp4File = ex_MP4Read(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"));
-	}
-	else
-	{
-		mp4File = ex_MP4Read(fileName);
-	}
-
+	MP4FileHandle	 mp4File = ex_MP4Read(fileName.ConvertTo("UTF-8"));
 	const MP4Tags	*mp4Tags = ex_MP4TagsAlloc();
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
@@ -389,29 +357,12 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	ex_MP4Close(mp4File, 0);
 
-	if (String::IsUnicode(fileName))
-	{
-		File(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag")).Delete();
-	}
-
 	return Success();
 }
 
 Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &track)
 {
-	MP4FileHandle	 mp4File;
-
-	if (String::IsUnicode(fileName))
-	{
-		File(fileName).Copy(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"));
-
-		mp4File = ex_MP4Modify(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"), 0);
-	}
-	else
-	{
-		mp4File = ex_MP4Modify(fileName, 0);
-	}
-
+	MP4FileHandle	 mp4File = ex_MP4Modify(fileName.ConvertTo("UTF-8"), 0);
 	const MP4Tags	*mp4Tags = ex_MP4TagsAlloc();
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
@@ -442,17 +393,7 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 
 	ex_MP4Close(mp4File, 0);
 
-	if (String::IsUnicode(fileName))
-	{
-		RenderStreamInfo(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag"), track);
-
-		File(fileName).Delete();
-		File(Utilities::GetNonUnicodeTempFileName(fileName).Append(".tag")).Move(fileName);
-	}
-	else
-	{
-		RenderStreamInfo(fileName, track);
-	}
+	RenderStreamInfo(fileName, track);
 
 	return Success();
 }
