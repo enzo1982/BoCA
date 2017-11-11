@@ -124,11 +124,11 @@ Void BoCA::LayerLengthStatus::RemoveTrack(const Track &track, Int64 &seconds, In
 
 	if (track.length >= 0 && format.rate > 0)
 	{
-		seconds -= track.length / format.rate;
+		seconds -= Math::Round(Float(track.length) / format.rate);
 	}
 	else if (track.approxLength >= 0 && format.rate > 0)
 	{
-		seconds -= track.approxLength / format.rate;
+		seconds -= Math::Round(Float(track.approxLength) / format.rate);
 
 		approx--;
 	}
