@@ -97,7 +97,7 @@ Bool BoCA::EncoderMAC::Activate()
 
 	/* Init encoder using output file name and format info.
 	 */
-	WAVEFORMATEX	 waveFormat;
+	APE::WAVEFORMATEX	 waveFormat;
 
 	waveFormat.wFormatTag		= WAVE_FORMAT_PCM;
 	waveFormat.nChannels		= format.channels;
