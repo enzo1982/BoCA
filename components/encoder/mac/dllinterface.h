@@ -26,12 +26,12 @@ Void			 FreeMACDLL();
 
 typedef APE_COMPRESS_HANDLE	(__stdcall *APECOMPRESS_CREATE)		(int *);
 typedef void			(__stdcall *APECOMPRESS_DESTROY)	(APE_COMPRESS_HANDLE);
-typedef int			(__stdcall *APECOMPRESS_START)		(APE_COMPRESS_HANDLE, const char *, const APE::WAVEFORMATEX *, int, int, const void *, int);
+typedef int			(__stdcall *APECOMPRESS_STARTW)		(APE_COMPRESS_HANDLE, const str_utfn *, const APE::WAVEFORMATEX *, int, int, const void *, int);
 typedef int			(__stdcall *APECOMPRESS_ADDDATA)	(APE_COMPRESS_HANDLE, unsigned char *, int);
 typedef int			(__stdcall *APECOMPRESS_FINISH)		(APE_COMPRESS_HANDLE, unsigned char *, int, int);
 
 extern APECOMPRESS_CREATE	 ex_APECompress_Create;
 extern APECOMPRESS_DESTROY	 ex_APECompress_Destroy;
-extern APECOMPRESS_START	 ex_APECompress_Start;
+extern APECOMPRESS_STARTW	 ex_APECompress_StartW;
 extern APECOMPRESS_ADDDATA	 ex_APECompress_AddData;
 extern APECOMPRESS_FINISH	 ex_APECompress_Finish;

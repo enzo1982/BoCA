@@ -13,7 +13,7 @@
 #include <boca.h>
 #include "dllinterface.h"
 
-APEDECOMPRESS_CREATE	 ex_APEDecompress_Create	= NIL;
+APEDECOMPRESS_CREATEW	 ex_APEDecompress_CreateW	= NIL;
 APEDECOMPRESS_DESTROY	 ex_APEDecompress_Destroy	= NIL;
 APEDECOMPRESS_SEEK	 ex_APEDecompress_Seek		= NIL;
 APEDECOMPRESS_GETDATA	 ex_APEDecompress_GetData	= NIL;
@@ -31,13 +31,13 @@ Bool LoadMACDLL()
 
 	if (macdll == NIL) return False;
 
-	ex_APEDecompress_Create		= (APEDECOMPRESS_CREATE) macdll->GetFunctionAddress("c_APEDecompress_Create");
+	ex_APEDecompress_CreateW	= (APEDECOMPRESS_CREATEW) macdll->GetFunctionAddress("c_APEDecompress_CreateW");
 	ex_APEDecompress_Destroy	= (APEDECOMPRESS_DESTROY) macdll->GetFunctionAddress("c_APEDecompress_Destroy");
 	ex_APEDecompress_Seek		= (APEDECOMPRESS_SEEK) macdll->GetFunctionAddress("c_APEDecompress_Seek");
 	ex_APEDecompress_GetData	= (APEDECOMPRESS_GETDATA) macdll->GetFunctionAddress("c_APEDecompress_GetData");
 	ex_APEDecompress_GetInfo	= (APEDECOMPRESS_GETINFO) macdll->GetFunctionAddress("c_APEDecompress_GetInfo");
 
-	if (ex_APEDecompress_Create	== NIL ||
+	if (ex_APEDecompress_CreateW	== NIL ||
 	    ex_APEDecompress_Destroy	== NIL ||
 	    ex_APEDecompress_Seek	== NIL ||
 	    ex_APEDecompress_GetData	== NIL ||

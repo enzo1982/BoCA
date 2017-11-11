@@ -67,19 +67,8 @@ Bool BoCA::DecoderMAC::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderMAC::GetStreamInfo(const String &streamURI, Track &track)
 {
-	int			 nRetVal = 0;
-	APE_DECOMPRESS_HANDLE	 hAPEDecompress = NIL;
-
-	if (String::IsUnicode(streamURI))
-	{
-		File(streamURI).Copy(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in.ape"));
-
-		hAPEDecompress = ex_APEDecompress_Create(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in.ape"), &nRetVal);
-	}
-	else
-	{
-		hAPEDecompress = ex_APEDecompress_Create(streamURI, &nRetVal);
-	}
+	int			 nRetVal	= 0;
+	APE_DECOMPRESS_HANDLE	 hAPEDecompress = ex_APEDecompress_CreateW(streamURI, &nRetVal);
 
 	if (hAPEDecompress == NIL) return Error();
 
@@ -111,11 +100,6 @@ Error BoCA::DecoderMAC::GetStreamInfo(const String &streamURI, Track &track)
 		boca.DeleteComponent(tagger);
 	}
 
-	if (String::IsUnicode(streamURI))
-	{
-		File(Utilities::GetNonUnicodeTempFileName(streamURI).Append(".in.ape")).Delete();
-	}
-
 	return Success();
 }
 
@@ -136,18 +120,8 @@ Bool BoCA::DecoderMAC::Activate()
 {
 	int	 nRetVal = 0;
 
-	if (String::IsUnicode(track.origFilename))
-	{
-		File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in.ape"));
-
-		hAPEDecompress = ex_APEDecompress_Create(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in.ape"), &nRetVal);
-	}
-	else
-	{
-		hAPEDecompress = ex_APEDecompress_Create(track.origFilename, &nRetVal);
-	}
-
-	blockId = 0;
+	hAPEDecompress = ex_APEDecompress_CreateW(track.origFilename, &nRetVal);
+	blockId	       = 0;
 
 	return True;
 }
@@ -155,11 +129,6 @@ Bool BoCA::DecoderMAC::Activate()
 Bool BoCA::DecoderMAC::Deactivate()
 {
 	ex_APEDecompress_Destroy(hAPEDecompress);
-
-	if (String::IsUnicode(track.origFilename))
-	{
-		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in.ape")).Delete();
-	}
 
 	return True;
 }
