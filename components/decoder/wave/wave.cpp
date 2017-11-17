@@ -251,11 +251,6 @@ Bool BoCA::DecoderWave::Activate()
 	return True;
 }
 
-Bool BoCA::DecoderWave::Deactivate()
-{
-	return True;
-}
-
 Bool BoCA::DecoderWave::Seek(Int64 samplePosition)
 {
 	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));

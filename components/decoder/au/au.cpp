@@ -111,11 +111,6 @@ Bool BoCA::DecoderSunAu::Activate()
 	return True;
 }
 
-Bool BoCA::DecoderSunAu::Deactivate()
-{
-	return True;
-}
-
 Bool BoCA::DecoderSunAu::Seek(Int64 samplePosition)
 {
 	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));

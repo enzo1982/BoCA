@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,9 +27,6 @@ namespace BoCA
 						~VerifierMD5();
 
 			Bool			 CanVerifyTrack(const Track &);
-
-			Bool			 Activate();
-			Bool			 Deactivate();
 
 			Int			 ProcessData(Buffer<UnsignedByte> &);
 

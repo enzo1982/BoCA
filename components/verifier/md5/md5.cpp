@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -43,16 +43,6 @@ Bool BoCA::VerifierMD5::CanVerifyTrack(const Track &track)
 {
 	if (track.md5 != NIL && track.md5 != String().FillN('0', 32)) return True;
 	else							      return False;
-}
-
-Bool BoCA::VerifierMD5::Activate()
-{
-	return True;
-}
-
-Bool BoCA::VerifierMD5::Deactivate()
-{
-	return True;
 }
 
 Int BoCA::VerifierMD5::ProcessData(Buffer<UnsignedByte> &data)

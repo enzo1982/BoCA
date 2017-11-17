@@ -265,11 +265,6 @@ Bool BoCA::DecoderAIFF::Activate()
 	return True;
 }
 
-Bool BoCA::DecoderAIFF::Deactivate()
-{
-	return True;
-}
-
 Bool BoCA::DecoderAIFF::Seek(Int64 samplePosition)
 {
 	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
