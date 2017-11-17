@@ -36,8 +36,8 @@ namespace BoCA
 				virtual Bool		 SetAudioTrackInfo(const Track &);
 				virtual const Format	&GetFormatInfo() const;
 
-				virtual Bool		 Activate() = 0;
-				virtual Bool		 Deactivate() = 0;
+				virtual Bool		 Activate();
+				virtual Bool		 Deactivate();
 
 				virtual Int		 TransformData(Buffer<UnsignedByte> &) = 0;
 

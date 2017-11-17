@@ -52,6 +52,16 @@ Bool BoCA::CS::EncoderComponent::IsLossless() const
 	return False;
 }
 
+Bool BoCA::CS::EncoderComponent::Activate()
+{
+	return True;
+}
+
+Bool BoCA::CS::EncoderComponent::Deactivate()
+{
+	return True;
+}
+
 Bool BoCA::CS::EncoderComponent::NextPass()
 {
 	return False;

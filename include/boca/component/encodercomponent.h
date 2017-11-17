@@ -58,8 +58,8 @@ namespace BoCA
 
 				/* Activate/deactivate filter.
 				 */
-				virtual Bool	 Activate() = 0;
-				virtual Bool	 Deactivate() = 0;
+				virtual Bool	 Activate();
+				virtual Bool	 Deactivate();
 
 				/* Write data from buffer.
 				 */

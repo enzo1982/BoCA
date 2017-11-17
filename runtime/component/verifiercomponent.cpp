@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,5 +24,15 @@ Bool BoCA::CS::VerifierComponent::SetAudioTrackInfo(const Track &nTrack)
 {
 	track = nTrack;
 
+	return True;
+}
+
+Bool BoCA::CS::VerifierComponent::Activate()
+{
+	return True;
+}
+
+Bool BoCA::CS::VerifierComponent::Deactivate()
+{
 	return True;
 }

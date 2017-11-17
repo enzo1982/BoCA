@@ -37,6 +37,16 @@ const BoCA::Format &BoCA::CS::DSPComponent::GetFormatInfo() const
 	return format;
 }
 
+Bool BoCA::CS::DSPComponent::Activate()
+{
+	return True;
+}
+
+Bool BoCA::CS::DSPComponent::Deactivate()
+{
+	return True;
+}
+
 Int BoCA::CS::DSPComponent::Flush(Buffer<UnsignedByte> &buffer)
 {
 	return 0;
