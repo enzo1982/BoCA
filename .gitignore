@@ -1,0 +1,13 @@
+# Ignore artifacts created during build.
+*.[oa]
+bin/*
+bin64/*
+lib/*
+lib64/*
+include/smooth.h
+include/smooth/*
+msvc/**/.vs/*
+msvc/**/Debug/*
+msvc/**/Release/*
+msvc/**/*.VC.*
+msvc/**/*.vcxproj.user
