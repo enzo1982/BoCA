@@ -23,6 +23,7 @@ Global includes
 #include <math.h>
 
 #if defined(PLATFORM_WINDOWS)
+    #include "WindowsEnvironment.h"
     #include <windows.h>
     #include <tchar.h>
     #include <assert.h>
@@ -45,8 +46,7 @@ Global compiler settings (useful for porting)
 *****************************************************************************************/
 // assembly code (helps performance, but limits portability)
 #ifndef PLATFORM_ARM
-	#define ENABLE_SSE_ASSEMBLY
-
+    #define ENABLE_SSE_ASSEMBLY
 	#ifdef _MSC_VER // doesn't compile in gcc
 		#ifndef PLATFORM_x64
 			#define ENABLE_MMX_ASSEMBLY
@@ -87,14 +87,20 @@ namespace APE
 	typedef	intptr_t                                    int32; // native integer, can safely hold a pointer
     typedef int64_t                                     int64;
 #endif
-	// from GlobalIntTypes.h (JRiver code)
-	#define __int64 long long
+    //typedef intptr_t                                  intn;
+	//typedef uintptr_t                                   uintn;
+
+// From GlobalIntTypes.h.
+#ifndef PLATFORM_WINDOWS
+#include <stdint.h>
+#endif
+
 #if defined(PLATFORM_x64)
-	typedef __int64 intn;
-	typedef unsigned __int64 uintn;
+    typedef int64_t intn;
+    typedef uint64_t uintn;
 #else
-	typedef int intn;
-	typedef unsigned int uintn;
+    typedef int32_t intn;
+    typedef uint32_t uintn;
 #endif
 
 	typedef uint64_t                                    uint64;
@@ -145,7 +151,6 @@ Global macros
     #define TICK_COUNT_TYPE                             unsigned long long
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
-    #define __forceinline                               __attribute__((always_inline))
     #define ASSERT(e)                                    
 #endif
 
@@ -173,12 +178,12 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.28")
-#define MAC_NAME                                        _T("Monkey's Audio 4.28")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.28"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.28)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.28) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.28\nCopyrighted (c) 2000-2017 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.29")
+#define MAC_NAME                                        _T("Monkey's Audio 4.29")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.29"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.29)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.29) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.29\nCopyrighted (c) 2000-2017 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #ifdef PLATFORM_WINDOWS
 	#define APE_FILENAME_SLASH '\\'

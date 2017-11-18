@@ -2,8 +2,6 @@
 
 #if !defined(PLATFORM_WINDOWS)
 
-#include <wctype.h>
-
 // we treat bool as a global type, so don't declare it in the namespace
 #ifdef PLATFORM_APPLE
 	typedef signed char BOOL;  // this is the way it's defined in Obj-C
@@ -14,10 +12,8 @@
 namespace APE
 {
 
-#define __forceinline __attribute__((always_inline))
+#define __forceinline inline
 #define __stdcall
-#define __fastcall
-#define __declspec(x)
 
 #define NEAR
 #define FAR
@@ -36,7 +32,6 @@ typedef long                LRESULT;
 
 #define ZeroMemory(POINTER, BYTES) memset(POINTER, 0, BYTES);
 
-#define __stdcall
 #define CALLBACK
 
 #define _T(x) L ## x
@@ -47,12 +42,10 @@ typedef long                LRESULT;
 #define _totlower towlower
 #define _totupper towupper
 
-#ifdef PLATFORM_LINUX
-#define _FPOSOFF(fp) (fp.__pos)
-#else
-#define _FPOSOFF(fp) (fp)
-#endif
 #define MAX_PATH    4096
+
+#include <wctype.h>
+#include <string.h>
 
 }
 
