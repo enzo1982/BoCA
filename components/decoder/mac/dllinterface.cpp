@@ -26,7 +26,7 @@ Bool LoadMACDLL()
 #ifdef __WIN32__
 	macdll = BoCA::Utilities::LoadCodecDLL("MACDll");
 #else
-	macdll = BoCA::Utilities::LoadCodecDLL("mac");
+	macdll = BoCA::Utilities::LoadCodecDLL("MAC");
 #endif
 
 	if (macdll == NIL) return False;
