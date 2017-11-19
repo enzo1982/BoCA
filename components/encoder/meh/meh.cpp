@@ -671,6 +671,8 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishTrackConversion(const Track &finished
 	{
 		Track	 convertedTrack = finishedTrack;
 
+		convertedTrack.SetFormat(track.GetFormat());
+
 		convertedTrack.outfile = GetFileNamePattern(track);
 		convertedTrack.length  = trackLength;
 
