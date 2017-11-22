@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -182,16 +182,26 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 			case PARAMETER_TYPE_SELECTION:
 				{
 					GroupBox	*group = GetParameterGroupBox(param->GetName());
-					ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
 
-					config->SetIntValue(specs->id, String("Set ").Append(param->GetName()), entry->IsMarked() ? 1 : 0);
-					config->SetStringValue(specs->id, param->GetName(), param->GetOptions().GetNth(selection->GetSelectedEntryNumber())->GetValue());
+					if (group == NIL) break;
+
+					ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
+					Option		*option	   = param->GetOptions().GetNth(selection->GetSelectedEntryNumber());
+
+					if (option != NIL)
+					{
+						config->SetIntValue(specs->id, String("Set ").Append(param->GetName()), entry->IsMarked() ? 1 : 0);
+						config->SetStringValue(specs->id, param->GetName(), option->GetValue());
+					}
 				}
 
 				break;
 			case PARAMETER_TYPE_RANGE:
 				{
 					GroupBox	*group = GetParameterGroupBox(param->GetName());
+
+					if (group == NIL) break;
+
 					Slider		*range = (Slider *) group->GetNthObject(0);
 
 					config->SetIntValue(specs->id, String("Set ").Append(param->GetName()), entry->IsMarked() ? 1 : 0);
@@ -244,12 +254,12 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 				{
 					GroupBox	*group = GetParameterGroupBox(param->GetName());
 
-					if (group != NIL)
-					{
-						ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
+					if (group == NIL) break;
 
-						arguments.Append(param->GetArgument().Replace("%VALUE", param->GetOptions().GetNth(selection->GetSelectedEntryNumber())->GetValue())).Append(" ");
-					}
+					ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
+					Option		*option	   = param->GetOptions().GetNth(selection->GetSelectedEntryNumber());
+
+					if (option != NIL) arguments.Append(param->GetArgument().Replace("%VALUE", option->GetValue())).Append(" ");
 				}
 
 				break;
@@ -257,12 +267,11 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 				{
 					GroupBox	*group = GetParameterGroupBox(param->GetName());
 
-					if (group != NIL)
-					{
-						Slider		*range = (Slider *) group->GetNthObject(0);
+					if (group == NIL) break;
 
-						arguments.Append(param->GetArgument().Replace("%VALUE", String::FromFloat(range->GetValue() * param->GetStepSize()))).Append(" ");
-					}
+					Slider		*range = (Slider *) group->GetNthObject(0);
+
+					arguments.Append(param->GetArgument().Replace("%VALUE", String::FromFloat(range->GetValue() * param->GetStepSize()))).Append(" ");
 				}
 
 				break;
@@ -302,6 +311,9 @@ Void BoCA::AS::ConfigLayerExternal::OnSliderValueChange()
 			case PARAMETER_TYPE_RANGE:
 				{
 					GroupBox	*group = GetParameterGroupBox(param->GetName());
+
+					if (group == NIL) break;
+
 					Slider		*range = (Slider *) group->GetNthObject(0);
 					Text		*value = (Text *) group->GetNthObject(1);
 
