@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Extended Module Player</name>
+  <version>1.0</version>
+  <id>xmp-dec</id>
+  <type>decoder</type>
+  <format>
+    <name>FastTracker Modules</name>
+    <extension>ft</extension>
+  </format>
+  <format>
+    <name>FastTracker II Modules</name>
+    <extension>xm</extension>
+  </format>
+  <format>
+    <name>Impulse Tracker Modules</name>
+    <extension>it</extension>
+  </format>
+  <format>
+    <name>Music Editor Modules</name>
+    <extension>med</extension>
+  </format>
+  <format>
+    <name>OctaMED Modules</name>
+    <extension>mmd0</extension>
+    <extension>mmd1</extension>
+    <extension>mmd2</extension>
+    <extension>mmd3</extension>
+  </format>
+  <format>
+    <name>PolyTracker Modules</name>
+    <extension>ptm</extension>
+  </format>
+  <format>
+    <name>ProTracker Modules</name>
+    <extension>mod</extension>
+  </format>
+  <format>
+    <name>Real Tracker Modules</name>
+    <extension>rtm</extension>
+  </format>
+  <format>
+    <name>Scream Tracker Modules</name>
+    <extension>stm</extension>
+    <extension>s3m</extension>
+  </format>
+  <format>
+    <name>UltraTracker Modules</name>
+    <extension>ult</extension>
+  </format>
+  <external>
+    <command>xmp</command>
+    <arguments>-o %OUTFILE -d wav %INFILE</arguments>
+    <mode>file</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>
