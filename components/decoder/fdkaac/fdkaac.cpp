@@ -391,6 +391,8 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 		if (mp4Track == -1) return False;
 
+		driver->Seek(0);
+
 		handle	 = ex_aacDecoder_Open(TT_MP4_RAW, 1);
 
 		/* Get codec configuration.

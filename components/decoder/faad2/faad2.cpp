@@ -347,6 +347,8 @@ Bool BoCA::DecoderFAAD2::Activate()
 		mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track == -1) return False;
+
+		driver->Seek(0);
 	}
 	else
 	{
