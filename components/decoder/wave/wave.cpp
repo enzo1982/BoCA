@@ -94,33 +94,33 @@ Bool BoCA::DecoderWave::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	track.fileSize	= f_in->Size();
+	track.fileSize = in.Size();
 
 	/* Read RIFF chunk.
 	 */
-	if (f_in->InputString(4) != "RIFF") { errorState = True; errorString = "Unknown file type"; }
+	if (in.InputString(4) != "RIFF") { errorState = True; errorString = "Unknown file type"; }
 
-	f_in->RelSeek(4);
+	in.RelSeek(4);
 
-	if (f_in->InputString(4) != "WAVE") { errorState = True; errorString = "Unknown file type"; }
+	if (in.InputString(4) != "WAVE") { errorState = True; errorString = "Unknown file type"; }
 
 	String		 chunk;
 
 	while (!errorState && chunk != "data")
 	{
-		if (f_in->GetPos() >= f_in->Size()) break;
+		if (in.GetPos() >= in.Size()) break;
 
 		/* Read next chunk.
 		 */
-		chunk = f_in->InputString(4);
+		chunk = in.InputString(4);
 
-		Int	 cSize = f_in->InputNumber(4);
+		Int	 cSize = in.InputNumber(4);
 
 		if (chunk == "fmt ")
 		{
-			Int	 waveFormat = f_in->InputNumber(2);
+			Int	 waveFormat = in.InputNumber(2);
 
 			if (waveFormat != WAVE_FORMAT_PCM	 &&
 			    waveFormat != WAVE_FORMAT_IEEE_FLOAT &&
@@ -128,25 +128,25 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 
 			Format	 format = track.GetFormat();
 
-			format.channels	= (unsigned short) f_in->InputNumber(2);
-			format.rate	= (unsigned long) f_in->InputNumber(4);
+			format.channels	= (unsigned short) in.InputNumber(2);
+			format.rate	= (unsigned long) in.InputNumber(4);
 
-			f_in->RelSeek(6);
+			in.RelSeek(6);
 
 			format.order	= (waveFormat == WAVE_FORMAT_IEEE_FLOAT) ? BYTE_NATIVE : BYTE_INTEL;
-			format.bits	= (unsigned short) f_in->InputNumber(2);
+			format.bits	= (unsigned short) in.InputNumber(2);
 
 			track.SetFormat(format);
 
 			/* Skip rest of chunk.
 			 */
-			f_in->RelSeek(cSize - 16 + cSize % 2);
+			in.RelSeek(cSize - 16 + cSize % 2);
 		}
 		else if (chunk == "data")
 		{
 			Format	 format = track.GetFormat();
 
-			if ((unsigned long) cSize == 0xFFFFFFFF || cSize == 0) cSize = f_in->Size() - f_in->GetPos();
+			if ((unsigned long) cSize == 0xFFFFFFFF || cSize == 0) cSize = in.Size() - in.GetPos();
 
 			track.length	= (unsigned long) cSize / format.channels / (format.bits / 8);
 			format.bits	= Math::Min(32, format.bits);
@@ -157,11 +157,9 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			/* Skip chunk.
 			 */
-			f_in->RelSeek(cSize + cSize % 2);
+			in.RelSeek(cSize + cSize % 2);
 		}
 	}
-
-	delete f_in;
 
 	if (!errorState)
 	{
@@ -207,9 +205,9 @@ BoCA::DecoderWave::~DecoderWave()
 
 Bool BoCA::DecoderWave::Activate()
 {
-	InStream	*in = new InStream(STREAM_DRIVER, driver);
+	InStream	 in(STREAM_DRIVER, driver);
 
-	in->Seek(12);
+	in.Seek(12);
 
 	String		 chunk;
 
@@ -217,34 +215,32 @@ Bool BoCA::DecoderWave::Activate()
 	{
 		/* Read next chunk.
 		 */
-		chunk = in->InputString(4);
+		chunk = in.InputString(4);
 
-		Int	 cSize = in->InputNumber(4);
+		Int	 cSize = in.InputNumber(4);
 
 		if (chunk == "fmt ")
 		{
-			Int	 waveFormat = in->InputNumber(2);
+			Int	 waveFormat = in.InputNumber(2);
 
 			if (waveFormat == WAVE_FORMAT_IEEE_FLOAT) floatFormat = True;
 
-			in->RelSeek(12);
+			in.RelSeek(12);
 
-			floatFormatBits	= (unsigned short) in->InputNumber(2);
+			floatFormatBits	= (unsigned short) in.InputNumber(2);
 
 			/* Skip rest of chunk.
 			 */
-			in->RelSeek(cSize - 16 + cSize % 2);
+			in.RelSeek(cSize - 16 + cSize % 2);
 		}
 		else if (chunk != "data")
 		{
-			in->RelSeek(cSize + cSize % 2);
+			in.RelSeek(cSize + cSize % 2);
 		}
 	}
 	while (chunk != "data");
 
-	dataOffset = in->GetPos();
-
-	delete in;
+	dataOffset = in.GetPos();
 
 	driver->Seek(dataOffset);
 
@@ -253,7 +249,9 @@ Bool BoCA::DecoderWave::Activate()
 
 Bool BoCA::DecoderWave::Seek(Int64 samplePosition)
 {
-	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
+	const Format	&format = track.GetFormat();
+
+	driver->Seek(dataOffset + samplePosition * format.channels * (format.bits / 8) * (floatFormatBits / 32));
 
 	return True;
 }

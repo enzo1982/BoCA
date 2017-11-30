@@ -50,34 +50,32 @@ Bool BoCA::DecoderVoc::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderVoc::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
 	/* ToDo: Add more checking to this!
 	 */
-	track.fileSize = f_in->Size();
+	track.fileSize = in.Size();
 
 	/* Skip main header.
 	 */
-	f_in->RelSeek(26);
+	in.RelSeek(26);
 
 	/* Skip block type and size.
 	 */
-	f_in->RelSeek(4);
+	in.RelSeek(4);
 
 	/* Read format data.
 	 */
 	Format	 format = track.GetFormat();
 
 	format.order	= BYTE_INTEL;
-	format.rate	= UnsignedInt32(f_in->InputNumber(4));
-	format.bits	= UnsignedInt8(f_in->InputNumber(1));
-	format.channels	= UnsignedInt8(f_in->InputNumber(1));
+	format.rate	= UnsignedInt32(in.InputNumber(4));
+	format.bits	= UnsignedInt8(in.InputNumber(1));
+	format.channels	= UnsignedInt8(in.InputNumber(1));
 
 	track.SetFormat(format);
 
 	track.length = (track.fileSize - 42 - 4 * Int((track.fileSize - 42) / 7340032)) / format.channels / (format.bits / 8);
-
-	delete f_in;
 
 	return Success();
 }
@@ -94,21 +92,19 @@ BoCA::DecoderVoc::~DecoderVoc()
 
 Bool BoCA::DecoderVoc::Activate()
 {
-	InStream	*in = new InStream(STREAM_DRIVER, driver);
+	InStream	 in(STREAM_DRIVER, driver);
 
 	/* Skip main header.
 	 */
-	in->RelSeek(26);
+	in.RelSeek(26);
 
 	/* Read block type.
 	 */
-	in->InputNumber(1);
+	in.InputNumber(1);
 
 	/* Read block size and continue.
 	 */
-	bytesLeft = in->InputNumber(3) - 12;
-
-	delete in;
+	bytesLeft = in.InputNumber(3) - 12;
 
 	driver->Seek(42);
 

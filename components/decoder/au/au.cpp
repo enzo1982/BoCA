@@ -48,18 +48,18 @@ Bool BoCA::DecoderSunAu::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderSunAu::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in	= new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 	Format		 format = track.GetFormat();
 
-	track.fileSize	= f_in->Size();
+	track.fileSize	= in.Size();
 	format.order	= BYTE_RAW;
 
 	/* Skip magic number and data offset.
 	 */
-	f_in->RelSeek(8);
+	in.RelSeek(8);
 
-	track.length	= UnsignedInt32(f_in->InputNumberRaw(4));
-	format.bits	= UnsignedInt32(f_in->InputNumberRaw(4));
+	track.length	= UnsignedInt32(in.InputNumberRaw(4));
+	format.bits	= UnsignedInt32(in.InputNumberRaw(4));
 
 	if	(format.bits == 2) { format.bits =  8; format.sign = False; }
 	else if (format.bits == 3)   format.bits = 16;
@@ -69,15 +69,13 @@ Error BoCA::DecoderSunAu::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (!errorState)
 	{
-		format.rate	= UnsignedInt32(f_in->InputNumberRaw(4));
-		format.channels	= UnsignedInt32(f_in->InputNumberRaw(4));
+		format.rate	= UnsignedInt32(in.InputNumberRaw(4));
+		format.channels	= UnsignedInt32(in.InputNumberRaw(4));
 
 		track.length	= track.length / format.channels / (format.bits / 8);
 	}
 
 	track.SetFormat(format);
-
-	delete f_in;
 
 	if (errorState)	return Error();
 	else		return Success();
@@ -96,15 +94,13 @@ BoCA::DecoderSunAu::~DecoderSunAu()
 
 Bool BoCA::DecoderSunAu::Activate()
 {
-	InStream	*in = new InStream(STREAM_DRIVER, driver);
+	InStream	 in(STREAM_DRIVER, driver);
 
 	/* Read magic number.
 	 */
-	in->InputNumber(4);
+	in.InputNumber(4);
 
-	dataOffset = in->InputNumberRaw(4);
-
-	delete in;
+	dataOffset = in.InputNumberRaw(4);
 
 	driver->Seek(dataOffset);
 
@@ -113,7 +109,9 @@ Bool BoCA::DecoderSunAu::Activate()
 
 Bool BoCA::DecoderSunAu::Seek(Int64 samplePosition)
 {
-	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
+	const Format	&format = track.GetFormat();
+
+	driver->Seek(dataOffset + samplePosition * format.channels * (format.bits / 8));
 
 	return True;
 }

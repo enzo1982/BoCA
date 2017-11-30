@@ -95,17 +95,17 @@ Bool BoCA::DecoderAIFF::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	track.fileSize	= f_in->Size();
+	track.fileSize = in.Size();
 
 	/* Read FORM chunk.
 	 */
-	if (f_in->InputString(4) != "FORM") { errorState = True; errorString = "Unknown file type"; }
+	if (in.InputString(4) != "FORM") { errorState = True; errorString = "Unknown file type"; }
 
-	f_in->RelSeek(4);
+	in.RelSeek(4);
 
-	String	 fileType = f_in->InputString(4);
+	String	 fileType = in.InputString(4);
 
 	if (fileType != "AIFF" && fileType != "AIFC") { errorState = True; errorString = "Unknown file type"; }
 
@@ -113,34 +113,34 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 
 	while (!errorState)
 	{
-		if (f_in->GetPos() >= f_in->Size()) break;
+		if (in.GetPos() >= in.Size()) break;
 
 		/* Read next chunk.
 		 */
-		chunk = f_in->InputString(4);
+		chunk = in.InputString(4);
 
-		Int	 cSize = f_in->InputNumberRaw(4);
+		Int	 cSize = in.InputNumberRaw(4);
 
 		if (chunk == "COMM")
 		{
-			Int	 cStart = f_in->GetPos();
+			Int	 cStart = in.GetPos();
 
 			Format	 format = track.GetFormat();
 
-			format.channels	= (unsigned short) f_in->InputNumberRaw(2);
-			track.length	= (unsigned long) f_in->InputNumberRaw(4);
+			format.channels	= (unsigned short) in.InputNumberRaw(2);
+			track.length	= (unsigned long) in.InputNumberRaw(4);
 
 			format.order	= BYTE_RAW;
-			format.bits	= (unsigned short) f_in->InputNumberRaw(2);
+			format.bits	= (unsigned short) in.InputNumberRaw(2);
 
 			if (format.bits == 8) format.sign = False;
 
 			/* Read sample rate as 80 bit float.
 			 */
-			int16_t		 exp = (f_in->InputNumberRaw(2) & 0x7FFF) - 16383 - 63;
+			int16_t		 exp = (in.InputNumberRaw(2) & 0x7FFF) - 16383 - 63;
 			uint64_t	 man = 0;
 
-			for (int i = 0; i < 8; i++) man = (man << 8) | f_in->InputNumberRaw(1);
+			for (int i = 0; i < 8; i++) man = (man << 8) | in.InputNumberRaw(1);
 
 			format.rate	= ldexp((double) man, exp);
 
@@ -148,7 +148,7 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 			 */
 			if (fileType == "AIFC")
 			{
-				String	 compression = f_in->InputString(4);
+				String	 compression = in.InputString(4);
 
 				if	(compression == "NONE") format.order = BYTE_RAW;
 				else if (compression == "sowt") format.order = BYTE_INTEL;
@@ -159,7 +159,7 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 
 			/* Skip rest of chunk.
 			 */
-			f_in->Seek(cStart + cSize + cSize % 2);
+			in.Seek(cStart + cSize + cSize % 2);
 		}
 		else if (chunk == "AUTH" ||
 			 chunk == "NAME" ||
@@ -167,21 +167,21 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			Info	 info = track.GetInfo();
 
-			if	(chunk == "AUTH") info.artist  = f_in->InputString(cSize);
-			else if	(chunk == "NAME") info.title   = f_in->InputString(cSize);
-			else if	(chunk == "ANNO") info.comment = f_in->InputString(cSize);
+			if	(chunk == "AUTH") info.artist  = in.InputString(cSize);
+			else if	(chunk == "NAME") info.title   = in.InputString(cSize);
+			else if	(chunk == "ANNO") info.comment = in.InputString(cSize);
 
 			track.SetInfo(info);
 
 			/* Skip rest of chunk.
 			 */
-			f_in->RelSeek(cSize % 2);
+			in.RelSeek(cSize % 2);
 		}
 		else if (chunk == "ID3 ")
 		{
 			Buffer<UnsignedByte>	 buffer(cSize);
 
-			f_in->InputData(buffer, cSize);
+			in.InputData(buffer, cSize);
 
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
@@ -196,17 +196,15 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 
 			/* Skip rest of chunk.
 			 */
-			f_in->RelSeek(cSize % 2);
+			in.RelSeek(cSize % 2);
 		}
 		else
 		{
 			/* Skip chunk.
 			 */
-			f_in->RelSeek(cSize + cSize % 2);
+			in.RelSeek(cSize + cSize % 2);
 		}
 	}
-
-	delete f_in;
 
 	/* Read .TOC.plist if it exists.
 	 */
@@ -238,9 +236,9 @@ BoCA::DecoderAIFF::~DecoderAIFF()
 
 Bool BoCA::DecoderAIFF::Activate()
 {
-	InStream	*in = new InStream(STREAM_DRIVER, driver);
+	InStream	 in(STREAM_DRIVER, driver);
 
-	in->Seek(12);
+	in.Seek(12);
 
 	String		 chunk;
 
@@ -248,17 +246,15 @@ Bool BoCA::DecoderAIFF::Activate()
 	{
 		/* Read next chunk
 		 */
-		chunk = in->InputString(4);
+		chunk = in.InputString(4);
 
-		Int	 cSize = in->InputNumberRaw(4);
+		Int	 cSize = in.InputNumberRaw(4);
 
-		if (chunk != "SSND") in->RelSeek(cSize + cSize % 2);
+		if (chunk != "SSND") in.RelSeek(cSize + cSize % 2);
 	}
 	while (chunk != "SSND");
 
-	dataOffset = in->GetPos() + 8;
-
-	delete in;
+	dataOffset = in.GetPos() + 8;
 
 	driver->Seek(dataOffset);
 
@@ -267,7 +263,9 @@ Bool BoCA::DecoderAIFF::Activate()
 
 Bool BoCA::DecoderAIFF::Seek(Int64 samplePosition)
 {
-	driver->Seek(dataOffset + samplePosition * track.GetFormat().channels * (track.GetFormat().bits / 8));
+	const Format	&format = track.GetFormat();
+
+	driver->Seek(dataOffset + samplePosition * format.channels * (format.bits / 8));
 
 	return True;
 }
