@@ -458,7 +458,7 @@ Int BoCA::DecoderSndFile::ReadData(Buffer<UnsignedByte> &data)
 		/* Convert float to integer.
 		 */
 		for (Int i = 0; i < size / 4; i++) ((Int32 *) (unsigned char *) data)[i] = Math::Min(Int64( 0x7FFFFFFF),
-											   Math::Max(Int64(~0x7FFFFFFF), Int64(((ShortFloat *) (unsigned char *) data)[i] * 0x80000000)));
+											   Math::Max(Int64(~0x7FFFFFFF), Int64(((Float32 *) (unsigned char *) data)[i] * 0x80000000)));
 	}
 	else if (floatFormat && floatFormatBits == 64)
 	{
