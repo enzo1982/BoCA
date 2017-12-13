@@ -27,7 +27,8 @@ Int BoCA::CS::DSPComponent::GetPackageSize() const
 
 Bool BoCA::CS::DSPComponent::SetAudioTrackInfo(const Track &nTrack)
 {
-	track = nTrack;
+	track  = nTrack;
+	format = nTrack.GetFormat();
 
 	return True;
 }
