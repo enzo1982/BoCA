@@ -73,6 +73,8 @@ Error BoCA::DecoderVoc::GetStreamInfo(const String &streamURI, Track &track)
 	format.bits	= UnsignedInt8(in.InputNumber(1));
 	format.channels	= UnsignedInt8(in.InputNumber(1));
 
+	if (format.bits == 8) format.sign = False;
+
 	track.SetFormat(format);
 
 	track.length = (track.fileSize - 42 - 4 * Int((track.fileSize - 42) / 7340032)) / format.channels / (format.bits / 8);

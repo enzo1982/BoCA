@@ -136,6 +136,8 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 			format.order	= (waveFormat == WAVE_FORMAT_IEEE_FLOAT) ? BYTE_NATIVE : BYTE_INTEL;
 			format.bits	= (unsigned short) in.InputNumber(2);
 
+			if (format.bits == 8) format.sign = False;
+
 			track.SetFormat(format);
 
 			/* Skip rest of chunk.
