@@ -95,6 +95,18 @@ Void BoCA::DSPFormat::TransformSamples(const UnsignedByte *in, const Format &inF
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
+	/* Shortcuts for common conversions.
+	 */
+	if (inFormat.bits == 16 && outFormat.fp)
+	{
+		for (Int i = numSamples - 1; i >= 0; i--) ((Float32 *) out)[i] = (((Int16 *) in)[i] + 32768) / 32767.5 - 1.0; return;
+	}
+
+	if (inFormat.bits == 8 && outFormat.bits == 8 && inFormat.sign != outFormat.sign)
+	{
+		for (Int i = 0; i < numSamples; i++) out[i] = (in[i] + 128) & 0xFF; return;
+	}
+
 	/* Resize intermediate buffer.
 	 */
 	samplesBuffer.Resize(numSamples);
@@ -107,22 +119,16 @@ Void BoCA::DSPFormat::TransformSamples(const UnsignedByte *in, const Format &inF
 	{
 		if	(inFormat.fp					   ) samples[i] = (((Float32 *) in)[i] + 1.0) * (1U << 31) - 0.5 - (1U << 31);
 
-		else if	(inFormat.bits	==  8				   ) samples[i] = 	     in [i] << 24;
-		else if	(inFormat.bits	== 16				   ) samples[i] = ((Int16 *) in)[i] << 16;
-		else if	(inFormat.bits	== 32				   ) samples[i] = ((Int32 *) in)[i];
+		else if	(inFormat.bits	==  8 && !inFormat.sign		   ) samples[i] = (		in [i] - 128) << 24;
+		else if	(inFormat.bits	==  8 &&  inFormat.sign		   ) samples[i] =  ((Int8  *)	in)[i]	      << 24;
+		else if	(inFormat.bits	== 16				   ) samples[i] =  ((Int16 *)	in)[i]	      << 16;
+		else if	(inFormat.bits	== 32				   ) samples[i] =  ((Int32 *)	in)[i];
 
 		else if	(inFormat.bits	== 24 && endianness == EndianLittle) samples[i] = in[i * 3 + 2] << 24 | in[i * 3 + 1] << 16 | in[i * 3	  ] << 8;
 		else if	(inFormat.bits	== 24 && endianness == EndianBig   ) samples[i] = in[i * 3    ] << 24 | in[i * 3 + 1] << 16 | in[i * 3 + 2] << 8;
 	}
 
-	/* Change to signed if needed.
-	 */
-	if (!inFormat.sign)
-	{
-		for (Int i = 0; i < numSamples; i++) samples[i] -= (1U << 31);
-	}
-
-	/* Apply rounding.
+	/* Apply rounding and clipping.
 	 */
 	if (inFormat.fp || outFormat.bits < inFormat.bits)
 	{
@@ -139,22 +145,16 @@ Void BoCA::DSPFormat::TransformSamples(const UnsignedByte *in, const Format &inF
 		}
 	}
 
-	/* Change to unsigned if needed.
-	 */
-	if (!outFormat.sign)
-	{
-		for (Int i = 0; i < numSamples; i++) samples[i] += (1U << 31);
-	}
-
 	/* Write samples.
 	 */
 	for (Int i = 0; i < numSamples; i++)
 	{
-		if	(outFormat.fp					   ) ((Float32 *) out)[i] = (samples[i] + (1U << 31) + 0.5) / (1U << 31) - 1.0;
+		if	(outFormat.fp					   ) ((Float32 *) out)[i] = (samples[i] + (1U << 31)) / ((1U << 31) + 0.5) - 1.0;
 
-		else if	(outFormat.bits	==  8				   )		out [i] = samples[i] >> 24;
-		else if	(outFormat.bits	== 16				   ) ((Int16 *) out)[i] = samples[i] >> 16;
-		else if	(outFormat.bits	== 32				   ) ((Int32 *) out)[i] = samples[i];
+		else if	(outFormat.bits	==  8 && !outFormat.sign	   )		  out [i] = (samples[i] + (1U << 31)) >> 24;
+		else if	(outFormat.bits	==  8 &&  outFormat.sign	   ) ((Int8  *)	  out)[i] =  samples[i]		      >> 24;
+		else if	(outFormat.bits	== 16				   ) ((Int16 *)	  out)[i] =  samples[i]		      >> 16;
+		else if	(outFormat.bits	== 32				   ) ((Int32 *)	  out)[i] =  samples[i];
 
 		else if	(outFormat.bits	== 24 && endianness == EndianLittle) { out[i * 3 + 2] = (samples[i] >> 24) & 0xFF; out[i * 3 + 1] = (samples[i] >> 16) & 0xFF; out[i * 3    ] = (samples[i] >> 8) & 0xFF; }
 		else if	(outFormat.bits	== 24 && endianness == EndianBig   ) { out[i * 3    ] = (samples[i] >> 24) & 0xFF; out[i * 3 + 1] = (samples[i] >> 16) & 0xFF; out[i * 3 + 2] = (samples[i] >> 8) & 0xFF; }
