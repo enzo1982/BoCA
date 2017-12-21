@@ -61,6 +61,8 @@ BoCA::ConfigureFormat::ConfigureFormat()
 	if (combo_numbers->GetSelectedEntryNumber() == 0) combo_resolution->SelectNthEntry(config->GetIntValue(ConfigID, "Bits", 16) /	8 - 1);
 	else						  combo_resolution->SelectNthEntry(config->GetIntValue(ConfigID, "Bits", 32) / 32 - 1);
 
+	check_unsigned->SetChecked(!config->GetIntValue(ConfigID, "Signed", True));
+
 	SetSize(Size(294, 112));
 }
 
@@ -94,8 +96,7 @@ Void BoCA::ConfigureFormat::OnChangeNumberFormat()
 		combo_resolution->SelectNthEntry(0);
 		combo_resolution->Deactivate();
 
-		unsignedSamples = False;
-
+		check_unsigned->SetChecked(False);
 		check_unsigned->Deactivate();
 	}
 	else
@@ -116,7 +117,7 @@ Void BoCA::ConfigureFormat::OnChangeResolution()
 {
 	if (combo_numbers->GetSelectedEntryNumber() == 1) return;
 
-	unsignedSamples = False;
+	if (combo_resolution->GetSelectedEntryNumber() != 0) check_unsigned->SetChecked(False);
 
 	if (combo_resolution->GetSelectedEntryNumber() == 0) check_unsigned->Activate();
 	else						     check_unsigned->Deactivate();
@@ -127,11 +128,10 @@ Int BoCA::ConfigureFormat::SaveSettings()
 	Config	*config = Config::Get();
 
 	config->SetIntValue(ConfigID, "Float", combo_numbers->GetSelectedEntryNumber());
+	config->SetIntValue(ConfigID, "Signed", !unsignedSamples);
 
-	if (combo_numbers->GetSelectedEntryNumber()    == 0) config->SetIntValue(ConfigID, "Bits", (combo_resolution->GetSelectedEntryNumber() + 1) *  8);
-	else						     config->SetIntValue(ConfigID, "Bits", (combo_resolution->GetSelectedEntryNumber() + 1) * 32);
-
-	if (combo_resolution->GetSelectedEntryNumber() == 0) config->SetIntValue(ConfigID, "Signed", !unsignedSamples);
+	if (combo_numbers->GetSelectedEntryNumber() == 0) config->SetIntValue(ConfigID, "Bits", (combo_resolution->GetSelectedEntryNumber() + 1) *  8);
+	else						  config->SetIntValue(ConfigID, "Bits", (combo_resolution->GetSelectedEntryNumber() + 1) * 32);
 
 	return Success();
 }
