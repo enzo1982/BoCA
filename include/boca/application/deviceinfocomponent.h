@@ -17,8 +17,6 @@
 #include "../common/metadata/device.h"
 #include "../common/metadata/mcdi.h"
 
-using namespace smooth::GUI;
-
 namespace BoCA
 {
 	namespace AS

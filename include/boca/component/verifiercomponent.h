@@ -13,10 +13,6 @@
 #ifndef H_BOCA_VERIFIERCOMPONENT
 #define H_BOCA_VERIFIERCOMPONENT
 
-#include <smooth.h>
-
-using namespace smooth;
-
 #include "component.h"
 #include "../common/metadata/track.h"
 

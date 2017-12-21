@@ -13,10 +13,6 @@
 #ifndef H_BOCA_DEVICEINFOCOMPONENT
 #define H_BOCA_DEVICEINFOCOMPONENT
 
-#include <smooth.h>
-
-using namespace smooth;
-
 #include "component.h"
 #include "../common/metadata/device.h"
 #include "../common/metadata/mcdi.h"

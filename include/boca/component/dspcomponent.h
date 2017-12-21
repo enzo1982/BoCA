@@ -13,10 +13,6 @@
 #ifndef H_BOCA_DSPCOMPONENT
 #define H_BOCA_DSPCOMPONENT
 
-#include <smooth.h>
-
-using namespace smooth;
-
 #include "component.h"
 #include "../common/metadata/track.h"
 

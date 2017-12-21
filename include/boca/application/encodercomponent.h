@@ -16,8 +16,6 @@
 #include "component.h"
 #include "../common/metadata/track.h"
 
-using namespace smooth::GUI;
-
 namespace BoCA
 {
 	namespace AS

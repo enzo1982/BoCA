@@ -13,6 +13,8 @@
 #include <boca/common/config.h>
 #include <boca/core/core.h>
 
+using namespace smooth::GUI;
+
 namespace BoCA
 {
 	class ApplicationConfig : public Config

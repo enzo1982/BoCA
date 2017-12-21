@@ -13,10 +13,6 @@
 #ifndef H_BOCA_DECODERCOMPONENT
 #define H_BOCA_DECODERCOMPONENT
 
-#include <smooth.h>
-
-using namespace smooth;
-
 #include "component.h"
 #include "../common/metadata/track.h"
 

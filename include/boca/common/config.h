@@ -17,7 +17,6 @@
 #include "../core/definitions.h"
 
 using namespace smooth;
-using namespace smooth::GUI;
 
 namespace BoCA
 {
