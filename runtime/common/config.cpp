@@ -283,11 +283,17 @@ BoCA::ApplicationConfig::ApplicationConfig()
 
 	configDir = applicationDir;
 
-	/* Check if configuration file exists.
+	/* Check if configuration file exists and try to create
+	 * it to check write permissions.
 	 */
-	File	 configFile = String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml");
+	File	 configFile	   = String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml");
+	Bool	 configFileCreated = False;
 
-	if (!applicationDir.ToUpper().StartsWith(programFilesDir.ToUpper()) && !configFile.Exists()) configFile.Create();
+	if (!applicationDir.ToUpper().StartsWith(programFilesDir.ToUpper()) && !configFile.Exists())
+	{
+		configFile.Create();
+		configFileCreated = True;
+	}
 
 	/* Use application data directory if configuration still
 	 * does not exist or installed in program files directory.
@@ -307,6 +313,12 @@ BoCA::ApplicationConfig::ApplicationConfig()
 		Directory(configDir).Create();
 	}
 
+	/* Remove empty file created for testing permissions.
+	 */
+	if (configFileCreated) configFile.Delete();
+
+	/* Load or create actual configuration.
+	 */
 	config = new Configuration(String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml"), True);
 
 	LoadSettings();
