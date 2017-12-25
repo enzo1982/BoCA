@@ -48,6 +48,9 @@ namespace BoCA
 			 */
 					 Format();
 					~Format();
+
+			Bool operator	 ==(const Format &) const;
+			Bool operator	 !=(const Format &) const;
 	};
 };
 

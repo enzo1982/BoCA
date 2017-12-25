@@ -28,3 +28,18 @@ BoCA::Format::Format()
 BoCA::Format::~Format()
 {
 }
+
+Bool BoCA::Format::operator ==(const Format &format) const
+{
+	return channels == format.channels &&
+	       rate	== format.rate	   &&
+	       bits	== format.bits	   &&
+	       fp	== format.fp	   &&
+	       sign	== format.sign	   &&
+	       order	== format.order;
+}
+
+Bool BoCA::Format::operator !=(const Format &format) const
+{
+	 return !(*this == format);
+}
