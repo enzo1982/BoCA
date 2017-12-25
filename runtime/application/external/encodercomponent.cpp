@@ -65,7 +65,7 @@ Bool BoCA::AS::EncoderComponentExternal::IsLossless() const
 
 BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()
 {
-	if (configLayer == NIL && specs->external_parameters.Length() > 0) configLayer = new ConfigLayerExternal(specs);
+	if (configLayer == NIL && specs->parameters.Length() > 0) configLayer = new ConfigLayerExternal(specs);
 
 	return configLayer;
 }

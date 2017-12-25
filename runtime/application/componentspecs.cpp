@@ -125,7 +125,7 @@ BoCA::AS::ComponentSpecs::~ComponentSpecs()
 	foreach (FileFormat *format, formats) delete format;
 	foreach (TagSpec *tag, tags) delete tag;
 
-	foreach (Parameter *parameter, external_parameters)
+	foreach (Parameter *parameter, parameters)
 	{
 		foreach (Option *option, parameter->GetOptions()) delete option;
 
@@ -264,7 +264,7 @@ String BoCA::AS::ComponentSpecs::GetExternalArgumentsString()
 	Config	*config = Config::Get();
 	String	 arguments;
 
-	foreach (Parameter *param, external_parameters)
+	foreach (Parameter *param, parameters)
 	{
 		switch (param->GetType())
 		{
@@ -486,7 +486,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				else if (node2->GetName() == "informat")   external_informat	= node2->GetContent();
 				else if (node2->GetName() == "outformat")  external_outformat	= node2->GetContent();
 				else if (node2->GetName() == "mode")	   mode			= node2->GetContent() == "file" ? COMPONENT_MODE_EXTERNAL_FILE : COMPONENT_MODE_EXTERNAL_STDIO;
-				else if (node2->GetName() == "parameters") ParseExternalParameters(node2);
+				else if (node2->GetName() == "parameters") ParseParameters(node2);
 			}
 
 			/* Check if external command actually exists.
@@ -517,9 +517,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 	return True;
 }
 
-Bool BoCA::AS::ComponentSpecs::ParseExternalParameters(XML::Node *root)
+Bool BoCA::AS::ComponentSpecs::ParseParameters(XML::Node *root)
 {
-	external_parameters.RemoveAll();
+	parameters.RemoveAll();
 
 	for (Int i = 0; i < root->GetNOfNodes(); i++)
 	{
@@ -594,7 +594,7 @@ Bool BoCA::AS::ComponentSpecs::ParseExternalParameters(XML::Node *root)
 				}
 			}
 
-			external_parameters.Add(parameter);
+			parameters.Add(parameter);
 		}
 	}
 

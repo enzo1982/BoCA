@@ -247,7 +247,7 @@ namespace BoCA
 
 				Bool			 ParseXMLSpec(const String &);
 
-				Bool			 ParseExternalParameters(XML::Node *);
+				Bool			 ParseParameters(XML::Node *);
 			public:
 				String			 id;
 				ComponentType		 type;
@@ -279,7 +279,7 @@ namespace BoCA
 				String			 external_md5_require;
 				String			 external_md5_prefix;
 
-				Array<Parameter *>	 external_parameters;
+				Array<Parameter *>	 parameters;
 
 				Array<FileFormat *>	 formats;
 				Array<TagSpec *>	 tags;

@@ -36,7 +36,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 	edit_commandline = new EditBox(NIL, Point(6, 174), Size(250, 0));
 	edit_commandline->Deactivate();
 
-	foreach (Parameter *param, specs->external_parameters)
+	foreach (Parameter *param, specs->parameters)
 	{
 		ListEntry	*entry = list_parameters->AddEntry(param->GetName());
 
@@ -168,10 +168,9 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 {
 	Config	*config = Config::Get();
 
-	for (Int i = 0; i < specs->external_parameters.Length(); i++)
+	foreach (const Parameter *param, specs->parameters)
 	{
-		Parameter	*param = specs->external_parameters.GetNth(i);
-		ListEntry	*entry = list_parameters->GetNthEntry(i);
+		ListEntry	*entry = list_parameters->GetNthEntry(foreachindex);
 
 		switch (param->GetType())
 		{
@@ -233,14 +232,13 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 {
 	/* Still initializing?
 	 */
-	if (list_parameters->Length() < specs->external_parameters.Length()) return NIL;
+	if (list_parameters->Length() < specs->parameters.Length()) return NIL;
 
 	String	 arguments;
 
-	for (Int i = 0; i < specs->external_parameters.Length(); i++)
+	foreach (const Parameter *param, specs->parameters)
 	{
-		Parameter	*param = specs->external_parameters.GetNth(i);
-		ListEntry	*entry = list_parameters->GetNthEntry(i);
+		ListEntry	*entry = list_parameters->GetNthEntry(foreachindex);
 
 		if (!entry->IsMarked()) continue;
 
@@ -302,10 +300,8 @@ Void BoCA::AS::ConfigLayerExternal::OnUpdateParameterValue()
 
 Void BoCA::AS::ConfigLayerExternal::OnSliderValueChange()
 {
-	for (Int i = 0; i < specs->external_parameters.Length(); i++)
+	foreach (const Parameter *param, specs->parameters)
 	{
-		Parameter	*param = specs->external_parameters.GetNth(i);
-
 		switch (param->GetType())
 		{
 			case PARAMETER_TYPE_RANGE:
