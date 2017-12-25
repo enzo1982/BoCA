@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -62,7 +62,7 @@ const Array<BoCA::AS::FileFormat *> &BoCA::AS::Component::GetFormats() const
 
 const Array<BoCA::AS::TagSpec *> &BoCA::AS::Component::GetTagSpecs() const
 {
-	return specs->tag_specs;
+	return specs->tags;
 }
 
 BoCA::ConfigLayer *BoCA::AS::Component::GetConfigurationLayer()

@@ -282,7 +282,7 @@ namespace BoCA
 				Array<Parameter *>	 external_parameters;
 
 				Array<FileFormat *>	 formats;
-				Array<TagSpec *>	 tag_specs;
+				Array<TagSpec *>	 tags;
 
 							 ComponentSpecs();
 							~ComponentSpecs();

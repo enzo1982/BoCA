@@ -310,7 +310,7 @@ const Array<BoCA::AS::FileFormat *> &BoCA::AS::Registry::GetComponentFormats(Int
 
 const Array<BoCA::AS::TagSpec *> &BoCA::AS::Registry::GetComponentTagSpecs(Int n)
 {
-	return componentSpecs.GetNth(n)->tag_specs;
+	return componentSpecs.GetNth(n)->tags;
 }
 
 Bool BoCA::AS::Registry::ComponentExists(const String &id)
