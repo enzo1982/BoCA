@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -77,12 +77,10 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 {
 	/* Finalize and close the uncompressed temporary file
 	 */
-	Int	 size = nOfSamples * (format.bits / 8) + 36;
+	Int	 size = nOfSamples * (format.bits / 8);
 
 	out->Seek(4);
-	out->OutputNumber(size, 4);
-
-	size -= 36;
+	out->OutputNumber(size + 36, 4);
 
 	out->Seek(40);
 	out->OutputNumber(size, 4);
@@ -200,9 +198,11 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 Int BoCA::AS::EncoderComponentExternalFile::WriteData(Buffer<UnsignedByte> &data)
 {
+	/* Convert to little-endian byte order.
+	 */
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, track.GetFormat().bits / 8);
+	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, format.bits / 8);
 
 	/* Hand data over to the output file
 	 */

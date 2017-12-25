@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -172,9 +172,11 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &data)
 {
+	/* Convert to little-endian byte order.
+	 */
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, track.GetFormat().bits / 8);
+	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, format.bits / 8);
 
 	/* Hand data over to the encoder using the stdio pipe
 	 */
