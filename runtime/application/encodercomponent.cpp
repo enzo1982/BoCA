@@ -12,27 +12,12 @@
 
 #include <boca/application/encodercomponent.h>
 
-BoCA::AS::EncoderComponent::EncoderComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
+BoCA::AS::EncoderComponent::EncoderComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
 {
 }
 
 BoCA::AS::EncoderComponent::~EncoderComponent()
 {
-}
-
-Int BoCA::AS::EncoderComponent::GetPackageSize() const
-{
-	return specs->func_GetPackageSize(component);
-}
-
-Int BoCA::AS::EncoderComponent::SetDriver(IO::Driver *driver)
-{
-	return specs->func_SetDriver(component, driver);
-}
-
-Bool BoCA::AS::EncoderComponent::SetAudioTrackInfo(const Track &track)
-{
-	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
 Bool BoCA::AS::EncoderComponent::SetOutputFormat(Int n)
@@ -63,25 +48,6 @@ Bool BoCA::AS::EncoderComponent::IsLossless() const
 {
 	if (specs->func_IsLossless(component)) return True;
 	else				       return specs->formats.GetFirst()->IsLossless();
-}
-
-Bool BoCA::AS::EncoderComponent::Activate()
-{
-	SetDriver(driver);
-
-	if (specs->func_Activate(component))
-	{
-		packageSize = GetPackageSize();
-
-		return True;
-	}
-
-	return False;
-}
-
-Bool BoCA::AS::EncoderComponent::Deactivate()
-{
-	return specs->func_Deactivate(component);
 }
 
 Int BoCA::AS::EncoderComponent::WriteData(Buffer<UnsignedByte> &buffer)

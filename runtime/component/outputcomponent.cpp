@@ -20,23 +20,6 @@ BoCA::CS::OutputComponent::~OutputComponent()
 {
 }
 
-Bool BoCA::CS::OutputComponent::SetAudioTrackInfo(const Track &nTrack)
-{
-	track = nTrack;
-
-	return True;
-}
-
-Bool BoCA::CS::OutputComponent::Activate()
-{
-	return True;
-}
-
-Bool BoCA::CS::OutputComponent::Deactivate()
-{
-	return True;
-}
-
 Bool BoCA::CS::OutputComponent::Finish()
 {
 	return True;

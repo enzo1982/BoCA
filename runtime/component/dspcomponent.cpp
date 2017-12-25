@@ -25,10 +25,10 @@ Int BoCA::CS::DSPComponent::GetPackageSize() const
 	return 0;
 }
 
-Bool BoCA::CS::DSPComponent::SetAudioTrackInfo(const Track &nTrack)
+Bool BoCA::CS::DSPComponent::SetAudioTrackInfo(const Track &track)
 {
-	track  = nTrack;
-	format = nTrack.GetFormat();
+	this->track  = track;
+	this->format = track.GetFormat();
 
 	return True;
 }
@@ -36,16 +36,6 @@ Bool BoCA::CS::DSPComponent::SetAudioTrackInfo(const Track &nTrack)
 const BoCA::Format &BoCA::CS::DSPComponent::GetFormatInfo() const
 {
 	return format;
-}
-
-Bool BoCA::CS::DSPComponent::Activate()
-{
-	return True;
-}
-
-Bool BoCA::CS::DSPComponent::Deactivate()
-{
-	return True;
 }
 
 Int BoCA::CS::DSPComponent::Flush(Buffer<UnsignedByte> &buffer)

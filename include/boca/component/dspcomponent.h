@@ -13,17 +13,15 @@
 #ifndef H_BOCA_DSPCOMPONENT
 #define H_BOCA_DSPCOMPONENT
 
-#include "component.h"
-#include "../common/metadata/track.h"
+#include "convertercomponent.h"
 
 namespace BoCA
 {
 	namespace CS
 	{
-		abstract class BOCA_DLL_EXPORT DSPComponent : public Component
+		abstract class BOCA_DLL_EXPORT DSPComponent : public ConverterComponent
 		{
 			protected:
-				Track			 track;
 				Format			 format;
 			public:
 							 DSPComponent();
@@ -31,9 +29,6 @@ namespace BoCA
 
 				virtual Bool		 SetAudioTrackInfo(const Track &);
 				virtual const Format	&GetFormatInfo() const;
-
-				virtual Bool		 Activate();
-				virtual Bool		 Deactivate();
 
 				virtual Int		 TransformData(Buffer<UnsignedByte> &) = 0;
 

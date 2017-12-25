@@ -22,9 +22,6 @@ BoCA::AS::EncoderComponentExternal::EncoderComponentExternal(ComponentSpecs *spe
 {
 	configuration	= NIL;
 
-	errorState	= False;
-	errorString	= "Unknown error";
-
 	configLayer	= NIL;
 }
 
@@ -35,6 +32,14 @@ BoCA::AS::EncoderComponentExternal::~EncoderComponentExternal()
 
 Bool BoCA::AS::EncoderComponentExternal::SetOutputFormat(Int n)
 {
+	return True;
+}
+
+Bool BoCA::AS::EncoderComponentExternal::SetAudioTrackInfo(const Track &track)
+{
+	this->track  = track;
+	this->format = track.GetFormat();
+
 	return True;
 }
 

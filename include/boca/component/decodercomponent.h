@@ -13,18 +13,15 @@
 #ifndef H_BOCA_DECODERCOMPONENT
 #define H_BOCA_DECODERCOMPONENT
 
-#include "component.h"
-#include "../common/metadata/track.h"
+#include "convertercomponent.h"
 
 namespace BoCA
 {
 	namespace CS
 	{
-		abstract class BOCA_DLL_EXPORT DecoderComponent : public Component, public IO::Filter
+		abstract class BOCA_DLL_EXPORT DecoderComponent : public ConverterComponent
 		{
 			protected:
-				Track		 track;
-
 				Int64		 inBytes;
 			public:
 						 DecoderComponent();
@@ -34,15 +31,6 @@ namespace BoCA
 				 */
 				virtual Bool	 CanOpenStream(const String &) = 0;
 				virtual Error	 GetStreamInfo(const String &, Track &) = 0;
-
-				/* Called to set information about input stream.
-				 */
-				virtual Bool	 SetAudioTrackInfo(const Track &);
-
-				/* Activate/deactivate filter.
-				 */
-				virtual Bool	 Activate();
-				virtual Bool	 Deactivate();
 
 				/* Seek to specified sample position.
 				 *

@@ -19,20 +19,3 @@ BoCA::CS::VerifierComponent::VerifierComponent()
 BoCA::CS::VerifierComponent::~VerifierComponent()
 {
 }
-
-Bool BoCA::CS::VerifierComponent::SetAudioTrackInfo(const Track &nTrack)
-{
-	track = nTrack;
-
-	return True;
-}
-
-Bool BoCA::CS::VerifierComponent::Activate()
-{
-	return True;
-}
-
-Bool BoCA::CS::VerifierComponent::Deactivate()
-{
-	return True;
-}

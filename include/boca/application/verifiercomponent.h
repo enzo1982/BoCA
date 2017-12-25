@@ -13,22 +13,19 @@
 #ifndef H_BOCA_AS_VERIFIERCOMPONENT
 #define H_BOCA_AS_VERIFIERCOMPONENT
 
-#include "component.h"
-#include "../common/metadata/track.h"
+#include "convertercomponent.h"
 
 namespace BoCA
 {
 	namespace AS
 	{
-		class BOCA_DLL_EXPORT VerifierComponent : public Component
+		class BOCA_DLL_EXPORT VerifierComponent : public ConverterComponent
 		{
 			public:
 						 VerifierComponent(ComponentSpecs *);
 				virtual		~VerifierComponent();
 
 				virtual Bool	 CanVerifyTrack(const Track &);
-
-				virtual Bool	 SetAudioTrackInfo(const Track &);
 
 				virtual Bool	 Activate();
 				virtual Bool	 Deactivate();

@@ -20,13 +20,6 @@ BoCA::CS::EncoderComponent::~EncoderComponent()
 {
 }
 
-Bool BoCA::CS::EncoderComponent::SetAudioTrackInfo(const Track &nTrack)
-{
-	track = nTrack;
-
-	return True;
-}
-
 Bool BoCA::CS::EncoderComponent::SetOutputFormat(Int n)
 {
 	return True;
@@ -50,16 +43,6 @@ Bool BoCA::CS::EncoderComponent::IsThreadSafe() const
 Bool BoCA::CS::EncoderComponent::IsLossless() const
 {
 	return False;
-}
-
-Bool BoCA::CS::EncoderComponent::Activate()
-{
-	return True;
-}
-
-Bool BoCA::CS::EncoderComponent::Deactivate()
-{
-	return True;
 }
 
 Bool BoCA::CS::EncoderComponent::NextPass()

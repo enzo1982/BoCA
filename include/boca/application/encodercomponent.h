@@ -13,20 +13,17 @@
 #ifndef H_BOCA_AS_ENCODERCOMPONENT
 #define H_BOCA_AS_ENCODERCOMPONENT
 
-#include "component.h"
-#include "../common/metadata/track.h"
+#include "convertercomponent.h"
 
 namespace BoCA
 {
 	namespace AS
 	{
-		class BOCA_DLL_EXPORT EncoderComponent : public Component, public IO::Filter
+		class BOCA_DLL_EXPORT EncoderComponent : public ConverterComponent
 		{
 			public:
 						 EncoderComponent(ComponentSpecs *);
 				virtual 	~EncoderComponent();
-
-				virtual Bool	 SetAudioTrackInfo(const Track &);
 
 				virtual Bool	 SetOutputFormat(Int);
 				virtual String	 GetOutputFileExtension() const;
@@ -37,15 +34,8 @@ namespace BoCA
 
 				virtual Bool	 IsLossless() const;
 
-				virtual Bool	 Activate();
-				virtual Bool	 Deactivate();
-
 				virtual Int	 WriteData(Buffer<UnsignedByte> &);
 				virtual Bool	 NextPass();
-
-				virtual Int	 GetPackageSize() const;
-				virtual Int	 SetDriver(IO::Driver *);
-
 		};
 	};
 };

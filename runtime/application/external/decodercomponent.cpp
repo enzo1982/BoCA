@@ -20,9 +20,6 @@ BoCA::AS::DecoderComponentExternal::DecoderComponentExternal(ComponentSpecs *spe
 {
 	configuration	= NIL;
 
-	errorState	= False;
-	errorString	= "Unknown error";
-
 	configLayer	= NIL;
 
 	packageSize	= 0;
@@ -49,6 +46,13 @@ Bool BoCA::AS::DecoderComponentExternal::CanOpenStream(const String &streamURI)
 	}
 
 	return False;
+}
+
+Bool BoCA::AS::DecoderComponentExternal::SetAudioTrackInfo(const Track &track)
+{
+	this->track = track;
+
+	return True;
 }
 
 Int BoCA::AS::DecoderComponentExternal::GetPackageSize() const

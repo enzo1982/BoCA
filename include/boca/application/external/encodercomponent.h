@@ -26,10 +26,6 @@ namespace BoCA
 
 				ConfigLayer		*configLayer;
 			protected:
-				Bool			 errorState;
-				String			 errorString;
-
-				Track			 track;
 				Format			 format;
 
 				virtual Int		 RenderTags(const String &, const Track &, Buffer<UnsignedByte> &, Buffer<UnsignedByte> &);
@@ -37,7 +33,7 @@ namespace BoCA
 							 EncoderComponentExternal(ComponentSpecs *);
 				virtual			~EncoderComponentExternal();
 
-				virtual Bool		 SetAudioTrackInfo(const Track &nTrack)	{ track = nTrack; format = nTrack.GetFormat(); return True; }
+				virtual Bool		 SetAudioTrackInfo(const Track &);
 
 				virtual Bool		 SetOutputFormat(Int);
 				virtual String		 GetOutputFileExtension() const;

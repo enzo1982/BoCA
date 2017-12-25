@@ -13,20 +13,17 @@
 #ifndef H_BOCA_AS_DECODERCOMPONENT
 #define H_BOCA_AS_DECODERCOMPONENT
 
-#include "component.h"
-#include "../common/metadata/track.h"
+#include "convertercomponent.h"
 
 namespace BoCA
 {
 	namespace AS
 	{
-		class BOCA_DLL_EXPORT DecoderComponent : public Component, public IO::Filter
+		class BOCA_DLL_EXPORT DecoderComponent : public ConverterComponent
 		{
 			public:
 						 DecoderComponent(ComponentSpecs *);
 				virtual		~DecoderComponent();
-
-				virtual Bool	 SetAudioTrackInfo(const Track &);
 
 				virtual Bool	 CanOpenStream(const String &);
 				virtual Error	 GetStreamInfo(const String &, Track &);
@@ -39,10 +36,6 @@ namespace BoCA
 				virtual Bool	 Seek(Int64);
 
 				virtual Int	 ReadData(Buffer<UnsignedByte> &);
-
-				virtual Int	 GetPackageSize() const;
-				virtual Int	 SetDriver(IO::Driver *);
-
 		};
 	};
 };

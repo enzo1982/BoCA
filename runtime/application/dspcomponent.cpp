@@ -12,7 +12,7 @@
 
 #include <boca/application/dspcomponent.h>
 
-BoCA::AS::DSPComponent::DSPComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
+BoCA::AS::DSPComponent::DSPComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
 {
 }
 
@@ -25,24 +25,9 @@ Int BoCA::AS::DSPComponent::GetPackageSize() const
 	return specs->func_GetPackageSize(component);
 }
 
-Bool BoCA::AS::DSPComponent::SetAudioTrackInfo(const Track &track)
-{
-	return specs->func_SetAudioTrackInfo(component, &track);
-}
-
 const BoCA::Format &BoCA::AS::DSPComponent::GetFormatInfo() const
 {
 	return *((const Format *) specs->func_GetFormatInfo(component));
-}
-
-Bool BoCA::AS::DSPComponent::Activate()
-{
-	return specs->func_Activate(component);
-}
-
-Bool BoCA::AS::DSPComponent::Deactivate()
-{
-	return specs->func_Deactivate(component);
 }
 
 Int BoCA::AS::DSPComponent::TransformData(Buffer<UnsignedByte> &buffer)

@@ -10,30 +10,29 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_AS_DSPCOMPONENT
-#define H_BOCA_AS_DSPCOMPONENT
+#include <boca/component/convertercomponent.h>
 
-#include "convertercomponent.h"
-
-namespace BoCA
+BoCA::CS::ConverterComponent::ConverterComponent()
 {
-	namespace AS
-	{
-		class BOCA_DLL_EXPORT DSPComponent : public ConverterComponent
-		{
-			public:
-							 DSPComponent(ComponentSpecs *);
-				virtual			~DSPComponent();
+}
 
-				virtual const Format	&GetFormatInfo() const;
+BoCA::CS::ConverterComponent::~ConverterComponent()
+{
+}
 
-				virtual Int		 TransformData(Buffer<UnsignedByte> &);
+Bool BoCA::CS::ConverterComponent::SetAudioTrackInfo(const Track &track)
+{
+	this->track = track;
 
-				virtual Int		 Flush(Buffer<UnsignedByte> &);
+	return True;
+}
 
-				virtual Int		 GetPackageSize() const;
-		};
-	};
-};
+Bool BoCA::CS::ConverterComponent::Activate()
+{
+	return True;
+}
 
-#endif
+Bool BoCA::CS::ConverterComponent::Deactivate()
+{
+	return True;
+}

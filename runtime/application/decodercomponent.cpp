@@ -12,27 +12,12 @@
 
 #include <boca/application/decodercomponent.h>
 
-BoCA::AS::DecoderComponent::DecoderComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
+BoCA::AS::DecoderComponent::DecoderComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
 {
 }
 
 BoCA::AS::DecoderComponent::~DecoderComponent()
 {
-}
-
-Int BoCA::AS::DecoderComponent::GetPackageSize() const
-{
-	return specs->func_GetPackageSize(component);
-}
-
-Int BoCA::AS::DecoderComponent::SetDriver(IO::Driver *driver)
-{
-	return specs->func_SetDriver(component, driver);
-}
-
-Bool BoCA::AS::DecoderComponent::SetAudioTrackInfo(const Track &track)
-{
-	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
 Bool BoCA::AS::DecoderComponent::CanOpenStream(const String &streamURI)
@@ -59,14 +44,11 @@ Bool BoCA::AS::DecoderComponent::Activate()
 {
 	SetDriver(driver);
 
-	if (specs->func_Activate(component))
-	{
-		packageSize = GetPackageSize();
+	if (!specs->func_Activate(component)) return False;
 
-		return True;
-	}
+	packageSize = GetPackageSize();
 
-	return False;
+	return True;
 }
 
 Bool BoCA::AS::DecoderComponent::Deactivate()

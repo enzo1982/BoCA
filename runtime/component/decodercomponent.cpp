@@ -21,23 +21,6 @@ BoCA::CS::DecoderComponent::~DecoderComponent()
 {
 }
 
-Bool BoCA::CS::DecoderComponent::SetAudioTrackInfo(const Track &nTrack)
-{
-	track = nTrack;
-
-	return True;
-}
-
-Bool BoCA::CS::DecoderComponent::Activate()
-{
-	return True;
-}
-
-Bool BoCA::CS::DecoderComponent::Deactivate()
-{
-	return True;
-}
-
 Bool BoCA::CS::DecoderComponent::Seek(Int64 samplePosition)
 {
 	return False;

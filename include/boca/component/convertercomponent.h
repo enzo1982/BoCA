@@ -10,28 +10,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_AS_DSPCOMPONENT
-#define H_BOCA_AS_DSPCOMPONENT
+#ifndef H_BOCA_CONVERTERCOMPONENT
+#define H_BOCA_CONVERTERCOMPONENT
 
-#include "convertercomponent.h"
+#include "component.h"
+#include "../common/metadata/track.h"
 
 namespace BoCA
 {
-	namespace AS
+	namespace CS
 	{
-		class BOCA_DLL_EXPORT DSPComponent : public ConverterComponent
+		abstract class BOCA_DLL_EXPORT ConverterComponent : public Component, public IO::Filter
 		{
+			protected:
+				Track		 track;
 			public:
-							 DSPComponent(ComponentSpecs *);
-				virtual			~DSPComponent();
+						 ConverterComponent();
+				virtual		~ConverterComponent();
 
-				virtual const Format	&GetFormatInfo() const;
+				/* Called to set information about output stream.
+				 */
+				virtual Bool	 SetAudioTrackInfo(const Track &);
 
-				virtual Int		 TransformData(Buffer<UnsignedByte> &);
-
-				virtual Int		 Flush(Buffer<UnsignedByte> &);
-
-				virtual Int		 GetPackageSize() const;
+				/* Activate/deactivate filter.
+				 */
+				virtual Bool	 Activate();
+				virtual Bool	 Deactivate();
 		};
 	};
 };

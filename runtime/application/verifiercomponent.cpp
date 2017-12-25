@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,7 +12,7 @@
 
 #include <boca/application/verifiercomponent.h>
 
-BoCA::AS::VerifierComponent::VerifierComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
+BoCA::AS::VerifierComponent::VerifierComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
 {
 }
 
@@ -23,11 +23,6 @@ BoCA::AS::VerifierComponent::~VerifierComponent()
 Bool BoCA::AS::VerifierComponent::CanVerifyTrack(const Track &track)
 {
 	return specs->func_CanVerifyTrack(component, &track);
-}
-
-Bool BoCA::AS::VerifierComponent::SetAudioTrackInfo(const Track &track)
-{
-	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
 Bool BoCA::AS::VerifierComponent::Activate()

@@ -13,29 +13,17 @@
 #ifndef H_BOCA_OUTPUTCOMPONENT
 #define H_BOCA_OUTPUTCOMPONENT
 
-#include "component.h"
-#include "../common/metadata/track.h"
+#include "convertercomponent.h"
 
 namespace BoCA
 {
 	namespace CS
 	{
-		abstract class BOCA_DLL_EXPORT OutputComponent : public Component, public IO::Filter
+		abstract class BOCA_DLL_EXPORT OutputComponent : public ConverterComponent
 		{
-			protected:
-				Track		 track;
 			public:
 						 OutputComponent();
 				virtual		~OutputComponent();
-
-				/* Called to set information about output stream.
-				 */
-				virtual Bool	 SetAudioTrackInfo(const Track &);
-
-				/* Activate/deactivate filter.
-				 */
-				virtual Bool	 Activate();
-				virtual Bool	 Deactivate();
 
 				/* Write data from buffer.
 				 */

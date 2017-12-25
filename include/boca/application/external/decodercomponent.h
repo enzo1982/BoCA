@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,11 +26,6 @@ namespace BoCA
 
 				ConfigLayer		*configLayer;
 			protected:
-				Bool			 errorState;
-				String			 errorString;
-
-				Track			 track;
-
 				Int64			 inBytes;
 
 				virtual Int		 QueryTags(const String &, Track &) const;
@@ -40,17 +35,17 @@ namespace BoCA
 
 				virtual Bool		 CanOpenStream(const String &);
 
-				Bool			 SetAudioTrackInfo(const Track &nTrack)	{ track = nTrack;  return True; }
+				virtual Bool		 SetAudioTrackInfo(const Track &);
 
-				Int64			 GetInBytes() const			{ return inBytes; }
+				Int64			 GetInBytes() const	{ return inBytes; }
 
 				virtual Int		 GetPackageSize() const;
 				virtual Int		 SetDriver(IO::Driver *);
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 			accessors:
-				Bool			 GetErrorState() const			{ return errorState; }
-				const String		&GetErrorString() const			{ return errorString; }
+				Bool			 GetErrorState() const	{ return errorState; }
+				const String		&GetErrorString() const	{ return errorString; }
 
 				const Config		*GetConfiguration() const;
 				Bool			 SetConfiguration(const Config *);
