@@ -26,10 +26,11 @@ const String &BoCA::DSPResample::GetComponentSpecs()
 								\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
 		  <component>					\
-		    <name>Resampling DSP Component</name>	\
+		    <name>Sample Rate Converter</name>		\
 		    <version>1.0</version>			\
 		    <id>resample-dsp</id>			\
 		    <type>dsp</type>				\
+		    <input float=\"true\"/>			\
 		  </component>					\
 								\
 		";
@@ -65,7 +66,6 @@ BoCA::DSPResample::~DSPResample()
 Bool BoCA::DSPResample::Activate()
 {
 	const Config	*config = GetConfiguration();
-
 	const Format	&format = track.GetFormat();
 
 	this->format	  = format;
@@ -106,139 +106,54 @@ Bool BoCA::DSPResample::Deactivate()
 
 Int BoCA::DSPResample::TransformData(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
 	if (state == NIL) return data.Size();
 
-	const Format	&format = track.GetFormat();
-
-	SRC_DATA	 src_data;
+	SRC_DATA	 src_data = { 0 };
 
 	src_data.end_of_input	= 0;
 	src_data.src_ratio	= ratio;
-	src_data.input_frames	= data.Size() / (format.bits / 8) / format.channels;
+	src_data.input_frames	= data.Size() / sizeof(float) / format.channels;
 	src_data.output_frames	= src_data.input_frames * src_data.src_ratio + 2;
 
-	inBuffer.Resize(src_data.input_frames * format.channels);
-	outBuffer.Resize(src_data.output_frames * format.channels);
+	output.Resize(src_data.output_frames * format.channels);
 
-	src_data.data_in	= inBuffer;
-	src_data.data_out	= outBuffer;
+	src_data.data_in	= (float *) (UnsignedByte *) data;
+	src_data.data_out	= output;
 
-	/* Scale up 8 and 24 bit samples.
-	 */
-	if (format.bits == 8)
-	{
-		shortBuffer.Resize(data.Size());
-
-		for (Int i = 0; i < data.Size(); i++) shortBuffer[i] = (data[i] - 128) * 256;
-	}
-
-	if (format.bits == 24)
-	{
-		intBuffer.Resize(data.Size() / (format.bits / 8));
-
-		for (Int i = 0; i < data.Size() / (format.bits / 8); i++)
-		{
-			if (endianness == EndianLittle) intBuffer[i] = (int) (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8);
-			if (endianness == EndianBig   ) intBuffer[i] = (int) (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8);
-		}
-	}
-
-	/* Convert samples to float.
-	 */
-	if	(format.bits ==  8) ex_src_short_to_float_array((short *) (SignedInt16 *) shortBuffer, src_data.data_in, src_data.input_frames * format.channels);
-	else if	(format.bits == 16) ex_src_short_to_float_array((short *) (UnsignedByte *) data, src_data.data_in, src_data.input_frames * format.channels);
-	else if (format.bits == 24) ex_src_int_to_float_array((int *) (SignedInt32 *) intBuffer, src_data.data_in, src_data.input_frames * format.channels);
-	else if (format.bits == 32) ex_src_int_to_float_array((int *) (UnsignedByte *) data, src_data.data_in, src_data.input_frames * format.channels);
-
-	/* Process input and adjust buffers.
+	/* Process input and copy to output.
 	 */
 	ex_src_process(state, &src_data);
 
-	data.Resize(src_data.output_frames_gen * (format.bits / 8) * format.channels);
+	data.Resize(src_data.output_frames_gen * sizeof(float) * format.channels);
 
-	if 	(format.bits ==  8) shortBuffer.Resize(src_data.output_frames_gen * format.channels);
-	else if (format.bits == 24) intBuffer.Resize(src_data.output_frames_gen * format.channels);
-
-	/* Convert samples back to short/int.
-	 */
-	if	(format.bits ==  8) ex_src_float_to_short_array(src_data.data_out, (short *) (SignedInt16 *) shortBuffer, src_data.output_frames_gen * format.channels);
-	else if	(format.bits == 16) ex_src_float_to_short_array(src_data.data_out, (short *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
-	else if (format.bits == 24) ex_src_float_to_int_array(src_data.data_out, (int *) (SignedInt32 *) intBuffer, src_data.output_frames_gen * format.channels);
-	else if (format.bits == 32) ex_src_float_to_int_array(src_data.data_out, (int *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
-
-	/* Convert back to original sample resolution.
-	 */
-	if (format.bits == 8)
-	{
-		for (Int i = 0; i < src_data.output_frames_gen * format.channels; i++) data[i] = shortBuffer[i] / 256 + 128;
-	}
-
-	if (format.bits == 24)
-	{
-		for (Int i = 0; i < src_data.output_frames_gen * format.channels; i++)
-		{
-			if (endianness == EndianLittle) { data[3 * i + 2] = (intBuffer[i] >> 24) & 0xFF; data[3 * i + 1] = (intBuffer[i] >> 16) & 0xFF; data[3 * i    ] = (intBuffer[i] >> 8) & 0xFF; }
-			if (endianness == EndianBig   ) { data[3 * i    ] = (intBuffer[i] >> 24) & 0xFF; data[3 * i + 1] = (intBuffer[i] >> 16) & 0xFF; data[3 * i + 2] = (intBuffer[i] >> 8) & 0xFF; }
-		}
-	}
+	memcpy(data, src_data.data_out, data.Size());
 
 	return data.Size();
 }
 
 Int BoCA::DSPResample::Flush(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
 	if (state == NIL) return 0;
 
-	const Format	&format = track.GetFormat();
-
-	SRC_DATA	 src_data;
+	SRC_DATA	 src_data = { 0 };
 
 	src_data.end_of_input	= 1;
 	src_data.src_ratio	= ratio;
 	src_data.input_frames	= 0;
-	src_data.output_frames	= format.rate * src_data.src_ratio + 1;
+	src_data.output_frames	= format.rate;
 
-	inBuffer.Resize(src_data.input_frames * format.channels);
-	outBuffer.Resize(src_data.output_frames * format.channels);
+	output.Resize(src_data.output_frames * format.channels);
 
-	src_data.data_in	= inBuffer;
-	src_data.data_out	= outBuffer;
+	src_data.data_in	= NIL;
+	src_data.data_out	= output;
 
-	/* Flush input and adjust buffers.
+	/* Flush input and copy to output.
 	 */
 	ex_src_process(state, &src_data);
 
-	data.Resize(src_data.output_frames_gen * (format.bits / 8) * format.channels);
+	data.Resize(src_data.output_frames_gen * sizeof(float) * format.channels);
 
-	if 	(format.bits ==  8) shortBuffer.Resize(src_data.output_frames_gen * format.channels);
-	else if (format.bits == 24) intBuffer.Resize(src_data.output_frames_gen * format.channels);
-
-	/* Convert samples back to short/int.
-	 */
-	if	(format.bits ==  8) ex_src_float_to_short_array(src_data.data_out, (short *) (SignedInt16 *) shortBuffer, src_data.output_frames_gen * format.channels);
-	else if	(format.bits == 16) ex_src_float_to_short_array(src_data.data_out, (short *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
-	else if (format.bits == 24) ex_src_float_to_int_array(src_data.data_out, (int *) (SignedInt32 *) intBuffer, src_data.output_frames_gen * format.channels);
-	else if (format.bits == 32) ex_src_float_to_int_array(src_data.data_out, (int *) (UnsignedByte *) data, src_data.output_frames_gen * format.channels);
-
-	/* Convert back to original sample resolution.
-	 */
-	if (format.bits == 8)
-	{
-		for (Int i = 0; i < src_data.output_frames_gen * format.channels; i++) data[i] = shortBuffer[i] / 256 + 128;
-	}
-
-	if (format.bits == 24)
-	{
-		for (Int i = 0; i < src_data.output_frames_gen * format.channels; i++)
-		{
-			if (endianness == EndianLittle) { data[3 * i + 2] = (intBuffer[i] >> 24) & 0xFF; data[3 * i + 1] = (intBuffer[i] >> 16) & 0xFF; data[3 * i    ] = (intBuffer[i] >> 8) & 0xFF; }
-			if (endianness == EndianBig   ) { data[3 * i    ] = (intBuffer[i] >> 24) & 0xFF; data[3 * i + 1] = (intBuffer[i] >> 16) & 0xFF; data[3 * i + 2] = (intBuffer[i] >> 8) & 0xFF; }
-		}
-	}
+	memcpy(data, src_data.data_out, data.Size());
 
 	return data.Size();
 }

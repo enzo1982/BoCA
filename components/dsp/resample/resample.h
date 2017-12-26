@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -25,11 +25,7 @@ namespace BoCA
 			Float			 ratio;
 			SRC_STATE		*state;
 
-			Buffer<float>		 inBuffer;
-			Buffer<float>		 outBuffer;
-
-			Buffer<SignedInt16>	 shortBuffer;
-			Buffer<SignedInt32>	 intBuffer;
+			Buffer<float>		 output;
 		public:
 			static const String	&GetComponentSpecs();
 
