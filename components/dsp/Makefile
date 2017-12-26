@@ -4,7 +4,7 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-FOLDERS = format resample
+FOLDERS = channels format resample
 
 .PHONY: $(FOLDERS)
 
