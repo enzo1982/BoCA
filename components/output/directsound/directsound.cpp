@@ -33,6 +33,9 @@ const String &BoCA::OutputDirectSound::GetComponentSpecs()
 		    <id>directsound-out</id>			\
 		    <type>output</type>				\
 		    <precede>waveout-out</precede>		\
+		    <input bits=\"8\" signed=\"false\"/>	\
+		    <input bits=\"16-32\"/>			\
+		    <input float=\"true\"/>			\
 		  </component>					\
 								\
 		";
@@ -82,7 +85,7 @@ Bool BoCA::OutputDirectSound::Activate()
 	wfx.Format.nBlockAlign		= (wfx.Format.wBitsPerSample >> 3) * wfx.Format.nChannels;
 	wfx.Format.nAvgBytesPerSec	= wfx.Format.nBlockAlign * wfx.Format.nSamplesPerSec;
 
-	wfx.SubFormat			= KSDATAFORMAT_SUBTYPE_PCM;
+	wfx.SubFormat			= format.fp ? KSDATAFORMAT_SUBTYPE_IEEE_FLOAT : KSDATAFORMAT_SUBTYPE_PCM;
 
 	wfx.Samples.wValidBitsPerSample = wfx.Format.wBitsPerSample;
 

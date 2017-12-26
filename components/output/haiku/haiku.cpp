@@ -26,6 +26,8 @@ const String &BoCA::OutputHaiku::GetComponentSpecs()
 	    <version>1.0</version>			\
 	    <id>haiku-out</id>				\
 	    <type>output</type>				\
+	    <input bits=\"8,16,32\"/>			\
+	    <input float=\"true\"/>			\
 	  </component>					\
 							\
 	";
@@ -65,10 +67,10 @@ Bool BoCA::OutputHaiku::Activate()
 	fmt.frame_rate	  = format.rate;
 	fmt.channel_count = format.channels;
 
-	if	(format.bits ==  8) fmt.format = media_raw_audio_format::B_AUDIO_UCHAR;
-	else if	(format.bits == 16) fmt.format = media_raw_audio_format::B_AUDIO_SHORT;
-	else if	(format.bits == 24) fmt.format = media_raw_audio_format::B_AUDIO_INT;
-	else if	(format.bits == 32) fmt.format = media_raw_audio_format::B_AUDIO_INT;
+	if	(format.bits ==  8		) fmt.format = media_raw_audio_format::B_AUDIO_CHAR;
+	else if	(format.bits == 16		) fmt.format = media_raw_audio_format::B_AUDIO_SHORT;
+	else if	(format.bits == 32 && !format.fp) fmt.format = media_raw_audio_format::B_AUDIO_INT;
+	else if	(format.bits == 32 &&  format.fp) fmt.format = media_raw_audio_format::B_AUDIO_FLOAT;
 
 	/* Preallocate sample buffer.
 	 */

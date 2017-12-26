@@ -30,6 +30,8 @@ const String &BoCA::OutputWinamp::GetComponentSpecs()
 		    <version>1.0</version>			\
 		    <id>winamp-out</id>				\
 		    <type>output</type>				\
+		    <input bits=\"8\" signed=\"false\"/>	\
+		    <input bits=\"16-32\"/>			\
 		  </component>					\
 								\
 		";
@@ -63,10 +65,11 @@ BoCA::OutputWinamp::~OutputWinamp()
 Bool BoCA::OutputWinamp::Activate()
 {
 	const Config	*config = GetConfiguration();
+	const Format	&format = track.GetFormat();
 
 	module = winamp_out_modules.GetNth(config->GetIntValue(ConfigureWinamp::ConfigID, "OutputPlugin", 0));
 
-	return (module->Open(track.GetFormat().rate, track.GetFormat().channels, track.GetFormat().bits, 0, 0) >= 0);
+	return (module->Open(format.rate, format.channels, format.bits, 0, 0) >= 0);
 }
 
 Bool BoCA::OutputWinamp::Deactivate()

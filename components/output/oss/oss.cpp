@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -43,9 +43,24 @@ const String &BoCA::OutputOSS::GetComponentSpecs()
 		    <version>1.0</version>			\
 		    <id>oss-out</id>				\
 		    <type>output</type>				\
-		  </component>					\
+		    <input bits=\"8\" signed=\"false\"/>	\
+		    <input bits=\"16\"/>			\
 								\
 		";
+
+#ifdef AFMT_S32_LE
+		componentSpecs.Append("				\
+								\
+		    <input bits=\"32\"/>			\
+								\
+		");
+#endif
+
+		componentSpecs.Append("				\
+								\
+		  </component>					\
+								\
+		");
 	}
 
 	return componentSpecs;
@@ -78,11 +93,7 @@ Bool BoCA::OutputOSS::Activate()
 
 	if	(format.bits ==  8) samples =					       AFMT_U8;
 	else if	(format.bits == 16) samples = (endianness == EndianBig ? AFMT_S16_BE : AFMT_S16_LE);
-#ifndef AFMT_S32_LE
-	else if	(format.bits == 24) samples = (endianness == EndianBig ? AFMT_S16_BE : AFMT_S16_LE);
-	else if	(format.bits == 32) samples = (endianness == EndianBig ? AFMT_S16_BE : AFMT_S16_LE);
-#else
-	else if	(format.bits == 24) samples = (endianness == EndianBig ? AFMT_S32_BE : AFMT_S32_LE);
+#ifdef AFMT_S32_LE
 	else if	(format.bits == 32) samples = (endianness == EndianBig ? AFMT_S32_BE : AFMT_S32_LE);
 #endif
 
@@ -107,50 +118,7 @@ Bool BoCA::OutputOSS::Deactivate()
 
 Int BoCA::OutputOSS::WriteData(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
-	const Format	&format = track.GetFormat();
-	Int		 bytes = -1;
-
-#ifndef AFMT_S32_LE
-	if (format.bits == 24)
-	{
-		/* Convert 24 bit samples to 16 bit.
-		 */
-		Buffer<Int16>	 samples(data.Size() / (format.bits / 8));
-
-		if (endianness == EndianLittle) for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i    ] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) / 256;
-		else				for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i + 2] + (data[3 * i + 1] << 8) + (data[3 * i	 ] << 16)) / 256;
-
-		bytes = write(device_fd, samples, data.Size() / (format.bits / 8) * sizeof(Int16));
-	}
-	else if (format.bits == 32)
-	{
-		/* Convert 32 bit samples to 16 bit.
-		 */
-		Buffer<Int16>	 samples(data.Size() / (format.bits / 8));
-
-		for (Int i = 0; i < samples.Size(); i++) samples[i] = (Int16) ((long *) (unsigned char *) data)[i] / 65536;
-
-		bytes = write(device_fd, samples, data.Size() / (format.bits / 8) * sizeof(Int16));
-	}
-#else
-	if (format.bits == 24)
-	{
-		/* Convert 24 bit samples to 32 bit.
-		 */
-		Buffer<Int32>	 samples(data.Size() / (format.bits / 8));
-
-		if (endianness == EndianLittle) for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i    ] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) * 256;
-		else				for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i + 2] + (data[3 * i + 1] << 8) + (data[3 * i	 ] << 16)) * 256;
-
-		bytes = write(device_fd, samples, data.Size() / (format.bits / 8) * sizeof(Int32));
-	}
-#endif
-	else
-	{
-		bytes = write(device_fd, data, data.Size());
-	}
+	Int	 bytes = write(device_fd, data, data.Size());
 
 	if (bytes < 0) return 0;
 

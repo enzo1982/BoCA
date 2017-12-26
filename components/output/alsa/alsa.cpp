@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,6 +33,9 @@ const String &BoCA::OutputALSA::GetComponentSpecs()
 		    <id>alsa-out</id>				\
 		    <type>output</type>				\
 		    <replace>oss-out</replace>			\
+		    <input bits=\"8\" signed=\"false\"/>	\
+		    <input bits=\"16,32\"/>			\
+		    <input float=\"true\"/>			\
 		  </component>					\
 								\
 		";
@@ -67,10 +70,10 @@ Bool BoCA::OutputALSA::Activate()
 	snd_pcm_hw_params_set_access(playback_handle, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
 	snd_pcm_hw_params_set_buffer_size(playback_handle, hw_params, format.rate * format.channels * (format.bits / 8) / 4);
 
-	if	(format.bits ==  8) snd_pcm_hw_params_set_format(playback_handle, hw_params,						       SND_PCM_FORMAT_U8);
-	else if	(format.bits == 16) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_S16_BE : SND_PCM_FORMAT_S16_LE);
-	else if	(format.bits == 24) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_S32_BE : SND_PCM_FORMAT_S32_LE);
-	else if	(format.bits == 32) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_S32_BE : SND_PCM_FORMAT_S32_LE);
+	if	(format.bits ==  8		) snd_pcm_hw_params_set_format(playback_handle, hw_params,						       SND_PCM_FORMAT_U8);
+	else if	(format.bits == 16		) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_S16_BE   : SND_PCM_FORMAT_S16_LE);
+	else if	(format.bits == 32 && !format.fp) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_S32_BE   : SND_PCM_FORMAT_S32_LE);
+	else if	(format.bits == 32 &&  format.fp) snd_pcm_hw_params_set_format(playback_handle, hw_params, endianness == EndianBig ? SND_PCM_FORMAT_FLOAT_BE : SND_PCM_FORMAT_FLOAT_LE);
 
 	snd_pcm_hw_params_set_rate(playback_handle, hw_params, format.rate, 0);
 	snd_pcm_hw_params_set_channels(playback_handle, hw_params, format.channels);
@@ -95,8 +98,6 @@ Bool BoCA::OutputALSA::Deactivate()
 
 Int BoCA::OutputALSA::WriteData(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
 	const Format		&format = track.GetFormat();
 	snd_pcm_sframes_t	 frames = -1;
 
@@ -107,21 +108,7 @@ Int BoCA::OutputALSA::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Output samples.
 	 */
-	if (format.bits == 24)
-	{
-		/* Convert 24 bit samples to 32 bit.
-		 */
-		Buffer<Int32>	 samples(data.Size() / (format.bits / 8));
-
-		if (endianness == EndianLittle) for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i    ] + (data[3 * i + 1] << 8) + (data[3 * i + 2] << 16)) * 256;
-		else				for (Int i = 0; i < samples.Size(); i++) samples[i] = (data[3 * i + 2] + (data[3 * i + 1] << 8) + (data[3 * i	 ] << 16)) * 256;
-
-		frames = snd_pcm_writei(playback_handle, samples, data.Size() / format.channels / (format.bits / 8));
-	}
-	else
-	{
-		frames = snd_pcm_writei(playback_handle, data, data.Size() / format.channels / (format.bits / 8));
-	}
+	frames = snd_pcm_writei(playback_handle, data, data.Size() / format.channels / (format.bits / 8));
 
 	if (frames < 0) return 0;
 
@@ -160,7 +147,7 @@ Bool BoCA::OutputALSA::IsPlaying()
 
 	snd_pcm_get_params(playback_handle, &bufferSize, &periodSize);
 
-	if (snd_pcm_avail(playback_handle) < bufferSize - 1) return True;
+	if (snd_pcm_avail(playback_handle) < (snd_pcm_sframes_t) bufferSize - 1) return True;
 
 	return False;
 }

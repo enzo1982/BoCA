@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,6 +24,9 @@ const String &BoCA::OutputWaveOut::GetComponentSpecs()
 	    <version>1.0</version>			\
 	    <id>waveout-out</id>			\
 	    <type>output</type>				\
+	    <input bits=\"8\" signed=\"false\"/>	\
+	    <input bits=\"16-32\"/>			\
+	    <input float=\"true\"/>			\
 	  </component>					\
 							\
 	";
@@ -97,7 +100,7 @@ Bool BoCA::OutputWaveOut::Activate()
 	wfx.Format.nBlockAlign		= (wfx.Format.wBitsPerSample >> 3) * wfx.Format.nChannels;
 	wfx.Format.nAvgBytesPerSec	= wfx.Format.nBlockAlign * wfx.Format.nSamplesPerSec;
 
-	wfx.SubFormat			= KSDATAFORMAT_SUBTYPE_PCM;
+	wfx.SubFormat			= format.fp ? KSDATAFORMAT_SUBTYPE_IEEE_FLOAT : KSDATAFORMAT_SUBTYPE_PCM;
 
 	wfx.Samples.wValidBitsPerSample = wfx.Format.wBitsPerSample;
 
