@@ -41,6 +41,7 @@ const String &BoCA::EncoderVorbis::GetComponentSpecs()
 		      <extension>oga</extension>					\
 		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
 		    </format>								\
+		    <input float=\"true\" rate=\"8000-192000\"/>			\
 		  </component>								\
 											\
 		";
@@ -82,12 +83,18 @@ BoCA::EncoderVorbis::~EncoderVorbis()
 
 Bool BoCA::EncoderVorbis::Activate()
 {
-	const Format	&format = track.GetFormat();
-	const Info	&info	= track.GetInfo();
-
 	const Config	*config = GetConfiguration();
 
+	/* Init Ogg stream.
+	 */
 	srand(clock());
+
+	ex_ogg_stream_init(&os, rand());
+
+	/* Create and configure Vorbis encoder.
+	 */
+	const Format	&format = track.GetFormat();
+	const Info	&info	= track.GetInfo();
 
 	int	 error = -1;
 
@@ -118,8 +125,6 @@ Bool BoCA::EncoderVorbis::Activate()
 	ex_vorbis_comment_init(&vc);
 	ex_vorbis_analysis_init(&vd, &vi);
 	ex_vorbis_block_init(&vd, &vb);
-
-	ex_ogg_stream_init(&os, rand());
 
 	ogg_packet	 header;
 	ogg_packet	 header_comm;
@@ -179,6 +184,8 @@ Bool BoCA::EncoderVorbis::Activate()
 
 Bool BoCA::EncoderVorbis::Deactivate()
 {
+	/* Finish conversion and write any remaining Ogg packets.
+	 */
 	ex_vorbis_analysis_wrote(&vd, 0);
 
 	while (ex_vorbis_analysis_blockout(&vd, &vb) == 1)
@@ -194,11 +201,12 @@ Bool BoCA::EncoderVorbis::Deactivate()
 		}
 	}
 
-	ex_ogg_stream_clear(&os);
 	ex_vorbis_block_clear(&vb);
 	ex_vorbis_dsp_clear(&vd);
 	ex_vorbis_comment_clear(&vc);
 	ex_vorbis_info_clear(&vi);
+
+	ex_ogg_stream_clear(&os);
 
 	/* Fix chapter marks in Vorbis Comments.
 	 */
@@ -209,8 +217,6 @@ Bool BoCA::EncoderVorbis::Deactivate()
 
 Int BoCA::EncoderVorbis::WriteData(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
 	const Format	&format	= track.GetFormat();
 
 	/* Change to Vorbis channel order.
@@ -221,36 +227,18 @@ Int BoCA::EncoderVorbis::WriteData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Default_6_1, Channel::Vorbis_6_1);
 	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Default_7_1, Channel::Vorbis_7_1);
 
-	/* Convert samples to 16 bit.
-	 */
-	Int	 samples_size = data.Size() / (format.bits / 8);
-
-	samplesBuffer.Resize(samples_size);
-
-	for (Int i = 0; i < samples_size; i++)
-	{
-		if	(format.bits ==  8				) samplesBuffer[i] =	   (				 data [i] - 128) * 256;
-		else if (format.bits == 16				) samplesBuffer[i] = (int)  ((short *) (unsigned char *) data)[i];
-		else if (format.bits == 32				) samplesBuffer[i] = (int) (((long *)  (unsigned char *) data)[i]	 / 65536);
-
-		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
-	}
-
 	/* Write samples to analysis buffer.
 	 */
-	float	**buffer = ex_vorbis_analysis_buffer(&vd, samples_size / format.channels);
+	Int	 numSamples = data.Size() / sizeof(float) / format.channels;
+	float	*samples    = (float *) (UnsignedByte *) data;
+	float  **buffer	    = ex_vorbis_analysis_buffer(&vd, numSamples);
 
-	for (Int i = 0; i < samples_size / format.channels; i++)
+	for (Int c = 0; c < format.channels; c++)
 	{
-		for (Int c = 0; c < format.channels; c++)
-		{
-			if (endianness == EndianLittle) { buffer[c][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 2 * format.channels + 2 * c + 1] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 2 * format.channels + 2 * c + 0])) / 32768.f; }
-			else				{ buffer[c][i] = ((((signed char *) (unsigned short *) samplesBuffer)[i * 2 * format.channels + 2 * c + 0] << 8) | (0x00ff & ((signed char *) (unsigned short *) samplesBuffer)[i * 2 * format.channels + 2 * c + 1])) / 32768.f; }
-		}
+		for (Int i = 0; i < numSamples; i++) buffer[c][i] = samples[i * format.channels + c];
 	}
 
-	ex_vorbis_analysis_wrote(&vd, samples_size / format.channels);
+	ex_vorbis_analysis_wrote(&vd, numSamples);
 
 	/* Output samples to encoder.
 	 */

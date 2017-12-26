@@ -60,6 +60,7 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 
 		componentSpecs.Append("							\
 											\
+		    <input bits=\"8-24\" channels=\"1-8\"/>				\
 		  </component>								\
 											\
 		");
@@ -106,19 +107,13 @@ BoCA::EncoderFLAC::~EncoderFLAC()
 
 Bool BoCA::EncoderFLAC::Activate()
 {
+	const Config	*config = GetConfiguration();
+
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
 
-	if (format.channels > 8)
-	{
-		errorString = "This encoder does not support more than 8 channels!";
-		errorState  = True;
-
-		return False;
-	}
-
-	const Config	*config = GetConfiguration();
-
+	/* Create FLAC encoder.
+	 */
 	srand(clock());
 
 	encoder = ex_FLAC__stream_encoder_new();
@@ -238,7 +233,7 @@ Bool BoCA::EncoderFLAC::Activate()
 
 	ex_FLAC__stream_encoder_set_channels(encoder, format.channels);
 	ex_FLAC__stream_encoder_set_sample_rate(encoder, format.rate);
-	ex_FLAC__stream_encoder_set_bits_per_sample(encoder, format.bits == 32 ? 24 : format.bits);
+	ex_FLAC__stream_encoder_set_bits_per_sample(encoder, format.bits);
 
 	if (config->GetIntValue(ConfigureFLAC::ConfigID, "Preset", 5) < 0)
 	{
@@ -321,9 +316,8 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data)
 
 	for (Int i = 0; i < data.Size() / (format.bits / 8); i++)
 	{
-		if	(format.bits ==  8				) buffer[i] =				   data [i] - 128;
-		else if (format.bits == 16				) buffer[i] = ((Short *) (unsigned char *) data)[i];
-		else if (format.bits == 32				) buffer[i] = ((Int32 *) (unsigned char *) data)[i] / 256;
+		if	(format.bits ==  8				) buffer[i] = ((int8_t	*) (UnsignedByte *) data)[i];
+		else if (format.bits == 16				) buffer[i] = ((int16_t *) (UnsignedByte *) data)[i];
 
 		else if (format.bits == 24 && endianness == EndianLittle) buffer[i] = (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 256;
 		else if (format.bits == 24 && endianness == EndianBig	) buffer[i] = (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 256;

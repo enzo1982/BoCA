@@ -138,7 +138,6 @@
     <ClCompile Include="..\..\..\components\encoder\opus\config.cpp" />
     <ClCompile Include="..\..\..\components\encoder\opus\dllinterface.cpp" />
     <ClCompile Include="..\..\..\components\encoder\opus\opus.cpp" />
-    <ClCompile Include="..\..\..\components\encoder\opus\resampler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\components\encoder\opus\config.h" />
@@ -149,7 +148,6 @@
     <ClInclude Include="..\..\..\components\encoder\opus\opus\opus.h" />
     <ClInclude Include="..\..\..\components\encoder\opus\opus\opus_defines.h" />
     <ClInclude Include="..\..\..\components\encoder\opus\opus\opus_types.h" />
-    <ClInclude Include="..\..\..\components\encoder\opus\resampler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

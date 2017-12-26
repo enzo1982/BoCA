@@ -24,43 +24,45 @@ const String &BoCA::EncoderFAAC::GetComponentSpecs()
 
 	if (faacdll != NIL)
 	{
-		componentSpecs = "							\
-											\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
-		  <component>								\
-		    <name>FAAC MP4/AAC Encoder %VERSION%</name>				\
-		    <version>1.0</version>						\
-		    <id>faac-enc</id>							\
-		    <type>encoder</type>						\
-		    <replace>voaacenc-enc</replace>					\
-											\
+		componentSpecs = "										\
+														\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
+		  <component>											\
+		    <name>FAAC MP4/AAC Encoder %VERSION%</name>							\
+		    <version>1.0</version>									\
+		    <id>faac-enc</id>										\
+		    <type>encoder</type>									\
+		    <replace>voaacenc-enc</replace>								\
+														\
 		";
 
 		if (mp4v2dll != NIL)
 		{
-			componentSpecs.Append("						\
-											\
-			    <format>							\
-			      <name>MPEG-4 AAC Files</name>				\
-			      <extension>m4a</extension>				\
-			      <extension>m4b</extension>				\
-			      <extension>m4r</extension>				\
-			      <extension>mp4</extension>				\
-			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
-			    </format>							\
-											\
+			componentSpecs.Append("									\
+														\
+			    <format>										\
+			      <name>MPEG-4 AAC Files</name>							\
+			      <extension>m4a</extension>							\
+			      <extension>m4b</extension>							\
+			      <extension>m4r</extension>							\
+			      <extension>mp4</extension>							\
+			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>				\
+			    </format>										\
+														\
 			");
 		}
 
-		componentSpecs.Append("							\
-											\
-		    <format>								\
-		      <name>Raw AAC Files</name>					\
-		      <extension>aac</extension>					\
-		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
-		    </format>								\
-		  </component>								\
-											\
+		componentSpecs.Append("										\
+														\
+		    <format>											\
+		      <name>Raw AAC Files</name>								\
+		      <extension>aac</extension>								\
+		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>					\
+		    </format>											\
+		    <input bits=\"16\" channels=\"1-6\"								\
+			   rate=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000\"/>	\
+		  </component>											\
+														\
 		");
 
 		unsigned long	 samplesSize;
@@ -110,28 +112,12 @@ BoCA::EncoderFAAC::~EncoderFAAC()
 
 Bool BoCA::EncoderFAAC::Activate()
 {
+	const Config	*config = GetConfiguration();
+
 	const Format	&format = track.GetFormat();
-
-	if (format.channels > 6)
-	{
-		errorString = "This encoder does not support more than 6 channels!";
-		errorState  = True;
-
-		return False;
-	}
-
-	if (GetSampleRateIndex(format.rate) == -1)
-	{
-		errorString = "Bad sampling rate! The selected sampling rate is not supported.";
-		errorState  = True;
-
-		return False;
-	}
 
 	/* Get configuration.
 	 */
-	const Config	*config = GetConfiguration();
-
 	Bool	 mp4Container = config->GetIntValue(ConfigureFAAC::ConfigID, "MP4Container", True);
 	Int	 mpegVersion  = config->GetIntValue(ConfigureFAAC::ConfigID, "MPEGVersion", 0);
 	Bool	 setQuality   = config->GetIntValue(ConfigureFAAC::ConfigID, "SetQuality", True);
@@ -154,19 +140,15 @@ Bool BoCA::EncoderFAAC::Activate()
 	 */
 	faacEncConfigurationPtr	 fConfig = ex_faacEncGetCurrentConfiguration(handle);
 
-	fConfig->mpegVersion	= mp4Container ? MPEG4 : mpegVersion;
+	fConfig->inputFormat	= FAAC_INPUT_16BIT;
 	fConfig->outputFormat	= mp4Container ? RAW_STREAM : ADTS_STREAM;
+	fConfig->mpegVersion	= mp4Container ? MPEG4 : mpegVersion;
 	fConfig->aacObjectType	= LOW;
 	fConfig->quantqual	= setQuality ? aacQuality : 0;
 	fConfig->bitRate	= setQuality ? 0 : bitrate * 1000;
 	fConfig->bandWidth	= bandwidth;
 	fConfig->jointmode	= allowJS ? JOINT_IS : JOINT_NONE;
 	fConfig->useTns		= useTNS;
-
-	if (format.bits ==  8) fConfig->inputFormat = FAAC_INPUT_16BIT;
-	if (format.bits == 16) fConfig->inputFormat = FAAC_INPUT_16BIT;
-	if (format.bits == 24) fConfig->inputFormat = FAAC_INPUT_32BIT;
-	if (format.bits == 32) fConfig->inputFormat = FAAC_INPUT_32BIT;
 
 	ex_faacEncSetConfiguration(handle, fConfig);
 
@@ -362,8 +344,6 @@ Bool BoCA::EncoderFAAC::Deactivate()
 
 Int BoCA::EncoderFAAC::WriteData(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
 	const Format	&format	= track.GetFormat();
 
 	/* Change to AAC channel order.
@@ -372,23 +352,13 @@ Int BoCA::EncoderFAAC::WriteData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 5) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_0, Channel::AAC_5_0);
 	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::Default_5_1, Channel::AAC_5_1);
 
-	/* Convert samples to 16 or 24 bit.
+	/* Copy data to samples buffer.
 	 */
-	Int	 samples = data.Size() / format.channels / (format.bits / 8);
-	Int	 offset	 = samplesBuffer.Size();
+	Int	 samples = data.Size() / 2;
 
-	if (format.bits <= 16) samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels / 2);
-	else		       samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
+	samplesBuffer.Resize(samplesBuffer.Size() + samples);
 
-	for (Int i = 0; i < samples * format.channels; i++)
-	{
-		if	(format.bits ==  8				) ((short *) (int32_t *) samplesBuffer)[2 * offset + i] = (				 data [i] - 128) * 256;
-		else if (format.bits == 16				) ((short *) (int32_t *) samplesBuffer)[2 * offset + i] = ((short *)   (unsigned char *) data)[i];
-		else if (format.bits == 32				)			 samplesBuffer [    offset + i] = ((int32_t *) (unsigned char *) data)[i]	 / 256;
-
-		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 256;
-		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 256;
-	}
+	memcpy(samplesBuffer + samplesBuffer.Size() - samples, data, data.Size());
 
 	/* Output samples to encoder.
 	 */
@@ -403,13 +373,13 @@ Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 	 */
 	if (flush && samplesBuffer.Size() > 0)
 	{
-		Int	 nullSamples = frameSize - (samplesBuffer.Size() / format.channels * (format.bits <= 16 ? 2 : 1)) % frameSize;
+		Int	 nullSamples = frameSize - (samplesBuffer.Size() / format.channels) % frameSize;
 
-		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels / (format.bits <= 16 ? 2 : 1));
+		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
 
-		memset(((int32_t *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels / (format.bits <= 16 ? 2 : 1), 0, sizeof(int32_t) * nullSamples * format.channels / (format.bits <= 16 ? 2 : 1));
+		memset(samplesBuffer + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(int16_t) * nullSamples * format.channels);
 
-		totalSamples += samplesBuffer.Size() / format.channels * (format.bits <= 16 ? 2 : 1) - nullSamples;
+		totalSamples += samplesBuffer.Size() / format.channels - nullSamples;
 	}
 
 	/* Encode samples.
@@ -417,13 +387,13 @@ Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 	Int	 dataLength	 = 0;
 	Int	 framesProcessed = 0;
 
-	Int	 samplesPerFrame = frameSize * format.channels / (format.bits <= 16 ? 2 : 1);
+	Int	 samplesPerFrame = frameSize * format.channels;
 
 	while (flush || samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame)
 	{
 		unsigned long	 bytes = 0;
 
-		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) bytes = ex_faacEncEncode(handle, samplesBuffer + framesProcessed * samplesPerFrame, frameSize * format.channels, outBuffer, outBuffer.Size());
+		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) bytes = ex_faacEncEncode(handle, (int32_t *) (int16_t *) (samplesBuffer + framesProcessed * samplesPerFrame), samplesPerFrame, outBuffer, outBuffer.Size());
 		else										 bytes = ex_faacEncEncode(handle, NULL, 0, outBuffer, outBuffer.Size());
 
 		if (flush && bytes == 0) break;
@@ -441,7 +411,7 @@ Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) framesProcessed++;
 	}
 
-	memmove((int32_t *) samplesBuffer, ((int32_t *) samplesBuffer) + framesProcessed * samplesPerFrame, sizeof(int32_t) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
+	memmove(samplesBuffer, samplesBuffer + framesProcessed * samplesPerFrame, sizeof(int16_t) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
 
 	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
 

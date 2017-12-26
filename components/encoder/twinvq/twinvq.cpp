@@ -29,20 +29,21 @@ const String &BoCA::EncoderTwinVQ::GetComponentSpecs()
 
 	if (twinvqdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>TwinVQ VQF Encoder</name>		\
-		    <version>1.0</version>			\
-		    <id>twinvq-enc</id>				\
-		    <type threadSafe=\"false\">encoder</type>	\
-		    <format>					\
-		      <name>TwinVQ VQF Audio</name>		\
-		      <extension>vqf</extension>		\
-		    </format>					\
-		  </component>					\
-								\
+		componentSpecs = "						\
+										\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+		  <component>							\
+		    <name>TwinVQ VQF Encoder</name>				\
+		    <version>1.0</version>					\
+		    <id>twinvq-enc</id>						\
+		    <type threadSafe=\"false\">encoder</type>			\
+		    <format>							\
+		      <name>TwinVQ VQF Audio</name>				\
+		      <extension>vqf</extension>				\
+		    </format>							\
+		    <input bits=\"16\" channels=\"1-2\" rate=\"22050,44100\"/>	\
+		  </component>							\
+										\
 		";
 	}
 
@@ -80,8 +81,10 @@ Bool BoCA::EncoderTwinVQ::Activate()
 	const Config	*config = GetConfiguration();
 
 	const Format	&format = track.GetFormat();
-	const Info	&info = track.GetInfo();
+	const Info	&info	= track.GetInfo();
 
+	/* Check settings.
+	 */
 	switch (format.rate)
 	{
 		case 22050:
@@ -102,29 +105,18 @@ Bool BoCA::EncoderTwinVQ::Activate()
 				return False;
 			}
 			break;
-		default:
-			errorString = "Bad sampling rate! The selected sampling rate is not supported.";
-			errorState  = True;
-
-			return False;
 	}
 
-	if (format.channels > 2)
-	{
-		errorString = "This encoder does not support more than 2 channels!";
-		errorState  = True;
-
-		return False;
-	}
-
+	/* Create and configure TwinVQ encoder.
+	 */
 	memset(&setupInfo, 0, sizeof(headerInfo));
 	memset(&encInfo, 0, sizeof(encSpecificInfo));
 
 	ex_TvqGetVersionID(V2, setupInfo.ID);
 
-	setupInfo.channelMode = format.channels - 1;
+	setupInfo.channelMode  = format.channels - 1;
 	setupInfo.samplingRate = int(format.rate / 1000);
-	setupInfo.bitRate = config->GetIntValue(ConfigureTwinVQ::ConfigID, "Bitrate", 48) * format.channels;
+	setupInfo.bitRate      = config->GetIntValue(ConfigureTwinVQ::ConfigID, "Bitrate", 48) * format.channels;
 
 	if (info.HasBasicInfo())
 	{
@@ -200,24 +192,15 @@ Bool BoCA::EncoderTwinVQ::Deactivate()
 
 Int BoCA::EncoderTwinVQ::WriteData(Buffer<UnsignedByte> &data)
 {
+	/* Output samples to encoder.
+	 */
 	const Format	&format = track.GetFormat();
 
-	samplesBuffer.Resize(data.Size() / (format.bits / 8));
-
-	for (int i = 0; i < data.Size() / (format.bits / 8); i++)
+	for (Int ch = 0; ch < format.channels; ch++)
 	{
-		if	(format.bits ==  8) samplesBuffer[i] =	     (				   data [i] - 128) * 256;
-		else if (format.bits == 16) samplesBuffer[i] =	      ((short *) (unsigned char *) data)[i];
-		else if (format.bits == 32) samplesBuffer[i] = (int) (((long *)  (unsigned char *) data)[i]	   / 65536);
-
-		else if (format.bits == 24) samplesBuffer[i] = (int) ((data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256);
-	}
-
-	for (int ch = 0; ch < format.channels; ch++)
-	{
-		for (int i = 0; i < int(data.Size() / (format.bits / 8) / format.channels); i++)
+		for (Int i = 0; i < int(data.Size() / sizeof(short) / format.channels); i++)
 		{
-			frame[ch * int(frame.Size() / format.channels) + i] = (float) samplesBuffer[i * format.channels + ch];
+			frame[ch * int(frame.Size() / format.channels) + i] = (float) ((short *) (UnsignedByte *) data)[i * format.channels + ch];
 		}
 	}
 

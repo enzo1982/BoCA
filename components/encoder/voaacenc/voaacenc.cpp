@@ -24,42 +24,44 @@ const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 
 	if (voaacencdll != NIL)
 	{
-		componentSpecs = "							\
-											\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
-		  <component>								\
-		    <name>VisualOn AAC Encoder</name>					\
-		    <version>1.0</version>						\
-		    <id>voaacenc-enc</id>						\
-		    <type>encoder</type>						\
-											\
+		componentSpecs = "										\
+														\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
+		  <component>											\
+		    <name>VisualOn AAC Encoder</name>								\
+		    <version>1.0</version>									\
+		    <id>voaacenc-enc</id>									\
+		    <type>encoder</type>									\
+														\
 		";
 
 		if (mp4v2dll != NIL)
 		{
-			componentSpecs.Append("						\
-											\
-			    <format>							\
-			      <name>MPEG-4 AAC Files</name>				\
-			      <extension>m4a</extension>				\
-			      <extension>m4b</extension>				\
-			      <extension>m4r</extension>				\
-			      <extension>mp4</extension>				\
-			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
-			    </format>							\
-											\
+			componentSpecs.Append("									\
+														\
+			    <format>										\
+			      <name>MPEG-4 AAC Files</name>							\
+			      <extension>m4a</extension>							\
+			      <extension>m4b</extension>							\
+			      <extension>m4r</extension>							\
+			      <extension>mp4</extension>							\
+			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>				\
+			    </format>										\
+														\
 			");
 		}
 
-		componentSpecs.Append("							\
-											\
-		    <format>								\
-		      <name>Raw AAC Files</name>					\
-		      <extension>aac</extension>					\
-		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
-		    </format>								\
-		  </component>								\
-											\
+		componentSpecs.Append("										\
+														\
+		    <format>											\
+		      <name>Raw AAC Files</name>								\
+		      <extension>aac</extension>								\
+		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>					\
+		    </format>											\
+		    <input bits=\"16\" channels=\"1-2\"								\
+			   rate=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000\"/>	\
+		  </component>											\
+														\
 		");
 	}
 
@@ -80,18 +82,18 @@ Void smooth::DetachDLL()
 
 BoCA::EncoderVOAAC::EncoderVOAAC()
 {
-	configLayer    = NIL;
+	configLayer  = NIL;
 
-	mp4File	       = NIL;
-	handle	       = NIL;
+	mp4File	     = NIL;
+	handle	     = NIL;
 
-	mp4Track       = -1;
-	sampleId       = 0;
+	mp4Track     = -1;
+	sampleId     = 0;
 
-	frameSize      = 0;
+	frameSize    = 0;
 
-	totalSamples   = 0;
-	delaySamples   = 0;
+	totalSamples = 0;
+	delaySamples = 0;
 
 	memset(&memOperator, 0, sizeof(memOperator));
 	memset(&userData, 0, sizeof(userData));
@@ -106,29 +108,13 @@ BoCA::EncoderVOAAC::~EncoderVOAAC()
 
 Bool BoCA::EncoderVOAAC::Activate()
 {
+	const Config	*config = GetConfiguration();
+
 	const Format	&format = track.GetFormat();
-	const Info	&info = track.GetInfo();
-
-	if (format.channels > 2)
-	{
-		errorString = "This encoder does not support more than 2 channels!";
-		errorState  = True;
-
-		return False;
-	}
-
-	if (GetSampleRateIndex(format.rate) == -1)
-	{
-		errorString = "Bad sampling rate! The selected sampling rate is not supported.";
-		errorState  = True;
-
-		return False;
-	}
+	const Info	&info	= track.GetInfo();
 
 	/* Get configuration.
 	 */
-	const Config	*config = GetConfiguration();
-
 	Bool	 mp4Container = config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
 	Int	 bitrate      = config->GetIntValue(ConfigureVOAAC::ConfigID, "Bitrate", 96);
 
@@ -352,25 +338,13 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 Int BoCA::EncoderVOAAC::WriteData(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
-	/* Convert samples to 16 bit.
+	/* Copy data to samples buffer.
 	 */
-	const Format	&format	 = track.GetFormat();
-	Int		 samples = data.Size() / format.channels / (format.bits / 8);
-	Int		 offset	 = samplesBuffer.Size();
+	Int	 samples = data.Size() / 2;
 
-	samplesBuffer.Resize(samplesBuffer.Size() + samples * format.channels);
+	samplesBuffer.Resize(samplesBuffer.Size() + samples);
 
-	for (Int i = 0; i < samples * format.channels; i++)
-	{
-		if	(format.bits ==  8				) samplesBuffer[offset + i] =	    (				    data [i] - 128) * 256;
-		else if	(format.bits == 16				) samplesBuffer[offset + i] = (int)  ((int16_t *) (unsigned char *) data)[i];
-		else if (format.bits == 32				) samplesBuffer[offset + i] = (int) (((int32_t *) (unsigned char *) data)[i]	    / 65536);
-
-		else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[offset + i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-		else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[offset + i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
-	}
+	memcpy(samplesBuffer + samplesBuffer.Size() - samples, data, data.Size());
 
 	/* Output samples to encoder.
 	 */
@@ -391,7 +365,7 @@ Int BoCA::EncoderVOAAC::EncodeFrames(Bool flush)
 
 		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
 
-		memset(((int16_t *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(int16_t) * nullSamples * format.channels);
+		memset(samplesBuffer + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(int16_t) * nullSamples * format.channels);
 
 		totalSamples += samplesBuffer.Size() / format.channels - nullSamples;
 	}
@@ -401,7 +375,9 @@ Int BoCA::EncoderVOAAC::EncodeFrames(Bool flush)
 	Int	 dataLength	 = 0;
 	Int	 framesProcessed = 0;
 
-	while (samplesBuffer.Size() - framesProcessed * frameSize * format.channels >= frameSize * format.channels)
+	Int	 samplesPerFrame = frameSize * format.channels;
+
+	while (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame)
 	{
 		/* Prepare buffer information.
 		 */
@@ -409,8 +385,8 @@ Int BoCA::EncoderVOAAC::EncodeFrames(Bool flush)
 		VO_CODECBUFFER		 output	     = { 0 };
 		VO_AUDIO_OUTPUTINFO	 outputInfo  = { 0 };
 
-		input.Buffer = (uint8_t *) ((int16_t *) samplesBuffer + framesProcessed * frameSize * format.channels);
-		input.Length = frameSize * format.channels * sizeof(int16_t);
+		input.Buffer = (uint8_t *) ((int16_t *) samplesBuffer + framesProcessed * samplesPerFrame);
+		input.Length = samplesPerFrame * sizeof(int16_t);
 
 		/* Hand input data to encoder and retrieve output.
 		 */
@@ -432,9 +408,9 @@ Int BoCA::EncoderVOAAC::EncodeFrames(Bool flush)
 		framesProcessed++;
 	}
 
-	memmove((int16_t *) samplesBuffer, ((int16_t *) samplesBuffer) + framesProcessed * frameSize * format.channels, sizeof(int16_t) * (samplesBuffer.Size() - framesProcessed * frameSize * format.channels));
+	memmove(samplesBuffer, samplesBuffer + framesProcessed * samplesPerFrame, sizeof(int16_t) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
 
-	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frameSize * format.channels);
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
 
 	return dataLength;
 }

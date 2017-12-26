@@ -43,6 +43,8 @@ const String &BoCA::EncoderMAC::GetComponentSpecs()
 		      <extension>mac</extension>				\
 		      <tag id=\"apev2-tag\" mode=\"append\">APEv2</tag>		\
 		    </format>							\
+		    <input bits=\"8\" signed=\"false\" channels=\"1-2\"/>	\
+		    <input bits=\"16-24\" channels=\"1-2\"/>			\
 		  </component>							\
 										\
 		";
@@ -77,22 +79,12 @@ Bool BoCA::EncoderMAC::Activate()
 {
 	const Config	*config = GetConfiguration();
 
-	int	 nRetVal = 0;
-
 	const Format	&format = track.GetFormat();
-
-	/* Check number of channels.
-	 */
-	if (format.channels > 2)
-	{
-		errorString = "This encoder does not support more than 2 channels!";
-		errorState  = True;
-
-		return False;
-	}
 
 	/* Create encoder and retrieve handle.
 	 */
+	int	 nRetVal = 0;
+
 	hAPECompress = ex_APECompress_Create(&nRetVal);
 
 	/* Init encoder using output file name and format info.

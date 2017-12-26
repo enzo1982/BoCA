@@ -18,6 +18,7 @@ SF_OPEN_VIRTUAL		 ex_sf_open_virtual	= NIL;
 SF_CLOSE		 ex_sf_close		= NIL;
 SF_WRITE_SHORT		 ex_sf_write_short	= NIL;
 SF_WRITE_INT		 ex_sf_write_int	= NIL;
+SF_WRITE_FLOAT		 ex_sf_write_float	= NIL;
 SF_SET_STRING		 ex_sf_set_string	= NIL;
 SF_COMMAND		 ex_sf_command		= NIL;
 SF_STRERROR		 ex_sf_strerror		= NIL;
@@ -36,6 +37,7 @@ Bool LoadSndFileDLL()
 	ex_sf_close		= (SF_CLOSE) sndfiledll->GetFunctionAddress("sf_close");
 	ex_sf_write_short	= (SF_WRITE_SHORT) sndfiledll->GetFunctionAddress("sf_write_short");
 	ex_sf_write_int		= (SF_WRITE_INT) sndfiledll->GetFunctionAddress("sf_write_int");
+	ex_sf_write_float	= (SF_WRITE_FLOAT) sndfiledll->GetFunctionAddress("sf_write_float");
 	ex_sf_set_string	= (SF_SET_STRING) sndfiledll->GetFunctionAddress("sf_set_string");
 	ex_sf_command		= (SF_COMMAND) sndfiledll->GetFunctionAddress("sf_command");
 	ex_sf_strerror		= (SF_STRERROR) sndfiledll->GetFunctionAddress("sf_strerror");
@@ -46,6 +48,7 @@ Bool LoadSndFileDLL()
 	    ex_sf_close			== NIL ||
 	    ex_sf_write_short		== NIL ||
 	    ex_sf_write_int		== NIL ||
+	    ex_sf_write_float		== NIL ||
 	    ex_sf_set_string		== NIL ||
 	    ex_sf_command		== NIL ||
 	    ex_sf_strerror		== NIL ||

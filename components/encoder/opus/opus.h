@@ -11,7 +11,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
-#include "resampler.h"
 #include "dllinterface.h"
 
 BoCA_BEGIN_COMPONENT(EncoderOpus)
@@ -22,8 +21,6 @@ namespace BoCA
 	{
 		private:
 			ConfigLayer		*configLayer;
-
-			Resampler		*resampler;
 
 			ogg_stream_state	 os;
 			ogg_page		 og;

@@ -37,6 +37,8 @@ const String &BoCA::EncoderWMA::GetComponentSpecs()
 		      <extension>wma</extension>				\
 		      <tag id=\"wma-tag\" mode=\"other\">WMA Metadata</tag>	\
 		    </format>							\
+		    <input bits=\"8\" signed=\"false\"/>			\
+		    <input bits=\"16-32\"/>					\
 		  </component>							\
 										\
 		";

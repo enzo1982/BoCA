@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -68,6 +68,9 @@ struct CoreAudioCommSetup
 	int32_t		 channels;
 	int32_t		 rate;
 	int32_t		 bits;
+
+	int8_t		 fp;
+	int8_t		 sign;
 
 	char		 file[32768];
 };

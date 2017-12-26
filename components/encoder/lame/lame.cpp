@@ -22,22 +22,24 @@ const String &BoCA::EncoderLAME::GetComponentSpecs()
 
 	if (lamedll != NIL)
 	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>LAME MP3 Encoder %VERSION%</name>			\
-		    <version>1.0</version>					\
-		    <id>lame-enc</id>						\
-		    <type>encoder</type>					\
-		    <format>							\
-		      <name>MPEG 1 Audio Layer 3</name>				\
-		      <extension>mp3</extension>				\
-		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>		\
-		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>	\
-		    </format>							\
-		  </component>							\
-										\
+		componentSpecs = "								\
+												\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
+		  <component>									\
+		    <name>LAME MP3 Encoder %VERSION%</name>					\
+		    <version>1.0</version>							\
+		    <id>lame-enc</id>								\
+		    <type>encoder</type>							\
+		    <format>									\
+		      <name>MPEG 1 Audio Layer 3</name>						\
+		      <extension>mp3</extension>						\
+		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>				\
+		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>			\
+		    </format>									\
+		    <input bits=\"16\" channels=\"1-2\"						\
+			   rate=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"/>	\
+		  </component>									\
+												\
 		";
 
 		componentSpecs.Replace("%VERSION%", String("v").Append(ex_get_lame_short_version()));
@@ -72,10 +74,13 @@ BoCA::EncoderLAME::~EncoderLAME()
 
 Bool BoCA::EncoderLAME::Activate()
 {
-	/* Get configuration.
-	 */
 	const Config	*config = GetConfiguration();
 
+	const Format	&format	  = track.GetFormat();
+	const Info	&info	  = track.GetInfo();
+
+	/* Get configuration.
+	 */
 	Int	 preset		  = config->GetIntValue(ConfigureLAME::ConfigID, "Preset", 2);
 	Int	 resample	  = config->GetIntValue(ConfigureLAME::ConfigID, "Resample", -1);
 	Int	 vbrMode	  = config->GetIntValue(ConfigureLAME::ConfigID, "VBRMode", 4);
@@ -112,9 +117,6 @@ Bool BoCA::EncoderLAME::Activate()
 
 	/* Check settings.
 	 */
-	const Format	&format	  = track.GetFormat();
-	const Info	&info	  = track.GetInfo();
-
 	if (resample >= 0)
 	{
 		Int	 effectiveRate = (resample != 0 ? resample : format.rate);
@@ -178,23 +180,8 @@ Bool BoCA::EncoderLAME::Activate()
 					return False;
 				}
 				break;
-			default:
-				errorString = "Bad sampling rate! The selected sampling rate is not supported.";
-				errorState  = True;
-
-				return False;
 		}
 	}
-
-	if (format.channels > 2)
-	{
-		errorString = "This encoder does not support more than 2 channels!";
-		errorState  = True;
-
-		return False;
-	}
-
-	outBuffer.Resize(131072);
 
 	/* Create and configure LAME encoder.
 	 */
@@ -322,6 +309,8 @@ Bool BoCA::EncoderLAME::Activate()
 
 	dataOffset = 0;
 
+	outBuffer.Resize(131072);
+
 	/* Write ID3v2 tag if requested.
 	 */
 	if (config->GetIntValue("Tags", "EnableID3v2", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
@@ -421,36 +410,16 @@ Bool BoCA::EncoderLAME::Deactivate()
 
 Int BoCA::EncoderLAME::WriteData(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
-	outBuffer.Resize(data.Size() + 7200);
-
-	/* Convert samples to 16 bit.
+	/* Output samples to encoder.
 	 */
 	const Format	&format = track.GetFormat();
 	unsigned long	 bytes	= 0;
 
-	if (format.bits != 16)
-	{
-		samplesBuffer.Resize(data.Size() / (format.bits / 8));
+	outBuffer.Resize(data.Size() + 7200);
 
-		for (Int i = 0; i < data.Size() / (format.bits / 8); i++)
-		{
-			if	(format.bits ==  8				) samplesBuffer[i] =	   (				data [i] - 128) * 256;
-			else if (format.bits == 32				) samplesBuffer[i] = (int) (((long *) (unsigned char *) data)[i]	/ 65536);
-
-			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
-		}
-
-		if (format.channels == 2) bytes = ex_lame_encode_buffer_interleaved(context, samplesBuffer, data.Size() / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
-		else			  bytes = ex_lame_encode_buffer(context, samplesBuffer, samplesBuffer, data.Size() / (format.bits / 8), outBuffer, outBuffer.Size());
-	}
-	else
-	{
-		if (format.channels == 2) bytes = ex_lame_encode_buffer_interleaved(context, (signed short *) (unsigned char *) data, data.Size() / (format.bits / 8) / format.channels, outBuffer, outBuffer.Size());
-		else			  bytes = ex_lame_encode_buffer(context, (signed short *) (unsigned char *) data, (signed short *) (unsigned char *) data, data.Size() / (format.bits / 8), outBuffer, outBuffer.Size());
-	}
+	if (format.channels == 2) bytes = ex_lame_encode_buffer_interleaved(context, (signed short *) (unsigned char *) data, data.Size() / sizeof(signed short) / 2, outBuffer, outBuffer.Size());
+	else			  bytes = ex_lame_encode_buffer(	    context, (signed short *) (unsigned char *) data,
+										     (signed short *) (unsigned char *) data, data.Size() / sizeof(signed short),     outBuffer, outBuffer.Size());
 
 	driver->WriteData(outBuffer, bytes);
 

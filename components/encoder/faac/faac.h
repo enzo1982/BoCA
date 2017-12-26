@@ -33,7 +33,7 @@ namespace BoCA
 			Int			 totalSamples;
 
 			Buffer<unsigned char>	 outBuffer;
-			Buffer<int32_t>		 samplesBuffer;
+			Buffer<int16_t>		 samplesBuffer;
 
 			Int			 EncodeFrames(Bool);
 

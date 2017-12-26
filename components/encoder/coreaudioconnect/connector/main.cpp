@@ -200,7 +200,9 @@ int main(int argc, char *argv[])
 					CA::AudioStreamBasicDescription	 sourceFormat = { 0 };
 
 					sourceFormat.mFormatID		    = CA::kAudioFormatLinearPCM;
-					sourceFormat.mFormatFlags	    = CA::kLinearPCMFormatFlagIsPacked | (setup.bits > 8 ? CA::kLinearPCMFormatFlagIsSignedInteger : 0);
+					sourceFormat.mFormatFlags	    = CA::kLinearPCMFormatFlagIsPacked;
+					sourceFormat.mFormatFlags	   |= setup.fp		      ? CA::kLinearPCMFormatFlagIsFloat		: 0;
+					sourceFormat.mFormatFlags	   |= setup.sign && !setup.fp ? CA::kLinearPCMFormatFlagIsSignedInteger : 0;
 					sourceFormat.mSampleRate	    = setup.rate;
 					sourceFormat.mChannelsPerFrame	    = setup.channels;
 					sourceFormat.mBitsPerChannel	    = setup.bits;

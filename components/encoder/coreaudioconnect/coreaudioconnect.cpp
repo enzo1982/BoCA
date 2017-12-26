@@ -121,20 +121,12 @@ Bool BoCA::EncoderCoreAudioConnect::IsLossless() const
 
 Bool BoCA::EncoderCoreAudioConnect::Activate()
 {
+	const Config	*config = GetConfiguration();
+
 	const Format	&format = track.GetFormat();
-
-	if (format.channels > 8)
-	{
-		errorString = "This encoder does not support more than 8 channels!";
-		errorState  = True;
-
-		return False;
-	}
 
 	/* Get configuration.
 	 */
-	const Config	*config = GetConfiguration();
-
 	Int	 codec	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
 	Int	 kbps	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64);
 	Bool	 mp4Container = config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
@@ -153,6 +145,9 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 	((CoreAudioCommSetup *) &comm->data)->channels = format.channels;
 	((CoreAudioCommSetup *) &comm->data)->rate     = format.rate;
 	((CoreAudioCommSetup *) &comm->data)->bits     = format.bits;
+
+	((CoreAudioCommSetup *) &comm->data)->fp       = format.fp;
+	((CoreAudioCommSetup *) &comm->data)->sign     = format.sign;
 
 	fileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out");
 

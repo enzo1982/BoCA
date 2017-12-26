@@ -24,22 +24,23 @@ const String &BoCA::EncoderBlade::GetComponentSpecs()
 
 	if (bladedll != NIL)
 	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>BladeEnc MP3 Encoder %VERSION%</name>			\
-		    <version>1.0</version>					\
-		    <id>bladeenc-enc</id>					\
-		    <type threadSafe=\"false\">encoder</type>			\
-		    <format>							\
-		      <name>MPEG 1 Audio Layer 3</name>				\
-		      <extension>mp3</extension>				\
-		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>		\
-		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>	\
-		    </format>							\
-		  </component>							\
-										\
+		componentSpecs = "							\
+											\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
+		  <component>								\
+		    <name>BladeEnc MP3 Encoder %VERSION%</name>				\
+		    <version>1.0</version>						\
+		    <id>bladeenc-enc</id>						\
+		    <type threadSafe=\"false\">encoder</type>				\
+		    <format>								\
+		      <name>MPEG 1 Audio Layer 3</name>					\
+		      <extension>mp3</extension>					\
+		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>			\
+		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
+		    </format>								\
+		    <input bits=\"16\" channels=\"1-2\" rate=\"32000,44100,48000\"/>	\
+		  </component>								\
+											\
 		";
 
 		BE_VERSION	 beVer;
@@ -76,27 +77,13 @@ BoCA::EncoderBlade::~EncoderBlade()
 
 Bool BoCA::EncoderBlade::Activate()
 {
-	const Format	&format = track.GetFormat();
-	const Info	&info = track.GetInfo();
-
-	if (format.rate != 32000 && format.rate != 44100 && format.rate != 48000)
-	{
-		errorString = "Bad sampling rate! BladeEnc supports only 32, 44.1 or 48 kHz.";
-		errorState  = True;
-
-		return False;
-	}
-
-	if (format.channels > 2)
-	{
-		errorString = "This encoder does not support more than 2 channels!";
-		errorState  = True;
-
-		return False;
-	}
-
 	const Config	*config = GetConfiguration();
 
+	const Format	&format = track.GetFormat();
+	const Info	&info	= track.GetInfo();
+
+	/* Create and configure BladeEnc encoder.
+	 */
 	beConfig.dwConfig			= BE_CONFIG_MP3;
 	beConfig.format.mp3.dwSampleRate	= format.rate;
 
@@ -122,7 +109,6 @@ Bool BoCA::EncoderBlade::Activate()
 	ex_beInitStream(&beConfig, &samplesSize, &bufferSize, &handle);
 
 	outBuffer.Resize(bufferSize);
-	samplesBuffer.Resize(samplesSize);
 
 	packageSize = samplesSize * (format.bits / 8);
 
@@ -208,26 +194,11 @@ Bool BoCA::EncoderBlade::Deactivate()
 
 Int BoCA::EncoderBlade::WriteData(Buffer<UnsignedByte> &data)
 {
+	/* Output samples to encoder.
+	 */
 	unsigned long	 bytes = 0;
 
-	const Format	&format = track.GetFormat();
-
-	if (format.bits != 16)
-	{
-		for (int i = 0; i < data.Size() / (format.bits / 8); i++)
-		{
-			if	(format.bits ==  8) samplesBuffer[i] =	     (				  data [i] - 128) * 256;
-			else if (format.bits == 32) samplesBuffer[i] = (int) (((long *) (unsigned char *) data)[i]	  / 65536);
-
-			else if (format.bits == 24) samplesBuffer[i] = (int) ((data[3 * i] + 256 * data[3 * i + 1] + 65536 * data[3 * i + 2] - (data[3 * i + 2] & 128 ? 16777216 : 0)) / 256);
-		}
-
-		ex_beEncodeChunk(handle, data.Size() / (format.bits / 8), samplesBuffer, outBuffer, &bytes);
-	}
-	else
-	{
-		ex_beEncodeChunk(handle, data.Size() / (format.bits / 8), (short *) (unsigned char *) data, outBuffer, &bytes);
-	}
+	ex_beEncodeChunk(handle, data.Size() / sizeof(short), (short *) (unsigned char *) data, outBuffer, &bytes);
 
 	driver->WriteData(outBuffer, bytes);
 

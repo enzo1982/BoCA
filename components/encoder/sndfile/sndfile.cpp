@@ -97,6 +97,8 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 		      <name>Audio Visual Research Format</name>			\
 		      <extension>avr</extension>				\
 		    </format>							\
+		    <input bits=\"8-32\"/>					\
+		    <input float=\"true\"/>					\
 		  </component>							\
 										\
 		";
@@ -409,7 +411,7 @@ Int BoCA::EncoderSndFile::WriteData(Buffer<UnsignedByte> &data)
 	{
 		Buffer<short>	 buffer(data.Size());
 
-		for (Int i = 0; i < data.Size(); i++) buffer[i] = (data[i] - 128) << 8;
+		for (Int i = 0; i < data.Size(); i++) buffer[i] = ((signed char *) (UnsignedByte *) data)[i] << 8;
 
 		bytes = ex_sf_write_short(sndf, buffer, data.Size());
 	}
@@ -429,9 +431,13 @@ Int BoCA::EncoderSndFile::WriteData(Buffer<UnsignedByte> &data)
 
 		bytes = ex_sf_write_int(sndf, buffer, data.Size() / 3) * 3;
 	}
-	else if (format.bits == 32)
+	else if (format.bits == 32 && !format.fp)
 	{
 		bytes = ex_sf_write_int(sndf, (int *) (UnsignedByte *) data, data.Size() / 4) * 4;
+	}
+	else if (format.bits == 32 && format.fp)
+	{
+		bytes = ex_sf_write_float(sndf, (float *) (UnsignedByte *) data, data.Size() / 4) * 4;
 	}
 
 	return bytes;
@@ -440,16 +446,18 @@ Int BoCA::EncoderSndFile::WriteData(Buffer<UnsignedByte> &data)
 Int BoCA::EncoderSndFile::SelectBestSubFormat(const Format &format, Int fileFormat)
 {
 	static Int	 formats8Bit[]	= { SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32, SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE, SF_FORMAT_ULAW, SF_FORMAT_ALAW, NIL };
-	static Int	 formats16Bit[] = { SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32, SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE, SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_ULAW, SF_FORMAT_ALAW, NIL };
-	static Int	 formats24Bit[] = { SF_FORMAT_PCM_24, SF_FORMAT_PCM_32, SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE, SF_FORMAT_PCM_16, SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_ULAW, SF_FORMAT_ALAW, NIL };
-	static Int	 formats32Bit[] = { SF_FORMAT_PCM_32, SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE, SF_FORMAT_PCM_24, SF_FORMAT_PCM_16, SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_ULAW, SF_FORMAT_ALAW, NIL };
+	static Int	 formats16Bit[]	= { SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32, SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE, SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_ULAW, SF_FORMAT_ALAW, NIL };
+	static Int	 formats24Bit[]	= { SF_FORMAT_PCM_24, SF_FORMAT_PCM_32, SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE, SF_FORMAT_PCM_16, SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_ULAW, SF_FORMAT_ALAW, NIL };
+	static Int	 formats32Bit[]	= { SF_FORMAT_PCM_32, SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE, SF_FORMAT_PCM_24, SF_FORMAT_PCM_16, SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_ULAW, SF_FORMAT_ALAW, NIL };
+	static Int	 formatsFloat[] = { SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE, SF_FORMAT_PCM_32, SF_FORMAT_PCM_24, SF_FORMAT_PCM_16, SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_ULAW, SF_FORMAT_ALAW, NIL };
 
 	Int	*formats = NIL;
 
-	if	(format.bits <=  8) formats = formats8Bit;
-	else if (format.bits <= 16) formats = formats16Bit;
-	else if (format.bits <= 24) formats = formats24Bit;
-	else			    formats = formats32Bit;
+	if	( format.bits <=  8) formats = formats8Bit;
+	else if ( format.bits <= 16) formats = formats16Bit;
+	else if ( format.bits <= 24) formats = formats24Bit;
+	else if	(!format.fp	   ) formats = formats32Bit;
+	else			     formats = formatsFloat;
 
 	for (Int i = 0; formats[i] != NIL; i++)
 	{

@@ -34,6 +34,7 @@ const String &BoCA::EncoderBonk::GetComponentSpecs()
 		      <name>Bonk Audio Files</name>		\
 		      <extension>bonk</extension>		\
 		    </format>					\
+		    <input bits=\"16\" channels=\"1-2\"/>	\
 		  </component>					\
 								\
 		";
@@ -75,19 +76,13 @@ Bool BoCA::EncoderBonk::IsLossless() const
 
 Bool BoCA::EncoderBonk::Activate()
 {
-	const Format	&format = track.GetFormat();
-	const Info	&info = track.GetInfo();
-
-	if (format.channels > 2)
-	{
-		errorString = "This encoder does not support more than 2 channels!";
-		errorState  = True;
-
-		return False;
-	}
-
 	const Config	*config = GetConfiguration();
 
+	const Format	&format = track.GetFormat();
+	const Info	&info	= track.GetInfo();
+
+	/* Configure and create Bonk encoder.
+	 */
 	packageSize = int(1024.0 * format.rate / 44100) * format.channels * (config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0) ? 1 : config->GetIntValue(ConfigureBonk::ConfigID, "Downsampling", 2)) * (format.bits / 8);
 
 	dataBuffer.Resize(131072);
@@ -116,6 +111,8 @@ Bool BoCA::EncoderBonk::Activate()
 		}
 	}
 
+	/* Init Bonk encoder.
+	 */
 	ex_bonk_encoder_init(encoder,
 		(unsigned int) Math::Max(track.length * format.channels, (Int64) 0), format.rate, format.channels,
 		config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0), config->GetIntValue(ConfigureBonk::ConfigID, "JointStereo", 0),
@@ -181,32 +178,9 @@ Bool BoCA::EncoderBonk::Deactivate()
 
 Int BoCA::EncoderBonk::WriteData(Buffer<UnsignedByte> &data)
 {
-	static Endianness	 endianness = CPU().GetEndianness();
-
-	/* Convert samples to 16 bit.
+	/* Output samples to encoder.
 	 */
-	const Format	&format = track.GetFormat();
-	int		 bytes	= 0;
-
-	if (format.bits != 16)
-	{
-		samplesBuffer.Resize(data.Size());
-
-		for (Int i = 0; i < data.Size() / (format.bits / 8); i++)
-		{
-			if	(format.bits ==  8				) samplesBuffer[i] =	   (				data [i] - 128) * 256;
-			else if (format.bits == 32				) samplesBuffer[i] = (int) (((long *) (unsigned char *) data)[i]	/ 65536);
-
-			else if (format.bits == 24 && endianness == EndianLittle) samplesBuffer[i] = (int) ((data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 65536);
-			else if (format.bits == 24 && endianness == EndianBig	) samplesBuffer[i] = (int) ((data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 65536);
-		}
-
-		bytes = ex_bonk_encoder_encode_packet(encoder, samplesBuffer, data.Size() / (format.bits / 8), dataBuffer, dataBuffer.Size());
-	}
-	else
-	{
-		bytes = ex_bonk_encoder_encode_packet(encoder, (short *) (unsigned char *) data, data.Size() / (format.bits / 8), dataBuffer, dataBuffer.Size());
-	}
+	unsigned long	 bytes = ex_bonk_encoder_encode_packet(encoder, (short *) (unsigned char *) data, data.Size() / sizeof(short), dataBuffer, dataBuffer.Size());
 
 	driver->WriteData(dataBuffer, bytes);
 

@@ -38,6 +38,8 @@ const String &BoCA::EncoderWave::GetComponentSpecs()
 	      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 	      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
 	    </format>							\
+	    <input bits=\"8\" signed=\"false\"/>			\
+	    <input bits=\"16-32\"/>					\
 	  </component>							\
 									\
 	";
