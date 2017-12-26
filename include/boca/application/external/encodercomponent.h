@@ -28,6 +28,8 @@ namespace BoCA
 			protected:
 				Format			 format;
 
+				Int			 TransformData(Buffer<UnsignedByte> &);
+
 				virtual Int		 RenderTags(const String &, const Track &, Buffer<UnsignedByte> &, Buffer<UnsignedByte> &);
 			public:
 							 EncoderComponentExternal(ComponentSpecs *);
@@ -43,6 +45,9 @@ namespace BoCA
 				virtual Bool		 IsThreadSafe() const;
 
 				virtual Bool		 IsLossless() const;
+
+				virtual Bool		 Activate();
+				virtual Bool		 Deactivate();
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 			accessors:

@@ -14,6 +14,7 @@
 #define H_BOCA_AS_STREAMCOMPONENT
 
 #include "component.h"
+#include "../common/formatconverter.h"
 #include "../common/metadata/track.h"
 
 namespace BoCA
@@ -23,6 +24,8 @@ namespace BoCA
 		class BOCA_DLL_EXPORT StreamComponent : public Component, public IO::Filter
 		{
 			protected:
+				FormatConverter		*converter;
+
 				Bool			 errorState;
 				String			 errorString;
 

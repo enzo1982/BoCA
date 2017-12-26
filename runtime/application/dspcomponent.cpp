@@ -32,10 +32,30 @@ const BoCA::Format &BoCA::AS::DSPComponent::GetFormatInfo() const
 
 Int BoCA::AS::DSPComponent::TransformData(Buffer<UnsignedByte> &buffer)
 {
+	converter->Transform(buffer);
+
 	return specs->func_TransformData(component, &buffer);
 }
 
 Int BoCA::AS::DSPComponent::Flush(Buffer<UnsignedByte> &buffer)
 {
-	return specs->func_Flush(component, &buffer);
+	/* Finish conversion.
+	 */
+	converter->Finish(buffer);
+
+	if (buffer.Size() != 0) specs->func_TransformData(component, &buffer);
+
+	/* Flush component.
+	 */
+	Buffer<UnsignedByte>	 flush;
+
+	specs->func_Flush(component, &flush);
+
+	/* Append flush buffer contents to output.
+	 */
+	buffer.Resize(buffer.Size() + flush.Size());
+
+	memcpy(buffer + buffer.Size() - flush.Size(), flush, flush.Size());
+
+	return buffer.Size();
 }

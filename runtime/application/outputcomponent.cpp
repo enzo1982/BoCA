@@ -27,11 +27,23 @@ Int BoCA::AS::OutputComponent::GetPackageSize()
 
 Int BoCA::AS::OutputComponent::WriteData(Buffer<UnsignedByte> &buffer)
 {
+	converter->Transform(buffer);
+
 	return specs->func_WriteData(component, &buffer);
 }
 
 Bool BoCA::AS::OutputComponent::Finish()
 {
+	/* Finish conversion.
+	 */
+	Buffer<UnsignedByte>	 buffer;
+
+	converter->Finish(buffer);
+
+	if (buffer.Size() != 0) specs->func_WriteData(component, &buffer);
+
+	/* Signal component to finish.
+	 */
 	return specs->func_Finish(component);
 }
 

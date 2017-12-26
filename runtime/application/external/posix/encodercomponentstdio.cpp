@@ -37,17 +37,7 @@ BoCA::AS::EncoderComponentExternalStdIO::~EncoderComponentExternalStdIO()
 
 Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 {
-	/* Check number of channels.
-	 */
-	Int	 channels = specs->formats.GetFirst()->GetNumberOfChannels();
-
-	if (format.channels > channels)
-	{
-		errorString = String("This encoder does not support more than ").Append(String::FromInt(channels)).Append(" channels!");
-		errorState  = True;
-
-		return False;
-	}
+	if (!EncoderComponentExternal::Activate()) return False;
 
 	/* Build output file name.
 	 */
@@ -105,6 +95,8 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 {
+	EncoderComponentExternal::Deactivate();
+
 	/* Close stdio pipe
 	 */
 	delete out;
@@ -172,6 +164,8 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &data)
 {
+	TransformData(data);
+
 	/* Convert to little-endian byte order.
 	 */
 	static Endianness	 endianness = CPU().GetEndianness();

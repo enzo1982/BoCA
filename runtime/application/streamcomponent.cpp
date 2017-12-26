@@ -14,6 +14,8 @@
 
 BoCA::AS::StreamComponent::StreamComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
 {
+	converter   = NIL;
+
 	errorState  = False;
 	errorString = "Unknown error";
 }
@@ -43,9 +45,34 @@ Bool BoCA::AS::StreamComponent::Activate()
 {
 	SetDriver(driver);
 
+	/* Setup format converter and adjust track info.
+	 */
+	Format	 target = FormatConverter::GetBestTargetFormat(track.GetFormat(), this);
+
+	converter = new FormatConverter(track.GetFormat(), target);
+
+	if (converter->GetErrorState())
+	{
+		errorState  = True;
+		errorString = converter->GetErrorString();
+
+		delete converter;
+
+		return False;
+	}
+
+	track.SetFormat(target);
+
+	specs->func_SetAudioTrackInfo(component, &track);
+
 	/* Activate component.
 	 */
-	if (!specs->func_Activate(component)) return False;
+	if (!specs->func_Activate(component))
+	{
+		delete converter;
+
+		return False;
+	}
 
 	packageSize = GetPackageSize();
 
@@ -54,6 +81,10 @@ Bool BoCA::AS::StreamComponent::Activate()
 
 Bool BoCA::AS::StreamComponent::Deactivate()
 {
+	/* Clean up format converter.
+	 */
+	delete converter;
+
 	/* Deactivate component.
 	 */
 	return specs->func_Deactivate(component);

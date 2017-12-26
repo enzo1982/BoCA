@@ -34,6 +34,9 @@ namespace BoCA
 
 				virtual Bool	 IsLossless() const;
 
+				virtual Bool	 Activate();
+				virtual Bool	 Deactivate();
+
 				virtual Int	 WriteData(Buffer<UnsignedByte> &);
 				virtual Bool	 NextPass();
 		};

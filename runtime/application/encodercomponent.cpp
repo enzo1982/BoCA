@@ -50,8 +50,32 @@ Bool BoCA::AS::EncoderComponent::IsLossless() const
 	else				       return specs->formats.GetFirst()->IsLossless();
 }
 
+Bool BoCA::AS::EncoderComponent::Activate()
+{
+	/* Activate component.
+	 */
+	return StreamComponent::Activate();
+}
+
+Bool BoCA::AS::EncoderComponent::Deactivate()
+{
+	/* Flush format converter.
+	 */
+	Buffer<UnsignedByte>	 buffer;
+
+	converter->Finish(buffer);
+
+	if (buffer.Size() != 0) specs->func_WriteData(component, &buffer);
+
+	/* Deactivate component.
+	 */
+	return StreamComponent::Deactivate();
+}
+
 Int BoCA::AS::EncoderComponent::WriteData(Buffer<UnsignedByte> &buffer)
 {
+	converter->Transform(buffer);
+
 	return specs->func_WriteData(component, &buffer);
 }
 

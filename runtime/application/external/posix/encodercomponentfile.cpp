@@ -33,17 +33,7 @@ BoCA::AS::EncoderComponentExternalFile::~EncoderComponentExternalFile()
 
 Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 {
-	/* Check number of channels.
-	 */
-	Int	 channels = specs->formats.GetFirst()->GetNumberOfChannels();
-
-	if (format.channels > channels)
-	{
-		errorString = String("This encoder does not support more than ").Append(String::FromInt(channels)).Append(" channels!");
-		errorState  = True;
-
-		return False;
-	}
+	if (!EncoderComponentExternal::Activate()) return False;
 
 	/* Create temporary WAVE file
 	 */
@@ -77,6 +67,8 @@ Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 
 Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 {
+	EncoderComponentExternal::Deactivate();
+
 	/* Finalize and close the uncompressed temporary file
 	 */
 	Int	 size = nOfSamples * (format.bits / 8);
@@ -176,6 +168,8 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 Int BoCA::AS::EncoderComponentExternalFile::WriteData(Buffer<UnsignedByte> &data)
 {
+	TransformData(data);
+
 	/* Convert to little-endian byte order.
 	 */
 	static Endianness	 endianness = CPU().GetEndianness();

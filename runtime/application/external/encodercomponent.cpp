@@ -63,6 +63,53 @@ Bool BoCA::AS::EncoderComponentExternal::IsLossless() const
 	return specs->formats.GetFirst()->IsLossless();
 }
 
+Bool BoCA::AS::EncoderComponentExternal::Activate()
+{
+	/* Setup format converter and adjust track info.
+	 */
+	Format	 target = FormatConverter::GetBestTargetFormat(track.GetFormat(), this);
+
+	if (target.bits == 8)	 target.sign = False;
+	if (target.fp	== True) target.fp   = False;
+
+	converter = new FormatConverter(track.GetFormat(), target);
+	format	  = target;
+
+	if (converter->GetErrorState())
+	{
+		errorState  = True;
+		errorString = converter->GetErrorString();
+
+		delete converter;
+
+		return False;
+	}
+
+	track.SetFormat(format);
+
+	return True;
+}
+
+Bool BoCA::AS::EncoderComponentExternal::Deactivate()
+{
+	/* Flush and clean up format converter.
+	 */
+	Buffer<UnsignedByte>	 buffer;
+
+	converter->Finish(buffer);
+
+	if (buffer.Size() != 0) WriteData(buffer);
+
+	delete converter;
+
+	return True;
+}
+
+Int BoCA::AS::EncoderComponentExternal::TransformData(Buffer<UnsignedByte> &buffer)
+{
+	return converter->Transform(buffer);
+}
+
 BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()
 {
 	if (configLayer == NIL && specs->parameters.Length() > 0) configLayer = new ConfigLayerExternal(specs);
