@@ -122,6 +122,8 @@ BoCA::AS::ComponentSpecs::~ComponentSpecs()
 {
 	if (library != NIL) delete library;
 
+	foreach (InputSpec *input, inputs) delete input;
+
 	foreach (FileFormat *format, formats) delete format;
 	foreach (TagSpec *tag, tags) delete tag;
 
@@ -373,6 +375,26 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 		{
 			succeedComponents.Add(node->GetContent());
 		}
+		else if (node->GetName() == "input")
+		{
+			InputSpec	*input = new InputSpec();
+
+			input->SetFloat(False);
+			input->SetSigned(True);
+
+			if (node->GetAttributeByName("float")	 != NIL) input->SetFloat(node->GetAttributeByName("float")->GetContent() == "true");
+			if (node->GetAttributeByName("signed")	 != NIL) input->SetSigned(node->GetAttributeByName("signed")->GetContent() == "true");
+
+			input->SetBits(input->GetFloat() ? "32" : "8-32");
+			input->SetChannels("1-255");
+			input->SetRate("1-192000");
+
+			if (node->GetAttributeByName("bits")	 != NIL) input->SetBits(node->GetAttributeByName("bits")->GetContent());
+			if (node->GetAttributeByName("channels") != NIL) input->SetChannels(node->GetAttributeByName("channels")->GetContent());
+			if (node->GetAttributeByName("rate")	 != NIL) input->SetRate(node->GetAttributeByName("rate")->GetContent());
+
+			inputs.Add(input);
+		}
 		else if (node->GetName() == "format")
 		{
 			FileFormat	*format = new FileFormat();
@@ -401,7 +423,6 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 					format->AddTagFormat(tagFormat);
 				}
-				else if (node2->GetName() == "channels")  format->SetNumberOfChannels(node2->GetContent().ToInt());
 			}
 
 			formats.Add(format);

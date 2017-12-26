@@ -2,7 +2,7 @@
 
 <!ENTITY % BoCA.Version "-//DTD BoCA 1.0 Draft//EN">
 
-<!ELEMENT component (name, version, id, type, require*, replace*, conflict*, precede*, succeed*, format*, tagspec*, external*)>
+<!ELEMENT component (name, version, id, type, require*, replace*, conflict*, precede*, succeed*, format*, input*, tagspec*, external*)>
 
 	<!ELEMENT name (#PCDATA)>
 
@@ -20,7 +20,7 @@
 	<!ELEMENT precede (#PCDATA)>
 	<!ELEMENT succeed (#PCDATA)>
 
-	<!ELEMENT format (name, lossless?, extension+, tag*, channels?)>
+	<!ELEMENT format (name, lossless?, extension+, tag*)>
 
 		<!ELEMENT lossless (#PCDATA)>
 		<!ELEMENT extension (#PCDATA)>
@@ -29,7 +29,12 @@
 		<!ATTLIST tag id   NMTOKEN		  #REQUIRED
 			      mode (prepend|append|other) #REQUIRED>
 
-		<!ELEMENT channels (#PCDATA)>
+	<!ELEMENT input EMPTY>
+	<!ATTLIST input float	 (true|false) "false"
+			signed	 (true|false) "true"
+			bits	 CDATA #IMPLIED
+			channels CDATA #IMPLIED
+			rate	 CDATA #IMPLIED>
 
 	<!ELEMENT tagspec (name, coverart?, encodings?)>
 	<!ATTLIST tagspec default (true|false) "true">

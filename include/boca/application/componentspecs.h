@@ -76,6 +76,39 @@ namespace BoCA
 
 	namespace AS
 	{
+		class BOCA_DLL_EXPORT InputSpec
+		{
+			private:
+				Bool			 fp;
+				Bool			 sign;
+
+				String			 bits;
+				String			 channels;
+				String			 rate;
+			public:
+							 InputSpec(Int n = 0) : fp(False),
+										sign(True),
+										bits("8-32"),
+										channels("1-255"),
+										rate("1-192000")	{ }
+							~InputSpec()					{ }
+
+				Bool			 GetFloat() const				{ return fp; }
+				Void			 SetFloat(Bool nFp)				{ fp = nFp; }
+
+				Bool			 GetSigned() const				{ return sign; }
+				Void			 SetSigned(Bool nSign)				{ sign = nSign; }
+
+				const String		&GetBits() const				{ return bits; }
+				Void			 SetBits(const String &nBits)			{ bits = nBits; }
+
+				const String		&GetChannels() const				{ return channels; }
+				Void			 SetChannels(const String &nChannels)		{ channels = nChannels; }
+
+				const String		&GetRate() const				{ return rate; }
+				Void			 SetRate(const String &nRate)			{ rate = nRate; }
+		};
+
 		class BOCA_DLL_EXPORT TagFormat
 		{
 			private:
@@ -104,11 +137,8 @@ namespace BoCA
 
 				Array<String>		 extensions;
 				Array<TagFormat>	 tagFormats;
-
-				Int			 channels;
 			public:
-							 FileFormat(Int n = 0) : lossless(False),
-										 channels(255)		{ }
+							 FileFormat(Int n = 0) : lossless(False)	{ }
 							~FileFormat()					{ }
 
 				const String		&GetName() const				{ return name; }
@@ -122,9 +152,6 @@ namespace BoCA
 
 				const Array<TagFormat>	&GetTagFormats() const				{ return tagFormats; }
 				Void			 AddTagFormat(const TagFormat &nFormat)		{ tagFormats.Add(nFormat); }
-
-				const Int		&GetNumberOfChannels() const			{ return channels; }
-				Void			 SetNumberOfChannels(Int nChannels)		{ channels = nChannels; }
 		};
 
 		class BOCA_DLL_EXPORT TagSpec
@@ -278,6 +305,8 @@ namespace BoCA
 				Bool			 external_md5_stderr;
 				String			 external_md5_require;
 				String			 external_md5_prefix;
+
+				Array<InputSpec *>	 inputs;
 
 				Array<Parameter *>	 parameters;
 

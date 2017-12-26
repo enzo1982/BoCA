@@ -55,6 +55,11 @@ Bool BoCA::AS::Component::IsThreadSafe() const
 	return specs->threadSafe;
 }
 
+const Array<BoCA::AS::InputSpec *> &BoCA::AS::Component::GetInputSpecs() const
+{
+	return specs->inputs;
+}
+
 const Array<BoCA::AS::FileFormat *> &BoCA::AS::Component::GetFormats() const
 {
 	return specs->formats;
