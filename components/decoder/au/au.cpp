@@ -61,7 +61,7 @@ Error BoCA::DecoderSunAu::GetStreamInfo(const String &streamURI, Track &track)
 	track.length	= UnsignedInt32(in.InputNumberRaw(4));
 	format.bits	= UnsignedInt32(in.InputNumberRaw(4));
 
-	if	(format.bits == 2) { format.bits =  8; format.sign = False; }
+	if	(format.bits == 2)   format.bits =  8;
 	else if (format.bits == 3)   format.bits = 16;
 	else if (format.bits == 4)   format.bits = 24;
 	else if (format.bits == 5)   format.bits = 32;
@@ -120,11 +120,5 @@ Int BoCA::DecoderSunAu::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (driver->GetPos() == driver->GetSize()) return -1;
 
-	Int	 size = driver->ReadData(data, data.Size());
-
-	/* Convert 8 bit samples to unsigned.
-	 */
-	if (track.GetFormat().bits == 8) for (Int i = 0; i < size; i++) data[i] = data[i] + 128;
-
-	return size;
+	return driver->ReadData(data, data.Size());
 }

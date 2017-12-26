@@ -133,8 +133,6 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 			format.order	= BYTE_RAW;
 			format.bits	= (unsigned short) in.InputNumberRaw(2);
 
-			if (format.bits == 8) format.sign = False;
-
 			/* Read sample rate as 80 bit float.
 			 */
 			int16_t		 exp = (in.InputNumberRaw(2) & 0x7FFF) - 16383 - 63;
@@ -274,11 +272,5 @@ Int BoCA::DecoderAIFF::ReadData(Buffer<UnsignedByte> &data)
 {
 	if (driver->GetPos() == driver->GetSize()) return -1;
 
-	Int	 size = driver->ReadData(data, data.Size());
-
-	/* Convert 8 bit samples to unsigned.
-	 */
-	if (track.GetFormat().bits == 8) for (Int i = 0; i < size; i++) data[i] = data[i] + 128;
-
-	return size;
+	return driver->ReadData(data, data.Size());
 }

@@ -272,24 +272,26 @@ Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data)
 
 	samplesBufferMutex->Lock();
 
-	Int	 size = samplesBuffer.Size() * (track.GetFormat().bits / 8);
-
-	data.Resize(size);
+	/* Convert samples to target format.
+	 */
+	const Format	&format = track.GetFormat();
+ 
+	data.Resize(samplesBuffer.Size() * (format.bits / 8));
 
 	for (Int i = 0; i < samplesBuffer.Size(); i++)
 	{
-		if	(track.GetFormat().bits ==  8				   )				  data [i] = samplesBuffer[i] + 128;
-		else if (track.GetFormat().bits == 16				   ) ((Short *) (unsigned char *) data)[i] = samplesBuffer[i];
+		if	(format.bits ==  8				) ((int8_t  *) (UnsignedByte *) data)[i] = samplesBuffer[i];
+		else if (format.bits == 16				) ((int16_t *) (UnsignedByte *) data)[i] = samplesBuffer[i];
 
-		else if (track.GetFormat().bits == 24 && endianness == EndianLittle) { data[3 * i + 2] = (samplesBuffer[i] >> 16) & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i    ] = samplesBuffer[i] & 0xFF; }
-		else if (track.GetFormat().bits == 24 && endianness == EndianBig   ) { data[3 * i    ] = (samplesBuffer[i] >> 16) & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i + 2] = samplesBuffer[i] & 0xFF; }
+		else if (format.bits == 24 && endianness == EndianLittle) { data[3 * i + 2] = (samplesBuffer[i] >> 16) & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i    ] = samplesBuffer[i] & 0xFF; }
+		else if (format.bits == 24 && endianness == EndianBig   ) { data[3 * i    ] = (samplesBuffer[i] >> 16) & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i + 2] = samplesBuffer[i] & 0xFF; }
 	}
 
 	samplesBuffer.Resize(0);
 
 	samplesBufferMutex->Release();
 
-	return size;
+	return data.Size();
 }
 
 Int BoCA::DecoderFLAC::ReadFLAC(Bool readData)

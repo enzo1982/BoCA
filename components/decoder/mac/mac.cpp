@@ -75,9 +75,10 @@ Error BoCA::DecoderMAC::GetStreamInfo(const String &streamURI, Track &track)
 	Format	 format = track.GetFormat();
 
 	format.bits	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BITS_PER_SAMPLE, 0, 0);
-
 	format.channels	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_CHANNELS, 0, 0);
 	format.rate	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_SAMPLE_RATE, 0, 0);
+
+	format.sign	= format.bits != 8;
 
 	track.length	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0);
 
