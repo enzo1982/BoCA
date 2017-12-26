@@ -99,12 +99,6 @@ namespace BoCA
 			GroupBox		*expert_format;
 			CheckBox		*expert_check_iso;
 
-			GroupBox		*filtering_resample;
-			ComboBox		*filtering_combo_resample;
-
-			GroupBox		*filtering_misc;
-			CheckBox		*filtering_check_disable_all;
-
 			GroupBox		*filtering_lowpass;
 			CheckBox		*filtering_set_lowpass;
 			EditBox			*filtering_edit_lowpass;
@@ -116,6 +110,9 @@ namespace BoCA
 			EditBox			*filtering_edit_highpass;
 			CheckBox		*filtering_set_highpass_width;
 			EditBox			*filtering_edit_highpass_width;
+
+			GroupBox		*filtering_misc;
+			CheckBox		*filtering_check_disable_all;
 
 			Int			 preset;
 			Int			 set_bitrate;

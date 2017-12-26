@@ -286,39 +286,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	i18n->SetContext("Encoders::LAME::Audio processing");
 
-	filtering_resample		= new GroupBox(i18n->TranslateString("Output sampling rate"), Point(7, 11), Size(161, 39));
-
-	filtering_combo_resample	= new ComboBox(Point(10, 10), Size(141, 0));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("auto"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("no resampling"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "8"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "11.025"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "12"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "16"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "22.05"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "24"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "32"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "44.1"));
-	filtering_combo_resample->AddEntry(i18n->TranslateString("%1 kHz", "Technical").Replace("%1", "48"));
-
-	switch (config->GetIntValue(ConfigID, "Resample", -1))
-	{
-		case    -1: filtering_combo_resample->SelectNthEntry(0);  break;
-		case	 0: filtering_combo_resample->SelectNthEntry(1);  break;
-		case  8000: filtering_combo_resample->SelectNthEntry(2);  break;
-		case 11025: filtering_combo_resample->SelectNthEntry(3);  break;
-		case 12000: filtering_combo_resample->SelectNthEntry(4);  break;
-		case 16000: filtering_combo_resample->SelectNthEntry(5);  break;
-		case 22050: filtering_combo_resample->SelectNthEntry(6);  break;
-		case 24000: filtering_combo_resample->SelectNthEntry(7);  break;
-		case 32000: filtering_combo_resample->SelectNthEntry(8);  break;
-		case 44100: filtering_combo_resample->SelectNthEntry(9);  break;
-		case 48000: filtering_combo_resample->SelectNthEntry(10); break;
-	}
-
-	filtering_resample->Add(filtering_combo_resample);
-
-	filtering_highpass		= new GroupBox(i18n->TranslateString("Highpass filter"), Point(176, 11), Size(246, 64));
+	filtering_highpass		= new GroupBox(i18n->TranslateString("Highpass filter"), Point(7, 11), Size(246, 64));
 
 	filtering_set_highpass		= new CheckBox(i18n->AddColon(i18n->TranslateString("Set Highpass frequency (Hz)")), Point(10, 11), Size(180, 0), &set_highpass);
 	filtering_set_highpass->onAction.Connect(&ConfigureLAME::SetHighpass, this);
@@ -337,7 +305,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	filtering_highpass->Add(filtering_set_highpass_width);
 	filtering_highpass->Add(filtering_edit_highpass_width);
 
-	filtering_lowpass		= new GroupBox(i18n->TranslateString("Lowpass filter"), Point(176, 87), Size(246, 64));
+	filtering_lowpass		= new GroupBox(i18n->TranslateString("Lowpass filter"), Point(7, 87), Size(246, 64));
 
 	filtering_set_lowpass		= new CheckBox(i18n->AddColon(i18n->TranslateString("Set Lowpass frequency (Hz)")), Point(10, 11), Size(180, 0), &set_lowpass);
 	filtering_set_lowpass->onAction.Connect(&ConfigureLAME::SetLowpass, this);
@@ -356,7 +324,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	filtering_lowpass->Add(filtering_set_lowpass_width);
 	filtering_lowpass->Add(filtering_edit_lowpass_width);
 
-	filtering_misc			= new GroupBox(i18n->TranslateString("Misc settings"), Point(7, 62), Size(161, 39));
+	filtering_misc			= new GroupBox(i18n->TranslateString("Misc settings"), Point(261, 11), Size(161, 39));
 
 	filtering_check_disable_all	= new CheckBox(i18n->TranslateString("Disable all filtering"), Point(10, 11), Size(140, 0), &disable_filtering);
 	filtering_check_disable_all->onAction.Connect(&ConfigureLAME::SetDisableFiltering, this);
@@ -389,7 +357,6 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	register_layer_expert->Add(expert_psycho);
 	register_layer_expert->Add(expert_format);
 
-	register_layer_filtering->Add(filtering_resample);
 	register_layer_filtering->Add(filtering_lowpass);
 	register_layer_filtering->Add(filtering_highpass);
 	register_layer_filtering->Add(filtering_misc);
@@ -462,8 +429,6 @@ BoCA::ConfigureLAME::~ConfigureLAME()
 	DeleteObject(expert_format);
 	DeleteObject(expert_check_iso);
 
-	DeleteObject(filtering_resample);
-	DeleteObject(filtering_combo_resample);
 	DeleteObject(filtering_lowpass);
 	DeleteObject(filtering_set_lowpass);
 	DeleteObject(filtering_edit_lowpass);
@@ -553,24 +518,6 @@ Int BoCA::ConfigureLAME::SaveSettings()
 	config->SetIntValue(ConfigID, "ATHType", expert_combo_athtype->GetSelectedEntryNumber() - 1);
 	config->SetIntValue(ConfigID, "UseTNS", enable_tempmask);
 
-	Int	 resampleValue = -1;
-
-	switch (filtering_combo_resample->GetSelectedEntryNumber())
-	{
-		case  1: resampleValue =     0; break;
-		case  2: resampleValue =  8000; break;
-		case  3: resampleValue = 11025; break;
-		case  4: resampleValue = 12000; break;
-		case  5: resampleValue = 16000; break;
-		case  6: resampleValue = 22050; break;
-		case  7: resampleValue = 24000; break;
-		case  8: resampleValue = 32000; break;
-		case  9: resampleValue = 44100; break;
-		case 10: resampleValue = 48000; break;
-	}
-
-	config->SetIntValue(ConfigID, "Resample", resampleValue);
-
 	return Success();
 }
 
@@ -617,8 +564,6 @@ Void BoCA::ConfigureLAME::SetPreset()
 		expert_format->Activate();
 		expert_check_iso->Activate();
 
-		filtering_resample->Activate();
-		filtering_combo_resample->Activate();
 		filtering_misc->Activate();
 		filtering_check_disable_all->Activate();
 
@@ -684,8 +629,6 @@ Void BoCA::ConfigureLAME::SetPreset()
 		expert_format->Deactivate();
 		expert_check_iso->Deactivate();
 
-		filtering_resample->Deactivate();
-		filtering_combo_resample->Deactivate();
 		filtering_lowpass->Deactivate();
 		filtering_set_lowpass->Deactivate();
 		filtering_edit_lowpass->Deactivate();

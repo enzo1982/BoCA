@@ -82,7 +82,6 @@ Bool BoCA::EncoderLAME::Activate()
 	/* Get configuration.
 	 */
 	Int	 preset		  = config->GetIntValue(ConfigureLAME::ConfigID, "Preset", 2);
-	Int	 resample	  = config->GetIntValue(ConfigureLAME::ConfigID, "Resample", -1);
 	Int	 vbrMode	  = config->GetIntValue(ConfigureLAME::ConfigID, "VBRMode", 4);
 	Bool	 setBitrate	  = config->GetIntValue(ConfigureLAME::ConfigID, "SetBitrate", 1);
 	Int	 bitrate	  = config->GetIntValue(ConfigureLAME::ConfigID, "Bitrate", 192);
@@ -115,74 +114,6 @@ Bool BoCA::EncoderLAME::Activate()
 	Bool	 setHighpassWidth = config->GetIntValue(ConfigureLAME::ConfigID, "SetHighpassWidth", 0);
 	Int	 highpassWidth	  = config->GetIntValue(ConfigureLAME::ConfigID, "HighpassWidth", 0);
 
-	/* Check settings.
-	 */
-	if (resample >= 0)
-	{
-		Int	 effectiveRate = (resample != 0 ? resample : format.rate);
-
-		switch (effectiveRate)
-		{
-			case 8000:
-			case 11025:
-			case 12000:
-			case 16000:
-			case 22050:
-			case 24000:
-				if (setBitrate && vbrMode == vbr_off && (bitrate == 192 || bitrate == 224 || bitrate == 256 || bitrate == 320))
-				{
-					errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
-					errorState  = True;
-
-					return False;
-				}
-
-				if (setMinVBRBitrate && vbrMode != vbr_off && (minVBRBitrate == 192 || minVBRBitrate == 224 || minVBRBitrate == 256 || minVBRBitrate == 320))
-				{
-					errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
-					errorState  = True;
-
-					return False;
-				}
-
-				if (setMaxVBRBitrate && vbrMode != vbr_off && (maxVBRBitrate == 192 || maxVBRBitrate == 224 || maxVBRBitrate == 256 || maxVBRBitrate == 320))
-				{
-					errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
-					errorState  = True;
-
-					return False;
-				}
-				break;
-			case 32000:
-			case 44100:
-			case 48000:
-				if (setBitrate && vbrMode == vbr_off && (bitrate == 8 || bitrate == 16 || bitrate == 24 || bitrate == 144))
-				{
-					errorString = "Bad bitrate! The selected bitrate is not supported for this sampling rate.";
-					errorState  = True;
-
-					return False;
-				}
-
-				if (setMinVBRBitrate && vbrMode != vbr_off && (minVBRBitrate == 8 || minVBRBitrate == 16 || minVBRBitrate == 24 || minVBRBitrate == 144))
-				{
-					errorString = "Bad minimum VBR bitrate! The selected minimum VBR bitrate is not supported for this sampling rate.";
-					errorState  = True;
-
-					return False;
-				}
-
-				if (setMaxVBRBitrate && vbrMode != vbr_off && (maxVBRBitrate == 8 || maxVBRBitrate == 16 || maxVBRBitrate == 24 || maxVBRBitrate == 144))
-				{
-					errorString = "Bad maximum VBR bitrate! The selected maximum VBR bitrate is not supported for this sampling rate.";
-					errorState  = True;
-
-					return False;
-				}
-				break;
-		}
-	}
-
 	/* Create and configure LAME encoder.
 	 */
 	context = ex_lame_init();
@@ -198,11 +129,6 @@ Bool BoCA::EncoderLAME::Activate()
 			ex_lame_set_extension(context, privateBit);
 			ex_lame_set_error_protection(context, crc);
 			ex_lame_set_strict_ISO(context, strictISO);
-
-			/* Set resampling.
-			 */
-			if	(resample == 0) ex_lame_set_out_samplerate(context, format.rate);
-			else if (resample >  0) ex_lame_set_out_samplerate(context, resample);
 
 			/* Set bitrate.
 			 */
