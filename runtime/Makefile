@@ -14,7 +14,7 @@ OBJECTS	  = application/external/configlayer.o application/external/decodercompo
 OBJECTS	 += application/component.o application/componentspecs.o application/convertercomponent.o application/decodercomponent.o application/deviceinfocomponent.o application/dspcomponent.o application/encodercomponent.o application/extensioncomponent.o application/outputcomponent.o application/playlistcomponent.o application/registry.o application/taggercomponent.o application/verifiercomponent.o
 OBJECTS	 += common/communication/application.o common/communication/engine.o common/communication/joblist.o common/communication/menu.o common/communication/settings.o
 OBJECTS	 += common/metadata/device.o common/metadata/format.o common/metadata/info.o common/metadata/mcdi.o common/metadata/picture.o common/metadata/picturedata.o common/metadata/track.o
-OBJECTS	 += common/config.o common/configlayer.o common/i18n.o common/protocol.o common/utilities.o
+OBJECTS	 += common/config.o common/configlayer.o common/formatconverter.o common/i18n.o common/protocol.o common/utilities.o
 OBJECTS	 += component/component.o component/convertercomponent.o component/decodercomponent.o component/deviceinfocomponent.o component/dspcomponent.o component/encodercomponent.o component/extensioncomponent.o component/outputcomponent.o component/playlistcomponent.o component/taggercomponent.o component/verifiercomponent.o
 OBJECTS	 += core/core.o core/main.o
 

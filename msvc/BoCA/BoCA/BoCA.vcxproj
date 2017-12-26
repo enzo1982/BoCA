@@ -223,6 +223,7 @@
     <ClCompile Include="..\..\..\runtime\common\communication\engine.cpp" />
     <ClCompile Include="..\..\..\runtime\common\config.cpp" />
     <ClCompile Include="..\..\..\runtime\common\configlayer.cpp" />
+    <ClCompile Include="..\..\..\runtime\common\formatconverter.cpp" />
     <ClCompile Include="..\..\..\runtime\common\i18n.cpp" />
     <ClCompile Include="..\..\..\runtime\common\protocol.cpp" />
     <ClCompile Include="..\..\..\runtime\common\utilities.cpp" />
@@ -356,6 +357,7 @@
     <ClInclude Include="..\..\..\include\boca\application\playlistcomponent.h" />
     <ClInclude Include="..\..\..\include\boca\application\verifiercomponent.h" />
     <ClInclude Include="..\..\..\include\boca\common\communication\engine.h" />
+    <ClInclude Include="..\..\..\include\boca\common\formatconverter.h" />
     <ClInclude Include="..\..\..\include\boca\common\metadata\channels.h" />
     <ClInclude Include="..\..\..\include\boca\component\component.h" />
     <ClInclude Include="..\..\..\include\boca\component\convertercomponent.h" />
