@@ -9,8 +9,8 @@
     <name>RealAudio Files</name>
     <extension>ra</extension>
     <extension>rm</extension>
-    <channels>6</channels>
   </format>
+  <input channels="1-6"/>
   <external>
     <command>helix/producer</command>
     <arguments>-i %INFILE -o %OUTFILE %OPTIONS -a %ARTIST -t %TITLE</arguments>

@@ -10,8 +10,8 @@
     <lossless>true</lossless>
     <extension>la</extension>
     <tag id="id3v1-tag" mode="append">ID3v1</tag>
-    <channels>2</channels>
   </format>
+  <input channels="1-2"/>
   <external>
     <command>la</command>
     <arguments>%OPTIONS %INFILE %OUTFILE</arguments>

@@ -9,8 +9,8 @@
     <name>Musepack Audio Files</name>
     <extension>mpc</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>
-    <channels>8</channels>
   </format>
+  <input channels="1-8"/>
   <external>
     <command>mpcenc</command>
     <arguments>%OPTIONS - %OUTFILE</arguments>

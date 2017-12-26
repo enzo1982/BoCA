@@ -9,8 +9,8 @@
     <name>MPEG Audio Layer 3</name>
     <extension>mp3</extension>
     <tag id="id3v1-tag" mode="append">ID3v1</tag>
-    <channels>2</channels>
   </format>
+  <input channels="1-2"/>
   <external>
     <command>mp3hdEncoder</command>
     <arguments>-if %INFILE -of %OUTFILE %OPTIONS</arguments>

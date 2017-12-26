@@ -8,8 +8,8 @@
   <format>
     <name>MIDI Files</name>
     <extension>mid</extension>
-    <channels>2</channels>
   </format>
+  <input channels="1-2"/>
   <external>
     <command>waon/waon</command>
     <arguments>%OPTIONS -i %INFILE -o %OUTFILE</arguments>

@@ -10,8 +10,8 @@
     <lossless>true</lossless>
     <extension>flac</extension>
     <tag id="flac-tag" mode="other">FLAC Metadata</tag>
-    <channels>8</channels>
   </format>
+  <input channels="1-8"/>
   <external>
     <command>flaccl/CUETools.FLACCL.cmd</command>
     <arguments>%OPTIONS %INFILE -o %OUTFILE</arguments>
