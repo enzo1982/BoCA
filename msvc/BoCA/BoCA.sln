@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA", "BoCA\BoCA.vcxproj", "{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}"
 EndProject
@@ -219,6 +219,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder meh!", "BoCA E
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Output DirectSound", "BoCA Output DirectSound\BoCA Output DirectSound.vcxproj", "{30EBD46C-1389-4C02-AC4E-3E01206489BE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Format", "BoCA DSP Format\BoCA DSP Format.vcxproj", "{61D698FB-1FAB-4319-AA23-AFF8ADE80663}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Channels", "BoCA DSP Channels\BoCA DSP Channels.vcxproj", "{01685C1C-4076-4F61-BB43-9388FB0E246F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
 	EndProjectSection
@@ -723,8 +733,27 @@ Global
 		{30EBD46C-1389-4C02-AC4E-3E01206489BE}.Release|Win32.Build.0 = Release|Win32
 		{30EBD46C-1389-4C02-AC4E-3E01206489BE}.Release|x64.ActiveCfg = Release|x64
 		{30EBD46C-1389-4C02-AC4E-3E01206489BE}.Release|x64.Build.0 = Release|x64
+		{61D698FB-1FAB-4319-AA23-AFF8ADE80663}.Debug|Win32.ActiveCfg = Debug|Win32
+		{61D698FB-1FAB-4319-AA23-AFF8ADE80663}.Debug|Win32.Build.0 = Debug|Win32
+		{61D698FB-1FAB-4319-AA23-AFF8ADE80663}.Debug|x64.ActiveCfg = Debug|x64
+		{61D698FB-1FAB-4319-AA23-AFF8ADE80663}.Debug|x64.Build.0 = Debug|x64
+		{61D698FB-1FAB-4319-AA23-AFF8ADE80663}.Release|Win32.ActiveCfg = Release|Win32
+		{61D698FB-1FAB-4319-AA23-AFF8ADE80663}.Release|Win32.Build.0 = Release|Win32
+		{61D698FB-1FAB-4319-AA23-AFF8ADE80663}.Release|x64.ActiveCfg = Release|x64
+		{61D698FB-1FAB-4319-AA23-AFF8ADE80663}.Release|x64.Build.0 = Release|x64
+		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Debug|Win32.Build.0 = Debug|Win32
+		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Debug|x64.ActiveCfg = Debug|x64
+		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Debug|x64.Build.0 = Debug|x64
+		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Release|Win32.ActiveCfg = Release|Win32
+		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Release|Win32.Build.0 = Release|Win32
+		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Release|x64.ActiveCfg = Release|x64
+		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {71AA83DD-D989-493C-B9D3-199DC6D28A53}
 	EndGlobalSection
 EndGlobal
