@@ -12,7 +12,7 @@
 
 #include <boca/application/encodercomponent.h>
 
-BoCA::AS::EncoderComponent::EncoderComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
+BoCA::AS::EncoderComponent::EncoderComponent(ComponentSpecs *iSpecs) : StreamComponent(iSpecs)
 {
 }
 

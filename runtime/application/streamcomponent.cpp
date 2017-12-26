@@ -10,36 +10,36 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca/application/convertercomponent.h>
+#include <boca/application/streamcomponent.h>
 
-BoCA::AS::ConverterComponent::ConverterComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
+BoCA::AS::StreamComponent::StreamComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
 {
 	errorState  = False;
 	errorString = "Unknown error";
 }
 
-BoCA::AS::ConverterComponent::~ConverterComponent()
+BoCA::AS::StreamComponent::~StreamComponent()
 {
 }
 
-Int BoCA::AS::ConverterComponent::GetPackageSize() const
+Int BoCA::AS::StreamComponent::GetPackageSize() const
 {
 	return specs->func_GetPackageSize != NIL ? specs->func_GetPackageSize(component) : 0;
 }
 
-Int BoCA::AS::ConverterComponent::SetDriver(IO::Driver *driver)
+Int BoCA::AS::StreamComponent::SetDriver(IO::Driver *driver)
 {
 	return specs->func_SetDriver != NIL ? specs->func_SetDriver(component, driver) : Success();
 }
 
-Bool BoCA::AS::ConverterComponent::SetAudioTrackInfo(const Track &track)
+Bool BoCA::AS::StreamComponent::SetAudioTrackInfo(const Track &track)
 {
 	this->track = track;
 
 	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
-Bool BoCA::AS::ConverterComponent::Activate()
+Bool BoCA::AS::StreamComponent::Activate()
 {
 	SetDriver(driver);
 
@@ -52,21 +52,21 @@ Bool BoCA::AS::ConverterComponent::Activate()
 	return True;
 }
 
-Bool BoCA::AS::ConverterComponent::Deactivate()
+Bool BoCA::AS::StreamComponent::Deactivate()
 {
 	/* Deactivate component.
 	 */
 	return specs->func_Deactivate(component);
 }
 
-Bool BoCA::AS::ConverterComponent::GetErrorState() const
+Bool BoCA::AS::StreamComponent::GetErrorState() const
 {
 	if (errorState) return True;
 
 	return Component::GetErrorState();
 }
 
-const String &BoCA::AS::ConverterComponent::GetErrorString() const
+const String &BoCA::AS::StreamComponent::GetErrorString() const
 {
 	if (errorState) return errorString;
 

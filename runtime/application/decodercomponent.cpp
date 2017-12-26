@@ -12,7 +12,7 @@
 
 #include <boca/application/decodercomponent.h>
 
-BoCA::AS::DecoderComponent::DecoderComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
+BoCA::AS::DecoderComponent::DecoderComponent(ComponentSpecs *iSpecs) : StreamComponent(iSpecs)
 {
 }
 

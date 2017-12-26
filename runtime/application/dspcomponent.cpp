@@ -12,7 +12,7 @@
 
 #include <boca/application/dspcomponent.h>
 
-BoCA::AS::DSPComponent::DSPComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
+BoCA::AS::DSPComponent::DSPComponent(ComponentSpecs *iSpecs) : StreamComponent(iSpecs)
 {
 }
 

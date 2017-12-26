@@ -10,8 +10,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_CONVERTERCOMPONENT
-#define H_BOCA_CONVERTERCOMPONENT
+#ifndef H_BOCA_STREAMCOMPONENT
+#define H_BOCA_STREAMCOMPONENT
 
 #include "component.h"
 #include "../common/metadata/track.h"
@@ -20,13 +20,13 @@ namespace BoCA
 {
 	namespace CS
 	{
-		abstract class BOCA_DLL_EXPORT ConverterComponent : public Component, public IO::Filter
+		abstract class BOCA_DLL_EXPORT StreamComponent : public Component, public IO::Filter
 		{
 			protected:
 				Track		 track;
 			public:
-						 ConverterComponent();
-				virtual		~ConverterComponent();
+						 StreamComponent();
+				virtual		~StreamComponent();
 
 				/* Called to set information about output stream.
 				 */

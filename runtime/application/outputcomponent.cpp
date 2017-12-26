@@ -12,7 +12,7 @@
 
 #include <boca/application/outputcomponent.h>
 
-BoCA::AS::OutputComponent::OutputComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
+BoCA::AS::OutputComponent::OutputComponent(ComponentSpecs *iSpecs) : StreamComponent(iSpecs)
 {
 }
 

@@ -13,13 +13,13 @@
 #ifndef H_BOCA_AS_DSPCOMPONENT
 #define H_BOCA_AS_DSPCOMPONENT
 
-#include "convertercomponent.h"
+#include "streamcomponent.h"
 
 namespace BoCA
 {
 	namespace AS
 	{
-		class BOCA_DLL_EXPORT DSPComponent : public ConverterComponent
+		class BOCA_DLL_EXPORT DSPComponent : public StreamComponent
 		{
 			public:
 							 DSPComponent(ComponentSpecs *);

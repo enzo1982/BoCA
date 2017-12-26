@@ -12,7 +12,7 @@
 
 #include <boca/application/verifiercomponent.h>
 
-BoCA::AS::VerifierComponent::VerifierComponent(ComponentSpecs *iSpecs) : ConverterComponent(iSpecs)
+BoCA::AS::VerifierComponent::VerifierComponent(ComponentSpecs *iSpecs) : StreamComponent(iSpecs)
 {
 }
 

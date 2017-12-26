@@ -13,13 +13,13 @@
 #ifndef H_BOCA_AS_OUTPUTCOMPONENT
 #define H_BOCA_AS_OUTPUTCOMPONENT
 
-#include "convertercomponent.h"
+#include "streamcomponent.h"
 
 namespace BoCA
 {
 	namespace AS
 	{
-		class BOCA_DLL_EXPORT OutputComponent : public ConverterComponent
+		class BOCA_DLL_EXPORT OutputComponent : public StreamComponent
 		{
 			public:
 						 OutputComponent(ComponentSpecs *);

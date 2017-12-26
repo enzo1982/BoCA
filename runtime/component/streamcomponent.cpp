@@ -10,29 +10,29 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca/component/convertercomponent.h>
+#include <boca/component/streamcomponent.h>
 
-BoCA::CS::ConverterComponent::ConverterComponent()
+BoCA::CS::StreamComponent::StreamComponent()
 {
 }
 
-BoCA::CS::ConverterComponent::~ConverterComponent()
+BoCA::CS::StreamComponent::~StreamComponent()
 {
 }
 
-Bool BoCA::CS::ConverterComponent::SetAudioTrackInfo(const Track &track)
+Bool BoCA::CS::StreamComponent::SetAudioTrackInfo(const Track &track)
 {
 	this->track = track;
 
 	return True;
 }
 
-Bool BoCA::CS::ConverterComponent::Activate()
+Bool BoCA::CS::StreamComponent::Activate()
 {
 	return True;
 }
 
-Bool BoCA::CS::ConverterComponent::Deactivate()
+Bool BoCA::CS::StreamComponent::Deactivate()
 {
 	return True;
 }

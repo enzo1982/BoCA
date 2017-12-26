@@ -13,13 +13,13 @@
 #ifndef H_BOCA_VERIFIERCOMPONENT
 #define H_BOCA_VERIFIERCOMPONENT
 
-#include "convertercomponent.h"
+#include "streamcomponent.h"
 
 namespace BoCA
 {
 	namespace CS
 	{
-		abstract class BOCA_DLL_EXPORT VerifierComponent : public ConverterComponent
+		abstract class BOCA_DLL_EXPORT VerifierComponent : public StreamComponent
 		{
 			public:
 						 VerifierComponent();
