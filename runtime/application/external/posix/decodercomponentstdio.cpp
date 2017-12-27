@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -40,7 +40,7 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 {
 	if (specs->external_md5_arguments == NIL) return NIL;
 
-	/* Start 3rd party command line decoder
+	/* Start 3rd party command line decoder.
 	 */
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_md5_arguments).Replace("%INFILE", String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
@@ -101,7 +101,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		File(streamURI).Copy(encFileName);
 	}
 
-	/* Start 3rd party command line decoder
+	/* Start 3rd party command line decoder.
 	 */
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
@@ -132,14 +132,14 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	{
 		InStream		*in = new InStream(STREAM_BUFFER, buffer, bytesReadTotal);
 
-		/* Read decoded WAVE file header
+		/* Read decoded WAVE file header.
 		 */
 		track.origFilename = streamURI;
 		track.fileSize	   = File(streamURI).GetFileSize();
 
 		track.lossless	   = specs->formats.GetFirst()->IsLossless();
 
-		/* Read RIFF chunk
+		/* Read RIFF chunk.
 		 */
 		if (in->InputString(4) != "RIFF") { errorState = True; errorString = "Unknown file type"; }
 
@@ -151,7 +151,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 		do
 		{
-			/* Read next chunk
+			/* Read next chunk.
 			 */
 			chunk = in->InputString(4);
 
@@ -176,7 +176,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 				track.SetFormat(format);
 
-				/* Skip rest of chunk
+				/* Skip rest of chunk.
 				 */
 				in->RelSeek(cSize - 16 + cSize % 2);
 			}
@@ -205,14 +205,14 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 			}
 			else
 			{
-				/* Skip chunk
+				/* Skip chunk.
 				 */
 				in->RelSeek(cSize + cSize % 2);
 			}
 		}
 		while (!errorState && chunk != "data");
 
-		/* Close stdio pipe
+		/* Close stdio pipe.
 		 */
 		delete in;
 	}
@@ -234,7 +234,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 		File(encFileName).Delete();
 	}
 
-	/* Query tags and update track
+	/* Query tags and update track.
 	 */
 	QueryTags(streamURI, track);
 

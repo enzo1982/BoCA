@@ -49,7 +49,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 	 */
 	File(encFileName).Delete();
 
-	/* Set up security attributes
+	/* Set up security attributes.
 	 */
 	SECURITY_ATTRIBUTES	 secAttr;
 
@@ -61,7 +61,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 	CreatePipe(&rPipe, &wPipe, &secAttr, 32768 * format.channels * (format.bits / 8));
 	SetHandleInformation(wPipe, HANDLE_FLAG_INHERIT, 0);
 
-	/* Start 3rd party command line encoder
+	/* Start 3rd party command line encoder.
 	 */
 	const Info	&info = track.GetInfo();
 
@@ -111,7 +111,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 	driver_stdin = new DriverWin32(wPipe);
 	out = new OutStream(STREAM_DRIVER, driver_stdin);
 
-	/* Output WAVE header
+	/* Output WAVE header.
 	 */
 	out->OutputString("RIFF");
 	out->OutputNumber(36, 4);
@@ -144,7 +144,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 {
 	EncoderComponentExternal::Deactivate();
 
-	/* Close stdio pipe
+	/* Close stdio pipe.
 	 */
 	delete out;
 	delete driver_stdin;
@@ -152,7 +152,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 	CloseHandle(rPipe);
 	CloseHandle(wPipe);
 
-	/* Wait until the encoder exits
+	/* Wait until the encoder exits.
 	 */
 	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
@@ -163,7 +163,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 		FreeConsole();
 	}
 
-	/* Check if anything went wrong
+	/* Check if anything went wrong.
 	 */
 	unsigned long	 exitCode = 0;
 
@@ -171,7 +171,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
-		/* Remove output file
+		/* Remove output file.
 		 */
 		File(encFileName).Delete();
 
@@ -181,18 +181,18 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 		return False;
 	}
 
-	/* Create tag buffers
+	/* Create tag buffers.
 	 */
 	Buffer<UnsignedByte>	 tagBufferPrepend;
 	Buffer<UnsignedByte>	 tagBufferAppend;
 
 	RenderTags(encFileName, track, tagBufferPrepend, tagBufferAppend);
 
-	/* Prepend tags
+	/* Prepend tags.
 	 */
 	driver->WriteData(tagBufferPrepend, tagBufferPrepend.Size());
 
-	/* Stream contents of created file to output driver
+	/* Stream contents of created file to output driver.
 	 */
 	InStream		 in(STREAM_FILE, encFileName, IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
@@ -207,7 +207,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 		bytesLeft -= Math::Min(1024, bytesLeft);
 	}
 
-	/* Append tags
+	/* Append tags.
 	 */
 	driver->WriteData(tagBufferAppend, tagBufferAppend.Size());
 
@@ -238,7 +238,7 @@ Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &dat
 		return -1;
 	}
 
-	/* Hand data over to the encoder using the stdio pipe
+	/* Hand data over to the encoder using the stdio pipe.
 	 */
 	out->OutputData(data, data.Size());
 	out->Flush();

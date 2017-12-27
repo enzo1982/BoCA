@@ -35,7 +35,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 {
 	if (!EncoderComponentExternal::Activate()) return False;
 
-	/* Create temporary WAVE file
+	/* Create temporary WAVE file.
 	 */
 	nOfSamples = 0;
 
@@ -44,7 +44,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 
 	out = new OutStream(STREAM_FILE, wavFileName, OS_REPLACE);
 
-	/* Write WAVE header
+	/* Write WAVE header.
 	 */
 	out->OutputString("RIFF");
 	out->OutputNumber(track.length * format.channels * (format.bits / 8) + 36, 4);
@@ -69,7 +69,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 {
 	EncoderComponentExternal::Deactivate();
 
-	/* Finalize and close the uncompressed temporary file
+	/* Finalize and close the uncompressed temporary file.
 	 */
 	Int	 size = nOfSamples * (format.bits / 8);
 
@@ -81,7 +81,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	delete out;
 
-	/* Start 3rd party command line encoder
+	/* Start 3rd party command line encoder.
 	 */
 	const Info	&info = track.GetInfo();
 
@@ -104,7 +104,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	FILE	*pipe	   = popen(String(command).Append(" ").Append(arguments).Append(specs->debug ? NIL : " 2> /dev/null"), "r");
 
-	/* Wait until the encoder exits
+	/* Wait until the encoder exits.
 	 */
 	unsigned long	 exitStatus = pclose(pipe);
 	unsigned long	 exitCode   = WIFEXITED(exitStatus)   ? WEXITSTATUS(exitStatus) : -1;
@@ -112,11 +112,11 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	File(wavFileName).Delete();
 
-	/* Check if anything went wrong
+	/* Check if anything went wrong.
 	 */
 	if (!specs->external_ignoreExitCode && exitCode != 0 && exitCode != 0x80 + SIGPIPE && exitSignal != SIGPIPE)
 	{
-		/* Remove output file
+		/* Remove output file.
 		 */
 		File(encFileName).Delete();
 
@@ -129,18 +129,18 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 		return False;
 	}
 
-	/* Create tag buffers
+	/* Create tag buffers.
 	 */
 	Buffer<UnsignedByte>	 tagBufferPrepend;
 	Buffer<UnsignedByte>	 tagBufferAppend;
 
 	RenderTags(encFileName, track, tagBufferPrepend, tagBufferAppend);
 
-	/* Prepend tags
+	/* Prepend tags.
 	 */
 	driver->WriteData(tagBufferPrepend, tagBufferPrepend.Size());
 
-	/* Stream contents of created file to output driver
+	/* Stream contents of created file to output driver.
 	 */
 	InStream		 in(STREAM_FILE, encFileName, IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
@@ -155,7 +155,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 		bytesLeft -= Math::Min(1024, bytesLeft);
 	}
 
-	/* Append tags
+	/* Append tags.
 	 */
 	driver->WriteData(tagBufferAppend, tagBufferAppend.Size());
 
@@ -176,7 +176,7 @@ Int BoCA::AS::EncoderComponentExternalFile::WriteData(Buffer<UnsignedByte> &data
 
 	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, format.bits / 8);
 
-	/* Hand data over to the output file
+	/* Hand data over to the output file.
 	 */
 	nOfSamples += (data.Size() / (format.bits / 8));
 
