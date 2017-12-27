@@ -81,7 +81,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	/* Start 3rd party command line encoder.
 	 */
-	const Info		&info = track.GetInfo();
+	const Info	&info = track.GetInfo();
 
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
 	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
@@ -94,32 +94,28 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 							      .Replace("%YEAR", String("\"").Append(String::FromInt(info.year)).Append("\""))
 							      .Replace("%GENRE", String("\"").Append((char *) info.genre).Append("\""));
 
-	SHELLEXECUTEINFOA	 execInfo;
+	if (specs->debug) AllocConsole();
 
-	ZeroMemory(&execInfo, sizeof(execInfo));
+	STARTUPINFOA		 startupInfo;
 
-	execInfo.cbSize	     = sizeof(execInfo);
-	execInfo.fMask	     = SEE_MASK_NOCLOSEPROCESS;
-	execInfo.lpVerb	     = "open";
-	execInfo.lpDirectory = Application::GetApplicationDirectory();
-	execInfo.nShow	     = specs->debug ? SW_SHOW : SW_HIDE;
+	ZeroMemory(&startupInfo, sizeof(startupInfo));
 
-	if (specs->debug)
-	{
-		execInfo.lpFile	      = String("cmd.exe");
-		execInfo.lpParameters = String("/c ").Append(command).Append(" ").Append(arguments).Append(" & pause");
-	}
-	else
-	{
-		execInfo.lpFile	      = String(command);
-		execInfo.lpParameters = String(arguments);
-	}
+	startupInfo.cb		= sizeof(startupInfo);
+	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
+	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+	startupInfo.hStdOutput	= GetStdHandle(STD_OUTPUT_HANDLE);
+	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
-	ShellExecuteExA(&execInfo);
+	PROCESS_INFORMATION	 processInfo;
+
+	ZeroMemory(&processInfo, sizeof(processInfo));
+
+	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	/* Check process handle.
 	 */
-	if (execInfo.hProcess == NIL)
+	if (processInfo.hProcess == NIL)
 	{
 		errorState  = True;
 		errorString = String("Unable to run encoder ").Append(command).Append(".");
@@ -129,7 +125,14 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	/* Wait until the encoder exits.
 	 */
-	while (WaitForSingleObject(execInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+	while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+
+	if (specs->debug)
+	{
+		BoCA::Utilities::InfoMessage("Click OK to close console window.");
+
+		FreeConsole();
+	}
 
 	File(wavFileName).Delete();
 
@@ -137,7 +140,7 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	 */
 	unsigned long	 exitCode = 0;
 
-	GetExitCodeProcess(execInfo.hProcess, &exitCode);
+	GetExitCodeProcess(processInfo.hProcess, &exitCode);
 
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{

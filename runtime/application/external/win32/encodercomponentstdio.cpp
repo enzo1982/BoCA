@@ -98,7 +98,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 	/* Check process handle.
 	 */
-	if (hProcess == NIL)
+	if (processInfo.hProcess == NIL)
 	{
 		errorState  = True;
 		errorString = String("Unable to run encoder ").Append(command).Append(".");

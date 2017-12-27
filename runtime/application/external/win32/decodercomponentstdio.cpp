@@ -68,9 +68,9 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 	startupInfo.cb		= sizeof(startupInfo);
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
-	startupInfo.hStdInput	= NIL;
-	startupInfo.hStdOutput	= specs->external_md5_stderr ? NIL : wPipe;
-	startupInfo.hStdError	= specs->external_md5_stderr ? wPipe : NIL;
+	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+	startupInfo.hStdOutput	= specs->external_md5_stderr ? GetStdHandle(STD_OUTPUT_HANDLE) : wPipe;
+	startupInfo.hStdError	= specs->external_md5_stderr ? wPipe : GetStdHandle(STD_ERROR_HANDLE);
 
 	PROCESS_INFORMATION	 processInfo;
 
@@ -78,11 +78,9 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 
 	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
-	HANDLE	 hProcess = processInfo.hProcess;
-
 	/* Check process handle.
 	 */
-	if (hProcess == NIL) return NIL;
+	if (processInfo.hProcess == NIL) return NIL;
 
 	/* Close stdio pipe write handle.
 	 */
@@ -106,11 +104,11 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 
 	CloseHandle(rPipe);
 
-	TerminateProcess(hProcess, 0);
+	TerminateProcess(processInfo.hProcess, 0);
 
 	/* Wait until the decoder exits.
 	 */
-	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+	while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	if (specs->debug)
 	{
@@ -176,9 +174,9 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	startupInfo.cb		= sizeof(startupInfo);
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
-	startupInfo.hStdInput	= NIL;
+	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
 	startupInfo.hStdOutput	= wPipe;
-	startupInfo.hStdError	= NIL;
+	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
 	PROCESS_INFORMATION	 processInfo;
 
@@ -186,11 +184,9 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
-	HANDLE	 hProcess = processInfo.hProcess;
-
 	/* Check process handle.
 	 */
-	if (hProcess == NIL)
+	if (processInfo.hProcess == NIL)
 	{
 		errorState  = True;
 		errorString = String("Unable to run decoder ").Append(command).Append(".");
@@ -314,11 +310,11 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	CloseHandle(rPipe);
 
-	TerminateProcess(hProcess, 0);
+	TerminateProcess(processInfo.hProcess, 0);
 
 	/* Wait until the decoder exits.
 	 */
-	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+	while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	if (specs->debug)
 	{
@@ -346,7 +342,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	 */
 	unsigned long	 exitCode = 0;
 
-	GetExitCodeProcess(hProcess, &exitCode);
+	GetExitCodeProcess(processInfo.hProcess, &exitCode);
 
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
@@ -404,9 +400,9 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 	startupInfo.cb		= sizeof(startupInfo);
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
-	startupInfo.hStdInput	= NIL;
+	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
 	startupInfo.hStdOutput	= wPipe;
-	startupInfo.hStdError	= NIL;
+	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
 	PROCESS_INFORMATION	 processInfo;
 
@@ -418,7 +414,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 	/* Check process handle.
 	 */
-	if (hProcess == NIL)
+	if (processInfo.hProcess == NIL)
 	{
 		errorState  = True;
 		errorString = String("Unable to run decoder ").Append(command).Append(".");

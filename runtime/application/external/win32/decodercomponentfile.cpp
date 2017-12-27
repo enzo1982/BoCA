@@ -63,9 +63,9 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 	startupInfo.cb		= sizeof(startupInfo);
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
-	startupInfo.hStdInput	= NIL;
-	startupInfo.hStdOutput	= specs->external_md5_stderr ? NIL : wPipe;
-	startupInfo.hStdError	= specs->external_md5_stderr ? wPipe : NIL;
+	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+	startupInfo.hStdOutput	= specs->external_md5_stderr ? GetStdHandle(STD_OUTPUT_HANDLE) : wPipe;
+	startupInfo.hStdError	= specs->external_md5_stderr ? wPipe : GetStdHandle(STD_ERROR_HANDLE);
 
 	PROCESS_INFORMATION	 processInfo;
 
@@ -151,32 +151,28 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""))
 							      .Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
 
-	SHELLEXECUTEINFOA	 execInfo;
+	if (specs->debug) AllocConsole();
 
-	ZeroMemory(&execInfo, sizeof(execInfo));
+	STARTUPINFOA		 startupInfo;
 
-	execInfo.cbSize	     = sizeof(execInfo);
-	execInfo.fMask	     = SEE_MASK_NOCLOSEPROCESS;
-	execInfo.lpVerb	     = "open";
-	execInfo.lpDirectory = Application::GetApplicationDirectory();
-	execInfo.nShow	     = specs->debug ? SW_SHOW : SW_HIDE;
+	ZeroMemory(&startupInfo, sizeof(startupInfo));
 
-	if (specs->debug)
-	{
-		execInfo.lpFile	      = String("cmd.exe");
-		execInfo.lpParameters = String("/c ").Append(command).Append(" ").Append(arguments).Append(" & pause");
-	}
-	else
-	{
-		execInfo.lpFile	      = String(command);
-		execInfo.lpParameters = String(arguments);
-	}
+	startupInfo.cb		= sizeof(startupInfo);
+	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
+	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+	startupInfo.hStdOutput	= GetStdHandle(STD_OUTPUT_HANDLE);
+	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
-	ShellExecuteExA(&execInfo);
+	PROCESS_INFORMATION	 processInfo;
+
+	ZeroMemory(&processInfo, sizeof(processInfo));
+
+	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	/* Check process handle.
 	 */
-	if (execInfo.hProcess == NIL)
+	if (processInfo.hProcess == NIL)
 	{
 		errorState  = True;
 		errorString = String("Unable to run decoder ").Append(command).Append(".");
@@ -193,7 +189,14 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 	/* Wait until the decoder exits.
 	 */
-	while (WaitForSingleObject(execInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+	while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+
+	if (specs->debug)
+	{
+		BoCA::Utilities::InfoMessage("Click OK to close console window.");
+
+		FreeConsole();
+	}
 
 	/* Query MD5.
 	 */
@@ -210,7 +213,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	 */
 	unsigned long	 exitCode = 0;
 
-	GetExitCodeProcess(execInfo.hProcess, &exitCode);
+	GetExitCodeProcess(processInfo.hProcess, &exitCode);
 
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
@@ -326,32 +329,28 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""))
 							      .Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
 
-	SHELLEXECUTEINFOA	 execInfo;
+	if (specs->debug) AllocConsole();
 
-	ZeroMemory(&execInfo, sizeof(execInfo));
+	STARTUPINFOA		 startupInfo;
 
-	execInfo.cbSize	     = sizeof(execInfo);
-	execInfo.fMask	     = SEE_MASK_NOCLOSEPROCESS;
-	execInfo.lpVerb	     = "open";
-	execInfo.lpDirectory = Application::GetApplicationDirectory();
-	execInfo.nShow	     = specs->debug ? SW_SHOW : SW_HIDE;
+	ZeroMemory(&startupInfo, sizeof(startupInfo));
 
-	if (specs->debug)
-	{
-		execInfo.lpFile	      = String("cmd.exe");
-		execInfo.lpParameters = String("/c ").Append(command).Append(" ").Append(arguments).Append(" & pause");
-	}
-	else
-	{
-		execInfo.lpFile	      = String(command);
-		execInfo.lpParameters = String(arguments);
-	}
+	startupInfo.cb		= sizeof(startupInfo);
+	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
+	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+	startupInfo.hStdOutput	= GetStdHandle(STD_OUTPUT_HANDLE);
+	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
-	ShellExecuteExA(&execInfo);
+	PROCESS_INFORMATION	 processInfo;
+
+	ZeroMemory(&processInfo, sizeof(processInfo));
+
+	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
 	/* Check process handle.
 	 */
-	if (execInfo.hProcess == NIL)
+	if (processInfo.hProcess == NIL)
 	{
 		errorState  = True;
 		errorString = String("Unable to run decoder ").Append(command).Append(".");
@@ -368,7 +367,14 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 
 	/* Wait until the decoder exits.
 	 */
-	while (WaitForSingleObject(execInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+	while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+
+	if (specs->debug)
+	{
+		BoCA::Utilities::InfoMessage("Click OK to close console window.");
+
+		FreeConsole();
+	}
 
 	/* Remove temporary copy if necessary.
 	 */
@@ -381,7 +387,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	 */
 	unsigned long	 exitCode = 0;
 
-	GetExitCodeProcess(execInfo.hProcess, &exitCode);
+	GetExitCodeProcess(processInfo.hProcess, &exitCode);
 
 	if (!specs->external_ignoreExitCode && exitCode != 0)
 	{
