@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -406,7 +406,11 @@ int main(int argc, char *argv[])
 
 					if (CA::AudioConverterGetProperty(converter, CA::kAudioConverterPrimeInfo, &size, &primeInfo) == 0)
 					{
-						float	 divider = float(setup.rate) / GetOutputSampleRate(setup);
+						int	 rate	 = GetOutputSampleRate(setup);
+
+						if (rate == 0) rate = setup.rate;
+
+						float	 divider = float(setup.rate) / rate;
 						int	 extra	 = 0;
 
 						if (setup.codec == CA::kAudioFormatMPEG4AAC_HE ||

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -323,7 +323,11 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	{
 		const Format	&format = track.GetFormat();
 
-		Float	 divider = Float(format.rate) / GetOutputSampleRate(format.rate);
+		Int	 rate	 = GetOutputSampleRate(format.rate);
+
+		if (rate == 0) rate = format.rate;
+
+		Float	 divider = Float(format.rate) / rate;
 		Int	 extra	 = 0;
 
 		if (codec == CA::kAudioFormatMPEG4AAC_HE ||
