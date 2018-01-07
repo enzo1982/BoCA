@@ -10,36 +10,33 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca.h>
-#include "dllinterface.h"
+#ifndef H_MP4CONFIG
+#define H_MP4CONFIG
 
-BoCA_BEGIN_COMPONENT(TaggerMP4)
+#include <smooth.h>
+#include <boca.h>
+
+using namespace smooth;
+using namespace smooth::GUI;
+
+using namespace BoCA;
 
 namespace BoCA
 {
-	class TaggerMP4 : public CS::TaggerComponent
+	class ConfigureMP4 : public ConfigLayer
 	{
 		private:
-			static const String	 genres[192];
-
-			ConfigLayer		*configLayer;
-
-			const String		&GetID3CategoryName(UnsignedInt);
+			GroupBox		*group_chapter;
+			Text			*text_chapter;
+			ComboBox		*combo_chapter;
 		public:
-			static const String	&GetComponentSpecs();
+			static const String	 ConfigID;
 
-						 TaggerMP4();
-						~TaggerMP4();
+						 ConfigureMP4();
+						~ConfigureMP4();
 
-			Error			 ParseStreamInfo(const String &, Track &);
-
-			Error			 RenderStreamInfo(const String &, const Track &);
-			Error			 UpdateStreamInfo(const String &, const Track &);
-
-			ConfigLayer		*GetConfigurationLayer();
+			Int			 SaveSettings();
 	};
 };
 
-BoCA_DEFINE_TAGGER_COMPONENT(TaggerMP4)
-
-BoCA_END_COMPONENT(TaggerMP4)
+#endif

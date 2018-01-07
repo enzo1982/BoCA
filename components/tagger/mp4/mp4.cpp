@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,6 +14,7 @@
 #include <smooth/dll.h>
 
 #include "mp4.h"
+#include "config.h"
 
 const String &BoCA::TaggerMP4::GetComponentSpecs()
 {
@@ -92,10 +93,12 @@ const String	 BoCA::TaggerMP4::genres[192] =
 
 BoCA::TaggerMP4::TaggerMP4()
 {
+	configLayer = NIL;
 }
 
 BoCA::TaggerMP4::~TaggerMP4()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &track)
@@ -216,7 +219,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 			else					 chapterList[i].duration = MP4_INVALID_DURATION;
 		}
 
-		ex_MP4SetChapters(mp4File, chapterList, chapterCount, (MP4ChapterType) currentConfig->GetIntValue("Tags", "WriteChaptersType", MP4ChapterTypeAny));
+		ex_MP4SetChapters(mp4File, chapterList, chapterCount, (MP4ChapterType) currentConfig->GetIntValue(ConfigureMP4::ConfigID, "ChapterType", MP4ChapterTypeAny));
 
 		delete [] chapterList;
 	}
@@ -404,4 +407,11 @@ const String &BoCA::TaggerMP4::GetID3CategoryName(UnsignedInt id)
 
 	if (id > 191) return empty;
 	else	      return genres[id];
+}
+
+ConfigLayer *BoCA::TaggerMP4::GetConfigurationLayer()
+{
+	if (configLayer == NIL) configLayer = new ConfigureMP4();
+
+	return configLayer;
 }

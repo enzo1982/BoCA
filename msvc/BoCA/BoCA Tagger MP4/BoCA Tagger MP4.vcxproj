@@ -143,10 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\components\tagger\mp4\config.cpp" />
     <ClCompile Include="..\..\..\components\tagger\mp4\dllinterface.cpp" />
     <ClCompile Include="..\..\..\components\tagger\mp4\mp4.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\components\tagger\mp4\config.h" />
     <ClInclude Include="..\..\..\components\tagger\mp4\dllinterface.h" />
     <ClInclude Include="..\..\..\components\tagger\mp4\mp4.h" />
   </ItemGroup>
