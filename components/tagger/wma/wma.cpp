@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -75,24 +75,39 @@ BoCA::TaggerWMA::~TaggerWMA()
 
 Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &track)
 {
-	const Config		*currentConfig	 = GetConfiguration();
+	const Config	*config = GetConfiguration();
 
-	Bool			 prependZero	 = currentConfig->GetIntValue("Tags", "TrackPrependZeroWMAMetadata", False);
+	/* Get configuration.
+	 */ 
+	Bool	 prependZero = config->GetIntValue("Tags", "TrackPrependZeroWMAMetadata", False);
 
+	/* Create metadata editor objects.
+	 */
 	IWMMetadataEditor	*metadataEditor	 = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
 
 	HRESULT	 hr = ex_WMCreateEditor(&metadataEditor);
 
+	if (FAILED(hr)) return Error();
+
 	hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
 
+	if (FAILED(hr))
+	{
+		metadataEditor->Release();
+
+		return Error();
+	}
+
+	/* Open file and render tags.
+	 */
 	hr = metadataEditor2->OpenEx(fileName, GENERIC_READ | GENERIC_WRITE, 0);
 
-	if (hr == S_OK)
+	if (!FAILED(hr))
 	{
 		IWMHeaderInfo3	*pHeaderInfo = NIL;
 
-		hr = metadataEditor2->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
+		metadataEditor2->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
 
 		/* Save basic information.
 		 */
@@ -125,8 +140,8 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			RenderWMAIntegerItem(g_wszWMSharedUserRating, Math::Min(99, info.rating), pHeaderInfo);
 		}
 
-		if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderWMAStringItem(g_wszWMDescription, info.comment, pHeaderInfo);
-		else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				RenderWMAStringItem(g_wszWMDescription, currentConfig->GetStringValue("Tags", "DefaultComment", NIL), pHeaderInfo);
+		if	(info.comment != NIL && !config->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderWMAStringItem(g_wszWMDescription, info.comment, pHeaderInfo);
+		else if (config->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				RenderWMAStringItem(g_wszWMDescription, config->GetStringValue("Tags", "DefaultComment", NIL), pHeaderInfo);
 
 		/* Save other text info.
 		 */
@@ -164,7 +179,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		/* Save CD table of contents.
 		 */
-		if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
+		if (config->GetIntValue("Tags", "WriteMCDI", True))
 		{
 			if (info.mcdi.GetData().Size() > 0)
 			{
@@ -174,7 +189,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		/* Save cover art.
 		 */
-		if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToWMAMetadata", True))
+		if (config->GetIntValue("Tags", "CoverArtWriteToTags", True) && config->GetIntValue("Tags", "CoverArtWriteToWMAMetadata", True))
 		{
 			foreach (const Picture &picInfo, track.pictures)
 			{
@@ -200,7 +215,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		/* Save chapters.
 		 */
-		if (track.tracks.Length() > 0 && currentConfig->GetIntValue("Tags", "WriteChapters", True))
+		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
 			Int64	 offset = 0;
 
@@ -218,70 +233,85 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 		}
 
 		pHeaderInfo->Release();
-	}
 
-	hr = metadataEditor2->Flush();
+		/* Flush metadata editor.
+		 */
+		hr = metadataEditor2->Flush();
+	}
 
 	metadataEditor->Release();
 	metadataEditor2->Release();
 
-	if (hr == S_OK) return Success();
-	else		return Error();
+	if (FAILED(hr)) return Error();
+	else		return Success();
 }
 
 Error BoCA::TaggerWMA::RenderWMAStringItem(const String &id, const String &value, Void *headerInfo)
 {
 	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) value.Trim(), wcslen(value.Trim()) * 2 + 2);
 
-	if (hr == S_OK) return Success();
-	else		return Error();
+	if (FAILED(hr)) return Error();
+	else		return Success();
 }
 
 Error BoCA::TaggerWMA::RenderWMAIntegerItem(const String &id, Int value, Void *headerInfo)
 {
 	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_DWORD, 0, (BYTE *) &value, sizeof(DWORD));
 
-	if (hr == S_OK) return Success();
-	else		return Error();
+	if (FAILED(hr)) return Error();
+	else		return Success();
 }
 
 Error BoCA::TaggerWMA::RenderWMABinaryItem(const String &id, const Buffer<UnsignedByte> &value, Void *headerInfo)
 {
 	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_BINARY, 0, (BYTE *) (UnsignedByte *) value, value.Size());
 
-	if (hr == S_OK) return Success();
-	else		return Error();
+	if (FAILED(hr)) return Error();
+	else		return Success();
 }
 
 Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 {
-	const Config		*currentConfig = GetConfiguration();
+	const Config	*config = GetConfiguration();
 
-	IWMMetadataEditor	*metadataEditor = NIL;
+	/* Create metadata editor objects.
+	 */
+	IWMMetadataEditor	*metadataEditor	 = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
 
 	HRESULT	 hr = ex_WMCreateEditor(&metadataEditor);
 
+	if (FAILED(hr)) return Error();
+
 	hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
 
+	if (FAILED(hr))
+	{
+		metadataEditor->Release();
+
+		return Error();
+	}
+
+	/* Open file and parse tags.
+	 */
 	hr = metadataEditor2->OpenEx(fileName, GENERIC_READ, FILE_SHARE_READ);
 
-	if (hr == S_OK)
+	if (!FAILED(hr))
 	{
 		IWMHeaderInfo3	*pHeaderInfo = NIL;
 
-		hr = metadataEditor2->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
+		metadataEditor2->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
 
 		Info	 info = track.GetInfo();
 
 		WORD	 langIndex = 0;
 		WORD	 numIndices = 0;
 
-		hr = pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, NIL, &numIndices);
+		pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, NIL, &numIndices);
 
 		WORD	*indices = new WORD [numIndices];
 
-		hr = pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, indices, &numIndices);
+		pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, indices, &numIndices);
 
 		for (Int i = 0; i < numIndices; i++)
 		{
@@ -289,12 +319,12 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			LPWSTR			 name	  = new WCHAR [nameLen];
 			DWORD			 cbLength = 0;
 
-			hr = pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, NIL, NIL, NIL, &cbLength);
+			pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, NIL, NIL, NIL, &cbLength);
 
 			WMT_ATTR_DATATYPE	 type	  = WMT_TYPE_DWORD;
 			BYTE			*pbValue  = new BYTE [cbLength];
 
-			hr = pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, &type, NIL, pbValue, &cbLength);
+			pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, &type, NIL, pbValue, &cbLength);
 
 			String			 value = String((LPWSTR) pbValue).Trim();
 
@@ -400,7 +430,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 					}
 				}
 			}
-			else if (String(name) == g_wszWMPicture && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+			else if (String(name) == g_wszWMPicture && config->GetIntValue("Tags", "CoverArtReadFromTags", True))
 			{
 				WM_PICTURE	*picData = (WM_PICTURE *) pbValue;
 				Picture		 picture;
@@ -435,9 +465,9 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 		 */
 		WORD	 numMarkers = 0;
 
-		hr = pHeaderInfo->GetMarkerCount(&numMarkers);
+		pHeaderInfo->GetMarkerCount(&numMarkers);
 
-		if (numMarkers > 0 && currentConfig->GetIntValue("Tags", "ReadChapters", True))
+		if (numMarkers > 0 && config->GetIntValue("Tags", "ReadChapters", True))
 		{
 			for (Int i = 0; i < numMarkers; i++)
 			{
@@ -446,11 +476,11 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				QWORD	 cnsMarkerTime	  = 0;
 				WORD	 cchMarkerNameLen = 0;
 
-				hr = pHeaderInfo->GetMarker(i, NIL, &cchMarkerNameLen, NIL);
+				pHeaderInfo->GetMarker(i, NIL, &cchMarkerNameLen, NIL);
 
 				WCHAR	*pwszMarkerName = new WCHAR [cchMarkerNameLen];
 
-				hr = pHeaderInfo->GetMarker(i, pwszMarkerName, &cchMarkerNameLen, &cnsMarkerTime);
+				pHeaderInfo->GetMarker(i, pwszMarkerName, &cchMarkerNameLen, &cnsMarkerTime);
 
 				/* Fill track data.
 				 */
@@ -498,44 +528,59 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 		}
 
 		pHeaderInfo->Release();
-	}
 
-	hr = metadataEditor2->Close();
+		/* Close metadata editor.
+		 */
+		hr = metadataEditor2->Close();
+	}
 
 	metadataEditor->Release();
 	metadataEditor2->Release();
 
-	if (hr == S_OK) return Success();
-	else		return Error();
+	if (FAILED(hr)) return Error();
+	else		return Success();
 }
 
 Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &track)
 {
+	/* Create metadata editor objects.
+	 */
 	IWMMetadataEditor	*metadataEditor	 = NIL;
 	IWMMetadataEditor2	*metadataEditor2 = NIL;
 
 	HRESULT	 hr = ex_WMCreateEditor(&metadataEditor);
 
-	if (hr == S_OK) hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
+	if (FAILED(hr)) return Error();
 
-	if (hr == S_OK) hr = metadataEditor2->OpenEx(fileName, GENERIC_READ | GENERIC_WRITE, 0);
+	hr = metadataEditor->QueryInterface(IID_IWMMetadataEditor2, (void **) &metadataEditor2);
 
-	if (hr == S_OK)
+	if (FAILED(hr))
+	{
+		metadataEditor->Release();
+
+		return Error();
+	}
+
+	/* Open file and rremove tags.
+	 */
+	hr = metadataEditor2->OpenEx(fileName, GENERIC_READ | GENERIC_WRITE, 0);
+
+	if (!FAILED(hr))
 	{
 		IWMHeaderInfo3	*pHeaderInfo = NIL;
 
-		hr = metadataEditor2->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
+		metadataEditor2->QueryInterface(IID_IWMHeaderInfo3, (void **) &pHeaderInfo);
 
 		/* Remove metadata first.
 		 */
 		WORD	 langIndex = 0;
 		WORD	 numIndices = 0;
 
-		hr = pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, NIL, &numIndices);
+		pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, NIL, &numIndices);
 
 		WORD	*indices = new WORD [numIndices];
 
-		hr = pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, indices, &numIndices);
+		pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, indices, &numIndices);
 
 		for (Int i = 0; i < numIndices; i++)
 		{
@@ -598,13 +643,14 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 
 		pHeaderInfo->Release();
 
+		/* Flush metadata editor.
+		 */
 		hr = metadataEditor2->Flush();
 	}
 
-	if (metadataEditor2 != NIL) metadataEditor2->Release();
-	if (metadataEditor  != NIL) metadataEditor->Release();
+	metadataEditor2->Release();
+	metadataEditor->Release();
 
-	if (hr == S_OK) RenderStreamInfo(fileName, track);
-
-	return Success();
+	if (FAILED(hr)) return Error();
+	else		return RenderStreamInfo(fileName, track);
 }

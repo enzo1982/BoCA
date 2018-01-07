@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -58,31 +58,44 @@ Void smooth::DetachDLL()
 
 Bool BoCA::DecoderWMA::CanOpenStream(const String &streamURI)
 {
-	InStream	*f_in  = new InStream(STREAM_FILE, streamURI, IS_READ);
-	Int		 magic = f_in->InputNumber(4);
-
-	delete f_in;
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
+	Int		 magic = in.InputNumber(4);
 
 	return (magic == 1974609456);
 }
 
 Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
+	/* Get file size.
+	 */
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	track.fileSize	= f_in->Size();
+	track.fileSize = in.Size();
 
-	delete f_in;
+	/* Create WMA reader object.
+	 */
+	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
 
+	if (FAILED(hr)) return Error();
+
+	hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &m_pReaderAdvanced);
+
+	if (FAILED(hr))
+	{
+		m_pReader->Release();
+
+		return Error();
+	}
+
+	/* Initialize reader callback.
+	 */
 	readerCallback = new WMAReader();
 
 	m_hAsyncEvent = readerCallback->GetAsyncEventHandle();
 
-	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
-
-	if (!FAILED(hr)) hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &m_pReaderAdvanced);
-
-	if (!FAILED(hr)) hr = m_pReader->Open(streamURI, readerCallback, NIL);
+	/* Open file.
+	 */
+	hr = m_pReader->Open(streamURI, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.
@@ -251,16 +264,31 @@ BoCA::DecoderWMA::~DecoderWMA()
 
 Bool BoCA::DecoderWMA::Activate()
 {
+	/* Create WMA reader object.
+	 */
 	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
 
-	if (!FAILED(hr)) hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &m_pReaderAdvanced);
+	if (FAILED(hr)) return False;
 
+	hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &m_pReaderAdvanced);
+
+	if (FAILED(hr))
+	{
+		m_pReader->Release();
+
+		return False;
+	}
+
+	/* Initialize reader callback.
+	 */
 	readerCallback = new WMAReader();
 	readerCallback->SetReaderAdvanced(m_pReaderAdvanced);
 	readerCallback->SetSamplesBuffer(&samplesBuffer, &samplesBufferMutex);
 
 	m_hAsyncEvent = readerCallback->GetAsyncEventHandle();
 
+	/* Open file.
+	 */
 	hr = m_pReader->Open(track.origFilename, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
