@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -98,16 +98,24 @@ Bool BoCA::AS::EncoderComponentExternal::Deactivate()
 
 	converter->Finish(buffer);
 
-	if (buffer.Size() != 0) WriteData(buffer);
-
 	delete converter;
+
+	converter = NIL;
+
+	if (buffer.Size() != 0) WriteData(buffer);
 
 	return True;
 }
 
 Int BoCA::AS::EncoderComponentExternal::TransformData(Buffer<UnsignedByte> &buffer)
 {
-	return converter->Transform(buffer);
+	if (converter != NIL) converter->Transform(buffer);
+
+	/* Calculate MD5 if requested.
+	 */
+	if (calculateMD5) md5.Feed(buffer);
+
+	return buffer.Size();
 }
 
 BoCA::ConfigLayer *BoCA::AS::EncoderComponentExternal::GetConfigurationLayer()
