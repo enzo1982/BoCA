@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -144,7 +144,7 @@ Int BoCA::DSPResample::Flush(Buffer<UnsignedByte> &data)
 
 	output.Resize(src_data.output_frames * format.channels);
 
-	src_data.data_in	= NIL;
+	src_data.data_in	= (float *) NIL + 1; // Library needs a non-NULL pointer even if input_frames is 0.
 	src_data.data_out	= output;
 
 	/* Flush input and copy to output.
