@@ -22,7 +22,7 @@ BoCA::ConfigureMP4::ConfigureMP4()
 
 	i18n->SetContext("Taggers::MP4");
 
-	Int	 chapterType = config->GetIntValue(ConfigID, "ChapterType", MP4ChapterTypeAny);
+	Int	 chapterType = config->GetIntValue(ConfigID, "ChapterType", MP4ChapterTypeQt);
 
 	group_chapter	= new GroupBox(i18n->TranslateString("Chapter format"), Point(7, 11), Size(236, 41));
 

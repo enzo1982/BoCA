@@ -219,7 +219,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 			else					 chapterList[i].duration = MP4_INVALID_DURATION;
 		}
 
-		ex_MP4SetChapters(mp4File, chapterList, chapterCount, (MP4ChapterType) currentConfig->GetIntValue(ConfigureMP4::ConfigID, "ChapterType", MP4ChapterTypeAny));
+		ex_MP4SetChapters(mp4File, chapterList, chapterCount, (MP4ChapterType) currentConfig->GetIntValue(ConfigureMP4::ConfigID, "ChapterType", MP4ChapterTypeQt));
 
 		delete [] chapterList;
 	}
@@ -309,51 +309,54 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	/* Read chapters.
 	 */
-	MP4Chapter_t	*chapterList  = NIL;
-	uint32_t	 chapterCount = 0;
-
-	ex_MP4GetChapters(mp4File, &chapterList, &chapterCount, MP4ChapterTypeAny);
-
-	if (chapterList != NIL && chapterCount > 1 && currentConfig->GetIntValue("Tags", "ReadChapters", True))
+	if (currentConfig->GetIntValue("Tags", "ReadChapters", True))
 	{
-		MP4Duration	 offset = 0;
+		MP4Chapter_t	*chapterList  = NIL;
+		uint32_t	 chapterCount = 0;
 
-		for (UnsignedInt i = 0; i < chapterCount; i++)
+		ex_MP4GetChapters(mp4File, &chapterList, &chapterCount, MP4ChapterTypeAny);
+
+		if (chapterList != NIL && chapterCount > 1)
 		{
-			const Format	&format = track.GetFormat();
+			MP4Duration	 offset = 0;
 
-			/* Fill track data.
-			 */
-			Track	 rTrack;
+			for (UnsignedInt i = 0; i < chapterCount; i++)
+			{
+				const Format	&format = track.GetFormat();
 
-			rTrack.origFilename = track.origFilename;
-			rTrack.pictures	    = track.pictures;
+				/* Fill track data.
+				 */
+				Track	 rTrack;
 
-			rTrack.sampleOffset = Math::Round(Float(offset)			 / MP4_MSECS_TIME_SCALE * format.rate);
-			rTrack.length	    = Math::Round(Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate);
+				rTrack.origFilename = track.origFilename;
+				rTrack.pictures	    = track.pictures;
 
-			rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
+				rTrack.sampleOffset = Math::Round(Float(offset)			 / MP4_MSECS_TIME_SCALE * format.rate);
+				rTrack.length	    = Math::Round(Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate);
 
-			rTrack.SetFormat(format);
+				rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
 
-			/* Set track title.
-			 */
-			Info	 info = track.GetInfo();
+				rTrack.SetFormat(format);
 
-			if (String(chapterList[i].title).Trim() != NIL) info.title = String(chapterList[i].title).Trim();
+				/* Set track title.
+				 */
+				Info	 info = track.GetInfo();
 
-			info.track = i + 1;
+				if (String(chapterList[i].title).Trim() != NIL) info.title = String(chapterList[i].title).Trim();
 
-			rTrack.SetInfo(info);
+				info.track = i + 1;
 
-			/* Add track to track list.
-			 */
-			track.tracks.Add(rTrack);
+				rTrack.SetInfo(info);
 
-			offset += chapterList[i].duration;
+				/* Add track to track list.
+				 */
+				track.tracks.Add(rTrack);
+
+				offset += chapterList[i].duration;
+			}
 		}
 
-		ex_MP4Free(chapterList);
+		if (chapterList != NIL) ex_MP4Free(chapterList);
 	}
 
 	String::SetInputFormat(prevInFormat);
