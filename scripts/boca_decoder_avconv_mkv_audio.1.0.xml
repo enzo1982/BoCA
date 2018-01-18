@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Matroska Video Audio Extractor</name>
+  <name>Matroska Audio Extractor</name>
   <version>1.0</version>
   <id>avconv-mkv_audio-dec</id>
   <type>decoder</type>
   <format>
     <name>Matroska Video Files</name>
     <extension>mkv</extension>
+  </format>
+  <format>
+    <name>Matroska Audio Files</name>
+    <extension>mka</extension>
   </format>
   <external>
     <command>avconv</command>
