@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -11,6 +11,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca/application/decodercomponent.h>
+#include <boca/common/utilities.h>
 
 BoCA::AS::DecoderComponent::DecoderComponent(ComponentSpecs *iSpecs) : StreamComponent(iSpecs)
 {
@@ -63,7 +64,30 @@ Bool BoCA::AS::DecoderComponent::Seek(Int64 samplePosition)
 
 Int BoCA::AS::DecoderComponent::ReadData(Buffer<UnsignedByte> &buffer)
 {
-	return specs->func_ReadData(component, &buffer);
+	/* Find system byte order.
+	 */
+	static Int	 systemByteOrder = CPU().GetEndianness() == EndianLittle ? BYTE_INTEL : BYTE_RAW;
+
+	/* Get data from decoder component.
+	 */
+	Int	 bytes = specs->func_ReadData(component, &buffer);
+
+	if (bytes >= 0)
+	{
+		buffer.Resize(bytes);
+
+		/* Switch byte order to native.
+		 */
+		const Format	&format = track.GetFormat();
+
+		if (format.order != BYTE_NATIVE && format.order != systemByteOrder) Utilities::SwitchBufferByteOrder(buffer, format.bits / 8);
+
+		/* Calculate MD5 if requested.
+		 */
+		if (calculateMD5) md5.Feed(buffer);
+	}
+
+	return bytes;
 }
 
 Int64 BoCA::AS::DecoderComponent::GetInBytes() const

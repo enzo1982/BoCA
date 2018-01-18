@@ -107,7 +107,7 @@ Bool BoCA::AS::EncoderComponentExternal::Deactivate()
 	return True;
 }
 
-Int BoCA::AS::EncoderComponentExternal::TransformData(Buffer<UnsignedByte> &buffer)
+Int BoCA::AS::EncoderComponentExternal::ProcessData(Buffer<UnsignedByte> &buffer)
 {
 	if (converter != NIL) converter->Transform(buffer);
 

@@ -65,7 +65,14 @@ Bool BoCA::AS::EncoderComponent::Deactivate()
 
 	converter->Finish(buffer);
 
-	if (buffer.Size() != 0) specs->func_WriteData(component, &buffer);
+	if (buffer.Size() != 0)
+	{
+		/* Calculate MD5 if requested.
+		 */
+		if (calculateMD5) md5.Feed(buffer);
+
+		specs->func_WriteData(component, &buffer);
+	}
 
 	/* Deactivate component.
 	 */
@@ -75,6 +82,10 @@ Bool BoCA::AS::EncoderComponent::Deactivate()
 Int BoCA::AS::EncoderComponent::WriteData(Buffer<UnsignedByte> &buffer)
 {
 	converter->Transform(buffer);
+
+	/* Calculate MD5 if requested.
+	 */
+	if (calculateMD5) md5.Feed(buffer);
 
 	return specs->func_WriteData(component, &buffer);
 }
@@ -88,6 +99,10 @@ Bool BoCA::AS::EncoderComponent::NextPass()
 	converter->Finish(buffer);
 
 	if (buffer.Size() != 0) specs->func_WriteData(component, &buffer);
+
+	/* Reset MD5 calculator.
+	 */
+	if (calculateMD5) md5.Reset();
 
 	return specs->func_NextPass(component);
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,10 +14,12 @@
 
 BoCA::AS::StreamComponent::StreamComponent(ComponentSpecs *iSpecs) : Component(iSpecs)
 {
-	converter   = NIL;
+	converter    = NIL;
 
-	errorState  = False;
-	errorString = "Unknown error";
+	calculateMD5 = False;
+
+	errorState   = False;
+	errorString  = "Unknown error";
 }
 
 BoCA::AS::StreamComponent::~StreamComponent()
@@ -39,6 +41,18 @@ Bool BoCA::AS::StreamComponent::SetAudioTrackInfo(const Track &track)
 	this->track = track;
 
 	return specs->func_SetAudioTrackInfo(component, &track);
+}
+
+Void BoCA::AS::StreamComponent::SetCalculateMD5(Bool nCalculateMD5)
+{
+	calculateMD5 = nCalculateMD5;
+}
+
+String BoCA::AS::StreamComponent::GetMD5Checksum()
+{
+	if (!calculateMD5 || converter != NIL) return NIL;
+
+	return md5.Finish();
 }
 
 Bool BoCA::AS::StreamComponent::Activate()
@@ -84,6 +98,8 @@ Bool BoCA::AS::StreamComponent::Deactivate()
 	/* Clean up format converter.
 	 */
 	delete converter;
+
+	converter = NIL;
 
 	/* Deactivate component.
 	 */

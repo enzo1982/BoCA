@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -15,6 +15,8 @@
 
 #include <boca/application/registry.h>
 #include <boca/application/taggercomponent.h>
+
+#include <boca/common/utilities.h>
 
 BoCA::AS::DecoderComponentExternal::DecoderComponentExternal(ComponentSpecs *specs) : DecoderComponent(specs)
 {
@@ -63,6 +65,25 @@ Int BoCA::AS::DecoderComponentExternal::GetPackageSize() const
 Int BoCA::AS::DecoderComponentExternal::SetDriver(IO::Driver *driver)
 {
 	return IO::Filter::SetDriver(driver);
+}
+
+Int BoCA::AS::DecoderComponentExternal::ProcessData(Buffer<UnsignedByte> &buffer)
+{
+	/* Find system byte order.
+	 */
+	static Int	 systemByteOrder = CPU().GetEndianness() == EndianLittle ? BYTE_INTEL : BYTE_RAW;
+
+	/* Switch byte order to native.
+	 */
+	const Format	&format = track.GetFormat();
+
+	if (format.order != BYTE_NATIVE && format.order != systemByteOrder) Utilities::SwitchBufferByteOrder(buffer, format.bits / 8);
+
+	/* Calculate MD5 if requested.
+	 */
+	if (calculateMD5) md5.Feed(buffer);
+
+	return buffer.Size();
 }
 
 BoCA::ConfigLayer *BoCA::AS::DecoderComponentExternal::GetConfigurationLayer()
