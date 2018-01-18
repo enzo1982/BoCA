@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -81,5 +81,13 @@ Int BoCA::AS::EncoderComponent::WriteData(Buffer<UnsignedByte> &buffer)
 
 Bool BoCA::AS::EncoderComponent::NextPass()
 {
+	/* Flush format converter.
+	 */
+	Buffer<UnsignedByte>	 buffer;
+
+	converter->Finish(buffer);
+
+	if (buffer.Size() != 0) specs->func_WriteData(component, &buffer);
+
 	return specs->func_NextPass(component);
 }
