@@ -35,8 +35,7 @@ Bool BoCA::Format::operator ==(const Format &format) const
 	       rate	== format.rate	   &&
 	       bits	== format.bits	   &&
 	       fp	== format.fp	   &&
-	       sign	== format.sign	   &&
-	       order	== format.order;
+	       sign	== format.sign;
 }
 
 Bool BoCA::Format::operator !=(const Format &format) const
