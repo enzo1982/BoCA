@@ -18,7 +18,8 @@
 #include <signal.h>
 #include <sys/wait.h>
 
-#define WAVE_FORMAT_PCM	0x0001
+#define WAVE_FORMAT_PCM	       0x0001
+#define WAVE_FORMAT_IEEE_FLOAT 0x0003
 
 using namespace smooth::IO;
 
@@ -78,7 +79,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 	out->OutputString("fmt ");
 
 	out->OutputNumber(16, 4);
-	out->OutputNumber(WAVE_FORMAT_PCM, 2);
+	out->OutputNumber(format.fp ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM, 2);
 	out->OutputNumber(format.channels, 2);
 	out->OutputNumber(format.rate, 4);
 	out->OutputNumber(format.rate * format.channels * (format.bits / 8), 4);
@@ -171,6 +172,13 @@ Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(Buffer<UnsignedByte> &dat
 	static Endianness	 endianness = CPU().GetEndianness();
 
 	if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, format.bits / 8);
+
+	/* Convert 8 bit samples to unsigned.
+	 */
+	if (format.bits == 8 && format.sign == True)
+	{
+		for (Int i = 0; i < data.Size(); i++) data[i] = SignedByte(data[i]) + 128;
+	}
 
 	/* Hand data over to the encoder using the stdio pipe.
 	 */

@@ -265,6 +265,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 				format.bits	= (unsigned short) in->InputNumber(2);
 				format.order	= BYTE_INTEL;
 
+				if (format.bits == 8) format.sign = False;
+
 				track.SetFormat(format);
 
 				/* Skip rest of chunk.
