@@ -11,6 +11,8 @@
     <extension>mp4</extension>
     <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>
+  <input bits="8" signed="false"/>
+  <input bits="16-32"/>
   <external>
     <command>mp4als</command>
     <arguments>-MP4 %OPTIONS %INFILE %OUTFILE</arguments>

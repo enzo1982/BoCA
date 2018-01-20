@@ -11,7 +11,8 @@
     <extension>ofr</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>
-  <input channels="1-2"/>
+  <input bits="8" signed="false" channels="1-2"/>
+  <input bits="16-32" channels="1-2"/>
   <external>
     <command>ofr</command>
     <arguments>--encode --incorrectheader %OPTIONS - --output %OUTFILE</arguments>

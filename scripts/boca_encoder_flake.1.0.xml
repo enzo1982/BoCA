@@ -11,7 +11,8 @@
     <extension>flac</extension>
     <tag id="flac-tag" mode="other">FLAC Metadata</tag>
   </format>
-  <input channels="1-8"/>
+  <input bits="8" signed="false" channels="1-8"/>
+  <input bits="16" channels="1-8"/>
   <external>
     <command>flake</command>
     <arguments>%OPTIONS %INFILE -o %OUTFILE</arguments>

@@ -9,6 +9,7 @@
     <name>Raw AAC Files</name>
     <extension>aac</extension>
   </format>
+  <input bits="8-24"/>
   <external>
     <command>DivXAACEnc</command>
     <arguments>-i %INFILE -o %OUTFILE %OPTIONS</arguments>

@@ -11,6 +11,8 @@
     <extension>tta</extension>
     <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
   </format>
+  <input bits="8" signed="false"/>
+  <input bits="16-24"/>
   <external>
     <command>ttaenc</command>
     <arguments>-e %OPTIONS %INFILE -o %OUTFILE</arguments>
