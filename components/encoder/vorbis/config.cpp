@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -241,7 +241,7 @@ Void BoCA::ConfigureVorbis::ToggleABRMin()
 
 Void BoCA::ConfigureVorbis::SetABRMin()
 {
-	edit_abrmin->SetText(String::FromInt(abrMin));
+	if (!edit_abrmin->IsFocussed()) edit_abrmin->SetText(String::FromInt(abrMin));
 }
 
 Void BoCA::ConfigureVorbis::SetABRMinByEditBox()
@@ -257,7 +257,7 @@ Void BoCA::ConfigureVorbis::ToggleABRNom()
 
 Void BoCA::ConfigureVorbis::SetABRNom()
 {
-	edit_abrnom->SetText(String::FromInt(abrNom));
+	if (!edit_abrnom->IsFocussed()) edit_abrnom->SetText(String::FromInt(abrNom));
 }
 
 Void BoCA::ConfigureVorbis::SetABRNomByEditBox()
@@ -273,7 +273,7 @@ Void BoCA::ConfigureVorbis::ToggleABRMax()
 
 Void BoCA::ConfigureVorbis::SetABRMax()
 {
-	edit_abrmax->SetText(String::FromInt(abrMax));
+	if (!edit_abrmax->IsFocussed()) edit_abrmax->SetText(String::FromInt(abrMax));
 }
 
 Void BoCA::ConfigureVorbis::SetABRMaxByEditBox()
