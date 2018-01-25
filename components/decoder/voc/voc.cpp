@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -40,9 +40,17 @@ Bool BoCA::DecoderVoc::CanOpenStream(const String &streamURI)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	if (in.InputString(19) == "Creative Voice File")
+	if (in.InputString(19) == "Creative Voice File" && in.InputNumber(1) == 0x1A)
 	{
-		if (in.InputNumber(1) == 0x1A) return True;
+		/* Skip rest of header.
+		 */
+		in.RelSeek(6);
+
+		/* Read block type.
+		 */
+		Int	 blockType = in.InputNumber(1);
+
+		if (blockType == 0x09) return True;
 	}
 
 	return False;
@@ -52,32 +60,59 @@ Error BoCA::DecoderVoc::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	/* ToDo: Add more checking to this!
-	 */
 	track.fileSize = in.Size();
 
 	/* Skip main header.
 	 */
 	in.RelSeek(26);
 
-	/* Skip block type and size.
+	/* Read block type.
 	 */
-	in.RelSeek(4);
+	Int	 blockType = in.InputNumber(1);
 
-	/* Read format data.
-	 */
-	Format	 format = track.GetFormat();
+	if (blockType == 0x09)
+	{
+		/* Read block size.
+		 */
+		Int	 blockSize = in.InputNumber(3);
 
-	format.order	= BYTE_INTEL;
-	format.rate	= UnsignedInt32(in.InputNumber(4));
-	format.bits	= UnsignedInt8(in.InputNumber(1));
-	format.channels	= UnsignedInt8(in.InputNumber(1));
+		/* Read format data.
+		 */
+		Format	 format = track.GetFormat();
 
-	if (format.bits == 8) format.sign = False;
+		format.order	= BYTE_INTEL;
+		format.rate	= UnsignedInt32(in.InputNumber(4));
+		format.bits	= UnsignedInt8(in.InputNumber(1));
+		format.channels	= UnsignedInt8(in.InputNumber(1));
 
-	track.SetFormat(format);
+		if (format.bits == 8) format.sign = False;
 
-	track.length = (track.fileSize - 42 - 4 * Int((track.fileSize - 42) / 7340032)) / format.channels / (format.bits / 8);
+		track.SetFormat(format);
+
+		in.RelSeek(6);
+		in.RelSeek(blockSize - 12);
+
+		/* Get track length.
+		 */
+		track.length = (blockSize - 12) / format.channels / (format.bits / 8);
+
+		if (in.InputNumber(1) == 0x02)
+		{
+			do
+			{
+				Int	 blockSize = in.InputNumber(3);
+
+				track.length += blockSize / format.channels / (format.bits / 8);
+
+				in.RelSeek(blockSize);
+			}
+			while (in.InputNumber(1) == 0x02);
+		}
+		else
+		{
+			track.length = (track.fileSize - 42) / format.channels / (format.bits / 8);
+		}
+	}
 
 	return Success();
 }
@@ -102,13 +137,16 @@ Bool BoCA::DecoderVoc::Activate()
 
 	/* Read block type.
 	 */
-	in.InputNumber(1);
+	Int	 blockType = in.InputNumber(1);
 
-	/* Read block size and continue.
-	 */
-	bytesLeft = in.InputNumber(3) - 12;
+	if (blockType == 0x09)
+	{
+		/* Read block size and continue.
+		 */
+		bytesLeft = in.InputNumber(3) - 12;
 
-	driver->Seek(42);
+		driver->Seek(in.GetPos() + 12);
+	}
 
 	return True;
 }
@@ -123,17 +161,25 @@ Int BoCA::DecoderVoc::ReadData(Buffer<UnsignedByte> &data)
 
 	if (size > bytesLeft)
 	{
-		if (((unsigned char *) data + bytesLeft)[0] == 2)
+		if ((data + bytesLeft)[0] == 0x02)
 		{
-			Int newBytesLeft = ((unsigned char *) data + bytesLeft + 1)[0] + 256 * ((unsigned char *) data + bytesLeft + 2)[0] + 65536 * ((unsigned char *) data + bytesLeft + 3)[0];
+			Int newBytesLeft =	   (data + bytesLeft)[1] +
+					     256 * (data + bytesLeft)[2] +
+					   65536 * (data + bytesLeft)[3];
 
 			outSize = size - 4;
 
-			memmove((unsigned char *) data + bytesLeft, (unsigned char *) data + bytesLeft + 4, size - bytesLeft - 4);
+			memmove(data + bytesLeft, data + bytesLeft + 4, size - bytesLeft - 4);
 
 			data.Resize(outSize);
 
 			bytesLeft = newBytesLeft - (size - bytesLeft - 4);
+		}
+		else
+		{
+			/* Possibly broken format.
+			 */
+			bytesLeft = driver->GetSize();
 		}
 	}
 	else
