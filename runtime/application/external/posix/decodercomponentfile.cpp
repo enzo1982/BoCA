@@ -71,6 +71,10 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 	unsigned long	 exitCode   = WIFEXITED(exitStatus)   ? WEXITSTATUS(exitStatus) : -1;
 	unsigned long	 exitSignal = WIFSIGNALED(exitStatus) ? WTERMSIG(exitStatus)	: -1;
 
+	/* Check if anything went wrong.
+	 */
+	if (!specs->external_ignoreExitCode && exitCode != 0 && exitCode != 0x80 + SIGPIPE && exitSignal != SIGPIPE) return NIL;
+
 	/* Extract MD5 from output.
 	 */
 	String	 md5;

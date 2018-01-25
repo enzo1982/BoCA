@@ -73,11 +73,9 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 
 	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
-	HANDLE	 hProcess = processInfo.hProcess;
-
 	/* Check process handle.
 	 */
-	if (hProcess == NIL) return NIL;
+	if (processInfo.hProcess == NIL) return NIL;
 
 	/* Close stdio pipe write handle.
 	 */
@@ -101,11 +99,11 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 
 	CloseHandle(rPipe);
 
-	TerminateProcess(hProcess, 0);
+	TerminateProcess(processInfo.hProcess, 0);
 
 	/* Wait until the decoder exits.
 	 */
-	while (WaitForSingleObject(hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+	while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
 
 	if (specs->debug)
 	{
@@ -113,6 +111,14 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 
 		FreeConsole();
 	}
+
+	/* Check if anything went wrong.
+	 */
+	unsigned long	 exitCode = 0;
+
+	GetExitCodeProcess(processInfo.hProcess, &exitCode);
+
+	if (!specs->external_ignoreExitCode && exitCode != 0) return NIL;
 
 	/* Extract MD5 from output.
 	 */

@@ -117,6 +117,14 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 		FreeConsole();
 	}
 
+	/* Check if anything went wrong.
+	 */
+	unsigned long	 exitCode = 0;
+
+	GetExitCodeProcess(processInfo.hProcess, &exitCode);
+
+	if (!specs->external_ignoreExitCode && exitCode != 0) return NIL;
+
 	/* Extract MD5 from output.
 	 */
 	String	 md5;
