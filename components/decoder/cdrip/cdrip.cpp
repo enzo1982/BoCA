@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -192,32 +192,30 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	info.track	= trackNumber;
 	info.numTracks	= info.mcdi.GetNumberOfAudioTracks();
 
-	/* Read CDText and cdplayer.ini
+	/* Read CD-Text and cdplayer.ini.
 	 */
+	Int	 discid = ComputeDiscID(info.mcdi);
+
+	if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDText", True)	   && cdTextDiscID   != discid) { cdText.ReadCDText(track.drive);   cdTextDiscID   = discid; }
+	if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(track.drive); cdPlayerDiscID = discid; }
+
+	if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 	{
-		Int	 discid = ComputeDiscID(track.drive);
+		const CDInfo	&cdInfo = cdText.GetCDInfo();
 
-		if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDText", True)	   && cdTextDiscID   != discid) { cdText.ReadCDText(track.drive);   cdTextDiscID   = discid; }
-		if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(track.drive); cdPlayerDiscID = discid; }
+		if (cdInfo.GetTrackArtist(trackNumber) != NIL)	info.artist = cdInfo.GetTrackArtist(trackNumber);
+		else						info.artist = cdInfo.GetArtist();
 
-		if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
-		{
-			const CDInfo	&cdInfo = cdText.GetCDInfo();
+		info.title  = cdInfo.GetTrackTitle(trackNumber);
+		info.album  = cdInfo.GetTitle();
+	}
+	else if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
+	{
+		const CDInfo	&cdInfo = cdPlayer.GetCDInfo();
 
-			if (cdInfo.GetTrackArtist(trackNumber) != NIL)	info.artist = cdInfo.GetTrackArtist(trackNumber);
-			else						info.artist = cdInfo.GetArtist();
-
-			info.title  = cdInfo.GetTrackTitle(trackNumber);
-			info.album  = cdInfo.GetTitle();
-		}
-		else if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
-		{
-			const CDInfo	&cdInfo = cdPlayer.GetCDInfo();
-
-			info.artist = cdInfo.GetArtist();
-			info.title  = cdInfo.GetTrackTitle(trackNumber);
-			info.album  = cdInfo.GetTitle();
-		}
+		info.artist = cdInfo.GetArtist();
+		info.title  = cdInfo.GetTrackTitle(trackNumber);
+		info.album  = cdInfo.GetTitle();
 	}
 
 	/* Read ISRC if requested.
@@ -548,25 +546,19 @@ static int cddb_sum(int n)
 	return ret;
 }
 
-Int BoCA::DecoderCDRip::ComputeDiscID(Int drive)
+Int BoCA::DecoderCDRip::ComputeDiscID(const MCDI &mcdi)
 {
-	CDROMDRIVE	*cd = ex_CR_OpenCDROM(drive);
-
-	if (cd == NIL) return -1;
-
-	Int	 numTocEntries = ex_CR_GetNumTocEntries(cd);
+	Int	 numTocEntries = mcdi.GetNumberOfEntries();
 	Int	 n = 0;
 
 	for (Int i = 0; i < numTocEntries; i++)
 	{
-		Int	 offset = ex_CR_GetTocEntry(cd, i).dwStartSector + 150;
+		Int	 offset = mcdi.GetNthEntryOffset(i) + 150;
 
 		n += cddb_sum(offset / 75);
 	}
 
-	Int	 t = ex_CR_GetTocEntry(cd, numTocEntries).dwStartSector / 75 - ex_CR_GetTocEntry(cd, 0).dwStartSector / 75;
-
-	ex_CR_CloseCDROM(cd);
+	Int	 t = mcdi.GetNthEntryOffset(numTocEntries) / 75 - mcdi.GetNthEntryOffset(0) / 75;
 
 	return ((n % 0xff) << 24 | t << 8 | numTocEntries);
 }

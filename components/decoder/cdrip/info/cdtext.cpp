@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -63,36 +63,35 @@ Int BoCA::CDText::ReadCDText(Int drive)
 	{
 		pCDtextPacks = (cdTextPackage *) &pbtBuffer[i * sizeof(cdTextPackage) + 4];
 
-		if (pCDtextPacks->block == 0)
+		if (pCDtextPacks->block != 0) continue;
+
+		for (Int j = 0; j < 12; j++) lpszBuffer[nInsertPos++] = pCDtextPacks->data[j];
+
+		while (nInsertPos > 0 && (lpZero = (char *) memchr(lpszBuffer, '\0', nInsertPos)) != NIL)
 		{
-			for (Int j = 0; j < 12; j++) lpszBuffer[nInsertPos++] = pCDtextPacks->data[j];
+			Int	 nOut = (lpZero - lpszBuffer) + 1;
 
-			while (nInsertPos > 0 && (lpZero = (char *) memchr(lpszBuffer, '\0', nInsertPos)) != NIL)
+			if	(pCDtextPacks->packType == 0x80) // Album/Track title
 			{
-				Int	 nOut = (lpZero - lpszBuffer) + 1;
+				if (pCDtextPacks->trackNumber == 0) cdInfo.SetTitle(lpszBuffer);
+				else				    cdInfo.SetTrackTitle(pCDtextPacks->trackNumber, lpszBuffer);
+			}
+			else if (pCDtextPacks->packType == 0x81) // Artist name
+			{
+				if (pCDtextPacks->trackNumber == 0) cdInfo.SetArtist(lpszBuffer);
+				else				    cdInfo.SetTrackArtist(pCDtextPacks->trackNumber, lpszBuffer);
+			}
 
-				if	(pCDtextPacks->packType == 0x80) // Album/Track title
-				{
-					if (pCDtextPacks->trackNumber == 0) cdInfo.SetTitle(lpszBuffer);
-					else				    cdInfo.SetTrackTitle(pCDtextPacks->trackNumber, lpszBuffer);
-				}
-				else if (pCDtextPacks->packType == 0x81) // Artist name
-				{
-					if (pCDtextPacks->trackNumber == 0) cdInfo.SetArtist(lpszBuffer);
-					else				    cdInfo.SetTrackArtist(pCDtextPacks->trackNumber, lpszBuffer);
-				}
+			nInsertPos -= nOut;
 
-				nInsertPos -= nOut;
+			memmove(lpszBuffer, lpZero + 1, 1024 - nOut -1);
 
-				memmove(lpszBuffer, lpZero + 1, 1024 - nOut -1);
+			pCDtextPacks->trackNumber++;
 
-				pCDtextPacks->trackNumber++;
-
-				while (nInsertPos > 0 && lpszBuffer[ 0 ] == '\0')
-				{
-					memmove(lpszBuffer, lpszBuffer + 1, 1024 -1);
-					nInsertPos--;
-				}
+			while (nInsertPos > 0 && lpszBuffer[ 0 ] == '\0')
+			{
+				memmove(lpszBuffer, lpszBuffer + 1, 1024 -1);
+				nInsertPos--;
 			}
 		}
 	}
