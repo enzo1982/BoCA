@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -23,6 +23,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	autoEject	= config->GetIntValue(ConfigID, "EjectAfterRipping", False);
 
+	readCDText	= config->GetIntValue(ConfigID, "ReadCDText", True);
 	readISRC	= config->GetIntValue(ConfigID, "ReadISRC", False);
 
 	cdparanoia	= config->GetIntValue(ConfigID, "CDParanoia", False);
@@ -109,13 +110,21 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	group_drive->Add(edit_offset);
 	group_drive->Add(text_offset_samples);
 
-	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 144), Size(354, 39));
+	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 144), Size(354, 65));
 
-	check_readISRC		= new CheckBox(i18n->TranslateString("Read ISRC when adding tracks to joblist"), Point(10, 11), Size(333, 0), &readISRC);
+	check_readCDText	= new CheckBox(i18n->TranslateString("Read CD Text"), Point(10, 11), Size(162, 0), &readCDText);
+	check_readISRC		= new CheckBox(i18n->TranslateString("Read ISRC when adding tracks to joblist"), Point(10, 37), Size(333, 0), &readISRC);
 
+#if defined __APPLE__ || defined __WIN32__
+	readCDText = False;
+
+	check_readCDText->Deactivate();
+#endif
+
+	group_cdinfo->Add(check_readCDText);
 	group_cdinfo->Add(check_readISRC);
 
-	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 195), Size(354, 42));
+	group_ripping		= new GroupBox(i18n->TranslateString("Ripper settings"), Point(7, 221), Size(354, 42));
 
 	check_paranoia		= new CheckBox(i18n->AddColon(i18n->TranslateString("Activate cdparanoia mode")), Point(10, 14), Size(162, 0), &cdparanoia);
 	check_paranoia->onAction.Connect(&ConfigureCDIO::ToggleParanoia, this);
@@ -151,7 +160,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	Add(group_automatization);
 	Add(group_cdinfo);
 
-	SetSize(Size(566, 244));
+	SetSize(Size(566, 270));
 }
 
 BoCA::ConfigureCDIO::~ConfigureCDIO()
@@ -177,6 +186,7 @@ BoCA::ConfigureCDIO::~ConfigureCDIO()
 	DeleteObject(check_autoEject);
 
 	DeleteObject(group_cdinfo);
+	DeleteObject(check_readCDText);
 	DeleteObject(check_readISRC);
 }
 
@@ -300,6 +310,7 @@ Int BoCA::ConfigureCDIO::SaveSettings()
 
 	config->SetIntValue(ConfigID, "EjectAfterRipping", autoEject);
 
+	config->SetIntValue(ConfigID, "ReadCDText", readCDText);
 	config->SetIntValue(ConfigID, "ReadISRC", readISRC);
 
 	config->SetIntValue(ConfigID, "CDParanoia", cdparanoia);

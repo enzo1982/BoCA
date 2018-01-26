@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = cdio.o config.o
+OBJECTS	  = cdio.o config.o info/cdinfo.o info/cdtext.o
 
 # Enter additional defines here:
 ifeq ($(wildcard /usr/include/cdio/paranoia/paranoia.h),)

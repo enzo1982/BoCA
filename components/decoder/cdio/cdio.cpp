@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -78,11 +78,13 @@ namespace BoCA
 	}
 };
 
+BoCA::CDText		 BoCA::DecoderCDIO::cdText;
+Int			 BoCA::DecoderCDIO::cdTextDiscID = -1;
+
 Array<UnsignedInt64>	 BoCA::DecoderCDIO::lastRead;
 
 Threads::Mutex		 BoCA::DecoderCDIO::readMutex;
-BoCA::DecoderCDIO	*BoCA::DecoderCDIO::readDecoder = NIL;
-
+BoCA::DecoderCDIO	*BoCA::DecoderCDIO::readDecoder	 = NIL;
 
 Bool BoCA::DecoderCDIO::CanOpenStream(const String &streamURI)
 {
@@ -98,6 +100,8 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdio-info");
 
 	if (component == NIL) return Error();
+
+	const Config	*config = GetConfiguration();
 
 	track.isCDTrack	= True;
 
@@ -204,10 +208,27 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 	info.track	= trackNumber;
 	info.numTracks	= info.mcdi.GetNumberOfAudioTracks();
 
+	/* Read CD-Text.
+	 */
+#if !defined __APPLE__ && !defined __WIN32__
+	Int	 discid = ComputeDiscID(info.mcdi);
+
+	if (config->GetIntValue(ConfigureCDIO::ConfigID, "ReadCDText", True) && cdTextDiscID != discid) { cdText.ReadCDText(component->GetNthDeviceInfo(track.drive).path); cdTextDiscID = discid; }
+
+	if (config->GetIntValue(ConfigureCDIO::ConfigID, "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
+	{
+		const CDInfo	&cdInfo = cdText.GetCDInfo();
+
+		if (cdInfo.GetTrackArtist(trackNumber) != NIL)	info.artist = cdInfo.GetTrackArtist(trackNumber);
+		else						info.artist = cdInfo.GetArtist();
+
+		info.title  = cdInfo.GetTrackTitle(trackNumber);
+		info.album  = cdInfo.GetTitle();
+	}
+#endif
+
 	/* Read ISRC if requested.
 	 */
-	const Config	*config = GetConfiguration();
-
 	if (config->GetIntValue(ConfigureCDIO::ConfigID, "ReadISRC", 0))
 	{
 		CdIo_t	*cd = cdio_open(component->GetNthDeviceInfo(track.drive).path, DRIVER_UNKNOWN);
@@ -552,4 +573,34 @@ ConfigLayer *BoCA::DecoderCDIO::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureCDIO();
 
 	return configLayer;
+}
+
+static int cddb_sum(int n)
+{
+	int	 ret = 0;
+
+	while (n > 0)
+	{
+		ret = ret + (n % 10);
+		n = n / 10;
+	}
+
+	return ret;
+}
+
+Int BoCA::DecoderCDIO::ComputeDiscID(const MCDI &mcdi)
+{
+	Int	 numTocEntries = mcdi.GetNumberOfEntries();
+	Int	 n = 0;
+
+	for (Int i = 0; i < numTocEntries; i++)
+	{
+		Int	 offset = mcdi.GetNthEntryOffset(i) + 150;
+
+		n += cddb_sum(offset / 75);
+	}
+
+	Int	 t = mcdi.GetNthEntryOffset(numTocEntries) / 75 - mcdi.GetNthEntryOffset(0) / 75;
+
+	return ((n % 0xff) << 24 | t << 8 | numTocEntries);
 }

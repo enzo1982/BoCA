@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,6 +20,8 @@
 #	include <cdio/paranoia/paranoia.h>
 #endif
 
+#include "info/cdtext.h"
+
 BoCA_BEGIN_COMPONENT(DecoderCDIO)
 
 namespace BoCA
@@ -34,6 +36,9 @@ namespace BoCA
 		private:
 			static Threads::Mutex		 readMutex;
 			static DecoderCDIO		*readDecoder;
+
+			static CDText			 cdText;
+			static Int			 cdTextDiscID;
 
 			static Array<UnsignedInt64>	 lastRead;
 
@@ -54,6 +59,8 @@ namespace BoCA
 			Int				 appendSamples;
 
 			Int				 numCacheErrors;
+
+			Int				 ComputeDiscID(const MCDI &);
 
 			Bool				 GetTrackSectors(Int &, Int &, Bool &);
 		public:
