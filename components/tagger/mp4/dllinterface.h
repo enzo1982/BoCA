@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -70,7 +70,7 @@ extern MP4TAGSFREE		 ex_MP4TagsFree;
 extern MP4TAGSSETNAME		 ex_MP4TagsSetName;
 extern MP4TAGSSETARTIST		 ex_MP4TagsSetArtist;
 extern MP4TAGSSETALBUMARTIST	 ex_MP4TagsSetAlbumArtist;
-extern MP4TAGSSETALBUMARTIST	 ex_MP4TagsSetAlbum;
+extern MP4TAGSSETALBUM		 ex_MP4TagsSetAlbum;
 extern MP4TAGSSETGROUPING	 ex_MP4TagsSetGrouping;
 extern MP4TAGSSETCOMPOSER	 ex_MP4TagsSetComposer;
 extern MP4TAGSSETCOMMENTS	 ex_MP4TagsSetComments;
