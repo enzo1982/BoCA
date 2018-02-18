@@ -102,9 +102,6 @@ BoCA::EncoderMultiEncoderHub::~EncoderMultiEncoderHub()
 		File(track.outfile).Delete();
 
 		if (track.outfile.Contains(Directory::GetDirectoryDelimiter())) track.outfile[track.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
-
-		if (!cancelled && !config->GetIntValue("Settings", "EncodeToSingleFile", False) &&
-				   config->GetIntValue("Settings", "RemoveTracks", True)) joblist->onComponentRemoveTrack.Emit(track);
 	}
 
 	/* Delete empty folders if <filetype> was used in path.
