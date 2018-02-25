@@ -29,6 +29,8 @@ Int BoCA::AS::OutputComponent::WriteData(Buffer<UnsignedByte> &buffer)
 {
 	converter->Transform(buffer);
 
+	if (buffer.Size() == 0) return 0;
+
 	return specs->func_WriteData(component, &buffer);
 }
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,6 +33,8 @@ const BoCA::Format &BoCA::AS::DSPComponent::GetFormatInfo() const
 Int BoCA::AS::DSPComponent::TransformData(Buffer<UnsignedByte> &buffer)
 {
 	converter->Transform(buffer);
+
+	if (buffer.Size() == 0) return 0;
 
 	return specs->func_TransformData(component, &buffer);
 }

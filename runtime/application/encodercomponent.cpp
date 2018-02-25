@@ -83,6 +83,8 @@ Int BoCA::AS::EncoderComponent::WriteData(Buffer<UnsignedByte> &buffer)
 {
 	converter->Transform(buffer);
 
+	if (buffer.Size() == 0) return 0;
+
 	/* Calculate MD5 if requested.
 	 */
 	if (calculateMD5) md5.Feed(buffer);
