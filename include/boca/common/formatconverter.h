@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -36,6 +36,17 @@ namespace BoCA
 
 			Bool					 errorState;
 			String					 errorString;
+
+			Threads::Thread				 converterThread;
+			Threads::Mutex				 converterMutex;
+
+			Buffer<UnsignedByte>			 samplesBuffer;
+			Buffer<UnsignedByte>			 backBuffer;
+
+			Bool					 process;
+			Bool					 finish;
+
+			Int					 ConverterThread();
 
 			static Int				 FindBestValue(Int, const String &);
 		public:

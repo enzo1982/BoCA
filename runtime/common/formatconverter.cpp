@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -141,10 +141,26 @@ BoCA::FormatConverter::FormatConverter(const Format &source, const Format &targe
 
 		converters.Add(converter);
 	}
+
+	/* Start converter thread.
+	 */
+	finish	= False;
+	process	= False;
+
+	converterThread.threadMain.Connect(&FormatConverter::ConverterThread, this);
+	converterThread.Start();
 }
 
 BoCA::FormatConverter::~FormatConverter()
 {
+	if (converterConfig == NIL) return;
+
+	/* Wait for converter thread to finish.
+	 */
+	finish = True;
+
+	converterThread.Wait();
+
 	/* Free converter components.
 	 */
 	AS::Registry	&boca = AS::Registry::Get();
@@ -160,14 +176,51 @@ BoCA::FormatConverter::~FormatConverter()
 
 	/* Free converter config.
 	 */
-	if (converterConfig != NIL) Config::Free(converterConfig);
+	Config::Free(converterConfig);
 }
 
 Int BoCA::FormatConverter::Transform(Buffer<UnsignedByte> &buffer)
 {
-	/* Call transform for every converter component.
+	if (converterConfig == NIL) return buffer.Size();
+
+	/* Buffer data until we have at least 128 kB.
 	 */
-	foreach (AS::DSPComponent *converter, converters) converter->TransformData(buffer);
+	backBuffer.Resize(backBuffer.Size() + buffer.Size());
+
+	memcpy(backBuffer + backBuffer.Size() - buffer.Size(), buffer, buffer.Size());
+
+	buffer.Resize(0);
+
+	if (backBuffer.Size() < 131072) return buffer.Size();
+
+	/* Aquire lock to handle data.
+	 */
+	while (True)
+	{
+		Threads::Lock	 lock(converterMutex);
+
+		if (process) continue;
+
+		/* Query data from converter thread.
+		 */
+		buffer.Resize(samplesBuffer.Size());
+
+		memcpy(buffer, samplesBuffer, samplesBuffer.Size());
+
+		/* Pass new samples to converter thread.
+		 */
+		samplesBuffer.Resize(backBuffer.Size());
+
+		memcpy(samplesBuffer, backBuffer, backBuffer.Size());
+
+		backBuffer.Resize(0);
+
+		/* Signal availability of new samples.
+		 */
+		process = True;
+
+		break;
+	}
 
 	return buffer.Size();
 }
@@ -176,11 +229,34 @@ Int BoCA::FormatConverter::Finish(Buffer<UnsignedByte> &buffer)
 {
 	if (buffer.Size() != 0) return -1;
 
+	if (converterConfig == NIL) return buffer.Size();
+
+	/* Aquire lock to handle data.
+	 */
+	while (True)
+	{
+		Threads::Lock	 lock(converterMutex);
+
+		if (process) continue;
+
+		/* Query data from converter thread.
+		 */
+		buffer.Resize(samplesBuffer.Size());
+
+		memcpy(buffer, samplesBuffer, samplesBuffer.Size());
+
+		samplesBuffer.Resize(0);
+
+		break;
+	}
+
+	/* Flush all converter components.
+	 */
 	foreach (AS::DSPComponent *converter, converters)
 	{
 		/* Transform data already in return buffer.
 		 */
-		if (buffer.Size() != 0) converter->TransformData(buffer);
+		if (backBuffer.Size() != 0) converter->TransformData(backBuffer);
 
 		/* Flush converter component.
 		 */
@@ -190,12 +266,40 @@ Int BoCA::FormatConverter::Finish(Buffer<UnsignedByte> &buffer)
 
 		/* Append remaining data to return buffer.
 		 */
-		buffer.Resize(buffer.Size() + flush.Size());
+		backBuffer.Resize(backBuffer.Size() + flush.Size());
 
-		memcpy(buffer + buffer.Size() - flush.Size(), flush, flush.Size());
+		memcpy(backBuffer + backBuffer.Size() - flush.Size(), flush, flush.Size());
 	}
 
+	/* Append remaining data in case there is any.
+	 */
+	buffer.Resize(buffer.Size() + backBuffer.Size());
+
+	memcpy(buffer + buffer.Size() - backBuffer.Size(), backBuffer, backBuffer.Size());
+
+	backBuffer.Resize(0);
+
 	return buffer.Size();
+}
+
+Int BoCA::FormatConverter::ConverterThread()
+{
+	while (!finish)
+	{
+		while (!finish && !process) S::System::System::Sleep(1);
+
+		if (!process) continue;
+
+		Threads::Lock	 lock(converterMutex);
+
+		/* Call transform for every converter component.
+		 */
+		foreach (AS::DSPComponent *converter, converters) converter->TransformData(samplesBuffer);
+
+		process = False;
+	}
+
+	return Success();
 }
 
 Bool BoCA::FormatConverter::GetErrorState() const
