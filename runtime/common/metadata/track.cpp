@@ -210,7 +210,8 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 	else if (file.Contains("back"))	 nPicture.type = 0x04; // Cover (back)
 	else if (file.Contains("disc"))	 nPicture.type = 0x06; // Media
 
-	pictures.Add(nPicture);
+	if (nPicture.type == 0x03) pictures.InsertAtPos(0, nPicture);
+	else			   pictures.Add(nPicture);
 
 	return True;
 }
