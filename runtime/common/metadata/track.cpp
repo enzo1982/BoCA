@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -186,6 +186,15 @@ Bool BoCA::Track::LoadCoverArtFiles()
 
 Bool BoCA::Track::LoadCoverArtFile(const String &file)
 {
+	/* Check if file size is within limits.
+	 */
+	Config	*config	     = Config::Get();
+	Int	 maxFileSize = config->GetIntValue("Tags", "CoverArtMaxFileSize", 100) * 1024;
+
+	if (maxFileSize > 0 && File(file).GetFileSize() > maxFileSize) return False;
+
+	/* Load picture file.
+	 */
 	Picture	 nPicture;
 
 	nPicture.LoadFromFile(file);
