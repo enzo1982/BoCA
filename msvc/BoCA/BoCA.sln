@@ -233,6 +233,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Channels", "BoCA D
 		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Rubber Band", "BoCA DSP Rubber Band\BoCA DSP Rubber Band.vcxproj", "{9FCC8C26-2971-402F-95A5-515B4BA537AA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -749,6 +754,14 @@ Global
 		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Release|Win32.Build.0 = Release|Win32
 		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Release|x64.ActiveCfg = Release|x64
 		{01685C1C-4076-4F61-BB43-9388FB0E246F}.Release|x64.Build.0 = Release|x64
+		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Debug|Win32.Build.0 = Debug|Win32
+		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Debug|x64.ActiveCfg = Debug|x64
+		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Debug|x64.Build.0 = Debug|x64
+		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Release|Win32.ActiveCfg = Release|Win32
+		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Release|Win32.Build.0 = Release|Win32
+		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Release|x64.ActiveCfg = Release|x64
+		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
