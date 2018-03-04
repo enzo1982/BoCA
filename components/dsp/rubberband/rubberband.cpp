@@ -126,7 +126,7 @@ Int BoCA::DSPRubberBand::TransformData(Buffer<UnsignedByte> &data)
 		/* Process samples.
 		 */
 		Int	 samplesToProcess = ex_rubberband_get_samples_required(state);
-		float	*samples[format.channels];
+		float  **samples	  = new float * [format.channels];
 
 		for (Int i = 0; i < format.channels; i++)
 		{
@@ -139,6 +139,8 @@ Int BoCA::DSPRubberBand::TransformData(Buffer<UnsignedByte> &data)
 
 		for (Int i = 0; i < format.channels; i++) delete [] samples[i];
 
+		delete [] samples;
+
 		samplesProcessed += samplesToProcess;
 
 		/* Retrieve available data.
@@ -146,7 +148,7 @@ Int BoCA::DSPRubberBand::TransformData(Buffer<UnsignedByte> &data)
 		if (ex_rubberband_available(state) > 0)
 		{
 			Int	 samplesToRead = ex_rubberband_available(state);
-			float	*samples[format.channels];
+			float  **samples       = new float * [format.channels];
 
 			for (Int i = 0; i < format.channels; i++) samples[i] = new float [samplesToRead];
 
@@ -160,6 +162,8 @@ Int BoCA::DSPRubberBand::TransformData(Buffer<UnsignedByte> &data)
 
 				delete [] samples[i];
 			}
+
+			delete [] samples;
 		}
 	}
 
@@ -179,7 +183,7 @@ Int BoCA::DSPRubberBand::Flush(Buffer<UnsignedByte> &data)
 	/* Process remaining samples.
 	 */
 	Int	 samplesToProcess = samplesBuffer.Size() / format.channels;
-	float	*samples[format.channels];
+	float  **samples	  = new float * [format.channels];
 
 	for (Int i = 0; i < format.channels; i++)
 	{
@@ -192,12 +196,14 @@ Int BoCA::DSPRubberBand::Flush(Buffer<UnsignedByte> &data)
 
 	for (Int i = 0; i < format.channels; i++) delete [] samples[i];
 
+	delete [] samples;
+
 	/* Retrieve available data.
 	 */
 	if (ex_rubberband_available(state) > 0)
 	{
 		Int	 samplesToRead = ex_rubberband_available(state);
-		float	*samples[format.channels];
+		float  **samples       = new float * [format.channels];
 
 		for (Int i = 0; i < format.channels; i++) samples[i] = new float [samplesToRead];
 
@@ -211,6 +217,8 @@ Int BoCA::DSPRubberBand::Flush(Buffer<UnsignedByte> &data)
 
 			delete [] samples[i];
 		}
+
+		delete [] samples;
 	}
 
 	samplesBuffer.Resize(0);
