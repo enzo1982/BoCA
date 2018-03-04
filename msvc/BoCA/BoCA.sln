@@ -238,6 +238,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Rubber Band", "BoC
 		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP RNNoise", "BoCA DSP RNNoise\BoCA DSP RNNoise.vcxproj", "{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist VCLT", "BoCA Playlist VCLT\BoCA Playlist VCLT.vcxproj", "{38992234-E808-4A1A-94CE-D58CB3F0055C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -762,6 +772,22 @@ Global
 		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Release|Win32.Build.0 = Release|Win32
 		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Release|x64.ActiveCfg = Release|x64
 		{9FCC8C26-2971-402F-95A5-515B4BA537AA}.Release|x64.Build.0 = Release|x64
+		{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}.Debug|Win32.Build.0 = Debug|Win32
+		{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}.Debug|x64.ActiveCfg = Debug|x64
+		{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}.Debug|x64.Build.0 = Debug|x64
+		{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}.Release|Win32.ActiveCfg = Release|Win32
+		{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}.Release|Win32.Build.0 = Release|Win32
+		{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}.Release|x64.ActiveCfg = Release|x64
+		{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}.Release|x64.Build.0 = Release|x64
+		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Debug|Win32.Build.0 = Debug|Win32
+		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Debug|x64.ActiveCfg = Debug|x64
+		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Debug|x64.Build.0 = Debug|x64
+		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Release|Win32.ActiveCfg = Release|Win32
+		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Release|Win32.Build.0 = Release|Win32
+		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Release|x64.ActiveCfg = Release|x64
+		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
