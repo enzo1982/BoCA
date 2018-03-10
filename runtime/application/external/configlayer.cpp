@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -23,36 +23,48 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 
 	i18n->SetContext("Configuration");
 
-	text_parameters = new Text(i18n->AddColon(i18n->TranslateString("Command line arguments")), Point(6, 6));
+	group_parameters = new GroupBox(i18n->TranslateString("Command line arguments"), Point(6, 10), Size(400, 140));
 
-	list_parameters	= new ListBox(Point(6, 24), Size(250, 64));
-	list_parameters->SetFlags(LF_MULTICHECKBOX);
-	list_parameters->onSelectEntry.Connect(&ConfigLayerExternal::OnSelectParameter, this);
-	list_parameters->onMarkEntry.Connect(&ConfigLayerExternal::OnSelectParameter, this);
-	list_parameters->onMarkEntry.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
+	text_commandline = new Text(i18n->AddColon(i18n->TranslateString("Resulting arguments string")), Point(6, 45));
+	text_commandline->SetOrientation(OR_LOWERLEFT);
 
-	text_commandline = new Text(i18n->AddColon(i18n->TranslateString("Resulting arguments string")), Point(6, 156));
-
-	edit_commandline = new EditBox(NIL, Point(6, 174), Size(250, 0));
+	edit_commandline = new EditBox(NIL, Point(6, 26), Size(400, 0));
+	edit_commandline->SetOrientation(OR_LOWERLEFT);
 	edit_commandline->Deactivate();
+
+	/* Create dynamic widgets.
+	 */
+	Point	 position    = Point(10, 13);
+	Int	 maxTextSize = 0;
 
 	foreach (Parameter *param, specs->parameters)
 	{
-		ListEntry	*entry = list_parameters->AddEntry(param->GetName());
+		CheckBox	*checkBox = new CheckBox(param->GetName(), position, Size(100, 0));
+		Layer		*layer	  = new Layer(param->GetName());
+
+		checkBox->onAction.Connect(&ConfigLayerExternal::OnSelectParameter, this);
+		checkBox->onAction.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
+
+		layer->SetMetrics(position + Point(230, -1), Size(230, 39));
+		layer->SetOrientation(OR_UPPERRIGHT);
 
 		switch (param->GetType())
 		{
 			case PARAMETER_TYPE_SWITCH:
-				entry->SetMark(config->GetIntValue(specs->id, param->GetName(), param->GetEnabled()));
+				checkBox->SetChecked(config->GetIntValue(specs->id, param->GetName(), param->GetEnabled()));
+
+				position += Point(0, 25);
+				layer->SetHeight(25);
 
 				break;
 			case PARAMETER_TYPE_SELECTION:
-				entry->SetMark(config->GetIntValue(specs->id, String("Set ").Append(param->GetName()), param->GetEnabled()));
+				checkBox->SetText(i18n->AddColon(checkBox->GetText()));
+				checkBox->SetChecked(config->GetIntValue(specs->id, String("Set ").Append(param->GetName()), param->GetEnabled()));
+
+				maxTextSize = Math::Max(maxTextSize, checkBox->GetUnscaledTextWidth());
 
 				{
-					GroupBox	*group = new GroupBox(param->GetName(), Point(6, 100), Size(250, 40));
-					ComboBox	*selection = new ComboBox(Point(10, 11), Size(230, 0));
-
+					ComboBox	*selection     = new ComboBox(Point(0, 0), Size(230, 0));
 					String		 selectedValue = config->GetStringValue(specs->id, param->GetName(), param->GetDefault());
 
 					foreach (Option *option, param->GetOptions())
@@ -68,18 +80,22 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 
 					selection->onSelectEntry.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
 
-					group->Hide();
-					group->Add(selection);
+					layer->Add(selection);
 
-					Add(group);
+					group_parameters->Add(layer);
 
 					widgets_parameters.Add(selection);
-					groups_parameters.Add(group);
 				}
+
+				position += Point(0, 26);
+				layer->SetHeight(26);
 
 				break;
 			case PARAMETER_TYPE_RANGE:
-				entry->SetMark(config->GetIntValue(specs->id, String("Set ").Append(param->GetName()), param->GetEnabled()));
+				checkBox->SetText(i18n->AddColon(checkBox->GetText()));
+				checkBox->SetChecked(config->GetIntValue(specs->id, String("Set ").Append(param->GetName()), param->GetEnabled()));
+
+				maxTextSize = Math::Max(maxTextSize, checkBox->GetUnscaledTextWidth());
 
 				{
 					Int	 min = 0;
@@ -103,9 +119,8 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 						}
 					}
 
-					GroupBox	*group = new GroupBox(param->GetName(), Point(6, 100), Size(250, 50));
-					Slider		*range = new Slider(Point(10, 11), Size(210, 0), OR_HORZ, NIL, min, max);
-					Text		*value = new Text(String::FromFloat(max * param->GetStepSize()).Append(param->GetStepSize() < 1 ? ".0" : NIL), Point(230, 13));
+					Slider	*range = new Slider(Point(0, 1), Size(210, 0), OR_HORZ, NIL, min, max);
+					Text	*value = new Text(String::FromFloat(max * param->GetStepSize()).Append(param->GetStepSize() < 1 ? ".0" : NIL), Point(220, 3));
 
 					range->SetWidth(222 - value->GetUnscaledTextWidth());
 
@@ -114,25 +129,26 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 					range->onValueChange.Connect(&ConfigLayerExternal::OnSliderValueChange, this);
 					range->onValueChange.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
 
-					Text		*minText = new Text(minAlias, Point(10, 30));
-					Text		*maxText = new Text(maxAlias, Point(10, 30));
+					Text	*minText = new Text(minAlias, Point(0, 20));
+					Text	*maxText = new Text(maxAlias, Point(0, 20));
 
-					maxText->SetPosition(Point(231 - value->GetUnscaledTextWidth() - maxText->GetUnscaledTextWidth(), 30));
+					maxText->SetPosition(Point(221 - value->GetUnscaledTextWidth() - maxText->GetUnscaledTextWidth(), 20));
 
-					group->Hide();
-					group->Add(range);
-					group->Add(value);
-					group->Add(minText);
-					group->Add(maxText);
+					layer->Add(range);
+					layer->Add(value);
+					layer->Add(minText);
+					layer->Add(maxText);
 
-					Add(group);
+					group_parameters->Add(layer);
 
 					widgets_parameters.Add(range);
 					widgets_parameters.Add(value);
 					widgets_parameters.Add(minText);
 					widgets_parameters.Add(maxText);
-					groups_parameters.Add(group);
 				}
+
+				position += Point(0, 39);
+				layer->SetHeight(39);
 
 				break;
 			default:
@@ -140,26 +156,46 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 				 */
 				break;
 		}
+
+		group_parameters->Add(checkBox);
+
+		checks_parameters.Add(checkBox);
+		layers_parameters.Add(layer);
 	}
 
-	Add(text_parameters);
-	Add(list_parameters);
+	/* Adjust check box sizes.
+	 */
+	foreach (Parameter *param, specs->parameters)
+	{
+		CheckBox	*checkBox = checks_parameters.GetNth(foreachindex);
+
+		if (param->GetType() == PARAMETER_TYPE_SWITCH) checkBox->SetWidth(maxTextSize + 259);
+		else					       checkBox->SetWidth(maxTextSize + 21);
+	}
+
+	group_parameters->SetSize(Size(279 + maxTextSize, position.y + 2));
+	edit_commandline->SetWidth(279 + maxTextSize);
+
+	Add(group_parameters);
+
 	Add(text_commandline);
 	Add(edit_commandline);
 
 	OnSliderValueChange();
+	OnSelectParameter();
 	OnUpdateParameterValue();
 
-	SetSize(Size(262, 200));
+	SetSize(Size(291 + maxTextSize, group_parameters->GetHeight() + 60));
 }
 
 BoCA::AS::ConfigLayerExternal::~ConfigLayerExternal()
 {
-	foreach (GroupBox *group, groups_parameters) DeleteObject(group);
+	foreach (CheckBox *checkBox, checks_parameters) DeleteObject(checkBox);
+	foreach (Layer *layer, layers_parameters) DeleteObject(layer);
 	foreach (Widget *widget, widgets_parameters) DeleteObject(widget);
 
-	DeleteObject(text_parameters);
-	DeleteObject(list_parameters);
+	DeleteObject(group_parameters);
+
 	DeleteObject(text_commandline);
 	DeleteObject(edit_commandline);
 }
@@ -170,26 +206,26 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 
 	foreach (const Parameter *param, specs->parameters)
 	{
-		ListEntry	*entry = list_parameters->GetNthEntry(foreachindex);
+		CheckBox	*checkBox = checks_parameters.GetNth(foreachindex);
 
 		switch (param->GetType())
 		{
 			case PARAMETER_TYPE_SWITCH:
-				config->SetIntValue(specs->id, param->GetName(), entry->IsMarked() ? 1 : 0);
+				config->SetIntValue(specs->id, param->GetName(), checkBox->IsChecked() ? 1 : 0);
 
 				break;
 			case PARAMETER_TYPE_SELECTION:
 				{
-					GroupBox	*group = GetParameterGroupBox(param->GetName());
+					Layer	*layer = GetParameterLayer(param->GetName());
 
-					if (group == NIL) break;
+					if (layer == NIL) break;
 
-					ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
+					ComboBox	*selection = (ComboBox *) layer->GetNthObject(0);
 					Option		*option	   = param->GetOptions().GetNth(selection->GetSelectedEntryNumber());
 
 					if (option != NIL)
 					{
-						config->SetIntValue(specs->id, String("Set ").Append(param->GetName()), entry->IsMarked() ? 1 : 0);
+						config->SetIntValue(specs->id, String("Set ").Append(param->GetName()), checkBox->IsChecked() ? 1 : 0);
 						config->SetStringValue(specs->id, param->GetName(), option->GetValue());
 					}
 				}
@@ -197,13 +233,13 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 				break;
 			case PARAMETER_TYPE_RANGE:
 				{
-					GroupBox	*group = GetParameterGroupBox(param->GetName());
+					Layer	*layer = GetParameterLayer(param->GetName());
 
-					if (group == NIL) break;
+					if (layer == NIL) break;
 
-					Slider		*range = (Slider *) group->GetNthObject(0);
+					Slider		*range = (Slider *) layer->GetNthObject(0);
 
-					config->SetIntValue(specs->id, String("Set ").Append(param->GetName()), entry->IsMarked() ? 1 : 0);
+					config->SetIntValue(specs->id, String("Set ").Append(param->GetName()), checkBox->IsChecked() ? 1 : 0);
 					config->SetIntValue(specs->id, param->GetName(), range->GetValue());
 				}
 
@@ -218,11 +254,11 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 	return Success();
 }
 
-GroupBox *BoCA::AS::ConfigLayerExternal::GetParameterGroupBox(const String &name)
+Layer *BoCA::AS::ConfigLayerExternal::GetParameterLayer(const String &name)
 {
-	foreach (GroupBox *group, groups_parameters)
+	foreach (Layer *layer, layers_parameters)
 	{
-		if (group->GetText() == name) return group;
+		if (layer->GetText() == name) return layer;
 	}
 
 	return NIL;
@@ -232,15 +268,15 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 {
 	/* Still initializing?
 	 */
-	if (list_parameters->Length() < specs->parameters.Length()) return NIL;
+	if (checks_parameters.Length() < specs->parameters.Length()) return NIL;
 
 	String	 arguments;
 
 	foreach (const Parameter *param, specs->parameters)
 	{
-		ListEntry	*entry = list_parameters->GetNthEntry(foreachindex);
+		CheckBox	*checkBox = checks_parameters.GetNth(foreachindex);
 
-		if (!entry->IsMarked()) continue;
+		if (!checkBox->IsChecked()) continue;
 
 		switch (param->GetType())
 		{
@@ -250,11 +286,11 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 				break;
 			case PARAMETER_TYPE_SELECTION:
 				{
-					GroupBox	*group = GetParameterGroupBox(param->GetName());
+					Layer	*layer = GetParameterLayer(param->GetName());
 
-					if (group == NIL) break;
+					if (layer == NIL) break;
 
-					ComboBox	*selection = (ComboBox *) group->GetNthObject(0);
+					ComboBox	*selection = (ComboBox *) layer->GetNthObject(0);
 					Option		*option	   = param->GetOptions().GetNth(selection->GetSelectedEntryNumber());
 
 					if (option != NIL) arguments.Append(param->GetArgument().Replace("%VALUE", option->GetValue())).Append(" ");
@@ -263,11 +299,11 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 				break;
 			case PARAMETER_TYPE_RANGE:
 				{
-					GroupBox	*group = GetParameterGroupBox(param->GetName());
+					Layer	*layer = GetParameterLayer(param->GetName());
 
-					if (group == NIL) break;
+					if (layer == NIL) break;
 
-					Slider		*range = (Slider *) group->GetNthObject(0);
+					Slider		*range = (Slider *) layer->GetNthObject(0);
 
 					arguments.Append(param->GetArgument().Replace("%VALUE", String::FromFloat(range->GetValue() * param->GetStepSize()))).Append(" ");
 				}
@@ -283,13 +319,16 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 	return arguments;
 }
 
-Void BoCA::AS::ConfigLayerExternal::OnSelectParameter(ListEntry *entry)
+Void BoCA::AS::ConfigLayerExternal::OnSelectParameter()
 {
-	foreach (GroupBox *group, groups_parameters) group->Hide();
-
-	if (entry->IsMarked() && GetParameterGroupBox(entry->GetText()) != NIL)
+	foreach (CheckBox *checkBox, checks_parameters)
 	{
-		GetParameterGroupBox(entry->GetText())->Show();
+		Layer	*layer = layers_parameters.GetNth(foreachindex);
+
+		if (layer == NIL) continue;
+
+		if (checkBox->IsChecked()) layer->Activate();
+		else			   layer->Deactivate();
 	}
 }
 
@@ -306,15 +345,15 @@ Void BoCA::AS::ConfigLayerExternal::OnSliderValueChange()
 		{
 			case PARAMETER_TYPE_RANGE:
 				{
-					GroupBox	*group = GetParameterGroupBox(param->GetName());
+					Layer	*layer = GetParameterLayer(param->GetName());
 
-					if (group == NIL) break;
+					if (layer == NIL) break;
 
-					Slider		*range = (Slider *) group->GetNthObject(0);
-					Text		*value = (Text *) group->GetNthObject(1);
+					Slider		*range = (Slider *) layer->GetNthObject(0);
+					Text		*value = (Text *) layer->GetNthObject(1);
 
 					value->SetText(String::FromFloat(range->GetValue() * param->GetStepSize()).Append(param->GetStepSize() < 1 && range->GetValue() % 10 == 0 ? ".0" : NIL));
-					value->SetPosition(Point(240 - value->GetUnscaledTextWidth(), 13));
+					value->SetPosition(Point(230 - value->GetUnscaledTextWidth(), 3));
 				}
 
 				break;

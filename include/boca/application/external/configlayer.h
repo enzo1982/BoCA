@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -25,16 +25,16 @@ namespace BoCA
 			protected:
 				ComponentSpecs			*specs;
 
-				Text				*text_parameters;
-				ListBox				*list_parameters;
+				GroupBox			*group_parameters;
 
 				Text				*text_commandline;
 				EditBox				*edit_commandline;
 
-				Array<GroupBox *, Void *>	 groups_parameters;
+				Array<CheckBox *, Void *>	 checks_parameters;
+				Array<Layer *, Void *>		 layers_parameters;
 				Array<Widget *, Void *>		 widgets_parameters;
 
-				GroupBox			*GetParameterGroupBox(const String &);
+				Layer				*GetParameterLayer(const String &);
 				String				 GetArgumentsString();
 			public:
 								 ConfigLayerExternal(ComponentSpecs *);
@@ -42,7 +42,7 @@ namespace BoCA
 
 				virtual Int			 SaveSettings();
 			slots:
-				Void				 OnSelectParameter(ListEntry *);
+				Void				 OnSelectParameter();
 				Void				 OnUpdateParameterValue();
 				Void				 OnSliderValueChange();
 		};
