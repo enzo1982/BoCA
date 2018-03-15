@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -60,6 +60,12 @@ const Array<BoCA::Track> &BoCA::PlaylistM3U::ReadPlaylist(const String &file)
 	String		 format = String::SetInputFormat("UTF-8");
 	InStream	 in(STREAM_FILE, file, IS_READ);
 
+	/* Skip UTF-8 BOM.
+	 */
+	if (in.InputNumberRaw(3) != 0xEFBBBF) in.Seek(0);
+
+	/* Parse file line by line.
+	 */
 	while (in.GetPos() < in.Size())
 	{
 		String	 line = in.InputLine();
