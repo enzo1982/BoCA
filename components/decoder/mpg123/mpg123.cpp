@@ -292,8 +292,8 @@ Int BoCA::DecoderMPG123::ReadData(Buffer<UnsignedByte> &data)
 Bool BoCA::DecoderMPG123::SkipID3v2Tag(InStream *in)
 {
 	/* Check for an ID3v2 tag at the beginning of the
-	 * file and skip it if it exists as LAME may crash
-	 * on unsynchronized tags.
+	 * file and skip it if it exists as it might cause
+	 * problems if the tag is unsynchronized.
 	 */
 	if (in->InputString(3) == "ID3")
 	{
@@ -351,10 +351,14 @@ Bool BoCA::DecoderMPG123::ParseVBRHeaders(InStream *in)
 
 		/* Check for a LAME header and extract length information.
 		 */
-		if (frameSize >= 192 && buffer[0x9C] == 'L' && buffer[0x9D] == 'A' && buffer[0x9E] == 'M' && buffer[0x9F] == 'E')
+		Int		 offset = ((buffer[1] >> 3) & 1 ? (buffer[3] >> 6 != 3 ? 32 : 17) :
+								  (buffer[3] >> 6 != 3 ? 17 :  9)) + 4;
+		UnsignedByte	*xing	= buffer + offset;
+
+		if (frameSize >= 192 && xing[0x78] == 'L' && xing[0x79] == 'A' && xing[0x7A] == 'M' && xing[0x7B] == 'E')
 		{
-			delaySamples = ( buffer[0xB1]	      << 4) | ((buffer[0xB2] & 0xF0) >> 4);
-			padSamples   = ((buffer[0xB2] & 0x0F) << 8) | ( buffer[0xB3]		 );
+			delaySamples = ( xing[0x8D]	    << 4) | ((xing[0x8E] & 0xF0) >> 4);
+			padSamples   = ((xing[0x8E] & 0x0F) << 8) | ( xing[0x8F]	     );
 
 			delaySamplesLeft += delaySamples;
 		}
