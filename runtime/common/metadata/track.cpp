@@ -216,7 +216,7 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 	return True;
 }
 
-Bool BoCA::Track::SaveCoverArtFiles(const String &directory)
+Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 {
 	Config	*config = Config::Get();
 	I18n	*i18n	= I18n::Get();
@@ -229,28 +229,30 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &directory)
 
 		switch (picture.type)
 		{
-			case  0: fileName.Replace("<type>", "other");		break;
-			case  1: fileName.Replace("<type>", "icon");		break;
-			case  2: fileName.Replace("<type>", "othericon");	break;
-			case  3: fileName.Replace("<type>", "front");		break;
-			case  4: fileName.Replace("<type>", "back");		break;
-			case  5: fileName.Replace("<type>", "leaflet");		break;
-			case  6: fileName.Replace("<type>", "disc");		break;
-			case  7: fileName.Replace("<type>", "leadartist");	break;
-			case  8: fileName.Replace("<type>", "artist");		break;
-			case  9: fileName.Replace("<type>", "conductor");	break;
-			case 10: fileName.Replace("<type>", "band");		break;
-			case 11: fileName.Replace("<type>", "composer");	break;
-			case 12: fileName.Replace("<type>", "writer");		break;
-			case 13: fileName.Replace("<type>", "location");	break;
-			case 14: fileName.Replace("<type>", "recording");	break;
-			case 15: fileName.Replace("<type>", "performing");	break;
-			case 16: fileName.Replace("<type>", "video");		break;
-			case 17: fileName.Replace("<type>", "fish");		break;
-			case 18: fileName.Replace("<type>", "illustration");	break;
-			case 19: fileName.Replace("<type>", "artistlogo");	break;
-			case 20: fileName.Replace("<type>", "publisherlogo");	break;
-			default: fileName.Replace("<type>", "unknown");		break;
+			static const char	*type = "<type>";
+
+			case  0: fileName.Replace(type, "other");	  break;
+			case  1: fileName.Replace(type, "icon");	  break;
+			case  2: fileName.Replace(type, "othericon");	  break;
+			case  3: fileName.Replace(type, "front");	  break;
+			case  4: fileName.Replace(type, "back");	  break;
+			case  5: fileName.Replace(type, "leaflet");	  break;
+			case  6: fileName.Replace(type, "disc");	  break;
+			case  7: fileName.Replace(type, "leadartist");	  break;
+			case  8: fileName.Replace(type, "artist");	  break;
+			case  9: fileName.Replace(type, "conductor");	  break;
+			case 10: fileName.Replace(type, "band");	  break;
+			case 11: fileName.Replace(type, "composer");	  break;
+			case 12: fileName.Replace(type, "writer");	  break;
+			case 13: fileName.Replace(type, "location");	  break;
+			case 14: fileName.Replace(type, "recording");	  break;
+			case 15: fileName.Replace(type, "performing");	  break;
+			case 16: fileName.Replace(type, "video");	  break;
+			case 17: fileName.Replace(type, "fish");	  break;
+			case 18: fileName.Replace(type, "illustration");  break;
+			case 19: fileName.Replace(type, "artistlogo");	  break;
+			case 20: fileName.Replace(type, "publisherlogo"); break;
+			default: fileName.Replace(type, "unknown");	  break;
 		}
 
 		/* Replace standard fields.
@@ -292,7 +294,9 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &directory)
 
 		/* Save cover art file.
 		 */
-		picture.SaveToFile(String(directory).Append(directory.EndsWith(Directory::GetDirectoryDelimiter()) ? NIL : Directory::GetDirectoryDelimiter()).Append(fileName));
+		String	 file = String(folder).Append(folder.EndsWith(Directory::GetDirectoryDelimiter()) ? NIL : Directory::GetDirectoryDelimiter()).Append(fileName);
+
+		picture.SaveToFile(Utilities::CreateDirectoryForFile(file));
 	}
 
 	return True;
