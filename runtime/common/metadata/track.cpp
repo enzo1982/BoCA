@@ -223,6 +223,11 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 
 	if (!config->GetIntValue("Tags", "CoverArtWriteToFiles", False)) return True;
 
+	Int	 lastBs		 = Math::Max(origFilename.FindLast("\\"), origFilename.FindLast("/"));
+	String	 inFileDirectory = origFilename;
+
+	inFileDirectory[lastBs + 1] = 0;
+
 	foreach (const Picture &picture, pictures)
 	{
 		String	 fileName = config->GetStringValue("Tags", "CoverArtFilenamePattern", "<artist> - <album>\\<type>");
@@ -267,10 +272,20 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 		fileName.Replace("<artist>", Utilities::ReplaceIncompatibleCharacters(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown artist")));
 		fileName.Replace("<album>", Utilities::ReplaceIncompatibleCharacters(info.album.Length() > 0 ? info.album : i18n->TranslateString("unknown album")));
 		fileName.Replace("<genre>", Utilities::ReplaceIncompatibleCharacters(info.genre.Length() > 0 ? info.genre : i18n->TranslateString("unknown genre")));
-		fileName.Replace("<disc>", String(info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc < 0 ? 0 : info.disc)));
 		fileName.Replace("<year>", Utilities::ReplaceIncompatibleCharacters(info.year > 0 ? String::FromInt(info.year) : i18n->TranslateString("unknown year")));
 		fileName.Replace("<currentdate>", currentDate);
 		fileName.Replace("<currenttime>", currentTime);
+
+		/* Replace <disc> pattern.
+		 */
+		fileName.Replace("<disc>", String::FromInt(info.disc < 0 ? 0 : info.disc));
+
+		for (Int i = 1; i <= 4; i++)
+		{
+			String	 pattern = String("<disc(").Append(String::FromInt(i)).Append(")>");
+
+			fileName.Replace(pattern, String().FillN('0', i - ((Int) Math::Log10(info.disc > 0 ? info.disc : 1) + 1)).Append(String::FromInt(info.disc < 0 ? 0 : info.disc)));
+		}
 
 		/* Replace other text fields.
 		 */
@@ -291,6 +306,56 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 		fileName.Replace("<albumartist>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown album artist")));
 		fileName.Replace("<conductor>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown conductor")));
 		fileName.Replace("<composer>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown composer")));
+
+		/* Replace <directory> pattern.
+		 */
+		String	 directory = inFileDirectory;
+
+		if	(directory[1] == ':')	       directory = directory.Tail(directory.Length() - 3);
+		else if (directory.StartsWith("\\\\")) directory = directory.Tail(directory.Length() - 2);
+
+		fileName.Replace("<directory>", directory);
+
+		for (Int i = 0; i < 10 && fileName.Contains("<directory+"); i++)
+		{
+			String	 pattern = String("<directory+").Append(String::FromInt(i)).Append(">");
+
+			if (fileName.Contains(pattern))
+			{
+				String	 value = directory;
+
+				for (Int n = 0; n < i; n++) value = value.Tail(value.Length() - value.Find(Directory::GetDirectoryDelimiter()) - 1);
+
+				fileName.Replace(pattern, value);
+			}
+
+			for (Int j = 0; j < 10 && fileName.Contains(String("<directory+").Append(String::FromInt(i)).Append("(")); j++)
+			{
+				String	 pattern = String("<directory+").Append(String::FromInt(i)).Append("(").Append(String::FromInt(j + 1)).Append(")>");
+
+				if (!fileName.Contains(pattern)) continue;
+
+				String	 value = directory;
+
+				for (Int n = 0; n < i; n++) value = value.Tail(value.Length() - value.Find(Directory::GetDirectoryDelimiter()) - 1);
+
+				Int	 bsCount = 0;
+
+				for (Int n = 0; n < value.Length(); n++)
+				{
+					if (value[n] == '\\' || value[n] == '/') bsCount++;
+
+					if (bsCount == j + 1)
+					{
+						value[n] = 0;
+
+						break;
+					}
+				}
+
+				fileName.Replace(pattern, value);
+			}
+		}
 
 		/* Save cover art file.
 		 */
