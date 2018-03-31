@@ -230,12 +230,12 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 
 	foreach (const Picture &picture, pictures)
 	{
+		static const char	*type = "<type>";
+
 		String	 fileName = config->GetStringValue("Tags", "CoverArtFilenamePattern", "<artist> - <album>\\<type>");
 
 		switch (picture.type)
 		{
-			static const char	*type = "<type>";
-
 			case  0: fileName.Replace(type, "other");	  break;
 			case  1: fileName.Replace(type, "icon");	  break;
 			case  2: fileName.Replace(type, "othericon");	  break;
