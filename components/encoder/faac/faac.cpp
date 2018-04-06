@@ -362,6 +362,8 @@ Int BoCA::EncoderFAAC::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Output samples to encoder.
 	 */
+	totalSamples += data.Size() / format.channels / (format.bits / 8);
+
 	return EncodeFrames(False);
 }
 
@@ -378,8 +380,6 @@ Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
 
 		memset(samplesBuffer + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(int16_t) * nullSamples * format.channels);
-
-		totalSamples += samplesBuffer.Size() / format.channels - nullSamples;
 	}
 
 	/* Encode samples.
@@ -397,8 +397,6 @@ Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 		else										 bytes = ex_faacEncEncode(handle, NULL, 0, outBuffer, outBuffer.Size());
 
 		if (flush && bytes == 0) break;
-
-		if (!flush) totalSamples += frameSize;
 
 		if (bytes > 0)
 		{
