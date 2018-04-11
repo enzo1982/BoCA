@@ -30,13 +30,14 @@ Int BoCA::CDText::ReadCDText(const String &path)
 
 	cdInfo.Clear();
 
+	Int	 firstTrack = cdio_get_first_track_num(cd);
+	Int	 lastTrack  = cdio_get_last_track_num(cd);
+
+#if LIBCDIO_VERSION_NUM >= 90
 	cdtext_t	*cdtext = cdio_get_cdtext(cd);
 
 	if (cdtext != NIL)
 	{
-		Int	 firstTrack = cdio_get_first_track_num(cd);
-		Int	 lastTrack  = cdio_get_last_track_num(cd);
-
 		cdInfo.SetArtist(cdtext_get_const(cdtext, CDTEXT_FIELD_PERFORMER, 0));
 		cdInfo.SetTitle(cdtext_get_const(cdtext, CDTEXT_FIELD_TITLE, 0));
 
@@ -46,6 +47,23 @@ Int BoCA::CDText::ReadCDText(const String &path)
 			cdInfo.SetTrackTitle(i, cdtext_get_const(cdtext, CDTEXT_FIELD_TITLE, i));
 		}
 	}
+#else
+	cdtext_t	*cdtext = cdio_get_cdtext(cd, 0);
+
+	if (cdtext != NIL)
+	{
+		cdInfo.SetArtist(cdtext_get_const(CDTEXT_PERFORMER, cdtext));
+		cdInfo.SetTitle(cdtext_get_const(CDTEXT_TITLE, cdtext));
+
+		for (Int i = firstTrack; i <= lastTrack; i++)
+		{
+			cdtext_t	*cdtext = cdio_get_cdtext(cd, i);
+
+			cdInfo.SetTrackArtist(i, cdtext_get_const(CDTEXT_PERFORMER, cdtext));
+			cdInfo.SetTrackTitle(i, cdtext_get_const(CDTEXT_TITLE, cdtext));
+		}
+	}
+#endif
 
 	cdio_destroy(cd);
 
