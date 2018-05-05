@@ -16,8 +16,6 @@
 #include "wma.h"
 #include "config.h"
 
-using namespace smooth::IO;
-
 const String &BoCA::EncoderWMA::GetComponentSpecs()
 {
 	static String	 componentSpecs;
@@ -148,6 +146,10 @@ Bool BoCA::EncoderWMA::Activate()
 {
 	const Config	*config = GetConfiguration();
 
+	/* Close output file as it will be written directly by Windows Media.
+	 */
+	driver->Close();
+
 	/* Create WMA writer object.
 	 */
 	HRESULT	 hr = ex_WMCreateWriter(NIL, &m_pWriter);
@@ -167,7 +169,7 @@ Bool BoCA::EncoderWMA::Activate()
 	 */
 	ex_WMCreateWriterFileSink(&m_pWriterFileSink);
 
-	m_pWriterFileSink->Open(String(track.outfile).Append(".out"));
+	m_pWriterFileSink->Open(track.outfile);
 
 	m_pWriterAdvanced->AddSink(m_pWriterFileSink);
 
@@ -246,7 +248,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 {
 	if (errorState)
 	{
-		File(String(track.outfile).Append(".out")).Delete();
+		File(track.outfile).Delete();
 
 		return True;
 	}
@@ -269,7 +271,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 
 	if (FAILED(hr))
 	{
-		File(String(track.outfile).Append(".out")).Delete();
+		File(track.outfile).Delete();
 
 		return False;
 	}
@@ -288,31 +290,12 @@ Bool BoCA::EncoderWMA::Deactivate()
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(GetConfiguration());
-				tagger->RenderStreamInfo(String(track.outfile).Append(".out"), track);
+				tagger->RenderStreamInfo(track.outfile, track);
 
 				boca.DeleteComponent(tagger);
 			}
 		}
 	}
-
-	/* Stream contents of created WMA file to output driver
-	 */
-	InStream		 in(STREAM_FILE, String(track.outfile).Append(".out"), IS_READ);
-	Buffer<UnsignedByte>	 buffer(1024);
-	Int64			 bytesLeft = in.Size();
-
-	while (bytesLeft)
-	{
-		in.InputData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-		driver->WriteData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-		bytesLeft -= Math::Min(Int64(1024), bytesLeft);
-	}
-
-	in.Close();
-
-	File(String(track.outfile).Append(".out")).Delete();
 
 	return True;
 }

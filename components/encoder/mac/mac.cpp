@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -81,6 +81,10 @@ Bool BoCA::EncoderMAC::Activate()
 
 	const Format	&format = track.GetFormat();
 
+	/* Close output file as it will be written directly by APE.
+	 */
+	driver->Close();
+
 	/* Create encoder and retrieve handle.
 	 */
 	int	 nRetVal = 0;
@@ -99,7 +103,7 @@ Bool BoCA::EncoderMAC::Activate()
 	waveFormat.wBitsPerSample	= format.bits;
 	waveFormat.cbSize		= 0;
 
-	ex_APECompress_StartW(hAPECompress, String(track.outfile).Append(".out"), &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
+	ex_APECompress_StartW(hAPECompress, track.outfile, &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
 
 	return True;
 }
@@ -111,26 +115,10 @@ Bool BoCA::EncoderMAC::Deactivate()
 	/* Finish encoding and destroy the encoder.
 	 */
 	ex_APECompress_Finish(hAPECompress, NIL, 0, 0);
-
 	ex_APECompress_Destroy(hAPECompress);
 
-	/* Stream contents of created APE file to output driver
+	/* Write APEv2 tag if requested.
 	 */
-	InStream		 in(STREAM_FILE, String(track.outfile).Append(".out"), IS_READ);
-	Buffer<UnsignedByte>	 buffer(1024);
-	Int64			 bytesLeft = in.Size();
-
-	while (bytesLeft)
-	{
-		in.InputData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-		driver->WriteData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-		bytesLeft -= Math::Min(Int64(1024), bytesLeft);
-	}
-
-	in.Close();
-
 	const Info	&info = track.GetInfo();
 
 	if (config->GetIntValue("Tags", "EnableAPEv2", True) && info.HasBasicInfo())
@@ -140,18 +128,17 @@ Bool BoCA::EncoderMAC::Deactivate()
 
 		if (tagger != NIL)
 		{
+			OutStream		 out(STREAM_FILE, track.outfile, OS_APPEND);
 			Buffer<unsigned char>	 tagBuffer;
 
 			tagger->SetConfiguration(GetConfiguration());
 			tagger->RenderBuffer(tagBuffer, track);
 
-			driver->WriteData(tagBuffer, tagBuffer.Size());
+			out.OutputData(tagBuffer, tagBuffer.Size());
 
 			boca.DeleteComponent(tagger);
 		}
 	}
-
-	File(String(track.outfile).Append(".out")).Delete();
 
 	return True;
 }

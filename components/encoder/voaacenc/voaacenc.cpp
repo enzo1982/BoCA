@@ -16,8 +16,6 @@
 #include "voaacenc.h"
 #include "config.h"
 
-using namespace smooth::IO;
-
 const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 {
 	static String	 componentSpecs;
@@ -150,11 +148,17 @@ Bool BoCA::EncoderVOAAC::Activate()
 	frameSize    = samplesSize / format.channels;
 	delaySamples = frameSize + 576;
 
-	/* Create MP4 container.
+	/* Check whether to use MP4 container.
 	 */
 	if (mp4Container)
 	{
-		mp4File		= ex_MP4CreateEx(String(track.outfile).Append(".out").ConvertTo("UTF-8"), 0, 1, 1, NIL, 0, NIL, 0);
+		/* Close output file as it will be written directly by MP4v2.
+		 */
+		driver->Close();
+
+		/* Create MP4 file.
+		 */
+		mp4File		= ex_MP4CreateEx(track.outfile.ConvertTo("UTF-8"), 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
@@ -251,7 +255,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 				if (tagger != NIL)
 				{
 					tagger->SetConfiguration(GetConfiguration());
-					tagger->RenderStreamInfo(String(track.outfile).Append(".out"), track);
+					tagger->RenderStreamInfo(track.outfile, track);
 
 					boca.DeleteComponent(tagger);
 				}
@@ -261,27 +265,8 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 		{
 			/* Optimize file even when no tags are written.
 			 */
-			ex_MP4Optimize(String(track.outfile).Append(".out").ConvertTo("UTF-8"), NIL);
+			ex_MP4Optimize(track.outfile.ConvertTo("UTF-8"), NIL);
 		}
-
-		/* Stream contents of created MP4 file to output driver
-		 */
-		InStream		 in(STREAM_FILE, String(track.outfile).Append(".out"), IS_READ);
-		Buffer<UnsignedByte>	 buffer(1024);
-		Int64			 bytesLeft = in.Size();
-
-		while (bytesLeft)
-		{
-			in.InputData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-			driver->WriteData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-			bytesLeft -= Math::Min(Int64(1024), bytesLeft);
-		}
-
-		in.Close();
-
-		File(String(track.outfile).Append(".out")).Delete();
 	}
 
 	/* Write ID3v1 tag if requested.
