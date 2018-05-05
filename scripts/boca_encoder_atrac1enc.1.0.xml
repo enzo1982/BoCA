@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>atracdenc ATRAC-1 Encoder</name>
+  <version>1.0</version>
+  <id>atrac1enc-enc</id>
+  <type>encoder</type>
+  <format>
+    <name>ATRAC-1 Files</name>
+    <extension>aea</extension>
+  </format>
+  <input bits="16" channels="1-2" rate="44100"/>
+  <external>
+    <command>atracdenc</command>
+    <arguments>--encode %OPTIONS -i %INFILE -o %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>
