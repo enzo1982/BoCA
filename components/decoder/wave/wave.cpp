@@ -133,8 +133,9 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 
 			in.RelSeek(6);
 
-			format.order	= (waveFormat == WAVE_FORMAT_IEEE_FLOAT) ? BYTE_NATIVE : BYTE_INTEL;
+			format.fp	= (waveFormat == WAVE_FORMAT_IEEE_FLOAT);
 			format.bits	= (unsigned short) in.InputNumber(2);
+			format.order	= (waveFormat == WAVE_FORMAT_IEEE_FLOAT && format.bits == 64) ? BYTE_NATIVE : BYTE_INTEL;
 
 			if (format.bits == 8) format.sign = False;
 
@@ -270,21 +271,13 @@ Int BoCA::DecoderWave::ReadData(Buffer<UnsignedByte> &data)
 
 	Int	 size = driver->ReadData(data, data.Size());
 
-	/* Convert float to integer.
+	/* Convert 64 bit float to 32 bit.
 	 */
-	if (floatFormat && floatFormatBits == 32)
-	{
-		if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, 4);
-
-		for (Int i = 0; i < size / 4; i++) ((Int32 *) (unsigned char *) data)[i] = Math::Min(Int64( 0x7FFFFFFF),
-											   Math::Max(Int64(~0x7FFFFFFF), Int64(((Float32 *) (unsigned char *) data)[i] * 0x80000000)));
-	}
-	else if (floatFormat && floatFormatBits == 64)
+	if (floatFormat && floatFormatBits == 64)
 	{
 		if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, 8);
 
-		for (Int i = 0; i < size / 8; i++) ((Int32 *) (unsigned char *) data)[i] = Math::Min(Int64( 0x7FFFFFFF),
-											   Math::Max(Int64(~0x7FFFFFFF), Int64(((Float *)      (unsigned char *) data)[i] * 0x80000000)));
+		for (Int i = 0; i < size / 8; i++) ((Float32 *) (unsigned char *) data)[i] = ((Float64 *) (unsigned char *) data)[i];
 
 		size /= 2;
 
