@@ -258,7 +258,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		 */
 		chunk = in->InputString(4);
 
-		Int	 cSize = in->InputNumber(4);
+		UnsignedInt32	 cSize = in->InputNumber(4);
 
 		if (chunk == "fmt ")
 		{
@@ -287,7 +287,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		}
 		else if (chunk == "data")
 		{
-			track.length	= (unsigned long) cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
+			track.length	= cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
 		}
 		else
 		{
@@ -423,7 +423,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 		 */
 		chunk = in->InputString(4);
 
-		Int	 cSize = in->InputNumber(4);
+		UnsignedInt32	 cSize = in->InputNumber(4);
 
 		if (chunk != "data")
 		{

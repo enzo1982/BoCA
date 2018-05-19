@@ -159,7 +159,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 			 */
 			chunk = in->InputString(4);
 
-			Int	 cSize = in->InputNumber(4);
+			UnsignedInt32	 cSize = in->InputNumber(4);
 
 			if (chunk == "fmt ")
 			{
@@ -188,8 +188,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 			}
 			else if (chunk == "data")
 			{
-				if ((unsigned) cSize == 0xffffffff || (unsigned) cSize == 0) track.length = -1;
-				else							     track.length = (unsigned long) cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
+				if (cSize == 0xffffffff || cSize == 0) track.length = -1;
+				else				       track.length = cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
 
 				/* Read the rest of the file to find actual size.
 				 */
