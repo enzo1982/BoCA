@@ -18,6 +18,7 @@
 #include <sys/wait.h>
 
 #define WAVE_FORMAT_PCM	       0x0001
+#define WAVE_FORMAT_IEEE_FLOAT 0x0003
 #define WAVE_FORMAT_EXTENSIBLE 0xFFFE
 
 using namespace smooth::IO;
@@ -185,7 +186,8 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		{
 			Int	 waveFormat = in->InputNumber(2);
 
-			if (waveFormat != WAVE_FORMAT_PCM &&
+			if (waveFormat != WAVE_FORMAT_PCM	 &&
+			    waveFormat != WAVE_FORMAT_IEEE_FLOAT &&
 			    waveFormat != WAVE_FORMAT_EXTENSIBLE) { errorState = True; errorString = "Unsupported audio format"; }
 
 			Format	 format = track.GetFormat();
@@ -195,6 +197,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 
 			in->RelSeek(6);
 
+			format.fp	= (waveFormat == WAVE_FORMAT_IEEE_FLOAT);
 			format.bits	= (unsigned short) in->InputNumber(2);
 			format.order	= BYTE_INTEL;
 
