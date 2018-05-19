@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -66,7 +66,7 @@ Bool BoCA::DecoderAIFF::CanOpenStream(const String &streamURI)
 		 */
 		chunk = in.InputString(4);
 
-		Int	 cSize = in.InputNumberRaw(4);
+		UnsignedInt32	 cSize = in.InputNumberRaw(4);
 
 		if (chunk == "COMM")
 		{
@@ -119,7 +119,7 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 		 */
 		chunk = in.InputString(4);
 
-		Int	 cSize = in.InputNumberRaw(4);
+		UnsignedInt32	 cSize = in.InputNumberRaw(4);
 
 		if (chunk == "COMM")
 		{
@@ -246,7 +246,7 @@ Bool BoCA::DecoderAIFF::Activate()
 		 */
 		chunk = in.InputString(4);
 
-		Int	 cSize = in.InputNumberRaw(4);
+		UnsignedInt32	 cSize = in.InputNumberRaw(4);
 
 		if (chunk != "SSND") in.RelSeek(cSize + cSize % 2);
 	}

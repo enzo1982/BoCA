@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -67,7 +67,7 @@ Bool BoCA::DecoderWave::CanOpenStream(const String &streamURI)
 		 */
 		chunk = in.InputString(4);
 
-		Int	 cSize = in.InputNumber(4);
+		UnsignedInt32	 cSize = in.InputNumber(4);
 
 		if (chunk == "fmt ")
 		{
@@ -116,7 +116,7 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 		 */
 		chunk = in.InputString(4);
 
-		Int	 cSize = in.InputNumber(4);
+		UnsignedInt32	 cSize = in.InputNumber(4);
 
 		if (chunk == "fmt ")
 		{
@@ -219,7 +219,7 @@ Bool BoCA::DecoderWave::Activate()
 		 */
 		chunk = in.InputString(4);
 
-		Int	 cSize = in.InputNumber(4);
+		UnsignedInt32	 cSize = in.InputNumber(4);
 
 		if (chunk == "fmt ")
 		{
