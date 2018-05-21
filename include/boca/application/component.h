@@ -44,6 +44,8 @@ namespace BoCA
 
 				const Array<InputSpec *>	&GetInputSpecs() const;
 
+				const Array<Parameter *>	&GetParameters() const;
+
 				const Array<FileFormat *>	&GetFormats() const;
 				const Array<TagSpec *>		&GetTagSpecs() const;
 

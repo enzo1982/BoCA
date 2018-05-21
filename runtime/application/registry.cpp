@@ -303,6 +303,11 @@ BoCA::ComponentType BoCA::AS::Registry::GetComponentType(Int n)
 	return componentSpecs.GetNth(n)->type;
 }
 
+const Array<BoCA::AS::Parameter *> &BoCA::AS::Registry::GetComponentParameters(Int n)
+{
+	return componentSpecs.GetNth(n)->parameters;
+}
+
 const Array<BoCA::AS::FileFormat *> &BoCA::AS::Registry::GetComponentFormats(Int n)
 {
 	return componentSpecs.GetNth(n)->formats;

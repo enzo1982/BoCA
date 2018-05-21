@@ -60,6 +60,11 @@ const Array<BoCA::AS::InputSpec *> &BoCA::AS::Component::GetInputSpecs() const
 	return specs->inputs;
 }
 
+const Array<BoCA::AS::Parameter *> &BoCA::AS::Component::GetParameters() const
+{
+	return specs->parameters;
+}
+
 const Array<BoCA::AS::FileFormat *> &BoCA::AS::Component::GetFormats() const
 {
 	return specs->formats;

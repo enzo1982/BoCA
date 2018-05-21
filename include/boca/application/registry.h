@@ -49,6 +49,9 @@ namespace BoCA
 				const String			&GetComponentVersion(Int);
 				const String			&GetComponentID(Int);
 				ComponentType			 GetComponentType(Int);
+
+				const Array<Parameter *>	&GetComponentParameters(Int);
+
 				const Array<FileFormat *>	&GetComponentFormats(Int);
 				const Array<TagSpec *>		&GetComponentTagSpecs(Int);
 

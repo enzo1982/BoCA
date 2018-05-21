@@ -527,6 +527,10 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 			if (!File(external_command).Exists()) external_command = NIL;
 		}
+		else if (node->GetName() == "parameters")
+		{
+			ParseParameters(node);
+		}
 	}
 
 	delete document;
