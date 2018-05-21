@@ -232,7 +232,7 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 	{
 		static const char	*type = "<type>";
 
-		String	 fileName = config->GetStringValue("Tags", "CoverArtFilenamePattern", "<artist> - <album>\\<type>");
+		String	 fileName = config->GetStringValue("Tags", "CoverArtFilenamePattern", "<albumartist> - <album>\\<type>");
 
 		switch (picture.type)
 		{
