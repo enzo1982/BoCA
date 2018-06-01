@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -25,29 +25,29 @@ namespace BoCA
 		private:
 			/* Singleton class, therefore private constructor/destructor
 			 */
-			static Engine				*instance;
+			static Engine					*instance;
 
-								 Engine();
-								~Engine();
+									 Engine();
+									~Engine();
 		public:
 			/* Returns a new or existing instance of Engine
 			 */
-			static Engine				*Get();
+			static Engine					*Get();
 
 			/* Destroys an existing instance of Engine
 			 */
-			static Void				 Free();
+			static Void					 Free();
 		signals:
 			/* Signals fired by application to notify components of
 			 * conversion engine related actions.
 			 */
-			Signal1<Void, const Array<Track> &>	 onStartConversion;
-			Signal0<Void>				 onFinishConversion;
-			Signal0<Void>				 onCancelConversion;
+			Signal2<Void, Int, const Array<Track> &>	 onStartConversion;
+			Signal1<Void, Int>				 onFinishConversion;
+			Signal1<Void, Int>				 onCancelConversion;
 
-			Signal1<Void, const Track &>		 onStartTrackConversion;
-			Signal1<Void, const Track &>		 onFinishTrackConversion;
-			Signal1<Void, const Track &>		 onCancelTrackConversion;
+			Signal2<Void, Int, const Track &>		 onStartTrackConversion;
+			Signal2<Void, Int, const Track &>		 onFinishTrackConversion;
+			Signal2<Void, Int, const Track &>		 onCancelTrackConversion;
 	};
 };
 
