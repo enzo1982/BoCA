@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\wmsdk">
+      <UniqueIdentifier>{a6952d81-3fc3-4c72-aea0-66ce75912bb9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\tagger\wma\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wma.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\ASFErr.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\drmexternals.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\mediaobj.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\mfidl.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\mfobjects.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\nserror.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\propkeydef.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\propsys.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\rpcndr.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\rpcsal.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\sal.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\shtypes.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\specstrings.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\specstrings_adt.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\specstrings_strict.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\specstrings_undef.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\structuredquery.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\wmdrmsdk.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\wmsbuffer.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\wmsdk.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\wma\wmsdk\wmsdkidl.h">
+      <Filter>Headerdateien\wmsdk</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\tagger\wma\dllinterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\wma\wma.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

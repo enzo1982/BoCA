@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Quelldateien\id3">
+      <UniqueIdentifier>{1db6b073-d69b-4800-94c2-fc78a935d2f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\id3">
+      <UniqueIdentifier>{6877bb2a-de1e-486a-b995-a3ce7a7c04d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\zlib">
+      <UniqueIdentifier>{aa0be43b-9a34-4c7e-956f-bd572f95db4c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\field.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\field_binary.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\field_integer.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\field_string_ascii.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\field_string_unicode.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\frame.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\frame_impl.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\frame_parse.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\frame_render.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\globals.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\header.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\header_frame.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\header_tag.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\helpers.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\io.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\io_decorators.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\io_helpers.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\misc_support.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\mp3_parse.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\spec.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\tag.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\tag_file.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\tag_impl.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\tag_parse.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\tag_parse_lyrics3.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\tag_parse_musicmatch.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\tag_parse_v1.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\tag_render.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\utils.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\adler32.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\compress.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\crc32.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\deflate.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\infback.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\inffast.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\inflate.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\inftrees.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\trees.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\uncompr.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\zlib\zutil.c">
+      <Filter>Quelldateien\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3v2.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\container.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\container_find.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\container_impl.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\container_render.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\container_parse.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\id3v2\id3\field_frames.cpp">
+      <Filter>Quelldateien\id3</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\field.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\globals.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\helpers.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\id3lib_frame.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\id3lib_streams.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\id3lib_strings.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\io_decorators.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\io_helpers.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\io_strings.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\misc_support.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\reader.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\readers.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\sized_types.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\tag.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\utils.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\writer.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\writers.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3v2.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\tagger\id3v2\id3\id3\container.h">
+      <Filter>Headerdateien\id3</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

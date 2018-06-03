@@ -1,0 +1,390 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Quelldateien\application">
+      <UniqueIdentifier>{2a1ae58b-b7da-47a2-a926-9cf2d7ffa857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\application\external">
+      <UniqueIdentifier>{913f2be6-f65f-4a72-99fa-a893584654fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\application\external\win32">
+      <UniqueIdentifier>{c6ca8cce-4507-47f9-8e85-f7bd9cba5018}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\application\external\posix">
+      <UniqueIdentifier>{10ef38d0-6c85-401f-9da3-33aca2fe3c20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\common">
+      <UniqueIdentifier>{4470f349-1ea7-4e5e-b9b2-0421ddbce386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\common\communication">
+      <UniqueIdentifier>{622b270c-0fb5-4b10-ba8f-b36da5cf3cd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\common\metadata">
+      <UniqueIdentifier>{b8507848-0791-4301-9c35-22b7f4daca86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\component">
+      <UniqueIdentifier>{2955faee-e8c0-43b2-86f3-edffc3ba4f3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\core">
+      <UniqueIdentifier>{cc6411ef-5db9-45b9-90de-05132b9246b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\boca">
+      <UniqueIdentifier>{873f647c-7541-4b4b-b735-f5290aaba8d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\boca\core">
+      <UniqueIdentifier>{7265b541-b589-4f70-9163-4f72b2d08469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\boca\component">
+      <UniqueIdentifier>{ef354e78-e173-46db-ba9c-72ef3680c606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\boca\common">
+      <UniqueIdentifier>{a66bdca3-74a2-4575-932d-0fa83c5f6fe3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\boca\common\communication">
+      <UniqueIdentifier>{d0a050f8-9371-47dc-b345-06432c2faded}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\boca\common\metadata">
+      <UniqueIdentifier>{4089855e-2bdc-4905-b11e-acdecabef343}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\boca\application">
+      <UniqueIdentifier>{1fcec05c-fdfd-4d42-96c1-1b038435c347}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\boca\application\external">
+      <UniqueIdentifier>{1a5d853e-ab54-4b3b-93ce-4737d2c3c0cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\runtime\application\component.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\componentspecs.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\decodercomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\deviceinfocomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\dspcomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\encodercomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\extensioncomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\outputcomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\registry.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\taggercomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\configlayer.cpp">
+      <Filter>Quelldateien\application\external</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\decodercomponent.cpp">
+      <Filter>Quelldateien\application\external</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\encodercomponent.cpp">
+      <Filter>Quelldateien\application\external</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\win32\decodercomponentfile.cpp">
+      <Filter>Quelldateien\application\external\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\win32\decodercomponentstdio.cpp">
+      <Filter>Quelldateien\application\external\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\win32\encodercomponentfile.cpp">
+      <Filter>Quelldateien\application\external\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\win32\encodercomponentstdio.cpp">
+      <Filter>Quelldateien\application\external\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\posix\decodercomponentfile.cpp">
+      <Filter>Quelldateien\application\external\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\posix\decodercomponentstdio.cpp">
+      <Filter>Quelldateien\application\external\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\posix\encodercomponentfile.cpp">
+      <Filter>Quelldateien\application\external\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\posix\encodercomponentstdio.cpp">
+      <Filter>Quelldateien\application\external\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\config.cpp">
+      <Filter>Quelldateien\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\configlayer.cpp">
+      <Filter>Quelldateien\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\i18n.cpp">
+      <Filter>Quelldateien\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\protocol.cpp">
+      <Filter>Quelldateien\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\utilities.cpp">
+      <Filter>Quelldateien\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\communication\application.cpp">
+      <Filter>Quelldateien\common\communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\communication\joblist.cpp">
+      <Filter>Quelldateien\common\communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\communication\menu.cpp">
+      <Filter>Quelldateien\common\communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\communication\settings.cpp">
+      <Filter>Quelldateien\common\communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\metadata\device.cpp">
+      <Filter>Quelldateien\common\metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\metadata\format.cpp">
+      <Filter>Quelldateien\common\metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\metadata\info.cpp">
+      <Filter>Quelldateien\common\metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\metadata\mcdi.cpp">
+      <Filter>Quelldateien\common\metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\metadata\picture.cpp">
+      <Filter>Quelldateien\common\metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\metadata\picturedata.cpp">
+      <Filter>Quelldateien\common\metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\metadata\track.cpp">
+      <Filter>Quelldateien\common\metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\component.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\decodercomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\deviceinfocomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\dspcomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\encodercomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\extensioncomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\outputcomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\taggercomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\core\main.cpp">
+      <Filter>Quelldateien\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\core\core.cpp">
+      <Filter>Quelldateien\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\playlistcomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\playlistcomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\verifiercomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\verifiercomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\communication\engine.cpp">
+      <Filter>Quelldateien\common\communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\common\formatconverter.cpp">
+      <Filter>Quelldateien\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\streamcomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\streamcomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\boca.h">
+      <Filter>Headerdateien\boca</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\component.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\decodercomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\deviceinfocomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\encodercomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\extensioncomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\outputcomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\taggercomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\config.h">
+      <Filter>Headerdateien\boca\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\configlayer.h">
+      <Filter>Headerdateien\boca\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\i18n.h">
+      <Filter>Headerdateien\boca\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\protocol.h">
+      <Filter>Headerdateien\boca\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\utilities.h">
+      <Filter>Headerdateien\boca\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\communication\application.h">
+      <Filter>Headerdateien\boca\common\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\communication\joblist.h">
+      <Filter>Headerdateien\boca\common\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\communication\menu.h">
+      <Filter>Headerdateien\boca\common\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\communication\settings.h">
+      <Filter>Headerdateien\boca\common\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\device.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\format.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\info.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\mcdi.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\picture.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\picturedata.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\track.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\component.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\componentspecs.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\decodercomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\deviceinfocomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\encodercomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\extensioncomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\outputcomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\registry.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\taggercomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\external\configlayer.h">
+      <Filter>Headerdateien\boca\application\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\external\decodercomponent.h">
+      <Filter>Headerdateien\boca\application\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\external\decodercomponentfile.h">
+      <Filter>Headerdateien\boca\application\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\external\decodercomponentstdio.h">
+      <Filter>Headerdateien\boca\application\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\external\encodercomponent.h">
+      <Filter>Headerdateien\boca\application\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\external\encodercomponentfile.h">
+      <Filter>Headerdateien\boca\application\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\external\encodercomponentstdio.h">
+      <Filter>Headerdateien\boca\application\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\core\core.h">
+      <Filter>Headerdateien\boca\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\core\definitions.h">
+      <Filter>Headerdateien\boca\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\playlistcomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\playlistcomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\verifiercomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\verifiercomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\communication\engine.h">
+      <Filter>Headerdateien\boca\common\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\channels.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\formatconverter.h">
+      <Filter>Headerdateien\boca\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\streamcomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\streamcomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

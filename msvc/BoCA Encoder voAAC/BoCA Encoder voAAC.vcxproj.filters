@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\vo-aacenc">
+      <UniqueIdentifier>{72e4b513-51bd-4094-b1c7-bb8edf8882cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\mp4v2">
+      <UniqueIdentifier>{fe9d9803-f4f2-4be7-b390-7e329d346b09}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\encoder\voaacenc\config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\voaacenc.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\chapter.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\file.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\file_prop.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\general.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\isma.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\itmf_generic.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\itmf_tags.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\mp4v2.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\platform.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\project.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\sample.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\streaming.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\track.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\mp4v2\track_prop.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\vo-aacenc\cmnMemory.h">
+      <Filter>Headerdateien\vo-aacenc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\vo-aacenc\voAAC.h">
+      <Filter>Headerdateien\vo-aacenc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\vo-aacenc\voAMRWB.h">
+      <Filter>Headerdateien\vo-aacenc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\vo-aacenc\voAudio.h">
+      <Filter>Headerdateien\vo-aacenc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\vo-aacenc\voIndex.h">
+      <Filter>Headerdateien\vo-aacenc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\vo-aacenc\voMem.h">
+      <Filter>Headerdateien\vo-aacenc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\voaacenc\vo-aacenc\voType.h">
+      <Filter>Headerdateien\vo-aacenc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\encoder\voaacenc\config.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\voaacenc\dllinterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\voaacenc\voaacenc.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

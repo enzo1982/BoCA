@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\fdk-aac">
+      <UniqueIdentifier>{5ea35721-54e6-4c42-a343-4e20999a98e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\mp4v2">
+      <UniqueIdentifier>{768c4c08-2e11-44d1-8569-1c03446d79c9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\encoder\fdkaac\config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\fdkaac.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\chapter.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\file.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\file_prop.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\general.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\isma.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\itmf_generic.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\itmf_tags.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\mp4v2.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\platform.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\project.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\sample.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\streaming.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\track.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\track_prop.h">
+      <Filter>Headerdateien\mp4v2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\fdk-aac\aacenc_lib.h">
+      <Filter>Headerdateien\fdk-aac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\fdk-aac\FDK_audio.h">
+      <Filter>Headerdateien\fdk-aac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\fdk-aac\genericStds.h">
+      <Filter>Headerdateien\fdk-aac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\fdk-aac\machine_type.h">
+      <Filter>Headerdateien\fdk-aac</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\encoder\fdkaac\config.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\fdkaac\dllinterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\fdkaac\fdkaac.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

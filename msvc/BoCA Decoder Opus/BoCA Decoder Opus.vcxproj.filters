@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\ogg">
+      <UniqueIdentifier>{73a0be47-2b28-45cc-80bc-010d5b11450c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\opus">
+      <UniqueIdentifier>{855206e2-d941-4866-acb6-f8a27682cf7d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\decoder\opus\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\opus\opus.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\opus\opus\opus.h">
+      <Filter>Headerdateien\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\opus\opus\opus_defines.h">
+      <Filter>Headerdateien\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\opus\opus\opus_types.h">
+      <Filter>Headerdateien\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\opus\ogg\ogg.h">
+      <Filter>Headerdateien\ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\opus\ogg\os_types.h">
+      <Filter>Headerdateien\ogg</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\decoder\opus\dllinterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\opus\opus.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

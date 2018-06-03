@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\twinvq">
+      <UniqueIdentifier>{59706059-5a32-4681-8522-7334ac971426}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\twinvq">
+      <UniqueIdentifier>{5309a988-956e-4ef9-b220-559729b56f70}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\decoder\twinvq\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\twinvq\twinvq.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\twinvq\twinvq\bfile.h">
+      <Filter>Headerdateien\twinvq</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\twinvq\twinvq\bstream.h">
+      <Filter>Headerdateien\twinvq</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\twinvq\twinvq\Chunk.h">
+      <Filter>Headerdateien\twinvq</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\twinvq\twinvq\HeaderManager.h">
+      <Filter>Headerdateien\twinvq</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\twinvq\twinvq\tvqdec.h">
+      <Filter>Headerdateien\twinvq</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\twinvq\twinvq\twinvq.h">
+      <Filter>Headerdateien\twinvq</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\decoder\twinvq\twinvq\bfile.cpp">
+      <Filter>Quelldateien\twinvq</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\twinvq\twinvq\bstream.cpp">
+      <Filter>Quelldateien\twinvq</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\twinvq\twinvq\Chunk.cpp">
+      <Filter>Quelldateien\twinvq</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\twinvq\twinvq\HeaderManager.cpp">
+      <Filter>Quelldateien\twinvq</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\twinvq\dllinterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\twinvq\twinvq.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\ogg">
+      <UniqueIdentifier>{450e78f8-c0df-4d05-b1aa-b190faecc82e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\speex">
+      <UniqueIdentifier>{f7cb6f45-2b22-46b7-aafc-f75842a6eed5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\encoder\speex\config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex_bits.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex_callbacks.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex_echo.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex_header.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex_jitter.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex_preprocess.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex_stereo.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\speex\speex_types.h">
+      <Filter>Headerdateien\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\ogg\ogg.h">
+      <Filter>Headerdateien\ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\ogg\os_types.h">
+      <Filter>Headerdateien\ogg</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\encoder\speex\config.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\speex\dllinterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\speex\speex.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
