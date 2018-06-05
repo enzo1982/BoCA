@@ -108,6 +108,9 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	const Info	&info	 = track.GetInfo();
 
 	MP4FileHandle	 mp4File = ex_MP4Modify(fileName.ConvertTo("UTF-8"), 0);
+
+	if (mp4File == NIL) return Error();
+
 	const MP4Tags	*mp4Tags = ex_MP4TagsAlloc();
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
@@ -227,7 +230,15 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	String::SetOutputFormat(prevOutFormat);
 
 	ex_MP4Close(mp4File, 0);
-	ex_MP4Optimize(fileName.ConvertTo("UTF-8"), NIL);
+
+	/* Optimize MP4 structure.
+	 */
+	String	 tempName = fileName.Append(".temp");
+
+	ex_MP4Optimize(fileName.ConvertTo("UTF-8"), tempName.ConvertTo("UTF-8"));
+
+	File(fileName).Delete();
+	File(tempName).Move(fileName);
 
 	return Success();
 }
@@ -239,6 +250,9 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 	Info		 info	 = track.GetInfo();
 
 	MP4FileHandle	 mp4File = ex_MP4Read(fileName.ConvertTo("UTF-8"));
+
+	if (mp4File == NIL) return Error();
+
 	const MP4Tags	*mp4Tags = ex_MP4TagsAlloc();
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
@@ -369,6 +383,9 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &track)
 {
 	MP4FileHandle	 mp4File = ex_MP4Modify(fileName.ConvertTo("UTF-8"), 0);
+
+	if (mp4File == NIL) return Error();
+
 	const MP4Tags	*mp4Tags = ex_MP4TagsAlloc();
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
