@@ -133,43 +133,9 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 	Int	 kbps	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64);
 	Bool	 mp4Container = config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
 
-	/* Get file type object of output file.
+	/* Get file type of output file.
 	 */
 	fileType = mp4Container ? CA::kAudioFileM4AType : CA::kAudioFileAAC_ADTSType;
-
-	/* Send Setup command.
-	 */
-	if (!connected) Connect();
-
-	comm->command = CommCommandSetup;
-	comm->length  = sizeof(CoreAudioCommSetup);
-
-	((CoreAudioCommSetup *) &comm->data)->codec    = codec;
-	((CoreAudioCommSetup *) &comm->data)->bitrate  = kbps * 1000 * format.channels;
-	((CoreAudioCommSetup *) &comm->data)->format   = mp4Container;
-
-	((CoreAudioCommSetup *) &comm->data)->channels = format.channels;
-	((CoreAudioCommSetup *) &comm->data)->rate     = format.rate;
-	((CoreAudioCommSetup *) &comm->data)->bits     = format.bits;
-
-	((CoreAudioCommSetup *) &comm->data)->fp       = format.fp;
-	((CoreAudioCommSetup *) &comm->data)->sign     = format.sign;
-
-	fileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out");
-
-#ifndef __WIN32__
-	fileName = fileName.Tail(fileName.Length() - fileName.FindLast(Directory::GetDirectoryDelimiter()) - 1);
-#endif
-
-	char	*outfile = fileName.ConvertTo("UTF-8");
-
-	memcpy(((CoreAudioCommSetup *) &comm->data)->file, outfile, strlen(outfile) + 1);
-
-	ProcessConnectorCommand();
-
-	if (comm->status != CommStatusReady) return False;
-
-	fileName.ImportFrom("UTF-8", ((CoreAudioCommSetup *) &comm->data)->file);
 
 	/* Write ID3v2 tag if requested.
 	 */
@@ -195,6 +161,34 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 			}
 		}
 	}
+
+	driver->Close();
+
+	/* Send Setup command.
+	 */
+	if (!connected) Connect();
+
+	comm->command = CommCommandSetup;
+	comm->length  = sizeof(CoreAudioCommSetup);
+
+	((CoreAudioCommSetup *) &comm->data)->codec    = codec;
+	((CoreAudioCommSetup *) &comm->data)->bitrate  = kbps * 1000 * format.channels;
+	((CoreAudioCommSetup *) &comm->data)->format   = mp4Container;
+
+	((CoreAudioCommSetup *) &comm->data)->channels = format.channels;
+	((CoreAudioCommSetup *) &comm->data)->rate     = format.rate;
+	((CoreAudioCommSetup *) &comm->data)->bits     = format.bits;
+
+	((CoreAudioCommSetup *) &comm->data)->fp       = format.fp;
+	((CoreAudioCommSetup *) &comm->data)->sign     = format.sign;
+
+	char	*outfile = track.outfile.ConvertTo("UTF-8");
+
+	memcpy(((CoreAudioCommSetup *) &comm->data)->file, outfile, strlen(outfile) + 1);
+
+	ProcessConnectorCommand();
+
+	if (comm->status != CommStatusReady) return False;
 
 	return True;
 }
@@ -230,31 +224,12 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(GetConfiguration());
-				tagger->RenderStreamInfo(fileName, track);
+				tagger->RenderStreamInfo(track.outfile, track);
 
 				boca.DeleteComponent(tagger);
 			}
 		}
 	}
-
-	/* Stream contents of created MP4 file to output driver
-	 */
-	InStream		 in(STREAM_FILE, fileName, IS_READ);
-	Buffer<UnsignedByte>	 buffer(1024);
-	Int64			 bytesLeft = in.Size();
-
-	while (bytesLeft)
-	{
-		in.InputData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-		driver->WriteData(buffer, Math::Min(Int64(1024), bytesLeft));
-
-		bytesLeft -= Math::Min(Int64(1024), bytesLeft);
-	}
-
-	in.Close();
-
-	File(fileName).Delete();
 
 	/* Write ID3v1 tag if requested.
 	 */
@@ -269,12 +244,13 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 			if (tagger != NIL)
 			{
+				OutStream		 out(STREAM_FILE, track.outfile, OS_APPEND);
 				Buffer<unsigned char>	 id3Buffer;
 
 				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
-				driver->WriteData(id3Buffer, id3Buffer.Size());
+				out.OutputData(id3Buffer, id3Buffer.Size());
 
 				boca.DeleteComponent(tagger);
 			}
@@ -292,13 +268,14 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 			if (tagger != NIL)
 			{
+				OutStream		 out(STREAM_FILE, track.outfile, OS_APPEND);
 				Buffer<unsigned char>	 id3Buffer;
 
 				tagger->SetConfiguration(GetConfiguration());
 				tagger->RenderBuffer(id3Buffer, track);
 
-				driver->Seek(0);
-				driver->WriteData(id3Buffer, id3Buffer.Size());
+				out.Seek(0);
+				out.OutputData(id3Buffer, id3Buffer.Size());
 
 				boca.DeleteComponent(tagger);
 			}

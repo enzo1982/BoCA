@@ -17,13 +17,21 @@
 #	include <sys/mman.h>
 #	include <unistd.h>
 #	include <fcntl.h>
+#else
+#	include <io.h>
+
+#	define ftruncate _chsize
 #endif
+
+#include <stdio.h>
 
 #ifndef min
 #	define min(n, m) ((n) < (m) ? (n) : (m))
 #endif
 
 static CoreAudioCommSetup	 setup		= { 0 };
+
+static unsigned int		 dataOffset	= 0;
 
 static unsigned char		*buffer		= NULL;
 static unsigned int		 bufferSize	= 0;
@@ -116,6 +124,53 @@ int GetOutputSampleRate(const CoreAudioCommSetup &setup)
 	return outputRate;
 }
 
+CA::OSStatus AudioFileReadProc(void *inClientData, CA::SInt64 inPosition, CA::UInt32 requestCount, void *buffer, CA::UInt32 *actualCount)
+{
+	FILE	*file = (FILE *) inClientData;
+
+	fseek(file, inPosition + dataOffset, SEEK_SET);
+
+	*actualCount = fread(buffer, 1, requestCount, file);
+
+	return 0;
+}
+
+CA::OSStatus AudioFileWriteProc(void *inClientData, CA::SInt64 inPosition, CA::UInt32 requestCount, const void *buffer, CA::UInt32 *actualCount)
+{
+	FILE	*file = (FILE *) inClientData;
+
+	fseek(file, inPosition + dataOffset, SEEK_SET);
+
+	*actualCount = fwrite(buffer, 1, requestCount, file);
+
+	return 0;
+}
+
+CA::SInt64 AudioFileGetSizeProc(void *inClientData)
+{
+	FILE	*file = (FILE *) inClientData;
+
+	unsigned int	 pos  = ftell(file);
+
+	fseek(file,   0, SEEK_END);
+
+	unsigned int	 size = ftell(file);
+
+	fseek(file, pos, SEEK_SET);
+
+	return size - dataOffset;
+}
+
+CA::OSStatus AudioFileSetSizeProc(void *inClientData, CA::SInt64 inSize)
+{
+	FILE	*file = (FILE *) inClientData;
+
+	fflush(file);
+	ftruncate(fileno(file), inSize + dataOffset);
+
+	return 0;
+}
+
 CA::OSStatus AudioConverterComplexInputDataProc(CA::AudioConverterRef inAudioConverter, CA::UInt32 *ioNumberDataPackets, CA::AudioBufferList *ioData, CA::AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
 {
 	static unsigned char	*suppliedData	  = NULL;
@@ -158,11 +213,12 @@ int main(int argc, char *argv[])
 
 	/* Load Core Audio DLLs.
 	 */
-	LoadCoreFoundationDLL();
 	LoadCoreAudioDLL();
 
 	/* Main processing loop.
 	 */
+	FILE			*file		= NULL;
+
 	CA::AudioFileID		 audioFile	= NULL;
 	CA::AudioConverterRef	 converter	= NULL;
 	CA::AudioBufferList	*buffers	= NULL;
@@ -177,9 +233,8 @@ int main(int argc, char *argv[])
 		switch (comm->command)
 		{
 			case CommCommandHello:
-				if (((CoreAudioCommHello *) &comm->data)->version == 1 &&
-				    corefoundationdll != NULL && coreaudiodll != NULL) comm->status = CommStatusReady;
-				else						       comm->status = CommStatusError;
+				if (((CoreAudioCommHello *) &comm->data)->version == 1 && coreaudiodll != NULL) comm->status = CommStatusReady;
+				else										comm->status = CommStatusError;
 
 				break;
 			case CommCommandCodecs:
@@ -260,37 +315,24 @@ int main(int argc, char *argv[])
 						CA::AudioConverterSetProperty(converter, CA::kAudioConverterEncodeBitRate, sizeof(CA::UInt32), &bitrate);
 					}
 
-					/* Get Windows compatible file name.
-					 */
-#ifdef __WINE__
-					char	 buffer[32768] = { 0 };
-
-					GetTempPathA(sizeof(buffer), buffer);
-
-					strcat(buffer, setup.file);
-					strcpy(setup.file, buffer);
-#endif
-
 					/* Create audio file object for output file.
 					 */
-					CA::CFStringRef	 fileNameString	= CA::CFStringCreateWithCString(NULL, setup.file, CA::kCFStringEncodingUTF8);
-					CA::CFURLRef	 fileNameURL	= CA::CFURLCreateWithFileSystemPath(NULL, fileNameString, CA::kCFURLWindowsPathStyle, false);
-					CA::UInt32	 fileType	= setup.format ? CA::kAudioFileM4AType : CA::kAudioFileAAC_ADTSType;
+					CA::UInt32	 fileType = setup.format ? CA::kAudioFileM4AType : CA::kAudioFileAAC_ADTSType;
 
-					CA::AudioFileCreateWithURL(fileNameURL, fileType, &destinationFormat, CA::kAudioFileFlags_EraseFile, &audioFile);
-
-					CA::CFRelease(fileNameURL);
-					CA::CFRelease(fileNameString);
-
-					/* Get Unix compatible file name.
-					 */
 #ifdef __WINE__
+					file	   = fopen(setup.file, "r+b");
+#else
 					wchar_t	 fileName[32768];
 
-					MultiByteToWideChar(CP_ACP, 0, setup.file, -1, fileName, sizeof(fileName) / sizeof(wchar_t));
+					MultiByteToWideChar(CP_UTF8, 0, setup.file, -1, fileName, sizeof(fileName) / sizeof(wchar_t));
 
-					strcpy(((CoreAudioCommSetup *) comm->data)->file, wine_get_unix_file_name(fileName));
+					file	   = _wfopen(fileName, L"r+b");
 #endif
+
+					fseek(file, 0, SEEK_END);
+					dataOffset = ftell(file);
+
+					CA::AudioFileInitializeWithCallbacks(file, AudioFileReadProc, AudioFileWriteProc, AudioFileGetSizeProc, AudioFileSetSizeProc, fileType, &destinationFormat, 0, &audioFile);
 
 					/* Get magic cookie and supply it to audio file.
 					 */
@@ -444,6 +486,8 @@ int main(int argc, char *argv[])
 					 */
 					CA::AudioConverterDispose(converter);
 					CA::AudioFileClose(audioFile);
+
+					fclose(file);
 				}
 
 				comm->status = CommStatusReady;
@@ -458,7 +502,6 @@ int main(int argc, char *argv[])
 
 	/* Free Core Audio DLLs.
 	 */
-	FreeCoreFoundationDLL();
 	FreeCoreAudioDLL();
 
 	/* Unmap view and close shared memory object.

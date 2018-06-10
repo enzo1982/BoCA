@@ -29,7 +29,6 @@ namespace BoCA
 		private:
 			ConfigLayer		*configLayer;
 
-			String			 fileName;
 			String			 mappingName;
 
 #ifdef __WIN32__

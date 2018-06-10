@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -35,30 +35,25 @@
 
 namespace CA
 {
-	CFSTRINGCREATEWITHCSTRING	 CFStringCreateWithCString		= NULL;
-	CFURLCREATEWITHFILESYSTEMPATH	 CFURLCreateWithFileSystemPath		= NULL;
-	CFRELEASE			 CFRelease				= NULL;
+	AUDIOFILEINITIALIZEWITHCALLBACKS	 AudioFileInitializeWithCallbacks	= NULL;
+	AUDIOFILECLOSE				 AudioFileClose				= NULL;
+	AUDIOFILESETPROPERTY			 AudioFileSetProperty			= NULL;
+	AUDIOFILEWRITEPACKETS			 AudioFileWritePackets			= NULL;
 
-	AUDIOFILECREATEWITHURL		 AudioFileCreateWithURL			= NULL;
-	AUDIOFILECLOSE			 AudioFileClose				= NULL;
-	AUDIOFILESETPROPERTY		 AudioFileSetProperty			= NULL;
-	AUDIOFILEWRITEPACKETS		 AudioFileWritePackets			= NULL;
+	AUDIOCONVERTERNEW			 AudioConverterNew			= NULL;
+	AUDIOCONVERTERDISPOSE			 AudioConverterDispose			= NULL;
+	AUDIOCONVERTERGETPROPERTY		 AudioConverterGetProperty		= NULL;
+	AUDIOCONVERTERGETPROPERTYINFO		 AudioConverterGetPropertyInfo		= NULL;
+	AUDIOCONVERTERSETPROPERTY		 AudioConverterSetProperty		= NULL;
+	AUDIOCONVERTERFILLCOMPLEXBUFFER		 AudioConverterFillComplexBuffer	= NULL;
 
-	AUDIOCONVERTERNEW		 AudioConverterNew			= NULL;
-	AUDIOCONVERTERDISPOSE		 AudioConverterDispose			= NULL;
-	AUDIOCONVERTERGETPROPERTY	 AudioConverterGetProperty		= NULL;
-	AUDIOCONVERTERGETPROPERTYINFO	 AudioConverterGetPropertyInfo		= NULL;
-	AUDIOCONVERTERSETPROPERTY	 AudioConverterSetProperty		= NULL;
-	AUDIOCONVERTERFILLCOMPLEXBUFFER	 AudioConverterFillComplexBuffer	= NULL;
-
-	AUDIOFORMATGETPROPERTY		 AudioFormatGetProperty			= NULL;
-	AUDIOFORMATGETPROPERTYINFO	 AudioFormatGetPropertyInfo		= NULL;
+	AUDIOFORMATGETPROPERTY			 AudioFormatGetProperty			= NULL;
+	AUDIOFORMATGETPROPERTYINFO		 AudioFormatGetPropertyInfo		= NULL;
 };
 
 using namespace CA;
 
-HINSTANCE  corefoundationdll	= NULL;
-HINSTANCE  coreaudiodll		= NULL;
+HINSTANCE  coreaudiodll	= NULL;
 
 const wchar_t *GetCommonFilesDirectory()
 {
@@ -76,42 +71,6 @@ const wchar_t *GetCommonFilesDirectory()
 	if (wcslen(commonFilesDir) > 0 && commonFilesDir[wcslen(commonFilesDir) - 1] != '\\') wcscat(commonFilesDir, wstring("\\"));
 
 	return commonFilesDir;
-}
-
-bool LoadCoreFoundationDLL()
-{
-	wchar_t	 aasDir[32768];
-
-	wcscpy(aasDir, GetCommonFilesDirectory());
-	wcscat(aasDir, wstring("Apple\\Apple Application Support\\"));
-
-	/* Add Apple Application Services directory to path.
-	 */
-	wchar_t	 buffer[32768];
-
-	GetEnvironmentVariableW(wstring("PATH"), buffer, 32768);
-	SetEnvironmentVariableW(wstring("PATH"), wcscat(wcscat(buffer, wstring(";")), aasDir));
-
-	corefoundationdll = LoadLibraryW(wcscat(aasDir, wstring("CoreFoundation.dll")));
-
-	if (corefoundationdll == NULL) return false;
-
-	CFStringCreateWithCString	= (CFSTRINGCREATEWITHCSTRING) GetProcAddress(corefoundationdll, "CFStringCreateWithCString");
-	CFURLCreateWithFileSystemPath	= (CFURLCREATEWITHFILESYSTEMPATH) GetProcAddress(corefoundationdll, "CFURLCreateWithFileSystemPath");
-	CFRelease			= (CFRELEASE) GetProcAddress(corefoundationdll, "CFRelease");
-
-	if (CFStringCreateWithCString		== NULL ||
-	    CFURLCreateWithFileSystemPath	== NULL ||
-	    CFRelease				== NULL) { FreeCoreFoundationDLL(); return false; }
-
-	return true;
-}
-
-void FreeCoreFoundationDLL()
-{
-	FreeLibrary(corefoundationdll);
-
-	corefoundationdll = NULL;
 }
 
 bool LoadCoreAudioDLL()
@@ -132,22 +91,22 @@ bool LoadCoreAudioDLL()
 
 	if (coreaudiodll == NULL) return false;
 
-	AudioFileCreateWithURL		= (AUDIOFILECREATEWITHURL) GetProcAddress(coreaudiodll, "AudioFileCreateWithURL");
-	AudioFileClose			= (AUDIOFILECLOSE) GetProcAddress(coreaudiodll, "AudioFileClose");
-	AudioFileSetProperty		= (AUDIOFILESETPROPERTY) GetProcAddress(coreaudiodll, "AudioFileSetProperty");
-	AudioFileWritePackets		= (AUDIOFILEWRITEPACKETS) GetProcAddress(coreaudiodll, "AudioFileWritePackets");
+	AudioFileInitializeWithCallbacks	= (AUDIOFILEINITIALIZEWITHCALLBACKS) GetProcAddress(coreaudiodll, "AudioFileInitializeWithCallbacks");
+	AudioFileClose				= (AUDIOFILECLOSE) GetProcAddress(coreaudiodll, "AudioFileClose");
+	AudioFileSetProperty			= (AUDIOFILESETPROPERTY) GetProcAddress(coreaudiodll, "AudioFileSetProperty");
+	AudioFileWritePackets			= (AUDIOFILEWRITEPACKETS) GetProcAddress(coreaudiodll, "AudioFileWritePackets");
 
-	AudioConverterNew		= (AUDIOCONVERTERNEW) GetProcAddress(coreaudiodll, "AudioConverterNew");
-	AudioConverterDispose		= (AUDIOCONVERTERDISPOSE) GetProcAddress(coreaudiodll, "AudioConverterDispose");
-	AudioConverterGetProperty	= (AUDIOCONVERTERGETPROPERTY) GetProcAddress(coreaudiodll, "AudioConverterGetProperty");
-	AudioConverterGetPropertyInfo	= (AUDIOCONVERTERGETPROPERTYINFO) GetProcAddress(coreaudiodll, "AudioConverterGetPropertyInfo");
-	AudioConverterSetProperty	= (AUDIOCONVERTERSETPROPERTY) GetProcAddress(coreaudiodll, "AudioConverterSetProperty");
-	AudioConverterFillComplexBuffer	= (AUDIOCONVERTERFILLCOMPLEXBUFFER) GetProcAddress(coreaudiodll, "AudioConverterFillComplexBuffer");
+	AudioConverterNew			= (AUDIOCONVERTERNEW) GetProcAddress(coreaudiodll, "AudioConverterNew");
+	AudioConverterDispose			= (AUDIOCONVERTERDISPOSE) GetProcAddress(coreaudiodll, "AudioConverterDispose");
+	AudioConverterGetProperty		= (AUDIOCONVERTERGETPROPERTY) GetProcAddress(coreaudiodll, "AudioConverterGetProperty");
+	AudioConverterGetPropertyInfo		= (AUDIOCONVERTERGETPROPERTYINFO) GetProcAddress(coreaudiodll, "AudioConverterGetPropertyInfo");
+	AudioConverterSetProperty		= (AUDIOCONVERTERSETPROPERTY) GetProcAddress(coreaudiodll, "AudioConverterSetProperty");
+	AudioConverterFillComplexBuffer		= (AUDIOCONVERTERFILLCOMPLEXBUFFER) GetProcAddress(coreaudiodll, "AudioConverterFillComplexBuffer");
 
-	AudioFormatGetProperty		= (AUDIOFORMATGETPROPERTY) GetProcAddress(coreaudiodll, "AudioFormatGetProperty");
-	AudioFormatGetPropertyInfo	= (AUDIOFORMATGETPROPERTYINFO) GetProcAddress(coreaudiodll, "AudioFormatGetPropertyInfo");
+	AudioFormatGetProperty			= (AUDIOFORMATGETPROPERTY) GetProcAddress(coreaudiodll, "AudioFormatGetProperty");
+	AudioFormatGetPropertyInfo		= (AUDIOFORMATGETPROPERTYINFO) GetProcAddress(coreaudiodll, "AudioFormatGetPropertyInfo");
 
-	if (AudioFileCreateWithURL		== NULL ||
+	if (AudioFileInitializeWithCallbacks	== NULL ||
 	    AudioFileClose			== NULL ||
 	    AudioFileSetProperty		== NULL ||
 	    AudioFileWritePackets		== NULL ||
