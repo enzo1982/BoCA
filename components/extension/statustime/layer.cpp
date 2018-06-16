@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -36,9 +36,9 @@ BoCA::LayerLengthStatus::LayerLengthStatus()
 	approx_unselected	= 0;
 	unknown_unselected	= 0;
 
-	display_selected	= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("freac.pci:18")));
-	display_unselected	= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("freac.pci:19")));
-	display_all		= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("freac.pci:20")));
+	display_selected	= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("icons/select/select-all.png")));
+	display_unselected	= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("icons/select/select-none.png")));
+	display_all		= new LengthDisplay(ImageLoader::Load(String(resourcesPath).Append("icons/select/select-toggle.png")));
 
 	Add(display_selected);
 	Add(display_unselected);

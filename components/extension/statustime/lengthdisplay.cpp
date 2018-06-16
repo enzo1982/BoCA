@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -36,7 +36,7 @@ Int BoCA::LengthDisplay::Paint(Int message)
 				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 				surface->Frame(frame, FRAME_DOWN);
 
-				Size	 scaledBitmapSize = bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0;
+				Size	 scaledBitmapSize = bitmap.GetSize() / 2 * surface->GetSurfaceDPI() / 96.0;
 				Int	 bitmapOffset	  = bitmap != NIL ? (frame.GetHeight() - scaledBitmapSize.cy) / 2.0 : 2;
 
 				if (bitmap != NIL) surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), Rect(frame.GetPosition() + Point(bitmapOffset, bitmapOffset), scaledBitmapSize));
@@ -56,7 +56,7 @@ S::Int BoCA::LengthDisplay::SetText(const String &newText)
 {
 	Widget::SetText(newText);
 
-	SetWidth(unscaledTextSize.cx + bitmap.GetSize().cx + 6);
+	SetWidth(unscaledTextSize.cx + bitmap.GetSize().cx / 2 + 6);
 
 	return Success();
 }
