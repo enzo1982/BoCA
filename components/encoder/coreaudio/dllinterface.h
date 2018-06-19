@@ -36,11 +36,6 @@ namespace CA
 #	ifndef MAC_OS_X_VERSION_10_8
 		const UInt32	 kAudioFormatMPEG4AAC_ELD_V2  = 'aacg';
 #	endif
-
-#	ifndef MAC_OS_X_VERSION_10_13
-		const UInt32	 kAudioFileFLACType	      = 'flac';
-		const UInt32	 kAudioFormatFLAC	      = 'flac';
-#	endif
 #else
 #	include "CoreAudio/AudioFile.h"
 #	include "CoreAudio/AudioConverter.h"

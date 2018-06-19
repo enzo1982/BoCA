@@ -56,12 +56,6 @@ const String &BoCA::EncoderCoreAudio::GetComponentSpecs()
 		      <extension>mp4</extension>				\
 		      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
 		    </format>							\
-		    <format>							\
-		      <name>FLAC Files</name>					\
-		      <lossless>true</lossless>					\
-		      <extension>flac</extension>				\
-		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
-		    </format>							\
 		  </component>							\
 										\
 		";
@@ -126,10 +120,9 @@ Bool BoCA::EncoderCoreAudio::IsLossless() const
 
 	CA::UInt32	 codec = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
 
-	/* Signal lossless for ALAC and FLAC.
+	/* Signal lossless for ALAC.
 	 */
-	if (codec == CA::kAudioFormatAppleLossless ||
-	    codec == CA::kAudioFormatFLAC) return True;
+	if (codec == CA::kAudioFormatAppleLossless) return True;
 
 	return False;
 }
@@ -222,9 +215,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Get file type of output file.
 	 */
-	fileType = (codec == CA::kAudioFormatFLAC) ? CA::kAudioFileFLACType : 
-		   (mp4Container		   ? CA::kAudioFileM4AType  :
-						     CA::kAudioFileAAC_ADTSType);
+	fileType = mp4Container ? CA::kAudioFileM4AType : CA::kAudioFileAAC_ADTSType;
 
 	/* Write ID3v2 tag if requested.
 	 */
@@ -541,10 +532,7 @@ Bool BoCA::EncoderCoreAudio::SetOutputFormat(Int n)
 	else	    config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", False);
 
 	if	(n != 2 && (CA::UInt32) config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC) == CA::kAudioFormatAppleLossless) config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
-	else if	(n != 3 && (CA::UInt32) config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC) == CA::kAudioFormatFLAC)	       config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
-
-	if	(n == 2) config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatAppleLossless);
-	else if (n == 3) config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatFLAC);
+	else if	(n == 2)																       config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatAppleLossless);
 
 	return True;
 }
@@ -552,8 +540,6 @@ Bool BoCA::EncoderCoreAudio::SetOutputFormat(Int n)
 String BoCA::EncoderCoreAudio::GetOutputFileExtension() const
 {
 	const Config	*config = GetConfiguration();
-
-	if ((CA::UInt32) config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC) == CA::kAudioFormatFLAC) return "flac";
 
 	if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True))
 	{

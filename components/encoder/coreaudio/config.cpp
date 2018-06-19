@@ -101,7 +101,6 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_ELD_V2)	 combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay v2");
 		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_Spatial) combo_codec->AddEntry("MPEG4 AAC Spatial");
 		else if (formats[i] == CA::kAudioFormatAppleLossless)	 combo_codec->AddEntry("Apple Lossless Audio Codec");
-		else if (formats[i] == CA::kAudioFormatFLAC)		 combo_codec->AddEntry("Free Lossless Audio Codec");
 		else							 continue;
 
 		codecs.Add(formats[i]);
@@ -252,14 +251,6 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 		option_extension_m4r->Deactivate();
 
 		if (fileExtension == 2) fileExtension = 0;
-
-		SetFileFormat();
-	}
-	else if (codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatFLAC)
-	{
-		group_mp4->Deactivate();
-		group_extension->Deactivate();
-		group_id3v2->Deactivate();
 	}
 	else if	(codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC	  ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_HE	  ||
@@ -273,11 +264,10 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 		group_mp4->Activate();
 
 		option_extension_m4r->Activate();
-
-		SetFileFormat();
 	}
 
 	SetBitrate();
+	SetFileFormat();
 }
 
 Void BoCA::ConfigureCoreAudio::SetBitrate()
@@ -286,7 +276,7 @@ Void BoCA::ConfigureCoreAudio::SetBitrate()
 
 	if (!edit_bitrate->IsFocussed())
 	{
-	 	if (bitrates.Length() == 2) edit_bitrate->SetText(String::FromInt(bitrate));
+		if (bitrates.Length() == 2) edit_bitrate->SetText(String::FromInt(bitrate));
 		else			    edit_bitrate->SetText(String::FromInt(bitrates.GetNth((bitrates.Length() / 2 + bitrate) * 2 + 1)));
 	}
 }
