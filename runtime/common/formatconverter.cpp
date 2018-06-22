@@ -21,7 +21,7 @@ BoCA::FormatConverter::FormatConverter(const Format &source, const Format &targe
 	errorState	= False;
 	errorString	= "Unknown error";
 
-	if (source == target) return;
+	if (source == target || source == Format() || target == Format()) return;
 
 	/* Create dummy track and converter config.
 	 */
