@@ -81,28 +81,30 @@ Bool BoCA::DecoderMPG123::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
 	Format	 format = track.GetFormat();
 
-	track.fileSize	= f_in->Size();
+	track.fileSize	= in.Size();
 	track.length	= -1;
 
-	SkipID3v2Tag(f_in);
-	ParseVBRHeaders(f_in);
+	SkipID3v2Tag(&in);
+	ParseVBRHeaders(&in);
 
 	Buffer<unsigned char>	 buffer(4096);
 
 	mpg123_handle	*context = ex_mpg123_new(NIL, NIL);
-	Int		 offset	 = f_in->GetPos();
+	Int		 offset	 = in.GetPos();
 
 	ex_mpg123_open_feed(context);
 
 	do
 	{
-		f_in->InputData((void *) buffer, buffer.Size());
+		Int	 bytes = Math::Min((Int64) buffer.Size(), in.Size() - in.GetPos());
 
-		int	 result = ex_mpg123_decode(context, buffer, buffer.Size(), NIL, 0, NIL);
+		in.InputData((void *) buffer, bytes);
+
+		int	 result = ex_mpg123_decode(context, buffer, bytes, NIL, 0, NIL);
 
 		if (result == MPG123_NEW_FORMAT)
 		{
@@ -130,13 +132,15 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 			break;
 		}
 	}
-	while (f_in->GetPos() < f_in->Size());
+	while (in.GetPos() < in.Size());
 
 	ex_mpg123_delete(context);
 
+	if (format == Format()) { errorState = True; errorString = "Invalid file format"; }
+
 	track.SetFormat(format);
 
-	delete f_in;
+	in.Close();
 
 	if (!errorState)
 	{
@@ -168,7 +172,8 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 		}
 	}
 
-	return Success();
+	if (errorState)	return Error();
+	else		return Success();
 }
 
 BoCA::DecoderMPG123::DecoderMPG123()

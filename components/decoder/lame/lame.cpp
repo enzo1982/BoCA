@@ -64,16 +64,15 @@ Bool BoCA::DecoderLAME::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	*f_in = new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
 	Format	 format = track.GetFormat();
 
-	format.bits	= 16;
-	track.fileSize	= f_in->Size();
+	track.fileSize	= in.Size();
 	track.length	= -1;
 
-	SkipID3v2Tag(f_in);
-	ParseVBRHeaders(f_in);
+	SkipID3v2Tag(&in);
+	ParseVBRHeaders(&in);
 
 	Buffer<unsigned char>	 buffer(4096);
 
@@ -81,22 +80,25 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 	Buffer<short>		 pcm_r(buffer.Size() * 24);
 
 	hip_t	 context = ex_hip_decode_init();
-	Int	 offset	 = f_in->GetPos();
+	Int	 offset	 = in.GetPos();
 
 	do
 	{
-		f_in->InputData((void *) buffer, buffer.Size());
+		Int	 bytes = Math::Min((Int64) buffer.Size(), in.Size() - in.GetPos());
+
+		in.InputData((void *) buffer, bytes);
 
 		mp3data_struct	 mp3data;
 
 		memset(&mp3data, 0, sizeof(mp3data));
 
-		Int	 nSamples = ex_hip_decode_headers(context, buffer, buffer.Size(), pcm_l, pcm_r, &mp3data);
+		Int	 nSamples = ex_hip_decode_headers(context, buffer, bytes, pcm_l, pcm_r, &mp3data);
 
 		if (mp3data.header_parsed && nSamples > mp3data.framesize)
 		{
 			format.channels	= mp3data.stereo;
 			format.rate	= mp3data.samplerate;
+			format.bits	= 16;
 
 			if	(mp3data.nsamp	 > 0) track.length = mp3data.nsamp - delaySamples - padSamples;
 			else if (mp3data.bitrate > 0) track.approxLength = (track.fileSize - offset) / (mp3data.bitrate * 1000 / 8) * format.rate;
@@ -104,13 +106,15 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 			break;
 		}
 	}
-	while (f_in->GetPos() < f_in->Size());
+	while (in.GetPos() < in.Size());
 
 	ex_hip_decode_exit(context);
 
+	if (format == Format()) { errorState = True; errorString = "Invalid file format"; }
+
 	track.SetFormat(format);
 
-	delete f_in;
+	in.Close();
 
 	if (!errorState)
 	{
@@ -142,7 +146,8 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 		}
 	}
 
-	return Success();
+	if (errorState)	return Error();
+	else		return Success();
 }
 
 BoCA::DecoderLAME::DecoderLAME()

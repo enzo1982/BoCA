@@ -101,21 +101,21 @@ Bool BoCA::DecoderMAD::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 {
-	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READ);
-	InStream	*f_in = new InStream(STREAM_DRIVER, ioDriver);
+	DriverPOSIX	 ioDriver(streamURI, IS_READ);
+	InStream	 in(STREAM_DRIVER, &ioDriver);
 
-	track.fileSize	= f_in->Size();
+	track.fileSize	= in.Size();
 	track.length	= -1;
 
 	infoTrack = &track;
 	stop	  = False;
 	finished  = False;
 
-	SkipID3v2Tag(f_in);
-	ParseVBRHeaders(f_in);
+	SkipID3v2Tag(&in);
+	ParseVBRHeaders(&in);
 
-	offset = f_in->GetPos();
-	driver = ioDriver;
+	offset = in.GetPos();
+	driver = &ioDriver;
 	driver->Seek(offset);
 
 	readDataMutex = new Mutex();
@@ -126,8 +126,10 @@ Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 	delete readDataMutex;
 	delete samplesBufferMutex;
 
-	delete f_in;
-	delete ioDriver;
+	if (track.GetFormat() == Format()) { errorState = True; errorString = "Invalid file format"; }
+
+	in.Close();
+	ioDriver.Close();
 
 	if (!errorState)
 	{
@@ -159,7 +161,8 @@ Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 		}
 	}
 
-	return Success();
+	if (errorState)	return Error();
+	else		return Success();
 }
 
 BoCA::DecoderMAD::DecoderMAD()
