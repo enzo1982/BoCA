@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -168,7 +168,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 			if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, 16384, 0) != AAC_DEC_OK)
 			{
 				errorState  = True;
-				errorString = "Unable to decode audio data.";
+				errorString = "Unsupported audio format";
 			}
 
 			delete [] outputBuffer;
@@ -253,7 +253,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		if (!SyncOnAACHeader(&in))
 		{
 			errorState  = True;
-			errorString = "No AAC file.";
+			errorString = "Invalid file format";
 
 			return Error();
 		}
@@ -307,7 +307,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		else
 		{
 			errorState  = True;
-			errorString = "Unrecognized file format.";
+			errorString = "Unsupported audio format";
 		}
 
 		/* Close handles.

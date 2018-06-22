@@ -184,7 +184,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
 
-	if (file == NIL) { errorState = True; errorString = "Unable to open file"; }
+	if (file == NIL) { errorState = True; errorString = "File not found"; }
 
 	if (file != NIL)
 	{
@@ -194,7 +194,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 		SNDFILE	*sndf = ex_sf_open_fd(fileno(file), SFM_READ, &sinfo, False);
 
-		if (sndf == NIL) { errorState = True; errorString = "Unsupported audio format"; }
+		if (sndf == NIL) { errorState = True; errorString = "Unknown file type"; }
 
 		if (sndf != NIL)
 		{
