@@ -22,23 +22,35 @@ const String &BoCA::OutputDirectSound::GetComponentSpecs()
 
 	if (DirectSoundCreate8(&DSDEVID_DefaultPlayback, &directSound, NIL) == DS_OK)
 	{
+		/* Query device capabilities.
+		 */
+		DSCAPS	 caps;
+
+		caps.dwSize = sizeof(DSCAPS);
+
+		directSound->GetCaps(&caps);
 		directSound->Release();
 
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>DirectSound Output Plugin</name>	\
-		    <version>1.0</version>			\
-		    <id>directsound-out</id>			\
-		    <type>output</type>				\
-		    <precede>waveout-out</precede>		\
-		    <input bits=\"8\" signed=\"false\"/>	\
-		    <input bits=\"16-32\"/>			\
-		    <input float=\"true\"/>			\
-		  </component>					\
-								\
-		";
+		/* Set component specs.
+		 */
+		String	 rateString = String::FromInt(caps.dwMinSecondarySampleRate).Append("-")
+			      .Append(String::FromInt(caps.dwMaxSecondarySampleRate));
+
+		componentSpecs = String("								\
+													\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
+		  <component>										\
+		    <name>DirectSound Output Plugin</name>						\
+		    <version>1.0</version>								\
+		    <id>directsound-out</id>								\
+		    <type>output</type>									\
+		    <precede>waveout-out</precede>							\
+		    <input bits=\"8\" signed=\"false\" rate=\"").Append(rateString).Append("\"/>	\
+		    <input bits=\"16-32\" rate=\"").Append(rateString).Append("\"/>			\
+		    <input float=\"true\" rate=\"").Append(rateString).Append("\"/>			\
+		  </component>										\
+													\
+		");
 	}
 
 	return componentSpecs;
