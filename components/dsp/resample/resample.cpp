@@ -30,7 +30,7 @@ const String &BoCA::DSPResample::GetComponentSpecs()
 		    <version>1.0</version>			\
 		    <id>resample-dsp</id>			\
 		    <type>dsp</type>				\
-		    <input float=\"true\"/>			\
+		    <input float=\"true\" rate=\"1-2822400\"/>	\
 		  </component>					\
 								\
 		";
