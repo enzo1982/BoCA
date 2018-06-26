@@ -11,7 +11,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca/application/external/decodercomponentfile.h>
-#include <boca/common/config.h>
+#include <boca/application/taggercomponent.h>
+#include <boca/application/registry.h>
 #include <boca/common/utilities.h>
 
 #include <windows.h>
@@ -286,6 +287,28 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 			/* Skip rest of chunk.
 			 */
 			in->RelSeek(cSize - 16 + cSize % 2);
+		}
+		else if (chunk == "LIST")
+		{
+			/* Copy chunk to separate buffer.
+			 */
+			Buffer<UnsignedByte>	 info(8 + cSize + cSize % 2);
+
+			in->RelSeek(-8);
+			in->InputData(info, info.Size());
+
+			/* Parse LIST INFO chunk.
+			 */
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*riffTagger = (AS::TaggerComponent *) boca.CreateComponentByID("riff-tag");
+
+			if (riffTagger != NIL)
+			{
+				riffTagger->SetConfiguration(GetConfiguration());
+				riffTagger->ParseBuffer(info, track);
+
+				boca.DeleteComponent(riffTagger);
+			}
 		}
 		else if (chunk == "data")
 		{
