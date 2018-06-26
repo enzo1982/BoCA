@@ -32,6 +32,7 @@ install:
 	$(INSTALL_DATA) $(SRCDIR)/boca_decoder_avconv_webm_audio.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_decoder_avconv_wma.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_decoder_avconv_wmv_audio.1.0.xml $(DESTDIR)$(libdir)/boca
+	$(INSTALL_DATA) $(SRCDIR)/boca_decoder_ffmpeg_dsd.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_decoder_la.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_decoder_mpc.1.0.xml $(DESTDIR)$(libdir)/boca
 	$(INSTALL_DATA) $(SRCDIR)/boca_decoder_optimfrog.1.0.xml $(DESTDIR)$(libdir)/boca
@@ -85,6 +86,7 @@ uninstall:
 	rm -f $(DESTDIR)$(libdir)/boca/boca_decoder_avconv_webm_audio.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_decoder_avconv_wma.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_decoder_avconv_wmv_audio.1.0.xml
+	rm -f $(DESTDIR)$(libdir)/boca/boca_decoder_ffmpeg_dsd.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_decoder_la.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_decoder_mpc.1.0.xml
 	rm -f $(DESTDIR)$(libdir)/boca/boca_decoder_optimfrog.1.0.xml

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Digital Stream Digital Decoder</name>
+  <version>1.0</version>
+  <id>ffmpeg-dsd-dec</id>
+  <type>decoder</type>
+  <format>
+    <name>DSD Files</name>
+    <extension>dsf</extension>
+    <extension>dff</extension>
+  </format>
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>
