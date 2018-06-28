@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -115,12 +115,10 @@ Bool BoCA::DecoderFLAC::CanOpenStream(const String &streamURI)
 
 	ex_ogg_sync_init(&oy);
 
-	Bool	 result = False;
-
+	Bool	 result	     = False;
 	Bool	 initialized = False;
-	Bool	 done = False;
 
-	while (!done)
+	do
 	{
 		Int	 size	= Math::Min((Int64) 4096, in.Size() - in.GetPos());
 		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
@@ -143,10 +141,11 @@ Bool BoCA::DecoderFLAC::CanOpenStream(const String &streamURI)
 				    op.packet[1] == 'F' && op.packet[2] == 'L' && op.packet[3] == 'A' && op.packet[4] == 'C' &&
 				    op.packet[5] == 0x01) result = True;
 
-				done = True;
+				break;
 			}
 		}
 	}
+	while (in.GetPos() < in.Size());
 
 	if (initialized) ex_ogg_stream_clear(&os);
 

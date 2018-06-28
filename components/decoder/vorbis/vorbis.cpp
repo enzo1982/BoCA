@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -72,12 +72,10 @@ Bool BoCA::DecoderVorbis::CanOpenStream(const String &streamURI)
 
 	ex_ogg_sync_init(&oy);
 
-	Bool	 result = False;
-
+	Bool	 result	     = False;
 	Bool	 initialized = False;
-	Bool	 done = False;
 
-	while (!done)
+	do
 	{
 		Int	 size	= Math::Min((Int64) 4096, in.Size() - in.GetPos());
 		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
@@ -99,10 +97,11 @@ Bool BoCA::DecoderVorbis::CanOpenStream(const String &streamURI)
 				if (op.packet[0] ==  1  &&
 				    op.packet[1] == 'v' && op.packet[2] == 'o' && op.packet[3] == 'r' && op.packet[4] == 'b' && op.packet[5] == 'i' && op.packet[6] == 's') result = True;
 
-				done = True;
+				break;
 			}
 		}
 	}
+	while (in.GetPos() < in.Size());
 
 	if (initialized) ex_ogg_stream_clear(&os);
 
@@ -142,7 +141,7 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 	Bool	 done	     = False;
 	Int	 packetNum   = 0;
 
-	while (!done)
+	do
 	{
 		Int	 size	= Math::Min((Int64) 4096, track.fileSize - in.GetPos());
 		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
@@ -198,7 +197,10 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 				packetNum++;
 			}
 		}
+
+		if (done) break;
 	}
+	while (in.GetPos() < in.Size());
 
 	track.SetFormat(format);
 

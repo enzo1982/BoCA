@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -93,7 +93,7 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 	Bool	 done	     = False;
 	Int	 packetNum   = 0;
 
-	while (!done)
+	do
 	{
 		Int	 size	= Math::Min((Int64) 4096, track.fileSize - in.GetPos());
 		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
@@ -145,7 +145,10 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 				packetNum++;
 			}
 		}
+
+		if (done) break;
 	}
+	while (in.GetPos() < in.Size());
 
 	track.SetFormat(format);
 

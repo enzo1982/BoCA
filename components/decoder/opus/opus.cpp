@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -100,12 +100,10 @@ Bool BoCA::DecoderOpus::CanOpenStream(const String &streamURI)
 
 	ex_ogg_sync_init(&oy);
 
-	Bool	 result = False;
-
+	Bool	 result	     = False;
 	Bool	 initialized = False;
-	Bool	 done = False;
 
-	while (!done)
+	do
 	{
 		Int	 size	= Math::Min((Int64) 4096, in.Size() - in.GetPos());
 		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
@@ -133,10 +131,11 @@ Bool BoCA::DecoderOpus::CanOpenStream(const String &streamURI)
 					if (setup->version_id >> 4 == 0 && setup->channel_mapping <= 1 && setup->nb_channels <= 8) result = True;
 				}
 
-				done = True;
+				break;
 			}
 		}
 	}
+	while (in.GetPos() < in.Size());
 
 	if (initialized) ex_ogg_stream_clear(&os);
 
@@ -173,7 +172,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 	Bool	 done	     = False;
 	Int	 packetNum   = 0;
 
-	while (!done)
+	do
 	{
 		Int	 size	= Math::Min((Int64) 4096, track.fileSize - in.GetPos());
 		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
@@ -265,7 +264,10 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 				packetNum++;
 			}
 		}
+
+		if (done) break;
 	}
+	while (in.GetPos() < in.Size());
 
 	track.SetFormat(format);
 
