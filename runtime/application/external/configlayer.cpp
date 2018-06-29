@@ -37,9 +37,11 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 	Point	 position    = Point(10, 13);
 	Int	 maxTextSize = 0;
 
+	i18n->SetContext(String("External::").Append(specs->name));
+
 	foreach (Parameter *param, specs->parameters)
 	{
-		CheckBox	*checkBox = new CheckBox(param->GetName(), position, Size(100, 0));
+		CheckBox	*checkBox = new CheckBox(i18n->TranslateString(param->GetName()), position, Size(100, 0));
 		Layer		*layer	  = new Layer(param->GetName());
 
 		checkBox->onAction.Connect(&ConfigLayerExternal::OnSelectParameter, this);
@@ -69,7 +71,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 
 					foreach (Option *option, param->GetOptions())
 					{
-						ListEntry	*entry = selection->AddEntry(option->GetAlias());
+						ListEntry	*entry = selection->AddEntry(i18n->TranslateString(option->GetAlias()));
 
 						if (selectedValue == option->GetValue()) selection->SelectEntry(entry);
 					}
@@ -109,13 +111,13 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 						if (option->GetType() == OPTION_TYPE_MIN)
 						{
 							min	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
-							minAlias = option->GetAlias();
+							minAlias = i18n->TranslateString(option->GetAlias());
 						}
 
 						if (option->GetType() == OPTION_TYPE_MAX)
 						{
 							max	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
-							maxAlias = option->GetAlias();
+							maxAlias = i18n->TranslateString(option->GetAlias());
 						}
 					}
 
