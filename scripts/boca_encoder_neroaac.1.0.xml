@@ -19,7 +19,7 @@
     <informat>wave</informat>
     <parameters>
       <selection name="Encoding mode" argument="%VALUE">
-	<option alias="Auto"/>
+	<option alias="auto"/>
 	<option alias="LC AAC">-lc</option>
 	<option alias="HE AAC">-he</option>
 	<option alias="HEv2 AAC">-hev2</option>

@@ -36,7 +36,7 @@
 	<min alias="off">0</min>
 	<max alias="high">6</max>
       </range>
-      <selection name="ClearVoiceDetection" argument="--cvd %VALUE" default="2">
+      <selection name="Clear Voice Detection" argument="--cvd %VALUE" default="2">
 	<option alias="off">0</option>
 	<option alias="on">1</option>
 	<option alias="dual">2</option>

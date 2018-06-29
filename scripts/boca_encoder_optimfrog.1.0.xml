@@ -20,28 +20,28 @@
     <informat>wave</informat>
     <parameters>
       <selection name="Encoding mode" argument="--mode %VALUE" default="normal">
-	<option alias="Fast">fast</option>
-	<option alias="Normal">normal</option>
-	<option alias="High">high</option>
-	<option alias="Extra">extra</option>
-	<option alias="Best">best</option>
-	<option alias="High, new">highnew</option>
-	<option alias="Extra, new">extranew</option>
-	<option alias="Best, new">bestnew</option>
+	<option alias="fast">fast</option>
+	<option alias="normal">normal</option>
+	<option alias="high">high</option>
+	<option alias="extra">extra</option>
+	<option alias="best">best</option>
+	<option alias="high, new">highnew</option>
+	<option alias="extra, new">extranew</option>
+	<option alias="best, new">bestnew</option>
       </selection>
-      <switch name="Store MD5 of original PCM data" argument="--md5" enabled="true"/>
+      <switch name="Add MD5 checksum" argument="--md5" enabled="true"/>
       <selection name="Seeking" argument="--seek %VALUE" default="normal">
-	<option alias="Fast">fast</option>
-	<option alias="Normal">normal</option>
-	<option alias="Slow">slow</option>
-	<option alias="Minimum">min</option>
+	<option alias="fast">fast</option>
+	<option alias="normal">normal</option>
+	<option alias="slow">slow</option>
+	<option alias="minimum">min</option>
       </selection>
       <selection name="Optimization" argument="--optimize %VALUE" default="fast">
-	<option alias="Disabled">none</option>
-	<option alias="Fast">fast</option>
-	<option alias="Normal">normal</option>
-	<option alias="High">high</option>
-	<option alias="Best">best</option>
+	<option alias="disabled">none</option>
+	<option alias="low">fast</option>
+	<option alias="normal">normal</option>
+	<option alias="high">high</option>
+	<option alias="best">best</option>
       </selection>
     </parameters>
   </external>

@@ -21,9 +21,9 @@
 	<max alias="720 kbps">720</max>
       </range>
       <selection name="Compression mode" argument="%VALUE" default="-h">
-	<option alias="Fast">-f</option>
-	<option alias="High quality">-h</option>
-	<option alias="Very high quality">-hh</option>
+	<option alias="fast">-f</option>
+	<option alias="high quality">-h</option>
+	<option alias="very high quality">-hh</option>
       </selection>
       <range name="Extra encode processing" argument="-x%VALUE" default="1">
 	<min alias="faster">1</min>
