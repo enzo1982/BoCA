@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -54,11 +54,22 @@ BoCA::ConfigureCueSheet::ConfigureCueSheet()
 
 	group_errors->Add(check_ignore_errors);
 
+	Int	 maxTextSize = Math::Max(Math::Max(check_read_tags->GetUnscaledTextWidth(), check_prefer_cue->GetUnscaledTextWidth() + 17), Math::Max(check_alternatives->GetUnscaledTextWidth(), check_ignore_errors->GetUnscaledTextWidth()));
+
+	check_read_tags->SetWidth(maxTextSize + 21);
+	check_prefer_cue->SetWidth(maxTextSize + 4);
+	check_alternatives->SetWidth(maxTextSize + 21);
+	check_ignore_errors->SetWidth(maxTextSize + 21);
+
+	group_information->SetWidth(check_read_tags->GetWidth() + 20);
+	group_alternatives->SetWidth(check_read_tags->GetWidth() + 20);
+	group_errors->SetWidth(check_read_tags->GetWidth() + 20);
+
 	Add(group_information);
 	Add(group_alternatives);
 	Add(group_errors);
 
-	SetSize(Size(566, 188));
+	SetSize(Size(group_information->GetWidth() + 14, 188));
 }
 
 BoCA::ConfigureCueSheet::~ConfigureCueSheet()

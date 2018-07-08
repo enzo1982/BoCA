@@ -153,6 +153,14 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	group_automatization->Add(check_autoRip);
 	group_automatization->Add(check_autoEject);
 
+	maxTextSize = Math::Max(Math::Max(check_autoRead->GetUnscaledTextWidth(), check_autoRip->GetUnscaledTextWidth()), check_autoEject->GetUnscaledTextWidth());
+
+	check_autoRead->SetWidth(Math::Max(149, maxTextSize + 21));
+	check_autoRip->SetWidth(check_autoRead->GetWidth());
+	check_autoEject->SetWidth(check_autoRead->GetWidth());
+
+	group_automatization->SetWidth(check_autoRead->GetWidth() + 20);
+
 	ToggleAutoRead();
 
 	Add(group_drive);
@@ -160,7 +168,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	Add(group_automatization);
 	Add(group_cdinfo);
 
-	SetSize(Size(566, 270));
+	SetSize(Size(376 + group_automatization->GetWidth(), 270));
 }
 
 BoCA::ConfigureCDIO::~ConfigureCDIO()

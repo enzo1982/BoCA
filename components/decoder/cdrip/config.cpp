@@ -175,6 +175,17 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	group_cdoptions->Add(check_locktray);
 	group_cdoptions->Add(check_ntscsi);
 
+	maxTextSize = Math::Max(Math::Max(Math::Max(check_autoRead->GetUnscaledTextWidth(), check_autoRip->GetUnscaledTextWidth()), check_autoEject->GetUnscaledTextWidth()), Math::Max(check_locktray->GetUnscaledTextWidth(), check_ntscsi->GetUnscaledTextWidth()));
+
+	check_autoRead->SetWidth(Math::Max(149, maxTextSize + 21));
+	check_autoRip->SetWidth(check_autoRead->GetWidth());
+	check_autoEject->SetWidth(check_autoRead->GetWidth());
+	check_locktray->SetWidth(check_autoRead->GetWidth());
+	check_ntscsi->SetWidth(check_autoRead->GetWidth());
+
+	group_automatization->SetWidth(check_autoRead->GetWidth() + 20);
+	group_cdoptions->SetWidth(check_autoRead->GetWidth() + 20);
+
 	ToggleAutoRead();
 
 	Add(group_drive);
@@ -183,7 +194,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	Add(group_cdoptions);
 	Add(group_cdinfo);
 
-	SetSize(Size(566, 296));
+	SetSize(Size(376 + group_automatization->GetWidth(), 296));
 }
 
 BoCA::ConfigureCDRip::~ConfigureCDRip()

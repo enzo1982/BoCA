@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -132,13 +132,20 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	group_automatization->Add(check_autoRead);
 	group_automatization->Add(check_autoRip);
 
+	maxTextSize = Math::Max(check_autoRead->GetUnscaledTextWidth(), check_autoRip->GetUnscaledTextWidth());
+
+	check_autoRead->SetWidth(Math::Max(149, maxTextSize + 21));
+	check_autoRip->SetWidth(check_autoRead->GetWidth());
+
+	group_automatization->SetWidth(check_autoRead->GetWidth() + 20);
+
 	ToggleAutoRead();
 
 	Add(group_drive);
 	Add(group_ripping);
 	Add(group_automatization);
 
-	SetSize(Size(566, 193));
+	SetSize(Size(376 + group_automatization->GetWidth(), 193));
 }
 
 BoCA::ConfigureCDParanoia::~ConfigureCDParanoia()

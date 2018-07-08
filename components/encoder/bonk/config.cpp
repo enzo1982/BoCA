@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -41,45 +41,55 @@ BoCA::ConfigureBonk::ConfigureBonk()
 
 	group_stereo->Add(check_joint);
 
-	group_quant		= new GroupBox(i18n->TranslateString("Quantization"), Point(7, 66), Size(179, 43));
+	Int	 maxTextSize = Math::Max(check_lossless->GetUnscaledTextWidth(), check_joint->GetUnscaledTextWidth());
 
-	slider_quant		= new Slider(Point(10, 13), Size(131, 0), OR_HORZ, &quant, 0, 40);
+	check_lossless->SetWidth(Math::Max(158, maxTextSize + 21));
+	check_joint->SetWidth(check_lossless->GetWidth());
+
+	group_mode->SetWidth(check_lossless->GetWidth() + 20);
+
+	group_stereo->SetX(group_mode->GetWidth() + 15);
+	group_stereo->SetWidth(group_mode->GetWidth());
+
+	group_quant		= new GroupBox(i18n->TranslateString("Quantization"), Point(7, 66), Size(group_mode->GetWidth(), 43));
+
+	slider_quant		= new Slider(Point(10, 13), Size(group_quant->GetWidth() - 48, 0), OR_HORZ, &quant, 0, 40);
 	slider_quant->onValueChange.Connect(&ConfigureBonk::SetQuantization, this);
 
-	text_quant		= new Text("0.00", Point(148, 15));
+	text_quant		= new Text("0.00", Point(slider_quant->GetWidth() + 17, 15));
 
-	text_quant->SetX(169 - text_quant->GetUnscaledTextWidth());
-	slider_quant->SetWidth(151 - text_quant->GetUnscaledTextWidth());
+	text_quant->SetX(group_quant->GetWidth() - 10 - text_quant->GetUnscaledTextWidth());
+	slider_quant->SetWidth(group_quant->GetWidth() - 28 - text_quant->GetUnscaledTextWidth());
 
 	group_quant->Add(slider_quant);
 	group_quant->Add(text_quant);
 
 	SetQuantization();
 
-	group_downsampling	= new GroupBox(i18n->TranslateString("Downsampling ratio"), Point(194, 66), Size(179, 43));
+	group_downsampling	= new GroupBox(i18n->TranslateString("Downsampling ratio"), Point(group_stereo->GetX(), 66), Size(group_stereo->GetWidth(), 43));
 
-	slider_downsampling	= new Slider(Point(10, 13), Size(131, 0), OR_HORZ, &downsampling, 1, 10);
+	slider_downsampling	= new Slider(Point(10, 13), Size(group_downsampling->GetWidth() - 48, 0), OR_HORZ, &downsampling, 1, 10);
 	slider_downsampling->onValueChange.Connect(&ConfigureBonk::SetDownsamplingRatio, this);
 
-	text_downsampling	= new Text("00:0", Point(148, 15));
+	text_downsampling	= new Text("00:0", Point(slider_downsampling->GetWidth() + 17, 15));
 
-	text_downsampling->SetX(169 - text_downsampling->GetUnscaledTextWidth());
-	slider_downsampling->SetWidth(151 - text_downsampling->GetUnscaledTextWidth());
+	text_downsampling->SetX(group_downsampling->GetWidth() - 10 - text_downsampling->GetUnscaledTextWidth());
+	slider_downsampling->SetWidth(group_downsampling->GetWidth() - 28 - text_downsampling->GetUnscaledTextWidth());
 
 	group_downsampling->Add(slider_downsampling);
 	group_downsampling->Add(text_downsampling);
 
 	SetDownsamplingRatio();
 
-	group_predictor		= new GroupBox(i18n->TranslateString("Predictor size"), Point(7, 121), Size(366, 43));
+	group_predictor		= new GroupBox(i18n->TranslateString("Predictor size"), Point(7, 121), Size(2 * group_mode->GetWidth() + 8, 43));
 
-	slider_predictor	= new Slider(Point(10, 13), Size(318, 0), OR_HORZ, &predictor, 0, 512);
+	slider_predictor	= new Slider(Point(10, 13), Size(group_predictor->GetWidth() - 48, 0), OR_HORZ, &predictor, 0, 512);
 	slider_predictor->onValueChange.Connect(&ConfigureBonk::SetPredictorSize, this);
 
-	text_predictor		= new Text("00:0", Point(335, 15));
+	text_predictor		= new Text("00:0", Point(slider_predictor->GetWidth() + 17, 15));
 
-	text_predictor->SetX(356 - text_predictor->GetUnscaledTextWidth());
-	slider_predictor->SetWidth(338 - text_predictor->GetUnscaledTextWidth());
+	text_predictor->SetX(group_predictor->GetWidth() - 10 - text_predictor->GetUnscaledTextWidth());
+	slider_predictor->SetWidth(group_predictor->GetWidth() - 28 - text_predictor->GetUnscaledTextWidth());
 
 	group_predictor->Add(slider_predictor);
 	group_predictor->Add(text_predictor);
@@ -93,7 +103,7 @@ BoCA::ConfigureBonk::ConfigureBonk()
 	Add(group_downsampling);
 	Add(group_predictor);
 
-	SetSize(Size(380, 171));
+	SetSize(Size(group_predictor->GetWidth() + 14, 171));
 }
 
 BoCA::ConfigureBonk::~ConfigureBonk()
