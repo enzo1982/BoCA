@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -168,20 +168,12 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	check_locktray	= new CheckBox(i18n->TranslateString("Lock CD tray while ripping"), Point(10, 14), Size(170, 0), &locktray);
 	check_ntscsi	= new CheckBox(i18n->TranslateString("Use native NT SCSI library"), check_locktray->GetPosition() + Point(0, 26), Size(170, 0), &ntscsi);
 
-	group_cdoptions->Add(check_locktray);
-	group_cdoptions->Add(check_ntscsi);
-
-#ifdef __WIN32__
-	OSVERSIONINFOA	 vInfo;
-
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-	GetVersionExA(&vInfo);
-
-	if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) check_ntscsi->Deactivate();
-#else
+#ifndef __WIN32__
 	check_ntscsi->Deactivate();
 #endif
+
+	group_cdoptions->Add(check_locktray);
+	group_cdoptions->Add(check_ntscsi);
 
 	ToggleAutoRead();
 
