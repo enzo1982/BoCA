@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,8 +27,8 @@ Void BoCA::Utilities::InfoMessage(const String &message, const String &replace1,
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Info"), Message::Buttons::Ok, Message::Icon::Information);
-	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Info")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Info"), Message::Buttons::Ok, Message::Icon::Information);
+	else							      Console::OutputString(String("\n").Append(i18n->TranslateString("Info")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
 /* Print a warning message.
@@ -40,8 +40,8 @@ Void BoCA::Utilities::WarningMessage(const String &message, const String &replac
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Warning"), Message::Buttons::Ok, Message::Icon::Warning);
-	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Warning")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Warning"), Message::Buttons::Ok, Message::Icon::Warning);
+	else							      Console::OutputString(String("\n").Append(i18n->TranslateString("Warning")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
 /* Print an error message.
@@ -53,8 +53,8 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 
 	i18n->SetContext("Messages");
 
-	if (!config->enable_console) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Error);
-	else			     Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Error);
+	else							      Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
 }
 
 /* Returns to path to the BoCA components directory.

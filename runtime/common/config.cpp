@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -30,8 +30,6 @@ Array<BoCA::Config *, Void *>	 BoCA::Config::copies;
 
 BoCA::Config::Config()
 {
-	enable_console	   = False;
-
 	saveSettingsOnExit = True;
 
 	config = NIL;
@@ -44,8 +42,6 @@ BoCA::Config::Config()
 
 BoCA::Config::Config(const Config &oConfig)
 {
-	enable_console	   = oConfig.enable_console;
-
 	saveSettingsOnExit = False;
 
 	config = new Configuration(*oConfig.config);
