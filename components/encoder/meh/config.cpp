@@ -220,11 +220,9 @@ Void BoCA::ConfigureMultiEncoderHub::OnConfigureEncoder()
 
 		if (layer != NIL)
 		{
-			ConfigureEncoder	*dlg = new ConfigureEncoder(layer, GetContainerWindow()->GetPosition() + Point(60, 60));
+			ConfigureEncoder	 configDialog(layer, GetContainerWindow()->GetPosition() + Point(60, 60));
 
-			dlg->ShowDialog();
-
-			DeleteObject(dlg);
+			configDialog.ShowDialog();
 		}
 		else
 		{
