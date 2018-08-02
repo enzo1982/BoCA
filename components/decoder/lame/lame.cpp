@@ -154,8 +154,6 @@ BoCA::DecoderLAME::DecoderLAME()
 {
 	context		 = 0;
 
-	packageSize	 = 0;
-
 	delaySamples	 = 0;
 	padSamples	 = 0;
 

@@ -318,8 +318,6 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderFAAD2::DecoderFAAD2()
 {
-	packageSize	 = 0;
-
 	mp4File		 = NIL;
 	handle		 = NIL;
 	fConfig		 = NIL;

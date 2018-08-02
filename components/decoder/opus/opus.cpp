@@ -325,8 +325,6 @@ BoCA::DecoderOpus::DecoderOpus()
 
 	sampleRate  = 48000;
 
-	packageSize = 0;
-
 	preSkip	    = 0;
 	preSkipLeft = 0;
 

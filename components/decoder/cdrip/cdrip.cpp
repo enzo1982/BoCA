@@ -251,8 +251,6 @@ BoCA::DecoderCDRip::DecoderCDRip()
 {
 	configLayer	= NIL;
 
-	packageSize	= 0;
-
 	cd		= NIL;
 
 	readOffset	= 0;

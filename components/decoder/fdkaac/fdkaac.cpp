@@ -358,8 +358,6 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderFDKAAC::DecoderFDKAAC()
 {
-	packageSize	 = 0;
-
 	mp4File		 = NIL;
 	handle		 = NIL;
 

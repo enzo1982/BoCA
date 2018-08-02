@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -106,8 +106,6 @@ Error BoCA::DecoderMAC::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderMAC::DecoderMAC()
 {
-	packageSize    = 0;
-
 	hAPEDecompress = NIL;
 
 	blockId	       = 0;

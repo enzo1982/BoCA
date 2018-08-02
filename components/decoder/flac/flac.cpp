@@ -186,8 +186,6 @@ Error BoCA::DecoderFLAC::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderFLAC::DecoderFLAC()
 {
-	packageSize	   = 0;
-
 	readDataMutex	   = NIL;
 	samplesBufferMutex = NIL;
 

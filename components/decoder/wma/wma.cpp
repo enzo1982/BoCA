@@ -246,8 +246,6 @@ BoCA::DecoderWMA::DecoderWMA()
 
 	readerCallback	  = NIL;
 
-	packageSize	  = 0;
-
 	userProvidedClock = True;
 
 	/* Init the Microsoft COM library.

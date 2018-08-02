@@ -223,9 +223,7 @@ Error BoCA::DecoderAIFF::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderAIFF::DecoderAIFF()
 {
-	packageSize = 0;
-
-	dataOffset  = 0;
+	dataOffset = 0;
 }
 
 BoCA::DecoderAIFF::~DecoderAIFF()

@@ -169,8 +169,6 @@ BoCA::DecoderMAD::DecoderMAD()
 {
 	configLayer	   = NIL;
 
-	packageSize	   = 0;
-
 	readDataMutex	   = NIL;
 	samplesBufferMutex = NIL;
 

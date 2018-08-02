@@ -347,12 +347,10 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderSndFile::DecoderSndFile()
 {
-	packageSize = 0;
+	fileFormat = 0;
 
-	fileFormat  = 0;
-
-	file	    = 0;
-	sndf	    = NIL;
+	file	   = 0;
+	sndf	   = NIL;
 }
 
 BoCA::DecoderSndFile::~DecoderSndFile()

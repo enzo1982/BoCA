@@ -180,8 +180,6 @@ BoCA::DecoderMPG123::DecoderMPG123()
 {
 	configLayer	 = NIL;
 
-	packageSize	 = 0;
-
 	context		 = 0;
 
 	numBytes	 = 0;

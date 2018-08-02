@@ -263,8 +263,6 @@ BoCA::DecoderCDIO::DecoderCDIO()
 {
 	configLayer	= NIL;
 
-	packageSize	= 0;
-
 	cd		= NIL;
 	drive		= NIL;
 	paranoia	= NIL;

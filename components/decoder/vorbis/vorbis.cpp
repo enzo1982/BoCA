@@ -257,8 +257,6 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderVorbis::DecoderVorbis()
 {
-	packageSize = 0;
-
 	skipSamples = 0;
 
 	memset(&oy, 0, sizeof(oy));

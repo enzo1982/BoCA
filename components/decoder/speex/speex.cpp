@@ -202,8 +202,6 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderSpeex::DecoderSpeex()
 {
-	packageSize = 0;
-
 	decoder	    = NIL;
 
 	frameSize   = 0;

@@ -119,8 +119,7 @@ Error BoCA::DecoderVoc::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderVoc::DecoderVoc()
 {
-	bytesLeft	= 0;
-	packageSize	= 0;
+	bytesLeft = 0;
 }
 
 BoCA::DecoderVoc::~DecoderVoc()

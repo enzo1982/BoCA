@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -182,11 +182,9 @@ Error BoCA::DecoderTwinVQ::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderTwinVQ::DecoderTwinVQ()
 {
-	packageSize = 0;
+	bfp	  = NIL;
 
-	bfp	    = NIL;
-
-	frameSize   = -1;
+	frameSize = -1;
 
 	memset(&setupInfo, 0, sizeof(setupInfo));
 	memset(&index, 0, sizeof(index));

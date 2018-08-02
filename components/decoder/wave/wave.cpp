@@ -194,8 +194,6 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderWave::DecoderWave()
 {
-	packageSize	= 0;
-
 	floatFormat	= False;
 	floatFormatBits	= 32;
 
