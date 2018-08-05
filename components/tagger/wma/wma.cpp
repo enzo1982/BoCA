@@ -315,6 +315,8 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 		for (Int i = 0; i < numIndices; i++)
 		{
+			/* Read metadata values.
+			 */
 			WORD			 nameLen  = 1024;
 			LPWSTR			 name	  = new WCHAR [nameLen];
 			DWORD			 cbLength = 0;
@@ -326,16 +328,25 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			pHeaderInfo->GetAttributeByIndexEx(0, indices[i], name, &nameLen, &type, NIL, pbValue, &cbLength);
 
-			String			 value = String((LPWSTR) pbValue).Trim();
+			/* Parse string values.
+			 */
+			String	 value;
 
-			if (value == NIL)
+			if (type == WMT_TYPE_STRING)
 			{
-				delete [] pbValue;
-				delete [] name;
+				value = String((LPWSTR) pbValue).Trim();
 
-				continue;
+				if (value == NIL)
+				{
+					delete [] pbValue;
+					delete [] name;
+
+					continue;
+				}
 			}
 
+			/* Assign values to metadata fields.
+			 */
 			if	(String(name) == g_wszWMAuthor)			 info.artist  = value;
 			else if (String(name) == g_wszWMTitle)			 info.title   = value;
 			else if (String(name) == g_wszWMAlbumTitle)		 info.album   = value;
