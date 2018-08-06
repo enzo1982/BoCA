@@ -70,17 +70,15 @@ Error BoCA::DecoderBonk::GetStreamInfo(const String &streamURI, Track &track)
 
 	Format		 format		= track.GetFormat();
 
-	int		 bytes = Math::Min(in->Size(), (Int64) 524288);
+	Buffer<UnsignedByte>	 data(Math::Min(in->Size(), (Int64) 524288));
 
-	Buffer<unsigned char>	 dataBuffer(bytes);
+	in->InputData(data, data.Size());
 
-	in->InputData(dataBuffer, bytes);
+	ex_bonk_decoder_init(decoder, dataBuffer, data.Size(), &length, &rate, &channels);
 
-	ex_bonk_decoder_init(decoder, dataBuffer, bytes, &length, &rate, &channels);
-
-	format.rate = rate;
-	format.channels = channels;
-	format.bits = 16;
+	format.rate	= rate;
+	format.channels	= channels;
+	format.bits	= 16;
 
 	track.SetFormat(format);
 
@@ -141,13 +139,11 @@ Bool BoCA::DecoderBonk::Activate()
 
 	decoder = ex_bonk_decoder_create();
 
-	int		 bytes = Math::Min(driver->GetSize(), (Int64) 524288);
+	Buffer<UnsignedByte>	 data(Math::Min(driver->GetSize(), (Int64) 524288));
 
-	dataBuffer.Resize(bytes);
+	driver->ReadData(data, data.Size());
 
-	driver->ReadData(dataBuffer, bytes);
-
-	ex_bonk_decoder_init(decoder, dataBuffer, bytes, &length, &rate, &channels);
+	ex_bonk_decoder_init(decoder, data, data.Size(), &length, &rate, &channels);
 
 	return True;
 }
@@ -163,13 +159,15 @@ Bool BoCA::DecoderBonk::Deactivate()
 
 Int BoCA::DecoderBonk::ReadData(Buffer<UnsignedByte> &data)
 {
-	Int	 size = driver->ReadData(dataBuffer, data.Size());
+	Int	 size = driver->ReadData(data, data.Size());
 
-	if (size <= 0) return -1;
+	data.Resize(Math::Max(data.Size(), 131072));
 
-	data.Resize(131072);
+	Int	 nSamples = ex_bonk_decoder_decode_packet(decoder, data, Math::Max(0, size), (signed short *) (UnsignedByte *) data, data.Size());
 
-	Int	 nSamples = ex_bonk_decoder_decode_packet(decoder, dataBuffer, size, (signed short *) (unsigned char *) data, data.Size());
+	if (nSamples == -1) return -1;
 
-	return (nSamples == -1) ? 0 : nSamples * (track.GetFormat().bits / 8);
+	data.Resize(nSamples * (track.GetFormat().bits / 8));
+
+	return data.Size();
 }
