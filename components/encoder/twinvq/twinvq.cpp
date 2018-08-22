@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,21 +29,34 @@ const String &BoCA::EncoderTwinVQ::GetComponentSpecs()
 
 	if (twinvqdll != NIL)
 	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>TwinVQ VQF Encoder</name>				\
-		    <version>1.0</version>					\
-		    <id>twinvq-enc</id>						\
-		    <type threadSafe=\"false\">encoder</type>			\
-		    <format>							\
-		      <name>TwinVQ VQF Audio</name>				\
-		      <extension>vqf</extension>				\
-		    </format>							\
-		    <input bits=\"16\" channels=\"1-2\" rate=\"22050,44100\"/>	\
-		  </component>							\
-										\
+		componentSpecs = "										\
+														\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
+		  <component>											\
+		    <name>TwinVQ VQF Encoder</name>								\
+		    <version>1.0</version>									\
+		    <id>twinvq-enc</id>										\
+		    <type threadSafe=\"false\">encoder</type>							\
+		    <format>											\
+		      <name>TwinVQ VQF Audio</name>								\
+		      <extension>vqf</extension>								\
+		    </format>											\
+		    <input bits=\"16\" channels=\"1-2\" rate=\"22050,44100\"/>					\
+		    <parameters>										\
+		      <selection name=\"Bitrate per channel\" argument=\"-b %VALUE\" default=\"48\">		\
+			<option alias=\"24 kbps\">24</option>							\
+			<option alias=\"32 kbps\">32</option>							\
+			<option alias=\"48 kbps\">48</option>							\
+		      </selection>										\
+		      <selection name=\"Preselection candidates\" argument=\"-c %VALUE\" default=\"32\">	\
+			<option>4</option>									\
+			<option>8</option>									\
+			<option>16</option>									\
+			<option>32</option>									\
+		      </selection>										\
+		    </parameters>										\
+		  </component>											\
+														\
 		";
 	}
 
@@ -66,6 +79,10 @@ BoCA::EncoderTwinVQ::EncoderTwinVQ()
 
 	bfp	    = NIL;
 
+	config	    = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
+
 	memset(&setupInfo, 0, sizeof(setupInfo));
 	memset(&encInfo, 0, sizeof(encInfo));
 	memset(&index, 0, sizeof(index));
@@ -73,13 +90,13 @@ BoCA::EncoderTwinVQ::EncoderTwinVQ()
 
 BoCA::EncoderTwinVQ::~EncoderTwinVQ()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderTwinVQ::Activate()
 {
-	const Config	*config = GetConfiguration();
-
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
 
@@ -120,13 +137,11 @@ Bool BoCA::EncoderTwinVQ::Activate()
 
 	if (info.HasBasicInfo())
 	{
-		const Config	*currentConfig = GetConfiguration();
-
 		if	(info.artist != NIL) strncpy(setupInfo.Auth, info.artist, Math::Min(info.artist.Length() + 1, sizeof(setupInfo.Auth)));
 		if	(info.title  != NIL) strncpy(setupInfo.Name, info.title,  Math::Min(info.title.Length() + 1,  sizeof(setupInfo.Name)));
 
-		if	(info.comment != NIL && !config->GetIntValue("Tags", "ReplaceExistingComments", False)) strncpy(setupInfo.Comt, info.comment,						      Math::Min(info.comment.Length() + 1,						   sizeof(setupInfo.Comt)));
-		else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)			strncpy(setupInfo.Comt, currentConfig->GetStringValue("Tags", "DefaultComment", NIL), Math::Min(currentConfig->GetStringValue("Tags", "DefaultComment", NIL).Length() + 1, sizeof(setupInfo.Comt)));
+		if	(info.comment != NIL && !config->GetIntValue("Tags", "ReplaceExistingComments", False)) strncpy(setupInfo.Comt, info.comment,					       Math::Min(info.comment.Length() + 1,					     sizeof(setupInfo.Comt)));
+		else if (config->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				strncpy(setupInfo.Comt, config->GetStringValue("Tags", "DefaultComment", NIL), Math::Min(config->GetStringValue("Tags", "DefaultComment", NIL).Length() + 1, sizeof(setupInfo.Comt)));
 	}
 
 	encInfo.N_CAN_GLOBAL = config->GetIntValue(ConfigureTwinVQ::ConfigID, "PreselectionCandidates", 32); // number of VQ pre-selection candidates
@@ -208,6 +223,28 @@ Int BoCA::EncoderTwinVQ::WriteData(Buffer<UnsignedByte> &data)
 	TvqWriteBsFrame(&index, bfp);
 
 	return data.Size();
+}
+
+Bool BoCA::EncoderTwinVQ::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "twinvq-enc";
+
+	/* Get command line settings.
+	 */
+	Int	 bitrate    = 48;
+	Int	 candidates = 32;
+
+	if (config->GetIntValue(encoderID, "Set Bitrate per channel", False))     bitrate    = config->GetIntValue(encoderID, "Bitrate per channel", bitrate);
+	if (config->GetIntValue(encoderID, "Set Preselection candidates", False)) candidates = config->GetIntValue(encoderID, "Preselection candidates", candidates);
+
+	/* Set configuration values.
+	 */
+	config->SetIntValue(ConfigureTwinVQ::ConfigID, "Bitrate", Math::Max(24, Math::Min(48, bitrate)));
+	config->SetIntValue(ConfigureTwinVQ::ConfigID, "PreselectionCandidates", Math::Max(4, Math::Min(32, candidates)));
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderTwinVQ::GetConfigurationLayer()

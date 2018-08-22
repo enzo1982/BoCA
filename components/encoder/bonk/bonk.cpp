@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,21 +22,37 @@ const String &BoCA::EncoderBonk::GetComponentSpecs()
 
 	if (bonkdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Bonk Audio Encoder %VERSION%</name>	\
-		    <version>1.0</version>			\
-		    <id>bonk-enc</id>				\
-		    <type>encoder</type>			\
-		    <format>					\
-		      <name>Bonk Audio Files</name>		\
-		      <extension>bonk</extension>		\
-		    </format>					\
-		    <input bits=\"16\" channels=\"1-2\"/>	\
-		  </component>					\
-								\
+		componentSpecs = "										\
+														\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
+		  <component>											\
+		    <name>Bonk Audio Encoder %VERSION%</name>							\
+		    <version>1.0</version>									\
+		    <id>bonk-enc</id>										\
+		    <type>encoder</type>									\
+		    <format>											\
+		      <name>Bonk Audio Files</name>								\
+		      <extension>bonk</extension>								\
+		    </format>											\
+		    <input bits=\"16\" channels=\"1-2\"/>							\
+		    <parameters>										\
+		      <range name=\"Quantization factor\" argument=\"-q %VALUE\" default=\"0.4\" step=\"0.05\">	\
+			<min alias=\"0\">0</min>								\
+			<max alias=\"2\">2</max>								\
+		      </range>											\
+		      <range name=\"Predictor size\" argument=\"-s %VALUE\" default=\"32\">			\
+			<min alias=\"min\">0</min>								\
+			<max alias=\"max\">512</max>								\
+		      </range>											\
+		      <range name=\"Downsampling ratio\" argument=\"-r %VALUE\" default=\"2\">			\
+			<min alias=\"1\">1</min>								\
+			<max alias=\"10\">10</max>								\
+		      </range>											\
+		      <switch name=\"Use Joint Stereo\" argument=\"--js\"/>					\
+		      <switch name=\"Use lossless compression\" argument=\"--lossless\"/>			\
+		    </parameters>										\
+		  </component>											\
+														\
 		";
 
 		componentSpecs.Replace("%VERSION%", String("v").Append(ex_bonk_get_version_string()));
@@ -60,24 +76,26 @@ BoCA::EncoderBonk::EncoderBonk()
 	configLayer = NIL;
 
 	encoder	    = NIL;
+
+	config	    = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 }
 
 BoCA::EncoderBonk::~EncoderBonk()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderBonk::IsLossless() const
 {
-	const Config	*config = GetConfiguration();
-
 	return config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0);
 }
 
 Bool BoCA::EncoderBonk::Activate()
 {
-	const Config	*config = GetConfiguration();
-
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
 
@@ -100,7 +118,7 @@ Bool BoCA::EncoderBonk::Activate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(id3Buffer, track);
 
 			ex_bonk_encoder_set_id3_data(encoder, id3Buffer, id3Buffer.Size());
@@ -126,8 +144,6 @@ Bool BoCA::EncoderBonk::Activate()
 Bool BoCA::EncoderBonk::Deactivate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
-
-	const Config	*config = GetConfiguration();
 
 	Int	 bytes = ex_bonk_encoder_finish(encoder, dataBuffer, dataBuffer.Size());
 
@@ -163,7 +179,7 @@ Bool BoCA::EncoderBonk::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->Seek(2);
@@ -185,6 +201,34 @@ Int BoCA::EncoderBonk::WriteData(Buffer<UnsignedByte> &data)
 	driver->WriteData(dataBuffer, bytes);
 
 	return bytes;
+}
+
+Bool BoCA::EncoderBonk::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "bonk-enc";
+
+	/* Get command line settings.
+	 */
+	Int	 quantization = 8;
+	Int	 predictor    = 32;
+	Int	 downsampling = 2;
+
+	if (config->GetIntValue(encoderID, "Set Quantization factor", False)) quantization = config->GetIntValue(encoderID, "Quantization factor", quantization);
+	if (config->GetIntValue(encoderID, "Set Predictor size", False))      predictor    = config->GetIntValue(encoderID, "Predictor size", predictor);
+	if (config->GetIntValue(encoderID, "Set Downsampling ratio", False))  downsampling = config->GetIntValue(encoderID, "Downsampling ratio", downsampling);
+
+	/* Set configuration values.
+	 */
+	config->SetIntValue(ConfigureBonk::ConfigID, "JointStereo", config->GetIntValue(encoderID, "Use Joint Stereo", False));
+	config->SetIntValue(ConfigureBonk::ConfigID, "Lossless", config->GetIntValue(encoderID, "Use lossless compression", False));
+
+	config->SetIntValue(ConfigureBonk::ConfigID, "Quantization", Math::Max(0, Math::Min(40, quantization)));
+	config->SetIntValue(ConfigureBonk::ConfigID, "Predictor", Math::Max(0, Math::Min(512, predictor)));
+	config->SetIntValue(ConfigureBonk::ConfigID, "Downsampling", Math::Max(0, Math::Min(10, downsampling)));
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderBonk::GetConfigurationLayer()

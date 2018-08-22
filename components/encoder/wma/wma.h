@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -21,6 +21,7 @@ namespace BoCA
 	{
 		private:
 			ConfigLayer		*configLayer;
+			Config			*config;
 
 			IWMWriter		*m_pWriter;
 			IWMWriterAdvanced	*m_pWriterAdvanced;
@@ -36,10 +37,12 @@ namespace BoCA
 
 			Buffer<signed short>	 samplesBuffer;
 
-			Int			 GetDefaultCodec(IWMCodecInfo3 *) const;
+			static Int		 GetDefaultCodec(IWMCodecInfo3 *);
 			IWMStreamConfig		*GetBestCodecFormat(IWMCodecInfo3 *, DWORD, const Format &) const;
 
 			Bool			 SetInputFormat(IWMWriter *, const Format &);
+
+			static Bool		 ConvertArguments(Config *);
 		public:
 			static const String	&GetComponentSpecs();
 

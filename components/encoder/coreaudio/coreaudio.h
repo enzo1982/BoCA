@@ -28,6 +28,7 @@ namespace BoCA
 
 		private:
 			ConfigLayer		*configLayer;
+			Config			*config;
 
 			CA::AudioFileID		 audioFile;
 			CA::AudioConverterRef	 converter;
@@ -50,6 +51,8 @@ namespace BoCA
 			Int			 EncodeFrames(Bool);
 
 			Int			 GetOutputSampleRate(Int) const;
+
+			static Bool		 ConvertArguments(Config *);
 		public:
 			static const String	&GetComponentSpecs();
 

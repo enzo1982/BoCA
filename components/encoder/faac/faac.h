@@ -21,6 +21,7 @@ namespace BoCA
 	{
 		private:
 			ConfigLayer		*configLayer;
+			Config			*config;
 
 			MP4FileHandle		 mp4File;
 			faacEncHandle		 handle;
@@ -36,6 +37,8 @@ namespace BoCA
 			Buffer<int16_t>		 samplesBuffer;
 
 			Int			 EncodeFrames(Bool);
+
+			static Bool		 ConvertArguments(Config *);
 		public:
 			static const String	&GetComponentSpecs();
 

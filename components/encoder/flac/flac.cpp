@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,42 +27,67 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 
 	if (flacdll != NIL)
 	{
-		componentSpecs = "							\
-											\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
-		  <component>								\
-		    <name>FLAC Audio Encoder %VERSION%</name>				\
-		    <version>1.0</version>						\
-		    <id>flac-enc</id>							\
-		    <type>encoder</type>						\
-		    <format>								\
-		      <name>FLAC Files</name>						\
-		      <lossless>true</lossless>						\
-		      <extension>flac</extension>					\
-		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>		\
-		    </format>								\
-											\
+		componentSpecs = "										\
+														\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
+		  <component>											\
+		    <name>FLAC Audio Encoder %VERSION%</name>							\
+		    <version>1.0</version>									\
+		    <id>flac-enc</id>										\
+		    <type>encoder</type>									\
+		    <format>											\
+		      <name>FLAC Files</name>									\
+		      <lossless>true</lossless>									\
+		      <extension>flac</extension>								\
+		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>					\
+		    </format>											\
+														\
 		";
 
 		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1)
 		{
-			componentSpecs.Append("						\
-											\
-			    <format>							\
-			      <name>Ogg FLAC Files</name>				\
-			      <lossless>true</lossless>					\
-			      <extension>oga</extension>				\
-			      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
-			    </format>							\
-											\
+			componentSpecs.Append("									\
+														\
+			    <format>										\
+			      <name>Ogg FLAC Files</name>							\
+			      <lossless>true</lossless>								\
+			      <extension>oga</extension>							\
+			      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>				\
+			    </format>										\
+														\
 			");
 		}
 
-		componentSpecs.Append("							\
-											\
-		    <input bits=\"8-24\" channels=\"1-8\"/>				\
-		  </component>								\
-											\
+		componentSpecs.Append("										\
+														\
+		    <input bits=\"8-24\" channels=\"1-8\"/>							\
+		    <parameters>										\
+		      <range name=\"Compression level\" argument=\"-c %VALUE\">					\
+			<min alias=\"fastest\">0</min>								\
+			<max alias=\"best\">8</max>								\
+		      </range>											\
+		      <range name=\"Block size\" argument=\"-b %VALUE\" default=\"4096\">			\
+			<min>192</min>										\
+			<max>32768</max>									\
+		      </range>											\
+		      <switch name=\"Use mid-side stereo\" argument=\"-m\"/>					\
+		      <switch name=\"Do exhaustive model search\" argument=\"-e\"/>				\
+		      <range name=\"Max LPC order\" argument=\"-l %VALUE\" default=\"8\">			\
+			<min alias=\"disabled\">0</min>								\
+			<max>32</max>										\
+		      </range>											\
+		      <switch name=\"Do exhaustive QLP coefficient search\" argument=\"-p\"/>			\
+		      <range name=\"QLP coefficient precision\" argument=\"-q %VALUE\" default=\"0\">		\
+			<min alias=\"auto\">0</min>								\
+			<max>16</max>										\
+		      </range>											\
+		      <range name=\"Maximum rice partition order\" argument=\"-r %VALUE\" default=\"5\">	\
+			<min>0</min>										\
+			<max>16</max>										\
+		      </range>											\
+		    </parameters>										\
+		  </component>											\
+														\
 		");
 
 		componentSpecs.Replace("%VERSION%", String("v").Append(*ex_FLAC__VERSION_STRING));
@@ -98,17 +123,21 @@ BoCA::EncoderFLAC::EncoderFLAC()
 	encoder	     = NIL;
 
 	bytesWritten = 0;
+
+	config	     = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 }
 
 BoCA::EncoderFLAC::~EncoderFLAC()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderFLAC::Activate()
 {
-	const Config	*config = GetConfiguration();
-
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
 
@@ -330,8 +359,6 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data)
 
 Bool BoCA::EncoderFLAC::FixChapterMarks()
 {
-	const Config	*config = GetConfiguration();
-
 	if (track.tracks.Length() == 0 || !config->GetIntValue("Tags", "WriteChapters", True)) return True;
 
 	/* Fill buffer with Vorbis Comment block.
@@ -461,14 +488,49 @@ Bool BoCA::EncoderFLAC::SetOutputFormat(Int n)
 
 String BoCA::EncoderFLAC::GetOutputFileExtension() const
 {
-	const Config	*config = GetConfiguration();
-
 	switch (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0))
 	{
 		default:
 		case  0: return "flac";
 		case  1: return *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 ? "oga" : "flac";
 	}
+}
+
+Bool BoCA::EncoderFLAC::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "flac-enc";
+
+	/* Get command line settings.
+	 */
+	Int	 preset	   = -1;
+	Int	 blocksize = 4096;
+	Int	 lpc	   = 8;
+	Int	 qlp	   = 0;
+	Int	 rice	   = 5;
+
+	if (config->GetIntValue(encoderID, "Set Compression level", False))	       preset	 = config->GetIntValue(encoderID, "Compression level", preset);
+	if (config->GetIntValue(encoderID, "Set Block size", False))		       blocksize = config->GetIntValue(encoderID, "Block size", blocksize);
+	if (config->GetIntValue(encoderID, "Set Max LPC order", False))		       lpc	 = config->GetIntValue(encoderID, "Max LPC order", lpc);
+	if (config->GetIntValue(encoderID, "Set QLP coefficient precision", False))    qlp	 = config->GetIntValue(encoderID, "QLP coefficient precision", qlp);
+	if (config->GetIntValue(encoderID, "Set Maximum rice partition order", False)) rice	 = config->GetIntValue(encoderID, "Maximum rice partition order", rice);
+
+	/* Set configuration values.
+	 */
+	config->SetIntValue(ConfigureFLAC::ConfigID, "Preset", preset);
+
+	config->SetIntValue(ConfigureFLAC::ConfigID, "DoMidSideStereo", config->GetIntValue(encoderID, "Use mid-side stereo", False));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "DoExhaustiveModelSearch", config->GetIntValue(encoderID, "Do exhaustive model search", False));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "DoQLPCoeffPrecSearch", config->GetIntValue(encoderID, "Do exhaustive QLP coefficient search", False));
+
+	config->SetIntValue(ConfigureFLAC::ConfigID, "Blocksize", Math::Max(192, Math::Min(32768, blocksize)));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "MaxLPCOrder", Math::Max(0, Math::Min(32, lpc)));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "QLPCoeffPrecision", Math::Max(0, Math::Min(16, qlp)));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "MinResidualPartitionOrder", 0);
+	config->SetIntValue(ConfigureFLAC::ConfigID, "MaxResidualPartitionOrder", Math::Max(0, Math::Min(16, rice)));
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderFLAC::GetConfigurationLayer()

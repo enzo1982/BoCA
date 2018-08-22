@@ -58,6 +58,13 @@ const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 		    </format>											\
 		    <input bits=\"16\" channels=\"1-2\"								\
 			   rate=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000\"/>	\
+		    <parameters>										\
+		      <range name=\"Bitrate per channel\" argument=\"-b %VALUE\" default=\"96\">		\
+			<min alias=\"min\">8</min>								\
+			<max alias=\"max\">128</max>								\
+		      </range>											\
+		      <switch name=\"Write raw AAC files\" argument=\"--raw\"/>					\
+		    </parameters>										\
 		  </component>											\
 														\
 		");
@@ -93,6 +100,10 @@ BoCA::EncoderVOAAC::EncoderVOAAC()
 	totalSamples = 0;
 	delaySamples = 0;
 
+	config	     = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
+
 	memset(&memOperator, 0, sizeof(memOperator));
 	memset(&userData, 0, sizeof(userData));
 
@@ -101,13 +112,13 @@ BoCA::EncoderVOAAC::EncoderVOAAC()
 
 BoCA::EncoderVOAAC::~EncoderVOAAC()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderVOAAC::Activate()
 {
-	const Config	*config = GetConfiguration();
-
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
 
@@ -185,7 +196,7 @@ Bool BoCA::EncoderVOAAC::Activate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
-				tagger->SetConfiguration(GetConfiguration());
+				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -200,8 +211,6 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 Bool BoCA::EncoderVOAAC::Deactivate()
 {
-	const Config	*config = GetConfiguration();
-
 	/* Output remaining samples to encoder.
 	 */
 	EncodeFrames(True);
@@ -254,7 +263,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 				if (tagger != NIL)
 				{
-					tagger->SetConfiguration(GetConfiguration());
+					tagger->SetConfiguration(config);
 					tagger->RenderStreamInfo(track.outfile, track);
 
 					boca.DeleteComponent(tagger);
@@ -289,7 +298,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
-				tagger->SetConfiguration(GetConfiguration());
+				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -312,7 +321,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
-				tagger->SetConfiguration(GetConfiguration());
+				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->Seek(0);
@@ -430,8 +439,6 @@ Bool BoCA::EncoderVOAAC::SetOutputFormat(Int n)
 
 String BoCA::EncoderVOAAC::GetOutputFileExtension() const
 {
-	const Config	*config = GetConfiguration();
-
 	if (config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True))
 	{
 		switch (config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4FileExtension", 0))
@@ -445,6 +452,27 @@ String BoCA::EncoderVOAAC::GetOutputFileExtension() const
 	}
 
 	return "aac";
+}
+
+Bool BoCA::EncoderVOAAC::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "voaacenc-enc";
+
+	/* Get command line settings.
+	 */
+	Int	 bitrate = 96;
+
+	if (config->GetIntValue(encoderID, "Set Bitrate per channel", False)) bitrate = config->GetIntValue(encoderID, "Bitrate per channel", bitrate);
+
+	/* Set configuration values.
+	 */
+	config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", !config->GetIntValue(encoderID, "Write raw AAC files", False));
+
+	config->SetIntValue(ConfigureVOAAC::ConfigID, "Bitrate", Math::Max(8, Math::Min(128, bitrate)));
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderVOAAC::GetConfigurationLayer()

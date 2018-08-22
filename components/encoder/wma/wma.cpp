@@ -22,23 +22,47 @@ const String &BoCA::EncoderWMA::GetComponentSpecs()
 
 	if (wmvcoredll != NIL)
 	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>Windows Media Audio Encoder</name>			\
-		    <version>1.0</version>					\
-		    <id>wma-enc</id>						\
-		    <type>encoder</type>					\
-		    <format>							\
-		      <name>Windows Media Audio Files</name>			\
-		      <extension>wma</extension>				\
-		      <tag id=\"wma-tag\" mode=\"other\">WMA Metadata</tag>	\
-		    </format>							\
-		    <input bits=\"8\" signed=\"false\"/>			\
-		    <input bits=\"16-32\"/>					\
-		  </component>							\
-										\
+		componentSpecs = "									\
+													\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
+		  <component>										\
+		    <name>Windows Media Audio Encoder</name>						\
+		    <version>1.0</version>								\
+		    <id>wma-enc</id>									\
+		    <type>encoder</type>								\
+		    <format>										\
+		      <name>Windows Media Audio Files</name>						\
+		      <extension>wma</extension>							\
+		      <tag id=\"wma-tag\" mode=\"other\">WMA Metadata</tag>				\
+		    </format>										\
+		    <input bits=\"8\" signed=\"false\"/>						\
+		    <input bits=\"16-32\"/>								\
+		    <parameters>									\
+		      <selection name=\"Target format\" argument=\"-f %VALUE\" default=\"standard\">	\
+			<option alias=\"WMA Standard\">standard</option>				\
+			<option alias=\"WMA Pro\">pro</option>						\
+			<option alias=\"WMA Lossless\">lossless</option>				\
+			<option alias=\"WMA Voice\">voice</option>					\
+			<option alias=\"Uncompressed\">uncompressed</option>				\
+		      </selection>									\
+		      <range name=\"VBR quality\" argument=\"-q %VALUE\" default=\"90\">		\
+			<min alias=\"min\">0</min>							\
+			<max alias=\"max\">100</max>							\
+		      </range>										\
+		      <switch name=\"Use CBR mode\" argument=\"--cbr\"/>				\
+		      <selection name=\"CBR bitrate\" argument=\"-b %VALUE\" default=\"128\">		\
+			<option alias=\"32 kbps\">32</option>						\
+			<option alias=\"48 kbps\">48</option>						\
+			<option alias=\"64 kbps\">64</option>						\
+			<option alias=\"80 kbps\">80</option>						\
+			<option alias=\"96 kbps\">96</option>						\
+			<option alias=\"128 kbps\">128</option>						\
+			<option alias=\"160 kbps\">160</option>						\
+			<option alias=\"192 kbps\">192</option>						\
+		      </selection>									\
+		    </parameters>									\
+		  </component>										\
+													\
 		";
 	}
 
@@ -71,6 +95,10 @@ BoCA::EncoderWMA::EncoderWMA()
 
 	samplesWritten	  = 0;
 
+	config		  = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
+
 	/* Init the Microsoft COM library.
 	 */
 	CoInitialize(NIL);
@@ -78,6 +106,8 @@ BoCA::EncoderWMA::EncoderWMA()
 
 BoCA::EncoderWMA::~EncoderWMA()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 
 	/* Uninit the Microsoft COM library.
@@ -94,8 +124,6 @@ Int BoCA::EncoderWMA::GetNumberOfPasses() const
 
 Bool BoCA::EncoderWMA::IsLossless() const
 {
-	const Config	*config = GetConfiguration();
-
 	if (config->GetIntValue(ConfigureWMA::ConfigID, "Uncompressed", False)) return True;
 
 	/* Create profile manager and get codec info.
@@ -144,8 +172,6 @@ Bool BoCA::EncoderWMA::IsLossless() const
 
 Bool BoCA::EncoderWMA::Activate()
 {
-	const Config	*config = GetConfiguration();
-
 	/* Close output file as it will be written directly by Windows Media.
 	 */
 	driver->Close();
@@ -253,8 +279,6 @@ Bool BoCA::EncoderWMA::Deactivate()
 		return True;
 	}
 
-	const Config	*config = GetConfiguration();
-
 	HRESULT	 hr = m_pWriter->EndWriting();
 
 	m_pWriterAdvanced->RemoveSink(m_pWriterFileSink);
@@ -289,7 +313,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 
 			if (tagger != NIL)
 			{
-				tagger->SetConfiguration(GetConfiguration());
+				tagger->SetConfiguration(config);
 				tagger->RenderStreamInfo(track.outfile, track);
 
 				boca.DeleteComponent(tagger);
@@ -337,6 +361,78 @@ Bool BoCA::EncoderWMA::NextPass()
 	return False;
 }
 
+Bool BoCA::EncoderWMA::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "wma-enc";
+
+	/* Get command line settings.
+	 */
+	Int	 bitrate = 128;
+	Int	 quality = 90;
+	String	 format	 = "standard";
+
+	if (config->GetIntValue(encoderID, "Set CBR bitrate", False))	bitrate	= config->GetIntValue(encoderID, "CBR bitrate", bitrate);
+	if (config->GetIntValue(encoderID, "Set VBR quality", False))	quality	= config->GetIntValue(encoderID, "VBR quality", quality);
+	if (config->GetIntValue(encoderID, "Set Target format", False))	format	= config->GetStringValue(encoderID, "Target format", format).ToLower();
+
+	/* Set configuration values.
+	 */
+	config->SetIntValue(ConfigureWMA::ConfigID, "Uncompressed", format == "uncompressed");
+	config->SetIntValue(ConfigureWMA::ConfigID, "AutoSelectFormat", True);
+
+	config->SetIntValue(ConfigureWMA::ConfigID, "EnableVBR", !config->GetIntValue(encoderID, "Use CBR mode", False));
+
+	config->SetIntValue(ConfigureWMA::ConfigID, "Bitrate", Math::Max(32, Math::Min(192, bitrate)));
+	config->SetIntValue(ConfigureWMA::ConfigID, "Quality", Math::Max(0, Math::Min(100, quality)));
+
+	IWMProfileManager	*pProfileManager = NIL;
+	IWMCodecInfo3		*pCodecInfo	= NIL;
+
+	HRESULT	 hr = ex_WMCreateProfileManager(&pProfileManager);
+
+	if (FAILED(hr)) return False;
+
+	hr = pProfileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo);
+
+	if (FAILED(hr))
+	{
+		pProfileManager->Release();
+
+		return False;
+	}
+
+	DWORD	 numCodecs    = 0;
+	Int	 targetFormat = GetDefaultCodec(pCodecInfo);
+
+	hr = pCodecInfo->GetCodecInfoCount(WMMEDIATYPE_Audio, &numCodecs);
+
+	for (DWORD i = 0; i < numCodecs; i++)
+	{
+		DWORD	 nameLen = 0;
+
+		hr = pCodecInfo->GetCodecName(WMMEDIATYPE_Audio, i, NIL, &nameLen);
+
+		WCHAR	*name = new WCHAR [nameLen];
+
+		hr = pCodecInfo->GetCodecName(WMMEDIATYPE_Audio, i, name, &nameLen);
+
+		if	(format == "pro"      && String(name).Contains("Pro"))	    targetFormat = i;
+		else if (format == "lossless" && String(name).Contains("Lossless")) targetFormat = i;
+		else if (format == "voice"    && String(name).Contains("Voice"))    targetFormat = i;
+
+		delete [] name;
+	}
+
+	pCodecInfo->Release();
+	pProfileManager->Release();
+
+	config->SetIntValue(ConfigureWMA::ConfigID, "Codec", targetFormat);
+
+	return True;
+}
+
 ConfigLayer *BoCA::EncoderWMA::GetConfigurationLayer()
 {
 	if (configLayer == NIL) configLayer = new ConfigureWMA();
@@ -346,7 +442,7 @@ ConfigLayer *BoCA::EncoderWMA::GetConfigurationLayer()
 
 /* Select default codec to be used when no codec is set.
  */
-Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo) const
+Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo)
 {
 	Int	 index	   = -1;
 
@@ -381,8 +477,6 @@ Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo) const
  */
 IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWORD codecIndex, const Format &format) const
 {
-	const Config	*config = GetConfiguration();
-
 	HRESULT		 hr = S_OK;
 
 	BOOL		 falseValue = FALSE;

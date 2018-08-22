@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,23 +24,41 @@ const String &BoCA::EncoderBlade::GetComponentSpecs()
 
 	if (bladedll != NIL)
 	{
-		componentSpecs = "							\
-											\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
-		  <component>								\
-		    <name>BladeEnc MP3 Encoder %VERSION%</name>				\
-		    <version>1.0</version>						\
-		    <id>bladeenc-enc</id>						\
-		    <type threadSafe=\"false\">encoder</type>				\
-		    <format>								\
-		      <name>MPEG 1 Audio Layer 3</name>					\
-		      <extension>mp3</extension>					\
-		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>			\
-		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>		\
-		    </format>								\
-		    <input bits=\"16\" channels=\"1-2\" rate=\"32000,44100,48000\"/>	\
-		  </component>								\
-											\
+		componentSpecs = "								\
+												\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
+		  <component>									\
+		    <name>BladeEnc MP3 Encoder %VERSION%</name>					\
+		    <version>1.0</version>							\
+		    <id>bladeenc-enc</id>							\
+		    <type threadSafe=\"false\">encoder</type>					\
+		    <format>									\
+		      <name>MPEG 1 Audio Layer 3</name>						\
+		      <extension>mp3</extension>						\
+		      <tag id=\"id3v1-tag\" mode=\"append\">ID3v1</tag>				\
+		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>			\
+		    </format>									\
+		    <input bits=\"16\" channels=\"1-2\" rate=\"32000,44100,48000\"/>		\
+		    <parameters>								\
+		      <selection name=\"Bitrate\" argument=\"-b %VALUE\" default=\"192\">	\
+			<option alias=\"32 kbps\">32</option>					\
+			<option alias=\"40 kbps\">40</option>					\
+			<option alias=\"48 kbps\">48</option>					\
+			<option alias=\"56 kbps\">56</option>					\
+			<option alias=\"64 kbps\">64</option>					\
+			<option alias=\"80 kbps\">80</option>					\
+			<option alias=\"96 kbps\">96</option>					\
+			<option alias=\"112 kbps\">112</option>					\
+			<option alias=\"128 kbps\">128</option>					\
+			<option alias=\"160 kbps\">160</option>					\
+			<option alias=\"192 kbps\">192</option>					\
+			<option alias=\"224 kbps\">224</option>					\
+			<option alias=\"256 kbps\">256</option>					\
+			<option alias=\"320 kbps\">320</option>					\
+		      </selection>								\
+		    </parameters>								\
+		  </component>									\
+												\
 		";
 
 		BE_VERSION	 beVer;
@@ -68,17 +86,21 @@ BoCA::EncoderBlade::EncoderBlade() : beConfig()
 	configLayer = NIL;
 
 	handle	    = NIL;
+
+	config	    = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 }
 
 BoCA::EncoderBlade::~EncoderBlade()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderBlade::Activate()
 {
-	const Config	*config = GetConfiguration();
-
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
 
@@ -123,7 +145,7 @@ Bool BoCA::EncoderBlade::Activate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -137,7 +159,6 @@ Bool BoCA::EncoderBlade::Activate()
 
 Bool BoCA::EncoderBlade::Deactivate()
 {
-	const Config	*config = GetConfiguration();
 	const Info	&info = track.GetInfo();
 
 	unsigned long	 bytes = 0;
@@ -159,7 +180,7 @@ Bool BoCA::EncoderBlade::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -179,7 +200,7 @@ Bool BoCA::EncoderBlade::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->Seek(0);
@@ -203,6 +224,25 @@ Int BoCA::EncoderBlade::WriteData(Buffer<UnsignedByte> &data)
 	driver->WriteData(outBuffer, bytes);
 
 	return bytes;
+}
+
+Bool BoCA::EncoderBlade::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "bladeenc-enc";
+
+	/* Get command line settings.
+	 */
+	Int	 bitrate = 192;
+
+	if (config->GetIntValue(encoderID, "Set Bitrate", False)) bitrate = config->GetIntValue(encoderID, "Bitrate", bitrate);
+
+	/* Set configuration values.
+	 */
+	config->SetIntValue(ConfigureBlade::ConfigID, "Bitrate", Math::Max(32, Math::Min(320, bitrate)));
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderBlade::GetConfigurationLayer()

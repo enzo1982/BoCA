@@ -28,6 +28,7 @@ namespace BoCA
 	{
 		private:
 			ConfigLayer		*configLayer;
+			Config			*config;
 
 			String			 mappingName;
 
@@ -49,6 +50,8 @@ namespace BoCA
 			Bool			 Disconnect();
 
 			Bool			 ProcessConnectorCommand();
+
+			static Bool		 ConvertArguments(Config *);
 		public:
 			static const String	&GetComponentSpecs();
 

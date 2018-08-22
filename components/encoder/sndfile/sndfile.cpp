@@ -22,86 +22,108 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 
 	if (sndfiledll != NIL)
 	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>SndFile Output Component %VERSION%</name>		\
-		    <version>1.0</version>					\
-		    <id>sndfile-enc</id>					\
-		    <type>encoder</type>					\
-		    <replace>wave-enc</replace>					\
-		    <format>							\
-		      <name>Microsoft Wave Files</name>				\
-		      <extension>wav</extension>				\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
-		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
-		    </format>							\
-		    <format>							\
-		      <name>Apple Audio Files</name>				\
-		      <extension>aif</extension>				\
-		      <extension>aiff</extension>				\
-		      <extension>aifc</extension>				\
-		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
-		    </format>							\
-		    <format>							\
-		      <name>Apple Core Audio Files</name>			\
-		      <extension>caf</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Sony Media Wave64 Files</name>			\
-		      <extension>w64</extension>				\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
-		    </format>							\
-		    <format>							\
-		      <name>RIFF 64 Audio Files</name>				\
-		      <extension>rf64</extension>				\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
-		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
-		    </format>							\
-		    <format>							\
-		      <name>Sun Audio Files</name>				\
-		      <extension>au</extension>					\
-		      <extension>snd</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Creative Voice Files</name>				\
-		      <extension>voc</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Amiga Audio Files</name>				\
-		      <extension>iff</extension>				\
-		      <extension>svx</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>IRCAM Sound Files</name>				\
-		      <extension>sf</extension>					\
-		    </format>							\
-		    <format>							\
-		      <name>Paris Audio Files</name>				\
-		      <extension>paf</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Portable Voice Format</name>			\
-		      <extension>pvf</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Psion WVE Files</name>				\
-		      <extension>wve</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>HMM Toolkit Format</name>				\
-		      <extension>htk</extension>				\
-		    </format>							\
-		    <format>							\
-		      <name>Audio Visual Research Format</name>			\
-		      <extension>avr</extension>				\
-		    </format>							\
-		    <input bits=\"8-32\"/>					\
-		    <input float=\"true\"/>					\
-		  </component>							\
-										\
+		componentSpecs = "								\
+												\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
+		  <component>									\
+		    <name>SndFile Output Component %VERSION%</name>				\
+		    <version>1.0</version>							\
+		    <id>sndfile-enc</id>							\
+		    <type>encoder</type>							\
+		    <replace>wave-enc</replace>							\
+		    <format>									\
+		      <name>Microsoft Wave Files</name>						\
+		      <extension>wav</extension>						\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>			\
+		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>			\
+		    </format>									\
+		    <format>									\
+		      <name>Apple Audio Files</name>						\
+		      <extension>aif</extension>						\
+		      <extension>aiff</extension>						\
+		      <extension>aifc</extension>						\
+		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>				\
+		    </format>									\
+		    <format>									\
+		      <name>Apple Core Audio Files</name>					\
+		      <extension>caf</extension>						\
+		    </format>									\
+		    <format>									\
+		      <name>Sony Media Wave64 Files</name>					\
+		      <extension>w64</extension>						\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>			\
+		    </format>									\
+		    <format>									\
+		      <name>RIFF 64 Audio Files</name>						\
+		      <extension>rf64</extension>						\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>			\
+		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>			\
+		    </format>									\
+		    <format>									\
+		      <name>Sun Audio Files</name>						\
+		      <extension>au</extension>							\
+		      <extension>snd</extension>						\
+		    </format>									\
+		    <format>									\
+		      <name>Creative Voice Files</name>						\
+		      <extension>voc</extension>						\
+		    </format>									\
+		    <format>									\
+		      <name>Amiga Audio Files</name>						\
+		      <extension>iff</extension>						\
+		      <extension>svx</extension>						\
+		    </format>									\
+		    <format>									\
+		      <name>IRCAM Sound Files</name>						\
+		      <extension>sf</extension>							\
+		    </format>									\
+		    <format>									\
+		      <name>Paris Audio Files</name>						\
+		      <extension>paf</extension>						\
+		    </format>									\
+		    <format>									\
+		      <name>Portable Voice Format</name>					\
+		      <extension>pvf</extension>						\
+		    </format>									\
+		    <format>									\
+		      <name>Psion WVE Files</name>						\
+		      <extension>wve</extension>						\
+		    </format>									\
+		    <format>									\
+		      <name>HMM Toolkit Format</name>						\
+		      <extension>htk</extension>						\
+		    </format>									\
+		    <format>									\
+		      <name>Audio Visual Research Format</name>					\
+		      <extension>avr</extension>						\
+		    </format>									\
+		    <input bits=\"8-32\"/>							\
+		    <input float=\"true\"/>							\
+		    <parameters>								\
+		      <selection name=\"Output format\" argument=\"-f %VALUE\" default=\"wav\">	\
+			<option alias=\"Microsoft Wave File\">wav</option>			\
+			<option alias=\"Apple Audio File\">aiff</option>			\
+			<option alias=\"Apple Core Audio File\">caf</option>			\
+			<option alias=\"Sony Media Wave64 File\">w64</option>			\
+			<option alias=\"RIFF 64 Audio File\">rf64</option>			\
+			<option alias=\"Sun Audio File\">au</option>				\
+			<option alias=\"Creative Voice File\">voc</option>			\
+			<option alias=\"Amiga Audio File\">iff</option>				\
+			<option alias=\"IRCAM Sound File\">sf</option>				\
+			<option alias=\"Paris Audio File\">paf</option>				\
+			<option alias=\"Portable Voice Format\">pvf</option>			\
+			<option alias=\"Psion WVE File\">wve</option>				\
+			<option alias=\"HMM Toolkit Format\">htk</option>			\
+			<option alias=\"Audio Visual Research Format\">avr</option>		\
+		      </selection>								\
+		    </parameters>								\
+		  </component>									\
+												\
 		";
+
+#ifdef __APPLE__
+		componentSpecs.Replace("default=\"wav\"", "default=\"aiff\"");
+#endif
 
 		componentSpecs.Replace("%VERSION%", String("v").Append(String(ex_sf_version_string()).Replace("libsndfile-", NIL)));
 	}
@@ -135,16 +157,21 @@ BoCA::EncoderSndFile::EncoderSndFile()
 	fileFormat  = 0;
 
 	sndf	    = NIL;
+
+	config	    = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 }
 
 BoCA::EncoderSndFile::~EncoderSndFile()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderSndFile::Activate()
 {
-	const Config	*config = GetConfiguration();
 	const Format	&format = track.GetFormat();
 
 	/* Get selected file format.
@@ -232,8 +259,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 
 	/* Write metadata.
 	 */
-	const Config	*config = GetConfiguration();
-	const Info	&info	= track.GetInfo();
+	const Info	&info = track.GetInfo();
 
 	if (fileFormat == SF_FORMAT_WAV || fileFormat == SF_FORMAT_RF64)
 	{
@@ -248,7 +274,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 			{
 				Buffer<unsigned char>	 tagBuffer;
 
-				tagger->SetConfiguration(GetConfiguration());
+				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(tagBuffer, track);
 
 				driver->WriteData(tagBuffer, tagBuffer.Size());
@@ -268,7 +294,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 			{
 				Buffer<unsigned char>	 tagBuffer;
 
-				tagger->SetConfiguration(GetConfiguration());
+				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(tagBuffer, track);
 
 				driver->WriteData(tagBuffer, tagBuffer.Size());
@@ -313,7 +339,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 			{
 				Buffer<unsigned char>	 tagBuffer;
 
-				tagger->SetConfiguration(GetConfiguration());
+				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(tagBuffer, track);
 
 				unsigned char	 guid[16] = { 'l', 'i', 's', 't', 0x2F, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB, 0x04, 0xC1, 0x00, 0x00 };
@@ -356,7 +382,7 @@ Bool BoCA::EncoderSndFile::Deactivate()
 			{
 				Buffer<unsigned char>	 id3Buffer;
 
-				tagger->SetConfiguration(GetConfiguration());
+				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(id3Buffer, track);
 
 				driver->WriteData((unsigned char *) "ID3 ", 4);
@@ -516,8 +542,6 @@ Bool BoCA::EncoderSndFile::SetOutputFormat(Int n)
 
 String BoCA::EncoderSndFile::GetOutputFileExtension() const
 {
-	const Config	*config = GetConfiguration();
-
 	SF_FORMAT_INFO	 format_info;
 
 #ifdef __APPLE__
@@ -529,6 +553,47 @@ String BoCA::EncoderSndFile::GetOutputFileExtension() const
 	ex_sf_command(NIL, SFC_GET_FORMAT_INFO, &format_info, sizeof(format_info));
 
 	return format_info.extension;
+}
+
+Bool BoCA::EncoderSndFile::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "sndfile-enc";
+
+	/* Get command line settings.
+	 */
+	String	 format = "wav";
+
+	if (config->GetIntValue(encoderID, "Set Output format", False)) format = config->GetStringValue(encoderID, "Output format", format).ToLower();
+
+	/* Set configuration values.
+	 */
+#ifdef __APPLE__
+	Int	 outputFormat = SF_FORMAT_AIFF;
+#else
+	Int	 outputFormat = SF_FORMAT_WAV;
+#endif
+
+	if	(format == "wav" ) outputFormat = SF_FORMAT_WAV;
+	else if (format == "aiff") outputFormat = SF_FORMAT_AIFF;
+	else if (format == "caf" ) outputFormat = SF_FORMAT_CAF;
+	else if (format == "w64" ) outputFormat = SF_FORMAT_W64;
+	else if (format == "rf64") outputFormat = SF_FORMAT_RF64;
+	else if (format == "au"	 ) outputFormat = SF_FORMAT_AU;
+	else if (format == "voc" ) outputFormat = SF_FORMAT_VOC;
+	else if (format == "iff" ) outputFormat = SF_FORMAT_SVX;
+	else if (format == "sf"	 ) outputFormat = SF_FORMAT_IRCAM;
+	else if (format == "paf" ) outputFormat = SF_FORMAT_PAF;
+	else if (format == "pvf" ) outputFormat = SF_FORMAT_PVF;
+	else if (format == "wve" ) outputFormat = SF_FORMAT_WVE;
+	else if (format == "htk" ) outputFormat = SF_FORMAT_HTK;
+	else if (format == "avr" ) outputFormat = SF_FORMAT_AVR;
+
+	config->SetIntValue(ConfigureSndFile::ConfigID, "Format", outputFormat);
+	config->SetIntValue(ConfigureSndFile::ConfigID, "SubFormat", 0);
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderSndFile::GetConfigurationLayer()

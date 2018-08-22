@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,23 +27,33 @@ const String &BoCA::EncoderVorbis::GetComponentSpecs()
 
 	if (oggdll != NIL && vorbisdll != NIL)
 	{
-		componentSpecs = "							\
-											\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
-		  <component>								\
-		    <name>Ogg Vorbis Encoder</name>					\
-		    <version>1.0</version>						\
-		    <id>vorbis-enc</id>							\
-		    <type>encoder</type>						\
-		    <format>								\
-		      <name>Ogg Vorbis Audio</name>					\
-		      <extension>ogg</extension>					\
-		      <extension>oga</extension>					\
-		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
-		    </format>								\
-		    <input float=\"true\" rate=\"8000-192000\"/>			\
-		  </component>								\
-											\
+		componentSpecs = "									\
+													\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
+		  <component>										\
+		    <name>Ogg Vorbis Encoder</name>							\
+		    <version>1.0</version>								\
+		    <id>vorbis-enc</id>									\
+		    <type>encoder</type>								\
+		    <format>										\
+		      <name>Ogg Vorbis Audio</name>							\
+		      <extension>ogg</extension>							\
+		      <extension>oga</extension>							\
+		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>			\
+		    </format>										\
+		    <input float=\"true\" rate=\"8000-192000\"/>					\
+		    <parameters>									\
+		      <range name=\"VBR quality\" argument=\"-q %VALUE\" default=\"60\">		\
+			<min alias=\"worst\">0</min>							\
+			<max alias=\"best\">100</max>							\
+		      </range>										\
+		      <range name=\"ABR target bitrate\" argument=\"-b %VALUE\" default=\"192\">	\
+			<min alias=\"min\">45</min>							\
+			<max alias=\"max\">500</max>							\
+		      </range>										\
+		    </parameters>									\
+		  </component>										\
+													\
 		";
 	}
 
@@ -66,6 +76,10 @@ BoCA::EncoderVorbis::EncoderVorbis()
 {
 	configLayer = NIL;
 
+	config	    = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
+
 	memset(&os, 0, sizeof(os));
 	memset(&og, 0, sizeof(og));
 	memset(&op, 0, sizeof(op));
@@ -78,13 +92,13 @@ BoCA::EncoderVorbis::EncoderVorbis()
 
 BoCA::EncoderVorbis::~EncoderVorbis()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderVorbis::Activate()
 {
-	const Config	*config = GetConfiguration();
-
 	/* Init Ogg stream.
 	 */
 	srand(clock());
@@ -154,7 +168,7 @@ Bool BoCA::EncoderVorbis::Activate()
 
 		if (tagger != NIL)
 		{
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->SetVendorString(vendor);
 
 			if (config->GetIntValue("Tags", "EnableVorbisComment", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))) tagger->RenderBuffer(vcBuffer, track);
@@ -283,7 +297,7 @@ Int BoCA::EncoderVorbis::WriteOggPackets(Bool flush)
 
 Bool BoCA::EncoderVorbis::FixChapterMarks()
 {
-	if (track.tracks.Length() == 0 || !GetConfiguration()->GetIntValue("Tags", "WriteChapters", True)) return True;
+	if (track.tracks.Length() == 0 || !config->GetIntValue("Tags", "WriteChapters", True)) return True;
 
 	driver->Seek(0);
 
@@ -371,14 +385,36 @@ Bool BoCA::EncoderVorbis::FixChapterMarks()
 
 String BoCA::EncoderVorbis::GetOutputFileExtension() const
 {
-	const Config	*config = GetConfiguration();
-
 	switch (config->GetIntValue(ConfigureVorbis::ConfigID, "FileExtension", 0))
 	{
 		default:
 		case  0: return "ogg";
 		case  1: return "oga";
 	}
+}
+
+Bool BoCA::EncoderVorbis::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "vorbis-enc";
+
+	/* Get command line settings.
+	 */
+	Int	 quality = 60;
+	Int	 bitrate = 192;
+
+	if (config->GetIntValue(encoderID, "Set VBR quality", False))	     quality = config->GetIntValue(encoderID, "VBR quality", quality);
+	if (config->GetIntValue(encoderID, "Set ABR target bitrate", False)) bitrate = config->GetIntValue(encoderID, "ABR target bitrate", bitrate);
+
+	/* Set configuration values.
+	 */
+	config->SetIntValue(ConfigureVorbis::ConfigID, "Mode", config->GetIntValue(encoderID, "Set ABR target bitrate", False) ? 1 : 0);
+
+	config->SetIntValue(ConfigureVorbis::ConfigID, "Quality", Math::Max(0, Math::Min(100, quality)));
+	config->SetIntValue(ConfigureVorbis::ConfigID, "Bitrate", Math::Max(45, Math::Min(500, bitrate)));
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderVorbis::GetConfigurationLayer()

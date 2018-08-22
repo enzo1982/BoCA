@@ -28,25 +28,34 @@ const String &BoCA::EncoderMAC::GetComponentSpecs()
 
 	if (macdll != NIL)
 	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>Monkey's Audio Encoder</name>				\
-		    <version>1.0</version>					\
-		    <id>mac-enc</id>						\
-		    <type>encoder</type>					\
-		    <format>							\
-		      <name>Monkey's Audio</name>				\
-		      <lossless>true</lossless>					\
-		      <extension>ape</extension>				\
-		      <extension>mac</extension>				\
-		      <tag id=\"apev2-tag\" mode=\"append\">APEv2</tag>		\
-		    </format>							\
-		    <input bits=\"8\" signed=\"false\" channels=\"1-2\"/>	\
-		    <input bits=\"16-24\" channels=\"1-2\"/>			\
-		  </component>							\
-										\
+		componentSpecs = "									\
+													\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
+		  <component>										\
+		    <name>Monkey's Audio Encoder</name>							\
+		    <version>1.0</version>								\
+		    <id>mac-enc</id>									\
+		    <type>encoder</type>								\
+		    <format>										\
+		      <name>Monkey's Audio</name>							\
+		      <lossless>true</lossless>								\
+		      <extension>ape</extension>							\
+		      <extension>mac</extension>							\
+		      <tag id=\"apev2-tag\" mode=\"append\">APEv2</tag>					\
+		    </format>										\
+		    <input bits=\"8\" signed=\"false\" channels=\"1-2\"/>				\
+		    <input bits=\"16-24\" channels=\"1-2\"/>						\
+		    <parameters>									\
+		      <selection name=\"Compression mode\" argument=\"-m %VALUE\" default=\"high\">	\
+			<option alias=\"Fast\">fast</option>						\
+			<option alias=\"Normal\">normal</option>					\
+			<option alias=\"High\">high</option>						\
+			<option alias=\"Extra high\">extra</option>					\
+			<option alias=\"Insane\">insane</option>					\
+		      </selection>									\
+		    </parameters>									\
+		  </component>										\
+													\
 		";
 	}
 
@@ -68,17 +77,21 @@ BoCA::EncoderMAC::EncoderMAC()
 	configLayer = NIL;
 
 	hAPECompress = NIL;
+
+	config	     = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 }
 
 BoCA::EncoderMAC::~EncoderMAC()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderMAC::Activate()
 {
-	const Config	*config = GetConfiguration();
-
 	const Format	&format = track.GetFormat();
 
 	/* Close output file as it will be written directly by APE.
@@ -110,8 +123,6 @@ Bool BoCA::EncoderMAC::Activate()
 
 Bool BoCA::EncoderMAC::Deactivate()
 {
-	const Config	*config = GetConfiguration();
-
 	/* Finish encoding and destroy the encoder.
 	 */
 	ex_APECompress_Finish(hAPECompress, NIL, 0, 0);
@@ -131,7 +142,7 @@ Bool BoCA::EncoderMAC::Deactivate()
 			OutStream		 out(STREAM_FILE, track.outfile, OS_APPEND);
 			Buffer<unsigned char>	 tagBuffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(tagBuffer, track);
 
 			out.OutputData(tagBuffer, tagBuffer.Size());
@@ -150,6 +161,33 @@ Int BoCA::EncoderMAC::WriteData(Buffer<UnsignedByte> &data)
 	ex_APECompress_AddData(hAPECompress, data, data.Size());
 
 	return data.Size();
+}
+
+Bool BoCA::EncoderMAC::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "mac-enc";
+
+	/* Get command line settings.
+	 */
+	String	 mode = "high";
+
+	if (config->GetIntValue(encoderID, "Set Compression mode", False)) mode = config->GetStringValue(encoderID, "Compression mode", mode).ToLower();
+
+	/* Set configuration values.
+	 */
+	Int	 compressionMode = 2;
+
+	if	(mode == "fast"	 ) compressionMode = 0;
+	else if (mode == "normal") compressionMode = 1;
+	else if (mode == "high"	 ) compressionMode = 2;
+	else if (mode == "extra" ) compressionMode = 3;
+	else if (mode == "insane") compressionMode = 4;
+
+	config->SetIntValue(ConfigureMAC::ConfigID, "CompressionMode", compressionMode);
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderMAC::GetConfigurationLayer()

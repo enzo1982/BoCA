@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -38,6 +38,21 @@ const String &BoCA::EncoderLAME::GetComponentSpecs()
 		    </format>									\
 		    <input bits=\"16\" channels=\"1-2\"						\
 			   rate=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"/>	\
+		    <parameters>								\
+		      <selection name=\"Mode\" argument=\"-m %VALUE\" default=\"VBR\">		\
+			<option alias=\"Constant Bitrate\">CBR</option>				\
+			<option alias=\"Variable Bitrate\">VBR</option>				\
+			<option alias=\"Average Bitrate\">ABR</option>				\
+		      </selection>								\
+		      <range name=\"CBR/ABR bitrate\" argument=\"-b %VALUE\" default=\"192\">	\
+			<min alias=\"min\">8</min>						\
+			<max alias=\"max\">320</max>						\
+		      </range>									\
+		      <range name=\"VBR quality\" argument=\"-q %VALUE\" default=\"5\">		\
+			<min alias=\"best\">0</min>						\
+			<max alias=\"worst\">9</max>						\
+		      </range>									\
+		    </parameters>								\
 		  </component>									\
 												\
 		";
@@ -65,19 +80,23 @@ BoCA::EncoderLAME::EncoderLAME()
 	context	    = NIL;
 
 	dataOffset  = 0;
+
+	config	    = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 }
 
 BoCA::EncoderLAME::~EncoderLAME()
 {
+	Config::Free(config);
+
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderLAME::Activate()
 {
-	const Config	*config = GetConfiguration();
-
-	const Format	&format	  = track.GetFormat();
-	const Info	&info	  = track.GetInfo();
+	const Format	&format = track.GetFormat();
+	const Info	&info	= track.GetInfo();
 
 	/* Get configuration.
 	 */
@@ -248,7 +267,7 @@ Bool BoCA::EncoderLAME::Activate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -266,7 +285,6 @@ Bool BoCA::EncoderLAME::Activate()
 
 Bool BoCA::EncoderLAME::Deactivate()
 {
-	const Config	*config = GetConfiguration();
 	const Info	&info = track.GetInfo();
 
 	/* Flush buffers and write remaining data.
@@ -291,7 +309,7 @@ Bool BoCA::EncoderLAME::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->WriteData(id3Buffer, id3Buffer.Size());
@@ -311,7 +329,7 @@ Bool BoCA::EncoderLAME::Deactivate()
 		{
 			Buffer<unsigned char>	 id3Buffer;
 
-			tagger->SetConfiguration(GetConfiguration());
+			tagger->SetConfiguration(config);
 			tagger->RenderBuffer(id3Buffer, track);
 
 			driver->Seek(0);
@@ -350,6 +368,42 @@ Int BoCA::EncoderLAME::WriteData(Buffer<UnsignedByte> &data)
 	driver->WriteData(outBuffer, bytes);
 
 	return bytes;
+}
+
+Bool BoCA::EncoderLAME::ConvertArguments(Config *config)
+{
+	if (!config->GetIntValue("Settings", "EnableConsole", False)) return False;
+
+	static const String	 encoderID = "lame-enc";
+
+	/* Get command line settings.
+	 */
+	Int	 bitrate = 192;
+	Int	 quality = 5;
+	String	 mode	 = "VBR";
+
+	if (config->GetIntValue(encoderID, "Set CBR/ABR bitrate", False)) bitrate = config->GetIntValue(encoderID, "CBR/ABR bitrate", bitrate);
+	if (config->GetIntValue(encoderID, "Set VBR quality", False))	  quality = config->GetIntValue(encoderID, "VBR quality", quality);
+	if (config->GetIntValue(encoderID, "Set Mode", False))		  mode	  = config->GetStringValue(encoderID, "Mode", mode).ToUpper();
+
+	/* Set configuration values.
+	 */
+	config->SetIntValue(ConfigureLAME::ConfigID, "Preset", 0);
+	config->SetIntValue(ConfigureLAME::ConfigID, "SetBitrate", True);
+
+	config->SetIntValue(ConfigureLAME::ConfigID, "Bitrate", Math::Max(0, Math::Min(320, bitrate)));
+	config->SetIntValue(ConfigureLAME::ConfigID, "ABRBitrate", Math::Max(0, Math::Min(320, bitrate)));
+	config->SetIntValue(ConfigureLAME::ConfigID, "VBRQuality", Math::Max(0, Math::Min(9, quality)) * 10);
+
+	Int	 vbrMode = vbr_default;
+
+	if	(mode == "VBR") vbrMode = vbr_mtrh;
+	else if (mode == "ABR") vbrMode = vbr_abr;
+	else if (mode == "CBR") vbrMode = vbr_off;
+
+	config->SetIntValue(ConfigureLAME::ConfigID, "VBRMode", vbrMode);
+
+	return True;
 }
 
 ConfigLayer *BoCA::EncoderLAME::GetConfigurationLayer()
