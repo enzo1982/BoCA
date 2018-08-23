@@ -99,15 +99,19 @@ BoCA::EncoderFDKAAC::EncoderFDKAAC()
 	configLayer  = NIL;
 
 	mp4File	     = NIL;
-	handle	     = NIL;
 
 	mp4Track     = -1;
 	sampleId     = 0;
 
 	frameSize    = 0;
 
+	blockSize    = 128;
+	overlap	     = 12;
+
 	totalSamples = 0;
 	delaySamples = 0;
+
+	nextWorker   = 0;
 
 	config	     = Config::Copy(GetConfiguration());
 
@@ -134,6 +138,8 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	/* Create and configure FDK AAC encoder.
 	 */
+	HANDLE_AACENCODER	 handle = NIL;
+
 	ex_aacEncOpen(&handle, 0x07, format.channels);
 
 	Int	 channelMode = MODE_UNKNOWN;
@@ -151,11 +157,9 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	ex_aacEncoder_SetParam(handle, AACENC_SAMPLERATE, format.rate);
 	ex_aacEncoder_SetParam(handle, AACENC_CHANNELMODE, channelMode);
-	ex_aacEncoder_SetParam(handle, AACENC_CHANNELORDER, 1 /* WAVE channel order */);
 
 	ex_aacEncoder_SetParam(handle, AACENC_AOT, mpegVersion + aacType);
 	ex_aacEncoder_SetParam(handle, AACENC_BITRATE, bitrate * 1000 * format.channels);
-	ex_aacEncoder_SetParam(handle, AACENC_AFTERBURNER, 1);
 	ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, mp4Container ? TT_MP4_RAW : TT_MP4_ADTS);
 
 	if (!mp4Container)
@@ -168,8 +172,6 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	ex_aacEncEncode(handle, NULL, NULL, NULL, NULL);
 	ex_aacEncInfo(handle, &aacInfo);
-
-	outBuffer.Resize(aacInfo.maxOutBufBytes);
 
 	frameSize    = aacInfo.frameLength;
 	delaySamples = aacInfo.encoderDelay;
@@ -198,6 +200,8 @@ Bool BoCA::EncoderFDKAAC::Activate()
 		totalSamples = 0;
 	}
 
+	ex_aacEncClose(&handle);
+
 	/* Write ID3v2 tag if requested.
 	 */
 	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureFDKAAC::ConfigID, "AllowID3v2", False))
@@ -223,6 +227,25 @@ Bool BoCA::EncoderFDKAAC::Activate()
 		}
 	}
 
+	/* Get number of threads to use.
+	 */
+	Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
+	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", False);
+	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
+
+	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
+
+	/* Disable overlap if we use only one thread.
+	 */
+	if (numberOfThreads == 1) overlap = 0;
+	else			  overlap = 12;
+
+	/* Start up worker threads.
+	 */
+	for (Int i = 0; i < numberOfThreads; i++) workers.Add(new SuperWorker(config, format));
+
+	foreach (SuperWorker *worker, workers) worker->Start();
+
 	return True;
 }
 
@@ -232,7 +255,13 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 	 */
 	EncodeFrames(True);
 
-	ex_aacEncClose(&handle);
+	/* Tear down worker threads.
+	 */
+	foreach (SuperWorker *worker, workers) worker->Quit();
+	foreach (SuperWorker *worker, workers) worker->Wait();
+	foreach (SuperWorker *worker, workers) delete worker;
+
+	workers.RemoveAll();
 
 	/* Finish MP4 writing.
 	 */
@@ -354,7 +383,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 Int BoCA::EncoderFDKAAC::WriteData(Buffer<UnsignedByte> &data)
 {
-	const Format	&format	= track.GetFormat();
+	const Format	&format = track.GetFormat();
 
 	/* Copy data to samples buffer.
 	 */
@@ -375,78 +404,86 @@ Int BoCA::EncoderFDKAAC::EncodeFrames(Bool flush)
 {
 	const Format	&format = track.GetFormat();
 
-	/* Pad end of stream with empty samples.
+	/* Pass samples to workers.
 	 */
-	if (flush)
-	{
-		Int	 nullSamples = delaySamples;
-
-		if ((samplesBuffer.Size() / format.channels + delaySamples) % frameSize > 0) nullSamples += frameSize - (samplesBuffer.Size() / format.channels + delaySamples) % frameSize;
-
-		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
-
-		memset(samplesBuffer + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(int16_t) * nullSamples * format.channels);
-	}
-
-	/* Encode samples.
-	 */
-	Int	 dataLength	 = 0;
+	Int	 framesToProcess = blockSize;
 	Int	 framesProcessed = 0;
+	Int	 dataLength	 = 0;
 
 	Int	 samplesPerFrame = frameSize * format.channels;
 
-	while (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame)
+	if (flush) framesToProcess = Math::Floor(samplesBuffer.Size() / samplesPerFrame);
+
+	while (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame * framesToProcess)
 	{
-		/* Prepare buffer information.
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
+
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
+
+		workerToUse->Lock();
+
+		/* See if the worker has some packets for us.
 		 */
-		Void	*inputBuffer	   = (int16_t *) samplesBuffer + framesProcessed * samplesPerFrame;
-		Int	 inputBufferID	   = IN_AUDIO_DATA;
-		Int	 inputBufferSize   = samplesPerFrame;
-		Int	 inputElementSize  = 2;
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length());
 
-		Void	*outputBuffer	   = (uint8_t *) outBuffer;
-		Int	 outputBufferID	   = OUT_BITSTREAM_DATA;
-		Int	 outputBufferSize  = outBuffer.Size();
-		Int	 outputElementSize = 1;
-
-		/* Configure buffer descriptors.
+		/* Pass new frames to worker.
 		 */
-		AACENC_BufDesc	 input	     = { 0 };
-		AACENC_BufDesc	 output	     = { 0 };
+		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, flush ? samplesBuffer.Size() : samplesPerFrame * framesToProcess, flush);
+		workerToUse->Release();
 
-		input.numBufs		 = 1;
-		input.bufs		 = &inputBuffer;
-		input.bufferIdentifiers  = &inputBufferID;
-		input.bufSizes		 = &inputBufferSize;
-		input.bufElSizes	 = &inputElementSize;
+		framesProcessed += framesToProcess - overlap;
 
-		output.numBufs		 = 1;
-		output.bufs		 = &outputBuffer;
-		output.bufferIdentifiers = &outputBufferID;
-		output.bufSizes		 = &outputBufferSize;
-		output.bufElSizes	 = &outputElementSize;
+		nextWorker++;
 
-		/* Hand input data to encoder and retrieve output.
-		 */
-		AACENC_InArgs	 inputInfo   = { 0 };
-		AACENC_OutArgs	 outputInfo  = { 0 };
-
-		inputInfo.numInSamples = samplesPerFrame;
-
-		if (ex_aacEncEncode(handle, &input, &output, &inputInfo, &outputInfo) == AACENC_OK)
-		{
-			dataLength += outputInfo.numOutBytes;
-
-			if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, outputInfo.numOutBytes, frameSize, 0, true);
-			else		    driver->WriteData(outBuffer, outputInfo.numOutBytes);
-		}
-
-		framesProcessed++;
+		if (flush) break;
 	}
 
 	memmove(samplesBuffer, samplesBuffer + framesProcessed * samplesPerFrame, sizeof(int16_t) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
 
 	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
+
+	if (!flush) return dataLength;
+
+	/* Wait for workers to finish and process packets.
+	 */
+	for (Int i = 0; i < workers.Length(); i++)
+	{
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
+
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
+
+		workerToUse->Lock();
+
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length());
+
+		workerToUse->Release();
+
+		nextWorker++;
+	}
+
+	return dataLength;
+}
+
+Int BoCA::EncoderFDKAAC::ProcessPackets(const Buffer<unsigned char> &packets, const Array<Int> &packetSizes, Bool first)
+{
+	Int	 offset	    = 0;
+	Int	 dataLength = 0;
+
+	if (!first) for (Int i = 0; i < overlap; i++) offset += packetSizes.GetNth(i);
+
+	for (Int i = 0; i < packetSizes.Length(); i++)
+	{
+		if (i <	overlap && !first)	continue;
+		if (packetSizes.GetNth(i) == 0) continue;
+
+		if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) packets + offset, packetSizes.GetNth(i), frameSize, 0, true);
+		else		    driver->WriteData(packets + offset, packetSizes.GetNth(i));
+
+		offset	   += packetSizes.GetNth(i);
+		dataLength += packetSizes.GetNth(i);
+	}
 
 	return dataLength;
 }

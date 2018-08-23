@@ -104,14 +104,18 @@ BoCA::EncoderFAAC::EncoderFAAC()
 	configLayer  = NIL;
 
 	mp4File	     = NIL;
-	handle	     = NIL;
 
 	mp4Track     = -1;
 	sampleId     = 0;
 
 	frameSize    = 0;
 
+	blockSize    = 128;
+	overlap	     = 8;
+
 	totalSamples = 0;
+
+	nextWorker   = 0;
 
 	config	     = Config::Copy(GetConfiguration());
 
@@ -133,35 +137,20 @@ Bool BoCA::EncoderFAAC::Activate()
 	 */
 	Bool	 mp4Container = config->GetIntValue(ConfigureFAAC::ConfigID, "MP4Container", True);
 	Int	 mpegVersion  = config->GetIntValue(ConfigureFAAC::ConfigID, "MPEGVersion", 0);
-	Bool	 setQuality   = config->GetIntValue(ConfigureFAAC::ConfigID, "SetQuality", True);
-	Int	 aacQuality   = config->GetIntValue(ConfigureFAAC::ConfigID, "AACQuality", 100);
-	Int	 bitrate      = config->GetIntValue(ConfigureFAAC::ConfigID, "Bitrate", 96);
-	Bool	 allowJS      = config->GetIntValue(ConfigureFAAC::ConfigID, "AllowJS", True);
-	Bool	 useTNS	      = config->GetIntValue(ConfigureFAAC::ConfigID, "UseTNS", False);
-	Int	 bandwidth    = config->GetIntValue(ConfigureFAAC::ConfigID, "BandWidth", 22050);
 
 	/* Create FAAC encoder.
 	 */
 	unsigned long	 samplesSize = 0;
 	unsigned long	 bufferSize  = 0;
 
-	handle = ex_faacEncOpen(format.rate, format.channels, &samplesSize, &bufferSize);
-
-	outBuffer.Resize(bufferSize);
+	faacEncHandle	 handle = ex_faacEncOpen(format.rate, format.channels, &samplesSize, &bufferSize);
 
 	/* Set encoder parameters.
 	 */
 	faacEncConfigurationPtr	 fConfig = ex_faacEncGetCurrentConfiguration(handle);
 
-	fConfig->inputFormat	= FAAC_INPUT_16BIT;
-	fConfig->outputFormat	= mp4Container ? RAW_STREAM : ADTS_STREAM;
 	fConfig->mpegVersion	= mp4Container ? MPEG4 : mpegVersion;
 	fConfig->aacObjectType	= LOW;
-	fConfig->quantqual	= setQuality ? aacQuality : 0;
-	fConfig->bitRate	= setQuality ? 0 : bitrate * 1000;
-	fConfig->bandWidth	= bandwidth;
-	fConfig->jointmode	= allowJS ? JOINT_IS : JOINT_NONE;
-	fConfig->useTns		= useTNS;
 
 	ex_faacEncSetConfiguration(handle, fConfig);
 
@@ -177,8 +166,8 @@ Bool BoCA::EncoderFAAC::Activate()
 
 		/* Create MP4 file.
 		 */
-		mp4File		= ex_MP4CreateEx(track.outfile.ConvertTo("UTF-8"), 0, 1, 1, NIL, 0, NIL, 0);
-		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
+		mp4File	 = ex_MP4CreateEx(track.outfile.ConvertTo("UTF-8"), 0, 1, 1, NIL, 0, NIL, 0);
+		mp4Track = ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
 
@@ -190,6 +179,8 @@ Bool BoCA::EncoderFAAC::Activate()
 
 		totalSamples = 0;
 	}
+
+	ex_faacEncClose(handle);
 
 	/* Write ID3v2 tag if requested.
 	 */
@@ -216,6 +207,25 @@ Bool BoCA::EncoderFAAC::Activate()
 		}
 	}
 
+	/* Get number of threads to use.
+	 */
+	Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
+	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", False);
+	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
+
+	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
+
+	/* Disable overlap if we use only one thread.
+	 */
+	if (numberOfThreads == 1) overlap = 0;
+	else			  overlap = 8;
+
+	/* Start up worker threads.
+	 */
+	for (Int i = 0; i < numberOfThreads; i++) workers.Add(new SuperWorker(config, format));
+
+	foreach (SuperWorker *worker, workers) worker->Start();
+
 	return True;
 }
 
@@ -225,7 +235,13 @@ Bool BoCA::EncoderFAAC::Deactivate()
 	 */
 	EncodeFrames(True);
 
-	ex_faacEncClose(handle);
+	/* Tear down worker threads.
+	 */
+	foreach (SuperWorker *worker, workers) worker->Quit();
+	foreach (SuperWorker *worker, workers) worker->Wait();
+	foreach (SuperWorker *worker, workers) delete worker;
+
+	workers.RemoveAll();
 
 	/* Finish MP4 writing.
 	 */
@@ -374,47 +390,86 @@ Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 {
 	const Format	&format = track.GetFormat();
 
-	/* Pad end of stream with empty samples.
+	/* Pass samples to workers.
 	 */
-	if (flush && samplesBuffer.Size() > 0)
-	{
-		Int	 nullSamples = frameSize - (samplesBuffer.Size() / format.channels) % frameSize;
-
-		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
-
-		memset(samplesBuffer + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(int16_t) * nullSamples * format.channels);
-	}
-
-	/* Encode samples.
-	 */
-	Int	 dataLength	 = 0;
+	Int	 framesToProcess = blockSize;
 	Int	 framesProcessed = 0;
+	Int	 dataLength	 = 0;
 
 	Int	 samplesPerFrame = frameSize * format.channels;
 
-	while (flush || samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame)
+	if (flush) framesToProcess = Math::Floor(samplesBuffer.Size() / samplesPerFrame);
+
+	while (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame * framesToProcess)
 	{
-		unsigned long	 bytes = 0;
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) bytes = ex_faacEncEncode(handle, (int32_t *) (int16_t *) (samplesBuffer + framesProcessed * samplesPerFrame), samplesPerFrame, outBuffer, outBuffer.Size());
-		else										 bytes = ex_faacEncEncode(handle, NULL, 0, outBuffer, outBuffer.Size());
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
 
-		if (flush && bytes == 0) break;
+		workerToUse->Lock();
 
-		if (bytes > 0)
-		{
-			dataLength += bytes;
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length());
 
-			if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, bytes, frameSize, 0, true);
-			else		    driver->WriteData(outBuffer, bytes);
-		}
+		/* Pass new frames to worker.
+		 */
+		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, flush ? samplesBuffer.Size() : samplesPerFrame * framesToProcess, flush);
+		workerToUse->Release();
 
-		if (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame) framesProcessed++;
+		framesProcessed += framesToProcess - overlap;
+
+		nextWorker++;
+
+		if (flush) break;
 	}
 
 	memmove(samplesBuffer, samplesBuffer + framesProcessed * samplesPerFrame, sizeof(int16_t) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
 
 	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
+
+	if (!flush) return dataLength;
+
+	/* Wait for workers to finish and process packets.
+	 */
+	for (Int i = 0; i < workers.Length(); i++)
+	{
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
+
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
+
+		workerToUse->Lock();
+
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length());
+
+		workerToUse->Release();
+
+		nextWorker++;
+	}
+
+	return dataLength;
+}
+
+Int BoCA::EncoderFAAC::ProcessPackets(const Buffer<unsigned char> &packets, const Array<Int> &packetSizes, Bool first)
+{
+	Int	 offset	    = 0;
+	Int	 dataLength = 0;
+
+	if (!first) for (Int i = 0; i < overlap; i++) offset += packetSizes.GetNth(i);
+
+	for (Int i = 0; i < packetSizes.Length(); i++)
+	{
+		if (i <	overlap && !first)	continue;
+		if (packetSizes.GetNth(i) == 0) continue;
+
+		if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) packets + offset, packetSizes.GetNth(i), frameSize, 0, true);
+		else		    driver->WriteData(packets + offset, packetSizes.GetNth(i));
+
+		offset	   += packetSizes.GetNth(i);
+		dataLength += packetSizes.GetNth(i);
+	}
 
 	return dataLength;
 }

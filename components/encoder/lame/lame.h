@@ -11,7 +11,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
-#include "dllinterface.h"
+#include "repacker.h"
+#include "worker.h"
 
 BoCA_BEGIN_COMPONENT(EncoderLAME)
 
@@ -23,11 +24,25 @@ namespace BoCA
 			ConfigLayer		*configLayer;
 			Config			*config;
 
-			lame_t			 context;
+			Array<SuperWorker *>	 workers;
+
+			Int			 nextWorker;
 
 			Int			 dataOffset;
+			Int			 frameSize;
 
-			Buffer<unsigned char>	 outBuffer;
+			Int			 blockSize;
+			Int			 overlap;
+
+			Int64			 totalSamples;
+
+			SuperRepacker		*repacker;
+
+			Buffer<signed short>	 samplesBuffer;
+
+			Int			 EncodeFrames(Bool);
+			Int			 ProcessResults(SuperWorker *, Bool);
+			Int			 ProcessPackets(const Buffer<unsigned char> &, const Array<Int> &, Bool, Int &, Bool &);
 
 			static Bool		 ConvertArguments(Config *);
 		public:

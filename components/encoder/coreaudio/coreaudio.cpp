@@ -95,8 +95,6 @@ namespace BoCA
 	CA::OSStatus	 AudioFileWriteProc(void *, CA::SInt64, CA::UInt32, const void *, CA::UInt32 *);
 	CA::SInt64	 AudioFileGetSizeProc(void *);
 	CA::OSStatus	 AudioFileSetSizeProc(void *, CA::SInt64);
-
-	CA::OSStatus	 AudioConverterComplexInputDataProc(CA::AudioConverterRef, CA::UInt32 *, CA::AudioBufferList *, CA::AudioStreamPacketDescription **, void *);
 };
 
 BoCA::EncoderCoreAudio::EncoderCoreAudio()
@@ -104,17 +102,19 @@ BoCA::EncoderCoreAudio::EncoderCoreAudio()
 	configLayer    = NIL;
 
 	audioFile      = NIL;
-	converter      = NIL;
 
 	fileType       = 0;
 
 	dataOffset     = 0;
 
-	buffers	       = NIL;
-	bufferSize     = 0;
-	bytesConsumed  = 0;
+	blockSize      = 256;
+	overlap	       = 24;
+
+	nextWorker     = 0;
 
 	packetsWritten = 0;
+	packetsMissing = 0;
+
 	totalSamples   = 0;
 
 	config	       = Config::Copy(GetConfiguration());
@@ -175,7 +175,7 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	CA::AudioStreamBasicDescription	 destinationFormat = { 0 };
 
 	destinationFormat.mFormatID	    = codec;
-	destinationFormat.mSampleRate	    = GetOutputSampleRate(format.rate);
+	destinationFormat.mSampleRate	    = SuperWorker::GetOutputSampleRate(destinationFormat.mFormatID, format.rate);
 	destinationFormat.mChannelsPerFrame = format.channels;
 
 	CA::UInt32	 formatSize = sizeof(destinationFormat);
@@ -184,6 +184,8 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 	/* Create audio converter object.
 	 */
+	CA::AudioConverterRef	 converter = NIL;
+
 	if (CA::AudioConverterNew(&sourceFormat, &destinationFormat, &converter) != 0)
 	{
 		errorString = "Could not create converter component!";
@@ -191,6 +193,8 @@ Bool BoCA::EncoderCoreAudio::Activate()
 
 		return False;
 	}
+
+	frameSize = destinationFormat.mFramesPerPacket;
 
 	/* Set bitrate if format does support bitrates.
 	 */
@@ -275,24 +279,31 @@ Bool BoCA::EncoderCoreAudio::Activate()
 		delete [] cookie;
 	}
 
-	/* Get maximum output packet size.
-	 */
-	CA::UInt32	 valueSize = 4;
-
-	CA::AudioConverterGetProperty(converter, CA::kAudioConverterPropertyMaximumOutputPacketSize, &valueSize, &bufferSize);
-
-	/* Set up buffer for Core Audio.
-	 */
-	buffers = (CA::AudioBufferList	*) new unsigned char [sizeof(CA::AudioBufferList) + sizeof(CA::AudioBuffer)];
-
-	buffers->mNumberBuffers = 1;
-
-	buffers->mBuffers[0].mData	     = new unsigned char [bufferSize];
-	buffers->mBuffers[0].mDataByteSize   = bufferSize;
-	buffers->mBuffers[0].mNumberChannels = format.channels;
+	CA::AudioConverterDispose(converter);
 
 	packetsWritten = 0;
+	packetsMissing = 0;
+
 	totalSamples   = 0;
+
+	/* Get number of threads to use.
+	 */
+	Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
+	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", False);
+	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
+
+	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
+
+	/* Disable overlap if we use only one thread.
+	 */
+	if (numberOfThreads == 1) overlap = 0;
+	else			  overlap = 24;
+
+	/* Start up worker threads.
+	 */
+	for (Int i = 0; i < numberOfThreads; i++) workers.Add(new SuperWorker(config, format));
+
+	foreach (SuperWorker *worker, workers) worker->Start();
 
 	return True;
 }
@@ -307,21 +318,16 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	 */
 	EncodeFrames(True);
 
-	/* Free buffers.
-	 */
-	delete [] (unsigned char *) buffers->mBuffers[0].mData;
-	delete [] (unsigned char *) buffers;
-
 	/* Write priming and remainder info.
 	 */
-	CA::AudioConverterPrimeInfo	 primeInfo;
-	CA::UInt32			 size = sizeof(primeInfo);
+	CA::AudioConverterPrimeInfo	 initialInfo = workers.GetNth(0					 )->GetPrimeInfo();
+	CA::AudioConverterPrimeInfo	 finalInfo   = workers.GetNth((nextWorker - 1) % workers.Length())->GetPrimeInfo();
 
-	if (CA::AudioConverterGetProperty(converter, CA::kAudioConverterPrimeInfo, &size, &primeInfo) == 0)
+	if (initialInfo.leadingFrames != 0xFFFFFFFF && finalInfo.trailingFrames != 0xFFFFFFFF)
 	{
 		const Format	&format = track.GetFormat();
 
-		Int	 rate	 = GetOutputSampleRate(format.rate);
+		Int	 rate	 = SuperWorker::GetOutputSampleRate(codec, format.rate);
 
 		if (rate == 0) rate = format.rate;
 
@@ -333,8 +339,8 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 		CA::AudioFilePacketTableInfo	 pti;
 
-		pti.mPrimingFrames     = primeInfo.leadingFrames + extra;
-		pti.mRemainderFrames   = primeInfo.trailingFrames;
+		pti.mPrimingFrames     = initialInfo.leadingFrames + extra;
+		pti.mRemainderFrames   = finalInfo.trailingFrames;
 		pti.mNumberValidFrames = totalSamples / divider;
 
 		CA::AudioFileSetProperty(audioFile, CA::kAudioFilePropertyPacketTableInfo, sizeof(pti), &pti);
@@ -344,20 +350,25 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	 * encoders may change it during encoding.
 	 */
 	CA::UInt32	 cookieSize = 4;
+	unsigned char	*cookie	    = workers.GetFirst()->GetMagicCookie(&cookieSize);
 
-	if (CA::AudioConverterGetPropertyInfo(converter, CA::kAudioConverterCompressionMagicCookie, &cookieSize, NIL) == 0)
+	if (cookie != NIL)
 	{
-		unsigned char	*cookie = new unsigned char [cookieSize];
-
-		CA::AudioConverterGetProperty(converter, CA::kAudioConverterCompressionMagicCookie, &cookieSize, cookie);
 		CA::AudioFileSetProperty(audioFile, CA::kAudioFilePropertyMagicCookieData, cookieSize, cookie);
 
 		delete [] cookie;
 	}
 
-	/* Close converter and audio file.
+	/* Tear down worker threads.
 	 */
-	CA::AudioConverterDispose(converter);
+	foreach (SuperWorker *worker, workers) worker->Quit();
+	foreach (SuperWorker *worker, workers) worker->Wait();
+	foreach (SuperWorker *worker, workers) delete worker;
+
+	workers.RemoveAll();
+
+	/* Close audio file.
+	 */
 	CA::AudioFileClose(audioFile);
 
 	/* Write metadata to file
@@ -447,90 +458,113 @@ Int BoCA::EncoderCoreAudio::WriteData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Default_6_1, Channel::AAC_6_1);
 	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Default_7_1, Channel::AAC_7_1);
 
-	/* Configure buffer.
+	/* Copy data to samples buffer.
 	 */
-	buffer.Resize(buffer.Size() + data.Size());
+	samplesBuffer.Resize(samplesBuffer.Size() + data.Size());
 
-	memmove(buffer, buffer + bytesConsumed, buffer.Size() - bytesConsumed - data.Size());
-	memcpy(buffer + buffer.Size() - bytesConsumed - data.Size(), data, data.Size());
+	memcpy(samplesBuffer + samplesBuffer.Size() - data.Size(), data, data.Size());
 
-	buffer.Resize(buffer.Size() - bytesConsumed);
-
-	bytesConsumed = 0;
-
-	/* Convert frames.
+	/* Output samples to encoder.
 	 */
+	totalSamples += data.Size() / format.channels / (format.bits / 8);
+
 	return EncodeFrames(False);
 }
 
 Int BoCA::EncoderCoreAudio::EncodeFrames(Bool flush)
 {
-	/* Encode samples.
+	const Format	&format = track.GetFormat();
+
+	/* Pass samples to workers.
 	 */
-	Int	 totalOutBytes = 0;
+	Int	 framesToProcess = blockSize;
+	Int	 framesProcessed = 0;
+	Int	 dataLength	 = 0;
 
-	CA::UInt32				 packets = 1;
-	CA::AudioStreamPacketDescription	 packet;
+	Int	 bytesPerFrame = frameSize * format.channels * (format.bits / 8);
 
-	buffers->mBuffers[0].mDataByteSize = bufferSize;
+	if (flush) framesToProcess = Math::Floor(samplesBuffer.Size() / bytesPerFrame);
 
-	while (CA::AudioConverterFillComplexBuffer(converter, &AudioConverterComplexInputDataProc, this, &packets, buffers, &packet) == 0)
+	while (samplesBuffer.Size() - framesProcessed * bytesPerFrame >= bytesPerFrame * framesToProcess)
 	{
-		if (buffers->mBuffers[0].mDataByteSize == 0) break;
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		CA::AudioFileWritePackets(audioFile, False, buffers->mBuffers[0].mDataByteSize, &packet, packetsWritten, &packets, buffers->mBuffers[0].mData);
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
 
-		packetsWritten += packets;
-		totalOutBytes  += buffers->mBuffers[0].mDataByteSize;
+		workerToUse->Lock();
 
-		if (!flush && buffer.Size() - bytesConsumed < 65536) break;
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), workerToUse->GetPacketInfos(), nextWorker == workers.Length(), nextWorker >= 2 * workers.Length());
 
-		buffers->mBuffers[0].mDataByteSize = bufferSize;
+		/* Pass new frames to worker.
+		 */
+		workerToUse->Encode(samplesBuffer, framesProcessed * bytesPerFrame, flush ? samplesBuffer.Size() : bytesPerFrame * framesToProcess, flush);
+		workerToUse->Release();
+
+		framesProcessed += framesToProcess - overlap;
+
+		nextWorker++;
+
+		if (flush) break;
 	}
 
-	return totalOutBytes;
+	memmove(samplesBuffer, samplesBuffer + framesProcessed * bytesPerFrame, samplesBuffer.Size() - framesProcessed * bytesPerFrame);
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * bytesPerFrame);
+
+	if (!flush) return dataLength;
+
+	/* Wait for workers to finish and process packets.
+	 */
+	for (Int i = 0; i < workers.Length(); i++)
+	{
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
+
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
+
+		workerToUse->Lock();
+
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), workerToUse->GetPacketInfos(), nextWorker == workers.Length(), nextWorker >= 2 * workers.Length());
+
+		workerToUse->Release();
+
+		nextWorker++;
+	}
+
+	return dataLength;
 }
 
-Int BoCA::EncoderCoreAudio::GetOutputSampleRate(Int inputRate) const
+Int BoCA::EncoderCoreAudio::ProcessPackets(const Buffer<unsigned char> &packetData, const Array<Int> &packetSizes, const Array<CA::AudioStreamPacketDescription *> &packetInfos, Bool first, Bool discardMissing)
 {
-	/* Get supported sample rate ranges for selected codec.
-	 */
-	CA::UInt32	 format	= config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
-	CA::UInt32	 size	= 0;
+	Int	 offset	    = 0;
+	Int	 dataLength = 0;
 
-	CA::AudioFormatGetPropertyInfo(CA::kAudioFormatProperty_AvailableEncodeSampleRates, sizeof(format), &format, &size);
+	if (discardMissing) packetsMissing = 0;
 
-	if (size == 0) return inputRate;
+	if (!first) for (Int i = 0; i < overlap - packetsMissing; i++) offset += packetSizes.GetNth(i);
 
-	CA::AudioValueRange	*sampleRates = new CA::AudioValueRange [size / sizeof(CA::AudioValueRange)];
-
-	CA::AudioFormatGetProperty(CA::kAudioFormatProperty_AvailableEncodeSampleRates, sizeof(format), &format, &size, sampleRates);
-
-	/* Find best fit output sample rate.
-	 */
-	Int	 outputRate = 0;
-
-	for (UnsignedInt i = 0; i < size / sizeof(CA::AudioValueRange); i++)
+	for (Int i = 0; i < packetSizes.Length(); i++)
 	{
-		/* Check if encoder supports arbitrary sample rate.
-		 */
-		if (sampleRates[i].mMinimum == 0 &&
-		    sampleRates[i].mMaximum == 0) { outputRate = inputRate; break; }
+		if (i <	overlap - packetsMissing && !first) continue;
+		if (packetSizes.GetNth(i) == 0)		    continue;
 
-		/* Check if input rate falls into current sample rate range.
-		 */
-		if (inputRate >= sampleRates[i].mMinimum &&
-		    inputRate <= sampleRates[i].mMaximum) { outputRate = inputRate; break; }
+		CA::UInt32				 packets = 1;
+		CA::AudioStreamPacketDescription	*packet	 = packetInfos.GetNth(i);
 
-		/* Check if current sample rate range fits better than previous best.
-		 */
-		if (Math::Abs(inputRate - sampleRates[i].mMinimum) < Math::Abs(inputRate - outputRate)) outputRate = sampleRates[i].mMinimum;
-		if (Math::Abs(inputRate - sampleRates[i].mMaximum) < Math::Abs(inputRate - outputRate)) outputRate = sampleRates[i].mMaximum;
+		CA::AudioFileWritePackets(audioFile, False, packetSizes.GetNth(i), packet, packetsWritten, &packets, (unsigned char *) packetData + offset);
+
+		offset	   += packetSizes.GetNth(i);
+		dataLength += packetSizes.GetNth(i);
+
+		packetsWritten += packets;
 	}
 
-	delete [] sampleRates;
+	packetsMissing = blockSize - packetSizes.Length();
 
-	return outputRate;
+	return dataLength;
 }
 
 Bool BoCA::EncoderCoreAudio::SetOutputFormat(Int n)
@@ -541,7 +575,7 @@ Bool BoCA::EncoderCoreAudio::SetOutputFormat(Int n)
 	else	    config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", False);
 
 	if	(n != 2 && (CA::UInt32) config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC) == CA::kAudioFormatAppleLossless) config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
-	else if	(n == 2)																       config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatAppleLossless);
+	else if (n == 2)																       config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatAppleLossless);
 
 	return True;
 }
@@ -634,27 +668,6 @@ CA::OSStatus BoCA::AudioFileSetSizeProc(void *inClientData, CA::SInt64 inSize)
 	EncoderCoreAudio	*filter = (EncoderCoreAudio *) inClientData;
 
 	filter->driver->Truncate(inSize + filter->dataOffset);
-
-	return 0;
-}
-
-CA::OSStatus BoCA::AudioConverterComplexInputDataProc(CA::AudioConverterRef inAudioConverter, CA::UInt32 *ioNumberDataPackets, CA::AudioBufferList *ioData, CA::AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
-{
-	EncoderCoreAudio	*filter = (EncoderCoreAudio *) inUserData;
-	const Format		&format = filter->track.GetFormat();
-
-	filter->suppliedData.Resize(Math::Min(filter->buffer.Size() - filter->bytesConsumed, *ioNumberDataPackets * format.channels * (format.bits / 8)));
-
-	memcpy(filter->suppliedData, filter->buffer + filter->bytesConsumed, filter->suppliedData.Size());
-
-	*ioNumberDataPackets = filter->suppliedData.Size() / format.channels / (format.bits / 8);
-
-	ioData->mBuffers[0].mData           = filter->suppliedData;
-	ioData->mBuffers[0].mDataByteSize   = filter->suppliedData.Size();
-	ioData->mBuffers[0].mNumberChannels = format.channels;
-
-	filter->totalSamples  += *ioNumberDataPackets;
-	filter->bytesConsumed += ioData->mBuffers[0].mDataByteSize;
 
 	return 0;
 }

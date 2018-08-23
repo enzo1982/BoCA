@@ -11,6 +11,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
+#include "worker.h"
 #include "dllinterface.h"
 
 BoCA_BEGIN_COMPONENT(EncoderFAAC)
@@ -23,20 +24,26 @@ namespace BoCA
 			ConfigLayer		*configLayer;
 			Config			*config;
 
+			Array<SuperWorker *>	 workers;
+
 			MP4FileHandle		 mp4File;
-			faacEncHandle		 handle;
 
 			Int			 mp4Track;
 			Int			 sampleId;
 
+			Int			 nextWorker;
+
 			Int			 frameSize;
+
+			Int			 blockSize;
+			Int			 overlap;
 
 			Int			 totalSamples;
 
-			Buffer<unsigned char>	 outBuffer;
 			Buffer<int16_t>		 samplesBuffer;
 
 			Int			 EncodeFrames(Bool);
+			Int			 ProcessPackets(const Buffer<unsigned char> &, const Array<Int> &, Bool);
 
 			static Bool		 ConvertArguments(Config *);
 		public:

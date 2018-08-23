@@ -10,7 +10,7 @@ BOCA_PATH = ../../..
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
-OBJECTS	  = config.o coreaudio.o dllinterface.o
+OBJECTS	  = config.o coreaudio.o dllinterface.o worker.o
 
 # Enter additional defines here:
 DEFINE	  = -Wno-multichar

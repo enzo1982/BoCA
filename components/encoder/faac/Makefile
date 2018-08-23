@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = config.o dllinterface.o faac.o
+OBJECTS	  = config.o dllinterface.o faac.o worker.o
 
 # Enter additional defines here:
 DEFINE	  = -I$(SRCDIR) -DFAACAPI=

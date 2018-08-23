@@ -87,10 +87,6 @@ Void smooth::DetachDLL()
 
 namespace BoCA
 {
-	/* Constants.
-	 */
-	const Int	 maxPacketSize = 4000;
-
 	/* Opus header definition.
 	 */
 	struct OpusHeader
@@ -111,18 +107,22 @@ namespace BoCA
 
 BoCA::EncoderOpus::EncoderOpus()
 {
-	configLayer  = NIL;
+	configLayer	= NIL;
 
-	encoder	     = NIL;
+	frameSize	= 0;
+	preSkip		= 0;
 
-	frameSize    = 0;
-	preSkip	     = 0;
-	sampleRate   = 48000;
+	blockSize	= 256;
+	overlap		= 24;
 
-	numPackets   = 0;
-	totalSamples = 0;
+	sampleRate	= 48000;
 
-	config	     = Config::Copy(GetConfiguration());
+	numPackets	= 0;
+	totalSamples	= 0;
+
+	nextWorker	= 0;
+
+	config		= Config::Copy(GetConfiguration());
 
 	ConvertArguments(config);
 
@@ -159,8 +159,6 @@ Bool BoCA::EncoderOpus::Activate()
 
 	ex_ogg_stream_init(&os, rand());
 
-	dataBuffer.Resize(maxPacketSize * Math::Ceil(format.channels / 2.0));
-
 	/* Create Opus header.
 	 */
 	OpusHeader	 setup;
@@ -181,23 +179,10 @@ Bool BoCA::EncoderOpus::Activate()
 	int	 streams = 0;
 	int	 coupled = 0;
 
-	encoder = ex_opus_multistream_surround_encoder_create(sampleRate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
+	OpusMSEncoder	*encoder = ex_opus_multistream_surround_encoder_create(sampleRate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
 
 	setup.nb_streams = streams;
 	setup.nb_coupled = coupled;
-
-	/* Set encoder parameters.
-	 */
-	if (config->GetIntValue(ConfigureOpus::ConfigID, "Mode", 0)	 != 0) ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_SIGNAL(OPUS_SIGNAL_VOICE + config->GetIntValue(ConfigureOpus::ConfigID, "Mode", 0) - 1));
-	if (config->GetIntValue(ConfigureOpus::ConfigID, "Bandwidth", 0) != 0) ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_BANDWIDTH_NARROWBAND + config->GetIntValue(ConfigureOpus::ConfigID, "Bandwidth", 0) - 1));
-
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_BITRATE( config->GetIntValue(ConfigureOpus::ConfigID, "Bitrate", 128) * 1000));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR(config->GetIntValue(ConfigureOpus::ConfigID, "EnableVBR", True)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR_CONSTRAINT(config->GetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", False)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(config->GetIntValue(ConfigureOpus::ConfigID, "PacketLoss", 0)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue(ConfigureOpus::ConfigID, "EnableDTX", False)));
-	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(0));
 
 	/* Get number of pre-skip samples.
 	 */
@@ -208,6 +193,8 @@ Bool BoCA::EncoderOpus::Activate()
 	frameSize     = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
 	totalSamples  = preSkip;
 	numPackets    = 0;
+
+	ex_opus_multistream_encoder_destroy(encoder);
 
 	/* Adjust endianness of header fields.
 	 */
@@ -269,6 +256,25 @@ Bool BoCA::EncoderOpus::Activate()
 
 	WriteOggPackets(True);
 
+	/* Get number of threads to use.
+	 */
+	Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
+	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", False);
+	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
+
+	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
+
+	/* Disable overlap if we use only one thread.
+	 */
+	if (numberOfThreads == 1) overlap = 0;
+	else			  overlap = Math::Max(24, (Int) Math::Ceil(24.0 * 960 / frameSize));
+
+	/* Start up worker threads.
+	 */
+	for (Int i = 0; i < numberOfThreads; i++) workers.Add(new SuperWorker(config, format));
+
+	foreach (SuperWorker *worker, workers) worker->Start();
+
 	return True;
 }
 
@@ -282,9 +288,15 @@ Bool BoCA::EncoderOpus::Deactivate()
 	 */
 	WriteOggPackets(True);
 
-	ex_opus_multistream_encoder_destroy(encoder);
-
 	ex_ogg_stream_clear(&os);
+
+	/* Tear down worker threads.
+	 */
+	foreach (SuperWorker *worker, workers) worker->Quit();
+	foreach (SuperWorker *worker, workers) worker->Wait();
+	foreach (SuperWorker *worker, workers) delete worker;
+
+	workers.RemoveAll();
 
 	/* Fix chapter marks in Vorbis Comments.
 	 */
@@ -337,31 +349,91 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 		memset(((signed short *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(short) * nullSamples * format.channels);
 	}
 
-	/* Encode samples and build Ogg packets.
+	/* Pass samples to workers.
 	 */
+	Int	 framesToProcess = blockSize;
 	Int	 framesProcessed = 0;
+	Int	 dataLength	 = 0;
 
-	while (samplesBuffer.Size() - framesProcessed * frameSize * format.channels >= frameSize * format.channels)
+	Int	 samplesPerFrame = frameSize * format.channels;
+
+	if (flush) framesToProcess = Math::Floor(samplesBuffer.Size() / samplesPerFrame);
+
+	while (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame * framesToProcess)
 	{
-		Int	 dataLength = ex_opus_multistream_encode(encoder, samplesBuffer + framesProcessed * frameSize * format.channels, frameSize, dataBuffer, dataBuffer.Size());
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
+
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
+
+		workerToUse->Lock();
+
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length(), False, 0);
+
+		/* Pass new frames to worker.
+		 */
+		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, samplesPerFrame * framesToProcess);
+		workerToUse->Release();
+
+		framesProcessed += framesToProcess - overlap;
+
+		nextWorker++;
+
+		if (flush) break;
+	}
+
+	memmove((signed short *) samplesBuffer, ((signed short *) samplesBuffer) + framesProcessed * samplesPerFrame, sizeof(short) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
+
+	if (!flush) return dataLength;
+
+	/* Wait for workers to finish and process packets.
+	 */
+	for (Int i = 0; i < workers.Length(); i++)
+	{
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
+
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
+
+		workerToUse->Lock();
+
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length(), i == workers.Length() - 1, i == workers.Length() - 1 ? nullSamples : 0);
+
+		workerToUse->Release();
+
+		nextWorker++;
+	}
+
+	return dataLength;
+}
+
+Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, const Array<Int> &packetSizes, Bool first, Bool flush, Int nullSamples)
+{
+	Int	 offset = 0;
+
+	if (!first) for (Int i = 0; i < overlap; i++) offset += packetSizes.GetNth(i);
+
+	for (Int i = 0; i < packetSizes.Length(); i++)
+	{
+		if (i <	overlap && !first) continue;
 
 		totalSamples += frameSize;
 
-		op.packet     = dataBuffer;
-		op.bytes      = dataLength;
-		op.b_o_s      = 0;
-		op.e_o_s      =  (flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= frameSize * format.channels) ? 1 : 0;
-		op.granulepos = ((flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= frameSize * format.channels) ? totalSamples - nullSamples : totalSamples) * (48000 / sampleRate);
+		op.packet     = packets + offset;
+		op.bytes      = packetSizes.GetNth(i);
+		op.b_o_s      = first && i == 0;
+		op.e_o_s      = flush && i == packetSizes.Length() - 1;
+		op.granulepos = (op.e_o_s ? totalSamples - nullSamples : totalSamples) * (48000 / sampleRate);
 		op.packetno   = numPackets++;
 
-		ex_ogg_stream_packetin(&os, &op);
+		ex_ogg_stream_packetin(&os, &op);	
 
-		framesProcessed++;
+		offset += packetSizes.GetNth(i);
 	}
-
-	memmove((signed short *) samplesBuffer, ((signed short *) samplesBuffer) + framesProcessed * frameSize * format.channels, sizeof(short) * (samplesBuffer.Size() - framesProcessed * frameSize * format.channels));
-
-	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frameSize * format.channels);
 
 	return WriteOggPackets(flush);
 }

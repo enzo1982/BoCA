@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -49,12 +49,15 @@ typedef int				(CDECL *LAME_SET_VBR_MAX_BITRATE_KBPS)	(lame_t, int);
 typedef int				(CDECL *LAME_SET_NOATH)			(lame_t, int);
 typedef int				(CDECL *LAME_SET_ATHTYPE)		(lame_t, int);
 typedef int				(CDECL *LAME_SET_USETEMPORAL)		(lame_t, int);
-typedef int				(CDECL *LAME_INIT_PARAMS)		(lame_t const);
+typedef int				(CDECL *LAME_INIT_PARAMS)		(lame_t);
+typedef int				(CDECL *LAME_GET_OUT_SAMPLERATE)	(const lame_t);
+typedef int				(CDECL *LAME_GET_FRAMESIZE)		(const lame_t);
 typedef int				(CDECL *LAME_ENCODE_BUFFER)		(lame_t, const short int [], const short int [], const int, unsigned char *, const int);
 typedef int				(CDECL *LAME_ENCODE_BUFFER_INTERLEAVED)	(lame_t, short int [], int, unsigned char *, int);
 typedef int				(CDECL *LAME_ENCODE_FLUSH)		(lame_t, unsigned char *, int);
+typedef int				(CDECL *LAME_ENCODE_FLUSH_NOGAP)	(lame_t, unsigned char *, int);
 typedef char *				(CDECL *GET_LAME_SHORT_VERSION)		();
-typedef size_t				(CDECL *LAME_GET_LAMETAG_FRAME)		(lame_t, unsigned char *, size_t);
+typedef size_t				(CDECL *LAME_GET_LAMETAG_FRAME)		(const lame_t, unsigned char *, size_t);
 typedef int				(CDECL *LAME_SET_BWRITEVBRTAG)		(lame_t, int);
 
 extern LAME_INIT			 ex_lame_init;
@@ -85,9 +88,12 @@ extern LAME_SET_NOATH			 ex_lame_set_noATH;
 extern LAME_SET_ATHTYPE			 ex_lame_set_ATHtype;
 extern LAME_SET_USETEMPORAL		 ex_lame_set_useTemporal;
 extern LAME_INIT_PARAMS			 ex_lame_init_params;
+extern LAME_GET_OUT_SAMPLERATE		 ex_lame_get_out_samplerate;
+extern LAME_GET_FRAMESIZE		 ex_lame_get_framesize;
 extern LAME_ENCODE_BUFFER		 ex_lame_encode_buffer;
 extern LAME_ENCODE_BUFFER_INTERLEAVED	 ex_lame_encode_buffer_interleaved;
 extern LAME_ENCODE_FLUSH		 ex_lame_encode_flush;
+extern LAME_ENCODE_FLUSH_NOGAP		 ex_lame_encode_flush_nogap;
 extern GET_LAME_SHORT_VERSION		 ex_get_lame_short_version;
 extern LAME_GET_LAMETAG_FRAME		 ex_lame_get_lametag_frame;
 extern LAME_SET_BWRITEVBRTAG		 ex_lame_set_bWriteVbrTag;

@@ -11,6 +11,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
+#include "worker.h"
 #include "dllinterface.h"
 
 BoCA_BEGIN_COMPONENT(EncoderOpus)
@@ -23,24 +24,29 @@ namespace BoCA
 			ConfigLayer		*configLayer;
 			Config			*config;
 
+			Array<SuperWorker *>	 workers;
+
 			ogg_stream_state	 os;
 			ogg_page		 og;
 			ogg_packet		 op;
 
-			OpusMSEncoder		*encoder;
+			Int			 nextWorker;
 
 			Int			 frameSize;
 			Int			 preSkip;
+
+			Int			 blockSize;
+			Int			 overlap;
 
 			Int			 sampleRate;
 
 			Int			 numPackets;
 			Int			 totalSamples;
 
-			Buffer<unsigned char>	 dataBuffer;
 			Buffer<signed short>	 samplesBuffer;
 
 			Int			 EncodeFrames(Bool);
+			Int			 ProcessPackets(const Buffer<unsigned char> &, const Array<Int> &, Bool, Bool, Int);
 			Bool			 FixChapterMarks();
 
 			Int			 WriteOggPackets(Bool);

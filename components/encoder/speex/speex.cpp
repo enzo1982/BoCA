@@ -88,13 +88,16 @@ BoCA::EncoderSpeex::EncoderSpeex()
 {
 	configLayer  = NIL;
 
-	encoder	     = NIL;
-
 	frameSize    = 0;
 	lookAhead    = 0;
 
+	blockSize    = 256;
+	overlap	     = 16;
+
 	numPackets   = 0;
 	totalSamples = 0;
+
+	nextWorker   = 0;
 
 	config	     = Config::Copy(GetConfiguration());
 
@@ -103,8 +106,6 @@ BoCA::EncoderSpeex::EncoderSpeex()
 	memset(&os, 0, sizeof(os));
 	memset(&og, 0, sizeof(og));
 	memset(&op, 0, sizeof(op));
-
-	memset(&bits, 0, sizeof(bits));
 }
 
 BoCA::EncoderSpeex::~EncoderSpeex()
@@ -139,56 +140,14 @@ Bool BoCA::EncoderSpeex::Activate()
 		else			       modeID = SPEEX_MODEID_UWB;
 	}
 
-	/* Create Speex encoder.
-	 */
-	encoder = ex_speex_encoder_init(ex_speex_lib_get_mode(modeID));
-
-	/* Set encoder options.
-	 */
-	spx_int32_t	 vbr = config->GetIntValue(ConfigureSpeex::ConfigID, "VBR", 0);
-	spx_int32_t	 abr = config->GetIntValue(ConfigureSpeex::ConfigID, "ABR", -16) * 1000;
-	spx_int32_t	 complexity = config->GetIntValue(ConfigureSpeex::ConfigID, "Complexity", 3);
-
-	ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR, &vbr);
-	ex_speex_encoder_ctl(encoder, SPEEX_SET_COMPLEXITY, &complexity);
-
-	if (abr > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_ABR, &abr);
-
-	if (vbr)
-	{
-		float		 vbrq = config->GetIntValue(ConfigureSpeex::ConfigID, "VBRQuality", 80) / 10.0;
-		spx_int32_t	 vbrmax = config->GetIntValue(ConfigureSpeex::ConfigID, "VBRMaxBitrate", -48) * 1000;
-
-		ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR_QUALITY, &vbrq);
-
-		if (vbrmax > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_VBR_MAX_BITRATE, &vbrmax);
-	}
-	else
-	{
-		spx_int32_t	 quality = config->GetIntValue(ConfigureSpeex::ConfigID, "Quality", 8);
-		spx_int32_t	 bitrate = config->GetIntValue(ConfigureSpeex::ConfigID, "Bitrate", -16) * 1000;
-		spx_int32_t	 vad = config->GetIntValue(ConfigureSpeex::ConfigID, "VAD", 0);
-
-		if (quality > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_QUALITY, &quality);
-		if (bitrate > 0) ex_speex_encoder_ctl(encoder, SPEEX_SET_BITRATE, &bitrate);
-
-		ex_speex_encoder_ctl(encoder, SPEEX_SET_VAD, &vad);
-	}
-
-	if (vbr || abr > 0 || config->GetIntValue(ConfigureSpeex::ConfigID, "VAD", 0))
-	{
-		spx_int32_t	 dtx = config->GetIntValue(ConfigureSpeex::ConfigID, "DTX", 0);
-
-		ex_speex_encoder_ctl(encoder, SPEEX_SET_DTX, &dtx);
-	}
-
 	/* Get frame size and look-ahead.
 	 */
-	spx_int32_t	 rate = format.rate;
+	void	*encoder = ex_speex_encoder_init(ex_speex_lib_get_mode(modeID));
 
-	ex_speex_encoder_ctl(encoder, SPEEX_SET_SAMPLING_RATE, &rate);
 	ex_speex_encoder_ctl(encoder, SPEEX_GET_FRAME_SIZE, &frameSize);
 	ex_speex_encoder_ctl(encoder, SPEEX_GET_LOOKAHEAD, &lookAhead);
+
+	ex_speex_encoder_destroy(encoder);
 
 	totalSamples = 0;
 	numPackets   = 0;
@@ -200,7 +159,7 @@ Bool BoCA::EncoderSpeex::Activate()
 	ex_speex_init_header(&speex_header, format.rate, format.channels, ex_speex_lib_get_mode(modeID));
 
 	speex_header.frames_per_packet = 1;
-	speex_header.vbr	       = vbr;
+	speex_header.vbr	       = config->GetIntValue(ConfigureSpeex::ConfigID, "VBR", 0);
 
 	/* Write Speex header.
 	 */
@@ -247,7 +206,24 @@ Bool BoCA::EncoderSpeex::Activate()
 
 	WriteOggPackets(True);
 
-	ex_speex_bits_init(&bits);
+	/* Get number of threads to use.
+	 */
+	Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
+	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", False);
+	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
+
+	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
+
+	/* Disable overlap if we use only one thread.
+	 */
+	if (numberOfThreads == 1) overlap = 0;
+	else			  overlap = 16;
+
+	/* Start up worker threads.
+	 */
+	for (Int i = 0; i < numberOfThreads; i++) workers.Add(new SuperWorker(config, format));
+
+	foreach (SuperWorker *worker, workers) worker->Start();
 
 	return True;
 }
@@ -262,11 +238,15 @@ Bool BoCA::EncoderSpeex::Deactivate()
 	 */
 	WriteOggPackets(True);
 
-	ex_speex_bits_destroy(&bits);
-
-	ex_speex_encoder_destroy(encoder);
-
 	ex_ogg_stream_clear(&os);
+
+	/* Tear down worker threads.
+	 */
+	foreach (SuperWorker *worker, workers) worker->Quit();
+	foreach (SuperWorker *worker, workers) worker->Wait();
+	foreach (SuperWorker *worker, workers) delete worker;
+
+	workers.RemoveAll();
 
 	/* Fix chapter marks in Vorbis Comments.
 	 */
@@ -309,43 +289,92 @@ Int BoCA::EncoderSpeex::EncodeFrames(Bool flush)
 		memset(((signed short *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(short) * nullSamples * format.channels);
 	}
 
-	/* Encode samples and build Ogg packets.
+	/* Pass samples to workers.
 	 */
+	Int	 framesToProcess = blockSize;
 	Int	 framesProcessed = 0;
+	Int	 dataLength	 = 0;
 
-	while (samplesBuffer.Size() - framesProcessed * frameSize * format.channels >= frameSize * format.channels)
+	Int	 samplesPerFrame = frameSize * format.channels;
+
+	if (flush) framesToProcess = Math::Floor(samplesBuffer.Size() / samplesPerFrame);
+
+	while (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame * framesToProcess)
 	{
-		if (format.channels == 2) ex_speex_encode_stereo_int(samplesBuffer + framesProcessed * frameSize * format.channels, frameSize, &bits);
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		ex_speex_encode_int(encoder, samplesBuffer + framesProcessed * frameSize * format.channels, &bits);
-		ex_speex_bits_insert_terminator(&bits);
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
 
-		Int	 dataLength = ex_speex_bits_nbytes(&bits);
+		workerToUse->Lock();
 
-		dataBuffer.Resize(dataLength);
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length(), False, 0);
 
-		dataLength = ex_speex_bits_write(&bits, (char *) (unsigned char *) dataBuffer, dataLength);
+		/* Pass new frames to worker.
+		 */
+		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, samplesPerFrame * framesToProcess);
+		workerToUse->Release();
 
-		ex_speex_bits_reset(&bits);
+		framesProcessed += framesToProcess - overlap;
+
+		nextWorker++;
+
+		if (flush) break;
+	}
+
+	memmove((signed short *) samplesBuffer, ((signed short *) samplesBuffer) + framesProcessed * samplesPerFrame, sizeof(short) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
+
+	if (!flush) return dataLength;
+
+	/* Wait for workers to finish and process packets.
+	 */
+	for (Int i = 0; i < workers.Length(); i++)
+	{
+		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
+
+		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
+
+		workerToUse->Lock();
+
+		/* See if the worker has some packets for us.
+		 */
+		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length(), i == workers.Length() - 1, i == workers.Length() - 1 ? nullSamples : 0);
+
+		workerToUse->Release();
+
+		nextWorker++;
+	}
+
+	return dataLength;
+}
+
+Int BoCA::EncoderSpeex::ProcessPackets(const Buffer<unsigned char> &packets, const Array<Int> &packetSizes, Bool first, Bool flush, Int nullSamples)
+{
+	Int	 offset = 0;
+
+	if (!first) for (Int i = 0; i < overlap; i++) offset += packetSizes.GetNth(i);
+
+	for (Int i = 0; i < packetSizes.Length(); i++)
+	{
+		if (i <	overlap && !first) continue;
 
 		totalSamples += frameSize;
 
-		op.packet     = dataBuffer;
-		op.bytes      = dataLength;
-		op.b_o_s      = 0;
-		op.e_o_s      =  (flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <=     frameSize * format.channels) ? 1 : 0;
-		op.granulepos =  (flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <=     frameSize * format.channels) ? totalSamples	       - nullSamples : 
-				((flush && samplesBuffer.Size() - framesProcessed * frameSize * format.channels <= 2 * frameSize * format.channels) ? totalSamples + frameSize - nullSamples - lookAhead : totalSamples - lookAhead);
+		op.packet     = packets + offset;
+		op.bytes      = packetSizes.GetNth(i);
+		op.b_o_s      = first && i == 0;
+		op.e_o_s      = flush && i == packetSizes.Length() - 1;
+		op.granulepos =  (flush && i == packetSizes.Length() - 1) ? totalSamples	     - nullSamples :
+				((flush && i == packetSizes.Length() - 2) ? totalSamples + frameSize - nullSamples - lookAhead : totalSamples - lookAhead);
 		op.packetno   = numPackets++;
 
-		ex_ogg_stream_packetin(&os, &op);
+		ex_ogg_stream_packetin(&os, &op);	
 
-		framesProcessed++;
+		offset += packetSizes.GetNth(i);
 	}
-
-	memmove((signed short *) samplesBuffer, ((signed short *) samplesBuffer) + framesProcessed * frameSize * format.channels, sizeof(short) * (samplesBuffer.Size() - framesProcessed * frameSize * format.channels));
-
-	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frameSize * format.channels);
 
 	return WriteOggPackets(flush);
 }

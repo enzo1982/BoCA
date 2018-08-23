@@ -11,6 +11,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca.h>
+#include "worker.h"
 #include "dllinterface.h"
 
 BoCA_BEGIN_COMPONENT(EncoderSpeex)
@@ -23,23 +24,27 @@ namespace BoCA
 			ConfigLayer		*configLayer;
 			Config			*config;
 
+			Array<SuperWorker *>	 workers;
+
 			ogg_stream_state	 os;
 			ogg_page		 og;
 			ogg_packet		 op;
 
-			void			*encoder;
-			SpeexBits		 bits;
+			Int			 nextWorker;
 
 			spx_int32_t		 frameSize;
 			spx_int32_t		 lookAhead;
 
+			Int			 blockSize;
+			Int			 overlap;
+
 			Int			 numPackets;
 			Int			 totalSamples;
 
-			Buffer<unsigned char>	 dataBuffer;
 			Buffer<spx_int16_t>	 samplesBuffer;
 
 			Int			 EncodeFrames(Bool);
+			Int			 ProcessPackets(const Buffer<unsigned char> &, const Array<Int> &, Bool, Bool, Int);
 			Bool			 FixChapterMarks();
 
 			Int			 WriteOggPackets(Bool);
