@@ -234,6 +234,8 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 
 		String	 fileName = config->GetStringValue("Tags", "CoverArtFilenamePattern", "<albumartist> - <album>\\<type>");
 
+		if (fileName.Trim() == NIL) fileName = "<albumartist> - <album>\\<type>";
+
 		switch (picture.type)
 		{
 			case  0: fileName.Replace(type, "other");	  break;
