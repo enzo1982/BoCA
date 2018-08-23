@@ -15,24 +15,42 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\superfast\components\lame\config.h">
+    <ClInclude Include="..\..\components\encoder\lame\framecrc.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\superfast\components\lame\dllinterface.h">
+    <ClInclude Include="..\..\components\encoder\lame\repacker.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\superfast\components\lame\lame.h">
+    <ClInclude Include="..\..\components\encoder\lame\worker.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\lame\config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\lame\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\lame\lame.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\superfast\components\lame\config.cpp">
+    <ClCompile Include="..\..\components\encoder\lame\config.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\superfast\components\lame\dllinterface.cpp">
+    <ClCompile Include="..\..\components\encoder\lame\dllinterface.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\superfast\components\lame\lame.cpp">
+    <ClCompile Include="..\..\components\encoder\lame\lame.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\lame\framecrc.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\lame\repacker.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\lame\worker.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

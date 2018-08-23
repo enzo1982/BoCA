@@ -45,6 +45,9 @@
     <ClInclude Include="..\..\components\encoder\coreaudio\CoreAudio\MacTypes.h">
       <Filter>Headerdateien\CoreAudio</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\components\encoder\coreaudio\worker.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\encoder\coreaudio\config.cpp">
@@ -54,6 +57,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\components\encoder\coreaudio\dllinterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\coreaudio\worker.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

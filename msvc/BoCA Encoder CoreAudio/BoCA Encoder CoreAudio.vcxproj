@@ -135,11 +135,13 @@
     <ClInclude Include="..\..\components\encoder\coreaudio\CoreAudio\CoreFoundation.h" />
     <ClInclude Include="..\..\components\encoder\coreaudio\CoreAudio\MacTypes.h" />
     <ClInclude Include="..\..\components\encoder\coreaudio\dllinterface.h" />
+    <ClInclude Include="..\..\components\encoder\coreaudio\worker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\encoder\coreaudio\config.cpp" />
     <ClCompile Include="..\..\components\encoder\coreaudio\coreaudio.cpp" />
     <ClCompile Include="..\..\components\encoder\coreaudio\dllinterface.cpp" />
+    <ClCompile Include="..\..\components\encoder\coreaudio\worker.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

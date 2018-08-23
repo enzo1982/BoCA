@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\components\encoder\opus\opus.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\components\encoder\opus\worker.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\components\encoder\opus\config.h">
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="..\..\components\encoder\opus\ogg\os_types.h">
       <Filter>Headerdateien\ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\opus\worker.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

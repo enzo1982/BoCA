@@ -84,6 +84,9 @@
     <ClInclude Include="..\..\components\encoder\fdkaac\fdk-aac\machine_type.h">
       <Filter>Headerdateien\fdk-aac</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\components\encoder\fdkaac\worker.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\encoder\fdkaac\config.cpp">
@@ -93,6 +96,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\components\encoder\fdkaac\fdkaac.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\fdkaac\worker.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

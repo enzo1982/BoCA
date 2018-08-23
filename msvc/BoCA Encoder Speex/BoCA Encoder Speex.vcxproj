@@ -140,11 +140,13 @@
     <ClInclude Include="..\..\components\encoder\speex\speex\speex_preprocess.h" />
     <ClInclude Include="..\..\components\encoder\speex\speex\speex_stereo.h" />
     <ClInclude Include="..\..\components\encoder\speex\speex\speex_types.h" />
+    <ClInclude Include="..\..\components\encoder\speex\worker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\encoder\speex\config.cpp" />
     <ClCompile Include="..\..\components\encoder\speex\dllinterface.cpp" />
     <ClCompile Include="..\..\components\encoder\speex\speex.cpp" />
+    <ClCompile Include="..\..\components\encoder\speex\worker.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

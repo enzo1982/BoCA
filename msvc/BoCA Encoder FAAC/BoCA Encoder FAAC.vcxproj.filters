@@ -24,6 +24,9 @@
     <ClCompile Include="..\..\components\encoder\faac\faac.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\components\encoder\faac\worker.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\components\encoder\faac\config.h">
@@ -33,6 +36,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\components\encoder\faac\faac.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\encoder\faac\worker.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

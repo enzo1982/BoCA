@@ -154,11 +154,13 @@
     <ClCompile Include="..\..\components\encoder\faac\config.cpp" />
     <ClCompile Include="..\..\components\encoder\faac\dllinterface.cpp" />
     <ClCompile Include="..\..\components\encoder\faac\faac.cpp" />
+    <ClCompile Include="..\..\components\encoder\faac\worker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\components\encoder\faac\config.h" />
     <ClInclude Include="..\..\components\encoder\faac\dllinterface.h" />
     <ClInclude Include="..\..\components\encoder\faac\faac.h" />
+    <ClInclude Include="..\..\components\encoder\faac\worker.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BoCA\BoCA.vcxproj">

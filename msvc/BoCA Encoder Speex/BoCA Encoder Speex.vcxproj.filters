@@ -63,6 +63,9 @@
     <ClInclude Include="..\..\components\encoder\speex\ogg\os_types.h">
       <Filter>Headerdateien\ogg</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\components\encoder\speex\worker.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\encoder\speex\config.cpp">
@@ -72,6 +75,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\components\encoder\speex\speex.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\encoder\speex\worker.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

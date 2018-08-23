@@ -147,11 +147,13 @@
     <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\streaming.h" />
     <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\track.h" />
     <ClInclude Include="..\..\components\encoder\fdkaac\mp4v2\track_prop.h" />
+    <ClInclude Include="..\..\components\encoder\fdkaac\worker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\encoder\fdkaac\config.cpp" />
     <ClCompile Include="..\..\components\encoder\fdkaac\dllinterface.cpp" />
     <ClCompile Include="..\..\components\encoder\fdkaac\fdkaac.cpp" />
+    <ClCompile Include="..\..\components\encoder\fdkaac\worker.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

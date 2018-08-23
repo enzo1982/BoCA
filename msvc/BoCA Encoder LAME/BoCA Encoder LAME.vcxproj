@@ -153,12 +153,18 @@
   <ItemGroup>
     <ClCompile Include="..\..\components\encoder\lame\config.cpp" />
     <ClCompile Include="..\..\components\encoder\lame\dllinterface.cpp" />
+    <ClCompile Include="..\..\components\encoder\lame\framecrc.cpp" />
     <ClCompile Include="..\..\components\encoder\lame\lame.cpp" />
+    <ClCompile Include="..\..\components\encoder\lame\repacker.cpp" />
+    <ClCompile Include="..\..\components\encoder\lame\worker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\components\encoder\lame\config.h" />
     <ClInclude Include="..\..\components\encoder\lame\dllinterface.h" />
+    <ClInclude Include="..\..\components\encoder\lame\framecrc.h" />
     <ClInclude Include="..\..\components\encoder\lame\lame.h" />
+    <ClInclude Include="..\..\components\encoder\lame\repacker.h" />
+    <ClInclude Include="..\..\components\encoder\lame\worker.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BoCA\BoCA.vcxproj">
