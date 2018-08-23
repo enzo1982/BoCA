@@ -74,7 +74,7 @@ Error BoCA::DecoderBonk::GetStreamInfo(const String &streamURI, Track &track)
 
 	in->InputData(data, data.Size());
 
-	ex_bonk_decoder_init(decoder, dataBuffer, data.Size(), &length, &rate, &channels);
+	ex_bonk_decoder_init(decoder, data, data.Size(), &length, &rate, &channels);
 
 	format.rate	= rate;
 	format.channels	= channels;
