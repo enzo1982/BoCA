@@ -25,7 +25,10 @@ namespace BoCA
 
 			void			*encoder;
 
+			Int			 frameSize;
+
 			Buffer<unsigned char>	 dataBuffer;
+			Buffer<short>		 samplesBuffer;
 
 			static Bool		 ConvertArguments(Config *);
 		public:

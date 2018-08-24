@@ -148,11 +148,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 
 	ex_TvqEncInitialize(&setupInfo, &encInfo, &index, 0);
 
-	unsigned long	 samples_size = ex_TvqEncGetFrameSize() * ex_TvqEncGetNumChannels();
-
-	packageSize = samples_size * (format.bits / 8);
-
-	frame.Resize(samples_size);
+	frame.Resize(ex_TvqEncGetFrameSize() * ex_TvqEncGetNumChannels());
 
 	TvqInitBsWriter();
 
@@ -169,6 +165,23 @@ Bool BoCA::EncoderTwinVQ::Activate()
 
 Bool BoCA::EncoderTwinVQ::Deactivate()
 {
+	const Format	&format = track.GetFormat();
+
+	/* Output remaining samples.
+	 */
+	frame.Zero();
+
+	for (Int ch = 0; ch < format.channels; ch++)
+	{
+		for (Int i = 0; i < samplesBuffer.Size() / format.channels; i++)
+		{
+			frame[ch * frame.Size() / format.channels + i] = (float) ((short *) samplesBuffer)[i * format.channels + ch];
+		}
+	}
+
+	ex_TvqEncodeFrame(frame, &index);
+	TvqWriteBsFrame(&index, bfp);
+
 	/* Flush TwinVQ buffers by writing two empty frames.
 	 */
 	frame.Zero();
@@ -207,20 +220,39 @@ Bool BoCA::EncoderTwinVQ::Deactivate()
 
 Int BoCA::EncoderTwinVQ::WriteData(Buffer<UnsignedByte> &data)
 {
-	/* Output samples to encoder.
-	 */
 	const Format	&format = track.GetFormat();
 
-	for (Int ch = 0; ch < format.channels; ch++)
+	/* Copy data to samples buffer.
+	 */
+	Int	 samples = data.Size() / 2;
+
+	samplesBuffer.Resize(samplesBuffer.Size() + samples);
+
+	memcpy(samplesBuffer + samplesBuffer.Size() - samples, data, data.Size());
+
+	/* Output samples to encoder.
+	 */
+	Int	 framesProcessed = 0;
+
+	while (samplesBuffer.Size() - framesProcessed * frame.Size() >= frame.Size())
 	{
-		for (Int i = 0; i < int(data.Size() / sizeof(short) / format.channels); i++)
+		for (Int ch = 0; ch < format.channels; ch++)
 		{
-			frame[ch * int(frame.Size() / format.channels) + i] = (float) ((short *) (UnsignedByte *) data)[i * format.channels + ch];
+			for (Int i = 0; i < frame.Size() / format.channels; i++)
+			{
+				frame[ch * frame.Size() / format.channels + i] = (float) ((short *) samplesBuffer + framesProcessed * frame.Size())[i * format.channels + ch];
+			}
 		}
+
+		ex_TvqEncodeFrame(frame, &index);
+		TvqWriteBsFrame(&index, bfp);
+
+		framesProcessed++;
 	}
 
-	ex_TvqEncodeFrame(frame, &index);
-	TvqWriteBsFrame(&index, bfp);
+	memmove(samplesBuffer, samplesBuffer + framesProcessed * frame.Size(), sizeof(short) * (samplesBuffer.Size() - framesProcessed * frame.Size()));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frame.Size());
 
 	return data.Size();
 }

@@ -77,6 +77,8 @@ BoCA::EncoderBonk::EncoderBonk()
 
 	encoder	    = NIL;
 
+	frameSize   = 0;
+
 	config	    = Config::Copy(GetConfiguration());
 
 	ConvertArguments(config);
@@ -101,7 +103,7 @@ Bool BoCA::EncoderBonk::Activate()
 
 	/* Configure and create Bonk encoder.
 	 */
-	packageSize = int(1024.0 * format.rate / 44100) * format.channels * (config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0) ? 1 : config->GetIntValue(ConfigureBonk::ConfigID, "Downsampling", 2)) * (format.bits / 8);
+	frameSize = Int(1024.0 * format.rate / 44100) * format.channels * (config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0) ? 1 : config->GetIntValue(ConfigureBonk::ConfigID, "Downsampling", 2));
 
 	dataBuffer.Resize(131072);
 
@@ -145,7 +147,15 @@ Bool BoCA::EncoderBonk::Deactivate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	Int	 bytes = ex_bonk_encoder_finish(encoder, dataBuffer, dataBuffer.Size());
+	/* Output remaining samples.
+	 */
+	Int	 bytes = ex_bonk_encoder_encode_packet(encoder, samplesBuffer, samplesBuffer.Size(), dataBuffer, dataBuffer.Size());
+
+	driver->WriteData(dataBuffer, bytes);
+
+	/* Finalize stream.
+	 */
+	bytes = ex_bonk_encoder_finish(encoder, dataBuffer, dataBuffer.Size());
 
 	if (bytes > dataBuffer.Size())
 	{
@@ -194,13 +204,35 @@ Bool BoCA::EncoderBonk::Deactivate()
 
 Int BoCA::EncoderBonk::WriteData(Buffer<UnsignedByte> &data)
 {
+	/* Copy data to samples buffer.
+	 */
+	Int	 samples = data.Size() / 2;
+
+	samplesBuffer.Resize(samplesBuffer.Size() + samples);
+
+	memcpy(samplesBuffer + samplesBuffer.Size() - samples, data, data.Size());
+
 	/* Output samples to encoder.
 	 */
-	unsigned long	 bytes = ex_bonk_encoder_encode_packet(encoder, (short *) (unsigned char *) data, data.Size() / sizeof(short), dataBuffer, dataBuffer.Size());
+	Int	 dataLength	 = 0;
+	Int	 framesProcessed = 0;
 
-	driver->WriteData(dataBuffer, bytes);
+	while (samplesBuffer.Size() - framesProcessed * frameSize >= frameSize)
+	{
+		Int	 bytes = ex_bonk_encoder_encode_packet(encoder, samplesBuffer + framesProcessed * frameSize, frameSize, dataBuffer, dataBuffer.Size());
 
-	return bytes;
+		dataLength += bytes;
+
+		driver->WriteData(dataBuffer, bytes);
+
+		framesProcessed++;
+	}
+
+	memmove(samplesBuffer, samplesBuffer + framesProcessed * frameSize, sizeof(short) * (samplesBuffer.Size() - framesProcessed * frameSize));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frameSize);
+
+	return dataLength;
 }
 
 Bool BoCA::EncoderBonk::ConvertArguments(Config *config)

@@ -87,6 +87,8 @@ BoCA::EncoderBlade::EncoderBlade() : beConfig()
 
 	handle	    = NIL;
 
+	frameSize   = 0;
+
 	config	    = Config::Copy(GetConfiguration());
 
 	ConvertArguments(config);
@@ -126,13 +128,10 @@ Bool BoCA::EncoderBlade::Activate()
 	beConfig.format.mp3.bPrivate	= config->GetIntValue(ConfigureBlade::ConfigID, "Private", 0);
 
 	unsigned long	 bufferSize	= 0;
-	unsigned long	 samplesSize	= 0;
 
-	ex_beInitStream(&beConfig, &samplesSize, &bufferSize, &handle);
+	ex_beInitStream(&beConfig, &frameSize, &bufferSize, &handle);
 
 	outBuffer.Resize(bufferSize);
-
-	packageSize = samplesSize * (format.bits / 8);
 
 	/* Write ID3v2 tag if requested.
 	 */
@@ -161,11 +160,21 @@ Bool BoCA::EncoderBlade::Deactivate()
 {
 	const Info	&info = track.GetInfo();
 
+	/* Output remaining samples.
+	 */
 	unsigned long	 bytes = 0;
 
-	ex_beDeinitStream(handle, outBuffer, &bytes);
+	if (ex_beEncodeChunk(handle, samplesBuffer.Size(), (short *) samplesBuffer, outBuffer, &bytes) == BE_ERR_SUCCESSFUL)
+	{
+		driver->WriteData(outBuffer, bytes);
+	}
 
-	driver->WriteData(outBuffer, bytes);
+	/* Finalize stream.
+	 */
+	if (ex_beDeinitStream(handle, outBuffer, &bytes) == BE_ERR_SUCCESSFUL)
+	{
+		driver->WriteData(outBuffer, bytes);
+	}
 
 	ex_beCloseStream(handle);
 
@@ -215,15 +224,38 @@ Bool BoCA::EncoderBlade::Deactivate()
 
 Int BoCA::EncoderBlade::WriteData(Buffer<UnsignedByte> &data)
 {
+	/* Copy data to samples buffer.
+	 */
+	Int	 samples = data.Size() / 2;
+
+	samplesBuffer.Resize(samplesBuffer.Size() + samples);
+
+	memcpy(samplesBuffer + samplesBuffer.Size() - samples, data, data.Size());
+
 	/* Output samples to encoder.
 	 */
-	unsigned long	 bytes = 0;
+	Int	 dataLength	 = 0;
+	Int	 framesProcessed = 0;
 
-	ex_beEncodeChunk(handle, data.Size() / sizeof(short), (short *) (unsigned char *) data, outBuffer, &bytes);
+	while (samplesBuffer.Size() - framesProcessed * frameSize >= frameSize)
+	{
+		unsigned long	 bytes = 0;
 
-	driver->WriteData(outBuffer, bytes);
+		if (ex_beEncodeChunk(handle, frameSize, (short *) samplesBuffer + framesProcessed * frameSize, outBuffer, &bytes) == BE_ERR_SUCCESSFUL)
+		{
+			dataLength += bytes;
 
-	return bytes;
+			driver->WriteData(outBuffer, bytes);
+		}
+
+		framesProcessed++;
+	}
+
+	memmove(samplesBuffer, samplesBuffer + framesProcessed * frameSize, sizeof(short) * (samplesBuffer.Size() - framesProcessed * frameSize));
+
+	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * frameSize);
+
+	return dataLength;
 }
 
 Bool BoCA::EncoderBlade::ConvertArguments(Config *config)

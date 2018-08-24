@@ -26,7 +26,10 @@ namespace BoCA
 			BE_CONFIG		 beConfig;
 			unsigned long		 handle;
 
+			unsigned long		 frameSize;
+
 			Buffer<unsigned char>	 outBuffer;
+			Buffer<short>		 samplesBuffer;
 
 			static Bool		 ConvertArguments(Config *);
 		public:

@@ -32,6 +32,7 @@ namespace BoCA
 			BFILE			*bfp;
 
 			Buffer<float>		 frame;
+			Buffer<short>		 samplesBuffer;
 
 			static Bool		 ConvertArguments(Config *);
 		public:
