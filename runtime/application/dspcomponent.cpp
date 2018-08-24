@@ -20,11 +20,6 @@ BoCA::AS::DSPComponent::~DSPComponent()
 {
 }
 
-Int BoCA::AS::DSPComponent::GetPackageSize() const
-{
-	return specs->func_GetPackageSize(component);
-}
-
 const BoCA::Format &BoCA::AS::DSPComponent::GetFormatInfo() const
 {
 	return *((const Format *) specs->func_GetFormatInfo(component));

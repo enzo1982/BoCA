@@ -26,11 +26,6 @@ BoCA::AS::StreamComponent::~StreamComponent()
 {
 }
 
-Int BoCA::AS::StreamComponent::GetPackageSize() const
-{
-	return specs->func_GetPackageSize != NIL ? specs->func_GetPackageSize(component) : 0;
-}
-
 Int BoCA::AS::StreamComponent::SetDriver(IO::Driver *driver)
 {
 	return specs->func_SetDriver != NIL ? specs->func_SetDriver(component, driver) : Success();
@@ -87,8 +82,6 @@ Bool BoCA::AS::StreamComponent::Activate()
 
 		return False;
 	}
-
-	packageSize = GetPackageSize();
 
 	return True;
 }

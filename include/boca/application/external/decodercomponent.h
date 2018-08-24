@@ -41,7 +41,6 @@ namespace BoCA
 
 				Int64			 GetInBytes() const	{ return inBytes; }
 
-				virtual Int		 GetPackageSize() const;
 				virtual Int		 SetDriver(IO::Driver *);
 
 				virtual ConfigLayer	*GetConfigurationLayer();

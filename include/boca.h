@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -94,7 +94,6 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_ReadData(void *component, void *buffer)						{ return ((BoCA::componentName *) component)->ReadData(*((Buffer<UnsignedByte> *) buffer)); }						\
 																																		\
-		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
 		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)						{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
 	}
 
@@ -117,7 +116,6 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer)						{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer)); }						\
 		BOCA_EXPORT bool BoCA_##componentName##_NextPass(void *component)							{ return ((BoCA::componentName *) component)->NextPass(); }										\
 																																		\
-		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
 		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)						{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
 	}
 
@@ -146,8 +144,6 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_TransformData(void *component, void *buffer)					{ return ((BoCA::componentName *) component)->TransformData(*((Buffer<UnsignedByte> *) buffer)); }					\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_Flush(void *component, void *buffer)						{ return ((BoCA::componentName *) component)->Flush(*((Buffer<UnsignedByte> *) buffer)); }						\
-																																		\
-		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
 	}
 
 #define BoCA_DEFINE_EXTENSION_COMPONENT(componentName)																												\
@@ -165,8 +161,6 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer)						{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer)); }						\
 		BOCA_EXPORT bool BoCA_##componentName##_Finish(void *component)								{ return ((BoCA::componentName *) component)->Finish(); }										\
-																																		\
-		BOCA_EXPORT int BoCA_##componentName##_GetPackageSize(void *component)							{ return ((BoCA::componentName *) component)->GetPackageSize(); }									\
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_CanWrite(void *component)							{ return ((BoCA::componentName *) component)->CanWrite(); }										\
 																																		\

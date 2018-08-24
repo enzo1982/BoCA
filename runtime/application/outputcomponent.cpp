@@ -20,11 +20,6 @@ BoCA::AS::OutputComponent::~OutputComponent()
 {
 }
 
-Int BoCA::AS::OutputComponent::GetPackageSize() const
-{
-	return specs->func_GetPackageSize(component);
-}
-
 Int BoCA::AS::OutputComponent::WriteData(Buffer<UnsignedByte> &buffer)
 {
 	converter->Transform(buffer);

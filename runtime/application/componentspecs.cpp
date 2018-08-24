@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -58,8 +58,6 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_RenderStreamInfo		= NIL;
 
 	func_UpdateStreamInfo		= NIL;
-
-	func_GetPackageSize		= NIL;
 
 	func_SetDriver			= NIL;
 
@@ -189,8 +187,6 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_RenderStreamInfo		= (int (*)(void *, const wchar_t *, const void *))	library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_RenderStreamInfo"));
 
 	func_UpdateStreamInfo		= (int (*)(void *, const wchar_t *, const void *))	library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_UpdateStreamInfo"));
-
-	func_GetPackageSize		= (int (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetPackageSize"));
 
 	func_SetDriver			= (int (*)(void *, void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetDriver"));
 

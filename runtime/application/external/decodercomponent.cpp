@@ -57,11 +57,6 @@ Bool BoCA::AS::DecoderComponentExternal::SetAudioTrackInfo(const Track &track)
 	return True;
 }
 
-Int BoCA::AS::DecoderComponentExternal::GetPackageSize() const
-{
-	return packageSize;
-}
-
 Int BoCA::AS::DecoderComponentExternal::SetDriver(IO::Driver *driver)
 {
 	return IO::Filter::SetDriver(driver);

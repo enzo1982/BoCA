@@ -29,8 +29,6 @@ namespace BoCA
 
 				virtual Bool	 Finish();
 
-				virtual Int	 GetPackageSize() const;
-
 				virtual Int	 CanWrite();
 
 				virtual Int	 SetPause(Bool);

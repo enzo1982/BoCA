@@ -42,7 +42,6 @@ namespace BoCA
 				virtual Bool		 Activate();
 				virtual Bool		 Deactivate();
 
-				virtual Int		 GetPackageSize() const;
 				virtual Int		 SetDriver(IO::Driver *);
 
 				Void			 SetCalculateMD5(Bool);

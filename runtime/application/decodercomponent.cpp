@@ -47,8 +47,6 @@ Bool BoCA::AS::DecoderComponent::Activate()
 
 	if (!specs->func_Activate(component)) return False;
 
-	packageSize = GetPackageSize();
-
 	return True;
 }
 
