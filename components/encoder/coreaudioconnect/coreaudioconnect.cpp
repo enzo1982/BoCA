@@ -101,17 +101,14 @@ BoCA::EncoderCoreAudioConnect::EncoderCoreAudioConnect()
 	fileType    = 0;
 
 	configLayer = NIL;
-
-	config	    = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
+	config	    = NIL;
 }
 
 BoCA::EncoderCoreAudioConnect::~EncoderCoreAudioConnect()
 {
 	if (connected) Disconnect();
 
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
@@ -127,6 +124,8 @@ Bool BoCA::EncoderCoreAudioConnect::IsLossless() const
 {
 	/* Get configuration.
 	 */
+	const Config	*config = GetConfiguration();
+
 	Int	 codec = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
 
 	/* Signal lossless for ALAC.
@@ -142,6 +141,10 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 
 	/* Get configuration.
 	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
+
 	Int	 codec	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
 	Int	 kbps	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64);
 	Bool	 mp4Container = config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
@@ -336,6 +339,8 @@ Bool BoCA::EncoderCoreAudioConnect::SetOutputFormat(Int n)
 
 String BoCA::EncoderCoreAudioConnect::GetOutputFileExtension() const
 {
+	const Config	*config = GetConfiguration();
+
 	if (config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True))
 	{
 		switch (config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4FileExtension", 0))

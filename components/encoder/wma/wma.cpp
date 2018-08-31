@@ -82,6 +82,7 @@ Void smooth::DetachDLL()
 BoCA::EncoderWMA::EncoderWMA()
 {
 	configLayer	  = NIL;
+	config		  = NIL;
 
 	m_pWriter	  = NIL;
 	m_pWriterAdvanced = NIL;
@@ -95,10 +96,6 @@ BoCA::EncoderWMA::EncoderWMA()
 
 	samplesWritten	  = 0;
 
-	config		  = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
-
 	/* Init the Microsoft COM library.
 	 */
 	CoInitialize(NIL);
@@ -106,7 +103,7 @@ BoCA::EncoderWMA::EncoderWMA()
 
 BoCA::EncoderWMA::~EncoderWMA()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 
@@ -124,6 +121,8 @@ Int BoCA::EncoderWMA::GetNumberOfPasses() const
 
 Bool BoCA::EncoderWMA::IsLossless() const
 {
+	const Config	*config = GetConfiguration();
+
 	if (config->GetIntValue(ConfigureWMA::ConfigID, "Uncompressed", False)) return True;
 
 	/* Create profile manager and get codec info.
@@ -172,6 +171,12 @@ Bool BoCA::EncoderWMA::IsLossless() const
 
 Bool BoCA::EncoderWMA::Activate()
 {
+	/* Get configuration.
+	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
+
 	/* Close output file as it will be written directly by Windows Media.
 	 */
 	driver->Close();

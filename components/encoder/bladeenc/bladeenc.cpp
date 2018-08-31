@@ -84,19 +84,16 @@ Void smooth::DetachDLL()
 BoCA::EncoderBlade::EncoderBlade() : beConfig()
 {
 	configLayer = NIL;
+	config	    = NIL;
 
 	handle	    = NIL;
 
 	frameSize   = 0;
-
-	config	    = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
 }
 
 BoCA::EncoderBlade::~EncoderBlade()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
@@ -105,6 +102,12 @@ Bool BoCA::EncoderBlade::Activate()
 {
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
+
+	/* Get configuration.
+	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 
 	/* Create and configure BladeEnc encoder.
 	 */

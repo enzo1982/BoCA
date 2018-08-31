@@ -75,10 +75,7 @@ Void smooth::DetachDLL()
 BoCA::EncoderVorbis::EncoderVorbis()
 {
 	configLayer = NIL;
-
-	config	    = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
+	config	    = NIL;
 
 	memset(&os, 0, sizeof(os));
 	memset(&og, 0, sizeof(og));
@@ -92,13 +89,19 @@ BoCA::EncoderVorbis::EncoderVorbis()
 
 BoCA::EncoderVorbis::~EncoderVorbis()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderVorbis::Activate()
 {
+	/* Get configuration.
+	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
+
 	/* Init Ogg stream.
 	 */
 	srand(clock());
@@ -385,6 +388,8 @@ Bool BoCA::EncoderVorbis::FixChapterMarks()
 
 String BoCA::EncoderVorbis::GetOutputFileExtension() const
 {
+	const Config	*config = GetConfiguration();
+
 	switch (config->GetIntValue(ConfigureVorbis::ConfigID, "FileExtension", 0))
 	{
 		default:

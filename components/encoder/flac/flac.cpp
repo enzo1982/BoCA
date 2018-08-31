@@ -119,19 +119,16 @@ namespace BoCA
 BoCA::EncoderFLAC::EncoderFLAC()
 {
 	configLayer  = NIL;
+	config	     = NIL;
 
 	encoder	     = NIL;
 
 	bytesWritten = 0;
-
-	config	     = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
 }
 
 BoCA::EncoderFLAC::~EncoderFLAC()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
@@ -140,6 +137,12 @@ Bool BoCA::EncoderFLAC::Activate()
 {
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
+
+	/* Get configuration.
+	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 
 	/* Create FLAC encoder.
 	 */
@@ -488,6 +491,8 @@ Bool BoCA::EncoderFLAC::SetOutputFormat(Int n)
 
 String BoCA::EncoderFLAC::GetOutputFileExtension() const
 {
+	const Config	*config = GetConfiguration();
+
 	switch (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0))
 	{
 		default:

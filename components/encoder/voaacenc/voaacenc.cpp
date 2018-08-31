@@ -88,6 +88,7 @@ Void smooth::DetachDLL()
 BoCA::EncoderVOAAC::EncoderVOAAC()
 {
 	configLayer  = NIL;
+	config	     = NIL;
 
 	mp4File	     = NIL;
 	handle	     = NIL;
@@ -100,10 +101,6 @@ BoCA::EncoderVOAAC::EncoderVOAAC()
 	totalSamples = 0;
 	delaySamples = 0;
 
-	config	     = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
-
 	memset(&memOperator, 0, sizeof(memOperator));
 	memset(&userData, 0, sizeof(userData));
 
@@ -112,7 +109,7 @@ BoCA::EncoderVOAAC::EncoderVOAAC()
 
 BoCA::EncoderVOAAC::~EncoderVOAAC()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
@@ -124,6 +121,10 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 	/* Get configuration.
 	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
+
 	Bool	 mp4Container = config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
 	Int	 bitrate      = config->GetIntValue(ConfigureVOAAC::ConfigID, "Bitrate", 96);
 
@@ -439,6 +440,8 @@ Bool BoCA::EncoderVOAAC::SetOutputFormat(Int n)
 
 String BoCA::EncoderVOAAC::GetOutputFileExtension() const
 {
+	const Config	*config = GetConfiguration();
+
 	if (config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True))
 	{
 		switch (config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4FileExtension", 0))

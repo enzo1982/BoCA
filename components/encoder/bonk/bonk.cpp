@@ -74,25 +74,24 @@ Void smooth::DetachDLL()
 BoCA::EncoderBonk::EncoderBonk()
 {
 	configLayer = NIL;
+	config	    = NIL;
 
 	encoder	    = NIL;
 
 	frameSize   = 0;
-
-	config	    = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
 }
 
 BoCA::EncoderBonk::~EncoderBonk()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::EncoderBonk::IsLossless() const
 {
+	const Config	*config = GetConfiguration();
+
 	return config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", 0);
 }
 
@@ -100,6 +99,12 @@ Bool BoCA::EncoderBonk::Activate()
 {
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
+
+	/* Get configuration.
+	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 
 	/* Configure and create Bonk encoder.
 	 */

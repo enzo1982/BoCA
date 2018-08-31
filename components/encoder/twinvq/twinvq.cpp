@@ -76,12 +76,9 @@ Void smooth::DetachDLL()
 BoCA::EncoderTwinVQ::EncoderTwinVQ()
 {
 	configLayer = NIL;
+	config	    = NIL;
 
 	bfp	    = NIL;
-
-	config	    = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
 
 	memset(&setupInfo, 0, sizeof(setupInfo));
 	memset(&encInfo, 0, sizeof(encInfo));
@@ -90,7 +87,7 @@ BoCA::EncoderTwinVQ::EncoderTwinVQ()
 
 BoCA::EncoderTwinVQ::~EncoderTwinVQ()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
@@ -99,6 +96,12 @@ Bool BoCA::EncoderTwinVQ::Activate()
 {
 	const Format	&format = track.GetFormat();
 	const Info	&info	= track.GetInfo();
+
+	/* Get configuration.
+	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 
 	/* Check settings.
 	 */

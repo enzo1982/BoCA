@@ -74,18 +74,15 @@ Void smooth::DetachDLL()
 
 BoCA::EncoderMAC::EncoderMAC()
 {
-	configLayer = NIL;
+	configLayer  = NIL;
+	config	     = NIL;
 
 	hAPECompress = NIL;
-
-	config	     = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
 }
 
 BoCA::EncoderMAC::~EncoderMAC()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
@@ -93,6 +90,12 @@ BoCA::EncoderMAC::~EncoderMAC()
 Bool BoCA::EncoderMAC::Activate()
 {
 	const Format	&format = track.GetFormat();
+
+	/* Get configuration.
+	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 
 	/* Close output file as it will be written directly by APE.
 	 */

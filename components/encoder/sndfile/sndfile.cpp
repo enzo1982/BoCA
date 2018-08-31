@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -153,19 +153,16 @@ namespace BoCA
 BoCA::EncoderSndFile::EncoderSndFile()
 {
 	configLayer = NIL;
+	config	    = NIL;
 
 	fileFormat  = 0;
 
 	sndf	    = NIL;
-
-	config	    = Config::Copy(GetConfiguration());
-
-	ConvertArguments(config);
 }
 
 BoCA::EncoderSndFile::~EncoderSndFile()
 {
-	Config::Free(config);
+	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
@@ -173,6 +170,12 @@ BoCA::EncoderSndFile::~EncoderSndFile()
 Bool BoCA::EncoderSndFile::Activate()
 {
 	const Format	&format = track.GetFormat();
+
+	/* Get configuration.
+	 */
+	config = Config::Copy(GetConfiguration());
+
+	ConvertArguments(config);
 
 	/* Get selected file format.
 	 */
@@ -542,6 +545,8 @@ Bool BoCA::EncoderSndFile::SetOutputFormat(Int n)
 
 String BoCA::EncoderSndFile::GetOutputFileExtension() const
 {
+	const Config	*config = GetConfiguration();
+
 	SF_FORMAT_INFO	 format_info;
 
 #ifdef __APPLE__
