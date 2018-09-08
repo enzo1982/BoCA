@@ -110,7 +110,7 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	check_paranoia		= new CheckBox(i18n->AddColon(i18n->TranslateString("Activate cdparanoia mode")), Point(10, 14), Size(162, 0), &cdparanoia);
 	check_paranoia->onAction.Connect(&ConfigureCDParanoia::ToggleParanoia, this);
 
-	combo_paranoia_mode	= new ComboBox(Point(181, 13), Size(163, 0));
+	combo_paranoia_mode	= new ComboBox(Point(181, 13), Size(162, 0));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("Overlap only"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No verify"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No scratch repair"));
@@ -119,10 +119,22 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 	ToggleParanoia();
 
+	check_paranoia->SetWidth(Math::Max(162, check_paranoia->GetUnscaledTextWidth() + 21));
+	combo_paranoia_mode->SetX(check_paranoia->GetWidth() + 19);
+
+	group_ripping->SetWidth(check_paranoia->GetWidth() + combo_paranoia_mode->GetWidth() + 29);
+
 	group_ripping->Add(check_paranoia);
 	group_ripping->Add(combo_paranoia_mode);
 
-	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(369, 11), Size(190, 68));
+	group_drive->SetWidth(group_ripping->GetWidth());
+
+	combo_drive->SetWidth(group_drive->GetWidth() - 20);
+	combo_speed->SetWidth(group_drive->GetWidth() - check_speed->GetWidth() - 28);
+	slider_spinup->SetWidth(group_drive->GetWidth() - 24 - slider_spinup->GetX() - text_spinup_seconds->GetUnscaledTextWidth());
+	text_spinup_seconds->SetX(group_drive->GetWidth() - 16 - text_spinup_seconds->GetUnscaledTextWidth());
+
+	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(group_drive->GetWidth() + 15, 11), Size(190, 68));
 
 	check_autoRead	= new CheckBox(i18n->TranslateString("Read CD contents on insert"), Point(10, 14), Size(170, 0), &autoRead);
 	check_autoRead->onAction.Connect(&ConfigureCDParanoia::ToggleAutoRead, this);
@@ -145,7 +157,7 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	Add(group_ripping);
 	Add(group_automatization);
 
-	SetSize(Size(376 + group_automatization->GetWidth(), 193));
+	SetSize(Size(group_drive->GetWidth() + group_automatization->GetWidth() + 22, 193));
 }
 
 BoCA::ConfigureCDParanoia::~ConfigureCDParanoia()

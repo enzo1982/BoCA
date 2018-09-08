@@ -125,6 +125,13 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	check_readCDPlayerIni	= new CheckBox(i18n->TranslateString("Read cdplayer.ini"), Point(181, 11), Size(162, 0), &readCDPlayerIni);
 	check_readISRC		= new CheckBox(i18n->TranslateString("Read ISRC when adding tracks to joblist"), Point(10, 37), Size(333, 0), &readISRC);
 
+	check_readCDText->SetWidth(Math::Max(162, check_readCDText->GetUnscaledTextWidth() + 21));
+	check_readCDPlayerIni->SetX(check_readCDText->GetWidth() + 19);
+	check_readCDPlayerIni->SetWidth(Math::Max(162, check_readCDPlayerIni->GetUnscaledTextWidth() + 21));
+	check_readISRC->SetWidth(Math::Max(333, check_readISRC->GetUnscaledTextWidth() + 21));
+
+	group_cdinfo->SetWidth(Math::Max(check_readCDText->GetWidth() + check_readCDPlayerIni->GetWidth() + 9, check_readISRC->GetWidth()) + 20);
+
 	group_cdinfo->Add(check_readCDText);
 	group_cdinfo->Add(check_readCDPlayerIni);
 	group_cdinfo->Add(check_readISRC);
@@ -134,7 +141,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	check_paranoia		= new CheckBox(i18n->AddColon(i18n->TranslateString("Activate cdparanoia mode")), Point(10, 14), Size(162, 0), &cdparanoia);
 	check_paranoia->onAction.Connect(&ConfigureCDRip::ToggleParanoia, this);
 
-	combo_paranoia_mode	= new ComboBox(Point(181, 13), Size(163, 0));
+	combo_paranoia_mode	= new ComboBox(Point(181, 13), Size(162, 0));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("Overlap only"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No verify"));
 	combo_paranoia_mode->AddEntry(i18n->TranslateString("No scratch repair"));
@@ -146,12 +153,37 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	check_jitter		= new CheckBox(i18n->TranslateString("Activate jitter correction"), Point(10, 40), Size(162, 0), &jitter);
 	check_swapchannels	= new CheckBox(i18n->TranslateString("Swap left/right channel"), Point(181, 40), Size(162, 0), &swapchannels);
 
+	maxTextSize = Math::Max(check_paranoia->GetUnscaledTextWidth(), check_jitter->GetUnscaledTextWidth());
+
+	check_paranoia->SetWidth(Math::Max(162, maxTextSize + 21));
+	check_jitter->SetWidth(check_paranoia->GetWidth());
+	combo_paranoia_mode->SetX(check_paranoia->GetWidth() + 19);
+	check_swapchannels->SetX(combo_paranoia_mode->GetX());
+	check_swapchannels->SetWidth(Math::Max(162, check_swapchannels->GetUnscaledTextWidth() + 21));
+
+	group_ripping->SetWidth(check_paranoia->GetWidth() + check_swapchannels->GetWidth() + 29);
+
 	group_ripping->Add(check_paranoia);
 	group_ripping->Add(combo_paranoia_mode);
 	group_ripping->Add(check_jitter);
 	group_ripping->Add(check_swapchannels);
 
-	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(369, 11), Size(190, 94));
+	group_drive->SetWidth(Math::Max(group_cdinfo->GetWidth(), group_ripping->GetWidth()));
+	group_cdinfo->SetWidth(group_drive->GetWidth());
+	group_ripping->SetWidth(group_drive->GetWidth());
+
+	combo_drive->SetWidth(group_drive->GetWidth() - 20);
+	combo_speed->SetWidth(group_drive->GetWidth() - check_speed->GetWidth() - 28);
+	slider_spinup->SetWidth(group_drive->GetWidth() - 24 - slider_spinup->GetX() - text_spinup_seconds->GetUnscaledTextWidth());
+	text_spinup_seconds->SetX(group_drive->GetWidth() - 16 - text_spinup_seconds->GetUnscaledTextWidth());
+
+	check_readCDPlayerIni->SetWidth(group_cdinfo->GetWidth() - check_readCDText->GetWidth() - 29);
+	check_readISRC->SetWidth(group_cdinfo->GetWidth() - 20);
+
+	check_swapchannels->SetWidth(group_ripping->GetWidth() - check_paranoia->GetWidth() - 29);
+	combo_paranoia_mode->SetWidth(check_swapchannels->GetWidth());
+
+	group_automatization	= new GroupBox(i18n->TranslateString("Automatization"), Point(group_drive->GetWidth() + 15, 11), Size(190, 94));
 
 	check_autoRead	= new CheckBox(i18n->TranslateString("Read CD contents on insert"), Point(10, 14), Size(170, 0), &autoRead);
 	check_autoRead->onAction.Connect(&ConfigureCDRip::ToggleAutoRead, this);
@@ -163,7 +195,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	group_automatization->Add(check_autoRip);
 	group_automatization->Add(check_autoEject);
 
-	group_cdoptions	= new GroupBox(i18n->TranslateString("CD options"), Point(369, 221), Size(190, 68));
+	group_cdoptions	= new GroupBox(i18n->TranslateString("CD options"), Point(group_drive->GetWidth() + 15, 221), Size(190, 68));
 
 	check_locktray	= new CheckBox(i18n->TranslateString("Lock CD tray while ripping"), Point(10, 14), Size(170, 0), &locktray);
 	check_ntscsi	= new CheckBox(i18n->TranslateString("Use native NT SCSI library"), check_locktray->GetPosition() + Point(0, 26), Size(170, 0), &ntscsi);
@@ -194,7 +226,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	Add(group_cdoptions);
 	Add(group_cdinfo);
 
-	SetSize(Size(376 + group_automatization->GetWidth(), 296));
+	SetSize(Size(group_drive->GetWidth() + group_automatization->GetWidth() + 22, 296));
 }
 
 BoCA::ConfigureCDRip::~ConfigureCDRip()

@@ -56,9 +56,7 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	option_format		= new OptionBox(i18n->AddColon(i18n->TranslateString("Use format")), Point(10, 39), Size(100, 0), &autoselect, 0);
 	option_format->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
 
-	option_codec->SetWidth(Math::Max(option_codec->GetUnscaledTextWidth(), option_format->GetUnscaledTextWidth()) + 21);
-
-	combo_codec		= new ComboBox(Point(18 + option_codec->GetWidth(), 38), Size(398 - option_codec->GetWidth(), 0));
+	combo_codec		= new ComboBox(Point(100, 38), Size(200, 0));
 
 	group_codec->Add(option_uncompressed);
 	group_codec->Add(option_codec);
@@ -66,17 +64,25 @@ BoCA::ConfigureWMA::ConfigureWMA()
 
 	group_format		= new GroupBox(i18n->TranslateString("Select codec format"), Point(7, 90), Size(426, 93));
 
-	option_format->SetWidth(option_codec->GetWidth());
-
 	option_autoselect	= new OptionBox(i18n->TranslateString("Automatically select format based on settings and input format"), Point(10, 13), Size(406, 0), &autoselect, 1);
 	option_autoselect->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
 
-	check_vbr		= new CheckBox(i18n->TranslateString("Use VBR encoding"), Point(18 + option_format->GetWidth(), 39), Size((392 - option_format->GetWidth()) / 2, 0), &useVBR);
+	option_format		= new OptionBox(i18n->AddColon(i18n->TranslateString("Use format")), Point(10, 39), Size(100, 0), &autoselect, 0);
+	option_format->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
+
+	option_format->SetWidth(Math::Max(option_codec->GetUnscaledTextWidth(), option_format->GetUnscaledTextWidth()) + 21);
+	option_codec->SetWidth(option_format->GetWidth());
+
+	check_vbr		= new CheckBox(i18n->TranslateString("Use VBR encoding"), Point(18 + option_format->GetWidth(), 39), Size(100, 0), &useVBR);
 	check_vbr->onAction.Connect(&ConfigureWMA::OnToggleVBR, this);
-	check_2pass		= new CheckBox(i18n->TranslateString("Use 2-pass encoding"), Point(25 + option_format->GetWidth() + check_vbr->GetWidth(), 39), Size((392 - option_format->GetWidth()) / 2, 0), &use2Pass);
+	check_2pass		= new CheckBox(i18n->TranslateString("Use 2-pass encoding"), Point(225, 39), Size(100, 0), &use2Pass);
 	check_2pass->onAction.Connect(&ConfigureWMA::OnToggle2Pass, this);
 
-	combo_format		= new ComboBox(Point(18 + option_format->GetWidth(), 64), Size(398 - option_format->GetWidth(), 0));
+	check_vbr->SetWidth(Math::Max(120, Math::Max(check_vbr->GetUnscaledTextWidth(), check_2pass->GetUnscaledTextWidth()) + 21));
+	check_2pass->SetWidth(check_vbr->GetWidth());
+
+	combo_format		= new ComboBox(Point(18 + option_codec->GetWidth(), 64), Size(200, 0));
+	combo_codec->SetX(combo_format->GetX());
 
 	group_format->Add(option_autoselect);
 	group_format->Add(option_format);
@@ -100,12 +106,13 @@ BoCA::ConfigureWMA::ConfigureWMA()
 
 	Int	 maxTextSize = Math::Max(text_quality->GetUnscaledTextWidth(), text_bitrate->GetUnscaledTextWidth());
 
-	slider_quality		= new Slider(Point(text_quality->GetX() + maxTextSize + 7, 13), Size(378 - maxTextSize - text_quality->GetX(), 0), OR_HORZ, &quality, 0, 20);
+	slider_quality		= new Slider(Point(text_quality->GetX() + maxTextSize + 7, 13), Size(100, 0), OR_HORZ, &quality, 0, 20);
 	slider_quality->onValueChange.Connect(&ConfigureWMA::OnSetQuality, this);
 
-	text_quality_value	= new Text(String::FromInt(quality * 5), Point(393, 16));
+	text_quality_value	= new Text(String::FromInt(quality * 5), Point(35, 16));
+	text_quality_value->SetOrientation(OR_UPPERRIGHT);
 
-	combo_bitrate		= new ComboBox(Point(text_bitrate->GetX() + maxTextSize + 7, 39), Size(378 - maxTextSize - text_quality->GetX(), 0));
+	combo_bitrate		= new ComboBox(Point(slider_quality->GetX(), 39), Size(100, 0));
 	combo_bitrate->AddEntry("32");
 	combo_bitrate->AddEntry("48");
 	combo_bitrate->AddEntry("64");
@@ -116,7 +123,8 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	combo_bitrate->AddEntry("192");
 	combo_bitrate->SelectEntry(String::FromInt(config->GetIntValue(ConfigID, "Bitrate", 128)));
 
-	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(393, 42));
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(35, 42));
+	text_bitrate_kbps->SetOrientation(OR_UPPERRIGHT);
 
 	group_settings->Add(check_vbr_setting);
 	group_settings->Add(check_2pass_setting);
@@ -126,6 +134,26 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	group_settings->Add(text_bitrate);
 	group_settings->Add(combo_bitrate);
 	group_settings->Add(text_bitrate_kbps);
+
+	Int	 maxSize = Math::Max(Math::Max(option_uncompressed->GetUnscaledTextWidth(), option_autoselect->GetUnscaledTextWidth()) + 21,
+				     Math::Max(option_format->GetWidth() + check_vbr->GetWidth() + check_2pass->GetWidth() + 16, check_vbr_setting->GetWidth() + maxTextSize + 120));
+
+	option_uncompressed->SetWidth(maxSize);
+	option_autoselect->SetWidth(maxSize);
+
+	combo_codec->SetWidth(maxSize - option_codec->GetWidth() - 8);
+	combo_format->SetWidth(maxSize - option_codec->GetWidth() - 8);
+
+	check_vbr->SetWidth((maxSize - option_format->GetWidth() - 16) / 2);
+	check_2pass->SetX(check_vbr->GetX() + check_vbr->GetWidth() + 8 + (maxSize - option_format->GetWidth()) % 2);
+	check_2pass->SetWidth(check_vbr->GetWidth());
+
+	slider_quality->SetWidth(maxSize - maxTextSize - text_quality->GetX() - 30);
+	combo_bitrate->SetWidth(slider_quality->GetWidth());
+
+	group_codec->SetWidth(maxSize + 20);
+	group_format->SetWidth(maxSize + 20);
+	group_settings->SetWidth(maxSize + 20);
 
 	Add(group_codec);
 	Add(group_format);
@@ -151,7 +179,7 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	check_2pass->Deactivate();
 	check_2pass_setting->Deactivate();
 
-	SetSize(Size(440, 269));
+	SetSize(Size(maxSize + 34, 269));
 }
 
 BoCA::ConfigureWMA::~ConfigureWMA()

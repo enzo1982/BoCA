@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -36,13 +36,8 @@ BoCA::ConfigureBlade::ConfigureBlade()
 
 	text_bit		= new Text("320 kbit", Point(131, 15));
 
-	text_bit->SetX(169 - text_bit->GetUnscaledTextWidth());
-	slider_bit->SetWidth(151 - text_bit->GetUnscaledTextWidth());
-
 	group_bit->Add(slider_bit);
 	group_bit->Add(text_bit);
-
-	SetBitrate();
 
 	group_copyright		= new GroupBox(i18n->TranslateString("Copyright bit"), Point(194, 11), Size(179, 43));
 	check_copyright		= new CheckBox(i18n->TranslateString("Set Copyright bit"), Point(10, 13), Size(158, 0), &copyright);
@@ -64,6 +59,30 @@ BoCA::ConfigureBlade::ConfigureBlade()
 	check_private		= new CheckBox(i18n->TranslateString("Set Private bit"), Point(10, 13), Size(158, 0), &priv);
 	group_private->Add(check_private);
 
+	Int	 maxTextSize = Math::Max(Math::Max(Math::Max(check_copyright->GetUnscaledTextWidth(), check_private->GetUnscaledTextWidth()), check_crc->GetUnscaledTextWidth()), Math::Max(check_original->GetUnscaledTextWidth(), check_dualchannel->GetUnscaledTextWidth()));
+
+	check_copyright->SetWidth(Math::Max(158, maxTextSize + 21));
+	check_original->SetWidth(check_copyright->GetWidth());
+	check_private->SetWidth(check_copyright->GetWidth());
+	check_crc->SetWidth(check_copyright->GetWidth());
+	check_dualchannel->SetWidth(check_copyright->GetWidth());
+
+	group_bit->SetWidth(check_copyright->GetWidth() + 20);
+	group_copyright->SetWidth(group_bit->GetWidth());
+	group_original->SetWidth(group_bit->GetWidth());
+	group_private->SetWidth(group_bit->GetWidth());
+	group_crc->SetWidth(group_bit->GetWidth());
+	group_dualchannel->SetWidth(group_bit->GetWidth());
+
+	group_copyright->SetX(group_bit->GetWidth() + 15);
+	group_original->SetX(group_bit->GetWidth() + 15);
+	group_private->SetX(group_bit->GetWidth() + 15);
+
+	text_bit->SetX(group_bit->GetWidth() - 10 - text_bit->GetUnscaledTextWidth());
+	slider_bit->SetWidth(group_bit->GetWidth() - 28 - text_bit->GetUnscaledTextWidth());
+
+	SetBitrate();
+
 	Add(group_bit);
 	Add(group_crc);
 	Add(group_copyright);
@@ -71,7 +90,7 @@ BoCA::ConfigureBlade::ConfigureBlade()
 	Add(group_private);
 	Add(group_dualchannel);
 
-	SetSize(Size(380, 171));
+	SetSize(Size(2 * group_bit->GetWidth() + 22, 171));
 }
 
 BoCA::ConfigureBlade::~ConfigureBlade()

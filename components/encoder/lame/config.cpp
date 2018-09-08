@@ -90,7 +90,9 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	basic_slider_bitrate		= new Slider(Point(18 + basic_option_set_bitrate->GetWidth(), 11), Size(200 - basic_option_set_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 0, 17);
 	basic_slider_bitrate->onValueChange.Connect(&ConfigureLAME::SetBitrate, this);
 
-	basic_text_bitrate		= new Text(NIL, Point(226, 13));
+	basic_text_bitrate		= new Text(NIL, Point(56, 13));
+	basic_text_bitrate->SetOrientation(OR_UPPERRIGHT);
+
 	SetBitrate();
 
 	basic_text_ratio		= new Text(i18n->IsActiveLanguageRightToLeft() ? ": 1" : "1 :", Point(18 + basic_option_set_bitrate->GetWidth(), 38));
@@ -114,14 +116,17 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	basic_slider_quality		= new Slider(Point(18 + basic_check_set_quality->GetWidth(), 11), Size(238 - basic_check_set_quality->GetWidth(), 0), OR_HORZ, &quality, 0, 9);
 	basic_slider_quality->onValueChange.Connect(&ConfigureLAME::SetQuality, this);
 
-	basic_text_quality		= new Text(NIL, Point(264, 13));
+	basic_text_quality		= new Text(NIL, Point(16, 13));
+	basic_text_quality->SetOrientation(OR_UPPERRIGHT);
+
 	SetQuality();
 
 	basic_text_quality_worse	= new Text(i18n->TranslateString("worse"), Point());
 	basic_text_quality_worse->SetPosition(Point(basic_slider_quality->GetX() + 3 - (basic_text_quality_worse->GetUnscaledTextWidth() / 2), 30));
 
 	basic_text_quality_better	= new Text(i18n->TranslateString("better"), Point());
-	basic_text_quality_better->SetPosition(Point(251 - (basic_text_quality_better->GetUnscaledTextWidth() / 2), 30));
+	basic_text_quality_better->SetOrientation(OR_UPPERRIGHT);
+	basic_text_quality_better->SetPosition(Point(29 + (basic_text_quality_better->GetUnscaledTextWidth() / 2), 30));
 
 	basic_quality->Add(basic_check_set_quality);
 	basic_quality->Add(basic_slider_quality);
@@ -151,13 +156,15 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	vbr_slider_quality		= new Slider(Point(18 + vbr_text_setquality->GetUnscaledTextWidth(), 11), Size(229 - vbr_text_setquality->GetUnscaledTextWidth(), 0), OR_HORZ, &vbrquality, 0, 99);
 	vbr_slider_quality->onValueChange.Connect(&ConfigureLAME::SetVBRQuality, this);
 
-	vbr_text_quality		= new Text(NIL, Point(255, 13));
+	vbr_text_quality		= new Text(NIL, Point(25, 13));
+	vbr_text_quality->SetOrientation(OR_UPPERRIGHT);
 
 	vbr_text_quality_worse		= new Text(i18n->TranslateString("worse"), Point());
 	vbr_text_quality_worse->SetPosition(Point(vbr_slider_quality->GetX() + 3 - (vbr_text_quality_worse->GetUnscaledTextWidth() / 2), 30));
 
 	vbr_text_quality_better		= new Text(i18n->TranslateString("better"), Point());
-	vbr_text_quality_better->SetPosition(Point(242 - (vbr_text_quality_better->GetUnscaledTextWidth() / 2), 30));
+	vbr_text_quality_better->SetOrientation(OR_UPPERRIGHT);
+	vbr_text_quality_better->SetPosition(Point(38 + (vbr_text_quality_better->GetUnscaledTextWidth() / 2), 30));
 
 	SetVBRQuality();
 
@@ -172,11 +179,13 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	vbr_slider_abrbitrate		= new Slider(Point(10, 11), Size(194, 0), OR_HORZ, &abrbitrate, 8, 320);
 	vbr_slider_abrbitrate->onValueChange.Connect(&ConfigureLAME::SetABRBitrate, this);
 
-	vbr_edit_abrbitrate		= new EditBox(NIL, Point(212, 10), Size(25, 0), 3);
+	vbr_edit_abrbitrate		= new EditBox(NIL, Point(68, 10), Size(25, 0), 3);
 	vbr_edit_abrbitrate->SetFlags(EDB_NUMERIC);
+	vbr_edit_abrbitrate->SetOrientation(OR_UPPERRIGHT);
 	vbr_edit_abrbitrate->onInput.Connect(&ConfigureLAME::SetABRBitrateByEditBox, this);
 
-	vbr_text_abrbitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(244, 13));
+	vbr_text_abrbitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(35, 13));
+	vbr_text_abrbitrate_kbps->SetOrientation(OR_UPPERRIGHT);
 
 	SetABRBitrate();
 
@@ -188,21 +197,29 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	misc_bits			= new GroupBox(i18n->TranslateString("Control bits"), Point(7, 11), Size(138, 90));
 
-	misc_check_copyright		= new CheckBox(i18n->TranslateString("Set Copyright bit"), Point(10, 11), Size(117, 0), &set_copyright);
-	misc_check_original		= new CheckBox(i18n->TranslateString("Set Original bit"), Point(10, 36), Size(117, 0), &set_original);
-	misc_check_private		= new CheckBox(i18n->TranslateString("Set Private bit"), Point(10, 61), Size(117, 0), &set_private);
+	misc_check_copyright		= new CheckBox(i18n->TranslateString("Set Copyright bit"), Point(10, 11), Size(118, 0), &set_copyright);
+	misc_check_original		= new CheckBox(i18n->TranslateString("Set Original bit"), Point(10, 36), Size(118, 0), &set_original);
+	misc_check_private		= new CheckBox(i18n->TranslateString("Set Private bit"), Point(10, 61), Size(118, 0), &set_private);
+
+	Int	 maxTextSize = Math::Max(Math::Max(misc_check_copyright->GetUnscaledTextWidth(), misc_check_original->GetUnscaledTextWidth()), misc_check_private->GetUnscaledTextWidth());
+
+	misc_check_copyright->SetWidth(Math::Max(118, maxTextSize + 21));
+	misc_check_original->SetWidth(misc_check_copyright->GetWidth());
+	misc_check_private->SetWidth(misc_check_copyright->GetWidth());
+
+	misc_bits->SetWidth(misc_check_copyright->GetWidth() + 20);
 
 	misc_bits->Add(misc_check_original);
 	misc_bits->Add(misc_check_copyright);
 	misc_bits->Add(misc_check_private);
 
-	misc_crc			= new GroupBox(i18n->TranslateString("CRC"), Point(153, 62), Size(269, 39));
+	misc_crc			= new GroupBox(i18n->TranslateString("CRC"), Point(misc_bits->GetWidth() + 15, 62), Size(269, 39));
 
-	misc_check_crc			= new CheckBox(i18n->TranslateString("Enable CRC"), Point(10, 11), Size(250, 0), &set_crc);
+	misc_check_crc			= new CheckBox(i18n->TranslateString("Enable CRC"), Point(10, 11), Size(249, 0), &set_crc);
 
 	misc_crc->Add(misc_check_crc);
 
-	misc_stereomode			= new GroupBox(i18n->TranslateString("Stereo mode"), Point(153, 11), Size(269, 39));
+	misc_stereomode			= new GroupBox(i18n->TranslateString("Stereo mode"), Point(misc_bits->GetWidth() + 15, 11), Size(269, 39));
 
 	misc_combo_stereomode		= new ComboBox(Point(10, 10), Size(120, 0));
 	misc_combo_stereomode->AddEntry(i18n->TranslateString("auto"));
@@ -212,12 +229,12 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	misc_combo_stereomode->SelectNthEntry(config->GetIntValue(ConfigID, "StereoMode", 0));
 	misc_combo_stereomode->onSelectEntry.Connect(&ConfigureLAME::SetStereoMode, this);
 
-	misc_check_forcejs		= new CheckBox(i18n->TranslateString("Force Joint Stereo"), Point(137, 11), Size(121, 0), &forcejs);
+	misc_check_forcejs		= new CheckBox(i18n->TranslateString("Force Joint Stereo"), Point(137, 11), Size(122, 0), &forcejs);
 
 	misc_stereomode->Add(misc_combo_stereomode);
 	misc_stereomode->Add(misc_check_forcejs);
 
-	misc_bitrate			= new GroupBox(i18n->TranslateString("VBR bitrate range"), Point(7, 113), Size(415, 63));
+	misc_bitrate			= new GroupBox(i18n->TranslateString("VBR bitrate range"), Point(7, 113), Size(misc_bits->GetWidth() + misc_stereomode->GetWidth() + 8, 63));
 
 	misc_check_set_min_brate	= new CheckBox(i18n->AddColon(i18n->TranslateString("Set minimum VBR bitrate")), Point(10, 11), Size(176, 0), &set_min_vbr_brate);
 	misc_check_set_min_brate->onAction.Connect(&ConfigureLAME::SetMinVBRBitrateOption, this);
@@ -228,15 +245,17 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	misc_check_set_min_brate->SetWidth(Math::Max(misc_check_set_min_brate->GetUnscaledTextWidth(), misc_check_set_max_brate->GetUnscaledTextWidth()) + 21);
 	misc_check_set_max_brate->SetWidth(Math::Max(misc_check_set_min_brate->GetUnscaledTextWidth(), misc_check_set_max_brate->GetUnscaledTextWidth()) + 21);
 
-	misc_slider_min_brate		= new Slider(Point(18 + misc_check_set_min_brate->GetWidth(), 11), Size(332 - misc_check_set_min_brate->GetWidth(), 0), OR_HORZ, &min_vbr_brate, 0, 17);
+	misc_slider_min_brate		= new Slider(Point(18 + misc_check_set_min_brate->GetWidth(), 11), Size(misc_bitrate->GetWidth() - 83 - misc_check_set_min_brate->GetWidth(), 0), OR_HORZ, &min_vbr_brate, 0, 17);
 	misc_slider_min_brate->onValueChange.Connect(&ConfigureLAME::SetMinVBRBitrate, this);
 
-	misc_text_min_brate_kbps	= new Text(NIL, Point(358, 13));
+	misc_text_min_brate_kbps	= new Text(NIL, Point(57, 13));
+	misc_text_min_brate_kbps->SetOrientation(OR_UPPERRIGHT);
 
-	misc_slider_max_brate		= new Slider(Point(18 + misc_check_set_min_brate->GetWidth(), 36), Size(332 - misc_check_set_min_brate->GetWidth(), 0), OR_HORZ, &max_vbr_brate, 0, 17);
+	misc_slider_max_brate		= new Slider(Point(18 + misc_check_set_min_brate->GetWidth(), 36), Size(misc_bitrate->GetWidth() - 83 - misc_check_set_min_brate->GetWidth(), 0), OR_HORZ, &max_vbr_brate, 0, 17);
 	misc_slider_max_brate->onValueChange.Connect(&ConfigureLAME::SetMaxVBRBitrate, this);
 
-	misc_text_max_brate_kbps	= new Text(NIL, Point(358, 38));
+	misc_text_max_brate_kbps	= new Text(NIL, Point(57, 38));
+	misc_text_max_brate_kbps->SetOrientation(OR_UPPERRIGHT);
 
 	SetMinVBRBitrate();
 	SetMaxVBRBitrate();
@@ -329,10 +348,54 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	filtering_check_disable_all	= new CheckBox(i18n->TranslateString("Disable all filtering"), Point(10, 11), Size(140, 0), &disable_filtering);
 	filtering_check_disable_all->onAction.Connect(&ConfigureLAME::SetDisableFiltering, this);
 
+	filtering_check_disable_all->SetWidth(Math::Max(140, filtering_check_disable_all->GetUnscaledTextWidth() + 21));
+	filtering_misc->SetWidth(filtering_check_disable_all->GetWidth() + 20);
+
 	filtering_misc->Add(filtering_check_disable_all);
 
 	SetPreset();
 
+	/* Adjust element widths.
+	 */
+	reg_register->SetWidth(Math::Max(Math::Max(433, misc_bitrate->GetWidth() + 18), filtering_highpass->GetWidth() + filtering_misc->GetWidth() + 26));
+
+	basic_preset->SetWidth(reg_register->GetWidth() - 18);
+	basic_combo_preset->SetWidth(basic_preset->GetWidth() - basic_combo_preset->GetX() - 10);
+
+	basic_bitrate->SetWidth(reg_register->GetWidth() - vbr_vbrmode->GetWidth() - 26);
+	basic_quality->SetWidth(basic_bitrate->GetWidth());
+	vbr_quality->SetWidth(basic_bitrate->GetWidth());
+	vbr_abrbitrate->SetWidth(basic_bitrate->GetWidth());
+
+	basic_slider_bitrate->SetWidth(basic_bitrate->GetWidth() - basic_slider_bitrate->GetX() - basic_text_bitrate->GetX() - 8);
+	basic_slider_quality->SetWidth(basic_quality->GetWidth() - basic_slider_quality->GetX() - 24);
+	vbr_slider_quality->SetWidth(vbr_quality->GetWidth() - vbr_slider_quality->GetX() - 33);
+	vbr_slider_abrbitrate->SetWidth(vbr_abrbitrate->GetWidth() - vbr_edit_abrbitrate->GetX() - 18);
+
+	misc_crc->SetWidth(reg_register->GetWidth() - misc_bits->GetWidth() - 26);
+	misc_stereomode->SetWidth(misc_crc->GetWidth());
+
+	misc_check_crc->SetWidth(misc_crc->GetWidth() - 20);
+	misc_check_forcejs->SetWidth(misc_stereomode->GetWidth() - misc_check_forcejs->GetX() - 10);
+
+	misc_bitrate->SetWidth(reg_register->GetWidth() - 18);
+
+	misc_slider_min_brate->SetWidth(reg_register->GetWidth() - misc_slider_min_brate->GetX() - misc_text_min_brate_kbps->GetX() - 26);
+	misc_slider_max_brate->SetWidth(misc_slider_min_brate->GetWidth());
+
+	expert_ath->SetWidth(reg_register->GetWidth() - 18);
+	expert_psycho->SetWidth(expert_ath->GetWidth());
+	expert_format->SetWidth(expert_ath->GetWidth());
+
+	expert_combo_athtype->SetWidth(expert_ath->GetWidth() - expert_combo_athtype->GetX() - 10);
+	expert_check_tempmask->SetWidth(expert_psycho->GetWidth() - 20);
+	expert_check_iso->SetWidth(expert_format->GetWidth() - 20);
+
+	filtering_misc->SetWidth(reg_register->GetWidth() - filtering_highpass->GetWidth() - 26);
+	filtering_check_disable_all->SetWidth(filtering_misc->GetWidth() - 20);
+
+	/* Add groups to layers.
+	 */
 	Add(reg_register);
 
 	reg_register->Add(register_layer_basic);
@@ -361,7 +424,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	register_layer_filtering->Add(filtering_highpass);
 	register_layer_filtering->Add(filtering_misc);
 
-	SetSize(Size(447, 232));
+	SetSize(Size(reg_register->GetWidth() + 14, 232));
 }
 
 BoCA::ConfigureLAME::~ConfigureLAME()
