@@ -67,10 +67,10 @@ Int BoCA::CDText::ReadCDText(Int drive)
 
 		for (Int j = 0; j < 12; j++) lpszBuffer[nInsertPos++] = pCDtextPacks->data[j];
 
-		while (nInsertPos > 0 && (lpZero = (char *) memchr(lpszBuffer, '\0', nInsertPos)) != NIL)
+		while (nInsertPos > 0)
 		{
-			Int	 nOut = (lpZero - lpszBuffer) + 1;
-
+			/* Update text data.
+			 */
 			if	(pCDtextPacks->packType == 0x80) // Album/Track title
 			{
 				if (pCDtextPacks->trackNumber == 0) cdInfo.SetTitle(lpszBuffer);
@@ -81,6 +81,12 @@ Int BoCA::CDText::ReadCDText(Int drive)
 				if (pCDtextPacks->trackNumber == 0) cdInfo.SetArtist(lpszBuffer);
 				else				    cdInfo.SetTrackArtist(pCDtextPacks->trackNumber, lpszBuffer);
 			}
+
+			/* Shift buffer if terminated.
+			 */
+			if ((lpZero = (char *) memchr(lpszBuffer, '\0', nInsertPos)) == NIL) break;
+
+			Int	 nOut = (lpZero - lpszBuffer) + 1;
 
 			nInsertPos -= nOut;
 
