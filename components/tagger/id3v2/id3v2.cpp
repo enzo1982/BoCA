@@ -548,6 +548,59 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			else if (description.ToLower() == "replaygain_album_gain") info.album_gain = value;
 			else if (description.ToLower() == "replaygain_album_peak") info.album_peak = value;
 
+			else if (description.ToLower() == "cuesheet")
+			{
+				if (currentConfig->GetIntValue("Tags", "ReadEmbeddedCueSheets", True))
+				{
+					/* Output cuesheet to temporary file.
+					 */
+					String		 cuesheet = value.Replace("\r\n", "\n");
+					String		 cueFile  = S::System::System::GetTempDirectory().Append("cuesheet_temp_").Append(String::FromInt(S::System::System::Clock())).Append(".cue");
+					OutStream	 out(STREAM_FILE, cueFile, OS_REPLACE);
+
+					const Array<String>	&lines = cuesheet.Explode("\n");
+
+					foreach (const String &line, lines)
+					{
+						if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.origFilename).Append("\" WAVE"));
+						else				    out.OutputLine(line);
+					}
+
+					String::ExplodeFinish();
+
+					out.Close();
+
+					/* Get cue sheet stream info.
+					 */
+					AS::Registry		&boca	 = AS::Registry::Get();
+					AS::DecoderComponent	*decoder = (AS::DecoderComponent *) boca.CreateComponentByID("cuesheet-dec");
+
+					if (decoder != NIL)
+					{
+						Track	 cueTrack;
+						Config	*cueConfig = Config::Copy(GetConfiguration());
+
+						cueConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+
+						cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
+						cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);
+						cueConfig->SetIntValue("CueSheet", "LookForAlternativeFiles", False);
+						cueConfig->SetIntValue("CueSheet", "IgnoreErrors", False);
+
+						decoder->SetConfiguration(cueConfig);
+						decoder->GetStreamInfo(cueFile, cueTrack);
+
+						boca.DeleteComponent(decoder);
+
+						Config::Free(cueConfig);
+
+						if (cueTrack.tracks.Length() > 0) track.tracks = cueTrack.tracks;
+					}
+
+					File(cueFile).Delete();
+				}
+			}
+
 			else if (description.ToLower() == "album artist")	   info.SetOtherInfo(INFO_ALBUMARTIST, value);
 
 			else							   info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(value));
