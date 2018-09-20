@@ -259,11 +259,11 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	String	 prevInFormat = String::SetInputFormat("UTF-8");
 
-	if	(mp4Tags->name	      != NIL) info.title    = String(mp4Tags->name).Trim();
-	if	(mp4Tags->artist      != NIL) info.artist   = String(mp4Tags->artist).Trim();
-	if	(mp4Tags->releaseDate != NIL) info.year     = String(mp4Tags->releaseDate).Trim().ToInt();
-	if	(mp4Tags->album	      != NIL) info.album    = String(mp4Tags->album).Trim();
-	if	(mp4Tags->comments    != NIL) info.comment  = String(mp4Tags->comments).Trim();
+	if	(mp4Tags->name	      != NIL) info.title   = String(mp4Tags->name).Trim();
+	if	(mp4Tags->artist      != NIL) info.artist  = String(mp4Tags->artist).Trim();
+	if	(mp4Tags->releaseDate != NIL) info.year    = String(mp4Tags->releaseDate).Trim().ToInt();
+	if	(mp4Tags->album	      != NIL) info.album   = String(mp4Tags->album).Trim();
+	if	(mp4Tags->comments    != NIL) info.comment = String(mp4Tags->comments).Trim();
 
 	if	(mp4Tags->albumArtist != NIL) info.SetOtherInfo(INFO_ALBUMARTIST, String(mp4Tags->albumArtist).Trim());
 
@@ -271,8 +271,8 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	if	(mp4Tags->tempo	      != NIL) info.SetOtherInfo(INFO_BPM,	  String::FromInt(*mp4Tags->tempo));
 
-	if	(mp4Tags->genre	      != NIL) info.genre    = String(mp4Tags->genre).Trim();
-	else if (mp4Tags->genreType   != NIL) info.genre    = GetID3CategoryName(*mp4Tags->genreType - 1);
+	if	(mp4Tags->genre	      != NIL) info.genre   = String(mp4Tags->genre).Trim();
+	else if (mp4Tags->genreType   != NIL) info.genre   = GetID3CategoryName(*mp4Tags->genreType - 1);
 
 	if (mp4Tags->track != NIL)
 	{
@@ -316,6 +316,10 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 			}
 		}
 	}
+
+	/* Set artist to album artist if artist is not filled.
+	 */
+	if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
 
 	track.SetInfo(info);
 

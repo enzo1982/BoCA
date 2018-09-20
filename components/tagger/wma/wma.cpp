@@ -470,6 +470,10 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 		delete [] indices;
 
+		/* Set artist to album artist if artist is not filled.
+		 */
+		if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
+
 		track.SetInfo(info);
 
 		/* Read chapters.

@@ -417,6 +417,10 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		}
 	}
 
+	/* Set artist to album artist if artist is not filled.
+	 */
+	if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
+
 	track.SetInfo(info);
 
 	String::SetInputFormat(prevInFormat);

@@ -692,6 +692,10 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		info.SetOtherInfo(INFO_BAND, NIL);
 	}
 
+	/* Set artist to album artist if artist is not filled.
+	 */
+	if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
+
 	track.SetInfo(info);
 
 	delete iterator;
