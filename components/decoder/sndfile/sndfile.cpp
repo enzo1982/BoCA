@@ -41,6 +41,7 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		      <extension>wav</extension>				\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
+		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
 		    </format>							\
 		    <format>							\
 		      <name>Apple Audio Files</name>				\
@@ -289,26 +290,27 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 			boca.DeleteComponent(tocTagger);
 		}
 
-		/* Read AIFF embedded ID3 tag.
+		/* Read RIFF or AIFF embedded ID3 tag.
 		 */
 		InStream	 in(STREAM_FILE, streamURI, IS_READ);
+		String		 magic = in.InputString(4);
 
-		if (in.InputString(4) == "FORM")
+		if (magic == "RIFF" || magic == "FORM")
 		{
 			in.RelSeek(4);
 
 			String	 type = in.InputString(4);
 
-			while (type == "AIFF" || type == "AIFC")
+			while (type == "WAVE" || type == "AIFF" || type == "AIFC")
 			{
 				if (in.GetPos() >= in.Size()) break;
 
 				/* Read next chunk.
 				 */
 				String		 chunk = in.InputString(4);
-				UnsignedInt32	 cSize = in.InputNumberRaw(4);
+				UnsignedInt32	 cSize = (magic == "RIFF") ? in.InputNumber(4) : in.InputNumberRaw(4);
 
-				if (chunk == "ID3 ")
+				if (chunk == "id3 " || chunk == "ID3 ")
 				{
 					Buffer<UnsignedByte>	 buffer(cSize);
 
@@ -325,16 +327,12 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 						boca.DeleteComponent(tagger);
 					}
 
-					/* Skip rest of chunk.
-					 */
-					in.RelSeek(cSize % 2);
+					break;
 				}
-				else
-				{
-					/* Skip chunk.
-					 */
-					in.RelSeek(cSize + cSize % 2);
-				}
+
+				/* Skip chunk.
+				 */
+				in.RelSeek(cSize + cSize % 2);
 			}
 		}
 

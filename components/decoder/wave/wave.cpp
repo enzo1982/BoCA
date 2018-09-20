@@ -39,6 +39,7 @@ const String &BoCA::DecoderWave::GetComponentSpecs()
 	      <extension>wav</extension>				\
 	      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 	      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
+	      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
 	    </format>							\
 	  </component>							\
 									\
@@ -108,7 +109,7 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 
 	String		 chunk;
 
-	while (!errorState && chunk != "data")
+	while (!errorState)
 	{
 		if (in.GetPos() >= in.Size()) break;
 
@@ -155,6 +156,31 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 			format.bits	= Math::Min(32, format.bits);
 
 			track.SetFormat(format);
+
+			/* Skip rest of chunk.
+			 */
+			in.RelSeek(cSize + cSize % 2);
+		}
+		else if (chunk == "id3 ")
+		{
+			Buffer<UnsignedByte>	 buffer(cSize);
+
+			in.InputData(buffer, cSize);
+
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+			if (tagger != NIL)
+			{
+				tagger->SetConfiguration(GetConfiguration());
+				tagger->ParseBuffer(buffer, track);
+
+				boca.DeleteComponent(tagger);
+			}
+
+			/* Skip rest of chunk.
+			 */
+			in.RelSeek(cSize % 2);
 		}
 		else
 		{
