@@ -460,7 +460,8 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 	/* Parse individual comment items.
 	 */
-	ID3_Container::ConstIterator	*iterator = container.CreateIterator();
+	ID3_Container::ConstIterator	*iterator     = container.CreateIterator();
+	Bool				 haveChapters = False;
 
 	for (UnsignedInt i = 0; i < container.NumFrames(); i++)
 	{
@@ -682,6 +683,12 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 				if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
 			}
 		}
+		else if (frame.GetID() == ID3FID_CHAPTER)
+		{
+			/* Chapters are processed further down.
+			 */
+			haveChapters = True;
+		}
 	}
 
 	/* Set album artist to band if only band is filled.
@@ -702,82 +709,88 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 	/* Read chapters.
 	 */
-	Int		 chapterCount = 0;
-	Array<String>	 chapterIDs;
-
-	iterator = container.CreateIterator();
-
-	for (UnsignedInt i = 0; i < container.NumFrames(); i++)
+	if (haveChapters && currentConfig->GetIntValue("Tags", "ReadChapters", True) &&
+			  (!currentConfig->GetIntValue("Tags", "PreferCueSheetsToChapters", True) || track.tracks.Length() == 0))
 	{
-		const ID3_Frame	&frame = *iterator->GetNext();
+		track.tracks.RemoveAll();
 
-		if	(frame.GetID() == ID3FID_TOC && currentConfig->GetIntValue("Tags", "ReadChapters", True))
+		Int		 chapterCount = 0;
+		Array<String>	 chapterIDs;
+
+		iterator = container.CreateIterator();
+
+		for (UnsignedInt i = 0; i < container.NumFrames(); i++)
 		{
-			/* Respect first toplevel TOC only.
-			 */
-			if (chapterIDs.Length() == 0 && GetIntegerField(frame, ID3FN_FLAGS) & ID3TF_TOPLEVEL)
+			const ID3_Frame	&frame = *iterator->GetNext();
+
+			if	(frame.GetID() == ID3FID_TOC)
 			{
-				ID3_Field	*chapters = frame.GetField(ID3FN_CHAPTERS);
-				Buffer<char>	 buffer(1024);
-
-				for (UnsignedInt i = 0; i < chapters->GetNumTextItems(); i++)
+				/* Respect first toplevel TOC only.
+				 */
+				if (chapterIDs.Length() == 0 && GetIntegerField(frame, ID3FN_FLAGS) & ID3TF_TOPLEVEL)
 				{
-					buffer.Zero();
+					ID3_Field	*chapters = frame.GetField(ID3FN_CHAPTERS);
+					Buffer<char>	 buffer(1024);
 
-					chapters->Get(buffer, buffer.Size(), i);
+					for (UnsignedInt i = 0; i < chapters->GetNumTextItems(); i++)
+					{
+						buffer.Zero();
 
-					String	 chapterID;
+						chapters->Get(buffer, buffer.Size(), i);
 
-					chapterID.ImportFrom("ISO-8859-1", buffer);
-					chapterIDs.Add(chapterID, chapterID.ComputeCRC32());
+						String	 chapterID;
+
+						chapterID.ImportFrom("ISO-8859-1", buffer);
+						chapterIDs.Add(chapterID, chapterID.ComputeCRC32());
+					}
 				}
 			}
+			else if (frame.GetID() == ID3FID_CHAPTER)
+			{
+				const Format	&format = track.GetFormat();
+
+				/* Fill track data.
+				 */
+				Track	 rTrack;
+
+				rTrack.origFilename = track.origFilename;
+				rTrack.pictures	    = track.pictures;
+
+				rTrack.sampleOffset = Math::Round(Float(				       frame.GetField(ID3FN_STARTTIME)->Get()) / 1000.0 * format.rate);
+				rTrack.length	    = Math::Round(Float(frame.GetField(ID3FN_ENDTIME)->Get() - frame.GetField(ID3FN_STARTTIME)->Get()) / 1000.0 * format.rate);
+
+				rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
+
+				rTrack.SetFormat(format);
+
+				/* Set track number and parent track info.
+				 */
+				Info	 info = track.GetInfo();
+
+				info.track = ++chapterCount;
+
+				rTrack.SetInfo(info);
+
+				/* Parse individual chapter information.
+				 */
+				ParseContainer(*frame.GetField(ID3FN_FRAMES), rTrack);
+
+				/* Add track to track list.
+				 */
+				track.tracks.Add(rTrack, GetASCIIField(frame, ID3FN_ID).ComputeCRC32());
+			}
 		}
-		else if (frame.GetID() == ID3FID_CHAPTER && currentConfig->GetIntValue("Tags", "ReadChapters", True))
+
+		delete iterator;
+
+		/* Ignore chapters that are not listed in TOC.
+		 */
+		if (chapterIDs.Length() > 0)
 		{
-			const Format	&format = track.GetFormat();
-
-			/* Fill track data.
-			 */
-			Track	 rTrack;
-
-			rTrack.origFilename = track.origFilename;
-			rTrack.pictures	    = track.pictures;
-
-			rTrack.sampleOffset = Math::Round(Float(				       frame.GetField(ID3FN_STARTTIME)->Get()) / 1000.0 * format.rate);
-			rTrack.length	    = Math::Round(Float(frame.GetField(ID3FN_ENDTIME)->Get() - frame.GetField(ID3FN_STARTTIME)->Get()) / 1000.0 * format.rate);
-
-			rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
-
-			rTrack.SetFormat(format);
-
-			/* Set track number and parent track info.
-			 */
-			Info	 info = track.GetInfo();
-
-			info.track = ++chapterCount;
-
-			rTrack.SetInfo(info);
-
-			/* Parse individual chapter information.
-			 */
-			ParseContainer(*frame.GetField(ID3FN_FRAMES), rTrack);
-
-			/* Add track to track list.
-			 */
-			track.tracks.Add(rTrack, GetASCIIField(frame, ID3FN_ID).ComputeCRC32());
-		}
-	}
-
-	delete iterator;
-
-	/* Ignore chapters that are not listed in TOC.
-	 */
-	if (chapterIDs.Length() > 0)
-	{
-		for (Int i = track.tracks.Length() - 1; i >= 0; i--)
-		{
-			if (chapterIDs.Get(track.tracks.GetNthIndex(i)) == NIL) track.tracks.RemoveNth(i);
+			for (Int i = track.tracks.Length() - 1; i >= 0; i--)
+			{
+				if (chapterIDs.Get(track.tracks.GetNthIndex(i)) == NIL) track.tracks.RemoveNth(i);
+			}
 		}
 	}
 
