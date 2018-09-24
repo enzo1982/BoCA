@@ -36,6 +36,7 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 		      <extension>wav</extension>						\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>			\
 		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>			\
+		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>				\
 		    </format>									\
 		    <format>									\
 		      <name>Apple Audio Files</name>						\
@@ -264,6 +265,8 @@ Bool BoCA::EncoderSndFile::Deactivate()
 	 */
 	const Info	&info = track.GetInfo();
 
+	/* Write RIFF and CART tags to Wave and RF64 files.
+	 */
 	if (fileFormat == SF_FORMAT_WAV || fileFormat == SF_FORMAT_RF64)
 	{
 		/* Write RIFF tag if requested.
@@ -329,7 +332,10 @@ Bool BoCA::EncoderSndFile::Deactivate()
 
 		driver->Seek(driver->GetSize());
 	}
-	else if (fileFormat == SF_FORMAT_W64)
+
+	/* Write RIFF tags to Wave64 files.
+	 */
+	if (fileFormat == SF_FORMAT_W64)
 	{
 		/* Write RIFF tag if requested.
 		 */
@@ -372,7 +378,10 @@ Bool BoCA::EncoderSndFile::Deactivate()
 
 		driver->Seek(driver->GetSize());
 	}
-	else if (fileFormat == SF_FORMAT_AIFF)
+
+	/* Write ID3v2 tags to Wave and AIFF files.
+	 */
+	if (fileFormat == SF_FORMAT_WAV || fileFormat == SF_FORMAT_AIFF)
 	{
 		/* Write ID3v2 tag if requested.
 		 */
@@ -388,12 +397,14 @@ Bool BoCA::EncoderSndFile::Deactivate()
 				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(id3Buffer, track);
 
-				driver->WriteData((unsigned char *) "ID3 ", 4);
+				if (fileFormat == SF_FORMAT_WAV) driver->WriteData((unsigned char *) "id3 ", 4);
+				else				 driver->WriteData((unsigned char *) "ID3 ", 4);
 
 				Int	 size = id3Buffer.Size();
 
-				if (endianness == EndianLittle)	for (Int i = 3; i >= 0; i--) driver->WriteData(((unsigned char *) &size) + i, 1);
-				else				for (Int i = 0; i <= 3; i++) driver->WriteData(((unsigned char *) &size) + i, 1);
+				if ((fileFormat == SF_FORMAT_WAV  && endianness == EndianLittle) ||
+				    (fileFormat == SF_FORMAT_AIFF && endianness == EndianBig)) for (Int i = 0; i <= 3; i++) driver->WriteData(((unsigned char *) &size) + i, 1);
+				else							       for (Int i = 3; i >= 0; i--) driver->WriteData(((unsigned char *) &size) + i, 1);
 
 				driver->WriteData(id3Buffer, id3Buffer.Size());
 
@@ -409,8 +420,16 @@ Bool BoCA::EncoderSndFile::Deactivate()
 
 		driver->Seek(4);
 
-		if (endianness == EndianLittle)	for (Int i = 3; i >= 0; i--) driver->WriteData(((unsigned char *) &fileSize) + i, 1);
-		else				for (Int i = 4; i <= 7; i++) driver->WriteData(((unsigned char *) &fileSize) + i, 1);
+		if (fileFormat == SF_FORMAT_WAV)
+		{
+			if (endianness == EndianLittle)	for (Int i = 0; i <= 3; i++) driver->WriteData(((unsigned char *) &fileSize) + i, 1);
+			else				for (Int i = 7; i >= 4; i--) driver->WriteData(((unsigned char *) &fileSize) + i, 1);
+		}
+		else
+		{
+			if (endianness == EndianLittle)	for (Int i = 3; i >= 0; i--) driver->WriteData(((unsigned char *) &fileSize) + i, 1);
+			else				for (Int i = 4; i <= 7; i++) driver->WriteData(((unsigned char *) &fileSize) + i, 1);
+		}
 
 		driver->Seek(driver->GetSize());
 	}

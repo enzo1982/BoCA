@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -37,6 +37,7 @@ const String &BoCA::EncoderWave::GetComponentSpecs()
 	      <extension>wav</extension>				\
 	      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 	      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
+	      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
 	    </format>							\
 	    <input bits=\"8\" signed=\"false\"/>			\
 	    <input bits=\"16-32\"/>					\
@@ -138,6 +139,33 @@ Bool BoCA::EncoderWave::Deactivate()
 			tagger->RenderBuffer(tagBuffer, track);
 
 			driver->WriteData(tagBuffer, tagBuffer.Size());
+
+			boca.DeleteComponent(tagger);
+		}
+	}
+
+	/* Write ID3v2 tag if requested.
+	 */
+	if (config->GetIntValue("Tags", "EnableID3v2", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
+	{
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
+
+		if (tagger != NIL)
+		{
+			Buffer<unsigned char>	 id3Buffer;
+
+			tagger->SetConfiguration(config);
+			tagger->RenderBuffer(id3Buffer, track);
+
+			driver->WriteData((unsigned char *) "id3 ", 4);
+
+			Int	 size = id3Buffer.Size();
+
+			if (endianness == EndianLittle) for (Int i = 0; i <= 3; i++) driver->WriteData(((unsigned char *) &size) + i, 1);
+			else				for (Int i = 3; i >= 0; i--) driver->WriteData(((unsigned char *) &size) + i, 1);
+
+			driver->WriteData(id3Buffer, id3Buffer.Size());
 
 			boca.DeleteComponent(tagger);
 		}
