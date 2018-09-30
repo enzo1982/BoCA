@@ -40,9 +40,9 @@ namespace BoCA
 				virtual Bool		 SetOutputFormat(Int);
 				virtual String		 GetOutputFileExtension() const;
 
-				virtual Int		 GetNumberOfPasses() const;
+				virtual Int		 GetNumberOfPasses() const	{ return 1; }
 
-				virtual Bool		 IsThreadSafe() const;
+				virtual Bool		 IsThreadSafe() const		{ return True; }
 
 				virtual Bool		 IsLossless() const;
 
@@ -51,8 +51,8 @@ namespace BoCA
 
 				virtual ConfigLayer	*GetConfigurationLayer();
 			accessors:
-				Bool			 GetErrorState() const	{ return errorState; }
-				const String		&GetErrorString() const	{ return errorString; }
+				Bool			 GetErrorState() const		{ return errorState; }
+				const String		&GetErrorString() const		{ return errorString; }
 
 				const Config		*GetConfiguration() const;
 				Bool			 SetConfiguration(const Config *);

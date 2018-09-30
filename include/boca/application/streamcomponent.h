@@ -39,6 +39,8 @@ namespace BoCA
 
 				virtual Bool		 SetAudioTrackInfo(const Track &);
 
+				virtual Bool		 IsThreadSafe() const;
+
 				virtual Bool		 Activate();
 				virtual Bool		 Deactivate();
 

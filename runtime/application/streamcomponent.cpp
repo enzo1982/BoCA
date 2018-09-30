@@ -38,6 +38,12 @@ Bool BoCA::AS::StreamComponent::SetAudioTrackInfo(const Track &track)
 	return specs->func_SetAudioTrackInfo(component, &track);
 }
 
+Bool BoCA::AS::StreamComponent::IsThreadSafe() const
+{
+	if (!specs->threadSafe) return False;
+	else			return specs->func_IsThreadSafe(component);
+}
+
 Void BoCA::AS::StreamComponent::SetCalculateMD5(Bool nCalculateMD5)
 {
 	calculateMD5 = nCalculateMD5;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,8 +29,6 @@ namespace BoCA
 				virtual String	 GetOutputFileExtension() const;
 
 				virtual Int	 GetNumberOfPasses() const;
-
-				virtual Bool	 IsThreadSafe() const;
 
 				virtual Bool	 IsLossless() const;
 

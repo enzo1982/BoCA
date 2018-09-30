@@ -85,6 +85,8 @@ using namespace smooth;
 		BOCA_EXPORT bool BoCA_##componentName##_CanOpenStream(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->CanOpenStream(file); }									\
 		BOCA_EXPORT int BoCA_##componentName##_GetStreamInfo(void *component, const wchar_t *file, void *track)			{ return ((BoCA::componentName *) component)->GetStreamInfo(file, *((BoCA::Track *) track)); }						\
 																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_IsThreadSafe(const void *component)						{ return ((const BoCA::componentName *) component)->IsThreadSafe(); }									\
+																																		\
 		BOCA_EXPORT __int64 BoCA_##componentName##_GetInBytes(const void *component)						{ return ((const BoCA::componentName *) component)->GetInBytes(); }									\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
@@ -138,6 +140,8 @@ using namespace smooth;
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
 		BOCA_EXPORT const void *BoCA_##componentName##_GetFormatInfo(void *component)						{ return &((BoCA::componentName *) component)->GetFormatInfo(); }									\
 																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_IsThreadSafe(const void *component)						{ return ((const BoCA::componentName *) component)->IsThreadSafe(); }									\
+																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
 																																		\
@@ -155,6 +159,8 @@ using namespace smooth;
 #define BoCA_DEFINE_OUTPUT_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_IsThreadSafe(const void *component)						{ return ((const BoCA::componentName *) component)->IsThreadSafe(); }									\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\
@@ -194,6 +200,8 @@ using namespace smooth;
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((BoCA::Track *) track)); }						\
 		BOCA_EXPORT bool BoCA_##componentName##_CanVerifyTrack(void *component, const void *track)				{ return ((BoCA::componentName *) component)->CanVerifyTrack(*((BoCA::Track *) track)); }									\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_IsThreadSafe(const void *component)						{ return ((const BoCA::componentName *) component)->IsThreadSafe(); }									\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Activate(void *component)							{ return ((BoCA::componentName *) component)->Activate(); }										\
 		BOCA_EXPORT bool BoCA_##componentName##_Deactivate(void *component)							{ return ((BoCA::componentName *) component)->Deactivate(); }										\

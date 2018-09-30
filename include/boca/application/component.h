@@ -40,8 +40,6 @@ namespace BoCA
 				const String			&GetID() const;
 				ComponentType			 GetType() const;
 
-				Bool				 IsThreadSafe() const;
-
 				const Array<InputSpec *>	&GetInputSpecs() const;
 
 				const Array<Parameter *>	&GetParameters() const;

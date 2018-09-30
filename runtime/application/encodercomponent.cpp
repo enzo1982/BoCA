@@ -38,12 +38,6 @@ Int BoCA::AS::EncoderComponent::GetNumberOfPasses() const
 	return specs->func_GetNumberOfPasses(component);
 }
 
-Bool BoCA::AS::EncoderComponent::IsThreadSafe() const
-{
-	if (!specs->threadSafe) return False;
-	else			return specs->func_IsThreadSafe(component);
-}
-
 Bool BoCA::AS::EncoderComponent::IsLossless() const
 {
 	if (specs->func_IsLossless(component)) return True;

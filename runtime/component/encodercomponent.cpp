@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,11 +33,6 @@ String BoCA::CS::EncoderComponent::GetOutputFileExtension() const
 Int BoCA::CS::EncoderComponent::GetNumberOfPasses() const
 {
 	return 1;
-}
-
-Bool BoCA::CS::EncoderComponent::IsThreadSafe() const
-{
-	return True;
 }
 
 Bool BoCA::CS::EncoderComponent::IsLossless() const

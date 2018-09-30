@@ -39,6 +39,8 @@ namespace BoCA
 
 				virtual Bool		 SetAudioTrackInfo(const Track &);
 
+				virtual Bool		 IsThreadSafe() const	{ return True; }
+
 				Int64			 GetInBytes() const	{ return inBytes; }
 
 				virtual Int		 SetDriver(IO::Driver *);

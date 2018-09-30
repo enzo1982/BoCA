@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,6 +24,11 @@ Bool BoCA::CS::StreamComponent::SetAudioTrackInfo(const Track &track)
 {
 	this->track = track;
 
+	return True;
+}
+
+Bool BoCA::CS::StreamComponent::IsThreadSafe() const
+{
 	return True;
 }
 
