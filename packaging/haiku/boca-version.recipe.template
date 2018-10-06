@@ -1,0 +1,72 @@
+SUMMARY="C++ audio component framework and library"
+DESCRIPTION="BoCA is the component framework behind the fre:ac audio \
+converter. It provides unified interfaces for components like encoders, \
+decoders, taggers and extensions as well as code to support communication \
+between applications and their components."
+HOMEPAGE="https://github.com/enzo1982/BoCA/"
+COPYRIGHT="2007-2018 by Robert Kausch"
+LICENSE="GNU GPL v2"
+REVISION="1"
+SOURCE_URI="https://github.com/enzo1982/BoCA/releases/download/<release>/<sourcefile>"
+CHECKSUM_SHA256="<checksum>"
+SOURCE_DIR="<sourcedir>"
+
+ARCHITECTURES="x86 x86_64"
+SECONDARY_ARCHITECTURES="x86"
+
+libVersion="${portVersion%~*}"
+libVersionCompat="$libVersion compat >= $libVersion"
+
+PROVIDES="
+	boca$secondaryArchSuffix = $portVersion
+	lib:libboca$secondaryArchSuffix = $libVersionCompat
+	lib:libboca_${libVersion}$secondaryArchSuffix = $libVersionCompat
+	"
+
+REQUIRES="
+	haiku$secondaryArchSuffix
+	lib:libsmooth$secondaryArchSuffix >= 0.8.74
+	lib:libexpat$secondaryArchSuffix
+	lib:liburiparser$secondaryArchSuffix
+	lib:libz$secondaryArchSuffix
+	"
+
+PROVIDES_devel="
+	boca${secondaryArchSuffix}_devel = $portVersion
+	devel:libboca$secondaryArchSuffix = $libVersionCompat
+	devel:libboca_${libVersion}$secondaryArchSuffix = $libVersionCompat
+	"
+
+REQUIRES_devel="
+	boca$secondaryArchSuffix == $portVersion base
+	devel:libsmooth$secondaryArchSuffix >= 0.8.74
+	"
+
+BUILD_REQUIRES="
+	devel:libsmooth$secondaryArchSuffix
+	devel:libexpat$secondaryArchSuffix
+	devel:liburiparser$secondaryArchSuffix
+	devel:libz$secondaryArchSuffix
+	"
+
+BUILD_PREREQUIRES="
+	haiku_devel
+	cmd:make
+	cmd:gcc$secondaryArchSuffix
+	cmd:g++$secondaryArchSuffix
+	cmd:ld$secondaryArchSuffix
+	cmd:pkg_config
+	"
+
+BUILD()
+{
+	make $jobArgs
+}
+
+INSTALL()
+{
+	make prefix=$prefix install
+
+	packageEntries devel \
+		$developDir
+}
