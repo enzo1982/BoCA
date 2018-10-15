@@ -14,6 +14,10 @@
 #include <boca/common/config.h>
 #include <boca/common/i18n.h>
 
+#if defined __HAIKU__
+#	include <dlfcn.h>
+#endif
+
 using namespace smooth::System;
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
@@ -63,7 +67,18 @@ String BoCA::Utilities::GetBoCADirectory()
 {
 	Directory	 bocaDirectory(GUI::Application::GetApplicationDirectory().Append("boca"));
 
-#ifndef __WIN32__
+#if defined __HAIKU__
+	if (!bocaDirectory.Exists())
+	{
+		/* Query actual BoCA library path on Haiku.
+		 */
+		Dl_info	 info = { 0 };
+
+		dladdr((void *) &BoCA::Utilities::GetBoCADirectory, &info);
+
+		bocaDirectory = File(info.dli_fname).GetFilePath();
+	}
+#elif !defined __WIN32__
 	if (!bocaDirectory.Exists()) bocaDirectory = GUI::Application::GetApplicationDirectory().Append("../lib/boca");
 
 	if (!bocaDirectory.Exists()) bocaDirectory = String(BOCA_INSTALL_PREFIX).Append("/lib/boca");

@@ -53,15 +53,6 @@ BUILD_PREREQUIRES="
 	cmd:pkg_config$secondaryArchSuffix
 	"
 
-PATCH()
-{
-	if [ -n "$secondaryArchSuffix" ]; then
-		sed -i \
-			-e "s|/lib/boca|/$relativeLibDir/boca|" \
-			runtime/common/utilities.cpp
-	fi
-}
-
 BUILD()
 {
 	make $jobArgs
