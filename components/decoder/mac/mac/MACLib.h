@@ -1,6 +1,6 @@
 /*****************************************************************************************
 Monkey's Audio MACLib.h (include for using MACLib.lib in your projects)
-Copyright (C) 2000-2013 by Matthew T. Ashland   All Rights Reserved.
+Copyright (C) 2000-2019 by Matthew T. Ashland   All Rights Reserved.
 
 Overview:
 

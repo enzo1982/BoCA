@@ -13,6 +13,17 @@ PLATFORM_LINUX
 	#define PLATFORM_WINDOWS
 #endif
 
+#ifdef PLATFORM_ANDROID
+#undef MBN
+#undef ODN
+#undef ODS
+#undef CATCH_ERRORS
+#undef ASSERT
+#undef _totlower
+#undef ZeroMemory
+#undef __forceinline
+#endif
+
 /*****************************************************************************************
 Global includes
 *****************************************************************************************/
@@ -45,7 +56,7 @@ Global includes
 Global compiler settings (useful for porting)
 *****************************************************************************************/
 // assembly code (helps performance, but limits portability)
-#ifndef PLATFORM_ARM
+#if !defined(PLATFORM_ARM) && !defined(PLATFORM_ANDROID)
     #define ENABLE_SSE_ASSEMBLY
 	#ifdef _MSC_VER // doesn't compile in gcc
 		#ifndef PLATFORM_x64
@@ -59,9 +70,9 @@ Global compiler settings (useful for porting)
 // that disabling APE_BACKWARDS_COMPATIBILITY would have any effect on a normal user.  For
 // porting or third party usage, it's probably best to not bother with APE_BACKWARDS_COMPATIBILITY.
 // A future release of Monkey's Audio itself may remove support for these obsolete files.
-//#if defined(PLATFORM_WINDOWS)
+#if !defined(PLATFORM_ANDROID)
 	#define APE_BACKWARDS_COMPATIBILITY
-//#endif
+#endif
 
 // compression modes
 #define ENABLE_COMPRESSION_MODE_FAST
@@ -70,6 +81,10 @@ Global compiler settings (useful for porting)
 #define ENABLE_COMPRESSION_MODE_EXTRA_HIGH
 
 // 64 bit platform
+#ifdef PLATFORM_64BIT
+	#define PLATFORM_x64
+#endif
+
 #if __x86_64__
     #define PLATFORM_x64
 #endif
@@ -184,12 +199,12 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.34")
-#define MAC_NAME                                        _T("Monkey's Audio 4.34")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.34"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.34)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.34) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.34\nCopyrighted (c) 2000-2018 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.36")
+#define MAC_NAME                                        _T("Monkey's Audio 4.36")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.36"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.36)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.36) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.35\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #ifdef PLATFORM_WINDOWS
 	#define APE_FILENAME_SLASH '\\'
