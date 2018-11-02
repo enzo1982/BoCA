@@ -213,10 +213,12 @@ Bool BoCA::EncoderFLAC::Activate()
 	{
 		FLAC__StreamMetadata	*seektable = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_SEEKTABLE);
 
-		/* Limit number Ogg FLAC seekpoints to 230 to fit in one Ogg page.
+		/* Set number of seek points and limit it to 230 for Ogg FLAC to fit in one Ogg page.
 		 */
-		if (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0) == 1 && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 && numSamples / format.rate / 10 > 230) ex_FLAC__metadata_object_seektable_template_append_spaced_points(seektable, 230, numSamples);
-		else																		      ex_FLAC__metadata_object_seektable_template_append_spaced_points_by_samples(seektable, 10 * format.rate, numSamples);
+		Int	 numSeekPoints = Math::Min(1000, Int(numSamples / format.rate));
+
+		if (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0) == 1 && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1) ex_FLAC__metadata_object_seektable_template_append_spaced_points(seektable, Math::Min(230, numSeekPoints), numSamples);
+		else													       ex_FLAC__metadata_object_seektable_template_append_spaced_points(seektable, numSeekPoints, numSamples);
 
 		ex_FLAC__metadata_object_seektable_template_sort(seektable, true);
 
