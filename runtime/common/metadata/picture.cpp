@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -63,8 +63,20 @@ Int BoCA::Picture::LoadFromFile(const String &fileName)
 
 	in.InputData(buffer, buffer.Size());
 
-	type = 0x03; // Cover (front)
+	/* Try to guess picture type.
+	 */
+	String	 lowerCase = fileName.ToLower();
 
+	if	(lowerCase.Contains("cover"))	type = 0x03; // Cover (front)
+	else if (lowerCase.Contains("folder"))  type = 0x03; // Cover (front)
+	else if (lowerCase.Contains("front"))	type = 0x03; // Cover (front)
+	else if (lowerCase.Contains("back"))	type = 0x04; // Cover (back)
+	else if (lowerCase.Contains("booklet"))	type = 0x05; // Leaflet page
+	else if (lowerCase.Contains("cd"))	type = 0x06; // Media (e.g. lable side of CD)
+	else					type = 0x00; // Other
+
+	/* Find MIME type and assign data.
+	 */
 	if (buffer.Size() >= 16)
 	{
 		if	(buffer[0] == 0xFF && buffer[1] == 0xD8) mime = "image/jpeg";
