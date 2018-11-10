@@ -151,7 +151,7 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	ToggleParanoia();
 
 	check_jitter		= new CheckBox(i18n->TranslateString("Activate jitter correction"), Point(10, 40), Size(162, 0), &jitter);
-	check_swapchannels	= new CheckBox(i18n->TranslateString("Swap left/right channel"), Point(181, 40), Size(162, 0), &swapchannels);
+	check_swapchannels	= new CheckBox(i18n->TranslateString("Switch stereo channels"), Point(181, 40), Size(162, 0), &swapchannels);
 
 	maxTextSize = Math::Max(check_paranoia->GetUnscaledTextWidth(), check_jitter->GetUnscaledTextWidth());
 
