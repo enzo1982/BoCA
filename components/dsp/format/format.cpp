@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -99,7 +99,7 @@ Void BoCA::DSPFormat::TransformSamples(const UnsignedByte *in, const Format &inF
 	 */
 	if (inFormat.bits == 16 && outFormat.fp)
 	{
-		for (Int i = numSamples - 1; i >= 0; i--) ((Float32 *) out)[i] = (((Int16 *) in)[i] + 32768) / 32767.5 - 1.0; return;
+		for (Int i = numSamples - 1; i >= 0; i--) ((Float32 *) out)[i] = (((Int16 *) in)[i] + 32768) / 32768.0 - 1.0; return;
 	}
 
 	if (inFormat.bits == 8 && outFormat.bits == 8 && inFormat.sign != outFormat.sign)
