@@ -49,6 +49,7 @@ BoCA::FormatConverter::FormatConverter(const Format &source, const Format &targe
 		}
 
 		converterConfig->SetIntValue("Channels", "Channels", target.channels);
+		converterConfig->SetIntValue("Channels", "SwapChannels", False);
 
 		channels->SetConfiguration(converterConfig);
 		channels->SetAudioTrackInfo(converterTrack);

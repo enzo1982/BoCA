@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,15 +20,20 @@ BoCA::ConfigureChannels::ConfigureChannels()
 
 	Int	 channels = config->GetIntValue(ConfigID, "Channels", 2);
 
+	swapChannels = config->GetIntValue(ConfigID, "SwapChannels", False);
+
 	I18n		*i18n	= I18n::Get();
 
 	i18n->SetContext("DSP::Channels");
 
-	group_output		= new GroupBox(i18n->TranslateString("Output channels"), Point(7, 11), Size(250, 42));
+	group_output		= new GroupBox(i18n->TranslateString("Output channels"), Point(7, 11), Size(250, 67));
+
+	check_swap		= new CheckBox(i18n->TranslateString("Switch stereo channels"), Point(10, 40), Size(230, 0), &swapChannels);
 
 	text_channels		= new Text(i18n->AddColon(i18n->TranslateString("Channel configuration")), Point(10, 16));
 
 	combo_channels		= new ComboBox(Point(17 + text_channels->GetUnscaledTextWidth(), 13), Size(223 - text_channels->GetUnscaledTextWidth(), 0));
+	combo_channels->onSelectEntry.Connect(&ConfigureChannels::OnSelectChannels, this);
 	combo_channels->AddEntry(i18n->TranslateString("Mono"));
 	combo_channels->AddEntry(i18n->TranslateString("Stereo"));
 	combo_channels->AddEntry("2.1");
@@ -39,10 +44,11 @@ BoCA::ConfigureChannels::ConfigureChannels()
 
 	group_output->Add(text_channels);
 	group_output->Add(combo_channels);
+	group_output->Add(check_swap);
 
 	Add(group_output);
 
-	SetSize(Size(264, 60));
+	SetSize(Size(264, 85));
 }
 
 BoCA::ConfigureChannels::~ConfigureChannels()
@@ -51,6 +57,8 @@ BoCA::ConfigureChannels::~ConfigureChannels()
 
 	DeleteObject(text_channels);
 	DeleteObject(combo_channels);
+
+	DeleteObject(check_swap);
 }
 
 Int BoCA::ConfigureChannels::SaveSettings()
@@ -60,6 +68,13 @@ Int BoCA::ConfigureChannels::SaveSettings()
 	Int	 entry = combo_channels->GetSelectedEntryNumber();
 
 	config->SetIntValue(ConfigID, "Channels", entry <= 3 ? entry + 1 : (entry - 1) * 2);
+	config->SetIntValue(ConfigID, "SwapChannels", swapChannels);
 
 	return Success();
+}
+
+Void BoCA::ConfigureChannels::OnSelectChannels()
+{
+	if (combo_channels->GetSelectedEntryNumber() == 1) check_swap->Activate();
+	else						   check_swap->Deactivate();
 }
