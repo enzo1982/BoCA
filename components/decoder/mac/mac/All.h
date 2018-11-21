@@ -57,7 +57,9 @@ Global compiler settings (useful for porting)
 *****************************************************************************************/
 // assembly code (helps performance, but limits portability)
 #if !defined(PLATFORM_ARM) && !defined(PLATFORM_ANDROID)
-    #define ENABLE_SSE_ASSEMBLY
+	#if defined __SSE2__ || _M_IX86_FP == 2 || defined _M_X64
+		#define ENABLE_SSE_ASSEMBLY
+	#endif
 	#ifdef _MSC_VER // doesn't compile in gcc
 		#ifndef PLATFORM_x64
 			#define ENABLE_MMX_ASSEMBLY
@@ -172,7 +174,9 @@ Global macros
     #define TICK_COUNT_TYPE                             unsigned long long
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
-    #define ASSERT(e)                                    
+    #define ASSERT(e)
+    #define wcsncpy_s(A, B, COUNT) wcscpy(A, B)
+    #define sprintf_s(A, B, C, D) sprintf(A, C, D)
 #endif
 
 /*****************************************************************************************
@@ -199,12 +203,12 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.36")
-#define MAC_NAME                                        _T("Monkey's Audio 4.36")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.36"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.36)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.36) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.35\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.40")
+#define MAC_NAME                                        _T("Monkey's Audio 4.40")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.40"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.40)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.40) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.40\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #ifdef PLATFORM_WINDOWS
 	#define APE_FILENAME_SLASH '\\'

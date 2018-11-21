@@ -32,6 +32,9 @@ typedef long                LRESULT;
 
 #define ZeroMemory(POINTER, BYTES) memset(POINTER, 0, BYTES);
 
+#define TRUE true
+#define FALSE false
+
 #define CALLBACK
 
 #define _T(x) L ## x

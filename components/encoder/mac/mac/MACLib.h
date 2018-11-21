@@ -85,7 +85,7 @@ Defines
 #define MAC_FORMAT_FLAG_CREATE_WAV_HEADER    32    // create the wave header on decompression (not stored)
 
 #define CREATE_WAV_HEADER_ON_DECOMPRESSION    -1
-#define MAX_AUDIO_BYTES_UNKNOWN -1
+#define MAX_AUDIO_BYTES_UNKNOWN 0xFFFFFFFF
 
 /*****************************************************************************************
 Progress callbacks
@@ -96,6 +96,7 @@ class IAPEProgressCallback
 {
 public:
     
+	virtual ~IAPEProgressCallback() { }
     virtual void Progress(int nPercentageDone) = 0;
     virtual int GetKillFlag() = 0; // KILL_FLAG_CONTINUE to continue
 };
