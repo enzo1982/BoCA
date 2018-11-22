@@ -362,7 +362,8 @@ Int BoCA::EncoderSpeex::ProcessPackets(const Buffer<unsigned char> &packets, con
 
 	for (Int i = 0; i < packetSizes.Length(); i++)
 	{
-		if (i <	overlap && !first) continue;
+		if (i <	overlap && !first)	continue;
+		if (packetSizes.GetNth(i) == 0) continue;
 
 		totalSamples += frameSize;
 
