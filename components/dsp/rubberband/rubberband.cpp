@@ -22,18 +22,22 @@ const String &BoCA::DSPRubberBand::GetComponentSpecs()
 
 	if (rbdll != NIL)
 	{
-		componentSpecs = "					\
-									\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>		\
-		  <component>						\
-		    <name>Rubber Band Tempo/Pitch Changer</name>	\
-		    <version>1.0</version>				\
-		    <id>rubberband-dsp</id>				\
-		    <type>dsp</type>					\
-		    <input float=\"true\"/>				\
-		  </component>						\
-									\
-		";
+		I18n	*i18n = I18n::Get();
+
+		i18n->SetContext("Components::DSP");
+
+		componentSpecs = String("									\
+														\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
+		  <component>											\
+		    <name>").Append(i18n->TranslateString("Rubber Band Tempo/Pitch Changer")).Append("</name>	\
+		    <version>1.0</version>									\
+		    <id>rubberband-dsp</id>									\
+		    <type>dsp</type>										\
+		    <input float=\"true\"/>									\
+		  </component>											\
+														\
+		");
 	}
 
 	return componentSpecs;

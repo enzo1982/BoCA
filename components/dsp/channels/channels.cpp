@@ -17,18 +17,22 @@
 
 const String &BoCA::DSPChannels::GetComponentSpecs()
 {
-	static String	 componentSpecs = "			\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Channel Converter</name>		\
-		    <version>1.0</version>			\
-		    <id>channels-dsp</id>			\
-		    <type>dsp</type>				\
-		    <input float=\"true\"/>			\
-		  </component>					\
-								\
-		";
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Components::DSP");
+
+	static String	 componentSpecs = String("						\
+												\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
+		  <component>									\
+		    <name>").Append(i18n->TranslateString("Channel Converter")).Append("</name>	\
+		    <version>1.0</version>							\
+		    <id>channels-dsp</id>							\
+		    <type>dsp</type>								\
+		    <input float=\"true\"/>							\
+		  </component>									\
+												\
+		");
 
 	return componentSpecs;
 }

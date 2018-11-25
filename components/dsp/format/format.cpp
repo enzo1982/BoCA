@@ -17,17 +17,21 @@
 
 const String &BoCA::DSPFormat::GetComponentSpecs()
 {
-	static String	 componentSpecs = "			\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Sample Format Converter</name>	\
-		    <version>1.0</version>			\
-		    <id>format-dsp</id>				\
-		    <type>dsp</type>				\
-		  </component>					\
-								\
-		";
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Components::DSP");
+
+	static String	 componentSpecs = String("							\
+													\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
+		  <component>										\
+		    <name>").Append(i18n->TranslateString("Sample Format Converter")).Append("</name>	\
+		    <version>1.0</version>								\
+		    <id>format-dsp</id>									\
+		    <type>dsp</type>									\
+		  </component>										\
+													\
+		");
 
 	return componentSpecs;
 }

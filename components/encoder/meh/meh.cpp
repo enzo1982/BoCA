@@ -20,20 +20,24 @@ using namespace smooth::IO;
 
 const String &BoCA::EncoderMultiEncoderHub::GetComponentSpecs()
 {
-	static String	 componentSpecs = "		\
-							\
-	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-	  <component>					\
-	    <name>meh! - multi encoder hub</name>	\
-	    <version>1.0</version>			\
-	    <id>meh-enc</id>				\
-	    <type>encoder</type>			\
-	    <format>					\
-	      <name>multi encoder hub Output</name>	\
-	    </format>					\
-	  </component>					\
-							\
-	";
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Components::Encoders");
+
+	static String	 componentSpecs = String("						\
+												\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
+	  <component>										\
+	    <name>").Append(i18n->TranslateString("meh! - multi encoder hub")).Append("</name>	\
+	    <version>1.0</version>								\
+	    <id>meh-enc</id>									\
+	    <type>encoder</type>								\
+	    <format>										\
+	      <name>multi encoder hub Output</name>						\
+	    </format>										\
+	  </component>										\
+												\
+	");
 
 	return componentSpecs;
 }

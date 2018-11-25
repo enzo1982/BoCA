@@ -22,18 +22,22 @@ const String &BoCA::DSPResample::GetComponentSpecs()
 
 	if (srcdll != NIL)
 	{
-		componentSpecs = "				\
-								\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>	\
-		  <component>					\
-		    <name>Sample Rate Converter</name>		\
-		    <version>1.0</version>			\
-		    <id>resample-dsp</id>			\
-		    <type>dsp</type>				\
-		    <input float=\"true\" rate=\"1-2822400\"/>	\
-		  </component>					\
-								\
-		";
+		I18n	*i18n = I18n::Get();
+
+		i18n->SetContext("Components::DSP");
+
+		componentSpecs = String("								\
+													\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
+		  <component>										\
+		    <name>").Append(i18n->TranslateString("Sample Rate Converter")).Append("</name>	\
+		    <version>1.0</version>								\
+		    <id>resample-dsp</id>								\
+		    <type>dsp</type>									\
+		    <input float=\"true\" rate=\"1-2822400\"/>						\
+		  </component>										\
+													\
+		");
 	}
 
 	return componentSpecs;

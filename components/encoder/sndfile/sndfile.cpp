@@ -22,105 +22,109 @@ const String &BoCA::EncoderSndFile::GetComponentSpecs()
 
 	if (sndfiledll != NIL)
 	{
-		componentSpecs = "								\
-												\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
-		  <component>									\
-		    <name>SndFile Output Component %VERSION%</name>				\
-		    <version>1.0</version>							\
-		    <id>sndfile-enc</id>							\
-		    <type>encoder</type>							\
-		    <replace>wave-enc</replace>							\
-		    <format>									\
-		      <name>Microsoft Wave Files</name>						\
-		      <extension>wav</extension>						\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>			\
-		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>			\
-		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>				\
-		    </format>									\
-		    <format>									\
-		      <name>Apple Audio Files</name>						\
-		      <extension>aif</extension>						\
-		      <extension>aiff</extension>						\
-		      <extension>aifc</extension>						\
-		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>				\
-		    </format>									\
-		    <format>									\
-		      <name>Apple Core Audio Files</name>					\
-		      <extension>caf</extension>						\
-		    </format>									\
-		    <format>									\
-		      <name>Sony Media Wave64 Files</name>					\
-		      <extension>w64</extension>						\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>			\
-		    </format>									\
-		    <format>									\
-		      <name>RIFF 64 Audio Files</name>						\
-		      <extension>rf64</extension>						\
-		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>			\
-		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>			\
-		    </format>									\
-		    <format>									\
-		      <name>Sun Audio Files</name>						\
-		      <extension>au</extension>							\
-		      <extension>snd</extension>						\
-		    </format>									\
-		    <format>									\
-		      <name>Creative Voice Files</name>						\
-		      <extension>voc</extension>						\
-		    </format>									\
-		    <format>									\
-		      <name>Amiga Audio Files</name>						\
-		      <extension>iff</extension>						\
-		      <extension>svx</extension>						\
-		    </format>									\
-		    <format>									\
-		      <name>IRCAM Sound Files</name>						\
-		      <extension>sf</extension>							\
-		    </format>									\
-		    <format>									\
-		      <name>Paris Audio Files</name>						\
-		      <extension>paf</extension>						\
-		    </format>									\
-		    <format>									\
-		      <name>Portable Voice Format</name>					\
-		      <extension>pvf</extension>						\
-		    </format>									\
-		    <format>									\
-		      <name>Psion WVE Files</name>						\
-		      <extension>wve</extension>						\
-		    </format>									\
-		    <format>									\
-		      <name>HMM Toolkit Format</name>						\
-		      <extension>htk</extension>						\
-		    </format>									\
-		    <format>									\
-		      <name>Audio Visual Research Format</name>					\
-		      <extension>avr</extension>						\
-		    </format>									\
-		    <input bits=\"8-32\"/>							\
-		    <input float=\"true\"/>							\
-		    <parameters>								\
-		      <selection name=\"Output format\" argument=\"-f %VALUE\" default=\"wav\">	\
-			<option alias=\"Microsoft Wave File\">wav</option>			\
-			<option alias=\"Apple Audio File\">aiff</option>			\
-			<option alias=\"Apple Core Audio File\">caf</option>			\
-			<option alias=\"Sony Media Wave64 File\">w64</option>			\
-			<option alias=\"RIFF 64 Audio File\">rf64</option>			\
-			<option alias=\"Sun Audio File\">au</option>				\
-			<option alias=\"Creative Voice File\">voc</option>			\
-			<option alias=\"Amiga Audio File\">iff</option>				\
-			<option alias=\"IRCAM Sound File\">sf</option>				\
-			<option alias=\"Paris Audio File\">paf</option>				\
-			<option alias=\"Portable Voice Format\">pvf</option>			\
-			<option alias=\"Psion WVE File\">wve</option>				\
-			<option alias=\"HMM Toolkit Format\">htk</option>			\
-			<option alias=\"Audio Visual Research Format\">avr</option>		\
-		      </selection>								\
-		    </parameters>								\
-		  </component>									\
-												\
-		";
+		I18n	*i18n = I18n::Get();
+
+		i18n->SetContext("Components::Encoders");
+
+		componentSpecs = String("										\
+															\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>								\
+		  <component>												\
+		    <name>").Append(i18n->TranslateString("SndFile Output Component")).Append(" %VERSION%</name>	\
+		    <version>1.0</version>										\
+		    <id>sndfile-enc</id>										\
+		    <type>encoder</type>										\
+		    <replace>wave-enc</replace>										\
+		    <format>												\
+		      <name>Microsoft Wave Files</name>									\
+		      <extension>wav</extension>									\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>						\
+		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>						\
+		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>							\
+		    </format>												\
+		    <format>												\
+		      <name>Apple Audio Files</name>									\
+		      <extension>aif</extension>									\
+		      <extension>aiff</extension>									\
+		      <extension>aifc</extension>									\
+		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>							\
+		    </format>												\
+		    <format>												\
+		      <name>Apple Core Audio Files</name>								\
+		      <extension>caf</extension>									\
+		    </format>												\
+		    <format>												\
+		      <name>Sony Media Wave64 Files</name>								\
+		      <extension>w64</extension>									\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>						\
+		    </format>												\
+		    <format>												\
+		      <name>RIFF 64 Audio Files</name>									\
+		      <extension>rf64</extension>									\
+		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>						\
+		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>						\
+		    </format>												\
+		    <format>												\
+		      <name>Sun Audio Files</name>									\
+		      <extension>au</extension>										\
+		      <extension>snd</extension>									\
+		    </format>												\
+		    <format>												\
+		      <name>Creative Voice Files</name>									\
+		      <extension>voc</extension>									\
+		    </format>												\
+		    <format>												\
+		      <name>Amiga Audio Files</name>									\
+		      <extension>iff</extension>									\
+		      <extension>svx</extension>									\
+		    </format>												\
+		    <format>												\
+		      <name>IRCAM Sound Files</name>									\
+		      <extension>sf</extension>										\
+		    </format>												\
+		    <format>												\
+		      <name>Paris Audio Files</name>									\
+		      <extension>paf</extension>									\
+		    </format>												\
+		    <format>												\
+		      <name>Portable Voice Format</name>								\
+		      <extension>pvf</extension>									\
+		    </format>												\
+		    <format>												\
+		      <name>Psion WVE Files</name>									\
+		      <extension>wve</extension>									\
+		    </format>												\
+		    <format>												\
+		      <name>HMM Toolkit Format</name>									\
+		      <extension>htk</extension>									\
+		    </format>												\
+		    <format>												\
+		      <name>Audio Visual Research Format</name>								\
+		      <extension>avr</extension>									\
+		    </format>												\
+		    <input bits=\"8-32\"/>										\
+		    <input float=\"true\"/>										\
+		    <parameters>											\
+		      <selection name=\"Output format\" argument=\"-f %VALUE\" default=\"wav\">				\
+			<option alias=\"Microsoft Wave File\">wav</option>						\
+			<option alias=\"Apple Audio File\">aiff</option>						\
+			<option alias=\"Apple Core Audio File\">caf</option>						\
+			<option alias=\"Sony Media Wave64 File\">w64</option>						\
+			<option alias=\"RIFF 64 Audio File\">rf64</option>						\
+			<option alias=\"Sun Audio File\">au</option>							\
+			<option alias=\"Creative Voice File\">voc</option>						\
+			<option alias=\"Amiga Audio File\">iff</option>							\
+			<option alias=\"IRCAM Sound File\">sf</option>							\
+			<option alias=\"Paris Audio File\">paf</option>							\
+			<option alias=\"Portable Voice Format\">pvf</option>						\
+			<option alias=\"Psion WVE File\">wve</option>							\
+			<option alias=\"HMM Toolkit Format\">htk</option>						\
+			<option alias=\"Audio Visual Research Format\">avr</option>					\
+		      </selection>											\
+		    </parameters>											\
+		  </component>												\
+															\
+		");
 
 #ifdef __APPLE__
 		componentSpecs.Replace("default=\"wav\"", "default=\"aiff\"");
