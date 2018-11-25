@@ -313,8 +313,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 #endif
 
 	XML::Document	*document = new XML::Document();
+	const char	*xmlUtf8  = xml.ConvertTo("UTF-8");
 
-	document->ParseMemory((void *) (char *) xml, xml.Length());
+	document->ParseMemory(xmlUtf8, strlen(xmlUtf8));
 
 	XML::Node	*root = document->GetRootNode();
 
