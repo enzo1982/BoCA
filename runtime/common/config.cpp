@@ -98,17 +98,20 @@ Void BoCA::Config::Free(Config *config)
 {
 	if (config != NIL)
 	{
-		for (Int i = 0; i < copies.Length(); i++)
+		copies.LockForWrite();
+
+		foreach (Config *copy, copies)
 		{
-			if (copies.GetNth(i) == config)
-			{
-				copies.RemoveNth(i);
+			if (copy != config) continue;
 
-				delete config;
+			copies.RemoveNth(foreachindex);
 
-				break;
-			}
+			delete config;
+
+			break;
 		}
+
+		copies.Unlock();
 	}
 	else if (instance != NIL)
 	{
