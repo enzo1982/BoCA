@@ -247,6 +247,8 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 			 */
 			data.Resize(data.Size() * 2);
 
+			Float32	*samples = (Float32 *) (UnsignedByte *) data;
+
 			for (Int i = numSamples - 1; i >= 0; i--)
 			{
 				Float32	 m = samples[i];
