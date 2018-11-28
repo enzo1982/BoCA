@@ -211,7 +211,7 @@ Int BoCA::SuperWorker::Run()
 			if (samplesLeft > 0)
 			{
 				if (format.channels == 2) dataLength = ex_lame_encode_buffer_interleaved(context, samplesBuffer + framesProcessed * samplesPerFrame, Math::Min(samplesLeft / 2, frameSize), packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
-				else			  dataLength = ex_lame_encode_buffer(		 context, samplesBuffer,
+				else			  dataLength = ex_lame_encode_buffer(		 context, samplesBuffer + framesProcessed * samplesPerFrame,
 														  samplesBuffer + framesProcessed * samplesPerFrame, Math::Min(samplesLeft,	frameSize), packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
 			}
 			else
