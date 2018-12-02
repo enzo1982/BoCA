@@ -244,17 +244,21 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_ReadPlaylist		= (const void *(*)(void *, const wchar_t *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadPlaylist"));
 	func_WritePlaylist		= (int (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WritePlaylist"));
 
+	/* Parse component description.
+	 */
+	String::InputFormat	 inputFormat("UTF-8");
+
 	return ParseXMLSpec(String(func_GetComponentSpecs()).Trim());
 }
 
 Bool BoCA::AS::ComponentSpecs::LoadFromXML(const String &file)
 {
-	IO::InStream	 in(IO::STREAM_FILE, file, IO::IS_READ);
-	String		 xml = in.InputString(in.Size());
+	/* Parse component description from external script.
+	 */
+	String::InputFormat	 inputFormat("UTF-8");
+	IO::InStream		 in(IO::STREAM_FILE, file, IO::IS_READ);
 
-	in.Close();
-
-	return ParseXMLSpec(xml);
+	return ParseXMLSpec(in.InputString(in.Size()).Trim());
 }
 
 String BoCA::AS::ComponentSpecs::GetExternalArgumentsString()

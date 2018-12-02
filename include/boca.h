@@ -199,7 +199,7 @@ using namespace smooth;
 #define BoCA_DEFINE_VERIFIER_COMPONENT(componentName)																												\
 	extern "C" {																																\
 		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((BoCA::Track *) track)); }						\
-		BOCA_EXPORT bool BoCA_##componentName##_CanVerifyTrack(void *component, const void *track)				{ return ((BoCA::componentName *) component)->CanVerifyTrack(*((BoCA::Track *) track)); }									\
+		BOCA_EXPORT bool BoCA_##componentName##_CanVerifyTrack(void *component, const void *track)				{ return ((BoCA::componentName *) component)->CanVerifyTrack(*((BoCA::Track *) track)); }						\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_IsThreadSafe(const void *component)						{ return ((const BoCA::componentName *) component)->IsThreadSafe(); }									\
 																																		\
@@ -213,7 +213,7 @@ using namespace smooth;
 
 #define BoCA_END_COMPONENT(componentName)																													\
 	extern "C" {																																\
-		BOCA_EXPORT const char *BoCA_##componentName##_GetComponentSpecs()							{ return BoCA::componentName::GetComponentSpecs(); }											\
+		BOCA_EXPORT const char *BoCA_##componentName##_GetComponentSpecs()							{ return BoCA::componentName::GetComponentSpecs().ConvertTo("UTF-8"); }									\
 																																		\
 		BOCA_EXPORT void *BoCA_##componentName##_Create()									{ return new BoCA::componentName(); }													\
 		BOCA_EXPORT bool BoCA_##componentName##_Delete(void *component)								{ delete ((BoCA::componentName *) component); return True; }										\
