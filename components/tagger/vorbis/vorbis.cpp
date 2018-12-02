@@ -52,10 +52,10 @@ BoCA::TaggerVorbis::~TaggerVorbis()
 
 Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config	*currentConfig = GetConfiguration();
-	String		 prevOutFormat = String::SetOutputFormat("UTF-8");
+	const Config		*currentConfig = GetConfiguration();
+	String::OutputFormat	 outputFormat("UTF-8");
 
-	Bool		 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroVorbisComment", True);
+	Bool			 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroVorbisComment", True);
 
 	/* Save basic information.
 	 */
@@ -194,8 +194,6 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	RenderTagHeader(vendorString, numItems, buffer);
 
-	String::SetOutputFormat(prevOutFormat);
-
 	return Success();
 }
 
@@ -234,8 +232,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 	/* Skip vendor string.
 	 */
-	String	 prevInFormat = String::SetInputFormat("UTF-8");
-	Int	 vendorLength = in.InputNumber(4);
+	String::InputFormat	 inputFormat("UTF-8");
+	Int			 vendorLength = in.InputNumber(4);
 
 	if (vendorLength < 0 || vendorLength > buffer.Size() - 8) return Error();
 
@@ -539,8 +537,6 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 			}
 		}
 	}
-
-	String::SetInputFormat(prevInFormat);
 
 	return Success();
 }

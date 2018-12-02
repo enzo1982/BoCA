@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -64,7 +64,7 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 	out.OutputNumber(0xBB, 1);
 	out.OutputNumber(0xBF, 1);
 
-	String		 format = String::SetOutputFormat("UTF-8");
+	String::OutputFormat	 outputFormat("UTF-8");
 
 	/* Check if all tracks belong to the same album and
 	 * if we need to create a single or multi file cue sheet.
@@ -162,10 +162,6 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 	}
 
 	out.Close();
-
-	/* Restore previous output format.
-	 */
-	String::SetOutputFormat(format);
 
 	return Success();
 }

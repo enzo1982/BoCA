@@ -115,7 +115,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
 
-	String	 prevOutFormat = String::SetOutputFormat("UTF-8");
+	String::OutputFormat	 outputFormat("UTF-8");
 
 	if (info.artist != NIL) ex_MP4TagsSetArtist(mp4Tags, info.artist.Trim());
 	if (info.title  != NIL) ex_MP4TagsSetName(mp4Tags, info.title.Trim());
@@ -227,8 +227,6 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		delete [] chapterList;
 	}
 
-	String::SetOutputFormat(prevOutFormat);
-
 	ex_MP4Close(mp4File, 0);
 
 	/* Optimize MP4 structure.
@@ -257,7 +255,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	ex_MP4TagsFetch(mp4Tags, mp4File);
 
-	String	 prevInFormat = String::SetInputFormat("UTF-8");
+	String::InputFormat	 inputFormat("UTF-8");
 
 	if	(mp4Tags->name	      != NIL) info.title   = String(mp4Tags->name).Trim();
 	if	(mp4Tags->artist      != NIL) info.artist  = String(mp4Tags->artist).Trim();
@@ -376,8 +374,6 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 		if (chapterList != NIL) ex_MP4Free(chapterList);
 	}
-
-	String::SetInputFormat(prevInFormat);
 
 	ex_MP4Close(mp4File, 0);
 

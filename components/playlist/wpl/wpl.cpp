@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -168,8 +168,8 @@ Error BoCA::PlaylistWPL::WritePlaylist(const String &file)
 
 	/* Convert to WPL and clean up.
 	 */
-	String		 inFormat  = String::SetInputFormat("UTF-8");
-	String		 outFormat = String::SetOutputFormat("UTF-8");
+	String::InputFormat	 inputFormat("UTF-8");
+	String::OutputFormat	 outputFormat("UTF-8");
 
 	InStream	 in(STREAM_FILE, String(actualFile).Append(".xml"), IS_READ);
 
@@ -181,9 +181,6 @@ Error BoCA::PlaylistWPL::WritePlaylist(const String &file)
 	out.Close();
 
 	File(String(actualFile).Append(".xml")).Delete();
-
-	String::SetInputFormat(inFormat);
-	String::SetOutputFormat(outFormat);
 
 	return Success();
 }

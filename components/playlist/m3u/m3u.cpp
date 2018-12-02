@@ -57,8 +57,8 @@ Bool BoCA::PlaylistM3U::CanOpenFile(const String &file)
 
 const Array<BoCA::Track> &BoCA::PlaylistM3U::ReadPlaylist(const String &file)
 {
-	String		 format = String::SetInputFormat("UTF-8");
-	InStream	 in(STREAM_FILE, file, IS_READ);
+	String::InputFormat	 inputFormat("UTF-8");
+	InStream		 in(STREAM_FILE, file, IS_READ);
 
 	/* Skip UTF-8 BOM.
 	 */
@@ -91,8 +91,6 @@ const Array<BoCA::Track> &BoCA::PlaylistM3U::ReadPlaylist(const String &file)
 
 	in.Close();
 
-	String::SetInputFormat(format);
-
 	return trackList;
 }
 
@@ -100,13 +98,10 @@ Error BoCA::PlaylistM3U::WritePlaylist(const String &file)
 {
 	if (trackList.Length() == 0) return Error();
 
-	String		 format;
+	String::OutputFormat	 outputFormat(file.EndsWith(".m3u8") ? "UTF-8" : "ISO-8859-1");
 
-	if (file.EndsWith(".m3u8")) format = String::SetOutputFormat("UTF-8");
-	else			    format = String::SetOutputFormat("ISO-8859-1");
-
-	String		 actualFile = Utilities::CreateDirectoryForFile(file);
-	OutStream	 out(STREAM_FILE, actualFile, OS_REPLACE);
+	String			 actualFile = Utilities::CreateDirectoryForFile(file);
+	OutStream		 out(STREAM_FILE, actualFile, OS_REPLACE);
 
 	if (out.GetLastError() != IO_ERROR_OK)
 	{
@@ -136,8 +131,6 @@ Error BoCA::PlaylistM3U::WritePlaylist(const String &file)
 	}
 
 	out.Close();
-
-	String::SetOutputFormat(format);
 
 	return Success();
 }

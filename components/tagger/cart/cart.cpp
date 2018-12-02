@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -59,8 +59,8 @@ BoCA::TaggerCart::~TaggerCart()
 
 Error BoCA::TaggerCart::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config	*currentConfig = GetConfiguration();
-	String		 prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "RIFFCartTagEncoding", "ISO-8859-1"));
+	const Config		*currentConfig = GetConfiguration();
+	String::OutputFormat	 outputFormat(currentConfig->GetStringValue("Tags", "RIFFCartTagEncoding", "ISO-8859-1"));
 
 	const Info	&info = track.GetInfo();
 	const Format	&format = track.GetFormat();
@@ -138,8 +138,6 @@ Error BoCA::TaggerCart::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	 */
 	RenderTagHeader(buffer);
 
-	String::SetOutputFormat(prevOutFormat);
-
 	return Success();
 }
 
@@ -210,8 +208,8 @@ Error BoCA::TaggerCart::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 
 	/* Parse individual comment items.
 	 */
-	Info	 info = track.GetInfo();
-	String	 prevInFormat = String::SetInputFormat("ISO-8859-1");
+	Info			 info = track.GetInfo();
+	String::InputFormat	 inputFormat("ISO-8859-1");
 
 	/* Cart chunk version.
 	 */
@@ -281,8 +279,6 @@ Error BoCA::TaggerCart::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 	}
 
 	track.SetInfo(info);
-
-	String::SetInputFormat(prevInFormat);
 
 	if (error) return Error();
 	else	   return Success();

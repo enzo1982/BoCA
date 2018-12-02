@@ -64,10 +64,10 @@ BoCA::TaggerRIFF::~TaggerRIFF()
 
 Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config	*currentConfig = GetConfiguration();
-	String		 prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "RIFFINFOTagEncoding", "ISO-8859-1"));
+	const Config		*currentConfig = GetConfiguration();
+	String::OutputFormat	 outputFormat(currentConfig->GetStringValue("Tags", "RIFFINFOTagEncoding", "ISO-8859-1"));
 
-	Bool		 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroRIFFINFOTag", True);
+	Bool			 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroRIFFINFOTag", True);
 
 	/* Save basic information.
 	 */
@@ -106,8 +106,6 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	}
 
 	RenderTagHeader(buffer);
-
-	String::SetOutputFormat(prevOutFormat);
 
 	return Success();
 }
@@ -155,8 +153,8 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 
 	/* Parse individual comment items.
 	 */
-	Info	 info = track.GetInfo();
-	String	 prevInFormat = String::SetInputFormat("ISO-8859-1");
+	Info			 info = track.GetInfo();
+	String::InputFormat	 inputFormat("ISO-8859-1");
 
 	while (!error)
 	{
@@ -189,8 +187,6 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 	}
 
 	track.SetInfo(info);
-
-	String::SetInputFormat(prevInFormat);
 
 	if (error) return Error();
 	else	   return Success();

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -110,7 +110,7 @@ Error BoCA::PlaylistXSPF::WritePlaylist(const String &file)
 {
 	if (trackList.Length() == 0) return Error();
 
-	String			 format  = String::SetOutputFormat("UTF-8");
+	String::OutputFormat	 outputFormat("UTF-8");
 
 	String			 actualFile = Utilities::CreateDirectoryForFile(file);
 	OutStream		 out(STREAM_FILE, actualFile, OS_REPLACE);
@@ -168,8 +168,6 @@ Error BoCA::PlaylistXSPF::WritePlaylist(const String &file)
 
 	out.Close();
 
-	String::SetOutputFormat(format);
-
 	return Success();
 }
 
@@ -214,7 +212,7 @@ BoCA::PlaylistXSPFCallback::PlaylistXSPFCallback(PlaylistXSPF *playlist)
 
 void BoCA::PlaylistXSPFCallback::addTrack(XspfTrack *xspfTrack)
 {
-	String	 inFormat = String::SetInputFormat("UTF-8");
+	String::InputFormat	 inputFormat("UTF-8");
 
 	Track	 track;
 	Info	 info;
@@ -229,8 +227,6 @@ void BoCA::PlaylistXSPFCallback::addTrack(XspfTrack *xspfTrack)
 	track.origFilename = playlist->DecodeURI(String(xspfTrack->getLocation(0)).Replace("file://", NIL));
 
 	playlist->trackList.Add(track);
-
-	String::SetInputFormat(inFormat);
 
 	delete xspfTrack;
 }

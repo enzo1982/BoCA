@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -57,10 +57,10 @@ BoCA::TaggerAPEv2::~TaggerAPEv2()
 
 Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config	*currentConfig = GetConfiguration();
-	String		 prevOutFormat = String::SetOutputFormat("UTF-8");
+	const Config		*currentConfig = GetConfiguration();
+	String::OutputFormat	 outputFormat("UTF-8");
 
-	Bool		 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroAPEv2", True);
+	Bool			 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroAPEv2", True);
 
 	/* Save basic information.
 	 */
@@ -178,8 +178,6 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		buffer.Resize(0);
 	}
 
-	String::SetOutputFormat(prevOutFormat);
-
 	return Success();
 }
 
@@ -263,7 +261,7 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		if (!ParseAPEFooter(buffer, NIL, &numItems)) return Error();
 	}
 
-	String	 prevInFormat = String::SetInputFormat("UTF-8");
+	String::InputFormat	 inputFormat("UTF-8");
 
 	Info	 info = track.GetInfo();
 
@@ -422,8 +420,6 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 	if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
 
 	track.SetInfo(info);
-
-	String::SetInputFormat(prevInFormat);
 
 	return Success();
 }

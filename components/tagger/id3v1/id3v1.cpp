@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -93,8 +93,8 @@ Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	out.OutputString("TAG");
 
-	const Info	&info = track.GetInfo();
-	String		 prevOutFormat = String::SetOutputFormat(currentConfig->GetStringValue("Tags", "ID3v1Encoding", "ISO-8859-1"));
+	const Info		&info = track.GetInfo();
+	String::OutputFormat	 outputFormat(currentConfig->GetStringValue("Tags", "ID3v1Encoding", "ISO-8859-1"));
 
 	{ out.OutputString(info.title.Trim().Head(Math::Min(30, info.title.Trim().Length())));   for (Int i = 0; i < 30 - info.title.Trim().Length(); i++) out.OutputNumber(0, 1); }
 	{ out.OutputString(info.artist.Trim().Head(Math::Min(30, info.artist.Trim().Length()))); for (Int i = 0; i < 30 - info.artist.Trim().Length(); i++) out.OutputNumber(0, 1); }
@@ -122,8 +122,6 @@ Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	out.OutputNumber(GetID3CategoryID(info.genre), 1);
 
-	String::SetOutputFormat(prevOutFormat);
-
 	return Success();
 }
 
@@ -138,7 +136,7 @@ Error BoCA::TaggerID3v1::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 	 */
 	if (in.InputString(3) == "TAG")
 	{
-		String	 prevInFormat = String::SetInputFormat("ISO-8859-1");
+		String::InputFormat	 inputFormat("ISO-8859-1");
 
 		Info	 info = track.GetInfo();
 
@@ -164,8 +162,6 @@ Error BoCA::TaggerID3v1::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		info.genre	= GetID3CategoryName(in.InputNumber(1));
 
 		track.SetInfo(info);
-
-		String::SetInputFormat(prevInFormat);
 
 		return Success();
 	}

@@ -847,7 +847,7 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 		 encodingID == "UTF-16LE" || encodingID == "UCS-2LE") encoding = ID3TE_UTF16;
 	else if (encodingID == "UTF-16BE" || encodingID == "UCS-2BE") encoding = ID3TE_UTF16BE;
 
-	String		 prevOutFormat = String::SetOutputFormat(encodingID);
+	String::OutputFormat	 outputFormat(encodingID);
 
 	SetIntegerField(frame, ID3FN_TEXTENC, encoding);
 
@@ -861,12 +861,8 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 		else if (encoding == ID3TE_UTF16BE) field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16BE"));
 		else				    field->Set((char *) string.Trim());
 
-		String::SetOutputFormat(prevOutFormat.ConvertTo("ISO-8859-1"));
-
 		return Success();
 	}
-
-	String::SetOutputFormat(prevOutFormat.ConvertTo("ISO-8859-1"));
 
 	return Error();
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -60,8 +60,8 @@ Bool BoCA::PlaylistPLS::CanOpenFile(const String &file)
 
 const Array<BoCA::Track> &BoCA::PlaylistPLS::ReadPlaylist(const String &file)
 {
-	String		 format = String::SetInputFormat("ISO-8859-1");
-	InStream	 in(STREAM_FILE, file, IS_READ);
+	String::InputFormat	 inputFormat("ISO-8859-1");
+	InStream		 in(STREAM_FILE, file, IS_READ);
 
 	while (in.GetPos() < in.Size())
 	{
@@ -88,8 +88,6 @@ const Array<BoCA::Track> &BoCA::PlaylistPLS::ReadPlaylist(const String &file)
 
 	in.Close();
 
-	String::SetInputFormat(format);
-
 	return trackList;
 }
 
@@ -97,10 +95,10 @@ Error BoCA::PlaylistPLS::WritePlaylist(const String &file)
 {
 	if (trackList.Length() == 0) return Error();
 
-	String		 format = String::SetOutputFormat("ISO-8859-1");
+	String::OutputFormat	 outputFormat("ISO-8859-1");
 
-	String		 actualFile = Utilities::CreateDirectoryForFile(file);
-	OutStream	 out(STREAM_FILE, actualFile, OS_REPLACE);
+	String			 actualFile = Utilities::CreateDirectoryForFile(file);
+	OutStream		 out(STREAM_FILE, actualFile, OS_REPLACE);
 
 	if (out.GetLastError() != IO_ERROR_OK)
 	{
@@ -135,8 +133,6 @@ Error BoCA::PlaylistPLS::WritePlaylist(const String &file)
 	}
 
 	out.Close();
-
-	String::SetOutputFormat(format);
 
 	return Success();
 }
