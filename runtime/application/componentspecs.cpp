@@ -307,13 +307,13 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 #if defined __WIN32__
 	static const char	*places[] = { "%APPDIR\\codecs\\cmdline\\%COMMAND", "%APPDIR\\codecs\\cmdline\\%COMMAND.exe", NIL };
 #elif defined __APPLE__
-	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/opt/local/bin/%COMMAND", "/sw/bin/%COMMAND", NIL };
+	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "%APPDIR/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/opt/local/bin/%COMMAND", "/sw/bin/%COMMAND", NIL };
 #elif defined __HAIKU__
-	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/system/bin/%COMMAND", "/system/non-packaged/bin/%COMMAND", NIL };
+	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "%APPDIR/%COMMAND", "/system/bin/%COMMAND", "/system/non-packaged/bin/%COMMAND", NIL };
 #elif defined __NetBSD__
-	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/usr/pkg/bin/%COMMAND", NIL };
+	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "%APPDIR/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", "/usr/pkg/bin/%COMMAND", NIL };
 #else
-	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", NIL };
+	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "%APPDIR/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", NIL };
 #endif
 
 	XML::Document	*document = new XML::Document();
