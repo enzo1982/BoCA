@@ -18,8 +18,10 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 {
 	const Config	*config = Config::Get();
 
-	autoRead	= config->GetIntValue(ConfigID, "AutoReadContents", True);
-	autoRip		= config->GetIntValue(ConfigID, "AutoRip", False);
+	Bool	 notificationAvailable = config->GetIntValue("Settings", "NotificationAvailable", False);
+
+	autoRead	= notificationAvailable && config->GetIntValue(ConfigID, "AutoReadContents", True);
+	autoRip		= notificationAvailable && config->GetIntValue(ConfigID, "AutoRip", False);
 
 	cdparanoia	= config->GetIntValue(ConfigID, "CDParanoia", False);
 
@@ -138,6 +140,8 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 	check_autoRead	= new CheckBox(i18n->TranslateString("Read CD contents on insert"), Point(10, 14), Size(170, 0), &autoRead);
 	check_autoRead->onAction.Connect(&ConfigureCDParanoia::ToggleAutoRead, this);
+
+	if (!notificationAvailable) check_autoRead->Deactivate();
 
 	check_autoRip	= new CheckBox(i18n->TranslateString("Start ripping automatically"), check_autoRead->GetPosition() + Point(0, 26), Size(170, 0), &autoRip);
 
@@ -297,8 +301,11 @@ Int BoCA::ConfigureCDParanoia::SaveSettings()
 		config->SetIntValue(ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(i)), driveSpinUpTimes.GetNth(i));
 	}
 
-	config->SetIntValue(ConfigID, "AutoReadContents", autoRead);
-	config->SetIntValue(ConfigID, "AutoRip", autoRip);
+	if (config->GetIntValue("Settings", "NotificationAvailable", False))
+	{
+		config->SetIntValue(ConfigID, "AutoReadContents", autoRead);
+		config->SetIntValue(ConfigID, "AutoRip", autoRip);
+	}
 
 	config->SetIntValue(ConfigID, "CDParanoia", cdparanoia);
 	config->SetIntValue(ConfigID, "CDParanoiaMode", combo_paranoia_mode->GetSelectedEntryNumber());

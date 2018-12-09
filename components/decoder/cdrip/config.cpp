@@ -20,8 +20,10 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 {
 	const Config	*config = Config::Get();
 
-	autoRead	= config->GetIntValue(ConfigID, "AutoReadContents", True);
-	autoRip		= config->GetIntValue(ConfigID, "AutoRip", False);
+	Bool	 notificationAvailable = config->GetIntValue("Settings", "NotificationAvailable", False);
+
+	autoRead	= notificationAvailable && config->GetIntValue(ConfigID, "AutoReadContents", True);
+	autoRip		= notificationAvailable && config->GetIntValue(ConfigID, "AutoRip", False);
 
 	jitter		= config->GetIntValue(ConfigID, "JitterCorrection", False);
 	swapchannels	= config->GetIntValue(ConfigID, "SwapChannels", False);
@@ -187,6 +189,8 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 
 	check_autoRead	= new CheckBox(i18n->TranslateString("Read CD contents on insert"), Point(10, 14), Size(170, 0), &autoRead);
 	check_autoRead->onAction.Connect(&ConfigureCDRip::ToggleAutoRead, this);
+
+	if (!notificationAvailable) check_autoRead->Deactivate();
 
 	check_autoRip	= new CheckBox(i18n->TranslateString("Start ripping automatically"), check_autoRead->GetPosition() + Point(0, 26), Size(170, 0), &autoRip);
 	check_autoEject	= new CheckBox(i18n->TranslateString("Eject disk after ripping"), check_autoRip->GetPosition() + Point(0, 26), Size(170, 0), &autoEject);
@@ -378,8 +382,11 @@ Int BoCA::ConfigureCDRip::SaveSettings()
 		config->SetIntValue(ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(i)), driveSpinUpTimes.GetNth(i));
 	}
 
-	config->SetIntValue(ConfigID, "AutoReadContents", autoRead);
-	config->SetIntValue(ConfigID, "AutoRip", autoRip);
+	if (config->GetIntValue("Settings", "NotificationAvailable", False))
+	{
+		config->SetIntValue(ConfigID, "AutoReadContents", autoRead);
+		config->SetIntValue(ConfigID, "AutoRip", autoRip);
+	}
 
 	config->SetIntValue(ConfigID, "JitterCorrection", jitter);
 	config->SetIntValue(ConfigID, "SwapChannels", swapchannels);
