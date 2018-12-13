@@ -150,6 +150,9 @@
     <ClCompile Include="..\..\components\playlist\xspf\expat\loadlibrary.c">
       <Filter>Quelldateien\expat</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriMemory.c">
+      <Filter>Quelldateien\uriparser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\components\playlist\xspf\xspf.h">

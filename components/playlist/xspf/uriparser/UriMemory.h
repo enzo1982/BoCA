@@ -1,8 +1,8 @@
 /*
  * uriparser - RFC 3986 URI parsing library
  *
- * Copyright (C) 2007, Weijia Song <songweijia@gmail.com>
- * Copyright (C) 2007, Sebastian Pipping <sebastian@pipping.org>
+ * Copyright (C) 2018, Weijia Song <songweijia@gmail.com>
+ * Copyright (C) 2018, Sebastian Pipping <sebastian@pipping.org>
  * All rights reserved.
  *
  * Redistribution  and use in source and binary forms, with or without
@@ -38,53 +38,22 @@
  */
 
 #ifndef URI_DOXYGEN
-# include "UriParseBase.h"
+# include <uriparser/Uri.h>
 #endif
 
 
 
-void uriWriteQuadToDoubleByte(const unsigned char * hexDigits, int digitCount, unsigned char * output) {
-	switch (digitCount) {
-	case 1:
-		/* 0x___? -> \x00 \x0? */
-		output[0] = 0;
-		output[1] = hexDigits[0];
-		break;
-
-	case 2:
-		/* 0x__?? -> \0xx \x?? */
-		output[0] = 0;
-		output[1] = 16 * hexDigits[0] + hexDigits[1];
-		break;
-
-	case 3:
-		/* 0x_??? -> \0x? \x?? */
-		output[0] = hexDigits[0];
-		output[1] = 16 * hexDigits[1] + hexDigits[2];
-		break;
-
-	case 4:
-		/* 0x???? -> \0?? \x?? */
-		output[0] = 16 * hexDigits[0] + hexDigits[1];
-		output[1] = 16 * hexDigits[2] + hexDigits[3];
-		break;
-
-	}
-}
+#define URI_CHECK_MEMORY_MANAGER(memory)  \
+	do { \
+		if (memory == NULL) { \
+			memory = &defaultMemoryManager; \
+		} else if (uriMemoryManagerIsComplete(memory) != URI_TRUE) { \
+			return URI_ERROR_MEMORY_MANAGER_INCOMPLETE; \
+		} \
+	} while (0)
 
 
 
-unsigned char uriGetOctetValue(const unsigned char * digits, int digitCount) {
-	switch (digitCount) {
-	case 1:
-		return digits[0];
+extern UriMemoryManager defaultMemoryManager;
 
-	case 2:
-		return 10 * digits[0] + digits[1];
-
-	case 3:
-	default:
-		return 100 * digits[0] + 10 * digits[1] + digits[2];
-
-	}
-}
+UriBool uriMemoryManagerIsComplete(const UriMemoryManager * memory);

@@ -138,6 +138,7 @@
     <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriFile.c" />
     <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriIp4.c" />
     <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriIp4Base.c" />
+    <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriMemory.c" />
     <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriNormalize.c" />
     <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriNormalizeBase.c" />
     <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriParse.c" />

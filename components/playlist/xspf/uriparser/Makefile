@@ -2,7 +2,7 @@ BOCA_PATH = ../../../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-OBJECTS	= UriCommon.o UriCompare.o UriEscape.o UriFile.o UriIp4.o UriIp4Base.o UriNormalize.o UriNormalizeBase.o UriParse.o UriParseBase.o UriQuery.o UriRecompose.o UriResolve.o UriShorten.o
+OBJECTS	= UriCommon.o UriCompare.o UriEscape.o UriFile.o UriIp4.o UriIp4Base.o UriMemory.o UriNormalize.o UriNormalizeBase.o UriParse.o UriParseBase.o UriQuery.o UriRecompose.o UriResolve.o UriShorten.o
 TARGET	= liburiparser.a
 
 CCOPTS	= -I$(SRCDIR)/..
