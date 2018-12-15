@@ -12,7 +12,6 @@
 
 #include <boca.h>
 #include "worker.h"
-#include "dllinterface.h"
 
 BoCA_BEGIN_COMPONENT(EncoderFDKAAC)
 
@@ -45,6 +44,8 @@ namespace BoCA
 
 			Int			 EncodeFrames(Bool);
 			Int			 ProcessPackets(const Buffer<unsigned char> &, const Array<Int> &, Bool);
+
+			static UnsignedInt32	 GetEncoderVersion();
 
 			static Bool		 ConvertArguments(Config *);
 		public:

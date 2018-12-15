@@ -122,6 +122,24 @@ BoCA::EncoderFDKAAC::~EncoderFDKAAC()
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
+UnsignedInt32 BoCA::EncoderFDKAAC::GetEncoderVersion()
+{
+	LIB_INFO	 info[0xFF];
+
+	memset(info, 0, sizeof(info));
+
+	ex_aacEncGetLibInfo(info);
+
+	for (int i = 0; i < 0xFF; i++)
+	{
+		if (info[i].module_id != FDK_AACENC) continue;
+
+		return info[i].version;
+	}
+
+	return 0;
+}
+
 Bool BoCA::EncoderFDKAAC::Activate()
 {
 	const Format	&format = track.GetFormat();
@@ -170,17 +188,28 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	}
 
 	AACENC_InfoStruct	 aacInfo;
+	AACENC_InfoStruct_Old	&aacInfoOld = *(AACENC_InfoStruct_Old *) &aacInfo;
 
 	ex_aacEncEncode(handle, NULL, NULL, NULL, NULL);
 	ex_aacEncInfo(handle, &aacInfo);
 
 	frameSize    = aacInfo.frameLength;
-	delaySamples = aacInfo.encoderDelay;
 
-	/* Adjust delay for LD/ELD object types.
-	 */
-	if (aacType == AOT_ER_AAC_LD)  delaySamples -= frameSize * 0.5625;
-	if (aacType == AOT_ER_AAC_ELD) delaySamples -= frameSize;
+#if AACENCODER_LIB_VL0 >= 4
+	if (GetEncoderVersion() >= 4 << 24)
+	{
+		delaySamples = aacInfo.nDelayCore;
+	}
+	else
+#endif
+	{
+		delaySamples = aacInfoOld.encoderDelay;
+
+		/* Adjust delay for LD/ELD object types.
+		 */
+		if (aacType == AOT_ER_AAC_LD)  delaySamples = frameSize;
+		if (aacType == AOT_ER_AAC_ELD) delaySamples = frameSize / 4;
+	}
 
 	/* Check whether to use MP4 container.
 	 */
@@ -196,7 +225,9 @@ Bool BoCA::EncoderFDKAAC::Activate()
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
-		ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfo.confBuf, aacInfo.confSize);
+
+		if (GetEncoderVersion() >= 4 << 24) ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfo.confBuf, aacInfo.confSize);
+		else				    ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfoOld.confBuf, aacInfoOld.confSize);
 
 		totalSamples = 0;
 	}

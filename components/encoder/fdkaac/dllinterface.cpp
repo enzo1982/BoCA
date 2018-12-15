@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@ AACENCOPEN			 ex_aacEncOpen			= NIL;
 AACENCCLOSE			 ex_aacEncClose			= NIL;
 AACENCENCODE			 ex_aacEncEncode		= NIL;
 AACENCINFO			 ex_aacEncInfo			= NIL;
+AACENCGETLIBINFO		 ex_aacEncGetLibInfo		= NIL;
 AACENCODER_SETPARAM		 ex_aacEncoder_SetParam		= NIL;
 
 MP4CREATEEX			 ex_MP4CreateEx			= NIL;
@@ -47,12 +48,14 @@ Bool LoadFDKAACDLL()
 	ex_aacEncClose		= (AACENCCLOSE) fdkaacdll->GetFunctionAddress("aacEncClose");
 	ex_aacEncEncode		= (AACENCENCODE) fdkaacdll->GetFunctionAddress("aacEncEncode");
 	ex_aacEncInfo		= (AACENCINFO) fdkaacdll->GetFunctionAddress("aacEncInfo");
+	ex_aacEncGetLibInfo	= (AACENCGETLIBINFO) fdkaacdll->GetFunctionAddress("aacEncGetLibInfo");
 	ex_aacEncoder_SetParam	= (AACENCODER_SETPARAM) fdkaacdll->GetFunctionAddress("aacEncoder_SetParam");
 
 	if (ex_aacEncOpen		== NIL ||
 	    ex_aacEncClose		== NIL ||
 	    ex_aacEncEncode		== NIL ||
 	    ex_aacEncInfo		== NIL ||
+	    ex_aacEncGetLibInfo		== NIL ||
 	    ex_aacEncoder_SetParam	== NIL) { FreeFDKAACDLL(); return False; }
 
 	return True;
