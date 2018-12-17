@@ -275,12 +275,14 @@ Int BoCA::Config::SetConfigurationName(const String &nConfig)
 
 BoCA::ApplicationConfig::ApplicationConfig()
 {
-	String	 applicationDir	    = Application::GetApplicationDirectory();
+	String	 applicationDir	     = Application::GetApplicationDirectory();
 
-	String	 programFilesDir    = S::System::System::GetProgramFilesDirectory();
-	String	 applicationDataDir = S::System::System::GetApplicationDataDirectory();
+	String	 programFilesDir     = S::System::System::GetProgramFilesDirectory();
+	String	 applicationDataDir  = S::System::System::GetApplicationDataDirectory();
+	String	 applicationCacheDir = S::System::System::GetApplicationCacheDirectory();
 
 	configDir = applicationDir;
+	cacheDir  = applicationDir;
 
 	/* Check if configuration file exists and try to create
 	 * it to check write permissions.
@@ -300,16 +302,26 @@ BoCA::ApplicationConfig::ApplicationConfig()
 	if (applicationDir.ToUpper().StartsWith(programFilesDir.ToUpper()) || !configFile.Exists())
 	{
 		configDir = applicationDataDir;
+		cacheDir  = applicationCacheDir;
 
 		if (configDir != NIL)
 		{
-#if !defined(__WIN32__) && !defined(__HAIKU__)
-			configDir.Append(".");
+#if !defined(__WIN32__) && !defined(__APPLE__) && !defined(__HAIKU__)
+			if (!configDir.EndsWith("/.config/")) configDir.Append(".");
 #endif
 			configDir.Append(BoCA::GetApplicationPrefix()).Append(Directory::GetDirectoryDelimiter());
 		}
 
+		if (cacheDir != NIL)
+		{
+#if !defined(__WIN32__) && !defined(__APPLE__) && !defined(__HAIKU__)
+			if (!cacheDir.EndsWith("/.cache/")) cacheDir.Append(".");
+#endif
+			cacheDir.Append(BoCA::GetApplicationPrefix()).Append(Directory::GetDirectoryDelimiter());
+		}
+
 		Directory(configDir).Create();
+		Directory(cacheDir).Create();
 	}
 
 	/* Remove empty file created for testing permissions.

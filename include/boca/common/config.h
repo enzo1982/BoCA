@@ -44,6 +44,7 @@ namespace BoCA
 			Configuration			*config;
 		public:
 			String				 configDir;
+			String				 cacheDir;
 
 			Int				 SetIntValue(const String &, const String &, Int);
 			Int				 SetStringValue(const String &, const String &, const String &);
