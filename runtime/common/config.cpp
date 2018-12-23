@@ -328,6 +328,19 @@ BoCA::ApplicationConfig::ApplicationConfig()
 	 */
 	if (configFileCreated) configFile.Delete();
 
+	/* Migrate old configuration file (remove this block after some time).
+	 */
+#ifndef __WIN32__
+	File	 configFileNew = String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml");
+#ifdef __APPLE__
+	File	 configFileOld = String(configDir).Append("../../../.").Append(BoCA::GetApplicationPrefix()).Append("/").Append(BoCA::GetApplicationPrefix()).Append(".xml");
+#else
+	File	 configFileOld = String(configDir).Append("../../.").Append(BoCA::GetApplicationPrefix()).Append("/").Append(BoCA::GetApplicationPrefix()).Append(".xml");
+#endif
+
+	if (!configFileNew.Exists() && configFileOld.Exists()) configFileOld.Copy(configFileNew);
+#endif
+
 	/* Load or create actual configuration.
 	 */
 	config = new Configuration(String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml"), True);
