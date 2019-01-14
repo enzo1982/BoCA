@@ -107,11 +107,6 @@ namespace APE
     //typedef intptr_t                                  intn;
 	//typedef uintptr_t                                   uintn;
 
-// From GlobalIntTypes.h.
-#ifndef PLATFORM_WINDOWS
-#include <stdint.h>
-#endif
-
 #if defined(PLATFORM_x64)
 // DO NOT CHANGE THE FOLLOWING 6 LINES! They are necessary for building Media Center 64 bit on non-windows platforms!
     #ifndef PLATFORM_WINDOWS
@@ -204,12 +199,12 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.42")
-#define MAC_NAME                                        _T("Monkey's Audio 4.42")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.42"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.42)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.42) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.42\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.43")
+#define MAC_NAME                                        _T("Monkey's Audio 4.43")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.43"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.43)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.43) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.43\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #ifdef PLATFORM_WINDOWS
 	#define APE_FILENAME_SLASH '\\'
