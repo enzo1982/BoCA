@@ -42,8 +42,10 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat)
 	CA::AudioStreamBasicDescription	 sourceFormat = { 0 };
 
 	sourceFormat.mFormatID		    = CA::kAudioFormatLinearPCM;
-	sourceFormat.mFormatFlags	    = CA::kLinearPCMFormatFlagIsPacked | (format.bits > 8	  ? CA::kLinearPCMFormatFlagIsSignedInteger : 0) |
-										 (endianness == EndianBig ? CA::kLinearPCMFormatFlagIsBigEndian	    : 0);
+	sourceFormat.mFormatFlags	    = CA::kLinearPCMFormatFlagIsPacked;
+	sourceFormat.mFormatFlags	   |= format.fp			? CA::kLinearPCMFormatFlagIsFloat	  : 0;
+	sourceFormat.mFormatFlags	   |= format.sign && !format.fp ? CA::kLinearPCMFormatFlagIsSignedInteger : 0;
+	sourceFormat.mFormatFlags	   |= endianness == EndianBig	? CA::kLinearPCMFormatFlagIsBigEndian     : 0;
 	sourceFormat.mSampleRate	    = format.rate;
 	sourceFormat.mChannelsPerFrame	    = format.channels;
 	sourceFormat.mBitsPerChannel	    = format.bits;
