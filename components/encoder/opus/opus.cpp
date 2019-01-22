@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -194,7 +194,7 @@ Bool BoCA::EncoderOpus::Activate()
 	setup.preskip = preSkip * (48000 / sampleRate);
 
 	frameSize     = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
-	totalSamples  = preSkip;
+	totalSamples  = 0;
 	numPackets    = 0;
 
 	ex_opus_multistream_encoder_destroy(encoder);
@@ -431,7 +431,7 @@ Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, cons
 		op.bytes      = packetSizes.GetNth(i);
 		op.b_o_s      = first && i == 0;
 		op.e_o_s      = flush && i == packetSizes.Length() - 1;
-		op.granulepos = (op.e_o_s ? totalSamples - nullSamples : totalSamples) * (48000 / sampleRate);
+		op.granulepos = (op.e_o_s ? totalSamples + preSkip - nullSamples : totalSamples) * (48000 / sampleRate);
 		op.packetno   = numPackets++;
 
 		ex_ogg_stream_packetin(&os, &op);	
