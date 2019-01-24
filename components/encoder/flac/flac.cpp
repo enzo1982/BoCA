@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,9 +12,6 @@
 
 #include <smooth.h>
 #include <smooth/dll.h>
-
-#include <time.h>
-#include <stdlib.h>
 
 #include "flac.h"
 #include "config.h"
@@ -146,7 +143,7 @@ Bool BoCA::EncoderFLAC::Activate()
 
 	/* Create FLAC encoder.
 	 */
-	srand(clock());
+	Math::RandomSeed();
 
 	encoder = ex_FLAC__stream_encoder_new();
 
@@ -304,7 +301,7 @@ Bool BoCA::EncoderFLAC::Activate()
 	}
 	else
 	{
-		ex_FLAC__stream_encoder_set_ogg_serial_number(encoder, rand());
+		ex_FLAC__stream_encoder_set_ogg_serial_number(encoder, Math::Random());
 
 		status = ex_FLAC__stream_encoder_init_ogg_stream(encoder, &FLACStreamEncoderReadCallback, &FLACStreamEncoderWriteCallback, &FLACStreamEncoderSeekCallback, &FLACStreamEncoderTellCallback, NIL, this);
 	}

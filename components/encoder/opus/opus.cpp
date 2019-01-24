@@ -13,8 +13,6 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
-#include <time.h>
-#include <stdlib.h>
 #include <stdint.h>
 
 #include "opus.h"
@@ -158,9 +156,9 @@ Bool BoCA::EncoderOpus::Activate()
 
 	/* Init Ogg stream.
 	 */
-	srand(clock());
+	Math::RandomSeed();
 
-	ex_ogg_stream_init(&os, rand());
+	ex_ogg_stream_init(&os, Math::Random());
 
 	/* Create Opus header.
 	 */
