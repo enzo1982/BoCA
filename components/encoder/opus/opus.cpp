@@ -115,8 +115,6 @@ BoCA::EncoderOpus::EncoderOpus()
 	overlap		= 24;
 
 	sampleRate	= 48000;
-
-	numPackets	= 0;
 	totalSamples	= 0;
 
 	nextWorker	= 0;
@@ -193,7 +191,6 @@ Bool BoCA::EncoderOpus::Activate()
 
 	frameSize     = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
 	totalSamples  = 0;
-	numPackets    = 0;
 
 	ex_opus_multistream_encoder_destroy(encoder);
 
@@ -208,7 +205,7 @@ Bool BoCA::EncoderOpus::Activate()
 
 	/* Write header packet.
 	 */
-	ogg_packet	 header = { (unsigned char *) &setup, 19 + (setup.channel_mapping == 0 ? 0 : 2 + setup.nb_channels), 1, 0, 0, numPackets };
+	ogg_packet	 header = { (unsigned char *) &setup, 19 + (setup.channel_mapping == 0 ? 0 : 2 + setup.nb_channels), 1, 0, 0, 0 };
 
 	ex_ogg_stream_packetin(&os, &header);
 
@@ -250,7 +247,7 @@ Bool BoCA::EncoderOpus::Activate()
 		memmove(vcBuffer + 8, vcBuffer, vcBuffer.Size() - 8);
 		memcpy(vcBuffer, "OpusTags", 8);
 
-		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, numPackets++ };
+		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, 0 };
 
 		ex_ogg_stream_packetin(&os, &header_comm);
 	}
@@ -430,7 +427,7 @@ Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, cons
 		op.b_o_s      = first && i == 0;
 		op.e_o_s      = flush && i == packetSizes.Length() - 1;
 		op.granulepos = (op.e_o_s ? totalSamples + preSkip - nullSamples : totalSamples) * (48000 / sampleRate);
-		op.packetno   = numPackets++;
+		op.packetno   = 0;
 
 		ex_ogg_stream_packetin(&os, &op);	
 

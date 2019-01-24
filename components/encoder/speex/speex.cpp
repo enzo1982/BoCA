@@ -92,7 +92,6 @@ BoCA::EncoderSpeex::EncoderSpeex()
 	blockSize    = 256;
 	overlap	     = 16;
 
-	numPackets   = 0;
 	totalSamples = 0;
 
 	nextWorker   = 0;
@@ -150,7 +149,6 @@ Bool BoCA::EncoderSpeex::Activate()
 	ex_speex_encoder_destroy(encoder);
 
 	totalSamples = 0;
-	numPackets   = 0;
 
 	/* Create Speex header.
 	 */
@@ -165,7 +163,7 @@ Bool BoCA::EncoderSpeex::Activate()
 	 */
 	int		 bytes;
 	unsigned char	*buffer = (unsigned char *) ex_speex_header_to_packet(&speex_header, &bytes);
-	ogg_packet	 header = { buffer, bytes, 1, 0, 0, numPackets++ };
+	ogg_packet	 header = { buffer, bytes, 1, 0, 0, 0 };
 
 	ex_ogg_stream_packetin(&os, &header);
 
@@ -199,7 +197,7 @@ Bool BoCA::EncoderSpeex::Activate()
 			boca.DeleteComponent(tagger);
 		}
 
-		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, numPackets++ };
+		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, 0 };
 
 		ex_ogg_stream_packetin(&os, &header_comm);
 	}
@@ -370,7 +368,7 @@ Int BoCA::EncoderSpeex::ProcessPackets(const Buffer<unsigned char> &packets, con
 		op.e_o_s      = flush && i == packetSizes.Length() - 1;
 		op.granulepos =  (flush && i == packetSizes.Length() - 1) ? totalSamples	     - nullSamples :
 				((flush && i == packetSizes.Length() - 2) ? totalSamples + frameSize - nullSamples - lookAhead : totalSamples - lookAhead);
-		op.packetno   = numPackets++;
+		op.packetno   = 0;
 
 		ex_ogg_stream_packetin(&os, &op);	
 
