@@ -234,7 +234,7 @@ Bool BoCA::EncoderOpus::Activate()
 			const char	*opusVersion = ex_opus_get_version_string();
 
 			tagger->SetConfiguration(config);
-			tagger->SetVendorString(String(opusVersion).Append("\n"));
+			tagger->SetVendorString(opusVersion);
 
 			if (config->GetIntValue("Tags", "EnableVorbisComment", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))) tagger->RenderBuffer(vcBuffer, track);
 			else																					    tagger->RenderBuffer(vcBuffer, Track());
