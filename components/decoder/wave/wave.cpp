@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -103,7 +103,7 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	if (in.InputString(4) != "RIFF") { errorState = True; errorString = "Unknown file type"; }
 
-	in.RelSeek(4);
+	UnsignedInt32	 rSize = in.InputNumber(4);
 
 	if (in.InputString(4) != "WAVE") { errorState = True; errorString = "Unknown file type"; }
 
@@ -117,7 +117,7 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 		 */
 		chunk = in.InputString(4);
 
-		UnsignedInt32	 cSize = in.InputNumber(4);
+		UnsignedInt64	 cSize = in.InputNumber(4);
 
 		if (chunk == "fmt ")
 		{
@@ -150,9 +150,10 @@ Error BoCA::DecoderWave::GetStreamInfo(const String &streamURI, Track &track)
 		{
 			Format	 format = track.GetFormat();
 
-			if ((unsigned long) cSize == 0xFFFFFFFF || cSize == 0) cSize = in.Size() - in.GetPos();
+			if (rSize == 0xFFFFFFFF || rSize == 0 ||
+			    cSize == 0xFFFFFFFF || cSize == 0) cSize = in.Size() - in.GetPos();
 
-			track.length	= (unsigned long) cSize / format.channels / (format.bits / 8);
+			track.length	= cSize / format.channels / (format.bits / 8);
 			format.bits	= Math::Min(32, format.bits);
 
 			track.SetFormat(format);

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -294,11 +294,13 @@ Error BoCA::TaggerCart::ParseStreamInfo(const String &fileName, Track &track)
 
 	if (riff == "RIFF" || riff == "RF64")
 	{
-		in.RelSeek(8);
+		UnsignedInt32	 rSize = in.InputNumber(4);
+
+		in.RelSeek(4);
 
 		Bool	 error = False;
 		String	 chunk;
-		Int64	 dSize = 0;
+		Int64	 dSize = -1;
 
 		while (!error && chunk != "cart")
 		{
@@ -308,7 +310,7 @@ Error BoCA::TaggerCart::ParseStreamInfo(const String &fileName, Track &track)
 			 */
 			chunk = in.InputString(4);
 
-			UnsignedInt	 cSize = in.InputNumber(4);
+			UnsignedInt64	 cSize = in.InputNumber(4);
 
 			if (chunk == "cart")
 			{
@@ -329,8 +331,11 @@ Error BoCA::TaggerCart::ParseStreamInfo(const String &fileName, Track &track)
 			}
 			else if (chunk == "data")
 			{
-				if (cSize != UnsignedInt(-1)) in.RelSeek(cSize + cSize % 2);
-				else			      in.RelSeek(dSize + dSize % 2);
+				if (rSize == 0xFFFFFFFF || rSize == 0 ||
+				    cSize == 0xFFFFFFFF || cSize == 0) cSize = in.Size() - in.GetPos();
+
+				if (dSize >= 0) in.RelSeek(dSize + dSize % 2);
+				else		in.RelSeek(cSize + cSize % 2);
 			}
 			else
 			{

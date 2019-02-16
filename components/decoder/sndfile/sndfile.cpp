@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -297,9 +297,8 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 		if (magic == "RIFF" || magic == "FORM")
 		{
-			in.RelSeek(4);
-
-			String	 type = in.InputString(4);
+			UnsignedInt32	 rSize = (magic == "RIFF") ? in.InputNumber(4) : in.InputNumberRaw(4);
+			String		 type = in.InputString(4);
 
 			while (type == "WAVE" || type == "AIFF" || type == "AIFC")
 			{
@@ -328,6 +327,11 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 					}
 
 					break;
+				}
+				else if (chunk == "data")
+				{
+					if (rSize == 0xFFFFFFFF || rSize == 0 ||
+					    cSize == 0xFFFFFFFF || cSize == 0) break;
 				}
 
 				/* Skip chunk.
