@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -56,6 +56,9 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	option_format		= new OptionBox(i18n->AddColon(i18n->TranslateString("Use format")), Point(10, 39), Size(100, 0), &autoselect, 0);
 	option_format->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
 
+	option_codec->SetWidth(Math::Max(option_codec->GetUnscaledTextWidth(), option_format->GetUnscaledTextWidth()) + 21);
+	option_format->SetWidth(option_codec->GetWidth());
+
 	combo_codec		= new ComboBox(Point(100, 38), Size(200, 0));
 
 	group_codec->Add(option_uncompressed);
@@ -66,12 +69,6 @@ BoCA::ConfigureWMA::ConfigureWMA()
 
 	option_autoselect	= new OptionBox(i18n->TranslateString("Automatically select format based on settings and input format"), Point(10, 13), Size(406, 0), &autoselect, 1);
 	option_autoselect->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
-
-	option_format		= new OptionBox(i18n->AddColon(i18n->TranslateString("Use format")), Point(10, 39), Size(100, 0), &autoselect, 0);
-	option_format->onAction.Connect(&ConfigureWMA::OnToggleFormat, this);
-
-	option_format->SetWidth(Math::Max(option_codec->GetUnscaledTextWidth(), option_format->GetUnscaledTextWidth()) + 21);
-	option_codec->SetWidth(option_format->GetWidth());
 
 	check_vbr		= new CheckBox(i18n->TranslateString("Use VBR encoding"), Point(18 + option_format->GetWidth(), 39), Size(100, 0), &useVBR);
 	check_vbr->onAction.Connect(&ConfigureWMA::OnToggleVBR, this);
