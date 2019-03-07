@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -69,7 +69,8 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat)
 	 */
 	CA::AudioConverterNew(&sourceFormat, &destinationFormat, &converter);
 
-	frameSize = destinationFormat.mFramesPerPacket;
+	frameSize  = destinationFormat.mFramesPerPacket;
+	sampleRate = destinationFormat.mSampleRate;
 
 	/* Set bitrate if format does support bitrates.
 	 */
@@ -151,7 +152,7 @@ Int BoCA::SuperWorker::Run()
 
 		packetInfos.RemoveAll();
 
-		Int	 bytesPerFrame = frameSize * format.channels * (format.bits / 8);
+		Int	 bytesPerFrame = Math::Ceil(frameSize * format.channels * (format.bits / 8) * (Float(format.rate) / sampleRate));
 
 		CA::UInt32				 packets = 1;
 		CA::AudioStreamPacketDescription	 packet;
