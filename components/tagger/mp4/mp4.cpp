@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -190,8 +190,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	 */
 	uint8_t	 mediaType = 1;					 //  1 == Music
 
-	if	(track.outfile.EndsWith(".m4b")) mediaType =  2; //  2 == Audiobook
-	else if (track.outfile.EndsWith(".m4r")) mediaType = 14; // 14 == Ringtone
+	if	(track.outfile.Contains(".m4b")) mediaType =  2; //  2 == Audiobook
+	else if (track.outfile.Contains(".m4r")) mediaType = 14; // 14 == Ringtone
 
 	ex_MP4TagsSetMediaType(mp4Tags, &mediaType);
 
