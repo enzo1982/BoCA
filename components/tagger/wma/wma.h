@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -25,6 +25,9 @@ namespace BoCA
 			Error			 RenderWMABinaryItem(const String &, const Buffer<UnsignedByte> &, Void *);
 		public:
 			static const String	&GetComponentSpecs();
+
+			static Void		 Initialize();
+			static Void		 Cleanup();
 
 						 TaggerWMA();
 						~TaggerWMA();

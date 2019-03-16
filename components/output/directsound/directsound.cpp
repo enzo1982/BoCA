@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -10,13 +10,18 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "directsound.h"
+#include <smooth.h>
+#include <smooth/dll.h>
 
 #include <mmreg.h>
+
+#include "directsound.h"
 
 const String &BoCA::OutputDirectSound::GetComponentSpecs()
 {
 	static String	 componentSpecs;
+
+	Initialize();
 
 	IDirectSound8	*directSound = NIL;
 
@@ -53,7 +58,43 @@ const String &BoCA::OutputDirectSound::GetComponentSpecs()
 		");
 	}
 
+	Cleanup();
+
 	return componentSpecs;
+}
+
+Void smooth::AttachDLL(Void *instance)
+{
+	/* Register initialization and cleanup handlers.
+	 */
+	BoCA::Engine	*engine = BoCA::Engine::Get();
+
+	engine->onInitialize.Connect(&BoCA::OutputDirectSound::Initialize);
+	engine->onCleanup.Connect(&BoCA::OutputDirectSound::Cleanup);
+}
+
+Void smooth::DetachDLL()
+{
+	/* Unregister initialization and cleanup handlers.
+	 */
+	BoCA::Engine	*engine = BoCA::Engine::Get();
+
+	engine->onInitialize.Disconnect(&BoCA::OutputDirectSound::Initialize);
+	engine->onCleanup.Disconnect(&BoCA::OutputDirectSound::Cleanup);
+}
+
+Void BoCA::OutputDirectSound::Initialize()
+{
+	/* Init the Microsoft COM library.
+	 */
+	CoInitialize(NIL);
+}
+
+Void BoCA::OutputDirectSound::Cleanup()
+{
+	/* Uninit the Microsoft COM library.
+	 */
+	CoUninitialize();
 }
 
 BoCA::OutputDirectSound::OutputDirectSound()

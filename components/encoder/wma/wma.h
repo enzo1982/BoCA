@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -23,15 +23,15 @@ namespace BoCA
 			ConfigLayer		*configLayer;
 			Config			*config;
 
-			IWMWriter		*m_pWriter;
-			IWMWriterAdvanced	*m_pWriterAdvanced;
+			IWMWriter		*writer;
+			IWMWriterAdvanced	*writerAdvanced;
 
-			IWMWriterFileSink	*m_pWriterFileSink;
+			IWMWriterFileSink	*writerFileSink;
 
-			IWMProfileManager	*m_pProfileManager;
-			IWMProfile		*m_pProfile;
+			IWMProfileManager	*profileManager;
+			IWMProfile		*profile;
 
-			IWMStreamConfig		*m_pStreamConfig;
+			IWMStreamConfig		*streamConfig;
 
 			Int64			 samplesWritten;
 
@@ -45,6 +45,9 @@ namespace BoCA
 			static Bool		 ConvertArguments(Config *);
 		public:
 			static const String	&GetComponentSpecs();
+
+			static Void		 Initialize();
+			static Void		 Cleanup();
 
 						 EncoderWMA();
 						~EncoderWMA();

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -72,33 +72,63 @@ const String &BoCA::EncoderWMA::GetComponentSpecs()
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadWMVCoreDLL();
+
+	/* Register initialization and cleanup handlers.
+	 */
+	if (wmvcoredll != NIL)
+	{
+		BoCA::Engine	*engine = BoCA::Engine::Get();
+
+		engine->onInitialize.Connect(&BoCA::EncoderWMA::Initialize);
+		engine->onCleanup.Connect(&BoCA::EncoderWMA::Cleanup);
+	}
 }
 
 Void smooth::DetachDLL()
 {
+	/* Unregister initialization and cleanup handlers.
+	 */
+	if (wmvcoredll != NIL)
+	{
+		BoCA::Engine	*engine = BoCA::Engine::Get();
+
+		engine->onInitialize.Disconnect(&BoCA::EncoderWMA::Initialize);
+		engine->onCleanup.Disconnect(&BoCA::EncoderWMA::Cleanup);
+	}
+
 	FreeWMVCoreDLL();
+}
+
+Void BoCA::EncoderWMA::Initialize()
+{
+	/* Init the Microsoft COM library.
+	 */
+	CoInitialize(NIL);
+}
+
+Void BoCA::EncoderWMA::Cleanup()
+{
+	/* Uninit the Microsoft COM library.
+	 */
+	CoUninitialize();
 }
 
 BoCA::EncoderWMA::EncoderWMA()
 {
-	configLayer	  = NIL;
-	config		  = NIL;
+	configLayer    = NIL;
+	config	       = NIL;
 
-	m_pWriter	  = NIL;
-	m_pWriterAdvanced = NIL;
+	writer	       = NIL;
+	writerAdvanced = NIL;
 
-	m_pWriterFileSink = NIL;
+	writerFileSink = NIL;
 
-	m_pProfileManager = NIL;
-	m_pProfile	  = NIL;
+	profileManager = NIL;
+	profile	       = NIL;
 
-	m_pStreamConfig	  = NIL;
+	streamConfig   = NIL;
 
-	samplesWritten	  = 0;
-
-	/* Init the Microsoft COM library.
-	 */
-	CoInitialize(NIL);
+	samplesWritten = 0;
 }
 
 BoCA::EncoderWMA::~EncoderWMA()
@@ -106,10 +136,6 @@ BoCA::EncoderWMA::~EncoderWMA()
 	if (config != NIL) Config::Free(config);
 
 	if (configLayer != NIL) Object::DeleteObject(configLayer);
-
-	/* Uninit the Microsoft COM library.
-	 */
-	CoUninitialize();
 }
 
 Int BoCA::EncoderWMA::GetNumberOfPasses() const
@@ -183,44 +209,44 @@ Bool BoCA::EncoderWMA::Activate()
 
 	/* Create WMA writer object.
 	 */
-	HRESULT	 hr = ex_WMCreateWriter(NIL, &m_pWriter);
+	HRESULT	 hr = ex_WMCreateWriter(NIL, &writer);
 
 	if (FAILED(hr)) return False;
 
-	hr = m_pWriter->QueryInterface(IID_IWMWriterAdvanced, (void **) &m_pWriterAdvanced);
+	hr = writer->QueryInterface(IID_IWMWriterAdvanced, (void **) &writerAdvanced);
 
 	if (FAILED(hr))
 	{
-		m_pWriter->Release();
+		writer->Release();
 
 		return False;
 	}
 
 	/* Create and open file sink.
 	 */
-	ex_WMCreateWriterFileSink(&m_pWriterFileSink);
+	ex_WMCreateWriterFileSink(&writerFileSink);
 
-	m_pWriterFileSink->Open(track.outfile);
+	writerFileSink->Open(track.outfile);
 
-	m_pWriterAdvanced->AddSink(m_pWriterFileSink);
+	writerAdvanced->AddSink(writerFileSink);
 
 	/* Create profile manager.
 	 */
-	ex_WMCreateProfileManager(&m_pProfileManager);
+	ex_WMCreateProfileManager(&profileManager);
 
-	m_pProfileManager->CreateEmptyProfile(WMT_VER_9_0, &m_pProfile);
+	profileManager->CreateEmptyProfile(WMT_VER_9_0, &profile);
 
 	/* Query codec info.
 	 */
 	IWMCodecInfo3	*pCodecInfo = NIL;
 
-	m_pProfileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo);
+	profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo);
 
 	Int	 defaultCodec = GetDefaultCodec(pCodecInfo);
 
 	if (config->GetIntValue(ConfigureWMA::ConfigID, "Uncompressed", False))
 	{
-		m_pProfile->CreateNewStream(WMMEDIATYPE_Audio, &m_pStreamConfig);
+		profile->CreateNewStream(WMMEDIATYPE_Audio, &streamConfig);
 	}
 	else if (!config->GetIntValue(ConfigureWMA::ConfigID, "AutoSelectFormat", True))
 	{
@@ -235,38 +261,38 @@ Bool BoCA::EncoderWMA::Activate()
 		if (config->GetIntValue(ConfigureWMA::ConfigID, "Enable2Pass", False)) pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &twoValue, sizeof(DWORD));
 		else								       pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
 
-		pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), config->GetIntValue(ConfigureWMA::ConfigID, "CodecFormat", 0), &m_pStreamConfig);
+		pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), config->GetIntValue(ConfigureWMA::ConfigID, "CodecFormat", 0), &streamConfig);
 	}
 	else
 	{
-		m_pStreamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), track.GetFormat());
+		streamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), track.GetFormat());
 	}
 
-	m_pStreamConfig->SetStreamNumber(1);
-	m_pStreamConfig->SetStreamName(String("Audio"));
-	m_pStreamConfig->SetConnectionName(String("Audio"));
+	streamConfig->SetStreamNumber(1);
+	streamConfig->SetStreamName(String("Audio"));
+	streamConfig->SetConnectionName(String("Audio"));
 
-	m_pProfile->AddStream(m_pStreamConfig);
+	profile->AddStream(streamConfig);
 
-	m_pWriter->SetProfile(m_pProfile);
+	writer->SetProfile(profile);
 
-	if (SetInputFormat(m_pWriter, track.GetFormat()) == False) errorState = True;
+	if (SetInputFormat(writer, track.GetFormat()) == False) errorState = True;
 
 	pCodecInfo->Release();
 
-	if (!errorState) hr = m_pWriter->BeginWriting();
+	if (!errorState) hr = writer->BeginWriting();
 
 	if (FAILED(hr))
 	{
-		m_pStreamConfig->Release();
+		streamConfig->Release();
 
-		m_pProfile->Release();
-		m_pProfileManager->Release();
+		profile->Release();
+		profileManager->Release();
 
-		m_pWriterFileSink->Release();
+		writerFileSink->Release();
 
-		m_pWriterAdvanced->Release();
-		m_pWriter->Release();
+		writerAdvanced->Release();
+		writer->Release();
 
 		errorState  = True;
 		errorString = "Could not initialize encoder.";
@@ -284,19 +310,19 @@ Bool BoCA::EncoderWMA::Deactivate()
 		return True;
 	}
 
-	HRESULT	 hr = m_pWriter->EndWriting();
+	HRESULT	 hr = writer->EndWriting();
 
-	m_pWriterAdvanced->RemoveSink(m_pWriterFileSink);
+	writerAdvanced->RemoveSink(writerFileSink);
 
-	m_pStreamConfig->Release();
+	streamConfig->Release();
 
-	m_pProfile->Release();
-	m_pProfileManager->Release();
+	profile->Release();
+	profileManager->Release();
 
-	m_pWriterFileSink->Release();
+	writerFileSink->Release();
 
-	m_pWriterAdvanced->Release();
-	m_pWriter->Release();
+	writerAdvanced->Release();
+	writer->Release();
 
 	if (FAILED(hr))
 	{
@@ -332,7 +358,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data)
 {
 	INSSBuffer	*pSample = NIL;
-	HRESULT		 hr	 = m_pWriter->AllocateSample(data.Size(), &pSample);
+	HRESULT		 hr	 = writer->AllocateSample(data.Size(), &pSample);
 
 	if (FAILED(hr)) return -1;
 
@@ -347,7 +373,7 @@ Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data)
 		const Format	&format = track.GetFormat();
 		QWORD		 cnsSampleTime = samplesWritten * 10000000 / format.channels / format.rate;
 
-		hr = m_pWriter->WriteSample(0, cnsSampleTime, WM_SF_CLEANPOINT, pSample);
+		hr = writer->WriteSample(0, cnsSampleTime, WM_SF_CLEANPOINT, pSample);
 
 		pSample->Release();
 
@@ -651,7 +677,7 @@ Bool BoCA::EncoderWMA::SetInputFormat(IWMWriter *pWriter, const Format &format)
 	{
 		pInputProps->SetMediaType(&mediaType);
 
-		HRESULT	 hr = m_pWriter->SetInputProps(0, pInputProps);
+		HRESULT	 hr = writer->SetInputProps(0, pInputProps);
 
 		pInputProps->Release();
 

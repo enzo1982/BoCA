@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -49,19 +49,53 @@ const String &BoCA::DecoderWMA::GetComponentSpecs()
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadWMVCoreDLL();
+
+	/* Register initialization and cleanup handlers.
+	 */
+	if (wmvcoredll != NIL)
+	{
+		BoCA::Engine	*engine = BoCA::Engine::Get();
+
+		engine->onInitialize.Connect(&BoCA::DecoderWMA::Initialize);
+		engine->onCleanup.Connect(&BoCA::DecoderWMA::Cleanup);
+	}
 }
 
 Void smooth::DetachDLL()
 {
+	/* Unregister initialization and cleanup handlers.
+	 */
+	if (wmvcoredll != NIL)
+	{
+		BoCA::Engine	*engine = BoCA::Engine::Get();
+
+		engine->onInitialize.Disconnect(&BoCA::DecoderWMA::Initialize);
+		engine->onCleanup.Disconnect(&BoCA::DecoderWMA::Cleanup);
+	}
+
 	FreeWMVCoreDLL();
+}
+
+Void BoCA::DecoderWMA::Initialize()
+{
+	/* Init the Microsoft COM library.
+	 */
+	CoInitialize(NIL);
+}
+
+Void BoCA::DecoderWMA::Cleanup()
+{
+	/* Uninit the Microsoft COM library.
+	 */
+	CoUninitialize();
 }
 
 Bool BoCA::DecoderWMA::CanOpenStream(const String &streamURI)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
-	Int		 magic = in.InputNumber(4);
+	UnsignedInt64	 magic = in.InputNumber(8);
 
-	return (magic == 1974609456);
+	return (magic == 0x11CF668E75B22630);
 }
 
 Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
@@ -74,15 +108,15 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Create WMA reader object.
 	 */
-	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
+	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &reader);
 
 	if (FAILED(hr)) return Error();
 
-	hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &m_pReaderAdvanced);
+	hr = reader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &readerAdvanced);
 
 	if (FAILED(hr))
 	{
-		m_pReader->Release();
+		reader->Release();
 
 		return Error();
 	}
@@ -91,16 +125,16 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	readerCallback = new WMAReader();
 
-	m_hAsyncEvent = readerCallback->GetAsyncEventHandle();
+	asyncEvent = readerCallback->GetAsyncEventHandle();
 
 	/* Open file.
 	 */
-	hr = m_pReader->Open(streamURI, readerCallback, NIL);
+	hr = reader->Open(streamURI, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.
 	 */
-	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+	if (!FAILED(hr)) WaitForEvent(asyncEvent);
 
 	if (!errorState)
 	{
@@ -109,7 +143,7 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 
 		/* Find out the output count
 		 */
-		m_pReader->GetOutputCount(&cOutputs);
+		reader->GetOutputCount(&cOutputs);
 
 		/* Find the first audio output.
 		 */
@@ -120,17 +154,17 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 			BOOL	 enableDiscreteOutput = TRUE;
 			DWORD	 speakerConfig	      = DSSPEAKER_DIRECTOUT;
 
-			m_pReaderAdvanced->SetOutputSetting(i, g_wszEnableDiscreteOutput, WMT_TYPE_BOOL, (BYTE *) &enableDiscreteOutput, sizeof(WMT_TYPE_BOOL));
-			m_pReaderAdvanced->SetOutputSetting(i, g_wszSpeakerConfig, WMT_TYPE_DWORD, (BYTE *) &speakerConfig, sizeof(WMT_TYPE_DWORD));
+			readerAdvanced->SetOutputSetting(i, g_wszEnableDiscreteOutput, WMT_TYPE_BOOL, (BYTE *) &enableDiscreteOutput, sizeof(WMT_TYPE_BOOL));
+			readerAdvanced->SetOutputSetting(i, g_wszSpeakerConfig, WMT_TYPE_DWORD, (BYTE *) &speakerConfig, sizeof(WMT_TYPE_DWORD));
 
 			/* Set the first output format as it is
 			 * the one with the highest quality.
 			 */
 			IWMOutputMediaProps	*pProps = NIL;
 
-			if (!FAILED(m_pReader->GetOutputFormat(i, 0, &pProps)))
+			if (!FAILED(reader->GetOutputFormat(i, 0, &pProps)))
 			{
-				if (!FAILED(m_pReader->SetOutputProps(i, pProps)))
+				if (!FAILED(reader->SetOutputProps(i, pProps)))
 				{
 					/* Find out the space needed for pMediaType
 					 */
@@ -182,7 +216,7 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 		IWMHeaderInfo	*pHeaderInfo = NIL;
 		BYTE		*pbValue = NIL;
 
-		hr = m_pReader->QueryInterface(IID_IWMHeaderInfo, (void **) &pHeaderInfo);
+		hr = reader->QueryInterface(IID_IWMHeaderInfo, (void **) &pHeaderInfo);
 
 		/* Get attribute "Duration"
 		 */
@@ -195,12 +229,12 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 			Format	 format = track.GetFormat();
 
 			track.length = -1;
-			track.approxLength = *(QWORD *) pbValue * format.rate / 10000000;
+			track.approxLength = *(QWORD *) pbValue / 1e7 * format.rate;
 
 			/* Try to guess if this is a lossless file.
 			 */
-			if (((Float) track.fileSize) / track.approxLength / format.channels / (format.bits / 8) > 0.35) track.lossless = True;
-			else												track.lossless = False;
+			if (Float(track.fileSize) / track.approxLength / format.channels / (format.bits / 8) > 0.35) track.lossless = True;
+			else											     track.lossless = False;
 
 			delete [] pbValue;
 		}
@@ -208,15 +242,15 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 		pHeaderInfo->Release();
 	}
 
-	hr = m_pReader->Close();
+	hr = reader->Close();
 
 	/* Wait for the reader to deliver a WMT_CLOSED event to the
 	 * OnStatus callback.
 	 */
-	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+	if (!FAILED(hr)) WaitForEvent(asyncEvent);
 
-	m_pReaderAdvanced->Release();
-	m_pReader->Release();
+	readerAdvanced->Release();
+	reader->Release();
 	readerCallback->Release();
 
 	if (!errorState)
@@ -239,40 +273,33 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderWMA::DecoderWMA()
 {
-	m_pReader	  = NIL;
-	m_pReaderAdvanced = NIL;
+	reader		  = NIL;
+	readerAdvanced	  = NIL;
 
-	m_hAsyncEvent	  = NIL;
+	asyncEvent	  = NIL;
 
 	readerCallback	  = NIL;
 
 	userProvidedClock = True;
-
-	/* Init the Microsoft COM library.
-	 */
-	CoInitialize(NIL);
 }
 
 BoCA::DecoderWMA::~DecoderWMA()
 {
-	/* Uninit the Microsoft COM library.
-	 */
-	CoUninitialize();
 }
 
 Bool BoCA::DecoderWMA::Activate()
 {
 	/* Create WMA reader object.
 	 */
-	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &m_pReader);
+	HRESULT	 hr = ex_WMCreateReader(NIL, WMT_RIGHT_PLAYBACK, &reader);
 
 	if (FAILED(hr)) return False;
 
-	hr = m_pReader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &m_pReaderAdvanced);
+	hr = reader->QueryInterface(IID_IWMReaderAdvanced2, (void **) &readerAdvanced);
 
 	if (FAILED(hr))
 	{
-		m_pReader->Release();
+		reader->Release();
 
 		return False;
 	}
@@ -280,27 +307,27 @@ Bool BoCA::DecoderWMA::Activate()
 	/* Initialize reader callback.
 	 */
 	readerCallback = new WMAReader();
-	readerCallback->SetReaderAdvanced(m_pReaderAdvanced);
+	readerCallback->SetReaderAdvanced(readerAdvanced);
 	readerCallback->SetSamplesBuffer(&samplesBuffer, &samplesBufferMutex);
 
-	m_hAsyncEvent = readerCallback->GetAsyncEventHandle();
+	asyncEvent = readerCallback->GetAsyncEventHandle();
 
 	/* Open file.
 	 */
-	hr = m_pReader->Open(track.origFilename, readerCallback, NIL);
+	hr = reader->Open(track.origFilename, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.
 	 */
-	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+	if (!FAILED(hr)) WaitForEvent(asyncEvent);
 
-	m_pReaderAdvanced->SetUserProvidedClock(userProvidedClock);
+	readerAdvanced->SetUserProvidedClock(userProvidedClock);
 
 	DWORD	 cOutputs = 0;
 
 	/* Find out the output count
 	 */
-	m_pReader->GetOutputCount(&cOutputs);
+	reader->GetOutputCount(&cOutputs);
 
 	/* Find the first audio output.
 	 */
@@ -311,17 +338,17 @@ Bool BoCA::DecoderWMA::Activate()
 		BOOL	 enableDiscreteOutput = TRUE;
 		DWORD	 speakerConfig	      = 0;
 
-		m_pReaderAdvanced->SetOutputSetting(i, g_wszEnableDiscreteOutput, WMT_TYPE_BOOL, (BYTE *) &enableDiscreteOutput, sizeof(WMT_TYPE_BOOL));
-		m_pReaderAdvanced->SetOutputSetting(i, g_wszSpeakerConfig, WMT_TYPE_DWORD, (BYTE *) &speakerConfig, sizeof(WMT_TYPE_DWORD));
+		readerAdvanced->SetOutputSetting(i, g_wszEnableDiscreteOutput, WMT_TYPE_BOOL, (BYTE *) &enableDiscreteOutput, sizeof(WMT_TYPE_BOOL));
+		readerAdvanced->SetOutputSetting(i, g_wszSpeakerConfig, WMT_TYPE_DWORD, (BYTE *) &speakerConfig, sizeof(WMT_TYPE_DWORD));
 
 		/* Set the first output format as it is
 		 * the one with the highest quality.
 		 */
 		IWMOutputMediaProps	*pProps = NIL;
 
-		if (!FAILED(m_pReader->GetOutputFormat(i, 0, &pProps)))
+		if (!FAILED(reader->GetOutputFormat(i, 0, &pProps)))
 		{
-			if (!FAILED(m_pReader->SetOutputProps(i, pProps)))
+			if (!FAILED(reader->SetOutputProps(i, pProps)))
 			{
 				/* Find out the space needed for pMediaType
 				 */
@@ -337,11 +364,11 @@ Bool BoCA::DecoderWMA::Activate()
 					{
 						readerCallback->SetAudioOutputNum(i);
 
-						hr = m_pReader->Start(0, 0, 1.0, NIL);
+						hr = reader->Start(0, 0, 1.0, NIL);
 
 						/* Wait for the Start call to complete.
 						 */
-						if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+						if (!FAILED(hr)) WaitForEvent(asyncEvent);
 					}
 
 					delete [] pMediaType;
@@ -376,21 +403,21 @@ Bool BoCA::DecoderWMA::Deactivate()
 {
 	readerCallback->SetActive(False);
 
-	HRESULT	 hr = m_pReader->Stop();
+	HRESULT	 hr = reader->Stop();
 
 	/* Wait for the reader to stop.
 	 */
-	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+	if (!FAILED(hr)) WaitForEvent(asyncEvent);
 
-	hr = m_pReader->Close();
+	hr = reader->Close();
 
 	/* Wait for the reader to deliver a WMT_CLOSED event to the
 	 * OnStatus callback.
 	 */
-	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+	if (!FAILED(hr)) WaitForEvent(asyncEvent);
 
-	m_pReaderAdvanced->Release();
-	m_pReader->Release();
+	readerAdvanced->Release();
+	reader->Release();
 	readerCallback->Release();
 
 	return True;
@@ -402,11 +429,11 @@ Bool BoCA::DecoderWMA::Seek(Int64 samplePosition)
 	 */
 	readerCallback->SetActive(False);
 
-	HRESULT	 hr = m_pReader->Stop();
+	HRESULT	 hr = reader->Stop();
 
 	/* Wait for the reader to stop.
 	 */
-	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+	if (!FAILED(hr)) WaitForEvent(asyncEvent);
 
 	/* Clear samples buffer.
 	 */
@@ -414,13 +441,13 @@ Bool BoCA::DecoderWMA::Seek(Int64 samplePosition)
 
 	/* Restart reader at new position.
 	 */
-	QWORD	 position = samplePosition * 10000000 / track.GetFormat().rate;
+	QWORD	 position = samplePosition * 1e7 / track.GetFormat().rate;
 
-	hr = m_pReader->Start(position, 0, 1.0, &position);
+	hr = reader->Start(position, 0, 1.0, &position);
 
 	/* Wait for the Start call to complete.
 	 */
-	if (!FAILED(hr)) WaitForEvent(m_hAsyncEvent);
+	if (!FAILED(hr)) WaitForEvent(asyncEvent);
 
 	return True;
 }

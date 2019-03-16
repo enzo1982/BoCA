@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -30,16 +30,19 @@ namespace BoCA
 
 			Bool			 userProvidedClock;
 
-			HANDLE			 m_hAsyncEvent;
+			HANDLE			 asyncEvent;
 
-			IWMReader		*m_pReader;
-			IWMReaderAdvanced2	*m_pReaderAdvanced;
+			IWMReader		*reader;
+			IWMReaderAdvanced2	*readerAdvanced;
 
 			HRESULT			 GetHeaderAttribute(IWMHeaderInfo *, LPCWSTR, BYTE **);
 
 			Void			 WaitForEvent(HANDLE, DWORD = INFINITE);
 		public:
 			static const String	&GetComponentSpecs();
+
+			static Void		 Initialize();
+			static Void		 Cleanup();
 
 						 DecoderWMA();
 						~DecoderWMA();

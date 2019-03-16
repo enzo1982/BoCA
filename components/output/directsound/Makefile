@@ -14,7 +14,7 @@ OBJECTS	  = directsound.o
 DEFINE	  =
 
 # Enter additional library dependencies here:
-LIBS	  = -ldsound -ldxguid -lksguid
+LIBS	  = -lole32 -ldsound -ldxguid -lksguid
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =
