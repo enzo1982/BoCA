@@ -248,6 +248,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist VCLT", "BoCA 
 		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder Media Foundation", "BoCA Decoder Media Foundation\BoCA Decoder Media Foundation.vcxproj", "{2063079A-BB73-4F95-B152-2C2F1C32C067}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -788,6 +790,14 @@ Global
 		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Release|Win32.Build.0 = Release|Win32
 		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Release|x64.ActiveCfg = Release|x64
 		{38992234-E808-4A1A-94CE-D58CB3F0055C}.Release|x64.Build.0 = Release|x64
+		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Debug|Win32.Build.0 = Debug|Win32
+		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Debug|x64.ActiveCfg = Debug|x64
+		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Debug|x64.Build.0 = Debug|x64
+		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Release|Win32.ActiveCfg = Release|Win32
+		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Release|Win32.Build.0 = Release|Win32
+		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Release|x64.ActiveCfg = Release|x64
+		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
