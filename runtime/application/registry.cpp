@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,6 +29,8 @@
 #include <boca/common/protocol.h>
 #include <boca/common/utilities.h>
 
+#include <boca/common/communication/engine.h>
+
 #include <boca/core/core.h>
 
 BoCA::AS::Registry	*BoCA::AS::Registry::registry = NIL;
@@ -57,6 +59,8 @@ BoCA::AS::Registry::Registry()
 
 	debug->Write("Initializing BoCA...");
 
+	/* Load available components.
+	 */
 	LoadComponents(Utilities::GetBoCADirectory(), "boca");
 
 	if (BoCA::GetApplicationPrefix() != NIL && BoCA::GetApplicationPrefix() != "boca")
@@ -65,14 +69,37 @@ BoCA::AS::Registry::Registry()
 		LoadComponents(Utilities::GetBoCADirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append(BoCA::GetApplicationPrefix()), BoCA::GetApplicationPrefix());
 	}
 
+	/* Check which components to use and
+	 * order them according to their specs.
+	 */
 	CheckComponents();
 	OrderComponents();
+
+	/* Tell components to initialize.
+	 */
+	Engine	*engine = Engine::Get();
+
+	engine->onInitialize.Emit();
 
 	debug->Write("BoCA is ready.");
 }
 
 BoCA::AS::Registry::~Registry()
 {
+	/* Tell components to clean up.
+	 */
+	Engine	*engine = Engine::Get();
+
+	engine->onCleanup.Emit();
+
+	/* Disconnect all initialization and cleanup
+	 * handlers before freeing components.
+	 */
+	engine->onInitialize.DisconnectAll();
+	engine->onCleanup.DisconnectAll();
+
+	/* Unregister all components.
+	 */
 	foreach (ComponentSpecs *cs, componentSpecs) delete cs;
 }
 
