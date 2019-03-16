@@ -214,7 +214,7 @@ Int BoCA::AS::EncoderComponentExternalFile::WriteData(const Buffer<UnsignedByte>
 	 */
 	nOfSamples += (buffer.Size() / (format.bits / 8));
 
-	out->OutputData(buffera, buffer.Size());
+	out->OutputData(buffer, buffer.Size());
 
 	return buffer.Size();
 }
