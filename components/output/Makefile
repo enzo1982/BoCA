@@ -7,7 +7,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 FOLDERS = 
 
 ifeq ($(BUILD_LINUX),True)
-	FOLDERS += alsa
+	FOLDERS += pulseaudio
 else ifeq ($(BUILD_OSX),True)
 	FOLDERS += coreaudio
 else ifeq ($(BUILD_FREEBSD),True)

@@ -11,10 +11,10 @@ echo "      git clone https://github.com/enzo1982/smooth.git"
 echo
 echo "  On macOS, Linux, *BSD, Solaris, Hurd:"
 echo
-echo "    - libasound2 / libalsa2 development package (Linux only)"
 echo "    - libcdio and libcdio-paranoia development packages (except OpenBSD)"
 echo "    - libcdparanoia development package (OpenBSD only)"
 echo "    - libexpat development package"
+echo "    - libpulse development package (Linux only)"
 echo "    - liburiparser development package"
 echo
 echo "    - The XSPF playlist component uses a bundled version of libxspf. If you"
