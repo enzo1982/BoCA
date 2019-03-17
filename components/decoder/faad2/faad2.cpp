@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -158,7 +158,34 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_MP4Free(escBuffer);
 
+			/* Decode frames to get frame size.
+			 */
+			while (frameSize == 0 && !errorState)
+			{
+				unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
+				unsigned char	*buffer	    = new unsigned char [bufferSize];
+
+				ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL);
+
+				NeAACDecFrameInfo frameInfo;
+
+				ex_NeAACDecDecode(handle, &frameInfo, buffer, bufferSize);
+
+				if (frameInfo.error)
+				{
+					errorState  = True;
+					errorString = "Unsupported audio format";
+				}
+
+				frameSize = frameInfo.samples / format.channels;
+
+				delete [] buffer;
+			}
+
+			/* Get track length.
+			 */
 			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
+			track.length   -= frameSize; // To account for encoder delay.
 
 			format.bits	= 16;
 
@@ -185,7 +212,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 					 */
 					const Array<String>	&values = String(value).Trim().Explode(" ");
 
-					track.length = Math::Round((Int64) Number::FromHexString(values.GetNth(3)) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
+					track.length = (Int64) Number::FromHexString(values.GetNth(3));
 
 					String::ExplodeFinish();
 				}
@@ -323,7 +350,7 @@ BoCA::DecoderFAAD2::DecoderFAAD2()
 	fConfig		 = NIL;
 
 	mp4Track	 = -1;
-	sampleId	 = 0;
+	sampleId	 = 1;
 
 	frameSize	 = 0;
 
@@ -402,7 +429,7 @@ Bool BoCA::DecoderFAAD2::Activate()
 				 */
 				const Array<String>	&values = String(value).Trim().Explode(" ");
 
-				delaySamples	 = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * Float(track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
+				delaySamples	 = (Int64) Number::FromHexString(values.GetNth(1));
 				delaySamplesLeft = delaySamples;
 
 				String::ExplodeFinish();
@@ -410,8 +437,6 @@ Bool BoCA::DecoderFAAD2::Activate()
 
 			ex_MP4ItmfItemListFree(items);
 		}
-
-		sampleId = 1;
 	}
 	else
 	{
@@ -489,6 +514,8 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 			{
 				frameSize = frameInfo.samples / frameInfo.channels;
 
+				/* Set delay samples to minimum encoder delay.
+				 */
 				if (delaySamples == 0)
 				{
 					delaySamples	 = frameSize;
@@ -509,7 +536,7 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 
 			memcpy(samplesBuffer + samplesRead * format.channels, samples, frameInfo.samples * (format.bits / 8));
 
-			samplesRead += frameInfo.samples / format.channels;
+			samplesRead += frameSize;
 		}
 	}
 	else
@@ -545,6 +572,8 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 				{
 					frameSize	 = frameInfo.samples / frameInfo.channels;
 
+					/* Set delay samples to minimum encoder delay.
+					 */
 					delaySamples	 = frameSize;
 					delaySamplesLeft = frameSize;
 
@@ -562,7 +591,7 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 
 				memcpy(samplesBuffer + samplesRead * format.channels, samples, frameInfo.samples * (format.bits / 8));
 
-				samplesRead += frameInfo.samples / format.channels;
+				samplesRead += frameSize;
 			}
 
 			bytesConsumed += frameInfo.bytesconsumed;

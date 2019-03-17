@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -212,7 +212,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 					 */
 					const Array<String>	&values = String(value).Trim().Explode(" ");
 
-					track.length = Math::Round((Int64) Number::FromHexString(values.GetNth(3)) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
+					track.length = (Int64) Number::FromHexString(values.GetNth(3));
 
 					String::ExplodeFinish();
 				}
@@ -362,7 +362,7 @@ BoCA::DecoderFDKAAC::DecoderFDKAAC()
 	handle		 = NIL;
 
 	mp4Track	 = -1;
-	sampleId	 = 0;
+	sampleId	 = 1;
 
 	adifFound	 = False;
 	adtsFound	 = False;
@@ -432,7 +432,7 @@ Bool BoCA::DecoderFDKAAC::Activate()
 				 */
 				const Array<String>	&values = String(value).Trim().Explode(" ");
 
-				delaySamples	 = Math::Round((Int64) Number::FromHexString(values.GetNth(1)) * Float(track.GetFormat().rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
+				delaySamples	 = (Int64) Number::FromHexString(values.GetNth(1));
 				delaySamplesLeft = delaySamples;
 
 				String::ExplodeFinish();
@@ -440,8 +440,6 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 			ex_MP4ItmfItemListFree(items);
 		}
-
-		sampleId = 1;
 	}
 	else
 	{
@@ -598,11 +596,8 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 				/* Set delay samples to minimum encoder delay.
 				 */
-				if (delaySamples == 0)
-				{
-					delaySamples	 = frameSize;
-					delaySamplesLeft = frameSize;
-				}
+				delaySamples	 = frameSize;
+				delaySamplesLeft = frameSize;
 
 				/* Add FDK decoder delay.
 				 */
