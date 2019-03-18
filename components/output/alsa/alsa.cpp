@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -115,6 +115,15 @@ Int BoCA::OutputALSA::WriteData(Buffer<UnsignedByte> &data)
 	return frames * format.channels * (format.bits / 8);
 }
 
+Bool BoCA::OutputALSA::Finish()
+{
+	if (playback_handle == NIL) return False;
+
+	if (snd_pcm_drain(playback_handle) < 0) return False;
+
+	return True;
+}
+
 Int BoCA::OutputALSA::CanWrite()
 {
 	if (playback_handle == NIL) return 0;
@@ -142,12 +151,7 @@ Bool BoCA::OutputALSA::IsPlaying()
 {
 	if (playback_handle == NIL) return False;
 
-	snd_pcm_uframes_t	 bufferSize = 0;
-	snd_pcm_uframes_t	 periodSize = 0;
-
-	snd_pcm_get_params(playback_handle, &bufferSize, &periodSize);
-
-	if (snd_pcm_avail(playback_handle) < (snd_pcm_sframes_t) bufferSize - 1) return True;
+	if (snd_pcm_state(playback_handle) == SND_PCM_STATE_RUNNING) return True;
 
 	return False;
 }
