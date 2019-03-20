@@ -129,6 +129,17 @@ Error BoCA::DecoderMediaFoundation::GetStreamInfo(const String &streamURI, Track
 	reader->SetStreamSelection(MF_SOURCE_READER_FIRST_AUDIO_STREAM, TRUE);
 	reader->GetNativeMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM, 0, &inputType);
 
+	/* See if this is a lossless file.
+	 */
+	GUID	 subtype;
+
+	inputType->GetGUID(MF_MT_SUBTYPE, &subtype);
+
+	if (subtype == MFAudioFormat_PCM   ||
+	    subtype == MFAudioFormat_Float ||
+	    subtype == MFAudioFormat_WMAudio_Lossless) track.lossless = True;
+	else					       track.lossless = False;
+
 	/* Fill format descriptor with input type.
 	 */
 	WAVEFORMATEX	 wfx	    = { };
@@ -179,11 +190,6 @@ Error BoCA::DecoderMediaFoundation::GetStreamInfo(const String &streamURI, Track
 		track.length	   = -1;
 		track.approxLength = Math::Round(Float(duration.hVal.QuadPart) / 1e7 * format.rate);
 		track.fileSize	   = driver.GetSize();
-
-		/* Try to guess if this is a lossless file.
-		 */
-		if (Float(track.fileSize) / track.approxLength / format.channels / (format.bits / 8) > 0.35) track.lossless = True;
-		else											     track.lossless = False;
 	}
 
 	driver.Close();
