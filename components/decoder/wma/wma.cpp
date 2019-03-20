@@ -15,6 +15,8 @@
 
 #include <dsound.h>
 
+#include "wmsdk/asferr.h"
+
 #include "wma.h"
 
 using namespace smooth::IO;
