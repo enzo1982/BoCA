@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -89,20 +89,26 @@ const Array<BoCA::Track> &BoCA::PlaylistWPL::ReadPlaylist(const String &file)
 
 		if (src == NIL) continue;
 
+		/* Get file name.
+		 */
+		String	 fileName = src->GetContent();
+
+		/* Handle relative paths.
+		 */
+#ifdef __WIN32__
+		if (fileName[1] != ':' && !fileName.StartsWith("\\\\") && !fileName.Contains("://"))
+#else
+		if (!fileName.StartsWith(Directory::GetDirectoryDelimiter()) && !fileName.StartsWith("~") && !fileName.Contains("://"))
+#endif
+		{
+			fileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(fileName);
+		}
+
 		/* Add track to track list.
 		 */
 		Track	 track;
 
-		track.origFilename = src->GetContent();
-
-#ifdef __WIN32__
-		if (track.origFilename[1] != ':' && !track.origFilename.StartsWith("\\\\") && !track.origFilename.Contains("://"))
-#else
-		if (!track.origFilename.StartsWith(Directory::GetDirectoryDelimiter()) && !track.origFilename.StartsWith("~") && !track.origFilename.Contains("://"))
-#endif
-		{
-			track.origFilename = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(track.origFilename);
-		}
+		track.origFilename = fileName;
 
 		trackList.Add(track);
 	}

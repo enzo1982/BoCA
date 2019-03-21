@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -81,7 +81,7 @@ const Array<BoCA::Track> &BoCA::PlaylistXSPF::ReadPlaylist(const String &file)
 
 	memory[numBytes - 1] = 0;
 
-	reader.parseMemory(memory, numBytes, &callback, String("file://").Append(EncodeURI(file.Replace("\\", "/")).Replace("%3A", ":")));
+	reader.parseMemory(memory, numBytes, &callback, String("file://").Append(Encoding::URLEncode::Encode(file.Replace("\\", "/")).Replace("%2F", "/").Replace("%3A", ":")));
 
 	delete [] memory;
 
@@ -91,13 +91,19 @@ const Array<BoCA::Track> &BoCA::PlaylistXSPF::ReadPlaylist(const String &file)
 	{
 		Track	&track = trackList.GetNthReference(i);
 
+		/* Get file name.
+		 */
+		String	&fileName = track.origFilename;
+
+		/* Handle relative paths.
+		 */
 #ifdef __WIN32__
-		if (track.origFilename[1] != ':' && !track.origFilename.StartsWith("\\\\") && !track.origFilename.Contains("://"))
+		if (fileName[1] != ':' && !fileName.StartsWith("\\\\") && !fileName.Contains("://"))
 #else
-		if (!track.origFilename.StartsWith(Directory::GetDirectoryDelimiter()) && !track.origFilename.StartsWith("~") && !track.origFilename.Contains("://"))
+		if (!fileName.StartsWith(Directory::GetDirectoryDelimiter()) && !fileName.StartsWith("~") && !fileName.Contains("://"))
 #endif
 		{
-			track.origFilename = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(track.origFilename);
+			fileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(fileName);
 		}
 	}
 
@@ -126,7 +132,16 @@ Error BoCA::PlaylistXSPF::WritePlaylist(const String &file)
 	{
 		/* Special handling for CD tracks on Windows.
 		 */
-		String		 fileName = Utilities::GetRelativeFileName(Utilities::GetCDTrackFileName(track), actualFile);
+		String	 fileName = Utilities::GetRelativeFileName(Utilities::GetCDTrackFileName(track), actualFile);
+			 fileName = Encoding::URLEncode::Encode(fileName.Replace("\\", "/")).Replace("%2F", "/").Replace("%3A", ":");
+
+		/* Handle absolute paths.
+		 */
+#ifdef __WIN32__
+		if (fileName[1] == ':') fileName = String("/").Append(fileName);
+#endif
+
+		if (fileName[0] == '/') fileName = String("file://").Append(fileName);
 
 		/* Add info to XSPF.
 		 */
@@ -140,7 +155,7 @@ Error BoCA::PlaylistXSPF::WritePlaylist(const String &file)
 		if (info.track   >    0) xspfTrack.setTrackNum(info.track);
 		if (track.length >=   0) xspfTrack.setDuration(Math::Round((Float) track.length / track.GetFormat().rate * 1000.0));
 
-		xspfTrack.lendAppendLocation(EncodeURI(fileName.Replace("\\", "/")).Replace("%3A", ":"));
+		xspfTrack.lendAppendLocation(fileName);
 
 		writer->addTrack(xspfTrack);
 	}
@@ -171,40 +186,6 @@ Error BoCA::PlaylistXSPF::WritePlaylist(const String &file)
 	return Success();
 }
 
-String BoCA::PlaylistXSPF::EncodeURI(const String &uri)
-{
-	char	*encoded = new char [12 * uri.Length() + 1];
-
-	uriEscapeA(uri.ConvertTo("UTF-8"), encoded, false, false);
-
-	String	 result;
-
-	result.ImportFrom("ISO-8859-1", encoded);
-	result.Replace("%2F", "/");
-
-	delete [] encoded;
-
-	return result;
-}
-
-String BoCA::PlaylistXSPF::DecodeURI(const String &uri)
-{
-	char	*decoded = new char [uri.Length() + 1];
-
-	strcpy(decoded, uri.ConvertTo("ISO-8859-1"));
-
-	uriUnescapeInPlaceA(decoded);
-
-	String	 result;
-
-	result.ImportFrom("UTF-8", decoded);
-	result.Replace("%2F", "/");
-
-	delete [] decoded;
-
-	return result;
-}
-
 BoCA::PlaylistXSPFCallback::PlaylistXSPFCallback(PlaylistXSPF *playlist)
 {
 	this->playlist = playlist;
@@ -214,6 +195,8 @@ void BoCA::PlaylistXSPFCallback::addTrack(XspfTrack *xspfTrack)
 {
 	String::InputFormat	 inputFormat("UTF-8");
 
+	/* Get title info.
+	 */
 	Track	 track;
 	Info	 info;
 
@@ -224,8 +207,18 @@ void BoCA::PlaylistXSPFCallback::addTrack(XspfTrack *xspfTrack)
 
 	track.SetInfo(info);
 
-	track.origFilename = playlist->DecodeURI(String(xspfTrack->getLocation(0)).Replace("file://", NIL));
+	/* Decode file name.
+	 */
+	String	 fileName = Encoding::URLEncode::Decode(String(xspfTrack->getLocation(0)).Replace("file://", NIL)).Replace("/", Directory::GetDirectoryDelimiter());
 
+#ifdef __WIN32__
+	if (fileName.StartsWith(Directory::GetDirectoryDelimiter()) && fileName[2] == ':') fileName = fileName.Tail(fileName.Length() - 1);
+#endif
+
+	track.origFilename = fileName;
+
+	/* Add track to playlist.
+	 */
 	playlist->trackList.Add(track);
 
 	delete xspfTrack;

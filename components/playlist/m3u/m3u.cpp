@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -70,23 +70,42 @@ const Array<BoCA::Track> &BoCA::PlaylistM3U::ReadPlaylist(const String &file)
 	{
 		String	 line = in.InputLine();
 
-		if (line != NIL && !line.StartsWith("#"))
-		{
-			Track	 track;
+		if (line == NIL || line.StartsWith("#")) continue;
 
-			track.origFilename = line;
+		/* Get file name.
+		 */
+		String	 fileName = line;
+
+		/* Handle file:// URIs as written to .m3u files by VLC.
+		 */
+		if (fileName.StartsWith("file://"))
+		{
+			fileName = fileName.Tail(fileName.Length() - 7).Replace("/", Directory::GetDirectoryDelimiter());
+			fileName = Encoding::URLEncode::Decode(fileName);
 
 #ifdef __WIN32__
-			if (track.origFilename[1] != ':' && !track.origFilename.StartsWith("\\\\") && !track.origFilename.Contains("://"))
-#else
-			if (!track.origFilename.StartsWith(Directory::GetDirectoryDelimiter()) && !track.origFilename.StartsWith("~") && !track.origFilename.Contains("://"))
+			if (fileName.StartsWith(Directory::GetDirectoryDelimiter()) && fileName[2] == ':') fileName = fileName.Tail(fileName.Length() - 1);
 #endif
-			{
-				track.origFilename = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(track.origFilename);
-			}
-
-			trackList.Add(track);
 		}
+
+		/* Handle relative paths.
+		 */
+#ifdef __WIN32__
+		if (fileName[1] != ':' && !fileName.StartsWith("\\\\") && !fileName.Contains("://"))
+#else
+		if (!fileName.StartsWith(Directory::GetDirectoryDelimiter()) && !fileName.StartsWith("~") && !fileName.Contains("://"))
+#endif
+		{
+			fileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(fileName);
+		}
+
+		/* Add track to track list.
+		 */
+		Track	 track;
+
+		track.origFilename = fileName;
+
+		trackList.Add(track);
 	}
 
 	in.Close();
