@@ -59,6 +59,9 @@ Global compiler settings (useful for porting)
 #if !defined(PLATFORM_ARM) && !defined(PLATFORM_ANDROID)
 	#if defined __SSE2__ || _M_IX86_FP == 2 || defined _M_X64
 		#define ENABLE_SSE_ASSEMBLY
+	#elif defined(_M_IX86)
+		#define ENABLE_SSE_ASSEMBLY
+		#define ENABLE_SSE_ASSEMBLY_DETECT
 	#endif
 	#ifdef _MSC_VER // doesn't compile in gcc
 		#ifndef PLATFORM_x64
@@ -82,44 +85,17 @@ Global compiler settings (useful for porting)
 #define ENABLE_COMPRESSION_MODE_HIGH
 #define ENABLE_COMPRESSION_MODE_EXTRA_HIGH
 
-// 64 bit platform
-#ifdef PLATFORM_64BIT
-	#define PLATFORM_x64
-#endif
-
-#if __x86_64__ || __aarch64__
-    #define PLATFORM_x64
-#endif
-
 /*****************************************************************************************
 Global types
 *****************************************************************************************/
 namespace APE
 {
 	// integer types
-#if defined(PLATFORM_x64)
-    typedef	int64_t                                     int64; // native integer, can safely hold a pointer
-    typedef int32_t                                     int32;
-#else
-	typedef	intptr_t                                    int32; // native integer, can safely hold a pointer
-    typedef int64_t                                     int64;
-#endif
-    //typedef intptr_t                                  intn;
-	//typedef uintptr_t                                   uintn;
+	typedef	int32_t                                     int32;
+	typedef int64_t                                     int64;
 
-#if defined(PLATFORM_x64)
-// DO NOT CHANGE THE FOLLOWING 6 LINES! They are necessary for building Media Center 64 bit on non-windows platforms!
-    #ifndef PLATFORM_WINDOWS
-    	typedef long long intn;
-    	typedef unsigned long long uintn;
-    #else
-    	typedef int64_t intn;
-    	typedef uint64_t uintn;
-    #endif    
-#else
-    typedef int32_t intn;
-    typedef uint32_t uintn;
-#endif
+	typedef intptr_t                                    intn; // native integer, can safely hold a pointer
+	typedef uintptr_t                                   uintn;
 
 	typedef uint64_t                                    uint64;
 	typedef uint32_t                                    uint32;
@@ -150,12 +126,19 @@ Global macros
     #define TICK_COUNT_TYPE                             unsigned long
     #define TICK_COUNT_READ(VARIABLE)                   VARIABLE = GetTickCount()
     #define TICK_COUNT_FREQ                             1000
+
     #if !defined(ASSERT)
         #if defined(_DEBUG)
             #define ASSERT(e)                            assert(e)
         #else
             #define ASSERT(e)                            
         #endif
+    #endif
+    #if !defined _MSC_VER
+        #define wcsncpy_s(A, B, COUNT) wcsncpy(A, B, COUNT)
+        #define sprintf_s(A, B, C, ...) sprintf(A, C, __VA_ARGS__)
+        #define _stprintf_s(A, B, C, ...) _stprintf(A, C, __VA_ARGS__)
+        #define wcscpy_s(A, B, C) wcscpy(A, C)
     #endif
 #else
     #define IO_USE_STD_LIB_FILE_IO
@@ -170,9 +153,9 @@ Global macros
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
     #define ASSERT(e)
-    #define wcsncpy_s(A, B, COUNT) wcscpy(A, B)
+    #define wcsncpy_s(A, B, COUNT) wcsncpy(A, B, COUNT)
     #define wcscpy_s(A, B, C) wcscpy(A, C)
-    #define sprintf_s(A, B, C, D) sprintf(A, C, D)
+    #define sprintf_s(A, B, C, ...) sprintf(A, C, __VA_ARGS__)
 #endif
 
 /*****************************************************************************************
@@ -199,13 +182,14 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.43")
-#define MAC_NAME                                        _T("Monkey's Audio 4.43")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.43"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.43)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.43) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.43\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.60")
+#define MAC_NAME                                        _T("Monkey's Audio 4.60")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.60"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.60)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.60) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.60\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
+#define ONE_MILLION										1000000
 #ifdef PLATFORM_WINDOWS
 	#define APE_FILENAME_SLASH '\\'
 #else

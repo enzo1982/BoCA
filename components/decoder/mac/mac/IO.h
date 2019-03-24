@@ -27,7 +27,7 @@ public:
     virtual int Write(const void * pBuffer, unsigned int nBytesToWrite, unsigned int * pBytesWritten) = 0;
     
     // seek
-	void SetSeekPosition(intn nPosition)
+	void SetSeekPosition(int64 nPosition)
 	{
 		m_nSeekPosition = nPosition;
 	}
@@ -45,8 +45,8 @@ public:
     virtual int SetEOF() = 0;
 
     // attributes
-    virtual int GetPosition() = 0;
-    virtual unsigned int GetSize() = 0;
+    virtual int64 GetPosition() = 0;
+    virtual int64 GetSize() = 0;
     virtual int GetName(wchar_t * pBuffer) = 0;
 
 protected:

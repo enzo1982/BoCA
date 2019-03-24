@@ -24,16 +24,14 @@ typedef unsigned short      WORD;
 typedef float               FLOAT;
 typedef void *              HANDLE;
 typedef unsigned int        UINT;
-//typedef unsigned int        intn;
-//typedef long                intn;
 typedef const char *        LPCSTR;
 typedef char *              LPSTR;
 typedef long                LRESULT;
 
 #define ZeroMemory(POINTER, BYTES) memset(POINTER, 0, BYTES);
 
-#define TRUE true
-#define FALSE false
+#define TRUE 1
+#define FALSE 0
 
 #define CALLBACK
 

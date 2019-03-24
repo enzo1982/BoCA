@@ -335,12 +335,12 @@ public:
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     virtual int Start(const str_utfn * pOutputFilename, const WAVEFORMATEX * pwfeInput, 
-        unsigned int nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, intn nCompressionLevel = COMPRESSION_LEVEL_NORMAL, 
-        const void * pHeaderData = NULL, intn nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
+        int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, intn nCompressionLevel = COMPRESSION_LEVEL_NORMAL, 
+        const void * pHeaderData = NULL, int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
 
     virtual int StartEx(CIO * pioOutput, const WAVEFORMATEX * pwfeInput, 
-        unsigned int nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, intn nCompressionLevel = COMPRESSION_LEVEL_NORMAL,
-        const void * pHeaderData = NULL, intn nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
+		int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, intn nCompressionLevel = COMPRESSION_LEVEL_NORMAL,
+        const void * pHeaderData = NULL, int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
     
     /*********************************************************************************************
     * Add / Compress Data
@@ -359,13 +359,13 @@ public:
     //    int nBytes
     //        the number of bytes in the buffer
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int AddData(unsigned char * pData, intn nBytes) = 0;
+    virtual int64 AddData(unsigned char * pData, int64 nBytes) = 0;
     
     //////////////////////////////////////////////////////////////////////////////////////////////
     // GetBufferBytesAvailable(...) - returns the number of bytes available in the buffer
     //    (helpful when locking)
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual intn GetBufferBytesAvailable() = 0;
+    virtual int64 GetBufferBytesAvailable() = 0;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // LockBuffer(...) - locks MAC's buffer so we can copy into it
@@ -377,7 +377,7 @@ public:
     // Return:
     //    pointer to the buffer (add at that location)
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual unsigned char * LockBuffer(intn * pBytesAvailable) = 0;
+    virtual unsigned char * LockBuffer(int64 * pBytesAvailable) = 0;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // UnlockBuffer(...) - releases the buffer
@@ -388,7 +388,7 @@ public:
     //    bool bProcess
     //        whether MAC should process as much as possible of the buffer
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int UnlockBuffer(unsigned int nBytesAdded, bool bProcess = true) = 0;
+    virtual int64 UnlockBuffer(int64 nBytesAdded, bool bProcess = true) = 0;
     
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +402,7 @@ public:
     //    int * pBytesAdded
     //        returns the number of bytes added from the I/O source
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int AddDataFromInputSource(CInputSource * pInputSource, unsigned int nMaxBytes = 0, int * pBytesAdded = NULL) = 0;
+    virtual int64 AddDataFromInputSource(CInputSource * pInputSource, int64 nMaxBytes = 0, int64 * pBytesAdded = NULL) = 0;
     
     /*********************************************************************************************
     * Finish / Kill
@@ -422,7 +422,7 @@ public:
     //        the number of bytes of the terminating data buffer that should be appended to a decoded
     //        WAV file (it's basically nTerminatingBytes - the bytes that make up the tag)
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int Finish(unsigned char * pTerminatingData, int nTerminatingBytes, int nWAVTerminatingBytes) = 0;
+    virtual int Finish(unsigned char * pTerminatingData, int64 nTerminatingBytes, int64 nWAVTerminatingBytes) = 0;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Kill(...) - stops encoding and deletes the output file
