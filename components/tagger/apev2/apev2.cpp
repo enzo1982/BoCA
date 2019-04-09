@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -426,12 +426,18 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 Error BoCA::TaggerAPEv2::ParseStreamInfo(const String &fileName, Track &track)
 {
-	InStream		 in(STREAM_FILE, fileName, IS_READ);
+	/* Open file and check size.
+	 */
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
+
+	if (in.Size() < 32) return Error();
+
+	/* Read header tag.
+	 */
 	Buffer<UnsignedByte>	 buffer(32);
+	Int			 tagSize = 0;
 
 	in.InputData(buffer, 32);
-
-	Int	 tagSize = 0;
 
 	if (ParseAPEHeader(buffer, &tagSize, NIL))
 	{
@@ -442,6 +448,8 @@ Error BoCA::TaggerAPEv2::ParseStreamInfo(const String &fileName, Track &track)
 		return ParseBuffer(buffer, track);
 	}
 
+	/* Read footer tag.
+	 */
 	in.Seek(in.Size() - 32);
 	in.InputData(buffer, 32);
 
@@ -556,15 +564,19 @@ Bool BoCA::TaggerAPEv2::ParseAPEBinaryItem(const Buffer<UnsignedByte> &buffer, I
 
 Error BoCA::TaggerAPEv2::UpdateStreamInfo(const String &fileName, const Track &track)
 {
-	InStream		 in(STREAM_FILE, fileName, IS_READ);
-	Buffer<UnsignedByte>	 buffer(32);
+	/* Open file and check size.
+	 */
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
 
-	in.InputData(buffer, 32);
-
-	Int	 tagSize = 0;
+	if (in.Size() < 32) return Error();
 
 	/* Check for APEv2 tag at the beginning of the file.
 	 */
+	Buffer<UnsignedByte>	 buffer(32);
+	Int			 tagSize = 0;
+
+	in.InputData(buffer, 32);
+
 	if (ParseAPEHeader(buffer, &tagSize, NIL))
 	{
 		/* Copy to temporary file.
@@ -604,11 +616,11 @@ Error BoCA::TaggerAPEv2::UpdateStreamInfo(const String &fileName, const Track &t
 		return Error();
 	}
 
+	/* Check for APEv2 tag at the end of the file.
+	 */
 	in.Seek(in.Size() - 32);
 	in.InputData(buffer, 32);
 
-	/* Check for APEv2 tag at the end of the file.
-	 */
 	if (ParseAPEFooter(buffer, &tagSize, NIL))
 	{
 		/* Check if this tag also has a header.
@@ -658,10 +670,10 @@ Error BoCA::TaggerAPEv2::UpdateStreamInfo(const String &fileName, const Track &t
 
 	in.Close();
 
-	OutStream	 out(STREAM_FILE, fileName, OS_APPEND);
-
 	/* Append new APEv2 tag.
 	 */
+	OutStream	 out(STREAM_FILE, fileName, OS_APPEND);
+
 	if (out.GetLastError() == IO_ERROR_OK)
 	{
 		Buffer<UnsignedByte>	 buffer;

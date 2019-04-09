@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -171,11 +171,16 @@ Error BoCA::TaggerID3v1::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 Error BoCA::TaggerID3v1::ParseStreamInfo(const String &fileName, Track &track)
 {
-	InStream		 in(STREAM_FILE, fileName, IS_READ);
-	Buffer<UnsignedByte>	 buffer(128);
+	/* Open file and check size.
+	 */
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
+
+	if (in.Size() < 128) return Error();
 
 	/* Copy tag to buffer and parse it.
 	 */
+	Buffer<UnsignedByte>	 buffer(128);
+
 	in.Seek(in.Size() - 128);
 	in.InputData(buffer, 128);
 
@@ -184,8 +189,15 @@ Error BoCA::TaggerID3v1::ParseStreamInfo(const String &fileName, Track &track)
 
 Error BoCA::TaggerID3v1::UpdateStreamInfo(const String &fileName, const Track &track)
 {
-	Int		 offset = 0;
+	/* Open file and check size.
+	 */
 	InStream	 in(STREAM_FILE, fileName, IS_READ);
+
+	if (in.Size() < 128) return Error();
+
+	/* Find existing tag if any.
+	 */
+	Int	 offset = 0;
 
 	in.Seek(in.Size() - 128);
 
@@ -193,6 +205,8 @@ Error BoCA::TaggerID3v1::UpdateStreamInfo(const String &fileName, const Track &t
 
 	in.Close();
 
+	/* Append new ID3v1 tag.
+	 */
 	OutStream	 out(STREAM_FILE, fileName, OS_APPEND);
 
 	if (out.GetLastError() == IO_ERROR_OK)
