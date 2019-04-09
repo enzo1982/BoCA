@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -102,7 +102,7 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 
 		ex_ogg_sync_wrote(&oy, size);
 
-		while (ex_ogg_sync_pageout(&oy, &og) == 1 && !done)
+		while (!done && ex_ogg_sync_pageout(&oy, &og) == 1)
 		{
 			if (!initialized)
 			{
@@ -113,7 +113,7 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_ogg_stream_pagein(&os, &og);
 
-			while (ex_ogg_stream_packetout(&os, &op) == 1 && !done)
+			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
 			{
 				/* Found header packet.
 				 */
@@ -156,10 +156,11 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	ex_ogg_sync_reset(&oy);
 
-	in.Seek(in.Size() - 65536);
+	Int	 size   = Math::Min(in.Size(), Int64(65536));
+	char    *buffer = ex_ogg_sync_buffer(&oy, size);
 
-	char	*buffer = ex_ogg_sync_buffer(&oy, 65536);
-	Int	 size	= in.InputData(buffer, 65536);
+	in.Seek(in.Size() - size);
+	in.InputData(buffer, size);
 
 	ex_ogg_sync_wrote(&oy, size);
 
@@ -249,7 +250,7 @@ Bool BoCA::DecoderSpeex::Activate()
 
 		ex_ogg_sync_wrote(&oy, size);
 
-		while (ex_ogg_sync_pageout(&oy, &og) == 1 && !done)
+		while (!done && ex_ogg_sync_pageout(&oy, &og) == 1)
 		{
 			if (!initialized)
 			{
@@ -260,7 +261,7 @@ Bool BoCA::DecoderSpeex::Activate()
 
 			ex_ogg_stream_pagein(&os, &og);
 
-			while (ex_ogg_stream_packetout(&os, &op) == 1 && !done)
+			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
 			{
 				if (packetNum == 0)
 				{
@@ -343,17 +344,7 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data)
 {
 	const Format	&format = track.GetFormat();
 
-	char	*buffer = ex_ogg_sync_buffer(&oy, data.Size());
-	Int	 size	= driver->ReadData((unsigned char *) buffer, data.Size());
-
-	if (size <= 0) return -1;
-
-	inBytes += size;
-
-	ex_ogg_sync_wrote(&oy, size);
-
-	size = 0;
-
+	Int	 size	       = 0;
 	Int	 dataBufferLen = 0;
 
 	while (ex_ogg_sync_pageout(&oy, &og) == 1)
@@ -405,6 +396,17 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data)
 
 		if (ex_ogg_page_eos(&og)) break;
 	}
+
+	/* Bail out if no more data available.
+	 */
+	char	*buffer = ex_ogg_sync_buffer(&oy, 8192);
+	Int	 bytes	= driver->ReadData((unsigned char *) buffer, 8192);
+
+	if (size == 0 && bytes <= 0) return -1;
+
+	inBytes += bytes;
+
+	ex_ogg_sync_wrote(&oy, bytes);
 
 	return size;
 }
