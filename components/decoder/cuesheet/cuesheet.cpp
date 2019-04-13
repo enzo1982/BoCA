@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -68,7 +68,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 	Bool		 trackMode	     = False;
 	Bool		 dataMode	     = False;
 
-	Int		 discLength	     = 0;
+	Int		 fileLength	     = 0;
 
 	/* Standard format for audio discs.
 	 */
@@ -137,28 +137,144 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		 */
 		if (line.StartsWith("REM ")) continue;
 
+		/* Regular metadata...
+		 */
+		if (line.StartsWith("PERFORMER "))
+		{
+			String	 artist;
+
+			if (line.Contains("\"")) artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!readInfoTags || preferCueSheets) info.artist = artist;
+
+			if (!trackMode && !dataMode) albumInfo.artist = artist;
+		}
+
+		if (line.StartsWith("SONGWRITER "))
+		{
+			String	 songwriter;
+
+			if (line.Contains("\"")) songwriter = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 songwriter = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!readInfoTags || preferCueSheets)
+			{
+				for (Int i = 0; i < info.other.Length(); i++)
+				{
+					if (info.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) info.other.RemoveNth(i);
+				}
+
+				info.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
+			}
+
+			if (!trackMode && !dataMode)
+			{
+				for (Int i = 0; i < albumInfo.other.Length(); i++)
+				{
+					if (albumInfo.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) albumInfo.other.RemoveNth(i);
+				}
+
+				albumInfo.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
+			}
+		}
+
+		if (line.StartsWith("TITLE "))
+		{
+			String	 title;
+
+			if (line.Contains("\"")) title = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 title = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (!readInfoTags || preferCueSheets)
+			{
+				if (!trackMode && !dataMode) info.album = title;
+				else			     info.title = title;
+			}
+
+			if (!trackMode && !dataMode) albumInfo.album = title;
+		}
+
+		if (line.StartsWith("ISRC "))
+		{
+			/* Check if the ISRC is valid.
+			 */
+			String	 isrc = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			if (Info::IsISRC(isrc)) info.isrc = isrc;
+		}
+
+		/* Track sample offset.
+		 */
+		if (line.StartsWith("INDEX 01 "))
+		{
+			String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+			Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
+					     msf.SubString(3, 2).ToInt() * format.rate +
+					     msf.SubString(6, 2).ToInt() * format.rate / 75;
+
+			iTrack.sampleOffset = samplePos;
+		}
+
+		/* End of a track.
+		 */
+		if ((line.StartsWith("TRACK ") || line.StartsWith("FILE ") || file->GetPos() == file->Size()) && trackMode)
+		{
+			if ((iTrack.length == -1 && iTrack.approxLength == -1) || iTrack.length == fileLength || iTrack.approxLength == fileLength)
+			{
+				/* Get previous track length.
+				 */
+				if (line.StartsWith("FILE ") || file->GetPos() == file->Size()) iTrack.length = fileLength - iTrack.sampleOffset;
+
+				if (line.StartsWith("TRACK "))
+				{
+					Int	 filePos = file->GetPos();
+
+					while (file->GetPos() < file->Size())
+					{
+						String	 line = file->InputLine().Trim();
+
+						if (line.StartsWith("FILE ")) break;
+
+						if (line.StartsWith("INDEX 01 "))
+						{
+							String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
+
+							Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
+									     msf.SubString(3, 2).ToInt() * format.rate +
+									     msf.SubString(6, 2).ToInt() * format.rate / 75;
+
+							iTrack.length = samplePos - iTrack.sampleOffset;
+
+							break;
+						}
+					}
+
+					file->Seek(filePos);
+				}
+			}
+
+			/* Add previous track.
+			 */
+			iTrack.SetFormat(format);
+			iTrack.SetInfo(info);
+
+			AddTrack(iTrack, track.tracks);
+
+			iTrack.length = -1;
+			iTrack.approxLength = -1;
+
+			info.track_gain = NIL;
+			info.track_peak = NIL;
+
+			trackMode = False;
+		}
+
 		/* File reference.
 		 */
 		if (line.StartsWith("FILE "))
 		{
-			if (trackMode && (iTrack.length >= 0 || iTrack.approxLength >= 0))
-			{
-				/* Add previous track.
-				 */
-				iTrack.SetFormat(format);
-				iTrack.SetInfo(info);
-
-				AddTrack(iTrack, track.tracks);
-
-				iTrack.length = -1;
-				iTrack.approxLength = -1;
-
-				info.track_gain = NIL;
-				info.track_peak = NIL;
-
-				trackMode = False;
-			}
-
 			/* Get referenced file name.
 			 */
 			if (line.Contains("\"")) iTrack.origFilename = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
@@ -268,139 +384,10 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			if (infoTrack.tracks.Length() > 0) albumTrack.tracks = infoTrack.tracks;
 
-			if	(infoTrack.length	>= 0) { discLength += infoTrack.length;	      iTrack.length	  = infoTrack.length;	    }
-			else if (infoTrack.approxLength >= 0) { discLength += infoTrack.approxLength; iTrack.approxLength = infoTrack.approxLength; }
+			if	(infoTrack.length	>= 0) { fileLength = infoTrack.length;	     iTrack.length	 = infoTrack.length;	   }
+			else if (infoTrack.approxLength >= 0) { fileLength = infoTrack.approxLength; iTrack.approxLength = infoTrack.approxLength; }
 
 			iTrack.lossless = infoTrack.lossless;
-		}
-
-		/* Regular metadata...
-		 */
-		if (line.StartsWith("PERFORMER "))
-		{
-			String	 artist;
-
-			if (line.Contains("\"")) artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
-
-			if (!readInfoTags || preferCueSheets) info.artist = artist;
-
-			if (!trackMode && !dataMode) albumInfo.artist = artist;
-		}
-
-		if (line.StartsWith("SONGWRITER "))
-		{
-			String	 songwriter;
-
-			if (line.Contains("\"")) songwriter = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 songwriter = line.Tail(line.Length() - line.FindLast(" ") - 1);
-
-			if (!readInfoTags || preferCueSheets)
-			{
-				for (Int i = 0; i < info.other.Length(); i++)
-				{
-					if (info.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) info.other.RemoveNth(i);
-				}
-
-				info.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
-			}
-
-			if (!trackMode && !dataMode)
-			{
-				for (Int i = 0; i < albumInfo.other.Length(); i++)
-				{
-					if (albumInfo.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) albumInfo.other.RemoveNth(i);
-				}
-
-				albumInfo.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
-			}
-		}
-
-		if (line.StartsWith("TITLE "))
-		{
-			String	 title;
-
-			if (line.Contains("\"")) title = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 title = line.Tail(line.Length() - line.FindLast(" ") - 1);
-
-			if (!readInfoTags || preferCueSheets)
-			{
-				if (!trackMode && !dataMode) info.album = title;
-				else			     info.title = title;
-			}
-
-			if (!trackMode && !dataMode) albumInfo.album = title;
-		}
-
-		if (line.StartsWith("ISRC "))
-		{
-			/* Check if the ISRC is valid.
-			 */
-			String	 isrc = line.Tail(line.Length() - line.FindLast(" ") - 1);
-
-			if (Info::IsISRC(isrc)) info.isrc = isrc;
-		}
-
-		/* Track sample offset.
-		 */
-		if (line.StartsWith("INDEX 01 "))
-		{
-			String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
-
-			Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
-					     msf.SubString(3, 2).ToInt() * format.rate +
-					     msf.SubString(6, 2).ToInt() * format.rate / 75;
-
-			iTrack.sampleOffset = samplePos;
-		}
-
-		/* End of a track.
-		 */
-		if ((line.StartsWith("TRACK ") || file->GetPos() == file->Size()) && trackMode)
-		{
-			if ((iTrack.length == -1 && iTrack.approxLength == -1) || iTrack.length == discLength || iTrack.approxLength == discLength)
-			{
-				/* Get previous track length.
-				 */
-				if (file->GetPos() == file->Size()) iTrack.length = discLength - iTrack.sampleOffset;
-
-				Int	 filePos = file->GetPos();
-
-				while (file->GetPos() < file->Size())
-				{
-					String	 line = file->InputLine().Trim();
-
-					if (line.StartsWith("FILE ")) break;
-
-					if (line.StartsWith("INDEX 01 "))
-					{
-						String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
-
-						Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
-								     msf.SubString(3, 2).ToInt() * format.rate +
-								     msf.SubString(6, 2).ToInt() * format.rate / 75;
-
-						iTrack.length = samplePos - iTrack.sampleOffset;
-
-						break;
-					}
-				}
-
-				file->Seek(filePos);
-			}
-
-			/* Add previous track.
-			 */
-			iTrack.SetFormat(format);
-			iTrack.SetInfo(info);
-
-			AddTrack(iTrack, track.tracks);
-
-			iTrack.length = -1;
-			iTrack.approxLength = -1;
-
-			info.track_gain = NIL;
-			info.track_peak = NIL;
 		}
 
 		/* Start of a track.
