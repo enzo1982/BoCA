@@ -91,7 +91,7 @@ Global types
 namespace APE
 {
 	// integer types
-	typedef	int32_t                                     int32;
+	typedef int32_t                                     int32;
 	typedef int64_t                                     int64;
 
 	typedef intptr_t                                    intn; // native integer, can safely hold a pointer
@@ -134,12 +134,6 @@ Global macros
             #define ASSERT(e)                            
         #endif
     #endif
-    #if !defined _MSC_VER
-        #define wcsncpy_s(A, B, COUNT) wcsncpy(A, B, COUNT)
-        #define sprintf_s(A, B, C, ...) sprintf(A, C, __VA_ARGS__)
-        #define _stprintf_s(A, B, C, ...) _stprintf(A, C, __VA_ARGS__)
-        #define wcscpy_s(A, B, C) wcscpy(A, C)
-    #endif
 #else
     #define IO_USE_STD_LIB_FILE_IO
     #define IO_HEADER_FILE                              "StdLibFileIO.h"
@@ -153,9 +147,15 @@ Global macros
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
     #define ASSERT(e)
+#endif
+
+#if !defined(PLATFORM_WINDOWS) || !defined(_MSC_VER)
     #define wcsncpy_s(A, B, COUNT) wcsncpy(A, B, COUNT)
     #define wcscpy_s(A, B, C) wcscpy(A, C)
     #define sprintf_s(A, B, C, ...) sprintf(A, C, __VA_ARGS__)
+    #define _stprintf_s(A, B, C, ...) _stprintf(A, C, __VA_ARGS__)
+    #define strcpy_s(A, B, C) strcpy(A, C)
+    #define _tcscat_s(A, B, C) _tcscat(A, C)
 #endif
 
 /*****************************************************************************************
@@ -182,12 +182,12 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.60")
-#define MAC_NAME                                        _T("Monkey's Audio 4.60")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.60"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.60)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.60) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.60\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.63")
+#define MAC_NAME                                        _T("Monkey's Audio 4.63")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.63"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.63)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.63) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.63\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #define ONE_MILLION										1000000
 #ifdef PLATFORM_WINDOWS
@@ -222,7 +222,7 @@ Macros
 #define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nResult = FUNCTION; if (nResult != 0) { return VALUE; } }
 #define RETURN_ON_EXCEPTION(CODE, VALUE) { try { CODE } catch(...) { return VALUE; } }
 
-#define THROW_ON_ERROR(CODE) { intn nResult = CODE; if (nResult != 0) throw(nResult); }
+#define THROW_ON_ERROR(CODE) { intn nResult = (intn) CODE; if (nResult != 0) throw(nResult); }
 
 #define EXPAND_1_TIMES(CODE) CODE
 #define EXPAND_2_TIMES(CODE) CODE CODE
