@@ -187,7 +187,7 @@ public:
     int GetFieldFlags();
     
     // output the entire field to a buffer (GetFieldSize() bytes)
-    int SaveField(char * pBuffer);
+    int SaveField(char * pBuffer, int nBytes);
 
     // checks to see if the field is read-only
     bool GetIsReadOnly() { return (m_nFieldFlags & TAG_FIELD_FLAG_READ_ONLY) ? true : false; }
