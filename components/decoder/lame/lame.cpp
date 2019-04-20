@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -71,8 +71,8 @@ Error BoCA::DecoderLAME::GetStreamInfo(const String &streamURI, Track &track)
 	track.fileSize	= in.Size();
 	track.length	= -1;
 
-	SkipID3v2Tag(&in);
-	ParseVBRHeaders(&in);
+	SkipID3v2Tag(in);
+	ParseVBRHeaders(in);
 
 	Buffer<unsigned char>	 buffer(4096);
 
@@ -168,15 +168,17 @@ BoCA::DecoderLAME::~DecoderLAME()
 
 Bool BoCA::DecoderLAME::Activate()
 {
-	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
+	/* Skip headers.
+	 */
+	InStream	 in(STREAM_DRIVER, driver);
 
-	SkipID3v2Tag(f_in);
-	ParseVBRHeaders(f_in);
+	SkipID3v2Tag(in);
+	ParseVBRHeaders(in);
 
-	driver->Seek(f_in->GetPos());
+	driver->Seek(in.GetPos());
 
-	delete f_in;
-
+	/* Create decoder.
+	 */
 	context = ex_hip_decode_init();
 
 	return True;
@@ -229,37 +231,37 @@ Int BoCA::DecoderLAME::ReadData(Buffer<UnsignedByte> &data)
 	return data.Size();
 }
 
-Bool BoCA::DecoderLAME::SkipID3v2Tag(InStream *in)
+Bool BoCA::DecoderLAME::SkipID3v2Tag(InStream &in)
 {
 	/* Check for an ID3v2 tag at the beginning of the
 	 * file and skip it if it exists as it might cause
 	 * problems if the tag is unsynchronized.
 	 */
-	if (in->InputString(3) == "ID3")
+	if (in.InputString(3) == "ID3")
 	{
-		in->InputNumber(2); // ID3 version
-		in->InputNumber(1); // Flags
+		in.InputNumber(2); // ID3 version
+		in.InputNumber(1); // Flags
 
 		/* Read tag size as a 4 byte unsynchronized integer.
 		 */
-		Int	 tagSize = (in->InputNumber(1) << 21) +
-				   (in->InputNumber(1) << 14) +
-				   (in->InputNumber(1) <<  7) +
-				   (in->InputNumber(1)      );
+		Int	 tagSize = (in.InputNumber(1) << 21) +
+				   (in.InputNumber(1) << 14) +
+				   (in.InputNumber(1) <<  7) +
+				   (in.InputNumber(1)      );
 
-		in->RelSeek(tagSize);
+		in.RelSeek(tagSize);
 
 		inBytes += (tagSize + 10);
 	}
 	else
 	{
-		in->Seek(0);
+		in.Seek(0);
 	}
 
 	return True;
 }
 
-Bool BoCA::DecoderLAME::ParseVBRHeaders(InStream *in)
+Bool BoCA::DecoderLAME::ParseVBRHeaders(InStream &in)
 {
 	/* Check for a LAME header and extract the number of samples if it exists.
 	 */
@@ -267,8 +269,8 @@ Bool BoCA::DecoderLAME::ParseVBRHeaders(InStream *in)
 
 	/* Read data and seek back to before the Xing header.
 	 */
-	in->InputData(buffer, 192);
-	in->RelSeek(-192);
+	in.InputData(buffer, 192);
+	in.RelSeek(-192);
 
 	Int		 offset = ((buffer[1] >> 3) & 1 ? (buffer[3] >> 6 != 3 ? 32 : 17) :
 							  (buffer[3] >> 6 != 3 ? 17 :  9)) + 4;

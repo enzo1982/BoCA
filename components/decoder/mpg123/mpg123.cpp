@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -88,8 +88,8 @@ Error BoCA::DecoderMPG123::GetStreamInfo(const String &streamURI, Track &track)
 	track.fileSize	= in.Size();
 	track.length	= -1;
 
-	SkipID3v2Tag(&in);
-	ParseVBRHeaders(&in);
+	SkipID3v2Tag(in);
+	ParseVBRHeaders(in);
 
 	Buffer<unsigned char>	 buffer(4096);
 
@@ -202,22 +202,26 @@ BoCA::DecoderMPG123::~DecoderMPG123()
 
 Bool BoCA::DecoderMPG123::Activate()
 {
-	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
-
-	SkipID3v2Tag(f_in);
-	ParseVBRHeaders(f_in);
-
-	dataOffset = f_in->GetPos();
-
-	delete f_in;
-
-	driver->Seek(dataOffset);
-
-	context = ex_mpg123_new(NIL, NIL);
-
+	/* Get configuration.
+	 */
 	const Config	*config = GetConfiguration();
 
 	String	 selectedDecoder = config->GetStringValue(ConfigureMPG123::ConfigID, "Decoder", NIL);
+
+	/* Skip headers and get data offset.
+	 */
+	InStream	 in(STREAM_DRIVER, driver);
+
+	SkipID3v2Tag(in);
+	ParseVBRHeaders(in);
+
+	dataOffset = in.GetPos();
+
+	driver->Seek(dataOffset);
+
+	/* Create decoder.
+	 */
+	context = ex_mpg123_new(NIL, NIL);
 
 	if (selectedDecoder != NIL) ex_mpg123_decoder(context, selectedDecoder);
 
@@ -292,44 +296,44 @@ Int BoCA::DecoderMPG123::ReadData(Buffer<UnsignedByte> &data)
 	return data.Size();
 }
 
-Bool BoCA::DecoderMPG123::SkipID3v2Tag(InStream *in)
+Bool BoCA::DecoderMPG123::SkipID3v2Tag(InStream &in)
 {
 	/* Check for an ID3v2 tag at the beginning of the
 	 * file and skip it if it exists as it might cause
 	 * problems if the tag is unsynchronized.
 	 */
-	if (in->InputString(3) == "ID3")
+	if (in.InputString(3) == "ID3")
 	{
-		in->InputNumber(2); // ID3 version
-		in->InputNumber(1); // Flags
+		in.InputNumber(2); // ID3 version
+		in.InputNumber(1); // Flags
 
 		/* Read tag size as a 4 byte unsynchronized integer.
 		 */
-		Int	 tagSize = (in->InputNumber(1) << 21) +
-				   (in->InputNumber(1) << 14) +
-				   (in->InputNumber(1) <<  7) +
-				   (in->InputNumber(1)      );
+		Int	 tagSize = (in.InputNumber(1) << 21) +
+				   (in.InputNumber(1) << 14) +
+				   (in.InputNumber(1) <<  7) +
+				   (in.InputNumber(1)      );
 
-		in->RelSeek(tagSize);
+		in.RelSeek(tagSize);
 
 		inBytes += (tagSize + 10);
 	}
 	else
 	{
-		in->Seek(0);
+		in.Seek(0);
 	}
 
 	return True;
 }
 
-Bool BoCA::DecoderMPG123::ParseVBRHeaders(InStream *in)
+Bool BoCA::DecoderMPG123::ParseVBRHeaders(InStream &in)
 {
 	/* Read MPEG header and get frame size.
 	 */
 	Buffer<UnsignedByte>	 header(3);
 
-	in->InputData(header, 3);
-	in->RelSeek(-3);
+	in.InputData(header, 3);
+	in.RelSeek(-3);
 
 	Int	 frameSize = GetMPEGFrameSize(header);
 
@@ -339,7 +343,7 @@ Bool BoCA::DecoderMPG123::ParseVBRHeaders(InStream *in)
 	 */
 	Buffer<UnsignedByte>	 buffer(frameSize);
 
-	in->InputData(buffer, frameSize);
+	in.InputData(buffer, frameSize);
 
 	/* Check for a Xing or VBRI header and extract the number of frames.
 	 */
@@ -380,7 +384,7 @@ Bool BoCA::DecoderMPG123::ParseVBRHeaders(InStream *in)
 	{
 		/* Seek back to before the frame if no Xing or VBRI header was found.
 		 */
-		in->RelSeek(-frameSize);
+		in.RelSeek(-frameSize);
 
 		return False;
 	}
@@ -388,7 +392,7 @@ Bool BoCA::DecoderMPG123::ParseVBRHeaders(InStream *in)
 	/* Sanity check for header vs. actual file size (account
 	 * for possible ID3v1 and addtional 4kB of other tags).
 	 */
-	if (numBytes > 0 && in->Size() - in->GetPos() > numBytes * 1.01 + 128 + 4096)
+	if (numBytes > 0 && in.Size() - in.GetPos() > numBytes * 1.01 + 128 + 4096)
 	{
 		numFrames  = 0;
 

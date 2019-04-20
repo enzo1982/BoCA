@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -120,7 +120,7 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (streamURI.StartsWith("device://cdda:"))
 	{
-		audiodrive = streamURI.SubString(14, 1).ToInt();
+		audiodrive  = streamURI.SubString(14, 1).ToInt();
 		trackNumber = streamURI.SubString(16, streamURI.Length() - 16).ToInt();
 	}
 	else if (streamURI.EndsWith(".cda"))
@@ -128,17 +128,10 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 		/* Find track number and length.
 		 */
 		{
-			InStream	*in = new InStream(STREAM_FILE, streamURI, IS_READ);
+			InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-			in->Seek(22);
-
-			trackNumber = in->InputNumber(2);
-
-			in->Seek(32);
-
-			trackLength = in->InputNumber(4);
-
-			delete in;
+			in.Seek(22); trackNumber = in.InputNumber(2);
+			in.Seek(32); trackLength = in.InputNumber(4);
 		}
 
 		for (audiodrive = 0; audiodrive < component->GetNumberOfDevices(); audiodrive++)

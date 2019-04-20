@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -97,7 +97,7 @@ Bool BoCA::DecoderFLAC::CanOpenStream(const String &streamURI)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	SkipID3v2Tag(&in);
+	SkipID3v2Tag(in);
 
 	String	 fileType = in.InputString(4);
 
@@ -156,19 +156,18 @@ Bool BoCA::DecoderFLAC::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderFLAC::GetStreamInfo(const String &streamURI, Track &track)
 {
-	Driver		*ioDriver = new DriverPOSIX(streamURI, IS_READ);
-	InStream	*f_in = new InStream(STREAM_DRIVER, ioDriver);
+	DriverPOSIX	 ioDriver(streamURI, IS_READ);
+	InStream	 in(STREAM_DRIVER, &ioDriver);
 
-	SkipID3v2Tag(f_in);
+	SkipID3v2Tag(in);
 
-	ioDriver->Seek(f_in->GetPos());
-
-	track.fileSize	   = f_in->Size();
+	track.fileSize	   = in.Size();
 
 	infoTrack	   = &track;
 	stop		   = False;
 
-	driver		   = ioDriver;
+	driver		   = &ioDriver;
+	driver->Seek(in.GetPos());
 
 	readDataMutex	   = new Mutex();
 	samplesBufferMutex = new Mutex();
@@ -178,8 +177,8 @@ Error BoCA::DecoderFLAC::GetStreamInfo(const String &streamURI, Track &track)
 	delete readDataMutex;
 	delete samplesBufferMutex;
 
-	delete f_in;
-	delete ioDriver;
+	in.Close();
+	ioDriver.Close();
 
 	return Success();
 }
@@ -203,14 +202,16 @@ BoCA::DecoderFLAC::~DecoderFLAC()
 
 Bool BoCA::DecoderFLAC::Activate()
 {
-	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
+	/* Skip headers.
+	 */
+	InStream	 in(STREAM_DRIVER, driver);
 
-	SkipID3v2Tag(f_in);
+	SkipID3v2Tag(in);
 
-	driver->Seek(f_in->GetPos());
+	driver->Seek(in.GetPos());
 
-	delete f_in;
-
+	/* Prepare decoder.
+	 */
 	stop		   = False;
 
 	seekPosition	   = 0;
@@ -324,31 +325,31 @@ Int BoCA::DecoderFLAC::ReadFLAC(Bool readData)
 	return Success();
 }
 
-Bool BoCA::DecoderFLAC::SkipID3v2Tag(InStream *in)
+Bool BoCA::DecoderFLAC::SkipID3v2Tag(InStream &in)
 {
 	/* Check for an ID3v2 tag at the beginning of the file
 	 * and skip it if it exists. EAC and possibly other
 	 * programs write ID3 tags fo FLAC if misconfigured.
 	 */
-	if (in->InputString(3) == "ID3")
+	if (in.InputString(3) == "ID3")
 	{
-		in->InputNumber(2); // ID3 version
-		in->InputNumber(1); // Flags
+		in.InputNumber(2); // ID3 version
+		in.InputNumber(1); // Flags
 
 		/* Read tag size as a 4 byte unsynchronized integer.
 		 */
-		Int	 tagSize = (in->InputNumber(1) << 21) +
-				   (in->InputNumber(1) << 14) +
-				   (in->InputNumber(1) <<  7) +
-				   (in->InputNumber(1)      );
+		Int	 tagSize = (in.InputNumber(1) << 21) +
+				   (in.InputNumber(1) << 14) +
+				   (in.InputNumber(1) <<  7) +
+				   (in.InputNumber(1)      );
 
-		in->RelSeek(tagSize);
+		in.RelSeek(tagSize);
 
 		inBytes += (tagSize + 10);
 	}
 	else
 	{
-		in->Seek(0);
+		in.Seek(0);
 	}
 
 	return True;

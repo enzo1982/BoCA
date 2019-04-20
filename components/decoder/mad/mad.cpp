@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -104,21 +104,21 @@ Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 	DriverPOSIX	 ioDriver(streamURI, IS_READ);
 	InStream	 in(STREAM_DRIVER, &ioDriver);
 
-	track.fileSize	= in.Size();
-	track.length	= -1;
+	SkipID3v2Tag(in);
+	ParseVBRHeaders(in);
 
-	infoTrack = &track;
-	stop	  = False;
-	finished  = False;
+	track.fileSize	   = in.Size();
+	track.length	   = -1;
 
-	SkipID3v2Tag(&in);
-	ParseVBRHeaders(&in);
+	infoTrack	   = &track;
+	stop		   = False;
+	finished	   = False;
 
-	offset = in.GetPos();
-	driver = &ioDriver;
+	offset		   = in.GetPos();
+	driver		   = &ioDriver;
 	driver->Seek(offset);
 
-	readDataMutex = new Mutex();
+	readDataMutex	   = new Mutex();
 	samplesBufferMutex = new Mutex();
 
 	ReadMAD(False);
@@ -199,24 +199,26 @@ BoCA::DecoderMAD::~DecoderMAD()
 
 Bool BoCA::DecoderMAD::Activate()
 {
-	stop	 = False;
-	finished = False;
+	/* Skip headers.
+	 */
+	InStream	 in(STREAM_DRIVER, driver);
 
-	InStream	*f_in = new InStream(STREAM_DRIVER, driver);
+	SkipID3v2Tag(in);
+	ParseVBRHeaders(in);
 
-	SkipID3v2Tag(f_in);
-	ParseVBRHeaders(f_in);
+	driver->Seek(in.GetPos());
 
-	driver->Seek(f_in->GetPos());
+	/* Prepare decoder.
+	 */
+	stop		   = False;
+	finished	   = False;
 
-	delete f_in;
-
-	readDataMutex = new Mutex();
+	readDataMutex	   = new Mutex();
 	samplesBufferMutex = new Mutex();
 
 	readDataMutex->Lock();
 
-	decoderThread = NIL;
+	decoderThread	   = NIL;
 
 	return True;
 }
@@ -277,44 +279,44 @@ Int BoCA::DecoderMAD::ReadData(Buffer<UnsignedByte> &data)
 	return size;
 }
 
-Bool BoCA::DecoderMAD::SkipID3v2Tag(InStream *in)
+Bool BoCA::DecoderMAD::SkipID3v2Tag(InStream &in)
 {
 	/* Check for an ID3v2 tag at the beginning of the
 	 * file and skip it if it exists as it might cause
 	 * problems if the tag is unsynchronized.
 	 */
-	if (in->InputString(3) == "ID3")
+	if (in.InputString(3) == "ID3")
 	{
-		in->InputNumber(2); // ID3 version
-		in->InputNumber(1); // Flags
+		in.InputNumber(2); // ID3 version
+		in.InputNumber(1); // Flags
 
 		/* Read tag size as a 4 byte unsynchronized integer.
 		 */
-		Int	 tagSize = (in->InputNumber(1) << 21) +
-				   (in->InputNumber(1) << 14) +
-				   (in->InputNumber(1) <<  7) +
-				   (in->InputNumber(1)      );
+		Int	 tagSize = (in.InputNumber(1) << 21) +
+				   (in.InputNumber(1) << 14) +
+				   (in.InputNumber(1) <<  7) +
+				   (in.InputNumber(1)      );
 
-		in->RelSeek(tagSize);
+		in.RelSeek(tagSize);
 
 		inBytes += (tagSize + 10);
 	}
 	else
 	{
-		in->Seek(0);
+		in.Seek(0);
 	}
 
 	return True;
 }
 
-Bool BoCA::DecoderMAD::ParseVBRHeaders(InStream *in)
+Bool BoCA::DecoderMAD::ParseVBRHeaders(InStream &in)
 {
 	/* Read MPEG header and get frame size.
 	 */
 	Buffer<UnsignedByte>	 header(3);
 
-	in->InputData(header, 3);
-	in->RelSeek(-3);
+	in.InputData(header, 3);
+	in.RelSeek(-3);
 
 	Int	 frameSize = GetMPEGFrameSize(header);
 
@@ -324,7 +326,7 @@ Bool BoCA::DecoderMAD::ParseVBRHeaders(InStream *in)
 	 */
 	Buffer<UnsignedByte>	 buffer(frameSize);
 
-	in->InputData(buffer, frameSize);
+	in.InputData(buffer, frameSize);
 
 	/* Check for a Xing or VBRI header and extract the number of frames.
 	 */
@@ -365,7 +367,7 @@ Bool BoCA::DecoderMAD::ParseVBRHeaders(InStream *in)
 	{
 		/* Seek back to before the frame if no Xing or VBRI header was found.
 		 */
-		in->RelSeek(-frameSize);
+		in.RelSeek(-frameSize);
 
 		return False;
 	}
@@ -373,7 +375,7 @@ Bool BoCA::DecoderMAD::ParseVBRHeaders(InStream *in)
 	/* Sanity check for header vs. actual file size (account
 	 * for possible ID3v1 and addtional 4kB of other tags).
 	 */
-	if (numBytes > 0 && in->Size() - in->GetPos() > numBytes * 1.01 + 128 + 4096)
+	if (numBytes > 0 && in.Size() - in.GetPos() > numBytes * 1.01 + 128 + 4096)
 	{
 		numFrames  = 0;
 

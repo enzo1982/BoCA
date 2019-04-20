@@ -107,9 +107,9 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 	{
 		in.Seek(0);
 
-		SkipID3v2Tag(&in);
+		SkipID3v2Tag(in);
 
-		isValidFile = SyncOnAACHeader(&in);
+		isValidFile = SyncOnAACHeader(in);
 	}
 
 	return isValidFile;
@@ -248,9 +248,9 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= in.Size();
 		track.length	= -1;
 
-		SkipID3v2Tag(&in);
+		SkipID3v2Tag(in);
 
-		if (!SyncOnAACHeader(&in))
+		if (!SyncOnAACHeader(in))
 		{
 			errorState  = True;
 			errorString = "Invalid file format";
@@ -445,8 +445,8 @@ Bool BoCA::DecoderFDKAAC::Activate()
 	{
 		in.Seek(0);
 
-		SkipID3v2Tag(&in);
-		SyncOnAACHeader(&in);
+		SkipID3v2Tag(in);
+		SyncOnAACHeader(in);
 
 		driver->Seek(in.GetPos());
 
@@ -651,53 +651,53 @@ Int BoCA::DecoderFDKAAC::GetAudioTrack(MP4FileHandle mp4File) const
 	return -1;
 }
 
-Bool BoCA::DecoderFDKAAC::SkipID3v2Tag(InStream *in)
+Bool BoCA::DecoderFDKAAC::SkipID3v2Tag(InStream &in)
 {
 	/* Check for an ID3v2 tag at the beginning
 	 * of the file and skip it if it exists.
 	 */
-	if (in->InputString(3) == "ID3")
+	if (in.InputString(3) == "ID3")
 	{
-		in->InputNumber(2); // ID3 version
-		in->InputNumber(1); // Flags
+		in.InputNumber(2); // ID3 version
+		in.InputNumber(1); // Flags
 
 		/* Read tag size as a 4 byte unsynchronized integer.
 		 */
-		Int	 tagSize = (in->InputNumber(1) << 21) +
-				   (in->InputNumber(1) << 14) +
-				   (in->InputNumber(1) <<  7) +
-				   (in->InputNumber(1)      );
+		Int	 tagSize = (in.InputNumber(1) << 21) +
+				   (in.InputNumber(1) << 14) +
+				   (in.InputNumber(1) <<  7) +
+				   (in.InputNumber(1)      );
 
-		in->RelSeek(tagSize);
+		in.RelSeek(tagSize);
 
 		inBytes += (tagSize + 10);
 	}
 	else
 	{
-		in->Seek(0);
+		in.Seek(0);
 	}
 
 	return True;
 }
 
-Bool BoCA::DecoderFDKAAC::SyncOnAACHeader(InStream *in)
+Bool BoCA::DecoderFDKAAC::SyncOnAACHeader(InStream &in)
 {
-	Int	 startPos = in->GetPos();
+	Int	 startPos = in.GetPos();
 
 	/* Try to sync on ADIF header.
 	 */
 	for (Int n = 0; n < 1024; n++)
 	{
-		if (in->InputNumber(1) != 'A') continue;
-		if (in->InputNumber(1) != 'D') continue;
-		if (in->InputNumber(1) != 'I') continue;
-		if (in->InputNumber(1) != 'F') continue;
+		if (in.InputNumber(1) != 'A') continue;
+		if (in.InputNumber(1) != 'D') continue;
+		if (in.InputNumber(1) != 'I') continue;
+		if (in.InputNumber(1) != 'F') continue;
 
 		/* No ADIF magic word found in the first 1 kB.
 		 */
 		if (n == 1023) break;
 
-		in->RelSeek(-4);
+		in.RelSeek(-4);
 
 		inBytes += n;
 
@@ -706,21 +706,21 @@ Bool BoCA::DecoderFDKAAC::SyncOnAACHeader(InStream *in)
 		return True;
 	}
 
-	in->Seek(startPos);
+	in.Seek(startPos);
 
 	/* Try to sync on ADTS header.
 	 */
 	for (Int n = 0; n < 1024; n++)
 	{
-		if (  in->InputNumber(1)	       != 0xFF) continue;
-		if ( (in->InputNumber(1) & 0xF6)       != 0xF0) continue;
-		if (((in->InputNumber(1) & 0x3C) >> 2) >=   12) continue;
+		if (  in.InputNumber(1)		      != 0xFF) continue;
+		if ( (in.InputNumber(1) & 0xF6)       != 0xF0) continue;
+		if (((in.InputNumber(1) & 0x3C) >> 2) >=   12) continue;
 
 		/* No ADTS sync found in the first 1 kB.
 		 */
 		if (n == 1023) break;
 
-		in->RelSeek(-3);
+		in.RelSeek(-3);
 
 		inBytes += n;
 
@@ -729,20 +729,20 @@ Bool BoCA::DecoderFDKAAC::SyncOnAACHeader(InStream *in)
 		return True;
 	}
 
-	in->Seek(startPos);
+	in.Seek(startPos);
 
 	/* Try to sync on LOAS/LATM header.
 	 */
 	for (Int n = 0; n < 1024; n++)
 	{
-		if (  in->InputNumber(1)	 != 0x56) continue;
-		if ( (in->InputNumber(1) & 0xE0) != 0xE0) continue;
+		if (  in.InputNumber(1)		!= 0x56) continue;
+		if ( (in.InputNumber(1) & 0xE0) != 0xE0) continue;
 
 		/* No LOAS sync found in the first 1 kB.
 		 */
 		if (n == 1023) break;
 
-		in->RelSeek(-2);
+		in.RelSeek(-2);
 
 		inBytes += n;
 
