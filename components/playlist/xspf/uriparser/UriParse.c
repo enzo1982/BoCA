@@ -388,7 +388,7 @@ static const URI_CHAR * URI_FUNC(ParseIpFutLoop)(URI_TYPE(ParserState) * state,
 		const URI_CHAR * first, const URI_CHAR * afterLast,
 		UriMemoryManager * memory) {
 	if (first >= afterLast) {
-		URI_FUNC(StopSyntax)(state, first, memory);
+		URI_FUNC(StopSyntax)(state, afterLast, memory);
 		return NULL;
 	}
 
@@ -468,7 +468,7 @@ static const URI_CHAR * URI_FUNC(ParseIpFuture)(URI_TYPE(ParserState) * state,
 		const URI_CHAR * first, const URI_CHAR * afterLast,
 		UriMemoryManager * memory) {
 	if (first >= afterLast) {
-		URI_FUNC(StopSyntax)(state, first, memory);
+		URI_FUNC(StopSyntax)(state, afterLast, memory);
 		return NULL;
 	}
 
@@ -480,7 +480,7 @@ static const URI_CHAR * URI_FUNC(ParseIpFuture)(URI_TYPE(ParserState) * state,
 	case _UT('v'):
 	*/
 		if (first + 1 >= afterLast) {
-			URI_FUNC(StopSyntax)(state, first + 1, memory);
+			URI_FUNC(StopSyntax)(state, afterLast, memory);
 			return NULL;
 		}
 
@@ -493,8 +493,11 @@ static const URI_CHAR * URI_FUNC(ParseIpFuture)(URI_TYPE(ParserState) * state,
 				if (afterHexZero == NULL) {
 					return NULL;
 				}
-				if ((afterHexZero >= afterLast)
-						|| (*afterHexZero != _UT('.'))) {
+				if (afterHexZero >= afterLast) {
+					URI_FUNC(StopSyntax)(state, afterLast, memory);
+					return NULL;
+				}
+				if (*afterHexZero != _UT('.')) {
 					URI_FUNC(StopSyntax)(state, afterHexZero, memory);
 					return NULL;
 				}
@@ -532,7 +535,7 @@ static URI_INLINE const URI_CHAR * URI_FUNC(ParseIpLit2)(
 		URI_TYPE(ParserState) * state, const URI_CHAR * first,
 		const URI_CHAR * afterLast, UriMemoryManager * memory) {
 	if (first >= afterLast) {
-		URI_FUNC(StopSyntax)(state, first, memory);
+		URI_FUNC(StopSyntax)(state, afterLast, memory);
 		return NULL;
 	}
 
@@ -544,9 +547,12 @@ static URI_INLINE const URI_CHAR * URI_FUNC(ParseIpLit2)(
 			if (afterIpFuture == NULL) {
 				return NULL;
 			}
-			if ((afterIpFuture >= afterLast)
-					|| (*afterIpFuture != _UT(']'))) {
-				URI_FUNC(StopSyntax)(state, first, memory);
+			if (afterIpFuture >= afterLast) {
+				URI_FUNC(StopSyntax)(state, afterLast, memory);
+				return NULL;
+			}
+			if (*afterIpFuture != _UT(']')) {
+				URI_FUNC(StopSyntax)(state, afterIpFuture, memory);
 				return NULL;
 			}
 			return afterIpFuture + 1;
@@ -589,7 +595,7 @@ static const URI_CHAR * URI_FUNC(ParseIPv6address2)(
 
 	for (;;) {
 		if (first >= afterLast) {
-			URI_FUNC(StopSyntax)(state, first, memory);
+			URI_FUNC(StopSyntax)(state, afterLast, memory);
 			return NULL;
 		}
 
@@ -692,6 +698,11 @@ static const URI_CHAR * URI_FUNC(ParseIPv6address2)(
 					return NULL;
 				}
 				first++;
+
+				if (first >= afterLast) {
+					URI_FUNC(StopSyntax)(state, afterLast, memory);
+					return NULL;
+				}
 			}
 		} else {
 			/* Eat while no dot in sight */
@@ -752,7 +763,7 @@ static const URI_CHAR * URI_FUNC(ParseIPv6address2)(
 
 						/* "::"? */
 						if (first + 1 >= afterLast) {
-							URI_FUNC(StopSyntax)(state, first + 1, memory);
+							URI_FUNC(StopSyntax)(state, afterLast, memory);
 							return NULL;
 						}
 						if (first[1] == _UT(':')) {
@@ -770,7 +781,7 @@ static const URI_CHAR * URI_FUNC(ParseIPv6address2)(
 
 							/* ":::+"? */
 							if (first + 1 >= afterLast) {
-								URI_FUNC(StopSyntax)(state, first + 1, memory);
+								URI_FUNC(StopSyntax)(state, afterLast, memory);
 								return NULL; /* No ']' yet */
 							}
 							if (first[1] == _UT(':')) {
@@ -862,7 +873,7 @@ static const URI_CHAR * URI_FUNC(ParseIPv6address2)(
 				first++;
 
 				if (first >= afterLast) {
-					URI_FUNC(StopSyntax)(state, first, memory);
+					URI_FUNC(StopSyntax)(state, afterLast, memory);
 					return NULL; /* No ']' yet */
 				}
 			} while (walking);
@@ -1147,7 +1158,7 @@ static const URI_CHAR * URI_FUNC(ParseOwnHostUserInfoNz)(
 		URI_TYPE(ParserState) * state, const URI_CHAR * first,
 		const URI_CHAR * afterLast, UriMemoryManager * memory) {
 	if (first >= afterLast) {
-		URI_FUNC(StopSyntax)(state, first, memory);
+		URI_FUNC(StopSyntax)(state, afterLast, memory);
 		return NULL;
 	}
 
@@ -1311,7 +1322,7 @@ static const URI_CHAR * URI_FUNC(ParseOwnUserInfo)(
 		URI_TYPE(ParserState) * state, const URI_CHAR * first,
 		const URI_CHAR * afterLast, UriMemoryManager * memory) {
 	if (first >= afterLast) {
-		URI_FUNC(StopSyntax)(state, first, memory);
+		URI_FUNC(StopSyntax)(state, afterLast, memory);
 		return NULL;
 	}
 
@@ -1519,7 +1530,7 @@ static const URI_CHAR * URI_FUNC(ParsePchar)(URI_TYPE(ParserState) * state,
 		const URI_CHAR * first, const URI_CHAR * afterLast,
 		UriMemoryManager * memory) {
 	if (first >= afterLast) {
-		URI_FUNC(StopSyntax)(state, first, memory);
+		URI_FUNC(StopSyntax)(state, afterLast, memory);
 		return NULL;
 	}
 
@@ -1564,7 +1575,7 @@ static const URI_CHAR * URI_FUNC(ParsePctEncoded)(
 		const URI_CHAR * first, const URI_CHAR * afterLast,
 		UriMemoryManager * memory) {
 	if (first >= afterLast) {
-		URI_FUNC(StopSyntax)(state, first, memory);
+		URI_FUNC(StopSyntax)(state, afterLast, memory);
 		return NULL;
 	}
 
@@ -1576,14 +1587,14 @@ static const URI_CHAR * URI_FUNC(ParsePctEncoded)(
 	case _UT('%'):
 	*/
 		if (first + 1 >= afterLast) {
-			URI_FUNC(StopSyntax)(state, first + 1, memory);
+			URI_FUNC(StopSyntax)(state, afterLast, memory);
 			return NULL;
 		}
 
 		switch (first[1]) {
 		case URI_SET_HEXDIG:
 			if (first + 2 >= afterLast) {
-				URI_FUNC(StopSyntax)(state, first + 2, memory);
+				URI_FUNC(StopSyntax)(state, afterLast, memory);
 				return NULL;
 			}
 
@@ -1621,7 +1632,7 @@ static const URI_CHAR * URI_FUNC(ParsePctSubUnres)(
 		const URI_CHAR * first, const URI_CHAR * afterLast,
 		UriMemoryManager * memory) {
 	if (first >= afterLast) {
-		URI_FUNC(StopSyntax)(state, first, memory);
+		URI_FUNC(StopSyntax)(state, afterLast, memory);
 		return NULL;
 	}
 
@@ -2170,10 +2181,18 @@ static int URI_FUNC(ParseUriExMm)(URI_TYPE(ParserState) * state,
 	/* Parse */
 	afterUriReference = URI_FUNC(ParseUriReference)(state, first, afterLast, memory);
 	if (afterUriReference == NULL) {
+		/* Waterproof errorPos <= afterLast */
+		if (state->errorPos && (state->errorPos > afterLast)) {
+			state->errorPos = afterLast;
+		}
 		return state->errorCode;
 	}
 	if (afterUriReference != afterLast) {
-		URI_FUNC(StopSyntax)(state, afterUriReference, memory);
+		if (afterUriReference < afterLast) {
+			URI_FUNC(StopSyntax)(state, afterUriReference, memory);
+		} else {
+			URI_FUNC(StopSyntax)(state, afterLast, memory);
+		}
 		return state->errorCode;
 	}
 	return URI_SUCCESS;

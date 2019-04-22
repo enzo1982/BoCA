@@ -55,7 +55,7 @@
 /* Version */
 #define URI_VER_MAJOR           0
 #define URI_VER_MINOR           9
-#define URI_VER_RELEASE         0
+#define URI_VER_RELEASE         2
 #define URI_VER_SUFFIX_ANSI     ""
 #define URI_VER_SUFFIX_UNICODE  URI_ANSI_TO_UNICODE(URI_VER_SUFFIX_ANSI)
 
@@ -93,6 +93,29 @@
 # define URI_UNUSED(x) unused_##x __attribute__((unused))
 #else
 # define URI_UNUSED(x) x
+#endif
+
+
+
+/* Import/export decorator */
+#if defined(URI_STATIC_BUILD)
+# define URI_PUBLIC
+#else
+# if defined(URI_LIBRARY_BUILD)
+#  if defined(_MSC_VER)
+#   define URI_PUBLIC __declspec(dllexport)
+#  elif defined(URI_VISIBILITY)
+#   define URI_PUBLIC __attribute__ ((visibility("default")))
+#  else
+#   define URI_PUBLIC
+#  endif
+# else
+#  if defined(_MSC_VER)
+#   define URI_PUBLIC __declspec(dllimport)
+#  else
+#   define URI_PUBLIC
+#  endif
+# endif
 #endif
 
 
@@ -283,7 +306,7 @@ typedef enum UriResolutionOptionsEnum {
  * @see UriMemoryManager
  * @since 0.9.0
  */
-int uriCompleteMemoryManager(UriMemoryManager * memory,
+URI_PUBLIC int uriCompleteMemoryManager(UriMemoryManager * memory,
 		UriMemoryManager * backend);
 
 
@@ -302,7 +325,7 @@ int uriCompleteMemoryManager(UriMemoryManager * memory,
  * @see UriMemoryManager
  * @since 0.9.0
  */
-void * uriEmulateCalloc(UriMemoryManager * memory,
+URI_PUBLIC void * uriEmulateCalloc(UriMemoryManager * memory,
 		size_t nmemb, size_t size);
 
 
@@ -322,7 +345,7 @@ void * uriEmulateCalloc(UriMemoryManager * memory,
  * @see UriMemoryManager
  * @since 0.9.0
  */
-void * uriEmulateReallocarray(UriMemoryManager * memory,
+URI_PUBLIC void * uriEmulateReallocarray(UriMemoryManager * memory,
 		void * ptr, size_t nmemb, size_t size);
 
 
@@ -347,7 +370,7 @@ void * uriEmulateReallocarray(UriMemoryManager * memory,
  * @see UriMemoryManager
  * @since 0.9.0
  */
-int uriTestMemoryManager(UriMemoryManager * memory);
+URI_PUBLIC int uriTestMemoryManager(UriMemoryManager * memory);
 
 
 
