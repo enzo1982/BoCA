@@ -4,6 +4,7 @@
 TARGET	  = boca
 TYPE	  = runtime
 VERSION	  = 1.0
+REVISION  = 1
 
 BOCA_PATH = ..
 
@@ -62,9 +63,9 @@ else
 	LDOPTS += -L$(prefix)/lib -lsmooth-$(SMOOTHVER)
 
 	ifeq ($(BUILD_OSX),True)
-		LDOPTS += -Wl,-dylib_install_name,libboca-$(VERSION).0$(SHARED)
+		LDOPTS += -Wl,-dylib_install_name,libboca-$(VERSION).$(REVISION)$(SHARED)
 	else
-		LDOPTS += -Wl,-soname,libboca-$(VERSION)$(SHARED).0
+		LDOPTS += -Wl,-soname,libboca-$(VERSION)$(SHARED).$(REVISION)
 	endif
 endif
 
@@ -119,9 +120,9 @@ ifneq ($(BUILD_WIN32),True)
 	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_OSX),True)
-	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION).0$(SHARED)
+	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION).$(REVISION)$(SHARED)
 else
-	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED).0
+	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED).$(REVISION)
 endif
 
 ifneq ($(BUILD_OSX),True)
@@ -138,9 +139,9 @@ endif
 uninstall:
 ifneq ($(BUILD_WIN32),True)
 ifeq ($(BUILD_OSX),True)
-	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION).0$(SHARED)
+	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION).$(REVISION)$(SHARED)
 else
-	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED).0
+	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED).$(REVISION)
 endif
 
 	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED)
