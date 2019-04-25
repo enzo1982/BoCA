@@ -62,6 +62,8 @@ namespace BoCA
 			Int			 WriteData(Buffer<UnsignedByte> &);
 			Bool			 NextPass();
 
+			Bool			 SetOutputFormat(Int);
+
 			ConfigLayer		*GetConfigurationLayer();
 	};
 };

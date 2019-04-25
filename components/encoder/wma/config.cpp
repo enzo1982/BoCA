@@ -35,11 +35,7 @@ BoCA::ConfigureWMA::ConfigureWMA()
 
 	quality		= config->GetIntValue(ConfigID, "Quality", 90) / 5;
 
-	/* Init the Microsoft COM library.
-	 */
-	CoInitialize(NIL);
-
-	HRESULT	 hr = ex_WMCreateProfileManager(&profileManager);
+	ex_WMCreateProfileManager(&profileManager);
 
 	I18n	*i18n = I18n::Get();
 
@@ -204,10 +200,6 @@ BoCA::ConfigureWMA::~ConfigureWMA()
 	DeleteObject(text_bitrate_kbps);
 
 	profileManager->Release();
-
-	/* Uninit the Microsoft COM library.
-	 */
-	CoUninitialize();
 }
 
 Int BoCA::ConfigureWMA::SaveSettings()

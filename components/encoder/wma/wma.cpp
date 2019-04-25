@@ -30,11 +30,54 @@ const String &BoCA::EncoderWMA::GetComponentSpecs()
 		    <version>1.0</version>								\
 		    <id>wma-enc</id>									\
 		    <type>encoder</type>								\
-		    <format>										\
-		      <name>Windows Media Audio Files</name>						\
-		      <extension>wma</extension>							\
-		      <tag id=\"wma-tag\" mode=\"other\">WMA Metadata</tag>				\
-		    </format>										\
+													\
+		";
+
+		Initialize();
+
+		IWMProfileManager	*profileManager = NIL;
+		IWMCodecInfo3		*codecInfo	= NIL;
+
+		ex_WMCreateProfileManager(&profileManager);
+
+		if (SUCCEEDED(profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &codecInfo)))
+		{
+			DWORD	 numCodecs = 0;
+
+			codecInfo->GetCodecInfoCount(WMMEDIATYPE_Audio, &numCodecs);
+
+			for (DWORD i = 0; i < numCodecs; i++)
+			{
+				DWORD	 nameLen = 0;
+
+				codecInfo->GetCodecName(WMMEDIATYPE_Audio, i, NIL, &nameLen);
+
+				WCHAR	*name = new WCHAR [nameLen];
+
+				codecInfo->GetCodecName(WMMEDIATYPE_Audio, i, name, &nameLen);
+
+				componentSpecs.Append("							\
+													\
+				    <format>								\
+				      <name>").Append(name).Append("</name>				\
+				      <extension>wma</extension>					\
+				      <tag id=\"wma-tag\" mode=\"other\">WMA Metadata</tag>		\
+				    </format>								\
+													\
+				");
+
+				delete [] name;
+			}
+
+			codecInfo->Release();
+		}
+
+		profileManager->Release();
+
+		Cleanup();
+
+		componentSpecs.Append("									\
+													\
 		    <input bits=\"8\" signed=\"false\"/>						\
 		    <input bits=\"16-32\"/>								\
 		    <parameters>									\
@@ -63,7 +106,7 @@ const String &BoCA::EncoderWMA::GetComponentSpecs()
 		    </parameters>									\
 		  </component>										\
 													\
-		";
+		");
 	}
 
 	return componentSpecs;
@@ -390,6 +433,16 @@ Bool BoCA::EncoderWMA::NextPass()
 	/* 2-pass encoding is not supported, yet.
 	 */
 	return False;
+}
+
+Bool BoCA::EncoderWMA::SetOutputFormat(Int n)
+{
+	Config	*config = Config::Get();
+
+	config->SetIntValue(ConfigureWMA::ConfigID, "Uncompressed", False);
+	config->SetIntValue(ConfigureWMA::ConfigID, "Codec", n);
+
+	return True;
 }
 
 Bool BoCA::EncoderWMA::ConvertArguments(Config *config)
