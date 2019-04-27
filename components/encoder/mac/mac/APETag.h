@@ -93,7 +93,7 @@ struct ID3_TAG
 /*****************************************************************************************
 Footer (and header) flags
 *****************************************************************************************/
-#define APE_TAG_FLAG_CONTAINS_HEADER            (1 << 31)
+#define APE_TAG_FLAG_CONTAINS_HEADER            ((unsigned int) 1 << 31)
 #define APE_TAG_FLAG_CONTAINS_FOOTER            (1 << 30)
 #define APE_TAG_FLAG_IS_HEADER                  (1 << 29)
 

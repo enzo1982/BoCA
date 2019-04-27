@@ -55,6 +55,8 @@ Global includes
 /*****************************************************************************************
 Global compiler settings (useful for porting)
 *****************************************************************************************/
+#pragma warning(disable: 4100)
+
 // assembly code (helps performance, but limits portability)
 #if !defined(PLATFORM_ARM) && !defined(PLATFORM_ANDROID)
 	#if defined __SSE2__ || _M_IX86_FP == 2 || defined _M_X64
@@ -182,12 +184,12 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.66")
-#define MAC_NAME                                        _T("Monkey's Audio 4.66")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.66"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.66)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.66) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.66\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.69")
+#define MAC_NAME                                        _T("Monkey's Audio 4.69")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.69"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.69)")
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.69) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.69\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #define ONE_MILLION										1000000
 #ifdef PLATFORM_WINDOWS
@@ -218,11 +220,11 @@ Macros
 
 #define CATCH_ERRORS(CODE) try { CODE } catch(...) { }
 
-#define RETURN_ON_ERROR(FUNCTION) {    int nResult = FUNCTION; if (nResult != 0) { return nResult; } }
-#define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nResult = FUNCTION; if (nResult != 0) { return VALUE; } }
+#define RETURN_ON_ERROR(FUNCTION) {    int nFunctionResult = FUNCTION; if (nFunctionResult != 0) { return nFunctionResult; } }
+#define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nFunctionResult = FUNCTION; if (nFunctionResult != 0) { return VALUE; } }
 #define RETURN_ON_EXCEPTION(CODE, VALUE) { try { CODE } catch(...) { return VALUE; } }
 
-#define THROW_ON_ERROR(CODE) { intn nResult = (intn) CODE; if (nResult != 0) throw(nResult); }
+#define THROW_ON_ERROR(CODE) { intn nThrowResult = (intn) CODE; if (nThrowResult != 0) throw(nThrowResult); }
 
 #define EXPAND_1_TIMES(CODE) CODE
 #define EXPAND_2_TIMES(CODE) CODE CODE

@@ -35,6 +35,9 @@ typedef long                LRESULT;
 
 #define CALLBACK
 
+#ifdef _T
+#undef _T
+#endif
 #define _T(x) L ## x
 
 #define _strnicmp strncasecmp
