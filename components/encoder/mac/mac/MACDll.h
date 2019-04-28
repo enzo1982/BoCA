@@ -1,6 +1,6 @@
 /*****************************************************************************************
 Monkey's Audio MACDll.h (include for using MACDll.dll in your projects)
-Copyright (C) 2000-2011 by Matthew T. Ashland   All Rights Reserved.
+Copyright (C) 2000-2019 by Matthew T. Ashland   All Rights Reserved.
 
 Overview:
 
@@ -53,7 +53,7 @@ typedef APE_COMPRESS_HANDLE (__stdcall * proc_APECompress_Create)(int *);
 typedef void (__stdcall * proc_APECompress_Destroy)(APE_COMPRESS_HANDLE); 
 typedef int (__stdcall * proc_APECompress_Start)(APE_COMPRESS_HANDLE, const char *, const APE::WAVEFORMATEX *, int, int, const void *, int);
 typedef int (__stdcall * proc_APECompress_StartW)(APE_COMPRESS_HANDLE, const APE::str_utfn *, const APE::WAVEFORMATEX *, int, int, const void *, int);
-typedef int (__stdcall * proc_APECompress_AddData)(APE_COMPRESS_HANDLE, unsigned char *, int);
+typedef APE::int64 (__stdcall * proc_APECompress_AddData)(APE_COMPRESS_HANDLE, unsigned char *, int);
 typedef int (__stdcall * proc_APECompress_GetBufferBytesAvailable)(APE_COMPRESS_HANDLE);
 typedef unsigned char * (__stdcall * proc_APECompress_LockBuffer)(APE_COMPRESS_HANDLE, APE::int64 *);
 typedef int (__stdcall * proc_APECompress_UnlockBuffer)(APE_COMPRESS_HANDLE, int, BOOL);
