@@ -42,6 +42,8 @@ const String &BoCA::TaggerVorbis::GetComponentSpecs()
 	return componentSpecs;
 }
 
+const String	 BoCA::TaggerVorbis::ConfigID = "Tags";
+
 BoCA::TaggerVorbis::TaggerVorbis()
 {
 }
@@ -52,10 +54,26 @@ BoCA::TaggerVorbis::~TaggerVorbis()
 
 Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config		*currentConfig = GetConfiguration();
-	String::OutputFormat	 outputFormat("UTF-8");
+	/* Get configuration.
+	 */
+	const Config	*currentConfig		 = GetConfiguration();
 
-	Bool			 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroVorbisComment", True);
+	Bool		 prependZero		 = currentConfig->GetIntValue(ConfigID, "TrackPrependZeroVorbisComment", True);
+
+	Bool		 writeChapters		 = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
+	Bool		 writeMCDI		 = currentConfig->GetIntValue(ConfigID, "WriteMCDI", True);
+
+	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
+
+	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 coverArtWriteToVorbis	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToVorbisComment", True);
+
+	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
+	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
+
+	/* Set output encoding.
+	 */
+	String::OutputFormat	 outputFormat("UTF-8");
 
 	/* Save basic information.
 	 */
@@ -79,8 +97,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(prependZero && info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)), buffer);	    numItems++; }
 	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL", String(prependZero && info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
 
-	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderTagItem("COMMENT", info.comment, buffer);						  numItems++; }
-	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderTagItem("COMMENT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
+	if	(info.comment != NIL && !replaceExistingComments) { RenderTagItem("COMMENT", info.comment, buffer);   numItems++; }
+	else if (defaultComment != NIL && numItems > 0)		  { RenderTagItem("COMMENT", defaultComment, buffer); numItems++; }
 
 	/* Save other text info.
 	 */
@@ -102,7 +120,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	/* Save Replay Gain info.
 	 */
-	if (currentConfig->GetIntValue("Tags", "PreserveReplayGain", True))
+	if (preserveReplayGain)
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
 		{
@@ -119,7 +137,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	/* Save CD table of contents.
 	 */
-	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
+	if (writeMCDI)
 	{
 		if	(info.mcdi.GetData().Size() > 0) { RenderTagItem("CDTOC", info.mcdi.GetOffsetString(), buffer);	numItems++; }
 		else if	(info.offsets != NIL)		 { RenderTagItem("CDTOC", info.offsets, buffer);		numItems++; }
@@ -127,7 +145,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	/* Save cover art.
 	 */
-	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToVorbisComment", True))
+	if (coverArtWriteToTags && coverArtWriteToVorbis)
 	{
 		/* This is the official way to store cover art in Vorbis
 		 * comments. It is used by most newer software.
@@ -164,7 +182,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	/* Save chapters.
 	 */
-	if (track.tracks.Length() > 0 && currentConfig->GetIntValue("Tags", "WriteChapters", True))
+	if (track.tracks.Length() > 0 && writeChapters)
 	{
 		Int64	 offset = 0;
 
@@ -302,7 +320,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		}
 		else if (id == "METADATA_BLOCK_PICTURE")
 		{
-			if (currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+			if (currentConfig->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 			{
 				/* This is the official way to store cover art in Vorbis
 				 * comments. It is used by most newer software.
@@ -338,7 +356,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		}
 		else if (id == "COVERART")
 		{
-			if (currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+			if (currentConfig->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 			{
 				/* This is an unofficial way to store cover art in Vorbis
 				 * comments. It is used by some existing software.
@@ -370,7 +388,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		}
 		else if (id == "CUESHEET")
 		{
-			if (currentConfig->GetIntValue("Tags", "ReadEmbeddedCueSheets", True))
+			if (currentConfig->GetIntValue(ConfigID, "ReadEmbeddedCueSheets", True))
 			{
 				/* Output cuesheet to temporary file.
 				 */
@@ -400,7 +418,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 					Track	 cueTrack;
 					Config	*cueConfig = Config::Copy(GetConfiguration());
 
-					cueConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+					cueConfig->SetIntValue(ConfigID, "ReadEmbeddedCueSheets", False);
 
 					cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
 					cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);
@@ -442,8 +460,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 	/* Read chapters.
 	 */
-	if (haveChapters && currentConfig->GetIntValue("Tags", "ReadChapters", True) &&
-			  (!currentConfig->GetIntValue("Tags", "PreferCueSheetsToChapters", True) || track.tracks.Length() == 0))
+	if (haveChapters && currentConfig->GetIntValue(ConfigID, "ReadChapters", True) &&
+			  (!currentConfig->GetIntValue(ConfigID, "PreferCueSheetsToChapters", True) || track.tracks.Length() == 0))
 	{
 		track.tracks.RemoveAll();
 

@@ -47,6 +47,8 @@ const String &BoCA::TaggerID3v1::GetComponentSpecs()
 	return componentSpecs;
 }
 
+const String	 BoCA::TaggerID3v1::ConfigID = "Tags";
+
 const String	 BoCA::TaggerID3v1::genres[192] =
       { "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz",
 	"Metal", "New Age", "Oldies", "Other", "Pop", "R&B", "Rap", "Reggae", "Rock", "Techno",
@@ -85,8 +87,17 @@ BoCA::TaggerID3v1::~TaggerID3v1()
 
 Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config	*currentConfig = GetConfiguration();
+	/* Get configuration.
+	 */
+	const Config	*currentConfig		 = GetConfiguration();
 
+	String		 encodingID		 = currentConfig->GetStringValue(ConfigID, "ID3v1Encoding", "ISO-8859-1");
+
+	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
+	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
+
+	/* Open buffer.
+	 */
 	buffer.Resize(128);
 
 	OutStream	 out(STREAM_BUFFER, buffer, buffer.Size());
@@ -94,7 +105,7 @@ Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 	out.OutputString("TAG");
 
 	const Info		&info = track.GetInfo();
-	String::OutputFormat	 outputFormat(currentConfig->GetStringValue("Tags", "ID3v1Encoding", "ISO-8859-1"));
+	String::OutputFormat	 outputFormat(encodingID);
 
 	{ out.OutputString(info.title.Trim().Head(Math::Min(30, info.title.Trim().Length())));   for (Int i = 0; i < 30 - info.title.Trim().Length(); i++) out.OutputNumber(0, 1); }
 	{ out.OutputString(info.artist.Trim().Head(Math::Min(30, info.artist.Trim().Length()))); for (Int i = 0; i < 30 - info.artist.Trim().Length(); i++) out.OutputNumber(0, 1); }
@@ -105,8 +116,8 @@ Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	String		 comment;
 
-	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	comment = info.comment;
-	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				comment = currentConfig->GetStringValue("Tags", "DefaultComment", NIL);
+	if	(info.comment != NIL && !replaceExistingComments) comment = info.comment;
+	else if (defaultComment != NIL)				  comment = defaultComment;
 
 	if (info.track > 0)
 	{

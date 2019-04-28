@@ -54,6 +54,8 @@ const String &BoCA::TaggerRIFF::GetComponentSpecs()
 	return componentSpecs;
 }
 
+const String	 BoCA::TaggerRIFF::ConfigID = "Tags";
+
 BoCA::TaggerRIFF::TaggerRIFF()
 {
 }
@@ -64,10 +66,22 @@ BoCA::TaggerRIFF::~TaggerRIFF()
 
 Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config		*currentConfig = GetConfiguration();
-	String::OutputFormat	 outputFormat(currentConfig->GetStringValue("Tags", "RIFFINFOTagEncoding", "ISO-8859-1"));
+	/* Get configuration.
+	 */
+	const Config	*currentConfig		 = GetConfiguration();
 
-	Bool			 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroRIFFINFOTag", True);
+	String		 encodingID		 = currentConfig->GetStringValue(ConfigID, "RIFFINFOTagEncoding", "ISO-8859-1");
+
+	Bool		 prependZero		 = currentConfig->GetIntValue(ConfigID, "TrackPrependZeroRIFFINFOTag", True);
+
+	Bool		 writeMCDI		 = currentConfig->GetIntValue(ConfigID, "WriteMCDI", True);
+
+	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
+	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
+
+	/* Set output encoding.
+	 */
+	String::OutputFormat	 outputFormat(encodingID);
 
 	/* Save basic information.
 	 */
@@ -82,8 +96,8 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	if	(info.track   >   0) RenderTagItem("ITRK", String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);
 	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year).Append("-01-01"), buffer);
 
-	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderTagItem("ICMT", info.comment, buffer);
-	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				RenderTagItem("ICMT", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer);
+	if	(info.comment != NIL && !replaceExistingComments) RenderTagItem("ICMT", info.comment, buffer);
+	else if (defaultComment != NIL)				  RenderTagItem("ICMT", defaultComment, buffer);
 
 	/* Save other text info.
 	 */
@@ -99,7 +113,7 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 
 	/* Save CD table of contents.
 	 */
-	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
+	if (writeMCDI)
 	{
 		if	(info.mcdi.GetData().Size() > 0) RenderTagItem("ITOC", info.mcdi.GetOffsetString(), buffer);
 		else if (info.offsets != NIL)		 RenderTagItem("ITOC", info.offsets, buffer);

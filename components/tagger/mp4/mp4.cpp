@@ -63,6 +63,8 @@ Void smooth::DetachDLL()
 	FreeMP4v2DLL();
 }
 
+const String	 BoCA::TaggerMP4::ConfigID = "Tags";
+
 const String	 BoCA::TaggerMP4::genres[192] =
       { "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz",
 	"Metal", "New Age", "Oldies", "Other", "Pop", "R&B", "Rap", "Reggae", "Rock", "Techno",
@@ -103,8 +105,20 @@ BoCA::TaggerMP4::~TaggerMP4()
 
 Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &track)
 {
-	const Config	*currentConfig = GetConfiguration();
+	/* Get configuration.
+	 */
+	const Config	*currentConfig		 = GetConfiguration();
 
+	Bool		 writeChapters		 = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
+
+	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 coverArtWriteToMP4	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToMP4Metadata", True);
+
+	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
+	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
+
+	/* Open MP4 file for modification.
+	 */
 	const Info	&info	 = track.GetInfo();
 
 	MP4FileHandle	 mp4File = ex_MP4Modify(fileName.ConvertTo("UTF-8"), 0);
@@ -137,8 +151,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		ex_MP4TagsSetDisk(mp4Tags, &mp4Disk);
 	}
 
-	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	ex_MP4TagsSetComments(mp4Tags, info.comment.Trim());
-	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				ex_MP4TagsSetComments(mp4Tags, currentConfig->GetStringValue("Tags", "DefaultComment", NIL).Trim());
+	if	(info.comment != NIL && !replaceExistingComments) ex_MP4TagsSetComments(mp4Tags, info.comment.Trim());
+	else if (defaultComment != NIL)				  ex_MP4TagsSetComments(mp4Tags, String(defaultComment).Trim());
 
 	/* Save other text info.
 	 */
@@ -163,7 +177,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	/* Save cover art.
 	 */
-	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToMP4Metadata", True))
+	if (coverArtWriteToTags && coverArtWriteToMP4)
 	{
 		/* Put front and back covers first.
 		 */
@@ -200,7 +214,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	/* Save chapters.
 	 */
-	if (track.tracks.Length() > 0 && currentConfig->GetIntValue("Tags", "WriteChapters", True))
+	if (track.tracks.Length() > 0 && writeChapters)
 	{
 		MP4Chapter_t	*chapterList = new MP4Chapter_t [track.tracks.Length()];
 		uint32_t	 chapterCount = track.tracks.Length();
@@ -284,7 +298,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 		info.numDiscs	= mp4Tags->disk->total;
 	}
 
-	if (currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+	if (currentConfig->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 	{
 		for (UnsignedInt i = 0; i < mp4Tags->artworkCount; i++)
 		{
@@ -325,7 +339,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	/* Read chapters.
 	 */
-	if (currentConfig->GetIntValue("Tags", "ReadChapters", True))
+	if (currentConfig->GetIntValue(ConfigID, "ReadChapters", True))
 	{
 		MP4Chapter_t	*chapterList  = NIL;
 		uint32_t	 chapterCount = 0;

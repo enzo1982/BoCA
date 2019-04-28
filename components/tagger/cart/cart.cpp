@@ -49,6 +49,8 @@ const String &BoCA::TaggerCart::GetComponentSpecs()
 	return componentSpecs;
 }
 
+const String	 BoCA::TaggerCart::ConfigID = "Tags";
+
 BoCA::TaggerCart::TaggerCart()
 {
 }
@@ -59,8 +61,15 @@ BoCA::TaggerCart::~TaggerCart()
 
 Error BoCA::TaggerCart::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config		*currentConfig = GetConfiguration();
-	String::OutputFormat	 outputFormat(currentConfig->GetStringValue("Tags", "RIFFCartTagEncoding", "ISO-8859-1"));
+	/* Get configuration.
+	 */
+	const Config	*currentConfig = GetConfiguration();
+
+	String		 encodingID    = currentConfig->GetStringValue(ConfigID, "RIFFCartTagEncoding", "ISO-8859-1");
+
+	/* Set output encoding.
+	 */
+	String::OutputFormat	 outputFormat(encodingID);
 
 	const Info	&info = track.GetInfo();
 	const Format	&format = track.GetFormat();

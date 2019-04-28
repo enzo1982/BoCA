@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -47,6 +47,8 @@ const String &BoCA::TaggerID3v2::GetComponentSpecs()
 
 	return componentSpecs;
 }
+
+const String	 BoCA::TaggerID3v2::ConfigID = "Tags";
 
 const String	 BoCA::TaggerID3v2::genres[192] =
       { "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz",
@@ -210,13 +212,29 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 
 Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &track, Bool isChapter)
 {
-	const Config	*currentConfig = GetConfiguration();
-	String		 encodingID    = currentConfig->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
+	/* Get configuration.
+	 */
+	const Config	*currentConfig		 = GetConfiguration();
 
+	String		 encodingID		 = currentConfig->GetStringValue(ConfigID, "ID3v2Encoding", "UTF-16LE");
+
+	Bool		 prependZero		 = currentConfig->GetIntValue(ConfigID, "TrackPrependZeroID3v2", False);
+
+	Bool		 writeChapters		 = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
+	Bool		 writeMCDI		 = currentConfig->GetIntValue(ConfigID, "WriteMCDI", True);
+
+	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
+
+	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 coverArtWriteToID3v2	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToID3v2", True);
+
+	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
+	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
+
+	/* Set ID3v2 version according to encoding.
+	 */
 	if (encodingID == "UTF-16BE" || encodingID == "UTF-8") container.SetSpec(ID3V2_4_0);
 	else						       container.SetSpec(ID3V2_3_0);
-
-	Bool		 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroID3v2", False);
 
 	/* Save basic information.
 	 */
@@ -266,8 +284,8 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		{ ID3_Frame frame(ID3FID_POPULARIMETER); SetASCIIField(frame, ID3FN_EMAIL, "rating@freac.org"); SetIntegerField(frame, ID3FN_RATING, rating); container.AddFrame(frame); }
 	}
 
-	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ ID3_Frame frame(ID3FID_COMMENT); SetStringField(frame, ID3FN_TEXT, info.comment);						    container.AddFrame(frame); }
-	else if (!isChapter && currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL)		{ ID3_Frame frame(ID3FID_COMMENT); SetStringField(frame, ID3FN_TEXT, currentConfig->GetStringValue("Tags", "DefaultComment", NIL)); container.AddFrame(frame); }
+	if	(info.comment != NIL && !replaceExistingComments) { ID3_Frame frame(ID3FID_COMMENT); SetStringField(frame, ID3FN_TEXT, info.comment);	container.AddFrame(frame); }
+	else if (!isChapter && defaultComment != NIL)		  { ID3_Frame frame(ID3FID_COMMENT); SetStringField(frame, ID3FN_TEXT, defaultComment); container.AddFrame(frame); }
 
 	/* Set band to album artist if only album artist is filled.
 	 */
@@ -335,7 +353,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	/* Save Replay Gain info.
 	 */
-	if (currentConfig->GetIntValue("Tags", "PreserveReplayGain", True))
+	if (preserveReplayGain)
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
 		{
@@ -352,7 +370,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	/* Save CD table of contents.
 	 */
-	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
+	if (writeMCDI)
 	{
 		if (info.mcdi.GetData().Size() > 0)
 		{
@@ -366,7 +384,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	/* Save cover art.
 	 */
-	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToID3v2", True))
+	if (coverArtWriteToTags && coverArtWriteToID3v2)
 	{
 		foreach (const Picture &picInfo, track.pictures)
 		{
@@ -378,9 +396,9 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 			if (picInfo.description != NIL)
 			{
 				Config	*singleByteConfig = Config::Copy(currentConfig);
-				String	 encoding	  = singleByteConfig->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
+				String	 encoding	  = encodingID;
 
-				if (encoding != "UTF-8" && !String::IsUnicode(picInfo.description)) singleByteConfig->SetStringValue("Tags", "ID3v2Encoding", "ISO-8859-1");
+				if (encoding != "UTF-8" && !String::IsUnicode(picInfo.description)) singleByteConfig->SetStringValue(ConfigID, "ID3v2Encoding", "ISO-8859-1");
 
 				SetConfiguration(singleByteConfig);
 
@@ -404,7 +422,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	/* Save chapters.
 	 */
-	if (!isChapter && track.tracks.Length() > 0 && currentConfig->GetIntValue("Tags", "WriteChapters", True))
+	if (!isChapter && track.tracks.Length() > 0 && writeChapters)
 	{
 		/* Write TOC frame.
 		 */
@@ -551,7 +569,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			else if (description.ToLower() == "cuesheet")
 			{
-				if (currentConfig->GetIntValue("Tags", "ReadEmbeddedCueSheets", True))
+				if (currentConfig->GetIntValue(ConfigID, "ReadEmbeddedCueSheets", True))
 				{
 					/* Output cuesheet to temporary file.
 					 */
@@ -581,7 +599,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 						Track	 cueTrack;
 						Config	*cueConfig = Config::Copy(GetConfiguration());
 
-						cueConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+						cueConfig->SetIntValue(ConfigID, "ReadEmbeddedCueSheets", False);
 
 						cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
 						cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);
@@ -659,7 +677,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 				}
 			}
 		}
-		else if (frame.GetID() == ID3FID_PICTURE && currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+		else if (frame.GetID() == ID3FID_PICTURE && currentConfig->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 		{
 			Picture			 picture;
 			Buffer<UnsignedByte>	 buffer;
@@ -709,8 +727,8 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 	/* Read chapters.
 	 */
-	if (haveChapters && currentConfig->GetIntValue("Tags", "ReadChapters", True) &&
-			  (!currentConfig->GetIntValue("Tags", "PreferCueSheetsToChapters", True) || track.tracks.Length() == 0))
+	if (haveChapters && currentConfig->GetIntValue(ConfigID, "ReadChapters", True) &&
+			  (!currentConfig->GetIntValue(ConfigID, "PreferCueSheetsToChapters", True) || track.tracks.Length() == 0))
 	{
 		track.tracks.RemoveAll();
 
@@ -839,7 +857,7 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 	const Config	*config = GetConfiguration();
 
 	ID3_TextEnc	 encoding   = ID3TE_NONE;
-	String		 encodingID = config->GetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
+	String		 encodingID = config->GetStringValue(ConfigID, "ID3v2Encoding", "UTF-16LE");
 
 	if	(encodingID == "UTF-8")				      encoding = ID3TE_UTF8;
 	else if (encodingID == "ISO-8859-1")			      encoding = ID3TE_ISO8859_1;

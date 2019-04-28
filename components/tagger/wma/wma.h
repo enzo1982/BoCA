@@ -20,6 +20,8 @@ namespace BoCA
 	class TaggerWMA : public CS::TaggerComponent
 	{
 		private:
+			static const String	 ConfigID;
+
 			Error			 RenderWMAStringItem(const String &, const String &, Void *);
 			Error			 RenderWMAIntegerItem(const String &, Int, Void *);
 			Error			 RenderWMABinaryItem(const String &, const Buffer<UnsignedByte> &, Void *);

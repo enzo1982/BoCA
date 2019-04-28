@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -88,6 +88,8 @@ namespace BoCA
 	int		 FLACIOCallbackEof(FLAC__IOHandle);
 };
 
+const String	 BoCA::TaggerFLAC::ConfigID = "Tags";
+
 BoCA::TaggerFLAC::TaggerFLAC()
 {
 }
@@ -112,8 +114,21 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 	if (fileType != "fLaC" && fileType != "OggS")		       return Error();
 	if (fileType == "OggS" && *ex_FLAC_API_SUPPORTS_OGG_FLAC == 0) return Error();
 
-	const Config	*config = GetConfiguration();
+	/* Get configuration.
+	 */
+	const Config	*currentConfig	     = GetConfiguration();
 
+	Bool		 enableFLACMetadata  = currentConfig->GetIntValue(ConfigID, "EnableFLACMetadata", True);
+
+	Bool		 prependZero	     = currentConfig->GetIntValue(ConfigID, "TrackPrependZeroFLACMetadata", True);
+
+	Bool		 writeChapters	     = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
+
+	Bool		 coverArtWriteToTags = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 coverArtWriteToFLAC = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToFLACMetadata", True);
+
+	/* Set up callbacks.
+	 */
 	FLAC__IOCallbacks	 callbacks;
 
 	callbacks.read	= FLACIOCallbackRead;
@@ -158,7 +173,7 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 	const Info		&info = track.GetInfo();
 	Buffer<unsigned char>	 vcBuffer;
 
-	if (config->GetIntValue("Tags", "EnableFLACMetadata", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
+	if (enableFLACMetadata && (info.HasBasicInfo() || (track.tracks.Length() > 0 && writeChapters)))
 	{
 		FLAC__StreamMetadata	*vorbiscomment = ex_FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
@@ -169,10 +184,10 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 		{
 			/* Disable writing cover art to Vorbis comment tags for FLAC files.
 			 */
-			Config	*taggerConfig = Config::Copy(config);
+			Config	*taggerConfig = Config::Copy(currentConfig);
 
-			taggerConfig->SetIntValue("Tags", "CoverArtWriteToVorbisComment", False);
-			taggerConfig->SetIntValue("Tags", "TrackPrependZeroVorbisComment", config->GetIntValue("Tags", "TrackPrependZeroFLACMetadata", True));
+			taggerConfig->SetIntValue(ConfigID, "CoverArtWriteToVorbisComment", False);
+			taggerConfig->SetIntValue(ConfigID, "TrackPrependZeroVorbisComment", prependZero);
 
 			tagger->SetConfiguration(taggerConfig);
 			tagger->SetVendorString(*ex_FLAC__VENDOR_STRING);
@@ -211,7 +226,7 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 
 	Int64	 pictureSizeAfter = 0;
 
-	if (config->GetIntValue("Tags", "CoverArtWriteToTags", True) && config->GetIntValue("Tags", "CoverArtWriteToFLACMetadata", True))
+	if (coverArtWriteToTags && coverArtWriteToFLAC)
 	{
 		for (Int i = 0; i < track.pictures.Length(); i++)
 		{

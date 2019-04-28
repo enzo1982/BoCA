@@ -47,6 +47,8 @@ const String &BoCA::TaggerAPEv2::GetComponentSpecs()
 	return componentSpecs;
 }
 
+const String	 BoCA::TaggerAPEv2::ConfigID = "Tags";
+
 BoCA::TaggerAPEv2::TaggerAPEv2()
 {
 }
@@ -57,10 +59,25 @@ BoCA::TaggerAPEv2::~TaggerAPEv2()
 
 Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &track)
 {
-	const Config		*currentConfig = GetConfiguration();
-	String::OutputFormat	 outputFormat("UTF-8");
+	/* Get configuration.
+	 */
+	const Config	*currentConfig		 = GetConfiguration();
 
-	Bool			 prependZero   = currentConfig->GetIntValue("Tags", "TrackPrependZeroAPEv2", True);
+	Bool		 prependZero		 = currentConfig->GetIntValue(ConfigID, "TrackPrependZeroAPEv2", True);
+
+	Bool		 writeMCDI		 = currentConfig->GetIntValue(ConfigID, "WriteMCDI", True);
+
+	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
+
+	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 coverArtWriteToAPEv2	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToAPEv2", True);
+
+	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
+	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
+
+	/* Set output encoding.
+	 */
+	String::OutputFormat	 outputFormat("UTF-8");
 
 	/* Save basic information.
 	 */
@@ -96,8 +113,8 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		{ RenderAPEItem("Disc", discString, buffer); numItems++; }
 	}
 
-	if	(info.comment != NIL && !currentConfig->GetIntValue("Tags", "ReplaceExistingComments", False))	{ RenderAPEItem("Comment", info.comment, buffer);						  numItems++; }
-	else if (currentConfig->GetStringValue("Tags", "DefaultComment", NIL) != NIL && numItems > 0)		{ RenderAPEItem("Comment", currentConfig->GetStringValue("Tags", "DefaultComment", NIL), buffer); numItems++; }
+	if	(info.comment != NIL && !replaceExistingComments) { RenderAPEItem("Comment", info.comment, buffer);   numItems++; }
+	else if (defaultComment != NIL && numItems > 0)		  { RenderAPEItem("Comment", defaultComment, buffer); numItems++; }
 
 	/* Save other text info.
 	 */
@@ -120,7 +137,7 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	/* Save Replay Gain info.
 	 */
-	if (currentConfig->GetIntValue("Tags", "PreserveReplayGain", True))
+	if (preserveReplayGain)
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
 		{
@@ -137,14 +154,14 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	/* Save CD table of contents.
 	 */
-	if (currentConfig->GetIntValue("Tags", "WriteMCDI", True))
+	if (writeMCDI)
 	{
 		if (info.mcdi.GetData().Size() > 0) { RenderAPEBinaryItem("MCDI", info.mcdi.GetData(), buffer); numItems++; }
 	}
 
 	/* Save cover art.
 	 */
-	if (currentConfig->GetIntValue("Tags", "CoverArtWriteToTags", True) && currentConfig->GetIntValue("Tags", "CoverArtWriteToAPEv2", True))
+	if (coverArtWriteToTags && coverArtWriteToAPEv2)
 	{
 		foreach (const Picture &picInfo, track.pictures)
 		{
@@ -322,7 +339,7 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		}
 		else if (id.StartsWith("COVER ART"))
 		{
-			if (currentConfig->GetIntValue("Tags", "CoverArtReadFromTags", True))
+			if (currentConfig->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 			{
 				Picture	 picture;
 
@@ -357,7 +374,7 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		}
 		else if (id == "CUESHEET")
 		{
-			if (currentConfig->GetIntValue("Tags", "ReadEmbeddedCueSheets", True))
+			if (currentConfig->GetIntValue(ConfigID, "ReadEmbeddedCueSheets", True))
 			{
 				/* Output cuesheet to temporary file.
 				 */
@@ -387,7 +404,7 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 					Track	 cueTrack;
 					Config	*cueConfig = Config::Copy(GetConfiguration());
 
-					cueConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+					cueConfig->SetIntValue(ConfigID, "ReadEmbeddedCueSheets", False);
 
 					cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
 					cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);

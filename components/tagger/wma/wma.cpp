@@ -93,6 +93,8 @@ Void BoCA::TaggerWMA::Cleanup()
 	CoUninitialize();
 }
 
+const String	 BoCA::TaggerWMA::ConfigID = "Tags";
+
 BoCA::TaggerWMA::TaggerWMA()
 {
 }
@@ -103,11 +105,20 @@ BoCA::TaggerWMA::~TaggerWMA()
 
 Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &track)
 {
-	const Config	*config = GetConfiguration();
-
 	/* Get configuration.
 	 */ 
-	Bool	 prependZero = config->GetIntValue("Tags", "TrackPrependZeroWMAMetadata", False);
+	const Config	*currentConfig = GetConfiguration();
+
+	Bool		 prependZero		 = currentConfig->GetIntValue(ConfigID, "TrackPrependZeroWMAMetadata", False);
+
+	Bool		 writeChapters		 = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
+	Bool		 writeMCDI		 = currentConfig->GetIntValue(ConfigID, "WriteMCDI", True);
+
+	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 coverArtWriteToWMA	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToWMAMetadata", True);
+
+	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
+	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
 
 	/* Create metadata editor objects.
 	 */
@@ -168,8 +179,8 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			RenderWMAIntegerItem(g_wszWMSharedUserRating, Math::Min(99, info.rating), pHeaderInfo);
 		}
 
-		if	(info.comment != NIL && !config->GetIntValue("Tags", "ReplaceExistingComments", False))	RenderWMAStringItem(g_wszWMDescription, info.comment, pHeaderInfo);
-		else if (config->GetStringValue("Tags", "DefaultComment", NIL) != NIL)				RenderWMAStringItem(g_wszWMDescription, config->GetStringValue("Tags", "DefaultComment", NIL), pHeaderInfo);
+		if	(info.comment != NIL && !replaceExistingComments) RenderWMAStringItem(g_wszWMDescription, info.comment, pHeaderInfo);
+		else if (defaultComment != NIL)				  RenderWMAStringItem(g_wszWMDescription, defaultComment, pHeaderInfo);
 
 		/* Save other text info.
 		 */
@@ -207,7 +218,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		/* Save CD table of contents.
 		 */
-		if (config->GetIntValue("Tags", "WriteMCDI", True))
+		if (writeMCDI)
 		{
 			if (info.mcdi.GetData().Size() > 0)
 			{
@@ -217,7 +228,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		/* Save cover art.
 		 */
-		if (config->GetIntValue("Tags", "CoverArtWriteToTags", True) && config->GetIntValue("Tags", "CoverArtWriteToWMAMetadata", True))
+		if (coverArtWriteToTags && coverArtWriteToWMA)
 		{
 			foreach (const Picture &picInfo, track.pictures)
 			{
@@ -243,7 +254,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		/* Save chapters.
 		 */
-		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
+		if (track.tracks.Length() > 0 && writeChapters)
 		{
 			Int64	 offset = 0;
 
@@ -469,7 +480,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 					}
 				}
 			}
-			else if (String(name) == g_wszWMPicture && config->GetIntValue("Tags", "CoverArtReadFromTags", True))
+			else if (String(name) == g_wszWMPicture && config->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 			{
 				WM_PICTURE	*picData = (WM_PICTURE *) pbValue;
 				Picture		 picture;
@@ -510,7 +521,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 		pHeaderInfo->GetMarkerCount(&numMarkers);
 
-		if (numMarkers > 0 && config->GetIntValue("Tags", "ReadChapters", True))
+		if (numMarkers > 0 && config->GetIntValue(ConfigID, "ReadChapters", True))
 		{
 			for (Int i = 0; i < numMarkers; i++)
 			{
