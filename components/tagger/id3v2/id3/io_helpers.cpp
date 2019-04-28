@@ -382,10 +382,7 @@ size_t io::writeUnicodeText(ID3_Writer &writer, String data, ID3_TextEnc enc)
 {
 	ID3_Writer::pos_type	 beg = writer.getCur();
 	size_t			 size = (data.size() / 2) * 2;
-
-	if (size == 0) return 0;
-
-	int			 is_bom = isBOM(data[0], data[1]);
+	int			 is_bom = size ? isBOM(data[0], data[1]) : false;
 
 	if (enc == ID3TE_UTF16 && !is_bom)
 	{
