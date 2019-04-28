@@ -284,8 +284,19 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		{ ID3_Frame frame(ID3FID_POPULARIMETER); SetASCIIField(frame, ID3FN_EMAIL, "rating@freac.org"); SetIntegerField(frame, ID3FN_RATING, rating); container.AddFrame(frame); }
 	}
 
-	if	(info.comment != NIL && !replaceExistingComments) { ID3_Frame frame(ID3FID_COMMENT); SetStringField(frame, ID3FN_TEXT, info.comment);	container.AddFrame(frame); }
-	else if (!isChapter && defaultComment != NIL)		  { ID3_Frame frame(ID3FID_COMMENT); SetStringField(frame, ID3FN_TEXT, defaultComment); container.AddFrame(frame); }
+	/* Save comment.
+	 */
+	if ((info.comment != NIL && !replaceExistingComments) || (!isChapter && defaultComment != NIL))
+	{
+		ID3_Frame	 frame(ID3FID_COMMENT);
+
+		SetASCIIField(frame, ID3FN_LANGUAGE, "XXX");
+
+		if (info.comment != NIL && !replaceExistingComments) SetStringField(frame, ID3FN_TEXT, info.comment);
+		else						     SetStringField(frame, ID3FN_TEXT, defaultComment);
+
+		container.AddFrame(frame);
+	}
 
 	/* Set band to album artist if only album artist is filled.
 	 */
