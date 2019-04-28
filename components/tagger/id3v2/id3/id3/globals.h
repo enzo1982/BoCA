@@ -258,7 +258,7 @@ ID3_ENUM(ID3_FrameID)
   /* AENC */ ID3FID_AUDIOCRYPTO,       /**< Audio encryption */
   /* APIC */ ID3FID_PICTURE,           /**< Attached picture */
   /* ASPI */ ID3FID_AUDIOSEEKPOINT,    /**< Audio seek point index */
-  /* COMM */ ID3FID_CHAPTER,           /**< Chapter */
+  /* CHAP */ ID3FID_CHAPTER,           /**< Chapter */
   /* COMM */ ID3FID_COMMENT,           /**< Comments */
   /* COMR */ ID3FID_COMMERCIAL,        /**< Commercial frame */
   /* COMM */ ID3FID_TOC,	       /**< Table of contents */
