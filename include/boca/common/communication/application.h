@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -38,8 +38,10 @@ namespace BoCA
 			 */
 			static Void		 Free();
 		callbacks:
-			Callback0<String>	 getClientName;		// returns the client application's name string
-			Callback0<String>	 getClientVersion;	// returns the client application's version string
+			Callback0<String>	 getScreenName;		// returns the application's full name string
+
+			Callback0<String>	 getClientName;		// returns the application's short name string
+			Callback0<String>	 getClientVersion;	// returns the application's version string
 		signals:
 			Signal0<Void>		 onQuit;		// called when application is about to quit
 	};

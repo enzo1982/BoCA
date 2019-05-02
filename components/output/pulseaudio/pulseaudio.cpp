@@ -73,7 +73,7 @@ pa_context		*BoCA::OutputPulseAudio::context  = NIL;
 
 Void BoCA::OutputPulseAudio::Initialize()
 {
-	String	 applicationName = Application::Get()->getClientName.Call();
+	String	 applicationName = Application::Get()->getScreenName.Call();
 
 	/* Connect to PulseAudio server.
 	 */
@@ -142,7 +142,7 @@ BoCA::OutputPulseAudio::~OutputPulseAudio()
 
 Bool BoCA::OutputPulseAudio::Activate()
 {
-	String	 applicationName = Application::Get()->getClientName.Call();
+	String	 applicationName = Application::Get()->getScreenName.Call();
 
 	/* Fill sample format spec.
 	 */
