@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -98,7 +98,7 @@ Void BoCA::Config::Free(Config *config)
 {
 	if (config != NIL)
 	{
-		copies.LockForWrite();
+		Array<Config *>::WriteLock	 lock(copies);
 
 		foreach (Config *copy, copies)
 		{
@@ -110,8 +110,6 @@ Void BoCA::Config::Free(Config *config)
 
 			break;
 		}
-
-		copies.Unlock();
 	}
 	else if (instance != NIL)
 	{
@@ -276,6 +274,7 @@ Int BoCA::Config::SetConfigurationName(const String &nConfig)
 BoCA::ApplicationConfig::ApplicationConfig()
 {
 	String	 applicationDir	     = Application::GetApplicationDirectory();
+	String	 applicationPrefix   = BoCA::GetApplicationPrefix();
 
 	String	 programFilesDir     = S::System::System::GetProgramFilesDirectory();
 	String	 applicationDataDir  = S::System::System::GetApplicationDataDirectory();
@@ -287,7 +286,7 @@ BoCA::ApplicationConfig::ApplicationConfig()
 	/* Check if configuration file exists and try to create
 	 * it to check write permissions.
 	 */
-	File	 configFile	   = String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml");
+	File	 configFile	   = String(configDir).Append(applicationPrefix).Append(".xml");
 	Bool	 configFileCreated = False;
 
 	if (!applicationDir.ToUpper().StartsWith(programFilesDir.ToUpper()) && !configFile.Exists())
@@ -309,7 +308,7 @@ BoCA::ApplicationConfig::ApplicationConfig()
 #if !defined(__WIN32__) && !defined(__APPLE__) && !defined(__HAIKU__)
 			if (!configDir.EndsWith("/.config/")) configDir.Append(".");
 #endif
-			configDir.Append(BoCA::GetApplicationPrefix()).Append(Directory::GetDirectoryDelimiter());
+			configDir.Append(applicationPrefix).Append(Directory::GetDirectoryDelimiter());
 		}
 
 		if (cacheDir != NIL)
@@ -317,7 +316,7 @@ BoCA::ApplicationConfig::ApplicationConfig()
 #if !defined(__WIN32__) && !defined(__APPLE__) && !defined(__HAIKU__)
 			if (!cacheDir.EndsWith("/.cache/")) cacheDir.Append(".");
 #endif
-			cacheDir.Append(BoCA::GetApplicationPrefix()).Append(Directory::GetDirectoryDelimiter());
+			cacheDir.Append(applicationPrefix).Append(Directory::GetDirectoryDelimiter());
 		}
 
 		Directory(configDir).Create();
@@ -331,11 +330,11 @@ BoCA::ApplicationConfig::ApplicationConfig()
 	/* Migrate old configuration file (remove this block after some time).
 	 */
 #ifndef __WIN32__
-	File	 configFileNew = String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml");
+	File	 configFileNew = String(configDir).Append(applicationPrefix).Append(".xml");
 #ifdef __APPLE__
-	File	 configFileOld = String(configDir).Append("../../../.").Append(BoCA::GetApplicationPrefix()).Append("/").Append(BoCA::GetApplicationPrefix()).Append(".xml");
+	File	 configFileOld = String(configDir).Append("../../../.").Append(applicationPrefix).Append("/").Append(applicationPrefix).Append(".xml");
 #else
-	File	 configFileOld = String(configDir).Append("../../.").Append(BoCA::GetApplicationPrefix()).Append("/").Append(BoCA::GetApplicationPrefix()).Append(".xml");
+	File	 configFileOld = String(configDir).Append("../../.").Append(applicationPrefix).Append("/").Append(applicationPrefix).Append(".xml");
 #endif
 
 	if (!configFileNew.Exists() && configFileOld.Exists()) configFileOld.Copy(configFileNew);
@@ -343,7 +342,7 @@ BoCA::ApplicationConfig::ApplicationConfig()
 
 	/* Load or create actual configuration.
 	 */
-	config = new Configuration(String(configDir).Append(BoCA::GetApplicationPrefix()).Append(".xml"), True);
+	config = new Configuration(String(configDir).Append(applicationPrefix).Append(".xml"), True);
 
 	LoadSettings();
 }
