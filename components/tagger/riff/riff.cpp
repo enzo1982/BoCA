@@ -119,6 +119,14 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 		else if (info.offsets != NIL)		 RenderTagItem("ITOC", info.offsets, buffer);
 	}
 
+	/* Save encoder version.
+	 */
+	Application	*app = Application::Get();
+
+	RenderTagItem("ISFT", app->getClientName.Call().Append(" ").Append(app->getClientVersion.Call()), buffer);
+
+	/* Render tag header.
+	 */
 	RenderTagHeader(buffer);
 
 	return Success();

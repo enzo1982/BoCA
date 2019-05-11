@@ -175,6 +175,12 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		}
 	}
 
+	/* Save encoder version.
+	 */
+	Application	*app = Application::Get();
+
+	ex_MP4TagsSetEncodingTool(mp4Tags, app->getClientName.Call().Append(" ").Append(app->getClientVersion.Call()));
+
 	/* Save cover art.
 	 */
 	if (coverArtWriteToTags && coverArtWriteToMP4)

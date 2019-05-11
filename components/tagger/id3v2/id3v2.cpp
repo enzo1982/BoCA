@@ -393,6 +393,18 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		}
 	}
 
+	/* Save encoder version.
+	 */
+	if (!isChapter)
+	{
+		Application	*app = Application::Get();
+		ID3_Frame	 frame(ID3FID_ENCODERSETTINGS);
+
+		SetStringField(frame, ID3FN_TEXT, app->getClientName.Call().Append(" ").Append(app->getClientVersion.Call()));
+
+		container.AddFrame(frame);
+	}
+
 	/* Save cover art.
 	 */
 	if (coverArtWriteToTags && coverArtWriteToID3v2)

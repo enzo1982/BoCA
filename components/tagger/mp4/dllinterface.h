@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -49,6 +49,7 @@ typedef bool			(*MP4TAGSSETCOMPILATION)	(const MP4Tags *, const uint8_t *);
 typedef bool			(*MP4TAGSSETCOPYRIGHT)		(const MP4Tags *, const char *);
 typedef bool			(*MP4TAGSSETMEDIATYPE)		(const MP4Tags *, const uint8_t *);
 typedef bool			(*MP4TAGSSETTEMPO)		(const MP4Tags *, const uint16_t *);
+typedef bool			(*MP4TAGSSETENCODINGTOOL)	(const MP4Tags *, const char *);
 
 typedef bool			(*MP4TAGSADDARTWORK)		(const MP4Tags *, MP4TagArtwork *);
 typedef bool			(*MP4TAGSREMOVEARTWORK)		(const MP4Tags *, uint32_t);
@@ -83,6 +84,7 @@ extern MP4TAGSSETCOMPILATION	 ex_MP4TagsSetCompilation;
 extern MP4TAGSSETCOPYRIGHT	 ex_MP4TagsSetCopyright;
 extern MP4TAGSSETMEDIATYPE	 ex_MP4TagsSetMediaType;
 extern MP4TAGSSETTEMPO		 ex_MP4TagsSetTempo;
+extern MP4TAGSSETENCODINGTOOL	 ex_MP4TagsSetEncodingTool;
 
 extern MP4TAGSADDARTWORK	 ex_MP4TagsAddArtwork;
 extern MP4TAGSREMOVEARTWORK	 ex_MP4TagsRemoveArtwork;

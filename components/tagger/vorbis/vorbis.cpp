@@ -143,6 +143,12 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		else if	(info.offsets != NIL)		 { RenderTagItem("CDTOC", info.offsets, buffer);		numItems++; }
 	}
 
+	/* Save encoder version.
+	 */
+	Application	*app = Application::Get();
+
+	{ RenderTagItem("ENCODER", app->getClientName.Call().Append(" ").Append(app->getClientVersion.Call()), buffer);	numItems++; }
+
 	/* Save cover art.
 	 */
 	if (coverArtWriteToTags && coverArtWriteToVorbis)
@@ -176,7 +182,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 			RenderTagItem("METADATA_BLOCK_PICTURE", Encoding::Base64(picBuffer).Encode(), buffer);
 
-			numItems += 1;
+			numItems++;
 		}
 	}
 
@@ -210,6 +216,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		}
 	}
 
+	/* Render tag header.
+	 */
 	RenderTagHeader(vendorString, numItems, buffer);
 
 	return Success();

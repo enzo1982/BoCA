@@ -226,6 +226,13 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			}
 		}
 
+		/* Save encoder version.
+		 */
+		Application	*app = Application::Get();
+
+		RenderWMAStringItem(g_wszWMToolName, app->getClientName.Call(), pHeaderInfo);
+		RenderWMAStringItem(g_wszWMToolVersion, app->getClientVersion.Call(), pHeaderInfo);
+
 		/* Save cover art.
 		 */
 		if (coverArtWriteToTags && coverArtWriteToWMA)
