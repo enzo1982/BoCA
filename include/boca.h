@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -96,7 +96,7 @@ using namespace smooth;
 																																		\
 		BOCA_EXPORT int BoCA_##componentName##_ReadData(void *component, void *buffer)						{ return ((BoCA::componentName *) component)->ReadData(*((Buffer<UnsignedByte> *) buffer)); }						\
 																																		\
-		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)						{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
+		BOCA_EXPORT void BoCA_##componentName##_SetDriver(void *component, void *driver)					{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
 	}
 
 #define BoCA_DEFINE_ENCODER_COMPONENT(componentName)																												\
@@ -118,7 +118,7 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_WriteData(void *component, void *buffer)						{ return ((BoCA::componentName *) component)->WriteData(*((Buffer<UnsignedByte> *) buffer)); }						\
 		BOCA_EXPORT bool BoCA_##componentName##_NextPass(void *component)							{ return ((BoCA::componentName *) component)->NextPass(); }										\
 																																		\
-		BOCA_EXPORT int BoCA_##componentName##_SetDriver(void *component, void *driver)						{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
+		BOCA_EXPORT void BoCA_##componentName##_SetDriver(void *component, void *driver)					{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
 	}
 
 #define BoCA_DEFINE_DEVICEINFO_COMPONENT(componentName)																												\

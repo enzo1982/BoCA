@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,9 +20,11 @@ namespace BoCA
 {
 	namespace CS
 	{
-		abstract class BOCA_DLL_EXPORT StreamComponent : public Component, public IO::Filter
+		abstract class BOCA_DLL_EXPORT StreamComponent : public Component
 		{
 			protected:
+				IO::Driver	*driver;
+
 				Track		 track;
 			public:
 						 StreamComponent();
@@ -35,6 +37,10 @@ namespace BoCA
 				/* Returns true if the component is thread safe.
 				 */
 				virtual Bool	 IsThreadSafe() const;
+
+				/* Set IO driver to be used by this component.
+				 */
+				Void		 SetDriver(IO::Driver *);
 
 				/* Activate/deactivate filter.
 				 */
