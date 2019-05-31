@@ -78,13 +78,16 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 
 	for (Int c = 0; c < trackList.Length() - 1; c++)
 	{
-		const Track	&track	= trackList.GetNth(c);
-		const Track	&track1	= trackList.GetNth(c + 1);
+		const Track	&track	 = trackList.GetNth(c);
+		const Track	&track1	 = trackList.GetNth(c + 1);
 
-		const Info	&info	= track.GetInfo();
-		const Info	&info1	= track1.GetInfo();
+		const Info	&info	 = track.GetInfo();
+		const Info	&info1	 = track1.GetInfo();
 
-		if (info.artist	!= info1.artist) artistConsistent = False;
+		const String	&artist  = info.HasOtherInfo(INFO_ALBUMARTIST)  ? info.GetOtherInfo(INFO_ALBUMARTIST)  : info.artist;
+		const String	&artist1 = info1.HasOtherInfo(INFO_ALBUMARTIST) ? info1.GetOtherInfo(INFO_ALBUMARTIST) : info1.artist;
+
+		if (artist	!= artist1)	 artistConsistent = False;
 		if (info.album	!= info1.album)	 albumConsistent  = False;
 
 		if (info.album_gain != info1.album_gain ||
@@ -95,31 +98,30 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 
 	/* Metadata.
 	 */
+	const Info	&info	= trackList.GetNth(0).GetInfo();
+	const String	&artist	= info.HasOtherInfo(INFO_ALBUMARTIST) ? info.GetOtherInfo(INFO_ALBUMARTIST) : info.artist;
+
+	/* Output per album metadata.
+	 */
+	if (artistConsistent && albumConsistent)
 	{
-		const Info	&info = trackList.GetNth(0).GetInfo();
+		if (info.genre  != NIL) out.OutputLine(String("REM GENRE \"").Append(info.genre).Append("\""));
+		if (info.year    >   0) out.OutputLine(String("REM DATE ").Append(String::FromInt(info.year)));
+	}
 
-		/* Output per album metadata.
-		 */
-		if (artistConsistent && albumConsistent)
+	if (config->GetStringValue("Tags", "DefaultComment", NIL) != NIL) out.OutputLine(String("REM COMMENT \"").Append(config->GetStringValue("Tags", "DefaultComment", NIL)).Append("\""));
+
+	if (artistConsistent) out.OutputLine(String("PERFORMER \"").Append(artist.Length() > 0 ? artist	    : i18n->TranslateString("unknown artist")).Append("\""));
+	if (albumConsistent)  out.OutputLine(String("TITLE \"").Append(info.album.Length() > 0 ? info.album : i18n->TranslateString("unknown album")).Append("\""));
+
+	/* Save Replay Gain info.
+	 */
+	if (albumGainConsistent && config->GetIntValue("Tags", "PreserveReplayGain", True))
+	{
+		if (info.album_gain != NIL && info.album_peak != NIL)
 		{
-			if (info.genre  != NIL) out.OutputLine(String("REM GENRE \"").Append(info.genre).Append("\""));
-			if (info.year    >   0) out.OutputLine(String("REM DATE ").Append(String::FromInt(info.year)));
-		}
-
-		if (config->GetStringValue("Tags", "DefaultComment", NIL) != NIL) out.OutputLine(String("REM COMMENT \"").Append(config->GetStringValue("Tags", "DefaultComment", NIL)).Append("\""));
-
-		if (artistConsistent) out.OutputLine(String("PERFORMER \"").Append(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown artist")).Append("\""));
-		if (albumConsistent)  out.OutputLine(String("TITLE \"").Append(info.album.Length() > 0 ? info.album : i18n->TranslateString("unknown album")).Append("\""));
-
-		/* Save Replay Gain info.
-		 */
-		if (albumGainConsistent && config->GetIntValue("Tags", "PreserveReplayGain", True))
-		{
-			if (info.album_gain != NIL && info.album_peak != NIL)
-			{
-				out.OutputLine(String("REM REPLAYGAIN_ALBUM_GAIN ").Append(info.album_gain));
-				out.OutputLine(String("REM REPLAYGAIN_ALBUM_PEAK ").Append(info.album_peak));
-			}
+			out.OutputLine(String("REM REPLAYGAIN_ALBUM_GAIN ").Append(info.album_gain));
+			out.OutputLine(String("REM REPLAYGAIN_ALBUM_PEAK ").Append(info.album_peak));
 		}
 	}
 
@@ -135,7 +137,7 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 		out.OutputLine(String("  TRACK ").Append(i < 9 ? "0" : NIL).Append(String::FromInt(i + 1)).Append(" AUDIO"));
 		out.OutputLine(String("    TITLE \"").Append(info.title.Length() > 0 ? info.title : i18n->TranslateString("unknown title")).Append("\""));
 
-		if (!artistConsistent) out.OutputLine(String("    PERFORMER \"").Append(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown artist")).Append("\""));
+		if (!artistConsistent || info.artist != artist) out.OutputLine(String("    PERFORMER \"").Append(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown artist")).Append("\""));
 
 		if (info.isrc != NIL) out.OutputLine(String("    ISRC ").Append(info.isrc));
 

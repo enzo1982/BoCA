@@ -146,7 +146,13 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (line.Contains("\"")) artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
 			else			 artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
-			if (!readInfoTags || preferCueSheets) info.artist = artist;
+			if (!readInfoTags || preferCueSheets)
+			{
+				info.artist = artist;
+
+				if (albumInfo.artist != NIL &&
+				    albumInfo.artist != artist) info.SetOtherInfo(INFO_ALBUMARTIST, albumInfo.artist);
+			}
 
 			if (!trackMode && !dataMode) albumInfo.artist = artist;
 		}
