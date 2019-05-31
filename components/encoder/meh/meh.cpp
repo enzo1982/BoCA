@@ -384,13 +384,33 @@ String BoCA::EncoderMultiEncoderHub::GetFileNamePattern(const Config *configurat
 	return fileNamePattern;
 }
 
-String BoCA::EncoderMultiEncoderHub::GetPlaylistFileName(const Config *configuration, const Track &track)
+String BoCA::EncoderMultiEncoderHub::GetPlaylistFileName(const Config *configuration, const Track &track, const Array<Track> &originalTracks)
 {
 	I18n		*i18n = I18n::Get();
 
 	const Info	&info = track.GetInfo();
 
-	String	 outputDir	   = configuration->GetStringValue("Settings", "EncoderOutDir", NIL);
+	/* Find playlist output folder.
+	 */
+	const Track	&originalTrack = originalTracks.Get(track.GetTrackID());
+
+	String		 outputDir     = configuration->GetStringValue("Settings", "EncoderOutDir", NIL);
+	String		 inputDir      = originalTrack.fileName.Head(Math::Max(originalTrack.fileName.FindLast("\\"), originalTrack.fileName.FindLast("/")) + 1);
+
+	if (configuration->GetIntValue("Settings", "WriteToInputDirectory", False) && !originalTrack.isCDTrack)
+	{
+		String		 file = String(inputDir).Append(String::FromInt(S::System::System::Clock())).Append(".temp");
+		OutStream	 temp(STREAM_FILE, file, OS_REPLACE);
+
+		if (temp.GetLastError() == IO_ERROR_OK) outputDir = inputDir;
+
+		temp.Close();
+
+		File(file).Delete();
+	}
+
+	/* Generate playlist file name.
+	 */
 	Bool	 useUnicode	   = configuration->GetIntValue("Settings", "UseUnicodeFilenames", True);
 	Bool	 replaceSpaces	   = configuration->GetIntValue("Settings", "FilenamesReplaceSpaces", False);
 
@@ -585,7 +605,7 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion(Int conversionID)
 			/* Set playlist filename so it is written to the same place as a single output file.
 			 */
 			if (encodeToSingleFile) playlistFileNames.Add(data->playlistTrack.outputFile);
-			else			playlistFileNames.Add(GetPlaylistFileName(data->configuration, playlistTracks.GetFirst()));
+			else			playlistFileNames.Add(GetPlaylistFileName(data->configuration, playlistTracks.GetFirst(), data->tracksToConvert));
 
 			playlistTrackLists.Add(new Array<Track>(playlistTracks));
 			cuesheetTrackLists.Add(new Array<Track>(cuesheetTracks));
@@ -596,7 +616,7 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion(Int conversionID)
 			{
 				/* Check if we already have a list for this playlist.
 				 */
-				String		 playlistFileName = GetPlaylistFileName(data->configuration, track);
+				String		 playlistFileName = GetPlaylistFileName(data->configuration, track, data->tracksToConvert);
 				UnsignedInt32	 playlistFileCRC  = playlistFileName.ComputeCRC32();
 
 				if (playlistFileNames.Add(playlistFileName, playlistFileCRC))
