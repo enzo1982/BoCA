@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -170,7 +170,7 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 		/* Create MP4 file.
 		 */
-		mp4File		= ex_MP4CreateEx(track.outfile.ConvertTo("UTF-8"), 0, 1, 1, NIL, 0, NIL, 0);
+		mp4File		= ex_MP4CreateEx(track.outputFile.ConvertTo("UTF-8"), 0, 1, 1, NIL, 0, NIL, 0);
 		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
@@ -265,7 +265,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 				if (tagger != NIL)
 				{
 					tagger->SetConfiguration(config);
-					tagger->RenderStreamInfo(track.outfile, track);
+					tagger->RenderStreamInfo(track.outputFile, track);
 
 					boca.DeleteComponent(tagger);
 				}
@@ -275,12 +275,12 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 		{
 			/* Optimize file even when no tags are written.
 			 */
-			String	 tempFile = String(track.outfile).Append(".temp");
+			String	 tempFile = String(track.outputFile).Append(".temp");
 
-			ex_MP4Optimize(track.outfile.ConvertTo("UTF-8"), tempFile.ConvertTo("UTF-8"));
+			ex_MP4Optimize(track.outputFile.ConvertTo("UTF-8"), tempFile.ConvertTo("UTF-8"));
 
-			File(track.outfile).Delete();
-			File(tempFile).Move(track.outfile);
+			File(track.outputFile).Delete();
+			File(tempFile).Move(track.outputFile);
 		}
 	}
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -119,7 +119,7 @@ Bool BoCA::DecoderMAC::Activate()
 {
 	int	 nRetVal = 0;
 
-	hAPEDecompress = ex_APEDecompress_CreateW(track.origFilename, &nRetVal);
+	hAPEDecompress = ex_APEDecompress_CreateW(track.fileName, &nRetVal);
 	blockId	       = 0;
 
 	return True;

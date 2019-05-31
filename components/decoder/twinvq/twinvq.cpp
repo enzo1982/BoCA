@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -196,15 +196,15 @@ BoCA::DecoderTwinVQ::~DecoderTwinVQ()
 
 Bool BoCA::DecoderTwinVQ::Activate()
 {
-	if (String::IsUnicode(track.origFilename))
+	if (String::IsUnicode(track.fileName))
 	{
-		File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
+		File(track.fileName).Copy(Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".in"));
 
-		bfp = bopen(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"), (char *) "rb");
+		bfp = bopen(Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".in"), (char *) "rb");
 	}
 	else
 	{
-		bfp = bopen(track.origFilename, (char *) "rb");
+		bfp = bopen(track.fileName, (char *) "rb");
 	}
 
 	/* Get setup info via header manager.
@@ -243,9 +243,9 @@ Bool BoCA::DecoderTwinVQ::Deactivate()
 
 	bclose(bfp);
 
-	if (String::IsUnicode(track.origFilename))
+	if (String::IsUnicode(track.fileName))
 	{
-		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".in")).Delete();
 	}
 
 	return True;

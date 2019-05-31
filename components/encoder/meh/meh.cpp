@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -97,21 +97,21 @@ BoCA::EncoderMultiEncoderHub::~EncoderMultiEncoderHub()
 
 	/* Delete output file if it still exists.
 	 */
-	if (track.outfile != NIL)
+	if (track.outputFile != NIL)
 	{
-		File(track.outfile).Delete();
+		File(track.outputFile).Delete();
 
-		if (track.outfile.Contains(Directory::GetDirectoryDelimiter())) track.outfile[track.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
+		if (track.outputFile.Contains(Directory::GetDirectoryDelimiter())) track.outputFile[track.outputFile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
 	}
 
 	/* Delete empty folders if <filetype> was used in path.
 	 */
-	while (track.outfile.Contains("[FILETYPE]"))
+	while (track.outputFile.Contains("[FILETYPE]"))
 	{
-		Directory(track.outfile).Delete();
+		Directory(track.outputFile).Delete();
 
-		if (track.outfile.Contains(Directory::GetDirectoryDelimiter())) track.outfile[track.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
-		else								break;
+		if (track.outputFile.Contains(Directory::GetDirectoryDelimiter())) track.outputFile[track.outputFile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
+		else								   break;
 	}
 }
 
@@ -204,7 +204,7 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 			Track	 encoderTrack = track;
 			String	 fileName     = String(fileNamePattern).Replace("[FILETYPE]", encoder->GetOutputFileExtension().ToUpper()).Append(".").Append(encoder->GetOutputFileExtension());
 
-			encoderTrack.outfile = fileName;
+			encoderTrack.outputFile = fileName;
 
 			encoder->SetAudioTrackInfo(encoderTrack);
 
@@ -266,7 +266,7 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 		Track	 encoderTrack = track;
 		String	 fileName     = String(fileNamePattern).Replace("[FILETYPE]", encoder->GetOutputFileExtension().ToUpper()).Append(".").Append(encoder->GetOutputFileExtension());
 
-		encoderTrack.outfile = fileName;
+		encoderTrack.outputFile = fileName;
 
 		encoder->SetAudioTrackInfo(encoderTrack);
 
@@ -280,13 +280,13 @@ Bool BoCA::EncoderMultiEncoderHub::Deactivate()
 
 		if (cancelled)
 		{
-			File(encoderTrack.outfile).Delete();
+			File(encoderTrack.outputFile).Delete();
 
 			if (config->GetIntValue(ConfigureMultiEncoderHub::ConfigID, "SeparateFolders", False) && !config->GetIntValue("Settings", "EncodeToSingleFile", False))
 			{
-				encoderTrack.outfile[encoderTrack.outfile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
+				encoderTrack.outputFile[encoderTrack.outputFile.FindLast(Directory::GetDirectoryDelimiter())] = 0;
 
-				Directory(encoderTrack.outfile).Delete();
+				Directory(encoderTrack.outputFile).Delete();
 			}
 		}
 	}
@@ -363,7 +363,7 @@ String BoCA::EncoderMultiEncoderHub::GetOutputFileExtension() const
 
 String BoCA::EncoderMultiEncoderHub::GetFileNamePattern(const Config *configuration, const Track &track)
 {
-	String	 fileNamePattern = track.outfile;
+	String	 fileNamePattern = track.outputFile;
 
 	if (fileNamePattern.EndsWith(".[FILETYPE]")) fileNamePattern[fileNamePattern.Length() - 11] = 0;
 
@@ -461,7 +461,7 @@ String BoCA::EncoderMultiEncoderHub::GetPlaylistFileName(const Config *configura
 	{
 		Track	 playlistTrack;
 
-		playlistTrack.outfile = playlistFileName;
+		playlistTrack.outputFile = playlistFileName;
 
 		playlistFileName = GetFileNamePattern(configuration, playlistTrack);
 	}
@@ -544,8 +544,8 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion(Int conversionID)
 		{
 			Track	 playlistTrack = track;
 
-			playlistTrack.isCDTrack	   = False;
-			playlistTrack.origFilename = track.outfile;
+			playlistTrack.isCDTrack	= False;
+			playlistTrack.fileName	= track.outputFile;
 
 			playlistTracks.Add(playlistTrack);
 			cuesheetTracks.Add(playlistTrack);
@@ -557,7 +557,7 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion(Int conversionID)
 			cuesheetTrack.isCDTrack	   = False;
 			cuesheetTrack.sampleOffset = track.sampleOffset;
 			cuesheetTrack.length	   = track.length;
-			cuesheetTrack.origFilename = track.outfile;
+			cuesheetTrack.fileName	   = track.outputFile;
 
 			cuesheetTracks.Add(cuesheetTrack);
 		}
@@ -584,7 +584,7 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion(Int conversionID)
 		{
 			/* Set playlist filename so it is written to the same place as a single output file.
 			 */
-			if (encodeToSingleFile) playlistFileNames.Add(data->playlistTrack.outfile);
+			if (encodeToSingleFile) playlistFileNames.Add(data->playlistTrack.outputFile);
 			else			playlistFileNames.Add(GetPlaylistFileName(data->configuration, playlistTracks.GetFirst()));
 
 			playlistTrackLists.Add(new Array<Track>(playlistTracks));
@@ -645,8 +645,8 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion(Int conversionID)
 				Array<Track>	 actualPlaylistTracks	= *playlistTrackLists.GetNth(i);
 				Array<Track>	 actualCuesheetTracks	= *cuesheetTrackLists.GetNth(i);
 
-				foreach (Track &playlistTrack, actualPlaylistTracks) playlistTrack.origFilename = String(playlistTrack.origFilename).Replace("[FILETYPE]", formatExtension.ToUpper()).Append(".").Append(formatExtension);
-				foreach (Track &cuesheetTrack, actualCuesheetTracks) cuesheetTrack.origFilename = String(cuesheetTrack.origFilename).Replace("[FILETYPE]", formatExtension.ToUpper()).Append(".").Append(formatExtension);
+				foreach (Track &playlistTrack, actualPlaylistTracks) playlistTrack.fileName = String(playlistTrack.fileName).Replace("[FILETYPE]", formatExtension.ToUpper()).Append(".").Append(formatExtension);
+				foreach (Track &cuesheetTrack, actualCuesheetTracks) cuesheetTrack.fileName = String(cuesheetTrack.fileName).Replace("[FILETYPE]", formatExtension.ToUpper()).Append(".").Append(formatExtension);
 
 				/* Write playlist.
 				 */
@@ -718,15 +718,15 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishTrackConversion(Int conversionID, con
 
 	/* Check if this conversion is the one being finished.
 	 */
-	if ((encodeToSingleFile && finishedTrack.outfile == track.outfile) ||
+	if ((encodeToSingleFile && finishedTrack.outputFile == track.outputFile) ||
 				   finishedTrack.GetTrackID() == track.GetTrackID())
 	{
 		Track	 convertedTrack = finishedTrack;
 
 		convertedTrack.SetFormat(track.GetFormat());
 
-		convertedTrack.outfile = GetFileNamePattern(config, track);
-		convertedTrack.length  = trackLength;
+		convertedTrack.outputFile = GetFileNamePattern(config, track);
+		convertedTrack.length	  = trackLength;
 
 		if (encodeToSingleFile)
 		{
@@ -757,7 +757,7 @@ Void BoCA::EncoderMultiEncoderHub::OnCancelTrackConversion(Int conversionID, con
 
 	/* Check if this conversion is the one being cancelled.
 	 */
-	if ((encodeToSingleFile && cancelledTrack.outfile == track.outfile) ||
+	if ((encodeToSingleFile && cancelledTrack.outputFile == track.outputFile) ||
 				   cancelledTrack.GetTrackID() == track.GetTrackID()) cancelled = True;
 }
 

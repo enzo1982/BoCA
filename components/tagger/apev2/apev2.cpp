@@ -386,7 +386,7 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 				foreach (const String &line, lines)
 				{
-					if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.origFilename).Append("\" WAVE"));
+					if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.fileName).Append("\" WAVE"));
 					else				    out.OutputLine(line);
 				}
 

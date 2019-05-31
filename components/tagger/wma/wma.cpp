@@ -547,8 +547,8 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				 */
 				Track	 rTrack;
 
-				rTrack.origFilename = track.origFilename;
-				rTrack.pictures	    = track.pictures;
+				rTrack.fileName = track.fileName;
+				rTrack.pictures = track.pictures;
 
 				rTrack.sampleOffset = Math::Round(cnsMarkerTime * format.rate / 10000000.0);
 

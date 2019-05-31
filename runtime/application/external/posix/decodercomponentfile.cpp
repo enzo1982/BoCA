@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -160,10 +160,10 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	 */
 	InStream	*in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
-	track.origFilename = streamURI;
-	track.fileSize	   = File(streamURI).GetFileSize();
+	track.fileName = streamURI;
+	track.fileSize = File(streamURI).GetFileSize();
 
-	track.lossless	   = specs->formats.GetFirst()->IsLossless();
+	track.lossless = specs->formats.GetFirst()->IsLossless();
 
 	/* Read RIFF chunk.
 	 */
@@ -264,17 +264,17 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 {
 	/* Create temporary WAVE file.
 	 */
-	wavFileName = Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".wav");
-	encFileName = track.origFilename;
+	wavFileName = Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".wav");
+	encFileName = track.fileName;
 
 	/* Copy the file and decode the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
-	if (String::IsUnicode(track.origFilename))
+	if (String::IsUnicode(track.fileName))
 	{
-		encFileName = Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
+		encFileName = Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
 
-		File(track.origFilename).Copy(encFileName);
+		File(track.fileName).Copy(encFileName);
 	}
 
 	/* Start 3rd party command line decoder.
@@ -300,7 +300,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(track.origFilename))
+	if (String::IsUnicode(track.fileName))
 	{
 		File(encFileName).Delete();
 	}

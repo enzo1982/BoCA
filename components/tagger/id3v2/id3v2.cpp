@@ -604,7 +604,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 					foreach (const String &line, lines)
 					{
-						if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.origFilename).Append("\" WAVE"));
+						if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.fileName).Append("\" WAVE"));
 						else				    out.OutputLine(line);
 					}
 
@@ -794,7 +794,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 				 */
 				Track	 rTrack;
 
-				rTrack.origFilename = track.origFilename;
+				rTrack.fileName	    = track.fileName;
 				rTrack.pictures	    = track.pictures;
 
 				rTrack.sampleOffset = Math::Round(Float(				       frame.GetField(ID3FN_STARTTIME)->Get()) / 1000.0 * format.rate);

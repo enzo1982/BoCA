@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -74,8 +74,8 @@ namespace BoCA
 
 			/* Filename information:
 			 */
-			String		 outfile;
-			String		 origFilename;
+			String		 fileName;
+			String		 outputFile;
 
 					 Track();
 					 Track(int);

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -157,7 +157,7 @@ Bool BoCA::EncoderTwinVQ::Activate()
 
 	CChunkChunk	*twinChunk	= TvqCreateHeaderChunk(&setupInfo, "header_info");
 
-	bfp = bopen(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), (char *) "wb");
+	bfp = bopen(Utilities::GetNonUnicodeTempFileName(track.outputFile).Append(".out"), (char *) "wb");
 
 	TvqPutBsHeaderInfo(bfp, *twinChunk);
 
@@ -201,7 +201,7 @@ Bool BoCA::EncoderTwinVQ::Deactivate()
 
 	/* Stream contents of created VQF file to output driver
 	 */
-	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out"), IS_READ);
+	InStream		 in(STREAM_FILE, Utilities::GetNonUnicodeTempFileName(track.outputFile).Append(".out"), IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
 	Int64			 bytesLeft = in.Size();
 
@@ -216,7 +216,7 @@ Bool BoCA::EncoderTwinVQ::Deactivate()
 
 	in.Close();
 
-	File(Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".out")).Delete();
+	File(Utilities::GetNonUnicodeTempFileName(track.outputFile).Append(".out")).Delete();
 
 	return True;
 }

@@ -364,9 +364,9 @@ Bool BoCA::DecoderSndFile::Activate()
 	/* Open input file.
 	 */
 #ifdef __WIN32__
-	file = _wfopen(track.origFilename, L"rb");
+	file = _wfopen(track.fileName, L"rb");
 #else
-	file = fopen(track.origFilename.ConvertTo("UTF-8"), "rb");
+	file = fopen(track.fileName.ConvertTo("UTF-8"), "rb");
 #endif
 
 	if (file == NIL) return False;

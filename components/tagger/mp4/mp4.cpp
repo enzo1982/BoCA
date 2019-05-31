@@ -208,10 +208,10 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	/* Set media type.
 	 */
-	uint8_t	 mediaType = 1;					 //  1 == Music
+	uint8_t	 mediaType = 1;					    //  1 == Music
 
-	if	(track.outfile.Contains(".m4b")) mediaType =  2; //  2 == Audiobook
-	else if (track.outfile.Contains(".m4r")) mediaType = 14; // 14 == Ringtone
+	if	(track.outputFile.Contains(".m4b")) mediaType =  2; //  2 == Audiobook
+	else if (track.outputFile.Contains(".m4r")) mediaType = 14; // 14 == Ringtone
 
 	ex_MP4TagsSetMediaType(mp4Tags, &mediaType);
 
@@ -364,7 +364,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 				 */
 				Track	 rTrack;
 
-				rTrack.origFilename = track.origFilename;
+				rTrack.fileName	    = track.fileName;
 				rTrack.pictures	    = track.pictures;
 
 				rTrack.sampleOffset = Math::Round(Float(offset)			 / MP4_MSECS_TIME_SCALE * format.rate);

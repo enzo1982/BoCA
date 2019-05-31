@@ -384,7 +384,7 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		mp4File	 = ex_MP4Read(track.origFilename.ConvertTo("UTF-8"));
+		mp4File	 = ex_MP4Read(track.fileName.ConvertTo("UTF-8"));
 		mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track == -1) return False;

@@ -42,7 +42,7 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 	/* Build output file name.
 	 */
-	encFileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".").Append(GetOutputFileExtension());
+	encFileName = Utilities::GetNonUnicodeTempFileName(track.outputFile).Append(".").Append(GetOutputFileExtension());
 
 	/* Remove temporary file if it exists.
 	 * Might be a leftover of a previous encoding attempt.

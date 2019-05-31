@@ -316,7 +316,7 @@ Bool BoCA::DecoderWMA::Activate()
 
 	/* Open file.
 	 */
-	hr = reader->Open(track.origFilename, readerCallback, NIL);
+	hr = reader->Open(track.fileName, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.

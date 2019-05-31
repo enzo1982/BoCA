@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -110,8 +110,8 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 
 	discid		= oTrack.discid;
 
-	outfile		= oTrack.outfile;
-	origFilename	= oTrack.origFilename;
+	outputFile	= oTrack.outputFile;
+	fileName	= oTrack.fileName;
 
 	lossless	= oTrack.lossless;
 	md5		= oTrack.md5;
@@ -167,7 +167,7 @@ Bool BoCA::Track::LoadCoverArtFiles()
 
 	if (config->GetIntValue("Tags", "CoverArtReadFromFiles", True))
 	{
-		Directory		 directory = File(origFilename).GetFilePath();
+		Directory		 directory = File(fileName).GetFilePath();
 		const Array<File>	&jpgFiles = directory.GetFilesByPattern("*.jpg");
 
 		foreach (const File &file, jpgFiles) LoadCoverArtFile(file);
@@ -223,8 +223,8 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 
 	if (!config->GetIntValue("Tags", "CoverArtWriteToFiles", False)) return True;
 
-	Int	 lastBs		 = Math::Max(origFilename.FindLast("\\"), origFilename.FindLast("/"));
-	String	 inFileDirectory = origFilename;
+	Int	 lastBs		 = Math::Max(fileName.FindLast("\\"), fileName.FindLast("/"));
+	String	 inFileDirectory = fileName;
 
 	inFileDirectory[lastBs + 1] = 0;
 

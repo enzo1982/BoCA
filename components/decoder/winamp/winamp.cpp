@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -307,7 +307,7 @@ Bool BoCA::DecoderWinamp::Activate()
 {
 	/* Get the correct module and set callback functions.
 	 */
-	module = GetModuleForFile(track.origFilename);
+	module = GetModuleForFile(track.fileName);
 
 	module->SetInfo			= SetInfo;
 	module->VSASetInfo		= VSASetInfo;
@@ -346,15 +346,15 @@ Bool BoCA::DecoderWinamp::Activate()
 	/* Copy the file and play the temporary copy
 	 * if the file name contains Unicode characters.
 	 */
-	if (String::IsUnicode(track.origFilename))
+	if (String::IsUnicode(track.fileName))
 	{
-		File(track.origFilename).Copy(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
+		File(track.fileName).Copy(Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".in"));
 
-		module->Play(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in"));
+		module->Play(Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".in"));
 	}
 	else
 	{
-		module->Play(track.origFilename);
+		module->Play(track.fileName);
 	}
 
 	return True;
@@ -371,9 +371,9 @@ Bool BoCA::DecoderWinamp::Deactivate()
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(track.origFilename))
+	if (String::IsUnicode(track.fileName))
 	{
-		File(Utilities::GetNonUnicodeTempFileName(track.origFilename).Append(".in")).Delete();
+		File(Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".in")).Delete();
 	}
 
 	return True;

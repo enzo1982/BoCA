@@ -269,7 +269,7 @@ Bool BoCA::EncoderWMA::Activate()
 	 */
 	ex_WMCreateWriterFileSink(&writerFileSink);
 
-	writerFileSink->Open(track.outfile);
+	writerFileSink->Open(track.outputFile);
 
 	writerAdvanced->AddSink(writerFileSink);
 
@@ -348,7 +348,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 {
 	if (errorState)
 	{
-		File(track.outfile).Delete();
+		File(track.outputFile).Delete();
 
 		return True;
 	}
@@ -369,7 +369,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 
 	if (FAILED(hr))
 	{
-		File(track.outfile).Delete();
+		File(track.outputFile).Delete();
 
 		return False;
 	}
@@ -388,7 +388,7 @@ Bool BoCA::EncoderWMA::Deactivate()
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(config);
-				tagger->RenderStreamInfo(track.outfile, track);
+				tagger->RenderStreamInfo(track.outputFile, track);
 
 				boca.DeleteComponent(tagger);
 			}

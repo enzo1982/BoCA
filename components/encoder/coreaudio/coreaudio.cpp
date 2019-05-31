@@ -390,7 +390,7 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(config);
-				tagger->RenderStreamInfo(track.outfile, track);
+				tagger->RenderStreamInfo(track.outputFile, track);
 
 				boca.DeleteComponent(tagger);
 			}

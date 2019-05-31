@@ -408,7 +408,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 				foreach (const String &line, lines)
 				{
-					if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.origFilename).Append("\" WAVE"));
+					if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.fileName).Append("\" WAVE"));
 					else				    out.OutputLine(line);
 				}
 
@@ -514,8 +514,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 					Track	 nTrack;
 					Info	 info = track.GetInfo();
 
-					nTrack.origFilename = track.origFilename;
-					nTrack.pictures	    = track.pictures;
+					nTrack.fileName = track.fileName;
+					nTrack.pictures = track.pictures;
 
 					info.track = chapter;
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -119,7 +119,7 @@ Bool BoCA::EncoderMAC::Activate()
 	waveFormat.wBitsPerSample	= format.bits;
 	waveFormat.cbSize		= 0;
 
-	ex_APECompress_StartW(hAPECompress, track.outfile, &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
+	ex_APECompress_StartW(hAPECompress, track.outputFile, &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
 
 	return True;
 }
@@ -142,7 +142,7 @@ Bool BoCA::EncoderMAC::Deactivate()
 
 		if (tagger != NIL)
 		{
-			OutStream		 out(STREAM_FILE, track.outfile, OS_APPEND);
+			OutStream		 out(STREAM_FILE, track.outputFile, OS_APPEND);
 			Buffer<unsigned char>	 tagBuffer;
 
 			tagger->SetConfiguration(config);

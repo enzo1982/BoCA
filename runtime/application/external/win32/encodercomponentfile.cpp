@@ -37,8 +37,8 @@ Bool BoCA::AS::EncoderComponentExternalFile::Activate()
 	 */
 	nOfSamples = 0;
 
-	wavFileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".wav");
-	encFileName = Utilities::GetNonUnicodeTempFileName(track.outfile).Append(".").Append(GetOutputFileExtension());
+	wavFileName = Utilities::GetNonUnicodeTempFileName(track.outputFile).Append(".wav");
+	encFileName = Utilities::GetNonUnicodeTempFileName(track.outputFile).Append(".").Append(GetOutputFileExtension());
 
 	out = new OutStream(STREAM_FILE, wavFileName, OS_REPLACE);
 

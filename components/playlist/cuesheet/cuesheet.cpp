@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -90,7 +90,7 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 		if (info.album_gain != info1.album_gain ||
 		    info.album_peak != info1.album_peak) albumGainConsistent = False;
 
-		if (track.origFilename != track1.origFilename) oneFile = False;
+		if (track.fileName != track1.fileName) oneFile = False;
 	}
 
 	/* Metadata.
@@ -130,7 +130,7 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 		const Track	&track = trackList.GetNth(i);
 		const Info	&info  = track.GetInfo();
 
-		if (!oneFile || i == 0) out.OutputLine(String("FILE \"").Append(Utilities::GetRelativeFileName(track.origFilename, actualFile)).Append("\" ").Append(GetFileType(track.origFilename)));
+		if (!oneFile || i == 0) out.OutputLine(String("FILE \"").Append(Utilities::GetRelativeFileName(track.fileName, actualFile)).Append("\" ").Append(GetFileType(track.fileName)));
 
 		out.OutputLine(String("  TRACK ").Append(i < 9 ? "0" : NIL).Append(String::FromInt(i + 1)).Append(" AUDIO"));
 		out.OutputLine(String("    TITLE \"").Append(info.title.Length() > 0 ? info.title : i18n->TranslateString("unknown title")).Append("\""));

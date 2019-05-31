@@ -93,7 +93,7 @@ const Array<BoCA::Track> &BoCA::PlaylistXSPF::ReadPlaylist(const String &file)
 
 		/* Get file name.
 		 */
-		String	&fileName = track.origFilename;
+		String	&fileName = track.fileName;
 
 		/* Handle relative paths.
 		 */
@@ -215,7 +215,7 @@ void BoCA::PlaylistXSPFCallback::addTrack(XspfTrack *xspfTrack)
 	if (fileName.StartsWith(Directory::GetDirectoryDelimiter()) && fileName[2] == ':') fileName = fileName.Tail(fileName.Length() - 1);
 #endif
 
-	track.origFilename = fileName;
+	track.fileName = fileName;
 
 	/* Add track to playlist.
 	 */

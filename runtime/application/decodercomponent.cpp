@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,9 +28,9 @@ Bool BoCA::AS::DecoderComponent::CanOpenStream(const String &streamURI)
 
 Error BoCA::AS::DecoderComponent::GetStreamInfo(const String &streamURI, Track &track)
 {
-	track.origFilename = streamURI;
+	track.fileName = streamURI;
 
-	track.lossless	   = specs->formats.GetFirst()->IsLossless();
+	track.lossless = specs->formats.GetFirst()->IsLossless();
 
 	if (specs->func_GetStreamInfo(component, streamURI, &track) != Success()) return Error();
 

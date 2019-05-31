@@ -108,7 +108,7 @@ const Array<BoCA::Track> &BoCA::PlaylistWPL::ReadPlaylist(const String &file)
 		 */
 		Track	 track;
 
-		track.origFilename = fileName;
+		track.fileName = fileName;
 
 		trackList.Add(track);
 	}

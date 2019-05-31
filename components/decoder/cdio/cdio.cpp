@@ -191,15 +191,15 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (entryNumber == -1) return Error();
 
-	track.length	= trackLength * samplesPerSector;
-	track.fileSize	= trackLength * bytesPerSector;
+	track.length	 = trackLength * samplesPerSector;
+	track.fileSize	 = trackLength * bytesPerSector;
 
-	track.cdTrack	= trackNumber;
-	track.drive	= audiodrive;
-	track.outfile	= NIL;
+	track.cdTrack	 = trackNumber;
+	track.drive	 = audiodrive;
+	track.outputFile = NIL;
 
-	info.track	= trackNumber;
-	info.numTracks	= info.mcdi.GetNumberOfAudioTracks();
+	info.track	 = trackNumber;
+	info.numTracks	 = info.mcdi.GetNumberOfAudioTracks();
 
 	/* Read CD-Text.
 	 */

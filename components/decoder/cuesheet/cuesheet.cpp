@@ -277,23 +277,23 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			/* Get referenced file name.
 			 */
-			if (line.Contains("\"")) iTrack.origFilename = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 iTrack.origFilename = line.SubString(line.Find(" ")  + 1, line.FindLast(" ")  - line.Find(" ")  - 1);
+			if (line.Contains("\"")) iTrack.fileName = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 iTrack.fileName = line.SubString(line.Find(" ")  + 1, line.FindLast(" ")  - line.Find(" ")  - 1);
 
-			if (!iTrack.origFilename.StartsWith("/")    &&
-			    !iTrack.origFilename.StartsWith("\\\\") &&
-			     iTrack.origFilename[1] != ':') iTrack.origFilename = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(iTrack.origFilename);
+			if (!iTrack.fileName.StartsWith("/")    &&
+			    !iTrack.fileName.StartsWith("\\\\") &&
+			     iTrack.fileName[1] != ':') iTrack.fileName = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(iTrack.fileName);
 
-			iTrack.origFilename = File(iTrack.origFilename);
+			iTrack.fileName = File(iTrack.fileName);
 
 			/* Look for compressed files in place of referenced Wave, Wave64, RF64 or AIFF files.
 			 */
-			if (!File(iTrack.origFilename).Exists() && lookForAlternatives &&
-			    (iTrack.origFilename.ToLower().EndsWith(".wav") || iTrack.origFilename.ToLower().EndsWith(".w64")  || iTrack.origFilename.ToLower().EndsWith(".rf64") ||
-			     iTrack.origFilename.ToLower().EndsWith(".aif") || iTrack.origFilename.ToLower().EndsWith(".aiff") || iTrack.origFilename.ToLower().EndsWith(".aifc")))
+			if (!File(iTrack.fileName).Exists() && lookForAlternatives &&
+			    (iTrack.fileName.ToLower().EndsWith(".wav") || iTrack.fileName.ToLower().EndsWith(".w64")  || iTrack.fileName.ToLower().EndsWith(".rf64") ||
+			     iTrack.fileName.ToLower().EndsWith(".aif") || iTrack.fileName.ToLower().EndsWith(".aiff") || iTrack.fileName.ToLower().EndsWith(".aifc")))
 			{
 				const char	*extensions[]  = { "wav", "w64", "rf64", "aif", "aiff", "aifc", "flac", "ape", "ofr", "tak", "tta", "wv", "m4a", "wma", "mp3", "ogg", "oga", "opus", "spx", NIL };
-				const String	 fileNameNoExt = iTrack.origFilename.SubString(0, iTrack.origFilename.FindLast(".") + 1);
+				const String	 fileNameNoExt = iTrack.fileName.SubString(0, iTrack.fileName.FindLast(".") + 1);
 
 				for (Int i = 0; extensions[i] != NIL; i++)
 				{
@@ -301,7 +301,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 					if (File(fileName).Exists())
 					{
-						iTrack.origFilename = fileName;
+						iTrack.fileName = fileName;
 
 						break;
 					}
@@ -310,7 +310,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			/* Check file existence.
 			 */
-			if (!File(iTrack.origFilename).Exists())
+			if (!File(iTrack.fileName).Exists())
 			{
 				errorState  = True;
 				errorString = "File referenced in cue sheet not found";
@@ -325,7 +325,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			/* Create decoder component.
 			 */
 			AS::Registry		&boca	 = AS::Registry::Get();
-			AS::DecoderComponent	*decoder = boca.CreateDecoderForStream(iTrack.origFilename);
+			AS::DecoderComponent	*decoder = boca.CreateDecoderForStream(iTrack.fileName);
 
 			if (decoder == NIL)
 			{
@@ -351,7 +351,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			 */
 			Track	 infoTrack;
 
-			errorState  = decoder->GetStreamInfo(iTrack.origFilename, infoTrack);
+			errorState  = decoder->GetStreamInfo(iTrack.fileName, infoTrack);
 			errorString = decoder->GetErrorString();
 
 			boca.DeleteComponent(decoder);
@@ -532,7 +532,7 @@ Bool BoCA::DecoderCueSheet::AddTrack(const Track &track, Array<Track> &tracks) c
 	 */
 	Track	 rTrack;
 
-	rTrack.origFilename = track.origFilename;
+	rTrack.fileName	    = track.fileName;
 
 	rTrack.sampleOffset = track.sampleOffset;
 

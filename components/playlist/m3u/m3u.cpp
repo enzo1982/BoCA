@@ -103,7 +103,7 @@ const Array<BoCA::Track> &BoCA::PlaylistM3U::ReadPlaylist(const String &file)
 		 */
 		Track	 track;
 
-		track.origFilename = fileName;
+		track.fileName = fileName;
 
 		trackList.Add(track);
 	}

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -198,7 +198,7 @@ Bool BoCA::EncoderCoreAudioConnect::Activate()
 	((CoreAudioCommSetup *) &comm->data)->fp       = format.fp;
 	((CoreAudioCommSetup *) &comm->data)->sign     = format.sign;
 
-	char	*outfile = track.outfile.ConvertTo("UTF-8");
+	char	*outfile = track.outputFile.ConvertTo("UTF-8");
 
 	memcpy(((CoreAudioCommSetup *) &comm->data)->file, outfile, strlen(outfile) + 1);
 
@@ -236,7 +236,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(config);
-				tagger->RenderStreamInfo(track.outfile, track);
+				tagger->RenderStreamInfo(track.outputFile, track);
 
 				boca.DeleteComponent(tagger);
 			}
@@ -256,7 +256,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 			if (tagger != NIL)
 			{
-				OutStream		 out(STREAM_FILE, track.outfile, OS_APPEND);
+				OutStream		 out(STREAM_FILE, track.outputFile, OS_APPEND);
 				Buffer<unsigned char>	 id3Buffer;
 
 				tagger->SetConfiguration(config);
@@ -280,7 +280,7 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 			if (tagger != NIL)
 			{
-				OutStream		 out(STREAM_FILE, track.outfile, OS_APPEND);
+				OutStream		 out(STREAM_FILE, track.outputFile, OS_APPEND);
 				Buffer<unsigned char>	 id3Buffer;
 
 				tagger->SetConfiguration(config);

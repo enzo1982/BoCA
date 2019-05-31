@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -360,33 +360,30 @@ String BoCA::Utilities::GetRelativeFileName(const String &trackFileName, const S
  */
 String BoCA::Utilities::GetCDTrackFileName(const Track &track)
 {
+	if (!track.isCDTrack) return track.fileName;
+
 	/* Special handling for CD tracks on Windows.
 	 */
-	String	 fileName = track.origFilename;
+	String	 fileName = track.fileName;
 
 #ifdef __WIN32__
-	if (track.isCDTrack)
+	for (Int drive = 2; drive < 26; drive++)
 	{
-		for (Int drive = 2; drive < 26; drive++)
+		String	 trackCDA = String(" ").Append(":\\track").Append(track.cdTrack < 10 ? "0" : NIL).Append(String::FromInt(track.cdTrack)).Append(".cda");
+
+		trackCDA[0] = drive + 'A';
+
+		InStream	 in(STREAM_FILE, trackCDA, IS_READ);
+
+		in.Seek(32);
+
+		Int	 trackLength = in.InputNumber(4);
+
+		if (track.length == (trackLength * 1176) / (track.GetFormat().bits / 8))
 		{
-			String	 trackCDA = String(" ").Append(":\\track").Append(track.cdTrack < 10 ? "0" : NIL).Append(String::FromInt(track.cdTrack)).Append(".cda");
+			fileName = trackCDA;
 
-			trackCDA[0] = drive + 'A';
-
-			InStream	*in = new InStream(STREAM_FILE, trackCDA, IS_READ);
-
-			in->Seek(32);
-
-			Int	 trackLength = in->InputNumber(4);
-
-			delete in;
-
-			if (track.length == (trackLength * 1176) / (track.GetFormat().bits / 8))
-			{
-				fileName = trackCDA;
-
-				break;
-			}
+			break;
 		}
 	}
 #endif
