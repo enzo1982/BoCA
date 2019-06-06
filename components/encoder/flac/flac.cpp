@@ -111,6 +111,10 @@ namespace BoCA
 	FLAC__StreamEncoderWriteStatus	 FLACStreamEncoderWriteCallback(const FLAC__StreamEncoder *, const FLAC__byte[], size_t, unsigned, unsigned, void *);
 	FLAC__StreamEncoderSeekStatus	 FLACStreamEncoderSeekCallback(const FLAC__StreamEncoder *, FLAC__uint64, void *);
 	FLAC__StreamEncoderTellStatus	 FLACStreamEncoderTellCallback(const FLAC__StreamEncoder *, FLAC__uint64 *, void *);
+
+	/* Use 512kB IO buffer for writing FLAC files.
+	 */
+	static const Int		 flacStreamEncoderBufferSize = 512 * 1024;
 };
 
 BoCA::EncoderFLAC::EncoderFLAC()
@@ -291,6 +295,10 @@ Bool BoCA::EncoderFLAC::Activate()
 
 	bytesWritten = 0;
 
+	/* Set larger write buffer size.
+	 */
+	if (driver->IsBuffered()) driver->SetBufferSize(flacStreamEncoderBufferSize);
+
 	/* Init encoder and check status.
 	 */
 	FLAC__StreamEncoderInitStatus	 status = FLAC__STREAM_ENCODER_INIT_STATUS_OK;
@@ -321,6 +329,8 @@ Bool BoCA::EncoderFLAC::Activate()
 
 Bool BoCA::EncoderFLAC::Deactivate()
 {
+	/* Finish and free encoder.
+	 */
 	ex_FLAC__stream_encoder_finish(encoder);
 	ex_FLAC__stream_encoder_delete(encoder);
 

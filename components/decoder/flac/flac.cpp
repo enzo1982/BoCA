@@ -91,6 +91,10 @@ namespace BoCA
 	FLAC__bool			 FLACStreamDecoderEofCallback(const FLAC__StreamDecoder *, void *);
 	void				 FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *, const FLAC__StreamMetadata *, void *);
 	void				 FLACStreamDecoderErrorCallback(const FLAC__StreamDecoder *, FLAC__StreamDecoderErrorStatus, void *);
+
+	/* Use 512kB IO buffer for reading FLAC files.
+	 */
+	static const Int		 flacStreamDecoderBufferSize = 512 * 1024;
 };
 
 Bool BoCA::DecoderFLAC::CanOpenStream(const String &streamURI)
@@ -302,6 +306,12 @@ Int BoCA::DecoderFLAC::ReadFLAC(Bool readData)
 		ex_FLAC__stream_decoder_set_metadata_respond(decoder, FLAC__METADATA_TYPE_PICTURE);
 	}
 
+	/* Set larger read buffer size.
+	 */
+	if (readData && driver->IsBuffered()) driver->SetBufferSize(flacStreamDecoderBufferSize);
+
+	/* Initialize decoder.
+	 */
 	char	 signature[5] = { 0, 0, 0, 0, 0 };
 
 	driver->ReadData((UnsignedByte *) signature, 4);
@@ -310,6 +320,8 @@ Int BoCA::DecoderFLAC::ReadFLAC(Bool readData)
 	if	(String(signature) == "fLaC") ex_FLAC__stream_decoder_init_stream(decoder, &FLACStreamDecoderReadCallback, &FLACStreamDecoderSeekCallback, &FLACStreamDecoderTellCallback, &FLACStreamDecoderLengthCallback, &FLACStreamDecoderEofCallback, &FLACStreamDecoderWriteCallback, &FLACStreamDecoderMetadataCallback, &FLACStreamDecoderErrorCallback, this);
 	else if (String(signature) == "OggS") ex_FLAC__stream_decoder_init_ogg_stream(decoder, &FLACStreamDecoderReadCallback, &FLACStreamDecoderSeekCallback, &FLACStreamDecoderTellCallback, &FLACStreamDecoderLengthCallback, &FLACStreamDecoderEofCallback, &FLACStreamDecoderWriteCallback, &FLACStreamDecoderMetadataCallback, &FLACStreamDecoderErrorCallback, this);
 
+	/* Process metadata and audio.
+	 */
 	ex_FLAC__stream_decoder_process_until_end_of_metadata(decoder);
 
 	if (readData)
@@ -319,6 +331,8 @@ Int BoCA::DecoderFLAC::ReadFLAC(Bool readData)
 		ex_FLAC__stream_decoder_process_until_end_of_stream(decoder);
 	}
 
+	/* Finish and free decoder.
+	 */
 	ex_FLAC__stream_decoder_finish(decoder);
 	ex_FLAC__stream_decoder_delete(decoder);
 
