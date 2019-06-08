@@ -61,12 +61,19 @@ BoCA::AS::Registry::Registry()
 
 	/* Load available components.
 	 */
-	LoadComponents(Utilities::GetBoCADirectory(), "boca");
+	Config	*configuration	   = Config::Get();
 
-	if (BoCA::GetApplicationPrefix() != NIL && BoCA::GetApplicationPrefix() != "boca")
+	String	 bocaPrefix	   = "boca";
+	String	 applicationPrefix = BoCA::GetApplicationPrefix();
+
+	LoadComponents(String(configuration->configDir).Append(Directory::GetDirectoryDelimiter()).Append(bocaPrefix), bocaPrefix);
+	LoadComponents(Utilities::GetBoCADirectory(), bocaPrefix);
+
+	if (applicationPrefix != NIL && applicationPrefix != bocaPrefix)
 	{
-		LoadComponents(Utilities::GetBoCADirectory(), BoCA::GetApplicationPrefix());
-		LoadComponents(Utilities::GetBoCADirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append(BoCA::GetApplicationPrefix()), BoCA::GetApplicationPrefix());
+		LoadComponents(String(configuration->configDir).Append(Directory::GetDirectoryDelimiter()).Append(bocaPrefix), applicationPrefix);
+		LoadComponents(Utilities::GetBoCADirectory(), applicationPrefix);
+		LoadComponents(Utilities::GetBoCADirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append(applicationPrefix), applicationPrefix);
 	}
 
 	/* Check which components to use and
