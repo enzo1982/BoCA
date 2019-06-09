@@ -136,6 +136,15 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 
 Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &streamURI, Track &track)
 {
+	/* Return cached track from previous call.
+	 */
+	if (this->track.fileName == streamURI)
+	{
+		track = this->track;
+
+		return Success();
+	}
+
 	/* Create temporary WAVE file.
 	 */
 	String	 wavFileName = Utilities::GetNonUnicodeTempFileName(streamURI).Append(".wav");

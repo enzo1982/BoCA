@@ -95,6 +95,15 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
+	/* Return cached track from previous call.
+	 */
+	if (this->track.fileName == streamURI)
+	{
+		track = this->track;
+
+		return Success();
+	}
+
 	String	 encFileName = streamURI;
 
 	/* Copy the file and decode the temporary copy

@@ -45,8 +45,6 @@ Bool BoCA::AS::DecoderComponentExternal::CanOpenStream(const String &streamURI)
 		{
 			if (!lcURI.EndsWith(String(".").Append(format->GetExtensions().GetNth(j)))) continue;
 
-			Track	 track;
-
 			if (GetStreamInfo(streamURI, track) == Success()) return True;
 		}
 	}
