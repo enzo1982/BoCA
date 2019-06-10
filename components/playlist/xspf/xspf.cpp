@@ -97,14 +97,7 @@ const Array<BoCA::Track> &BoCA::PlaylistXSPF::ReadPlaylist(const String &file)
 
 		/* Handle relative paths.
 		 */
-#ifdef __WIN32__
-		if (fileName[1] != ':' && !fileName.StartsWith("\\\\") && !fileName.Contains("://"))
-#else
-		if (!fileName.StartsWith(Directory::GetDirectoryDelimiter()) && !fileName.StartsWith("~") && !fileName.Contains("://"))
-#endif
-		{
-			fileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(fileName);
-		}
+		if (Utilities::IsRelativePath(fileName)) fileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(fileName);
 	}
 
 	in.Close();

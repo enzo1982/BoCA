@@ -75,20 +75,27 @@ const Array<BoCA::Track> &BoCA::PlaylistPLS::ReadPlaylist(const String &file)
 
 		/* Handle relative paths.
 		 */
-#ifdef __WIN32__
-		if (fileName[1] != ':' && !fileName.StartsWith("\\\\") && !fileName.Contains("://"))
-#else
-		if (!fileName.StartsWith(Directory::GetDirectoryDelimiter()) && !fileName.StartsWith("~") && !fileName.Contains("://"))
-#endif
+		String	 resolvedFileName = fileName;
+
+		if (Utilities::IsRelativePath(resolvedFileName)) resolvedFileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(resolvedFileName);
+
+		/* If file is not found, try interpreting the file name using the default system encoding.
+		 */
+		if (!File(resolvedFileName).Exists())
 		{
-			fileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(fileName);
+			String::InputFormat	 inputFormat(String::GetDefaultEncoding());
+			String			 nativeFileName = fileName.ConvertTo("ISO-8859-1");
+
+			if (Utilities::IsRelativePath(nativeFileName)) nativeFileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(nativeFileName);
+
+			if (File(nativeFileName).Exists()) resolvedFileName = nativeFileName;
 		}
 
 		/* Add track to track list.
 		 */
 		Track	 track;
 
-		track.fileName = fileName;
+		track.fileName = resolvedFileName;
 
 		trackList.Add(track);
 	}

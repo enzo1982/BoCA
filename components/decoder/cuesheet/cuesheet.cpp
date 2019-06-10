@@ -81,22 +81,20 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 	/* Open cue sheet.
 	 */
-	InStream	*file	= new InStream(STREAM_FILE, streamURI, IS_READ);
+	InStream		 in(STREAM_FILE, streamURI, IS_READ);
 
 	/* Look for UTF-8 BOM and set input format.
 	 */
-	String		 prevInputFormat = String::SetInputFormat("ISO-8859-1");
+	String::InputFormat	 inputFormat("ISO-8859-1");
 
-	Int		 bom[3] = { (Int) file->InputNumber(1), (Int) file->InputNumber(1), (Int) file->InputNumber(1) };
-
-	if (bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF) String::SetInputFormat("UTF-8");
-	else							file->Seek(0);
+	if (in.InputNumberRaw(3) == 0xEFBBBF) String::SetInputFormat("UTF-8");
+	else				      in.Seek(0);
 
 	/* Actual parsing action.
 	 */
-	while (file->GetPos() < file->Size())
+	while (in.GetPos() < in.Size())
 	{
-		String	 line = file->InputLine().Trim();
+		String	 line = in.InputLine().Trim();
 
 		/* Parse metadata comments.
 		 */
@@ -225,21 +223,21 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 		/* End of a track.
 		 */
-		if ((line.StartsWith("TRACK ") || line.StartsWith("FILE ") || file->GetPos() == file->Size()) && trackMode)
+		if ((line.StartsWith("TRACK ") || line.StartsWith("FILE ") || in.GetPos() == in.Size()) && trackMode)
 		{
 			if ((iTrack.length == -1 && iTrack.approxLength == -1) || iTrack.length == fileLength || iTrack.approxLength == fileLength)
 			{
 				/* Get previous track length.
 				 */
-				if (line.StartsWith("FILE ") || file->GetPos() == file->Size()) iTrack.length = fileLength - iTrack.sampleOffset;
+				if (line.StartsWith("FILE ") || in.GetPos() == in.Size()) iTrack.length = fileLength - iTrack.sampleOffset;
 
 				if (line.StartsWith("TRACK "))
 				{
-					Int	 filePos = file->GetPos();
+					Int	 filePos = in.GetPos();
 
-					while (file->GetPos() < file->Size())
+					while (in.GetPos() < in.Size())
 					{
-						String	 line = file->InputLine().Trim();
+						String	 line = in.InputLine().Trim();
 
 						if (line.StartsWith("FILE ")) break;
 
@@ -257,7 +255,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 						}
 					}
 
-					file->Seek(filePos);
+					in.Seek(filePos);
 				}
 			}
 
@@ -283,14 +281,30 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			/* Get referenced file name.
 			 */
-			if (line.Contains("\"")) iTrack.fileName = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 iTrack.fileName = line.SubString(line.Find(" ")  + 1, line.FindLast(" ")  - line.Find(" ")  - 1);
+			String	 fileName;
 
-			if (!iTrack.fileName.StartsWith("/")    &&
-			    !iTrack.fileName.StartsWith("\\\\") &&
-			     iTrack.fileName[1] != ':') iTrack.fileName = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(iTrack.fileName);
+			if (line.Contains("\"")) fileName = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
+			else			 fileName = line.SubString(line.Find(" ")  + 1, line.FindLast(" ")  - line.Find(" ")  - 1);
 
-			iTrack.fileName = File(iTrack.fileName);
+			/* Handle relative paths.
+			 */
+			String	 resolvedFileName = fileName;
+
+			if (Utilities::IsRelativePath(resolvedFileName)) resolvedFileName = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(resolvedFileName);
+
+			/* If file is not found, try interpreting the file name using the default system encoding.
+			 */
+			if (!File(resolvedFileName).Exists())
+			{
+				String::InputFormat	 inputFormat(String::GetDefaultEncoding());
+				String			 nativeFileName = fileName.ConvertTo("ISO-8859-1");
+
+				if (Utilities::IsRelativePath(nativeFileName)) nativeFileName = File(streamURI).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(nativeFileName);
+
+				if (File(nativeFileName).Exists()) resolvedFileName = nativeFileName;
+			}
+
+			iTrack.fileName = File(resolvedFileName);
 
 			/* Look for compressed files in place of referenced Wave, Wave64, RF64 or AIFF files.
 			 */
@@ -425,13 +439,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		}
 	}
 
-	file->Close();
-
-	delete file;
-
-	/* Restore previous input format.
-	 */
-	String::SetInputFormat(prevInputFormat);
+	in.Close();
 
 	/* Return on error.
 	 */

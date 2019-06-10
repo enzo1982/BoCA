@@ -57,12 +57,14 @@ Bool BoCA::PlaylistM3U::CanOpenFile(const String &file)
 
 const Array<BoCA::Track> &BoCA::PlaylistM3U::ReadPlaylist(const String &file)
 {
-	String::InputFormat	 inputFormat("UTF-8");
 	InStream		 in(STREAM_FILE, file, IS_READ);
 
-	/* Skip UTF-8 BOM.
+	/* Look for UTF-8 BOM and set input format.
 	 */
-	if (in.InputNumberRaw(3) != 0xEFBBBF) in.Seek(0);
+	String::InputFormat	 inputFormat("ISO-8859-1");
+
+	if (in.InputNumberRaw(3) == 0xEFBBBF) String::SetInputFormat("UTF-8");
+	else				      in.Seek(0);
 
 	/* Parse file line by line.
 	 */
@@ -90,20 +92,27 @@ const Array<BoCA::Track> &BoCA::PlaylistM3U::ReadPlaylist(const String &file)
 
 		/* Handle relative paths.
 		 */
-#ifdef __WIN32__
-		if (fileName[1] != ':' && !fileName.StartsWith("\\\\") && !fileName.Contains("://"))
-#else
-		if (!fileName.StartsWith(Directory::GetDirectoryDelimiter()) && !fileName.StartsWith("~") && !fileName.Contains("://"))
-#endif
+		String	 resolvedFileName = fileName;
+
+		if (Utilities::IsRelativePath(resolvedFileName)) resolvedFileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(resolvedFileName);
+
+		/* If file is not found, try interpreting the file name using the default system encoding.
+		 */
+		if (!File(resolvedFileName).Exists())
 		{
-			fileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(fileName);
+			String::InputFormat	 inputFormat(String::GetDefaultEncoding());
+			String			 nativeFileName = fileName.ConvertTo("ISO-8859-1");
+
+			if (Utilities::IsRelativePath(nativeFileName)) nativeFileName = File(file).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(nativeFileName);
+
+			if (File(nativeFileName).Exists()) resolvedFileName = nativeFileName;
 		}
 
 		/* Add track to track list.
 		 */
 		Track	 track;
 
-		track.fileName = fileName;
+		track.fileName = resolvedFileName;
 
 		trackList.Add(track);
 	}
