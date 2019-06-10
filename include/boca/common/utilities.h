@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -42,6 +42,8 @@ namespace BoCA
 
 			static String		 CreateDirectoryForFile(const String &);
 			static String		 ReplaceIncompatibleCharacters(const String &, Bool = True, Bool = True, Bool = False);
+
+			static Bool		 IsRelativePath(const String &);
 
 			static String		 GetAbsolutePathName(const String &);
 			static String		 GetRelativeFileName(const String &, const String &);

@@ -195,32 +195,40 @@ String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string, Bool
 	return rVal;
 }
 
+/* This function checks if the passed path is a relative one.
+ */
+Bool BoCA::Utilities::IsRelativePath(const String &path)
+{
+#ifdef __WIN32__
+	return ( path[1] != ':'		 && // Absolute local path
+		!path.StartsWith("\\\\") && // Network resource
+		!path.Contains("://"));	    // URI
+#else
+	return (!path.StartsWith("/")	 && // Absolute path
+		!path.StartsWith("~")	 && // Home directory
+		!path.Contains("://"));	    // URI
+#endif
+}
+
 /* This function returns the absolute path corresponding to the passed
  * path. It may differ from the passed one due to use of the <installdrive>
  * placeholder or because the passed path is a relative one.
  */
-String BoCA::Utilities::GetAbsolutePathName(const String &pathName)
+String BoCA::Utilities::GetAbsolutePathName(const String &path)
 {
-	String	 rPathName = pathName;
+	String	 pathName = path;
 
-	/* Replace <installdrive> patter.
+	/* Replace <installdrive> pattern.
 	 */
 #ifdef __WIN32__
-	rPathName.Replace("<installdrive>", GUI::Application::GetApplicationDirectory().Head(2));
-
-	if ( rPathName[1] != ':' &&	   // Absolute local path
-	    !rPathName.StartsWith("\\\\")) // Network resource
+	pathName.Replace("<installdrive>", GUI::Application::GetApplicationDirectory().Head(2));
 #else
-	rPathName.Replace("<installdrive>", NIL);
-
-	if (!rPathName.StartsWith("/") &&  // Absolute path
-	    !rPathName.StartsWith("~"))	   // Home directory
+	pathName.Replace("<installdrive>", NIL);
 #endif
-	{
-		rPathName = GUI::Application::GetApplicationDirectory().Append(rPathName);
-	}
 
-	return rPathName;
+	if (IsRelativePath(pathName)) pathName = GUI::Application::GetApplicationDirectory().Append(pathName);
+
+	return pathName;
 }
 
 /* This function takes a file name and normalizes all the
