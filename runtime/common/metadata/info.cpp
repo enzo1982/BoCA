@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -81,7 +81,9 @@ Bool BoCA::Info::HasOtherInfo(const String &key) const
 {
 	foreach (const String &info, other)
 	{
-		if (info.Head(info.Find(":")) == key) return True;
+		Int	 separator = info.Find(":");
+
+		if (info.Head(separator) == key) return True;
 	}
 
 	return False;
@@ -91,7 +93,9 @@ String BoCA::Info::GetOtherInfo(const String &key) const
 {
 	foreach (const String &info, other)
 	{
-		if (info.Head(info.Find(":")) == key) return info.Tail(info.Length() - info.Find(":") - 1);
+		Int	 separator = info.Find(":");
+
+		if (info.Head(separator) == key) return info.Tail(info.Length() - separator - 1);
 	}
 
 	return NIL;
@@ -101,7 +105,9 @@ Bool BoCA::Info::SetOtherInfo(const String &key, const String &value)
 {
 	foreach (const String &info, other)
 	{
-		if (info.Head(info.Find(":")) == key)
+		Int	 separator = info.Find(":");
+
+		if (info.Head(separator) == key)
 		{
 			if (value != NIL) other.SetNth(foreachindex, String(key).Append(":").Append(value));
 			else		  other.RemoveNth(foreachindex);
