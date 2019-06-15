@@ -113,7 +113,7 @@ STDMETHODIMP BoCA::MFByteStream::IsEndOfStream(BOOL *pfEndOfStream)
 	Int64	 position = driver->GetPos();
 	Int64	 size	  = driver->GetSize();
 
-	*pfEndOfStream = (position == size);
+	*pfEndOfStream = (position >= size);
 
 	return S_OK;
 }
