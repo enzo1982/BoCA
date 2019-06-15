@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,7 +14,7 @@
 
 BoCA::LengthDisplay::LengthDisplay(const Bitmap &iBitmap) : Widget(Point(0, 0), Size(42, 14))
 {
-	bitmap	= iBitmap;
+	bitmap = iBitmap;
 }
 
 BoCA::LengthDisplay::~LengthDisplay()
@@ -36,14 +36,25 @@ Int BoCA::LengthDisplay::Paint(Int message)
 				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 				surface->Frame(frame, FRAME_DOWN);
 
-				Size	 scaledBitmapSize = bitmap.GetSize() / 2 * surface->GetSurfaceDPI() / 96.0;
-				Int	 bitmapOffset	  = bitmap != NIL ? (frame.GetHeight() - scaledBitmapSize.cy) / 2.0 : 2;
+				/* Draw bitmap.
+				 */
+				Size	 bitmapSize   = bitmap.GetSize();
+				Size	 scaledSize   = bitmapSize / 2 * surface->GetSurfaceDPI() / 96.0;
+				Int	 bitmapOffset = bitmap != NIL ? (frame.GetHeight() - scaledSize.cy) / 2.0 : 2;
 
-				if (bitmap != NIL) surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), Rect(frame.GetPosition() + Point(bitmapOffset, bitmapOffset), scaledBitmapSize));
+				if (bitmap != NIL)
+				{
+					if (bitmapSize != scaledSize && bitmapScaled.GetSize() != scaledSize) bitmapScaled = bitmap.Scale(scaledSize);
 
-				Int	 textOffset	  = Math::Round((frame.GetHeight() - scaledTextSize.cy) / 2.0);
+					if (bitmapSize == scaledSize) surface->BlitFromBitmap(bitmap,	    Rect(Point(0, 0), scaledSize), Rect(frame.GetPosition() + Point(bitmapOffset, bitmapOffset), scaledSize));
+					else			      surface->BlitFromBitmap(bitmapScaled, Rect(Point(0, 0), scaledSize), Rect(frame.GetPosition() + Point(bitmapOffset, bitmapOffset), scaledSize));
+				}
 
-				surface->SetText(text, frame + Point(scaledBitmapSize.cx + 2 * bitmapOffset - 1, textOffset - 1), font);
+				/* Draw text.
+				 */
+				Int	 textOffset   = Math::Round((frame.GetHeight() - scaledTextSize.cy) / 2.0);
+
+				surface->SetText(text, frame + Point(scaledSize.cx + 2 * bitmapOffset - 1, textOffset - 1), font);
 			}
 
 			break;
