@@ -13,7 +13,7 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
-#include <smooth/io/drivers/driver_posix.h> 
+#include <smooth/io/drivers/driver_ansi.h> 
 
 #include <mfapi.h>
 #include <propvarutil.h>
@@ -111,7 +111,7 @@ Bool BoCA::DecoderMediaFoundation::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderMediaFoundation::GetStreamInfo(const String &streamURI, Track &track)
 {
-	DriverPOSIX	 driver(streamURI, IS_READ);
+	DriverANSI	 driver(streamURI, IS_READ);
 
 	/* Wrap stream in an IMFByteStream interface and create source reader.
 	 */

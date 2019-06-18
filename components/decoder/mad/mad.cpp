@@ -13,7 +13,7 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
-#include <smooth/io/drivers/driver_posix.h>
+#include <smooth/io/drivers/driver_ansi.h>
 
 #include "mad.h"
 #include "config.h"
@@ -101,7 +101,7 @@ Bool BoCA::DecoderMAD::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 {
-	DriverPOSIX	 ioDriver(streamURI, IS_READ);
+	DriverANSI	 ioDriver(streamURI, IS_READ);
 	InStream	 in(STREAM_DRIVER, &ioDriver);
 
 	SkipID3v2Tag(in);
