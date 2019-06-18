@@ -93,6 +93,8 @@ Bool BoCA::DecoderOpus::CanOpenStream(const String &streamURI)
 
 	in.Seek(0);
 
+	/* Check if Opus stream.
+	 */
 	ogg_sync_state		 oy;
 	ogg_stream_state	 os;
 	ogg_page		 og;
@@ -149,13 +151,18 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 	static Endianness	 endianness = CPU().GetEndianness();
 
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
-	Format		 format;
+
+	/* Set up track format.
+	 */
+	Format	 format;
 
 	format.bits  = 16;
 	format.rate  = 48000;
 
 	track.fileSize = in.Size();
 
+	/* Set up Ogg reader.
+	 */
 	ogg_sync_state		 oy;
 	ogg_stream_state	 os;
 	ogg_page		 og;

@@ -72,12 +72,17 @@ Bool BoCA::DecoderSpeex::CanOpenStream(const String &streamURI)
 Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 {
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
-	Format		 format = track.GetFormat();
+
+	/* Set up track format.
+	 */
+	Format	 format = track.GetFormat();
 
 	format.bits  = 16;
 
 	track.fileSize = in.Size();
 
+	/* Set up Ogg reader.
+	 */
 	ogg_sync_state		 oy;
 	ogg_stream_state	 os;
 	ogg_page		 og;

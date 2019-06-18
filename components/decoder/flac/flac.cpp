@@ -103,6 +103,8 @@ Bool BoCA::DecoderFLAC::CanOpenStream(const String &streamURI)
 
 	SkipID3v2Tag(in);
 
+	/* Check file signature.
+	 */
 	String	 fileType = in.InputString(4);
 
 	if	(fileType == "fLaC") return True;
@@ -112,6 +114,8 @@ Bool BoCA::DecoderFLAC::CanOpenStream(const String &streamURI)
 
 	in.RelSeek(-4);
 
+	/* Check if Ogg FLAC.
+	 */
 	ogg_sync_state		 oy;
 	ogg_stream_state	 os;
 	ogg_page		 og;
@@ -165,6 +169,8 @@ Error BoCA::DecoderFLAC::GetStreamInfo(const String &streamURI, Track &track)
 
 	SkipID3v2Tag(in);
 
+	/* Set up members.
+	 */
 	track.fileSize	   = in.Size();
 
 	infoTrack	   = &track;
@@ -173,6 +179,8 @@ Error BoCA::DecoderFLAC::GetStreamInfo(const String &streamURI, Track &track)
 	driver		   = &ioDriver;
 	driver->Seek(in.GetPos());
 
+	/* Read metadata.
+	 */
 	readDataMutex	   = new Mutex();
 	samplesBufferMutex = new Mutex();
 
