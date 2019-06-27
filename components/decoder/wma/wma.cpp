@@ -78,6 +78,11 @@ Void smooth::DetachDLL()
 	FreeWMVCoreDLL();
 }
 
+namespace BoCA
+{
+	static const String	 uncPrefix = "\\\\?\\";
+};
+
 Void BoCA::DecoderWMA::Initialize()
 {
 	/* Init the Microsoft COM library.
@@ -131,7 +136,9 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Open file.
 	 */
-	hr = reader->Open(streamURI, readerCallback, NIL);
+	String	 uncPath = String(streamURI.StartsWith("\\\\") ? "" : uncPrefix).Append(streamURI);
+
+	hr = reader->Open(uncPath, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.
@@ -316,7 +323,9 @@ Bool BoCA::DecoderWMA::Activate()
 
 	/* Open file.
 	 */
-	hr = reader->Open(track.fileName, readerCallback, NIL);
+	String	 uncPath = String(track.fileName.StartsWith("\\\\") ? "" : uncPrefix).Append(track.fileName);
+
+	hr = reader->Open(uncPath, readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.

@@ -79,6 +79,11 @@ Void smooth::DetachDLL()
 	FreeWMVCoreDLL();
 }
 
+namespace BoCA
+{
+	static const String	 uncPrefix = "\\\\?\\";
+};
+
 Void BoCA::TaggerWMA::Initialize()
 {
 	/* Init the Microsoft COM library.
@@ -140,7 +145,9 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 	/* Open file and render tags.
 	 */
-	hr = metadataEditor2->OpenEx(fileName, GENERIC_READ | GENERIC_WRITE, 0);
+	String	 uncPath = String(fileName.StartsWith("\\\\") ? "" : uncPrefix).Append(fileName);
+
+	hr = metadataEditor2->OpenEx(uncPath, GENERIC_READ | GENERIC_WRITE, 0);
 
 	if (!FAILED(hr))
 	{
@@ -340,7 +347,9 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 	/* Open file and parse tags.
 	 */
-	hr = metadataEditor2->OpenEx(fileName, GENERIC_READ, FILE_SHARE_READ);
+	String	 uncPath = String(fileName.StartsWith("\\\\") ? "" : uncPrefix).Append(fileName);
+
+	hr = metadataEditor2->OpenEx(uncPath, GENERIC_READ, FILE_SHARE_READ);
 
 	if (!FAILED(hr))
 	{
@@ -622,9 +631,11 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 		return Error();
 	}
 
-	/* Open file and rremove tags.
+	/* Open file and remove tags.
 	 */
-	hr = metadataEditor2->OpenEx(fileName, GENERIC_READ | GENERIC_WRITE, 0);
+	String	 uncPath = String(fileName.StartsWith("\\\\") ? "" : uncPrefix).Append(fileName);
+
+	hr = metadataEditor2->OpenEx(uncPath, GENERIC_READ | GENERIC_WRITE, 0);
 
 	if (!FAILED(hr))
 	{

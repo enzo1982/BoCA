@@ -142,6 +142,11 @@ Void smooth::DetachDLL()
 	FreeWMVCoreDLL();
 }
 
+namespace BoCA
+{
+	static const String	 uncPrefix = "\\\\?\\";
+};
+
 Void BoCA::EncoderWMA::Initialize()
 {
 	/* Init the Microsoft COM library.
@@ -267,9 +272,11 @@ Bool BoCA::EncoderWMA::Activate()
 
 	/* Create and open file sink.
 	 */
+	String	 uncPath = String(track.outputFile.StartsWith("\\\\") ? "" : uncPrefix).Append(track.outputFile);
+
 	ex_WMCreateWriterFileSink(&writerFileSink);
 
-	writerFileSink->Open(track.outputFile);
+	writerFileSink->Open(uncPath);
 
 	writerAdvanced->AddSink(writerFileSink);
 
