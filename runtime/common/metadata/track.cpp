@@ -17,30 +17,9 @@
 
 Int BoCA::Track::nextTrackID = 0;
 
-BoCA::Track::Track()
+BoCA::Track::Track(const int nil)
 {
-	trackID		= nextTrackID++;
-
-	sampleOffset	= 0;
-
-	length		= -1;
-	approxLength	= -1;
-
-	fileSize	= -1;
-
-	isCDTrack	= False;
-
-	drive		= -1;
-	cdTrack		= -1;
-
-	discid		= 0;
-
-	lossless	= False;
-}
-
-BoCA::Track::Track(int nil)
-{
-	trackID		= -1;
+	trackID		= Threads::Access::Increment(nextTrackID);
 
 	sampleOffset	= 0;
 
@@ -71,6 +50,11 @@ BoCA::Track::~Track()
 BoCA::Track &BoCA::Track::operator =(const int nil)
 {
 	trackID		= -1;
+
+	format		= Format();
+
+	info		= Info();
+	originalInfo	= Info();
 
 	pictures.RemoveAll();
 	tracks.RemoveAll();
@@ -121,14 +105,14 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 
 Bool BoCA::Track::operator ==(const int nil) const
 {
-	if (trackID == -1) return True;
-	else		   return False;
+	if (format == Format())	return True;
+	else			return False;
 }
 
 Bool BoCA::Track::operator !=(const int nil) const
 {
-	if (trackID == -1) return False;
-	else		   return True;
+	if (format == Format())	return False;
+	else			return True;
 }
 
 String BoCA::Track::GetLengthString() const

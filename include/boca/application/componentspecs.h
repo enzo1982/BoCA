@@ -86,11 +86,11 @@ namespace BoCA
 				String			 channels;
 				String			 rate;
 			public:
-							 InputSpec(Int n = 0) : fp(False),
-										sign(True),
-										bits("8-32"),
-										channels("1-255"),
-										rate("1-192000")	{ }
+							 InputSpec() : fp(False),
+								       sign(True),
+								       bits("8-32"),
+								       channels("1-255"),
+								       rate("1-192000")			{ }
 							~InputSpec()					{ }
 
 				Bool			 GetFloat() const				{ return fp; }
@@ -116,7 +116,7 @@ namespace BoCA
 				String			 tagger;
 				TagMode			 mode;
 			public:
-							 TagFormat(Int n = 0) : mode(TAG_MODE_NONE)	{ }
+							 TagFormat() : mode(TAG_MODE_NONE)		{ }
 							~TagFormat()					{ }
 
 				const String		&GetName() const				{ return name; }
@@ -138,7 +138,7 @@ namespace BoCA
 				Array<String>		 extensions;
 				Array<TagFormat>	 tagFormats;
 			public:
-							 FileFormat(Int n = 0) : lossless(False)	{ }
+							 FileFormat() : lossless(False)			{ }
 							~FileFormat()					{ }
 
 				const String		&GetName() const				{ return name; }
@@ -171,12 +171,12 @@ namespace BoCA
 				Bool			 allowsPrependZero;
 				Bool			 prependZeroDefault;
 			public:
-							 TagSpec(Int n = 0) : defaultEnabled(True),
-									      supportsFreeEncoding(True),
-									      supportsCoverArt(False),
-									      coverArtDefault(True),
-									      allowsPrependZero(False),
-									      prependZeroDefault(True)	{ }
+							 TagSpec() : defaultEnabled(True),
+								     supportsFreeEncoding(True),
+								     supportsCoverArt(False),
+								     coverArtDefault(True),
+								     allowsPrependZero(False),
+								     prependZeroDefault(True)		{ }
 							~TagSpec()					{ }
 
 				const String		&GetName() const				{ return name; }
@@ -214,7 +214,7 @@ namespace BoCA
 				String			 alias;
 				String			 value;
 			public:
-							 Option(Int n = 0) : type(OPTION_TYPE_OPTION)	{ }
+							 Option() : type(OPTION_TYPE_OPTION)		{ }
 							~Option()					{ }
 
 				OptionType		 GetType() const				{ return type; }
@@ -238,9 +238,9 @@ namespace BoCA
 				String			 defaultValue;
 				Array<Option *>		 options;
 			public:
-							 Parameter(Int n = 0) : type(PARAMETER_TYPE_SWITCH),
-										enabled(False),
-										stepSize(1.0)		{ }
+							 Parameter() : type(PARAMETER_TYPE_SWITCH),
+								       enabled(False),
+								       stepSize(1.0)			{ }
 							~Parameter()					{ }
 
 				ParameterType		 GetType() const				{ return type; }

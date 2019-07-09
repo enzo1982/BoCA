@@ -77,8 +77,7 @@ namespace BoCA
 			String		 fileName;
 			String		 outputFile;
 
-					 Track();
-					 Track(int);
+					 Track(const int = NIL);
 					 Track(const Track &);
 					~Track();
 
