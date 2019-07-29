@@ -11,7 +11,7 @@
 
 namespace APE
 {
-
+#undef __forceinline
 #define __forceinline inline
 #define __stdcall
 
@@ -28,6 +28,7 @@ typedef const char *        LPCSTR;
 typedef char *              LPSTR;
 typedef long                LRESULT;
 
+#undef ZeroMemory
 #define ZeroMemory(POINTER, BYTES) memset(POINTER, 0, BYTES);
 
 #define TRUE 1
@@ -43,6 +44,7 @@ typedef long                LRESULT;
 #define _strnicmp strncasecmp
 #define _wtoi(x) wcstol(x, NULL, 10)
 #define _tcscat wcscat
+#undef _totlower
 #define _totlower towlower
 #define _totupper towupper
 

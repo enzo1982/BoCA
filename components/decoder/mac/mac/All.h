@@ -144,10 +144,12 @@ Global macros
     #define SLEEP(MILLISECONDS)                         { struct timespec t; t.tv_sec = (MILLISECONDS) / 1000; t.tv_nsec = (MILLISECONDS) % 1000 * 1000000; nanosleep(&t, NULL); }
     #define MESSAGEBOX(PARENT, TEXT, CAPTION, TYPE)
     #define PUMP_MESSAGE_LOOP
+    #undef	ODS
     #define ODS                                         printf
     #define TICK_COUNT_TYPE                             unsigned long long
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
+    #undef	ASSERT
     #define ASSERT(e)
 #endif
 
@@ -184,12 +186,15 @@ namespace APE
 Global defines
 *****************************************************************************************/
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.78")
-#define MAC_NAME                                        _T("Monkey's Audio 4.78")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.78"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.78)")
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.78) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.78\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              _T("4.81")
+#define MAC_NAME                                        _T("Monkey's Audio 4.81")
+#define PLUGIN_NAME                                     "Monkey's Audio Player v4.81"
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.81)")
+#define RESOURCE_VERSION_COMMA							4, 81, 0, 0
+#define RESOURCE_VERSION_STRING							"4.81.0.0"
+#define RESOURCE_COPYRIGHT								"Copyright (c) 2000-2019 Matthew T. Ashland"
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.81) (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.81\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #define ONE_MILLION										1000000
 #ifdef PLATFORM_WINDOWS
