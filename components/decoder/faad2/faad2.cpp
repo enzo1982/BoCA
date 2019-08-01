@@ -675,21 +675,20 @@ Bool BoCA::DecoderFAAD2::SkipID3v2Tag(InStream &in)
 
 Bool BoCA::DecoderFAAD2::SyncOnAACHeader(InStream &in)
 {
-	Int	 startPos = in.GetPos();
+	const Int	 startPos     = in.GetPos();
+	const Int	 maxFrameSize = 8192;
 
 	/* Try to sync on ADIF header.
 	 */
-	for (Int n = 0; n < 1024; n++)
+	for (Int n = 0; n < maxFrameSize; n++)
 	{
 		if (in.InputNumber(1) != 'A') continue;
 		if (in.InputNumber(1) != 'D') continue;
 		if (in.InputNumber(1) != 'I') continue;
 		if (in.InputNumber(1) != 'F') continue;
 
-		/* No ADIF magic word found in the first 1 kB.
+		/* ADIF magic word found.
 		 */
-		if (n == 1023) break;
-
 		in.RelSeek(-4);
 
 		inBytes += n;
@@ -701,16 +700,14 @@ Bool BoCA::DecoderFAAD2::SyncOnAACHeader(InStream &in)
 
 	/* Try to sync on ADTS header.
 	 */
-	for (Int n = 0; n < 1024; n++)
+	for (Int n = 0; n < maxFrameSize; n++)
 	{
 		if (  in.InputNumber(1)		      != 0xFF) continue;
 		if ( (in.InputNumber(1) & 0xF6)       != 0xF0) continue;
 		if (((in.InputNumber(1) & 0x3C) >> 2) >=   12) continue;
 
-		/* No ADTS sync found in the first 1 kB.
+		/* ADTS sync found.
 		 */
-		if (n == 1023) break;
-
 		in.RelSeek(-3);
 
 		inBytes += n;
@@ -718,7 +715,7 @@ Bool BoCA::DecoderFAAD2::SyncOnAACHeader(InStream &in)
 		return True;
 	}
 
-	/* No sync; probably not an AAC file.
+	/* No sync. Probably not an AAC file.
 	 */
 	return False;
 }
