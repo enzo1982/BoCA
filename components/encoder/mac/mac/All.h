@@ -185,16 +185,34 @@ namespace APE
 /*****************************************************************************************
 Global defines
 *****************************************************************************************/
+
+// major version number
+#define VERSION_MAJOR 4
+
+// build version number
+#define VERSION_REVISION 84
+
+// year in the copyright strings
+#define MAC_YEAR 2019
+
+// Build the version string
+#define STRINGIZE2(s) #s
+#define STRINGIZE(s) STRINGIZE2(s)
+#define VER_FILE_VERSION_STR        STRINGIZE(VERSION_MAJOR) _T(".") STRINGIZE(VERSION_REVISION) 
+#define VER_FILE_VERSION_STR_NARROW STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_REVISION) 
+#define VER_FILE_VERSION_STR_FULL	STRINGIZE(VERSION_MAJOR) _T(".") STRINGIZE(VERSION_REVISION) _T(".0.0")
+
 #define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              _T("4.81")
-#define MAC_NAME                                        _T("Monkey's Audio 4.81")
-#define PLUGIN_NAME                                     "Monkey's Audio Player v4.81"
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v4.81)")
-#define RESOURCE_VERSION_COMMA							4, 81, 0, 0
-#define RESOURCE_VERSION_STRING							"4.81.0.0"
-#define RESOURCE_COPYRIGHT								"Copyright (c) 2000-2019 Matthew T. Ashland"
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v 4.81) (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v4.81\nCopyrighted (c) 2000-2019 by Matthew T. Ashland")
+#define MAC_VERSION_STRING                              VER_FILE_VERSION_STR
+#define MAC_VERSION_STRING_W                            STRINGIZE(VERSION_MAJOR) _T(".") STRINGIZE(VERSION_REVISION) _T(".0.0")
+#define MAC_NAME                                        _T("Monkey's Audio ") VER_FILE_VERSION_STR
+#define PLUGIN_NAME                                     "Monkey's Audio Player " VER_FILE_VERSION_STR_NARROW
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") VER_FILE_VERSION_STR _T(")")
+#define RESOURCE_VERSION_COMMA							VERSION_MAJOR, VERSION_REVISION, 0, 0
+#define RESOURCE_VERSION_STRING							VER_FILE_VERSION_STR_FULL
+#define RESOURCE_COPYRIGHT								"Copyright (c) 2000-" STRINGIZE(MAC_YEAR) " Matthew T. Ashland"
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v ") VER_FILE_VERSION_STR _T(") (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(MAC_YEAR) _T(" by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #define ONE_MILLION										1000000
 #ifdef PLATFORM_WINDOWS
@@ -305,28 +323,3 @@ Error Codes
 
 // unknown error
 #define ERROR_UNDEFINED                                -1
-
-#define ERROR_EXPLANATION \
-    { ERROR_IO_READ                               , _T("I/O read error") },                         \
-    { ERROR_IO_WRITE                              , _T("I/O write error") },                        \
-    { ERROR_INVALID_INPUT_FILE                    , _T("invalid input file") },                     \
-    { ERROR_INVALID_OUTPUT_FILE                   , _T("invalid output file") },                    \
-    { ERROR_INPUT_FILE_TOO_LARGE                  , _T("input file file too large") },              \
-    { ERROR_INPUT_FILE_UNSUPPORTED_BIT_DEPTH      , _T("input file unsupported bit depth") },       \
-    { ERROR_INPUT_FILE_UNSUPPORTED_SAMPLE_RATE    , _T("input file unsupported sample rate") },     \
-    { ERROR_INPUT_FILE_UNSUPPORTED_CHANNEL_COUNT  , _T("input file unsupported channel count") },   \
-    { ERROR_INPUT_FILE_TOO_SMALL                  , _T("input file too small") },                   \
-    { ERROR_INVALID_CHECKSUM                      , _T("invalid checksum") },                       \
-    { ERROR_DECOMPRESSING_FRAME                   , _T("decompressing frame") },                    \
-    { ERROR_INITIALIZING_UNMAC                    , _T("initializing unmac") },                     \
-    { ERROR_INVALID_FUNCTION_PARAMETER            , _T("invalid function parameter") },             \
-    { ERROR_UNSUPPORTED_FILE_TYPE                 , _T("unsupported file type") },                  \
-    { ERROR_INSUFFICIENT_MEMORY                   , _T("insufficient memory") },                    \
-    { ERROR_LOADINGAPE_DLL                        , _T("loading MAC.dll") },                        \
-    { ERROR_LOADINGAPE_INFO_DLL                   , _T("loading MACinfo.dll") },                    \
-    { ERROR_LOADING_UNMAC_DLL                     , _T("loading UnMAC.dll") },                      \
-    { ERROR_USER_STOPPED_PROCESSING               , _T("user stopped processing") },                \
-    { ERROR_SKIPPED                               , _T("skipped") },                                \
-    { ERROR_BAD_PARAMETER                         , _T("bad parameter") },                          \
-    { ERROR_APE_COMPRESS_TOO_MUCH_DATA            , _T("APE compress too much data") },             \
-    { ERROR_UNDEFINED                             , _T("undefined") },
