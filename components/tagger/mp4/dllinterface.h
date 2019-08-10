@@ -57,6 +57,13 @@ typedef bool			(*MP4TAGSREMOVEARTWORK)		(const MP4Tags *, uint32_t);
 typedef MP4ChapterType		(*MP4GETCHAPTERS)		(MP4FileHandle, MP4Chapter_t **, uint32_t *, MP4ChapterType);
 typedef MP4ChapterType		(*MP4SETCHAPTERS)		(MP4FileHandle, MP4Chapter_t *, uint32_t, MP4ChapterType);
 
+typedef MP4ItmfItem *		(*MP4ITMFITEMALLOC)		(const char *, uint32_t);
+typedef void			(*MP4ITMFITEMFREE)		(MP4ItmfItem *);
+typedef bool			(*MP4ITMFADDITEM)		(MP4FileHandle, const MP4ItmfItem *);
+typedef bool			(*MP4ITMFREMOVEITEM)		(MP4FileHandle, const MP4ItmfItem *);
+typedef MP4ItmfItemList *	(*MP4ITMFGETITEMSBYMEANING)	(MP4FileHandle, const char *, const char *);
+typedef void			(*MP4ITMFITEMLISTFREE)		(MP4ItmfItemList *);
+
 extern MP4READ			 ex_MP4Read;
 extern MP4MODIFY		 ex_MP4Modify;
 extern MP4CLOSE			 ex_MP4Close;
@@ -91,3 +98,10 @@ extern MP4TAGSREMOVEARTWORK	 ex_MP4TagsRemoveArtwork;
 
 extern MP4GETCHAPTERS		 ex_MP4GetChapters;
 extern MP4SETCHAPTERS		 ex_MP4SetChapters;
+
+extern MP4ITMFITEMALLOC		 ex_MP4ItmfItemAlloc;
+extern MP4ITMFITEMFREE		 ex_MP4ItmfItemFree;
+extern MP4ITMFADDITEM		 ex_MP4ItmfAddItem;
+extern MP4ITMFREMOVEITEM	 ex_MP4ItmfRemoveItem;
+extern MP4ITMFGETITEMSBYMEANING	 ex_MP4ItmfGetItemsByMeaning;
+extern MP4ITMFITEMLISTFREE	 ex_MP4ItmfItemListFree;

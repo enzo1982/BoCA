@@ -347,6 +347,8 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		else if	(key == INFO_COPYRIGHT)	     { ID3_Frame frame(ID3FID_COPYRIGHT);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
+		else if	(key == INFO_DISCSUBTITLE)   { ID3_Frame frame(ID3FID_SETSUBTITLE);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+
 		else if	(key == INFO_RADIOSTATION)   { ID3_Frame frame(ID3FID_NETRADIOSTATION);   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_RADIOOWNER)     { ID3_Frame frame(ID3FID_NETRADIOOWNER);     SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
@@ -536,6 +538,8 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_INITIALKEY)	    info.SetOtherInfo(INFO_INITIALKEY,	   GetStringField(frame, ID3FN_TEXT));
 
 		else if (frame.GetID() == ID3FID_COPYRIGHT)	    info.SetOtherInfo(INFO_COPYRIGHT,	   GetStringField(frame, ID3FN_TEXT));
+
+		else if (frame.GetID() == ID3FID_SETSUBTITLE)	    info.SetOtherInfo(INFO_DISCSUBTITLE,   GetStringField(frame, ID3FN_TEXT));
 
 		else if (frame.GetID() == ID3FID_NETRADIOSTATION)   info.SetOtherInfo(INFO_RADIOSTATION,   GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_NETRADIOOWNER)     info.SetOtherInfo(INFO_RADIOOWNER,	   GetStringField(frame, ID3FN_TEXT));

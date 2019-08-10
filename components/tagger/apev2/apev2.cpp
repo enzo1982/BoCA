@@ -125,14 +125,23 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST) { RenderAPEItem("Album Artist", value, buffer); numItems++; }
+		if	(key == INFO_ALBUMARTIST)    { RenderAPEItem("Album Artist",   value, buffer); numItems++; }
 
-		else if	(key == INFO_SUBTITLE)    { RenderAPEItem("Subtitle",     value, buffer); numItems++; }
+		else if	(key == INFO_CONTENTGROUP)   { RenderAPEItem("Grouping",       value, buffer); numItems++; }
+		else if	(key == INFO_SUBTITLE)	     { RenderAPEItem("Subtitle",       value, buffer); numItems++; }
 
-		else if	(key == INFO_CONDUCTOR)   { RenderAPEItem("Conductor",    value, buffer); numItems++; }
-		else if	(key == INFO_COMPOSER)    { RenderAPEItem("Composer",     value, buffer); numItems++; }
+		else if	(key == INFO_CONDUCTOR)	     { RenderAPEItem("Conductor",      value, buffer); numItems++; }
+		else if	(key == INFO_REMIX)	     { RenderAPEItem("MixArtist",      value, buffer); numItems++; }
+		else if	(key == INFO_COMPOSER)	     { RenderAPEItem("Composer",       value, buffer); numItems++; }
 
-		else if	(key == INFO_BPM)	  { RenderAPEItem("BPM",	  value, buffer); numItems++; }
+		else if	(key == INFO_BPM)	     { RenderAPEItem("BPM",	       value, buffer); numItems++; }
+
+		else if	(key == INFO_COPYRIGHT)	     { RenderAPEItem("Copyright",      value, buffer); numItems++; }
+		else if	(key == INFO_CATALOGNUMBER)  { RenderAPEItem("CatalogNumber",  value, buffer); numItems++; }
+
+		else if	(key == INFO_RELEASECOUNTRY) { RenderAPEItem("ReleaseCountry", value, buffer); numItems++; }
+
+		else if	(key == INFO_DISCSUBTITLE)   { RenderAPEItem("DiscSubtitle",   value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -296,23 +305,33 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		id = id.ToUpper();
 
-		if	(id == "ARTIST")       info.artist  = value;
-		else if (id == "TITLE")	       info.title   = value;
-		else if (id == "ALBUM")	       info.album   = value;
-		else if (id == "YEAR")	       info.year    = value.ToInt();
-		else if (id == "GENRE")	       info.genre   = value;
-		else if (id == "COMMENT")      info.comment = value;
-		else if (id == "PUBLISHER")    info.label   = value;
-		else if (id == "ISRC")	       info.isrc    = value;
+		if	(id == "ARTIST")	 info.artist  = value;
+		else if (id == "TITLE")		 info.title   = value;
+		else if (id == "ALBUM")		 info.album   = value;
+		else if (id == "YEAR")		 info.year    = value.ToInt();
+		else if (id == "GENRE")		 info.genre   = value;
+		else if (id == "COMMENT")	 info.comment = value;
+		else if (id == "PUBLISHER")	 info.label   = value;
+		else if (id == "LABEL")		 info.label   = value;
+		else if (id == "ISRC")		 info.isrc    = value;
 
-		else if (id == "ALBUM ARTIST") info.SetOtherInfo(INFO_ALBUMARTIST, value);
+		else if (id == "ALBUM ARTIST")	 info.SetOtherInfo(INFO_ALBUMARTIST,	value);
 
-		else if (id == "SUBTITLE")     info.SetOtherInfo(INFO_SUBTITLE,	   value);
+		else if (id == "GROUPING")	 info.SetOtherInfo(INFO_CONTENTGROUP,	value);
+		else if (id == "SUBTITLE")	 info.SetOtherInfo(INFO_SUBTITLE,	value);
 
-		else if (id == "CONDUCTOR")    info.SetOtherInfo(INFO_CONDUCTOR,   value);
-		else if (id == "COMPOSER")     info.SetOtherInfo(INFO_COMPOSER,	   value);
+		else if (id == "CONDUCTOR")	 info.SetOtherInfo(INFO_CONDUCTOR,	value);
+		else if (id == "MIXARTIST")	 info.SetOtherInfo(INFO_REMIX,		value);
+		else if (id == "COMPOSER")	 info.SetOtherInfo(INFO_COMPOSER,	value);
 
-		else if (id == "BPM")	       info.SetOtherInfo(INFO_BPM,	   value);
+		else if (id == "BPM")		 info.SetOtherInfo(INFO_BPM,		value);
+
+		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);
+		else if (id == "CATALOGNUMBER")  info.SetOtherInfo(INFO_CATALOGNUMBER,	value);
+
+		else if (id == "RELEASECOUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,	value);
+
+		else if (id == "DISCSUBTITLE")	 info.SetOtherInfo(INFO_DISCSUBTITLE,	value);
 
 		else if (id == "TRACK")
 		{

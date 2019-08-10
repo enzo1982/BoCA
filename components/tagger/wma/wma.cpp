@@ -198,29 +198,32 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 			if (value == NIL) continue;
 
-			if	(key == INFO_ALBUMARTIST)   RenderWMAStringItem(g_wszWMAlbumArtist,		value, pHeaderInfo);
+			if	(key == INFO_ALBUMARTIST)    RenderWMAStringItem(g_wszWMAlbumArtist,		 value, pHeaderInfo);
 
-			else if	(key == INFO_CONTENTGROUP)  RenderWMAStringItem(g_wszWMContentGroupDescription, value, pHeaderInfo);
-			else if	(key == INFO_SUBTITLE)	    RenderWMAStringItem(g_wszWMSubTitle,		value, pHeaderInfo);
+			else if	(key == INFO_CONTENTGROUP)   RenderWMAStringItem(g_wszWMContentGroupDescription, value, pHeaderInfo);
+			else if	(key == INFO_SUBTITLE)	     RenderWMAStringItem(g_wszWMSubTitle,		 value, pHeaderInfo);
 
-			else if	(key == INFO_CONDUCTOR)	    RenderWMAStringItem(g_wszWMConductor,		value, pHeaderInfo);
-			else if	(key == INFO_COMPOSER)	    RenderWMAStringItem(g_wszWMComposer,		value, pHeaderInfo);
-			else if	(key == INFO_LYRICIST)	    RenderWMAStringItem(g_wszWMWriter,			value, pHeaderInfo);
+			else if	(key == INFO_CONDUCTOR)	     RenderWMAStringItem(g_wszWMConductor,		 value, pHeaderInfo);
+			else if	(key == INFO_COMPOSER)	     RenderWMAStringItem(g_wszWMComposer,		 value, pHeaderInfo);
+			else if	(key == INFO_LYRICIST)	     RenderWMAStringItem(g_wszWMWriter,			 value, pHeaderInfo);
 
-			else if	(key == INFO_ORIG_ARTIST)   RenderWMAStringItem(g_wszWMOriginalArtist,		value, pHeaderInfo);
-			else if	(key == INFO_ORIG_ALBUM)    RenderWMAStringItem(g_wszWMOriginalAlbumTitle,      value, pHeaderInfo);
-			else if	(key == INFO_ORIG_LYRICIST) RenderWMAStringItem(g_wszWMOriginalLyricist,	value, pHeaderInfo);
-			else if	(key == INFO_ORIG_YEAR)	    RenderWMAStringItem(g_wszWMOriginalReleaseYear,     value, pHeaderInfo);
+			else if	(key == INFO_ORIG_ARTIST)    RenderWMAStringItem(g_wszWMOriginalArtist,		 value, pHeaderInfo);
+			else if	(key == INFO_ORIG_ALBUM)     RenderWMAStringItem(g_wszWMOriginalAlbumTitle,	 value, pHeaderInfo);
+			else if	(key == INFO_ORIG_LYRICIST)  RenderWMAStringItem(g_wszWMOriginalLyricist,	 value, pHeaderInfo);
+			else if	(key == INFO_ORIG_YEAR)	     RenderWMAStringItem(g_wszWMOriginalReleaseYear,	 value, pHeaderInfo);
 
-			else if	(key == INFO_BPM)	    RenderWMAStringItem(g_wszWMBeatsPerMinute,		value, pHeaderInfo);
-			else if	(key == INFO_INITIALKEY)    RenderWMAStringItem(g_wszWMInitialKey,		value, pHeaderInfo);
+			else if	(key == INFO_BPM)	     RenderWMAStringItem(g_wszWMBeatsPerMinute,		 value, pHeaderInfo);
+			else if	(key == INFO_INITIALKEY)     RenderWMAStringItem(g_wszWMInitialKey,		 value, pHeaderInfo);
 
-			else if	(key == INFO_RADIOSTATION)  RenderWMAStringItem(g_wszWMRadioStationName,	value, pHeaderInfo);
-			else if	(key == INFO_RADIOOWNER)    RenderWMAStringItem(g_wszWMRadioStationOwner,	value, pHeaderInfo);
+			else if	(key == INFO_COPYRIGHT)	     RenderWMAStringItem(g_wszWMCopyright,		 value, pHeaderInfo);
 
-			else if	(key == INFO_WEB_ARTIST)    RenderWMAStringItem(g_wszWMAuthorURL,		value, pHeaderInfo);
-			else if	(key == INFO_WEB_SOURCE)    RenderWMAStringItem(g_wszWMAudioSourceURL,		value, pHeaderInfo);
-			else if	(key == INFO_WEB_COPYRIGHT) RenderWMAStringItem(g_wszWMCopyrightURL,		value, pHeaderInfo);
+			else if	(key == INFO_RADIOSTATION)   RenderWMAStringItem(g_wszWMRadioStationName,	 value, pHeaderInfo);
+			else if	(key == INFO_RADIOOWNER)     RenderWMAStringItem(g_wszWMRadioStationOwner,	 value, pHeaderInfo);
+
+			else if	(key == INFO_WEB_ARTIST)     RenderWMAStringItem(g_wszWMAuthorURL,		 value, pHeaderInfo);
+			else if	(key == INFO_WEB_SOURCE)     RenderWMAStringItem(g_wszWMAudioSourceURL,		 value, pHeaderInfo);
+			else if	(key == INFO_WEB_COPYRIGHT)  RenderWMAStringItem(g_wszWMCopyrightURL,		 value, pHeaderInfo);
+			else if	(key == INFO_WEB_COMMERCIAL) RenderWMAStringItem(g_wszWMPromotionURL,		 value, pHeaderInfo);
 		}
 
 		/* Save CD table of contents.
@@ -411,29 +414,32 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			else if (String(name) == g_wszWMPublisher)		 info.label   = value;
 			else if (String(name) == g_wszWMISRC)			 info.isrc    = value;
 
-			else if (String(name) == g_wszWMAlbumArtist)		 info.SetOtherInfo(INFO_ALBUMARTIST,   value);
+			else if (String(name) == g_wszWMAlbumArtist)		 info.SetOtherInfo(INFO_ALBUMARTIST,	value);
 
-			else if (String(name) == g_wszWMContentGroupDescription) info.SetOtherInfo(INFO_CONTENTGROUP,  value);
-			else if (String(name) == g_wszWMSubTitle)		 info.SetOtherInfo(INFO_SUBTITLE,      value);
+			else if (String(name) == g_wszWMContentGroupDescription) info.SetOtherInfo(INFO_CONTENTGROUP,	value);
+			else if (String(name) == g_wszWMSubTitle)		 info.SetOtherInfo(INFO_SUBTITLE,	value);
 
-			else if (String(name) == g_wszWMConductor)		 info.SetOtherInfo(INFO_CONDUCTOR,     value);
-			else if (String(name) == g_wszWMComposer)		 info.SetOtherInfo(INFO_COMPOSER,      value);
-			else if (String(name) == g_wszWMWriter)			 info.SetOtherInfo(INFO_LYRICIST,      value);
+			else if (String(name) == g_wszWMConductor)		 info.SetOtherInfo(INFO_CONDUCTOR,	value);
+			else if (String(name) == g_wszWMComposer)		 info.SetOtherInfo(INFO_COMPOSER,	value);
+			else if (String(name) == g_wszWMWriter)			 info.SetOtherInfo(INFO_LYRICIST,	value);
 
-			else if (String(name) == g_wszWMOriginalArtist)		 info.SetOtherInfo(INFO_ORIG_ARTIST,   value);
-			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.SetOtherInfo(INFO_ORIG_ALBUM,    value);
-			else if (String(name) == g_wszWMOriginalLyricist)	 info.SetOtherInfo(INFO_ORIG_LYRICIST, value);
-			else if (String(name) == g_wszWMOriginalReleaseYear)	 info.SetOtherInfo(INFO_ORIG_YEAR,     value);
+			else if (String(name) == g_wszWMOriginalArtist)		 info.SetOtherInfo(INFO_ORIG_ARTIST,	value);
+			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.SetOtherInfo(INFO_ORIG_ALBUM,	value);
+			else if (String(name) == g_wszWMOriginalLyricist)	 info.SetOtherInfo(INFO_ORIG_LYRICIST,	value);
+			else if (String(name) == g_wszWMOriginalReleaseYear)	 info.SetOtherInfo(INFO_ORIG_YEAR,	value);
 
-			else if (String(name) == g_wszWMBeatsPerMinute)		 info.SetOtherInfo(INFO_BPM,	       value);
-			else if (String(name) == g_wszWMInitialKey)		 info.SetOtherInfo(INFO_INITIALKEY,    value);
+			else if (String(name) == g_wszWMBeatsPerMinute)		 info.SetOtherInfo(INFO_BPM,		value);
+			else if (String(name) == g_wszWMInitialKey)		 info.SetOtherInfo(INFO_INITIALKEY,	value);
 
-			else if (String(name) == g_wszWMRadioStationName)	 info.SetOtherInfo(INFO_RADIOSTATION,  value);
-			else if (String(name) == g_wszWMRadioStationOwner)	 info.SetOtherInfo(INFO_RADIOOWNER,    value);
+			else if (String(name) == g_wszWMCopyright)		 info.SetOtherInfo(INFO_COPYRIGHT,	value);
 
-			else if (String(name) == g_wszWMAuthorURL)		 info.SetOtherInfo(INFO_WEB_ARTIST,    value);
-			else if (String(name) == g_wszWMAudioSourceURL)		 info.SetOtherInfo(INFO_WEB_SOURCE,    value);
-			else if (String(name) == g_wszWMCopyrightURL)		 info.SetOtherInfo(INFO_WEB_COPYRIGHT, value);
+			else if (String(name) == g_wszWMRadioStationName)	 info.SetOtherInfo(INFO_RADIOSTATION,	value);
+			else if (String(name) == g_wszWMRadioStationOwner)	 info.SetOtherInfo(INFO_RADIOOWNER,	value);
+
+			else if (String(name) == g_wszWMAuthorURL)		 info.SetOtherInfo(INFO_WEB_ARTIST,	value);
+			else if (String(name) == g_wszWMAudioSourceURL)		 info.SetOtherInfo(INFO_WEB_SOURCE,	value);
+			else if (String(name) == g_wszWMCopyrightURL)		 info.SetOtherInfo(INFO_WEB_COPYRIGHT,	value);
+			else if (String(name) == g_wszWMPromotionURL)		 info.SetOtherInfo(INFO_WEB_COMMERCIAL,	value);
 
 			else if (String(name) == g_wszWMTrack)
 			{
@@ -692,12 +698,15 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 				    nameStr == g_wszWMBeatsPerMinute		||
 				    nameStr == g_wszWMInitialKey		||
 
+				    nameStr == g_wszWMCopyright			||
+
 				    nameStr == g_wszWMRadioStationName		||
 				    nameStr == g_wszWMRadioStationOwner		||
 
 				    nameStr == g_wszWMAuthorURL			||
 				    nameStr == g_wszWMAudioSourceURL		||
 				    nameStr == g_wszWMCopyrightURL		||
+				    nameStr == g_wszWMPromotionURL		||
 
 				    nameStr == g_wszWMSharedUserRating		||
 

@@ -88,7 +88,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	if	(info.album  != NIL) { RenderTagItem("ALBUM", info.album, buffer);		  numItems++; }
 	if	(info.year    >   0) { RenderTagItem("DATE", String::FromInt(info.year), buffer); numItems++; }
 	if	(info.genre  != NIL) { RenderTagItem("GENRE", info.genre, buffer);		  numItems++; }
-	if	(info.label  != NIL) { RenderTagItem("ORGANIZATION", info.label, buffer);	  numItems++; }
+	if	(info.label  != NIL) { RenderTagItem("PUBLISHER", info.label, buffer);		  numItems++; }
 	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);		  numItems++; }
 
 	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);	    numItems++; }
@@ -109,13 +109,24 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST) { RenderTagItem("ALBUMARTIST", value, buffer); numItems++; }
+		if	(key == INFO_ALBUMARTIST)    { RenderTagItem("ALBUMARTIST",    value, buffer); numItems++; }
 
-		else if	(key == INFO_CONDUCTOR)   { RenderTagItem("PERFORMER",   value, buffer); numItems++; }
-		else if	(key == INFO_COMPOSER)    { RenderTagItem("COMPOSER",    value, buffer); numItems++; }
-		else if	(key == INFO_LYRICIST)    { RenderTagItem("LYRICIST",    value, buffer); numItems++; }
+		else if	(key == INFO_CONTENTGROUP)   { RenderTagItem("GROUPING",       value, buffer); numItems++; }
+		else if	(key == INFO_SUBTITLE)	     { RenderTagItem("SUBTITLE",       value, buffer); numItems++; }
 
-		else if	(key == INFO_BPM)	  { RenderTagItem("BPM",	 value, buffer); numItems++; }
+		else if	(key == INFO_CONDUCTOR)      { RenderTagItem("PERFORMER",      value, buffer); numItems++; }
+		else if	(key == INFO_REMIX)	     { RenderTagItem("REMIXER",	       value, buffer); numItems++; }
+		else if	(key == INFO_COMPOSER)       { RenderTagItem("COMPOSER",       value, buffer); numItems++; }
+		else if	(key == INFO_LYRICIST)       { RenderTagItem("LYRICIST",       value, buffer); numItems++; }
+
+		else if	(key == INFO_BPM)	     { RenderTagItem("BPM",	       value, buffer); numItems++; }
+
+		else if	(key == INFO_COPYRIGHT)	     { RenderTagItem("COPYRIGHT",      value, buffer); numItems++; }
+		else if	(key == INFO_CATALOGNUMBER)  { RenderTagItem("CATALOGNUMBER",  value, buffer); numItems++; }
+
+		else if	(key == INFO_RELEASECOUNTRY) { RenderTagItem("RELEASECOUNTRY", value, buffer); numItems++; }
+
+		else if	(key == INFO_DISCSUBTITLE)   { RenderTagItem("DISCSUBTITLE",   value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -290,30 +301,47 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		if (value == NIL) continue;
 
-		if	(id == "ARTIST")       info.artist    = value;
-		else if (id == "TITLE")	       info.title     = value;
-		else if (id == "ALBUM")	       info.album     = value;
-		else if (id == "DATE")	       info.year      = value.ToInt();
-		else if (id == "GENRE")	       info.genre     = value;
-		else if (id == "COMMENT")      info.comment   = value;
-		else if (id == "ORGANIZATION") info.label     = value;
-		else if (id == "ISRC")	       info.isrc      = value;
+		if	(id == "ARTIST")	 info.artist    = value;
+		else if (id == "TITLE")		 info.title     = value;
+		else if (id == "ALBUM")		 info.album     = value;
+		else if (id == "DATE")		 info.year      = value.ToInt();
+		else if (id == "GENRE")		 info.genre     = value;
+		else if (id == "COMMENT")	 info.comment   = value;
 
-		else if (id == "TRACKNUMBER")  info.track     = value.ToInt();
-		else if (id == "TRACKTOTAL")   info.numTracks = value.ToInt();
-		else if (id == "TOTALTRACKS")  info.numTracks = value.ToInt();
+		else if (id == "LABEL"	   ||
+			 id == "PUBLISHER" ||
+			 id == "ORGANIZATION")	 info.label     = value;
 
-		else if (id == "DISCNUMBER")   info.disc      = value.ToInt();
-		else if (id == "DISCTOTAL")    info.numDiscs  = value.ToInt();
-		else if (id == "TOTALDISCS")   info.numDiscs  = value.ToInt();
+		else if (id == "ISRC")		 info.isrc      = value;
 
-		else if (id == "ALBUMARTIST")  info.SetOtherInfo(INFO_ALBUMARTIST, value);
+		else if (id == "TRACKNUMBER")	 info.track     = value.ToInt();
+		else if (id == "TRACKTOTAL")	 info.numTracks = value.ToInt();
+		else if (id == "TOTALTRACKS")	 info.numTracks = value.ToInt();
 
-		else if (id == "PERFORMER")    info.SetOtherInfo(INFO_CONDUCTOR,   value);
-		else if (id == "COMPOSER")     info.SetOtherInfo(INFO_COMPOSER,	   value);
-		else if (id == "LYRICIST")     info.SetOtherInfo(INFO_LYRICIST,	   value);
+		else if (id == "DISCNUMBER")	 info.disc      = value.ToInt();
+		else if (id == "DISCTOTAL")	 info.numDiscs  = value.ToInt();
+		else if (id == "TOTALDISCS")	 info.numDiscs  = value.ToInt();
 
-		else if (id == "BPM")	       info.SetOtherInfo(INFO_BPM,	   value);
+		else if (id == "ALBUMARTIST")	 info.SetOtherInfo(INFO_ALBUMARTIST,	value);
+
+		else if (id == "GROUPING")	 info.SetOtherInfo(INFO_CONTENTGROUP,	value);
+		else if (id == "SUBTITLE")	 info.SetOtherInfo(INFO_SUBTITLE,	value);
+
+		else if (id == "PERFORMER")	 info.SetOtherInfo(INFO_CONDUCTOR,	value);
+		else if (id == "REMIXER")	 info.SetOtherInfo(INFO_REMIX,		value);
+		else if (id == "COMPOSER")	 info.SetOtherInfo(INFO_COMPOSER,	value);
+		else if (id == "LYRICIST")	 info.SetOtherInfo(INFO_LYRICIST,	value);
+
+		else if (id == "BPM")		 info.SetOtherInfo(INFO_BPM,		value);
+
+		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);
+
+		else if (id == "LABELNO" ||
+			 id == "CATALOGNUMBER")	 info.SetOtherInfo(INFO_CATALOGNUMBER,	value);
+
+		else if (id == "RELEASECOUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,	value);
+
+		else if (id == "DISCSUBTITLE")	 info.SetOtherInfo(INFO_DISCSUBTITLE,	value);
 
 		else if (id.StartsWith("REPLAYGAIN"))
 		{

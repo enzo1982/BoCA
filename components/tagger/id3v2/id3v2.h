@@ -39,7 +39,7 @@ namespace BoCA
 			Int			 GetBinaryField(const ID3_Frame &, ID3_FieldID, Buffer<UnsignedByte> &);
 			Int			 SetBinaryField(ID3_Frame &, ID3_FieldID, const Buffer<UnsignedByte> &);
 
-			const String		&GetID3CategoryName(UnsignedInt);
+			static const String	&GetID3CategoryName(UnsignedInt);
 		public:
 			static const String	&GetComponentSpecs();
 

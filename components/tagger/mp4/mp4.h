@@ -26,7 +26,13 @@ namespace BoCA
 
 			ConfigLayer		*configLayer;
 
-			const String		&GetID3CategoryName(UnsignedInt);
+			Bool			 AddItmfItem(MP4FileHandle, const String &, const String &);
+			Bool			 RemoveItmfItem(MP4FileHandle, const String &);
+
+			Bool			 ParseItmfItems(MP4FileHandle, Info &);
+			String			 GetItmfItemValue(MP4ItmfItem &);
+
+			static const String	&GetID3CategoryName(UnsignedInt);
 		public:
 			static const String	&GetComponentSpecs();
 
