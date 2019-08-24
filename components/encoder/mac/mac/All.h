@@ -190,7 +190,7 @@ Global defines
 #define VERSION_MAJOR 4
 
 // build version number
-#define VERSION_REVISION 84
+#define VERSION_REVISION 91
 
 // year in the copyright strings
 #define MAC_YEAR 2019
@@ -204,7 +204,6 @@ Global defines
 
 #define MAC_FILE_VERSION_NUMBER                         3990
 #define MAC_VERSION_STRING                              VER_FILE_VERSION_STR
-#define MAC_VERSION_STRING_W                            STRINGIZE(VERSION_MAJOR) _T(".") STRINGIZE(VERSION_REVISION) _T(".0.0")
 #define MAC_NAME                                        _T("Monkey's Audio ") VER_FILE_VERSION_STR
 #define PLUGIN_NAME                                     "Monkey's Audio Player " VER_FILE_VERSION_STR_NARROW
 #define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") VER_FILE_VERSION_STR _T(")")
