@@ -541,11 +541,11 @@ Bool BoCA::EncoderSndFile::SetOutputFormat(Int n)
 		case  5: format_info.format = SF_FORMAT_AU;    break;
 		case  6: format_info.format = SF_FORMAT_VOC;   break;
 		case  7: format_info.format = SF_FORMAT_SVX;   break;
-		case  9: format_info.format = SF_FORMAT_IRCAM; break;
-		case  8: format_info.format = SF_FORMAT_PAF;   break;
+		case  8: format_info.format = SF_FORMAT_IRCAM; break;
+		case  9: format_info.format = SF_FORMAT_PAF;   break;
 		case 10: format_info.format = SF_FORMAT_PVF;   break;
-		case 12: format_info.format = SF_FORMAT_WVE;   break;
-		case 11: format_info.format = SF_FORMAT_HTK;   break;
+		case 11: format_info.format = SF_FORMAT_WVE;   break;
+		case 12: format_info.format = SF_FORMAT_HTK;   break;
 		case 13: format_info.format = SF_FORMAT_AVR;   break;
 		default:				       return False;
 	}
