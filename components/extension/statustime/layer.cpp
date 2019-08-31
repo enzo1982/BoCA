@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -73,12 +73,9 @@ Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 {
 	/* Update displayed values.
 	 */
-	Surface	*surface = GetDrawSurface();
+	Surface	*surface = (IsVisible() ? GetDrawSurface() : NIL);
 
-	if (IsRegistered())
-	{
-		surface->StartPaint(Rect(container->GetRealPosition(), container->GetRealSize()));
-	}
+	if (surface) surface->StartPaint(container->GetVisibleArea());
 
 	display_selected->SetText(GetLengthString(seconds_selected, approx_selected, unknown_selected));
 	display_unselected->SetText(GetLengthString(seconds_unselected, approx_unselected, unknown_unselected));
@@ -90,7 +87,7 @@ Void BoCA::LayerLengthStatus::UpdateLengthDisplays()
 
 	SetSize(Size(display_all->GetWidth() + display_selected->GetWidth() + display_unselected->GetWidth() + 6, display_all->GetHeight()));
 
-	if (IsRegistered())
+	if (surface)
 	{
 		container->Paint(SP_UPDATE);
 
