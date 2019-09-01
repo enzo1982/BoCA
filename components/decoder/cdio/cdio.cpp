@@ -203,7 +203,7 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Read CD-Text.
 	 */
-#if !defined __APPLE__ && !defined __WIN32__
+#if !defined __WIN32__
 	Int	 discid = ComputeDiscID(info.mcdi);
 
 	if (config->GetIntValue(ConfigureCDIO::ConfigID, "ReadCDText", True) && cdTextDiscID != discid) { cdText.ReadCDText(component->GetNthDeviceInfo(track.drive).path); cdTextDiscID = discid; }

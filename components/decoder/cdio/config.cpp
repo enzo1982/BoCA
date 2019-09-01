@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -117,7 +117,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	check_readCDText	= new CheckBox(i18n->TranslateString("Read CD Text"), Point(10, 11), Size(162, 0), &readCDText);
 	check_readISRC		= new CheckBox(i18n->TranslateString("Read ISRC when adding tracks to joblist"), Point(10, 37), Size(333, 0), &readISRC);
 
-#if defined __APPLE__ || defined __WIN32__
+#if defined __WIN32__
 	readCDText = False;
 
 	check_readCDText->Deactivate();
