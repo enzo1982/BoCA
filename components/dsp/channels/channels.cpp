@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -265,7 +265,7 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 	{
 		const Channel::Layout	 Mirrored_2_0 = { Channel::FrontRight, Channel::FrontLeft };
 
-		Utilities::ChangeChannelOrder(data, format, Mirrored_2_0, Channel::Default_2_0);
+		Utilities::ChangeChannelOrder(data, this->format, Mirrored_2_0, Channel::Default_2_0);
 	}
 
 	return data.Size();
