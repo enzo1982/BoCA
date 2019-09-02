@@ -302,7 +302,13 @@ Int BoCA::DecoderWave::ReadData(Buffer<UnsignedByte> &data)
 	{
 		if (endianness != EndianLittle) BoCA::Utilities::SwitchBufferByteOrder(data, 8);
 
-		for (Int i = 0; i < size / 8; i++) ((Float32 *) (unsigned char *) data)[i] = ((Float64 *) (unsigned char *) data)[i];
+		for (Int i = 0; i < size / 8; i++)
+		{
+			Float64	 sample64 = ((Float64 *) (unsigned char *) data)[i];
+			Float32	&sample32 = ((Float32 *) (unsigned char *) data)[i];
+
+			sample32 = sample64;
+		}
 
 		size /= 2;
 
