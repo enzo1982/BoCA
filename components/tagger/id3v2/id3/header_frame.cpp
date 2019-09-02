@@ -40,13 +40,11 @@ void ID3_FrameHeader::SetUnknownFrame(const char *id)
 {
 	Clear();
 
+	if (strlen(id) > 4) return;
+
 	_frame_def = new ID3_FrameDef;
 
-	if (_frame_def == NULL)
-	{
-		// log this;
-		return;
-	}
+	if (_frame_def == NULL) return;
 
 	_frame_def->eID		 = ID3FID_NOFRAME;
 	_frame_def->bTagDiscard	 = false;
