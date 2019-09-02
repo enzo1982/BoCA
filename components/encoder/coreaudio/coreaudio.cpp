@@ -108,6 +108,8 @@ BoCA::EncoderCoreAudio::EncoderCoreAudio()
 
 	dataOffset     = 0;
 
+	frameSize      = 0;
+
 	blockSize      = 256;
 	overlap	       = 24;
 
