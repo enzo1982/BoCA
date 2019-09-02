@@ -35,7 +35,12 @@ ULONG STDMETHODCALLTYPE BoCA::MFByteStream::AddRef()
 
 ULONG STDMETHODCALLTYPE BoCA::MFByteStream::Release()
 {
-	if (--refCount == 0) delete this;
+	if (--refCount == 0)
+	{
+		delete this;
+
+		return 0;
+	}
 
 	return refCount;
 }
