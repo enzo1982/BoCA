@@ -40,11 +40,15 @@ void ID3_FrameHeader::SetUnknownFrame(const char *id)
 {
 	Clear();
 
-	if (strlen(id) > 4) return;
+	int	 id_len = strlen(id);
+
+	if (id_len > 4) return;
 
 	_frame_def = new ID3_FrameDef;
 
 	if (_frame_def == NULL) return;
+
+	memset(_frame_def, 0, sizeof(ID3_FrameDef));
 
 	_frame_def->eID		 = ID3FID_NOFRAME;
 	_frame_def->bTagDiscard	 = false;
@@ -52,16 +56,8 @@ void ID3_FrameHeader::SetUnknownFrame(const char *id)
 	_frame_def->aeFieldDefs	 = ID3_FieldDef::DEFAULT;
 	_frame_def->sDescription = NULL;
 
-	if (strlen(id) <= 3)
-	{
-		strcpy(_frame_def->sShortTextID, id);
-		strcpy(_frame_def->sLongTextID, "");
-	}
-	else
-	{
-		strcpy(_frame_def->sLongTextID, id);
-		strcpy(_frame_def->sShortTextID, "");
-	}
+	if (id_len <= 3) strncpy(_frame_def->sShortTextID, id, 3);
+	else		 strncpy(_frame_def->sLongTextID, id, 4);
 
 	_dyn_frame_def = true;
 }
@@ -148,8 +144,6 @@ ID3_Err ID3_FrameHeader::Render(ID3_Writer &writer) const
 {
 	if (_frame_def == NULL)
 	{
-		/* TODO: log this
-		 */
 		ID3D_WARNING("ID3_FrameHeader::Render(): _frame_def is NULL!");
 
 		return ID3E_InvalidFrameID;
@@ -190,34 +184,32 @@ const char *ID3_FrameHeader::GetTextID() const
 
 ID3_FrameHeader &ID3_FrameHeader::operator =(const ID3_FrameHeader &hdr)
 {
-	if (this != &hdr)
+	if (this == &hdr) return *this;
+
+	this->Clear();
+	this->ID3_Header::operator =(hdr);
+
+	if (!hdr._dyn_frame_def)
 	{
-		this->Clear();
-		this->ID3_Header::operator =(hdr);
+		_frame_def = hdr._frame_def;
+	}
+	else
+	{
+		_frame_def = new ID3_FrameDef;
 
-		if (!hdr._dyn_frame_def)
-		{
-			_frame_def = hdr._frame_def;
-		}
-		else
-		{
-			_frame_def = new ID3_FrameDef;
+		if (_frame_def == NULL) return *this;
 
-			if (_frame_def == NULL)
-			{
-				// TODO: throw something here...
-			}
+		memset(_frame_def, 0, sizeof(ID3_FrameDef));
 
-			_frame_def->eID		 = hdr._frame_def->eID;
-			_frame_def->bTagDiscard	 = hdr._frame_def->bTagDiscard;
-			_frame_def->bFileDiscard = hdr._frame_def->bFileDiscard;
-			_frame_def->aeFieldDefs	 = hdr._frame_def->aeFieldDefs;
+		_frame_def->eID		 = hdr._frame_def->eID;
+		_frame_def->bTagDiscard	 = hdr._frame_def->bTagDiscard;
+		_frame_def->bFileDiscard = hdr._frame_def->bFileDiscard;
+		_frame_def->aeFieldDefs	 = hdr._frame_def->aeFieldDefs;
 
-			strcpy(_frame_def->sShortTextID, hdr._frame_def->sShortTextID);
-			strcpy(_frame_def->sLongTextID, hdr._frame_def->sLongTextID);
+		strcpy(_frame_def->sShortTextID, hdr._frame_def->sShortTextID);
+		strcpy(_frame_def->sLongTextID, hdr._frame_def->sLongTextID);
 
-			_dyn_frame_def = true;
-		}
+		_dyn_frame_def = true;
 	}
 
 	return *this;
