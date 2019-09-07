@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,6 +14,7 @@
 #include <smooth/dll.h>
 
 #include "rnnoise.h"
+#include "config.h"
 
 const String &BoCA::DSPRNNoise::GetComponentSpecs()
 {
@@ -25,17 +26,17 @@ const String &BoCA::DSPRNNoise::GetComponentSpecs()
 
 		i18n->SetContext("Components::DSP");
 
-		componentSpecs = String("									\
-														\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
-		  <component>											\
-		    <name>").Append(i18n->TranslateString("RNNoise Speech Noise Reduction")).Append("</name>	\
-		    <version>1.0</version>									\
-		    <id>rnnoise-dsp</id>									\
-		    <type>dsp</type>										\
-		    <input bits=\"16\" rate=\"48000\"/>								\
-		  </component>											\
-														\
+		componentSpecs = String("								\
+													\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
+		  <component>										\
+		    <name>").Append(i18n->TranslateString("RNNoise Noise Reduction")).Append("</name>	\
+		    <version>1.0</version>								\
+		    <id>rnnoise-dsp</id>								\
+		    <type>dsp</type>									\
+		    <input bits=\"16\" rate=\"48000\"/>							\
+		  </component>										\
+													\
 		");
 	}
 
@@ -56,22 +57,56 @@ namespace BoCA
 {
 	/* Constants.
 	 */
-	const Int	 frameSize = 480;
+	static const Int	 frameSize = 480;
+	static const String	 uncPrefix = "\\\\?\\";
+
+	/* Models.
+	 */
+	static const char	*models[2][3] = { { "mp.rnnn", "lq.rnnn", NIL }, { "cb.rnnn", "bd.rnnn", "sh.rnnn" } };
 };
 
 BoCA::DSPRNNoise::DSPRNNoise()
 {
+	configLayer = NIL;
+
+	model	    = NIL;
 }
 
 BoCA::DSPRNNoise::~DSPRNNoise()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::DSPRNNoise::Activate()
 {
+	/* Get configuration.
+	 */
+	const Config	*config = GetConfiguration();
+
+	Int	 signal = config->GetIntValue(ConfigureRNNoise::ConfigID, "SignalType", 2);
+	Int	 noise	= config->GetIntValue(ConfigureRNNoise::ConfigID, "NoiseType", 0);
+
+	/* Create model.
+	 */
+	if (models[noise][signal] != NIL)
+	{
+		String	 modelFileName = Utilities::GetBoCADirectory().Append("boca.dsp.rnnoise/").Append(models[noise][signal]);
+
+#if defined __WIN32__
+		String	 uncPath       = String(modelFileName.StartsWith("\\\\") ? "" : uncPrefix).Append(modelFileName);
+		FILE	*modelFile     = _wfopen(uncPath, L"rbN");
+#else
+		FILE	*modelFile     = fopen(modelFileName.ConvertTo("UTF-8"), "rb");
+#endif
+
+		model = ex_rnnoise_model_from_file(modelFile);
+
+		fclose(modelFile);
+	}
+
 	/* Create RNNoise states.
 	 */
-	for (Int c = 0; c < format.channels; c++) states.Add(ex_rnnoise_create());
+	for (Int c = 0; c < format.channels; c++) states.Add(ex_rnnoise_create(model));
 
 	return True;
 }
@@ -83,6 +118,15 @@ Bool BoCA::DSPRNNoise::Deactivate()
 	for (Int c = 0; c < format.channels; c++) ex_rnnoise_destroy(states.GetNth(c));
 
 	states.RemoveAll();
+
+	/* Free model.
+	 */
+	if (model != NIL)
+	{
+		ex_rnnoise_model_free(model);
+
+		model = NIL;
+	}
 
 	return True;
 }
@@ -148,4 +192,11 @@ Int BoCA::DSPRNNoise::Flush(Buffer<UnsignedByte> &data)
 	data.Resize(numSamples * 2);
 
 	return data.Size();
+}
+
+ConfigLayer *BoCA::DSPRNNoise::GetConfigurationLayer()
+{
+	if (configLayer == NIL) configLayer = new ConfigureRNNoise();
+
+	return configLayer;
 }

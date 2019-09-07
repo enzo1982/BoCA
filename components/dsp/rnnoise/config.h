@@ -10,39 +10,37 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <boca.h>
-#include "dllinterface.h"
+#ifndef H_RNNOISECONFIG
+#define H_RNNOISECONFIG
 
-BoCA_BEGIN_COMPONENT(DSPRNNoise)
+#include <smooth.h>
+#include <boca.h>
+
+using namespace smooth;
+using namespace smooth::GUI;
+
+using namespace BoCA;
 
 namespace BoCA
 {
-	class DSPRNNoise : public CS::DSPComponent
+	class ConfigureRNNoise : public ConfigLayer
 	{
 		private:
-			ConfigLayer		*configLayer;
+			GroupBox		*group_signal;
 
-			RNNModel		*model;
-			Array<DenoiseState *>	 states;
+			Text			*text_signal;
+			ComboBox		*combo_signal;
 
-			Buffer<Short>		 samples;
+			Text			*text_noise;
+			ComboBox		*combo_noise;
 		public:
-			static const String	&GetComponentSpecs();
+			static const String	 ConfigID;
 
-						 DSPRNNoise();
-						~DSPRNNoise();
+						 ConfigureRNNoise();
+						~ConfigureRNNoise();
 
-			Bool			 Activate();
-			Bool			 Deactivate();
-
-			Int			 TransformData(Buffer<UnsignedByte> &);
-
-			Int			 Flush(Buffer<UnsignedByte> &);
-
-			ConfigLayer		*GetConfigurationLayer();
+			Int			 SaveSettings();
 	};
 };
 
-BoCA_DEFINE_DSP_COMPONENT(DSPRNNoise)
-
-BoCA_END_COMPONENT(DSPRNNoise)
+#endif
