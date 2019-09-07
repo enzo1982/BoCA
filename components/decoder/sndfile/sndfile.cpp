@@ -137,6 +137,11 @@ Void smooth::DetachDLL()
 	FreeSndFileDLL();
 }
 
+namespace BoCA
+{
+	static const String	 uncPrefix = "\\\\?\\";
+};
+
 Bool BoCA::DecoderSndFile::CanOpenStream(const String &streamURI)
 {
 	/* Do not open Ogg files with SndFile.
@@ -152,7 +157,9 @@ Bool BoCA::DecoderSndFile::CanOpenStream(const String &streamURI)
 	FILE	*file = 0;
 
 #ifdef __WIN32__
-	file = _wfopen(streamURI, L"rb");
+	String	 uncPath = String(streamURI.StartsWith("\\\\") ? "" : uncPrefix).Append(streamURI);
+ 
+	file = _wfopen(uncPath, L"rbN");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
@@ -180,7 +187,9 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 	FILE	*file = 0;
 
 #ifdef __WIN32__
-	file = _wfopen(streamURI, L"rb");
+	String	 uncPath = String(streamURI.StartsWith("\\\\") ? "" : uncPrefix).Append(streamURI);
+
+	file = _wfopen(streamURI, L"rbN");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
@@ -364,7 +373,9 @@ Bool BoCA::DecoderSndFile::Activate()
 	/* Open input file.
 	 */
 #ifdef __WIN32__
-	file = _wfopen(track.fileName, L"rb");
+	String	 uncPath = String(track.fileName.StartsWith("\\\\") ? "" : uncPrefix).Append(track.fileName);
+
+	file = _wfopen(track.fileName, L"rbN");
 #else
 	file = fopen(track.fileName.ConvertTo("UTF-8"), "rb");
 #endif
