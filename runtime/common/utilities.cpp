@@ -55,7 +55,7 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 	Config	*config	= Config::Get();
 	I18n	*i18n	= I18n::Get();
 
-	i18n->SetContext("Messages");
+	i18n->SetContext("Errors");
 
 	if (!config->GetIntValue("Settings", "EnableConsole", False)) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Error);
 	else							      Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
