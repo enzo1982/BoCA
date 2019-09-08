@@ -90,7 +90,7 @@ Bool BoCA::DSPRNNoise::Activate()
 	 */
 	if (models[noise][signal] != NIL)
 	{
-		String	 modelFileName = Utilities::GetBoCADirectory().Append("boca.dsp.rnnoise/").Append(models[noise][signal]);
+		String	 modelFileName = Utilities::GetBoCADirectory().Append("boca.dsp.rnnoise").Append(Directory::GetDirectoryDelimiter()).Append(models[noise][signal]);
 
 #if defined __WIN32__
 		String	 uncPath       = String(modelFileName.StartsWith("\\\\") ? "" : uncPrefix).Append(modelFileName);
@@ -98,6 +98,14 @@ Bool BoCA::DSPRNNoise::Activate()
 #else
 		FILE	*modelFile     = fopen(modelFileName.ConvertTo("UTF-8"), "rb");
 #endif
+
+		if (modelFile == NIL)
+		{
+			errorString = "Unable to open model file.";
+			errorState  = True;
+
+			return False;
+		}
 
 		model = ex_rnnoise_model_from_file(modelFile);
 
