@@ -344,6 +344,10 @@ Int BoCA::DecoderFLAC::ReadFLAC(Bool readData)
 	ex_FLAC__stream_decoder_finish(decoder);
 	ex_FLAC__stream_decoder_delete(decoder);
 
+	/* Set chapter pictures.
+	 */
+	foreach (Track &track, infoTrack->tracks) track.pictures = infoTrack->pictures;
+
 	return Success();
 }
 
