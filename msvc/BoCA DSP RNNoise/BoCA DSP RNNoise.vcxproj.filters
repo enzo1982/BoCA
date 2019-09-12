@@ -21,12 +21,18 @@
     <ClInclude Include="..\..\components\dsp\rnnoise\rnnoise.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\components\dsp\rnnoise\config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\dsp\rnnoise\dllinterface.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\components\dsp\rnnoise\rnnoise.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\rnnoise\config.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

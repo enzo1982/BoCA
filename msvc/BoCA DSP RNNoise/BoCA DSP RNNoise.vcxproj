@@ -129,10 +129,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\components\dsp\rnnoise\config.h" />
     <ClInclude Include="..\..\components\dsp\rnnoise\dllinterface.h" />
     <ClInclude Include="..\..\components\dsp\rnnoise\rnnoise.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\components\dsp\rnnoise\config.cpp" />
     <ClCompile Include="..\..\components\dsp\rnnoise\dllinterface.cpp" />
     <ClCompile Include="..\..\components\dsp\rnnoise\rnnoise.cpp" />
   </ItemGroup>
