@@ -103,21 +103,21 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			String	 genre;
 
 			if (line.Contains("\"")) genre = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 genre = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			else			 genre = line.Tail(line.Length() - 10);
 
 			if (!readInfoTags || preferCueSheets) info.genre = genre;
 
 			if (!trackMode && !dataMode) albumInfo.genre = genre;
 		}
 
-		if (line.StartsWith("REM DATE ")) info.year = line.Tail(line.Length() - line.FindLast(" ") - 1).ToInt();
+		if (line.StartsWith("REM DATE ")) info.year = line.Tail(line.Length() - 9).ToInt();
 
 		if (line.StartsWith("REM COMMENT "))
 		{
 			String	 comment;
 
 			if (line.Contains("\"")) comment = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 comment = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			else			 comment = line.Tail(line.Length() - 12);
 
 			if (!readInfoTags || preferCueSheets) info.comment = comment;
 
@@ -142,7 +142,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			String	 artist;
 
 			if (line.Contains("\"")) artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 artist = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			else			 artist = line.Tail(line.Length() - 10);
 
 			if (!readInfoTags || preferCueSheets)
 			{
@@ -160,7 +160,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			String	 songwriter;
 
 			if (line.Contains("\"")) songwriter = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 songwriter = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			else			 songwriter = line.Tail(line.Length() - 11);
 
 			if (!readInfoTags || preferCueSheets)
 			{
@@ -188,7 +188,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			String	 title;
 
 			if (line.Contains("\"")) title = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 title = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			else			 title = line.Tail(line.Length() - 6);
 
 			if (!readInfoTags || preferCueSheets)
 			{
@@ -203,7 +203,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			/* Check if the ISRC is valid.
 			 */
-			String	 isrc = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			String	 isrc = line.Tail(line.Length() - 5);
 
 			if (Info::IsISRC(isrc)) info.isrc = isrc;
 		}
