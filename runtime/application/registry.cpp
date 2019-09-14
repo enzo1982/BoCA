@@ -266,15 +266,14 @@ Void BoCA::AS::Registry::OrderComponents()
 			{
 				ComponentSpecs	*csp = componentSpecs.GetNth(j);
 
-				if (csp->id == precedeComponent)
-				{
-					componentSpecs.RemoveNth(i);
-					componentSpecs.InsertAtPos(j, cs);
+				if (csp->id != precedeComponent) continue;
 
-					i = j;
+				componentSpecs.RemoveNth(i);
+				componentSpecs.InsertAtPos(j, cs);
 
-					break;
-				}
+				i = j;
+
+				break;
 			}
 		}
 	}
@@ -291,15 +290,14 @@ Void BoCA::AS::Registry::OrderComponents()
 			{
 				ComponentSpecs	*csp = componentSpecs.GetNth(j);
 
-				if (csp->id == succeedComponent)
-				{
-					componentSpecs.RemoveNth(i);
-					componentSpecs.InsertAtPos(j, cs);
+				if (csp->id != succeedComponent) continue;
 
-					i = j;
+				componentSpecs.RemoveNth(i);
+				componentSpecs.InsertAtPos(j, cs);
 
-					break;
-				}
+				i = j;
+
+				break;
 			}
 		}
 	}
@@ -418,7 +416,7 @@ Bool BoCA::AS::Registry::DeleteComponent(Component *component)
 	return True;
 }
 
-BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const String &streamURI)
+BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const String &streamURI, const Config *config)
 {
 	/* Check those decoders that claim to
 	 * support the file extension first.
@@ -439,12 +437,13 @@ BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const Str
 
 				DecoderComponent	*component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
 
-				if (component != NIL)
-				{
-					if (component->CanOpenStream(streamURI)) return component;
+				if (component == NIL) continue;
 
-					DeleteComponent(component);
-				}
+				if (config != NIL) component->SetConfiguration(config);
+
+				if (component->CanOpenStream(streamURI)) return component;
+
+				DeleteComponent(component);
 			}
 		}
 
@@ -458,12 +457,13 @@ BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const Str
 
 			DecoderComponent	*component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
 
-			if (component != NIL)
-			{
-				if (component->CanOpenStream(streamURI)) return component;
+			if (component == NIL) continue;
 
-				DeleteComponent(component);
-			}
+			if (config != NIL) component->SetConfiguration(config);
+
+			if (component->CanOpenStream(streamURI)) return component;
+
+			DeleteComponent(component);
 		}
 */	}
 
@@ -475,18 +475,19 @@ BoCA::AS::DecoderComponent *BoCA::AS::Registry::CreateDecoderForStream(const Str
 
 		DecoderComponent	*component = (DecoderComponent *) CreateComponentByID(GetComponentID(i));
 
-		if (component != NIL)
-		{
-			if (component->CanOpenStream(streamURI)) return component;
+		if (component == NIL) continue;
 
-			DeleteComponent(component);
-		}
+		if (config != NIL) component->SetConfiguration(config);
+
+		if (component->CanOpenStream(streamURI)) return component;
+
+		DeleteComponent(component);
 	}
 
 	return NIL;
 }
 
-BoCA::AS::VerifierComponent *BoCA::AS::Registry::CreateVerifierForTrack(const Track &track)
+BoCA::AS::VerifierComponent *BoCA::AS::Registry::CreateVerifierForTrack(const Track &track, const Config *config)
 {
 	/* Try all verifiers.
 	 */
@@ -496,12 +497,13 @@ BoCA::AS::VerifierComponent *BoCA::AS::Registry::CreateVerifierForTrack(const Tr
 
 		VerifierComponent	*component = (VerifierComponent *) CreateComponentByID(GetComponentID(i));
 
-		if (component != NIL)
-		{
-			if (component->CanVerifyTrack(track)) return component;
+		if (component == NIL) continue;
 
-			DeleteComponent(component);
-		}
+		if (config != NIL) component->SetConfiguration(config);
+
+		if (component->CanVerifyTrack(track)) return component;
+
+		DeleteComponent(component);
 	}
 
 	return NIL;

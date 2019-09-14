@@ -345,7 +345,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			/* Create decoder component.
 			 */
 			AS::Registry		&boca	 = AS::Registry::Get();
-			AS::DecoderComponent	*decoder = boca.CreateDecoderForStream(iTrack.fileName);
+			AS::DecoderComponent	*decoder = boca.CreateDecoderForStream(iTrack.fileName, GetConfiguration());
 
 			if (decoder == NIL)
 			{
