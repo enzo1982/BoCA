@@ -299,9 +299,8 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		ParseAPEItem(buffer, offset, &id, &value);
 
-		if (value == NIL) continue;
-
-		if (id.ToUpper() == "!BINARY") ParseAPEBinaryItem(buffer, offset, &id, item);
+		if	(id != "!Binary" && value == NIL) continue;
+		else if (id == "!Binary"		) ParseAPEBinaryItem(buffer, offset, &id, item);
 
 		id = id.ToUpper();
 
