@@ -598,12 +598,20 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			{
 				if (currentConfig->GetIntValue(ConfigID, "ReadEmbeddedCueSheets", True))
 				{
-					/* Output cuesheet to temporary file.
+					String::OutputFormat	 outputFormat("UTF-8");
+
+ 					/* Output cuesheet to temporary file.
 					 */
 					String		 cuesheet = value.Replace("\r\n", "\n");
 					String		 cueFile  = S::System::System::GetTempDirectory().Append("cuesheet_temp_").Append(String::FromInt(S::System::System::Clock())).Append(".cue");
 					OutStream	 out(STREAM_FILE, cueFile, OS_REPLACE);
 
+					/* Write UTF-8 BOM.
+					 */
+					if (value[0] != 0xFEFF) out.OutputNumberRaw(0xEFBBBF, 3);
+
+					/* Write cuesheet line by line.
+					 */
 					const Array<String>	&lines = cuesheet.Explode("\n");
 
 					foreach (const String &line, lines)

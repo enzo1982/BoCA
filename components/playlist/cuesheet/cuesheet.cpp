@@ -60,9 +60,7 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 
 	/* Write UTF-8 BOM and set output format.
 	 */
-	out.OutputNumber(0xEF, 1);
-	out.OutputNumber(0xBB, 1);
-	out.OutputNumber(0xBF, 1);
+	out.OutputNumberRaw(0xEFBBBF, 3);
 
 	String::OutputFormat	 outputFormat("UTF-8");
 
