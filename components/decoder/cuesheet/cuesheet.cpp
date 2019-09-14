@@ -60,7 +60,9 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 	Track		 iTrack;
 	Format		 format		     = track.GetFormat();
+
 	Info		 info;
+	Array<Picture>	 pictures;
 
 	Track		 albumTrack;
 	Info		 albumInfo;
@@ -264,6 +266,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			iTrack.SetFormat(format);
 			iTrack.SetInfo(info);
 
+			iTrack.pictures = pictures;
+
 			AddTrack(iTrack, track.tracks);
 
 			iTrack.length = -1;
@@ -391,13 +395,15 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			if (readInfoTags)
 			{
-				info = infoTrack.GetInfo();
+				info	 = infoTrack.GetInfo();
+				pictures = infoTrack.pictures;
 
 				if (preferCueSheets) UpdateInfoWithAlbumInfo(info, albumInfo);
 			}
 			else
 			{
-				info = Info();
+				info	 = Info();
+				pictures.RemoveAll();
 
 				UpdateInfoWithAlbumInfo(info, albumInfo);
 			}
@@ -423,13 +429,15 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			{
 				if (readInfoTags)
 				{
-					info = albumTrack.tracks.GetNth(track - 1).GetInfo();
+					info	 = albumTrack.tracks.GetNth(track - 1).GetInfo();
+					pictures = albumTrack.tracks.GetNth(track - 1).pictures;
 
 					if (preferCueSheets) UpdateInfoWithAlbumInfo(info, albumInfo);
 				}
 				else
 				{
-					info = Info();
+					info	 = Info();
+					pictures.RemoveAll();
 
 					UpdateInfoWithAlbumInfo(info, albumInfo);
 				}
@@ -556,6 +564,8 @@ Bool BoCA::DecoderCueSheet::AddTrack(const Track &track, Array<Track> &tracks) c
 	rTrack.fileSize	    = track.length * track.GetFormat().channels * (track.GetFormat().bits / 8);
 
 	rTrack.lossless	    = track.lossless;
+
+	rTrack.pictures	    = track.pictures;
 
 	rTrack.SetFormat(track.GetFormat());
 	rTrack.SetInfo(track.GetInfo());
