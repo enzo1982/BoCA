@@ -448,8 +448,6 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 					else				    out.OutputLine(line);
 				}
 
-				String::ExplodeFinish();
-
 				out.Close();
 
 				/* Get cue sheet stream info.

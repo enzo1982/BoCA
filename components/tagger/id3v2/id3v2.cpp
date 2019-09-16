@@ -620,8 +620,6 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 						else				    out.OutputLine(line);
 					}
 
-					String::ExplodeFinish();
-
 					out.Close();
 
 					/* Get cue sheet stream info.

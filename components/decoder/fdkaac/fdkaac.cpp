@@ -213,8 +213,6 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 					const Array<String>	&values = String(value).Trim().Explode(" ");
 
 					track.length = (Int64) Number::FromHexString(values.GetNth(3));
-
-					String::ExplodeFinish();
 				}
 
 				ex_MP4ItmfItemListFree(items);
@@ -434,8 +432,6 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 				delaySamples	 = (Int64) Number::FromHexString(values.GetNth(1));
 				delaySamplesLeft = delaySamples;
-
-				String::ExplodeFinish();
 			}
 
 			ex_MP4ItmfItemListFree(items);

@@ -403,7 +403,5 @@ Int BoCA::FormatConverter::FindBestValue(Int reference, const String &spec)
 		if (high < reference &&  bestValue < high			  ) bestValue = high;
 	}
 
-	String::ExplodeFinish();
-
 	return bestValue;
 }

@@ -139,8 +139,6 @@ Bool BoCA::EncoderMultiEncoderHub::IsThreadSafe() const
 		}
 	}
 
-	String::ExplodeFinish();
-
 	return threadSafe;
 }
 
@@ -167,8 +165,6 @@ Bool BoCA::EncoderMultiEncoderHub::IsLossless() const
 			boca.DeleteComponent(encoder);
 		}
 	}
-
-	String::ExplodeFinish();
 
 	return lossless;
 }
@@ -226,8 +222,6 @@ Bool BoCA::EncoderMultiEncoderHub::Activate()
 			}
 		}
 	}
-
-	String::ExplodeFinish();
 
 	return True;
 }
@@ -693,8 +687,6 @@ Void BoCA::EncoderMultiEncoderHub::OnFinishConversion(Int conversionID)
 				}
 			}
 		}
-
-		String::ExplodeFinish();
 
 		/* Clean up playlist and cuesheet track lists.
 		 */
