@@ -147,9 +147,6 @@
     <ClCompile Include="..\..\components\playlist\xspf\xspf.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\components\playlist\xspf\expat\loadlibrary.c">
-      <Filter>Quelldateien\expat</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\components\playlist\xspf\uriparser\UriMemory.c">
       <Filter>Quelldateien\uriparser</Filter>
     </ClCompile>
