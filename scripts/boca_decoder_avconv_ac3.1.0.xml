@@ -9,6 +9,10 @@
     <name>AC-3 Files</name>
     <extension>ac3</extension>
   </format>
+  <format>
+    <name>Enhanced AC-3 Files</name>
+    <extension>eac3</extension>
+  </format>
   <external>
     <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
