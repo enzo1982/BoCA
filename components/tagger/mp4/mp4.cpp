@@ -240,6 +240,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		else if	(key == INFO_REMIX)	    AddItmfItem(mp4File, "REMIXER",	  value);
 		else if	(key == INFO_LYRICIST)	    AddItmfItem(mp4File, "LYRICIST",	  value);
 
+		else if	(key == INFO_INITIALKEY)    AddItmfItem(mp4File, "initialkey",	  value);
+
 		else if	(key == INFO_CATALOGNUMBER) AddItmfItem(mp4File, "CATALOGNUMBER", value);
 
 		else if	(key == INFO_DISCSUBTITLE)  AddItmfItem(mp4File, "DISCSUBTITLE",  value);
@@ -482,7 +484,7 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 		/* Read and assign value string.
 		 */
-		String	 id    = item.name;
+		String	 id    = String(item.name).ToUpper();
 		String	 value = GetItmfItemValue(item);
 
 		if (value == NIL) continue;
@@ -497,6 +499,8 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 		else if (id == "CONDUCTOR")	info.SetOtherInfo(INFO_CONDUCTOR,     value);
 		else if (id == "REMIXER")	info.SetOtherInfo(INFO_REMIX,	      value);
 		else if (id == "LYRICIST")	info.SetOtherInfo(INFO_LYRICIST,      value);
+
+		else if (id == "INITIALKEY")	info.SetOtherInfo(INFO_INITIALKEY,    value);
 
 		else if (id == "CATALOGNUMBER")	info.SetOtherInfo(INFO_CATALOGNUMBER, value);
 

@@ -135,6 +135,7 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		else if	(key == INFO_COMPOSER)	     { RenderAPEItem("Composer",       value, buffer); numItems++; }
 
 		else if	(key == INFO_BPM)	     { RenderAPEItem("BPM",	       value, buffer); numItems++; }
+		else if	(key == INFO_INITIALKEY)     { RenderAPEItem("InitialKey",     value, buffer); numItems++; }
 
 		else if	(key == INFO_COPYRIGHT)	     { RenderAPEItem("Copyright",      value, buffer); numItems++; }
 		else if	(key == INFO_CATALOGNUMBER)  { RenderAPEItem("CatalogNumber",  value, buffer); numItems++; }
@@ -324,6 +325,7 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		else if (id == "COMPOSER")	 info.SetOtherInfo(INFO_COMPOSER,	value);
 
 		else if (id == "BPM")		 info.SetOtherInfo(INFO_BPM,		value);
+		else if (id == "INITIALKEY")	 info.SetOtherInfo(INFO_INITIALKEY,	value);
 
 		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);
 		else if (id == "CATALOGNUMBER")  info.SetOtherInfo(INFO_CATALOGNUMBER,	value);

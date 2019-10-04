@@ -120,6 +120,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		else if	(key == INFO_LYRICIST)       { RenderTagItem("LYRICIST",       value, buffer); numItems++; }
 
 		else if	(key == INFO_BPM)	     { RenderTagItem("BPM",	       value, buffer); numItems++; }
+		else if	(key == INFO_INITIALKEY)     { RenderTagItem("INITIALKEY",     value, buffer); numItems++; }
 
 		else if	(key == INFO_COPYRIGHT)	     { RenderTagItem("COPYRIGHT",      value, buffer); numItems++; }
 		else if	(key == INFO_CATALOGNUMBER)  { RenderTagItem("CATALOGNUMBER",  value, buffer); numItems++; }
@@ -333,6 +334,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "LYRICIST")	 info.SetOtherInfo(INFO_LYRICIST,	value);
 
 		else if (id == "BPM")		 info.SetOtherInfo(INFO_BPM,		value);
+		else if (id == "INITIALKEY")	 info.SetOtherInfo(INFO_INITIALKEY,	value);
 
 		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);
 
