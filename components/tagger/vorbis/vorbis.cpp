@@ -114,10 +114,14 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		else if	(key == INFO_CONTENTGROUP)   { RenderTagItem("GROUPING",       value, buffer); numItems++; }
 		else if	(key == INFO_SUBTITLE)	     { RenderTagItem("SUBTITLE",       value, buffer); numItems++; }
 
-		else if	(key == INFO_CONDUCTOR)      { RenderTagItem("PERFORMER",      value, buffer); numItems++; }
-		else if	(key == INFO_REMIX)	     { RenderTagItem("REMIXER",	       value, buffer); numItems++; }
-		else if	(key == INFO_COMPOSER)       { RenderTagItem("COMPOSER",       value, buffer); numItems++; }
-		else if	(key == INFO_LYRICIST)       { RenderTagItem("LYRICIST",       value, buffer); numItems++; }
+		else if	(key == INFO_PERFORMER)	     { RenderTagItem("PERFORMER",      value, buffer); numItems++; }
+		else if	(key == INFO_CONDUCTOR)	     { RenderTagItem("CONDUCTOR",      value, buffer); numItems++; }
+		else if	(key == INFO_REMIXER)	     { RenderTagItem("REMIXER",	       value, buffer); numItems++; }
+		else if	(key == INFO_COMPOSER)	     { RenderTagItem("COMPOSER",       value, buffer); numItems++; }
+		else if	(key == INFO_LYRICIST)	     { RenderTagItem("LYRICIST",       value, buffer); numItems++; }
+		else if	(key == INFO_ARRANGER)	     { RenderTagItem("ARRANGER",       value, buffer); numItems++; }
+		else if	(key == INFO_PRODUCER)	     { RenderTagItem("PRODUCER",       value, buffer); numItems++; }
+		else if	(key == INFO_ENGINEER)	     { RenderTagItem("ENGINEER",       value, buffer); numItems++; }
 
 		else if	(key == INFO_BPM)	     { RenderTagItem("BPM",	       value, buffer); numItems++; }
 		else if	(key == INFO_INITIALKEY)     { RenderTagItem("INITIALKEY",     value, buffer); numItems++; }
@@ -128,6 +132,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		else if	(key == INFO_RELEASECOUNTRY) { RenderTagItem("RELEASECOUNTRY", value, buffer); numItems++; }
 
 		else if	(key == INFO_DISCSUBTITLE)   { RenderTagItem("DISCSUBTITLE",   value, buffer); numItems++; }
+
+		else if	(key == INFO_WEB_ARTIST)     { RenderTagItem("WEBSITE",	       value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -328,10 +334,14 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "GROUPING")	 info.SetOtherInfo(INFO_CONTENTGROUP,	value);
 		else if (id == "SUBTITLE")	 info.SetOtherInfo(INFO_SUBTITLE,	value);
 
-		else if (id == "PERFORMER")	 info.SetOtherInfo(INFO_CONDUCTOR,	value);
-		else if (id == "REMIXER")	 info.SetOtherInfo(INFO_REMIX,		value);
+		else if (id == "PERFORMER")	 info.SetOtherInfo(INFO_PERFORMER,	value);
+		else if (id == "CONDUCTOR")	 info.SetOtherInfo(INFO_CONDUCTOR,	value);
+		else if (id == "REMIXER")	 info.SetOtherInfo(INFO_REMIXER,	value);
 		else if (id == "COMPOSER")	 info.SetOtherInfo(INFO_COMPOSER,	value);
 		else if (id == "LYRICIST")	 info.SetOtherInfo(INFO_LYRICIST,	value);
+		else if (id == "ARRANGER")	 info.SetOtherInfo(INFO_ARRANGER,	value);
+		else if (id == "PRODUCER")	 info.SetOtherInfo(INFO_PRODUCER,	value);
+		else if (id == "ENGINEER")	 info.SetOtherInfo(INFO_ENGINEER,	value);
 
 		else if (id == "BPM")		 info.SetOtherInfo(INFO_BPM,		value);
 		else if (id == "INITIALKEY")	 info.SetOtherInfo(INFO_INITIALKEY,	value);
@@ -344,6 +354,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "RELEASECOUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,	value);
 
 		else if (id == "DISCSUBTITLE")	 info.SetOtherInfo(INFO_DISCSUBTITLE,	value);
+
+		else if (id == "WEBSITE")	 info.SetOtherInfo(INFO_WEB_ARTIST,	value);
 
 		else if (id.StartsWith("REPLAYGAIN"))
 		{

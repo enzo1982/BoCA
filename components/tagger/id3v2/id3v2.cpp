@@ -322,7 +322,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		else if	(key == INFO_BAND)	     { ID3_Frame frame(ID3FID_BAND);		  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_CONDUCTOR)	     { ID3_Frame frame(ID3FID_CONDUCTOR);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_REMIX)	     { ID3_Frame frame(ID3FID_MIXARTIST);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_REMIXER)	     { ID3_Frame frame(ID3FID_MIXARTIST);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_COMPOSER)	     { ID3_Frame frame(ID3FID_COMPOSER);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_LYRICIST)	     { ID3_Frame frame(ID3FID_LYRICIST);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
@@ -524,7 +524,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 		else if (frame.GetID() == ID3FID_BAND)		    info.SetOtherInfo(INFO_BAND,	   GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_CONDUCTOR)	    info.SetOtherInfo(INFO_CONDUCTOR,	   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_MIXARTIST)	    info.SetOtherInfo(INFO_REMIX,	   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_MIXARTIST)	    info.SetOtherInfo(INFO_REMIXER,	   GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_COMPOSER)	    info.SetOtherInfo(INFO_COMPOSER,	   GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_LYRICIST)	    info.SetOtherInfo(INFO_LYRICIST,	   GetStringField(frame, ID3FN_TEXT));
 

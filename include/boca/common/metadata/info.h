@@ -26,10 +26,14 @@ namespace BoCA
 	const char * const INFO_SUBTITLE	= (char *) "Subtitle/Description refinement";
 
 	const char * const INFO_BAND		= (char *) "Band/orchestra/accompaniment";
+	const char * const INFO_PERFORMER	= (char *) "Performer";
 	const char * const INFO_CONDUCTOR	= (char *) "Conductor/performer refinement";
-	const char * const INFO_REMIX		= (char *) "Interpreted, remixed or otherwise modified by";
+	const char * const INFO_REMIXER		= (char *) "Interpreted, remixed or otherwise modified by";
 	const char * const INFO_COMPOSER	= (char *) "Composer";
 	const char * const INFO_LYRICIST	= (char *) "Lyricist/Text writer";
+	const char * const INFO_ARRANGER	= (char *) "Arranger";
+	const char * const INFO_PRODUCER	= (char *) "Producer";
+	const char * const INFO_ENGINEER	= (char *) "Audio engineer";
 
 	const char * const INFO_ORIG_ARTIST	= (char *) "Original artist(s)/performer(s)";
 	const char * const INFO_ORIG_ALBUM	= (char *) "Original album/movie/show title";

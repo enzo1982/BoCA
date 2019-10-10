@@ -204,8 +204,10 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			else if	(key == INFO_SUBTITLE)	     RenderWMAStringItem(g_wszWMSubTitle,		 value, pHeaderInfo);
 
 			else if	(key == INFO_CONDUCTOR)	     RenderWMAStringItem(g_wszWMConductor,		 value, pHeaderInfo);
+			else if	(key == INFO_REMIXER)	     RenderWMAStringItem(g_wszWMModifiedBy,		 value, pHeaderInfo);
 			else if	(key == INFO_COMPOSER)	     RenderWMAStringItem(g_wszWMComposer,		 value, pHeaderInfo);
 			else if	(key == INFO_LYRICIST)	     RenderWMAStringItem(g_wszWMWriter,			 value, pHeaderInfo);
+			else if	(key == INFO_PRODUCER)	     RenderWMAStringItem(g_wszWMProducer,		 value, pHeaderInfo);
 
 			else if	(key == INFO_ORIG_ARTIST)    RenderWMAStringItem(g_wszWMOriginalArtist,		 value, pHeaderInfo);
 			else if	(key == INFO_ORIG_ALBUM)     RenderWMAStringItem(g_wszWMOriginalAlbumTitle,	 value, pHeaderInfo);
@@ -420,8 +422,10 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			else if (String(name) == g_wszWMSubTitle)		 info.SetOtherInfo(INFO_SUBTITLE,	value);
 
 			else if (String(name) == g_wszWMConductor)		 info.SetOtherInfo(INFO_CONDUCTOR,	value);
+			else if (String(name) == g_wszWMModifiedBy)		 info.SetOtherInfo(INFO_REMIXER,	value);
 			else if (String(name) == g_wszWMComposer)		 info.SetOtherInfo(INFO_COMPOSER,	value);
 			else if (String(name) == g_wszWMWriter)			 info.SetOtherInfo(INFO_LYRICIST,	value);
+			else if (String(name) == g_wszWMProducer)		 info.SetOtherInfo(INFO_PRODUCER,	value);
 
 			else if (String(name) == g_wszWMOriginalArtist)		 info.SetOtherInfo(INFO_ORIG_ARTIST,	value);
 			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.SetOtherInfo(INFO_ORIG_ALBUM,	value);

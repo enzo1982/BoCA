@@ -93,7 +93,7 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	if	(info.title  != NIL) RenderTagItem("INAM", info.title, buffer);
 	if	(info.album  != NIL) RenderTagItem("IPRD", info.album, buffer);
 	if	(info.genre  != NIL) RenderTagItem("IGNR", info.genre, buffer);
-	if	(info.label  != NIL) RenderTagItem("IPRO", info.label, buffer);
+	if	(info.label  != NIL) RenderTagItem("IDST", info.label, buffer);
 
 	if	(info.track   >   0) RenderTagItem("ITRK", String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);
 	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year).Append("-01-01"), buffer);
@@ -110,11 +110,16 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_LYRICIST)	 RenderTagItem("IWRI", value, buffer);
+		if	(key == INFO_COMPOSER)	     RenderTagItem("IMUS", value, buffer);
+		else if	(key == INFO_LYRICIST)	     RenderTagItem("IWRI", value, buffer);
+		else if	(key == INFO_PRODUCER)	     RenderTagItem("IPRO", value, buffer);
+		else if	(key == INFO_ENGINEER)	     RenderTagItem("IENG", value, buffer);
 
-		else if	(key == INFO_COPYRIGHT)	 RenderTagItem("ICOP", value, buffer);
+		else if	(key == INFO_COPYRIGHT)	     RenderTagItem("ICOP", value, buffer);
 
-		else if (key == INFO_WEB_ARTIST) RenderTagItem("IURL", value, buffer);
+		else if	(key == INFO_RELEASECOUNTRY) RenderTagItem("ICNT", value, buffer);
+
+		else if (key == INFO_WEB_ARTIST)     RenderTagItem("IURL", value, buffer);
 	}
 
 	/* Save CD table of contents.
@@ -201,18 +206,23 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 			else if (id == "ICRD") info.year    = value.Head(4).ToInt();
 			else if (id == "IGNR") info.genre   = value;
 			else if (id == "ICMT") info.comment = value;
-			else if (id == "IPRO") info.label   = value;
+			else if (id == "IDST") info.label   = value;
 			else if (id == "TORG") info.label   = value;
 
 			else if (id == "IPRT") info.track   = value.ToInt();
 			else if (id == "ITRK") info.track   = value.ToInt();
 			else if (id == "TRCK") info.track   = value.ToInt();
 
-			else if (id == "IWRI") info.SetOtherInfo(INFO_LYRICIST,	  value);
+			else if (id == "IMUS") info.SetOtherInfo(INFO_COMPOSER,	      value);
+			else if (id == "IWRI") info.SetOtherInfo(INFO_LYRICIST,	      value);
+			else if (id == "IPRO") info.SetOtherInfo(INFO_PRODUCER,	      value);
+			else if (id == "IENG") info.SetOtherInfo(INFO_ENGINEER,	      value);
 
-			else if (id == "ICOP") info.SetOtherInfo(INFO_COPYRIGHT,  value);
+			else if (id == "ICOP") info.SetOtherInfo(INFO_COPYRIGHT,      value);
 
-			else if (id == "IURL") info.SetOtherInfo(INFO_WEB_ARTIST, value);
+			else if (id == "ICNT") info.SetOtherInfo(INFO_RELEASECOUNTRY, value);
+
+			else if (id == "IURL") info.SetOtherInfo(INFO_WEB_ARTIST,     value);
 
 			else if (id == "ITOC") info.offsets = value;
 

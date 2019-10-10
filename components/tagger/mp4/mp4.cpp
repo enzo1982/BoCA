@@ -237,8 +237,10 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		if	(key == INFO_SUBTITLE)	    AddItmfItem(mp4File, "SUBTITLE",	  value);
 
 		else if	(key == INFO_CONDUCTOR)     AddItmfItem(mp4File, "CONDUCTOR",	  value);
-		else if	(key == INFO_REMIX)	    AddItmfItem(mp4File, "REMIXER",	  value);
+		else if	(key == INFO_REMIXER)	    AddItmfItem(mp4File, "REMIXER",	  value);
 		else if	(key == INFO_LYRICIST)	    AddItmfItem(mp4File, "LYRICIST",	  value);
+		else if	(key == INFO_PRODUCER)	    AddItmfItem(mp4File, "PRODUCER",	  value);
+		else if	(key == INFO_ENGINEER)	    AddItmfItem(mp4File, "ENGINEER",	  value);
 
 		else if	(key == INFO_INITIALKEY)    AddItmfItem(mp4File, "initialkey",	  value);
 
@@ -497,8 +499,10 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 		else if (id == "SUBTITLE")	info.SetOtherInfo(INFO_SUBTITLE,      value);
 
 		else if (id == "CONDUCTOR")	info.SetOtherInfo(INFO_CONDUCTOR,     value);
-		else if (id == "REMIXER")	info.SetOtherInfo(INFO_REMIX,	      value);
+		else if (id == "REMIXER")	info.SetOtherInfo(INFO_REMIXER,	      value);
 		else if (id == "LYRICIST")	info.SetOtherInfo(INFO_LYRICIST,      value);
+		else if (id == "PRODUCER")	info.SetOtherInfo(INFO_PRODUCER,      value);
+		else if (id == "ENGINEER")	info.SetOtherInfo(INFO_ENGINEER,      value);
 
 		else if (id == "INITIALKEY")	info.SetOtherInfo(INFO_INITIALKEY,    value);
 
