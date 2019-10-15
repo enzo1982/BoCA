@@ -190,10 +190,10 @@ Global defines
 #define VERSION_MAJOR 4
 
 // build version number
-#define VERSION_REVISION 91
+#define VERSION_REVISION 93
 
 // year in the copyright strings
-#define MAC_YEAR 2019
+#define MAC_YEAR 2020
 
 // Build the version string
 #define STRINGIZE2(s) #s
