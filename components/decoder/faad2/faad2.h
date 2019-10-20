@@ -28,6 +28,7 @@ namespace BoCA
 			Int				 sampleId;
 
 			Int				 frameSize;
+			Int				 sbrRatio;
 
 			Int				 delaySamples;
 			Int				 delaySamplesLeft;
@@ -37,6 +38,7 @@ namespace BoCA
 			Buffer<short>			 samplesBuffer;
 
 			Int				 GetAudioTrack(MP4FileHandle) const;
+			Bool				 ReadGaplessInfo(MP4FileHandle, Int &, Int &, Int64 &) const;
 
 			Bool				 SkipID3v2Tag(IO::InStream &);
 			Bool				 SyncOnAACHeader(IO::InStream &);

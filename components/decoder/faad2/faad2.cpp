@@ -98,15 +98,15 @@ Bool BoCA::DecoderFAAD2::CanOpenStream(const String &streamURI)
 		{
 			Int	 type = ex_MP4GetTrackAudioMpeg4Type(mp4File, mp4Track);
 
-			if (type == ER_LC			  ||
-			    type == ER_LTP			  ||
-			    type == LD				  ||
+			if (type == MAIN   ||
+			    type == LC	   ||
+			    type == SSR	   ||
+			    type == LTP	   ||
+			    type == HE_AAC ||
+			    type == LD	   ||
 
-			    type == MP4_MPEG4_AAC_MAIN_AUDIO_TYPE ||
-			    type == MP4_MPEG4_AAC_LC_AUDIO_TYPE	  ||
-			    type == MP4_MPEG4_AAC_SSR_AUDIO_TYPE  ||
-			    type == MP4_MPEG4_AAC_LTP_AUDIO_TYPE  ||
-			    type == MP4_MPEG4_AAC_HE_AUDIO_TYPE) isValidFile = True;
+			    type == ER_LC  ||
+			    type == ER_LTP) isValidFile = True;
 		}
 
 		ex_MP4Close(mp4File, 0);
@@ -179,6 +179,9 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 				frameSize = frameInfo.samples / format.channels;
 
+				if (frameInfo.sbr == SBR_UPSAMPLED ||
+				    frameInfo.sbr == NO_SBR_UPSAMPLED) sbrRatio = 2;
+
 				delete [] buffer;
 			}
 
@@ -193,29 +196,14 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 			track.SetFormat(format);
 
-			/* Look for iTunes metadata with gapless information.
+			/* Read gapless information.
 			 */
-			MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+			Int	 delay	= 0, padding = 0;
+			Int64	 length	= 0;
 
-			if (items != NIL)
+			if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track))))
 			{
-				if (items->size == 1)
-				{
-					/* Read value as string.
-					 */
-					Buffer<char>	 value(items->elements[0].dataList.elements[0].valueSize + 1);
-
-					memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
-					memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
-
-					/* Parse value string.
-					 */
-					const Array<String>	&values = String(value).Trim().Explode(" ");
-
-					track.length = (Int64) Number::FromHexString(values.GetNth(3));
-				}
-
-				ex_MP4ItmfItemListFree(items);
+				track.length = length * sbrRatio;
 			}
 		}
 
@@ -351,6 +339,7 @@ BoCA::DecoderFAAD2::DecoderFAAD2()
 	sampleId	 = 1;
 
 	frameSize	 = 0;
+	sbrRatio	 = 1;
 
 	delaySamples	 = 0;
 	delaySamplesLeft = 0;
@@ -407,32 +396,6 @@ Bool BoCA::DecoderFAAD2::Activate()
 		ex_NeAACDecInit2(handle, escBuffer, escBufferSize, &rate, &channels);
 
 		ex_MP4Free(escBuffer);
-
-		/* Look for iTunes metadata with gapless information.
-		 */
-		MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
-
-		if (items != NIL)
-		{
-			if (items->size == 1)
-			{
-				/* Read value as string.
-				 */
-				Buffer<char>	 value(items->elements[0].dataList.elements[0].valueSize + 1);
-
-				memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
-				memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
-
-				/* Parse value string.
-				 */
-				const Array<String>	&values = String(value).Trim().Explode(" ");
-
-				delaySamples	 = (Int64) Number::FromHexString(values.GetNth(1));
-				delaySamplesLeft = delaySamples;
-			}
-
-			ex_MP4ItmfItemListFree(items);
-		}
 	}
 	else
 	{
@@ -510,12 +473,28 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 			{
 				frameSize = frameInfo.samples / frameInfo.channels;
 
+				if (frameInfo.sbr == SBR_UPSAMPLED ||
+				    frameInfo.sbr == NO_SBR_UPSAMPLED) sbrRatio = 2;
+
+				/* Get delay from gapless information.
+				 */
+				Int	 delay	= 0, padding = 0;
+				Int64	 length	= 0;
+
+				if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track))))
+				{
+					if (sbrRatio > 1) delay += 480;
+
+					delaySamples	 = delay * sbrRatio;
+					delaySamplesLeft = delaySamples;
+				}
+
 				/* Set delay samples to minimum encoder delay.
 				 */
 				if (delaySamples == 0)
 				{
-					delaySamples	 = frameSize;
-					delaySamplesLeft = frameSize;
+					delaySamples	 = frameSize + (sbrRatio == 1 ? 0 : 480) * sbrRatio;
+					delaySamplesLeft = delaySamples;
 				}
 
 				/* FAAD2 automatically skips the first frame, so
@@ -568,10 +547,13 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 				{
 					frameSize	 = frameInfo.samples / frameInfo.channels;
 
+					if (frameInfo.sbr == SBR_UPSAMPLED ||
+					    frameInfo.sbr == NO_SBR_UPSAMPLED) sbrRatio = 2;
+
 					/* Set delay samples to minimum encoder delay.
 					 */
-					delaySamples	 = frameSize;
-					delaySamplesLeft = frameSize;
+					delaySamples	 = frameSize + (sbrRatio == 1 ? 0 : 480) * sbrRatio;
+					delaySamplesLeft = delaySamples;
 
 					/* FAAD2 automatically skips the first frame, so
 					 * subtract it from the delay sample count.
@@ -637,6 +619,42 @@ Int BoCA::DecoderFAAD2::GetAudioTrack(MP4FileHandle mp4File) const
 	}
 
 	return -1;
+}
+
+Bool BoCA::DecoderFAAD2::ReadGaplessInfo(MP4FileHandle mp4File, Int &delay, Int &padding, Int64 &length) const
+{
+	Bool	 result = False;
+
+	/* Look for iTunes metadata with gapless information.
+	 */
+	MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+
+	if (items != NIL)
+	{
+		if (items->size == 1)
+		{
+			/* Read value as string.
+			 */
+			Buffer<char>	 value(items->elements[0].dataList.elements[0].valueSize + 1);
+
+			memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
+			memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
+
+			/* Parse value string.
+			 */
+			const Array<String>	&values = String(value).Trim().Explode(" ");
+
+			delay	= (Int64) Number::FromHexString(values.GetNth(1));
+			padding	= (Int64) Number::FromHexString(values.GetNth(2));
+			length	= (Int64) Number::FromHexString(values.GetNth(3));
+
+			result = True;
+		}
+
+		ex_MP4ItmfItemListFree(items);
+	}
+
+	return result;
 }
 
 Bool BoCA::DecoderFAAD2::SkipID3v2Tag(InStream &in)
