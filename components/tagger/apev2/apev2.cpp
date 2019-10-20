@@ -17,6 +17,8 @@
 
 using namespace smooth::IO;
 
+using namespace BoCA::AS;
+
 const String &BoCA::TaggerAPEv2::GetComponentSpecs()
 {
 	static String	 componentSpecs = "			\
@@ -65,6 +67,7 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	Bool		 prependZero		 = currentConfig->GetIntValue(ConfigID, "TrackPrependZeroAPEv2", True);
 
+	Bool		 writeChapters		 = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
 	Bool		 writeMCDI		 = currentConfig->GetIntValue(ConfigID, "WriteMCDI", True);
 
 	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
@@ -199,6 +202,82 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		}
 	}
 
+	/* Save chapters.
+	 */
+	if (track.tracks.Length() > 0 && writeChapters)
+	{
+		Registry	&boca = Registry::Get();
+
+		/* Save temporary cue sheet.
+		 */
+		PlaylistComponent	*cuesheet = (PlaylistComponent *) boca.CreateComponentByID("cuesheet-playlist");
+
+		if (cuesheet != NIL)
+		{
+			Config	*cuesheetConfig = Config::Copy(currentConfig);
+
+			cuesheetConfig->SetStringValue("Tags", "DefaultComment", NIL);
+
+			cuesheet->SetConfiguration(cuesheetConfig); 
+
+			/* Update track filenames and offsets.
+			 */
+			Array<Track>	 chapters = track.tracks;
+			const Format	&format	  = track.GetFormat();
+			Int64		 offset	  = 0;
+
+			foreach (Track &chapterTrack, chapters)
+			{
+				const Format	&chapterFormat = chapterTrack.GetFormat();
+				Info		 chapterInfo   = chapterTrack.GetInfo();
+
+				chapterTrack.fileName	  = S::System::System::GetTempDirectory().Append(File(track.fileName).GetFileName());
+				chapterTrack.sampleOffset = offset;
+
+				if (chapterInfo.artist == NIL) chapterInfo.artist = info.artist;
+				if (chapterInfo.album  == NIL) chapterInfo.album  = info.album;
+				if (chapterInfo.genre  == NIL) chapterInfo.genre  = info.genre;
+				if (chapterInfo.year   <=   0) chapterInfo.year	  = info.year;
+
+				chapterTrack.SetInfo(chapterInfo);
+
+				if	(chapterTrack.length	   >= 0) offset += Math::Round(Float(chapterTrack.length)	* format.rate / chapterFormat.rate);
+				else if (chapterTrack.approxLength >= 0) offset += Math::Round(Float(chapterTrack.approxLength)	* format.rate / chapterFormat.rate);
+			}
+
+			/* Create temporary cuesheet file.
+			 */
+			String	 cueFile  = S::System::System::GetTempDirectory().Append("cuesheet_temp_").Append(String::FromInt(S::System::System::Clock())).Append(".cue");
+
+			cuesheet->SetTrackList(chapters);
+			cuesheet->WritePlaylist(cueFile);
+
+			boca.DeleteComponent(cuesheet);
+
+			Config::Free(cuesheetConfig);
+
+			/* Read generated cuesheet.
+			 */
+			String::InputFormat	 inputFormat("UTF-8");
+
+			InStream	 in(STREAM_FILE, cueFile, IS_READ);
+			String		 data = in.InputString(in.Size());
+
+			data.Replace(L"\xFEFF", NIL);
+			data.Replace("\r\n", "\n");
+
+			in.Close();
+
+			File(cueFile).Delete();
+
+			/* Write cuesheet to tag.
+			 */
+			{ RenderAPEItem("Cuesheet", data, buffer, False); numItems++; }
+		} 
+	}
+
+	/* Render tag header and footer.
+	 */
 	if (numItems > 0)
 	{
 		Int	 tagSize = buffer.Size();
@@ -246,19 +325,20 @@ Int BoCA::TaggerAPEv2::RenderAPEFooter(Int tagSize, Int numItems, Buffer<Unsigne
 	return Success();
 }
 
-Int BoCA::TaggerAPEv2::RenderAPEItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
+Int BoCA::TaggerAPEv2::RenderAPEItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer, Bool trim)
 {
-	Int		 size = id.Length() + strlen(value.Trim()) + 9;
+	String		 data = trim ? value.Trim() : value;
+	Int		 size = id.Length() + strlen(data) + 9;
 
 	buffer.Resize(buffer.Size() + size);
 
 	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - size, size);
 
-	out.OutputNumber(strlen(value.Trim()), 4);
+	out.OutputNumber(strlen(data), 4);
 	out.OutputNumber(0, 4);
 	out.OutputString(id);
 	out.OutputNumber(0, 1);
-	out.OutputString(value.Trim());
+	out.OutputString(data);
 
 	return Success();
 }

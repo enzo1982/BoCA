@@ -23,7 +23,7 @@ namespace BoCA
 
 			Int			 RenderAPEHeader(Int, Int, Buffer<UnsignedByte> &);
 			Int			 RenderAPEFooter(Int, Int, Buffer<UnsignedByte> &);
-			Int			 RenderAPEItem(const String &, const String &, Buffer<UnsignedByte> &);
+			Int			 RenderAPEItem(const String &, const String &, Buffer<UnsignedByte> &, Bool = True);
 			Int			 RenderAPEBinaryItem(const String &, const Buffer<UnsignedByte> &, Buffer<UnsignedByte> &);
 
 			Bool			 ParseAPEHeader(const Buffer<UnsignedByte> &, Int *, Int *);
