@@ -337,16 +337,15 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 		if (rate == 0) rate = format.rate;
 
 		Float	 divider = Float(format.rate) / rate;
-		Int	 extra	 = 0;
 
 		if (codec == CA::kAudioFormatMPEG4AAC_HE ||
-		    codec == CA::kAudioFormatMPEG4AAC_HE_V2) { divider *= 2.0; extra = 480; }
+		    codec == CA::kAudioFormatMPEG4AAC_HE_V2) divider *= 2.0;
 
 		CA::AudioFilePacketTableInfo	 pti;
 
-		pti.mPrimingFrames     = initialInfo.leadingFrames + extra;
+		pti.mPrimingFrames     = initialInfo.leadingFrames;
 		pti.mRemainderFrames   = finalInfo.trailingFrames;
-		pti.mNumberValidFrames = totalSamples / divider;
+		pti.mNumberValidFrames = Math::Ceil(totalSamples / divider);
 
 		CA::AudioFileSetProperty(audioFile, CA::kAudioFilePropertyPacketTableInfo, sizeof(pti), &pti);
 	}

@@ -454,16 +454,15 @@ int main(int argc, char *argv[])
 						if (rate == 0) rate = setup.rate;
 
 						float	 divider = float(setup.rate) / rate;
-						int	 extra	 = 0;
 
 						if (setup.codec == CA::kAudioFormatMPEG4AAC_HE ||
-						    setup.codec == CA::kAudioFormatMPEG4AAC_HE_V2) { divider *= 2.0; extra = 480; }
+						    setup.codec == CA::kAudioFormatMPEG4AAC_HE_V2) divider *= 2.0;
 
 						CA::AudioFilePacketTableInfo	 pti;
 
-						pti.mPrimingFrames     = primeInfo.leadingFrames + extra;
+						pti.mPrimingFrames     = primeInfo.leadingFrames;
 						pti.mRemainderFrames   = primeInfo.trailingFrames;
-						pti.mNumberValidFrames = totalSamples / divider;
+						pti.mNumberValidFrames = ceil(totalSamples / divider);
 
 						CA::AudioFileSetProperty(audioFile, CA::kAudioFilePropertyPacketTableInfo, sizeof(pti), &pti);
 					}
