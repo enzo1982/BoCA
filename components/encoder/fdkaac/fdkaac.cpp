@@ -105,6 +105,7 @@ BoCA::EncoderFDKAAC::EncoderFDKAAC()
 	sampleId     = 0;
 
 	frameSize    = 0;
+	granuleSize  = 0;
 
 	blockSize    = 128;
 	overlap	     = 12;
@@ -194,6 +195,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	ex_aacEncInfo(handle, &aacInfo);
 
 	frameSize    = aacInfo.frameLength;
+	granuleSize  = ex_aacEncoder_GetParam(handle, AACENC_GRANULE_LENGTH);
 
 #if AACENCODER_LIB_VL0 >= 4
 	if (GetEncoderVersion() >= 4 << 24)
@@ -301,12 +303,13 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 	{
 		/* Write iTunes metadata with gapless information.
 		 */
-		MP4ItmfItem	*item  = ex_MP4ItmfItemAlloc("----", 1);
-		String		 value = String().Append(" 00000000")
-						 .Append(" ").Append(Number((Int64) delaySamples).ToHexString(8).ToUpper())
-						 .Append(" ").Append(Number((Int64) frameSize - (delaySamples + totalSamples) % frameSize).ToHexString(8).ToUpper())
-						 .Append(" ").Append(Number((Int64) totalSamples).ToHexString(16).ToUpper())
-						 .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
+		Float		 sbrRatio = frameSize / granuleSize;
+		MP4ItmfItem	*item	  = ex_MP4ItmfItemAlloc("----", 1);
+		String		 value	  = String().Append(" 00000000")
+						    .Append(" ").Append(Number((Int64) Math::Round(delaySamples / sbrRatio)).ToHexString(8).ToUpper())
+						    .Append(" ").Append(Number((Int64) Math::Floor((frameSize - (delaySamples + totalSamples) % frameSize) / sbrRatio)).ToHexString(8).ToUpper())
+						    .Append(" ").Append(Number((Int64) Math::Ceil(totalSamples / sbrRatio)).ToHexString(16).ToUpper())
+						    .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
 
 		item->mean = (char *) "com.apple.iTunes";
 		item->name = (char *) "iTunSMPB";

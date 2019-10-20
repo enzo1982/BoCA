@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -45,6 +45,7 @@ typedef AACENC_ERROR			(*AACENCCLOSE)			(HANDLE_AACENCODER *);
 typedef AACENC_ERROR			(*AACENCENCODE)			(const HANDLE_AACENCODER, const AACENC_BufDesc *, const AACENC_BufDesc *, const AACENC_InArgs *, AACENC_OutArgs *);
 typedef AACENC_ERROR			(*AACENCINFO)			(const HANDLE_AACENCODER, AACENC_InfoStruct *);
 typedef AACENC_ERROR			(*AACENCGETLIBINFO)		(LIB_INFO *);
+typedef UINT				(*AACENCODER_GETPARAM)		(const HANDLE_AACENCODER, const AACENC_PARAM);
 typedef AACENC_ERROR			(*AACENCODER_SETPARAM)		(const HANDLE_AACENCODER, const AACENC_PARAM, const UINT);
 
 extern AACENCOPEN			 ex_aacEncOpen;
@@ -52,6 +53,7 @@ extern AACENCCLOSE			 ex_aacEncClose;
 extern AACENCENCODE			 ex_aacEncEncode;
 extern AACENCINFO			 ex_aacEncInfo;
 extern AACENCGETLIBINFO			 ex_aacEncGetLibInfo;
+extern AACENCODER_GETPARAM		 ex_aacEncoder_GetParam;
 extern AACENCODER_SETPARAM		 ex_aacEncoder_SetParam;
 
 typedef MP4FileHandle			(*MP4CREATEEX)			(const char *, uint32_t, int, int, char *, uint32_t, char **, uint32_t);

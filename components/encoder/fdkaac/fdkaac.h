@@ -33,6 +33,7 @@ namespace BoCA
 			Int			 nextWorker;
 
 			Int			 frameSize;
+			Int			 granuleSize;
 
 			Int			 blockSize;
 			Int			 overlap;
