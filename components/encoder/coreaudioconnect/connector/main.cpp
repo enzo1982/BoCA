@@ -24,6 +24,7 @@
 #endif
 
 #include <stdio.h>
+#include <math.h>
 
 #ifndef min
 #	define min(n, m) ((n) < (m) ? (n) : (m))
@@ -302,8 +303,8 @@ int main(int argc, char *argv[])
 						{
 							if (bitrate >= bitrateValues[i].mMinimum && bitrate <= bitrateValues[i].mMaximum)  nearest = bitrate;
 
-							if (abs(int(bitrate - bitrateValues[i].mMinimum)) < abs(int(bitrate - nearest))) nearest = bitrateValues[i].mMinimum;
-							if (abs(int(bitrate - bitrateValues[i].mMaximum)) < abs(int(bitrate - nearest))) nearest = bitrateValues[i].mMaximum;
+							if (fabs(bitrate - bitrateValues[i].mMinimum) < fabs(bitrate - nearest)) nearest = bitrateValues[i].mMinimum;
+							if (fabs(bitrate - bitrateValues[i].mMaximum) < fabs(bitrate - nearest)) nearest = bitrateValues[i].mMaximum;
 						}
 
 						bitrate = nearest;
