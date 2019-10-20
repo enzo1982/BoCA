@@ -127,8 +127,9 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 	 */
 	for (Int i = 0; i < trackList.Length(); i++)
 	{
-		const Track	&track = trackList.GetNth(i);
-		const Info	&info  = track.GetInfo();
+		const Track	&track	= trackList.GetNth(i);
+		const Format	&format	= track.GetFormat();
+		const Info	&info	= track.GetInfo();
 
 		if (!oneFile || i == 0) out.OutputLine(String("FILE \"").Append(Utilities::GetRelativeFileName(track.fileName, actualFile)).Append("\" ").Append(GetFileType(track.fileName)));
 
@@ -152,9 +153,9 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 
 		/* Save index.
 		 */
-		Int	 minutes =  track.sampleOffset					       / (75 * 60);
-		Int	 seconds = (track.sampleOffset			- (minutes * 60 * 75)) /  75      ;
-		Int	 frames  =  track.sampleOffset - (seconds * 75) - (minutes * 60 * 75)		  ;
+		Int	 minutes =  track.sampleOffset								      / format.rate / 60;
+		Int	 seconds = (track.sampleOffset				 - (minutes * 60 * format.rate))      / format.rate	;
+		Int	 frames  = (track.sampleOffset - (seconds * format.rate) - (minutes * 60 * format.rate)) * 75 / format.rate	;
 
 		out.OutputLine(String("    INDEX 01 ").Append(minutes < 10 ? "0" : NIL).Append(String::FromInt(minutes)).Append(":")
 						      .Append(seconds < 10 ? "0" : NIL).Append(String::FromInt(seconds)).Append(":")
