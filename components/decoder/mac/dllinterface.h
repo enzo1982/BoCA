@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,10 +24,10 @@ extern DynamicLoader	*macdll;
 Bool			 LoadMACDLL();
 Void			 FreeMACDLL();
 
-typedef APE_DECOMPRESS_HANDLE	(__stdcall *APEDECOMPRESS_CREATEW)	(const str_utfn *, int *);
+typedef APE_DECOMPRESS_HANDLE	(__stdcall *APEDECOMPRESS_CREATEW)	(const APE::str_utfn *, int *);
 typedef void			(__stdcall *APEDECOMPRESS_DESTROY)	(APE_DECOMPRESS_HANDLE);
 typedef int			(__stdcall *APEDECOMPRESS_SEEK)		(APE_DECOMPRESS_HANDLE, int);
-typedef int			(__stdcall *APEDECOMPRESS_GETDATA)	(APE_DECOMPRESS_HANDLE, char *, intn, intn *);
+typedef int			(__stdcall *APEDECOMPRESS_GETDATA)	(APE_DECOMPRESS_HANDLE, char *, APE::intn, APE::intn *);
 typedef int			(__stdcall *APEDECOMPRESS_GETINFO)	(APE_DECOMPRESS_HANDLE, APE_DECOMPRESS_FIELDS, int, int);
 
 extern APEDECOMPRESS_CREATEW	 ex_APEDecompress_CreateW;
