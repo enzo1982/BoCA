@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -89,7 +89,7 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 	slider_spinup->SetWidth(335 - slider_spinup->GetX() - text_spinup_seconds->GetUnscaledTextWidth());
 	slider_spinup->onValueChange.Connect(&ConfigureCDParanoia::ChangeSpinUpTime, this);
 
-	edit_offset		= new EditBox(NIL, Point(39 + maxTextSize, 93), Size(36, 0), 5);
+	edit_offset		= new EditBox(Point(39 + maxTextSize, 93), Size(36, 0), 5);
 	edit_offset->SetFlags(EDB_NUMERIC);
 	edit_offset->onInput.Connect(&ConfigureCDParanoia::ChangeOffset, this);
 

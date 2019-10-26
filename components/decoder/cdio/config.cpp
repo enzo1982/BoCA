@@ -94,7 +94,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	slider_spinup->SetWidth(335 - slider_spinup->GetX() - text_spinup_seconds->GetUnscaledTextWidth());
 	slider_spinup->onValueChange.Connect(&ConfigureCDIO::ChangeSpinUpTime, this);
 
-	edit_offset		= new EditBox(NIL, Point(39 + maxTextSize, 93), Size(36, 0), 5);
+	edit_offset		= new EditBox(Point(39 + maxTextSize, 93), Size(36, 0), 5);
 	edit_offset->SetFlags(EDB_NUMERIC);
 	edit_offset->onInput.Connect(&ConfigureCDIO::ChangeOffset, this);
 

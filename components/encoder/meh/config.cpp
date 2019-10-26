@@ -32,11 +32,11 @@ BoCA::ConfigureMultiEncoderHub::ConfigureMultiEncoderHub()
 	list_available	= new ListBox(Point(10, 29), Size(245, 116));
 	list_available->onSelectEntry.Connect(&ConfigureMultiEncoderHub::OnSelectAvailable, this);
 
-	btn_add		= new Button(i18n->IsActiveLanguageRightToLeft() ? "<-" : "->", NIL, Point(263, 60), Size(26, 0));
+	btn_add		= new Button(i18n->IsActiveLanguageRightToLeft() ? "<-" : "->", Point(263, 60), Size(26, 0));
 	btn_add->onAction.Connect(&ConfigureMultiEncoderHub::OnAddEncoder, this);
 	btn_add->Deactivate();
 
-	btn_remove	= new Button(i18n->IsActiveLanguageRightToLeft() ? "->" : "<-", NIL, Point(263, 90), Size(26, 0));
+	btn_remove	= new Button(i18n->IsActiveLanguageRightToLeft() ? "->" : "<-", Point(263, 90), Size(26, 0));
 	btn_remove->onAction.Connect(&ConfigureMultiEncoderHub::OnRemoveEncoder, this);
 	btn_remove->Deactivate();
 
@@ -45,7 +45,7 @@ BoCA::ConfigureMultiEncoderHub::ConfigureMultiEncoderHub()
 	list_selected	= new ListBox(Point(297, 29), Size(245, 116));
 	list_selected->onSelectEntry.Connect(&ConfigureMultiEncoderHub::OnSelectEncoder, this);
 
-	btn_configure	= new Button(i18n->TranslateString("Configure encoder"), NIL, Point(382, 153), Size(160, 0));
+	btn_configure	= new Button(i18n->TranslateString("Configure encoder"), Point(382, 153), Size(160, 0));
 	btn_configure->onAction.Connect(&ConfigureMultiEncoderHub::OnConfigureEncoder, this);
 	btn_configure->Deactivate();
 

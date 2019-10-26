@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -179,7 +179,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	vbr_slider_abrbitrate		= new Slider(Point(10, 11), Size(194, 0), OR_HORZ, &abrbitrate, 8, 320);
 	vbr_slider_abrbitrate->onValueChange.Connect(&ConfigureLAME::SetABRBitrate, this);
 
-	vbr_edit_abrbitrate		= new EditBox(NIL, Point(68, 10), Size(25, 0), 3);
+	vbr_edit_abrbitrate		= new EditBox(Point(68, 10), Size(25, 0), 3);
 	vbr_edit_abrbitrate->SetFlags(EDB_NUMERIC);
 	vbr_edit_abrbitrate->SetOrientation(OR_UPPERRIGHT);
 	vbr_edit_abrbitrate->onInput.Connect(&ConfigureLAME::SetABRBitrateByEditBox, this);

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -51,7 +51,7 @@ BoCA::ConfigureVOAAC::ConfigureVOAAC()
 	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 8, 128);
 	slider_bitrate->onValueChange.Connect(&ConfigureVOAAC::SetBitrate, this);
 
-	edit_bitrate		= new EditBox(NIL, Point(group_bitrate->GetWidth() - 66, 12), Size(25, 0), 3);
+	edit_bitrate		= new EditBox(Point(group_bitrate->GetWidth() - 66, 12), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureVOAAC::SetBitrateByEditBox, this);
 

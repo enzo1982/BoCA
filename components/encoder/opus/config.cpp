@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -90,7 +90,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	slider_bitrate		= new Slider(Point(70, 11), Size(201, 0), OR_HORZ, &bitrate, 3, 255);
 	slider_bitrate->onValueChange.Connect(&ConfigureOpus::SetBitrate, this);
 
-	edit_bitrate		= new EditBox(NIL, Point(279, 10), Size(25, 0), 3);
+	edit_bitrate		= new EditBox(Point(279, 10), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
 	edit_bitrate->onInput.Connect(&ConfigureOpus::SetBitrateByEditBox, this);
 

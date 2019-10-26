@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -114,7 +114,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	slider_blocksize	= new Slider(Point(16 + text_blocksize->GetUnscaledTextWidth(), 38), Size(441 - text_blocksize->GetUnscaledTextWidth() - text_blocksize_bytes->GetUnscaledTextWidth(), 0), OR_HORZ, &blocksize, 24, 4096);
 	slider_blocksize->onValueChange.Connect(&ConfigureFLAC::SetBlockSize, this);
 
-	edit_blocksize		= new EditBox(NIL, Point(24 + text_blocksize->GetUnscaledTextWidth() + slider_blocksize->GetWidth(), 37), Size(37, 0), 5);
+	edit_blocksize		= new EditBox(Point(24 + text_blocksize->GetUnscaledTextWidth() + slider_blocksize->GetWidth(), 37), Size(37, 0), 5);
 	edit_blocksize->onInput.Connect(&ConfigureFLAC::EditBlockSize, this);
 
 	group_format->Add(check_streamable_subset);

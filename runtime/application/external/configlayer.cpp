@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 	text_commandline = new Text(i18n->AddColon(i18n->TranslateString("Resulting arguments string")), Point(6, 45));
 	text_commandline->SetOrientation(OR_LOWERLEFT);
 
-	edit_commandline = new EditBox(NIL, Point(6, 26), Size(400, 0));
+	edit_commandline = new EditBox(Point(6, 26), Size(400, 0));
 	edit_commandline->SetOrientation(OR_LOWERLEFT);
 	edit_commandline->Deactivate();
 

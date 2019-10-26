@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,11 +27,11 @@ BoCA::ConfigureWinamp::ConfigureWinamp()
 	list_output->onSelectEntry.Connect(&ConfigureWinamp::SelectOutputPlugin, this);
 	list_output->onMarkEntry.Connect(&ConfigureWinamp::SelectOutputPlugin, this);
 
-	button_output		= new Button(i18n->TranslateString("Configure"), NIL, Point(440, 7), Size());
+	button_output		= new Button(i18n->TranslateString("Configure"), Point(440, 7), Size());
 	button_output->onAction.Connect(&ConfigureWinamp::ConfigureOutputPlugin, this);
 	button_output->Deactivate();
 
-	button_output_about	= new Button(i18n->TranslateString("About"), NIL, Point(440, 37), Size());
+	button_output_about	= new Button(i18n->TranslateString("About"), Point(440, 37), Size());
 	button_output_about->onAction.Connect(&ConfigureWinamp::AboutOutputPlugin, this);
 	button_output_about->Deactivate();
 
