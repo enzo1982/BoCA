@@ -170,8 +170,11 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 		/* Create MP4 file.
 		 */
-		mp4File		= ex_MP4CreateEx(track.outputFile.ConvertTo("UTF-8"), 0, 1, 1, NIL, 0, NIL, 0);
-		mp4Track	= ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
+		uint32_t	 flags = (track.length       >= 0xFFFF0000 ||
+					  track.approxLength >= 0xFFFF0000) ? MP4_CREATE_64BIT_DATA | MP4_CREATE_64BIT_TIME : 0;
+
+		mp4File	 = ex_MP4CreateEx(track.outputFile.ConvertTo("UTF-8"), flags, 1, 1, NIL, 0, NIL, 0);
+		mp4Track = ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
 
