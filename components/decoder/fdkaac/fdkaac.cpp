@@ -181,15 +181,16 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 			{
 				CStreamInfo	*streamInfo = ex_aacDecoder_GetStreamInfo(handle);
 
+				frameSize	= streamInfo->frameSize;
+				sbrRatio	= streamInfo->frameSize / streamInfo->aacSamplesPerFrame;
+
 				format.rate	= streamInfo->sampleRate;
 				format.channels = streamInfo->numChannels;
 
-				track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
+				track.length	= Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * streamInfo->frameSize;
 				track.length   -= streamInfo->frameSize; // To account for encoder delay.
 
 				format.bits	= 16;
-
-				sbrRatio	= streamInfo->frameSize / streamInfo->aacSamplesPerFrame;
 			}
 
 			ex_aacDecoder_Close(handle);
@@ -201,7 +202,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 			Int	 delay	= 0, padding = 0;
 			Int64	 length	= 0;
 
-			if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track))))
+			if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * frameSize)
 			{
 				track.length = length * sbrRatio;
 			}
@@ -494,7 +495,7 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 					Int	 delay	= 0, padding = 0;
 					Int64	 length	= 0;
 
-					if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track))))
+					if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * frameSize)
 					{
 						delaySamples	 = delay * sbrRatio;
 						delaySamplesLeft = delaySamples;

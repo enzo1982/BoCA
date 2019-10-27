@@ -187,7 +187,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 			/* Get track length.
 			 */
-			track.length	= Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track)));
+			track.length	= Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * frameSize;
 			track.length   -= frameSize; // To account for encoder delay.
 
 			format.bits	= 16;
@@ -201,7 +201,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 			Int	 delay	= 0, padding = 0;
 			Int64	 length	= 0;
 
-			if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track))))
+			if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * frameSize)
 			{
 				track.length = length * sbrRatio;
 			}
@@ -481,7 +481,7 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 				Int	 delay	= 0, padding = 0;
 				Int64	 length	= 0;
 
-				if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Math::Round(ex_MP4GetTrackDuration(mp4File, mp4Track) * Float(format.rate / ex_MP4GetTrackTimeScale(mp4File, mp4Track))))
+				if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * frameSize)
 				{
 					if (sbrRatio > 1) delay += 480;
 
