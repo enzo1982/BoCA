@@ -107,7 +107,7 @@ Bool BoCA::DecoderOpus::CanOpenStream(const String &streamURI)
 
 	do
 	{
-		Int	 size	= Math::Min((Int64) 4096, in.Size() - in.GetPos());
+		Int	 size	= Math::Min(Int64(4096), in.Size() - in.GetPos());
 		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
 
 		in.InputData(buffer, size);
@@ -181,7 +181,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 	do
 	{
-		Int	 size	= Math::Min((Int64) 4096, track.fileSize - in.GetPos());
+		Int	 size	= Math::Min(Int64(4096), track.fileSize - in.GetPos());
 		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
 
 		in.InputData(buffer, size);
@@ -282,7 +282,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	ex_ogg_sync_reset(&oy);
 
-	Int	 size   = Math::Min(in.Size(), Int64(65536));
+	Int	 size   = Math::Min(in.Size(), 65536);
 	char    *buffer = ex_ogg_sync_buffer(&oy, size);
 
 	in.Seek(in.Size() - size);

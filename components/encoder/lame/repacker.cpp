@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -222,7 +222,7 @@ Bool BoCA::SuperRepacker::UpdateInfoTag(Buffer<UnsignedByte> &frame, Int64 total
 	{
 		UnsignedInt32	 offset = frameOffsets.GetNth(frameOffsets.Length() * i / 100);
 
-		tag[0x10 + i] = Math::Min(Int64(255), Math::Floor(256.0 * offset / bytes));
+		tag[0x10 + i] = Math::Min(255, Math::Floor(256.0 * offset / bytes));
 	}
 
 	/* Set pad samples.

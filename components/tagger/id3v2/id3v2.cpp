@@ -192,7 +192,7 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 
 		for (Int i = in.GetPos(); i < in.Size(); i += buffer.Size())
 		{
-			Int	 bytes = Math::Min(Int64(buffer.Size()), in.Size() - i);
+			Int	 bytes = Math::Min(buffer.Size(), in.Size() - i);
 
 			in.InputData(buffer, bytes);
 			out.OutputData(buffer, bytes);
