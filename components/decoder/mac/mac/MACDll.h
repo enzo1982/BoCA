@@ -21,7 +21,7 @@ Defines (implemented elsewhere)
 *****************************************************************************************/
 namespace APE
 {
-	struct ID3_TAG;
+    struct ID3_TAG;
 }
 
 /*****************************************************************************************
@@ -35,7 +35,7 @@ extern "C"
     DLLEXPORT int __stdcall ShowFileInfoDialog(const APE::str_ansi * pFilename, HWND hwndWindow);
 #endif
     DLLEXPORT int __stdcall TagFileSimple(const APE::str_ansi * pFilename, const char * pArtist, const char * pAlbum, const char * pTitle, const char * pComment, const char * pGenre, const char * pYear, const char * pTrack, BOOL bClearFirst, BOOL bUseOldID3);
-	DLLEXPORT int __stdcall GetID3Tag(const APE::str_ansi * pFilename, APE::ID3_TAG * pID3Tag);
+    DLLEXPORT int __stdcall GetID3Tag(const APE::str_ansi * pFilename, APE::ID3_TAG * pID3Tag);
     DLLEXPORT int __stdcall RemoveTag(const APE::str_ansi * pFilename);
 }
 
