@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -46,12 +46,12 @@ namespace CA
 using namespace smooth;
 using namespace smooth::System;
 
-#ifndef __APPLE__
 extern DynamicLoader	*coreaudiodll;
 
 Bool			 LoadCoreAudioDLL();
 Void			 FreeCoreAudioDLL();
 
+#ifndef __APPLE__
 namespace CA
 {
 	typedef OSStatus			(*AUDIOFILEINITIALIZEWITHCALLBACKS)	(void *, AudioFile_ReadProc, AudioFile_WriteProc, AudioFile_GetSizeProc, AudioFile_SetSizeProc, AudioFileTypeID, const AudioStreamBasicDescription *, UInt32, AudioFileID *);

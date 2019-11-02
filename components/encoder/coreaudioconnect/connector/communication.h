@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,6 +29,7 @@ const int32_t	 CommCommandCodecs    = 'CDCS';	// Codecs   <-	Get available codec
 const int32_t	 CommCommandSetup     = 'STUP';	// Setup     ->	Setup encoder.
 const int32_t	 CommCommandEncode    = 'ENCD';	// Raw	     ->	Encode audio samples.
 const int32_t	 CommCommandFinish    = 'FNSH'; //		Finish encoding.
+const int32_t	 CommCommandDuration  = 'DURA';	// Int64    <-	Get total duration in samples.
 const int32_t	 CommCommandQuit      = 'QUIT';	//		Quit adapter process.
 
 /* General command data structure.

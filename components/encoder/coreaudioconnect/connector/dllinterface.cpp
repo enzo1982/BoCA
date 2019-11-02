@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -55,7 +55,7 @@ using namespace CA;
 
 HINSTANCE  coreaudiodll	= NULL;
 
-const wchar_t *GetCommonFilesDirectory()
+static const wchar_t *GetCommonFilesDirectory()
 {
 	static wchar_t	 commonFilesDir[32768] = { 0 };
 

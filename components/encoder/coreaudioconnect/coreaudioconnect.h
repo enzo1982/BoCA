@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -50,6 +50,8 @@ namespace BoCA
 			Bool			 Disconnect();
 
 			Bool			 ProcessConnectorCommand();
+
+			Bool			 FixupDurationAtoms(Int64, IO::InStream &, IO::OutStream &, Int64, Bool = False);
 
 			static Bool		 ConvertArguments(Config *);
 		public:

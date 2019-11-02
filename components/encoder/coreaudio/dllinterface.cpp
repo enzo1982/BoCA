@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -40,11 +40,12 @@ namespace CA
 	AUDIOFORMATGETPROPERTY			 AudioFormatGetProperty			= NIL;
 	AUDIOFORMATGETPROPERTYINFO		 AudioFormatGetPropertyInfo		= NIL;
 };
+#endif
 
-DynamicLoader *coreaudiodll	= NIL;
+DynamicLoader *coreaudiodll = NIL;
 
 #ifdef __WIN32__
-String GetCommonFilesDirectory()
+static String GetCommonFilesDirectory()
 {
 	String	 commonFilesDir;
 
@@ -58,7 +59,7 @@ String GetCommonFilesDirectory()
 
 	CoTaskMemFree(idlist);
 
-	if (commonFilesDir != NIL && !commonFilesDir.EndsWith(Directory::GetDirectoryDelimiter())) commonFilesDir.Append(Directory::GetDirectoryDelimiter());
+	if (commonFilesDir != NIL && !commonFilesDir.EndsWith("\\")) commonFilesDir.Append("\\");
 
 	return commonFilesDir;
 }
@@ -66,6 +67,7 @@ String GetCommonFilesDirectory()
 
 Bool LoadCoreAudioDLL()
 {
+#ifndef __APPLE__
 #	ifdef __WIN32__
 	String	 aasDir = GetCommonFilesDirectory().Append("Apple\\Apple Application Support\\");
 
@@ -78,7 +80,7 @@ Bool LoadCoreAudioDLL()
 
 	delete [] buffer;
 
-	coreaudiodll	  = new DynamicLoader(String(aasDir).Append("CoreAudioToolbox.dll"));
+	coreaudiodll = new DynamicLoader(String(aasDir).Append("CoreAudioToolbox.dll"));
 #	endif
 
 	if (coreaudiodll == NIL) return False;
@@ -112,14 +114,16 @@ Bool LoadCoreAudioDLL()
 
 	    AudioFormatGetProperty		== NIL ||
 	    AudioFormatGetPropertyInfo		== NIL) { FreeCoreAudioDLL(); return False; }
+#endif
 
 	return True;
 }
 
 Void FreeCoreAudioDLL()
 {
+#ifndef __APPLE__
 	BoCA::Utilities::FreeCodecDLL(coreaudiodll);
-
-	coreaudiodll	  = NIL;
-}
 #endif
+
+	coreaudiodll = NIL;
+}

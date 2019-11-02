@@ -16,6 +16,8 @@
 #include "coreaudio.h"
 #include "config.h"
 
+using namespace smooth::IO;
+
 const String &BoCA::EncoderCoreAudio::GetComponentSpecs()
 {
 	static String	 componentSpecs;
@@ -77,16 +79,12 @@ const String &BoCA::EncoderCoreAudio::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
-#ifndef __APPLE__
 	LoadCoreAudioDLL();
-#endif
 }
 
 Void smooth::DetachDLL()
 {
-#ifndef __APPLE__
 	FreeCoreAudioDLL();
-#endif
 }
 
 namespace BoCA
@@ -323,6 +321,21 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	 */
 	EncodeFrames(True);
 
+	/* Calculate frame size divider and duration.
+	 */
+	const Format	&format = track.GetFormat();
+
+	Int	 rate	  = SuperWorker::GetOutputSampleRate(codec, format.rate);
+
+	if (rate == 0) rate = format.rate;
+
+	Float	 divider  = Float(format.rate) / rate;
+
+	if (codec == CA::kAudioFormatMPEG4AAC_HE ||
+	    codec == CA::kAudioFormatMPEG4AAC_HE_V2) divider *= 2.0;
+
+	Int64	 duration = Int64(packetsWritten) * frameSize / divider;
+
 	/* Write priming and remainder info.
 	 */
 	CA::AudioConverterPrimeInfo	 initialInfo = workers.GetNth(0					 )->GetPrimeInfo();
@@ -330,17 +343,6 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	if (initialInfo.leadingFrames != 0xFFFFFFFF && finalInfo.trailingFrames != 0xFFFFFFFF)
 	{
-		const Format	&format = track.GetFormat();
-
-		Int	 rate	 = SuperWorker::GetOutputSampleRate(codec, format.rate);
-
-		if (rate == 0) rate = format.rate;
-
-		Float	 divider = Float(format.rate) / rate;
-
-		if (codec == CA::kAudioFormatMPEG4AAC_HE ||
-		    codec == CA::kAudioFormatMPEG4AAC_HE_V2) divider *= 2.0;
-
 		CA::AudioFilePacketTableInfo	 pti;
 
 		pti.mPrimingFrames     = initialInfo.leadingFrames;
@@ -375,7 +377,32 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	 */
 	CA::AudioFileClose(audioFile);
 
-	/* Write metadata to file
+	/* Fix mhdr atom for long running tracks.
+	 */
+	if (fileType == CA::kAudioFileM4AType && duration > 0xFFFFFFFF)
+	{
+		driver->Close();
+
+		String		 tempFile = String(track.outputFile).Append(".temp");
+
+		InStream	 in(STREAM_FILE, track.outputFile, IS_READ);
+		OutStream	 out(STREAM_FILE, tempFile, OS_REPLACE);
+
+		Bool		 result = FixupDurationAtoms(duration, in, out, in.Size());
+
+		in.Close();
+		out.Close();
+
+		if (result)
+		{
+			File(track.outputFile).Delete();
+			File(tempFile).Move(track.outputFile);
+		}
+
+		File(tempFile).Delete();
+	}
+
+	/* Write metadata to file.
 	 */
 	if (fileType == CA::kAudioFileM4AType && config->GetIntValue("Tags", "EnableMP4Metadata", True))
 	{
@@ -601,6 +628,153 @@ String BoCA::EncoderCoreAudio::GetOutputFileExtension() const
 	}
 
 	return "aac";
+}
+
+Bool BoCA::EncoderCoreAudio::FixupDurationAtoms(Int64 duration, InStream &in, OutStream &out, Int64 size, Bool seenMdat)
+{
+	Int64			 bytesLeft = size;
+	Buffer<UnsignedByte>	 buffer(65536);
+
+	while (bytesLeft > 0)
+	{
+		UnsignedInt64	 bytes	  = UnsignedInt32(in.InputNumberRaw(4));
+		UnsignedInt32	 id	  = in.InputNumberRaw(4);
+		Bool		 use64bit = (bytes == 1);
+		Int		 grow	  = 0;
+
+		if (use64bit == 1) bytes = in.InputNumberRaw(8);
+
+		if	(id == 'moov') grow = 36;
+		else if (id == 'trak') grow = 24;
+		else if (id == 'mdia' ||
+			 id == 'tkhd' ||
+			 id == 'mdhd' ||
+			 id == 'mvhd') grow = 12;
+
+		out.OutputNumberRaw(use64bit ? 1 : bytes + grow, 4);
+		out.OutputNumberRaw(id, 4);
+
+		if (use64bit)
+		{
+			out.OutputNumberRaw(bytes + grow, 8);
+
+			bytes	  -= 8;
+			bytesLeft -= 8;
+		}
+
+		bytes	  -= 8;
+		bytesLeft -= 8;
+
+		/* Recurse into moov, trak, mdia, minf and stbl boxes.
+		 */
+		if (id == 'moov' ||
+		    id == 'trak' ||
+		    id == 'mdia' ||
+		    id == 'minf' ||
+		    id == 'stbl')
+		{
+			if (!FixupDurationAtoms(duration, in, out, bytes, seenMdat)) return False;
+
+			bytesLeft -= bytes;
+
+			continue;
+		}
+
+		/* Fixup duration atoms.
+		 */
+		if (id == 'tkhd' ||
+		    id == 'mdhd' ||
+		    id == 'mvhd')
+		{
+			Int	 size = 0;
+
+			// Version.
+			if (in.InputNumberRaw(1) >= 1) return False;
+
+			out.OutputNumberRaw(1, 1);
+			size += 1;
+
+			// Flags.
+			out.OutputNumberRaw(in.InputNumberRaw(3), 3);
+			size += 3;
+
+			// Creation time.
+			out.OutputNumberRaw(0, 4);
+			out.OutputNumberRaw(in.InputNumberRaw(4), 4);
+			size += 4;
+
+			// Modification time.
+			out.OutputNumberRaw(0, 4);
+			out.OutputNumberRaw(in.InputNumberRaw(4), 4);
+			size += 4;
+
+			// Time scale.
+			out.OutputNumberRaw(in.InputNumberRaw(4), 4);
+			size += 4;
+
+			// Reserved.
+			if (id == 'tkhd')
+			{
+				out.OutputNumberRaw(in.InputNumberRaw(4), 4);
+				size += 4;
+			}
+
+			// Duration.
+			in.RelSeek(4);
+			out.OutputNumberRaw(duration, 8);
+			size += 4;
+
+			// Rest of atom.
+			in.InputData(buffer, bytes - size);
+			out.OutputData(buffer, bytes - size);
+
+			bytesLeft -= bytes;
+
+			continue;
+		}
+
+		/* Fixup chunk offset atoms.
+		 */
+		if (!seenMdat && (id == 'stco' ||
+				  id == 'co64'))
+		{
+			// Version.
+			out.OutputNumberRaw(in.InputNumberRaw(1), 1);
+
+			// Flags.
+			out.OutputNumberRaw(in.InputNumberRaw(3), 3);
+
+			// Number of entries.
+			UnsignedInt32	 numEntries = in.InputNumberRaw(4);
+
+			out.OutputNumberRaw(numEntries, 4);
+
+			// Entries.
+			if (id == 'stco') for (UnsignedInt32 i = 0; i < numEntries; i++) out.OutputNumberRaw(in.InputNumberRaw(4) + 36, 4);
+			else		  for (UnsignedInt32 i = 0; i < numEntries; i++) out.OutputNumberRaw(in.InputNumberRaw(8) + 36, 8);
+
+			bytesLeft -= bytes;
+
+			continue;
+		}
+
+		/* Copy other boxes/atoms.
+		 */
+		if (id == 'mdat') seenMdat = True;
+
+		while (bytes > 0)
+		{
+			Int	 size = Math::Min(bytes, buffer.Size());
+
+			in.InputData(buffer, size);
+			out.OutputData(buffer, size);
+
+			bytes	  -= size;
+			bytesLeft -= size;
+		}
+	}
+
+	return True;
 }
 
 Bool BoCA::EncoderCoreAudio::ConvertArguments(Config *config)

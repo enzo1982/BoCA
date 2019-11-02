@@ -224,6 +224,9 @@ int main(int argc, char *argv[])
 	CA::AudioConverterRef	 converter	= NULL;
 	CA::AudioBufferList	*buffers	= NULL;
 
+	int			 frameSize	= 0;
+	int64_t			 duration	= 0;
+
 	CA::UInt32		 dataSize	= 0;
 	CA::UInt32		 packetsWritten	= 0;
 
@@ -281,6 +284,8 @@ int main(int argc, char *argv[])
 					/* Create audio converter object.
 					 */
 					if (CA::AudioConverterNew(&sourceFormat, &destinationFormat, &converter) != 0) { comm->status = CommStatusError; break; }
+
+					frameSize = destinationFormat.mFramesPerPacket;
 
 					/* Set bitrate if format does support bitrates.
 					 */
@@ -442,6 +447,19 @@ int main(int argc, char *argv[])
 					free(buffers->mBuffers[0].mData);
 					free(buffers);
 
+					/* Calculate frame size divider and duration.
+					 */
+					int	 rate	 = GetOutputSampleRate(setup);
+
+					if (rate == 0) rate = setup.rate;
+
+					float	 divider = float(setup.rate) / rate;
+
+					if (setup.codec == CA::kAudioFormatMPEG4AAC_HE ||
+					    setup.codec == CA::kAudioFormatMPEG4AAC_HE_V2) divider *= 2.0;
+
+					duration = int64_t(packetsWritten) * frameSize / divider;
+
 					/* Write priming and remainder info.
 					 */
 					CA::AudioConverterPrimeInfo	 primeInfo;
@@ -449,15 +467,6 @@ int main(int argc, char *argv[])
 
 					if (CA::AudioConverterGetProperty(converter, CA::kAudioConverterPrimeInfo, &size, &primeInfo) == 0)
 					{
-						int	 rate	 = GetOutputSampleRate(setup);
-
-						if (rate == 0) rate = setup.rate;
-
-						float	 divider = float(setup.rate) / rate;
-
-						if (setup.codec == CA::kAudioFormatMPEG4AAC_HE ||
-						    setup.codec == CA::kAudioFormatMPEG4AAC_HE_V2) divider *= 2.0;
-
 						CA::AudioFilePacketTableInfo	 pti;
 
 						pti.mPrimingFrames     = primeInfo.leadingFrames;
@@ -489,6 +498,15 @@ int main(int argc, char *argv[])
 
 					fclose(file);
 				}
+
+				comm->status = CommStatusReady;
+
+				break;
+			case CommCommandDuration:
+				comm->length = sizeof(int64_t);
+
+				comm->data[0] = duration >> 32;
+				comm->data[1] = duration & 0xFFFFFFFF;
 
 				comm->status = CommStatusReady;
 

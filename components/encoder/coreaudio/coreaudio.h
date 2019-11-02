@@ -53,6 +53,8 @@ namespace BoCA
 			Int			 EncodeFrames(Bool);
 			Int			 ProcessPackets(const Buffer<unsigned char> &, const Array<Int> &, const Array<CA::AudioStreamPacketDescription *> &, Bool, Bool);
 
+			Bool			 FixupDurationAtoms(Int64, IO::InStream &, IO::OutStream &, Int64, Bool = False);
+
 			static Bool		 ConvertArguments(Config *);
 		public:
 			static const String	&GetComponentSpecs();
