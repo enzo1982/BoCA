@@ -11,6 +11,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth.h>
+#include <smooth/dll.h>
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -24,6 +25,7 @@
 #endif
 
 #include "coreaudioconnect.h"
+#include "dllinterface.h"
 #include "config.h"
 
 using namespace smooth::IO;
@@ -82,6 +84,16 @@ const String &BoCA::EncoderCoreAudioConnect::GetComponentSpecs()
 	}
 
 	return componentSpecs;
+}
+
+Void smooth::AttachDLL(Void *instance)
+{
+	LoadMP4v2DLL();
+}
+
+Void smooth::DetachDLL()
+{
+	FreeMP4v2DLL();
 }
 
 BoCA::EncoderCoreAudioConnect::EncoderCoreAudioConnect()
@@ -222,47 +234,49 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 	if (comm->status != CommStatusReady) return False;
 
-	/* Get total duration.
+	/* Finish MP4 writing.
 	 */
-	comm->command = CommCommandDuration;
-	comm->length  = 0;
-
-	ProcessConnectorCommand();
-
-	if (comm->status != CommStatusReady) return False;
-
-	Int64	 duration = Int64(comm->data[0]) << 32 | comm->data[1];
-
-	/* Fix mhdr atom for long running tracks.
-	 */
-	if (fileType == CA::kAudioFileM4AType && duration > 0xFFFFFFFF)
+	if (fileType == CA::kAudioFileM4AType)
 	{
-		String		 tempFile = String(track.outputFile).Append(".temp");
+		/* Get total duration.
+		 */
+		comm->command = CommCommandDuration;
+		comm->length  = 0;
 
-		InStream	 in(STREAM_FILE, track.outputFile, IS_READ);
-		OutStream	 out(STREAM_FILE, tempFile, OS_REPLACE);
+		ProcessConnectorCommand();
 
-		Bool		 result = FixupDurationAtoms(duration, in, out, in.Size());
+		if (comm->status != CommStatusReady) return False;
 
-		in.Close();
-		out.Close();
+		Int64	 duration = Int64(comm->data[0]) << 32 | comm->data[1];
 
-		if (result)
+		/* Fix mhdr atom for long running tracks.
+		 */
+		if (duration > 0xFFFFFFFF)
 		{
-			File(track.outputFile).Delete();
-			File(tempFile).Move(track.outputFile);
+			String		 tempFile = String(track.outputFile).Append(".temp");
+
+			InStream	 in(STREAM_FILE, track.outputFile, IS_READ);
+			OutStream	 out(STREAM_FILE, tempFile, OS_REPLACE);
+
+			Bool		 result = FixupDurationAtoms(duration, in, out, in.Size());
+
+			in.Close();
+			out.Close();
+
+			if (result)
+			{
+				File(track.outputFile).Delete();
+				File(tempFile).Move(track.outputFile);
+			}
+
+			File(tempFile).Delete();
 		}
 
-		File(tempFile).Delete();
-	}
-
-	/* Write metadata to file.
-	 */
-	if (fileType == CA::kAudioFileM4AType && config->GetIntValue("Tags", "EnableMP4Metadata", True))
-	{
+		/* Write metadata to file.
+		 */
 		const Info	&info = track.GetInfo();
 
-		if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
+		if (config->GetIntValue("Tags", "EnableMP4Metadata", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
@@ -274,6 +288,17 @@ Bool BoCA::EncoderCoreAudioConnect::Deactivate()
 
 				boca.DeleteComponent(tagger);
 			}
+		}
+		else
+		{
+			/* Optimize file even when no tags are written.
+			 */
+			String	 tempFile = String(track.outputFile).Append(".temp");
+
+			ex_MP4Optimize(track.outputFile.ConvertTo("UTF-8"), tempFile.ConvertTo("UTF-8"));
+
+			File(track.outputFile).Delete();
+			File(tempFile).Move(track.outputFile);
 		}
 	}
 

@@ -14,10 +14,10 @@ ifeq ($(BUILD_X86_64),True)
 endif
 
 # Enter object files here:
-OBJECTS	  = config.o coreaudioconnect.o
+OBJECTS	  = config.o coreaudioconnect.o dllinterface.o
 
 # Enter additional defines here:
-DEFINE	  = -Iconnector -Wno-multichar
+DEFINE	  = -I$(SRCDIR) -Iconnector -Wno-multichar
 
 # Enter additional library dependencies here:
 LIBS	  =

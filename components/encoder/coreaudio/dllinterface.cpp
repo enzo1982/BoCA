@@ -42,7 +42,10 @@ namespace CA
 };
 #endif
 
-DynamicLoader *coreaudiodll = NIL;
+MP4OPTIMIZE	 ex_MP4Optimize = NIL;
+
+DynamicLoader *coreaudiodll	= NIL;
+DynamicLoader *mp4v2dll		= NIL;
 
 #ifdef __WIN32__
 static String GetCommonFilesDirectory()
@@ -126,4 +129,24 @@ Void FreeCoreAudioDLL()
 #endif
 
 	coreaudiodll = NIL;
+}
+
+Bool LoadMP4v2DLL()
+{
+	mp4v2dll = BoCA::Utilities::LoadCodecDLL("mp4v2");
+
+	if (mp4v2dll == NIL) return False;
+
+	ex_MP4Optimize = (MP4OPTIMIZE) mp4v2dll->GetFunctionAddress("MP4Optimize");
+
+	if (ex_MP4Optimize == NIL) { FreeMP4v2DLL(); return False; }
+
+	return True;
+}
+
+Void FreeMP4v2DLL()
+{
+	BoCA::Utilities::FreeCodecDLL(mp4v2dll);
+
+	mp4v2dll = NIL;
 }

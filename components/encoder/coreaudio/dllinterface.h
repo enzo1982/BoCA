@@ -43,13 +43,19 @@ namespace CA
 #endif
 };
 
+#include "mp4v2/mp4v2.h"
+
 using namespace smooth;
 using namespace smooth::System;
 
 extern DynamicLoader	*coreaudiodll;
+extern DynamicLoader	*mp4v2dll;
 
 Bool			 LoadCoreAudioDLL();
 Void			 FreeCoreAudioDLL();
+
+Bool			 LoadMP4v2DLL();
+Void			 FreeMP4v2DLL();
 
 #ifndef __APPLE__
 namespace CA
@@ -85,3 +91,7 @@ namespace CA
 	extern AUDIOFORMATGETPROPERTYINFO	 AudioFormatGetPropertyInfo;
 };
 #endif
+
+typedef bool	(*MP4OPTIMIZE)(const char *, const char *);
+
+extern MP4OPTIMIZE	 ex_MP4Optimize;

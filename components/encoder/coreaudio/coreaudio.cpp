@@ -80,11 +80,13 @@ const String &BoCA::EncoderCoreAudio::GetComponentSpecs()
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadCoreAudioDLL();
+	LoadMP4v2DLL();
 }
 
 Void smooth::DetachDLL()
 {
 	FreeCoreAudioDLL();
+	FreeMP4v2DLL();
 }
 
 namespace BoCA
@@ -321,7 +323,7 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	 */
 	EncodeFrames(True);
 
-	/* Calculate frame size divider and duration.
+	/* Calculate frame size divider.
 	 */
 	const Format	&format = track.GetFormat();
 
@@ -333,8 +335,6 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 	if (codec == CA::kAudioFormatMPEG4AAC_HE ||
 	    codec == CA::kAudioFormatMPEG4AAC_HE_V2) divider *= 2.0;
-
-	Int64	 duration = Int64(packetsWritten) * frameSize / divider;
 
 	/* Write priming and remainder info.
 	 */
@@ -377,40 +377,42 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 	 */
 	CA::AudioFileClose(audioFile);
 
-	/* Fix mhdr atom for long running tracks.
+	/* Finish MP4 writing.
 	 */
-	if (fileType == CA::kAudioFileM4AType && duration > 0xFFFFFFFF)
+	if (fileType == CA::kAudioFileM4AType)
 	{
 		driver->Close();
 
-		String		 tempFile = String(track.outputFile).Append(".temp");
+		/* Fix mhdr atom for long running tracks.
+		 */
+		Int64	 duration = Int64(packetsWritten) * frameSize / divider;
 
-		InStream	 in(STREAM_FILE, track.outputFile, IS_READ);
-		OutStream	 out(STREAM_FILE, tempFile, OS_REPLACE);
-
-		Bool		 result = FixupDurationAtoms(duration, in, out, in.Size());
-
-		in.Close();
-		out.Close();
-
-		if (result)
+		if (duration > 0xFFFFFFFF)
 		{
-			File(track.outputFile).Delete();
-			File(tempFile).Move(track.outputFile);
+			String		 tempFile = String(track.outputFile).Append(".temp");
+
+			InStream	 in(STREAM_FILE, track.outputFile, IS_READ);
+			OutStream	 out(STREAM_FILE, tempFile, OS_REPLACE);
+
+			Bool		 result = FixupDurationAtoms(duration, in, out, in.Size());
+
+			in.Close();
+			out.Close();
+
+			if (result)
+			{
+				File(track.outputFile).Delete();
+				File(tempFile).Move(track.outputFile);
+			}
+
+			File(tempFile).Delete();
 		}
 
-		File(tempFile).Delete();
-	}
-
-	/* Write metadata to file.
-	 */
-	if (fileType == CA::kAudioFileM4AType && config->GetIntValue("Tags", "EnableMP4Metadata", True))
-	{
-		driver->Close();
-
+		/* Write metadata to file.
+		 */
 		const Info	&info = track.GetInfo();
 
-		if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
+		if (config->GetIntValue("Tags", "EnableMP4Metadata", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
 		{
 			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
@@ -422,6 +424,17 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 				boca.DeleteComponent(tagger);
 			}
+		}
+		else
+		{
+			/* Optimize file even when no tags are written.
+			 */
+			String	 tempFile = String(track.outputFile).Append(".temp");
+
+			ex_MP4Optimize(track.outputFile.ConvertTo("UTF-8"), tempFile.ConvertTo("UTF-8"));
+
+			File(track.outputFile).Delete();
+			File(tempFile).Move(track.outputFile);
 		}
 	}
 
