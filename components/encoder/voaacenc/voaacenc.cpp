@@ -254,24 +254,21 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 		ex_MP4Close(mp4File, 0);
 
-		/* Write metadata to file
+		/* Write metadata to file.
 		 */
-		if (config->GetIntValue("Tags", "EnableMP4Metadata", True))
+		const Info	&info = track.GetInfo();
+
+		if (config->GetIntValue("Tags", "EnableMP4Metadata", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
 		{
-			const Info	&info = track.GetInfo();
+			AS::Registry		&boca = AS::Registry::Get();
+			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
 
-			if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
+			if (tagger != NIL)
 			{
-				AS::Registry		&boca = AS::Registry::Get();
-				AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
+				tagger->SetConfiguration(config);
+				tagger->RenderStreamInfo(track.outputFile, track);
 
-				if (tagger != NIL)
-				{
-					tagger->SetConfiguration(config);
-					tagger->RenderStreamInfo(track.outputFile, track);
-
-					boca.DeleteComponent(tagger);
-				}
+				boca.DeleteComponent(tagger);
 			}
 		}
 		else
