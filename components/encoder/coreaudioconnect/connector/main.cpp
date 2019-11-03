@@ -10,8 +10,13 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#define _FILE_OFFSET_BITS 64
+
 #include "dllinterface.h"
 #include "communication.h"
+
+#include <stdio.h>
+#include <math.h>
 
 #ifdef __WINE__
 #	include <sys/mman.h>
@@ -20,11 +25,13 @@
 #else
 #	include <io.h>
 
-#	define ftruncate _chsize
-#endif
+#	if !defined __MINGW32__
+#		define fseeko _fseeki64
+#		define ftello _ftelli64
+#	endif
 
-#include <stdio.h>
-#include <math.h>
+#	define ftruncate chsize
+#endif
 
 #ifndef min
 #	define min(n, m) ((n) < (m) ? (n) : (m))
@@ -129,7 +136,7 @@ CA::OSStatus AudioFileReadProc(void *inClientData, CA::SInt64 inPosition, CA::UI
 {
 	FILE	*file = (FILE *) inClientData;
 
-	fseek(file, inPosition + dataOffset, SEEK_SET);
+	fseeko(file, inPosition + dataOffset, SEEK_SET);
 
 	*actualCount = fread(buffer, 1, requestCount, file);
 
@@ -140,7 +147,7 @@ CA::OSStatus AudioFileWriteProc(void *inClientData, CA::SInt64 inPosition, CA::U
 {
 	FILE	*file = (FILE *) inClientData;
 
-	fseek(file, inPosition + dataOffset, SEEK_SET);
+	fseeko(file, inPosition + dataOffset, SEEK_SET);
 
 	*actualCount = fwrite(buffer, 1, requestCount, file);
 
@@ -151,13 +158,13 @@ CA::SInt64 AudioFileGetSizeProc(void *inClientData)
 {
 	FILE	*file = (FILE *) inClientData;
 
-	unsigned int	 pos  = ftell(file);
+	int64_t	 pos  = ftello(file);
 
-	fseek(file,   0, SEEK_END);
+	fseeko(file,   0, SEEK_END);
 
-	unsigned int	 size = ftell(file);
+	int64_t	 size = ftello(file);
 
-	fseek(file, pos, SEEK_SET);
+	fseeko(file, pos, SEEK_SET);
 
 	return size - dataOffset;
 }
@@ -335,8 +342,8 @@ int main(int argc, char *argv[])
 					file	   = _wfopen(fileName, L"r+b");
 #endif
 
-					fseek(file, 0, SEEK_END);
-					dataOffset = ftell(file);
+					fseeko(file, 0, SEEK_END);
+					dataOffset = ftello(file);
 
 					CA::AudioFileInitializeWithCallbacks(file, AudioFileReadProc, AudioFileWriteProc, AudioFileGetSizeProc, AudioFileSetSizeProc, fileType, &destinationFormat, 0, &audioFile);
 
