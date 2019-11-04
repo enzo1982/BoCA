@@ -731,9 +731,9 @@ Error BoCA::TaggerAPEv2::UpdateStreamInfo(const String &fileName, const Track &t
 
 			buffer.Resize(1024);
 
-			for (Int i = in.GetPos(); i < in.Size(); i += buffer.Size())
+			for (Int64 i = in.GetPos(); i < in.Size(); i += buffer.Size())
 			{
-				Int	 bytes = Math::Min(buffer.Size(), in.Size() - i);
+				Int	 bytes = Math::Min(in.Size() - i, buffer.Size());
 
 				in.InputData(buffer, bytes);
 				out.OutputData(buffer, bytes);
@@ -777,9 +777,9 @@ Error BoCA::TaggerAPEv2::UpdateStreamInfo(const String &fileName, const Track &t
 
 			buffer.Resize(1024);
 
-			for (Int i = tagSize; i < in.Size(); i += buffer.Size())
+			for (Int64 i = tagSize; i < in.Size(); i += buffer.Size())
 			{
-				Int	 bytes = Math::Min(buffer.Size(), in.Size() - i);
+				Int	 bytes = Math::Min(in.Size() - i, buffer.Size());
 
 				in.InputData(buffer, bytes);
 				out.OutputData(buffer, bytes);

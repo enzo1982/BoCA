@@ -141,15 +141,17 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 	 */
 	InStream		 in(STREAM_FILE, encFileName, IS_READ);
 	Buffer<UnsignedByte>	 buffer(1024);
-	Int			 bytesLeft = in.Size();
+	Int64			 bytesLeft = in.Size();
 
 	while (bytesLeft)
 	{
-		in.InputData(buffer, Math::Min(1024, bytesLeft));
+		Int	 bytes = Math::Min(Int64(1024), bytesLeft);
 
-		driver->WriteData(buffer, Math::Min(1024, bytesLeft));
+		in.InputData(buffer, bytes);
 
-		bytesLeft -= Math::Min(1024, bytesLeft);
+		driver->WriteData(buffer, bytes);
+
+		bytesLeft -= bytes;
 	}
 
 	/* Append tags.

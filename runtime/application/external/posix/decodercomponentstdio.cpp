@@ -130,7 +130,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	/* Read WAVE header into buffer.
 	 */
 	Buffer<UnsignedByte>	 buffer(4096);
-	Int			 bytesReadTotal = 0;
+	Int64			 bytesReadTotal = 0;
 	Int			 bytesRead = 0;
 
 	do

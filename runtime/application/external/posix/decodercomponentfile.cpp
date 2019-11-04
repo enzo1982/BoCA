@@ -243,7 +243,8 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 		}
 		else if (chunk == "data")
 		{
-			track.length	= cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
+			if (cSize == 0xffffffff || cSize == 0) track.length = (in->Size() - in->GetPos()) / track.GetFormat().channels / (track.GetFormat().bits / 8);
+			else				       track.length = cSize / track.GetFormat().channels / (track.GetFormat().bits / 8);
 		}
 		else
 		{

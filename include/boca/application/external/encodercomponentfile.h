@@ -27,7 +27,7 @@ namespace BoCA
 				String		 wavFileName;
 				String		 encFileName;
 
-				Int		 nOfSamples;
+				Int64		 nOfSamples;
 			public:
 						 EncoderComponentExternalFile(ComponentSpecs *);
 				virtual		~EncoderComponentExternalFile();

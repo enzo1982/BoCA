@@ -207,11 +207,13 @@ Bool BoCA::EncoderTwinVQ::Deactivate()
 
 	while (bytesLeft)
 	{
-		in.InputData(buffer, Math::Min(Int64(1024), bytesLeft));
+		Int	 bytes = Math::Min(Int64(1024), bytesLeft);
 
-		driver->WriteData(buffer, Math::Min(Int64(1024), bytesLeft));
+		in.InputData(buffer, bytes);
 
-		bytesLeft -= Math::Min(Int64(1024), bytesLeft);
+		driver->WriteData(buffer, bytes);
+
+		bytesLeft -= bytes;
 	}
 
 	in.Close();
