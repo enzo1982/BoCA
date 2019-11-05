@@ -97,6 +97,8 @@ BoCA::Track &BoCA::Track::operator =(const Track &oTrack)
 	outputFile	= oTrack.outputFile;
 	fileName	= oTrack.fileName;
 
+	decoderID	= oTrack.decoderID;
+
 	lossless	= oTrack.lossless;
 	md5		= oTrack.md5;
 

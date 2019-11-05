@@ -77,6 +77,10 @@ namespace BoCA
 			String		 fileName;
 			String		 outputFile;
 
+			/* Decoder information:
+			 */
+			String		 decoderID;
+
 					 Track(const int = NIL);
 					 Track(const Track &);
 					~Track();

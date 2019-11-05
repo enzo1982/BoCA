@@ -169,10 +169,12 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	 */
 	InStream	*in = new InStream(STREAM_FILE, wavFileName, IS_READ);
 
-	track.fileName = streamURI;
-	track.fileSize = File(streamURI).GetFileSize();
+	track.decoderID	= specs->id;
 
-	track.lossless = specs->formats.GetFirst()->IsLossless();
+	track.fileName	= streamURI;
+	track.fileSize	= File(streamURI).GetFileSize();
+
+	track.lossless	= specs->formats.GetFirst()->IsLossless();
 
 	/* Read RIFF chunk.
 	 */
