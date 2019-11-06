@@ -44,7 +44,7 @@ const String &BoCA::EncoderMAC::GetComponentSpecs()
 		      <tag id=\"apev2-tag\" mode=\"append\">APEv2</tag>					\
 		    </format>										\
 		    <input bits=\"8\" signed=\"false\" channels=\"1-8\"/>				\
-		    <input bits=\"16-24\" channels=\"1-8\"/>						\
+		    <input bits=\"16-32\" channels=\"1-8\"/>						\
 		    <parameters>									\
 		      <selection name=\"Compression mode\" argument=\"-m %VALUE\" default=\"high\">	\
 			<option alias=\"Fast\">fast</option>						\

@@ -187,10 +187,10 @@ Global defines
 *****************************************************************************************/
 
 // major version number
-#define VERSION_MAJOR 4
+#define VERSION_MAJOR 5
 
 // build version number
-#define VERSION_REVISION 99
+#define VERSION_REVISION 02
 
 // year in the copyright strings
 #define MAC_YEAR 2020
