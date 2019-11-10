@@ -149,12 +149,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 		/* Read decoded WAVE file header.
 		 */
-		track.decoderID	= specs->id;
-
-		track.fileName	= streamURI;
-		track.fileSize	= File(streamURI).GetFileSize();
-
-		track.lossless	= specs->formats.GetFirst()->IsLossless();
+		track.fileName = streamURI;
+		track.fileSize = File(streamURI).GetFileSize();
 
 		/* Read RIFF chunk.
 		 */

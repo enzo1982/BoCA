@@ -413,7 +413,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if	(infoTrack.length	>= 0) { fileLength = infoTrack.length;	     iTrack.length	 = infoTrack.length;	   }
 			else if (infoTrack.approxLength >= 0) { fileLength = infoTrack.approxLength; iTrack.approxLength = infoTrack.approxLength; }
 
-			iTrack.lossless = infoTrack.lossless;
+			iTrack.decoderID = infoTrack.decoderID;
+			iTrack.lossless	 = infoTrack.lossless;
 		}
 
 		/* Start of a track.
@@ -554,6 +555,7 @@ Bool BoCA::DecoderCueSheet::AddTrack(const Track &track, Array<Track> &tracks) c
 	 */
 	Track	 rTrack;
 
+	rTrack.decoderID    = track.decoderID;
 	rTrack.fileName	    = track.fileName;
 
 	rTrack.sampleOffset = track.sampleOffset;

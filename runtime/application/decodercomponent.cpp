@@ -28,16 +28,22 @@ Bool BoCA::AS::DecoderComponent::CanOpenStream(const String &streamURI)
 
 Error BoCA::AS::DecoderComponent::GetStreamInfo(const String &streamURI, Track &track)
 {
+	track.fileName = streamURI;
+
 	if (specs->func_GetStreamInfo(component, streamURI, &track) != Success()) return Error();
 
 	track.decoderID = specs->id;
-
-	track.fileName	= streamURI;
 	track.lossless	= specs->formats.GetFirst()->IsLossless();
 
-	/* Set lossless flag for chapters.
+	/* Set decoder ID and lossless flag for chapters.
 	 */
-	if (track.lossless) foreach (Track &chapter, track.tracks) chapter.lossless = True;
+	foreach (Track &chapter, track.tracks)
+	{
+		if (chapter.decoderID != NIL) continue;
+
+		chapter.decoderID = specs->id;
+		chapter.lossless  = track.lossless;
+	}
 
 	return Success();
 }

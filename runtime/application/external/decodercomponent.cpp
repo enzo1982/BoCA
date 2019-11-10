@@ -133,9 +133,18 @@ Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track
 				}
 			}
 
-			/* Set lossless flag for chapters.
+			/* Set decoder ID and lossless flag for track and chapters.
 			 */
-			if (track.lossless) foreach (Track &chapter, track.tracks) chapter.lossless = True;
+			track.decoderID = specs->id;
+			track.lossless	= format->IsLossless();
+
+			foreach (Track &chapter, track.tracks)
+			{
+				if (chapter.decoderID != NIL) continue;
+
+				chapter.decoderID = specs->id;
+				chapter.lossless  = track.lossless;
+			}
 
 			break;
 		}
