@@ -20,6 +20,9 @@
 
 using namespace BoCA;
 
+using namespace smooth::IO;
+using namespace smooth::XML;
+
 #ifndef __APPLE__
 using namespace CA;
 
@@ -48,6 +51,8 @@ DynamicLoader *coreaudiodll	= NIL;
 DynamicLoader *mp4v2dll		= NIL;
 
 #ifdef __WIN32__
+static const String	 coreAudioToolbox = "CoreAudioToolbox.dll";
+
 static String GetCommonFilesDirectory()
 {
 	String	 commonFilesDir;
@@ -66,24 +71,224 @@ static String GetCommonFilesDirectory()
 
 	return commonFilesDir;
 }
+
+#if defined __i386__ || defined _M_IX86
+static const String	 architecture = "x86";
+#elif defined __x86_64__ || defined _M_AMD64
+static const String	 architecture = "x64";
+#endif
+
+static Void GetPackageFolders(const String &, Array<String> &);
+
+static Void FindDependenciesFolders(const String &packageFolder, Array<String> &packageFolders)
+{
+	if (!File(packageFolder.Append("AppxManifest.xml")).Exists()) return;
+
+	/* Load app manifest.
+	 */
+	Document	 document;
+
+	document.LoadFile(packageFolder.Append("AppxManifest.xml"));
+
+	/* Get root node.
+	 */
+	Node	*root = document.GetRootNode();
+
+	if (root == NIL) return;
+
+	/* Get Dependencies node.
+	 */
+	Node	*dependencies = root->GetNodeByName("Dependencies");
+
+	if (dependencies == NIL) return;
+
+	for (Int i = 0; i < dependencies->GetNOfNodes(); i++)
+	{
+		Node		*node = dependencies->GetNthNode(i);
+
+		if (node->GetName() != "PackageDependency") continue;
+
+		Attribute	*name = node->GetAttributeByName("Name");
+
+		if (name == NIL) continue;
+
+		GetPackageFolders(name->GetContent(), packageFolders);
+	}
+}
+
+static Void GetPackageFolders(const String &packageName, Array<String> &packageFolders)
+{
+	/* Open Packages key.
+	 */
+	HKEY	 packagesKey;
+
+	if (RegOpenKey(HKEY_CLASSES_ROOT, L"Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\AppModel\\Repository\\Packages", &packagesKey) != ERROR_SUCCESS) return;
+
+	/* Enumerate registered packages.
+	 */
+	Int	 index = 0;
+	wchar_t	 name[256];
+
+	while (RegEnumKey(packagesKey, index++, name, sizeof(name) / sizeof(wchar_t)) == ERROR_SUCCESS)
+	{
+		if (!String(name).StartsWith(packageName)) continue;
+		if (!String(name).Contains(String("_").Append(architecture).Append("_"))) continue;
+
+		/* Found package, open key.
+		 */
+		HKEY	 packageKey;
+
+		if (RegOpenKey(packagesKey, name, &packageKey) != ERROR_SUCCESS) continue;
+
+		/* Query folder.
+		 */
+		const DWORD	 size	      = 2048;
+		DWORD		 bytes	      = size * sizeof(wchar_t);
+		wchar_t		 folder[size] = { 0 };
+
+		RegQueryValueEx(packageKey, L"PackageRootFolder", 0, 0, (BYTE *) folder, &bytes);
+		RegCloseKey(packageKey);
+
+		/* Add folder and dependencies to list.
+		 */
+		String	 packageFolder = folder;
+
+		if (!packageFolder.EndsWith("\\")) packageFolder.Append("\\");
+
+		if (packageFolders.Add(packageFolder, packageFolder.ComputeCRC32())) FindDependenciesFolders(packageFolder, packageFolders);
+
+		break;
+	}
+
+	RegCloseKey(packagesKey);
+}
+
+static Void CopyLibrary(const String &libName, const Array<String> &packageFolders, const String &cacheFolder)
+{
+	/* Find source and target file names.
+	 */
+	String	 sourceFile;
+	String	 targetFile = cacheFolder.Append(libName);
+
+	foreach (const String &packageFolder, packageFolders)
+	{
+		if (!File(packageFolder.Append(libName)).Exists()) continue;
+
+		sourceFile = packageFolder.Append(libName);
+	}
+
+	/* Check file existence and skip already existing files.
+	 */
+	if (!File(sourceFile).Exists() ||
+	     File(targetFile).Exists()) return;
+
+	/* Prepare input and output files.
+	 */
+	InStream	 in(STREAM_FILE, sourceFile);
+	OutStream	 out(STREAM_FILE, targetFile, OS_REPLACE);
+
+	/* Copy chunks of 128kB.
+	 */
+	Buffer<UnsignedByte>	 buffer(131072);
+
+	Int			 overlap   = 0;
+	Bool			 foundSelf = False;
+
+	for (Int i = 0; i < in.Size(); i += buffer.Size() - overlap)
+	{
+		memcpy(buffer, buffer + buffer.Size() - overlap, overlap);
+
+		Int	 bytes = in.InputData(buffer + overlap, Math::Min(buffer.Size() - overlap, in.Size() - in.GetPos()));
+
+		out.OutputData(buffer + overlap, bytes);
+
+		/* Check for referenced DLLs.
+		 */
+		for (Int n = 0; n < overlap + bytes - 5; n++)
+		{
+			if (buffer[n] != '.' || buffer[n + 1] != 'd' || buffer[n + 2] != 'l' || buffer[n + 3] != 'l' || buffer[n + 4] != 0) continue;
+
+			for (Int m = n; m >= 0; m--)
+			{
+				if (buffer[m] >= 0x20) continue;
+
+				/* Get DLL name and copy it if it looks like a reference.
+				 */
+				String	 dllName = (char *) (UnsignedByte *) buffer + m + 1;
+
+				if	(foundSelf)	     CopyLibrary(dllName, packageFolders, cacheFolder);
+				else if (dllName == libName) foundSelf = True;
+
+				break;
+			}
+		}
+
+		/* Overlap 128 bytes when wrapping around so we do not miss any relevant DLLs.
+		 */
+		overlap = 128;
+	}
+}
+
+static Void CacheCoreAudioLibraries(const String &cacheFolder)
+{
+	Array<String>	 iTunesFolders;
+
+	GetPackageFolders("AppleInc.iTunes", iTunesFolders);
+
+	if (iTunesFolders.Length() == 0) return;
+
+	/* Check if package ID has changed.
+	 */
+	const String	 packageId     = Directory(iTunesFolders.GetFirst()).GetDirectoryName();
+	const String	 packageIdFile = cacheFolder.Append("PackageId");
+
+	if (File(packageIdFile).Exists())
+	{
+		InStream	 in(STREAM_FILE, packageIdFile);
+
+		if (in.InputLine() == packageId) return;
+	}
+
+	/* Create cache folder and make sure it's empty.
+	 */
+	Directory(cacheFolder).Create();
+	Directory(cacheFolder).Empty();
+
+	/* Recursively copy CoreAudioToolbox.dll and referenced DLLs.
+	 */
+	CopyLibrary(coreAudioToolbox, iTunesFolders, cacheFolder);
+
+	/* Store package ID.
+	 */
+	OutStream	 out(STREAM_FILE, packageIdFile, OS_REPLACE);
+
+	out.OutputLine(packageId);
+}
 #endif
 
 Bool LoadCoreAudioDLL()
 {
 #ifndef __APPLE__
 #	ifdef __WIN32__
-	String	 aasDir = GetCommonFilesDirectory().Append("Apple\\Apple Application Support\\");
+	String	 coreAudioDir = GetCommonFilesDirectory().Append("Apple\\Apple Application Support\\");
+
+	if (!File(String(coreAudioDir).Append(coreAudioToolbox)).Exists())
+	{
+		coreAudioDir = String(BoCA::Config::Get()->cacheDir).Append("boca\\boca.encoder.coreaudio\\").Append(architecture).Append("\\");
+
+		CacheCoreAudioLibraries(coreAudioDir);
+	}
 
 	/* Add Apple Application Services directory to path.
 	 */
 	char	*buffer = new char [32768];
 
 	GetEnvironmentVariableA("PATH", buffer, 32768);
-	SetEnvironmentVariableA("PATH", String(buffer).Append(";").Append(aasDir));
+	SetEnvironmentVariableA("PATH", String(buffer).Append(";").Append(coreAudioDir));
 
 	delete [] buffer;
 
-	coreaudiodll = new DynamicLoader(String(aasDir).Append("CoreAudioToolbox.dll"));
+	coreaudiodll = new DynamicLoader(String(coreAudioDir).Append(coreAudioToolbox));
 #	endif
 
 	if (coreaudiodll == NIL) return False;
