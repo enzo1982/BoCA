@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -10,8 +10,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_BOCA_PROTOCOL_
-#define H_BOCA_PROTOCOL_
+#ifndef H_BOCA_PROTOCOL
+#define H_BOCA_PROTOCOL
 
 #include <smooth.h>
 #include "../core/definitions.h"
@@ -47,6 +47,9 @@ namespace BoCA
 								 Protocol(const String &);
 								~Protocol();
 		public:
+			Void					 Lock();
+			Void					 Release();
+
 			Int					 Write(const String &, MessageType = MessageTypeMessage);
 
 			/* Returns a new or existing instance of Protocol

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,11 +27,21 @@ BoCA::Protocol::~Protocol()
 {
 }
 
+Void BoCA::Protocol::Lock()
+{
+	mutex.Lock();
+}
+
+Void BoCA::Protocol::Release()
+{
+	mutex.Release();
+}
+
 Int BoCA::Protocol::Write(const String &message, MessageType messageType)
 {
 	UnsignedInt64	 ticks = S::System::System::Clock() - startTicks;
 
-	mutex.Lock();
+	Lock();
 
 	messages.Add(String(ticks / 1000 / 60 / 60 <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 / 60 / 60)).Append(":")
 		    .Append(ticks / 1000 / 60 % 60 <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 / 60 % 60)).Append(":")
@@ -43,7 +53,7 @@ Int BoCA::Protocol::Write(const String &message, MessageType messageType)
 
 	onUpdateProtocol.Emit(name);
 
-	mutex.Release();
+	Release();
 
 	return Success();
 }
