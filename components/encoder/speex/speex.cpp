@@ -207,7 +207,7 @@ Bool BoCA::EncoderSpeex::Activate()
 	/* Get number of threads to use.
 	 */
 	Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
-	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", False);
+	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", True);
 	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
 
 	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
