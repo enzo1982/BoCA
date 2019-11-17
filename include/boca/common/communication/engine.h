@@ -50,6 +50,8 @@ namespace BoCA
 			Signal1<Void, Int>				 onFinishConversion;
 			Signal1<Void, Int>				 onCancelConversion;
 
+			Signal2<Void, Int, const String &>		 onSingleFileConversion;
+
 			Signal2<Void, Int, const Track &>		 onStartTrackConversion;
 			Signal2<Void, Int, const Track &>		 onFinishTrackConversion;
 			Signal2<Void, Int, const Track &>		 onCancelTrackConversion;
