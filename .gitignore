@@ -1,7 +1,7 @@
 # Ignore artifacts created during build.
-*.[oa]
 bin/*
 bin64/*
+components/**/*.[oa]
 lib/*
 lib64/*
 include/smooth.h
@@ -11,3 +11,4 @@ msvc/**/Debug/*
 msvc/**/Release/*
 msvc/**/*.VC.*
 msvc/**/*.vcxproj.user
+runtime/**/*.[oa]
