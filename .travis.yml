@@ -35,9 +35,11 @@ matrix:
             - libxml2-dev
 
     - os: osx
+      osx_image: xcode10.2
       compiler: gcc
 
     - os: osx
+      osx_image: xcode10.2
       compiler: clang
 
 before_install:
