@@ -28,8 +28,6 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	jitter		= config->GetIntValue(ConfigID, "JitterCorrection", False);
 	swapchannels	= config->GetIntValue(ConfigID, "SwapChannels", False);
 
-	ntscsi		= config->GetIntValue(ConfigID, "UseNTSCSI", True);
-
 	locktray	= config->GetIntValue(ConfigID, "LockTray", True);
 	autoEject	= config->GetIntValue(ConfigID, "EjectAfterRipping", False);
 
@@ -199,25 +197,18 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	group_automatization->Add(check_autoRip);
 	group_automatization->Add(check_autoEject);
 
-	group_cdoptions	= new GroupBox(i18n->TranslateString("CD options"), Point(group_drive->GetWidth() + 15, 221), Size(190, 68));
+	group_cdoptions	= new GroupBox(i18n->TranslateString("CD options"), Point(group_drive->GetWidth() + 15, 117), Size(190, 42));
 
 	check_locktray	= new CheckBox(i18n->TranslateString("Lock CD tray while ripping"), Point(10, 14), Size(170, 0), &locktray);
-	check_ntscsi	= new CheckBox(i18n->TranslateString("Use native NT SCSI library"), check_locktray->GetPosition() + Point(0, 26), Size(170, 0), &ntscsi);
-
-#ifndef __WIN32__
-	check_ntscsi->Deactivate();
-#endif
 
 	group_cdoptions->Add(check_locktray);
-	group_cdoptions->Add(check_ntscsi);
 
-	maxTextSize = Math::Max(Math::Max(Math::Max(check_autoRead->GetUnscaledTextWidth(), check_autoRip->GetUnscaledTextWidth()), check_autoEject->GetUnscaledTextWidth()), Math::Max(check_locktray->GetUnscaledTextWidth(), check_ntscsi->GetUnscaledTextWidth()));
+	maxTextSize = Math::Max(Math::Max(Math::Max(check_autoRead->GetUnscaledTextWidth(), check_autoRip->GetUnscaledTextWidth()), check_autoEject->GetUnscaledTextWidth()), check_locktray->GetUnscaledTextWidth());
 
 	check_autoRead->SetWidth(Math::Max(149, maxTextSize + 21));
 	check_autoRip->SetWidth(check_autoRead->GetWidth());
 	check_autoEject->SetWidth(check_autoRead->GetWidth());
 	check_locktray->SetWidth(check_autoRead->GetWidth());
-	check_ntscsi->SetWidth(check_autoRead->GetWidth());
 
 	group_automatization->SetWidth(check_autoRead->GetWidth() + 20);
 	group_cdoptions->SetWidth(check_autoRead->GetWidth() + 20);
@@ -259,7 +250,6 @@ BoCA::ConfigureCDRip::~ConfigureCDRip()
 
 	DeleteObject(group_cdoptions);
 	DeleteObject(check_locktray);
-	DeleteObject(check_ntscsi);
 
 	DeleteObject(group_cdinfo);
 	DeleteObject(check_readCDText);
@@ -390,8 +380,6 @@ Int BoCA::ConfigureCDRip::SaveSettings()
 
 	config->SetIntValue(ConfigID, "JitterCorrection", jitter);
 	config->SetIntValue(ConfigID, "SwapChannels", swapchannels);
-
-	config->SetIntValue(ConfigID, "UseNTSCSI", ntscsi);
 
 	config->SetIntValue(ConfigID, "LockTray", locktray);
 	config->SetIntValue(ConfigID, "EjectAfterRipping", autoEject);
