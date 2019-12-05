@@ -71,16 +71,16 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 		      <switch name=\"Do exhaustive model search\" argument=\"-e\"/>				\
 		      <range name=\"Max LPC order\" argument=\"-l %VALUE\" default=\"8\">			\
 			<min alias=\"disabled\">0</min>								\
-			<max>32</max>										\
+			<max>").Append(String::FromInt(FLAC__MAX_LPC_ORDER)).Append("</max>			\
 		      </range>											\
 		      <switch name=\"Do exhaustive QLP coefficient search\" argument=\"-p\"/>			\
-		      <range name=\"QLP coefficient precision\" argument=\"-q %VALUE\" default=\"0\">		\
-			<min alias=\"auto\">0</min>								\
-			<max>16</max>										\
+		      <range name=\"QLP coefficient precision\" argument=\"-q %VALUE\" default=\"0 (auto)\">	\
+			<min>").Append(String::FromInt(FLAC__MIN_QLP_COEFF_PRECISION)).Append("</min>		\
+			<max>").Append(String::FromInt(FLAC__MAX_QLP_COEFF_PRECISION)).Append("</max>		\
 		      </range>											\
 		      <range name=\"Maximum rice partition order\" argument=\"-r %VALUE\" default=\"5\">	\
-			<min>0</min>										\
-			<max>16</max>										\
+			<min alias=\"auto\">0</min>								\
+			<max>").Append(String::FromInt(FLAC__MAX_RICE_PARTITION_ORDER)).Append("</max>		\
 		      </range>											\
 		    </parameters>										\
 		  </component>											\
@@ -272,17 +272,20 @@ Bool BoCA::EncoderFLAC::Activate()
 
 	if (config->GetIntValue(ConfigureFLAC::ConfigID, "Preset", 5) < 0)
 	{
+		const String	&windowFunctions = config->GetStringValue(ConfigureFLAC::ConfigID, "Apodization", "tukey(0.5)");
+
 		ex_FLAC__stream_encoder_set_streamable_subset(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "StreamableSubset", 1));
 		ex_FLAC__stream_encoder_set_do_mid_side_stereo(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "DoMidSideStereo", 1));
 		ex_FLAC__stream_encoder_set_loose_mid_side_stereo(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "LooseMidSideStereo", 0));
 		ex_FLAC__stream_encoder_set_blocksize(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "Blocksize", 4096));
-		ex_FLAC__stream_encoder_set_apodization(encoder, config->GetStringValue(ConfigureFLAC::ConfigID, "Apodization", "tukey(0.5)"));
 		ex_FLAC__stream_encoder_set_max_lpc_order(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "MaxLPCOrder", 8));
 		ex_FLAC__stream_encoder_set_qlp_coeff_precision(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "QLPCoeffPrecision", 0));
 		ex_FLAC__stream_encoder_set_do_qlp_coeff_prec_search(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "DoQLPCoeffPrecSearch", 0));
 		ex_FLAC__stream_encoder_set_do_exhaustive_model_search(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "DoExhaustiveModelSearch", 0));
 		ex_FLAC__stream_encoder_set_min_residual_partition_order(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "MinResidualPartitionOrder", 0));
 		ex_FLAC__stream_encoder_set_max_residual_partition_order(encoder, config->GetIntValue(ConfigureFLAC::ConfigID, "MaxResidualPartitionOrder", 5));
+
+		if (windowFunctions != NIL) ex_FLAC__stream_encoder_set_apodization(encoder, windowFunctions);
 	}
 	else
 	{
@@ -539,10 +542,10 @@ Bool BoCA::EncoderFLAC::ConvertArguments(Config *config)
 	config->SetIntValue(ConfigureFLAC::ConfigID, "DoQLPCoeffPrecSearch", config->GetIntValue(encoderID, "Do exhaustive QLP coefficient search", False));
 
 	config->SetIntValue(ConfigureFLAC::ConfigID, "Blocksize", Math::Max(192, Math::Min(32768, blocksize)));
-	config->SetIntValue(ConfigureFLAC::ConfigID, "MaxLPCOrder", Math::Max(0, Math::Min(32, lpc)));
-	config->SetIntValue(ConfigureFLAC::ConfigID, "QLPCoeffPrecision", Math::Max(0, Math::Min(16, qlp)));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "MaxLPCOrder", Math::Max(0, Math::Min(FLAC__MAX_LPC_ORDER, lpc)));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "QLPCoeffPrecision", qlp == 0 ? 0 : Math::Max(FLAC__MIN_QLP_COEFF_PRECISION, Math::Min(FLAC__MAX_QLP_COEFF_PRECISION, qlp)));
 	config->SetIntValue(ConfigureFLAC::ConfigID, "MinResidualPartitionOrder", 0);
-	config->SetIntValue(ConfigureFLAC::ConfigID, "MaxResidualPartitionOrder", Math::Max(0, Math::Min(16, rice)));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "MaxResidualPartitionOrder", Math::Max(0, Math::Min(FLAC__MAX_RICE_PARTITION_ORDER, rice)));
 
 	return True;
 }

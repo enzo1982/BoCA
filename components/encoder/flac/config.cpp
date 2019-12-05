@@ -107,11 +107,11 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	text_blocksize		= new Text(i18n->AddColon(i18n->TranslateString("Blocksize")), Point(9, 40));
 
-	text_blocksize_bytes	= new Text(i18n->TranslateString("%1 bytes", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(508, 40));
-	text_blocksize_bytes->SetX(9 + text_blocksize_bytes->GetUnscaledTextWidth());
-	text_blocksize_bytes->SetOrientation(OR_UPPERRIGHT);
+	text_blocksize_samples	= new Text(i18n->TranslateString("%1 samples").Replace("%1", NIL).Replace(" ", NIL), Point(508, 40));
+	text_blocksize_samples->SetX(9 + text_blocksize_samples->GetUnscaledTextWidth());
+	text_blocksize_samples->SetOrientation(OR_UPPERRIGHT);
 
-	slider_blocksize	= new Slider(Point(16 + text_blocksize->GetUnscaledTextWidth(), 38), Size(441 - text_blocksize->GetUnscaledTextWidth() - text_blocksize_bytes->GetUnscaledTextWidth(), 0), OR_HORZ, &blocksize, 24, 4096);
+	slider_blocksize	= new Slider(Point(16 + text_blocksize->GetUnscaledTextWidth(), 38), Size(441 - text_blocksize->GetUnscaledTextWidth() - text_blocksize_samples->GetUnscaledTextWidth(), 0), OR_HORZ, &blocksize, 24, 4096);
 	slider_blocksize->onValueChange.Connect(&ConfigureFLAC::SetBlockSize, this);
 
 	edit_blocksize		= new EditBox(Point(24 + text_blocksize->GetUnscaledTextWidth() + slider_blocksize->GetWidth(), 37), Size(37, 0), 5);
@@ -121,7 +121,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 	group_format->Add(text_blocksize);
 	group_format->Add(slider_blocksize);
 	group_format->Add(edit_blocksize);
-	group_format->Add(text_blocksize_bytes);
+	group_format->Add(text_blocksize_samples);
 
 	layer_format->Add(group_format);
 
@@ -165,7 +165,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	text_max_lpc_order	= new Text(i18n->AddColon(i18n->TranslateString("Maximum LPC order")), Point(9, 13));
 
-	slider_max_lpc_order	= new Slider(Point(16, 11), Size(250, 0), OR_HORZ, &max_lpc_order, 0, 32);
+	slider_max_lpc_order	= new Slider(Point(16, 11), Size(250, 0), OR_HORZ, &max_lpc_order, 0, FLAC__MAX_LPC_ORDER);
 	slider_max_lpc_order->onValueChange.Connect(&ConfigureFLAC::SetLPCOrder, this);
 
 	text_max_lpc_order_value= new Text(i18n->TranslateString("disabled"), Point(273, 13));
@@ -174,7 +174,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	text_qlp_precision	= new Text(i18n->AddColon(i18n->TranslateString("Quantized LPC precision")), Point(9, 36));
 
-	slider_qlp_precision	= new Slider(Point(16, 34), Size(250, 0), OR_HORZ, &qlp_coeff_precision, 0, 32);
+	slider_qlp_precision	= new Slider(Point(16, 34), Size(250, 0), OR_HORZ, &qlp_coeff_precision, FLAC__MIN_QLP_COEFF_PRECISION - 1, FLAC__MAX_QLP_COEFF_PRECISION);
 	slider_qlp_precision->onValueChange.Connect(&ConfigureFLAC::SetQLPPrecision, this);
 
 	text_qlp_precision_value= new Text(i18n->TranslateString("auto"), Point(273, 36));
@@ -205,14 +205,14 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	text_min_part_order	= new Text(i18n->AddColon(i18n->TranslateString("Minimum partition order")), Point(9, 13));
 
-	slider_min_part_order	= new Slider(Point(16, 11), Size(250, 0), OR_HORZ, &min_residual_partition_order, 0, 16);
+	slider_min_part_order	= new Slider(Point(16, 11), Size(250, 0), OR_HORZ, &min_residual_partition_order, 0, FLAC__MAX_RICE_PARTITION_ORDER);
 	slider_min_part_order->onValueChange.Connect(&ConfigureFLAC::SetRiceOrder, this);
 
 	text_min_part_order_value= new Text(NIL, Point(text_max_lpc_order_value->GetX(), 13));
 
 	text_max_part_order	= new Text(i18n->AddColon(i18n->TranslateString("Maximum partition order")), Point(9, 36));
 
-	slider_max_part_order	= new Slider(Point(16, 34), Size(250, 0), OR_HORZ, &max_residual_partition_order, 0, 16);
+	slider_max_part_order	= new Slider(Point(16, 34), Size(250, 0), OR_HORZ, &max_residual_partition_order, 0, FLAC__MAX_RICE_PARTITION_ORDER);
 	slider_max_part_order->onValueChange.Connect(&ConfigureFLAC::SetRiceOrder, this);
 
 	text_max_part_order_value= new Text(NIL, Point(text_max_lpc_order_value->GetX(), 36));
@@ -279,7 +279,7 @@ BoCA::ConfigureFLAC::~ConfigureFLAC()
 	DeleteObject(text_blocksize);
 	DeleteObject(slider_blocksize);
 	DeleteObject(edit_blocksize);
-	DeleteObject(text_blocksize_bytes);
+	DeleteObject(text_blocksize_samples);
 
 	DeleteObject(group_apodization);
 	DeleteObject(text_apodization);
@@ -319,7 +319,7 @@ Int BoCA::ConfigureFLAC::SaveSettings()
 	config->SetIntValue(ConfigID, "Blocksize", (streamable_subset ? blocksize * 8 : Math::Max(0, Math::Min(32768, (Int) edit_blocksize->GetText().ToInt()))));
 	config->SetStringValue(ConfigID, "Apodization", edit_apodization->GetText());
 	config->SetIntValue(ConfigID, "MaxLPCOrder", max_lpc_order);
-	config->SetIntValue(ConfigID, "QLPCoeffPrecision", qlp_coeff_precision);
+	config->SetIntValue(ConfigID, "QLPCoeffPrecision", qlp_coeff_precision == 4 ? 0 : qlp_coeff_precision);
 	config->SetIntValue(ConfigID, "DoQLPCoeffPrecSearch", do_qlp_coeff_prec_search);
 	config->SetIntValue(ConfigID, "DoExhaustiveModelSearch", do_exhaustive_model_search);
 	config->SetIntValue(ConfigID, "MinResidualPartitionOrder", min_residual_partition_order);
@@ -403,18 +403,11 @@ Void BoCA::ConfigureFLAC::SetQLPSearch()
 
 Void BoCA::ConfigureFLAC::SetQLPPrecision()
 {
-	GUI::Font	 font = text_qlp_precision_value->GetFont();
-
-	if (qlp_coeff_precision >= 16)	font.SetColor(Color(255, 0, 0));
-	else				font.SetColor(Color(0, 0, 0));
-
-	text_qlp_precision_value->SetFont(font);
-
 	I18n	*i18n = I18n::Get();
 
 	i18n->SetContext("Encoders::FLAC::Expert");
 
-	if (qlp_coeff_precision == 0)	text_qlp_precision_value->SetText(i18n->TranslateString("auto"));
+	if (qlp_coeff_precision == 4)	text_qlp_precision_value->SetText(i18n->TranslateString("auto"));
 	else				text_qlp_precision_value->SetText(String::FromInt(qlp_coeff_precision));
 }
 
@@ -440,17 +433,26 @@ Void BoCA::ConfigureFLAC::SetStreamableSubset()
 		edit_blocksize->Deactivate();
 
 		slider_blocksize->SetRange(24, 576);
-		slider_max_lpc_order->SetRange(0, 12);
+
+		slider_max_lpc_order->SetRange(0, FLAC__SUBSET_MAX_LPC_ORDER_48000HZ);
+		slider_min_part_order->SetRange(0, FLAC__SUBSET_MAX_RICE_PARTITION_ORDER);
+		slider_max_part_order->SetRange(0, FLAC__SUBSET_MAX_RICE_PARTITION_ORDER);
 	}
 	else
 	{
 		edit_blocksize->Activate();
 
 		slider_blocksize->SetRange(24, 4096);
-		slider_max_lpc_order->SetRange(0, 32);
+
+		slider_max_lpc_order->SetRange(0, FLAC__MAX_LPC_ORDER);
+		slider_min_part_order->SetRange(0, FLAC__MAX_RICE_PARTITION_ORDER);
+		slider_max_part_order->SetRange(0, FLAC__MAX_RICE_PARTITION_ORDER);
 	}
 
 	SetBlockSize();
+
+	SetLPCOrder();
+	SetRiceOrder();
 }
 
 Void BoCA::ConfigureFLAC::SetBlockSize()

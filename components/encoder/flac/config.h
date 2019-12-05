@@ -49,7 +49,7 @@ namespace BoCA
 			Text			*text_blocksize;
 			Slider			*slider_blocksize;
 			EditBox			*edit_blocksize;
-			Text			*text_blocksize_bytes;
+			Text			*text_blocksize_samples;
 
 			Layer			*layer_advanced;
 
