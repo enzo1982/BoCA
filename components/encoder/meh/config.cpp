@@ -214,18 +214,9 @@ Void BoCA::ConfigureMultiEncoderHub::OnConfigureEncoder()
 
 	if (component != NIL)
 	{
-		ConfigLayer	*layer = component->GetConfigurationLayer();
+		Point	 position = GetContainerWindow()->GetPosition() + Point(60, 60);
 
-		if (layer != NIL)
-		{
-			ConfigureEncoder	 configDialog(layer, GetContainerWindow()->GetPosition() + Point(60, 60));
-
-			configDialog.ShowDialog();
-		}
-		else
-		{
-			Utilities::ErrorMessage("No configuration dialog available for:\n\n%1", component->GetName());
-		}
+		if (ConfigureEncoder(component, position).ShowDialog() == Error()) Utilities::ErrorMessage("No configuration dialog available for:\n\n%1", component->GetName());
 
 		boca.DeleteComponent(component);
 	}
