@@ -143,6 +143,8 @@ Int BoCA::SuperWorker::Run()
 	{
 		while (!quit && !process) S::System::System::Sleep(1);
 
+		if (quit) break;
+
 		workerMutex.Lock();
 
 		packetBuffer.Resize(0);
