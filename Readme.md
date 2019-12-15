@@ -25,7 +25,7 @@ Installation
 The following packages must be installed in order to compile BoCA:
 
 - the _smooth_ Class Library
-- libasound2 / libalsa2 development package (Linux only)
+- libpulse development package (Linux only)
 - libcdio and libcdio-paranoia development packages (except OpenBSD)
 - libcdparanoia development package (OpenBSD only)
 - libexpat development package

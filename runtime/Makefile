@@ -4,7 +4,7 @@
 TARGET	  = boca
 TYPE	  = runtime
 VERSION	  = 1.0
-REVISION  = 1
+REVISION  = 2
 
 BOCA_PATH = ..
 
