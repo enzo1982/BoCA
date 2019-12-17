@@ -90,23 +90,27 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	slider_bitrate		= new Slider(Point(70, 11), Size(201, 0), OR_HORZ, &bitrate, 3, 255);
 	slider_bitrate->onValueChange.Connect(&ConfigureOpus::SetBitrate, this);
 
-	edit_bitrate		= new EditBox(Point(279, 10), Size(25, 0), 3);
+	edit_bitrate		= new EditBox("000", Point(279, 10), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
+	edit_bitrate->SetWidth(edit_bitrate->GetUnscaledTextWidth() + 6);
 	edit_bitrate->onInput.Connect(&ConfigureOpus::SetBitrateByEditBox, this);
 
 	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(310, 13));
+	text_bitrate_kbps->SetX(335 - text_bitrate_kbps->GetUnscaledTextWidth());
+
+	edit_bitrate->SetX(329 - text_bitrate_kbps->GetUnscaledTextWidth() - edit_bitrate->GetWidth());
 
 	text_complexity		= new Text(i18n->AddColon(i18n->TranslateString("Complexity")), Point(10, 40));
 
 	slider_complexity	= new Slider(Point(70, 38), Size(201, 0), OR_HORZ, &complexity, 0, 10);
 	slider_complexity->onValueChange.Connect(&ConfigureOpus::SetComplexity, this);
 
-	text_complexity_value	= new Text(NIL, Point(279, 40));
+	text_complexity_value	= new Text(NIL, Point(edit_bitrate->GetX(), 40));
 
 	maxTextSize = Math::Max(text_bitrate->GetUnscaledTextWidth(), text_complexity->GetUnscaledTextWidth());
 
-	slider_bitrate->SetMetrics(Point(17 + maxTextSize, slider_bitrate->GetY()), Size(254 - maxTextSize, slider_bitrate->GetHeight()));
-	slider_complexity->SetMetrics(Point(17 + maxTextSize, slider_complexity->GetY()), Size(254 - maxTextSize, slider_complexity->GetHeight()));
+	slider_bitrate->SetMetrics(Point(17 + maxTextSize, slider_bitrate->GetY()), Size(edit_bitrate->GetX() - 25 - maxTextSize, slider_bitrate->GetHeight()));
+	slider_complexity->SetMetrics(Point(17 + maxTextSize, slider_complexity->GetY()), Size(edit_bitrate->GetX()- 25 - maxTextSize, slider_complexity->GetHeight()));
 
 	group_quality->Add(text_bitrate);
 	group_quality->Add(slider_bitrate);
@@ -120,10 +124,10 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	text_framesize		= new Text(i18n->AddColon(i18n->TranslateString("Frame length")), Point(10, 13));
 
-	slider_framesize	= new Slider(Point(17 + text_framesize->GetUnscaledTextWidth(), 11), Size(254 - text_framesize->GetUnscaledTextWidth(), 0), OR_HORZ, &framesize, 0, 8);
+	slider_framesize	= new Slider(Point(17 + text_framesize->GetUnscaledTextWidth(), 11), Size(edit_bitrate->GetX() - 25 - text_framesize->GetUnscaledTextWidth(), 0), OR_HORZ, &framesize, 0, 8);
 	slider_framesize->onValueChange.Connect(&ConfigureOpus::SetFrameSize, this);
 
-	text_framesize_value	= new Text(NIL, Point(279, 13));
+	text_framesize_value	= new Text(NIL, Point(edit_bitrate->GetX(), 13));
 
 	group_stream->Add(text_framesize);
 	group_stream->Add(slider_framesize);
@@ -135,10 +139,10 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	text_packet_loss	= new Text(i18n->AddColon(i18n->TranslateString("Expected packet loss")), Point(10, 40));
 
-	slider_packet_loss	= new Slider(Point(17 + text_packet_loss->GetUnscaledTextWidth(), 38), Size(254 - text_packet_loss->GetUnscaledTextWidth(), 0), OR_HORZ, &packet_loss, 0, 100);
+	slider_packet_loss	= new Slider(Point(17 + text_packet_loss->GetUnscaledTextWidth(), 38), Size(edit_bitrate->GetX() - 25 - text_packet_loss->GetUnscaledTextWidth(), 0), OR_HORZ, &packet_loss, 0, 100);
 	slider_packet_loss->onValueChange.Connect(&ConfigureOpus::SetPacketLoss, this);
 
-	text_packet_loss_value	= new Text(NIL, Point(279, 40));
+	text_packet_loss_value	= new Text(NIL, Point(edit_bitrate->GetX(), 40));
 
 	group_options->Add(check_dtx);
 	group_options->Add(text_packet_loss);
