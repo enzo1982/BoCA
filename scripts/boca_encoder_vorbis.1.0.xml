@@ -21,8 +21,8 @@
 	<max alias="best">10</max>
       </range>
       <range name="ABR bitrate" argument="--bitrate %VALUE" default="192">
-	<min alias="">32</min>
-	<max alias="kbps">320</max>
+	<min alias="%1 kbps">32</min>
+	<max alias="%1 kbps">320</max>
       </range>
     </parameters>
   </external>

@@ -18,8 +18,8 @@
     <informat>wave</informat>
     <parameters>
       <range name="Bitrate" argument="-br %VALUE000" default="192" enabled="true" step="4">
-	<min alias="16 kbps">16</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">16</min>
+	<max alias="%1 kbps">320</max>
       </range>
       <selection name="Encoding mode" argument="-mode %VALUE" default="0">
 	<option alias="CBR">0</option>

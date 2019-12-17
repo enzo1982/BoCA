@@ -17,8 +17,8 @@
     <informat>wave</informat>
     <parameters>
       <range name="Bitrate" argument="-b:a %VALUE000" default="192" enabled="true" step="4">
-	<min alias="24 kbps">24</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">24</min>
+	<max alias="%1 kbps">320</max>
       </range>
     </parameters>
   </external>
@@ -29,8 +29,8 @@
     <informat>wave</informat>
     <parameters>
       <range name="Bitrate" argument="-b:a %VALUE000" default="192" enabled="true" step="4">
-	<min alias="24 kbps">24</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">24</min>
+	<max alias="%1 kbps">320</max>
       </range>
     </parameters>
   </external>

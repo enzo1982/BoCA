@@ -17,8 +17,8 @@
     <informat>wave</informat>
     <parameters>
       <range name="Enable lossy compression" argument="-b%VALUE" default="256" step="8">
-	<min alias="64 kbps">64</min>
-	<max alias="720 kbps">720</max>
+	<min alias="%1 kbps">64</min>
+	<max alias="%1 kbps">720</max>
       </range>
       <selection name="Compression mode" argument="%VALUE" default="-h">
 	<option alias="fast">-f</option>

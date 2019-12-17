@@ -29,12 +29,12 @@
 	<max alias="better">1.0</max>
       </range>
       <range name="Bitrate" argument="-br %VALUE000" default="96" step="4">
-	<min>12 kbps</min>
-	<max>424 kbps</max>
+	<min alias="%1 kbps">12</min>
+	<max alias="%1 kbps">424</max>
       </range>
       <range name="Bitrate (Streaming)" argument="-cbr %VALUE000" default="96" step="4">
-	<min>12 kbps</min>
-	<max>424 kbps</max>
+	<min alias="%1 kbps">12</min>
+	<max alias="%1 kbps">424</max>
       </range>
     </parameters>
   </external>

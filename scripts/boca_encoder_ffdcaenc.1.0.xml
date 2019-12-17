@@ -16,16 +16,16 @@
     <informat>wave</informat>
     <parameters>
       <selection name="Bitrate" argument="-b %VALUE" default="1411.2" enabled="true">
-	<option alias="256 kbps (Stereo)">256</option>
-	<option alias="384 kbps (Stereo)">384</option>
-	<option alias="512 kbps (Stereo)">512</option>
-	<option alias="754.5 kbps (DTS 5.1 DVD, half rate)">754.5</option>
-	<option alias="768 kbps">768</option>
-	<option alias="1024 kbps">1024</option>
-	<option alias="1411.2 kbps (DTS 5.1 CD)">1411.2</option>
-	<option alias="1509 kbps (DTS 5.1 DVD)">1509</option>
-	<option alias="1536 kbps">1536</option>
-	<option alias="2048 kbps">2048</option>
+	<option alias="%1 kbps (Stereo)">256</option>
+	<option alias="%1 kbps (Stereo)">384</option>
+	<option alias="%1 kbps (Stereo)">512</option>
+	<option alias="%1 kbps (DTS 5.1 DVD, half rate)">754.5</option>
+	<option alias="%1 kbps">768</option>
+	<option alias="%1 kbps">1024</option>
+	<option alias="%1 kbps (DTS 5.1 CD)">1411.2</option>
+	<option alias="%1 kbps (DTS 5.1 DVD)">1509</option>
+	<option alias="%1 kbps">1536</option>
+	<option alias="%1 kbps">2048</option>
       </selection>
       <switch name="Reduced bit depth for DTS CD format" argument="-r"/>
       <switch name="Write output in little-endian byte order" argument="-e"/>

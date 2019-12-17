@@ -71,7 +71,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 
 					foreach (Option *option, param->GetOptions())
 					{
-						ListEntry	*entry = selection->AddEntry(i18n->TranslateString(option->GetAlias()));
+						ListEntry	*entry = selection->AddEntry(i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue()));
 
 						if (selectedValue == option->GetValue()) selection->SelectEntry(entry);
 					}
@@ -111,13 +111,13 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 						if (option->GetType() == OPTION_TYPE_MIN)
 						{
 							min	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
-							minAlias = i18n->TranslateString(option->GetAlias());
+							minAlias = i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue());
 						}
 
 						if (option->GetType() == OPTION_TYPE_MAX)
 						{
 							max	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
-							maxAlias = i18n->TranslateString(option->GetAlias());
+							maxAlias = i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue());
 						}
 					}
 

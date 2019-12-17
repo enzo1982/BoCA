@@ -21,16 +21,16 @@
 	<max alias="better">127</max>
       </range>
       <range name="Constrained VBR Mode" argument="--cvbr %VALUE" default="128" step="8">
-	<min alias="8 kbps">8</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">8</min>
+	<max alias="%1 kbps">320</max>
       </range>
       <range name="ABR Mode" argument="--abr %VALUE" default="128" step="8">
-	<min alias="8 kbps">8</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">8</min>
+	<max alias="%1 kbps">320</max>
       </range>
       <range name="CBR Mode" argument="--cbr %VALUE" default="128" step="8">
-	<min alias="8 kbps">8</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">8</min>
+	<max alias="%1 kbps">320</max>
       </range>
       <selection name="Quality" argument="--quality %VALUE" default="2" enabled="true">
 	<option alias="High">2</option>
@@ -64,16 +64,16 @@
 	<max alias="better">127</max>
       </range>
       <range name="Constrained VBR Mode" argument="--cvbr %VALUE" default="128" step="8">
-	<min alias="8 kbps">8</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">8</min>
+	<max alias="%1 kbps">320</max>
       </range>
       <range name="ABR Mode" argument="--abr %VALUE" default="128" step="8">
-	<min alias="8 kbps">8</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">8</min>
+	<max alias="%1 kbps">320</max>
       </range>
       <range name="CBR Mode" argument="--cbr %VALUE" default="128" step="8">
-	<min alias="8 kbps">8</min>
-	<max alias="320 kbps">320</max>
+	<min alias="%1 kbps">8</min>
+	<max alias="%1 kbps">320</max>
       </range>
       <selection name="Quality" argument="--quality %VALUE" default="2" enabled="true">
 	<option alias="High">2</option>
