@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -155,7 +155,7 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	check_vad		= new CheckBox(i18n->TranslateString("Voice Activity Detection"), Point(10, 14), Size(177, 0), &use_vad);
 	check_vad->onAction.Connect(&ConfigureSpeex::SetVAD, this);
 
-	check_dtx		= new CheckBox(i18n->TranslateString("Discontinued Transmission"), Point(10, 39), Size(177, 0), &use_dtx);
+	check_dtx		= new CheckBox(i18n->TranslateString("Discontinuous Transmission"), Point(10, 39), Size(177, 0), &use_dtx);
 
 	group_options->Add(check_vad);
 	group_options->Add(check_dtx);
