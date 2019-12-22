@@ -34,6 +34,11 @@ namespace BoCA
 		return (frame[1] >> 3) & 0x03;
 	}
 
+	static Int GetLayer(const UnsignedByte *frame)
+	{
+		return (frame[1] >> 1) & 0x03;
+	}
+
 	static Int GetBitrateIndex(const UnsignedByte *frame)
 	{
 		return frame[2] >> 4;
@@ -145,19 +150,29 @@ namespace BoCA
 		return Math::Ceil(Float(bits) / 8);
 	}
 
-	static Bool IsValidFrame(const UnsignedByte *frame)
+	static Bool IsValidFrame(const UnsignedByte *frame, const UnsignedByte *reference = NIL)
 	{
 		if (((frame[0] << 3) | (frame[1] >> 5)) != 0x07FF) return False;
 
 		Int	 mode	 = GetMode(frame);
+		Int	 layer	 = GetLayer(frame);
 		Int	 brindex = GetBitrateIndex(frame);
 		Int	 srindex = GetSampleRateIndex(frame);
 
-		if (mode == 1 || brindex == 0 || brindex == 15 || srindex == 3) return False;
+		if (mode == 1 || layer != 1 || brindex == 0 || brindex == 15 || srindex == 3) return False;
 
 		Int	 frameb	 = GetFrameSize(frame);
 
 		if (frameb < 24) return False;
+
+		/* Verify that frame parameters are constant.
+		 */
+		if (reference != NIL)
+		{
+			if (GetMode(frame)	      != GetMode(reference)	    ||
+			    GetHeaderLength(frame)    != GetHeaderLength(reference) ||
+			    GetSampleRateIndex(frame) != GetSampleRateIndex(reference)) return False;
+		}
 
 		return True;
 	}
@@ -415,7 +430,7 @@ Bool BoCA::SuperRepacker::WriteFrame(UnsignedByte *iFrame, Int size)
 		{
 			Int	 prevRes = reservoir;
 
-			IncreaseReservoir(required);
+			IncreaseReservoir(required, frame);
 			SetMainDataOffset(frame, GetMainDataOffset(frame) + reservoir - prevRes);
 
 			driver->WriteData(frame + info + prevRes, reservoir - prevRes);
@@ -517,26 +532,34 @@ Bool BoCA::SuperRepacker::FillReservoir(Int threshold)
 	return True;
 }
 
-Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes)
+Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 {
 	/* Find last written frame.
 	 */
-	UnsignedByte	data[maxFrameSize];
+	UnsignedByte	data[2 * maxFrameSize];
 
-	driver->Seek(driver->GetPos() - maxFrameSize);
-	driver->ReadData(data, maxFrameSize);
+	driver->Seek(driver->GetPos() - sizeof(data));
+	driver->ReadData(data, sizeof(data));
 
-	for (Int n = maxFrameSize - 13; n >= 0; n--)
+	for (Int n = sizeof(data) - 13; n >= 0; n--)
 	{
-		if (!IsValidFrame(data + n)) continue;
+		if (!IsValidFrame(data + n, reference)) continue;
 
 		UnsignedByte	*frame = data + n;
 
 		Int	 frameb	 = GetFrameSize(frame);
 		Int	 nframeb = GetFrameSize(frame);
 
-		if (frameb != maxFrameSize - n) continue;
+		/* Verify that frame size looks correct.
+		 */
+		if (UnsignedInt(frameb) != sizeof(data) - n) continue;
 
+		/* Verify that there is a frame precding this one at the correct position.
+		 */
+		if (!CheckPrecedingFrame(data, n, reference)) continue;
+
+		/* Check that reservoir plus requested bytes does not exceed maximum reservoir size.
+		 */
 		Int	 offset	 = driver->GetPos() - frameb;
 
 		Int	 info	 = GetHeaderLength(frame) + GetSideInfoLength(frame);
@@ -588,7 +611,7 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes)
 
 		reservoir = pre;
 
-		Bool	 result	 = IncreaseReservoir(bytes - (nframeb - frameb));
+		Bool	 result	 = IncreaseReservoir(bytes - (nframeb - frameb), reference);
 
 		SetMainDataOffset(frame, reservoir);
 
@@ -611,6 +634,22 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes)
 		driver->WriteData(frame + frameb - prevRes, prevRes);
 
 		return result;
+	}
+
+	return False;
+}
+
+Bool BoCA::SuperRepacker::CheckPrecedingFrame(UnsignedByte *data, Int offset, UnsignedByte *reference)
+{
+	for (Int n = offset - 13; n >= 0; n--)
+	{
+		if (!IsValidFrame(data + n, reference)) continue;
+
+		/* Verify that frame size looks correct.
+		 */
+		if (GetFrameSize(data + n) != offset - n) continue;
+
+		return True;
 	}
 
 	return False;
