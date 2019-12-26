@@ -120,9 +120,9 @@ Bool BoCA::EncoderVorbis::Activate()
 			error = ex_vorbis_encode_init_vbr(&vi, format.channels, format.rate, ((double) config->GetIntValue(ConfigureVorbis::ConfigID, "Quality", 60)) / 100);
 			break;
 		case 1:
-			error = ex_vorbis_encode_init(&vi, format.channels, format.rate, config->GetIntValue(ConfigureVorbis::ConfigID, "SetMinBitrate", False) ? config->GetIntValue(ConfigureVorbis::ConfigID, "MinBitrate",  32) * 1000 : -1,
+			error = ex_vorbis_encode_init(&vi, format.channels, format.rate, config->GetIntValue(ConfigureVorbis::ConfigID, "SetMaxBitrate", False) ? config->GetIntValue(ConfigureVorbis::ConfigID, "MaxBitrate", 320) * 1000 : -1,
 											 config->GetIntValue(ConfigureVorbis::ConfigID, "SetBitrate",    True)  ? config->GetIntValue(ConfigureVorbis::ConfigID, "Bitrate",    192) * 1000 : -1,
-											 config->GetIntValue(ConfigureVorbis::ConfigID, "SetMaxBitrate", False) ? config->GetIntValue(ConfigureVorbis::ConfigID, "MaxBitrate", 320) * 1000 : -1);
+											 config->GetIntValue(ConfigureVorbis::ConfigID, "SetMinBitrate", False) ? config->GetIntValue(ConfigureVorbis::ConfigID, "MinBitrate",  32) * 1000 : -1);
 			break;
 	}
 
