@@ -591,7 +591,7 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 				/* Write updated frame and update reservoir size.
 				 */
 				driver->Seek(offset);
-				driver->WriteData(frame, frameb - prevRes);
+				driver->WriteData(frame, Math::Max(info, frameb - prevRes));
 
 				reservoir += nframeb - frameb;
 
@@ -599,7 +599,7 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 				 */
 				FillReservoir(maxR);
 
-				driver->WriteData(frame + frameb - prevRes, prevRes);
+				driver->WriteData(frame + Math::Max(info, frameb - prevRes), Math::Min(prevRes, frameb - info));
 
 				return True;
 			}
