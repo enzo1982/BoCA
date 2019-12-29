@@ -269,14 +269,17 @@ Bool BoCA::DecoderLAME::ParseVBRHeaders(InStream &in)
 
 	/* Read data and seek back to before the Xing header.
 	 */
-	in.InputData(buffer, 192);
-	in.RelSeek(-192);
+	in.InputData(buffer, buffer.Size());
+	in.RelSeek(-buffer.Size());
 
+	/* Check for a LAME header and extract length information.
+	 */
 	Int		 offset = ((buffer[1] >> 3) & 1 ? (buffer[3] >> 6 != 3 ? 32 : 17) :
 							  (buffer[3] >> 6 != 3 ? 17 :  9)) + 4;
 	UnsignedByte	*xing	= buffer + offset;
+	UnsignedInt16	 crc	= Hash::CRC16::Compute(buffer, offset + 0x9A);
 
-	if (xing[0x78] == 'L' && xing[0x79] == 'A' && xing[0x7A] == 'M' && xing[0x7B] == 'E')
+	if (xing[0x9A] == (crc >> 8) && xing[0x9B] == (crc & 0xFF))
 	{
 		delaySamples = ( xing[0x8D]	    << 4) | ((xing[0x8E] & 0xF0) >> 4);
 		padSamples   = ((xing[0x8E] & 0x0F) << 8) | ( xing[0x8F]	     );

@@ -361,8 +361,9 @@ Bool BoCA::DecoderMPG123::ParseVBRHeaders(InStream &in)
 		Int		 offset = ((buffer[1] >> 3) & 1 ? (buffer[3] >> 6 != 3 ? 32 : 17) :
 								  (buffer[3] >> 6 != 3 ? 17 :  9)) + 4;
 		UnsignedByte	*xing	= buffer + offset;
+		UnsignedInt16	 crc	= Hash::CRC16::Compute(buffer, offset + 0x9A);
 
-		if (frameSize >= 192 && xing[0x78] == 'L' && xing[0x79] == 'A' && xing[0x7A] == 'M' && xing[0x7B] == 'E')
+		if (frameSize >= 192 && xing[0x9A] == (crc >> 8) && xing[0x9B] == (crc & 0xFF))
 		{
 			delaySamples = ( xing[0x8D]	    << 4) | ((xing[0x8E] & 0xF0) >> 4);
 			padSamples   = ((xing[0x8E] & 0x0F) << 8) | ( xing[0x8F]	     );
