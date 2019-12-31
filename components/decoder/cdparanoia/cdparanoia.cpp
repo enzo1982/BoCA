@@ -278,7 +278,7 @@ Bool BoCA::DecoderCDParanoia::Activate()
 
 	/* Call seek to initialize ripper to start of track.
 	 */
-	Seek(0);
+	if (!Seek(0)) return False;
 
 	return True;
 }
@@ -428,11 +428,15 @@ Int BoCA::DecoderCDParanoia::ReadData(Buffer<UnsignedByte> &data)
 
 		readMutex.Release();
 
+		if (audio == NIL) return -1;
+
 		memcpy(data + prependBytes, audio, sectors * bytesPerSector);
 	}
 	else
 	{
-		cdda_read(drive, data + prependBytes, nextSector, sectors);
+		int	 sectors = cdda_read(drive, data + prependBytes, nextSector, sectors);
+
+		if (sectors <= 0) return -1;
 	}
 
 	nextSector  += sectors;

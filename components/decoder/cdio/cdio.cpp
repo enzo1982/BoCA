@@ -336,7 +336,7 @@ Bool BoCA::DecoderCDIO::Activate()
 
 	/* Call seek to initialize ripper to start of track.
 	 */
-	Seek(0);
+	if (!Seek(0)) return False;
 
 	return True;
 }
@@ -490,11 +490,15 @@ Int BoCA::DecoderCDIO::ReadData(Buffer<UnsignedByte> &data)
 
 		readMutex.Release();
 
+		if (audio == NIL) return -1;
+
 		memcpy(data + prependBytes, audio, sectors * bytesPerSector);
 	}
 	else
 	{
-		cdio_read_audio_sectors(cd, data + prependBytes, nextSector, sectors);
+		driver_return_code_t	 error = cdio_read_audio_sectors(cd, data + prependBytes, nextSector, sectors);
+
+		if (error != DRIVER_OP_SUCCESS) return -1;
 	}
 
 	nextSector  += sectors;

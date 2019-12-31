@@ -317,7 +317,7 @@ Bool BoCA::DecoderCDRip::Activate()
 
 	/* Call seek to initialize ripper to start of track.
 	 */
-	Seek(0);
+	if (!Seek(0)) return False;
 
 	return True;
 }
@@ -441,10 +441,11 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data)
 
 	/* Rip chunk.
 	 */
-	BOOL	 abort = false;
-	LONG	 bytes = dataBufferSize;
+	BOOL		 abort = false;
+	LONG		 bytes = dataBufferSize;
+	CDEX_ERR	 error = ex_CR_RipChunk(cd, data + prependBytes, &bytes, abort);
 
-	ex_CR_RipChunk(cd, data + prependBytes, &bytes, abort);
+	if (error != CDEX_OK) return -1;
 
 	lastRead.SetNth(track.drive, S::System::System::Clock());
 
