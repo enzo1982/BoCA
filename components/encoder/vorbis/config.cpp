@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,12 @@ const String	 BoCA::ConfigureVorbis::ConfigID = "Vorbis";
 BoCA::ConfigureVorbis::ConfigureVorbis()
 {
 	const Config	*config = Config::Get();
+	I18n		*i18n	= I18n::Get();
 
+	i18n->SetContext("Encoders::Vorbis");
+
+	/* Get configuration.
+	 */
 	mode		= config->GetIntValue(ConfigID, "Mode", 0);
 	fileExtension	= config->GetIntValue(ConfigID, "FileExtension", 0);
 	quality		= config->GetIntValue(ConfigID, "Quality", 60);
@@ -28,10 +33,8 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	setABRMax	= config->GetIntValue(ConfigID, "SetMaxBitrate", False);
 	abrMax		= config->GetIntValue(ConfigID, "MaxBitrate", 320);
 
-	I18n	*i18n = I18n::Get();
-
-	i18n->SetContext("Encoders::Vorbis");
-
+	/* Encoding mode group.
+	 */
 	group_mode		= new GroupBox(i18n->TranslateString("Encoding Mode"), Point(7, 11), Size(168, 65));
 
 	option_mode_vbr		= new OptionBox(i18n->AddBrackets("VBR", i18n->TranslateString("Variable Bitrate")), Point(10, 13), Size(148, 0), &mode, 0);
@@ -43,14 +46,25 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	group_mode->Add(option_mode_vbr);
 	group_mode->Add(option_mode_abr);
 
-	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(183, 11), Size(168, 65));
+	Int	 maxTextSize = Math::Max(option_mode_vbr->GetUnscaledTextWidth(), option_mode_abr->GetUnscaledTextWidth());
 
-	option_extension_ogg	= new OptionBox(".ogg", Point(10, 13), Size(148, 0), &fileExtension, 0);
-	option_extension_oga	= new OptionBox(".oga", Point(10, 38), Size(148, 0), &fileExtension, 1);
+	group_mode->SetWidth(Math::Max(168, maxTextSize + 41));
+
+	option_mode_vbr->SetWidth(group_mode->GetWidth() - 20);
+	option_mode_abr->SetWidth(group_mode->GetWidth() - 20);
+
+	/* File extension group.
+	 */
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_mode->GetWidth() + 15, 11), Size(336 - group_mode->GetWidth(), 65));
+
+	option_extension_ogg	= new OptionBox(".ogg", Point(10, 13), Size(group_extension->GetWidth() - 20, 0), &fileExtension, 0);
+	option_extension_oga	= new OptionBox(".oga", Point(10, 38), Size(group_extension->GetWidth() - 20, 0), &fileExtension, 1);
 
 	group_extension->Add(option_extension_ogg);
 	group_extension->Add(option_extension_oga);
 
+	/* Quality group.
+	 */
 	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 88), Size(344, 42));
 
 	text_quality		= new Text(i18n->AddColon(i18n->TranslateString("Quality")), Point(10, 16));
@@ -64,6 +78,8 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	group_quality->Add(slider_quality);
 	group_quality->Add(text_quality_value);
 
+	/* Bitrate group.
+	 */
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 88), Size(344, 96));
 
 	check_abrmin		= new CheckBox(i18n->AddColon(i18n->TranslateString("Minimum bitrate")), Point(10, 14), Size(), &setABRMin);
@@ -102,7 +118,7 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	text_abrmax_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(311, 70));
 
-	Int	 maxTextSize = Math::Max(Math::Max(check_abrmin->GetUnscaledTextWidth(), check_abrnom->GetUnscaledTextWidth()), check_abrmax->GetUnscaledTextWidth());
+	maxTextSize = Math::Max(Math::Max(check_abrmin->GetUnscaledTextWidth(), check_abrnom->GetUnscaledTextWidth()), check_abrmax->GetUnscaledTextWidth());
 
 	check_abrmin->SetWidth(maxTextSize + 20);
 	check_abrnom->SetWidth(maxTextSize + 20);
