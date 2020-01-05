@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -178,7 +178,7 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 
 	/* Copy to temporary file and write tag.
 	 */
-	OutStream	 out(STREAM_FILE, fileName.Append(".temp"), OS_APPEND);
+	OutStream	 out(STREAM_FILE, fileName.Append(".temp"), OS_REPLACE);
 
 	if (out.GetLastError() == IO_ERROR_OK)
 	{
