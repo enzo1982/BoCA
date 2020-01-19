@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -106,11 +106,9 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 	}
 	else
 	{
-		in.Seek(0);
+		Track	 track;
 
-		SkipID3v2Tag(in);
-
-		isValidFile = SyncOnAACHeader(in);
+		if (GetStreamInfo(streamURI, track) == Success()) isValidFile = True;
 	}
 
 	return isValidFile;
