@@ -36,7 +36,9 @@ extern "C"
 #endif
     DLLEXPORT int __stdcall TagFileSimple(const APE::str_ansi * pFilename, const char * pArtist, const char * pAlbum, const char * pTitle, const char * pComment, const char * pGenre, const char * pYear, const char * pTrack, BOOL bClearFirst, BOOL bUseOldID3);
     DLLEXPORT int __stdcall GetID3Tag(const APE::str_ansi * pFilename, APE::ID3_TAG * pID3Tag);
+    DLLEXPORT int __stdcall GetID3TagW(const APE::str_utfn * pFilename, APE::ID3_TAG * pID3Tag);
     DLLEXPORT int __stdcall RemoveTag(const APE::str_ansi * pFilename);
+    DLLEXPORT int __stdcall RemoveTagW(const APE::str_utfn * pFilename);
 }
 
 typedef int (__stdcall * proc_GetVersionNumber)();
@@ -79,8 +81,8 @@ IAPEDecompress wrapper(s)
 *****************************************************************************************/
 typedef void * APE_DECOMPRESS_HANDLE;
 
-typedef APE_DECOMPRESS_HANDLE (__stdcall * proc_APEDecompress_Create)(const char *, int *); 
-typedef APE_DECOMPRESS_HANDLE (__stdcall * proc_APEDecompress_CreateW)(const char *, int *); 
+typedef APE_DECOMPRESS_HANDLE (__stdcall * proc_APEDecompress_Create)(const APE::str_ansi *, int *);
+typedef APE_DECOMPRESS_HANDLE (__stdcall * proc_APEDecompress_CreateW)(const APE::str_utfn *, int *);
 typedef void (__stdcall * proc_APEDecompress_Destroy)(APE_DECOMPRESS_HANDLE); 
 typedef int (__stdcall * proc_APEDecompress_GetData)(APE_DECOMPRESS_HANDLE, char *, APE::intn, APE::intn *);
 typedef int (__stdcall * proc_APEDecompress_Seek)(APE_DECOMPRESS_HANDLE, int); 

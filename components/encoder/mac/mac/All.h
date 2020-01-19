@@ -63,7 +63,6 @@ Global compiler settings (useful for porting)
         #define ENABLE_SSE_ASSEMBLY
     #elif defined(_M_IX86)
         #define ENABLE_SSE_ASSEMBLY
-        #define ENABLE_SSE_ASSEMBLY_DETECT
     #endif
     #ifdef _MSC_VER // doesn't compile in gcc
         #ifndef PLATFORM_x64
@@ -109,7 +108,7 @@ namespace APE
     // string types
     typedef char                                        str_ansi;
     typedef unsigned char                               str_utf8;
-    typedef int16                                        str_utf16;
+    typedef int16                                       str_utf16;
     typedef wchar_t                                     str_utfn; // could be UTF-16 or UTF-32 depending on platform
 }
 
@@ -190,7 +189,7 @@ Global defines
 #define VERSION_MAJOR 5
 
 // build version number
-#define VERSION_REVISION 02
+#define VERSION_REVISION 14
 
 // year in the copyright strings
 #define MAC_YEAR 2020
@@ -207,13 +206,13 @@ Global defines
 #define MAC_NAME                                        _T("Monkey's Audio ") VER_FILE_VERSION_STR
 #define PLUGIN_NAME                                     "Monkey's Audio Player " VER_FILE_VERSION_STR_NARROW
 #define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") VER_FILE_VERSION_STR _T(")")
-#define RESOURCE_VERSION_COMMA                            VERSION_MAJOR, VERSION_REVISION, 0, 0
-#define RESOURCE_VERSION_STRING                            VER_FILE_VERSION_STR_FULL
-#define RESOURCE_COPYRIGHT                                "Copyright (c) 2000-" STRINGIZE(MAC_YEAR) " Matthew T. Ashland"
+#define RESOURCE_VERSION_COMMA                          VERSION_MAJOR, VERSION_REVISION, 0, 0
+#define RESOURCE_VERSION_STRING                         VER_FILE_VERSION_STR_FULL
+#define RESOURCE_COPYRIGHT                              "Copyright (c) 2000-" STRINGIZE(MAC_YEAR) " Matthew T. Ashland"
 #define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v ") VER_FILE_VERSION_STR _T(") (c) Matthew T. Ashland ---\n")
 #define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(MAC_YEAR) _T(" by Matthew T. Ashland")
 #define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
-#define ONE_MILLION                                        1000000
+#define ONE_MILLION                                     1000000
 #ifdef PLATFORM_WINDOWS
     #define APE_FILENAME_SLASH '\\'
 #else

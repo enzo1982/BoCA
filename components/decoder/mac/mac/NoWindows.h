@@ -42,12 +42,15 @@ typedef long                LRESULT;
 #define _T(x) L ## x
 
 #define _strnicmp strncasecmp
-#define _wcsicmp wcscmp
 #define _wtoi(x) wcstol(x, NULL, 10)
 #define _tcscat wcscat
 #undef _totlower
 #define _totlower towlower
 #define _totupper towupper
+#define _tcschr wcschr
+#define _tcsicmp wcscmp
+#define _tcscpy wcscpy
+#define _tcslen wcslen
 
 #define MAX_PATH    4096
 
