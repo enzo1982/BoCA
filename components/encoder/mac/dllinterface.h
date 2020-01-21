@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ Void			 FreeMACDLL();
 
 typedef APE_COMPRESS_HANDLE	(__stdcall *APECOMPRESS_CREATE)		(int *);
 typedef void			(__stdcall *APECOMPRESS_DESTROY)	(APE_COMPRESS_HANDLE);
-typedef int			(__stdcall *APECOMPRESS_STARTW)		(APE_COMPRESS_HANDLE, const APE::str_utfn *, const APE::WAVEFORMATEX *, APE::int64, APE::intn, const void *, APE::int64);
+typedef int			(__stdcall *APECOMPRESS_STARTW)		(APE_COMPRESS_HANDLE, const APE::str_utfn *, const APE::WAVEFORMATEX *, APE::int64, int, const void *, APE::int64);
 typedef APE::int64		(__stdcall *APECOMPRESS_ADDDATA)	(APE_COMPRESS_HANDLE, unsigned char *, int);
 typedef int			(__stdcall *APECOMPRESS_FINISH)		(APE_COMPRESS_HANDLE, unsigned char *, int, int);
 
