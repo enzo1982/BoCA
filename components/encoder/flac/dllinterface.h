@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -42,24 +42,24 @@ typedef void					(*FLAC__STREAM_ENCODER_DELETE)						(FLAC__StreamEncoder *);
 typedef FLAC__StreamEncoderInitStatus		(*FLAC__STREAM_ENCODER_INIT_STREAM)					(FLAC__StreamEncoder *, FLAC__StreamEncoderWriteCallback, FLAC__StreamEncoderSeekCallback, FLAC__StreamEncoderTellCallback, FLAC__StreamEncoderMetadataCallback, void *);
 typedef FLAC__StreamEncoderInitStatus		(*FLAC__STREAM_ENCODER_INIT_OGG_STREAM)					(FLAC__StreamEncoder *, FLAC__StreamEncoderReadCallback, FLAC__StreamEncoderWriteCallback, FLAC__StreamEncoderSeekCallback, FLAC__StreamEncoderTellCallback, FLAC__StreamEncoderMetadataCallback, void *);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_FINISH)						(FLAC__StreamEncoder *);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_CHANNELS)					(FLAC__StreamEncoder *, unsigned);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_BITS_PER_SAMPLE)				(FLAC__StreamEncoder *, unsigned);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_SAMPLE_RATE)					(FLAC__StreamEncoder *, unsigned);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_CHANNELS)					(FLAC__StreamEncoder *, uint32_t);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_BITS_PER_SAMPLE)				(FLAC__StreamEncoder *, uint32_t);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_SAMPLE_RATE)					(FLAC__StreamEncoder *, uint32_t);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_STREAMABLE_SUBSET)				(FLAC__StreamEncoder *, FLAC__bool);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_DO_MID_SIDE_STEREO)				(FLAC__StreamEncoder *, FLAC__bool);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_LOOSE_MID_SIDE_STEREO)			(FLAC__StreamEncoder *, FLAC__bool);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_BLOCKSIZE)					(FLAC__StreamEncoder *, unsigned);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_MAX_LPC_ORDER)				(FLAC__StreamEncoder *, unsigned);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_QLP_COEFF_PRECISION)				(FLAC__StreamEncoder *, unsigned);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_BLOCKSIZE)					(FLAC__StreamEncoder *, uint32_t);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_MAX_LPC_ORDER)				(FLAC__StreamEncoder *, uint32_t);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_QLP_COEFF_PRECISION)				(FLAC__StreamEncoder *, uint32_t);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_DO_QLP_COEFF_PREC_SEARCH)			(FLAC__StreamEncoder *, FLAC__bool);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_DO_EXHAUSTIVE_MODEL_SEARCH)			(FLAC__StreamEncoder *, FLAC__bool);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_MIN_RESIDUAL_PARTITION_ORDER)		(FLAC__StreamEncoder *, unsigned);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_MAX_RESIDUAL_PARTITION_ORDER)		(FLAC__StreamEncoder *, unsigned);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_METADATA)					(FLAC__StreamEncoder *, FLAC__StreamMetadata **, unsigned);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_COMPRESSION_LEVEL)				(FLAC__StreamEncoder *, unsigned);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_MIN_RESIDUAL_PARTITION_ORDER)		(FLAC__StreamEncoder *, uint32_t);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_MAX_RESIDUAL_PARTITION_ORDER)		(FLAC__StreamEncoder *, uint32_t);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_METADATA)					(FLAC__StreamEncoder *, FLAC__StreamMetadata **, uint32_t);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_COMPRESSION_LEVEL)				(FLAC__StreamEncoder *, uint32_t);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_APODIZATION)					(FLAC__StreamEncoder *, const char *);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_OGG_SERIAL_NUMBER)				(FLAC__StreamEncoder *, long);
-typedef FLAC__bool				(*FLAC__STREAM_ENCODER_PROCESS_INTERLEAVED)				(FLAC__StreamEncoder *, const FLAC__int32[], unsigned);
+typedef FLAC__bool				(*FLAC__STREAM_ENCODER_PROCESS_INTERLEAVED)				(FLAC__StreamEncoder *, const FLAC__int32[], uint32_t);
 
 typedef FLAC__StreamMetadata *			(*FLAC__METADATA_OBJECT_NEW)						(FLAC__MetadataType);
 typedef void					(*FLAC__METADATA_OBJECT_DELETE)						(FLAC__StreamMetadata *);
@@ -70,14 +70,14 @@ typedef FLAC__bool 				(*FLAC__METADATA_OBJECT_PICTURE_SET_DATA)				(FLAC__Strea
 
 typedef FLAC__StreamMetadata_CueSheet_Track * 	(*FLAC__METADATA_OBJECT_CUESHEET_TRACK_NEW)				();
 typedef void					(*FLAC__METADATA_OBJECT_CUESHEET_TRACK_DELETE)				(FLAC__StreamMetadata_CueSheet_Track *);
-typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_TRACK_RESIZE_INDICES)			(FLAC__StreamMetadata *, unsigned, unsigned);
-typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_TRACK_INSERT_INDEX)			(FLAC__StreamMetadata *, unsigned, unsigned, FLAC__StreamMetadata_CueSheet_Index);
-typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_RESIZE_TRACKS)				(FLAC__StreamMetadata *, unsigned);
-typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_INSERT_TRACK)				(FLAC__StreamMetadata *, unsigned, FLAC__StreamMetadata_CueSheet_Track *, FLAC__bool);
+typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_TRACK_RESIZE_INDICES)			(FLAC__StreamMetadata *, uint32_t, uint32_t);
+typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_TRACK_INSERT_INDEX)			(FLAC__StreamMetadata *, uint32_t, uint32_t, FLAC__StreamMetadata_CueSheet_Index);
+typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_RESIZE_TRACKS)				(FLAC__StreamMetadata *, uint32_t);
+typedef FLAC__bool				(*FLAC__METADATA_OBJECT_CUESHEET_INSERT_TRACK)				(FLAC__StreamMetadata *, uint32_t, FLAC__StreamMetadata_CueSheet_Track *, FLAC__bool);
 
 typedef FLAC__bool 				(*FLAC__METADATA_OBJECT_VORBISCOMMENT_APPEND_COMMENT)			(FLAC__StreamMetadata *, FLAC__StreamMetadata_VorbisComment_Entry, FLAC__bool);
 
-typedef FLAC__bool 				(*FLAC__METADATA_OBJECT_SEEKTABLE_TEMPLATE_APPEND_SPACED_POINTS)	(FLAC__StreamMetadata *, unsigned, FLAC__uint64);
+typedef FLAC__bool 				(*FLAC__METADATA_OBJECT_SEEKTABLE_TEMPLATE_APPEND_SPACED_POINTS)	(FLAC__StreamMetadata *, uint32_t, FLAC__uint64);
 typedef FLAC__bool 				(*FLAC__METADATA_OBJECT_SEEKTABLE_TEMPLATE_SORT)			(FLAC__StreamMetadata *, FLAC__bool);
 
 typedef char *					 *FLAC__VERSION_STRING_TYPE;

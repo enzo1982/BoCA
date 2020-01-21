@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -62,9 +62,9 @@ typedef FLAC__bool			(*FLAC__STREAM_DECODER_SET_METADATA_RESPOND)		(FLAC__Stream
 typedef FLAC__StreamDecoderInitStatus	(*FLAC__STREAM_DECODER_INIT_STREAM)			(FLAC__StreamDecoder *, FLAC__StreamDecoderReadCallback, FLAC__StreamDecoderSeekCallback, FLAC__StreamDecoderTellCallback, FLAC__StreamDecoderLengthCallback, FLAC__StreamDecoderEofCallback, FLAC__StreamDecoderWriteCallback, FLAC__StreamDecoderMetadataCallback, FLAC__StreamDecoderErrorCallback, void *);
 typedef FLAC__StreamDecoderInitStatus	(*FLAC__STREAM_DECODER_INIT_OGG_STREAM)			(FLAC__StreamDecoder *, FLAC__StreamDecoderReadCallback, FLAC__StreamDecoderSeekCallback, FLAC__StreamDecoderTellCallback, FLAC__StreamDecoderLengthCallback, FLAC__StreamDecoderEofCallback, FLAC__StreamDecoderWriteCallback, FLAC__StreamDecoderMetadataCallback, FLAC__StreamDecoderErrorCallback, void *);
 typedef FLAC__bool			(*FLAC__STREAM_DECODER_FINISH)				(FLAC__StreamDecoder *);
-typedef unsigned			(*FLAC__STREAM_DECODER_GET_CHANNELS)			(const FLAC__StreamDecoder *);
-typedef unsigned			(*FLAC__STREAM_DECODER_GET_BITS_PER_SAMPLE)		(const FLAC__StreamDecoder *);
-typedef unsigned			(*FLAC__STREAM_DECODER_GET_SAMPLE_RATE)			(const FLAC__StreamDecoder *);
+typedef uint32_t			(*FLAC__STREAM_DECODER_GET_CHANNELS)			(const FLAC__StreamDecoder *);
+typedef uint32_t			(*FLAC__STREAM_DECODER_GET_BITS_PER_SAMPLE)		(const FLAC__StreamDecoder *);
+typedef uint32_t			(*FLAC__STREAM_DECODER_GET_SAMPLE_RATE)			(const FLAC__StreamDecoder *);
 typedef FLAC__bool			(*FLAC__STREAM_DECODER_SEEK_ABSOLUTE)			(FLAC__StreamDecoder *, FLAC__uint64);
 typedef FLAC__bool			(*FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_METADATA)	(FLAC__StreamDecoder *);
 typedef FLAC__bool			(*FLAC__STREAM_DECODER_PROCESS_UNTIL_END_OF_STREAM)	(FLAC__StreamDecoder *);
