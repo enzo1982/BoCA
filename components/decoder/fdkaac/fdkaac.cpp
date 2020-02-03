@@ -454,14 +454,18 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 	if (mp4File != NIL)
 	{
-		unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
+		MP4SampleId	 numberOfSamples = ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track);
 
-		dataBuffer.Resize(bufferSize + 4); // + 4 to account for FDK bitstream implementation overreading.
-
-		unsigned char	*buffer	    = dataBuffer;
-
-		if (ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL))
+		if (sampleId <= numberOfSamples)
 		{
+			unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
+
+			dataBuffer.Resize(bufferSize + 4); // + 4 to account for FDK bitstream implementation overreading.
+
+			unsigned char	*buffer	    = dataBuffer;
+
+			if (!ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL)) return -1;
+
 			unsigned int	 bytesValid = bufferSize;
 
 			while (True)
@@ -493,7 +497,7 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 					Int	 delay	= 0, padding = 0;
 					Int64	 length	= 0;
 
-					if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * frameSize)
+					if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(numberOfSamples) * frameSize)
 					{
 						delaySamples	 = delay * sbrRatio;
 						delaySamplesLeft = delaySamples;

@@ -458,6 +458,10 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 
 	if (mp4File != NIL)
 	{
+		MP4SampleId	 numberOfSamples = ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track);
+
+		if (sampleId > numberOfSamples) return -1;
+
 		unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
 
 		dataBuffer.Resize(bufferSize);
@@ -484,7 +488,7 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 				Int	 delay	= 0, padding = 0;
 				Int64	 length	= 0;
 
-				if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * frameSize)
+				if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(numberOfSamples) * frameSize)
 				{
 					if (sbrRatio > 1) delay += 480;
 
