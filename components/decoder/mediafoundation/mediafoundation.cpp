@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -111,7 +111,7 @@ Bool BoCA::DecoderMediaFoundation::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderMediaFoundation::GetStreamInfo(const String &streamURI, Track &track)
 {
-	DriverANSI	 driver(streamURI, IS_READ);
+	DriverANSI	 driver(File(streamURI), IS_READ);
 
 	/* Wrap stream in an IMFByteStream interface and create source reader.
 	 */

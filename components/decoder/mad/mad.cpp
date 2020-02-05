@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -101,7 +101,7 @@ Bool BoCA::DecoderMAD::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 {
-	DriverANSI	 ioDriver(streamURI, IS_READ);
+	DriverANSI	 ioDriver(File(streamURI), IS_READ);
 	InStream	 in(STREAM_DRIVER, &ioDriver);
 
 	SkipID3v2Tag(in);
