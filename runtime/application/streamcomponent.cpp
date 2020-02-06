@@ -60,7 +60,7 @@ String BoCA::AS::StreamComponent::GetMD5Checksum()
 
 Bool BoCA::AS::StreamComponent::Activate()
 {
-	SetDriver(driver);
+	if (driver != NIL) SetDriver(driver);
 
 	/* Setup format converter and adjust track info.
 	 */
