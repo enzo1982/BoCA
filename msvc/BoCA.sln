@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA", "BoCA\BoCA.vcxproj", "{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}"
 EndProject
@@ -249,6 +249,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist VCLT", "BoCA 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder Media Foundation", "BoCA Decoder Media Foundation\BoCA Decoder Media Foundation.vcxproj", "{2063079A-BB73-4F95-B152-2C2F1C32C067}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder Sndfile Wave", "BoCA Encoder Sndfile Wave\BoCA Encoder Sndfile Wave.vcxproj", "{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -742,6 +744,14 @@ Global
 		{10051E4C-1220-4AF4-9518-8415C674ED8F}.Release|Win32.Build.0 = Release|Win32
 		{10051E4C-1220-4AF4-9518-8415C674ED8F}.Release|x64.ActiveCfg = Release|x64
 		{10051E4C-1220-4AF4-9518-8415C674ED8F}.Release|x64.Build.0 = Release|x64
+		{E7B21AC7-2FEC-4273-912E-81877D501814}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E7B21AC7-2FEC-4273-912E-81877D501814}.Debug|Win32.Build.0 = Debug|Win32
+		{E7B21AC7-2FEC-4273-912E-81877D501814}.Debug|x64.ActiveCfg = Debug|x64
+		{E7B21AC7-2FEC-4273-912E-81877D501814}.Debug|x64.Build.0 = Debug|x64
+		{E7B21AC7-2FEC-4273-912E-81877D501814}.Release|Win32.ActiveCfg = Release|Win32
+		{E7B21AC7-2FEC-4273-912E-81877D501814}.Release|Win32.Build.0 = Release|Win32
+		{E7B21AC7-2FEC-4273-912E-81877D501814}.Release|x64.ActiveCfg = Release|x64
+		{E7B21AC7-2FEC-4273-912E-81877D501814}.Release|x64.Build.0 = Release|x64
 		{30EBD46C-1389-4C02-AC4E-3E01206489BE}.Debug|Win32.ActiveCfg = Debug|Win32
 		{30EBD46C-1389-4C02-AC4E-3E01206489BE}.Debug|Win32.Build.0 = Debug|Win32
 		{30EBD46C-1389-4C02-AC4E-3E01206489BE}.Debug|x64.ActiveCfg = Debug|x64
@@ -798,6 +808,14 @@ Global
 		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Release|Win32.Build.0 = Release|Win32
 		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Release|x64.ActiveCfg = Release|x64
 		{2063079A-BB73-4F95-B152-2C2F1C32C067}.Release|x64.Build.0 = Release|x64
+		{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}.Debug|Win32.Build.0 = Debug|Win32
+		{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}.Debug|x64.ActiveCfg = Debug|x64
+		{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}.Debug|x64.Build.0 = Debug|x64
+		{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}.Release|Win32.ActiveCfg = Release|Win32
+		{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}.Release|Win32.Build.0 = Release|Win32
+		{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}.Release|x64.ActiveCfg = Release|x64
+		{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
