@@ -19,7 +19,7 @@ DEFINE	  =
 LIBS	  =
 
 # Enter addition commands for targets all and clean here:
-ifneq ($(SRCDIR),$(CURDIR))
+ifneq ("$(SRCDIR)","$(CURDIR)")
 	ALLCMD1   = mkdir -p xing
 	ALLCMD2   =
 	CLEANCMD1 = rmdir xing || true

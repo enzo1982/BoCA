@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = config.o dllinterface.o flac.o
 
 # Enter additional defines here:
-DEFINE	  = -I$(SRCDIR)
+DEFINE	  = -I"$(SRCDIR)"
 
 # Enter additional library dependencies here:
 LIBS	  =

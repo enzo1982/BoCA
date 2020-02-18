@@ -5,7 +5,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 OBJECTS	= xmlparse.o xmlrole.o xmltok.o
 TARGET	= libexpat.a
 
-CCOPTS	= -I$(SRCDIR) -DHAVE_EXPAT_CONFIG_H
+CCOPTS	= -I"$(SRCDIR)" -DHAVE_EXPAT_CONFIG_H
 AR	= ar
 
 ifneq ($(BUILD_WIN32),True)

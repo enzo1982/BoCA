@@ -21,9 +21,9 @@ ALLCMD1   =
 ALLCMD2   =
 CLEANCMD1 =
 CLEANCMD2 =
-INSTCMD1  = cp -r $(SRCDIR)/boca.dsp.rnnoise $(DESTDIR)$(libdir)/boca
-INSTCMD2  = chmod -R a=rX,u=rwX $(DESTDIR)$(libdir)/boca/boca.dsp.rnnoise
-UINSTCMD1 = rm -f -r $(DESTDIR)$(libdir)/boca/boca.dsp.rnnoise
+INSTCMD1  = cp -r "$(SRCDIR)"/boca.dsp.rnnoise "$(DESTDIR)"$(libdir)/boca
+INSTCMD2  = chmod -R a=rX,u=rwX "$(DESTDIR)"$(libdir)/boca/boca.dsp.rnnoise
+UINSTCMD1 = rm -f -r "$(DESTDIR)"$(libdir)/boca/boca.dsp.rnnoise
 UINSTCMD2 =
 
 ## Do not change anything below this line. ##

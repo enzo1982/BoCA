@@ -36,8 +36,8 @@ CLEANCMD1 =
 
 ## Do not change anything below this line. ##
 
-CCOPTS	  = -fvisibility=hidden -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(prefix)\" -I$(SRCDIR)/$(BOCA_PATH)/include
-LDOPTS	  = -L$(SRCDIR)/$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+CCOPTS	  = -fvisibility=hidden -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(prefix)\" -I"$(SRCDIR)"/$(BOCA_PATH)/include
+LDOPTS	  = -L"$(SRCDIR)"/$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_WIN32),True)
 	LDOPTS += -lsmooth -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import
@@ -95,7 +95,7 @@ clean:
 	rm -f $(OBJECTS)
 	rm -f $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED)
 
-ifneq ($(SRCDIR),$(CURDIR))
+ifneq ("$(SRCDIR)","$(CURDIR)")
 ifeq ($(BUILD_WIN32),True)
 	rmdir application/external/win32 || true
 else
@@ -113,20 +113,20 @@ endif
 
 install: all
 ifneq ($(BUILD_WIN32),True)
-	$(INSTALL) -d $(DESTDIR)$(libdir)/boca
-	$(INSTALL_DATA) $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/boca
-	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED)
+	$(INSTALL) -d "$(DESTDIR)"$(libdir)/boca
+	$(INSTALL_DATA) $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/boca
+	ln -fs boca/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/libboca-$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_OSX),True)
-	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION).$(REVISION)$(SHARED)
+	ln -fs boca/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/libboca-$(VERSION).$(REVISION)$(SHARED)
 else
-	ln -fs boca/boca.$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED).$(REVISION)
+	ln -fs boca/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/libboca-$(VERSION)$(SHARED).$(REVISION)
 endif
 
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
-ifeq ($(DESTDIR),)
+ifeq ("$(DESTDIR)","")
 	$(LDCONFIG) 2> /dev/null || true
 endif
 endif
@@ -137,18 +137,18 @@ endif
 uninstall:
 ifneq ($(BUILD_WIN32),True)
 ifeq ($(BUILD_OSX),True)
-	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION).$(REVISION)$(SHARED)
+	rm -f "$(DESTDIR)"$(libdir)/libboca-$(VERSION).$(REVISION)$(SHARED)
 else
-	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED).$(REVISION)
+	rm -f "$(DESTDIR)"$(libdir)/libboca-$(VERSION)$(SHARED).$(REVISION)
 endif
 
-	rm -f $(DESTDIR)$(libdir)/libboca-$(VERSION)$(SHARED)
-	rm -f $(DESTDIR)$(libdir)/boca/boca.$(VERSION)$(SHARED)
+	rm -f "$(DESTDIR)"$(libdir)/libboca-$(VERSION)$(SHARED)
+	rm -f "$(DESTDIR)"$(libdir)/boca/boca.$(VERSION)$(SHARED)
 
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
-ifeq ($(DESTDIR),)
+ifeq ("$(DESTDIR)","")
 	$(LDCONFIG) 2> /dev/null || true
 endif
 endif

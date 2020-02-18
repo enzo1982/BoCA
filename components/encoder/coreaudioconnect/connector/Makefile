@@ -12,7 +12,7 @@ TARGET	= $(BOCA_PATH)/$(BINDIR)/boca_encoder_coreaudioconnect$(X64).1.0$(EXECUTA
 DEFINE	= -DUNICODE
 LIBS	= -lole32 -lshell32
 
-CCOPTS	= -Wno-multichar -I$(SRCDIR) -I $(BOCA_PATH)/include $(DEFINE)
+CCOPTS	= -Wno-multichar -I"$(SRCDIR)" -I $(BOCA_PATH)/include $(DEFINE)
 LDOPTS	= -L $(BOCA_PATH)/$(LIBDIR) $(LIBS)
 
 ifneq ($(BUILD_WIN32),True)

@@ -15,7 +15,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 OBJECTS	  = id3v2.o
 
 # Enter additional defines here:
-DEFINE	  = -I$(SRCDIR)/id3 -DID3LIB_LINKOPTION=LINKOPTION_STATIC
+DEFINE	  = -I"$(SRCDIR)"/id3 -DID3LIB_LINKOPTION=LINKOPTION_STATIC
 
 # Enter additional library dependencies here:
 LIBS	  = id3/libid3.a -lstdc++

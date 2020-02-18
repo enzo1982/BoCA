@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = dllinterface.o faad2.o
 
 # Enter additional defines here:
-DEFINE	  = -I$(SRCDIR) -Wno-multichar
+DEFINE	  = -I"$(SRCDIR)" -Wno-multichar
 
 # Enter additional library dependencies here:
 LIBS	  =

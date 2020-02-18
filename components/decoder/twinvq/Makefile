@@ -21,7 +21,7 @@ ifeq ($(BUILD_X86),True)
 endif
 
 # Enter addition commands for targets all and clean here:
-ifneq ($(SRCDIR),$(CURDIR))
+ifneq ("$(SRCDIR)","$(CURDIR)")
 	ALLCMD1   = mkdir -p twinvq
 	ALLCMD2   =
 	CLEANCMD1 = rmdir twinvq || true

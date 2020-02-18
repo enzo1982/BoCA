@@ -18,7 +18,7 @@ clean:
 	+ $(call cleanin,runtime)
 	+ $(call cleanin,components)
 
-ifneq ($(SRCDIR),$(CURDIR))
+ifneq ("$(SRCDIR)","$(CURDIR)")
 	rmdir $(BOCA_PATH)/$(BINDIR) $(BOCA_PATH)/$(LIBDIR) || true
 endif
 

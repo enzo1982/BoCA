@@ -27,13 +27,13 @@ LIBS	  =
 
 # Enter addition commands for targets all and clean here:
 ifeq ($(wrapper),)
-	ALLCMD1   = $(MAKE) -f $(SRCDIR)/Makefile config=$(config) wrapper=wave
+	ALLCMD1   = $(MAKE) -f "$(SRCDIR)"/Makefile config=$(config) wrapper=wave
 	ALLCMD2   =
-	CLEANCMD1 = $(MAKE) -f $(SRCDIR)/Makefile config=$(config) wrapper=wave clean
+	CLEANCMD1 = $(MAKE) -f "$(SRCDIR)"/Makefile config=$(config) wrapper=wave clean
 	CLEANCMD2 =
-	INSTCMD1  = $(MAKE) -f $(SRCDIR)/Makefile config=$(config) wrapper=wave install
+	INSTCMD1  = $(MAKE) -f "$(SRCDIR)"/Makefile config=$(config) wrapper=wave install
 	INSTCMD2  = 
-	UINSTCMD1 = $(MAKE) -f $(SRCDIR)/Makefile config=$(config) wrapper=wave uninstall
+	UINSTCMD1 = $(MAKE) -f "$(SRCDIR)"/Makefile config=$(config) wrapper=wave uninstall
 	UINSTCMD2 =
 else
 	ALLCMD1   =

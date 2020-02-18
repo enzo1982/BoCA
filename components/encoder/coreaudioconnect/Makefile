@@ -17,7 +17,7 @@ endif
 OBJECTS	  = config.o coreaudioconnect.o dllinterface.o
 
 # Enter additional defines here:
-DEFINE	  = -I$(SRCDIR) -Iconnector -Wno-multichar
+DEFINE	  = -I"$(SRCDIR)" -Iconnector -Wno-multichar
 
 # Enter additional library dependencies here:
 LIBS	  =
@@ -27,9 +27,9 @@ ALLCMD1   = $(call makein,connector)
 ALLCMD2   =
 CLEANCMD1 = $(call cleanin,connector)
 CLEANCMD2 =
-INSTCMD1  = $(INSTALL) $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE) $(DESTDIR)$(libdir)/boca
+INSTCMD1  = $(INSTALL) $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE) "$(DESTDIR)"$(libdir)/boca
 INSTCMD2  =
-UINSTCMD1 = rm -f $(DESTDIR)$(libdir)/boca/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE)
+UINSTCMD1 = rm -f "$(DESTDIR)"$(libdir)/boca/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE)
 UINSTCMD2 =
 
 ## Do not change anything below this line. ##

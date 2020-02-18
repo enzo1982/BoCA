@@ -5,11 +5,11 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 OBJECTS	= container.o container_find.o container_impl.o container_parse.o container_render.o field.o field_binary.o field_frames.o field_integer.o field_string_ascii.o field_string_unicode.o frame.o frame_impl.o frame_parse.o frame_render.o globals.o header.o header_frame.o header_tag.o helpers.o io.o io_decorators.o io_helpers.o misc_support.o mp3_parse.o spec.o tag.o tag_file.o tag_impl.o tag_parse.o tag_parse_lyrics3.o tag_parse_musicmatch.o tag_parse_v1.o tag_render.o utils.o
 TARGET	= libid3.a
 
-CCOPTS	= -I$(SRCDIR) -DHAVE_CONFIG_H -DID3LIB_LINKOPTION=LINKOPTION_STATIC
+CCOPTS	= -I"$(SRCDIR)" -DHAVE_CONFIG_H -DID3LIB_LINKOPTION=LINKOPTION_STATIC
 AR	= ar
 
 ifeq ($(USE_BUNDLED_ZLIB),True)
-	CCOPTS += -I$(SRCDIR)/../zlib
+	CCOPTS += -I"$(SRCDIR)"/../zlib
 endif
 
 ifneq ($(BUILD_WIN32),True)

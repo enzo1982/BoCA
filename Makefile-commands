@@ -2,8 +2,8 @@
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-CCOPTS = -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE) -I$(SRCDIR)/$(BOCA_PATH)/include
-LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -L$(SRCDIR)/$(BOCA_PATH)/$(LIBDIR) $(LIBS)
+CCOPTS = -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE) -I"$(SRCDIR)"/$(BOCA_PATH)/include
+LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -L"$(SRCDIR)"/$(BOCA_PATH)/$(LIBDIR) $(LIBS)
 
 ifeq (,$(findstring -lstdc++,$(LIBS)))
 	LDOPTS += -lstdc++
@@ -64,15 +64,15 @@ clean:
 
 install: all
 ifneq ($(BUILD_WIN32),True)
-	$(INSTALL) -d $(DESTDIR)$(libdir)/boca
-	$(INSTALL_DATA) $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/boca
+	$(INSTALL) -d "$(DESTDIR)"$(libdir)/boca
+	$(INSTALL_DATA) $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/boca
 endif
 	$(INSTCMD1)
 	$(INSTCMD2)
 
 uninstall:
 ifneq ($(BUILD_WIN32),True)
-	rm -f $(DESTDIR)$(libdir)/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
+	rm -f "$(DESTDIR)"$(libdir)/boca/boca_$(TYPE)_$(TARGET).$(VERSION)$(SHARED)
 endif
 	$(UINSTCMD1)
 	$(UINSTCMD2)

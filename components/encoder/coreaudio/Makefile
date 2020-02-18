@@ -16,7 +16,7 @@ OBJECTS	  = config.o coreaudio.o dllinterface.o worker.o
 DEFINE	  = -Wno-multichar
 
 ifneq ($(BUILD_OSX),True)
-	DEFINE += -I$(SRCDIR)
+	DEFINE += -I"$(SRCDIR)"
 endif
 
 ifeq ($(BUILD_WIN32),True)

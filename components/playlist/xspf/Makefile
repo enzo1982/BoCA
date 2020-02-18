@@ -18,15 +18,15 @@ OBJECTS	  = xspf.o
 DEFINE	  =
 
 ifeq ($(USE_BUNDLED_LIBEXPAT),True)
-DEFINE	  += -I$(SRCDIR)/expat
+DEFINE	  += -I"$(SRCDIR)"/expat
 endif
 
 ifeq ($(USE_BUNDLED_LIBURIPARSER),True)
-DEFINE	  += -I$(SRCDIR)
+DEFINE	  += -I"$(SRCDIR)"
 endif
 
 ifeq ($(USE_BUNDLED_LIBXSPF),True)
-DEFINE	  += -I$(SRCDIR)
+DEFINE	  += -I"$(SRCDIR)"
 endif
 
 # Enter additional library dependencies here:

@@ -13,13 +13,13 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 OBJECTS	  = xing/dxhead.o config.o dllinterface.o mpg123.o
 
 # Enter additional defines here:
-DEFINE	  = -I$(SRCDIR)/mpg123
+DEFINE	  = -I"$(SRCDIR)"/mpg123
 
 # Enter additional library dependencies here:
 LIBS	  =
 
 # Enter addition commands for targets all and clean here:
-ifneq ($(SRCDIR),$(CURDIR))
+ifneq ("$(SRCDIR)","$(CURDIR)")
 	ALLCMD1   = mkdir -p xing
 	ALLCMD2   =
 	CLEANCMD1 = rmdir xing || true
