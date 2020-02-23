@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -175,8 +175,10 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat, Int 
 
 	ex_lame_init_params(context);
 
-	frameSize     = ex_lame_get_framesize(context);
-	maxPacketSize = frameSize * 1.25 + 7200;
+	frameSize      = ex_lame_get_framesize(context);
+	maxPacketSize  = frameSize * 1.25 + 7200;
+
+	bytesPerSample = format.bits / 8;
 }
 
 BoCA::SuperWorker::~SuperWorker()
@@ -199,7 +201,7 @@ Int BoCA::SuperWorker::Run()
 		packetBuffer.Resize(0);
 		packetSizes.RemoveAll();
 
-		Int	 samplesLeft	 = samplesBuffer.Size();
+		Int	 samplesLeft	 = samplesBuffer.Size() / bytesPerSample;
 		Int	 samplesPerFrame = frameSize * format.channels;
 
 		Int	 framesProcessed = 0;
@@ -212,9 +214,18 @@ Int BoCA::SuperWorker::Run()
 
 			if (samplesLeft > 0)
 			{
-				if (format.channels == 2) dataLength = ex_lame_encode_buffer_interleaved(context, samplesBuffer + framesProcessed * samplesPerFrame, Math::Min(samplesLeft / 2, frameSize), packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
-				else			  dataLength = ex_lame_encode_buffer(		 context, samplesBuffer + framesProcessed * samplesPerFrame,
-														  samplesBuffer + framesProcessed * samplesPerFrame, Math::Min(samplesLeft,	frameSize), packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
+				if (format.bits == 16)
+				{
+					if (format.channels == 2) dataLength = ex_lame_encode_buffer_interleaved(context, ((short int *) (UnsignedByte *) samplesBuffer) + framesProcessed * samplesPerFrame, Math::Min(samplesLeft / 2, frameSize), packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
+					else			  dataLength = ex_lame_encode_buffer(		 context, ((short int *) (UnsignedByte *) samplesBuffer) + framesProcessed * samplesPerFrame,
+															  ((short int *) (UnsignedByte *) samplesBuffer) + framesProcessed * samplesPerFrame, Math::Min(samplesLeft,	 frameSize), packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
+				}
+				else
+				{
+					if (format.channels == 2) dataLength = ex_lame_encode_buffer_interleaved_ieee_float(context, ((float *) (UnsignedByte *) samplesBuffer) + framesProcessed * samplesPerFrame, Math::Min(samplesLeft / 2, frameSize), packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
+					else			  dataLength = ex_lame_encode_buffer_ieee_float(	    context, ((float *) (UnsignedByte *) samplesBuffer) + framesProcessed * samplesPerFrame,
+																     ((float *) (UnsignedByte *) samplesBuffer) + framesProcessed * samplesPerFrame, Math::Min(samplesLeft,	frameSize), packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
+				}
 			}
 			else
 			{
@@ -252,13 +263,13 @@ Int BoCA::SuperWorker::Run()
 	return Success();
 }
 
-Void BoCA::SuperWorker::Encode(const Buffer<signed short> &buffer, Int offset, Int size, Bool last)
+Void BoCA::SuperWorker::Encode(const Buffer<UnsignedByte> &buffer, Int offset, Int samples, Bool last)
 {
 	workerMutex.Lock();
 
-	samplesBuffer.Resize(size);
+	samplesBuffer.Resize(samples * bytesPerSample);
 
-	memcpy(samplesBuffer, buffer + offset, size * sizeof(signed short));
+	memcpy(samplesBuffer, buffer + offset * bytesPerSample, samples * bytesPerSample);
 
 	workerMutex.Release();
 
@@ -273,19 +284,23 @@ Void BoCA::SuperWorker::ReEncode(Int skipFrames, Int dummyFrames)
 
 	/* Backup samples buffer.
 	 */
-	Buffer<signed short>	 backupBuffer(samplesBuffer.Size() - skipSamples);
+	Buffer<UnsignedByte>	 backupBuffer(samplesBuffer.Size() - skipSamples * bytesPerSample);
 
-	memcpy(backupBuffer, samplesBuffer + skipSamples, backupBuffer.Size() * sizeof(signed short));
+	memcpy(backupBuffer, samplesBuffer + skipSamples * bytesPerSample, backupBuffer.Size());
 
 	/* Create buffer with dummy data.
 	 */
-	Buffer<signed short>	 dummyBuffer(dummySamples);
+	Buffer<UnsignedByte>	 dummyBuffer(dummySamples * bytesPerSample);
 
-	for (Int i = 0; i < dummyBuffer.Size(); i++) dummyBuffer[i] = i * 147;
+	for (Int i = 0; i < dummySamples; i++)
+	{
+		if (format.bits == 16) ((short int *) (UnsignedByte *) dummyBuffer)[i] = i	  * 147;
+		else		       ((float *)     (UnsignedByte *) dummyBuffer)[i] = float(i) * 0.0045f;
+	}
 
 	/* Encode dummy frames to pressure reservoir.
 	 */
-	Encode(dummyBuffer, 0, dummyBuffer.Size(), flush);
+	Encode(dummyBuffer, 0, dummyBuffer.Size() / bytesPerSample, flush);
 
 	workerMutex.Release();
 
@@ -295,7 +310,7 @@ Void BoCA::SuperWorker::ReEncode(Int skipFrames, Int dummyFrames)
 
 	/* Re-encode previous samples.
 	 */
-	Encode(backupBuffer, 0, backupBuffer.Size(), flush);
+	Encode(backupBuffer, 0, backupBuffer.Size() / bytesPerSample, flush);
 
 	workerMutex.Release();
 

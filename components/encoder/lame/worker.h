@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,7 +27,8 @@ namespace BoCA
 			Int				 frameSize;
 			Int				 maxPacketSize;
 
-			Buffer<signed short>		 samplesBuffer;
+			Buffer<UnsignedByte>		 samplesBuffer;
+			Int				 bytesPerSample;
 
 			Buffer<unsigned char>		 packetBuffer;
 			Array<Int>			 packetSizes;
@@ -43,7 +44,7 @@ namespace BoCA
 							 SuperWorker(const Config *, const Format &, Int);
 							~SuperWorker();
 
-			Void				 Encode(const Buffer<signed short> &, Int, Int, Bool);
+			Void				 Encode(const Buffer<UnsignedByte> &, Int, Int, Bool);
 			Void				 ReEncode(Int, Int);
 
 			Void				 GetInfoTag(Buffer<UnsignedByte> &) const;

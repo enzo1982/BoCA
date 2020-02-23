@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -37,6 +37,8 @@ const String &BoCA::EncoderLAME::GetComponentSpecs()
 		      <tag id=\"id3v2-tag\" mode=\"prepend\">ID3v2</tag>			\
 		    </format>									\
 		    <input bits=\"16\" channels=\"1-2\"						\
+			   rate=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"/>	\
+		    <input float=\"true\" channels=\"1-2\"					\
 			   rate=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"/>	\
 		    <parameters>								\
 		      <selection name=\"Mode\" argument=\"-m %VALUE\" default=\"VBR\">		\
@@ -338,15 +340,15 @@ Int BoCA::EncoderLAME::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Copy data to samples buffer.
 	 */
-	Int	 samples = data.Size() / 2;
+	Int	 size = data.Size();
 
-	samplesBuffer.Resize(samplesBuffer.Size() + samples);
+	samplesBuffer.Resize(samplesBuffer.Size() + size);
 
-	memcpy(samplesBuffer + samplesBuffer.Size() - samples, data, data.Size());
+	memcpy(samplesBuffer + samplesBuffer.Size() - size, data, size);
 
 	/* Output samples to encoder.
 	 */
-	totalSamples += data.Size() / format.channels / (format.bits / 8);
+	totalSamples += size / format.channels / (format.bits / 8);
 
 	return EncodeFrames(False);
 }
@@ -362,10 +364,11 @@ Int BoCA::EncoderLAME::EncodeFrames(Bool flush)
 	Int	 dataLength	 = 0;
 
 	Int	 samplesPerFrame = frameSize * format.channels;
+	Int	 samplesInBuffer = samplesBuffer.Size() / (format.bits / 8);
 
-	if (flush) framesToProcess = Math::Floor(samplesBuffer.Size() / samplesPerFrame);
+	if (flush) framesToProcess = Math::Floor(samplesInBuffer / samplesPerFrame);
 
-	while (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame * framesToProcess)
+	while (samplesInBuffer - framesProcessed * samplesPerFrame >= samplesPerFrame * framesToProcess)
 	{
 		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
@@ -379,7 +382,7 @@ Int BoCA::EncoderLAME::EncodeFrames(Bool flush)
 
 		/* Pass new frames to worker.
 		 */
-		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, flush ? samplesBuffer.Size() : samplesPerFrame * framesToProcess, flush);
+		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, flush ? samplesInBuffer : samplesPerFrame * framesToProcess, flush);
 		workerToUse->Release();
 
 		framesProcessed += framesToProcess - overlap;
@@ -389,9 +392,11 @@ Int BoCA::EncoderLAME::EncodeFrames(Bool flush)
 		if (flush) break;
 	}
 
-	memmove((signed short *) samplesBuffer, ((signed short *) samplesBuffer) + framesProcessed * samplesPerFrame, sizeof(signed short) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
+	Int	 bytesProcessed = framesProcessed * samplesPerFrame * (format.bits / 8);
 
-	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
+	memmove((UnsignedByte *) samplesBuffer, (UnsignedByte *) samplesBuffer + bytesProcessed, samplesBuffer.Size() - bytesProcessed);
+
+	samplesBuffer.Resize(samplesBuffer.Size() - bytesProcessed);
 
 	if (!flush) return dataLength;
 
