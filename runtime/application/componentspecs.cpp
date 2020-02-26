@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -316,12 +316,14 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 	static const char	*places[] = { "%APPDIR/codecs/cmdline/%COMMAND", "%APPDIR/%COMMAND", "/usr/bin/%COMMAND", "/usr/local/bin/%COMMAND", NIL };
 #endif
 
-	XML::Document	*document = new XML::Document();
-	const char	*xmlUtf8  = xml.ConvertTo("UTF-8");
+	XML::Document	 document;
+	const char	*xmlUtf8 = xml.ConvertTo("UTF-8");
 
-	document->ParseMemory(xmlUtf8, strlen(xmlUtf8));
+	document.ParseMemory(xmlUtf8, strlen(xmlUtf8));
 
-	XML::Node	*root = document->GetRootNode();
+	XML::Node	*root = document.GetRootNode();
+
+	if (root->GetName() != "component") return False;
 
 	for (Int i = 0; i < root->GetNOfNodes(); i++)
 	{
@@ -534,7 +536,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 		}
 	}
 
-	delete document;
+	/* Check for presence of basic parameters.
+	 */
+	if (id == NIL || type == COMPONENT_TYPE_UNKNOWN) return False;
 
 	/* Report an error if no external command could be found in external mode.
 	 */
