@@ -10,16 +10,16 @@ clean:
 
 install: all
 ifneq ($(BUILD_WIN32),True)
-	$(INSTALL) -d $(DESTDIR)$(includedir)
+	$(INSTALL) -d "$(DESTDIR)"$(includedir)
 
-	cp -r $(SRCDIR)/boca $(DESTDIR)$(includedir)
-	chmod -R a=rX,u=rwX $(DESTDIR)$(includedir)/boca
+	cp -r "$(SRCDIR)"/boca "$(DESTDIR)"$(includedir)
+	chmod -R a=rX,u=rwX "$(DESTDIR)"$(includedir)/boca
 
-	$(INSTALL_DATA) $(SRCDIR)/boca.h $(DESTDIR)$(includedir)
+	$(INSTALL_DATA) "$(SRCDIR)"/boca.h "$(DESTDIR)"$(includedir)
 endif
 
 uninstall:
 ifneq ($(BUILD_WIN32),True)
-	rm -f $(DESTDIR)$(includedir)/boca.h
-	rm -f -r $(DESTDIR)$(includedir)/boca
+	rm -f "$(DESTDIR)"$(includedir)/boca.h
+	rm -f -r "$(DESTDIR)"$(includedir)/boca
 endif
