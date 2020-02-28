@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -624,7 +624,7 @@ ConfigLayer *BoCA::EncoderCoreAudioConnect::GetConfigurationLayer()
 
 Bool BoCA::EncoderCoreAudioConnect::Connect()
 {
-	static multithread (int)	 count = 0;
+	static multithread (intptr_t)	 count = 0;
 
 	if (connected) return False;
 
