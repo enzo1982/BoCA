@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,6 +28,7 @@
 
 #	define SHGetPathFromIDListW SHGetPathFromIDListA
 
+#	define SetDllDirectoryW SetDllDirectoryA
 #	define LoadLibraryW LoadLibraryA
 #else
 #	define wstring(s) L##s
@@ -80,12 +81,9 @@ bool LoadCoreAudioDLL()
 	wcscpy(aasDir, GetCommonFilesDirectory());
 	wcscat(aasDir, wstring("Apple\\Apple Application Support\\"));
 
-	/* Add Apple Application Services directory to path.
+	/* Add Apple Application Services directory to DLL search path.
 	 */
-	wchar_t	 buffer[32768];
-
-	GetEnvironmentVariableW(wstring("PATH"), buffer, 32768);
-	SetEnvironmentVariableW(wstring("PATH"), wcscat(wcscat(buffer, wstring(";")), aasDir));
+	SetDllDirectoryW(aasDir);
 
 	coreaudiodll	  = LoadLibraryW(wcscat(aasDir, wstring("CoreAudioToolbox.dll")));
 

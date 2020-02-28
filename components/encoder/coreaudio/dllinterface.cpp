@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -279,14 +279,9 @@ Bool LoadCoreAudioDLL()
 		CacheCoreAudioLibraries(coreAudioDir);
 	}
 
-	/* Add Apple Application Services directory to path.
+	/* Add Apple Application Services directory to DLL search path.
 	 */
-	char	*buffer = new char [32768];
-
-	GetEnvironmentVariableA("PATH", buffer, 32768);
-	SetEnvironmentVariableA("PATH", String(buffer).Append(";").Append(coreAudioDir));
-
-	delete [] buffer;
+	SetDllDirectory(coreAudioDir);
 
 	coreaudiodll = new DynamicLoader(String(coreAudioDir).Append(coreAudioToolbox));
 #	endif
