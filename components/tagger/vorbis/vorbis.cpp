@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -348,7 +348,10 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);
 
-		else if (id == "LABELNO" ||
+		else if (id == "LABELNO"   ||
+			 id == "CATALOG"   ||
+			 id == "CATALOGID" ||
+			 id == "CATALOGUE" ||
 			 id == "CATALOGNUMBER")	 info.SetOtherInfo(INFO_CATALOGNUMBER,	value);
 
 		else if (id == "RELEASECOUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,	value);
