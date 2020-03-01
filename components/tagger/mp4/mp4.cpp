@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -139,14 +139,14 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	if (info.track > 0)
 	{
-		MP4TagTrack	 mp4Track = { (uint16_t) info.track, (uint16_t) info.numTracks };
+		MP4TagTrack	 mp4Track = { (uint16_t) info.track, (uint16_t) (info.numTracks > 0 ? info.numTracks : 0 ) };
 
 		ex_MP4TagsSetTrack(mp4Tags, &mp4Track);
 	}
 
 	if (info.disc > 0)
 	{
-		MP4TagDisk	 mp4Disk = { (uint16_t) info.disc, (uint16_t) (info.numDiscs > 0 ? info.numDiscs : info.disc) };
+		MP4TagDisk	 mp4Disk = { (uint16_t) info.disc, (uint16_t) (info.numDiscs > 0 ? info.numDiscs : 0) };
 
 		ex_MP4TagsSetDisk(mp4Tags, &mp4Disk);
 	}
