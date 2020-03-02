@@ -132,6 +132,11 @@ endif
 LDCONFIG	= /sbin/ldconfig
 
 INSTALL		= install
+
+ifeq ($(BUILD_SOLARIS),True)
+	INSTALL = ginstall
+endif
+
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA	= $(INSTALL) -m 644
 
@@ -190,6 +195,8 @@ else ifeq ($(findstring systemliburiparser,$(config)),systemliburiparser)
 	USE_BUNDLED_LIBURIPARSER = False
 else
 	ifeq ($(BUILD_OSX),True)
+		USE_BUNDLED_LIBURIPARSER = True
+	else ifeq ($(BUILD_SOLARIS),True)
 		USE_BUNDLED_LIBURIPARSER = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBURIPARSER = True
