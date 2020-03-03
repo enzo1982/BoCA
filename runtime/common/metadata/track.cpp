@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -349,7 +349,7 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 		 */
 		String	 file = String(folder).Append(folder.EndsWith(Directory::GetDirectoryDelimiter()) ? NIL : Directory::GetDirectoryDelimiter()).Append(fileName);
 
-		picture.SaveToFile(Utilities::CreateDirectoryForFile(file));
+		picture.SaveToFile(Utilities::CreateDirectoryForFile(Utilities::NormalizeFileName(file)));
 	}
 
 	return True;
