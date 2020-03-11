@@ -262,30 +262,30 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 		/* Compute approximate length of stream.
 		 */
-		Void	*samples       = NIL;
-		Int	 bytesConsumed = 0;
-		Int	 samplesRead   = 0;
+		NeAACDecFrameInfo	 frameInfo;
 
-		do
+		ex_NeAACDecDecode(handle, &frameInfo, data, size);
+
+		if (!frameInfo.error)
 		{
-			NeAACDecFrameInfo	 frameInfo;
+			Int	 bytesConsumed = 0;
+			Int	 samplesRead   = 0;
 
-			samples = ex_NeAACDecDecode(handle, &frameInfo, data + bytesConsumed, size - bytesConsumed);
-
-			if (!frameInfo.error)
+			while (!frameInfo.error)
 			{
 				bytesConsumed += frameInfo.bytesconsumed;
 				samplesRead   += frameInfo.samples;
-			}
-			else
-			{
-				errorState  = True;
-				errorString = "Unsupported audio format";
-			}
-		}
-		while (samples != NIL);
 
-		if (samplesRead > 0) track.approxLength = samplesRead / format.channels * (track.fileSize / bytesConsumed);
+				ex_NeAACDecDecode(handle, &frameInfo, data + bytesConsumed, size - bytesConsumed);
+			}
+
+			if (samplesRead > 0) track.approxLength = samplesRead / format.channels * (track.fileSize / bytesConsumed);
+		}
+		else
+		{
+			errorState  = True;
+			errorString = "Unsupported audio format";
+		}
 
 		/* Close handles.
 		 */
