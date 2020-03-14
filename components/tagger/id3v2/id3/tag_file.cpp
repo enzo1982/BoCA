@@ -46,7 +46,7 @@ using namespace dami;
 #	include <sys/stat.h>
 #endif
 
-#if defined WIN32
+#if defined _WIN32
 #	include <windows.h>
 
 static int truncate(const char *path, size_t length)
