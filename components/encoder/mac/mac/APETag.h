@@ -288,8 +288,9 @@ private:
     bool m_bAnalyzed;
     int m_nTagBytes;
     int m_nFields;
-    CAPETagField * m_aryFields[256];
-    bool m_bHasAPETag;
+    int m_nAllocatedFields;
+	CAPETagField ** m_aryFields;
+	bool m_bHasAPETag;
     int m_nAPETagVersion;
     bool m_bHasID3Tag;
     bool m_bIgnoreReadOnly;

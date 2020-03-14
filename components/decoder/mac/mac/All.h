@@ -155,6 +155,7 @@ Global macros
 #if !defined(PLATFORM_WINDOWS) || !defined(_MSC_VER)
     #define wcsncpy_s(A, B, COUNT) wcsncpy(A, B, COUNT)
     #define wcscpy_s(A, B, C) wcscpy(A, C)
+    #define wcscat_s(A, B, C) wcscat(A, C)
     #define sprintf_s(A, B, C, ...) sprintf(A, C, __VA_ARGS__)
     #define _stprintf_s(A, B, C, ...) _stprintf(A, C, __VA_ARGS__)
     #define strcpy_s(A, B, C) strcpy(A, C)
@@ -189,7 +190,7 @@ Global defines
 #define VERSION_MAJOR 5
 
 // build version number
-#define VERSION_REVISION 14
+#define VERSION_REVISION 23
 
 // year in the copyright strings
 #define MAC_YEAR 2020
