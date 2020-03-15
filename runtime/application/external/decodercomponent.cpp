@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -133,10 +133,26 @@ Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track
 				}
 			}
 
+			/* Consider a track lossless if bitrate is high enough to
+			 * avoid a lossy to lossless conversion warning on hybrid
+			 * formats like WavPack.
+			 */
+			Bool	 lossless = format->IsLossless();
+
+			if (!lossless && track.length > 0)
+			{
+				const Format	&format = track.GetFormat();
+
+				Int	 rawBitrate  = format.channels * format.rate * format.bits;
+				Int	 fileBitrate = Float(track.fileSize) / (track.length / format.rate) * 8.0;
+
+				if (fileBitrate > rawBitrate * 0.33) lossless = True;
+			}
+
 			/* Set decoder ID and lossless flag for track and chapters.
 			 */
 			track.decoderID = specs->id;
-			track.lossless	= format->IsLossless();
+			track.lossless	= lossless;
 
 			foreach (Track &chapter, track.tracks)
 			{
