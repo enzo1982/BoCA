@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -306,7 +306,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 	{
 		/* Write iTunes metadata with gapless information.
 		 */
-		Float		 sbrRatio = frameSize / granuleSize;
+		Float		 sbrRatio = Float(frameSize) / granuleSize;
 		MP4ItmfItem	*item	  = ex_MP4ItmfItemAlloc("----", 1);
 		String		 value	  = String().Append(" 00000000")
 						    .Append(" ").Append(Number((Int64) Math::Round(delaySamples / sbrRatio)).ToHexString(8).ToUpper())

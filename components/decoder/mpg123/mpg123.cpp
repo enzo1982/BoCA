@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -373,8 +373,8 @@ Bool BoCA::DecoderMPG123::ParseVBRHeaders(InStream &in)
 	}
 	else if (buffer[0x24] == 'V' && buffer[0x25] == 'B' && buffer[0x26] == 'R' && buffer[0x27] == 'I')
 	{
-		numBytes     = ((buffer[0x2E] << 24) | (buffer[0x2F] << 16) | (buffer[0x30] << 8) | (buffer[0x31])) - frameSize;
-		numFrames    = ((buffer[0x32] << 24) | (buffer[0x33] << 16) | (buffer[0x34] << 8) | (buffer[0x35])) - 1;
+		numBytes     = UnsignedInt32((buffer[0x2E] << 24) | (buffer[0x2F] << 16) | (buffer[0x30] << 8) | (buffer[0x31])) - frameSize;
+		numFrames    = UnsignedInt32((buffer[0x32] << 24) | (buffer[0x33] << 16) | (buffer[0x34] << 8) | (buffer[0x35])) - 1;
 
 		delaySamples = 576;
 		padSamples   = ((buffer[0x2A] << 8) | (buffer[0x2B])) - delaySamples;

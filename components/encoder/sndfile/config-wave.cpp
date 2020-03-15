@@ -23,6 +23,9 @@ BoCA::ConfigureSndFile::ConfigureSndFile()
 
 	group_format	= new GroupBox(i18n->TranslateString("Output format"), Point(7, 11), Size(328, 39));
 
+	text_format	= NIL;
+	combo_format	= NIL;
+
 	text_subformat	= new Text(i18n->AddColon(i18n->TranslateString("Audio format")), Point(10, 13));
 	combo_subformat	= new ComboBox(Point(text_subformat->GetUnscaledTextWidth() + 17, 10), Size(301 - text_subformat->GetUnscaledTextWidth(), 0));
 

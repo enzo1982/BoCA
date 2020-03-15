@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -53,6 +53,16 @@ BoCA::ConfigureEncoder::ConfigureEncoder(AS::Component *component, const Point &
 
 		mainWnd->SetFlags(mainWnd->GetFlags() | WF_NOTASKBUTTON | WF_MODAL);
 		mainWnd->SetIcon(ImageLoader::Load(String(resourcesPath).Append("icons/freac.png")));
+	}
+	else
+	{
+		mainWnd			= NIL;
+		mainWnd_titlebar	= NIL;
+
+		btn_cancel		= NIL;
+		btn_ok			= NIL;
+
+		divbar			= NIL;
 	}
 }
 
