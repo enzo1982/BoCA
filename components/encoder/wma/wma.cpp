@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -270,13 +270,17 @@ Bool BoCA::EncoderWMA::Activate()
 		return False;
 	}
 
+	/* A temporary file is needed if the path exceeds 255 characters.
+	 */
+	String	 outputFile = String(track.outputFile.StartsWith("\\\\") ? "" : uncPrefix).Append(track.outputFile);
+
+	if (track.outputFile.Length() > 255) outputFile = Utilities::GetNonUnicodeTempFileName(track.outputFile);
+
 	/* Create and open file sink.
 	 */
-	String	 uncPath = String(track.outputFile.StartsWith("\\\\") ? "" : uncPrefix).Append(track.outputFile);
-
 	ex_WMCreateWriterFileSink(&writerFileSink);
 
-	writerFileSink->Open(uncPath);
+	writerFileSink->Open(outputFile);
 
 	writerAdvanced->AddSink(writerFileSink);
 
@@ -353,13 +357,21 @@ Bool BoCA::EncoderWMA::Activate()
 
 Bool BoCA::EncoderWMA::Deactivate()
 {
+	String	 outputFile = track.outputFile;
+
+	if (track.outputFile.Length() > 255) outputFile = Utilities::GetNonUnicodeTempFileName(track.outputFile);
+
+	/* Delete output file in case of an error.
+	 */
 	if (errorState)
 	{
-		File(track.outputFile).Delete();
+		File(outputFile).Delete();
 
 		return True;
 	}
 
+	/* Finish writing output file.
+	 */
 	HRESULT	 hr = writer->EndWriting();
 
 	writerAdvanced->RemoveSink(writerFileSink);
@@ -376,12 +388,12 @@ Bool BoCA::EncoderWMA::Deactivate()
 
 	if (FAILED(hr))
 	{
-		File(track.outputFile).Delete();
+		File(outputFile).Delete();
 
 		return False;
 	}
 
-	/* Write metadata to file
+	/* Write metadata to file.
 	 */
 	if (config->GetIntValue("Tags", "EnableWMAMetadata", True))
 	{
@@ -395,11 +407,19 @@ Bool BoCA::EncoderWMA::Deactivate()
 			if (tagger != NIL)
 			{
 				tagger->SetConfiguration(config);
-				tagger->RenderStreamInfo(track.outputFile, track);
+				tagger->RenderStreamInfo(outputFile, track);
 
 				boca.DeleteComponent(tagger);
 			}
 		}
+	}
+
+	/* Move actual output file in place.
+	 */
+	if (outputFile != track.outputFile)
+	{
+		File(track.outputFile).Delete();
+		File(outputFile).Move(track.outputFile);
 	}
 
 	return True;
