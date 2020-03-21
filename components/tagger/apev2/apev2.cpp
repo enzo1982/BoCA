@@ -729,7 +729,7 @@ Error BoCA::TaggerAPEv2::UpdateStreamInfo(const String &fileName, const Track &t
 
 			out.OutputData(buffer, buffer.Size());
 
-			buffer.Resize(1024);
+			buffer.Resize(128 * 1024);
 
 			for (Int64 i = in.GetPos(); i < in.Size(); i += buffer.Size())
 			{
@@ -775,7 +775,7 @@ Error BoCA::TaggerAPEv2::UpdateStreamInfo(const String &fileName, const Track &t
 		{
 			Buffer<UnsignedByte>	 buffer;
 
-			buffer.Resize(1024);
+			buffer.Resize(128 * 1024);
 
 			for (Int64 i = tagSize; i < in.Size(); i += buffer.Size())
 			{

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -195,12 +195,12 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 	/* Stream contents of created file to output driver.
 	 */
 	InStream		 in(STREAM_FILE, encFileName, IS_READ);
-	Buffer<UnsignedByte>	 buffer(1024);
+	Buffer<UnsignedByte>	 buffer(128 * 1024);
 	Int64			 bytesLeft = in.Size();
 
 	while (bytesLeft)
 	{
-		Int	 bytes = Math::Min(Int64(1024), bytesLeft);
+		Int	 bytes = Math::Min(buffer.Size(), bytesLeft);
 
 		in.InputData(buffer, bytes);
 

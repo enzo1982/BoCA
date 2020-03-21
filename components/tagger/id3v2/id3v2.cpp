@@ -188,7 +188,7 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 
 		out.OutputData(buffer, buffer.Size());
 
-		buffer.Resize(1024);
+		buffer.Resize(128 * 1024);
 
 		for (Int64 i = in.GetPos(); i < in.Size(); i += buffer.Size())
 		{
