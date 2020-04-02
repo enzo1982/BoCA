@@ -445,6 +445,13 @@ Int BoCA::EncoderLAME::ProcessResults(SuperWorker *worker, Bool first)
 
 		/* Re-encode remaining frames if a frame didn't fit.
 		 */
+		if (first)
+		{
+			first	   = False;
+			overlap	   = Math::Min(processed, overlap);
+			processed -= overlap;
+		}
+
 		if (!complete) worker->ReEncode(processed, round);
 	}
 

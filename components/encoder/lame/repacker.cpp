@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -426,7 +426,7 @@ Bool BoCA::SuperRepacker::WriteFrame(UnsignedByte *iFrame, Int size)
 		 */
 		Int	 required = bytes - reservoir - (GetFrameSize(frame) - info);
 
-		if (required > 0 && !cbrIndex)
+		if (required > 0)
 		{
 			Int	 prevRes = reservoir;
 
@@ -554,7 +554,7 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 		 */
 		if (UnsignedInt(frameb) != sizeof(data) - n) continue;
 
-		/* Verify that there is a frame precding this one at the correct position.
+		/* Verify that there is a frame preceding this one at the correct position.
 		 */
 		if (!CheckPrecedingFrame(data, n, reference)) continue;
 
@@ -575,10 +575,10 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 		 */
 		Int	 brindex = GetBitrateIndex(frame);
 
-		while (brindex < maxIndex || !GetPadding(frame))
+		while ((brindex < maxIndex && !cbrIndex) || !GetPadding(frame))
 		{
-			if (brindex == maxIndex || (nframeb - frameb == bytes - 1 && !GetPadding(frame))) SetPadding(frame, True);
-			else										  SetBitrateIndex(frame, ++brindex);
+			if ((brindex == maxIndex || cbrIndex) || (nframeb - frameb == bytes - 1 && !GetPadding(frame))) SetPadding(frame, True);
+			else												SetBitrateIndex(frame, ++brindex);
 
 			nframeb = GetFrameSize(frame);
 
