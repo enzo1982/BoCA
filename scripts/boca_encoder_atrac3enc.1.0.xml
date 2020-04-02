@@ -19,8 +19,8 @@
     <informat>wave</informat>
     <parameters>
       <range name="Bitrate" argument="--bitrate %VALUE" default="132" step="4">
-	<min alias="%1 kbps">96</min>
-	<max alias="%1 kbps">344</max>
+	<min alias="%1 kbps">32</min>
+	<max alias="%1 kbps">384</max>
       </range>
     </parameters>
   </external>
