@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -79,7 +79,7 @@ namespace BoCA
 };
 
 BoCA::CDText		 BoCA::DecoderCDIO::cdText;
-Int			 BoCA::DecoderCDIO::cdTextDiscID = -1;
+UnsignedInt32		 BoCA::DecoderCDIO::cdTextDiscID = 0;
 
 Array<UnsignedInt64>	 BoCA::DecoderCDIO::lastRead;
 
@@ -204,7 +204,7 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 	/* Read CD-Text.
 	 */
 #if !defined __WIN32__
-	Int	 discid = ComputeDiscID(info.mcdi);
+	UnsignedInt32	 discid = ComputeDiscID(info.mcdi);
 
 	if (config->GetIntValue(ConfigureCDIO::ConfigID, "ReadCDText", True) && cdTextDiscID != discid) { cdText.ReadCDText(component->GetNthDeviceInfo(track.drive).path); cdTextDiscID = discid; }
 
@@ -583,7 +583,7 @@ static int cddb_sum(int n)
 	return ret;
 }
 
-Int BoCA::DecoderCDIO::ComputeDiscID(const MCDI &mcdi)
+UnsignedInt32 BoCA::DecoderCDIO::ComputeDiscID(const MCDI &mcdi)
 {
 	Int	 numTocEntries = mcdi.GetNumberOfEntries();
 	Int	 n = 0;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -31,16 +31,16 @@ Int BoCA::CDPlayerIni::ReadCDInfo(Int drive)
 
 	cdInfo.Clear();
 
-	Int	 numTocEntries = ex_CR_GetNumTocEntries(cd);
-	Int	 discID = 0;
+	Int		 numTocEntries = ex_CR_GetNumTocEntries(cd);
+	UnsignedInt32	 discID = 0;
 
 	for (Int i = 0; i < numTocEntries; i++)
 	{
-		int	 startSector = ex_CR_GetTocEntry(cd, i).dwStartSector + 150;
+		Int	 startSector = ex_CR_GetTocEntry(cd, i).dwStartSector + 150;
 
-		int	 minutes = startSector / 75 / 60;
-		int	 seconds = startSector / 75 % 60;
-		int	 frames	 = startSector % 75;
+		Int	 minutes = startSector / 75 / 60;
+		Int	 seconds = startSector / 75 % 60;
+		Int	 frames	 = startSector % 75;
 
 		discID += minutes * 0x10000 + seconds * 0x100 + frames;
 	}
@@ -125,7 +125,7 @@ const BoCA::CDInfo &BoCA::CDPlayerIni::GetCDInfo() const
 	return cdInfo;
 }
 
-String BoCA::CDPlayerIni::DiscIDToString(Int discID)
+String BoCA::CDPlayerIni::DiscIDToString(UnsignedInt32 discID)
 {
 	String	 result;
 

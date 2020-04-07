@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,10 +27,10 @@ namespace BoCA
 			static const UnsignedInt	 samplesPerSector =  588;
 		private:
 			static CDText			 cdText;
-			static Int			 cdTextDiscID;
+			static UnsignedInt32		 cdTextDiscID;
 
 			static CDPlayerIni		 cdPlayer;
-			static Int			 cdPlayerDiscID;
+			static UnsignedInt32		 cdPlayerDiscID;
 
 			static Array<UnsignedInt64>	 lastRead;
 
@@ -46,7 +46,7 @@ namespace BoCA
 			Int				 prependSamples;
 			Int				 appendSamples;
 
-			Int				 ComputeDiscID(const MCDI &);
+			UnsignedInt32			 ComputeDiscID(const MCDI &);
 
 			Bool				 GetTrackSectors(Int &, Int &, Bool &);
 		public:

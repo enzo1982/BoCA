@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -63,10 +63,10 @@ Void smooth::DetachDLL()
 }
 
 BoCA::CDPlayerIni	 BoCA::DecoderCDRip::cdPlayer;
-Int			 BoCA::DecoderCDRip::cdPlayerDiscID = -1;
+UnsignedInt32		 BoCA::DecoderCDRip::cdPlayerDiscID = 0;
 
 BoCA::CDText		 BoCA::DecoderCDRip::cdText;
-Int			 BoCA::DecoderCDRip::cdTextDiscID   = -1;
+UnsignedInt32		 BoCA::DecoderCDRip::cdTextDiscID   = 0;
 
 Array<UnsignedInt64>	 BoCA::DecoderCDRip::lastRead;
 
@@ -187,7 +187,7 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Read CD-Text and cdplayer.ini.
 	 */
-	Int	 discid = ComputeDiscID(info.mcdi);
+	UnsignedInt32	 discid = ComputeDiscID(info.mcdi);
 
 	if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDText", True)	   && cdTextDiscID   != discid) { cdText.ReadCDText(track.drive);   cdTextDiscID   = discid; }
 	if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayerDiscID != discid) { cdPlayer.ReadCDInfo(track.drive); cdPlayerDiscID = discid; }
@@ -538,7 +538,7 @@ static int cddb_sum(int n)
 	return ret;
 }
 
-Int BoCA::DecoderCDRip::ComputeDiscID(const MCDI &mcdi)
+UnsignedInt32 BoCA::DecoderCDRip::ComputeDiscID(const MCDI &mcdi)
 {
 	Int	 numTocEntries = mcdi.GetNumberOfEntries();
 	Int	 n = 0;
