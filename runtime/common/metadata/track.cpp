@@ -261,6 +261,7 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 		fileName.Replace("<album>", Utilities::ReplaceIncompatibleCharacters(info.album.Length() > 0 ? info.album : i18n->TranslateString("unknown album")));
 		fileName.Replace("<genre>", Utilities::ReplaceIncompatibleCharacters(info.genre.Length() > 0 ? info.genre : i18n->TranslateString("unknown genre")));
 		fileName.Replace("<year>", Utilities::ReplaceIncompatibleCharacters(info.year > 0 ? String::FromInt(info.year) : i18n->TranslateString("unknown year")));
+		fileName.Replace("<discid>", Number((Int64) discid).ToHexString(8));
 		fileName.Replace("<currentdate>", currentDate);
 		fileName.Replace("<currenttime>", currentTime);
 
