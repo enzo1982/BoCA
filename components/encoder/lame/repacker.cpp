@@ -335,7 +335,6 @@ Bool BoCA::SuperRepacker::UnpackFrames(const Buffer<UnsignedByte> &data, Buffer<
 		memcpy(packets + offset + info, main + main.Size() - (frameb - info) - pre, bytes);
 
 		SetBitrateIndex(packets + offset, cbrIndex);
-		SetPadding(packets + offset, False);
 		SetMainDataOffset(packets + offset, 0);
 
 		packetSizes.Add(size);
