@@ -439,9 +439,9 @@ Int BoCA::EncoderLAME::ProcessResults(SuperWorker *worker, Bool first)
 	{
 		dataLength += ProcessPackets(worker->GetPackets(), worker->GetPacketSizes(), first, processed, complete);
 
-		/* Reduce overlap if not finished after 4 rounds.
+		/* Reduce overlap if not finished after 16 rounds.
 		 */
-		if (round & 4 && overlap > 0) { round = 0; overlap--; processed++; }
+		if (round & 16 && overlap > 0) { round = 0; overlap--; processed++; }
 
 		/* Re-encode remaining frames if a frame didn't fit.
 		 */
