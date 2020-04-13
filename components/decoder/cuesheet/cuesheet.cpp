@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -70,7 +70,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 	Bool		 trackMode	     = False;
 	Bool		 dataMode	     = False;
 
-	Int		 fileLength	     = 0;
+	Int64		 fileLength	     = 0;
+	Int64		 fileSize	     = 0;
 
 	/* Standard format for audio discs.
 	 */
@@ -216,7 +217,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
-			Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
+			Int64	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
 					     msf.SubString(3, 2).ToInt() * format.rate +
 					     msf.SubString(6, 2).ToInt() * format.rate / 75;
 
@@ -231,7 +232,11 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			{
 				/* Get previous track length.
 				 */
-				if (line.StartsWith("FILE ") || in.GetPos() == in.Size()) iTrack.length = fileLength - iTrack.sampleOffset;
+				if (line.StartsWith("FILE ") || in.GetPos() == in.Size())
+				{
+					iTrack.length	= fileLength - iTrack.sampleOffset;
+					iTrack.fileSize = Math::Round(Float(iTrack.fileSize) / fileLength * iTrack.length);
+				}
 
 				if (line.StartsWith("TRACK "))
 				{
@@ -247,11 +252,12 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 						{
 							String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
 
-							Int	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
+							Int64	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
 									     msf.SubString(3, 2).ToInt() * format.rate +
 									     msf.SubString(6, 2).ToInt() * format.rate / 75;
 
-							iTrack.length = samplePos - iTrack.sampleOffset;
+							iTrack.length	= samplePos - iTrack.sampleOffset;
+							iTrack.fileSize	= Math::Round(Float(iTrack.fileSize) / fileLength * iTrack.length);
 
 							break;
 						}
@@ -272,6 +278,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			iTrack.length = -1;
 			iTrack.approxLength = -1;
+
+			iTrack.fileSize = fileSize;
 
 			info.track_gain = NIL;
 			info.track_peak = NIL;
@@ -412,6 +420,9 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			if	(infoTrack.length	>= 0) { fileLength = infoTrack.length;	     iTrack.length	 = infoTrack.length;	   }
 			else if (infoTrack.approxLength >= 0) { fileLength = infoTrack.approxLength; iTrack.approxLength = infoTrack.approxLength; }
+
+			fileSize	 = infoTrack.fileSize;
+			iTrack.fileSize  = infoTrack.fileSize;
 
 			iTrack.decoderID = infoTrack.decoderID;
 			iTrack.lossless	 = infoTrack.lossless;
@@ -563,7 +574,7 @@ Bool BoCA::DecoderCueSheet::AddTrack(const Track &track, Array<Track> &tracks) c
 	rTrack.length	    = track.length;
 	rTrack.approxLength = track.approxLength;
 
-	rTrack.fileSize	    = track.length * track.GetFormat().channels * (track.GetFormat().bits / 8);
+	rTrack.fileSize	    = track.fileSize;
 
 	rTrack.lossless	    = track.lossless;
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -575,8 +575,9 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				else if (track.approxLength >= 0) rTrack.approxLength = track.approxLength - rTrack.sampleOffset;
 				else				  rTrack.approxLength = 240 * format.rate;
 
-				if (rTrack.length >= 0) rTrack.fileSize	= rTrack.length	      * format.channels * (format.bits / 8);
-				else			rTrack.fileSize	= rTrack.approxLength * format.channels * (format.bits / 8);
+				if	(track.length	    > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.length * rTrack.length);
+				else if (track.approxLength > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.approxLength * rTrack.approxLength);
+				else				 rTrack.fileSize = rTrack.approxLength * format.channels * (format.bits / 8);
 
 				rTrack.SetFormat(format);
 
@@ -596,7 +597,10 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 					Track	&pTrack = track.tracks.GetNthReference(i - 1);
 
 					pTrack.length	= rTrack.sampleOffset - pTrack.sampleOffset;
-					pTrack.fileSize	= pTrack.length * format.channels * (format.bits / 8);
+
+					if	(track.length	    > 0) pTrack.fileSize = Math::Round(Float(track.fileSize) / track.length * pTrack.length);
+					else if (track.approxLength > 0) pTrack.fileSize = Math::Round(Float(track.fileSize) / track.approxLength * pTrack.length);
+					else				 pTrack.fileSize = pTrack.length * format.channels * (format.bits / 8);
 				}
 
 				/* Add track to track list.

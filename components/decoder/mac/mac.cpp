@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -143,7 +143,6 @@ Int BoCA::DecoderMAC::ReadData(Buffer<UnsignedByte> &data)
 	inBytes += data.Size();
 
 	int	 nBlockAlign	       = ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BLOCK_ALIGN, 0, 0);
-	int	 nTotalBlocks	       = ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0);
 	intn	 nBlocksRetrieved      = 0;
 	int	 nTotalBlocksRetrieved = 0;
 
@@ -158,7 +157,7 @@ Int BoCA::DecoderMAC::ReadData(Buffer<UnsignedByte> &data)
 		nTotalBlocksRetrieved += nBlocksRetrieved;
 		blockId += nBlocksRetrieved;
 	}
-	while (nBlocksRetrieved > 0 && blockId < (nTotalBlocks * (double(inBytes) / track.fileSize)));
+	while (nBlocksRetrieved > 0 && blockId < (track.length * (double(inBytes) / track.fileSize)));
 
 	return nTotalBlocksRetrieved * nBlockAlign;
 }

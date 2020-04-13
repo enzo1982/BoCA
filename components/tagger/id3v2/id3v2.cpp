@@ -810,7 +810,9 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 				rTrack.sampleOffset = Math::Round(Float(				       frame.GetField(ID3FN_STARTTIME)->Get()) / 1000.0 * format.rate);
 				rTrack.length	    = Math::Round(Float(frame.GetField(ID3FN_ENDTIME)->Get() - frame.GetField(ID3FN_STARTTIME)->Get()) / 1000.0 * format.rate);
 
-				rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
+				if	(track.length	    > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.length * rTrack.length);
+				else if (track.approxLength > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.approxLength * rTrack.length);
+				else				 rTrack.fileSize = rTrack.length * format.channels * (format.bits / 8);
 
 				rTrack.SetFormat(format);
 

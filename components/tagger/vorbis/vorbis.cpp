@@ -588,7 +588,10 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 									  value.SubString(9, 3).ToInt()		  * format.rate / 1000.0);
 
 					rTrack.length	    = track.length - rTrack.sampleOffset;
-					rTrack.fileSize	    = rTrack.length * format.channels * (format.bits / 8);
+
+					if	(track.length	    > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.length * rTrack.length);
+					else if (track.approxLength > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.approxLength * rTrack.length);
+					else				 rTrack.fileSize = rTrack.length * format.channels * (format.bits / 8);
 				}
 
 				/* Set track title.
@@ -609,7 +612,10 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 					Track	&pTrack = track.tracks.GetReference(chapter - 1);
 
 					pTrack.length	= rTrack.sampleOffset - pTrack.sampleOffset;
-					pTrack.fileSize	= pTrack.length * format.channels * (format.bits / 8);
+
+					if	(track.length	    > 0) pTrack.fileSize = Math::Round(Float(track.fileSize) / track.length * pTrack.length);
+					else if (track.approxLength > 0) pTrack.fileSize = Math::Round(Float(track.fileSize) / track.approxLength * pTrack.length);
+					else				 pTrack.fileSize = pTrack.length * format.channels * (format.bits / 8);
 				}
 			}
 		}
