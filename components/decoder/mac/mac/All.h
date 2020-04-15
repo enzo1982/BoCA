@@ -53,9 +53,40 @@ Global includes
 #include "SmartPtr.h"
 
 /*****************************************************************************************
+Version
+*****************************************************************************************/
+#include "Version.h"
+
+// year in the copyright strings
+#define MAC_YEAR 2020
+
+// build the version string
+#define STRINGIZE2(s) #s
+#define STRINGIZE(s) STRINGIZE2(s)
+#define MAC_VER_FILE_VERSION_STR        STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION) 
+#define MAC_VER_FILE_VERSION_STR_NARROW STRINGIZE(MAC_VERSION_MAJOR) "." STRINGIZE(MAC_VERSION_REVISION) 
+#define MAC_VER_FILE_VERSION_STR_FULL    STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION) _T(".0.0")
+#define MAC_VER_FILE_VERSION_FULL_NO_DOT APE_VERSION_MAJOR APE_VERSION_REVISION
+
+#define MAC_FILE_VERSION_NUMBER                         3990
+#define MAC_VERSION_STRING                              MAC_VER_FILE_VERSION_STR
+#define MAC_VERSION_NUMBER								MAC_VERSION_MAJOR MAC_VERSION_REVISION
+#define MAC_NAME                                        _T("Monkey's Audio ") MAC_VER_FILE_VERSION_STR
+#define PLUGIN_NAME                                     "Monkey's Audio Player " MAC_VER_FILE_VERSION_STR_NARROW
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") MAC_VER_FILE_VERSION_STR _T(")")
+#define MAC_RESOURCE_VERSION_COMMA                      MAC_VERSION_MAJOR, MAC_VERSION_REVISION, 0, 0
+#define MAC_RESOURCE_VERSION_STRING                     MAC_VER_FILE_VERSION_STR_FULL
+#define MAC_RESOURCE_COPYRIGHT                          "Copyright (c) 2000-" STRINGIZE(MAC_YEAR) " Matthew T. Ashland"
+#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v ") MAC_VER_FILE_VERSION_STR _T(") (c) Matthew T. Ashland ---\n")
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") MAC_VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(MAC_YEAR) _T(" by Matthew T. Ashland")
+#define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
+
+/*****************************************************************************************
 Global compiler settings (useful for porting)
 *****************************************************************************************/
-#pragma warning(disable: 4100)
+#ifdef _MSC_VER
+    #pragma warning(disable: 4100)
+#endif
 
 // assembly code (helps performance, but limits portability)
 #if !defined(PLATFORM_ARM) && !defined(PLATFORM_ANDROID)
@@ -69,15 +100,6 @@ Global compiler settings (useful for porting)
             #define ENABLE_MMX_ASSEMBLY
         #endif
     #endif
-#endif
-
-// APE_BACKWARDS_COMPATIBILITY is only needed for decoding APE 3.92 or earlier files.  It
-// has not been possible to make these files for over 10 years, so it's unlikely
-// that disabling APE_BACKWARDS_COMPATIBILITY would have any effect on a normal user.  For
-// porting or third party usage, it's probably best to not bother with APE_BACKWARDS_COMPATIBILITY.
-// A future release of Monkey's Audio itself may remove support for these obsolete files.
-#if !defined(PLATFORM_ANDROID)
-    #define APE_BACKWARDS_COMPATIBILITY
 #endif
 
 // compression modes
@@ -185,34 +207,6 @@ namespace APE
 /*****************************************************************************************
 Global defines
 *****************************************************************************************/
-
-// major version number
-#define VERSION_MAJOR 5
-
-// build version number
-#define VERSION_REVISION 23
-
-// year in the copyright strings
-#define MAC_YEAR 2020
-
-// Build the version string
-#define STRINGIZE2(s) #s
-#define STRINGIZE(s) STRINGIZE2(s)
-#define VER_FILE_VERSION_STR        STRINGIZE(VERSION_MAJOR) _T(".") STRINGIZE(VERSION_REVISION) 
-#define VER_FILE_VERSION_STR_NARROW STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_REVISION) 
-#define VER_FILE_VERSION_STR_FULL    STRINGIZE(VERSION_MAJOR) _T(".") STRINGIZE(VERSION_REVISION) _T(".0.0")
-
-#define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              VER_FILE_VERSION_STR
-#define MAC_NAME                                        _T("Monkey's Audio ") VER_FILE_VERSION_STR
-#define PLUGIN_NAME                                     "Monkey's Audio Player " VER_FILE_VERSION_STR_NARROW
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") VER_FILE_VERSION_STR _T(")")
-#define RESOURCE_VERSION_COMMA                          VERSION_MAJOR, VERSION_REVISION, 0, 0
-#define RESOURCE_VERSION_STRING                         VER_FILE_VERSION_STR_FULL
-#define RESOURCE_COPYRIGHT                              "Copyright (c) 2000-" STRINGIZE(MAC_YEAR) " Matthew T. Ashland"
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v ") VER_FILE_VERSION_STR _T(") (c) Matthew T. Ashland ---\n")
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(MAC_YEAR) _T(" by Matthew T. Ashland")
-#define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 #define ONE_MILLION                                     1000000
 #ifdef PLATFORM_WINDOWS
     #define APE_FILENAME_SLASH '\\'

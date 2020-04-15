@@ -67,8 +67,7 @@ Bool BoCA::DecoderMAC::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderMAC::GetStreamInfo(const String &streamURI, Track &track)
 {
-	int			 nRetVal	= 0;
-	APE_DECOMPRESS_HANDLE	 hAPEDecompress = ex_APEDecompress_CreateW(streamURI, &nRetVal);
+	APE_DECOMPRESS_HANDLE	 hAPEDecompress = ex_APEDecompress_CreateW(streamURI, NIL);
 
 	if (hAPEDecompress == NIL) return Error();
 
@@ -117,9 +116,7 @@ BoCA::DecoderMAC::~DecoderMAC()
 
 Bool BoCA::DecoderMAC::Activate()
 {
-	int	 nRetVal = 0;
-
-	hAPEDecompress = ex_APEDecompress_CreateW(track.fileName, &nRetVal);
+	hAPEDecompress = ex_APEDecompress_CreateW(track.fileName, NIL);
 	blockId	       = 0;
 
 	return True;
@@ -142,9 +139,9 @@ Int BoCA::DecoderMAC::ReadData(Buffer<UnsignedByte> &data)
 {
 	inBytes += data.Size();
 
-	int	 nBlockAlign	       = ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BLOCK_ALIGN, 0, 0);
-	intn	 nBlocksRetrieved      = 0;
-	int	 nTotalBlocksRetrieved = 0;
+	int64	 nBlockAlign	       = ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BLOCK_ALIGN, 0, 0);
+	int64	 nBlocksRetrieved      = 0;
+	int64	 nTotalBlocksRetrieved = 0;
 
 	do
 	{

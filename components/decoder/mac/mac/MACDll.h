@@ -66,8 +66,8 @@ extern "C"
 {
     DLLEXPORT APE_COMPRESS_HANDLE __stdcall c_APECompress_Create(int * pErrorCode = NULL);
     DLLEXPORT void __stdcall c_APECompress_Destroy(APE_COMPRESS_HANDLE hAPECompress);
-    DLLEXPORT int __stdcall c_APECompress_Start(APE_COMPRESS_HANDLE hAPECompress, const char * pOutputFilename, const APE::WAVEFORMATEX * pwfeInput, APE::int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, const void * pHeaderData = NULL, APE::int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION);
-    DLLEXPORT int __stdcall c_APECompress_StartW(APE_COMPRESS_HANDLE hAPECompress, const APE::str_utfn * pOutputFilename, const APE::WAVEFORMATEX * pwfeInput, APE::int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = COMPRESSION_LEVEL_NORMAL, const void * pHeaderData = NULL, APE::int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION);
+    DLLEXPORT int __stdcall c_APECompress_Start(APE_COMPRESS_HANDLE hAPECompress, const char * pOutputFilename, const APE::WAVEFORMATEX * pwfeInput, APE::int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = MAC_COMPRESSION_LEVEL_NORMAL, const void * pHeaderData = NULL, APE::int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION);
+    DLLEXPORT int __stdcall c_APECompress_StartW(APE_COMPRESS_HANDLE hAPECompress, const APE::str_utfn * pOutputFilename, const APE::WAVEFORMATEX * pwfeInput, APE::int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = MAC_COMPRESSION_LEVEL_NORMAL, const void * pHeaderData = NULL, APE::int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION);
     DLLEXPORT APE::int64 __stdcall c_APECompress_AddData(APE_COMPRESS_HANDLE hAPECompress, unsigned char * pData, int nBytes);
     DLLEXPORT int __stdcall c_APECompress_GetBufferBytesAvailable(APE_COMPRESS_HANDLE hAPECompress);
     DLLEXPORT unsigned char * __stdcall c_APECompress_LockBuffer(APE_COMPRESS_HANDLE hAPECompress, APE::int64 * pBytesAvailable);
@@ -84,16 +84,16 @@ typedef void * APE_DECOMPRESS_HANDLE;
 typedef APE_DECOMPRESS_HANDLE (__stdcall * proc_APEDecompress_Create)(const APE::str_ansi *, int *);
 typedef APE_DECOMPRESS_HANDLE (__stdcall * proc_APEDecompress_CreateW)(const APE::str_utfn *, int *);
 typedef void (__stdcall * proc_APEDecompress_Destroy)(APE_DECOMPRESS_HANDLE); 
-typedef int (__stdcall * proc_APEDecompress_GetData)(APE_DECOMPRESS_HANDLE, char *, APE::intn, APE::intn *);
+typedef int (__stdcall * proc_APEDecompress_GetData)(APE_DECOMPRESS_HANDLE, char *, APE::int64, APE::int64 *);
 typedef int (__stdcall * proc_APEDecompress_Seek)(APE_DECOMPRESS_HANDLE, int); 
-typedef int (__stdcall * proc_APEDecompress_GetInfo)(APE_DECOMPRESS_HANDLE, APE::APE_DECOMPRESS_FIELDS, int, int);
+typedef APE::int64 (__stdcall * proc_APEDecompress_GetInfo)(APE_DECOMPRESS_HANDLE, APE::APE_DECOMPRESS_FIELDS, APE::int64, APE::int64);
 
 extern "C"
 {
     DLLEXPORT APE_DECOMPRESS_HANDLE __stdcall c_APEDecompress_Create(const APE::str_ansi * pFilename, int * pErrorCode = NULL);
     DLLEXPORT APE_DECOMPRESS_HANDLE __stdcall c_APEDecompress_CreateW(const APE::str_utfn * pFilename, int * pErrorCode = NULL);
     DLLEXPORT void __stdcall c_APEDecompress_Destroy(APE_DECOMPRESS_HANDLE hAPEDecompress);
-    DLLEXPORT int __stdcall c_APEDecompress_GetData(APE_DECOMPRESS_HANDLE hAPEDecompress, char * pBuffer, APE::intn nBlocks, APE::intn * pBlocksRetrieved);
+    DLLEXPORT int __stdcall c_APEDecompress_GetData(APE_DECOMPRESS_HANDLE hAPEDecompress, char * pBuffer, APE::int64 nBlocks, APE::int64 * pBlocksRetrieved);
     DLLEXPORT int __stdcall c_APEDecompress_Seek(APE_DECOMPRESS_HANDLE hAPEDecompress, int nBlockOffset);
-    DLLEXPORT int __stdcall c_APEDecompress_GetInfo(APE_DECOMPRESS_HANDLE hAPEDecompress, APE::APE_DECOMPRESS_FIELDS Field, int nParam1 = 0, int nParam2 = 0);
+    DLLEXPORT APE::int64 __stdcall c_APEDecompress_GetInfo(APE_DECOMPRESS_HANDLE hAPEDecompress, APE::APE_DECOMPRESS_FIELDS Field, APE::int64 nParam1 = 0, APE::int64 nParam2 = 0);
 }
