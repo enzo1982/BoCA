@@ -319,6 +319,10 @@ Bool BoCA::DecoderCDRip::Activate()
 	 */
 	if (!Seek(0)) return False;
 
+	/* Read CD TOC to initialize internal structures.
+	 */
+	ex_CR_ReadToc(cd);
+
 	return True;
 }
 
