@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -48,9 +48,6 @@ namespace BoCA
 			CheckBox		*check_autoRip;
 			CheckBox		*check_autoEject;
 
-			GroupBox		*group_cdoptions;
-			CheckBox		*check_locktray;
-
 			GroupBox		*group_cdinfo;
 			CheckBox		*check_readCDText;
 			CheckBox		*check_readCDPlayerIni;
@@ -62,8 +59,6 @@ namespace BoCA
 			Bool			 cdparanoia;
 			Bool			 jitter;
 			Bool			 swapchannels;
-
-			Bool			 locktray;
 
 			Bool			 autoRead;
 			Bool			 autoRip;

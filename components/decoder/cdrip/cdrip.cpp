@@ -311,10 +311,6 @@ Bool BoCA::DecoderCDRip::Activate()
 
 	ex_CR_SetCDROMParameters(cd, &params);
 
-	/* Lock tray if requested.
-	 */
-	if (config->GetIntValue(ConfigureCDRip::ConfigID, "LockTray", True)) ex_CR_LockCD(cd, True);
-
 	/* Call seek to initialize ripper to start of track.
 	 */
 	if (!Seek(0)) return False;
@@ -328,8 +324,6 @@ Bool BoCA::DecoderCDRip::Activate()
 
 Bool BoCA::DecoderCDRip::Deactivate()
 {
-	const Config	*config = GetConfiguration();
-
 	/* Check for drive cache errors.
 	 */
 	if (ex_CR_GetNumberOfCacheErrors(cd) > 0)
@@ -355,11 +349,6 @@ Bool BoCA::DecoderCDRip::Deactivate()
 	}
 
 	ex_CR_CloseRipper(cd);
-
-	/* Unlock tray if previously locked.
-	 */
-	if (config->GetIntValue(ConfigureCDRip::ConfigID, "LockTray", True)) ex_CR_LockCD(cd, False);
-
 	ex_CR_CloseCDROM(cd);
 
 	return True;

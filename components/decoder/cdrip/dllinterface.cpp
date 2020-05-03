@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -23,7 +23,6 @@ CR_CLOSERIPPER			 ex_CR_CloseRipper		= NIL;
 CR_RIPCHUNK			 ex_CR_RipChunk			= NIL;
 CR_GETCDROMPARAMETERS		 ex_CR_GetCDROMParameters	= NIL;
 CR_SETCDROMPARAMETERS		 ex_CR_SetCDROMParameters	= NIL;
-CR_LOCKCD			 ex_CR_LockCD			= NIL;
 CR_READCDTEXT			 ex_CR_ReadCDText		= NIL;
 CR_READANDGETISRC		 ex_CR_ReadAndGetISRC		= NIL;
 CR_GETNUMBEROFCACHEERRORS	 ex_CR_GetNumberOfCacheErrors	= NIL;
@@ -50,7 +49,6 @@ Bool LoadCDRipDLL()
 	ex_CR_RipChunk			= (CR_RIPCHUNK) cdripdll->GetFunctionAddress("CR_RipChunk");
 	ex_CR_GetCDROMParameters	= (CR_GETCDROMPARAMETERS) cdripdll->GetFunctionAddress("CR_GetCDROMParameters");
 	ex_CR_SetCDROMParameters	= (CR_SETCDROMPARAMETERS) cdripdll->GetFunctionAddress("CR_SetCDROMParameters");
-	ex_CR_LockCD			= (CR_LOCKCD) cdripdll->GetFunctionAddress("CR_LockCD");
 	ex_CR_ReadCDText		= (CR_READCDTEXT) cdripdll->GetFunctionAddress("CR_ReadCDText");
 	ex_CR_ReadAndGetISRC		= (CR_READANDGETISRC) cdripdll->GetFunctionAddress("CR_ReadAndGetISRC");
 	ex_CR_GetNumberOfCacheErrors	= (CR_GETNUMBEROFCACHEERRORS) cdripdll->GetFunctionAddress("CR_GetNumberOfCacheErrors");
@@ -67,7 +65,6 @@ Bool LoadCDRipDLL()
 	    ex_CR_RipChunk			== NIL ||
 	    ex_CR_GetCDROMParameters		== NIL ||
 	    ex_CR_SetCDROMParameters		== NIL ||
-	    ex_CR_LockCD			== NIL ||
 	    ex_CR_ReadCDText			== NIL ||
 	    ex_CR_ReadAndGetISRC		== NIL ||
 	    ex_CR_GetNumberOfCacheErrors	== NIL ||

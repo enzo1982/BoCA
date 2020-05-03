@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,7 +28,6 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	jitter		= config->GetIntValue(ConfigID, "JitterCorrection", False);
 	swapchannels	= config->GetIntValue(ConfigID, "SwapChannels", False);
 
-	locktray	= config->GetIntValue(ConfigID, "LockTray", True);
 	autoEject	= config->GetIntValue(ConfigID, "EjectAfterRipping", False);
 
 	readCDText	= config->GetIntValue(ConfigID, "ReadCDText", True);
@@ -197,28 +196,19 @@ BoCA::ConfigureCDRip::ConfigureCDRip()
 	group_automatization->Add(check_autoRip);
 	group_automatization->Add(check_autoEject);
 
-	group_cdoptions	= new GroupBox(i18n->TranslateString("CD options"), Point(group_drive->GetWidth() + 15, 117), Size(190, 42));
-
-	check_locktray	= new CheckBox(i18n->TranslateString("Lock CD tray while ripping"), Point(10, 14), Size(170, 0), &locktray);
-
-	group_cdoptions->Add(check_locktray);
-
-	maxTextSize = Math::Max(Math::Max(Math::Max(check_autoRead->GetUnscaledTextWidth(), check_autoRip->GetUnscaledTextWidth()), check_autoEject->GetUnscaledTextWidth()), check_locktray->GetUnscaledTextWidth());
+	maxTextSize = Math::Max(Math::Max(check_autoRead->GetUnscaledTextWidth(), check_autoRip->GetUnscaledTextWidth()), check_autoEject->GetUnscaledTextWidth());
 
 	check_autoRead->SetWidth(Math::Max(149, maxTextSize + 21));
 	check_autoRip->SetWidth(check_autoRead->GetWidth());
 	check_autoEject->SetWidth(check_autoRead->GetWidth());
-	check_locktray->SetWidth(check_autoRead->GetWidth());
 
 	group_automatization->SetWidth(check_autoRead->GetWidth() + 20);
-	group_cdoptions->SetWidth(check_autoRead->GetWidth() + 20);
 
 	ToggleAutoRead();
 
 	Add(group_drive);
 	Add(group_ripping);
 	Add(group_automatization);
-	Add(group_cdoptions);
 	Add(group_cdinfo);
 
 	SetSize(Size(group_drive->GetWidth() + group_automatization->GetWidth() + 22, 296));
@@ -247,9 +237,6 @@ BoCA::ConfigureCDRip::~ConfigureCDRip()
 	DeleteObject(check_autoRead);
 	DeleteObject(check_autoRip);
 	DeleteObject(check_autoEject);
-
-	DeleteObject(group_cdoptions);
-	DeleteObject(check_locktray);
 
 	DeleteObject(group_cdinfo);
 	DeleteObject(check_readCDText);
@@ -381,7 +368,6 @@ Int BoCA::ConfigureCDRip::SaveSettings()
 	config->SetIntValue(ConfigID, "JitterCorrection", jitter);
 	config->SetIntValue(ConfigID, "SwapChannels", swapchannels);
 
-	config->SetIntValue(ConfigID, "LockTray", locktray);
 	config->SetIntValue(ConfigID, "EjectAfterRipping", autoEject);
 
 	config->SetIntValue(ConfigID, "ReadCDText", readCDText);
