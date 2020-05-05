@@ -102,6 +102,15 @@ Global compiler settings (useful for porting)
     #endif
 #endif
 
+// APE_BACKWARDS_COMPATIBILITY is only needed for decoding APE 3.92 or earlier files.  It
+// has not been possible to make these files for over 10 years, so it's unlikely
+// that disabling APE_BACKWARDS_COMPATIBILITY would have any effect on a normal user.  For
+// porting or third party usage, it's probably best to not bother with APE_BACKWARDS_COMPATIBILITY.
+// A future release of Monkey's Audio itself may remove support for these obsolete files.
+#if !defined(PLATFORM_ANDROID)
+    #define APE_BACKWARDS_COMPATIBILITY
+#endif
+
 // compression modes
 #define ENABLE_COMPRESSION_MODE_FAST
 #define ENABLE_COMPRESSION_MODE_NORMAL
