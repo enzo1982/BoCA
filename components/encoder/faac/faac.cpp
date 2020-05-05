@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -60,11 +60,11 @@ const String &BoCA::EncoderFAAC::GetComponentSpecs()
 		    <input bits=\"16\" channels=\"1-6\"								\
 			   rate=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000\"/>	\
 		    <parameters>										\
-		      <range name=\"VBR quality\" argument=\"-q %VALUE\" default=\"100\">			\
+		      <range name=\"VBR quality\" argument=\"-q %VALUE\" default=\"150\">			\
 			<min alias=\"worst\">10</min>								\
 			<max alias=\"best\">500</max>								\
 		      </range>											\
-		      <range name=\"ABR bitrate per channel\" argument=\"-b %VALUE\" default=\"64\">		\
+		      <range name=\"ABR bitrate per channel\" argument=\"-b %VALUE\" default=\"96\">		\
 			<min alias=\"min\">8</min>								\
 			<max alias=\"max\">256</max>								\
 		      </range>											\
@@ -519,8 +519,8 @@ Bool BoCA::EncoderFAAC::ConvertArguments(Config *config)
 
 	/* Get command line settings.
 	 */
-	Int	 quality = 100;
-	Int	 bitrate = 64;
+	Int	 quality = 150;
+	Int	 bitrate = 96;
 
 	if (config->GetIntValue(encoderID, "Set VBR quality", False))		  quality = config->GetIntValue(encoderID, "VBR quality", quality);
 	if (config->GetIntValue(encoderID, "Set ABR bitrate per channel", False)) bitrate = config->GetIntValue(encoderID, "ABR bitrate per channel", bitrate);

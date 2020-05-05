@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,7 +24,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	allowjs		= config->GetIntValue(ConfigID, "AllowJS", True);
 	usetns		= config->GetIntValue(ConfigID, "UseTNS", False);
 	setQuality	= config->GetIntValue(ConfigID, "SetQuality", True);
-	aacQuality	= config->GetIntValue(ConfigID, "AACQuality", 100);
+	aacQuality	= config->GetIntValue(ConfigID, "AACQuality", 150);
 	allowID3	= config->GetIntValue(ConfigID, "AllowID3v2", False);
 	fileFormat	= config->GetIntValue(ConfigID, "MP4Container", True);
 	fileExtension	= config->GetIntValue(ConfigID, "MP4FileExtension", 0);
@@ -146,7 +146,7 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 
 	text_bandwidth		= new Text(i18n->AddColon(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz)")), Point(11, 15));
 
-	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue(ConfigID, "BandWidth", 22050)), Point(text_bandwidth->GetUnscaledTextWidth() + 19, 12), Size(291 - text_bandwidth->GetUnscaledTextWidth(), 0), 5);
+	edit_bandwidth		= new EditBox(String::FromInt(config->GetIntValue(ConfigID, "BandWidth", 18500)), Point(text_bandwidth->GetUnscaledTextWidth() + 19, 12), Size(291 - text_bandwidth->GetUnscaledTextWidth(), 0), 5);
 	edit_bandwidth->SetFlags(EDB_NUMERIC);
 
 	group_bandwidth->Add(text_bandwidth);
