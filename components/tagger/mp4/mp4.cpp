@@ -435,8 +435,17 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 				rTrack.fileName	    = track.fileName;
 				rTrack.pictures	    = track.pictures;
 
-				rTrack.sampleOffset = Math::Round(Float(offset)			 / MP4_MSECS_TIME_SCALE * format.rate);
-				rTrack.length	    = Math::Round(Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate);
+				rTrack.sampleOffset = Math::Round(Float(offset) / MP4_MSECS_TIME_SCALE * format.rate);
+
+				if (chapterList[i].duration > 0 || i < chapterCount - 1)
+				{
+					rTrack.length = Math::Round(Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate);
+				}
+				else
+				{
+					if	(track.length	    > 0) rTrack.length	     = track.length	  - rTrack.sampleOffset;
+					else if (track.approxLength > 0) rTrack.approxLength = track.approxLength - rTrack.sampleOffset;
+				}
 
 				if	(track.length	    > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.length * rTrack.length);
 				else if (track.approxLength > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.approxLength * rTrack.length);
