@@ -26,6 +26,8 @@ namespace BoCA
 			Int				 mp4Track;
 			MP4SampleId			 sampleId;
 
+			Bool				 finished;
+
 			Bool				 adifFound;
 			Bool				 adtsFound;
 			Bool				 loasFound;

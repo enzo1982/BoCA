@@ -349,6 +349,8 @@ BoCA::DecoderFDKAAC::DecoderFDKAAC()
 	mp4Track	 = -1;
 	sampleId	 = 1;
 
+	finished	 = False;
+
 	adifFound	 = False;
 	adtsFound	 = False;
 	loasFound	 = False;
@@ -446,6 +448,8 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 {
 	static Int	 maxFrameSize = 2048;
 
+	if (finished) return -1;
+
 	const Format	&format = track.GetFormat();
 
 	Int	 samplesRead = 0;
@@ -531,6 +535,7 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 			ex_aacDecoder_DecodeFrame(handle, outputBuffer + frameSize * format.channels, samplesBuffer.Size() - (samplesRead + frameSize) * format.channels, AACDEC_FLUSH);
 
 			samplesRead += 2 * frameSize;
+			finished     = True;
 		}
 	}
 	else
@@ -593,6 +598,7 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 			ex_aacDecoder_DecodeFrame(handle, outputBuffer + frameSize * format.channels, samplesBuffer.Size() - (samplesRead + frameSize) * format.channels, AACDEC_FLUSH);
 
 			samplesRead += 2 * frameSize;
+			finished     = True;
 		}
 	}
 
