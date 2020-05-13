@@ -163,29 +163,34 @@ String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
  */
 String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string, Bool useUnicode, Bool replaceSlashes, Bool replaceSpaces)
 {
-	String	 rVal;
+	String	 result;
+	Int	 length = string.Length();
 
-	for (Int k = 0, b = 0; k < string.Length(); k++)
+	for (Int i = 0, p = 0; i < length; i++, p++)
 	{
-		if	(string[k] == '\"')		    { rVal[k + b] = '\''; rVal[k + ++b] = '\''; }
-		else if (string[k] == '\n')		      b--;
-		else if (string[k] == '\r')		      b--;
-		else if (string[k] == '?')		      b--;
-		else if (string[k] == '|')		      rVal[k + b] = '_';
-		else if (string[k] == '*')		      b--;
-		else if (string[k] == '<')		      rVal[k + b] = '(';
-		else if (string[k] == '>')		      rVal[k + b] = ')';
-		else if (string[k] == ':')		      b--;
-		else if (string[k] == '/'  && replaceSlashes) rVal[k + b] = '-';
-		else if (string[k] == '\\' && replaceSlashes) rVal[k + b] = '-';
-		else if (string[k] == ' '  && replaceSpaces)  rVal[k + b] = '_';
-		else if (string[k] == '\t' && replaceSpaces)  rVal[k + b] = '_';
-		else if (string[k] == '\t')		      rVal[k + b] = ' ';
-		else if (string[k] >= 256  && !useUnicode)    rVal[k + b] = '#';
-		else					      rVal[k + b] = string[k];
+		wchar_t	 character = string[i];
+
+		/* Replace other characters.
+		 */
+		if	(character == '\"')		     { result[p] = '\''; result[++p] = '\''; }
+		else if (character == '\n')		       p--;
+		else if (character == '\r')		       p--;
+		else if (character == '?')		       p--;
+		else if (character == '|')		       result[p] = '_';
+		else if (character == '*')		       p--;
+		else if (character == '<')		       result[p] = '(';
+		else if (character == '>')		       result[p] = ')';
+		else if (character == ':')		       p--;
+		else if (character == '/'  &&  replaceSlashes) result[p] = '-';
+		else if (character == '\\' &&  replaceSlashes) result[p] = '-';
+		else if (character == ' '  &&  replaceSpaces)  result[p] = '_';
+		else if (character == '\t' &&  replaceSpaces)  result[p] = '_';
+		else if (character == '\t')		       result[p] = ' ';
+		else if (character >= 256  && !useUnicode)     result[p] = '#';
+		else					       result[p] = character;
 	}
 
-	return rVal;
+	return result;
 }
 
 /* This function checks if the passed path is a relative one.
@@ -233,68 +238,39 @@ String BoCA::Utilities::GetAbsolutePathName(const String &path)
  */
 String BoCA::Utilities::NormalizeFileName(const String &fileName)
 {
-	String	 rFileName = fileName;
-	String	 dir	   = fileName;
-
 	Int	 maxLength = 248;
-
-	String	 tmpDir;
-	Int	 lastBS	   = 0;
-
-	for (Int i = 0; i < dir.Length(); i++)
-	{
-		if (dir[i] == '\\' || dir[i] == '/')
-		{
-			String	 tmpDir2 = tmpDir;
-
-			/* Shorten to at most maxLength characters.
-			 */
-			if (tmpDir.Length() - lastBS > maxLength)
-			{
-				tmpDir2 = String().CopyN(tmpDir, lastBS + maxLength);
-
-				i -= (tmpDir.Length() - lastBS - maxLength);
-			}
-
-			/* Replace trailing dots and spaces.
-			 */
-			while ((tmpDir2.Tail(tmpDir2.Length() - lastBS - 1) != ".." &&
-				tmpDir2.Tail(tmpDir2.Length() - lastBS - 1) != ".") &&
-			       (tmpDir2.EndsWith(".") || tmpDir2.EndsWith(" ")))
-			{
-				tmpDir2[tmpDir2.Length() - 1] = 0;
-
-				i--;
-			}
-
-			if (tmpDir2 != tmpDir)
-			{
-				rFileName.Replace(tmpDir, tmpDir2);
-
-				tmpDir = tmpDir2;
-				dir = rFileName;
-			}
-
-			lastBS = i;
-		}
-
-		tmpDir[i] = dir[i];
-	}
-
-	/* Shorten file name to maxLength characters.
-	 */
-	if (rFileName.Length() - lastBS > maxLength) rFileName = String().CopyN(rFileName, lastBS + maxLength);
+	String	 path	   = fileName;
 
 	/* Normalize directory delimiters.
 	 */
-	rFileName.Replace("\\",	Directory::GetDirectoryDelimiter());
-	rFileName.Replace("/",	Directory::GetDirectoryDelimiter());
+	path.Replace("\\", Directory::GetDirectoryDelimiter());
+	path.Replace("/",  Directory::GetDirectoryDelimiter());
 
-	/* Replace trailing spaces.
+	/* Split path into components and process those.
 	 */
-	while (rFileName.EndsWith(" ")) { rFileName[rFileName.Length() - 1] = 0; }
+	const Array<String>	&components = path.Explode(Directory::GetDirectoryDelimiter());
 
-	return rFileName;
+	foreach (String component, components)
+	{
+		/* Shorten to at most maxLength characters.
+		 */
+		if (component.Length() > maxLength) component[maxLength] = 0;
+
+		/* Replace trailing dots and spaces.
+		 */
+		if (component != ".." && component != ".")
+		{
+			if (foreachindex == components.Length() - 1) while (			       component.EndsWith(" ")) component[component.Length() - 1] = 0;
+			else					     while (component.EndsWith(".") || component.EndsWith(" ")) component[component.Length() - 1] = 0;
+		}
+
+		/* Append component back to path.
+		 */
+		if (foreachindex == 0) path = component;
+		else		       path.Append(Directory::GetDirectoryDelimiter()).Append(component);
+	}
+
+	return path;
 }
 
 /* Creates the folder corresponding to the file name
