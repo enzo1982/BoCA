@@ -186,6 +186,14 @@ String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string, Bool
 		else if (character == ' '  &&  replaceSpaces)  result[p] = '_';
 		else if (character == '\t' &&  replaceSpaces)  result[p] = '_';
 		else if (character == '\t')		       result[p] = ' ';
+#ifndef __WIN32__
+		else if (character == '.'  && !replaceSlashes && (p == 0 || result[p - 1] == '/' || result[p - 1] == '\\'))
+		{
+			if	(useUnicode)		       result[p] = 0x2024;
+			else if (replaceSpaces)		       result[p] = ',';
+			else				     { result[p] = ' '; result[++p] = character; }
+		}
+#endif
 		else if (character >= 256  && !useUnicode)     result[p] = '#';
 		else					       result[p] = character;
 	}
