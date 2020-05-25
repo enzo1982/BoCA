@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,7 +33,7 @@ typedef mpg123_handle *	(*MPG123_NEW)			(const char *, int *);
 typedef void		(*MPG123_DELETE)		(mpg123_handle *);
 
 typedef int		(*MPG123_OPEN_FEED)		(mpg123_handle *);
-typedef int		(*MPG123_DECODE)		(mpg123_handle *, const unsigned char *, size_t, unsigned char *, size_t, size_t *);
+typedef int		(*MPG123_DECODE)		(mpg123_handle *, const unsigned char *, size_t, void *, size_t, size_t *);
 typedef int		(*MPG123_FEED)			(mpg123_handle *, const unsigned char *, size_t);
 typedef off_t		(*MPG123_FEEDSEEK)		(mpg123_handle *, off_t, int, off_t *);
 
