@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -70,7 +70,11 @@ Int BoCA::VerifierMD5::ProcessData(Buffer<UnsignedByte> &data)
 
 Bool BoCA::VerifierMD5::Verify()
 {
-	if (md5.Finish() == track.md5) return True;
+	String	 checksum = md5.Finish();
 
-	return False;
+	errorString = String("Checksum: ").Append(checksum);
+
+	if (checksum != track.md5) errorString = String("Expected: ").Append(track.md5);
+
+	return checksum == track.md5;
 }
