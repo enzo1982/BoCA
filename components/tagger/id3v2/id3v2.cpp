@@ -383,7 +383,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	/* Save CD table of contents.
 	 */
-	if (writeMCDI)
+	if (writeMCDI && !isChapter)
 	{
 		if (info.mcdi.GetData().Size() > 0)
 		{
