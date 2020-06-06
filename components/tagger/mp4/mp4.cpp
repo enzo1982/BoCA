@@ -529,6 +529,8 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 String BoCA::TaggerMP4::GetItmfItemValue(MP4ItmfItem &item)
 {
+	if (item.dataList.size == 0) return NIL;
+
 	/* Check type code.
 	 */
 	if (item.dataList.elements[0].typeCode != MP4_ITMF_BT_UTF8 &&
