@@ -385,7 +385,7 @@ Int BoCA::EncoderLAME::EncodeFrames(Bool flush)
 		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, flush ? samplesInBuffer : samplesPerFrame * framesToProcess, flush);
 		workerToUse->Release();
 
-		framesProcessed += framesToProcess - overlap;
+		framesProcessed += framesToProcess - (flush ? 0 : overlap);
 
 		nextWorker++;
 
