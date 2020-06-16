@@ -418,7 +418,7 @@ Int BoCA::EncoderFAAC::EncodeFrames(Bool flush)
 		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, flush ? samplesBuffer.Size() : samplesPerFrame * framesToProcess, flush);
 		workerToUse->Release();
 
-		framesProcessed += framesToProcess - overlap;
+		framesProcessed += framesToProcess - (flush ? 0 : overlap);
 
 		nextWorker++;
 

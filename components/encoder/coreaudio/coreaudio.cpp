@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -546,7 +546,7 @@ Int BoCA::EncoderCoreAudio::EncodeFrames(Bool flush)
 		workerToUse->Encode(samplesBuffer, framesProcessed * bytesPerFrame, flush ? samplesBuffer.Size() : bytesPerFrame * framesToProcess, flush);
 		workerToUse->Release();
 
-		framesProcessed += framesToProcess - overlap;
+		framesProcessed += framesToProcess - (flush ? 0 : overlap);
 
 		nextWorker++;
 
