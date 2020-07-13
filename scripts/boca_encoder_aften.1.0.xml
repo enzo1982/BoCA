@@ -5,7 +5,7 @@
   <version>1.0</version>
   <id>aften-enc</id>
   <type>encoder</type>
-  <replace>avconv-ac3-enc</replace>
+  <replace>ffmpeg-ac3-enc</replace>
   <format>
     <name>AC-3 Files</name>
     <extension>ac3</extension>

@@ -3,20 +3,20 @@
 <component>
   <name>Qualcomm PureVoice Decoder</name>
   <version>1.0</version>
-  <id>avconv-qcp-dec</id>
+  <id>ffmpeg-qcp-dec</id>
   <type>decoder</type>
   <format>
     <name>PureVoice Files</name>
     <extension>qcp</extension>
   </format>
   <external>
-    <command>avconv</command>
+    <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -y %OUTFILE</arguments>
     <mode>file</mode>
     <outformat>wave</outformat>
   </external>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -y %OUTFILE</arguments>
     <mode>file</mode>
     <outformat>wave</outformat>

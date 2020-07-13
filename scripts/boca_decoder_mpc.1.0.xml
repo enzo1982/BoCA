@@ -5,7 +5,7 @@
   <version>1.0</version>
   <id>mpc-dec</id>
   <type>decoder</type>
-  <replace>avconv-mpc-dec</replace>
+  <replace>ffmpeg-mpc-dec</replace>
   <format>
     <name>Musepack Audio Files</name>
     <extension>mpc</extension>

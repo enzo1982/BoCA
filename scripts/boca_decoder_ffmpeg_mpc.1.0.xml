@@ -3,7 +3,7 @@
 <component>
   <name>Musepack Audio Decoder</name>
   <version>1.0</version>
-  <id>avconv-mpc-dec</id>
+  <id>ffmpeg-mpc-dec</id>
   <type>decoder</type>
   <format>
     <name>Musepack Audio Files</name>
@@ -11,13 +11,13 @@
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>
   <external>
-    <command>avconv</command>
+    <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

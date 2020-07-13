@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Digital Speech Standard Decoder</name>
+  <name>Monkey's Audio Decoder</name>
   <version>1.0</version>
-  <id>avconv-dss-dec</id>
+  <id>ffmpeg-mac-dec</id>
   <type>decoder</type>
   <format>
-    <name>DSS Files</name>
-    <extension>dss</extension>
+    <name>Monkey's Audio Files</name>
+    <lossless>true</lossless>
+    <extension>ape</extension>
+    <extension>mac</extension>
+    <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>
   <external>
-    <command>avconv</command>
+    <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

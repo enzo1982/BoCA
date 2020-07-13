@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>MPEG Video Audio Extractor</name>
+  <name>AVI Video Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-mpg_audio-dec</id>
+  <id>ffmpeg-avi_audio-dec</id>
   <type>decoder</type>
   <format>
-    <name>MPEG Video Files</name>
-    <extension>mpg</extension>
-    <extension>mpeg</extension>
+    <name>Microsoft AVI Video</name>
+    <extension>avi</extension>
+    <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
   </format>
   <external>
-    <command>avconv</command>
+    <command>ffmpeg</command>
     <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>QuickTime Video Audio Extractor</name>
+  <version>1.0</version>
+  <id>ffmpeg-mov_audio-dec</id>
+  <type>decoder</type>
+  <format>
+    <name>QuickTime Video</name>
+    <extension>mov</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+  </format>
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+  <external>
+    <command>avconv</command>
+    <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

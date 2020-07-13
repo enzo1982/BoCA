@@ -1,31 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>MLP Audio Decoder</name>
+  <name>ATRAC-1 Decoder</name>
   <version>1.0</version>
-  <id>avconv-mlp-dec</id>
+  <id>ffmpeg-atrac1-dec</id>
   <type>decoder</type>
   <format>
-    <name>MLP Files</name>
-    <lossless>true</lossless>
-    <extension>mlp</extension>
+    <name>ATRAC-1 Files</name>
+    <extension>aea</extension>
   </format>
-  <external>
-    <command>avconv</command>
-    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
-    <mode>stdio</mode>
-    <outformat>wave</outformat>
-    <parameters>
-      <switch name="Downmix multi-channel audio to stereo" argument="-ac 2"/>
-    </parameters>
-  </external>
   <external>
     <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
-    <parameters>
-      <switch name="Downmix multi-channel audio to stereo" argument="-ac 2"/>
-    </parameters>
+  </external>
+  <external>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
   </external>
 </component>

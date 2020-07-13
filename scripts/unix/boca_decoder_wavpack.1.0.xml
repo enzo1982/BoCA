@@ -5,7 +5,7 @@
   <version>1.0</version>
   <id>wv-dec</id>
   <type>decoder</type>
-  <replace>avconv-wv-dec</replace>
+  <replace>ffmpeg-wv-dec</replace>
   <format>
     <name>WavPack Files</name>
     <extension>wv</extension>

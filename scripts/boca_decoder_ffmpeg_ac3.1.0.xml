@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>ATRAC-3 Decoder</name>
+  <name>AC-3 Audio Decoder</name>
   <version>1.0</version>
-  <id>avconv-atrac3-dec</id>
+  <id>ffmpeg-ac3-dec</id>
   <type>decoder</type>
   <format>
-    <name>ATRAC-3 Files</name>
-    <extension>at3</extension>
-    <extension>wav</extension>
-    <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
+    <name>AC-3 Files</name>
+    <extension>ac3</extension>
   </format>
   <format>
-    <name>OpenMG Audio Files</name>
-    <extension>aa3</extension>
-    <extension>oma</extension>
-    <extension>omg</extension>
+    <name>Enhanced AC-3 Files</name>
+    <extension>eac3</extension>
   </format>
-  <external>
-    <command>avconv</command>
-    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
-    <mode>stdio</mode>
-    <outformat>wave</outformat>
-  </external>
   <external>
     <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
+    <parameters>
+      <switch name="Downmix multi-channel audio to stereo" argument="-ac 2"/>
+    </parameters>
+  </external>
+  <external>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+    <parameters>
+      <switch name="Downmix multi-channel audio to stereo" argument="-ac 2"/>
+    </parameters>
   </external>
 </component>

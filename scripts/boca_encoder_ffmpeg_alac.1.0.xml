@@ -3,7 +3,7 @@
 <component>
   <name>Apple Lossless Encoder</name>
   <version>1.0</version>
-  <id>avconv-alac-enc</id>
+  <id>ffmpeg-alac-enc</id>
   <type>encoder</type>
   <format>
     <name>Apple Lossless Files</name>
@@ -11,16 +11,16 @@
     <extension>m4a</extension>
     <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>
-  <input bits="16"/>
+  <input bits="16-24"/>
   <external>
-    <command>avconv</command>
-    <arguments>-f wav -i %INFILE -c:a alac %OPTIONS -y %OUTFILE</arguments>
+    <command>ffmpeg</command>
+    <arguments>-f wav -i %INFILE -acodec alac %OPTIONS -y %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>
   <external>
-    <command>ffmpeg</command>
-    <arguments>-f wav -i %INFILE -acodec alac %OPTIONS -y %OUTFILE</arguments>
+    <command>avconv</command>
+    <arguments>-f wav -i %INFILE -c:a alac %OPTIONS -y %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>

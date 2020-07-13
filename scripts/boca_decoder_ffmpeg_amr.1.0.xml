@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Tom's Audiokompressor</name>
+  <name>Adaptive Multi-Rate Decoder</name>
   <version>1.0</version>
-  <id>avconv-tak-dec</id>
+  <id>ffmpeg-amr-dec</id>
   <type>decoder</type>
   <format>
-    <name>Tom's Audio</name>
-    <lossless>true</lossless>
-    <extension>tak</extension>
-    <tag id="apev2-tag" mode="append">APEv2</tag>
+    <name>AMR Files</name>
+    <extension>amr</extension>
   </format>
-  <external>
-    <command>avconv</command>
-    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
-    <mode>stdio</mode>
-    <outformat>wave</outformat>
-    <md5 stream="stderr" prefix="MD5=">-v 40 -i %INFILE</md5>
-  </external>
+  <format>
+    <name>3GPP Files</name>
+    <extension>3gp</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+  </format>
   <external>
     <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
-    <md5 stream="stderr" prefix="MD5=">-v 40 -i %INFILE</md5>
+  </external>
+  <external>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
   </external>
 </component>

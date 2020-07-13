@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Monkey's Audio Decoder</name>
+  <name>ATRAC-3 Decoder</name>
   <version>1.0</version>
-  <id>avconv-mac-dec</id>
+  <id>ffmpeg-atrac3-dec</id>
   <type>decoder</type>
   <format>
-    <name>Monkey's Audio Files</name>
-    <lossless>true</lossless>
-    <extension>ape</extension>
-    <extension>mac</extension>
-    <tag id="apev2-tag" mode="append">APEv2</tag>
+    <name>ATRAC-3 Files</name>
+    <extension>at3</extension>
+    <extension>wav</extension>
+    <tag id="riff-tag" mode="other">RIFF INFO Tag</tag>
+  </format>
+  <format>
+    <name>OpenMG Audio Files</name>
+    <extension>aa3</extension>
+    <extension>oma</extension>
+    <extension>omg</extension>
   </format>
   <external>
-    <command>avconv</command>
+    <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

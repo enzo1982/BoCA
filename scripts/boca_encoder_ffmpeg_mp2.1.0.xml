@@ -3,7 +3,7 @@
 <component>
   <name>MPEG-1 Audio Layer 2 Encoder</name>
   <version>1.0</version>
-  <id>avconv-mp2-enc</id>
+  <id>ffmpeg-mp2-enc</id>
   <type>encoder</type>
   <format>
     <name>MPEG-1 Audio Layer 2</name>
@@ -12,14 +12,14 @@
     <tag id="id3v2-tag" mode="prepend">ID3v2</tag>
   </format>
   <external>
-    <command>avconv</command>
-    <arguments>-f wav -i %INFILE -c:a mp2 %OPTIONS -y %OUTFILE</arguments>
+    <command>ffmpeg</command>
+    <arguments>-f wav -i %INFILE -acodec mp2 %OPTIONS -y %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>
   <external>
-    <command>ffmpeg</command>
-    <arguments>-f wav -i %INFILE -acodec mp2 %OPTIONS -y %OUTFILE</arguments>
+    <command>avconv</command>
+    <arguments>-f wav -i %INFILE -c:a mp2 %OPTIONS -y %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>

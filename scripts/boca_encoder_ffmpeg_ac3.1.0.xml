@@ -3,21 +3,21 @@
 <component>
   <name>AC-3 Audio Encoder</name>
   <version>1.0</version>
-  <id>avconv-ac3-enc</id>
+  <id>ffmpeg-ac3-enc</id>
   <type>encoder</type>
   <format>
     <name>AC-3 Files</name>
     <extension>ac3</extension>
   </format>
   <external>
-    <command>avconv</command>
-    <arguments>-f wav -i %INFILE -c:a ac3 %OPTIONS -y %OUTFILE</arguments>
+    <command>ffmpeg</command>
+    <arguments>-f wav -i %INFILE -acodec ac3 %OPTIONS -y %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>
   <external>
-    <command>ffmpeg</command>
-    <arguments>-f wav -i %INFILE -acodec ac3 %OPTIONS -y %OUTFILE</arguments>
+    <command>avconv</command>
+    <arguments>-f wav -i %INFILE -c:a ac3 %OPTIONS -y %OUTFILE</arguments>
     <mode>file</mode>
     <informat>wave</informat>
   </external>

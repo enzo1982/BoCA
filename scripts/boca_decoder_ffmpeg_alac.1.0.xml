@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>DTS Audio Decoder</name>
+  <name>Apple Lossless Decoder</name>
   <version>1.0</version>
-  <id>avconv-dts-dec</id>
+  <id>ffmpeg-alac-dec</id>
   <type>decoder</type>
+  <replace>alac-dec</replace>
   <format>
-    <name>DTS Files</name>
+    <name>Apple Lossless Files</name>
     <lossless>true</lossless>
-    <extension>dts</extension>
+    <extension>m4a</extension>
+    <extension>m4b</extension>
+    <extension>mp4</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>
-  <external>
-    <command>avconv</command>
-    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
-    <mode>stdio</mode>
-    <outformat>wave</outformat>
-    <parameters>
-      <switch name="Downmix multi-channel audio to stereo" argument="-ac 2"/>
-    </parameters>
-  </external>
   <external>
     <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
-    <parameters>
-      <switch name="Downmix multi-channel audio to stereo" argument="-ac 2"/>
-    </parameters>
+  </external>
+  <external>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
   </external>
 </component>

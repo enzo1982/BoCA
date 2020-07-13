@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>Matroska Audio Extractor</name>
+  <name>Flash Video Audio Extractor</name>
   <version>1.0</version>
-  <id>avconv-mkv_audio-dec</id>
+  <id>ffmpeg-flv_audio-dec</id>
   <type>decoder</type>
   <format>
-    <name>Matroska Video Files</name>
-    <extension>mkv</extension>
-  </format>
-  <format>
-    <name>Matroska Audio Files</name>
-    <extension>mka</extension>
+    <name>Adobe Flash Video</name>
+    <extension>flv</extension>
+    <extension>f4v</extension>
   </format>
   <external>
-    <command>avconv</command>
+    <command>ffmpeg</command>
     <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE -vn %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

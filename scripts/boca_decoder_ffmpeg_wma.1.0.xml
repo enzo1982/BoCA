@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>WavPack Audio Decoder</name>
+  <name>Windows Media Audio Decoder</name>
   <version>1.0</version>
-  <id>avconv-wv-dec</id>
+  <id>ffmpeg-wma-dec</id>
   <type>decoder</type>
   <format>
-    <name>WavPack Files</name>
-    <extension>wv</extension>
-    <tag id="apev2-tag" mode="append">APEv2</tag>
+    <name>Windows Media Audio Files</name>
+    <extension>wma</extension>
+    <tag id="wma-tag" mode="other">WMA Metadata</tag>
   </format>
   <external>
-    <command>avconv</command>
+    <command>ffmpeg</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
   <external>
-    <command>ffmpeg</command>
+    <command>avconv</command>
     <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
     <mode>stdio</mode>
     <outformat>wave</outformat>

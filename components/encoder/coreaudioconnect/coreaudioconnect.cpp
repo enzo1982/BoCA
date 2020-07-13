@@ -46,7 +46,7 @@ const String &BoCA::EncoderCoreAudioConnect::GetComponentSpecs()
 		    <type>encoder</type>								\
 		    <replace>faac-enc</replace>								\
 		    <replace>voaacenc-enc</replace>							\
-		    <replace>avconv-alac-enc</replace>							\
+		    <replace>ffmpeg-alac-enc</replace>							\
 		    <format>										\
 		      <name>MPEG-4 AAC Files</name>							\
 		      <extension>m4a</extension>							\

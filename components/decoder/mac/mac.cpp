@@ -31,7 +31,7 @@ const String &BoCA::DecoderMAC::GetComponentSpecs()
 		    <version>1.0</version>					\
 		    <id>mac-dec</id>						\
 		    <type>decoder</type>					\
-		    <replace>avconv-mac-dec</replace>				\
+		    <replace>ffmpeg-mac-dec</replace>				\
 		    <format>							\
 		      <name>Monkey's Audio</name>				\
 		      <lossless>true</lossless>					\

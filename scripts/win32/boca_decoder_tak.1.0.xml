@@ -5,7 +5,7 @@
   <version>1.0</version>
   <id>tak-dec</id>
   <type>decoder</type>
-  <replace>avconv-tak-dec</replace>
+  <replace>ffmpeg-tak-dec</replace>
   <format>
     <name>Tom's Audio</name>
     <lossless>true</lossless>
