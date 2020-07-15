@@ -178,13 +178,13 @@ Bool BoCA::EncoderLAME::Activate()
 
 			break;
 		case 1:
-			ex_lame_set_preset(context, MEDIUM_FAST);
+			ex_lame_set_preset(context, MEDIUM);
 			break;
 		case 2:
-			ex_lame_set_preset(context, STANDARD_FAST);
+			ex_lame_set_preset(context, STANDARD);
 			break;
 		case 3:
-			ex_lame_set_preset(context, EXTREME_FAST);
+			ex_lame_set_preset(context, EXTREME);
 			break;
 		case 4:
 			ex_lame_set_preset(context, abrBitrate);

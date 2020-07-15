@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -66,9 +66,9 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	basic_combo_preset		= new ComboBox(Point(17 + basic_text_preset->GetUnscaledTextWidth(), 10), Size(388 - basic_text_preset->GetUnscaledTextWidth(), 0));
 	basic_combo_preset->AddEntry(i18n->TranslateString("Custom settings"));
-	basic_combo_preset->AddEntry(i18n->TranslateString("Medium, Fast"));
-	basic_combo_preset->AddEntry(i18n->TranslateString("Standard, Fast"));
-	basic_combo_preset->AddEntry(i18n->TranslateString("Extreme, Fast"));
+	basic_combo_preset->AddEntry(i18n->TranslateString("Medium"));
+	basic_combo_preset->AddEntry(i18n->TranslateString("Standard"));
+	basic_combo_preset->AddEntry(i18n->TranslateString("Extreme"));
 	basic_combo_preset->AddEntry("ABR");
 	basic_combo_preset->SelectNthEntry(preset);
 	basic_combo_preset->onSelectEntry.Connect(&ConfigureLAME::SetPreset, this);
