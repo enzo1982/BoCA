@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -165,6 +165,26 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 		layers_parameters.Add(layer);
 	}
 
+	/* Create additional arguments fields.
+	 */
+	i18n->SetContext("Configuration");
+
+	check_additional = new CheckBox(i18n->AddColon(i18n->TranslateString("Additional arguments")), position, Size(100, 0));
+	check_additional->SetChecked(config->GetIntValue(specs->id, "Set Additional arguments", False));
+	check_additional->onAction.Connect(&ConfigLayerExternal::OnSelectParameter, this);
+	check_additional->onAction.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
+
+	edit_additional	 = new EditBox(position + Point(230, -1), Size(230, 0));
+	edit_additional->SetOrientation(OR_UPPERRIGHT);
+	edit_additional->SetText(config->GetStringValue(specs->id, "Additional arguments", NIL));
+	edit_additional->onInput.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
+
+	maxTextSize = Math::Max(maxTextSize, check_additional->GetUnscaledTextWidth());
+	position += Point(0, 26);
+
+	group_parameters->Add(check_additional);
+	group_parameters->Add(edit_additional);
+
 	/* Adjust check box sizes.
 	 */
 	foreach (Parameter *param, specs->parameters)
@@ -174,6 +194,8 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 		if (param->GetType() == PARAMETER_TYPE_SWITCH) checkBox->SetWidth(maxTextSize + 259);
 		else					       checkBox->SetWidth(maxTextSize + 21);
 	}
+
+	check_additional->SetWidth(maxTextSize + 21);
 
 	group_parameters->SetSize(Size(279 + maxTextSize, position.y + 2));
 	edit_commandline->SetWidth(279 + maxTextSize);
@@ -197,6 +219,9 @@ BoCA::AS::ConfigLayerExternal::~ConfigLayerExternal()
 	foreach (Widget *widget, widgets_parameters) DeleteObject(widget);
 
 	DeleteObject(group_parameters);
+
+	DeleteObject(check_additional);
+	DeleteObject(edit_additional);
 
 	DeleteObject(text_commandline);
 	DeleteObject(edit_commandline);
@@ -252,6 +277,9 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 				break;
 		}
 	}
+
+	config->SetIntValue(specs->id, "Set Additional arguments", check_additional->IsChecked() ? 1 : 0);
+	config->SetStringValue(specs->id, "Additional arguments", edit_additional->GetText());
 
 	return Success();
 }
@@ -318,6 +346,8 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 		}
 	}
 
+	if (check_additional->IsChecked()) arguments.Append(" ").Append(edit_additional->GetText());
+
 	return arguments;
 }
 
@@ -332,6 +362,9 @@ Void BoCA::AS::ConfigLayerExternal::OnSelectParameter()
 		if (checkBox->IsChecked()) layer->Activate();
 		else			   layer->Deactivate();
 	}
+
+	if (check_additional->IsChecked()) edit_additional->Activate();
+	else				   edit_additional->Deactivate();
 }
 
 Void BoCA::AS::ConfigLayerExternal::OnUpdateParameterValue()

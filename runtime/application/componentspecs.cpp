@@ -295,6 +295,8 @@ String BoCA::AS::ComponentSpecs::GetExternalArgumentsString()
 		}
 	}
 
+	if (config->GetIntValue(id, "Set Additional arguments", False)) arguments.Append(" ").Append(config->GetStringValue(id, "Additional arguments", NIL));
+
 	return arguments;
 }
 
