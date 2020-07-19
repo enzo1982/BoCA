@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -79,13 +79,18 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 
 	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
-	/* Check process handle.
-	 */
-	if (processInfo.hProcess == NIL) return NIL;
-
 	/* Close stdio pipe write handle.
 	 */
 	CloseHandle(wPipe);
+
+	/* Check process handle.
+	 */
+	if (processInfo.hProcess == NIL)
+	{
+		CloseHandle(rPipe);
+
+		return NIL;
+	}
 
 	/* Read output into buffer.
 	 */
@@ -202,10 +207,16 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
+	/* Close stdio pipe write handle.
+	 */
+	CloseHandle(wPipe);
+
 	/* Check process handle.
 	 */
 	if (processInfo.hProcess == NIL)
 	{
+		CloseHandle(rPipe);
+
 		errorState  = True;
 		errorString = String("Unable to run decoder ").Append(command).Append(".");
 
@@ -218,10 +229,6 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 		return Error();
 	}
-
-	/* Close stdio pipe write handle.
-	 */
-	CloseHandle(wPipe);
 
 	/* Read WAVE header into buffer.
 	 */
@@ -454,10 +461,16 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 	hProcess = processInfo.hProcess;
 
+	/* Close stdio pipe write handle.
+	 */
+	CloseHandle(wPipe);
+
 	/* Check process handle.
 	 */
 	if (processInfo.hProcess == NIL)
 	{
+		CloseHandle(rPipe);
+
 		errorState  = True;
 		errorString = String("Unable to run decoder ").Append(command).Append(".");
 
@@ -470,10 +483,6 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 		return False;
 	}
-
-	/* Close stdio pipe write handle before reading.
-	 */
-	CloseHandle(wPipe);
 
 	/* Skip the WAVE header.
 	 */

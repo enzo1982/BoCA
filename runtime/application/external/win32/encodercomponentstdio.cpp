@@ -96,10 +96,16 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 	hProcess = processInfo.hProcess;
 
+	/* Close stdio pipe read handle.
+	 */
+	CloseHandle(rPipe);
+
 	/* Check process handle.
 	 */
 	if (processInfo.hProcess == NIL)
 	{
+		CloseHandle(wPipe);
+
 		errorState  = True;
 		errorString = String("Unable to run encoder ").Append(command).Append(".");
 
@@ -131,12 +137,6 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Activate()
 
 	out->Flush();
 
-	/* Sleep for 1/8th second to avoid locking up in WriteData
-	 * when the encoder exits because of invalid parameters or
-	 * audio format as process exit is detected with some delay.
-	 */
-	S::System::System::Sleep(125);
-
 	return True;
 }
 
@@ -149,7 +149,6 @@ Bool BoCA::AS::EncoderComponentExternalStdIO::Deactivate()
 	delete out;
 	delete driver_stdin;
 
-	CloseHandle(rPipe);
 	CloseHandle(wPipe);
 
 	/* Wait until the encoder exits.
@@ -243,7 +242,7 @@ Int BoCA::AS::EncoderComponentExternalStdIO::WriteData(const Buffer<UnsignedByte
 	 */
 	if (WaitForSingleObject(hProcess, 0) != WAIT_TIMEOUT)
 	{
-		errorState  = True;
+		errorState = True;
 		errorString = "Encoder quit prematurely.";
 
 		return -1;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -74,13 +74,18 @@ String BoCA::AS::DecoderComponentExternalFile::GetMD5(const String &encFileName)
 
 	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
 
-	/* Check process handle.
-	 */
-	if (processInfo.hProcess == NIL) return NIL;
-
 	/* Close stdio pipe write handle.
 	 */
 	CloseHandle(wPipe);
+
+	/* Check process handle.
+	 */
+	if (processInfo.hProcess == NIL)
+	{
+		CloseHandle(rPipe);
+
+		return NIL;
+	}
 
 	/* Read output into buffer.
 	 */
