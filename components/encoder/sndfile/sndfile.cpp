@@ -235,6 +235,7 @@ Bool BoCA::EncoderSndFile::Activate()
 	if (sndf == NIL) return False;
 
 	ex_sf_command(sndf, SFC_SET_SCALE_INT_FLOAT_WRITE, NIL, SF_TRUE);
+	ex_sf_command(sndf, SFC_SET_CLIPPING, NIL, SF_TRUE);
 
 	/* Set metadata.
 	 */
