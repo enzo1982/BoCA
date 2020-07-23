@@ -845,6 +845,13 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 				if (chapterIDs.Get(track.tracks.GetNthIndex(i)) == NIL) track.tracks.RemoveNth(i);
 			}
 		}
+
+		/* Discard chapters if their number does not match TOC.
+		 */
+		if (track.tracks.Length() != chapterIDs.Length())
+		{
+			track.tracks.RemoveAll();
+		}
 	}
 
 	return Success();
