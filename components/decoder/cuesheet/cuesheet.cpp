@@ -86,12 +86,40 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 	 */
 	InStream		 in(STREAM_FILE, streamURI, IS_READ);
 
-	/* Look for UTF-8 BOM and set input format.
+	/* Detect input format.
 	 */
 	String::InputFormat	 inputFormat("ISO-8859-1");
 
-	if (in.InputNumberRaw(3) == 0xEFBBBF) String::SetInputFormat("UTF-8");
-	else				      in.Seek(0);
+	if (in.InputNumberRaw(3) == 0xEFBBBF)
+	{
+		/* Found UTF-8 BOM.
+		 */
+		String::SetInputFormat("UTF-8");
+	}
+	else
+	{
+		in.Seek(0);
+
+		/* Check for UTF-8, otherwise use system encoding or ISO-8859-1.
+		 */
+		String	 data = in.InputString(in.Size());
+		String	 dataUTF;
+
+		if (dataUTF.ImportFrom("UTF-8", data.ConvertTo("ISO-8859-1")) == Success() && dataUTF != data)
+		{
+			/* Encoding appears to be UTF-8.
+			 */
+			String::SetInputFormat("UTF-8");
+		}
+		else if (String(String::GetDefaultEncoding()) != "UTF-8")
+		{
+			/* Other encoding, use system default.
+			 */
+			String::SetInputFormat(String::GetDefaultEncoding());
+		}
+
+		in.Seek(0);
+	}
 
 	/* Actual parsing action.
 	 */
@@ -306,7 +334,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			/* If file is not found, try interpreting the file name using the default system encoding.
 			 */
-			if (!File(resolvedFileName).Exists())
+			if (!File(resolvedFileName).Exists() && String(String::GetInputFormat()) != String::GetDefaultEncoding())
 			{
 				String::InputFormat	 inputFormat(String::GetDefaultEncoding());
 				String			 nativeFileName = fileName.ConvertTo("ISO-8859-1");
