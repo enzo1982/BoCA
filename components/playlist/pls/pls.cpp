@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -45,8 +45,16 @@ BoCA::PlaylistPLS::~PlaylistPLS()
 
 Bool BoCA::PlaylistPLS::CanOpenFile(const String &file)
 {
-	InStream	 in(STREAM_FILE, file, IS_READ);
+	InStream		 in(STREAM_FILE, file, IS_READ);
 
+	/* Skip UTF-8 BOM.
+	 */
+	String::InputFormat	 inputFormat("ISO-8859-1");
+
+	if (in.InputNumberRaw(3) != 0xEFBBBF) in.Seek(0);
+
+	/* Check file format.
+	 */
 	while (in.GetPos() < in.Size())
 	{
 		String	 line = in.InputLine();
@@ -60,9 +68,39 @@ Bool BoCA::PlaylistPLS::CanOpenFile(const String &file)
 
 const Array<BoCA::Track> &BoCA::PlaylistPLS::ReadPlaylist(const String &file)
 {
-	String::InputFormat	 inputFormat("ISO-8859-1");
 	InStream		 in(STREAM_FILE, file, IS_READ);
 
+	/* Detect input format.
+	 */
+	String::InputFormat	 inputFormat("ISO-8859-1");
+
+	if (in.InputNumberRaw(3) == 0xEFBBBF)
+	{
+		/* Found UTF-8 BOM.
+		 */
+		String::SetInputFormat("UTF-8");
+	}
+	else
+	{
+		in.Seek(0);
+
+		/* Check for UTF-8, otherwise use ISO-8859-1.
+		 */
+		String	 data = in.InputString(in.Size());
+		String	 dataUTF;
+
+		if (dataUTF.ImportFrom("UTF-8", data.ConvertTo("ISO-8859-1")) == Success() && dataUTF != data)
+		{
+			/* Encoding appears to be UTF-8.
+			 */
+			String::SetInputFormat("UTF-8");
+		}
+
+		in.Seek(0);
+	}
+
+	/* Parse file line by line.
+	 */
 	while (in.GetPos() < in.Size())
 	{
 		String	 line = in.InputLine();
