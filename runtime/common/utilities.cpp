@@ -218,13 +218,13 @@ Bool BoCA::Utilities::IsRelativePath(const String &path)
 
 /* This function returns the absolute path corresponding to the passed
  * path. It may differ from the passed one due to use of the <installdrive>
- * placeholder or because the passed path is a relative one.
+ * or <profile> placeholders or because the passed path is a relative one.
  */
 String BoCA::Utilities::GetAbsolutePathName(const String &path)
 {
 	String	 pathName = path;
 
-	/* Replace <installdrive> pattern.
+	/* Replace <installdrive> placeholder.
 	 */
 #ifdef __WIN32__
 	pathName.Replace("<installdrive>", GUI::Application::GetApplicationDirectory().Head(2));
@@ -232,6 +232,16 @@ String BoCA::Utilities::GetAbsolutePathName(const String &path)
 	pathName.Replace("<installdrive>", NIL);
 #endif
 
+	/* Replace <profile> placeholder.
+	 */
+	String	 personalFiles = S::System::System::GetPersonalFilesDirectory();
+
+	if (personalFiles.EndsWith(Directory::GetDirectoryDelimiter())) personalFiles[personalFiles.Length() - 1] = 0;
+
+	pathName.Replace("<profile>", personalFiles);
+
+	/* Convert relative to absolute paths.
+	 */
 	if (IsRelativePath(pathName)) pathName = GUI::Application::GetApplicationDirectory().Append(pathName);
 
 	if (!pathName.EndsWith(Directory::GetDirectoryDelimiter())) pathName.Append(Directory::GetDirectoryDelimiter());
