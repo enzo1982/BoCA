@@ -243,11 +243,11 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		 */
 		if (line.StartsWith("INDEX 01 "))
 		{
-			String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
+			const Array<String>	&msf = line.Tail(line.Length() - line.FindLast(" ") - 1).Explode(":");
 
-			Int64	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
-					     msf.SubString(3, 2).ToInt() * format.rate +
-					     msf.SubString(6, 2).ToInt() * format.rate / 75;
+			Int64	 samplePos = msf.GetNth(0).ToInt() * 60 * format.rate +
+					     msf.GetNth(1).ToInt()	* format.rate +
+					     msf.GetNth(2).ToInt()	* format.rate / 75;
 
 			iTrack.sampleOffset = samplePos;
 		}
@@ -278,11 +278,11 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 						if (line.StartsWith("INDEX 01 "))
 						{
-							String	 msf = line.Tail(line.Length() - line.FindLast(" ") - 1);
+							const Array<String>	&msf = line.Tail(line.Length() - line.FindLast(" ") - 1).Explode(":");
 
-							Int64	 samplePos = msf.Head(2).ToInt() * 60 * format.rate +
-									     msf.SubString(3, 2).ToInt() * format.rate +
-									     msf.SubString(6, 2).ToInt() * format.rate / 75;
+							Int64	 samplePos = msf.GetNth(0).ToInt() * 60 * format.rate +
+									     msf.GetNth(1).ToInt()	* format.rate +
+									     msf.GetNth(2).ToInt()	* format.rate / 75;
 
 							iTrack.length	= samplePos - iTrack.sampleOffset;
 							iTrack.fileSize	= Math::Round(Float(iTrack.fileSize) / fileLength * iTrack.length);
