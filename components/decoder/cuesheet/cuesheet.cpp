@@ -262,8 +262,11 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 				 */
 				if (line.StartsWith("FILE ") || in.GetPos() == in.Size())
 				{
-					iTrack.length	= fileLength - iTrack.sampleOffset;
-					iTrack.fileSize = Math::Round(Float(iTrack.fileSize) / fileLength * iTrack.length);
+					if (fileLength >= iTrack.sampleOffset)
+					{
+						iTrack.length	= fileLength - iTrack.sampleOffset;
+						iTrack.fileSize = Math::Round(Float(iTrack.fileSize) / fileLength * iTrack.length);
+					}
 				}
 
 				if (line.StartsWith("TRACK "))
@@ -280,12 +283,15 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 						{
 							const Array<String>	&msf = line.Tail(line.Length() - line.FindLast(" ") - 1).Explode(":");
 
-							Int64	 samplePos = msf.GetNth(0).ToInt() * 60 * format.rate +
-									     msf.GetNth(1).ToInt()	* format.rate +
-									     msf.GetNth(2).ToInt()	* format.rate / 75;
+							Int64	 samplePos = Math::Min(msf.GetNth(0).ToInt() * 60 * format.rate +
+										       msf.GetNth(1).ToInt()	  * format.rate +
+										       msf.GetNth(2).ToInt()	  * format.rate / 75, fileLength);
 
-							iTrack.length	= samplePos - iTrack.sampleOffset;
-							iTrack.fileSize	= Math::Round(Float(iTrack.fileSize) / fileLength * iTrack.length);
+							if (samplePos >= iTrack.sampleOffset)
+							{
+								iTrack.length	= samplePos - iTrack.sampleOffset;
+								iTrack.fileSize	= Math::Round(Float(iTrack.fileSize) / fileLength * iTrack.length);
+							}
 
 							break;
 						}
@@ -297,12 +303,15 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			/* Add previous track.
 			 */
-			iTrack.SetFormat(format);
-			iTrack.SetInfo(info);
+			if (iTrack.length != -1 || iTrack.approxLength != -1)
+			{
+				iTrack.SetFormat(format);
+				iTrack.SetInfo(info);
 
-			iTrack.pictures = pictures;
+				iTrack.pictures = pictures;
 
-			AddTrack(iTrack, track.tracks);
+				AddTrack(iTrack, track.tracks);
+			}
 
 			iTrack.length = -1;
 			iTrack.approxLength = -1;
