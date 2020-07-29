@@ -399,11 +399,12 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 				break;
 			}
 
-			/* Disable reading chapters.
+			/* Disable reading chapters and embedded cue sheets.
 			 */
 			Config	*decoderConfig = Config::Copy(GetConfiguration());
 
 			decoderConfig->SetIntValue("Tags", "ReadChapters", False);
+			decoderConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
 
 			decoder->SetConfiguration(decoderConfig);
 

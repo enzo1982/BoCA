@@ -523,8 +523,6 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 					Track	 cueTrack;
 					Config	*cueConfig = Config::Copy(GetConfiguration());
 
-					cueConfig->SetIntValue(ConfigID, "ReadEmbeddedCueSheets", False);
-
 					cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
 					cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);
 					cueConfig->SetIntValue("CueSheet", "LookForAlternativeFiles", False);
