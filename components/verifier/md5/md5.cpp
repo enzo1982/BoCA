@@ -74,7 +74,11 @@ Bool BoCA::VerifierMD5::Verify()
 
 	errorString = String("Checksum: ").Append(checksum);
 
-	if (checksum != track.md5) errorString = String("Expected: ").Append(track.md5);
+	if (checksum != track.md5)
+	{
+		errorState  = True;
+		errorString = String("Expected: ").Append(track.md5);
+	}
 
 	return checksum == track.md5;
 }
