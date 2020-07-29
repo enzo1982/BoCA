@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -189,7 +189,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 #ifdef __WIN32__
 	String	 uncPath = String(streamURI.StartsWith("\\\\") ? "" : uncPrefix).Append(streamURI);
 
-	file = _wfopen(streamURI, L"rbN");
+	file = _wfopen(uncPath, L"rbN");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
 #endif
