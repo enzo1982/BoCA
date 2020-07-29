@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -96,7 +96,7 @@ Bool BoCA::DSPRNNoise::Activate()
 		String	 uncPath       = String(modelFileName.StartsWith("\\\\") ? "" : uncPrefix).Append(modelFileName);
 		FILE	*modelFile     = _wfopen(uncPath, L"rbN");
 #else
-		FILE	*modelFile     = fopen(modelFileName.ConvertTo("UTF-8"), "rb");
+		FILE	*modelFile     = fopen(modelFileName.ConvertTo("UTF-8"), "rbe");
 #endif
 
 		if (modelFile == NIL)

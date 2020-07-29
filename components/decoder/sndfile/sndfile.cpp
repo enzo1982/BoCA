@@ -161,7 +161,7 @@ Bool BoCA::DecoderSndFile::CanOpenStream(const String &streamURI)
  
 	file = _wfopen(uncPath, L"rbN");
 #else
-	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
+	file = fopen(streamURI.ConvertTo("UTF-8"), "rbe");
 #endif
 
 	if (file != NIL)
@@ -191,7 +191,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 	file = _wfopen(uncPath, L"rbN");
 #else
-	file = fopen(streamURI.ConvertTo("UTF-8"), "rb");
+	file = fopen(streamURI.ConvertTo("UTF-8"), "rbe");
 #endif
 
 	if (file == NIL) { errorState = True; errorString = "File not found"; }
