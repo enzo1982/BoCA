@@ -614,10 +614,11 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 					 */
 					const Array<String>	&lines = cuesheet.Explode("\n");
 
+					out.OutputLine(String("FILE \"").Append(track.fileName).Append("\" WAVE"));
+
 					foreach (const String &line, lines)
 					{
-						if (line.Trim().StartsWith("FILE")) out.OutputLine(String("FILE \"").Append(track.fileName).Append("\" WAVE"));
-						else				    out.OutputLine(line);
+						if (!line.Trim().StartsWith("FILE")) out.OutputLine(line);
 					}
 
 					out.Close();
