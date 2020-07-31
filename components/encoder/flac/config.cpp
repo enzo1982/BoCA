@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -107,7 +107,7 @@ BoCA::ConfigureFLAC::ConfigureFLAC()
 
 	text_blocksize		= new Text(i18n->AddColon(i18n->TranslateString("Blocksize")), Point(9, 40));
 
-	text_blocksize_samples	= new Text(i18n->TranslateString("%1 samples").Replace("%1", NIL).Replace(" ", NIL), Point(508, 40));
+	text_blocksize_samples	= new Text(i18n->TranslateString("%1 samples").Replace("%1", NIL).Trim(), Point(508, 40));
 	text_blocksize_samples->SetX(9 + text_blocksize_samples->GetUnscaledTextWidth());
 	text_blocksize_samples->SetOrientation(OR_UPPERRIGHT);
 

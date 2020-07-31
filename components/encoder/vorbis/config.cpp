@@ -88,11 +88,14 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	slider_abrmin		= new Slider(Point(38, 14), Size(228, 0), OR_HORZ, &abrMin, 32, 320);
 	slider_abrmin->onValueChange.Connect(&ConfigureVorbis::SetABRMin, this);
 
-	edit_abrmin		= new EditBox(Point(279, 13), Size(25, 0), 3);
-	edit_abrmin->SetFlags(EDB_NUMERIC);
-	edit_abrmin->onInput.Connect(&ConfigureVorbis::SetABRMinByEditBox, this);
+	text_abrmin_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(35, 16));
+	text_abrmin_kbps->SetOrientation(OR_UPPERRIGHT);
+	text_abrmin_kbps->SetX(text_abrmin_kbps->GetUnscaledTextWidth() + 10);
 
-	text_abrmin_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(311, 16));
+	edit_abrmin		= new EditBox(Point(text_abrmin_kbps->GetX() + 32, 13), Size(25, 0), 3);
+	edit_abrmin->SetFlags(EDB_NUMERIC);
+	edit_abrmin->SetOrientation(OR_UPPERRIGHT);
+	edit_abrmin->onInput.Connect(&ConfigureVorbis::SetABRMinByEditBox, this);
 
 	check_abrnom		= new CheckBox(i18n->AddColon(i18n->TranslateString("Average bitrate")), Point(10, 41), Size(), &setABRNom);
 	check_abrnom->onAction.Connect(&ConfigureVorbis::ToggleABRNom, this);
@@ -100,11 +103,13 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	slider_abrnom		= new Slider(Point(38, 41), Size(228, 0), OR_HORZ, &abrNom, 32, 320);
 	slider_abrnom->onValueChange.Connect(&ConfigureVorbis::SetABRNom, this);
 
-	edit_abrnom		= new EditBox(Point(279, 40), Size(25, 0), 3);
-	edit_abrnom->SetFlags(EDB_NUMERIC);
-	edit_abrnom->onInput.Connect(&ConfigureVorbis::SetABRNomByEditBox, this);
+	text_abrnom_kbps	= new Text(text_abrmin_kbps->GetText(), Point(text_abrmin_kbps->GetX(), 43));
+	text_abrnom_kbps->SetOrientation(OR_UPPERRIGHT);
 
-	text_abrnom_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(311, 43));
+	edit_abrnom		= new EditBox(Point(text_abrnom_kbps->GetX() + 32, 40), Size(25, 0), 3);
+	edit_abrnom->SetFlags(EDB_NUMERIC);
+	edit_abrnom->SetOrientation(OR_UPPERRIGHT);
+	edit_abrnom->onInput.Connect(&ConfigureVorbis::SetABRNomByEditBox, this);
 
 	check_abrmax		= new CheckBox(i18n->AddColon(i18n->TranslateString("Maximum bitrate")), Point(10, 68), Size(), &setABRMax);
 	check_abrmax->onAction.Connect(&ConfigureVorbis::ToggleABRMax, this);
@@ -112,11 +117,13 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	slider_abrmax		= new Slider(Point(38, 68), Size(228, 0), OR_HORZ, &abrMax, 32, 320);
 	slider_abrmax->onValueChange.Connect(&ConfigureVorbis::SetABRMax, this);
 
-	edit_abrmax		= new EditBox(Point(279, 67), Size(25, 0), 3);
-	edit_abrmax->SetFlags(EDB_NUMERIC);
-	edit_abrmax->onInput.Connect(&ConfigureVorbis::SetABRMaxByEditBox, this);
+	text_abrmax_kbps	= new Text(text_abrnom_kbps->GetText(), Point(text_abrnom_kbps->GetX(), 70));
+	text_abrmax_kbps->SetOrientation(OR_UPPERRIGHT);
 
-	text_abrmax_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(311, 70));
+	edit_abrmax		= new EditBox(Point(text_abrmax_kbps->GetX() + 32, 67), Size(25, 0), 3);
+	edit_abrmax->SetFlags(EDB_NUMERIC);
+	edit_abrmax->SetOrientation(OR_UPPERRIGHT);
+	edit_abrmax->onInput.Connect(&ConfigureVorbis::SetABRMaxByEditBox, this);
 
 	maxTextSize = Math::Max(Math::Max(check_abrmin->GetUnscaledTextWidth(), check_abrnom->GetUnscaledTextWidth()), check_abrmax->GetUnscaledTextWidth());
 
@@ -128,9 +135,9 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 	slider_abrnom->SetX(maxTextSize + 38);
 	slider_abrmax->SetX(maxTextSize + 38);
 
-	slider_abrmin->SetWidth(233 - maxTextSize);
-	slider_abrnom->SetWidth(233 - maxTextSize);
-	slider_abrmax->SetWidth(233 - maxTextSize);
+	slider_abrmin->SetWidth(266 - maxTextSize - text_abrmin_kbps->GetX());
+	slider_abrnom->SetWidth(266 - maxTextSize - text_abrnom_kbps->GetX());
+	slider_abrmax->SetWidth(266 - maxTextSize - text_abrmax_kbps->GetX());
 
 	group_bitrate->Add(check_abrmin);
 	group_bitrate->Add(slider_abrmin);

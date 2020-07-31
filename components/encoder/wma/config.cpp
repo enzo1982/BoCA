@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -99,11 +99,15 @@ BoCA::ConfigureWMA::ConfigureWMA()
 
 	Int	 maxTextSize = Math::Max(text_quality->GetUnscaledTextWidth(), text_bitrate->GetUnscaledTextWidth());
 
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(35, 42));
+	text_bitrate_kbps->SetOrientation(OR_UPPERRIGHT);
+	text_bitrate_kbps->SetX(text_bitrate_kbps->GetUnscaledTextWidth() + 10);
+
+	text_quality_value	= new Text(String::FromInt(quality * 5), Point(text_bitrate_kbps->GetX(), 16));
+	text_quality_value->SetOrientation(OR_UPPERRIGHT);
+
 	slider_quality		= new Slider(Point(text_quality->GetX() + maxTextSize + 7, 13), Size(100, 0), OR_HORZ, &quality, 0, 20);
 	slider_quality->onValueChange.Connect(&ConfigureWMA::OnSetQuality, this);
-
-	text_quality_value	= new Text(String::FromInt(quality * 5), Point(35, 16));
-	text_quality_value->SetOrientation(OR_UPPERRIGHT);
 
 	combo_bitrate		= new ComboBox(Point(slider_quality->GetX(), 39), Size(100, 0));
 	combo_bitrate->AddEntry("32");
@@ -115,9 +119,6 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	combo_bitrate->AddEntry("160");
 	combo_bitrate->AddEntry("192");
 	combo_bitrate->SelectEntry(String::FromInt(config->GetIntValue(ConfigID, "Bitrate", 128)));
-
-	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(35, 42));
-	text_bitrate_kbps->SetOrientation(OR_UPPERRIGHT);
 
 	group_settings->Add(check_vbr_setting);
 	group_settings->Add(check_2pass_setting);
@@ -141,7 +142,7 @@ BoCA::ConfigureWMA::ConfigureWMA()
 	check_2pass->SetX(check_vbr->GetX() + check_vbr->GetWidth() + 8 + (maxSize - option_format->GetWidth()) % 2);
 	check_2pass->SetWidth(check_vbr->GetWidth());
 
-	slider_quality->SetWidth(maxSize - maxTextSize - text_quality->GetX() - 30);
+	slider_quality->SetWidth(maxSize - maxTextSize - text_quality->GetX() - text_bitrate_kbps->GetX() + 6);
 	combo_bitrate->SetWidth(slider_quality->GetWidth());
 
 	group_codec->SetWidth(maxSize + 20);

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -51,6 +51,8 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	i18n->SetContext("Encoders::Speex");
 
+	Int	 kbpsLabelWidth = Font().GetUnscaledTextSizeX(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", "64"));
+
 	group_profile		= new GroupBox(i18n->TranslateString("Profile"), Point(7, 11), Size(406, 43));
 
 	text_profile		= new Text(i18n->AddColon(i18n->TranslateString("Select encoding profile")), Point(10, 16));
@@ -93,15 +95,17 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 	option_cbr_quality->SetWidth(maxTextSize + 21);
 	option_cbr_bitrate->SetWidth(maxTextSize + 21);
 
-	slider_cbr_quality	= new Slider(Point(maxTextSize + 39, 14), Size(176 - maxTextSize, 0), OR_HORZ, &quality, 0, 10);
+	slider_cbr_quality	= new Slider(Point(maxTextSize + 39, 14), Size(214 - maxTextSize - kbpsLabelWidth, 0), OR_HORZ, &quality, 0, 10);
 	slider_cbr_quality->onValueChange.Connect(&ConfigureSpeex::SetQuality, this);
 
-	text_cbr_quality_value	= new Text(NIL, Point(222, 16));
+	text_cbr_quality_value	= new Text(NIL, Point(kbpsLabelWidth + 10, 16));
+	text_cbr_quality_value->SetOrientation(OR_UPPERRIGHT);
 
-	slider_cbr_bitrate	= new Slider(Point(maxTextSize + 39, 39), Size(176 - maxTextSize, 0), OR_HORZ, &bitrate, 4, 64);
+	slider_cbr_bitrate	= new Slider(Point(maxTextSize + 39, 39), Size(214 - maxTextSize - kbpsLabelWidth, 0), OR_HORZ, &bitrate, 4, 64);
 	slider_cbr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetBitrate, this);
 
-	text_cbr_bitrate_value	= new Text(NIL, Point(222, 41));
+	text_cbr_bitrate_value	= new Text(NIL, Point(kbpsLabelWidth + 10, 41));
+	text_cbr_bitrate_value->SetOrientation(OR_UPPERRIGHT);
 
 	group_cbr_quality->Add(option_cbr_quality);
 	group_cbr_quality->Add(slider_cbr_quality);
@@ -120,15 +124,17 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	maxTextSize = Math::Max(text_vbr_quality->GetUnscaledTextWidth() - 21, check_vbr_bitrate->GetUnscaledTextWidth());
 
-	slider_vbr_quality	= new Slider(Point(maxTextSize + 39, 14), Size(176 - maxTextSize, 0), OR_HORZ, &vbrq, 0, 100);
+	slider_vbr_quality	= new Slider(Point(maxTextSize + 39, 14), Size(214 - maxTextSize - kbpsLabelWidth, 0), OR_HORZ, &vbrq, 0, 100);
 	slider_vbr_quality->onValueChange.Connect(&ConfigureSpeex::SetVBRQuality, this);
 
-	text_vbr_quality_value	= new Text(NIL, Point(222, 16));
+	text_vbr_quality_value	= new Text(NIL, Point(kbpsLabelWidth + 10, 16));
+	text_vbr_quality_value->SetOrientation(OR_UPPERRIGHT);
 
-	slider_vbr_bitrate	= new Slider(Point(maxTextSize + 39, 39), Size(176 - maxTextSize, 0), OR_HORZ, &vbrmax, 4, 64);
+	slider_vbr_bitrate	= new Slider(Point(maxTextSize + 39, 39), Size(214 - maxTextSize - kbpsLabelWidth, 0), OR_HORZ, &vbrmax, 4, 64);
 	slider_vbr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetVBRBitrate, this);
 
-	text_vbr_bitrate_value	= new Text(NIL, Point(222, 41));
+	text_vbr_bitrate_value	= new Text(NIL, Point(kbpsLabelWidth + 10, 41));
+	text_vbr_bitrate_value->SetOrientation(OR_UPPERRIGHT);
 
 	group_vbr_quality->Add(text_vbr_quality);
 	group_vbr_quality->Add(slider_vbr_quality);
@@ -141,10 +147,11 @@ BoCA::ConfigureSpeex::ConfigureSpeex()
 
 	text_abr_bitrate	= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 16));
 
-	slider_abr_bitrate	= new Slider(Point(text_abr_bitrate->GetUnscaledTextWidth() + 18, 14), Size(197 - text_abr_bitrate->GetUnscaledTextWidth(), 0), OR_HORZ, &abr, 4, 64);
+	slider_abr_bitrate	= new Slider(Point(text_abr_bitrate->GetUnscaledTextWidth() + 18, 14), Size(235 - text_abr_bitrate->GetUnscaledTextWidth() - kbpsLabelWidth, 0), OR_HORZ, &abr, 4, 64);
 	slider_abr_bitrate->onValueChange.Connect(&ConfigureSpeex::SetABRBitrate, this);
 
-	text_abr_bitrate_value	= new Text(NIL, Point(222, 16));
+	text_abr_bitrate_value	= new Text(NIL, Point(kbpsLabelWidth + 10, 16));
+	text_abr_bitrate_value->SetOrientation(OR_UPPERRIGHT);
 
 	group_abr_bitrate->Add(text_abr_bitrate);
 	group_abr_bitrate->Add(slider_abr_bitrate);

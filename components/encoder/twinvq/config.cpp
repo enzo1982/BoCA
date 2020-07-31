@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ BoCA::ConfigureTwinVQ::ConfigureTwinVQ()
 	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(233, 39));
 
 	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(9, 13));
-	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(200, 13));
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(200, 13));
 	text_bitrate_kbps->SetOrientation(OR_UPPERRIGHT);
 	text_bitrate_kbps->SetX(text_bitrate_kbps->GetUnscaledTextWidth() + 10);
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -121,14 +121,17 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 
 	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 15));
 
-	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - 91 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 1, 256);
-	slider_bitrate->onValueChange.Connect(&ConfigureCoreAudio::SetBitrate, this);
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(35, 15));
+	text_bitrate_kbps->SetX(text_bitrate_kbps->GetUnscaledTextWidth() + 10);
+	text_bitrate_kbps->SetOrientation(OR_UPPERRIGHT);
 
-	edit_bitrate		= new EditBox(String::FromInt(bitrate), Point(group_bitrate->GetWidth() - 66, 12), Size(25, 0), 3);
+	edit_bitrate		= new EditBox(String::FromInt(bitrate), Point(text_bitrate_kbps->GetX() + 32, 12), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
+	edit_bitrate->SetOrientation(OR_UPPERRIGHT);
 	edit_bitrate->onInput.Connect(&ConfigureCoreAudio::SetBitrateByEditBox, this);
 
-	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(group_bitrate->GetWidth() - 34, 15));
+	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - edit_bitrate->GetX() - 25 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 1, 256);
+	slider_bitrate->onValueChange.Connect(&ConfigureCoreAudio::SetBitrate, this);
 
 	group_bitrate->Add(text_bitrate);
 	group_bitrate->Add(slider_bitrate);

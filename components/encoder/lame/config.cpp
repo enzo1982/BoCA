@@ -51,6 +51,8 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	i18n->SetContext("Encoders::LAME");
 
+	Int	 kbpsLabelWidth = Font().GetUnscaledTextSizeX(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", "256"));
+
 	register_layer_basic		= new Layer(i18n->TranslateString("Basic"));
 	register_layer_misc		= new Layer(i18n->TranslateString("Misc"));
 	register_layer_expert		= new Layer(i18n->TranslateString("Expert"));
@@ -90,7 +92,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	basic_slider_bitrate		= new Slider(Point(18 + basic_option_set_bitrate->GetWidth(), 11), Size(200 - basic_option_set_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 0, 17);
 	basic_slider_bitrate->onValueChange.Connect(&ConfigureLAME::SetBitrate, this);
 
-	basic_text_bitrate		= new Text(NIL, Point(56, 13));
+	basic_text_bitrate		= new Text(NIL, Point(kbpsLabelWidth + 10, 13));
 	basic_text_bitrate->SetOrientation(OR_UPPERRIGHT);
 
 	SetBitrate();
@@ -179,13 +181,14 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	vbr_slider_abrbitrate		= new Slider(Point(10, 11), Size(194, 0), OR_HORZ, &abrbitrate, 8, 320);
 	vbr_slider_abrbitrate->onValueChange.Connect(&ConfigureLAME::SetABRBitrate, this);
 
-	vbr_edit_abrbitrate		= new EditBox(Point(68, 10), Size(25, 0), 3);
+	vbr_text_abrbitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(35, 13));
+	vbr_text_abrbitrate_kbps->SetX(vbr_text_abrbitrate_kbps->GetUnscaledTextWidth() + 10);
+	vbr_text_abrbitrate_kbps->SetOrientation(OR_UPPERRIGHT);
+
+	vbr_edit_abrbitrate		= new EditBox(Point(vbr_text_abrbitrate_kbps->GetX() + 33, 10), Size(25, 0), 3);
 	vbr_edit_abrbitrate->SetFlags(EDB_NUMERIC);
 	vbr_edit_abrbitrate->SetOrientation(OR_UPPERRIGHT);
 	vbr_edit_abrbitrate->onInput.Connect(&ConfigureLAME::SetABRBitrateByEditBox, this);
-
-	vbr_text_abrbitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(35, 13));
-	vbr_text_abrbitrate_kbps->SetOrientation(OR_UPPERRIGHT);
 
 	SetABRBitrate();
 
@@ -248,13 +251,13 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	misc_slider_min_brate		= new Slider(Point(18 + misc_check_set_min_brate->GetWidth(), 11), Size(misc_bitrate->GetWidth() - 83 - misc_check_set_min_brate->GetWidth(), 0), OR_HORZ, &min_vbr_brate, 0, 17);
 	misc_slider_min_brate->onValueChange.Connect(&ConfigureLAME::SetMinVBRBitrate, this);
 
-	misc_text_min_brate_kbps	= new Text(NIL, Point(57, 13));
+	misc_text_min_brate_kbps	= new Text(NIL, Point(kbpsLabelWidth + 10, 13));
 	misc_text_min_brate_kbps->SetOrientation(OR_UPPERRIGHT);
 
 	misc_slider_max_brate		= new Slider(Point(18 + misc_check_set_min_brate->GetWidth(), 36), Size(misc_bitrate->GetWidth() - 83 - misc_check_set_min_brate->GetWidth(), 0), OR_HORZ, &max_vbr_brate, 0, 17);
 	misc_slider_max_brate->onValueChange.Connect(&ConfigureLAME::SetMaxVBRBitrate, this);
 
-	misc_text_max_brate_kbps	= new Text(NIL, Point(57, 38));
+	misc_text_max_brate_kbps	= new Text(NIL, Point(kbpsLabelWidth + 10, 38));
 	misc_text_max_brate_kbps->SetOrientation(OR_UPPERRIGHT);
 
 	SetMinVBRBitrate();

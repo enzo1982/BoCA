@@ -99,27 +99,32 @@ BoCA::ConfigureFAAC::ConfigureFAAC()
 	option_bitrate->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
 	option_bitrate->SetWidth(option_bitrate->GetUnscaledTextWidth() + 19);
 
-	slider_bitrate		= new Slider(Point(option_bitrate->GetWidth() + 19, 13), Size(227 - option_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 8, 256);
-	slider_bitrate->onValueChange.Connect(&ConfigureFAAC::SetBitrate, this);
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(35, 15));
+	text_bitrate_kbps->SetX(text_bitrate_kbps->GetUnscaledTextWidth() + 10);
+	text_bitrate_kbps->SetOrientation(OR_UPPERRIGHT);
 
-	edit_bitrate		= new EditBox(Point(254, 12), Size(25, 0), 3);
+	edit_bitrate		= new EditBox(Point(text_bitrate_kbps->GetX() + 32, 12), Size(25, 0), 3);
 	edit_bitrate->SetFlags(EDB_NUMERIC);
+	edit_bitrate->SetOrientation(OR_UPPERRIGHT);
 	edit_bitrate->onInput.Connect(&ConfigureFAAC::SetBitrateByEditBox, this);
 
-	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(286, 15));
+	slider_bitrate		= new Slider(Point(option_bitrate->GetWidth() + 18, 13), Size(group_bitrate->GetWidth() - edit_bitrate->GetX() - 26 - option_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 8, 256);
+	slider_bitrate->onValueChange.Connect(&ConfigureFAAC::SetBitrate, this);
 
 	option_quality		= new OptionBox(i18n->AddColon(i18n->TranslateString("Set quality")), Point(10, 38), Size(150, 0), &setQuality, 1);
 	option_quality->onAction.Connect(&ConfigureFAAC::ToggleBitrateQuality, this);
-	option_quality->SetWidth(option_bitrate->GetUnscaledTextWidth() + 19);
+	option_quality->SetWidth(option_bitrate->GetWidth());
 
-	slider_quality		= new Slider(Point(option_quality->GetWidth() + 19, 38), Size(227 - option_quality->GetWidth(), 0), OR_HORZ, &aacQuality, 10, 500);
+	slider_quality		= new Slider(Point(option_quality->GetWidth() + 18, 38), Size(slider_bitrate->GetWidth(), 0), OR_HORZ, &aacQuality, 10, 500);
 	slider_quality->onValueChange.Connect(&ConfigureFAAC::SetQuality, this);
 
-	edit_quality		= new EditBox(Point(254, 37), Size(25, 0), 3);
+	edit_quality		= new EditBox(Point(edit_bitrate->GetX(), 37), Size(25, 0), 3);
 	edit_quality->SetFlags(EDB_NUMERIC);
+	edit_quality->SetOrientation(OR_UPPERRIGHT);
 	edit_quality->onInput.Connect(&ConfigureFAAC::SetQualityByEditBox, this);
 
-	text_quality_percent	= new Text(i18n->TranslateString("%1%", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(286, 40));
+	text_quality_percent	= new Text(i18n->TranslateString("%1%", "Technical").Replace("%1", NIL).Trim(), Point(text_bitrate_kbps->GetX(), 40));
+	text_quality_percent->SetOrientation(OR_UPPERRIGHT);
 
 	group_bitrate->Add(option_bitrate);
 	group_bitrate->Add(slider_bitrate);

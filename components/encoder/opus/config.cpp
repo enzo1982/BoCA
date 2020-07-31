@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -95,7 +95,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	edit_bitrate->SetWidth(edit_bitrate->GetUnscaledTextWidth() + 6);
 	edit_bitrate->onInput.Connect(&ConfigureOpus::SetBitrateByEditBox, this);
 
-	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Replace(" ", NIL), Point(310, 13));
+	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(310, 13));
 	text_bitrate_kbps->SetX(335 - text_bitrate_kbps->GetUnscaledTextWidth());
 
 	edit_bitrate->SetX(329 - text_bitrate_kbps->GetUnscaledTextWidth() - edit_bitrate->GetWidth());
