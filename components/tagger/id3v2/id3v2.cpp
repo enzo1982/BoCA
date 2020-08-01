@@ -290,7 +290,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	{
 		ID3_Frame	 frame(ID3FID_COMMENT);
 
-		SetASCIIField(frame, ID3FN_LANGUAGE, "XXX");
+		SetASCIIField(frame, ID3FN_LANGUAGE, "eng"); // iTunes recognizes comments only if language is set to English
 
 		if (info.comment != NIL && !replaceExistingComments) SetStringField(frame, ID3FN_TEXT, info.comment);
 		else						     SetStringField(frame, ID3FN_TEXT, defaultComment);
