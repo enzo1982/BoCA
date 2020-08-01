@@ -345,7 +345,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 				/* Skip chunk.
 				 */
-				in.RelSeek(cSize + cSize % 2);
+				if (!in.RelSeek(cSize + cSize % 2)) break;
 			}
 		}
 
