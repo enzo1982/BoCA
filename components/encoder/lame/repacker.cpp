@@ -620,9 +620,11 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 
 		/* Write modified frame.
 		 */
+		Int	 frameRes = Math::Min(frameb - info - (reservoir - pre), prevRes);
+
 		driver->WriteData(frame + info, reservoir - pre);
 		driver->WriteData(frame, info);
-		driver->WriteData(frame + info + reservoir - pre, frameb - info - (reservoir - pre) - prevRes);
+		driver->WriteData(frame + info + reservoir - pre, frameb - info - (reservoir - pre) - frameRes);
 
 		reservoir += prevRes - pre + nframeb - frameb;
 
@@ -630,7 +632,7 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 		 */
 		FillReservoir(maxR);
 
-		driver->WriteData(frame + frameb - prevRes, prevRes);
+		driver->WriteData(frame + frameb - frameRes, frameRes);
 
 		return result;
 	}
