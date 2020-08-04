@@ -348,7 +348,7 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 
 	if (check_additional->IsChecked()) arguments.Append(" ").Append(edit_additional->GetText());
 
-	return arguments;
+	return arguments.Trim();
 }
 
 Void BoCA::AS::ConfigLayerExternal::OnSelectParameter()
