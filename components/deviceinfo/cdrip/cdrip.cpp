@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -71,6 +71,23 @@ Void smooth::DetachDLL()
 	FreeCDRipDLL();
 }
 
+namespace BoCA
+{
+	static Bool OpenDriveTray(Int n)
+	{
+		Int	 nDrives = ex_CR_GetNumCDROM();
+
+		if (n >= nDrives) return False;
+
+		CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
+
+		ex_CR_EjectCD(cd, True);
+		ex_CR_CloseCDROM(cd);
+
+		return True;
+	}
+};
+
 BoCA::DeviceInfoCDRip::DeviceInfoCDRip()
 {
 	CollectDriveInfo();
@@ -101,10 +118,7 @@ Bool BoCA::DeviceInfoCDRip::OpenNthDeviceTray(Int n)
 
 	if (n >= nDrives) return False;
 
-	CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
-
-	ex_CR_EjectCD(cd, True);
-	ex_CR_CloseCDROM(cd);
+	NonBlocking1<Int>(&OpenDriveTray).Call(n);
 
 	return True;
 }

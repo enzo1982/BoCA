@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -114,6 +114,33 @@ Void smooth::DetachDLL()
 {
 }
 
+namespace BoCA
+{
+	static Bool OpenDriveTray(Int n)
+	{
+		const Array<String>	&driveNames = DeviceInfoCDParanoia::FindDrives();
+		cdrom_drive		*cd	    = cdda_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
+
+		if (cd == NIL) return False;
+
+		cdda_open(cd);
+
+		/* Unlock tray, then eject.
+		 */
+#if defined __linux__
+		ioctl(cd->ioctl_fd, CDROM_LOCKDOOR, 0);
+		ioctl(cd->ioctl_fd, CDROMEJECT);
+#else
+		ioctl(cd->ioctl_fd, CDIOCALLOW);
+		ioctl(cd->ioctl_fd, CDIOCEJECT);
+#endif
+
+		cdda_close(cd);
+
+		return True;
+	}
+};
+
 BoCA::DeviceInfoCDParanoia::DeviceInfoCDParanoia()
 {
 	CollectDriveInfo();
@@ -147,24 +174,11 @@ Bool BoCA::DeviceInfoCDParanoia::IsNthDeviceTrayOpen(Int n)
 
 Bool BoCA::DeviceInfoCDParanoia::OpenNthDeviceTray(Int n)
 {
-	const Array<String>	&driveNames = FindDrives();
-	cdrom_drive		*cd	    = cdda_identify(driveNames.GetNth(n), CDDA_MESSAGE_FORGETIT, NIL);
+	Int	 nDrives = GetNumberOfDevices();
 
-	if (cd == NIL) return False;
+	if (n >= nDrives) return False;
 
-	cdda_open(cd);
-
-	/* Unlock tray, then eject.
-	 */
-#if defined __linux__
-	ioctl(cd->ioctl_fd, CDROM_LOCKDOOR, 0);
-	ioctl(cd->ioctl_fd, CDROMEJECT);
-#else
-	ioctl(cd->ioctl_fd, CDIOCALLOW);
-	ioctl(cd->ioctl_fd, CDIOCEJECT);
-#endif
-
-	cdda_close(cd);
+	NonBlocking1<Int>(&OpenDriveTray).Call(n);
 
 	return True;
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -160,6 +160,19 @@ Void smooth::DetachDLL()
 {
 }
 
+namespace BoCA
+{
+	static Bool OpenDriveTray(Int n)
+	{
+		const Array<String>	&driveNames = DeviceInfoCDIO::FindDrives();
+
+		/* Eject.
+		 */
+		if (cdio_eject_media_drive(driveNames.GetNth(n)) == DRIVER_OP_SUCCESS) return True;
+		else								       return False;
+	}
+};
+
 BoCA::DeviceInfoCDIO::DeviceInfoCDIO()
 {
 	CollectDriveInfo();
@@ -187,12 +200,13 @@ Bool BoCA::DeviceInfoCDIO::IsNthDeviceTrayOpen(Int n)
 
 Bool BoCA::DeviceInfoCDIO::OpenNthDeviceTray(Int n)
 {
-	const Array<String>	&driveNames = FindDrives();
+	Int	 nDrives = GetNumberOfDevices();
 
-	/* Eject.
-	 */
-	if (cdio_eject_media_drive(driveNames.GetNth(n)) == DRIVER_OP_SUCCESS) return True;
-	else								       return False;
+	if (n >= nDrives) return False;
+
+	NonBlocking1<Int>(&OpenDriveTray).Call(n);
+
+	return True;
 }
 
 Bool BoCA::DeviceInfoCDIO::CloseNthDeviceTray(Int n)
