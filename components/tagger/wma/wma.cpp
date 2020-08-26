@@ -306,7 +306,12 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 Error BoCA::TaggerWMA::RenderWMAStringItem(const String &id, const String &value, Void *headerInfo)
 {
-	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) value.Trim(), wcslen(value.Trim()) * 2 + 2);
+	String	 data	  = value.Trim();
+	Int	 dataSize = data != NIL ? wcslen(data) + 1 : 0;
+
+	if (data == NIL) return Success();
+
+	HRESULT	 hr = ((IWMHeaderInfo3 *) headerInfo)->AddAttribute(0, id, NIL, WMT_TYPE_STRING, 0, (BYTE *) (wchar_t *) data, dataSize * 2);
 
 	if (FAILED(hr)) return Error();
 	else		return Success();

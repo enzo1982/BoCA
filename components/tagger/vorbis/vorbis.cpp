@@ -79,7 +79,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	 */
 	const Info	&info = track.GetInfo();
 
-	buffer.Resize(4 + strlen(vendorString) + 4);
+	buffer.Resize(4 + (vendorString != NIL ? strlen(vendorString) : 0) + 4);
 
 	Int	 numItems = 0;
 
@@ -243,9 +243,10 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 Int BoCA::TaggerVorbis::RenderTagHeader(const String &vendorString, Int numItems, Buffer<UnsignedByte> &buffer)
 {
-	OutStream	 out(STREAM_BUFFER, buffer, 4 + strlen(vendorString) + 4);
+	Int		 vendorStringSize = vendorString != NIL ? strlen(vendorString) : 0;
+	OutStream	 out(STREAM_BUFFER, buffer, 4 + vendorStringSize + 4);
 
-	out.OutputNumber(strlen(vendorString), 4);
+	out.OutputNumber(vendorStringSize, 4);
 	out.OutputString(vendorString);
 	out.OutputNumber(numItems, 4);
 
@@ -254,7 +255,9 @@ Int BoCA::TaggerVorbis::RenderTagHeader(const String &vendorString, Int numItems
 
 Int BoCA::TaggerVorbis::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
 {
-	Int		 size = id.Length() + strlen(value.Trim()) + 5;
+	String		 data     = value.Trim();
+	Int		 dataSize = data != NIL ? strlen(data) : 0;
+	Int		 size	  = id.Length() + dataSize + 5;
 
 	buffer.Resize(buffer.Size() + size);
 
@@ -263,7 +266,7 @@ Int BoCA::TaggerVorbis::RenderTagItem(const String &id, const String &value, Buf
 	out.OutputNumber(size - 4, 4);
 	out.OutputString(id);
 	out.OutputNumber('=', 1);
-	out.OutputString(value.Trim());
+	out.OutputString(data);
 
 	return Success();
 }

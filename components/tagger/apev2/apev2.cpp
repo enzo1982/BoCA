@@ -327,14 +327,15 @@ Int BoCA::TaggerAPEv2::RenderAPEFooter(Int tagSize, Int numItems, Buffer<Unsigne
 
 Int BoCA::TaggerAPEv2::RenderAPEItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer, Bool trim)
 {
-	String		 data = trim ? value.Trim() : value;
-	Int		 size = id.Length() + strlen(data) + 9;
+	String		 data	  = trim ? value.Trim() : value;
+	Int		 dataSize = data != NIL ? strlen(data) : 0;
+	Int		 size	  = id.Length() + dataSize + 9;
 
 	buffer.Resize(buffer.Size() + size);
 
 	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - size, size);
 
-	out.OutputNumber(strlen(data), 4);
+	out.OutputNumber(dataSize, 4);
 	out.OutputNumber(0, 4);
 	out.OutputString(id);
 	out.OutputNumber(0, 1);

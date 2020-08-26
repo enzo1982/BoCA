@@ -156,17 +156,18 @@ Int BoCA::TaggerRIFF::RenderTagHeader(Buffer<UnsignedByte> &buffer)
 
 Int BoCA::TaggerRIFF::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
 {
-	Int		 stringSize = strlen(value.Trim()) + 1;
-	Int		 bufferSize = stringSize + (stringSize & 1) + 8;
+	String		 data     = value.Trim();
+	Int		 dataSize = data != NIL ? strlen(data) + 1 : 1;
+	Int		 size	  = dataSize + (dataSize & 1) + 8;
 
-	buffer.Resize(buffer.Size() + bufferSize);
+	buffer.Resize(buffer.Size() + size);
 
-	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - bufferSize, bufferSize);
+	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - size, size);
 
 	out.OutputString(id);
-	out.OutputNumber(stringSize, 4);
-	out.OutputString(value.Trim());
-	out.OutputNumber(0, 1 + (stringSize & 1));
+	out.OutputNumber(dataSize, 4);
+	out.OutputString(data);
+	out.OutputNumber(0, 1 + (dataSize & 1));
 
 	return Success();
 }
