@@ -39,9 +39,13 @@ Global includes
     #include <tchar.h>
     #include <assert.h>
 #else
-    #include <unistd.h>
+    #ifndef _MSC_VER
+        #include <unistd.h>
+    #endif
     #include <time.h>
-    #include <sys/time.h>
+    #ifndef _MSC_VER
+        #include <sys/time.h>
+    #endif
     #include <sys/types.h>
     #include <sys/stat.h>
     #include <wchar.h>
@@ -70,7 +74,7 @@ Version
 
 #define MAC_FILE_VERSION_NUMBER                         3990
 #define MAC_VERSION_STRING                              MAC_VER_FILE_VERSION_STR
-#define MAC_VERSION_NUMBER								MAC_VERSION_MAJOR MAC_VERSION_REVISION
+#define MAC_VERSION_NUMBER                              MAC_VERSION_MAJOR MAC_VERSION_REVISION
 #define MAC_NAME                                        _T("Monkey's Audio ") MAC_VER_FILE_VERSION_STR
 #define PLUGIN_NAME                                     "Monkey's Audio Player " MAC_VER_FILE_VERSION_STR_NARROW
 #define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") MAC_VER_FILE_VERSION_STR _T(")")
@@ -176,8 +180,13 @@ Global macros
     #define PUMP_MESSAGE_LOOP
     #undef    ODS
     #define ODS                                         printf
-    #define TICK_COUNT_TYPE                             unsigned long long
-    #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
+    #ifndef _MSC_VER
+        #define TICK_COUNT_TYPE                             unsigned long long
+        #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
+    #else
+        #define TICK_COUNT_TYPE                             unsigned long
+        #define TICK_COUNT_READ(VARIABLE)                   VARIABLE = GetTickCount()
+    #endif
     #define TICK_COUNT_FREQ                             1000000
     #undef    ASSERT
     #define ASSERT(e)
@@ -190,7 +199,12 @@ Global macros
     #define sprintf_s(A, B, C, ...) sprintf(A, C, __VA_ARGS__)
     #define _stprintf_s(A, B, C, ...) _stprintf(A, C, __VA_ARGS__)
     #define strcpy_s(A, B, C) strcpy(A, C)
-    #define _tcscat_s(A, B, C) _tcscat(A, C)
+
+    #if defined(PLATFORM_WINDOWS)
+        #define _tcsncpy_s(A, B, C, COUNT) _tcsncpy(A, C, COUNT)
+        #define _tcscpy_s(A, B, C) _tcscpy(A, C)
+        #define _tcscat_s(A, B, C) _tcscat(A, C)
+    #endif
 #endif
 
 /*****************************************************************************************

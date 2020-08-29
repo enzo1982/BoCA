@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -43,8 +43,8 @@ const String &BoCA::EncoderMAC::GetComponentSpecs()
 		      <extension>mac</extension>							\
 		      <tag id=\"apev2-tag\" mode=\"append\">APEv2</tag>					\
 		    </format>										\
-		    <input bits=\"8\" signed=\"false\" channels=\"1-8\"/>				\
-		    <input bits=\"16-32\" channels=\"1-8\"/>						\
+		    <input bits=\"8\" signed=\"false\" channels=\"1-32\"/>				\
+		    <input bits=\"16-32\" channels=\"1-32\"/>						\
 		    <parameters>									\
 		      <selection name=\"Compression mode\" argument=\"-m %VALUE\" default=\"high\">	\
 			<option alias=\"Fast\">fast</option>						\

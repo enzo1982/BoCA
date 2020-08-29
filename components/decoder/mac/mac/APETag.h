@@ -68,6 +68,7 @@ The version of the APE tag
 #define APE_TAG_FIELD_REPLAY_GAIN_ALBUM         L"Replay Gain (album)"
 #define APE_TAG_FIELD_COMPOSER                  L"Composer"
 #define APE_TAG_FIELD_KEYWORDS                  L"Keywords"
+#define APE_TAG_FIELD_RATING                    L"Rating"
 
 /*****************************************************************************************
 Standard APE tag field values
@@ -289,8 +290,8 @@ private:
     int m_nTagBytes;
     int m_nFields;
     int m_nAllocatedFields;
-	CAPETagField ** m_aryFields;
-	bool m_bHasAPETag;
+    CAPETagField ** m_aryFields;
+    bool m_bHasAPETag;
     int m_nAPETagVersion;
     bool m_bHasID3Tag;
     bool m_bIgnoreReadOnly;
