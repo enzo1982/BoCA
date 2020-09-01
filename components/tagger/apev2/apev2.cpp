@@ -448,7 +448,19 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		}
 		else if (id == "MCDI")
 		{
-			info.mcdi.SetData(item);
+			/* Check validity of MCDI data.
+			 */
+			MCDI	 mcdi(item);
+			Bool	 valid = True;
+
+			for (Int i = 1; i < mcdi.GetNumberOfEntries(); i++)
+			{
+				if (mcdi.GetNthEntryOffset(i - 1) >= mcdi.GetNthEntryOffset(i)) valid = False;
+			}
+
+			/* Found a binary MCDI field.
+			 */
+			if (valid) info.mcdi.SetData(item);
 		}
 		else if (id.StartsWith("COVER ART"))
 		{

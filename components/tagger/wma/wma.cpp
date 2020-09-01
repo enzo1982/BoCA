@@ -491,13 +491,23 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 				if (binary)
 				{
+					Buffer<UnsignedByte>	 data(cbLength);
+
+					memcpy(data, pbValue, cbLength);
+
+					/* Check validity of MCDI data.
+					 */
+					MCDI	 mcdi(data);
+					Bool	 valid = True;
+
+					for (Int i = 1; i < mcdi.GetNumberOfEntries(); i++)
+					{
+						if (mcdi.GetNthEntryOffset(i - 1) >= mcdi.GetNthEntryOffset(i)) valid = False;
+					}
+
 					/* Found a binary MCDI field.
 					 */
-					Buffer<UnsignedByte>	 mcdi(cbLength);
-
-					memcpy(mcdi, pbValue, cbLength);
-
-					info.mcdi.SetData(mcdi);
+					if (valid) info.mcdi.SetData(data);
 				}
 				else
 				{

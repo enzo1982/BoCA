@@ -677,33 +677,43 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		}
 		else if (frame.GetID() == ID3FID_CDID)
 		{
-			Buffer<UnsignedByte>	 mcdi;
+			Buffer<UnsignedByte>	 data;
 
-			GetBinaryField(frame, ID3FN_DATA, mcdi);
+			GetBinaryField(frame, ID3FN_DATA, data);
 
 			/* Use a heuristic to detect if this is a valid binary MCDI
 			 * field or the commonly used track offset string.
 			 */
 			Bool	 binary = False;
 
-			for (Int i = 0; i < mcdi.Size(); i++)
+			for (Int i = 0; i < data.Size(); i++)
 			{
-				if (mcdi[i] > 0 && mcdi[i] < 0x20) { binary = True; break; }
+				if (data[i] > 0 && data[i] < 0x20) { binary = True; break; }
 			}
 
 			if (binary)
 			{
+				/* Check validity of MCDI data.
+				 */
+				MCDI	 mcdi(data);
+				Bool	 valid = True;
+
+				for (Int i = 1; i < mcdi.GetNumberOfEntries(); i++)
+				{
+					if (mcdi.GetNthEntryOffset(i - 1) >= mcdi.GetNthEntryOffset(i)) valid = False;
+				}
+
 				/* Found a binary MCDI field.
 				 */
-				info.mcdi.SetData(mcdi);
+				if (valid) info.mcdi.SetData(data);
 			}
 			else
 			{
 				/* Found offset string.
 				 */
-				for (Int i = 0; i < mcdi.Size() / 2; i++)
+				for (Int i = 0; i < data.Size() / 2; i++)
 				{
-					info.offsets[i] = ((short *) (UnsignedByte *) mcdi)[i];
+					info.offsets[i] = ((short *) (UnsignedByte *) data)[i];
 
 					if (info.offsets[i] == 0) break;
 				}
