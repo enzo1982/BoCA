@@ -110,6 +110,18 @@ namespace BoCA
 			String		 GetLengthString() const;
 			String		 GetFileSizeString() const;
 	};
+
+	inline Void AdjustTrackSampleCounts(Track &track, const Format &newFormat)
+	{
+		const Format	&oldFormat = track.GetFormat();
+
+		if (track.sampleOffset > 0) track.sampleOffset = track.sampleOffset * newFormat.rate / oldFormat.rate;
+
+		if (track.length       > 0) track.length       = track.length	    * newFormat.rate / oldFormat.rate;
+		if (track.approxLength > 0) track.approxLength = track.approxLength * newFormat.rate / oldFormat.rate;
+
+		foreach (Track &subTrack, track.tracks) AdjustTrackSampleCounts(subTrack, newFormat);
+	}
 };
 
 #endif
