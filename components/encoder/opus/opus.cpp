@@ -114,7 +114,6 @@ BoCA::EncoderOpus::EncoderOpus()
 	blockSize	= 256;
 	overlap		= 24;
 
-	sampleRate	= 48000;
 	totalSamples	= 0;
 
 	nextWorker	= 0;
@@ -144,14 +143,6 @@ Bool BoCA::EncoderOpus::Activate()
 
 	ConvertArguments(config);
 
-	/* Get best sample rate.
-	 */
-	if	(format.rate <=  8000) sampleRate =  8000;
-	else if (format.rate <= 12000) sampleRate = 12000;
-	else if (format.rate <= 16000) sampleRate = 16000;
-	else if (format.rate <= 24000) sampleRate = 24000;
-	else			       sampleRate = 48000;
-
 	/* Init Ogg stream.
 	 */
 	Math::RandomSeed();
@@ -178,7 +169,7 @@ Bool BoCA::EncoderOpus::Activate()
 	int	 streams = 0;
 	int	 coupled = 0;
 
-	OpusMSEncoder	*encoder = ex_opus_multistream_surround_encoder_create(sampleRate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
+	OpusMSEncoder	*encoder = ex_opus_multistream_surround_encoder_create(format.rate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
 
 	setup.nb_streams = streams;
 	setup.nb_coupled = coupled;
@@ -187,9 +178,9 @@ Bool BoCA::EncoderOpus::Activate()
 	 */
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_GET_LOOKAHEAD(&preSkip));
 
-	setup.preskip = preSkip * (48000 / sampleRate);
+	setup.preskip = preSkip * (48000 / format.rate);
 
-	frameSize     = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
+	frameSize     = Math::Round(Float(format.rate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
 	totalSamples  = 0;
 
 	ex_opus_multistream_encoder_destroy(encoder);
@@ -411,7 +402,8 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 
 Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, const Array<Int> &packetSizes, Bool first, Bool flush, Int nullSamples)
 {
-	Int	 offset = 0;
+	const Format	&format = track.GetFormat();
+	Int		 offset = 0;
 
 	if (!first) for (Int i = 0; i < overlap; i++) offset += packetSizes.GetNth(i);
 
@@ -426,7 +418,7 @@ Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, cons
 		op.bytes      = packetSizes.GetNth(i);
 		op.b_o_s      = first && i == 0;
 		op.e_o_s      = flush && i == packetSizes.Length() - 1;
-		op.granulepos = (op.e_o_s ? totalSamples + preSkip - nullSamples : totalSamples) * (48000 / sampleRate);
+		op.granulepos = (op.e_o_s ? totalSamples + preSkip - nullSamples : totalSamples) * (48000 / format.rate);
 		op.packetno   = 0;
 
 		ex_ogg_stream_packetin(&os, &op);	
