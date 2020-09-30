@@ -53,14 +53,14 @@ DynamicLoader *mp4v2dll		= NIL;
 #ifdef __WIN32__
 static const String	 coreAudioToolbox = "CoreAudioToolbox.dll";
 
-static String GetCommonFilesDirectory()
+static String GetSystemDirectory(int id)
 {
 	String	 commonFilesDir;
 
 	ITEMIDLIST	*idlist;
 	Buffer<wchar_t>	 buffer(32768 + 1);
 
-	SHGetSpecialFolderLocation(NIL, CSIDL_PROGRAM_FILES_COMMON, &idlist);
+	SHGetSpecialFolderLocation(NIL, id, &idlist);
 	SHGetPathFromIDList(idlist, buffer);
 
 	commonFilesDir = buffer;
@@ -270,7 +270,12 @@ Bool LoadCoreAudioDLL()
 {
 #ifndef __APPLE__
 #	ifdef __WIN32__
-	String	 coreAudioDir = GetCommonFilesDirectory().Append("Apple\\Apple Application Support\\");
+	String	 coreAudioDir = GetSystemDirectory(CSIDL_PROGRAM_FILES_COMMON).Append("Apple\\Apple Application Support\\");
+
+	if (!File(String(coreAudioDir).Append(coreAudioToolbox)).Exists())
+	{
+		coreAudioDir = GetSystemDirectory(CSIDL_PROGRAM_FILES).Append("iTunes\\");
+	}
 
 	if (!File(String(coreAudioDir).Append(coreAudioToolbox)).Exists())
 	{

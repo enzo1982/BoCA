@@ -30,6 +30,10 @@
 
 #	define SetDllDirectoryW SetDllDirectoryA
 #	define LoadLibraryW LoadLibraryA
+
+#	define FindFirstFileW FindFirstFileA
+
+#	define WIN32_FIND_DATAW WIN32_FIND_DATAA
 #else
 #	define wstring(s) L##s
 #endif
@@ -56,15 +60,13 @@ using namespace CA;
 
 HINSTANCE  coreaudiodll	= NULL;
 
-static const wchar_t *GetCommonFilesDirectory()
+static const wchar_t *GetSystemDirectory(int id)
 {
 	static wchar_t	 commonFilesDir[32768] = { 0 };
 
-	if (commonFilesDir[0] != 0) return commonFilesDir;
-
 	ITEMIDLIST	*idlist;
 
-	SHGetSpecialFolderLocation(NULL, CSIDL_PROGRAM_FILES_COMMON, &idlist);
+	SHGetSpecialFolderLocation(NULL, id, &idlist);
 	SHGetPathFromIDListW(idlist, commonFilesDir);
 
 	CoTaskMemFree(idlist);
@@ -78,8 +80,19 @@ bool LoadCoreAudioDLL()
 {
 	wchar_t	 aasDir[32768];
 
-	wcscpy(aasDir, GetCommonFilesDirectory());
+	wcscpy(aasDir, GetSystemDirectory(CSIDL_PROGRAM_FILES_COMMON));
 	wcscat(aasDir, wstring("Apple\\Apple Application Support\\"));
+
+	WIN32_FIND_DATAW	 findData;
+	HANDLE			 handle = FindFirstFileW(aasDir, &findData);
+
+	if (handle == INVALID_HANDLE_VALUE)
+	{
+		wcscpy(aasDir, GetSystemDirectory(CSIDL_PROGRAM_FILES));
+		wcscat(aasDir, wstring("iTunes\\"));
+	}
+
+	FindClose(handle);
 
 	/* Add Apple Application Services directory to DLL search path.
 	 */
