@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>exhale xHE-AAC Encoder</name>
+  <version>1.0</version>
+  <id>exhale-enc</id>
+  <type>encoder</type>
+  <format>
+    <name>MPEG-4 AAC Files</name>
+    <extension>m4a</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+  </format>
+  <input channels="1-4,6"/>
+  <external>
+    <command>exhale</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <selection name="Bitrate per channel" argument="%VALUE" default="5" enabled="true">
+	<option alias="24 kbps (Preset %1)">0</option>
+	<option alias="32 kbps (Preset %1)">1</option>
+	<option alias="40 kbps (Preset %1)">2</option>
+	<option alias="48 kbps (Preset %1)">3</option>
+	<option alias="56 kbps (Preset %1)">4</option>
+	<option alias="64 kbps (Preset %1)">5</option>
+	<option alias="72 kbps (Preset %1)">6</option>
+	<option alias="80 kbps (Preset %1)">7</option>
+	<option alias="88 kbps (Preset %1)">8</option>
+	<option alias="96 kbps (Preset %1)">9</option>
+      </selection>
+    </parameters>
+  </external>
+</component>
+
+
