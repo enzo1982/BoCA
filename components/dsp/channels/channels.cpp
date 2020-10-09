@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -65,10 +65,9 @@ Bool BoCA::DSPChannels::Activate()
 	 *		7.1 => 5.1 => 4.0 => Stereo => Mono
 	 *		Mono => Stereo
 	 */
-	if (!(format.channels == 8 && (channels == 6 || channels <= 3)) &&
-	    !(format.channels == 6 &&			channels <= 3 ) &&
-	    !(format.channels == 3 &&			channels <= 2 ) &&
-	    !(format.channels <= 2 &&			channels <= 2 ))
+	if (!(format.channels == 8 && (channels == 6 || channels <= 4)) &&
+	    !(format.channels == 6 &&			channels <= 4 ) &&
+	    !(format.channels <= 4 &&			channels <= 2 ))
 	{
 		errorState  = True;
 		errorString = String("Requested conversion from ").Append(String::FromInt(format.channels)).Append(" to ").Append(String::FromInt(channels)).Append(" channels is not supported.");
