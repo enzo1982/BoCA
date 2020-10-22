@@ -15,6 +15,10 @@
 
 #include "faad2.h"
 
+#ifndef PS
+#	define PS 29
+#endif
+
 using namespace smooth::IO;
 
 const String &BoCA::DecoderFAAD2::GetComponentSpecs()
@@ -100,10 +104,10 @@ Bool BoCA::DecoderFAAD2::CanOpenStream(const String &streamURI)
 
 			if (type == MAIN   ||
 			    type == LC	   ||
-			    type == SSR	   ||
 			    type == LTP	   ||
 			    type == HE_AAC ||
 			    type == LD	   ||
+			    type == PS	   ||
 
 			    type == ER_LC  ||
 			    type == ER_LTP) isValidFile = True;
