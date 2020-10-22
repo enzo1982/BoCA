@@ -38,7 +38,7 @@ namespace BoCA
 			Int			 blockSize;
 			Int			 overlap;
 
-			Int			 totalSamples;
+			Int64			 totalSamples;
 
 			Buffer<signed short>	 samplesBuffer;
 
