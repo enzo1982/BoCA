@@ -68,15 +68,13 @@ Int BoCA::CDText::ReadCDText(const String &path)
 	{
 		cdInfo.SetArtist(cdtext_get_const(CDTEXT_PERFORMER, cdtext));
 		cdInfo.SetTitle(cdtext_get_const(CDTEXT_TITLE, cdtext));
-		cdInfo.SetSongwriter(cdtext_get_const(CDTEXT_FIELD_SONGWRITER, cdtext));
-		cdInfo.SetComposer(cdtext_get_const(CDTEXT_FIELD_COMPOSER, cdtext));
-		cdInfo.SetArranger(cdtext_get_const(CDTEXT_FIELD_ARRANGER, cdtext));
-		cdInfo.SetComment(cdtext_get_const(CDTEXT_FIELD_MESSAGE, cdtext));
-		cdInfo.SetGenre(cdtext_get_const(CDTEXT_FIELD_GENRE, cdtext));
-		cdInfo.SetCatalog(cdtext_get_const(CDTEXT_FIELD_DISCID, cdtext));
-		cdInfo.SetBarcode(cdtext_get_const(CDTEXT_FIELD_UPC_EAN, cdtext));
-
-		if (cdInfo.GetGenre() == NIL) cdInfo.SetGenre(cdtext_genre2str(cdtext_get_genre(cdtext)));
+		cdInfo.SetSongwriter(cdtext_get_const(CDTEXT_SONGWRITER, cdtext));
+		cdInfo.SetComposer(cdtext_get_const(CDTEXT_COMPOSER, cdtext));
+		cdInfo.SetArranger(cdtext_get_const(CDTEXT_ARRANGER, cdtext));
+		cdInfo.SetComment(cdtext_get_const(CDTEXT_MESSAGE, cdtext));
+		cdInfo.SetGenre(cdtext_get_const(CDTEXT_GENRE, cdtext));
+		cdInfo.SetCatalog(cdtext_get_const(CDTEXT_DISCID, cdtext));
+		cdInfo.SetBarcode(cdtext_get_const(CDTEXT_UPC_EAN, cdtext));
 
 		for (Int i = firstTrack; i <= lastTrack; i++)
 		{
@@ -84,11 +82,11 @@ Int BoCA::CDText::ReadCDText(const String &path)
 
 			cdInfo.SetTrackArtist(i, cdtext_get_const(CDTEXT_PERFORMER, cdtext));
 			cdInfo.SetTrackTitle(i, cdtext_get_const(CDTEXT_TITLE, cdtext));
-			cdInfo.SetTrackSongwriter(i, cdtext_get_const(CDTEXT_FIELD_SONGWRITER, cdtext));
-			cdInfo.SetTrackComposer(i, cdtext_get_const(CDTEXT_FIELD_COMPOSER, cdtext));
-			cdInfo.SetTrackArranger(i, cdtext_get_const(CDTEXT_FIELD_ARRANGER, cdtext));
-			cdInfo.SetTrackComment(i, cdtext_get_const(CDTEXT_FIELD_MESSAGE, cdtext));
-			cdInfo.SetTrackISRC(i, cdtext_get_const(CDTEXT_FIELD_ISRC, cdtext));
+			cdInfo.SetTrackSongwriter(i, cdtext_get_const(CDTEXT_SONGWRITER, cdtext));
+			cdInfo.SetTrackComposer(i, cdtext_get_const(CDTEXT_COMPOSER, cdtext));
+			cdInfo.SetTrackArranger(i, cdtext_get_const(CDTEXT_ARRANGER, cdtext));
+			cdInfo.SetTrackComment(i, cdtext_get_const(CDTEXT_MESSAGE, cdtext));
+			cdInfo.SetTrackISRC(i, cdtext_get_const(CDTEXT_ISRC, cdtext));
 		}
 	}
 #endif
