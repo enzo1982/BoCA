@@ -145,7 +145,9 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		else if	(key == INFO_INITIALKEY)     { RenderAPEItem("InitialKey",     value, buffer); numItems++; }
 
 		else if	(key == INFO_COPYRIGHT)	     { RenderAPEItem("Copyright",      value, buffer); numItems++; }
+
 		else if	(key == INFO_CATALOGNUMBER)  { RenderAPEItem("CatalogNumber",  value, buffer); numItems++; }
+		else if	(key == INFO_BARCODE)	     { RenderAPEItem("Barcode",	       value, buffer); numItems++; }
 
 		else if	(key == INFO_RELEASECOUNTRY) { RenderAPEItem("ReleaseCountry", value, buffer); numItems++; }
 
@@ -419,7 +421,9 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		else if (id == "INITIALKEY")	 info.SetOtherInfo(INFO_INITIALKEY,	value);
 
 		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);
+
 		else if (id == "CATALOGNUMBER")  info.SetOtherInfo(INFO_CATALOGNUMBER,	value);
+		else if (id == "BARCODE")	 info.SetOtherInfo(INFO_BARCODE,	value);
 
 		else if (id == "RELEASECOUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,	value);
 

@@ -127,7 +127,9 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		else if	(key == INFO_INITIALKEY)     { RenderTagItem("INITIALKEY",     value, buffer); numItems++; }
 
 		else if	(key == INFO_COPYRIGHT)	     { RenderTagItem("COPYRIGHT",      value, buffer); numItems++; }
+
 		else if	(key == INFO_CATALOGNUMBER)  { RenderTagItem("CATALOGNUMBER",  value, buffer); numItems++; }
+		else if	(key == INFO_BARCODE)	     { RenderTagItem("BARCODE",	       value, buffer); numItems++; }
 
 		else if	(key == INFO_RELEASECOUNTRY) { RenderTagItem("RELEASECOUNTRY", value, buffer); numItems++; }
 
@@ -356,6 +358,14 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 			 id == "CATALOGID" ||
 			 id == "CATALOGUE" ||
 			 id == "CATALOGNUMBER")	 info.SetOtherInfo(INFO_CATALOGNUMBER,	value);
+
+		else if (id == "BARCODE"       ||
+			 id == "EAN"	       ||
+			 id == "EAN/UPC"       ||
+			 id == "EAN/UPN"       ||
+			 id == "UPC"	       ||
+			 id == "UPN"	       ||
+			 id == "PRODUCTNUMBER")	 info.SetOtherInfo(INFO_BARCODE,	value);
 
 		else if (id == "RELEASECOUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,	value);
 
