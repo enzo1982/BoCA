@@ -33,7 +33,6 @@ namespace BoCA
 
 			Int		 ReadCDInfo(Int);
 
-			Int		 ClearCDInfo();
 			const CDInfo	&GetCDInfo() const;
 	};
 };

@@ -113,13 +113,6 @@ Int BoCA::CDPlayerIni::ReadCDInfo(Int drive)
 	return Success();
 }
 
-Int BoCA::CDPlayerIni::ClearCDInfo()
-{
-	cdInfo.Clear();
-
-	return Success();
-}
-
 const BoCA::CDInfo &BoCA::CDPlayerIni::GetCDInfo() const
 {
 	return cdInfo;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -40,11 +40,25 @@ Int BoCA::CDText::ReadCDText(const String &path)
 	{
 		cdInfo.SetArtist(cdtext_get_const(cdtext, CDTEXT_FIELD_PERFORMER, 0));
 		cdInfo.SetTitle(cdtext_get_const(cdtext, CDTEXT_FIELD_TITLE, 0));
+		cdInfo.SetSongwriter(cdtext_get_const(cdtext, CDTEXT_FIELD_SONGWRITER, 0));
+		cdInfo.SetComposer(cdtext_get_const(cdtext, CDTEXT_FIELD_COMPOSER, 0));
+		cdInfo.SetArranger(cdtext_get_const(cdtext, CDTEXT_FIELD_ARRANGER, 0));
+		cdInfo.SetComment(cdtext_get_const(cdtext, CDTEXT_FIELD_MESSAGE, 0));
+		cdInfo.SetGenre(cdtext_get_const(cdtext, CDTEXT_FIELD_GENRE, 0));
+		cdInfo.SetCatalog(cdtext_get_const(cdtext, CDTEXT_FIELD_DISCID, 0));
+		cdInfo.SetBarcode(cdtext_get_const(cdtext, CDTEXT_FIELD_UPC_EAN, 0));
+
+		if (cdInfo.GetGenre() == NIL) cdInfo.SetGenre(cdtext_genre2str(cdtext_get_genre(cdtext)));
 
 		for (Int i = firstTrack; i <= lastTrack; i++)
 		{
 			cdInfo.SetTrackArtist(i, cdtext_get_const(cdtext, CDTEXT_FIELD_PERFORMER, i));
 			cdInfo.SetTrackTitle(i, cdtext_get_const(cdtext, CDTEXT_FIELD_TITLE, i));
+			cdInfo.SetTrackSongwriter(i, cdtext_get_const(cdtext, CDTEXT_FIELD_SONGWRITER, i));
+			cdInfo.SetTrackComposer(i, cdtext_get_const(cdtext, CDTEXT_FIELD_COMPOSER, i));
+			cdInfo.SetTrackArranger(i, cdtext_get_const(cdtext, CDTEXT_FIELD_ARRANGER, i));
+			cdInfo.SetTrackComment(i, cdtext_get_const(cdtext, CDTEXT_FIELD_MESSAGE, i));
+			cdInfo.SetTrackISRC(i, cdtext_get_const(cdtext, CDTEXT_FIELD_ISRC, i));
 		}
 	}
 #else
@@ -54,6 +68,15 @@ Int BoCA::CDText::ReadCDText(const String &path)
 	{
 		cdInfo.SetArtist(cdtext_get_const(CDTEXT_PERFORMER, cdtext));
 		cdInfo.SetTitle(cdtext_get_const(CDTEXT_TITLE, cdtext));
+		cdInfo.SetSongwriter(cdtext_get_const(CDTEXT_FIELD_SONGWRITER, cdtext));
+		cdInfo.SetComposer(cdtext_get_const(CDTEXT_FIELD_COMPOSER, cdtext));
+		cdInfo.SetArranger(cdtext_get_const(CDTEXT_FIELD_ARRANGER, cdtext));
+		cdInfo.SetComment(cdtext_get_const(CDTEXT_FIELD_MESSAGE, cdtext));
+		cdInfo.SetGenre(cdtext_get_const(CDTEXT_FIELD_GENRE, cdtext));
+		cdInfo.SetCatalog(cdtext_get_const(CDTEXT_FIELD_DISCID, cdtext));
+		cdInfo.SetBarcode(cdtext_get_const(CDTEXT_FIELD_UPC_EAN, cdtext));
+
+		if (cdInfo.GetGenre() == NIL) cdInfo.SetGenre(cdtext_genre2str(cdtext_get_genre(cdtext)));
 
 		for (Int i = firstTrack; i <= lastTrack; i++)
 		{
@@ -61,18 +84,16 @@ Int BoCA::CDText::ReadCDText(const String &path)
 
 			cdInfo.SetTrackArtist(i, cdtext_get_const(CDTEXT_PERFORMER, cdtext));
 			cdInfo.SetTrackTitle(i, cdtext_get_const(CDTEXT_TITLE, cdtext));
+			cdInfo.SetTrackSongwriter(i, cdtext_get_const(CDTEXT_FIELD_SONGWRITER, cdtext));
+			cdInfo.SetTrackComposer(i, cdtext_get_const(CDTEXT_FIELD_COMPOSER, cdtext));
+			cdInfo.SetTrackArranger(i, cdtext_get_const(CDTEXT_FIELD_ARRANGER, cdtext));
+			cdInfo.SetTrackComment(i, cdtext_get_const(CDTEXT_FIELD_MESSAGE, cdtext));
+			cdInfo.SetTrackISRC(i, cdtext_get_const(CDTEXT_FIELD_ISRC, cdtext));
 		}
 	}
 #endif
 
 	cdio_destroy(cd);
-
-	return Success();
-}
-
-Int BoCA::CDText::ClearCDInfo()
-{
-	cdInfo.Clear();
 
 	return Success();
 }

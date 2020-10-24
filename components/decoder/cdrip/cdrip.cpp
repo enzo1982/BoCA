@@ -196,11 +196,30 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		const CDInfo	&cdInfo = cdText.GetCDInfo();
 
-		if (cdInfo.GetTrackArtist(trackNumber) != NIL)	info.artist = cdInfo.GetTrackArtist(trackNumber);
-		else						info.artist = cdInfo.GetArtist();
-
 		info.title  = cdInfo.GetTrackTitle(trackNumber);
 		info.album  = cdInfo.GetTitle();
+		info.genre  = cdInfo.GetGenre();
+		info.isrc   = cdInfo.GetTrackISRC(trackNumber);
+
+		if	(cdInfo.GetTrackArtist(trackNumber)	 != NIL) info.artist  = cdInfo.GetTrackArtist(trackNumber);
+		else							 info.artist  = cdInfo.GetArtist();
+
+		if	(cdInfo.GetTrackComment(trackNumber)	 != NIL) info.comment = cdInfo.GetTrackComment(trackNumber);
+		else							 info.comment = cdInfo.GetComment();
+
+		if	(cdInfo.GetTrackSongwriter(trackNumber)	 != NIL) info.SetOtherInfo(INFO_LYRICIST, cdInfo.GetTrackSongwriter(trackNumber));
+		else if (cdInfo.GetSongwriter()			 != NIL) info.SetOtherInfo(INFO_LYRICIST, cdInfo.GetSongwriter());
+
+		if	(cdInfo.GetTrackComposer(trackNumber)	 != NIL) info.SetOtherInfo(INFO_COMPOSER, cdInfo.GetTrackComposer(trackNumber));
+		else if (cdInfo.GetComposer()			 != NIL) info.SetOtherInfo(INFO_COMPOSER, cdInfo.GetComposer());
+
+		if	(cdInfo.GetTrackArranger(trackNumber)	 != NIL) info.SetOtherInfo(INFO_ARRANGER, cdInfo.GetTrackArranger(trackNumber));
+		else if (cdInfo.GetArranger()			 != NIL) info.SetOtherInfo(INFO_ARRANGER, cdInfo.GetArranger());
+
+		if	(cdInfo.GetCatalog()			 != NIL) info.SetOtherInfo(INFO_CATALOGNUMBER, cdInfo.GetCatalog());
+		if	(cdInfo.GetBarcode()			 != NIL) info.SetOtherInfo(INFO_BARCODE, cdInfo.GetBarcode());
+
+		if	(Info::IsISRC(cdInfo.GetTrackISRC(trackNumber))) info.isrc = cdInfo.GetTrackISRC(trackNumber);
 	}
 	else if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 	{
