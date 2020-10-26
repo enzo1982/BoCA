@@ -96,6 +96,7 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 			if (type == AOT_AAC_LC	  ||
 			    type == AOT_SBR	  ||
 			    type == AOT_PS	  ||
+			    type == AOT_USAC	  ||
 
 			    type == AOT_ER_AAC_LC ||
 			    type == AOT_ER_AAC_LD ||
@@ -472,23 +473,21 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 			unsigned int	 bytesValid = bufferSize;
 
-			while (True)
+			if (bytesValid > 0)
 			{
-				if (bytesValid > 0)
-				{
-					unsigned char	*inputBuffer	 = buffer + bufferSize - bytesValid;
-					unsigned int	 inputBufferSize = bytesValid;
+				unsigned char	*inputBuffer	 = buffer + bufferSize - bytesValid;
+				unsigned int	 inputBufferSize = bytesValid;
 
-					ex_aacDecoder_Fill(handle, &inputBuffer, &inputBufferSize, &bytesValid);
-				}
+				ex_aacDecoder_Fill(handle, &inputBuffer, &inputBufferSize, &bytesValid);
+			}
 
-				if (frameSize == 0) samplesBuffer.Resize((samplesRead + maxFrameSize) * format.channels);
-				else		    samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
+			if (frameSize == 0) samplesBuffer.Resize((samplesRead + maxFrameSize) * format.channels);
+			else		    samplesBuffer.Resize((samplesRead + frameSize) * format.channels);
 
-				short	*outputBuffer = samplesBuffer + samplesRead * format.channels;
+			short	*outputBuffer = samplesBuffer + samplesRead * format.channels;
 
-				if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, samplesBuffer.Size() - samplesRead * format.channels, 0) != AAC_DEC_OK) break;
-
+			if (ex_aacDecoder_DecodeFrame(handle, outputBuffer, samplesBuffer.Size() - samplesRead * format.channels, 0) == AAC_DEC_OK)
+			{
 				if (frameSize == 0)
 				{
 					CStreamInfo	*streamInfo = ex_aacDecoder_GetStreamInfo(handle);
