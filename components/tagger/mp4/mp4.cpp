@@ -274,6 +274,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 			else					 chapterList[i].duration = MP4_INVALID_DURATION;
 		}
 
+		ex_MP4DeleteChapters(mp4File, MP4ChapterTypeAny, MP4_INVALID_TRACK_ID);
 		ex_MP4SetChapters(mp4File, chapterList, chapterCount, (MP4ChapterType) currentConfig->GetIntValue(ConfigureMP4::ConfigID, "ChapterType", MP4ChapterTypeQt));
 
 		delete [] chapterList;

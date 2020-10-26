@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -47,6 +47,7 @@ MP4TAGSREMOVEARTWORK		 ex_MP4TagsRemoveArtwork	= NIL;
 
 MP4GETCHAPTERS			 ex_MP4GetChapters		= NIL;
 MP4SETCHAPTERS			 ex_MP4SetChapters		= NIL;
+MP4DELETECHAPTERS		 ex_MP4DeleteChapters		= NIL;
 
 MP4ITMFITEMALLOC		 ex_MP4ItmfItemAlloc		= NIL;
 MP4ITMFITEMFREE			 ex_MP4ItmfItemFree		= NIL;
@@ -97,6 +98,7 @@ Bool LoadMP4v2DLL()
 
 	ex_MP4GetChapters		= (MP4GETCHAPTERS) mp4v2dll->GetFunctionAddress("MP4GetChapters");
 	ex_MP4SetChapters		= (MP4SETCHAPTERS) mp4v2dll->GetFunctionAddress("MP4SetChapters");
+	ex_MP4DeleteChapters		= (MP4DELETECHAPTERS) mp4v2dll->GetFunctionAddress("MP4DeleteChapters");
 
 	ex_MP4ItmfItemAlloc		= (MP4ITMFITEMALLOC) mp4v2dll->GetFunctionAddress("MP4ItmfItemAlloc");
 	ex_MP4ItmfItemFree		= (MP4ITMFITEMFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemFree");
@@ -139,6 +141,7 @@ Bool LoadMP4v2DLL()
 
 	    ex_MP4GetChapters		== NIL ||
 	    ex_MP4SetChapters		== NIL ||
+	    ex_MP4DeleteChapters	== NIL ||
 
 	    ex_MP4ItmfItemAlloc		== NIL ||
 	    ex_MP4ItmfItemFree		== NIL ||
