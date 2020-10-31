@@ -49,6 +49,7 @@ const String &BoCA::DecoderFAAD2::GetComponentSpecs()
 			      <extension>m4r</extension>				\
 			      <extension>mp4</extension>				\
 			      <extension>3gp</extension>				\
+			      <extension>3gpp</extension>				\
 			      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
 			    </format>							\
 											\
