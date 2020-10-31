@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@ AACDECODER_FILL			 ex_aacDecoder_Fill			= NIL;
 AACDECODER_GETSTREAMINFO	 ex_aacDecoder_GetStreamInfo		= NIL;
 AACDECODER_DECODEFRAME		 ex_aacDecoder_DecodeFrame		= NIL;
 AACDECODER_CLOSE		 ex_aacDecoder_Close			= NIL;
+AACDECODER_GETLIBINFO		 ex_aacDecoder_GetLibInfo		= NIL;
 
 MP4READ				 ex_MP4Read				= NIL;
 MP4CLOSE			 ex_MP4Close				= NIL;
@@ -52,13 +53,15 @@ Bool LoadFDKAACDLL()
 	ex_aacDecoder_GetStreamInfo	= (AACDECODER_GETSTREAMINFO) fdkaacdll->GetFunctionAddress("aacDecoder_GetStreamInfo");
 	ex_aacDecoder_DecodeFrame	= (AACDECODER_DECODEFRAME) fdkaacdll->GetFunctionAddress("aacDecoder_DecodeFrame");
 	ex_aacDecoder_Close		= (AACDECODER_CLOSE) fdkaacdll->GetFunctionAddress("aacDecoder_Close");
+	ex_aacDecoder_GetLibInfo	= (AACDECODER_GETLIBINFO) fdkaacdll->GetFunctionAddress("aacDecoder_GetLibInfo");
 
 	if (ex_aacDecoder_Open		== NIL ||
 	    ex_aacDecoder_ConfigRaw	== NIL ||
 	    ex_aacDecoder_Fill		== NIL ||
 	    ex_aacDecoder_GetStreamInfo	== NIL ||
 	    ex_aacDecoder_DecodeFrame	== NIL ||
-	    ex_aacDecoder_Close		== NIL) { FreeFDKAACDLL(); return False; }
+	    ex_aacDecoder_Close		== NIL ||
+	    ex_aacDecoder_GetLibInfo	== NIL) { FreeFDKAACDLL(); return False; }
 
 	return True;
 }

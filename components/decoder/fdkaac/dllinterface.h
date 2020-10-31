@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,6 +33,7 @@ typedef AAC_DECODER_ERROR		(LINKSPEC_H *AACDECODER_FILL)		(HANDLE_AACDECODER, UC
 typedef CStreamInfo *			(LINKSPEC_H *AACDECODER_GETSTREAMINFO)	(HANDLE_AACDECODER);
 typedef AAC_DECODER_ERROR		(LINKSPEC_H *AACDECODER_DECODEFRAME)	(HANDLE_AACDECODER, INT_PCM *, const INT, const UINT);
 typedef void				(LINKSPEC_H *AACDECODER_CLOSE)		(HANDLE_AACDECODER);
+typedef INT				(LINKSPEC_H *AACDECODER_GETLIBINFO)	(LIB_INFO *);
 
 extern AACDECODER_OPEN			 ex_aacDecoder_Open;
 extern AACDECODER_CONFIGRAW		 ex_aacDecoder_ConfigRaw;
@@ -40,6 +41,7 @@ extern AACDECODER_FILL			 ex_aacDecoder_Fill;
 extern AACDECODER_GETSTREAMINFO		 ex_aacDecoder_GetStreamInfo;
 extern AACDECODER_DECODEFRAME		 ex_aacDecoder_DecodeFrame;
 extern AACDECODER_CLOSE			 ex_aacDecoder_Close;
+extern AACDECODER_GETLIBINFO		 ex_aacDecoder_GetLibInfo;
 
 typedef MP4FileHandle			(*MP4READ)				(const char *);
 typedef void				(*MP4CLOSE)				(MP4FileHandle, uint32_t);

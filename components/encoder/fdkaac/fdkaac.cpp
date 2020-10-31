@@ -22,6 +22,13 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 
 	if (fdkaacdll != NIL)
 	{
+		LIB_INFO	 info[FDK_MODULE_LAST];
+
+		FDKinitLibInfo(info);
+		ex_aacEncGetLibInfo(info);
+
+		UINT	 sbrFlags = FDKlibInfo_getCapabilities(info, FDK_SBRENC);
+
 		componentSpecs = "										\
 														\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
@@ -63,8 +70,14 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 		    <parameters>										\
 		      <selection name=\"AAC encoding mode\" argument=\"-m %VALUE\" default=\"LC\">		\
 			<option alias=\"Low Complexity\">LC</option>						\
-			<option alias=\"High Efficiency\">HE</option>						\
-			<option alias=\"High Efficiency v2\">HEv2</option>					\
+														\
+		");
+
+		if (sbrFlags)			 componentSpecs.Append("<option alias=\"High Efficiency\">HE</option>");
+		if (sbrFlags & CAPF_SBR_PS_MPEG) componentSpecs.Append("<option alias=\"High Efficiency v2\">HEv2</option>");
+
+		componentSpecs.Append("										\
+														\
 			<option alias=\"Low Delay\">LD</option>							\
 			<option alias=\"Enhanced Low Delay\">ELD</option>					\
 		      </selection>										\
@@ -125,13 +138,12 @@ BoCA::EncoderFDKAAC::~EncoderFDKAAC()
 
 UnsignedInt32 BoCA::EncoderFDKAAC::GetEncoderVersion()
 {
-	LIB_INFO	 info[0xFF];
+	LIB_INFO	 info[FDK_MODULE_LAST];
 
-	memset(info, 0, sizeof(info));
-
+	FDKinitLibInfo(info);
 	ex_aacEncGetLibInfo(info);
 
-	for (int i = 0; i < 0xFF; i++)
+	for (Int i = 0; i < FDK_MODULE_LAST; i++)
 	{
 		if (info[i].module_id != FDK_AACENC) continue;
 
@@ -198,7 +210,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	granuleSize  = ex_aacEncoder_GetParam(handle, AACENC_GRANULE_LENGTH);
 
 #if AACENCODER_LIB_VL0 >= 4
-	if (GetEncoderVersion() >= 4 << 24)
+	if (GetEncoderVersion() >= LIB_VERSION(4, 0, 0))
 	{
 		delaySamples = aacInfo.nDelayCore;
 	}
@@ -231,8 +243,8 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
 
-		if (GetEncoderVersion() >= 4 << 24) ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfo.confBuf, aacInfo.confSize);
-		else				    ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfoOld.confBuf, aacInfoOld.confSize);
+		if (GetEncoderVersion() >= LIB_VERSION(4, 0, 0)) ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfo.confBuf, aacInfo.confSize);
+		else						 ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfoOld.confBuf, aacInfoOld.confSize);
 
 		totalSamples = 0;
 	}

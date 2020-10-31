@@ -15,6 +15,10 @@
 
 #include "fdkaac.h"
 
+#ifndef CAPF_AAC_USAC
+#	define CAPF_AAC_USAC 0x00200000
+#endif
+
 using namespace smooth::IO;
 
 const String &BoCA::DecoderFDKAAC::GetComponentSpecs()
@@ -92,16 +96,26 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
-			Int	 type = ex_MP4GetTrackAudioMpeg4Type(mp4File, mp4Track);
+			LIB_INFO	 info[FDK_MODULE_LAST];
 
-			if (type == AOT_AAC_LC	  ||
-			    type == AOT_SBR	  ||
-			    type == AOT_PS	  ||
-			    type == AOT_USAC	  ||
+			FDKinitLibInfo(info);
+			ex_aacDecoder_GetLibInfo(info);
 
-			    type == AOT_ER_AAC_LC ||
-			    type == AOT_ER_AAC_LD ||
-			    type == AOT_ER_AAC_ELD) isValidFile = True;
+			UINT	 aacFlags = FDKlibInfo_getCapabilities(info, FDK_AACDEC);
+			UINT	 sbrFlags = FDKlibInfo_getCapabilities(info, FDK_SBRDEC);
+
+			Int	 type	  = ex_MP4GetTrackAudioMpeg4Type(mp4File, mp4Track);
+
+			if ((type == AOT_AAC_LC	     && aacFlags & CAPF_AAC_LC	   ) ||
+			    (type == AOT_SBR	     && sbrFlags		   ) ||
+			    (type == AOT_PS	     && sbrFlags & CAPF_SBR_PS_MPEG) ||
+			    (type == AOT_USAC	     && aacFlags & CAPF_AAC_USAC   ) ||
+
+			    (type == AOT_ER_AAC_LC   && aacFlags & CAPF_ER_AAC_LC  ) ||
+			    (type == AOT_ER_AAC_LD   && aacFlags & CAPF_ER_AAC_LD  ) ||
+			    (type == AOT_ER_AAC_ELD  && aacFlags & CAPF_ER_AAC_ELD ) ||
+			    (type == AOT_ER_AAC_SCAL && aacFlags & CAPF_ER_AAC_SCAL) ||
+			    (type == AOT_ER_BSAC     && aacFlags & CAPF_ER_AAC_BSAC)) isValidFile = True;
 		}
 
 		ex_MP4Close(mp4File, 0);

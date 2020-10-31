@@ -69,6 +69,16 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	option_aactype_eld	= new OptionBox("ELD", Point(10, 113), Size(99, 0), &aacType, AOT_ER_AAC_ELD);
 	option_aactype_eld->onAction.Connect(&ConfigureFDKAAC::SetObjectType, this);
 
+	LIB_INFO	 info[FDK_MODULE_LAST];
+
+	FDKinitLibInfo(info);
+	ex_aacEncGetLibInfo(info);
+
+	UINT	 sbrFlags = FDKlibInfo_getCapabilities(info, FDK_SBRENC);
+
+	if (! sbrFlags			  ) option_aactype_he->Deactivate();
+	if (!(sbrFlags & CAPF_SBR_PS_MPEG)) option_aactype_hev2->Deactivate();
+
 	group_aactype->Add(option_aactype_low);
 	group_aactype->Add(option_aactype_he);
 	group_aactype->Add(option_aactype_hev2);
