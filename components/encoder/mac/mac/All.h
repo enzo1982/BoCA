@@ -62,7 +62,7 @@ Version
 #include "Version.h"
 
 // year in the copyright strings
-#define MAC_YEAR 2020
+#define MAC_YEAR 2021
 
 // build the version string
 #define STRINGIZE2(s) #s
@@ -150,6 +150,11 @@ namespace APE
 /*****************************************************************************************
 Global macros
 *****************************************************************************************/
+#define WAVE_FORMAT_PCM 1
+#define WAVE_FORMAT_IEEE_FLOAT 0x0003
+#define WAVE_FORMAT_EXTENSIBLE 0xFFFE
+#define APE_TRUNCATE ((size_t)-1)
+
 #if defined(PLATFORM_WINDOWS)
     #define IO_USE_WIN_FILE_IO
     #define IO_HEADER_FILE                              "WinFileIO.h"
@@ -180,20 +185,13 @@ Global macros
     #define PUMP_MESSAGE_LOOP
     #undef    ODS
     #define ODS                                         printf
-    #ifndef _MSC_VER
-        #define TICK_COUNT_TYPE                             unsigned long long
-        #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
-    #else
-        #define TICK_COUNT_TYPE                             unsigned long
-        #define TICK_COUNT_READ(VARIABLE)                   VARIABLE = GetTickCount()
-    #endif
     #define TICK_COUNT_FREQ                             1000000
     #undef    ASSERT
     #define ASSERT(e)
 #endif
 
 #if !defined(PLATFORM_WINDOWS) || !defined(_MSC_VER)
-    #define wcsncpy_s(A, B, COUNT) wcsncpy(A, B, COUNT)
+    #define wcsncpy_s(A, B, C, D) wcsncpy(A, C, D)
     #define wcscpy_s(A, B, C) wcscpy(A, C)
     #define wcscat_s(A, B, C) wcscat(A, C)
     #define sprintf_s(A, B, C, ...) sprintf(A, C, __VA_ARGS__)
@@ -201,9 +199,10 @@ Global macros
     #define strcpy_s(A, B, C) strcpy(A, C)
 
     #if defined(PLATFORM_WINDOWS)
-        #define _tcsncpy_s(A, B, C, COUNT) _tcsncpy(A, C, COUNT)
+        #define _tcsncpy_s(A, B, C, D) _tcsncpy(A, C, D)
         #define _tcscpy_s(A, B, C) _tcscpy(A, C)
         #define _tcscat_s(A, B, C) _tcscat(A, C)
+        #define strncpy_s(A, B, C, D) strncpy(A, C, D)
     #endif
 #endif
 

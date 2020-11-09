@@ -66,7 +66,7 @@ typedef wchar_t             TCHAR;
 #define _tcsncpy_s wcsncpy_s
 #define _ttoi _wtoi
 #define _tcscmp wcscmp
-
+#define strncpy_s(a, b, c, d) strncpy(a, c, d)
 #define MAX_PATH    4096
 
 #include <wctype.h>

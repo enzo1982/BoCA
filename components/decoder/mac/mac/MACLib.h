@@ -1,6 +1,6 @@
 /*****************************************************************************************
 Monkey's Audio MACLib.h (include for using MACLib.lib in your projects)
-Copyright (C) 2000-2019 by Matthew T. Ashland   All Rights Reserved.
+Copyright (C) 2000-2021 by Matthew T. Ashland   All Rights Reserved.
 
 Overview:
 
@@ -479,6 +479,6 @@ extern "C"
     DLLEXPORT int __stdcall VerifyFileW2(const APE::str_utfn * pInputFilename, APE::IAPEProgressCallback * pProgressCallback = NULL, bool bQuickVerifyIfPossible = false); 
 
     // helper functions
-    DLLEXPORT int __stdcall FillWaveFormatEx(APE::WAVEFORMATEX * pWaveFormatEx, int nSampleRate = 44100, int nBitsPerSample = 16, int nChannels = 2);
+    DLLEXPORT int __stdcall FillWaveFormatEx(APE::WAVEFORMATEX * pWaveFormatEx, int nFormatTag, int nSampleRate, int nBitsPerSample, int nChannels);
     DLLEXPORT int __stdcall FillWaveHeader(APE::WAVE_HEADER * pWAVHeader, APE::int64 nAudioBytes, APE::WAVEFORMATEX * pWaveFormatEx, APE::intn nTerminatingBytes = 0);
 }
