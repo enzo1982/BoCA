@@ -81,7 +81,7 @@ bool LoadCoreAudioDLL()
 	wchar_t	 aasDir[32768];
 
 	wcscpy(aasDir, GetSystemDirectory(CSIDL_PROGRAM_FILES_COMMON));
-	wcscat(aasDir, wstring("Apple\\Apple Application Support\\"));
+	wcscat(aasDir, wstring("Apple\\Apple Application Support"));
 
 	WIN32_FIND_DATAW	 findData;
 	HANDLE			 handle = FindFirstFileW(aasDir, &findData);
@@ -89,7 +89,7 @@ bool LoadCoreAudioDLL()
 	if (handle == INVALID_HANDLE_VALUE)
 	{
 		wcscpy(aasDir, GetSystemDirectory(CSIDL_PROGRAM_FILES));
-		wcscat(aasDir, wstring("iTunes\\"));
+		wcscat(aasDir, wstring("iTunes"));
 	}
 
 	FindClose(handle);
@@ -98,7 +98,7 @@ bool LoadCoreAudioDLL()
 	 */
 	SetDllDirectoryW(aasDir);
 
-	coreaudiodll	  = LoadLibraryW(wcscat(aasDir, wstring("CoreAudioToolbox.dll")));
+	coreaudiodll	  = LoadLibraryW(wcscat(aasDir, wstring("\\CoreAudioToolbox.dll")));
 
 	if (coreaudiodll == NULL) return false;
 
