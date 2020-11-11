@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -244,8 +244,20 @@ int main(int argc, char *argv[])
 		switch (comm->command)
 		{
 			case CommCommandHello:
-				if (((CoreAudioCommHello *) &comm->data)->version == 1 && coreaudiodll != NULL) comm->status = CommStatusReady;
-				else										comm->status = CommStatusError;
+				if (((CoreAudioCommHello *) &comm->data)->version == 1 && coreaudiodll != NULL)
+				{
+					/* Check whether any codecs are available.
+					 */
+					CoreAudioCommCodecs	 codecs;
+
+					memset(&codecs, 0, sizeof(CoreAudioCommCodecs));
+
+					QueryCoreAudioCodecs(&codecs);
+
+					if (codecs.codecs[0] != 0) comm->status = CommStatusReady;
+				}
+
+				if (comm->status != CommStatusReady) comm->status = CommStatusError;
 
 				break;
 			case CommCommandCodecs:
