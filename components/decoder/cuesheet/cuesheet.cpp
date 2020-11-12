@@ -193,25 +193,9 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (line.Contains("\"")) songwriter = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
 			else			 songwriter = line.Tail(line.Length() - 11);
 
-			if (!readInfoTags || preferCueSheets)
-			{
-				for (Int i = 0; i < info.other.Length(); i++)
-				{
-					if (info.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) info.other.RemoveNth(i);
-				}
+			if (!readInfoTags || preferCueSheets) info.SetOtherInfo(INFO_COMPOSER, songwriter);
 
-				info.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
-			}
-
-			if (!trackMode && !dataMode)
-			{
-				for (Int i = 0; i < albumInfo.other.Length(); i++)
-				{
-					if (albumInfo.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":"))) albumInfo.other.RemoveNth(i);
-				}
-
-				albumInfo.other.Add(String(INFO_COMPOSER).Append(":").Append(songwriter));
-			}
+			if (!trackMode && !dataMode) albumInfo.SetOtherInfo(INFO_COMPOSER, songwriter);
 		}
 
 		if (line.StartsWith("TITLE "))
@@ -412,10 +396,13 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			 */
 			Config	*decoderConfig = Config::Copy(GetConfiguration());
 
-			decoderConfig->SetIntValue("Tags", "ReadChapters", False);
-			decoderConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+			if (trackMode)
+			{
+				decoderConfig->SetIntValue("Tags", "ReadChapters", False);
+				decoderConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
 
-			decoder->SetConfiguration(decoderConfig);
+				decoder->SetConfiguration(decoderConfig);
+			}
 
 			/* Get stream info.
 			 */
@@ -581,18 +568,7 @@ Void BoCA::DecoderCueSheet::UpdateInfoWithAlbumInfo(Info &info, const Info &albu
 	if (albumInfo.genre   != NIL) info.genre   = albumInfo.genre;
 	if (albumInfo.comment != NIL) info.comment = albumInfo.comment;
 
-	for (Int i = 0; i < albumInfo.other.Length(); i++)
-	{
-		if (albumInfo.other.GetNth(i).StartsWith(String(INFO_COMPOSER).Append(":")))
-		{
-			for (Int j = 0; j < info.other.Length(); j++)
-			{
-				if (info.other.GetNth(j).StartsWith(String(INFO_COMPOSER).Append(":"))) info.other.RemoveNth(j);
-			}
-
-			info.other.Add(albumInfo.other.GetNth(i));
-		}
-	}
+	if (albumInfo.HasOtherInfo(INFO_COMPOSER)) info.SetOtherInfo(INFO_COMPOSER, albumInfo.GetOtherInfo(INFO_COMPOSER));
 
 	if (albumInfo.album_gain != NIL) info.album_gain = albumInfo.album_gain;
 	if (albumInfo.album_peak != NIL) info.album_peak = albumInfo.album_peak;

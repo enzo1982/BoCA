@@ -491,6 +491,9 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 					Track	 cueTrack;
 					Config	*cueConfig = Config::Copy(GetConfiguration());
 
+					cueConfig->SetIntValue("Tags", "ReadChapters", False);
+					cueConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+
 					cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
 					cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);
 					cueConfig->SetIntValue("CueSheet", "LookForAlternativeFiles", False);

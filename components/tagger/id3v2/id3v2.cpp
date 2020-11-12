@@ -633,6 +633,9 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 						Track	 cueTrack;
 						Config	*cueConfig = Config::Copy(GetConfiguration());
 
+						cueConfig->SetIntValue("Tags", "ReadChapters", False);
+						cueConfig->SetIntValue("Tags", "ReadEmbeddedCueSheets", False);
+
 						cueConfig->SetIntValue("CueSheet", "ReadInformationTags", True);
 						cueConfig->SetIntValue("CueSheet", "PreferCueSheets", True);
 						cueConfig->SetIntValue("CueSheet", "LookForAlternativeFiles", False);
