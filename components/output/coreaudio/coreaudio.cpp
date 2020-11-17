@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,6 +22,10 @@ namespace CA
 
 #include "coreaudio.h"
 
+#ifndef MAC_OS_X_VERSION_10_6
+#	define MAC_OS_X_VERSION_10_6 1060
+#endif
+
 using namespace smooth::Threads;
 
 const String &BoCA::OutputCoreAudio::GetComponentSpecs()
@@ -30,7 +34,11 @@ const String &BoCA::OutputCoreAudio::GetComponentSpecs()
 
 	/* See if we can find an output audio unit.
 	 */
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6
 	CA::ComponentDescription	 description;
+#else
+	CA::AudioComponentDescription	 description;
+#endif
 
 	description.componentType	  = CA::kAudioUnitType_Output;
 	description.componentSubType	  = CA::kAudioUnitSubType_DefaultOutput;
@@ -38,7 +46,11 @@ const String &BoCA::OutputCoreAudio::GetComponentSpecs()
 	description.componentFlags	  = 0;
 	description.componentFlagsMask	  = 0;
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6
 	if (CA::FindNextComponent(NIL, &description) != NIL)
+#else
+	if (CA::AudioComponentFindNext(NIL, &description) != NIL)
+#endif
 	{
 		componentSpecs = "				\
 								\
@@ -82,8 +94,13 @@ Bool BoCA::OutputCoreAudio::Activate()
 
 	/* Find default output audio unit.
 	 */
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6
 	CA::ComponentDescription	 description;
 	CA::Component			 component;
+#else
+	CA::AudioComponentDescription	 description;
+	CA::AudioComponent		 component;
+#endif
 
 	description.componentType	  = CA::kAudioUnitType_Output;
 	description.componentSubType	  = CA::kAudioUnitSubType_DefaultOutput;
@@ -91,13 +108,21 @@ Bool BoCA::OutputCoreAudio::Activate()
 	description.componentFlags	  = 0;
 	description.componentFlagsMask	  = 0;
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6
 	component = CA::FindNextComponent(NIL, &description);
+#else
+	component = CA::AudioComponentFindNext(NIL, &description);
+#endif
 
 	if (component == NIL) return False;
 
 	/* Initialize audio unit.
 	 */
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6
 	if (CA::OpenAComponent(component, &audioUnit) != 0) return False;
+#else
+	if (CA::AudioComponentInstanceNew(component, &audioUnit) != 0) return False;
+#endif
 	if (CA::AudioUnitInitialize(audioUnit) != 0) return False;
 
 	/* Set stream format.
@@ -156,7 +181,11 @@ Bool BoCA::OutputCoreAudio::Deactivate()
 
 	if (CA::AudioUnitSetProperty(audioUnit, CA::kAudioUnitProperty_SetRenderCallback, CA::kAudioUnitScope_Input, 0, &audioCallback, sizeof(audioCallback)) != 0) return False;
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6
 	if (CA::CloseComponent(audioUnit) != 0) return False;
+#else
+	if (CA::AudioComponentInstanceDispose(audioUnit) != 0) return False;
+#endif
 
 	audioUnit = NIL;
 
