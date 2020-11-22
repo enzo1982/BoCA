@@ -64,196 +64,82 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder Cuesheet", "BoCA Decoder Cuesheet\BoCA Decoder Cuesheet.vcxproj", "{95F4E9A6-9B61-4017-9BDF-75BF15312DF9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder Opus", "BoCA Encoder Opus\BoCA Encoder Opus.vcxproj", "{B66C24E2-B8E4-4E6A-974C-696A1C37886E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Resample", "BoCA DSP Resample\BoCA DSP Resample.vcxproj", "{1FD18ADC-F590-4714-A01B-44CB173E77D4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist M3U", "BoCA Playlist M3U\BoCA Playlist M3U.vcxproj", "{ECFC35DF-E414-4CF3-84F4-81749657D8F5}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist XSPF", "BoCA Playlist XSPF\BoCA Playlist XSPF.vcxproj", "{815DA8C2-34FA-4AE8-90D7-1253183C4F01}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder CoreAudio", "BoCA Encoder CoreAudio\BoCA Encoder CoreAudio.vcxproj", "{C1C0D366-24C3-429A-944F-E057971A4D2B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder Opus", "BoCA Decoder Opus\BoCA Decoder Opus.vcxproj", "{D17DD4D0-7F58-4D8D-8E5D-E47434A50C5D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Extension StatusTime", "BoCA Extension StatusTime\BoCA Extension StatusTime.vcxproj", "{9868B1DA-EE14-4A6A-BA5A-BA7BD48DC9BE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist PLS", "BoCA Playlist PLS\BoCA Playlist PLS.vcxproj", "{4B0499FA-2E64-4765-B79E-F8A5C283E372}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist WPL", "BoCA Playlist WPL\BoCA Playlist WPL.vcxproj", "{2B0C9CBB-13FC-42EA-844D-88CE3E4BE303}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist Cuesheet", "BoCA Playlist Cuesheet\BoCA Playlist Cuesheet.vcxproj", "{A63C8858-4C68-4871-A624-8F01E763265A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Output WaveOut", "BoCA Output WaveOut\BoCA Output WaveOut.vcxproj", "{25CE1149-5E11-4DF1-8FAF-93EC47CBB000}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder AIFF", "BoCA Decoder AIFF\BoCA Decoder AIFF.vcxproj", "{51720752-D947-498E-B025-17D0788C887A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder AU", "BoCA Decoder AU\BoCA Decoder AU.vcxproj", "{5955A02D-128D-4F13-9261-C891AEC71E05}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder FDKAAC", "BoCA Decoder FDKAAC\BoCA Decoder FDKAAC.vcxproj", "{21E996FE-0298-420B-9F03-F57DBFAE956F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder MPG123", "BoCA Decoder MPG123\BoCA Decoder MPG123.vcxproj", "{C0FD916F-F4C5-457D-9028-8CFEBC702A83}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder Speex", "BoCA Decoder Speex\BoCA Decoder Speex.vcxproj", "{04FA827B-2ADF-4E0A-A90D-727B246B4E0B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder TwinVQ", "BoCA Decoder TwinVQ\BoCA Decoder TwinVQ.vcxproj", "{6E70B3D7-3566-4AFF-9B40-CFE33B63AD6F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Tagger APEv2", "BoCA Tagger APEv2\BoCA Tagger APEv2.vcxproj", "{CE3D1B9D-7F87-4780-848C-82D4E18FAD35}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Tagger Cart", "BoCA Tagger Cart\BoCA Tagger Cart.vcxproj", "{B47FA930-675C-4077-9350-734F7492AB5A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Tagger FLAC", "BoCA Tagger FLAC\BoCA Tagger FLAC.vcxproj", "{D7F1A1DF-30EC-4197-9F70-E079310AB5A2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Tagger ID3v1", "BoCA Tagger ID3v1\BoCA Tagger ID3v1.vcxproj", "{9B656569-1B48-4154-99A7-2BC32FED354C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Tagger Vorbis", "BoCA Tagger Vorbis\BoCA Tagger Vorbis.vcxproj", "{33439687-0064-443A-924B-A0E6467C4972}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Tagger WMA", "BoCA Tagger WMA\BoCA Tagger WMA.vcxproj", "{08A268A7-AB6A-446F-9876-48956BC615C2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder BladeEnc", "BoCA Encoder BladeEnc\BoCA Encoder BladeEnc.vcxproj", "{B9AF74FE-477F-4907-ABE1-DC37E6D1F7D4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder FDKAAC", "BoCA Encoder FDKAAC\BoCA Encoder FDKAAC.vcxproj", "{C45B1627-A03E-4CF1-A76D-CD1DBB4B7E83}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder Speex", "BoCA Encoder Speex\BoCA Encoder Speex.vcxproj", "{3299103C-F24E-4157-86CB-F568B48CD6A1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder TwinVQ", "BoCA Encoder TwinVQ\BoCA Encoder TwinVQ.vcxproj", "{565C7891-D45B-4F64-A974-484122FD1253}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder voAAC", "BoCA Encoder voAAC\BoCA Encoder voAAC.vcxproj", "{F79A69FE-F6A3-4326-B492-A34574468179}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder Sndfile", "BoCA Encoder Sndfile\BoCA Encoder Sndfile.vcxproj", "{4C1AB73D-202E-493D-93EC-ABD92D43D1F6}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Verifier MD5", "BoCA Verifier MD5\BoCA Verifier MD5.vcxproj", "{8D721824-C5F4-49E2-955D-BF0D57B1D9A5}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder meh!", "BoCA Encoder meh!\BoCA Encoder meh!.vcxproj", "{10051E4C-1220-4AF4-9518-8415C674ED8F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Output DirectSound", "BoCA Output DirectSound\BoCA Output DirectSound.vcxproj", "{30EBD46C-1389-4C02-AC4E-3E01206489BE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Format", "BoCA DSP Format\BoCA DSP Format.vcxproj", "{61D698FB-1FAB-4319-AA23-AFF8ADE80663}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Channels", "BoCA DSP Channels\BoCA DSP Channels.vcxproj", "{01685C1C-4076-4F61-BB43-9388FB0E246F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Rubber Band", "BoCA DSP Rubber Band\BoCA DSP Rubber Band.vcxproj", "{9FCC8C26-2971-402F-95A5-515B4BA537AA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP RNNoise", "BoCA DSP RNNoise\BoCA DSP RNNoise.vcxproj", "{EADA19B1-2871-4DD4-8FD2-7F5A2E6BD92F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Playlist VCLT", "BoCA Playlist VCLT\BoCA Playlist VCLT.vcxproj", "{38992234-E808-4A1A-94CE-D58CB3F0055C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder Media Foundation", "BoCA Decoder Media Foundation\BoCA Decoder Media Foundation.vcxproj", "{2063079A-BB73-4F95-B152-2C2F1C32C067}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder Sndfile Wave", "BoCA Encoder Sndfile Wave\BoCA Encoder Sndfile Wave.vcxproj", "{0E66B073-E4B5-4B98-ABAD-50BC657A32AC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3} = {94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP HDCD", "BoCA DSP HDCD\BoCA DSP HDCD.vcxproj", "{E1323161-F952-4A53-96A9-9C4B0E622B3B}"
 EndProject

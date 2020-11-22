@@ -40,6 +40,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\components\tagger\apev2\apev2.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BoCA\BoCA.vcxproj">
+      <Project>{94f50ab3-6adb-4f2e-97c5-3fbbc7e30fa3}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CE3D1B9D-7F87-4780-848C-82D4E18FAD35}</ProjectGuid>
     <RootNamespace>BoCATaggerAPEv2</RootNamespace>

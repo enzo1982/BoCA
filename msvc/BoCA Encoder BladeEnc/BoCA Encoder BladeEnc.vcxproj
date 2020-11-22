@@ -242,6 +242,11 @@
     <ClCompile Include="..\..\components\encoder\bladeenc\config.cpp" />
     <ClCompile Include="..\..\components\encoder\bladeenc\dllinterface.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BoCA\BoCA.vcxproj">
+      <Project>{94f50ab3-6adb-4f2e-97c5-3fbbc7e30fa3}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

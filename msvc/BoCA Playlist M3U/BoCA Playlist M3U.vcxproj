@@ -40,6 +40,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\components\playlist\m3u\m3u.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BoCA\BoCA.vcxproj">
+      <Project>{94f50ab3-6adb-4f2e-97c5-3fbbc7e30fa3}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ECFC35DF-E414-4CF3-84F4-81749657D8F5}</ProjectGuid>
     <RootNamespace>BoCAPlaylistM3U</RootNamespace>
