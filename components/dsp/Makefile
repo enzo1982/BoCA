@@ -4,7 +4,7 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-FOLDERS = channels format resample rnnoise rubberband
+FOLDERS = channels format hdcd resample rnnoise rubberband
 
 .PHONY: $(FOLDERS)
 

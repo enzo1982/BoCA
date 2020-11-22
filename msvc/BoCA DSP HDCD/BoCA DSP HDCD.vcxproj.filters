@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\libhdcd">
+      <UniqueIdentifier>{edc8a5fe-c9e4-4b04-9821-de997b8c7457}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\libhdcd">
+      <UniqueIdentifier>{4374ff58-caef-46dd-a17e-d5c0dd67d196}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\dsp\hdcd\libhdcd\hdcd_analyze.h">
+      <Filter>Headerdateien\libhdcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\hdcd\libhdcd\hdcd_decode2.h">
+      <Filter>Headerdateien\libhdcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\hdcd\libhdcd\hdcd_detect.h">
+      <Filter>Headerdateien\libhdcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\hdcd\libhdcd\hdcd_libversion.h">
+      <Filter>Headerdateien\libhdcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\hdcd\libhdcd\hdcd_simple.h">
+      <Filter>Headerdateien\libhdcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\hdcd\hdcd.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\dsp\hdcd\libhdcd\hdcd_analyze_tonegen.c">
+      <Filter>Quelldateien\libhdcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\hdcd\libhdcd\hdcd_decode2.c">
+      <Filter>Quelldateien\libhdcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\hdcd\libhdcd\hdcd_libversion.c">
+      <Filter>Quelldateien\libhdcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\hdcd\libhdcd\hdcd_simple.c">
+      <Filter>Quelldateien\libhdcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\hdcd\libhdcd\hdcd_strings.c">
+      <Filter>Quelldateien\libhdcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\hdcd\libhdcd\hdcd_tables.c">
+      <Filter>Quelldateien\libhdcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\hdcd\hdcd.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
