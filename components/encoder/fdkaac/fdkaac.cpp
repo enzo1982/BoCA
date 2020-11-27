@@ -465,9 +465,7 @@ Int BoCA::EncoderFDKAAC::EncodeFrames(Bool flush)
 	{
 		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
-
-		workerToUse->Lock();
+		workerToUse->WaitUntilReady();
 
 		/* See if the worker has some packets for us.
 		 */
@@ -476,7 +474,6 @@ Int BoCA::EncoderFDKAAC::EncodeFrames(Bool flush)
 		/* Pass new frames to worker.
 		 */
 		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, flush ? samplesBuffer.Size() : samplesPerFrame * framesToProcess, flush);
-		workerToUse->Release();
 
 		framesProcessed += framesToProcess - (flush ? 0 : overlap);
 
@@ -497,15 +494,11 @@ Int BoCA::EncoderFDKAAC::EncodeFrames(Bool flush)
 	{
 		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
-
-		workerToUse->Lock();
+		workerToUse->WaitUntilReady();
 
 		/* See if the worker has some packets for us.
 		 */
 		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length());
-
-		workerToUse->Release();
 
 		nextWorker++;
 	}

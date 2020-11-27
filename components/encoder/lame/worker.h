@@ -18,7 +18,8 @@ namespace BoCA
 	class SuperWorker : public Threads::Thread
 	{
 		private:
-			Threads::Mutex			 workerMutex;
+			Threads::Semaphore		 processSignal;
+			Threads::Semaphore		 readySignal;
 
 			lame_t				 context;
 
@@ -35,7 +36,6 @@ namespace BoCA
 
 			Int				 overlap;
 
-			Bool				 process;
 			Bool				 flush;
 			Bool				 quit;
 
@@ -47,14 +47,11 @@ namespace BoCA
 			Void				 Encode(const Buffer<UnsignedByte> &, Int, Int, Bool);
 			Void				 ReEncode(Int, Int);
 
+			Void				 WaitUntilReady();
+
 			Void				 GetInfoTag(Buffer<UnsignedByte> &) const;
 
 			Int				 Quit();
-
-			Bool				 Lock()			{ return workerMutex.Lock(); }
-			Bool				 Release()		{ return workerMutex.Release(); }
-
-			Bool				 IsReady() const	{ return !process; }
 
 			const Buffer<unsigned char>	&GetPackets() const	{ return packetBuffer; };
 			const Array<Int>		&GetPacketSizes() const	{ return packetSizes; };

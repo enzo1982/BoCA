@@ -533,9 +533,7 @@ Int BoCA::EncoderCoreAudio::EncodeFrames(Bool flush)
 	{
 		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
-
-		workerToUse->Lock();
+		workerToUse->WaitUntilReady();
 
 		/* See if the worker has some packets for us.
 		 */
@@ -544,7 +542,6 @@ Int BoCA::EncoderCoreAudio::EncodeFrames(Bool flush)
 		/* Pass new frames to worker.
 		 */
 		workerToUse->Encode(samplesBuffer, framesProcessed * bytesPerFrame, flush ? samplesBuffer.Size() : bytesPerFrame * framesToProcess, flush);
-		workerToUse->Release();
 
 		framesProcessed += framesToProcess - (flush ? 0 : overlap);
 
@@ -565,15 +562,11 @@ Int BoCA::EncoderCoreAudio::EncodeFrames(Bool flush)
 	{
 		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
-
-		workerToUse->Lock();
+		workerToUse->WaitUntilReady();
 
 		/* See if the worker has some packets for us.
 		 */
 		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), workerToUse->GetPacketInfos(), nextWorker == workers.Length(), nextWorker >= 2 * workers.Length());
-
-		workerToUse->Release();
 
 		nextWorker++;
 	}

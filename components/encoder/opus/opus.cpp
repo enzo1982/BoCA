@@ -352,9 +352,7 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 	{
 		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
-
-		workerToUse->Lock();
+		workerToUse->WaitUntilReady();
 
 		/* See if the worker has some packets for us.
 		 */
@@ -363,7 +361,6 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 		/* Pass new frames to worker.
 		 */
 		workerToUse->Encode(samplesBuffer, framesProcessed * samplesPerFrame, samplesPerFrame * framesToProcess);
-		workerToUse->Release();
 
 		framesProcessed += framesToProcess - (flush ? 0 : overlap);
 
@@ -384,15 +381,11 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 	{
 		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
-		while (!workerToUse->IsReady()) S::System::System::Sleep(1);
-
-		workerToUse->Lock();
+		workerToUse->WaitUntilReady();
 
 		/* See if the worker has some packets for us.
 		 */
 		if (workerToUse->GetPacketSizes().Length() != 0) dataLength += ProcessPackets(workerToUse->GetPackets(), workerToUse->GetPacketSizes(), nextWorker == workers.Length(), i == workers.Length() - 1, i == workers.Length() - 1 ? nullSamples : 0);
-
-		workerToUse->Release();
 
 		nextWorker++;
 	}

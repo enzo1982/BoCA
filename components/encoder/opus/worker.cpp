@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -17,9 +17,10 @@
 #include "worker.h"
 #include "config.h"
 
-BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat)
+BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : processSignal(1), readySignal(1)
 {
-	process	= False;
+	processSignal.Wait();
+
 	quit	= False;
 
 	format	= iFormat;
@@ -74,11 +75,9 @@ Int BoCA::SuperWorker::Run()
 {
 	while (!quit)
 	{
-		while (!quit && !process) S::System::System::Sleep(1);
+		processSignal.Wait();
 
 		if (quit) break;
-
-		workerMutex.Lock();
 
 		packetBuffer.Resize(0);
 		packetSizes.RemoveAll();
@@ -102,9 +101,7 @@ Int BoCA::SuperWorker::Run()
 			samplesLeft -= samplesPerFrame;
 		}
 
-		workerMutex.Release();
-
-		process	= False;
+		readySignal.Release();
 	}
 
 	return Success();
@@ -112,20 +109,23 @@ Int BoCA::SuperWorker::Run()
 
 Void BoCA::SuperWorker::Encode(const Buffer<signed short> &buffer, Int offset, Int size)
 {
-	workerMutex.Lock();
-
 	samplesBuffer.Resize(size);
 
 	memcpy(samplesBuffer, buffer + offset, size * sizeof(signed short));
 
-	workerMutex.Release();
+	processSignal.Release();
+}
 
-	process = True;
+Void BoCA::SuperWorker::WaitUntilReady()
+{
+	readySignal.Wait();
 }
 
 Int BoCA::SuperWorker::Quit()
 {
 	quit = True;
+
+	processSignal.Release();
 
 	return Success();
 }

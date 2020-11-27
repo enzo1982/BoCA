@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -18,7 +18,8 @@ namespace BoCA
 	class SuperWorker : public Threads::Thread
 	{
 		private:
-			Threads::Mutex			 workerMutex;
+			Threads::Semaphore		 processSignal;
+			Threads::Semaphore		 readySignal;
 
 			faacEncHandle			 handle;
 
@@ -32,7 +33,6 @@ namespace BoCA
 			Buffer<unsigned char>		 packetBuffer;
 			Array<Int>			 packetSizes;
 
-			Bool				 process;
 			Bool				 flush;
 			Bool				 quit;
 
@@ -42,13 +42,9 @@ namespace BoCA
 							~SuperWorker();
 
 			Void				 Encode(const Buffer<int16_t> &, Int, Int, Bool);
+			Void				 WaitUntilReady();
 
 			Int				 Quit();
-
-			Bool				 Lock()			{ return workerMutex.Lock(); }
-			Bool				 Release()		{ return workerMutex.Release(); }
-
-			Bool				 IsReady() const	{ return !process; }
 
 			const Buffer<unsigned char>	&GetPackets() const	{ return packetBuffer; };
 			const Array<Int>		&GetPacketSizes() const	{ return packetSizes; };

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,11 +20,12 @@ namespace BoCA
 	CA::OSStatus	 AudioConverterComplexInputDataProc(CA::AudioConverterRef, CA::UInt32 *, CA::AudioBufferList *, CA::AudioStreamPacketDescription **, void *);
 };
 
-BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat)
+BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : processSignal(1), readySignal(1)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
-	process	= False;
+	processSignal.Wait();
+
 	flush	= False;
 	quit	= False;
 
@@ -141,11 +142,9 @@ Int BoCA::SuperWorker::Run()
 {
 	while (!quit)
 	{
-		while (!quit && !process) S::System::System::Sleep(1);
+		processSignal.Wait();
 
 		if (quit) break;
-
-		workerMutex.Lock();
 
 		packetBuffer.Resize(0);
 		packetSizes.RemoveAll();
@@ -175,9 +174,7 @@ Int BoCA::SuperWorker::Run()
 			buffers->mBuffers[0].mDataByteSize = bufferSize;
 		}
 
-		workerMutex.Release();
-
-		process	= False;
+		readySignal.Release();
 	}
 
 	return Success();
@@ -185,8 +182,6 @@ Int BoCA::SuperWorker::Run()
 
 Void BoCA::SuperWorker::Encode(const Buffer<unsigned char> &buffer, Int offset, Int size, Bool last)
 {
-	workerMutex.Lock();
-
 	samplesBuffer.Resize(samplesBuffer.Size() + size);
 
 	memmove(samplesBuffer, samplesBuffer + bytesConsumed, samplesBuffer.Size() - bytesConsumed - size);
@@ -195,16 +190,21 @@ Void BoCA::SuperWorker::Encode(const Buffer<unsigned char> &buffer, Int offset, 
 	samplesBuffer.Resize(samplesBuffer.Size() - bytesConsumed);
 
 	bytesConsumed = 0;
+	flush	      = last;
 
-	workerMutex.Release();
+	processSignal.Release();
+}
 
-	flush	= last;
-	process = True;
+Void BoCA::SuperWorker::WaitUntilReady()
+{
+	readySignal.Wait();
 }
 
 Int BoCA::SuperWorker::Quit()
 {
 	quit = True;
+
+	processSignal.Release();
 
 	return Success();
 }

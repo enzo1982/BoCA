@@ -15,9 +15,10 @@
 #include "worker.h"
 #include "config.h"
 
-BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat, Int iOverlap)
+BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat, Int iOverlap) : processSignal(1), readySignal(1)
 {
-	process	= False;
+	processSignal.Wait();
+
 	flush	= False;
 	quit	= False;
 
@@ -192,11 +193,9 @@ Int BoCA::SuperWorker::Run()
 {
 	while (!quit)
 	{
-		while (!quit && !process) S::System::System::Sleep(1);
+		processSignal.Wait();
 
 		if (quit) break;
-
-		workerMutex.Lock();
 
 		packetBuffer.Resize(0);
 		packetSizes.RemoveAll();
@@ -255,9 +254,7 @@ Int BoCA::SuperWorker::Run()
 			if (dataLength > 0) packetSizes.Add(dataLength);
 		}
 
-		workerMutex.Release();
-
-		process	= False;
+		readySignal.Release();
 	}
 
 	return Success();
@@ -265,16 +262,13 @@ Int BoCA::SuperWorker::Run()
 
 Void BoCA::SuperWorker::Encode(const Buffer<UnsignedByte> &buffer, Int offset, Int samples, Bool last)
 {
-	workerMutex.Lock();
-
 	samplesBuffer.Resize(samples * bytesPerSample);
 
 	memcpy(samplesBuffer, buffer + offset * bytesPerSample, samples * bytesPerSample);
 
-	workerMutex.Release();
+	flush = last;
 
-	flush	= last;
-	process = True;
+	processSignal.Release();
 }
 
 Void BoCA::SuperWorker::ReEncode(Int skipFrames, Int dummyFrames)
@@ -301,22 +295,17 @@ Void BoCA::SuperWorker::ReEncode(Int skipFrames, Int dummyFrames)
 	/* Encode dummy frames to pressure reservoir.
 	 */
 	Encode(dummyBuffer, 0, dummyBuffer.Size() / bytesPerSample, flush);
-
-	workerMutex.Release();
-
-	while (process) S::System::System::Sleep(1);
-
-	workerMutex.Lock();
+	WaitUntilReady();
 
 	/* Re-encode previous samples.
 	 */
 	Encode(backupBuffer, 0, backupBuffer.Size() / bytesPerSample, flush);
+	WaitUntilReady();
+}
 
-	workerMutex.Release();
-
-	while (process) S::System::System::Sleep(1);
-
-	workerMutex.Lock();
+Void BoCA::SuperWorker::WaitUntilReady()
+{
+	readySignal.Wait();
 }
 
 Void BoCA::SuperWorker::GetInfoTag(Buffer<UnsignedByte> &buffer) const
@@ -331,6 +320,8 @@ Void BoCA::SuperWorker::GetInfoTag(Buffer<UnsignedByte> &buffer) const
 Int BoCA::SuperWorker::Quit()
 {
 	quit = True;
+
+	processSignal.Release();
 
 	return Success();
 }
