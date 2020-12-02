@@ -166,7 +166,9 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	Bool	 mp4Container = config->GetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", True);
 	Int	 mpegVersion  = config->GetIntValue(ConfigureFDKAAC::ConfigID, "MPEGVersion", 0);
 	Int	 aacType      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "AACType", AOT_AAC_LC);
+	Int	 mode	      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Mode", 0);
 	Int	 bitrate      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
+	Int	 quality      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Quality", 4);
 
 	/* Create and configure FDK AAC encoder.
 	 */
@@ -190,8 +192,10 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	ex_aacEncoder_SetParam(handle, AACENC_SAMPLERATE, format.rate);
 	ex_aacEncoder_SetParam(handle, AACENC_CHANNELMODE, channelMode);
 
+	if (mode == 0) ex_aacEncoder_SetParam(handle, AACENC_BITRATE, bitrate * 1000 * format.channels);
+	else	       ex_aacEncoder_SetParam(handle, AACENC_BITRATEMODE, quality);
+
 	ex_aacEncoder_SetParam(handle, AACENC_AOT, mpegVersion + aacType);
-	ex_aacEncoder_SetParam(handle, AACENC_BITRATE, bitrate * 1000 * format.channels);
 	ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, mp4Container ? TT_MP4_RAW : TT_MP4_ADTS);
 
 	if (!mp4Container)

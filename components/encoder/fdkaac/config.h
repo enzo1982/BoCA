@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -59,22 +59,31 @@ namespace BoCA
 			Layer			*layer_quality;
 
 			GroupBox		*group_bitrate;
-			Text			*text_bitrate;
+			OptionBox		*option_bitrate;
 			Slider			*slider_bitrate;
 			EditBox			*edit_bitrate;
 			Text			*text_bitrate_kbps;
+			OptionBox		*option_quality;
+			Slider			*slider_quality;
+			Text			*text_quality_level;
+			Text			*text_quality_worse;
+			Text			*text_quality_better;
 
 			Int			 mpegVersion;
 			Int			 aacType;
+			Int			 mode;
 			Int			 bitrate;
+			Int			 quality;
 			Bool			 allowID3;
 			Int			 fileFormat;
 			Int			 fileExtension;
 		slots:
 			Void			 SetMPEGVersion();
 			Void			 SetObjectType();
+			Void			 SetMode();
 			Void			 SetBitrate();
 			Void			 SetBitrateByEditBox();
+			Void			 SetQuality();
 			Void			 SetFileFormat();
 		public:
 			static const String	 ConfigID;

@@ -21,7 +21,9 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	mpegVersion	= config->GetIntValue(ConfigID, "MPEGVersion", 0);
 	aacType		= config->GetIntValue(ConfigID, "AACType", AOT_AAC_LC);
+	mode		= config->GetIntValue(ConfigID, "Mode", 0);
 	bitrate		= config->GetIntValue(ConfigID, "Bitrate", 64);
+	quality		= config->GetIntValue(ConfigID, "Quality", 4);
 	allowID3	= config->GetIntValue(ConfigID, "AllowID3v2", False);
 	fileFormat	= config->GetIntValue(ConfigID, "MP4Container", True);
 	fileExtension	= config->GetIntValue(ConfigID, "MP4FileExtension", 0);
@@ -126,9 +128,11 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	layer_quality		= new Layer(i18n->TranslateString("Quality"));
 
-	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate"), Point(7, 11), Size(group_id3v2->GetWidth() + 128, 43));
+	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate / Quality"), Point(7, 11), Size(group_id3v2->GetWidth() + 128, 78));
 
-	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 15));
+	option_bitrate		= new OptionBox(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 13), Size(150, 0), &mode, 0);
+	option_bitrate->onAction.Connect(&ConfigureFDKAAC::SetMode, this);
+	option_bitrate->SetWidth(option_bitrate->GetUnscaledTextWidth() + 19);
 
 	text_bitrate_kbps	= new Text(i18n->TranslateString("%1 kbps", "Technical").Replace("%1", NIL).Trim(), Point(35, 15));
 	text_bitrate_kbps->SetX(text_bitrate_kbps->GetUnscaledTextWidth() + 10);
@@ -139,18 +143,41 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	edit_bitrate->SetOrientation(OR_UPPERRIGHT);
 	edit_bitrate->onInput.Connect(&ConfigureFDKAAC::SetBitrateByEditBox, this);
 
-	slider_bitrate		= new Slider(Point(text_bitrate->GetUnscaledTextSize().cx + 17, 13), Size(group_bitrate->GetWidth() - edit_bitrate->GetX() - 25 - text_bitrate->GetUnscaledTextSize().cx, 0), OR_HORZ, &bitrate, 8, 256);
+	slider_bitrate		= new Slider(Point(option_bitrate->GetWidth() + 18, 13), Size(group_bitrate->GetWidth() - edit_bitrate->GetX() - 26 - option_bitrate->GetWidth(), 0), OR_HORZ, &bitrate, 8, 256);
 	slider_bitrate->onValueChange.Connect(&ConfigureFDKAAC::SetBitrate, this);
 
-	group_bitrate->Add(text_bitrate);
+	option_quality		= new OptionBox(i18n->AddColon(i18n->TranslateString("Set quality")), Point(10, 38), Size(150, 0), &mode, 1);
+	option_quality->onAction.Connect(&ConfigureFDKAAC::SetMode, this);
+	option_quality->SetWidth(option_bitrate->GetWidth());
+
+	slider_quality		= new Slider(Point(option_quality->GetWidth() + 18, 38), Size(slider_bitrate->GetWidth(), 0), OR_HORZ, &quality, 1, 5);
+	slider_quality->onValueChange.Connect(&ConfigureFDKAAC::SetQuality, this);
+
+	text_quality_level	= new Text(NIL, Point(edit_bitrate->GetX(), 40));
+	text_quality_level->SetOrientation(OR_UPPERRIGHT);
+
+	text_quality_worse	= new Text(i18n->TranslateString("worse"), Point(slider_quality->GetX(), 57));
+	text_quality_worse->SetX(text_quality_worse->GetX() - text_quality_worse->GetUnscaledTextWidth() / 2);
+
+	text_quality_better	= new Text(i18n->TranslateString("better"), Point(slider_quality->GetX() + slider_quality->GetWidth(), 57));
+	text_quality_better->SetX(text_quality_better->GetX() - text_quality_better->GetUnscaledTextWidth() / 2);
+
+	group_bitrate->Add(option_bitrate);
 	group_bitrate->Add(slider_bitrate);
 	group_bitrate->Add(edit_bitrate);
 	group_bitrate->Add(text_bitrate_kbps);
+	group_bitrate->Add(option_quality);
+	group_bitrate->Add(slider_quality);
+	group_bitrate->Add(text_quality_level);
+	group_bitrate->Add(text_quality_worse);
+	group_bitrate->Add(text_quality_better);
 
 	SetFileFormat();
 	SetMPEGVersion();
 	SetObjectType();
+	SetMode();
 	SetBitrate();
+	SetQuality();
 
 	tabwidget->SetSize(Size(group_id3v2->GetWidth() + 146, Math::Max(258, group_id3v2->GetHeight() + 118)));
 
@@ -199,10 +226,15 @@ BoCA::ConfigureFDKAAC::~ConfigureFDKAAC()
 	DeleteObject(text_id3v2);
 
 	DeleteObject(group_bitrate);
-	DeleteObject(text_bitrate);
+	DeleteObject(option_bitrate);
 	DeleteObject(slider_bitrate);
 	DeleteObject(edit_bitrate);
 	DeleteObject(text_bitrate_kbps);
+	DeleteObject(option_quality);
+	DeleteObject(slider_quality);
+	DeleteObject(text_quality_level);
+	DeleteObject(text_quality_worse);
+	DeleteObject(text_quality_better);
 }
 
 Int BoCA::ConfigureFDKAAC::SaveSettings()
@@ -214,7 +246,9 @@ Int BoCA::ConfigureFDKAAC::SaveSettings()
 
 	config->SetIntValue(ConfigID, "MPEGVersion", mpegVersion);
 	config->SetIntValue(ConfigID, "AACType", aacType);
+	config->SetIntValue(ConfigID, "Mode", mode);
 	config->SetIntValue(ConfigID, "Bitrate", bitrate);
+	config->SetIntValue(ConfigID, "Quality", quality);
 	config->SetIntValue(ConfigID, "AllowID3v2", allowID3);
 	config->SetIntValue(ConfigID, "MP4Container", fileFormat);
 	config->SetIntValue(ConfigID, "MP4FileExtension", fileExtension);
@@ -276,6 +310,32 @@ Void BoCA::ConfigureFDKAAC::SetObjectType()
 	SetBitrate();
 }
 
+Void BoCA::ConfigureFDKAAC::SetMode()
+{
+	if (mode == 0)	// bitrate
+	{
+		slider_quality->Deactivate();
+		text_quality_level->Deactivate();
+		text_quality_worse->Deactivate();
+		text_quality_better->Deactivate();
+
+		slider_bitrate->Activate();
+		edit_bitrate->Activate();
+		text_bitrate_kbps->Activate();
+	}
+	else		// quality
+	{
+		slider_bitrate->Deactivate();
+		edit_bitrate->Deactivate();
+		text_bitrate_kbps->Deactivate();
+
+		slider_quality->Activate();
+		text_quality_level->Activate();
+		text_quality_worse->Activate();
+		text_quality_better->Activate();
+	}
+}
+
 Void BoCA::ConfigureFDKAAC::SetBitrate()
 {
 	if (!edit_bitrate->IsFocussed()) edit_bitrate->SetText(String::FromInt(bitrate));
@@ -284,6 +344,11 @@ Void BoCA::ConfigureFDKAAC::SetBitrate()
 Void BoCA::ConfigureFDKAAC::SetBitrateByEditBox()
 {
 	slider_bitrate->SetValue(edit_bitrate->GetText().ToInt());
+}
+
+Void BoCA::ConfigureFDKAAC::SetQuality()
+{
+	text_quality_level->SetText(String::FromInt(quality));
 }
 
 Void BoCA::ConfigureFDKAAC::SetFileFormat()
