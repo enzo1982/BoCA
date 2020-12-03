@@ -100,7 +100,7 @@ Global compiler settings (useful for porting)
         #define ENABLE_SSE_ASSEMBLY
     #endif
     #ifdef _MSC_VER // doesn't compile in gcc
-        #ifndef PLATFORM_x64
+        #if defined(_M_IX86)
             #define ENABLE_MMX_ASSEMBLY
         #endif
     #endif
@@ -127,19 +127,19 @@ Global types
 namespace APE
 {
     // integer types
-    typedef int32_t                                     int32;
+    typedef uint64_t                                    uint64;
+    typedef uint32_t                                    uint32;
+    typedef uint16_t                                    uint16;
+    typedef uint8_t                                     uint8;
+    
     typedef int64_t                                     int64;
+    typedef int32_t                                     int32;
+    typedef int16_t                                     int16;
+    typedef int8_t                                      int8;
 
     typedef intptr_t                                    intn; // native integer, can safely hold a pointer
     typedef uintptr_t                                   uintn;
 
-    typedef uint64_t                                    uint64;
-    typedef uint32_t                                    uint32;
-    typedef uint16_t                                    uint16;
-    typedef int16_t                                     int16;
-    typedef uint8_t                                     uint8;
-    typedef int8_t                                      int8;
-    
     // string types
     typedef char                                        str_ansi;
     typedef unsigned char                               str_utf8;
@@ -316,7 +316,7 @@ Error Codes
 #define ERROR_INITIALIZING_UNMAC                        1011
 #define ERROR_INVALID_FUNCTION_PARAMETER                1012
 #define ERROR_UNSUPPORTED_FILE_TYPE                     1013
-#define ERROR_UPSUPPORTED_FILE_VERSION                  1014
+#define ERROR_UNSUPPORTED_FILE_VERSION                  1014
 
 // memory errors (2000's)
 #define ERROR_INSUFFICIENT_MEMORY                       2000

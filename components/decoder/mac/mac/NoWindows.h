@@ -6,7 +6,13 @@
 #ifdef _MSC_VER
     typedef int BOOL;
 #elif defined(PLATFORM_APPLE)
-    typedef signed char BOOL;  // this is the way it's defined in Obj-C
+    #ifndef OBJC_BOOL_DEFINED
+        #if OBJC_BOOL_IS_BOOL
+            typedef bool BOOL;
+        #else
+            typedef signed char BOOL; // this is the way it's defined in Obj-C
+        #endif
+    #endif
 #else
     typedef unsigned char BOOL; // this is the way it's defined in X11
 #endif

@@ -451,7 +451,7 @@ Usage example:
 *************************************************************************************************/
 extern "C"
 {
-    APE::IAPEDecompress * __stdcall CreateIAPEDecompress(const APE::str_utfn * pFilename, int * pErrorCode = NULL);
+    APE::IAPEDecompress * __stdcall CreateIAPEDecompress(const APE::str_utfn * pFilename, int * pErrorCode = NULL, bool bReadOnly = true);
     APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx(APE::CIO * pIO, int * pErrorCode = NULL);
     APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx2(APE::CAPEInfo * pAPEInfo, int nStartBlock = -1, int nFinishBlock = -1, int * pErrorCode = NULL);
     APE::IAPECompress * __stdcall CreateIAPECompress(int * pErrorCode = NULL);

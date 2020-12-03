@@ -197,7 +197,11 @@ public:
     // set helpers (use with EXTREME caution)
     void SetFieldFlags(int nFlags) { m_nFieldFlags = nFlags; }
 
-private:        
+private:  
+    // helpers
+    void Save32(char* pBuffer, int nValue);
+
+    // data
     CSmartPtr<str_utfn> m_spFieldNameUTF16;
     CSmartPtr<char> m_spFieldValue;
     int m_nFieldFlags;
