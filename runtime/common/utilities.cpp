@@ -251,13 +251,15 @@ String BoCA::Utilities::GetAbsolutePathName(const String &path)
 
 /* This function takes a file name and normalizes all the
  * directory names included in the path by removing spaces
- * and dots at the end. It also shortens each directory
- * and the file name to a maximum of 248 characters.
+ * and dots at the end. It also shortens each directory name
+ * to a maximum of 255 characters and the file name to 246
+ * characters (to leave room for file extensions).
  */
 String BoCA::Utilities::NormalizeFileName(const String &fileName)
 {
-	Int	 maxLength = 248;
-	String	 path	   = fileName;
+	Int	 maxFolderLength = 255;
+	Int	 maxFileLength	 = 246;
+	String	 path		 = fileName;
 
 	/* Normalize directory delimiters.
 	 */
@@ -272,7 +274,8 @@ String BoCA::Utilities::NormalizeFileName(const String &fileName)
 	{
 		/* Shorten to at most maxLength characters.
 		 */
-		if (component.Length() > maxLength) component[maxLength] = 0;
+		if	(foreachindex  < components.Length() - 1 && component.Length() > maxFolderLength) component[maxFolderLength] = 0;
+		else if (foreachindex == components.Length() - 1 && component.Length() > maxFileLength)	  component[maxFileLength]   = 0;
 
 		/* Replace trailing dots and spaces.
 		 */
