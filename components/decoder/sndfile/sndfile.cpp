@@ -375,7 +375,7 @@ Bool BoCA::DecoderSndFile::Activate()
 #ifdef __WIN32__
 	String	 uncPath = String(track.fileName.StartsWith("\\\\") ? "" : uncPrefix).Append(track.fileName);
 
-	file = _wfopen(track.fileName, L"rbN");
+	file = _wfopen(uncPath, L"rbN");
 #else
 	file = fopen(track.fileName.ConvertTo("UTF-8"), "rb");
 #endif
