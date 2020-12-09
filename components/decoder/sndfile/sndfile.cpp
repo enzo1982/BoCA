@@ -137,10 +137,16 @@ Void smooth::DetachDLL()
 	FreeSndFileDLL();
 }
 
-namespace BoCA
+#ifdef __WIN32__
+static String toUNCPath(const String &streamURI)
 {
+	if (streamURI.StartsWith("\\\\")) return streamURI;
+
 	static const String	 uncPrefix = "\\\\?\\";
-};
+
+	return uncPrefix.Append(File(streamURI));
+}
+#endif
 
 Bool BoCA::DecoderSndFile::CanOpenStream(const String &streamURI)
 {
@@ -157,9 +163,7 @@ Bool BoCA::DecoderSndFile::CanOpenStream(const String &streamURI)
 	FILE	*file = 0;
 
 #ifdef __WIN32__
-	String	 uncPath = String(streamURI.StartsWith("\\\\") ? "" : uncPrefix).Append(streamURI);
- 
-	file = _wfopen(uncPath, L"rbN");
+	file = _wfopen(toUNCPath(streamURI), L"rbN");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rbe");
 #endif
@@ -187,9 +191,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 	FILE	*file = 0;
 
 #ifdef __WIN32__
-	String	 uncPath = String(streamURI.StartsWith("\\\\") ? "" : uncPrefix).Append(streamURI);
-
-	file = _wfopen(uncPath, L"rbN");
+	file = _wfopen(toUNCPath(streamURI), L"rbN");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rbe");
 #endif
@@ -373,9 +375,7 @@ Bool BoCA::DecoderSndFile::Activate()
 	/* Open input file.
 	 */
 #ifdef __WIN32__
-	String	 uncPath = String(track.fileName.StartsWith("\\\\") ? "" : uncPrefix).Append(track.fileName);
-
-	file = _wfopen(uncPath, L"rbN");
+	file = _wfopen(toUNCPath(track.fileName), L"rbN");
 #else
 	file = fopen(track.fileName.ConvertTo("UTF-8"), "rb");
 #endif

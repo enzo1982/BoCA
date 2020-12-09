@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -78,10 +78,14 @@ Void smooth::DetachDLL()
 	FreeWMVCoreDLL();
 }
 
-namespace BoCA
+static String toUNCPath(const String &streamURI)
 {
+	if (streamURI.StartsWith("\\\\")) return streamURI;
+
 	static const String	 uncPrefix = "\\\\?\\";
-};
+
+	return uncPrefix.Append(File(streamURI));
+}
 
 Void BoCA::DecoderWMA::Initialize()
 {
@@ -136,9 +140,7 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Open file.
 	 */
-	String	 uncPath = String(streamURI.StartsWith("\\\\") ? "" : uncPrefix).Append(streamURI);
-
-	hr = reader->Open(uncPath, readerCallback, NIL);
+	hr = reader->Open(toUNCPath(streamURI), readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.
@@ -323,9 +325,7 @@ Bool BoCA::DecoderWMA::Activate()
 
 	/* Open file.
 	 */
-	String	 uncPath = String(track.fileName.StartsWith("\\\\") ? "" : uncPrefix).Append(track.fileName);
-
-	hr = reader->Open(uncPath, readerCallback, NIL);
+	hr = reader->Open(toUNCPath(track.fileName), readerCallback, NIL);
 
 	/* Wait for the Open call to complete. The event is set in the
 	 * OnStatus callback when the reader reports completion.

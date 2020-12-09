@@ -142,10 +142,14 @@ Void smooth::DetachDLL()
 	FreeWMVCoreDLL();
 }
 
-namespace BoCA
+static String toUNCPath(const String &streamURI)
 {
+	if (streamURI.StartsWith("\\\\")) return streamURI;
+
 	static const String	 uncPrefix = "\\\\?\\";
-};
+
+	return uncPrefix.Append(File(streamURI));
+}
 
 Void BoCA::EncoderWMA::Initialize()
 {
@@ -272,7 +276,7 @@ Bool BoCA::EncoderWMA::Activate()
 
 	/* A temporary file is needed if the path exceeds 255 characters.
 	 */
-	String	 outputFile = String(track.outputFile.StartsWith("\\\\") ? "" : uncPrefix).Append(track.outputFile);
+	String	 outputFile = toUNCPath(track.outputFile);
 
 	if (track.outputFile.Length() > 255) outputFile = Utilities::GetNonUnicodeTempFileName(track.outputFile);
 
