@@ -44,7 +44,7 @@ jobs:
           CXX: ${{ matrix.cxx }}
         run: |
           cd smooth
-          make
+          make -j$(nproc)
           sudo make install prefix=/usr/local
           cd ..
 
@@ -60,13 +60,13 @@ jobs:
           wget https://ftp.gnu.org/gnu/libcdio/libcdio-2.1.0.tar.bz2
           tar xfj libcdio-2.1.0.tar.bz2
           cd libcdio-2.1.0
-          ./configure --prefix=/usr/local && make && sudo make install
+          ./configure --prefix=/usr/local && make -j$(nproc) && sudo make install
           cd ..
           wget https://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-10.2+2.0.1.tar.bz2
           tar xfj libcdio-paranoia-10.2+2.0.1.tar.bz2
           cd libcdio-paranoia-10.2+2.0.1
           sed -i -e "s/-Wl,--version-script=.*\.la\.ver//" lib/*/Makefile.in
-          ./configure --prefix=/usr/local && make && sudo make install
+          ./configure --prefix=/usr/local && make -j$(nproc) && sudo make install
           cd ..
 
       - name: Checkout repository
@@ -86,4 +86,4 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
         run: |
-          make
+          make -j$(nproc)
