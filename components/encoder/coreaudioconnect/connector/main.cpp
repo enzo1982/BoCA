@@ -347,9 +347,9 @@ int main(int argc, char *argv[])
 #ifdef __WINE__
 					file	   = fopen(setup.file, "r+b");
 #else
-					wchar_t	 fileName[32768];
+					wchar_t	 fileName[32768] = L"\\\\?\\";
 
-					MultiByteToWideChar(CP_UTF8, 0, setup.file, -1, fileName, sizeof(fileName) / sizeof(wchar_t));
+					MultiByteToWideChar(CP_UTF8, 0, setup.file, -1, fileName + 4, sizeof(fileName) / sizeof(wchar_t) - 4);
 
 					file	   = _wfopen(fileName, L"r+b");
 #endif

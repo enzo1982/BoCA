@@ -143,20 +143,22 @@ Bool BoCA::Utilities::FreeCodecDLL(DynamicLoader *loader)
 /* Computes a non-Unicode temporary file name for
  * the passed file name.
  */
-String BoCA::Utilities::GetNonUnicodeTempFileName(const String &fileName)
+String BoCA::Utilities::GetNonUnicodeTempFileName(const String &file)
 {
+	const String	&tempDir = S::System::System::GetTempDirectory();
+
 	/* Replace Unicode characters in input file name and
 	 * append CRC32 of orignal file name to avoid name clashes.
 	 */
-	String	 file = File(fileName).GetFileName();
+	String	 fileName = File(file).GetFileName().Head(259 - tempDir.Length() - 14);
 
-	for (Int i = 0; i < file.Length(); i++) if (file[i] > 127) file[i] = '#';
+	for (Int i = 0; i < fileName.Length(); i++) if (fileName[i] > 127) fileName[i] = '#';
 
-	file.Append("-").Append(Number(Int64(fileName.ComputeCRC32())).ToHexString(8));
+	fileName.Append("-").Append(Number(Int64(file.ComputeCRC32())).ToHexString(8));
 
 	/* Return temporary file name in temp folder.
 	 */
-	return S::System::System::GetTempDirectory().Append(file).Append(".temp");
+	return tempDir.Append(fileName).Append(".temp");
 }
 
 /* Replaces or strips characters not allowed in file names.
