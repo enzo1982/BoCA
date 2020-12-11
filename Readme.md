@@ -1,6 +1,6 @@
 BoCA - fre:ac Component Architecture
 ====================================================================================================
-[![Build Status](https://travis-ci.com/enzo1982/BoCA.svg?branch=master)](https://travis-ci.com/enzo1982/BoCA) [![Last commit](https://img.shields.io/github/last-commit/enzo1982/BoCA.svg)](https://github.com/enzo1982/BoCA/commits/master) [![License](https://img.shields.io/github/license/enzo1982/BoCA.svg)](https://github.com/enzo1982/BoCA/blob/master/COPYING)
+[![Build Status](https://img.shields.io/github/workflow/status/enzo1982/BoCA/Verify%20build/master)](https://github.com/enzo1982/BoCA/actions?query=workflow%3A%22Verify+build%22+branch%3Amaster) [![Last commit](https://img.shields.io/github/last-commit/enzo1982/BoCA.svg)](https://github.com/enzo1982/BoCA/commits/master) [![License](https://img.shields.io/github/license/enzo1982/BoCA.svg)](https://github.com/enzo1982/BoCA/blob/master/COPYING)
 
 BoCA is the component framework behind the fre:ac audio converter. It provides unified interfaces
 for components like encoders, decoders, taggers and extensions as well as code to support
