@@ -112,19 +112,14 @@ Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 
 	infoTrack	   = &track;
 	stop		   = False;
+	finishing	   = False;
 	finished	   = False;
 
 	offset		   = in.GetPos();
 	driver		   = &ioDriver;
 	driver->Seek(offset);
 
-	readDataMutex	   = new Mutex();
-	samplesBufferMutex = new Mutex();
-
 	ReadMAD(False);
-
-	delete readDataMutex;
-	delete samplesBufferMutex;
 
 	if (track.GetFormat() == Format()) { errorState = True; errorString = "Invalid file format"; }
 
@@ -165,31 +160,28 @@ Error BoCA::DecoderMAD::GetStreamInfo(const String &streamURI, Track &track)
 	else		return Success();
 }
 
-BoCA::DecoderMAD::DecoderMAD()
+BoCA::DecoderMAD::DecoderMAD() : samplesRequestedSignal(1), samplesAvailableSignal(1)
 {
-	configLayer	   = NIL;
+	configLayer	 = NIL;
 
-	readDataMutex	   = NIL;
-	samplesBufferMutex = NIL;
+	infoTrack	 = NIL;
+	decoderThread	 = NIL;
 
-	decoderThread	   = NIL;
+	stop		 = False;
+	finishing	 = False;
+	finished	 = False;
 
-	infoTrack	   = NIL;
+	offset		 = 0;
 
-	stop		   = False;
-	finished	   = False;
+	numBytes	 = 0;
+	numFrames	 = 0;
 
-	offset		   = 0;
-
-	numBytes	   = 0;
-	numFrames	   = 0;
-
-	delaySamples	   = 0;
-	padSamples	   = 0;
+	delaySamples	 = 0;
+	padSamples	 = 0;
 
 	/* Initialize to decoder delay.
 	 */
-	delaySamplesLeft   = 529;
+	delaySamplesLeft = 529;
 }
 
 BoCA::DecoderMAD::~DecoderMAD()
@@ -210,15 +202,14 @@ Bool BoCA::DecoderMAD::Activate()
 
 	/* Prepare decoder.
 	 */
-	stop		   = False;
-	finished	   = False;
+	infoTrack     = new Track();
+	decoderThread = NIL;
 
-	readDataMutex	   = new Mutex();
-	samplesBufferMutex = new Mutex();
+	stop	      = False;
+	finishing     = False;
+	finished      = False;
 
-	readDataMutex->Lock();
-
-	decoderThread	   = NIL;
+	samplesAvailableSignal.Wait();
 
 	return True;
 }
@@ -229,13 +220,12 @@ Bool BoCA::DecoderMAD::Deactivate()
 	{
 		stop = True;
 
-		readDataMutex->Release();
+		samplesRequestedSignal.Release();
 
 		decoderThread->Wait();
 	}
 
-	delete readDataMutex;
-	delete samplesBufferMutex;
+	delete infoTrack;
 
 	return True;
 }
@@ -246,21 +236,15 @@ Int BoCA::DecoderMAD::ReadData(Buffer<UnsignedByte> &data)
 
 	if (decoderThread == NIL) decoderThread = NonBlocking1<Bool>(&DecoderMAD::ReadMAD, this).Call(True);
 
-	if (decoderThread->GetStatus() != THREAD_RUNNING && samplesBuffer.Size() <= 0) return -1;
+	if (finished && samplesBuffer.Size() <= 0) return -1;
 
+	samplesAvailableSignal.Wait();
+
+	/* Convert samples to target format.
+	 */
 	const Format	&format = track.GetFormat();
 
-	readDataMutex->Release();
-
-	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
-
-	readDataMutex->Lock();
-
-	samplesBufferMutex->Lock();
-
-	Int	 size = samplesBuffer.Size() * (format.bits / 8);
-
-	data.Resize(size);
+	data.Resize(samplesBuffer.Size() * (format.bits / 8));
 
 	for (Int i = 0; i < samplesBuffer.Size(); i++)
 	{
@@ -274,9 +258,9 @@ Int BoCA::DecoderMAD::ReadData(Buffer<UnsignedByte> &data)
 
 	samplesBuffer.Resize(0);
 
-	samplesBufferMutex->Release();
+	samplesRequestedSignal.Release();
 
-	return size;
+	return data.Size();
 }
 
 Bool BoCA::DecoderMAD::SkipID3v2Tag(InStream &in)
@@ -462,12 +446,22 @@ Int BoCA::DecoderMAD::GetMPEGFrameSize(const Buffer<UnsignedByte> &header)
 
 Int BoCA::DecoderMAD::ReadMAD(Bool readData)
 {
+	/* Initialize decoder.
+	 */
 	mad_decoder	 decoder;
 
 	if (readData)	ex_mad_decoder_init(&decoder, this, &MADInputCallback, NIL, NIL, &MADOutputCallback, &MADErrorCallback, NIL);
 	else		ex_mad_decoder_init(&decoder, this, &MADInputCallback, NIL, NIL, &MADHeaderCallback, &MADErrorCallback, NIL);
 
+	/* Process header and audio.
+	 */
 	ex_mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
+
+	/* Finish and free decoder.
+	 */
+	finished = True;
+
+	samplesAvailableSignal.Release();
 
 	ex_mad_decoder_finish(&decoder);
 
@@ -485,26 +479,22 @@ mad_flow BoCA::MADInputCallback(void *client_data, mad_stream *stream)
 {
 	DecoderMAD	*filter = (DecoderMAD *) client_data;
 
-	if (filter->stop || filter->finished) return MAD_FLOW_STOP;
-
-	filter->readDataMutex->Lock();
+	if (filter->stop || filter->finishing) return MAD_FLOW_STOP;
 
 	/* Check if we have any more data. If not, append an empty
 	 * frame to the last frame to allow the decoder to finish.
 	 */
-	if (filter->driver->GetPos() == filter->driver->GetSize()) filter->finished = True;
+	if (filter->driver->GetPos() == filter->driver->GetSize()) filter->finishing = True;
 
-	Int	 bytes = Math::Min((Int64) 131072, filter->finished ? 1440 : filter->driver->GetSize() - filter->driver->GetPos());
+	Int	 bytes = Math::Min((Int64) 131072, filter->finishing ? 1440 : filter->driver->GetSize() - filter->driver->GetPos());
 	Int	 backup = stream->bufend - stream->next_frame;
 
 	memmove(filter->inputBuffer, stream->next_frame, backup);
 
 	filter->inputBuffer.Resize(bytes + backup);
 
-	if (!filter->finished) filter->driver->ReadData(filter->inputBuffer + backup, bytes);
-	else		       memset(filter->inputBuffer + backup, 0, bytes);
-
-	filter->readDataMutex->Release();
+	if (!filter->finishing) filter->driver->ReadData(filter->inputBuffer + backup, bytes);
+	else			memset(filter->inputBuffer + backup, 0, bytes);
 
 	ex_mad_stream_buffer(stream, filter->inputBuffer, bytes + backup);
 
@@ -517,7 +507,9 @@ mad_flow BoCA::MADOutputCallback(void *client_data, const mad_header *header, ma
 {
 	DecoderMAD	*filter = (DecoderMAD *) client_data;
 
-	filter->samplesBufferMutex->Lock();
+	if (filter->stop) return MAD_FLOW_STOP;
+
+	filter->samplesRequestedSignal.Wait();
 
 	Int	 oSize = filter->samplesBuffer.Size();
 	Int	 channels = header->mode == MAD_MODE_SINGLE_CHANNEL ? 1 : 2;
@@ -537,7 +529,7 @@ mad_flow BoCA::MADOutputCallback(void *client_data, const mad_header *header, ma
 
 	filter->delaySamplesLeft = Math::Max(0, filter->delaySamplesLeft - pcm->length);
 
-	filter->samplesBufferMutex->Release();
+	filter->samplesAvailableSignal.Release();
 
 	return MAD_FLOW_CONTINUE;
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -30,6 +30,7 @@ namespace BoCA
 
 		private:
 			Bool			 stop;
+			Bool			 finished;
 
 			Int64			 seekPosition;
 
@@ -37,9 +38,10 @@ namespace BoCA
 
 			Track			*infoTrack;
 
-			Threads::Mutex		*readDataMutex;
-			Threads::Mutex		*samplesBufferMutex;
 			Threads::Thread		*decoderThread;
+
+			Threads::Semaphore	 samplesRequestedSignal;
+			Threads::Semaphore	 samplesAvailableSignal;
 
 			Int			 ReadFLAC(Bool);
 

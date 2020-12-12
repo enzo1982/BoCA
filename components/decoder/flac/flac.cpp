@@ -171,23 +171,18 @@ Error BoCA::DecoderFLAC::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Set up members.
 	 */
-	track.fileSize	   = in.Size();
+	track.fileSize	    = in.Size();
 
-	infoTrack	   = &track;
-	stop		   = False;
+	infoTrack	    = &track;
+	stop		    = False;
+	finished	    = False;
 
-	driver		   = &ioDriver;
+	driver		    = &ioDriver;
 	driver->Seek(in.GetPos());
 
 	/* Read metadata.
 	 */
-	readDataMutex	   = new Mutex();
-	samplesBufferMutex = new Mutex();
-
 	ReadFLAC(False);
-
-	delete readDataMutex;
-	delete samplesBufferMutex;
 
 	in.Close();
 	ioDriver.Close();
@@ -195,17 +190,15 @@ Error BoCA::DecoderFLAC::GetStreamInfo(const String &streamURI, Track &track)
 	return Success();
 }
 
-BoCA::DecoderFLAC::DecoderFLAC()
+BoCA::DecoderFLAC::DecoderFLAC() : samplesRequestedSignal(1), samplesAvailableSignal(1)
 {
-	readDataMutex	   = NIL;
-	samplesBufferMutex = NIL;
+	infoTrack     = NIL;
+	decoderThread = NIL;
 
-	infoTrack	   = NIL;
-	decoderThread	   = NIL;
+	stop	      = False;
+	finished      = False;
 
-	stop		   = False;
-
-	seekPosition	   = 0;
+	seekPosition  = 0;
 }
 
 BoCA::DecoderFLAC::~DecoderFLAC()
@@ -224,18 +217,15 @@ Bool BoCA::DecoderFLAC::Activate()
 
 	/* Prepare decoder.
 	 */
-	stop		   = False;
+	infoTrack     = new Track();
+	decoderThread = NIL;
 
-	seekPosition	   = 0;
+	stop	      = False;
+	finished      = False;
 
-	readDataMutex	   = new Mutex();
-	samplesBufferMutex = new Mutex();
+	seekPosition  = 0;
 
-	readDataMutex->Lock();
-
-	infoTrack	   = new Track();
-
-	decoderThread	   = NIL;
+	samplesAvailableSignal.Wait();
 
 	return True;
 }
@@ -246,13 +236,10 @@ Bool BoCA::DecoderFLAC::Deactivate()
 	{
 		stop = True;
 
-		readDataMutex->Release();
+		samplesRequestedSignal.Release();
 
 		decoderThread->Wait();
 	}
-
-	delete readDataMutex;
-	delete samplesBufferMutex;
 
 	delete infoTrack;
 
@@ -272,15 +259,9 @@ Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data)
 
 	if (decoderThread == NIL) decoderThread = NonBlocking1<Bool>(&DecoderFLAC::ReadFLAC, this).Call(True);
 
-	if (decoderThread->GetStatus() != THREAD_RUNNING && samplesBuffer.Size() <= 0) return -1;
+	if (finished && samplesBuffer.Size() <= 0) return -1;
 
-	readDataMutex->Release();
-
-	while (decoderThread->GetStatus() == THREAD_RUNNING && samplesBuffer.Size() <= 0) S::System::System::Sleep(1);
-
-	readDataMutex->Lock();
-
-	samplesBufferMutex->Lock();
+	samplesAvailableSignal.Wait();
 
 	/* Convert samples to target format.
 	 */
@@ -299,7 +280,7 @@ Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data)
 
 	samplesBuffer.Resize(0);
 
-	samplesBufferMutex->Release();
+	samplesRequestedSignal.Release();
 
 	return data.Size();
 }
@@ -341,6 +322,10 @@ Int BoCA::DecoderFLAC::ReadFLAC(Bool readData)
 
 	/* Finish and free decoder.
 	 */
+	finished = True;
+
+	samplesAvailableSignal.Release();
+
 	ex_FLAC__stream_decoder_finish(decoder);
 	ex_FLAC__stream_decoder_delete(decoder);
 
@@ -392,11 +377,7 @@ FLAC__StreamDecoderReadStatus BoCA::FLACStreamDecoderReadCallback(const FLAC__St
 	    return FLAC__STREAM_DECODER_READ_STATUS_ABORT;
 	}
 
-	filter->readDataMutex->Lock();
-
 	*bytes = filter->driver->ReadData(buffer, *bytes);
-
-	filter->readDataMutex->Release();
 
 	if (*bytes == 0) return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
 	else		 return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
@@ -406,7 +387,9 @@ FLAC__StreamDecoderWriteStatus BoCA::FLACStreamDecoderWriteCallback(const FLAC__
 {
 	DecoderFLAC	*filter = (DecoderFLAC *) client_data;
 
-	filter->samplesBufferMutex->Lock();
+	if (filter->stop) return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+
+	filter->samplesRequestedSignal.Wait();
 
 	Int	 oSize = filter->samplesBuffer.Size();
 
@@ -420,7 +403,7 @@ FLAC__StreamDecoderWriteStatus BoCA::FLACStreamDecoderWriteCallback(const FLAC__
 		}
 	}
 
-	filter->samplesBufferMutex->Release();
+	filter->samplesAvailableSignal.Release();
 
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
