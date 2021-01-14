@@ -4,7 +4,7 @@ converter. It provides unified interfaces for components like encoders, \
 decoders, taggers and extensions as well as code to support communication \
 between applications and their components."
 HOMEPAGE="https://github.com/enzo1982/BoCA"
-COPYRIGHT="2007-2020 Robert Kausch"
+COPYRIGHT="2007-2021 Robert Kausch"
 LICENSE="GNU GPL v2"
 REVISION="1"
 SOURCE_URI="https://github.com/enzo1982/BoCA/releases/download/v${portVersion/\~/-}/boca-${portVersion/\~/-}.tar.gz"
