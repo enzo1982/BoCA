@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -123,6 +123,8 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 	Bool		 writeChapters		 = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
 	Bool		 writeMCDI		 = currentConfig->GetIntValue(ConfigID, "WriteMCDI", True);
 
+	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
+
 	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
 	Bool		 coverArtWriteToWMA	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToWMAMetadata", True);
 
@@ -228,6 +230,23 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			else if	(key == INFO_WEB_SOURCE)     RenderWMAStringItem(g_wszWMAudioSourceURL,		 value, pHeaderInfo);
 			else if	(key == INFO_WEB_COPYRIGHT)  RenderWMAStringItem(g_wszWMCopyrightURL,		 value, pHeaderInfo);
 			else if	(key == INFO_WEB_COMMERCIAL) RenderWMAStringItem(g_wszWMPromotionURL,		 value, pHeaderInfo);
+		}
+
+		/* Save Replay Gain info.
+		 */
+		if (preserveReplayGain)
+		{
+			if (info.track_gain != NIL && info.track_peak != NIL)
+			{
+				RenderWMAStringItem("replaygain_track_gain", info.track_gain, pHeaderInfo);
+				RenderWMAStringItem("replaygain_track_peak", info.track_peak, pHeaderInfo);
+			}
+
+			if (info.album_gain != NIL && info.album_peak != NIL)
+			{
+				RenderWMAStringItem("replaygain_album_gain", info.album_gain, pHeaderInfo);
+				RenderWMAStringItem("replaygain_album_peak", info.album_peak, pHeaderInfo);
+			}
 		}
 
 		/* Save CD table of contents.
@@ -395,6 +414,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			/* Parse string values.
 			 */
+			String	 id = name;
 			String	 value;
 
 			if (type == WMT_TYPE_STRING)
@@ -412,50 +432,50 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			/* Assign values to metadata fields.
 			 */
-			if	(String(name) == g_wszWMAuthor)			 info.artist  = value;
-			else if (String(name) == g_wszWMTitle)			 info.title   = value;
-			else if (String(name) == g_wszWMAlbumTitle)		 info.album   = value;
-			else if (String(name) == g_wszWMYear)			 info.year    = value.ToInt();
-			else if (String(name) == g_wszWMGenre)			 info.genre   = value;
-			else if (String(name) == g_wszWMDescription)		 info.comment = value;
-			else if (String(name) == g_wszWMPublisher)		 info.label   = value;
-			else if (String(name) == g_wszWMISRC)			 info.isrc    = value;
+			if	(id == g_wszWMAuthor)		       info.artist  = value;
+			else if (id == g_wszWMTitle)		       info.title   = value;
+			else if (id == g_wszWMAlbumTitle)	       info.album   = value;
+			else if (id == g_wszWMYear)		       info.year    = value.ToInt();
+			else if (id == g_wszWMGenre)		       info.genre   = value;
+			else if (id == g_wszWMDescription)	       info.comment = value;
+			else if (id == g_wszWMPublisher)	       info.label   = value;
+			else if (id == g_wszWMISRC)		       info.isrc    = value;
 
-			else if (String(name) == g_wszWMAlbumArtist)		 info.SetOtherInfo(INFO_ALBUMARTIST,	value);
+			else if (id == g_wszWMAlbumArtist)	       info.SetOtherInfo(INFO_ALBUMARTIST,    value);
 
-			else if (String(name) == g_wszWMContentGroupDescription) info.SetOtherInfo(INFO_CONTENTGROUP,	value);
-			else if (String(name) == g_wszWMSubTitle)		 info.SetOtherInfo(INFO_SUBTITLE,	value);
+			else if (id == g_wszWMContentGroupDescription) info.SetOtherInfo(INFO_CONTENTGROUP,   value);
+			else if (id == g_wszWMSubTitle)		       info.SetOtherInfo(INFO_SUBTITLE,	      value);
 
-			else if (String(name) == g_wszWMConductor)		 info.SetOtherInfo(INFO_CONDUCTOR,	value);
-			else if (String(name) == g_wszWMModifiedBy)		 info.SetOtherInfo(INFO_REMIXER,	value);
-			else if (String(name) == g_wszWMComposer)		 info.SetOtherInfo(INFO_COMPOSER,	value);
-			else if (String(name) == g_wszWMWriter)			 info.SetOtherInfo(INFO_LYRICIST,	value);
-			else if (String(name) == g_wszWMProducer)		 info.SetOtherInfo(INFO_PRODUCER,	value);
+			else if (id == g_wszWMConductor)	       info.SetOtherInfo(INFO_CONDUCTOR,      value);
+			else if (id == g_wszWMModifiedBy)	       info.SetOtherInfo(INFO_REMIXER,	      value);
+			else if (id == g_wszWMComposer)		       info.SetOtherInfo(INFO_COMPOSER,	      value);
+			else if (id == g_wszWMWriter)		       info.SetOtherInfo(INFO_LYRICIST,	      value);
+			else if (id == g_wszWMProducer)		       info.SetOtherInfo(INFO_PRODUCER,	      value);
 
-			else if (String(name) == g_wszWMOriginalArtist)		 info.SetOtherInfo(INFO_ORIG_ARTIST,	value);
-			else if (String(name) == g_wszWMOriginalAlbumTitle)	 info.SetOtherInfo(INFO_ORIG_ALBUM,	value);
-			else if (String(name) == g_wszWMOriginalLyricist)	 info.SetOtherInfo(INFO_ORIG_LYRICIST,	value);
-			else if (String(name) == g_wszWMOriginalReleaseYear)	 info.SetOtherInfo(INFO_ORIG_YEAR,	value);
+			else if (id == g_wszWMOriginalArtist)	       info.SetOtherInfo(INFO_ORIG_ARTIST,    value);
+			else if (id == g_wszWMOriginalAlbumTitle)      info.SetOtherInfo(INFO_ORIG_ALBUM,     value);
+			else if (id == g_wszWMOriginalLyricist)	       info.SetOtherInfo(INFO_ORIG_LYRICIST,  value);
+			else if (id == g_wszWMOriginalReleaseYear)     info.SetOtherInfo(INFO_ORIG_YEAR,      value);
 
-			else if (String(name) == g_wszWMBeatsPerMinute)		 info.SetOtherInfo(INFO_BPM,		value);
-			else if (String(name) == g_wszWMInitialKey)		 info.SetOtherInfo(INFO_INITIALKEY,	value);
+			else if (id == g_wszWMBeatsPerMinute)	       info.SetOtherInfo(INFO_BPM,	      value);
+			else if (id == g_wszWMInitialKey)	       info.SetOtherInfo(INFO_INITIALKEY,     value);
 
-			else if (String(name) == g_wszWMCopyright)		 info.SetOtherInfo(INFO_COPYRIGHT,	value);
+			else if (id == g_wszWMCopyright)	       info.SetOtherInfo(INFO_COPYRIGHT,      value);
 
-			else if (String(name) == g_wszWMRadioStationName)	 info.SetOtherInfo(INFO_RADIOSTATION,	value);
-			else if (String(name) == g_wszWMRadioStationOwner)	 info.SetOtherInfo(INFO_RADIOOWNER,	value);
+			else if (id == g_wszWMRadioStationName)	       info.SetOtherInfo(INFO_RADIOSTATION,   value);
+			else if (id == g_wszWMRadioStationOwner)       info.SetOtherInfo(INFO_RADIOOWNER,     value);
 
-			else if (String(name) == g_wszWMAuthorURL)		 info.SetOtherInfo(INFO_WEB_ARTIST,	value);
-			else if (String(name) == g_wszWMAudioSourceURL)		 info.SetOtherInfo(INFO_WEB_SOURCE,	value);
-			else if (String(name) == g_wszWMCopyrightURL)		 info.SetOtherInfo(INFO_WEB_COPYRIGHT,	value);
-			else if (String(name) == g_wszWMPromotionURL)		 info.SetOtherInfo(INFO_WEB_COMMERCIAL,	value);
+			else if (id == g_wszWMAuthorURL)	       info.SetOtherInfo(INFO_WEB_ARTIST,     value);
+			else if (id == g_wszWMAudioSourceURL)	       info.SetOtherInfo(INFO_WEB_SOURCE,     value);
+			else if (id == g_wszWMCopyrightURL)	       info.SetOtherInfo(INFO_WEB_COPYRIGHT,  value);
+			else if (id == g_wszWMPromotionURL)	       info.SetOtherInfo(INFO_WEB_COMMERCIAL, value);
 
-			else if (String(name) == g_wszWMTrack)
+			else if (id == g_wszWMTrack)
 			{
 				if	(type == WMT_TYPE_DWORD)  info.track = 1 + ((DWORD *) pbValue)[0];
 				else if (type == WMT_TYPE_STRING) info.track = 1 + value.ToInt();
 			}
-			else if (String(name) == g_wszWMTrackNumber)
+			else if (id == g_wszWMTrackNumber)
 			{
 				if	(type == WMT_TYPE_DWORD)  info.track = ((DWORD *) pbValue)[0];
 				else if (type == WMT_TYPE_STRING)
@@ -465,19 +485,26 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 					if (value.Contains("/")) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 				}
 			}
-			else if (String(name) == g_wszWMPartOfSet)
+			else if (id == g_wszWMPartOfSet)
 			{
 				info.disc = value.ToInt();
 
 				if (value.Contains("/")) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 			}
-			else if (String(name) == g_wszWMSharedUserRating)
+			else if (id == g_wszWMSharedUserRating)
 			{
 				info.rating = (DWORD) *pbValue;
 
 				if (info.rating == 99) info.rating = 100;
 			}
-			else if (String(name) == g_wszWMMCDI)
+			else if (id.ToUpper().StartsWith("REPLAYGAIN"))
+			{
+				if	(id.ToUpper() == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;
+				else if (id.ToUpper() == "REPLAYGAIN_TRACK_PEAK") info.track_peak = value;
+				else if (id.ToUpper() == "REPLAYGAIN_ALBUM_GAIN") info.album_gain = value;
+				else if (id.ToUpper() == "REPLAYGAIN_ALBUM_PEAK") info.album_peak = value;
+			}
+			else if (id == g_wszWMMCDI)
 			{
 				/* Use a heuristic to detect if this is a valid binary MCDI
 				 * field or the commonly used track offset string.
@@ -521,7 +548,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 					}
 				}
 			}
-			else if (String(name) == g_wszWMPicture && config->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
+			else if (id == g_wszWMPicture && config->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 			{
 				WM_PICTURE	*picData = (WM_PICTURE *) pbValue;
 				Picture		 picture;

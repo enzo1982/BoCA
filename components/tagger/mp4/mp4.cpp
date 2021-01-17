@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -110,6 +110,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	const Config	*currentConfig		 = GetConfiguration();
 
 	Bool		 writeChapters		 = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
+
+	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
 
 	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
 	Bool		 coverArtWriteToMP4	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToMP4Metadata", True);
@@ -248,6 +250,23 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		else if	(key == INFO_BARCODE)	    AddItmfItem(mp4File, "BARCODE",	  value);
 
 		else if	(key == INFO_DISCSUBTITLE)  AddItmfItem(mp4File, "DISCSUBTITLE",  value);
+	}
+
+	/* Save Replay Gain info.
+	 */
+	if (preserveReplayGain)
+	{
+		if (info.track_gain != NIL && info.track_peak != NIL)
+		{
+			AddItmfItem(mp4File, "replaygain_track_gain", info.track_gain);
+			AddItmfItem(mp4File, "replaygain_track_peak", info.track_peak);
+		}
+
+		if (info.album_gain != NIL && info.album_peak != NIL)
+		{
+			AddItmfItem(mp4File, "replaygain_album_gain", info.album_gain);
+			AddItmfItem(mp4File, "replaygain_album_peak", info.album_peak);
+		}
 	}
 
 	/* Save chapters.
@@ -483,49 +502,89 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 {
+	String::InputFormat	 inputFormat("UTF-8");
+
 	/* Look for iTunes metadata items.
 	 */
 	MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", NIL);
 
-	if (items == NIL) return False;
-
-	/* Loop over items.
-	 */
-	String::InputFormat	 inputFormat("UTF-8");
-
-	for (UnsignedInt i = 0; i < items->size; i++)
+	if (items != NIL)
 	{
-		MP4ItmfItem	 item = items->elements[i];
-
-		/* Read and assign value string.
+		/* Loop over items.
 		 */
-		String	 id    = String(item.name).ToUpper();
-		String	 value = GetItmfItemValue(item);
+		for (UnsignedInt i = 0; i < items->size; i++)
+		{
+			MP4ItmfItem	 item = items->elements[i];
 
-		if (value == NIL) continue;
+			/* Read and assign value string.
+			 */
+			String	 id    = String(item.name).ToUpper();
+			String	 value = GetItmfItemValue(item);
 
-		if	(id == "LABEL"	   ||
-			 id == "PUBLISHER")	info.label = value;
+			if (value == NIL) continue;
 
-		else if (id == "ISRC")		info.isrc  = value;
+			if	(id == "LABEL"	   ||
+				 id == "PUBLISHER")	info.label = value;
 
-		else if (id == "SUBTITLE")	info.SetOtherInfo(INFO_SUBTITLE,      value);
+			else if (id == "ISRC")		info.isrc  = value;
 
-		else if (id == "CONDUCTOR")	info.SetOtherInfo(INFO_CONDUCTOR,     value);
-		else if (id == "REMIXER")	info.SetOtherInfo(INFO_REMIXER,	      value);
-		else if (id == "LYRICIST")	info.SetOtherInfo(INFO_LYRICIST,      value);
-		else if (id == "PRODUCER")	info.SetOtherInfo(INFO_PRODUCER,      value);
-		else if (id == "ENGINEER")	info.SetOtherInfo(INFO_ENGINEER,      value);
+			else if (id == "SUBTITLE")	info.SetOtherInfo(INFO_SUBTITLE,      value);
 
-		else if (id == "INITIALKEY")	info.SetOtherInfo(INFO_INITIALKEY,    value);
+			else if (id == "CONDUCTOR")	info.SetOtherInfo(INFO_CONDUCTOR,     value);
+			else if (id == "REMIXER")	info.SetOtherInfo(INFO_REMIXER,	      value);
+			else if (id == "LYRICIST")	info.SetOtherInfo(INFO_LYRICIST,      value);
+			else if (id == "PRODUCER")	info.SetOtherInfo(INFO_PRODUCER,      value);
+			else if (id == "ENGINEER")	info.SetOtherInfo(INFO_ENGINEER,      value);
 
-		else if (id == "CATALOGNUMBER")	info.SetOtherInfo(INFO_CATALOGNUMBER, value);
-		else if (id == "BARCODE")	info.SetOtherInfo(INFO_BARCODE,	      value);
+			else if (id == "INITIALKEY")	info.SetOtherInfo(INFO_INITIALKEY,    value);
 
-		else if (id == "DISCSUBTITLE")	info.SetOtherInfo(INFO_DISCSUBTITLE,  value);
+			else if (id == "CATALOGNUMBER")	info.SetOtherInfo(INFO_CATALOGNUMBER, value);
+			else if (id == "BARCODE")	info.SetOtherInfo(INFO_BARCODE,	      value);
+
+			else if (id == "DISCSUBTITLE")	info.SetOtherInfo(INFO_DISCSUBTITLE,  value);
+
+			else if (id.StartsWith("REPLAYGAIN"))
+			{
+				if	(id == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;
+				else if (id == "REPLAYGAIN_TRACK_PEAK") info.track_peak = value;
+				else if (id == "REPLAYGAIN_ALBUM_GAIN") info.album_gain = value;
+				else if (id == "REPLAYGAIN_ALBUM_PEAK") info.album_peak = value;
+			}
+		}
+
+		ex_MP4ItmfItemListFree(items);
 	}
 
-	ex_MP4ItmfItemListFree(items);
+	/* Look for Replay Gain items.
+	 */
+	items = ex_MP4ItmfGetItemsByMeaning(mp4File, "org.hydrogenaudio.replaygain", NIL);
+
+	if (items != NIL)
+	{
+		/* Loop over items.
+		 */
+		for (UnsignedInt i = 0; i < items->size; i++)
+		{
+			MP4ItmfItem	 item = items->elements[i];
+
+			/* Read and assign value string.
+			 */
+			String	 id    = String(item.name).ToUpper();
+			String	 value = GetItmfItemValue(item);
+
+			if (value == NIL) continue;
+
+			if	(id.StartsWith("REPLAYGAIN"))
+			{
+				if	(id == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;
+				else if (id == "REPLAYGAIN_TRACK_PEAK") info.track_peak = value;
+				else if (id == "REPLAYGAIN_ALBUM_GAIN") info.album_gain = value;
+				else if (id == "REPLAYGAIN_ALBUM_PEAK") info.album_peak = value;
+			}
+		}
+
+		ex_MP4ItmfItemListFree(items);
+	}
 
 	return True;
 }
