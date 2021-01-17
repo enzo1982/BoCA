@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -237,12 +237,12 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	misc_stereomode->Add(misc_combo_stereomode);
 	misc_stereomode->Add(misc_check_forcejs);
 
-	misc_bitrate			= new GroupBox(i18n->TranslateString("VBR bitrate range"), Point(7, 113), Size(misc_bits->GetWidth() + misc_stereomode->GetWidth() + 8, 63));
+	misc_bitrate			= new GroupBox(i18n->TranslateString("VBR/ABR bitrate range"), Point(7, 113), Size(misc_bits->GetWidth() + misc_stereomode->GetWidth() + 8, 63));
 
-	misc_check_set_min_brate	= new CheckBox(i18n->AddColon(i18n->TranslateString("Set minimum VBR bitrate")), Point(10, 11), Size(176, 0), &set_min_vbr_brate);
+	misc_check_set_min_brate	= new CheckBox(i18n->AddColon(i18n->TranslateString("Set minimum VBR/ABR bitrate")), Point(10, 11), Size(176, 0), &set_min_vbr_brate);
 	misc_check_set_min_brate->onAction.Connect(&ConfigureLAME::SetMinVBRBitrateOption, this);
 
-	misc_check_set_max_brate	= new CheckBox(i18n->AddColon(i18n->TranslateString("Set maximum VBR bitrate")), Point(10, 36), Size(176, 0), &set_max_vbr_brate);
+	misc_check_set_max_brate	= new CheckBox(i18n->AddColon(i18n->TranslateString("Set maximum VBR/ABR bitrate")), Point(10, 36), Size(176, 0), &set_max_vbr_brate);
 	misc_check_set_max_brate->onAction.Connect(&ConfigureLAME::SetMaxVBRBitrateOption, this);
 
 	misc_check_set_min_brate->SetWidth(Math::Max(misc_check_set_min_brate->GetUnscaledTextWidth(), misc_check_set_max_brate->GetUnscaledTextWidth()) + 21);
