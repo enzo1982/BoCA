@@ -184,7 +184,7 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 					if	(vi.bitrate_nominal > 0)		       bitrate = vi.bitrate_nominal;
 					else if (vi.bitrate_lower > 0 && vi.bitrate_upper > 0) bitrate = (vi.bitrate_lower + vi.bitrate_upper) / 2;
 
-					if (bitrate > 0) track.approxLength = track.fileSize / (bitrate / 8) * format.rate;
+					if (bitrate > 0) track.approxLength = Math::Round(Float(track.fileSize) / (bitrate / 8) * format.rate);
 				}
 
 				/* Found Vorbis Comment packet.

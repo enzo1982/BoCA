@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -122,12 +122,15 @@ Error BoCA::PlaylistVCLT::WritePlaylist(const String &file)
 
 		if (track.length >= 0 || track.approxLength >= 0)
 		{
-			Int64	 length	  = track.length >= 0 ? track.length : track.approxLength;
+			Int64	 mseconds = 0;
 
-			Int	 hours	 = length / format.rate / 3600;
-			Int	 minutes = length / format.rate % 3600 / 60;
-			Int	 seconds = length / format.rate % 3600 % 60;
-			Int	 msecs	 = Math::Round(Math::Fract(Float(length) / format.rate) * 1000);
+			if	(track.length	    >= 0) mseconds = Math::Round(Float(track.length)	   / (Float(format.rate) / 1000));
+			else if (track.approxLength >= 0) mseconds = Math::Round(Float(track.approxLength) / (Float(format.rate) / 1000));
+
+			Int	 hours	 = mseconds / 1000 / 3600;
+			Int	 minutes = mseconds / 1000 % 3600 / 60;
+			Int	 seconds = mseconds / 1000 % 3600 % 60;
+			Int	 msecs	 = mseconds % 1000;
 
 			out.OutputString(String("LENGTH=").Append(hours > 0 ? String(			 hours   <  10 ? "0" : NIL).Append(String::FromInt(hours)).Append(":") : String())
 							  .Append(	      String(			 minutes <  10 ? "0" : NIL).Append(String::FromInt(minutes))).Append(":")

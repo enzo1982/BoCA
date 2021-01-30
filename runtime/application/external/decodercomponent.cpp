@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -144,7 +144,7 @@ Int BoCA::AS::DecoderComponentExternal::QueryTags(const String &streamURI, Track
 				const Format	&format = track.GetFormat();
 
 				Int	 rawBitrate  = format.channels * format.rate * format.bits;
-				Int	 fileBitrate = Float(track.fileSize) / (track.length / format.rate) * 8.0;
+				Int	 fileBitrate = Float(track.fileSize) / (Float(track.length) / format.rate) * 8.0;
 
 				if (fileBitrate > rawBitrate * 0.33) lossless = True;
 			}
