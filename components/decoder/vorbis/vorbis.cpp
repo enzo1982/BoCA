@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -449,6 +449,8 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data)
 	inBytes += bytes;
 
 	ex_ogg_sync_wrote(&oy, bytes);
+
+	if (size == 0) return ReadData(data);
 
 	/* Change to default channel order.
 	 */
