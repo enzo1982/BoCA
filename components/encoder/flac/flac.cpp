@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -57,7 +57,7 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 
 		componentSpecs.Append("										\
 														\
-		    <input bits=\"8-24\" channels=\"1-8\"/>							\
+		    <input bits=\"8-24\" channels=\"1-8\" rate=\"1-655350\"/>					\
 		    <parameters>										\
 		      <range name=\"Compression level\" argument=\"-c %VALUE\">					\
 			<min alias=\"fastest\">0</min>								\
