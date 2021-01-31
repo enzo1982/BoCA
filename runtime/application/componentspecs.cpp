@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -392,7 +392,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 			input->SetBits(input->GetFloat() ? "32" : "8-32");
 			input->SetChannels("1-255");
-			input->SetRate("1-192000");
+			input->SetRate("1-768000");
 
 			if (node->GetAttributeByName("bits")	 != NIL) input->SetBits(node->GetAttributeByName("bits")->GetContent());
 			if (node->GetAttributeByName("channels") != NIL) input->SetChannels(node->GetAttributeByName("channels")->GetContent());
