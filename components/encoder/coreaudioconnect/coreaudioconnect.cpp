@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -17,6 +17,7 @@
 #	include <windows.h>
 #else
 #	include <sys/mman.h>
+#	include <sys/sem.h>
 #	include <sys/wait.h>
 #	include <stdlib.h>
 #	include <unistd.h>
@@ -653,13 +654,18 @@ Bool BoCA::EncoderCoreAudioConnect::Connect()
 #ifdef __WIN32__
 		mappingName = String("freac:").Append(Number((Int64) GetCurrentProcessId()).ToHexString()).Append("-").Append(Number((Int64) GetCurrentThreadId()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
 
+		semaphore   = CreateSemaphoreA(NIL, 0, 1, String(mappingName).Append("-sem"));
 		mapping	    = CreateFileMappingA(INVALID_HANDLE_VALUE, NIL, PAGE_READWRITE, 0, sizeof(CoreAudioCommBuffer), mappingName);
 		comm	    = (CoreAudioCommBuffer *) MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 #else
 		mappingName = String("/freac:").Append(Number((Int64) getpid()).ToHexString()).Append("-").Append(Number((Int64) pthread_self()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
 
+		key_t	 key = mappingName.ComputeCRC32();
+
+		semaphore   = semget(key, 1, IPC_CREAT | IPC_EXCL | 0666);
 		mapping	    = shm_open(mappingName, O_CREAT | O_EXCL | O_RDWR, 0666);
 
+		semctl(semaphore, 0, SETVAL, 0);
 		ftruncate(mapping, sizeof(CoreAudioCommBuffer));
 
 		comm	    = (CoreAudioCommBuffer *) mmap(NULL, sizeof(CoreAudioCommBuffer), PROT_READ | PROT_WRITE, MAP_SHARED, mapping, 0);
@@ -684,7 +690,7 @@ Bool BoCA::EncoderCoreAudioConnect::Connect()
 
 		connector = execInfo.hProcess;
 #else
-		const char	*cmd = String("wine ").Append(file).Append(" ").Append(mappingName).Append(" 2> /dev/null");
+		const char	*cmd = String("wine ").Append(file).Append(" ").Append(mappingName).Append(" ").Append(String::FromInt(key)).Append(" 2> /dev/null");
 
 		connector = fork();
 
@@ -737,11 +743,13 @@ Bool BoCA::EncoderCoreAudioConnect::Disconnect()
 #ifdef __WIN32__
 	UnmapViewOfFile(comm);
 	CloseHandle(mapping);
+	CloseHandle(semaphore);
 #else
 	munmap(comm, sizeof(CoreAudioCommBuffer));
 	close(mapping);
 
 	shm_unlink(mappingName);
+	semctl(semaphore, 0, IPC_RMID, 0);
 #endif
 
 	connected = False;
@@ -753,23 +761,35 @@ Bool BoCA::EncoderCoreAudioConnect::ProcessConnectorCommand()
 {
 	if (!connected) return False;
 
+	static sembuf	 opWait[1] = { 0, -1, SEM_UNDO };
+	static sembuf	 opPost[1] = { 0, 1,  SEM_UNDO };
+
 	comm->status = CommStatusIssued;
 
-	while (comm->status == CommStatusIssued || comm->status == CommStatusProcessing)
+	while (True)
 	{
+#ifdef __WIN32__
+		ReleaseSemaphore(semaphore, 1, NULL);
+
+		while (WaitForSingleObject(semaphore, 1000) != WAIT_OBJECT_0)
+		{
+			/* Check if the connector still exists.
+			 */
+			if (WaitForSingleObject(connector, 0) != WAIT_TIMEOUT) return False;
+		}
+#else
+		semop(semaphore, opPost, 1);
+
+		if (semop(semaphore, opWait, 1) != 0) return False;
+
 		/* Check if the connector still exists.
 		 */
-#ifdef __WIN32__
-		if (WaitForSingleObject(connector, 0) != WAIT_TIMEOUT) break;
-#else
 		int	 status = 0;
 
-		if (waitpid(connector, &status, WNOHANG) != 0) break;
+		if (waitpid(connector, &status, WNOHANG) != 0) return False;
 #endif
 
-		/* Sleep for one millisecond.
-		 */
-		S::System::System::Sleep(1);
+		if (comm->status != CommStatusIssued) break;
 	}
 
 	return True;

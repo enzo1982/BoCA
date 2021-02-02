@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,6 +20,7 @@
 
 #ifdef __WINE__
 #	include <sys/mman.h>
+#	include <sys/sem.h>
 #	include <unistd.h>
 #	include <fcntl.h>
 #else
@@ -206,15 +207,25 @@ int main(int argc, char *argv[])
 	/* Open shared memory object and map view to communication buffer.
 	 */
 #ifndef __WINE__
-	HANDLE	 mapping = OpenFileMappingA(FILE_MAP_ALL_ACCESS, false, argv[1]);
+	char	 semaphoreName[128] = { 0 };
 
-	if (mapping == NULL) return 1;
+	strcpy(semaphoreName, argv[1]);
+	strcat(semaphoreName, "-sem");
+
+	HANDLE	 semaphore = CreateSemaphoreA(NULL, 0, 0, semaphoreName);
+	HANDLE	 mapping   = OpenFileMappingA(FILE_MAP_ALL_ACCESS, false, argv[1]);
+
+	if (semaphore == NULL || mapping == NULL) return 1;
 
 	CoreAudioCommBuffer	*comm = (CoreAudioCommBuffer *) MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 #else
-	int	 mapping = shm_open(argv[1], O_RDWR, 0666);
+	sembuf	 opWait[1] = { 0, -1, SEM_UNDO };
+	sembuf	 opPost[1] = { 0, 1,  SEM_UNDO };
 
-	if (mapping == -1) return 1;
+	int	 semaphore = semget(atoi(argv[2]), 1, IPC_PRIVATE);
+	int	 mapping   = shm_open(argv[1], O_RDWR, 0666);
+
+	if (semaphore == -1 || mapping == -1) return 1;
 
 	CoreAudioCommBuffer	*comm = (CoreAudioCommBuffer *) mmap(NULL, sizeof(CoreAudioCommBuffer), PROT_READ | PROT_WRITE, MAP_SHARED, mapping, 0);
 #endif
@@ -237,9 +248,24 @@ int main(int argc, char *argv[])
 	CA::UInt32		 dataSize	= 0;
 	CA::UInt32		 packetsWritten	= 0;
 
-	while (comm->command != CommCommandQuit)
+	while (true)
 	{
-		while (comm->status != CommStatusIssued) Sleep(1);
+#ifndef __WINE__
+		WaitForSingleObject(semaphore, INFINITE);
+#else
+		semop(semaphore, opWait, 1);
+#endif
+
+		if (comm->status != CommStatusIssued)
+		{
+#ifndef __WINE__
+			ReleaseSemaphore(semaphore, 1, NULL);
+#else
+			semop(semaphore, opPost, 1);
+#endif
+
+			continue;
+		}
 
 		switch (comm->command)
 		{
@@ -535,6 +561,14 @@ int main(int argc, char *argv[])
 
 				break;
 		}
+
+#ifndef __WINE__
+		ReleaseSemaphore(semaphore, 1, NULL);
+#else
+		semop(semaphore, opPost, 1);
+#endif
+
+		if (comm->command == CommCommandQuit) break;
 	}
 
 	/* Free Core Audio DLLs.
@@ -546,6 +580,7 @@ int main(int argc, char *argv[])
 #ifndef __WINE__
 	UnmapViewOfFile(comm);
 	CloseHandle(mapping);
+	CloseHandle(semaphore);
 #else
 	munmap(comm, sizeof(CoreAudioCommBuffer));
 	close(mapping);
