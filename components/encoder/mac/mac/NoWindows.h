@@ -75,9 +75,9 @@ typedef wchar_t             TCHAR;
 #define strncpy_s(a, b, c, d) strncpy(a, c, d)
 #define MAX_PATH    4096
 
+}
+
 #include <wctype.h>
 #include <string.h>
-
-}
 
 #endif // #ifndef _WIN32
