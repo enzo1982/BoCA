@@ -761,8 +761,10 @@ Bool BoCA::EncoderCoreAudioConnect::ProcessConnectorCommand()
 {
 	if (!connected) return False;
 
+#ifndef __WIN32__
 	static sembuf	 opWait[1] = { 0, -1, SEM_UNDO };
 	static sembuf	 opPost[1] = { 0, 1,  SEM_UNDO };
+#endif
 
 	comm->status = CommStatusIssued;
 

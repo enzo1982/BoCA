@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 	strcpy(semaphoreName, argv[1]);
 	strcat(semaphoreName, "-sem");
 
-	HANDLE	 semaphore = CreateSemaphoreA(NULL, 0, 0, semaphoreName);
+	HANDLE	 semaphore = OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, semaphoreName);
 	HANDLE	 mapping   = OpenFileMappingA(FILE_MAP_ALL_ACCESS, false, argv[1]);
 
 	if (semaphore == NULL || mapping == NULL) return 1;
