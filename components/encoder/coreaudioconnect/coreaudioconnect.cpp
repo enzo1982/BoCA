@@ -35,6 +35,15 @@ const String &BoCA::EncoderCoreAudioConnect::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
+#ifndef __WIN32__
+	const Array<String>	&args = GUI::Application::GetArguments();
+
+	foreach (const String &arg, args)
+	{
+		if (arg == "--disable-wine") return componentSpecs;
+	}
+#endif
+
 	if (EncoderCoreAudioConnect().IsReady())
 	{
 		componentSpecs = "									\
