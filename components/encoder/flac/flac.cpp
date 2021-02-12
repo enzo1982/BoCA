@@ -59,6 +59,23 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 														\
 		    <input bits=\"8-24\" channels=\"1-8\" rate=\"1-655350\"/>					\
 		    <parameters>										\
+														\
+		");
+
+		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1)
+		{
+			componentSpecs.Append("									\
+														\
+		      <selection name=\"Format\" argument=\"-f %VALUE\" default=\"flac\">			\
+			<option alias=\"FLAC\">flac</option>							\
+			<option alias=\"Ogg FLAC\">ogg</option>							\
+		      </selection>										\
+														\
+			");
+		}
+
+		componentSpecs.Append("										\
+														\
 		      <range name=\"Compression level\" argument=\"-c %VALUE\">					\
 			<min alias=\"fastest\">0</min>								\
 			<max alias=\"best\">8</max>								\
@@ -503,14 +520,20 @@ Bool BoCA::EncoderFLAC::SetOutputFormat(Int n)
 
 String BoCA::EncoderFLAC::GetOutputFileExtension() const
 {
-	const Config	*config = GetConfiguration();
+	String	 extension = "flac";
 
-	switch (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0))
+	if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1)
 	{
-		default:
-		case  0: return "flac";
-		case  1: return *ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 ? "oga" : "flac";
+		Config	*config = Config::Copy(GetConfiguration());
+
+		ConvertArguments(config);
+
+		if (config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0) == 1) extension = "oga";
+
+		Config::Free(config);
 	}
+
+	return extension;
 }
 
 Bool BoCA::EncoderFLAC::ConvertArguments(Config *config)
@@ -521,12 +544,14 @@ Bool BoCA::EncoderFLAC::ConvertArguments(Config *config)
 
 	/* Get command line settings.
 	 */
+	String	 format	   = "flac";
 	Int	 preset	   = -1;
 	Int	 blocksize = 4096;
 	Int	 lpc	   = 8;
 	Int	 qlp	   = 0;
 	Int	 rice	   = 5;
 
+	if (config->GetIntValue(encoderID, "Set Format", False))		       format	 = config->GetStringValue(encoderID, "Format", format).ToLower();
 	if (config->GetIntValue(encoderID, "Set Compression level", False))	       preset	 = config->GetIntValue(encoderID, "Compression level", preset);
 	if (config->GetIntValue(encoderID, "Set Block size", False))		       blocksize = config->GetIntValue(encoderID, "Block size", blocksize);
 	if (config->GetIntValue(encoderID, "Set Max LPC order", False))		       lpc	 = config->GetIntValue(encoderID, "Max LPC order", lpc);
@@ -535,6 +560,8 @@ Bool BoCA::EncoderFLAC::ConvertArguments(Config *config)
 
 	/* Set configuration values.
 	 */
+	config->SetIntValue(ConfigureFLAC::ConfigID, "FileFormat", format == "ogg");
+
 	config->SetIntValue(ConfigureFLAC::ConfigID, "Preset", preset);
 
 	config->SetIntValue(ConfigureFLAC::ConfigID, "DoMidSideStereo", config->GetIntValue(encoderID, "Use mid-side stereo", False));
