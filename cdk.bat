@@ -7,7 +7,7 @@ mkdir %CDK_INSTALL_PATH%\system\etc 2> nul
 set BUILD_WIN32=True
 set BUILD_X86=True
 
-echo fre:ac Component Development Kit v1.1.3
+echo fre:ac Component Development Kit v1.1.4
 echo Copyright (C) 2001-2021 Robert Kausch
 
 bash
