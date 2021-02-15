@@ -29,9 +29,8 @@
 #define _HDCD_SIMPLE_H_
 
 #include <stdarg.h>
-#include "hdcd_libversion.h"
-#include "hdcd_detect.h"         /* enums for various detection values */
-#include "hdcd_analyze.h"        /* enums and definitions for analyze modes */
+
+#include "hdcd_decode2.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,8 +71,6 @@ void hdcd_detect_str(hdcd_simple *ctx, char *str, int maxlen); /* [256] should b
 
 
 /** set a logging callback or use the default (print to stderr) */
-typedef void (*hdcd_log_callback)(const void *priv, const char* fmt, va_list args);
-
 int hdcd_logger_attach(hdcd_simple *ctx, hdcd_log_callback func, void *priv);
 void hdcd_logger_default(hdcd_simple *ctx);
 void hdcd_logger_detach(hdcd_simple *ctx);
