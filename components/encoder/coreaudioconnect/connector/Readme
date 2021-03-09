@@ -1,0 +1,42 @@
+This is the connector part of the Core Audio Connect encoder component. It is a Winelib binary that
+loads the Core Audio codec installed with iTunes or iCloud in Wine and connects to a running instance
+of the Core Audio Connect component via shared memory.
+
+The Core Audio Connect component can load two versions of the connector, a 64 bit or 32 bit variant.
+Due to incompatiblities between the Core Audio codecs and recent versions of Wine, the 32 bit variant
+is needed in most cases. Building this on a 64 bit system requires some additional steps as only the
+64 bit variant is built by default.
+
+Prerequisites
+-------------
+
+To successfully build the 32 bit connector on a 64 bit system, the following components are needed in
+addition to the components needed to build BoCA and the Wine development tools needed to build the
+Core Audio Connect component:
+
+ - A multilib version of g++
+ - The 32 bit libwine development package
+
+On Debian based systems, these can be installed using:
+
+ sudo apt install g++-multilib libwine-dev:i386
+
+Building
+--------
+
+After building BoCA on a 64 bit system, you should find the following two files belonging to the Core
+Audio Connect encoder in the BoCA/bin folder:
+
+ - boca_encoder_coreaudioconnect.1.0.so (the encoder component)
+ - boca_encoder_coreaudioconnect64.1.0 (the 64 bit connector part)
+
+To build the 32 bit connector part, enter the following commands:
+
+ cd components/encoder/coreaudioconnect/connector
+ make BUILD_X86=True clean
+ make BUILD_X86=True
+
+This should create a boca_encoder_coreaudioconnect.1.0 binary in the BoCA/bin folder. To install it,
+run the following command:
+
+ sudo make BUILD_X86=True install

@@ -1,3 +1,10 @@
+########## Core Audio connector makefile ##########
+
+# Change these variables to fit your project:
+TARGET	  = coreaudioconnect
+TYPE	  = encoder
+VERSION	  = 1.0
+
 BOCA_PATH = ../../../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
@@ -7,7 +14,7 @@ ifeq ($(BUILD_X86_64),True)
 endif
 
 OBJECTS	= dllinterface.o main.o
-TARGET	= $(BOCA_PATH)/$(BINDIR)/boca_encoder_coreaudioconnect$(X64).1.0$(EXECUTABLE)
+BINARY	= $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE)
 
 DEFINE	= -DUNICODE
 LIBS	= -lole32 -lshell32
@@ -24,9 +31,14 @@ ifeq ($(BUILD_LINUX),True)
 	LDOPTS += -lrt
 endif
 
-all: $(TARGET)
+ifeq ($(BUILD_X86),True)
+	CCOPTS += -m32
+	LDOPTS += -m32
+endif
 
-$(TARGET): $(OBJECTS)
+all: $(BINARY)
+
+$(BINARY): $(OBJECTS)
 ifeq ($(BUILD_WIN32),True)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS)
 else
@@ -35,7 +47,18 @@ else
 endif
 
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -f $(BINARY) $(OBJECTS)
+
+install: all
+ifneq ($(BUILD_WIN32),True)
+	$(INSTALL) -d "$(DESTDIR)"$(libdir)/boca
+	$(INSTALL_DATA) $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE) "$(DESTDIR)"$(libdir)/boca
+endif
+
+uninstall:
+ifneq ($(BUILD_WIN32),True)
+	rm -f "$(DESTDIR)"$(libdir)/boca/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE)
+endif
 
 .cpp.o:
 	$(CXX) $(CCOPTS) $(CXXFLAGS) -c $< -o $@

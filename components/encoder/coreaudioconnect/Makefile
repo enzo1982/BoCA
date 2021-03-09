@@ -9,10 +9,6 @@ BOCA_PATH = ../../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-ifeq ($(BUILD_X86_64),True)
-	X64 = 64
-endif
-
 # Enter object files here:
 OBJECTS	  = config.o coreaudioconnect.o dllinterface.o
 
@@ -27,9 +23,9 @@ ALLCMD1   = $(call makein,connector)
 ALLCMD2   =
 CLEANCMD1 = $(call cleanin,connector)
 CLEANCMD2 =
-INSTCMD1  = $(INSTALL) $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE) "$(DESTDIR)"$(libdir)/boca
+INSTCMD1  = $(call makein,connector,install)
 INSTCMD2  =
-UINSTCMD1 = rm -f "$(DESTDIR)"$(libdir)/boca/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE)
+UINSTCMD1 = $(call makein,connector,uninstall)
 UINSTCMD2 =
 
 ## Do not change anything below this line. ##
