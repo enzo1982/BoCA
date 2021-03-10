@@ -1,30 +1,14 @@
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (c) 2002-2016, Erik de Castro Lopo <erikd@mega-nerd.com>
+** All rights reserved.
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-*/
-
-/*
-** This code is part of Secret Rabbit Code aka libsamplerate. A commercial
-** use license for this code is available, please see:
-**		http://www.mega-nerd.com/SRC/procedure.html
+** This code is released under 2-clause BSD license. Please see the
+** file at : https://github.com/libsndfile/libsamplerate/blob/master/COPYING
 */
 
 /*
 ** API documentation is available here:
-**     http://www.mega-nerd.com/SRC/api.html
+**     http://libsndfile.github.io/libsamplerate/api.html
 */
 
 #ifndef SAMPLERATE_H
@@ -40,7 +24,8 @@ typedef struct SRC_STATE_tag SRC_STATE ;
 
 /* SRC_DATA is used to pass data to src_simple() and src_process(). */
 typedef struct
-{	float	*data_in, *data_out ;
+{	const float	*data_in ;
+	float	*data_out ;
 
 	long	input_frames, output_frames ;
 	long	input_frames_used, output_frames_gen ;
@@ -49,12 +34,6 @@ typedef struct
 
 	double	src_ratio ;
 } SRC_DATA ;
-
-/* SRC_CB_DATA is used with callback based API. */
-typedef struct
-{	long	frames ;
-	float	*data_in ;
-} SRC_CB_DATA ;
 
 /*
 ** User supplied callback function type for use with src_callback_new()
@@ -74,6 +53,12 @@ typedef long (*src_callback_t) (void *cb_data, float **data) ;
 */
 
 SRC_STATE* src_new (int converter_type, int channels, int *error) ;
+
+/*
+** Clone a handle : return an anonymous pointer to a new converter
+** containing the same internal state as orig. Error returned in *error.
+*/
+SRC_STATE* src_clone (SRC_STATE* orig, int *error) ;
 
 /*
 **	Initilisation for callback based API : return an anonymous pointer to the
@@ -135,6 +120,13 @@ const char *src_get_version (void) ;
 */
 
 int src_set_ratio (SRC_STATE *state, double new_ratio) ;
+
+/*
+**	Get the current channel count.
+**	Returns negative on error, positive channel count otherwise
+*/
+
+int src_get_channels (SRC_STATE *state) ;
 
 /*
 **	Reset the internal SRC state.
