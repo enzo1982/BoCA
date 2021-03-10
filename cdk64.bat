@@ -1,9 +1,10 @@
 @echo off
 set CDK_INSTALL_PATH=%CD%
-set PATH=%CDK_INSTALL_PATH%\system64\bin
+set PATH=%CDK_INSTALL_PATH%\system64\usr\bin
 
-mkdir %CDK_INSTALL_PATH%\system64\etc 2> nul
+mkdir %CDK_INSTALL_PATH%\system64\tmp 2> nul
 
+set MSYSTEM=MINGW64
 set BUILD_WIN32=True
 set BUILD_X86_64=True
 
