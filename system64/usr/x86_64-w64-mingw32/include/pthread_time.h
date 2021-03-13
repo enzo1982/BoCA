@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2011 mingw-w64 project
+   Copyright (c) 2011-2016  mingw-w64 project
 
    Permission is hereby granted, free of charge, to any person obtaining a
    copy of this software and associated documentation files (the "Software"),
@@ -45,10 +45,10 @@
 #define _POSIX_THREAD_CPUTIME   200809L
 #endif
 
-#ifndef __clockid_t_defined
-typedef int clockid_t;
-#define __clockid_t_defined 1
-#endif  /* __clockid_t_defined */
+#ifndef ____winpthreads_clockid_t_defined
+typedef int __winpthreads_clockid_t;
+#define ____winpthreads_clockid_t_defined 1
+#endif  /* ____winpthreads_clockid_t_defined */
 
 #ifndef TIMER_ABSTIME
 #define TIMER_ABSTIME   1
@@ -83,10 +83,10 @@ extern "C" {
 /* These should really be dllimport'ed if using winpthread dll */
 int __cdecl WINPTHREAD_API nanosleep(const struct timespec *request, struct timespec *remain);
 
-int __cdecl WINPTHREAD_API clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *request, struct timespec *remain);
-int __cdecl WINPTHREAD_API clock_getres(clockid_t clock_id, struct timespec *res);
-int __cdecl WINPTHREAD_API clock_gettime(clockid_t clock_id, struct timespec *tp);
-int __cdecl WINPTHREAD_API clock_settime(clockid_t clock_id, const struct timespec *tp);
+int __cdecl WINPTHREAD_API clock_nanosleep(__winpthreads_clockid_t clock_id, int flags, const struct timespec *request, struct timespec *remain);
+int __cdecl WINPTHREAD_API __pthread_clock_getres(__winpthreads_clockid_t clock_id, struct timespec *res);
+int __cdecl WINPTHREAD_API __pthread_clock_gettime(__winpthreads_clockid_t clock_id, struct timespec *tp);
+int __cdecl WINPTHREAD_API __pthread_clock_settime(__winpthreads_clockid_t clock_id, const struct timespec *tp);
 
 #pragma pop_macro("WINPTHREAD_API")
 

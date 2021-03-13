@@ -27,7 +27,12 @@ typedef struct _GUID {
 
 #if defined(__cplusplus) && (USE___UUIDOF == 0)
 extern "C++" {
+#if __cpp_constexpr >= 200704l && __cpp_inline_variables >= 201606L
+__extension__ template<typename T> struct __mingw_uuidof_s;
+__extension__ template<typename T> constexpr const GUID &__mingw_uuidof();
+#else
 __extension__ template<typename T> const GUID &__mingw_uuidof();
+#endif
 }
 #endif
 
@@ -58,6 +63,7 @@ __extension__ template<typename T> const GUID &__mingw_uuidof();
 #define DEFINE_GUID(name,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) const GUID DECLSPEC_SELECTANY name = { l, w1, w2, { b1, b2, b3, b4, b5, b6, b7, b8 } }
 #endif
 #else
+/* __declspec(selectany) must be applied to initialized objects on GCC 5 hence must not be used here. */
 #define DEFINE_GUID(name,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) EXTERN_C const GUID name
 #endif
 

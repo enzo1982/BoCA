@@ -8,6 +8,15 @@
 
 #include <crtdefs.h>
 
+#if defined(__LIBMSVCRT__)
+/* When building mingw-w64, this should be blank.  */
+#define _SECIMP
+#else
+#ifndef _SECIMP
+#define _SECIMP __declspec(dllimport)
+#endif /* _SECIMP */
+#endif /* defined(_CRTBLD) || defined(__LIBMSVCRT__) */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,6 +48,7 @@ extern "C" {
   _CRTIMP int __cdecl _memicmp_l(const void *_Buf1,const void *_Buf2,size_t _Size,_locale_t _Locale);
   int __cdecl memcmp(const void *_Buf1,const void *_Buf2,size_t _Size);
   void * __cdecl memcpy(void * __restrict__ _Dst,const void * __restrict__ _Src,size_t _Size) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
+  _SECIMP errno_t __cdecl memcpy_s (void *_dest,size_t _numberOfElements,const void *_src,size_t _count);
   void * __cdecl mempcpy (void *_Dst, const void *_Src, size_t _Size);
   void * __cdecl memset(void *_Dst,int _Val,size_t _Size);
 #ifndef	NO_OLDNAMES
@@ -178,4 +188,98 @@ extern "C" {
 #endif
 
 #include <sec_api/string_s.h>
+
+#if __MINGW_FORTIFY_LEVEL > 0
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+__mingw_bos_declare;
+
+__mingw_bos_extern_ovr
+void * memcpy(void * __restrict__ __dst, const void * __restrict__ __src, size_t __n)
+{
+  return __builtin___memcpy_chk(__dst, __src, __n, __mingw_bos(__dst, 0));
+}
+
+__mingw_bos_extern_ovr
+void * memset(void * __dst, int __val, size_t __n)
+{
+  return __builtin___memset_chk(__dst, __val, __n, __mingw_bos(__dst, 0));
+}
+
+__mingw_bos_extern_ovr
+void * memmove(void * __dst, const void * __src, size_t __n)
+{
+  return __builtin___memmove_chk(__dst, __src, __n, __mingw_bos(__dst, 0));
+}
+
+#ifdef _GNU_SOURCE
+__mingw_bos_extern_ovr
+void * mempcpy(void * __dst, const void * __src, size_t __n)
+{
+  return __builtin___mempcpy_chk(__dst, __src, __n, __mingw_bos(__dst, 0));
+}
+#endif /* _GNU_SOURCE */
+
+__mingw_bos_extern_ovr
+char * strcpy(char * __restrict__ __dst, const char * __restrict__ __src)
+{
+  return __builtin___strcpy_chk(__dst, __src, __mingw_bos(__dst, 1));
+}
+
+__mingw_bos_extern_ovr
+char * strcat(char * __restrict__ __dst, const char * __restrict__ __src)
+{
+  return __builtin___strcat_chk(__dst, __src, __mingw_bos(__dst, 1));
+}
+
+__mingw_bos_extern_ovr
+char * strncpy(char * __restrict__ __dst, const char * __restrict__ __src, size_t __n)
+{
+  return __builtin___strncpy_chk(__dst, __src, __n, __mingw_bos(__dst, 1));
+}
+
+__mingw_bos_extern_ovr
+char * strncat(char * __restrict__ __dst, const char * __restrict__ __src, size_t __n)
+{
+  return __builtin___strncat_chk(__dst, __src, __n, __mingw_bos(__dst, 1));
+}
+
+_SECIMP errno_t __cdecl __mingw_call_memcpy_s(void *, size_t, const void *, size_t) __MINGW_ASM_CRT_CALL(memcpy_s);
+wchar_t * __cdecl __mingw_call_wcscpy(wchar_t * __restrict__, const wchar_t * __restrict__) __MINGW_ASM_CALL(wcscpy);
+wchar_t * __cdecl __mingw_call_wcscat(wchar_t * __restrict__, const wchar_t * __restrict__) __MINGW_ASM_CALL(wcscat);
+
+__mingw_bos_extern_ovr
+errno_t memcpy_s(void * __dst, size_t __os, const void * __src, size_t __n)
+{
+  __mingw_bos_ptr_chk_warn(__dst, __os, 0);
+  return __mingw_call_memcpy_s(__dst, __os, __src, __n);
+}
+
+__mingw_bos_extern_ovr
+wchar_t * wcscpy(wchar_t * __restrict__ __dst, const wchar_t * __restrict__ __src)
+{
+  if (__mingw_bos_known(__dst)) {
+    __mingw_bos_cond_chk(!wcscpy_s(__dst, __mingw_bos(__dst, 1) / sizeof(wchar_t), __src));
+    return __dst;
+  }
+  return __mingw_call_wcscpy(__dst, __src);
+}
+
+__mingw_bos_extern_ovr
+wchar_t * wcscat(wchar_t * __restrict__ __dst, const wchar_t * __restrict__ __src)
+{
+  if (__mingw_bos_known(__dst)) {
+    __mingw_bos_cond_chk(!wcscat_s(__dst, __mingw_bos(__dst, 1) / sizeof(wchar_t), __src));
+    return __dst;
+  }
+  return __mingw_call_wcscat(__dst, __src);
+}
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* __MINGW_FORTIFY_LEVEL > 0 */
+
 #endif

@@ -7,6 +7,7 @@
 #define _WINREG_
 
 #include <_mingw_unicode.h>
+#include <winapifamily.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,8 +29,16 @@ extern "C" {
 #define RRF_RT_QWORD (RRF_RT_REG_BINARY | RRF_RT_REG_QWORD)
 #define RRF_RT_ANY 0x0000ffff
 
+#if (_WIN32_WINNT >= 0x0A00)
+#define RRF_SUBKEY_WOW6464KEY 0x00010000
+#define RRF_SUBKEY_WOW6432KEY 0x00020000
+#define RRF_WOW64_MASK 0x00030000
+#endif
+
 #define RRF_NOEXPAND 0x10000000
 #define RRF_ZEROONFAILURE 0x20000000
+
+#define REG_PROCESS_APPKEY 0x00000001
 
   typedef ACCESS_MASK REGSAM;
   typedef LONG LSTATUS;
@@ -41,10 +50,10 @@ extern "C" {
 #define HKEY_PERFORMANCE_DATA ((HKEY) (ULONG_PTR)((LONG)0x80000004))
 #define HKEY_PERFORMANCE_TEXT ((HKEY) (ULONG_PTR)((LONG)0x80000050))
 #define HKEY_PERFORMANCE_NLSTEXT ((HKEY) (ULONG_PTR)((LONG)0x80000060))
+#if (WINVER >= 0x0400)
 #define HKEY_CURRENT_CONFIG ((HKEY) (ULONG_PTR)((LONG)0x80000005))
 #define HKEY_DYN_DATA ((HKEY) (ULONG_PTR)((LONG)0x80000006))
-
-#define REG_SECURE_CONNECTION 1
+#define HKEY_CURRENT_USER_LOCAL_SETTINGS ((HKEY) (ULONG_PTR)((LONG)0x80000007))
 
 #ifndef _PROVIDER_STRUCTS_DEFINED
 #define _PROVIDER_STRUCTS_DEFINED
@@ -107,8 +116,17 @@ extern "C" {
   __MINGW_TYPEDEF_AW(VALENT)
   __MINGW_TYPEDEF_AW(PVALENT)
 #endif
+#endif
 
 #define WIN31_CLASS NULL
+
+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+
+#define REG_MUI_STRING_TRUNCATE 0x00000001
+
+#if (WINVER >= 0x0400)
+#define REG_SECURE_CONNECTION 1
+#endif
 
 #define RegConnectRegistry __MINGW_NAME_AW(RegConnectRegistry)
 #define RegConnectRegistryEx __MINGW_NAME_AW(RegConnectRegistryEx)
@@ -141,7 +159,8 @@ extern "C" {
   WINADVAPI LONG WINAPI RegOverridePredefKey(HKEY hKey,HKEY hNewHKey);
   WINADVAPI LONG WINAPI RegOpenUserClassesRoot(HANDLE hToken,DWORD dwOptions,REGSAM samDesired,PHKEY phkResult);
   WINADVAPI LONG WINAPI RegOpenCurrentUser(REGSAM samDesired,PHKEY phkResult);
-  WINADVAPI LONG WINAPI RegDisablePredefinedCache();
+  WINADVAPI LONG WINAPI RegDisablePredefinedCache(void);
+  WINADVAPI LONG WINAPI RegDisablePredefinedCacheEx(void);
   WINADVAPI LONG WINAPI RegConnectRegistryA(LPCSTR lpMachineName,HKEY hKey,PHKEY phkResult);
   WINADVAPI LONG WINAPI RegConnectRegistryW(LPCWSTR lpMachineName,HKEY hKey,PHKEY phkResult);
   WINADVAPI LONG WINAPI RegConnectRegistryExA(LPCSTR lpMachineName,HKEY hKey,ULONG Flags,PHKEY phkResult);
@@ -312,8 +331,6 @@ WINADVAPI LONG WINAPI RegDeleteTreeW(
   LPCWSTR lpSubKey
 );
 
-WINADVAPI LONG WINAPI RegDisablePredefinedCacheEx(void);
-
 WINADVAPI LONG WINAPI RegLoadAppKeyA(
   LPCSTR lpFile,
   PHKEY phkResult,
@@ -357,6 +374,11 @@ WINADVAPI LONG WINAPI RegOpenKeyTransactedW(
   PVOID pExtendedParameter
 );
 
+WINADVAPI LONG WINAPI RegRenameKey(
+  HKEY hKey,
+  LPCWSTR lpSubKeyName,
+  LPCWSTR lpNewKeyName);
+
 #define RegOpenKeyTransacted __MINGW_NAME_AW(RegOpenKeyTransacted)
 
 WINADVAPI LONG WINAPI RegSetKeyValueA(
@@ -370,8 +392,8 @@ WINADVAPI LONG WINAPI RegSetKeyValueA(
 
 WINADVAPI LONG WINAPI RegSetKeyValueW(
   HKEY hKey,
-  LPCSTR lpSubKey,
-  LPCSTR lpValueName,
+  LPCWSTR lpSubKey,
+  LPCWSTR lpValueName,
   DWORD dwType,
   LPCVOID lpData,
   DWORD cbData
@@ -386,7 +408,12 @@ WINADVAPI LONG WINAPI RegSetKeyValueW(
 #define SHUTDOWN_GRACE_OVERRIDE 0x00000020
 #define SHUTDOWN_INSTALL_UPDATES 0x00000040
 #define SHUTDOWN_RESTARTAPPS 0x00000080
+#define SHUTDOWN_SKIP_SVC_PRESHUTDOWN 0x00000100
 #define SHUTDOWN_HYBRID 0x00000200
+#define SHUTDOWN_RESTART_BOOTOPTIONS 0x00000400
+#define SHUTDOWN_SOFT_REBOOT 0x00000800
+#define SHUTDOWN_MOBILE_UI 0x00001000
+#define SHUTDOWN_ARSO 0x00002000
 
 WINADVAPI DWORD WINAPI InitiateShutdownA(
   LPSTR lpMachineName,
@@ -406,7 +433,14 @@ WINADVAPI DWORD WINAPI InitiateShutdownW(
 
 #define InitiateShutdown __MINGW_NAME_AW(InitiateShutdown)
 
+WINADVAPI DWORD WINAPI CheckForHiberboot(
+  PBOOLEAN pHiberboot,
+  BOOLEAN bClearFlag
+);
+
 #endif /* (_WIN32_WINNT >= 0x0600) */
+
+#endif /* WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) */
 
 #ifdef __cplusplus
 }

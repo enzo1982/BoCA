@@ -21,9 +21,9 @@
  *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision$
- * $Author$
- * $Date$
+ * $Revision: 1.3 $
+ * $Author: earnie $
+ * $Date: 2003/05/03 13:48:47 $
  *
  */
 

@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2011-2013 mingw-w64 project
+   Copyright (c) 2011-2016 mingw-w64 project
 
    Permission is hereby granted, free of charge, to any person obtaining a
    copy of this software and associated documentation files (the "Software"),
@@ -60,6 +60,7 @@
 #define WIN_PTHREADS_H
 
 #include <stddef.h>
+#include <stdint.h>
 #include <errno.h>
 #include <sys/types.h>
 
@@ -67,6 +68,7 @@
 #include <limits.h>
 #include <signal.h>
 
+#include <unistd.h>
 #include <sys/timeb.h>
 
 #include "pthread_compat.h"
@@ -212,21 +214,26 @@ struct _pthread_cleanup
 
 /* Note that if async cancelling is used, then there is a race here */
 #define pthread_cleanup_pop(E)\
-    (*pthread_getclean() = _pthread_cup.next, (E?_pthread_cup.func((pthread_once_t *)_pthread_cup.arg):0));}
+    (*pthread_getclean() = _pthread_cup.next, ((E) ? (_pthread_cup.func((pthread_once_t *)_pthread_cup.arg)) : (void)0));}
 
 /* Windows doesn't have this, so declare it ourselves. */
 #ifndef _TIMESPEC_DEFINED
 #define _TIMESPEC_DEFINED
+/* MinGW.org defines a compatible struct timespec, guarded by
+ * __struct_timespec_defined, but doesn't define struct itimerspec.
+ */
+#if ! __struct_timespec_defined
+#define __struct_timespec_defined 1
 struct timespec {
   time_t  tv_sec;   /* Seconds */
   long    tv_nsec;  /* Nanoseconds */
 };
-
+#endif /* ! __struct_timespec_defined */
 struct itimerspec {
   struct timespec  it_interval;  /* Timer period */
   struct timespec  it_value;     /* Timer expiration */
 };
-#endif
+#endif /* ! defined _TIMESPEC_DEFINED */
 
 #ifndef SCHED_OTHER
 /* Some POSIX realtime extensions, mostly stubbed */
@@ -262,23 +269,23 @@ int WINPTHREAD_API pthread_attr_getschedparam(const pthread_attr_t *attr, struct
 int WINPTHREAD_API pthread_getschedparam(pthread_t thread, int *pol, struct sched_param *param);
 int WINPTHREAD_API pthread_setschedparam(pthread_t thread, int pol, const struct sched_param *param);
 int WINPTHREAD_API pthread_attr_setschedpolicy (pthread_attr_t *attr, int pol);
-int WINPTHREAD_API pthread_attr_getschedpolicy (pthread_attr_t *attr, int *pol);
+int WINPTHREAD_API pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *pol);
 
 /* synchronization objects */
-typedef void	*pthread_spinlock_t;
-typedef void	*pthread_mutex_t;
-typedef void	*pthread_cond_t;
-typedef void	*pthread_rwlock_t;
+typedef intptr_t pthread_spinlock_t;
+typedef intptr_t pthread_mutex_t;
+typedef intptr_t pthread_cond_t;
+typedef intptr_t pthread_rwlock_t;
 typedef void	*pthread_barrier_t;
 
 #define PTHREAD_MUTEX_NORMAL 0
 #define PTHREAD_MUTEX_ERRORCHECK 1
 #define PTHREAD_MUTEX_RECURSIVE 2
 
-#define GENERIC_INITIALIZER				((void *) (size_t) -1)
-#define GENERIC_ERRORCHECK_INITIALIZER			((void *) (size_t) -2)
-#define GENERIC_RECURSIVE_INITIALIZER			((void *) (size_t) -3)
-#define GENERIC_NORMAL_INITIALIZER			((void *) (size_t) -1)
+#define GENERIC_INITIALIZER				-1
+#define GENERIC_ERRORCHECK_INITIALIZER			-2
+#define GENERIC_RECURSIVE_INITIALIZER			-3
+#define GENERIC_NORMAL_INITIALIZER			-1
 #define PTHREAD_MUTEX_INITIALIZER			(pthread_mutex_t)GENERIC_INITIALIZER
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER		(pthread_mutex_t)GENERIC_RECURSIVE_INITIALIZER
 #define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER		(pthread_mutex_t)GENERIC_ERRORCHECK_INITIALIZER
@@ -314,6 +321,9 @@ int       WINPTHREAD_API pthread_create_wrapper(void *args);
 int       WINPTHREAD_API pthread_create(pthread_t *th, const pthread_attr_t *attr, void *(* func)(void *), void *arg);
 int       WINPTHREAD_API pthread_join(pthread_t t, void **res);
 int       WINPTHREAD_API pthread_detach(pthread_t t);
+int       WINPTHREAD_API pthread_setname_np(pthread_t thread, const char *name);
+int       WINPTHREAD_API pthread_getname_np(pthread_t thread, char *name, size_t len);
+
 
 int WINPTHREAD_API pthread_rwlock_init(pthread_rwlock_t *rwlock_, const pthread_rwlockattr_t *attr);
 int WINPTHREAD_API pthread_rwlock_wrlock(pthread_rwlock_t *l);
@@ -359,7 +369,7 @@ int WINPTHREAD_API pthread_attr_setinheritsched(pthread_attr_t *a, int flag);
 int WINPTHREAD_API pthread_attr_getinheritsched(const pthread_attr_t *a, int *flag);
 int WINPTHREAD_API pthread_attr_setscope(pthread_attr_t *a, int flag);
 int WINPTHREAD_API pthread_attr_getscope(const pthread_attr_t *a, int *flag);
-int WINPTHREAD_API pthread_attr_getstackaddr(pthread_attr_t *attr, void **stack);
+int WINPTHREAD_API pthread_attr_getstackaddr(const pthread_attr_t *attr, void **stack);
 int WINPTHREAD_API pthread_attr_setstackaddr(pthread_attr_t *attr, void *stack);
 int WINPTHREAD_API pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *size);
 int WINPTHREAD_API pthread_attr_setstacksize(pthread_attr_t *attr, size_t size);
@@ -382,16 +392,16 @@ int WINPTHREAD_API pthread_condattr_init(pthread_condattr_t *a);
 int WINPTHREAD_API pthread_condattr_getpshared(const pthread_condattr_t *a, int *s);
 int WINPTHREAD_API pthread_condattr_setpshared(pthread_condattr_t *a, int s);
 
-#ifndef __clockid_t_defined
-typedef int clockid_t;
-#define __clockid_t_defined 1
-#endif  /* __clockid_t_defined */
+#ifndef ____winpthreads_clockid_t_defined
+typedef int __winpthreads_clockid_t;
+#define ____winpthreads_clockid_t_defined 1
+#endif  /* ____winpthreads_clockid_t_defined */
 
 int WINPTHREAD_API pthread_condattr_getclock (const pthread_condattr_t *attr,
-       clockid_t *clock_id);
+       __winpthreads_clockid_t *clock_id);
 int WINPTHREAD_API pthread_condattr_setclock(pthread_condattr_t *attr,
-       clockid_t clock_id);
-int WINPTHREAD_API __pthread_clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp, struct timespec *rmtp);
+       __winpthreads_clockid_t clock_id);
+int WINPTHREAD_API __pthread_clock_nanosleep(__winpthreads_clockid_t clock_id, int flags, const struct timespec *rqtp, struct timespec *rmtp);
 
 int WINPTHREAD_API pthread_barrierattr_init(void **attr);
 int WINPTHREAD_API pthread_barrierattr_destroy(void **attr);
@@ -407,54 +417,10 @@ unsigned long long         WINPTHREAD_API _pthread_rel_time_in_ms(const struct t
 unsigned long long         WINPTHREAD_API _pthread_time_in_ms(void);
 unsigned long long         WINPTHREAD_API _pthread_time_in_ms_from_timespec(const struct timespec *ts);
 int                        WINPTHREAD_API _pthread_tryjoin (pthread_t t, void **res);
-int                        WINPTHREAD_API pthread_delay_np (const struct timespec *interval);
 int                        WINPTHREAD_API pthread_rwlockattr_destroy(pthread_rwlockattr_t *a);
 int                        WINPTHREAD_API pthread_rwlockattr_getpshared(pthread_rwlockattr_t *a, int *s);
 int                        WINPTHREAD_API pthread_rwlockattr_init(pthread_rwlockattr_t *a);
 int                        WINPTHREAD_API pthread_rwlockattr_setpshared(pthread_rwlockattr_t *a, int s);
-
-/* Recursive API emulation.  */
-#undef localtime_r
-#define localtime_r(_Time, _Tm)	({ struct tm *___tmp_tm;		\
-						pthread_testcancel();	\
-						___tmp_tm = localtime((_Time));\
-						if (___tmp_tm) {	\
-						  *(_Tm) = *___tmp_tm;	\
-						  ___tmp_tm = (_Tm);	\
-						}			\
-						___tmp_tm;	})
-
-#undef gmtime_r
-#define gmtime_r(_Time,_Tm)	({ struct tm *___tmp_tm;		\
-						pthread_testcancel();	\
-						___tmp_tm = gmtime((_Time)); \
-						if (___tmp_tm) {	\
-						  *(_Tm) = *___tmp_tm;	\
-						  ___tmp_tm = (_Tm);	\
-						}			\
-						___tmp_tm;	})
-
-#undef ctime_r
-#define ctime_r(_Time,_Str)	({ char *___tmp_tm;			\
-						pthread_testcancel();	\
-						___tmp_tm = ctime((_Time));  \
-						if (___tmp_tm)		\
-						 ___tmp_tm =		\
-						   strcpy((_Str),___tmp_tm); \
-						___tmp_tm;	})
-
-#undef asctime_r
-#define asctime_r(_Tm, _Buf)	({ char *___tmp_tm;			\
-						pthread_testcancel();	\
-						___tmp_tm = asctime((_Tm)); \
-						if (___tmp_tm)		\
-						 ___tmp_tm =		\
-						   strcpy((_Buf),___tmp_tm);\
-						___tmp_tm;	})
-
-#ifndef rand_r
-#define rand_r(__seed) (__seed == __seed ? rand () : rand ())
-#endif
 
 #ifndef SIG_BLOCK
 #define SIG_BLOCK 0
@@ -717,6 +683,14 @@ int                        WINPTHREAD_API pthread_rwlockattr_setpshared(pthread_
 #define wprintf(...) (pthread_testcancel(), wprintf(__VA_ARGS__))
 #define wscanf(...) (pthread_testcancel(), wscanf(__VA_ARGS__))
 #endif
+
+/* We deal here with a gcc issue for posix threading on Windows.
+   We would need to change here gcc's gthr-posix.h header, but this
+   got rejected.  So we deal it within this header.  */
+#ifdef _GTHREAD_USE_MUTEX_INIT_FUNC
+#undef _GTHREAD_USE_MUTEX_INIT_FUNC
+#endif
+#define _GTHREAD_USE_MUTEX_INIT_FUNC 1
 
 #ifdef __cplusplus
 }
