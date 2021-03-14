@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -38,7 +38,7 @@ const String &BoCA::EncoderOpus::GetComponentSpecs()
 		      <extension>oga</extension>							\
 		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>			\
 		    </format>										\
-		    <input bits=\"16\" channels=\"1-8\" rate=\"8000,12000,16000,24000,48000\"/>		\
+		    <input bits=\"16\" channels=\"1-8\"/>						\
 		    <parameters>									\
 		      <range name=\"Bitrate\" argument=\"--bitrate %VALUE\" default=\"128\">		\
 			<min>6</min>									\
@@ -108,6 +108,8 @@ BoCA::EncoderOpus::EncoderOpus()
 	configLayer	= NIL;
 	config		= NIL;
 
+	converter	= NIL;
+
 	frameSize	= 0;
 	preSkip		= 0;
 
@@ -143,6 +145,30 @@ Bool BoCA::EncoderOpus::Activate()
 
 	ConvertArguments(config);
 
+	/* Get target format.
+	 */
+	targetFormat = format;
+
+	if	(format.rate <=  8000) targetFormat.rate =  8000;
+	else if (format.rate <= 12000) targetFormat.rate = 12000;
+	else if (format.rate <= 16000) targetFormat.rate = 16000;
+	else if (format.rate <= 24000) targetFormat.rate = 24000;
+	else			       targetFormat.rate = 48000;
+
+	/* Create and init format converter component.
+	 */
+	converter = new FormatConverter(format, targetFormat);
+
+	if (converter->GetErrorState() == True)
+	{
+		errorState  = True;
+		errorString = converter->GetErrorString();
+
+		delete converter;
+
+		return False;
+	}
+
 	/* Init Ogg stream.
 	 */
 	Math::RandomSeed();
@@ -153,7 +179,7 @@ Bool BoCA::EncoderOpus::Activate()
 	 */
 	OpusHeader	 setup;
 
-	strncpy(setup.codec_id, "OpusHead", 8);
+	memcpy(setup.codec_id, "OpusHead", 8);
 
 	setup.version_id  = 1;
 	setup.nb_channels = format.channels;
@@ -169,7 +195,7 @@ Bool BoCA::EncoderOpus::Activate()
 	int	 streams = 0;
 	int	 coupled = 0;
 
-	OpusMSEncoder	*encoder = ex_opus_multistream_surround_encoder_create(format.rate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
+	OpusMSEncoder	*encoder = ex_opus_multistream_surround_encoder_create(targetFormat.rate, setup.nb_channels, setup.channel_mapping, &streams, &coupled, setup.stream_map, OPUS_APPLICATION_AUDIO, &error);
 
 	setup.nb_streams = streams;
 	setup.nb_coupled = coupled;
@@ -178,9 +204,9 @@ Bool BoCA::EncoderOpus::Activate()
 	 */
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_GET_LOOKAHEAD(&preSkip));
 
-	setup.preskip = preSkip * (48000 / format.rate);
+	setup.preskip = preSkip * (48000 / targetFormat.rate);
 
-	frameSize     = Math::Round(Float(format.rate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
+	frameSize     = Math::Round(Float(targetFormat.rate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
 	totalSamples  = 0;
 
 	ex_opus_multistream_encoder_destroy(encoder);
@@ -260,7 +286,7 @@ Bool BoCA::EncoderOpus::Activate()
 
 	/* Start up worker threads.
 	 */
-	for (Int i = 0; i < numberOfThreads; i++) workers.Add(new SuperWorker(config, format));
+	for (Int i = 0; i < numberOfThreads; i++) workers.Add(new SuperWorker(config, targetFormat));
 
 	foreach (SuperWorker *worker, workers) worker->Start();
 
@@ -269,6 +295,22 @@ Bool BoCA::EncoderOpus::Activate()
 
 Bool BoCA::EncoderOpus::Deactivate()
 {
+	/* Flush and clean up format converter.
+	 */
+	Buffer<UnsignedByte>	 buffer;
+
+	converter->Finish(buffer);
+
+	delete converter;
+
+	/* Append remaining samples to samples buffer.
+	 */
+	Int	 samples = buffer.Size() / 2;
+
+	samplesBuffer.Resize(samplesBuffer.Size() + samples);
+
+	memcpy(samplesBuffer + samplesBuffer.Size() - samples, buffer, buffer.Size());
+
 	/* Output remaining samples to encoder.
 	 */
 	EncodeFrames(True);
@@ -306,6 +348,10 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 7) Utilities::ChangeChannelOrder(data, format, Channel::Default_6_1, Channel::Vorbis_6_1);
 	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Default_7_1, Channel::Vorbis_7_1);
 
+	/* Perform sample rate conversion.
+	 */
+	converter->Transform(data);
+
 	/* Copy data to samples buffer.
 	 */
 	Int	 samples = data.Size() / 2;
@@ -321,8 +367,6 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 
 Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 {
-	const Format	&format = track.GetFormat();
-
 	/* Pad end of stream with empty samples.
 	 */
 	Int	 nullSamples = 0;
@@ -331,11 +375,11 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 	{
 		nullSamples = preSkip;
 
-		if ((samplesBuffer.Size() / format.channels + preSkip) % frameSize > 0) nullSamples += frameSize - (samplesBuffer.Size() / format.channels + preSkip) % frameSize;
+		if ((samplesBuffer.Size() / targetFormat.channels + preSkip) % frameSize > 0) nullSamples += frameSize - (samplesBuffer.Size() / targetFormat.channels + preSkip) % frameSize;
 
-		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * format.channels);
+		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * targetFormat.channels);
 
-		memset(((signed short *) samplesBuffer) + samplesBuffer.Size() - nullSamples * format.channels, 0, sizeof(short) * nullSamples * format.channels);
+		memset(((signed short *) samplesBuffer) + samplesBuffer.Size() - nullSamples * targetFormat.channels, 0, sizeof(short) * nullSamples * targetFormat.channels);
 	}
 
 	/* Pass samples to workers.
@@ -344,7 +388,7 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 	Int	 framesProcessed = 0;
 	Int	 dataLength	 = 0;
 
-	Int	 samplesPerFrame = frameSize * format.channels;
+	Int	 samplesPerFrame = frameSize * targetFormat.channels;
 
 	if (flush) framesToProcess = Math::Floor(samplesBuffer.Size() / samplesPerFrame);
 
@@ -395,8 +439,7 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 
 Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, const Array<Int> &packetSizes, Bool first, Bool flush, Int nullSamples)
 {
-	const Format	&format = track.GetFormat();
-	Int		 offset = 0;
+	Int	 offset = 0;
 
 	if (!first) for (Int i = 0; i < overlap; i++) offset += packetSizes.GetNth(i);
 
@@ -411,7 +454,7 @@ Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, cons
 		op.bytes      = packetSizes.GetNth(i);
 		op.b_o_s      = first && i == 0;
 		op.e_o_s      = flush && i == packetSizes.Length() - 1;
-		op.granulepos = (op.e_o_s ? totalSamples + preSkip - nullSamples : totalSamples) * (48000 / format.rate);
+		op.granulepos = (op.e_o_s ? totalSamples + preSkip - nullSamples : totalSamples) * (48000 / targetFormat.rate);
 		op.packetno   = 0;
 
 		ex_ogg_stream_packetin(&os, &op);	
