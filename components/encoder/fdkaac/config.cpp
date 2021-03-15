@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,9 +24,14 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	mode		= config->GetIntValue(ConfigID, "Mode", 0);
 	bitrate		= config->GetIntValue(ConfigID, "Bitrate", 64);
 	quality		= config->GetIntValue(ConfigID, "Quality", 4);
+	bandwidth	= config->GetIntValue(ConfigID, "Bandwidth", 0);
 	allowID3	= config->GetIntValue(ConfigID, "AllowID3v2", False);
 	fileFormat	= config->GetIntValue(ConfigID, "MP4Container", True);
 	fileExtension	= config->GetIntValue(ConfigID, "MP4FileExtension", 0);
+
+	if (bandwidth) bandwidth = (bandwidth - 7900) / 100;
+
+	previousBandwidth = 0;
 
 	I18n	*i18n = I18n::Get();
 
@@ -172,12 +177,28 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_bitrate->Add(text_quality_worse);
 	group_bitrate->Add(text_quality_better);
 
+	group_bandwidth		= new GroupBox(i18n->TranslateString("Maximum bandwidth"), Point(7, group_bitrate->GetHeight() + 22), Size(group_id3v2->GetWidth() + 128, 40));
+
+	text_bandwidth		= new Text(i18n->AddColon(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz)")), Point(9, 15));
+
+	text_bandwidth_hz	= new Text(i18n->TranslateString("%1 Hz", "Technical").Replace("%1", "20000"), Point(35, 15));
+	text_bandwidth_hz->SetX(Math::Max(text_bandwidth_hz->GetUnscaledTextWidth(), text_bandwidth_hz->GetFont().GetUnscaledTextSizeX(i18n->TranslateString("auto"))) + 10);
+	text_bandwidth_hz->SetOrientation(OR_UPPERRIGHT);
+
+	slider_bandwidth	= new Slider(Point(text_bandwidth->GetUnscaledTextWidth() + 16, 13), Size(group_bandwidth->GetWidth() - text_bandwidth->GetUnscaledTextWidth() - text_bandwidth_hz->GetX() - 24, 0), OR_HORZ, &bandwidth, 0, 121);
+	slider_bandwidth->onValueChange.Connect(&ConfigureFDKAAC::SetBandwidth, this);
+
+	group_bandwidth->Add(text_bandwidth);
+	group_bandwidth->Add(slider_bandwidth);
+	group_bandwidth->Add(text_bandwidth_hz);
+
 	SetFileFormat();
 	SetMPEGVersion();
 	SetObjectType();
 	SetMode();
 	SetBitrate();
 	SetQuality();
+	SetBandwidth();
 
 	tabwidget->SetSize(Size(group_id3v2->GetWidth() + 146, Math::Max(258, group_id3v2->GetHeight() + 118)));
 
@@ -193,6 +214,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	layer_format->Add(group_id3v2);
 
 	layer_quality->Add(group_bitrate);
+	layer_quality->Add(group_bandwidth);
 
 	SetSize(Size(group_id3v2->GetWidth() + 160, Math::Max(272, group_id3v2->GetHeight() + 132)));
 }
@@ -235,6 +257,11 @@ BoCA::ConfigureFDKAAC::~ConfigureFDKAAC()
 	DeleteObject(text_quality_level);
 	DeleteObject(text_quality_worse);
 	DeleteObject(text_quality_better);
+
+	DeleteObject(group_bandwidth);
+	DeleteObject(text_bandwidth);
+	DeleteObject(slider_bandwidth);
+	DeleteObject(text_bandwidth_hz);
 }
 
 Int BoCA::ConfigureFDKAAC::SaveSettings()
@@ -244,11 +271,17 @@ Int BoCA::ConfigureFDKAAC::SaveSettings()
 	if (bitrate <	8) bitrate =   8;
 	if (bitrate > 256) bitrate = 256;
 
+	if (aacType != AOT_AAC_LC &&
+	    aacType != AOT_ER_AAC_LD) bandwidth = previousBandwidth;
+
+	if (bandwidth) bandwidth = 7900 + 100 * bandwidth;
+
 	config->SetIntValue(ConfigID, "MPEGVersion", mpegVersion);
 	config->SetIntValue(ConfigID, "AACType", aacType);
 	config->SetIntValue(ConfigID, "Mode", mode);
 	config->SetIntValue(ConfigID, "Bitrate", bitrate);
 	config->SetIntValue(ConfigID, "Quality", quality);
+	config->SetIntValue(ConfigID, "Bandwidth", bandwidth);
 	config->SetIntValue(ConfigID, "AllowID3v2", allowID3);
 	config->SetIntValue(ConfigID, "MP4Container", fileFormat);
 	config->SetIntValue(ConfigID, "MP4FileExtension", fileExtension);
@@ -283,6 +316,27 @@ Void BoCA::ConfigureFDKAAC::SetObjectType()
 	    aacType == AOT_ER_AAC_ELD) option_version_mpeg2->Deactivate();
 	else			       option_version_mpeg2->Activate();
 
+	/* Toggle bandwidth controls.
+	 */
+	if (aacType == AOT_AAC_LC || aacType == AOT_ER_AAC_LD)
+	{
+		if (!group_bandwidth->IsActive()) bandwidth = previousBandwidth;
+
+		group_bandwidth->Activate();
+	}
+	else
+	{
+		if (group_bandwidth->IsActive()) previousBandwidth = bandwidth;
+
+		group_bandwidth->Deactivate();
+
+		bandwidth = 0;
+	}
+
+	SetBandwidth();
+
+	/* Set bitrate range for AAC type.
+	 */
 	switch (aacType)
 	{
 		case AOT_AAC_LC:
@@ -349,6 +403,16 @@ Void BoCA::ConfigureFDKAAC::SetBitrateByEditBox()
 Void BoCA::ConfigureFDKAAC::SetQuality()
 {
 	text_quality_level->SetText(String::FromInt(quality));
+}
+
+Void BoCA::ConfigureFDKAAC::SetBandwidth()
+{
+	I18n	*i18n = I18n::Get();
+
+	i18n->SetContext("Encoders::AAC::Quality");
+
+	if (bandwidth) text_bandwidth_hz->SetText(i18n->TranslateString("%1 Hz", "Technical").Replace("%1", String::FromInt(7900 + 100 * bandwidth)));
+	else	       text_bandwidth_hz->SetText(i18n->TranslateString("auto"));
 }
 
 Void BoCA::ConfigureFDKAAC::SetFileFormat()

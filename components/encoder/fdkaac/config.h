@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -69,11 +69,18 @@ namespace BoCA
 			Text			*text_quality_worse;
 			Text			*text_quality_better;
 
+			GroupBox		*group_bandwidth;
+			Text			*text_bandwidth;
+			Slider			*slider_bandwidth;
+			Text			*text_bandwidth_hz;
+
 			Int			 mpegVersion;
 			Int			 aacType;
 			Int			 mode;
 			Int			 bitrate;
 			Int			 quality;
+			Int			 bandwidth;
+			Int			 previousBandwidth;
 			Bool			 allowID3;
 			Int			 fileFormat;
 			Int			 fileExtension;
@@ -84,6 +91,7 @@ namespace BoCA
 			Void			 SetBitrate();
 			Void			 SetBitrateByEditBox();
 			Void			 SetQuality();
+			Void			 SetBandwidth();
 			Void			 SetFileFormat();
 		public:
 			static const String	 ConfigID;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -34,6 +34,7 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : pr
 	Int	 mode	      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Mode", 0);
 	Int	 bitrate      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
 	Int	 quality      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Quality", 4);
+	Int	 bandwidth    = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bandwidth", 0);
 
 	/* Create and configure FDK AAC encoder.
 	 */
@@ -58,6 +59,9 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : pr
 
 	if (mode == 0) ex_aacEncoder_SetParam(handle, AACENC_BITRATE, bitrate * 1000 * format.channels);
 	else	       ex_aacEncoder_SetParam(handle, AACENC_BITRATEMODE, quality);
+
+	if (aacType == AOT_AAC_LC ||
+	    aacType == AOT_ER_AAC_LD) ex_aacEncoder_SetParam(handle, AACENC_BANDWIDTH, Math::Min(bandwidth, format.rate / 2));
 
 	ex_aacEncoder_SetParam(handle, AACENC_AOT, mpegVersion + aacType);
 	ex_aacEncoder_SetParam(handle, AACENC_AFTERBURNER, 1);
