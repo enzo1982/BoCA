@@ -85,6 +85,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	if (! sbrFlags			  ) option_aactype_he->Deactivate();
 	if (!(sbrFlags & CAPF_SBR_PS_MPEG)) option_aactype_hev2->Deactivate();
+	if (! sbrFlags			  ) option_aactype_eld->Deactivate();
 
 	group_aactype->Add(option_aactype_low);
 	group_aactype->Add(option_aactype_he);

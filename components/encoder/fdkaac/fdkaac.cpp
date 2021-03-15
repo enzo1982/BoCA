@@ -79,7 +79,13 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 		componentSpecs.Append("										\
 														\
 			<option alias=\"Low Delay\">LD</option>							\
-			<option alias=\"Enhanced Low Delay\">ELD</option>					\
+														\
+		");
+
+		if (sbrFlags)			 componentSpecs.Append("<option alias=\"Enhanced Low Delay\">ELD</option>");
+
+		componentSpecs.Append("										\
+														\
 		      </selection>										\
 		      <range name=\"Bitrate per channel\" argument=\"-b %VALUE\" default=\"64\">		\
 			<min alias=\"min\">8</min>								\
