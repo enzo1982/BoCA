@@ -15,7 +15,7 @@ ARCHITECTURES="!x86_gcc2 x86 x86_64"
 SECONDARY_ARCHITECTURES="x86"
 
 libVersion="${portVersion%.*}"
-libVersionCompat="2 compat >= 2"
+libVersionCompat="3 compat >= 2"
 
 PROVIDES="
 	boca$secondaryArchSuffix = $portVersion
@@ -67,10 +67,10 @@ INSTALL()
 
 	mkdir -p "$developLibDir"
 
-	ln -r -s "$libDir"/libboca-$libVersion.so.2 \
+	ln -r -s "$libDir"/libboca-$libVersion.so.3 \
 		"$developLibDir"/libboca-$libVersion.so
-	ln -r -s "$libDir"/libboca-$libVersion.so.2 \
-		"$developLibDir"/libboca-$libVersion.so.2
+	ln -r -s "$libDir"/libboca-$libVersion.so.3 \
+		"$developLibDir"/libboca-$libVersion.so.3
 
 	packageEntries devel \
 		"$developDir"

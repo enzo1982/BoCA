@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -216,6 +216,25 @@ Bool BoCA::Utilities::IsRelativePath(const String &path)
 		!path.StartsWith("~")	 && // Home directory
 		!path.Contains("://"));	    // URI
 #endif
+}
+
+/* This function checks if a folder can be written to by trying
+ * to create a file inside it.
+ */
+Bool BoCA::Utilities::IsFolderWritable(const String &path)
+{
+	Bool		 result	= False;
+	Directory	 folder = path;
+	String		 file	= String(folder).Append(Directory::GetDirectoryDelimiter()).Append(String::FromInt(S::System::System::Clock())).Append(".temp");
+	OutStream	 temp(STREAM_FILE, file, OS_REPLACE);
+
+	if (temp.GetLastError() == IO_ERROR_OK) result = True;
+
+	temp.Close();
+
+	File(file).Delete();
+
+	return result;
 }
 
 /* This function returns the absolute path corresponding to the passed

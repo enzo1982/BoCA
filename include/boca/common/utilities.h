@@ -44,6 +44,7 @@ namespace BoCA
 			static String		 ReplaceIncompatibleCharacters(const String &, Bool = True, Bool = True, Bool = False);
 
 			static Bool		 IsRelativePath(const String &);
+			static Bool		 IsFolderWritable(const String &);
 
 			static String		 GetAbsolutePathName(const String &);
 			static String		 GetRelativeFileName(const String &, const String &);
