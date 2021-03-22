@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -106,10 +106,5 @@ Bitmap BoCA::Picture::GetBitmap() const
 {
 	if (data.Size() == 0) return NIL;
 
-	Int	 format = -1;
-
-	if	(mime == "image/jpeg" || mime == "image/jpg") format = IMAGE_FORMAT_JPEG;
-	else if	(mime == "image/png")			      format = IMAGE_FORMAT_PNG;
-
-	return ImageLoader::Load(data, format);
+	return ImageLoader::Load(data);
 }
