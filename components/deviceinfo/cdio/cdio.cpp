@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -184,6 +184,7 @@ BoCA::DeviceInfoCDIO::~DeviceInfoCDIO()
 
 Bool BoCA::DeviceInfoCDIO::IsNthDeviceTrayOpen(Int n)
 {
+#ifndef __APPLE__
 	const Array<String>	&driveNames = FindDrives();
 	CdIo_t			*cd	    = cdio_open(driveNames.GetNth(n), DRIVER_UNKNOWN);
 
@@ -196,6 +197,11 @@ Bool BoCA::DeviceInfoCDIO::IsNthDeviceTrayOpen(Int n)
 	cdio_destroy(cd);
 
 	return status;
+#else
+	/* On macOS, drives are available only when closed.
+	 */
+	return False;
+#endif
 }
 
 Bool BoCA::DeviceInfoCDIO::OpenNthDeviceTray(Int n)
