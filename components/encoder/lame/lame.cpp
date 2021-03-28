@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -135,7 +135,9 @@ Bool BoCA::EncoderLAME::Activate()
 	switch (preset)
 	{
 		case 0:
-			ex_lame_set_strict_ISO(context, strictISO);
+			/* Enforce strict ISO compliance.
+			 */
+			if (strictISO) ex_lame_set_strict_ISO(context, strictISO);
 
 			/* Set bitrate.
 			 */

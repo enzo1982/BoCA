@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -53,6 +53,7 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat, Int 
 	Bool	 enableATH	  = config->GetIntValue(ConfigureLAME::ConfigID, "EnableATH", 1);
 	Int	 athType	  = config->GetIntValue(ConfigureLAME::ConfigID, "ATHType", -1);
 	Bool	 useTNS		  = config->GetIntValue(ConfigureLAME::ConfigID, "UseTNS", 1);
+	Int	 tnsMode	  = config->GetIntValue(ConfigureLAME::ConfigID, "TNSMode", -1);
 	Bool	 disableFiltering = config->GetIntValue(ConfigureLAME::ConfigID, "DisableFiltering", 0);
 	Bool	 setLowpass	  = config->GetIntValue(ConfigureLAME::ConfigID, "SetLowpass", 0);
 	Int	 lowpass	  = config->GetIntValue(ConfigureLAME::ConfigID, "Lowpass", 0);
@@ -77,7 +78,10 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat, Int 
 			ex_lame_set_original(context, originalBit);
 			ex_lame_set_extension(context, privateBit);
 			ex_lame_set_error_protection(context, crc);
-			ex_lame_set_strict_ISO(context, strictISO);
+
+			/* Enforce strict ISO compliance.
+			 */
+			if (strictISO) ex_lame_set_strict_ISO(context, strictISO);
 
 			/* Set bitrate.
 			 */
@@ -146,18 +150,13 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat, Int 
 
 			/* Set ATH.
 			 */
-			if (enableATH)
-			{
-				if (athType != -1) ex_lame_set_ATHtype(context, athType);
-			}
-			else
-			{
-				ex_lame_set_noATH(context, 1);
-			}
+			if	(!enableATH)	ex_lame_set_noATH(context, 1);
+			else if (athType != -1) ex_lame_set_ATHtype(context, athType);
 
 			/* Set TNS.
 			 */
-			ex_lame_set_useTemporal(context, useTNS);
+			if	(!useTNS)	ex_lame_set_useTemporal(context, 0);
+			else if (tnsMode != -1) ex_lame_set_useTemporal(context, 1);
 
 			break;
 		case 1:

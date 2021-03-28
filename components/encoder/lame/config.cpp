@@ -45,7 +45,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	set_highpass		= config->GetIntValue(ConfigID, "SetHighpass", 0);
 	set_highpass_width	= config->GetIntValue(ConfigID, "SetHighpassWidth", 0);
 	enable_ath		= config->GetIntValue(ConfigID, "EnableATH", 1);
-	enable_tempmask		= config->GetIntValue(ConfigID, "UseTNS", 1);
+	enable_tns		= config->GetIntValue(ConfigID, "UseTNS", 1);
 
 	I18n	*i18n = I18n::Get();
 
@@ -296,9 +296,19 @@ BoCA::ConfigureLAME::ConfigureLAME()
 
 	expert_psycho			= new GroupBox(i18n->TranslateString("Psycho acoustic model"), Point(7, 62), Size(415, 39));
 
-	expert_check_tempmask		= new CheckBox(i18n->TranslateString("Use Temporal Masking Effect"), Point(10, 11), Size(394, 0), &enable_tempmask);
+	expert_check_tns		= new CheckBox(i18n->AddColon(i18n->TranslateString("Use Temporal Masking Effect")), Point(10, 11), Size(394, 0), &enable_tns);
+	expert_check_tns->onAction.Connect(&ConfigureLAME::SetEnableTNS, this);
+	expert_check_tns->SetWidth(expert_check_tns->GetUnscaledTextWidth() + 19);
 
-	expert_psycho->Add(expert_check_tempmask);
+	expert_combo_tnsmode		= new ComboBox(Point(38 + expert_check_tns->GetUnscaledTextWidth(), 10), Size(367 - expert_check_tns->GetUnscaledTextWidth(), 0));
+	expert_combo_tnsmode->AddEntry(i18n->TranslateString("automatic"));
+	expert_combo_tnsmode->AddEntry(i18n->TranslateString("always"));
+	expert_combo_tnsmode->SelectNthEntry(config->GetIntValue(ConfigID, "TNSMode", -1) + 1);
+
+	if (!enable_tns) expert_combo_tnsmode->Deactivate();
+
+	expert_psycho->Add(expert_check_tns);
+	expert_psycho->Add(expert_combo_tnsmode);
 
 	expert_format			= new GroupBox(i18n->TranslateString("Stream format"), Point(7, 113), Size(415, 39));
 
@@ -391,7 +401,7 @@ BoCA::ConfigureLAME::ConfigureLAME()
 	expert_format->SetWidth(expert_ath->GetWidth());
 
 	expert_combo_athtype->SetWidth(expert_ath->GetWidth() - expert_combo_athtype->GetX() - 10);
-	expert_check_tempmask->SetWidth(expert_psycho->GetWidth() - 20);
+	expert_combo_tnsmode->SetWidth(expert_ath->GetWidth() - expert_combo_tnsmode->GetX() - 10);
 	expert_check_iso->SetWidth(expert_format->GetWidth() - 20);
 
 	filtering_misc->SetWidth(reg_register->GetWidth() - filtering_highpass->GetWidth() - 26);
@@ -491,7 +501,8 @@ BoCA::ConfigureLAME::~ConfigureLAME()
 	DeleteObject(expert_check_ath);
 	DeleteObject(expert_combo_athtype);
 	DeleteObject(expert_psycho);
-	DeleteObject(expert_check_tempmask);
+	DeleteObject(expert_check_tns);
+	DeleteObject(expert_combo_tnsmode);
 	DeleteObject(expert_format);
 	DeleteObject(expert_check_iso);
 
@@ -582,7 +593,8 @@ Int BoCA::ConfigureLAME::SaveSettings()
 	config->SetIntValue(ConfigID, "HighpassWidth", filtering_edit_highpass_width->GetText().ToInt());
 	config->SetIntValue(ConfigID, "EnableATH", enable_ath);
 	config->SetIntValue(ConfigID, "ATHType", expert_combo_athtype->GetSelectedEntryNumber() - 1);
-	config->SetIntValue(ConfigID, "UseTNS", enable_tempmask);
+	config->SetIntValue(ConfigID, "UseTNS", enable_tns);
+	config->SetIntValue(ConfigID, "TNSMode", expert_combo_tnsmode->GetSelectedEntryNumber() - 1);
 
 	return Success();
 }
@@ -626,7 +638,7 @@ Void BoCA::ConfigureLAME::SetPreset()
 		expert_ath->Activate();
 		expert_check_ath->Activate();
 		expert_psycho->Activate();
-		expert_check_tempmask->Activate();
+		expert_check_tns->Activate();
 		expert_format->Activate();
 		expert_check_iso->Activate();
 
@@ -638,6 +650,7 @@ Void BoCA::ConfigureLAME::SetPreset()
 		SetQualityOption();
 		SetStereoMode();
 		SetEnableATH();
+		SetEnableTNS();
 		SetDisableFiltering();
 	}
 	else
@@ -691,7 +704,8 @@ Void BoCA::ConfigureLAME::SetPreset()
 		expert_check_ath->Deactivate();
 		expert_combo_athtype->Deactivate();
 		expert_psycho->Deactivate();
-		expert_check_tempmask->Deactivate();
+		expert_check_tns->Deactivate();
+		expert_combo_tnsmode->Deactivate();
 		expert_format->Deactivate();
 		expert_check_iso->Deactivate();
 
@@ -1008,14 +1022,14 @@ Void BoCA::ConfigureLAME::SetLowpassWidth()
 
 Void BoCA::ConfigureLAME::SetEnableATH()
 {
-	if (enable_ath)
-	{
-		expert_combo_athtype->Activate();
-	}
-	else
-	{
-		expert_combo_athtype->Deactivate();
-	}
+	if (enable_ath) expert_combo_athtype->Activate();
+	else		expert_combo_athtype->Deactivate();
+}
+
+Void BoCA::ConfigureLAME::SetEnableTNS()
+{
+	if (enable_tns) expert_combo_tnsmode->Activate();
+	else		expert_combo_tnsmode->Deactivate();
 }
 
 Void BoCA::ConfigureLAME::SetDisableFiltering()
@@ -1052,7 +1066,7 @@ Int BoCA::ConfigureLAME::GetBitrate()
 
 Int BoCA::ConfigureLAME::GetSliderValue()
 {
-	return BitrateToSliderValue(Config::Get()->GetIntValue("LAME", "Bitrate", 192));
+	return BitrateToSliderValue(Config::Get()->GetIntValue(ConfigID, "Bitrate", 192));
 }
 
 Int BoCA::ConfigureLAME::GetMinVBRBitrate()
@@ -1062,7 +1076,7 @@ Int BoCA::ConfigureLAME::GetMinVBRBitrate()
 
 Int BoCA::ConfigureLAME::GetMinVBRSliderValue()
 {
-	return BitrateToSliderValue(Config::Get()->GetIntValue("LAME", "MinVBRBitrate", 128));
+	return BitrateToSliderValue(Config::Get()->GetIntValue(ConfigID, "MinVBRBitrate", 128));
 }
 
 Int BoCA::ConfigureLAME::GetMaxVBRBitrate()
@@ -1072,7 +1086,7 @@ Int BoCA::ConfigureLAME::GetMaxVBRBitrate()
 
 Int BoCA::ConfigureLAME::GetMaxVBRSliderValue()
 {
-	return BitrateToSliderValue(Config::Get()->GetIntValue("LAME", "MaxVBRBitrate", 256));
+	return BitrateToSliderValue(Config::Get()->GetIntValue(ConfigID, "MaxVBRBitrate", 256));
 }
 
 Int BoCA::ConfigureLAME::SliderValueToBitrate(Int value)

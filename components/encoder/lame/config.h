@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -94,7 +94,8 @@ namespace BoCA
 			ComboBox		*expert_combo_athtype;
 
 			GroupBox		*expert_psycho;
-			CheckBox		*expert_check_tempmask;
+			CheckBox		*expert_check_tns;
+			ComboBox		*expert_combo_tnsmode;
 
 			GroupBox		*expert_format;
 			CheckBox		*expert_check_iso;
@@ -134,7 +135,7 @@ namespace BoCA
 			Bool			 set_crc;
 			Bool			 set_iso;
 			Bool			 enable_ath;
-			Bool			 enable_tempmask;
+			Bool			 enable_tns;
 			Bool			 disable_filtering;
 			Bool			 set_lowpass;
 			Bool			 set_lowpass_width;
@@ -156,6 +157,7 @@ namespace BoCA
 			Void			 SetMinVBRBitrate();
 			Void			 SetMaxVBRBitrate();
 			Void			 SetEnableATH();
+			Void			 SetEnableTNS();
 			Void			 SetDisableFiltering();
 			Void			 SetLowpass();
 			Void			 SetLowpassWidth();
