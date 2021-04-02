@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,9 +14,24 @@
 #include <boca/application/dspcomponent.h>
 #include <boca/application/registry.h>
 
+namespace BoCA
+{
+	class FormatConverterData
+	{
+		public:
+						 FormatConverterData(Config *config) : processSignal(1), readySignal(1)	{ this->config = Config::Copy(config); }
+						~FormatConverterData()							{ Config::Free(config); }
+
+			Config			*config;
+
+			Threads::Semaphore	 processSignal;
+			Threads::Semaphore	 readySignal;
+	};
+}
+
 BoCA::FormatConverter::FormatConverter(const Format &source, const Format &target)
 {
-	converterConfig = NIL;
+	converterData	= NIL;
 
 	errorState	= False;
 	errorString	= "Unknown error";
@@ -26,12 +41,13 @@ BoCA::FormatConverter::FormatConverter(const Format &source, const Format &targe
 
 	if (source == target || source == Format() || target == Format()) return;
 
-	/* Create dummy track and converter config.
+	/* Create dummy track and converter data.
 	 */
 	Track	 converterTrack;
 
 	converterTrack.SetFormat(source);
-	converterConfig = Config::Copy(Config::Get());
+	converterData = new FormatConverterData(Config::Get());
+	converterData->processSignal.Wait();
 
 	/* Create converter components.
 	 */
@@ -51,10 +67,10 @@ BoCA::FormatConverter::FormatConverter(const Format &source, const Format &targe
 			return;
 		}
 
-		converterConfig->SetIntValue("Channels", "Channels", target.channels);
-		converterConfig->SetIntValue("Channels", "SwapChannels", False);
+		converterData->config->SetIntValue("Channels", "Channels", target.channels);
+		converterData->config->SetIntValue("Channels", "SwapChannels", False);
 
-		channels->SetConfiguration(converterConfig);
+		channels->SetConfiguration(converterData->config);
 		channels->SetAudioTrackInfo(converterTrack);
 		channels->Activate();
 
@@ -87,10 +103,10 @@ BoCA::FormatConverter::FormatConverter(const Format &source, const Format &targe
 			return;
 		}
 
-		converterConfig->SetIntValue("Resample", "Converter", 2);
-		converterConfig->SetIntValue("Resample", "Samplerate", target.rate);
+		converterData->config->SetIntValue("Resample", "Converter", 2);
+		converterData->config->SetIntValue("Resample", "Samplerate", target.rate);
 
-		resampler->SetConfiguration(converterConfig);
+		resampler->SetConfiguration(converterData->config);
 		resampler->SetAudioTrackInfo(converterTrack);
 		resampler->Activate();
 
@@ -123,11 +139,11 @@ BoCA::FormatConverter::FormatConverter(const Format &source, const Format &targe
 			return;
 		}
 
-		converterConfig->SetIntValue("Format", "Bits", target.bits);
-		converterConfig->SetIntValue("Format", "Signed", target.sign);
-		converterConfig->SetIntValue("Format", "Float", target.fp);
+		converterData->config->SetIntValue("Format", "Bits", target.bits);
+		converterData->config->SetIntValue("Format", "Signed", target.sign);
+		converterData->config->SetIntValue("Format", "Float", target.fp);
 
-		converter->SetConfiguration(converterConfig);
+		converter->SetConfiguration(converterData->config);
 		converter->SetAudioTrackInfo(converterTrack);
 		converter->Activate();
 
@@ -154,11 +170,13 @@ BoCA::FormatConverter::FormatConverter(const Format &source, const Format &targe
 
 BoCA::FormatConverter::~FormatConverter()
 {
-	if (converterConfig == NIL) return;
+	if (converterData == NIL) return;
 
 	/* Wait for converter thread to finish.
 	 */
 	finish = True;
+
+	converterData->processSignal.Release();
 
 	converterThread.Wait();
 
@@ -175,53 +193,44 @@ BoCA::FormatConverter::~FormatConverter()
 
 	converters.RemoveAll();
 
-	/* Free converter config.
+	/* Free converter data.
 	 */
-	Config::Free(converterConfig);
+	delete converterData;
 }
 
 Int BoCA::FormatConverter::Transform(Buffer<UnsignedByte> &buffer)
 {
-	if (converterConfig == NIL) return buffer.Size();
+	if (converterData == NIL) return buffer.Size();
 
-	/* Buffer data until we have at least 128 kB.
+	/* Move new data out of the way.
 	 */
-	backBuffer.Resize(backBuffer.Size() + buffer.Size());
+	backBuffer.Resize(buffer.Size());
 
-	memcpy(backBuffer + backBuffer.Size() - buffer.Size(), buffer, buffer.Size());
+	memcpy(backBuffer, buffer, buffer.Size());
 
 	buffer.Resize(0);
 
-	if (backBuffer.Size() < 131072) return buffer.Size();
-
 	/* Aquire lock to handle data.
 	 */
-	while (True)
-	{
-		Threads::Lock	 lock(converterMutex);
+	converterData->readySignal.Wait();
 
-		if (process) continue;
+	/* Query data from converter thread.
+	 */
+	buffer.Resize(samplesBuffer.Size());
 
-		/* Query data from converter thread.
-		 */
-		buffer.Resize(samplesBuffer.Size());
+	memcpy(buffer, samplesBuffer, samplesBuffer.Size());
 
-		memcpy(buffer, samplesBuffer, samplesBuffer.Size());
+	/* Pass new samples to converter thread.
+	 */
+	samplesBuffer.Resize(backBuffer.Size());
 
-		/* Pass new samples to converter thread.
-		 */
-		samplesBuffer.Resize(backBuffer.Size());
+	memcpy(samplesBuffer, backBuffer, backBuffer.Size());
 
-		memcpy(samplesBuffer, backBuffer, backBuffer.Size());
+	backBuffer.Resize(0);
 
-		backBuffer.Resize(0);
-
-		/* Signal availability of new samples.
-		 */
-		process = True;
-
-		break;
-	}
+	/* Signal availability of new samples.
+	 */
+	converterData->processSignal.Release();
 
 	return buffer.Size();
 }
@@ -230,26 +239,19 @@ Int BoCA::FormatConverter::Finish(Buffer<UnsignedByte> &buffer)
 {
 	if (buffer.Size() != 0) return -1;
 
-	if (converterConfig == NIL) return buffer.Size();
+	if (converterData == NIL) return buffer.Size();
 
 	/* Aquire lock to handle data.
 	 */
-	while (True)
-	{
-		Threads::Lock	 lock(converterMutex);
+	converterData->readySignal.Wait();
 
-		if (process) continue;
+	/* Query data from converter thread.
+	 */
+	buffer.Resize(samplesBuffer.Size());
 
-		/* Query data from converter thread.
-		 */
-		buffer.Resize(samplesBuffer.Size());
+	memcpy(buffer, samplesBuffer, samplesBuffer.Size());
 
-		memcpy(buffer, samplesBuffer, samplesBuffer.Size());
-
-		samplesBuffer.Resize(0);
-
-		break;
-	}
+	samplesBuffer.Resize(0);
 
 	/* Flush all converter components.
 	 */
@@ -287,17 +289,15 @@ Int BoCA::FormatConverter::ConverterThread()
 {
 	while (!finish)
 	{
-		while (!finish && !process) S::System::System::Sleep(1);
+		converterData->processSignal.Wait();
 
-		if (!process) continue;
-
-		Threads::Lock	 lock(converterMutex);
+		if (finish) break;
 
 		/* Call transform for every converter component.
 		 */
 		foreach (AS::DSPComponent *converter, converters) converter->TransformData(samplesBuffer);
 
-		process = False;
+		converterData->readySignal.Release();
 	}
 
 	return Success();
