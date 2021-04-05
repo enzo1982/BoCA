@@ -223,9 +223,11 @@ Bool BoCA::Utilities::IsRelativePath(const String &path)
  */
 Bool BoCA::Utilities::IsFolderWritable(const String &path)
 {
+	Math::RandomSeed();
+
 	Bool		 result	= False;
 	Directory	 folder = path;
-	String		 file	= String(folder).Append(Directory::GetDirectoryDelimiter()).Append(String::FromInt(S::System::System::Clock())).Append(".temp");
+	String		 file	= String(folder).Append(Directory::GetDirectoryDelimiter()).Append(String::FromInt(Math::Random())).Append(".temp");
 	OutStream	 temp(STREAM_FILE, file, OS_REPLACE);
 
 	if (temp.GetLastError() == IO_ERROR_OK) result = True;
