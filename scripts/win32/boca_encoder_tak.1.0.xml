@@ -15,7 +15,7 @@
   <input bits="16-24" channels="1-6"/>
   <external>
     <command>takc</command>
-    <arguments>-e -ihs %OPTIONS - %OUTFILE</arguments>
+    <arguments>-e -ihs -tn%THREADS %OPTIONS - %OUTFILE</arguments>
     <mode>stdio</mode>
     <informat>wave</informat>
     <parameters>
