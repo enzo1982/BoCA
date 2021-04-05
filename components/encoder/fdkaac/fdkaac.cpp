@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,7 +33,7 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 														\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
 		  <component>											\
-		    <name>Fraunhofer FDK AAC Encoder</name>							\
+		    <name>FDK-AAC Encoder %VERSION%</name>							\
 		    <version>1.0</version>									\
 		    <id>fdkaac-enc</id>										\
 		    <type>encoder</type>									\
@@ -96,6 +96,12 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 		  </component>											\
 														\
 		");
+
+		UnsignedInt32	 version = GetEncoderVersion();
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(String::FromInt((version >> 24) & 0xff)).Append(".")
+							       .Append(String::FromInt((version >> 16) & 0xff)).Append(".")
+							       .Append(String::FromInt((version >>  8) & 0xff)));
 	}
 
 	return componentSpecs;

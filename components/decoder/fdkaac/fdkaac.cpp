@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -31,7 +31,7 @@ const String &BoCA::DecoderFDKAAC::GetComponentSpecs()
 											\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
 		  <component>								\
-		    <name>Fraunhofer FDK AAC Decoder</name>				\
+		    <name>FDK-AAC Decoder %VERSION%</name>				\
 		    <version>1.0</version>						\
 		    <id>fdkaac-dec</id>							\
 		    <type>decoder</type>						\
@@ -67,6 +67,12 @@ const String &BoCA::DecoderFDKAAC::GetComponentSpecs()
 		  </component>								\
 											\
 		");
+
+		UnsignedInt32	 version = GetDecoderVersion();
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(String::FromInt((version >> 24) & 0xff)).Append(".")
+							       .Append(String::FromInt((version >> 16) & 0xff)).Append(".")
+							       .Append(String::FromInt((version >>  8) & 0xff)));
 	}
 
 	return componentSpecs;
@@ -380,6 +386,23 @@ BoCA::DecoderFDKAAC::DecoderFDKAAC()
 
 BoCA::DecoderFDKAAC::~DecoderFDKAAC()
 {
+}
+
+UnsignedInt32 BoCA::DecoderFDKAAC::GetDecoderVersion()
+{
+	LIB_INFO	 info[FDK_MODULE_LAST];
+
+	FDKinitLibInfo(info);
+	ex_aacDecoder_GetLibInfo(info);
+
+	for (Int i = 0; i < FDK_MODULE_LAST; i++)
+	{
+		if (info[i].module_id != FDK_AACDEC) continue;
+
+		return info[i].version;
+	}
+
+	return 0;
 }
 
 Bool BoCA::DecoderFDKAAC::Activate()
