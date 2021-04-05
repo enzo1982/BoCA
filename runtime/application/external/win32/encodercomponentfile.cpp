@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -85,12 +85,23 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	delete out;
 
+	/* Get number of threads to use.
+	 */
+	const Config	*config = GetConfiguration();
+
+	Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
+	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", True);
+	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
+
+	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
+
 	/* Start 3rd party command line encoder.
 	 */
 	const Info	&info = track.GetInfo();
 
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+	String	 arguments = String(specs->external_arguments).Replace("%THREADS", String::FromInt(Math::Min(numberOfThreads, 8)))
+							      .Replace("%OPTIONS", specs->GetExternalArgumentsString())
 							      .Replace("%INFILE", String("\"").Append(wavFileName).Append("\""))
 							      .Replace("%OUTFILE", String("\"").Append(encFileName).Append("\""))
 							      .Replace("%ARTIST", String("\"").Append((char *) info.artist).Append("\""))
