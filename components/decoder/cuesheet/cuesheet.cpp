@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -271,7 +271,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 										       msf.GetNth(1).ToInt()	  * format.rate +
 										       msf.GetNth(2).ToInt()	  * format.rate / 75, fileLength);
 
-							if (samplePos >= iTrack.sampleOffset)
+							if (samplePos > iTrack.sampleOffset)
 							{
 								iTrack.length	= samplePos - iTrack.sampleOffset;
 								iTrack.fileSize	= Math::Round(Float(iTrack.fileSize) / fileLength * iTrack.length);
@@ -287,7 +287,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 			/* Add previous track.
 			 */
-			if (iTrack.length != -1 || iTrack.approxLength != -1)
+			if (iTrack.length > 0 || iTrack.approxLength > 0)
 			{
 				iTrack.SetFormat(format);
 				iTrack.SetInfo(info);
