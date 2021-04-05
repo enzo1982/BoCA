@@ -766,6 +766,10 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 	 */
 	if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
 
+	/* Remove sub-tracks if main track has a track number.
+	 */
+	if (info.track > 0) track.tracks.RemoveAll();
+
 	track.SetInfo(info);
 
 	delete iterator;

@@ -530,6 +530,10 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 	 */
 	if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
 
+	/* Remove sub-tracks if main track has a track number.
+	 */
+	if (info.track > 0) track.tracks.RemoveAll();
+
 	track.SetInfo(info);
 
 	/* Read chapters.
