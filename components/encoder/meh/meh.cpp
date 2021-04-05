@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -391,17 +391,7 @@ String BoCA::EncoderMultiEncoderHub::GetPlaylistFileName(const Config *configura
 	String		 outputDir     = configuration->GetStringValue("Settings", "EncoderOutDir", NIL);
 	String		 inputDir      = originalTrack.fileName.Head(Math::Max(originalTrack.fileName.FindLast("\\"), originalTrack.fileName.FindLast("/")) + 1);
 
-	if (configuration->GetIntValue("Settings", "WriteToInputDirectory", False) && !originalTrack.isCDTrack)
-	{
-		String		 file = String(inputDir).Append(String::FromInt(S::System::System::Clock())).Append(".temp");
-		OutStream	 temp(STREAM_FILE, file, OS_REPLACE);
-
-		if (temp.GetLastError() == IO_ERROR_OK) outputDir = inputDir;
-
-		temp.Close();
-
-		File(file).Delete();
-	}
+	if (configuration->GetIntValue("Settings", "WriteToInputDirectory", False) && !originalTrack.isCDTrack && Utilities::IsFolderWritable(inputDir)) outputDir = inputDir;
 
 	/* Generate playlist file name.
 	 */
