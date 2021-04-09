@@ -326,13 +326,25 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		else if (id == "ISRC")		 info.isrc      = value;
 
-		else if (id == "TRACKNUMBER")	 info.track     = value.ToInt();
-		else if (id == "TRACKTOTAL")	 info.numTracks = value.ToInt();
-		else if (id == "TOTALTRACKS")	 info.numTracks = value.ToInt();
+		else if (id == "TRACKNUMBER")
+		{
+			info.track = value.ToInt();
 
-		else if (id == "DISCNUMBER")	 info.disc      = value.ToInt();
-		else if (id == "DISCTOTAL")	 info.numDiscs  = value.ToInt();
-		else if (id == "TOTALDISCS")	 info.numDiscs  = value.ToInt();
+			if (value.Contains("/")) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
+		}
+
+		else if (id == "TRACKTOTAL" ||
+			 id == "TOTALTRACKS")	 info.numTracks = value.ToInt();
+
+		else if (id == "DISCNUMBER")
+		{
+			info.disc = value.ToInt();
+
+			if (value.Contains("/")) info.numDiscs  = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
+		}
+
+		else if (id == "DISCTOTAL" ||
+			 id == "TOTALDISCS")	 info.numDiscs  = value.ToInt();
 
 		else if (id == "ALBUMARTIST")	 info.SetOtherInfo(INFO_ALBUMARTIST,	value);
 
