@@ -173,7 +173,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Get stream format.
 	 */
-	OpusHeader		*setup = NIL;
+	OpusHeader		 setup;
 	Buffer<UnsignedByte>	 comments;
 
 	Bool	 initialized = False;
@@ -206,27 +206,27 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 				 */
 				if (packetNum == 0)
 				{
-					setup = (OpusHeader *) op.packet;
+					memcpy(&setup, op.packet, sizeof(OpusHeader));
 
 					if (endianness != EndianLittle)
 					{
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->preskip, sizeof(setup->preskip));
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->sample_rate, sizeof(setup->sample_rate));
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->output_gain, sizeof(setup->output_gain));
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.preskip, sizeof(setup.preskip));
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.sample_rate, sizeof(setup.sample_rate));
+						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.output_gain, sizeof(setup.output_gain));
 					}
 
-					format.channels = setup->nb_channels;
+					format.channels = setup.nb_channels;
 
-					if (setup->sample_rate != 0)
+					if (setup.sample_rate != 0)
 					{
-						if	(setup->sample_rate <=  8000) format.rate =  8000;
-						else if	(setup->sample_rate <= 12000) format.rate = 12000;
-						else if	(setup->sample_rate <= 16000) format.rate = 16000;
-						else if	(setup->sample_rate <= 24000) format.rate = 24000;
-						else				      format.rate = 48000;
+						if	(setup.sample_rate <=  8000) format.rate =  8000;
+						else if	(setup.sample_rate <= 12000) format.rate = 12000;
+						else if	(setup.sample_rate <= 16000) format.rate = 16000;
+						else if	(setup.sample_rate <= 24000) format.rate = 24000;
+						else				     format.rate = 48000;
 					}
 
-					preSkip = setup->preskip;
+					preSkip = setup.preskip;
 
 					track.length = -1;
 				}
@@ -252,8 +252,8 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 					OpusMSDecoder	*decoder    = NIL;
 
-					if (setup->channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup->nb_channels, 1,		  setup->nb_channels - 1, mapping,	     &error);
-					else				 decoder = ex_opus_multistream_decoder_create(format.rate, setup->nb_channels, setup->nb_streams, setup->nb_coupled,	  setup->stream_map, &error);
+					if (setup.channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, 1,		       setup.nb_channels - 1, mapping,		&error);
+					else				decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, setup.nb_streams, setup.nb_coupled,      setup.stream_map, &error);
 
 					if (error == 0)
 					{
