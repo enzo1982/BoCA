@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -208,13 +208,9 @@ Bool BoCA::EncoderWMA::IsLossless() const
 	IWMProfileManager	*pProfileManager = NIL;
 	IWMCodecInfo3		*pCodecInfo	 = NIL;
 
-	HRESULT	 hr = ex_WMCreateProfileManager(&pProfileManager);
+	if (FAILED(ex_WMCreateProfileManager(&pProfileManager))) return False;
 
-	if (FAILED(hr)) return False;
-
-	hr = pProfileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo);
-
-	if (FAILED(hr))
+	if (FAILED(pProfileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo)))
 	{
 		pProfileManager->Release();
 
@@ -261,13 +257,9 @@ Bool BoCA::EncoderWMA::Activate()
 
 	/* Create WMA writer object.
 	 */
-	HRESULT	 hr = ex_WMCreateWriter(NIL, &writer);
+	if (FAILED(ex_WMCreateWriter(NIL, &writer))) return False;
 
-	if (FAILED(hr)) return False;
-
-	hr = writer->QueryInterface(IID_IWMWriterAdvanced, (void **) &writerAdvanced);
-
-	if (FAILED(hr))
+	if (FAILED(writer->QueryInterface(IID_IWMWriterAdvanced, (void **) &writerAdvanced)))
 	{
 		writer->Release();
 
@@ -300,49 +292,96 @@ Bool BoCA::EncoderWMA::Activate()
 
 	profileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo);
 
-	Int	 defaultCodec = GetDefaultCodec(pCodecInfo);
+	Int	 codec		    = config->GetIntValue(ConfigureWMA::ConfigID, "Codec", GetDefaultCodec(pCodecInfo));
+	Int	 codecFormat	    = config->GetIntValue(ConfigureWMA::ConfigID, "CodecFormat", 0);
+	Bool	 uncompressedFormat = config->GetIntValue(ConfigureWMA::ConfigID, "Uncompressed", False);
+	Bool	 autoSelectFormat   = config->GetIntValue(ConfigureWMA::ConfigID, "AutoSelectFormat", True);
+	Bool	 enableVBR	    = config->GetIntValue(ConfigureWMA::ConfigID, "EnableVBR", True);
+	Bool	 enable2Pass	    = config->GetIntValue(ConfigureWMA::ConfigID, "Enable2Pass", False);
 
-	if (config->GetIntValue(ConfigureWMA::ConfigID, "Uncompressed", False))
+	DWORD	 numCodecs = 0;
+
+	pCodecInfo->GetCodecInfoCount(WMMEDIATYPE_Audio, &numCodecs);
+	
+	if (codec >= (Int) numCodecs)
+	{
+		codec		 = GetDefaultCodec(pCodecInfo);
+		autoSelectFormat = True;
+	}
+
+	if (codec == -1 || numCodecs == 0) uncompressedFormat = True;
+
+	/* Create stream configuration.
+	 */
+	if (uncompressedFormat)
 	{
 		profile->CreateNewStream(WMMEDIATYPE_Audio, &streamConfig);
 	}
-	else if (!config->GetIntValue(ConfigureWMA::ConfigID, "AutoSelectFormat", True))
+	else if (!autoSelectFormat)
 	{
 		BOOL	 falseValue = FALSE;
 		BOOL	 trueValue = TRUE;
 		DWORD	 oneValue = 1;
 		DWORD	 twoValue = 2;
 
-		if (config->GetIntValue(ConfigureWMA::ConfigID, "EnableVBR", True))    pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &trueValue,  sizeof(BOOL));
-		else								       pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &falseValue, sizeof(BOOL));
+		if (enableVBR)   pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, codec, g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &trueValue,  sizeof(BOOL));
+		else		 pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, codec, g_wszVBREnabled, WMT_TYPE_BOOL, (BYTE *) &falseValue, sizeof(BOOL));
 
-		if (config->GetIntValue(ConfigureWMA::ConfigID, "Enable2Pass", False)) pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &twoValue, sizeof(DWORD));
-		else								       pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
+		if (enable2Pass) pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, codec, g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &twoValue, sizeof(DWORD));
+		else		 pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, codec, g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
 
-		pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), config->GetIntValue(ConfigureWMA::ConfigID, "CodecFormat", 0), &streamConfig);
+		pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, codec, codecFormat, &streamConfig);
 	}
 	else
 	{
-		streamConfig = GetBestCodecFormat(pCodecInfo, config->GetIntValue(ConfigureWMA::ConfigID, "Codec", defaultCodec), track.GetFormat());
+		streamConfig = GetBestCodecFormat(pCodecInfo, codec, track.GetFormat());
 	}
 
-	streamConfig->SetStreamNumber(1);
-	streamConfig->SetStreamName(String("Audio"));
-	streamConfig->SetConnectionName(String("Audio"));
+	/* Check stream configuration.
+	 */
+	if (!streamConfig)
+	{
+		errorState  = True;
+		errorString = "Could not create codec configuration.";
+	}
 
-	profile->AddStream(streamConfig);
+	/* Set up profile and writer.
+	 */
+	if (!errorState)
+	{
+		streamConfig->SetStreamNumber(1);
+		streamConfig->SetStreamName(String("Audio"));
+		streamConfig->SetConnectionName(String("Audio"));
 
-	writer->SetProfile(profile);
+		profile->AddStream(streamConfig);
 
-	if (SetInputFormat(writer, track.GetFormat()) == False) errorState = True;
+		writer->SetProfile(profile);
+
+		if (SetInputFormat(writer, track.GetFormat()) == False)
+		{
+			errorState  = True;
+			errorString = "Incompatible sample format.";
+		}
+	}
 
 	pCodecInfo->Release();
 
-	if (!errorState) hr = writer->BeginWriting();
-
-	if (FAILED(hr))
+	/* Start writing output file.
+	 */
+	if (!errorState)
 	{
-		streamConfig->Release();
+		if (FAILED(writer->BeginWriting()))
+		{
+			errorState  = True;
+			errorString = "Could not initialize encoder.";
+		}
+	}
+
+	/* Release objects in case of an error.
+	 */
+	if (errorState)
+	{
+		if (streamConfig) streamConfig->Release();
 
 		profile->Release();
 		profileManager->Release();
@@ -351,9 +390,6 @@ Bool BoCA::EncoderWMA::Activate()
 
 		writerAdvanced->Release();
 		writer->Release();
-
-		errorState  = True;
-		errorString = "Could not initialize encoder.";
 	}
 
 	return !errorState;
@@ -432,9 +468,8 @@ Bool BoCA::EncoderWMA::Deactivate()
 Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data)
 {
 	INSSBuffer	*pSample = NIL;
-	HRESULT		 hr	 = writer->AllocateSample(data.Size(), &pSample);
 
-	if (FAILED(hr)) return -1;
+	if (FAILED(writer->AllocateSample(data.Size(), &pSample))) return -1;
 
 	BYTE	*buffer = NIL;
 
@@ -444,10 +479,10 @@ Int BoCA::EncoderWMA::WriteData(Buffer<UnsignedByte> &data)
 
 		pSample->SetLength(data.Size());
 
-		const Format	&format = track.GetFormat();
+		const Format	&format	       = track.GetFormat();
 		QWORD		 cnsSampleTime = samplesWritten * 10000000 / format.channels / format.rate;
 
-		hr = writer->WriteSample(0, cnsSampleTime, WM_SF_CLEANPOINT, pSample);
+		HRESULT	 hr = writer->WriteSample(0, cnsSampleTime, WM_SF_CLEANPOINT, pSample);
 
 		pSample->Release();
 
@@ -505,13 +540,9 @@ Bool BoCA::EncoderWMA::ConvertArguments(Config *config)
 	IWMProfileManager	*pProfileManager = NIL;
 	IWMCodecInfo3		*pCodecInfo	= NIL;
 
-	HRESULT	 hr = ex_WMCreateProfileManager(&pProfileManager);
+	if (FAILED(ex_WMCreateProfileManager(&pProfileManager))) return False;
 
-	if (FAILED(hr)) return False;
-
-	hr = pProfileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo);
-
-	if (FAILED(hr))
+	if (FAILED(pProfileManager->QueryInterface(IID_IWMCodecInfo3, (void **) &pCodecInfo)))
 	{
 		pProfileManager->Release();
 
@@ -521,17 +552,17 @@ Bool BoCA::EncoderWMA::ConvertArguments(Config *config)
 	DWORD	 numCodecs    = 0;
 	Int	 targetFormat = GetDefaultCodec(pCodecInfo);
 
-	hr = pCodecInfo->GetCodecInfoCount(WMMEDIATYPE_Audio, &numCodecs);
+	pCodecInfo->GetCodecInfoCount(WMMEDIATYPE_Audio, &numCodecs);
 
 	for (DWORD i = 0; i < numCodecs; i++)
 	{
 		DWORD	 nameLen = 0;
 
-		hr = pCodecInfo->GetCodecName(WMMEDIATYPE_Audio, i, NIL, &nameLen);
+		pCodecInfo->GetCodecName(WMMEDIATYPE_Audio, i, NIL, &nameLen);
 
 		WCHAR	*name = new WCHAR [nameLen];
 
-		hr = pCodecInfo->GetCodecName(WMMEDIATYPE_Audio, i, name, &nameLen);
+		pCodecInfo->GetCodecName(WMMEDIATYPE_Audio, i, name, &nameLen);
 
 		if	(format == "pro"      && String(name).Contains("Pro"))	    targetFormat = i;
 		else if (format == "lossless" && String(name).Contains("Lossless")) targetFormat = i;
@@ -592,17 +623,15 @@ Int BoCA::EncoderWMA::GetDefaultCodec(IWMCodecInfo3 *codecInfo)
  */
 IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo, DWORD codecIndex, const Format &format) const
 {
-	HRESULT		 hr = S_OK;
+	BOOL	 falseValue   = FALSE;
+	BOOL	 trueValue    = TRUE;
+	DWORD	 oneValue     = 1;
+	DWORD	 twoValue     = 2;
 
-	BOOL		 falseValue = FALSE;
-	BOOL		 trueValue = TRUE;
-	DWORD		 oneValue = 1;
-	DWORD		 twoValue = 2;
-
-	Bool		 supportCBR	= False;
-	Bool		 supportVBR	= False;
-	Bool		 support1Pass	= True;
-	Bool		 support2Pass	= False;
+	Bool	 supportCBR   = False;
+	Bool	 supportVBR   = False;
+	Bool	 support1Pass = True;
+	Bool	 support2Pass = False;
 
 	/* Check if CBR is supported.
 	 */
@@ -611,8 +640,7 @@ IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo,
 		pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, codecIndex, g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
 
 		DWORD	 numFormats = 0;
-
-		hr = pCodecInfo->GetCodecFormatCount(WMMEDIATYPE_Audio, codecIndex, &numFormats);
+		HRESULT	 hr	    = pCodecInfo->GetCodecFormatCount(WMMEDIATYPE_Audio, codecIndex, &numFormats);
 
 		if (!FAILED(hr) && numFormats > 0) supportCBR = True;
 	}
@@ -624,7 +652,7 @@ IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo,
 		DWORD			 valueSize = sizeof(BOOL);
 		BOOL			 isVBRSupported = FALSE;
 
-		hr = pCodecInfo->GetCodecProp(WMMEDIATYPE_Audio, codecIndex, g_wszIsVBRSupported, &valueType, (BYTE *) &isVBRSupported, &valueSize);
+		pCodecInfo->GetCodecProp(WMMEDIATYPE_Audio, codecIndex, g_wszIsVBRSupported, &valueType, (BYTE *) &isVBRSupported, &valueSize);
 
 		if (isVBRSupported)
 		{
@@ -632,8 +660,7 @@ IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo,
 			pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, codecIndex, g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
 
 			DWORD	 numFormats = 0;
-
-			hr = pCodecInfo->GetCodecFormatCount(WMMEDIATYPE_Audio, codecIndex, &numFormats);
+			HRESULT	 hr	    = pCodecInfo->GetCodecFormatCount(WMMEDIATYPE_Audio, codecIndex, &numFormats);
 
 			if (!FAILED(hr) && numFormats > 0) supportVBR = True;
 		}
@@ -645,27 +672,27 @@ IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo,
 	if (support2Pass && (!support1Pass || config->GetIntValue(ConfigureWMA::ConfigID, "Enable2Pass", False))) pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, codecIndex, g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &twoValue, sizeof(DWORD));
 	else													  pCodecInfo->SetCodecEnumerationSetting(WMMEDIATYPE_Audio, codecIndex, g_wszNumPasses, WMT_TYPE_DWORD, (BYTE *) &oneValue, sizeof(DWORD));
 
-	IWMStreamConfig	*result = NIL;
+	IWMStreamConfig	*result		     = NIL;
 
-	Int		 targetBitrate = config->GetIntValue(ConfigureWMA::ConfigID, "Bitrate", 128) * 1000;
-	Int		 targetQuality = config->GetIntValue(ConfigureWMA::ConfigID, "Quality", 90);
+	Int		 targetBitrate	     = config->GetIntValue(ConfigureWMA::ConfigID, "Bitrate", 128) * 1000;
+	Int		 targetQuality	     = config->GetIntValue(ConfigureWMA::ConfigID, "Quality", 90);
 
-	Bool		 useVBR = (supportVBR && config->GetIntValue(ConfigureWMA::ConfigID, "EnableVBR", True));
+	Bool		 useVBR		     = (supportVBR && config->GetIntValue(ConfigureWMA::ConfigID, "EnableVBR", True));
 
-	DWORD		 bestMatchBitrate	= 100000000;
-	DWORD		 bestMatchQuality	= 100000000;
-	DWORD		 bestMatchSampleRate	= 100000000;
-	DWORD		 bestMatchBits		= 100000000;
-	DWORD		 bestMatchChannels	= 100000000;
+	DWORD		 bestMatchBitrate    = 100000000;
+	DWORD		 bestMatchQuality    = 100000000;
+	DWORD		 bestMatchSampleRate = 100000000;
+	DWORD		 bestMatchBits	     = 100000000;
+	DWORD		 bestMatchChannels   = 100000000;
 
-	DWORD		 numFormats = 0;
+	DWORD		 numFormats	     = 0;
 
-	hr = pCodecInfo->GetCodecFormatCount(WMMEDIATYPE_Audio, codecIndex, &numFormats);
+	pCodecInfo->GetCodecFormatCount(WMMEDIATYPE_Audio, codecIndex, &numFormats);
 
 	for (DWORD i = 0; i < numFormats; i++)
 	{
 		IWMStreamConfig	*pStreamConfig = NIL;
-		IWMMediaProps	*pMediaProps = NIL;
+		IWMMediaProps	*pMediaProps   = NIL;
 
 		pCodecInfo->GetCodecFormat(WMMEDIATYPE_Audio, codecIndex, i, &pStreamConfig);
 		pStreamConfig->QueryInterface(IID_IWMMediaProps, (void **) &pMediaProps);
@@ -687,7 +714,7 @@ IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo,
 		    mediaType->formattype == WMFORMAT_WaveFormatEx)
 		{
 			Bool		 newBestMatch = False;
-			WAVEFORMATEX	*waveFormat = (WAVEFORMATEX *) mediaType->pbFormat;
+			WAVEFORMATEX	*waveFormat   = (WAVEFORMATEX *) mediaType->pbFormat;
 
 			formatQuality = waveFormat->nAvgBytesPerSec & 255;
 
@@ -710,11 +737,11 @@ IWMStreamConfig *BoCA::EncoderWMA::GetBestCodecFormat(IWMCodecInfo3 *pCodecInfo,
 				result = pStreamConfig;
 				result->AddRef();
 
-				bestMatchChannels	= waveFormat->nChannels;
-				bestMatchBits		= waveFormat->wBitsPerSample;
-				bestMatchSampleRate	= waveFormat->nSamplesPerSec;
-				bestMatchBitrate	= formatBitrate;
-				bestMatchQuality	= formatQuality;
+				bestMatchChannels   = waveFormat->nChannels;
+				bestMatchBits	    = waveFormat->wBitsPerSample;
+				bestMatchSampleRate = waveFormat->nSamplesPerSec;
+				bestMatchBitrate    = formatBitrate;
+				bestMatchQuality    = formatQuality;
 			}
 		}
 
