@@ -531,8 +531,12 @@ Bool BoCA::SuperRepacker::FillReservoir(Int threshold)
 	return True;
 }
 
-Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
+Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference, Int depth)
 {
+	/* Limit recursion depth to avoid stack overflow.
+	 */
+	if (depth == 256) return False;
+
 	/* Find last written frame.
 	 */
 	UnsignedByte	data[2 * maxFrameSize];
@@ -611,7 +615,7 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 
 		reservoir = pre;
 
-		Bool	 result	 = IncreaseReservoir(bytes - (nframeb - frameb), reference);
+		Bool	 result	 = IncreaseReservoir(bytes - (nframeb - frameb), reference, depth + 1);
 
 		SetMainDataOffset(frame, reservoir);
 
