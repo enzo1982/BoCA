@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -536,11 +536,12 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 	/* Find last written frame.
 	 */
 	UnsignedByte	data[2 * maxFrameSize];
+	Int		dataSize = Math::Min(driver->GetPos() - offset, sizeof(data));
 
-	driver->Seek(driver->GetPos() - sizeof(data));
-	driver->ReadData(data, sizeof(data));
+	driver->Seek(driver->GetPos() - dataSize);
+	driver->ReadData(data, dataSize);
 
-	for (Int n = sizeof(data) - 13; n >= 0; n--)
+	for (Int n = dataSize - 13; n >= 0; n--)
 	{
 		if (!IsValidFrame(data + n, reference)) continue;
 
@@ -551,7 +552,7 @@ Bool BoCA::SuperRepacker::IncreaseReservoir(Int bytes, UnsignedByte *reference)
 
 		/* Verify that frame size looks correct.
 		 */
-		if (UnsignedInt(frameb) != sizeof(data) - n) continue;
+		if (frameb != dataSize - n) continue;
 
 		/* Verify that there is a frame preceding this one at the correct position.
 		 */
