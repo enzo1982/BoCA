@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -9,9 +9,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#include <smooth.h>
-#include <smooth/dll.h>
 
 #include <cdio/cdio.h>
 
@@ -60,14 +57,6 @@ const String &BoCA::DecoderCDIO::GetComponentSpecs()
 	componentSpecs.Replace("%VERSION%", String("v").Append(String(cdio_version_string).Head(String(cdio_version_string).Find(" "))));
 
 	return componentSpecs;
-}
-
-Void smooth::AttachDLL(Void *instance)
-{
-}
-
-Void smooth::DetachDLL()
-{
 }
 
 namespace BoCA
