@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -23,6 +23,9 @@ namespace BoCA
 			static const String	 ConfigID;
 
 			static const String	 genres[192];
+
+			String			 textEncodingID;
+			ID3_TextEnc		 textEncoding;
 
 			Int			 ParseContainer(const ID3_Container &, Track &);
 			Int			 RenderContainer(ID3_Container &, const Track &, Bool = False);

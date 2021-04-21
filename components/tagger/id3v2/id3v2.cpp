@@ -80,6 +80,7 @@ const String	 BoCA::TaggerID3v2::genres[192] =
 
 BoCA::TaggerID3v2::TaggerID3v2()
 {
+	textEncoding = ID3TE_NONE;
 }
 
 BoCA::TaggerID3v2::~TaggerID3v2()
@@ -216,8 +217,6 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	 */
 	const Config	*currentConfig		 = GetConfiguration();
 
-	String		 encodingID		 = currentConfig->GetStringValue(ConfigID, "ID3v2Encoding", "UTF-16LE");
-
 	Bool		 prependZero		 = currentConfig->GetIntValue(ConfigID, "TrackPrependZeroID3v2", False);
 
 	Bool		 writeChapters		 = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
@@ -231,10 +230,20 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
 	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
 
+	/* Set text encoding.
+	 */
+	textEncodingID = currentConfig->GetStringValue(ConfigID, "ID3v2Encoding", "UTF-16LE");
+
+	if	(textEncodingID == "UTF-8")				      textEncoding = ID3TE_UTF8;
+	else if (textEncodingID == "ISO-8859-1")			      textEncoding = ID3TE_ISO8859_1;
+	else if (textEncodingID == "UTF-16"   || textEncodingID == "UCS-2" ||
+		 textEncodingID == "UTF-16LE" || textEncodingID == "UCS-2LE") textEncoding = ID3TE_UTF16;
+	else if (textEncodingID == "UTF-16BE" || textEncodingID == "UCS-2BE") textEncoding = ID3TE_UTF16BE;
+
 	/* Set ID3v2 version according to encoding.
 	 */
-	if (encodingID == "UTF-16BE" || encodingID == "UTF-8") container.SetSpec(ID3V2_4_0);
-	else						       container.SetSpec(ID3V2_3_0);
+	if (textEncodingID == "UTF-16BE" || textEncodingID == "UTF-8") container.SetSpec(ID3V2_4_0);
+	else							       container.SetSpec(ID3V2_3_0);
 
 	/* Save basic information.
 	 */
@@ -420,18 +429,19 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 			 */
 			if (picInfo.description != NIL)
 			{
-				Config	*singleByteConfig = Config::Copy(currentConfig);
-				String	 encoding	  = encodingID;
+				String		 savedEncodingID = textEncodingID;
+				ID3_TextEnc	 savedEncoding	 = textEncoding;
 
-				if (encoding != "UTF-8" && !String::IsUnicode(picInfo.description)) singleByteConfig->SetStringValue(ConfigID, "ID3v2Encoding", "ISO-8859-1");
-
-				SetConfiguration(singleByteConfig);
+				if (textEncodingID != "UTF-8" && !String::IsUnicode(picInfo.description))
+				{
+					textEncodingID = "ISO-8859-1";
+					textEncoding   = ID3TE_ISO8859_1;
+				}
 
 				SetStringField(frame_picture, ID3FN_DESCRIPTION, picInfo.description);
 
-				SetConfiguration(currentConfig);
-
-				Config::Free(singleByteConfig);
+				textEncodingID = savedEncodingID;
+				textEncoding   = savedEncoding;
 			}
 
 			/* Set picture data.
@@ -912,30 +922,17 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 {
 	if (string == NIL) return Error();
 
-	const Config	*config = GetConfiguration();
-
-	ID3_TextEnc	 encoding   = ID3TE_NONE;
-	String		 encodingID = config->GetStringValue(ConfigID, "ID3v2Encoding", "UTF-16LE");
-
-	if	(encodingID == "UTF-8")				      encoding = ID3TE_UTF8;
-	else if (encodingID == "ISO-8859-1")			      encoding = ID3TE_ISO8859_1;
-	else if (encodingID == "UTF-16"	  || encodingID == "UCS-2" ||
-		 encodingID == "UTF-16LE" || encodingID == "UCS-2LE") encoding = ID3TE_UTF16;
-	else if (encodingID == "UTF-16BE" || encodingID == "UCS-2BE") encoding = ID3TE_UTF16BE;
-
-	String::OutputFormat	 outputFormat(encodingID);
-
-	SetIntegerField(frame, ID3FN_TEXTENC, encoding);
+	SetIntegerField(frame, ID3FN_TEXTENC, textEncoding);
 
 	ID3_Field	*field = frame.GetField(fieldType);
 
 	if (field != NIL)
 	{
-		field->SetEncoding(encoding);
+		field->SetEncoding(textEncoding);
 
-		if	(encoding == ID3TE_UTF16)   field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16LE"));
-		else if (encoding == ID3TE_UTF16BE) field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16BE"));
-		else				    field->Set((char *) string.Trim());
+		if	(textEncoding == ID3TE_UTF16)	field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16LE"));
+		else if (textEncoding == ID3TE_UTF16BE)	field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16BE"));
+		else					field->Set((char *)	 string.Trim().ConvertTo(textEncodingID));
 
 		return Success();
 	}
