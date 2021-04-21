@@ -177,6 +177,8 @@ Error BoCA::DecoderCDParanoia::GetStreamInfo(const String &streamURI, Track &tra
 	info.track	 = trackNumber;
 	info.numTracks	 = info.mcdi.GetNumberOfAudioTracks();
 
+	info.SetOtherInfo(INFO_MEDIATYPE, I18n::Get()->TranslateString("CD", "Media types"));
+
 	track.SetInfo(info);
 
 	/* Delete DeviceInfo component.

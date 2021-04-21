@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -184,6 +184,8 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 
 	info.track	 = trackNumber;
 	info.numTracks	 = info.mcdi.GetNumberOfAudioTracks();
+
+	info.SetOtherInfo(INFO_MEDIATYPE, I18n::Get()->TranslateString("CD", "Media types"));
 
 	/* Read CD-Text and cdplayer.ini.
 	 */

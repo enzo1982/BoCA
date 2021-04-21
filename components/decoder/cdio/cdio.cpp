@@ -190,6 +190,8 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 	info.track	 = trackNumber;
 	info.numTracks	 = info.mcdi.GetNumberOfAudioTracks();
 
+	info.SetOtherInfo(INFO_MEDIATYPE, I18n::Get()->TranslateString("CD", "Media types"));
+
 	/* Read CD-Text.
 	 */
 	UnsignedInt32	 discid = ComputeDiscID(info.mcdi);
