@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -45,6 +45,7 @@ namespace BoCA
 
 	const char * const INFO_COPYRIGHT	= (char *) "Copyright";
 
+	const char * const INFO_MEDIATYPE	= (char *) "Source media type";
 	const char * const INFO_CATALOGNUMBER	= (char *) "Source media catalog number";
 	const char * const INFO_BARCODE		= (char *) "Source media EAN/UPC barcode";
 

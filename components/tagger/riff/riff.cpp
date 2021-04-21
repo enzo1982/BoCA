@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -117,6 +117,8 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 
 		else if	(key == INFO_COPYRIGHT)	     RenderTagItem("ICOP", value, buffer);
 
+		else if	(key == INFO_MEDIATYPE)	     RenderTagItem("ISRF", value, buffer);
+
 		else if	(key == INFO_RELEASECOUNTRY) RenderTagItem("ICNT", value, buffer);
 
 		else if (key == INFO_WEB_ARTIST)     RenderTagItem("IURL", value, buffer);
@@ -220,6 +222,8 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 			else if (id == "IENG") info.SetOtherInfo(INFO_ENGINEER,	      value);
 
 			else if (id == "ICOP") info.SetOtherInfo(INFO_COPYRIGHT,      value);
+
+			else if (id == "ISRF") info.SetOtherInfo(INFO_MEDIATYPE,      value);
 
 			else if (id == "ICNT") info.SetOtherInfo(INFO_RELEASECOUNTRY, value);
 

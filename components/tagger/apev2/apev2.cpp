@@ -146,6 +146,7 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		else if	(key == INFO_COPYRIGHT)	     { RenderAPEItem("Copyright",      value, buffer); numItems++; }
 
+		else if	(key == INFO_MEDIATYPE)	     { RenderAPEItem("Media",	       value, buffer); numItems++; }
 		else if	(key == INFO_CATALOGNUMBER)  { RenderAPEItem("CatalogNumber",  value, buffer); numItems++; }
 		else if	(key == INFO_BARCODE)	     { RenderAPEItem("Barcode",	       value, buffer); numItems++; }
 
@@ -422,6 +423,7 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);
 
+		else if (id == "MEDIA")		 info.SetOtherInfo(INFO_MEDIATYPE,	value);
 		else if (id == "CATALOGNUMBER")  info.SetOtherInfo(INFO_CATALOGNUMBER,	value);
 		else if (id == "BARCODE")	 info.SetOtherInfo(INFO_BARCODE,	value);
 

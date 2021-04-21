@@ -223,6 +223,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 			else if	(key == INFO_COPYRIGHT)	     RenderWMAStringItem(g_wszWMCopyright,		 value, pHeaderInfo);
 
+			else if	(key == INFO_MEDIATYPE)	     RenderWMAStringItem("WM/Media",			 value, pHeaderInfo);
 			else if	(key == INFO_CATALOGNUMBER)  RenderWMAStringItem("WM/CatalogNo",		 value, pHeaderInfo);
 			else if	(key == INFO_BARCODE)	     RenderWMAStringItem("WM/Barcode",			 value, pHeaderInfo);
 
@@ -465,6 +466,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			else if (id == g_wszWMCopyright)	       info.SetOtherInfo(INFO_COPYRIGHT,      value);
 
+			else if (id == "WM/Media")		       info.SetOtherInfo(INFO_MEDIATYPE,      value);
 			else if (id == "WM/CatalogNo")		       info.SetOtherInfo(INFO_CATALOGNUMBER,  value);
 			else if (id == "WM/Barcode")		       info.SetOtherInfo(INFO_BARCODE,	      value);
 
@@ -754,6 +756,7 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 
 				    nameStr == g_wszWMCopyright			||
 
+				    nameStr == "WM/Media"			||
 				    nameStr == "WM/CatalogNo"			||
 				    nameStr == "WM/Barcode"			||
 

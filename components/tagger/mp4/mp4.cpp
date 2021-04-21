@@ -246,6 +246,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 		else if	(key == INFO_INITIALKEY)    AddItmfItem(mp4File, "initialkey",	  value);
 
+		else if	(key == INFO_MEDIATYPE)	    AddItmfItem(mp4File, "MEDIA",	  value);
 		else if	(key == INFO_CATALOGNUMBER) AddItmfItem(mp4File, "CATALOGNUMBER", value);
 		else if	(key == INFO_BARCODE)	    AddItmfItem(mp4File, "BARCODE",	  value);
 
@@ -538,6 +539,7 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 			else if (id == "INITIALKEY")	info.SetOtherInfo(INFO_INITIALKEY,    value);
 
+			else if (id == "MEDIA")		info.SetOtherInfo(INFO_MEDIATYPE,     value);
 			else if (id == "CATALOGNUMBER")	info.SetOtherInfo(INFO_CATALOGNUMBER, value);
 			else if (id == "BARCODE")	info.SetOtherInfo(INFO_BARCODE,	      value);
 
@@ -653,12 +655,21 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	 */
 	RemoveItmfItem(mp4File, "LABEL");
 	RemoveItmfItem(mp4File, "ISRC");
+
 	RemoveItmfItem(mp4File, "SUBTITLE");
+
 	RemoveItmfItem(mp4File, "CONDUCTOR");
 	RemoveItmfItem(mp4File, "REMIXER");
 	RemoveItmfItem(mp4File, "LYRICIST");
+	RemoveItmfItem(mp4File, "PRODUCER");
+	RemoveItmfItem(mp4File, "ENGINEER");
+
+	RemoveItmfItem(mp4File, "initialkey");
+
+	RemoveItmfItem(mp4File, "MEDIA");
 	RemoveItmfItem(mp4File, "CATALOGNUMBER");
 	RemoveItmfItem(mp4File, "BARCODE");
+
 	RemoveItmfItem(mp4File, "DISCSUBTITLE");
 
 	ex_MP4Close(mp4File, 0);

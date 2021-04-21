@@ -128,6 +128,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 		else if	(key == INFO_COPYRIGHT)	     { RenderTagItem("COPYRIGHT",      value, buffer); numItems++; }
 
+		else if	(key == INFO_MEDIATYPE)	     { RenderTagItem("MEDIA",	       value, buffer); numItems++; }
 		else if	(key == INFO_CATALOGNUMBER)  { RenderTagItem("CATALOGNUMBER",  value, buffer); numItems++; }
 		else if	(key == INFO_BARCODE)	     { RenderTagItem("BARCODE",	       value, buffer); numItems++; }
 
@@ -364,6 +365,11 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "INITIALKEY")	 info.SetOtherInfo(INFO_INITIALKEY,	value);
 
 		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);
+
+		else if (id == "MEDIA"	     ||
+			 id == "SOURCE"	     ||
+			 id == "SOURCEMEDIA" ||
+			 id == "SOURCE MEDIUM")	 info.SetOtherInfo(INFO_MEDIATYPE,	value);
 
 		else if (id == "LABELNO"   ||
 			 id == "CATALOG"   ||
