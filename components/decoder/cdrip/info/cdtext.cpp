@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -74,15 +74,17 @@ Int BoCA::CDText::ReadCDText(Int drive)
 	{
 		currentPack = (cdTextPackage *) &cdTextBuffer[i * sizeof(cdTextPackage) + 4];
 
-		if (currentPack->block != 0) continue;
+		if (currentPack->block != 0 || currentPack->bDBC) continue;
 
 		/* Append pack data to buffer.
 		 */
 		for (Int j = 0; j < 12; j++)
 		{
-			if (j == 0 && currentPack->packType == 0x87 && currentPack->data[j] < 31) // Genre code
+			if (j == 0 && currentPack->packType == 0x87 && currentPack->data[0] < 31 && currentPack->data[1] < 31) // Genre code
 			{
-				genreCode = currentPack->data[0] << 8 | currentPack->data[1];
+				if (currentPack->data[0] == 0) genreCode = currentPack->data[0] << 8 | currentPack->data[1];
+				else			       genreCode = currentPack->data[1] << 8 | currentPack->data[0];
+
 				j++;
 				continue;
 			}
@@ -155,25 +157,27 @@ Int BoCA::CDText::ReadCDText(Int drive)
 			memmove(dataBuffer, dataBuffer + nRemove, sizeof(dataBuffer) - nRemove);
 			dataBufferPos -= nRemove;
 
+			currentPack->trackNumber++;
+
 			/* Skip zero bytes.
 			 */
 			while (dataBufferPos > 0 && dataBuffer[0] == 0)
 			{
 				memmove(dataBuffer, dataBuffer + 1, sizeof(dataBuffer) - 1);
 				dataBufferPos--;
+
+				currentPack->trackNumber++;
 			}
 
-			/* Bump track number and update data.
+			/* Update data string.
 			 */
-			currentPack->trackNumber++;
-
 			if (dataBufferPos && String(dataBuffer) != "\t") data = dataBuffer;
 		}
 	}
 
 	ex_CR_CloseCDROM(cd);
 
-	if (cdInfo.GetGenre().Trim() == NIL && genreCode != 0) cdInfo.SetGenre(cdTextGenre[genreCode]);
+	if (cdInfo.GetGenre().Trim() == NIL && genreCode != 0 && genreCode < 28) cdInfo.SetGenre(cdTextGenre[genreCode]);
 
 	return Success();
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -48,7 +48,14 @@ Int BoCA::CDText::ReadCDText(const String &path)
 		cdInfo.SetCatalog(cdtext_get_const(cdtext, CDTEXT_FIELD_DISCID, 0));
 		cdInfo.SetBarcode(cdtext_get_const(cdtext, CDTEXT_FIELD_UPC_EAN, 0));
 
-		if (cdInfo.GetGenre() == NIL) cdInfo.SetGenre(cdtext_genre2str(cdtext_get_genre(cdtext)));
+		if (cdInfo.GetGenre() == NIL)
+		{
+			cdtext_genre_t	 genre	  = cdtext_get_genre(cdtext);
+			cdtext_genre_t	 genre_le = cdtext_genre_t((genre & 0xFF) << 8 | genre >> 8);
+
+			if	(genre	  < 28) cdInfo.SetGenre(cdtext_genre2str(genre));
+			else if (genre_le < 28) cdInfo.SetGenre(cdtext_genre2str(genre_le));
+		}
 
 		for (Int i = firstTrack; i <= lastTrack; i++)
 		{
