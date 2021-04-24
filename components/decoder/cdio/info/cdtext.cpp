@@ -38,15 +38,15 @@ Int BoCA::CDText::ReadCDText(const String &path)
 
 	if (cdtext != NIL)
 	{
-		cdInfo.SetArtist(cdtext_get_const(cdtext, CDTEXT_FIELD_PERFORMER, 0));
-		cdInfo.SetTitle(cdtext_get_const(cdtext, CDTEXT_FIELD_TITLE, 0));
-		cdInfo.SetSongwriter(cdtext_get_const(cdtext, CDTEXT_FIELD_SONGWRITER, 0));
-		cdInfo.SetComposer(cdtext_get_const(cdtext, CDTEXT_FIELD_COMPOSER, 0));
-		cdInfo.SetArranger(cdtext_get_const(cdtext, CDTEXT_FIELD_ARRANGER, 0));
-		cdInfo.SetComment(cdtext_get_const(cdtext, CDTEXT_FIELD_MESSAGE, 0));
-		cdInfo.SetGenre(cdtext_get_const(cdtext, CDTEXT_FIELD_GENRE, 0));
-		cdInfo.SetCatalog(cdtext_get_const(cdtext, CDTEXT_FIELD_DISCID, 0));
-		cdInfo.SetBarcode(cdtext_get_const(cdtext, CDTEXT_FIELD_UPC_EAN, 0));
+		cdInfo.SetArtist    (ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_PERFORMER,  0)));
+		cdInfo.SetTitle	    (ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_TITLE,	     0)));
+		cdInfo.SetSongwriter(ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_SONGWRITER, 0)));
+		cdInfo.SetComposer  (ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_COMPOSER,   0)));
+		cdInfo.SetArranger  (ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_ARRANGER,   0)));
+		cdInfo.SetComment   (ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_MESSAGE,    0)));
+		cdInfo.SetGenre	    (ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_GENRE,	     0)));
+		cdInfo.SetCatalog   (			   cdtext_get_const(cdtext, CDTEXT_FIELD_DISCID,     0));
+		cdInfo.SetBarcode   (			   cdtext_get_const(cdtext, CDTEXT_FIELD_UPC_EAN,    0));
 
 		if (cdInfo.GetGenre() == NIL)
 		{
@@ -59,13 +59,13 @@ Int BoCA::CDText::ReadCDText(const String &path)
 
 		for (Int i = firstTrack; i <= lastTrack; i++)
 		{
-			cdInfo.SetTrackArtist(i, cdtext_get_const(cdtext, CDTEXT_FIELD_PERFORMER, i));
-			cdInfo.SetTrackTitle(i, cdtext_get_const(cdtext, CDTEXT_FIELD_TITLE, i));
-			cdInfo.SetTrackSongwriter(i, cdtext_get_const(cdtext, CDTEXT_FIELD_SONGWRITER, i));
-			cdInfo.SetTrackComposer(i, cdtext_get_const(cdtext, CDTEXT_FIELD_COMPOSER, i));
-			cdInfo.SetTrackArranger(i, cdtext_get_const(cdtext, CDTEXT_FIELD_ARRANGER, i));
-			cdInfo.SetTrackComment(i, cdtext_get_const(cdtext, CDTEXT_FIELD_MESSAGE, i));
-			cdInfo.SetTrackISRC(i, cdtext_get_const(cdtext, CDTEXT_FIELD_ISRC, i));
+			cdInfo.SetTrackArtist	 (i, ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_PERFORMER,  i)));
+			cdInfo.SetTrackTitle	 (i, ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_TITLE,	     i)));
+			cdInfo.SetTrackSongwriter(i, ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_SONGWRITER, i)));
+			cdInfo.SetTrackComposer	 (i, ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_COMPOSER,   i)));
+			cdInfo.SetTrackArranger	 (i, ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_ARRANGER,   i)));
+			cdInfo.SetTrackComment	 (i, ReplaceFullWidthChars(cdtext_get_const(cdtext, CDTEXT_FIELD_MESSAGE,    i)));
+			cdInfo.SetTrackISRC	 (i,			   cdtext_get_const(cdtext, CDTEXT_FIELD_ISRC,	     i));
 		}
 	}
 #else
@@ -73,27 +73,27 @@ Int BoCA::CDText::ReadCDText(const String &path)
 
 	if (cdtext != NIL)
 	{
-		cdInfo.SetArtist(cdtext_get_const(CDTEXT_PERFORMER, cdtext));
-		cdInfo.SetTitle(cdtext_get_const(CDTEXT_TITLE, cdtext));
-		cdInfo.SetSongwriter(cdtext_get_const(CDTEXT_SONGWRITER, cdtext));
-		cdInfo.SetComposer(cdtext_get_const(CDTEXT_COMPOSER, cdtext));
-		cdInfo.SetArranger(cdtext_get_const(CDTEXT_ARRANGER, cdtext));
-		cdInfo.SetComment(cdtext_get_const(CDTEXT_MESSAGE, cdtext));
-		cdInfo.SetGenre(cdtext_get_const(CDTEXT_GENRE, cdtext));
-		cdInfo.SetCatalog(cdtext_get_const(CDTEXT_DISCID, cdtext));
-		cdInfo.SetBarcode(cdtext_get_const(CDTEXT_UPC_EAN, cdtext));
+		cdInfo.SetArtist    (ReplaceFullWidthChars(cdtext_get_const(CDTEXT_PERFORMER,  cdtext)));
+		cdInfo.SetTitle	    (ReplaceFullWidthChars(cdtext_get_const(CDTEXT_TITLE,      cdtext)));
+		cdInfo.SetSongwriter(ReplaceFullWidthChars(cdtext_get_const(CDTEXT_SONGWRITER, cdtext)));
+		cdInfo.SetComposer  (ReplaceFullWidthChars(cdtext_get_const(CDTEXT_COMPOSER,   cdtext)));
+		cdInfo.SetArranger  (ReplaceFullWidthChars(cdtext_get_const(CDTEXT_ARRANGER,   cdtext)));
+		cdInfo.SetComment   (ReplaceFullWidthChars(cdtext_get_const(CDTEXT_MESSAGE,    cdtext)));
+		cdInfo.SetGenre	    (ReplaceFullWidthChars(cdtext_get_const(CDTEXT_GENRE,      cdtext)));
+		cdInfo.SetCatalog   (			   cdtext_get_const(CDTEXT_DISCID,     cdtext));
+		cdInfo.SetBarcode   (			   cdtext_get_const(CDTEXT_UPC_EAN,    cdtext));
 
 		for (Int i = firstTrack; i <= lastTrack; i++)
 		{
 			cdtext_t	*cdtext = cdio_get_cdtext(cd, i);
 
-			cdInfo.SetTrackArtist(i, cdtext_get_const(CDTEXT_PERFORMER, cdtext));
-			cdInfo.SetTrackTitle(i, cdtext_get_const(CDTEXT_TITLE, cdtext));
-			cdInfo.SetTrackSongwriter(i, cdtext_get_const(CDTEXT_SONGWRITER, cdtext));
-			cdInfo.SetTrackComposer(i, cdtext_get_const(CDTEXT_COMPOSER, cdtext));
-			cdInfo.SetTrackArranger(i, cdtext_get_const(CDTEXT_ARRANGER, cdtext));
-			cdInfo.SetTrackComment(i, cdtext_get_const(CDTEXT_MESSAGE, cdtext));
-			cdInfo.SetTrackISRC(i, cdtext_get_const(CDTEXT_ISRC, cdtext));
+			cdInfo.SetTrackArtist	 (i, ReplaceFullWidthChars(cdtext_get_const(CDTEXT_PERFORMER,  cdtext)));
+			cdInfo.SetTrackTitle	 (i, ReplaceFullWidthChars(cdtext_get_const(CDTEXT_TITLE,      cdtext)));
+			cdInfo.SetTrackSongwriter(i, ReplaceFullWidthChars(cdtext_get_const(CDTEXT_SONGWRITER, cdtext)));
+			cdInfo.SetTrackComposer	 (i, ReplaceFullWidthChars(cdtext_get_const(CDTEXT_COMPOSER,   cdtext)));
+			cdInfo.SetTrackArranger	 (i, ReplaceFullWidthChars(cdtext_get_const(CDTEXT_ARRANGER,   cdtext)));
+			cdInfo.SetTrackComment	 (i, ReplaceFullWidthChars(cdtext_get_const(CDTEXT_MESSAGE,    cdtext)));
+			cdInfo.SetTrackISRC	 (i,			   cdtext_get_const(CDTEXT_ISRC,       cdtext));
 		}
 	}
 #endif
@@ -106,4 +106,18 @@ Int BoCA::CDText::ReadCDText(const String &path)
 const BoCA::CDInfo &BoCA::CDText::GetCDInfo() const
 {
 	return cdInfo;
+}
+
+String BoCA::CDText::ReplaceFullWidthChars(const String &string)
+{
+	String	 result = string;
+	Int	 length = string.Length();
+
+	for (Int i = 0; i < length; i++)
+	{
+		if	(result[i] >= 0xff01 && result[i] <= 0xff5e) result[i] -= 0xfee0;
+		else if (result[i] == 0x3000			   ) result[i]  = 0x20;
+	}
+
+	return result;
 }

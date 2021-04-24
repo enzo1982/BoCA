@@ -74,7 +74,20 @@ Int BoCA::CDText::ReadCDText(Int drive)
 	{
 		currentPack = (cdTextPackage *) &cdTextBuffer[i * sizeof(cdTextPackage) + 4];
 
-		if (currentPack->block != 0 || currentPack->bDBC) continue;
+		if (currentPack->block != 0) continue;
+
+		String::InputFormat	 format("ISO-8859-1");
+
+		String	 tabString = "\t";
+		Int	 nullBytes = 1;
+
+		if (currentPack->bDBC)
+		{
+			String::SetInputFormat("Shift_JIS");
+
+			tabString = "\t\t";
+			nullBytes = 2;
+		}
 
 		/* Append pack data to buffer.
 		 */
@@ -94,7 +107,7 @@ Int BoCA::CDText::ReadCDText(Int drive)
 
 		/* Process pack data.
 		 */
-		if (String(dataBuffer) != "\t") data = dataBuffer;
+		if (String(dataBuffer) != tabString) data = ReplaceFullWidthChars(dataBuffer);
 
 		while (dataBufferPos > 0)
 		{
@@ -152,7 +165,7 @@ Int BoCA::CDText::ReadCDText(Int drive)
 
 			/* Shift buffer if terminated.
 			 */
-			Int	 nRemove = (lpZero - dataBuffer) + 1;
+			Int	 nRemove = (lpZero - dataBuffer) + nullBytes;
 
 			memmove(dataBuffer, dataBuffer + nRemove, sizeof(dataBuffer) - nRemove);
 			dataBufferPos -= nRemove;
@@ -161,17 +174,17 @@ Int BoCA::CDText::ReadCDText(Int drive)
 
 			/* Skip zero bytes.
 			 */
-			while (dataBufferPos > 0 && dataBuffer[0] == 0)
+			while (dataBufferPos >= nullBytes && dataBuffer[0] == 0)
 			{
-				memmove(dataBuffer, dataBuffer + 1, sizeof(dataBuffer) - 1);
-				dataBufferPos--;
+				memmove(dataBuffer, dataBuffer + nullBytes, sizeof(dataBuffer) - nullBytes);
+				dataBufferPos -= nullBytes;
 
 				currentPack->trackNumber++;
 			}
 
 			/* Update data string.
 			 */
-			if (dataBufferPos && String(dataBuffer) != "\t") data = dataBuffer;
+			if (dataBufferPos && String(dataBuffer) != tabString) data = ReplaceFullWidthChars(dataBuffer);
 		}
 	}
 
@@ -185,4 +198,18 @@ Int BoCA::CDText::ReadCDText(Int drive)
 const BoCA::CDInfo &BoCA::CDText::GetCDInfo() const
 {
 	return cdInfo;
+}
+
+String BoCA::CDText::ReplaceFullWidthChars(const String &string)
+{
+	String	 result = string;
+	Int	 length = string.Length();
+
+	for (Int i = 0; i < length; i++)
+	{
+		if	(result[i] >= 0xff01 && result[i] <= 0xff5e) result[i] -= 0xfee0;
+		else if (result[i] == 0x3000			   ) result[i]  = 0x20;
+	}
+
+	return result;
 }
