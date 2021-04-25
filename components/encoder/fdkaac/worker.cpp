@@ -67,11 +67,8 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : pr
 	ex_aacEncoder_SetParam(handle, AACENC_AFTERBURNER, 1);
 	ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, mp4Container ? TT_MP4_RAW : TT_MP4_ADTS);
 
-	if (!mp4Container)
-	{
-		if (aacType == AOT_ER_AAC_LD ||
-		    aacType == AOT_ER_AAC_ELD) ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, TT_MP4_LOAS);
-	}
+	if ( mp4Container && (aacType == AOT_SBR       || aacType == AOT_PS	   )) ex_aacEncoder_SetParam(handle, AACENC_SIGNALING_MODE, 1);
+	if (!mp4Container && (aacType == AOT_ER_AAC_LD || aacType == AOT_ER_AAC_ELD)) ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, TT_MP4_LOAS);
 
 	AACENC_InfoStruct	 aacInfo;
 
