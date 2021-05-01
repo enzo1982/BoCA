@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -18,7 +18,8 @@ BoCA::ConfigureEncoder::ConfigureEncoder(AS::Component *component, const Point &
 
 	i18n->SetContext("Encoders::meh!");
 
-	layer = component->GetConfigurationLayer();
+	componentID = component->GetID();
+	layer	    = component->GetConfigurationLayer();
 
 	if (layer != NIL)
 	{
@@ -45,10 +46,10 @@ BoCA::ConfigureEncoder::ConfigureEncoder(AS::Component *component, const Point &
 
 		mainWnd->GetMainLayer()->Add(layer);
 
-		String	 resourcesPath;
+		String	 resourcesPath = Application::GetApplicationDirectory();
 
 #ifndef __WIN32__
-		if (Directory(S::System::System::GetResourcesDirectory().Append("freac")).Exists()) resourcesPath = S::System::System::GetResourcesDirectory().Append("freac/").Append(Directory::GetDirectoryDelimiter());
+		if (Directory(S::System::System::GetResourcesDirectory().Append("freac")).Exists()) resourcesPath = S::System::System::GetResourcesDirectory().Append("freac").Append(Directory::GetDirectoryDelimiter());
 #endif
 
 		mainWnd->SetFlags(mainWnd->GetFlags() | WF_NOTASKBUTTON | WF_MODAL);
@@ -90,6 +91,8 @@ Void BoCA::ConfigureEncoder::OK()
 	if (layer->SaveSettings() == Error()) return;
 
 	mainWnd->Close();
+
+	Settings::onChangeComponentSettings.Emit(componentID);
 }
 
 Void BoCA::ConfigureEncoder::Cancel()

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -25,21 +25,23 @@ namespace BoCA
 		private:
 			/* Singleton class, therefore private constructor/destructor
 			 */
-			static Settings			*instance;
+			static Settings				*instance;
 
-							 Settings();
-							~Settings();
+								 Settings();
+								~Settings();
 		public:
 			/* Returns a new or existing instance of Settings
 			 */
-			static Settings			*Get();
+			static Settings				*Get();
 
 			/* Destroys an existing instance of Settings
 			 */
-			static Void			 Free();
+			static Void				 Free();
 		signals:
-			Signal0<Void>			 onChangeConfigurationSettings;	// called when configuration settings are changed
-			Signal0<Void>			 onChangeLanguageSettings;	// called when language settings are changed
+			Signal0<Void>				 onChangeConfigurationSettings;	// called when configuration settings changed
+			static Signal1<Void, const String &>	 onChangeComponentSettings;	// called when configuration of a component changed
+
+			Signal0<Void>				 onChangeLanguageSettings;	// called when language settings changed
 	};
 };
 

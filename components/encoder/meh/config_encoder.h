@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,6 +26,7 @@ namespace BoCA
 	class ConfigureEncoder : public Dialogs::Dialog
 	{
 		private:
+			String		 componentID;
 			ConfigLayer	*layer;
 
 			Window		*mainWnd;
