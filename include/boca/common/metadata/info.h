@@ -35,6 +35,10 @@ namespace BoCA
 	const char * const INFO_PRODUCER	= (char *) "Producer";
 	const char * const INFO_ENGINEER	= (char *) "Audio engineer";
 
+	const char * const INFO_MOVEMENT	= (char *) "Movement";
+	const char * const INFO_MOVEMENTTOTAL	= (char *) "Total movements";
+	const char * const INFO_MOVEMENTNAME	= (char *) "Movement name";
+
 	const char * const INFO_ORIG_ARTIST	= (char *) "Original artist(s)/performer(s)";
 	const char * const INFO_ORIG_ALBUM	= (char *) "Original album/movie/show title";
 	const char * const INFO_ORIG_LYRICIST	= (char *) "Original lyricist(s)/text writer(s)";

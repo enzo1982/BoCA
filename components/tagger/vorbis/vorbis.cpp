@@ -114,6 +114,7 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		else if	(key == INFO_CONTENTGROUP)   { RenderTagItem("GROUPING",       value, buffer); numItems++; }
 		else if	(key == INFO_SUBTITLE)	     { RenderTagItem("SUBTITLE",       value, buffer); numItems++; }
 
+		else if	(key == INFO_BAND)	     { RenderTagItem("ENSEMBLE",       value, buffer); numItems++; }
 		else if	(key == INFO_PERFORMER)	     { RenderTagItem("PERFORMER",      value, buffer); numItems++; }
 		else if	(key == INFO_CONDUCTOR)	     { RenderTagItem("CONDUCTOR",      value, buffer); numItems++; }
 		else if	(key == INFO_REMIXER)	     { RenderTagItem("REMIXER",	       value, buffer); numItems++; }
@@ -122,6 +123,10 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		else if	(key == INFO_ARRANGER)	     { RenderTagItem("ARRANGER",       value, buffer); numItems++; }
 		else if	(key == INFO_PRODUCER)	     { RenderTagItem("PRODUCER",       value, buffer); numItems++; }
 		else if	(key == INFO_ENGINEER)	     { RenderTagItem("ENGINEER",       value, buffer); numItems++; }
+
+		else if	(key == INFO_MOVEMENT)	     { RenderTagItem("MOVEMENT",       value, buffer); numItems++; }
+		else if	(key == INFO_MOVEMENTTOTAL)  { RenderTagItem("MOVEMENTTOTAL",  value, buffer); numItems++; }
+		else if	(key == INFO_MOVEMENTNAME)   { RenderTagItem("MOVEMENTNAME",   value, buffer); numItems++; }
 
 		else if	(key == INFO_BPM)	     { RenderTagItem("BPM",	       value, buffer); numItems++; }
 		else if	(key == INFO_INITIALKEY)     { RenderTagItem("INITIALKEY",     value, buffer); numItems++; }
@@ -352,6 +357,10 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "GROUPING")	 info.SetOtherInfo(INFO_CONTENTGROUP,	value);
 		else if (id == "SUBTITLE")	 info.SetOtherInfo(INFO_SUBTITLE,	value);
 
+		else if (id == "BAND"	  ||
+			 id == "ENSEMBLE" ||
+			 id == "ORCHESTRA")	 info.SetOtherInfo(INFO_BAND,		value);
+
 		else if (id == "PERFORMER")	 info.SetOtherInfo(INFO_PERFORMER,	value);
 		else if (id == "CONDUCTOR")	 info.SetOtherInfo(INFO_CONDUCTOR,	value);
 		else if (id == "REMIXER")	 info.SetOtherInfo(INFO_REMIXER,	value);
@@ -360,6 +369,22 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "ARRANGER")	 info.SetOtherInfo(INFO_ARRANGER,	value);
 		else if (id == "PRODUCER")	 info.SetOtherInfo(INFO_PRODUCER,	value);
 		else if (id == "ENGINEER")	 info.SetOtherInfo(INFO_ENGINEER,	value);
+
+		else if (id == "MOVEMENT" ||
+			 id == "PART")
+		{
+			info.SetOtherInfo(INFO_MOVEMENT, String::FromInt(value.ToInt()));
+
+			if (value.Contains("/")) info.SetOtherInfo(INFO_MOVEMENTTOTAL, String::FromInt(value.Tail(value.Length() - value.Find("/") - 1).ToInt()));
+		}
+
+		else if (id == "MOVEMENTTOTAL"	||
+			 id == "TOTALMOVEMENTS"	||
+			 id == "PARTTOTAL"	||
+			 id == "TOTALPARTS")	 info.SetOtherInfo(INFO_MOVEMENTTOTAL,	value);
+
+		else if (id == "MOVEMENTNAME" ||
+			 id == "PARTNAME")	 info.SetOtherInfo(INFO_MOVEMENTNAME,	value);
 
 		else if (id == "BPM")		 info.SetOtherInfo(INFO_BPM,		value);
 		else if (id == "INITIALKEY")	 info.SetOtherInfo(INFO_INITIALKEY,	value);
