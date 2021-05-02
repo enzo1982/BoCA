@@ -403,8 +403,8 @@ Bool BoCA::DecoderCDIO::Seek(Int64 samplePosition)
 	 */
 	readOffset = config->GetIntValue(ConfigureCDIO::ConfigID, String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue(ConfigureCDIO::ConfigID, String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
 
-	startSector += readOffset / samplesPerSector;
-	endSector   += readOffset / samplesPerSector;
+	startSector += readOffset / Int(samplesPerSector);
+	endSector   += readOffset / Int(samplesPerSector);
 
 	if	(readOffset % Int(samplesPerSector) < 0) {		   startSector--; skipSamples = samplesPerSector + readOffset % Int(samplesPerSector); }
 	else if (readOffset % Int(samplesPerSector) > 0) { if (!lastTrack) endSector++;   skipSamples = 		   readOffset % Int(samplesPerSector); }
