@@ -190,6 +190,13 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		if (info.mcdi.GetData().Size() > 0) { RenderAPEBinaryItem("MCDI", info.mcdi.GetData(), buffer); numItems++; }
 	}
 
+	/* Save encoder version.
+	 */
+	Application	*app = Application::Get();
+
+	{ RenderAPEItem("Tool Name",	app->getClientName.Call(),    buffer); numItems++; }
+	{ RenderAPEItem("Tool Version",	app->getClientVersion.Call(), buffer); numItems++; }
+
 	/* Save cover art.
 	 */
 	if (coverArtWriteToTags && coverArtWriteToAPEv2)
