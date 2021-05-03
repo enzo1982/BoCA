@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
 <component>
-  <name>QuickTime AAC Encoder</name>
+  <name>qaac AAC/ALAC Encoder</name>
   <version>1.0</version>
   <id>qaac-enc</id>
   <type>encoder</type>
   <format>
-    <name>MPEG-4 AAC Files</name>
+    <name>MPEG-4 AAC/ALAC Files</name>
     <extension>m4a</extension>
     <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
   </format>
@@ -16,6 +16,11 @@
     <mode>stdio</mode>
     <informat>wave</informat>
     <parameters>
+      <selection name="Audio codec" argument="%VALUE" default="" enabled="true">
+	<option alias="MPEG4 AAC Low Complexity"/>
+	<option alias="MPEG4 AAC High Efficiency">--he</option>
+	<option alias="Apple Lossless Audio Codec">-A</option>
+      </selection>
       <range name="True VBR Mode" argument="--tvbr %VALUE" default="60" step="1" enabled="true">
 	<min alias="worse">0</min>
 	<max alias="better">127</max>
@@ -37,7 +42,7 @@
 	<option alias="Normal">1</option>
 	<option alias="Fast">0</option>
       </selection>
-      <selection name="Samplerate" argument="--rate %VALUE" default="auto" enabled="true">
+      <selection name="Sample rate" argument="--rate %VALUE" default="auto" enabled="true">
 	<option alias="Auto">auto</option>
 	<option alias="Keep">keep</option>
 	<option alias="8.000 Hz">8000</option>
@@ -50,7 +55,6 @@
 	<option alias="44.100 Hz">44100</option>
 	<option alias="48.000 Hz">48000</option>
       </selection>
-      <switch name="Enable HE-AAC Mode" argument="--he"/>
     </parameters>
   </external>
   <external>
@@ -59,6 +63,11 @@
     <mode>stdio</mode>
     <informat>wave</informat>
     <parameters>
+      <selection name="Audio codec" argument="%VALUE" default="" enabled="true">
+	<option alias="MPEG4 AAC Low Complexity"/>
+	<option alias="MPEG4 AAC High Efficiency">--he</option>
+	<option alias="Apple Lossless Audio Codec">-A</option>
+      </selection>
       <range name="True VBR Mode" argument="--tvbr %VALUE" default="60" step="1" enabled="true">
 	<min alias="worse">0</min>
 	<max alias="better">127</max>
@@ -80,7 +89,7 @@
 	<option alias="Normal">1</option>
 	<option alias="Fast">0</option>
       </selection>
-      <selection name="Samplerate" argument="--rate %VALUE" default="auto" enabled="true">
+      <selection name="Sample rate" argument="--rate %VALUE" default="auto" enabled="true">
 	<option alias="Auto">auto</option>
 	<option alias="Keep">keep</option>
 	<option alias="8.000 Hz">8000</option>
@@ -93,7 +102,6 @@
 	<option alias="44.100 Hz">44100</option>
 	<option alias="48.000 Hz">48000</option>
       </selection>
-      <switch name="Enable HE-AAC Mode" argument="--he"/>
     </parameters>
   </external>
 </component>
