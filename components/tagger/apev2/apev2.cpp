@@ -159,7 +159,11 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		else if	(key == INFO_DISCSUBTITLE)   { RenderAPEItem("DiscSubtitle",   value, buffer); numItems++; }
 
-		else if	(key == INFO_WEB_ARTIST)     { RenderAPEItem("Weblink",	       value, buffer); numItems++; }
+		else if	(key == INFO_WEB_ARTIST)     { RenderAPEItem("Artist URL",     value, buffer); numItems++; }
+		else if	(key == INFO_WEB_PUBLISHER)  { RenderAPEItem("Publisher URL",  value, buffer); numItems++; }
+		else if	(key == INFO_WEB_SOURCE)     { RenderAPEItem("File URL",       value, buffer); numItems++; }
+		else if	(key == INFO_WEB_COPYRIGHT)  { RenderAPEItem("Copyright URL",  value, buffer); numItems++; }
+		else if	(key == INFO_WEB_COMMERCIAL) { RenderAPEItem("Buy URL",	       value, buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -449,7 +453,13 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		else if (id == "DISCSUBTITLE")	 info.SetOtherInfo(INFO_DISCSUBTITLE,	value);
 
-		else if (id == "WEBLINK")	 info.SetOtherInfo(INFO_WEB_ARTIST,	value);
+		else if (id == "WEBLINK" ||
+			 id == "ARTIST URL")	 info.SetOtherInfo(INFO_WEB_ARTIST,	value);
+
+		else if (id == "PUBLISHER URL")	 info.SetOtherInfo(INFO_WEB_PUBLISHER,	value);
+		else if (id == "FILE URL")	 info.SetOtherInfo(INFO_WEB_SOURCE,	value);
+		else if (id == "COPYRIGHT URL")	 info.SetOtherInfo(INFO_WEB_COPYRIGHT,	value);
+		else if (id == "BUY URL")	 info.SetOtherInfo(INFO_WEB_COMMERCIAL,	value);
 
 		else if (id == "TRACK")
 		{
