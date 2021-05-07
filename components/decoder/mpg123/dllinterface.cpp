@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -53,7 +53,11 @@ Bool LoadMPG123DLL()
 	ex_mpg123_feedseek		= (MPG123_FEEDSEEK) mpg123dll->GetFunctionAddress("mpg123_feedseek");
 
 	ex_mpg123_getformat		= (MPG123_GETFORMAT) mpg123dll->GetFunctionAddress("mpg123_getformat");
-	ex_mpg123_info			= (MPG123_INFO) mpg123dll->GetFunctionAddress("mpg123_info");
+	ex_mpg123_info			= (MPG123_INFO) mpg123dll->GetFunctionAddress("mpg123_info2");
+
+	if (ex_mpg123_info == NIL)
+		ex_mpg123_info		= (MPG123_INFO) mpg123dll->GetFunctionAddress("mpg123_info");
+
 	ex_mpg123_spf			= (MPG123_SPF) mpg123dll->GetFunctionAddress("mpg123_spf");
 
 	ex_mpg123_supported_decoders	= (MPG123_SUPPORTED_DECODERS) mpg123dll->GetFunctionAddress("mpg123_supported_decoders");
