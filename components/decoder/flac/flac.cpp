@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -263,6 +263,8 @@ Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data)
 
 	samplesAvailableSignal.Wait();
 
+	inBytes = driver->GetPos();
+
 	/* Convert samples to target format.
 	 */
 	const Format	&format = track.GetFormat();
@@ -455,7 +457,8 @@ void BoCA::FLACStreamDecoderMetadataCallback(const FLAC__StreamDecoder *decoder,
 		format.channels	= metadata->data.stream_info.channels;
 		format.rate	= metadata->data.stream_info.sample_rate;
 
-		filter->infoTrack->length = metadata->data.stream_info.total_samples;
+		if (metadata->data.stream_info.total_samples > 0) filter->infoTrack->length	  = metadata->data.stream_info.total_samples;
+		else						  filter->infoTrack->approxLength = filter->driver->GetSize() / (format.bits / 8) / format.channels * 1.5;
 
 		for (Int i = 0; i < 16; i++) filter->infoTrack->md5.Append(Number((Int64) metadata->data.stream_info.md5sum[i]).ToHexString(2));
 
