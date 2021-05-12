@@ -206,9 +206,12 @@ Int BoCA::FormatConverter::Transform(Buffer<UnsignedByte> &buffer)
 	 */
 	backBuffer.Resize(buffer.Size());
 
-	memcpy(backBuffer, buffer, buffer.Size());
+	if (buffer.Size() > 0)
+	{
+		memcpy(backBuffer, buffer, buffer.Size());
 
-	buffer.Resize(0);
+		buffer.Resize(0);
+	}
 
 	/* Aquire lock to handle data.
 	 */
@@ -218,15 +221,18 @@ Int BoCA::FormatConverter::Transform(Buffer<UnsignedByte> &buffer)
 	 */
 	buffer.Resize(samplesBuffer.Size());
 
-	memcpy(buffer, samplesBuffer, samplesBuffer.Size());
+	if (samplesBuffer.Size() > 0) memcpy(buffer, samplesBuffer, samplesBuffer.Size());
 
 	/* Pass new samples to converter thread.
 	 */
 	samplesBuffer.Resize(backBuffer.Size());
 
-	memcpy(samplesBuffer, backBuffer, backBuffer.Size());
+	if (backBuffer.Size() > 0)
+	{
+		memcpy(samplesBuffer, backBuffer, backBuffer.Size());
 
-	backBuffer.Resize(0);
+		backBuffer.Resize(0);
+	}
 
 	/* Signal availability of new samples.
 	 */
@@ -249,9 +255,12 @@ Int BoCA::FormatConverter::Finish(Buffer<UnsignedByte> &buffer)
 	 */
 	buffer.Resize(samplesBuffer.Size());
 
-	memcpy(buffer, samplesBuffer, samplesBuffer.Size());
+	if (samplesBuffer.Size() > 0)
+	{
+		memcpy(buffer, samplesBuffer, samplesBuffer.Size());
 
-	samplesBuffer.Resize(0);
+		samplesBuffer.Resize(0);
+	}
 
 	/* Flush all converter components.
 	 */
@@ -269,18 +278,24 @@ Int BoCA::FormatConverter::Finish(Buffer<UnsignedByte> &buffer)
 
 		/* Append remaining data to return buffer.
 		 */
-		backBuffer.Resize(backBuffer.Size() + flush.Size());
+		if (flush.Size() > 0)
+		{
+			backBuffer.Resize(backBuffer.Size() + flush.Size());
 
-		memcpy(backBuffer + backBuffer.Size() - flush.Size(), flush, flush.Size());
+			memcpy(backBuffer + backBuffer.Size() - flush.Size(), flush, flush.Size());
+		}
 	}
 
 	/* Append remaining data in case there is any.
 	 */
-	buffer.Resize(buffer.Size() + backBuffer.Size());
+	if (backBuffer.Size() > 0)
+	{
+		buffer.Resize(buffer.Size() + backBuffer.Size());
 
-	memcpy(buffer + buffer.Size() - backBuffer.Size(), backBuffer, backBuffer.Size());
+		memcpy(buffer + buffer.Size() - backBuffer.Size(), backBuffer, backBuffer.Size());
 
-	backBuffer.Resize(0);
+		backBuffer.Resize(0);
+	}
 
 	return buffer.Size();
 }

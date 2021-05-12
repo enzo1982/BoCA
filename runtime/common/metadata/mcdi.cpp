@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -43,10 +43,13 @@ BoCA::MCDI &BoCA::MCDI::operator =(const MCDI &oMCDI)
 
 Bool BoCA::MCDI::operator ==(const MCDI &oMCDI) const
 {
-	if (oMCDI.GetData().Size() != data.Size()) return False;
+	Int	 size  = data.Size();
+	Int	 oSize = oMCDI.GetData().Size();
 
-	if (memcmp((UnsignedByte *) oMCDI.GetData(), (UnsignedByte *) data, data.Size()) == 0) return True;
-	else										       return False;
+	if (size != oSize) return False;
+
+	if (size == 0 || memcmp((UnsignedByte *) oMCDI.GetData(), (UnsignedByte *) data, size) == 0) return True;
+	else											     return False;
 }
 
 Bool BoCA::MCDI::operator !=(const MCDI &oMCDI) const
@@ -152,7 +155,7 @@ Bool BoCA::MCDI::SetData(const Buffer<UnsignedByte> &nData)
 {
 	data.Resize(nData.Size());
 
-	memcpy((UnsignedByte *) data, (UnsignedByte *) nData, nData.Size());
+	if (data.Size() > 0) memcpy((UnsignedByte *) data, (UnsignedByte *) nData, nData.Size());
 
 	return True;
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -50,9 +50,12 @@ Int BoCA::AS::DSPComponent::Flush(Buffer<UnsignedByte> &buffer)
 
 	/* Append flush buffer contents to output.
 	 */
-	buffer.Resize(buffer.Size() + flush.Size());
+	if (flush.Size() > 0)
+	{
+		buffer.Resize(buffer.Size() + flush.Size());
 
-	memcpy(buffer + buffer.Size() - flush.Size(), flush, flush.Size());
+		memcpy(buffer + buffer.Size() - flush.Size(), flush, flush.Size());
+	}
 
 	return buffer.Size();
 }
