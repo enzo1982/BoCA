@@ -404,9 +404,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 		{
 			FileFormat	*format = new FileFormat();
 
-			for (Int j = 0; j < node->GetNOfNodes(); j++)
+			for (Int i = 0; i < node->GetNOfNodes(); i++)
 			{
-				XML::Node	*node2 = node->GetNthNode(j);
+				XML::Node	*node2 = node->GetNthNode(i);
 
 				if	(node2->GetName() == "name")	  format->SetName(node2->GetContent());
 				else if (node2->GetName() == "lossless")  format->SetLossless(node2->GetContent() == "true");
@@ -448,9 +448,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 			if (node->GetAttributeByName("default") != NIL) tag->SetDefault(node->GetAttributeByName("default")->GetContent() == "true");
 
-			for (Int j = 0; j < node->GetNOfNodes(); j++)
+			for (Int i = 0; i < node->GetNOfNodes(); i++)
 			{
-				XML::Node	*node2 = node->GetNthNode(j);
+				XML::Node	*node2 = node->GetNthNode(i);
 
 				if	(node2->GetName() == "name")	 tag->SetName(node2->GetContent());
 				else if	(node2->GetName() == "coverart")
@@ -467,9 +467,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				{
 					if (node2->GetAttributeByName("free") != NIL) tag->SetFreeEncodingSupported(node2->GetAttributeByName("free")->GetContent() == "true");
 
-					for (Int k = 0; k < node2->GetNOfNodes(); k++)
+					for (Int i = 0; i < node2->GetNOfNodes(); i++)
 					{
-						XML::Node	*node3 = node2->GetNthNode(k);
+						XML::Node	*node3 = node2->GetNthNode(i);
 
 						if (node3->GetName() == "encoding")
 						{
@@ -490,9 +490,11 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 		}
 		else if (node->GetName() == "external" && external_command == NIL)
 		{
-			for (Int j = 0; j < node->GetNOfNodes(); j++)
+			/* Find external command name.
+			 */
+			for (Int i = 0; i < node->GetNOfNodes(); i++)
 			{
-				XML::Node	*node2 = node->GetNthNode(j);
+				XML::Node	*node2 = node->GetNthNode(i);
 
 				if (node2->GetName() == "command")
 				{
@@ -500,22 +502,9 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 					if (node2->GetAttributeByName("ignoreExitCode") != NIL) external_ignoreExitCode = (node2->GetAttributeByName("ignoreExitCode")->GetContent() == "true");
 				}
-				else if (node2->GetName() == "md5")
-				{
-					external_md5_arguments = node2->GetContent();
-
-					if (node2->GetAttributeByName("stream")	 != NIL) external_md5_stderr  = (node2->GetAttributeByName("stream")->GetContent() == "stderr");
-					if (node2->GetAttributeByName("require") != NIL) external_md5_require =  node2->GetAttributeByName("require")->GetContent();
-					if (node2->GetAttributeByName("prefix")	 != NIL) external_md5_prefix  =  node2->GetAttributeByName("prefix")->GetContent();
-				}
-				else if (node2->GetName() == "arguments")  external_arguments	= node2->GetContent();
-				else if (node2->GetName() == "informat")   external_informat	= node2->GetContent();
-				else if (node2->GetName() == "outformat")  external_outformat	= node2->GetContent();
-				else if (node2->GetName() == "mode")	   mode			= node2->GetContent() == "file" ? COMPONENT_MODE_EXTERNAL_FILE : COMPONENT_MODE_EXTERNAL_STDIO;
-				else if (node2->GetName() == "parameters") ParseParameters(node2);
 			}
 
-			/* Check if external command actually exists.
+			/* Find absolute path to external command.
 			 */
 			if (external_command[0] != '/' && external_command[1] != ':')
 			{
@@ -530,7 +519,35 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				if (external_command[0] != '/' && external_command[1] != ':') external_command = NIL;
 			}
 
-			if (!File(external_command).Exists()) external_command = NIL;
+			/* Check if external command actually exists.
+			 */
+			if (!File(external_command).Exists())
+			{
+				external_command = NIL;
+
+				continue;
+			}
+
+			/* Find arguments and parameters.
+			 */
+			for (Int i = 0; i < node->GetNOfNodes(); i++)
+			{
+				XML::Node	*node2 = node->GetNthNode(i);
+
+				if (node2->GetName() == "md5")
+				{
+					external_md5_arguments = node2->GetContent();
+
+					if (node2->GetAttributeByName("stream")	 != NIL) external_md5_stderr  = (node2->GetAttributeByName("stream")->GetContent() == "stderr");
+					if (node2->GetAttributeByName("require") != NIL) external_md5_require =  node2->GetAttributeByName("require")->GetContent();
+					if (node2->GetAttributeByName("prefix")	 != NIL) external_md5_prefix  =  node2->GetAttributeByName("prefix")->GetContent();
+				}
+				else if (node2->GetName() == "arguments")  external_arguments	= node2->GetContent();
+				else if (node2->GetName() == "informat")   external_informat	= node2->GetContent();
+				else if (node2->GetName() == "outformat")  external_outformat	= node2->GetContent();
+				else if (node2->GetName() == "mode")	   mode			= node2->GetContent() == "file" ? COMPONENT_MODE_EXTERNAL_FILE : COMPONENT_MODE_EXTERNAL_STDIO;
+				else if (node2->GetName() == "parameters") ParseParameters(node2);
+			}
 		}
 		else if (node->GetName() == "parameters")
 		{
@@ -551,83 +568,80 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 
 Bool BoCA::AS::ComponentSpecs::ParseParameters(XML::Node *root)
 {
-	parameters.RemoveAll();
-
 	for (Int i = 0; i < root->GetNOfNodes(); i++)
 	{
 		XML::Node	*node = root->GetNthNode(i);
 
-		if (node->GetName() == "switch" || node->GetName() == "selection" || node->GetName() == "range")
+		if (node->GetName() != "switch" && node->GetName() != "selection" && node->GetName() != "range") continue;
+
+		Parameter	*parameter = new Parameter();
+
+		parameter->SetEnabled(False);
+
+		if (node->GetAttributeByName("name")	 != NIL) parameter->SetName(node->GetAttributeByName("name")->GetContent());
+		if (node->GetAttributeByName("argument") != NIL) parameter->SetArgument(node->GetAttributeByName("argument")->GetContent());
+		if (node->GetAttributeByName("enabled")	 != NIL) parameter->SetEnabled(node->GetAttributeByName("enabled")->GetContent() == "true" ? True : False);
+
+		if (node->GetName() == "switch")
 		{
-			Parameter	*parameter = new Parameter();
-
-			parameter->SetEnabled(False);
-
-			if (node->GetAttributeByName("name")	 != NIL) parameter->SetName(node->GetAttributeByName("name")->GetContent());
-			if (node->GetAttributeByName("argument") != NIL) parameter->SetArgument(node->GetAttributeByName("argument")->GetContent());
-			if (node->GetAttributeByName("enabled")	 != NIL) parameter->SetEnabled(node->GetAttributeByName("enabled")->GetContent() == "true" ? True : False);
-
-			if (node->GetName() == "switch")
-			{
-				parameter->SetType(PARAMETER_TYPE_SWITCH);
-			}
-			else if (node->GetName() == "selection")
-			{
-				parameter->SetType(PARAMETER_TYPE_SELECTION);
-
-				if (node->GetAttributeByName("default") != NIL) parameter->SetDefault(node->GetAttributeByName("default")->GetContent());
-
-				for (Int j = 0; j < node->GetNOfNodes(); j++)
-				{
-					XML::Node	*node2 = node->GetNthNode(j);
-
-					if (node2->GetName() == "option")
-					{
-						Option	 *option = new Option();
-
-						option->SetValue(node2->GetContent());
-
-						if (node2->GetAttributeByName("alias") != NIL)	option->SetAlias(node2->GetAttributeByName("alias")->GetContent());
-						else						option->SetAlias(option->GetValue());
-
-						option->SetType(OPTION_TYPE_OPTION);
-
-						parameter->AddOption(option);
-					}
-				}
-			}
-			else if (node->GetName() == "range")
-			{
-				parameter->SetType(PARAMETER_TYPE_RANGE);
-
-				if (node->GetAttributeByName("default") != NIL) parameter->SetDefault(node->GetAttributeByName("default")->GetContent());
-
-				if (node->GetAttributeByName("step") != NIL) parameter->SetStepSize(node->GetAttributeByName("step")->GetContent().ToFloat());
-				else					     parameter->SetStepSize(1.0);
-
-				for (Int j = 0; j < node->GetNOfNodes(); j++)
-				{
-					XML::Node	*node2 = node->GetNthNode(j);
-
-					if (node2->GetName() == "min" || node2->GetName() == "max")
-					{
-						Option	 *option = new Option();
-
-						option->SetValue(node2->GetContent());
-
-						if (node2->GetAttributeByName("alias") != NIL)	option->SetAlias(node2->GetAttributeByName("alias")->GetContent());
-						else						option->SetAlias(option->GetValue());
-
-						if	(node2->GetName() == "min") option->SetType(OPTION_TYPE_MIN);
-						else if (node2->GetName() == "max") option->SetType(OPTION_TYPE_MAX);
-
-						parameter->AddOption(option);
-					}
-				}
-			}
-
-			parameters.Add(parameter);
+			parameter->SetType(PARAMETER_TYPE_SWITCH);
 		}
+		else if (node->GetName() == "selection")
+		{
+			parameter->SetType(PARAMETER_TYPE_SELECTION);
+
+			if (node->GetAttributeByName("default") != NIL) parameter->SetDefault(node->GetAttributeByName("default")->GetContent());
+
+			for (Int i = 0; i < node->GetNOfNodes(); i++)
+			{
+				XML::Node	*node2 = node->GetNthNode(i);
+
+				if (node2->GetName() == "option")
+				{
+					Option	 *option = new Option();
+
+					option->SetValue(node2->GetContent());
+
+					if (node2->GetAttributeByName("alias") != NIL)	option->SetAlias(node2->GetAttributeByName("alias")->GetContent());
+					else						option->SetAlias(option->GetValue());
+
+					option->SetType(OPTION_TYPE_OPTION);
+
+					parameter->AddOption(option);
+				}
+			}
+		}
+		else if (node->GetName() == "range")
+		{
+			parameter->SetType(PARAMETER_TYPE_RANGE);
+
+			if (node->GetAttributeByName("default") != NIL) parameter->SetDefault(node->GetAttributeByName("default")->GetContent());
+
+			if (node->GetAttributeByName("step") != NIL) parameter->SetStepSize(node->GetAttributeByName("step")->GetContent().ToFloat());
+			else					     parameter->SetStepSize(1.0);
+
+			for (Int i = 0; i < node->GetNOfNodes(); i++)
+			{
+				XML::Node	*node2 = node->GetNthNode(i);
+
+				if (node2->GetName() == "min" || node2->GetName() == "max")
+				{
+					Option	 *option = new Option();
+
+					option->SetValue(node2->GetContent());
+
+					if (node2->GetAttributeByName("alias") != NIL)	option->SetAlias(node2->GetAttributeByName("alias")->GetContent());
+					else						option->SetAlias(option->GetValue());
+
+					if	(node2->GetName() == "min") option->SetType(OPTION_TYPE_MIN);
+					else if (node2->GetName() == "max") option->SetType(OPTION_TYPE_MAX);
+
+					parameter->AddOption(option);
+				}
+			}
+		}
+
+		parameters.Add(parameter);
 	}
 
 	return True;
