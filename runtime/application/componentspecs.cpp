@@ -523,6 +523,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			 */
 			if (!File(external_command).Exists())
 			{
+				mode		 = COMPONENT_MODE_EXTERNAL_STDIO;
 				external_command = NIL;
 
 				continue;
