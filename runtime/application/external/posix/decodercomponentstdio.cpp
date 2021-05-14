@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -326,16 +326,16 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 	Int32			 bytesRead = 0;
 	Int32			 chunkSize = 0;
 
-	bytesRead = fread(buffer, 1,	     8, rPipe); // RIFF chunk
-	bytesRead = fread(buffer, 1,	     4, rPipe); // WAVE ID
-	bytesRead = fread(buffer, 1,	     4, rPipe); //  fmt FOURCC
-	bytesRead = fread(buffer, 1,	     4, rPipe); //  fmt chunk size
+	fread(buffer, 1,	 8, rPipe); // RIFF chunk
+	fread(buffer, 1,	 4, rPipe); // WAVE ID
+	fread(buffer, 1,	 4, rPipe); //  fmt FOURCC
+	fread(buffer, 1,	 4, rPipe); //  fmt chunk size
 
 	chunkSize = buffer[0] | buffer[1] << 8 | buffer[2] << 16 | buffer[3] << 24;
 
 	buffer.Resize(Math::Max(8, chunkSize));
 
-	bytesRead = fread(buffer, 1, chunkSize, rPipe); // rest of  fmt chunk
+	fread(buffer, 1, chunkSize, rPipe); // rest of  fmt chunk
 
 	do
 	{
