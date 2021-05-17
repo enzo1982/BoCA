@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -47,6 +47,8 @@ extern OGGSTREAMCLEAR		 ex_ogg_stream_clear;
 
 /* Vorbis API functions.
  */
+typedef const char *		(*VORBISVERSIONSTRING)		();
+
 typedef void			(*VORBISINFOINIT)		(vorbis_info *);
 typedef void			(*VORBISCOMMENTINIT)		(vorbis_comment *);
 typedef void			(*VORBISCOMMENTADDTAG)		(vorbis_comment *, char *, char *);
@@ -66,6 +68,8 @@ typedef void			(*VORBISINFOCLEAR)		(vorbis_info *);
 
 typedef int			(*VORBISENCODEINIT)		(vorbis_info *, long, long, long, long, long);
 typedef int			(*VORBISENCODEINITVBR)		(vorbis_info *, long, long, float);
+
+extern VORBISVERSIONSTRING	 ex_vorbis_version_string;
 
 extern VORBISINFOINIT		 ex_vorbis_info_init;
 extern VORBISCOMMENTINIT	 ex_vorbis_comment_init;

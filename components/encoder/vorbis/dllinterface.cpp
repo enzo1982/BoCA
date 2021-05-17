@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,6 +22,8 @@ OGGSTREAMPAGEOUT		 ex_ogg_stream_pageout			= NIL;
 OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
 OGGPAGECHECKSUMSET		 ex_ogg_page_checksum_set		= NIL;
 OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
+
+VORBISVERSIONSTRING		 ex_vorbis_version_string		= NIL;
 
 VORBISINFOINIT			 ex_vorbis_info_init			= NIL;
 VORBISCOMMENTINIT		 ex_vorbis_comment_init			= NIL;
@@ -85,6 +87,8 @@ Bool LoadVorbisDLL()
 	vorbisencdll = BoCA::Utilities::LoadCodecDLL("vorbisenc");
 
 	if (vorbisdll == NIL || vorbisencdll == NIL) return False;
+
+	ex_vorbis_version_string	= (VORBISVERSIONSTRING) vorbisdll->GetFunctionAddress("vorbis_version_string");
 
 	ex_vorbis_info_init		= (VORBISINFOINIT) vorbisdll->GetFunctionAddress("vorbis_info_init");
 	ex_vorbis_comment_init		= (VORBISCOMMENTINIT) vorbisdll->GetFunctionAddress("vorbis_comment_init");

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -99,6 +99,20 @@ Bool BoCA::EncoderVorbis::Activate()
 
 	ConvertArguments(config);
 
+	Int	 mode	 = config->GetIntValue(ConfigureVorbis::ConfigID, "Mode", 0);
+	Int	 quality = config->GetIntValue(ConfigureVorbis::ConfigID, "Quality", 60);
+
+	if (ex_vorbis_version_string != NIL && String(ex_vorbis_version_string()).Contains("aoTuV")) quality = Math::Max(-20, Math::Min(quality, 100));
+	else											     quality = Math::Max(-10, Math::Min(quality, 100));
+
+	Bool	 setBitrate    = config->GetIntValue(ConfigureVorbis::ConfigID, "SetBitrate", True);
+	Bool	 setMinBitrate = config->GetIntValue(ConfigureVorbis::ConfigID, "SetMinBitrate", False);
+	Bool	 setMaxBitrate = config->GetIntValue(ConfigureVorbis::ConfigID, "SetMaxBitrate", False);
+
+	Int	 bitrate       = config->GetIntValue(ConfigureVorbis::ConfigID, "Bitrate", 192);
+	Int	 minBitrate    = config->GetIntValue(ConfigureVorbis::ConfigID, "MinBitrate", 32);
+	Int	 maxBitrate    = config->GetIntValue(ConfigureVorbis::ConfigID, "MaxBitrate", 320);
+
 	/* Init Ogg stream.
 	 */
 	Math::RandomSeed();
@@ -114,15 +128,15 @@ Bool BoCA::EncoderVorbis::Activate()
 
 	ex_vorbis_info_init(&vi);
 
-	switch (config->GetIntValue(ConfigureVorbis::ConfigID, "Mode", 0))
+	switch (mode)
 	{
 		case 0:
-			error = ex_vorbis_encode_init_vbr(&vi, format.channels, format.rate, ((double) config->GetIntValue(ConfigureVorbis::ConfigID, "Quality", 60)) / 100);
+			error = ex_vorbis_encode_init_vbr(&vi, format.channels, format.rate, ((double) quality) / 100);
 			break;
 		case 1:
-			error = ex_vorbis_encode_init(&vi, format.channels, format.rate, config->GetIntValue(ConfigureVorbis::ConfigID, "SetMaxBitrate", False) ? config->GetIntValue(ConfigureVorbis::ConfigID, "MaxBitrate", 320) * 1000 : -1,
-											 config->GetIntValue(ConfigureVorbis::ConfigID, "SetBitrate",    True)  ? config->GetIntValue(ConfigureVorbis::ConfigID, "Bitrate",    192) * 1000 : -1,
-											 config->GetIntValue(ConfigureVorbis::ConfigID, "SetMinBitrate", False) ? config->GetIntValue(ConfigureVorbis::ConfigID, "MinBitrate",  32) * 1000 : -1);
+			error = ex_vorbis_encode_init(&vi, format.channels, format.rate, setMaxBitrate ? maxBitrate * 1000 : -1,
+											 setBitrate    ? bitrate    * 1000 : -1,
+											 setMinBitrate ? minBitrate * 1000 : -1);
 			break;
 	}
 

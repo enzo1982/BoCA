@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -11,6 +11,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include "config.h"
+#include "dllinterface.h"
 
 const String	 BoCA::ConfigureVorbis::ConfigID = "Vorbis";
 
@@ -69,8 +70,10 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	text_quality		= new Text(i18n->AddColon(i18n->TranslateString("Quality")), Point(10, 16));
 
-	slider_quality		= new Slider(Point(text_quality->GetUnscaledTextWidth() + 18, 14), Size(289 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, -20, 100);
+	slider_quality		= new Slider(Point(text_quality->GetUnscaledTextWidth() + 18, 14), Size(289 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, -10, 100);
 	slider_quality->onValueChange.Connect(&ConfigureVorbis::SetQuality, this);
+
+	if (ex_vorbis_version_string != NIL && String(ex_vorbis_version_string()).Contains("aoTuV")) slider_quality->SetRange(-20, 100);
 
 	text_quality_value	= new Text(NIL, Point(313, 16));
 
