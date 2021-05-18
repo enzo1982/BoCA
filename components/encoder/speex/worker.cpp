@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -103,11 +103,11 @@ BoCA::SuperWorker::~SuperWorker()
 
 Int BoCA::SuperWorker::Run()
 {
-	while (!quit)
+	while (!Threads::Access::Value(quit))
 	{
 		processSignal.Wait();
 
-		if (quit) break;
+		if (Threads::Access::Value(quit)) break;
 
 		packetBuffer.Resize(0);
 		packetSizes.RemoveAll();
@@ -160,7 +160,7 @@ Void BoCA::SuperWorker::WaitUntilReady()
 
 Int BoCA::SuperWorker::Quit()
 {
-	quit = True;
+	Threads::Access::Set(quit, True);
 
 	processSignal.Release();
 

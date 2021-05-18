@@ -88,11 +88,11 @@ BoCA::SuperWorker::~SuperWorker()
 
 Int BoCA::SuperWorker::Run()
 {
-	while (!quit)
+	while (!Threads::Access::Value(quit))
 	{
 		processSignal.Wait();
 
-		if (quit) break;
+		if (Threads::Access::Value(quit)) break;
 
 		packetBuffer.Resize(0);
 		packetSizes.RemoveAll();
@@ -181,7 +181,7 @@ Void BoCA::SuperWorker::WaitUntilReady()
 
 Int BoCA::SuperWorker::Quit()
 {
-	quit = True;
+	Threads::Access::Set(quit, True);
 
 	processSignal.Release();
 

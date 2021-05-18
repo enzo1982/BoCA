@@ -174,7 +174,7 @@ BoCA::FormatConverter::~FormatConverter()
 
 	/* Wait for converter thread to finish.
 	 */
-	finish = True;
+	Threads::Access::Set(finish, True);
 
 	converterData->processSignal.Release();
 
@@ -302,11 +302,11 @@ Int BoCA::FormatConverter::Finish(Buffer<UnsignedByte> &buffer)
 
 Int BoCA::FormatConverter::ConverterThread()
 {
-	while (!finish)
+	while (!Threads::Access::Value(finish))
 	{
 		converterData->processSignal.Wait();
 
-		if (finish) break;
+		if (Threads::Access::Value(finish)) break;
 
 		/* Call transform for every converter component.
 		 */
