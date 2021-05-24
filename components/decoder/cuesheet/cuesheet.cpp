@@ -133,8 +133,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			String	 genre;
 
-			if (line.Contains("\"")) genre = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 genre = line.Tail(line.Length() - 10);
+			if (line.Contains("\"")) genre = UnescapeString(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
+			else			 genre = UnescapeString(line.Tail(line.Length() - 10));
 
 			if (!readInfoTags || preferCueSheets) info.genre = genre;
 
@@ -147,8 +147,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			String	 comment;
 
-			if (line.Contains("\"")) comment = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 comment = line.Tail(line.Length() - 12);
+			if (line.Contains("\"")) comment = UnescapeString(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
+			else			 comment = UnescapeString(line.Tail(line.Length() - 12));
 
 			if (!readInfoTags || preferCueSheets) info.comment = comment;
 
@@ -172,8 +172,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			String	 artist;
 
-			if (line.Contains("\"")) artist = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 artist = line.Tail(line.Length() - 10);
+			if (line.Contains("\"")) artist = UnescapeString(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
+			else			 artist = UnescapeString(line.Tail(line.Length() - 10));
 
 			if (!readInfoTags || preferCueSheets)
 			{
@@ -190,8 +190,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			String	 songwriter;
 
-			if (line.Contains("\"")) songwriter = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 songwriter = line.Tail(line.Length() - 11);
+			if (line.Contains("\"")) songwriter = UnescapeString(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
+			else			 songwriter = UnescapeString(line.Tail(line.Length() - 11));
 
 			if (!readInfoTags || preferCueSheets) info.SetOtherInfo(INFO_COMPOSER, songwriter);
 
@@ -202,8 +202,8 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			String	 title;
 
-			if (line.Contains("\"")) title = line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1);
-			else			 title = line.Tail(line.Length() - 6);
+			if (line.Contains("\"")) title = UnescapeString(line.SubString(line.Find("\"") + 1, line.FindLast("\"") - line.Find("\"") - 1));
+			else			 title = UnescapeString(line.Tail(line.Length() - 6));
 
 			if (!readInfoTags || preferCueSheets)
 			{
@@ -600,6 +600,11 @@ Bool BoCA::DecoderCueSheet::AddTrack(const Track &track, Array<Track> &tracks) c
 	tracks.Add(rTrack);
 
 	return True;
+}
+
+String BoCA::DecoderCueSheet::UnescapeString(const String &string)
+{
+	return string.Replace(" // ", "\n").Replace("''", "\"");
 }
 
 BoCA::DecoderCueSheet::DecoderCueSheet()

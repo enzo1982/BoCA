@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -43,8 +43,14 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 {
 	if (trackList.Length() == 0) return Error();
 
+	/* Get configuration.
+	 */
 	const Config	*config = GetConfiguration();
-	I18n		*i18n	= I18n::Get();
+
+	Bool		 replaceExistingComments = config->GetIntValue("Tags", "ReplaceExistingComments", False);
+	String		 defaultComment		 = config->GetStringValue("Tags", "DefaultComment", NIL);
+
+	Bool		 preserveReplayGain	 = config->GetIntValue("Tags", "PreserveReplayGain", True);
 
 	/* Create cue sheet file.
 	 */
@@ -69,6 +75,7 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 	 */
 	Bool		 artistConsistent    = True;
 	Bool		 albumConsistent     = True;
+	Bool		 commentConsistent   = True;
 
 	Bool		 albumGainConsistent = True;
 
@@ -85,8 +92,9 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 		const String	&artist  = info.HasOtherInfo(INFO_ALBUMARTIST)  ? info.GetOtherInfo(INFO_ALBUMARTIST)  : info.artist;
 		const String	&artist1 = info1.HasOtherInfo(INFO_ALBUMARTIST) ? info1.GetOtherInfo(INFO_ALBUMARTIST) : info1.artist;
 
-		if (artist	!= artist1)	 artistConsistent = False;
-		if (info.album	!= info1.album)	 albumConsistent  = False;
+		if (artist	 != artist1)	   artistConsistent  = False;
+		if (info.album	 != info1.album)   albumConsistent   = False;
+		if (info.comment != info1.comment) commentConsistent = False;
 
 		if (info.album_gain != info1.album_gain ||
 		    info.album_peak != info1.album_peak) albumGainConsistent = False;
@@ -96,6 +104,8 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 
 	/* Metadata.
 	 */
+	I18n		*i18n	= I18n::Get();
+
 	const Info	&info	= trackList.GetNth(0).GetInfo();
 	const String	&artist	= info.HasOtherInfo(INFO_ALBUMARTIST) ? info.GetOtherInfo(INFO_ALBUMARTIST) : info.artist;
 
@@ -103,18 +113,19 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 	 */
 	if (artistConsistent && albumConsistent)
 	{
-		if (info.genre  != NIL) out.OutputLine(String("REM GENRE \"").Append(info.genre).Append("\""));
+		if (info.genre  != NIL) out.OutputLine(String("REM GENRE \"").Append(EscapeString(info.genre)).Append("\""));
 		if (info.year    >   0) out.OutputLine(String("REM DATE ").Append(String::FromInt(info.year)));
 	}
 
-	if (config->GetStringValue("Tags", "DefaultComment", NIL) != NIL) out.OutputLine(String("REM COMMENT \"").Append(config->GetStringValue("Tags", "DefaultComment", NIL)).Append("\""));
+	if	(info.comment != NIL && commentConsistent && !replaceExistingComments) out.OutputLine(String("REM COMMENT \"").Append(EscapeString(info.comment)).Append("\""));
+	else if (defaultComment != NIL)						       out.OutputLine(String("REM COMMENT \"").Append(EscapeString(defaultComment)).Append("\""));
 
-	if (artistConsistent) out.OutputLine(String("PERFORMER \"").Append(artist.Length() > 0 ? artist	    : i18n->TranslateString("unknown artist")).Append("\""));
-	if (albumConsistent)  out.OutputLine(String("TITLE \"").Append(info.album.Length() > 0 ? info.album : i18n->TranslateString("unknown album")).Append("\""));
+	if (artistConsistent) out.OutputLine(String("PERFORMER \"").Append(artist.Length() > 0 ? EscapeString(artist)	  : i18n->TranslateString("unknown artist")).Append("\""));
+	if (albumConsistent)  out.OutputLine(String("TITLE \"").Append(info.album.Length() > 0 ? EscapeString(info.album) : i18n->TranslateString("unknown album")).Append("\""));
 
 	/* Save Replay Gain info.
 	 */
-	if (albumGainConsistent && config->GetIntValue("Tags", "PreserveReplayGain", True))
+	if (albumGainConsistent && preserveReplayGain)
 	{
 		if (info.album_gain != NIL && info.album_peak != NIL)
 		{
@@ -134,15 +145,16 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 		if (!oneFile || i == 0) out.OutputLine(String("FILE \"").Append(Utilities::GetRelativeFileName(track.fileName, actualFile)).Append("\" ").Append(GetFileType(track.fileName)));
 
 		out.OutputLine(String("  TRACK ").Append(i < 9 ? "0" : NIL).Append(String::FromInt(i + 1)).Append(" AUDIO"));
-		out.OutputLine(String("    TITLE \"").Append(info.title.Length() > 0 ? info.title : i18n->TranslateString("unknown title")).Append("\""));
+		out.OutputLine(String("    TITLE \"").Append(info.title.Length() > 0 ? EscapeString(info.title) : i18n->TranslateString("unknown title")).Append("\""));
 
-		if (!artistConsistent || info.artist != artist) out.OutputLine(String("    PERFORMER \"").Append(info.artist.Length() > 0 ? info.artist : i18n->TranslateString("unknown artist")).Append("\""));
+		if (!artistConsistent || info.artist != artist)				   out.OutputLine(String("    PERFORMER \"").Append(info.artist.Length() > 0 ? EscapeString(info.artist) : i18n->TranslateString("unknown artist")).Append("\""));
+		if (!commentConsistent && info.comment != NIL && !replaceExistingComments) out.OutputLine(String("    REM COMMENT \"").Append(EscapeString(info.comment)).Append("\""));
 
 		if (info.isrc != NIL) out.OutputLine(String("    ISRC ").Append(info.isrc));
 
 		/* Save Replay Gain info.
 		 */
-		if (config->GetIntValue("Tags", "PreserveReplayGain", True))
+		if (preserveReplayGain)
 		{
 			if (info.track_gain != NIL && info.track_peak != NIL)
 			{
@@ -175,4 +187,15 @@ String BoCA::PlaylistCueSheet::GetFileType(const String &fileName)
 	else if	(fileName.ToLower().EndsWith(".aiff")) fileType = "AIFF";
 
 	return fileType;
+}
+
+String BoCA::PlaylistCueSheet::EscapeString(const String &string)
+{
+	const Array<String>	&lines = string.Explode("\n");
+
+	String	 result;
+
+	foreach (const String &line, lines) result.Append(result == NIL ? "" : " // ").Append(line.Trim().Replace("\"", "''"));
+
+	return result;
 }
