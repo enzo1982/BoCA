@@ -903,22 +903,22 @@ String BoCA::TaggerID3v2::GetStringField(const ID3_Frame &frame, ID3_FieldID fie
 
 		if (encoding == ID3TE_ISO8859_1 || encoding == ID3TE_UTF8)
 		{
-			Buffer<char>	 aBuffer(1024);
+			Buffer<char>	 aBuffer(field->Size() + 1);
 
 			aBuffer.Zero();
 
-			field->Get(aBuffer, aBuffer.Size());
+			field->Get(aBuffer, field->Size());
 
 			if	(encoding == ID3TE_ISO8859_1) result.ImportFrom("ISO-8859-1", aBuffer);
 			else if (encoding == ID3TE_UTF8)      result.ImportFrom("UTF-8", aBuffer);
 		}
 		else if (encoding == ID3TE_UTF16 || encoding == ID3TE_UTF16BE)
 		{
-			Buffer<wchar_t>	 wBuffer(1024);
+			Buffer<wchar_t>	 wBuffer(field->Size() + 1);
 
 			wBuffer.Zero();
 
-			field->Get((unicode_t *) (wchar_t *) wBuffer, wBuffer.Size());
+			field->Get((unicode_t *) (wchar_t *) wBuffer, field->Size());
 
 			result.ImportFrom("UTF-16BE", (char *) (wchar_t *) wBuffer);
 		}
@@ -956,11 +956,11 @@ String BoCA::TaggerID3v2::GetASCIIField(const ID3_Frame &frame, ID3_FieldID fiel
 
 	if (field != NIL)
 	{
-		Buffer<char>	 aBuffer(1024);
+		Buffer<char>	 aBuffer(field->Size() + 1);
 
 		aBuffer.Zero();
 
-		field->Get(aBuffer, aBuffer.Size());
+		field->Get(aBuffer, field->Size());
 
 		result.ImportFrom("ISO-8859-1", aBuffer);
 	}
