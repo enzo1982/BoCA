@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -202,33 +202,34 @@ const BoCA::MCDI &BoCA::DeviceInfoCDRip::GetNthDeviceMCDI(Int n)
 	{
 		CDROMDRIVE	*cd = ex_CR_OpenCDROM(n);
 
-		ex_CR_ReadToc(cd);
-
-		Int			 numTocEntries = ex_CR_GetNumTocEntries(cd);
-		Buffer<UnsignedByte>	 buffer(4 + 8 * numTocEntries + 8);
-
-		((UnsignedInt16 *) (UnsignedByte *) buffer)[0] = htons(buffer.Size() - 2);
-
-		buffer[2] = ex_CR_GetTocEntry(cd, 0).btTrackNumber;
-		buffer[3] = ex_CR_GetTocEntry(cd, numTocEntries - 1).btTrackNumber;
-
-		for (Int i = 0; i <= numTocEntries; i++)
+		if (ex_CR_ReadToc(cd) == CDEX_OK)
 		{
-			TOCENTRY	 entry = ex_CR_GetTocEntry(cd, i);
+			Int			 numTocEntries = ex_CR_GetNumTocEntries(cd);
+			Buffer<UnsignedByte>	 buffer(4 + 8 * numTocEntries + 8);
 
-			buffer[4 + 8 * i + 0] = 0;
-			buffer[4 + 8 * i + 1] = entry.btFlag;
-			buffer[4 + 8 * i + 2] = entry.btTrackNumber;
-			buffer[4 + 8 * i + 3] = 0;
+			((UnsignedInt16 *) (UnsignedByte *) buffer)[0] = htons(buffer.Size() - 2);
 
-			Int32		 address = entry.dwStartSector;
+			buffer[2] = ex_CR_GetTocEntry(cd, 0).btTrackNumber;
+			buffer[3] = ex_CR_GetTocEntry(cd, numTocEntries - 1).btTrackNumber;
 
-			if (address < 0) address = ~((-address) - 1) & ((1 << 24) - 1);
+			for (Int i = 0; i <= numTocEntries; i++)
+			{
+				TOCENTRY	 entry = ex_CR_GetTocEntry(cd, i);
 
-			((UnsignedInt32 *) (UnsignedByte *) buffer)[1 + 2 * i + 1] = htonl(address);
+				buffer[4 + 8 * i + 0] = 0;
+				buffer[4 + 8 * i + 1] = entry.btFlag;
+				buffer[4 + 8 * i + 2] = entry.btTrackNumber;
+				buffer[4 + 8 * i + 3] = 0;
+
+				Int32		 address = entry.dwStartSector;
+
+				if (address < 0) address = ~((-address) - 1) & ((1 << 24) - 1);
+
+				((UnsignedInt32 *) (UnsignedByte *) buffer)[1 + 2 * i + 1] = htonl(address);
+			}
+
+			mcdi.SetData(buffer);
 		}
-
-		mcdi.SetData(buffer);
 
 		ex_CR_CloseCDROM(cd);
 	}
