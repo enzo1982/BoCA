@@ -21,7 +21,10 @@ namespace APE
 {
 #undef __forceinline
 #define __forceinline inline
+
+#ifndef __stdcall
 #define __stdcall
+#endif
 
 #define NEAR
 #define FAR
