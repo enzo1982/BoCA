@@ -57,6 +57,18 @@ Bool BoCA::MCDI::operator !=(const MCDI &oMCDI) const
 	return !(*this == oMCDI);
 }
 
+Bool BoCA::MCDI::IsValid() const
+{
+	if (GetNumberOfEntries() <= 0) return False;
+
+	for (Int i = 1; i < GetNumberOfEntries(); i++)
+	{
+		if (GetNthEntryOffset(i - 1) >= GetNthEntryOffset(i)) return False;
+	}
+
+	return True;
+}
+
 Int BoCA::MCDI::GetNumberOfEntries() const
 {
 	if (data.Size() < 2) return 0;

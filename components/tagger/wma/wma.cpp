@@ -255,13 +255,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		/* Save CD table of contents.
 		 */
-		if (writeMCDI)
-		{
-			if (info.mcdi.GetData().Size() > 0)
-			{
-				RenderWMABinaryItem(g_wszWMMCDI, info.mcdi.GetData(), pHeaderInfo);
-			}
-		}
+		if (writeMCDI && info.mcdi.IsValid()) RenderWMABinaryItem(g_wszWMMCDI, info.mcdi.GetData(), pHeaderInfo);
 
 		/* Save encoder version.
 		 */
@@ -530,19 +524,11 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 					memcpy(data, pbValue, cbLength);
 
-					/* Check validity of MCDI data.
+					/* Check validity of MCDI data and assign.
 					 */
 					MCDI	 mcdi(data);
-					Bool	 valid = True;
 
-					for (Int i = 1; i < mcdi.GetNumberOfEntries(); i++)
-					{
-						if (mcdi.GetNthEntryOffset(i - 1) >= mcdi.GetNthEntryOffset(i)) valid = False;
-					}
-
-					/* Found a binary MCDI field.
-					 */
-					if (valid) info.mcdi.SetData(data);
+					if (mcdi.IsValid()) info.mcdi.SetData(data);
 				}
 				else
 				{

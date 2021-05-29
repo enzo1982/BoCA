@@ -128,8 +128,8 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	 */
 	if (writeMCDI)
 	{
-		if	(info.mcdi.GetData().Size() > 0) RenderTagItem("ITOC", info.mcdi.GetOffsetString(), buffer);
-		else if (info.offsets != NIL)		 RenderTagItem("ITOC", info.offsets, buffer);
+		if	(info.mcdi.IsValid()) RenderTagItem("ITOC", info.mcdi.GetOffsetString(), buffer);
+		else if (info.offsets != NIL) RenderTagItem("ITOC", info.offsets, buffer);
 	}
 
 	/* Save encoder version.

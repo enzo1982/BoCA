@@ -396,16 +396,13 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	/* Save CD table of contents.
 	 */
-	if (writeMCDI && !isChapter)
+	if (writeMCDI && info.mcdi.IsValid() && !isChapter)
 	{
-		if (info.mcdi.GetData().Size() > 0)
-		{
-			ID3_Frame	 frame_mcdi(ID3FID_CDID);
+		ID3_Frame	 frame_mcdi(ID3FID_CDID);
 
-			SetBinaryField(frame_mcdi, ID3FN_DATA, info.mcdi.GetData());
+		SetBinaryField(frame_mcdi, ID3FN_DATA, info.mcdi.GetData());
 
-			container.AddFrame(frame_mcdi);
-		}
+		container.AddFrame(frame_mcdi);
 	}
 
 	/* Save encoder version.
@@ -715,19 +712,11 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			if (binary)
 			{
-				/* Check validity of MCDI data.
+				/* Check validity of MCDI data and assign.
 				 */
 				MCDI	 mcdi(data);
-				Bool	 valid = True;
 
-				for (Int i = 1; i < mcdi.GetNumberOfEntries(); i++)
-				{
-					if (mcdi.GetNthEntryOffset(i - 1) >= mcdi.GetNthEntryOffset(i)) valid = False;
-				}
-
-				/* Found a binary MCDI field.
-				 */
-				if (valid) info.mcdi.SetData(data);
+				if (mcdi.IsValid()) info.mcdi.SetData(data);
 			}
 			else
 			{

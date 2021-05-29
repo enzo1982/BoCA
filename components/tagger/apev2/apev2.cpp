@@ -185,10 +185,7 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	/* Save CD table of contents.
 	 */
-	if (writeMCDI)
-	{
-		if (info.mcdi.GetData().Size() > 0) { RenderAPEBinaryItem("MCDI", info.mcdi.GetData(), buffer); numItems++; }
-	}
+	if (writeMCDI && info.mcdi.IsValid()) { RenderAPEBinaryItem("MCDI", info.mcdi.GetData(), buffer); numItems++; }
 
 	/* Save encoder version.
 	 */
@@ -489,19 +486,11 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		}
 		else if (id == "MCDI")
 		{
-			/* Check validity of MCDI data.
+			/* Check validity of MCDI data and assign.
 			 */
 			MCDI	 mcdi(item);
-			Bool	 valid = True;
 
-			for (Int i = 1; i < mcdi.GetNumberOfEntries(); i++)
-			{
-				if (mcdi.GetNthEntryOffset(i - 1) >= mcdi.GetNthEntryOffset(i)) valid = False;
-			}
-
-			/* Found a binary MCDI field.
-			 */
-			if (valid) info.mcdi.SetData(item);
+			if (mcdi.IsValid()) info.mcdi.SetData(item);
 		}
 		else if (id.StartsWith("COVER ART"))
 		{

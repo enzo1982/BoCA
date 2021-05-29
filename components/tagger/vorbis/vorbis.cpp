@@ -165,8 +165,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	 */
 	if (writeMCDI)
 	{
-		if	(info.mcdi.GetData().Size() > 0) { RenderTagItem("CDTOC", info.mcdi.GetOffsetString(), buffer);	numItems++; }
-		else if	(info.offsets != NIL)		 { RenderTagItem("CDTOC", info.offsets, buffer);		numItems++; }
+		if	(info.mcdi.IsValid()) { RenderTagItem("CDTOC", info.mcdi.GetOffsetString(), buffer);	numItems++; }
+		else if	(info.offsets != NIL) { RenderTagItem("CDTOC", info.offsets, buffer);			numItems++; }
 	}
 
 	/* Save encoder version.
