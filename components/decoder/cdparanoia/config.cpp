@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -42,14 +42,15 @@ BoCA::ConfigureCDParanoia::ConfigureCDParanoia()
 
 		for (Int i = 0; i < info->GetNumberOfDevices(); i++)
 		{
-			const Device	&device = info->GetNthDeviceInfo(i);
+			const Device	&device	  = info->GetNthDeviceInfo(i);
+			String		 deviceID = device.GetID();
 
-			combo_drive->AddEntry(String(device.vendor).Append(" ").Append(device.model).Append(" ").Append(device.revision).Trim());
+			combo_drive->AddEntry(device.GetName());
 
-			driveOffsetUsed.Add(config->GetIntValue(ConfigID, String("UseOffsetDrive").Append(String::FromInt(i)), 0));
-			driveOffsets.Add(config->GetIntValue(ConfigID, String("ReadOffsetDrive").Append(String::FromInt(i)), 0));
-			driveSpeeds.Add(config->GetIntValue(ConfigID, String("RippingSpeedDrive").Append(String::FromInt(i)), 0));
-			driveSpinUpTimes.Add(config->GetIntValue(ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(i)), -5));
+			driveOffsetUsed.Add(config->GetIntValue(ConfigID, String("UseOffsetDrive-").Append(deviceID), 0));
+			driveOffsets.Add(config->GetIntValue(ConfigID, String("ReadOffsetDrive-").Append(deviceID), 0));
+			driveSpeeds.Add(config->GetIntValue(ConfigID, String("RippingSpeedDrive-").Append(deviceID), 0));
+			driveSpinUpTimes.Add(config->GetIntValue(ConfigID, String("SpinUpTimeDrive-").Append(deviceID), -5));
 		}
 
 		boca.DeleteComponent(info);
@@ -293,12 +294,23 @@ Int BoCA::ConfigureCDParanoia::SaveSettings()
 
 	if (driveSpeeds.Length() >= 1) config->SetIntValue(ConfigID, "ActiveDrive", combo_drive->GetSelectedEntryNumber());
 
-	for (Int i = 0; i < driveSpeeds.Length(); i++)
+	AS::Registry		&boca = AS::Registry::Get();
+	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdparanoia-info");
+
+	if (info != NIL)
 	{
-		config->SetIntValue(ConfigID, String("UseOffsetDrive").Append(String::FromInt(i)), driveOffsetUsed.GetNth(i));
-		config->SetIntValue(ConfigID, String("ReadOffsetDrive").Append(String::FromInt(i)), driveOffsets.GetNth(i));
-		config->SetIntValue(ConfigID, String("RippingSpeedDrive").Append(String::FromInt(i)), driveSpeeds.GetNth(i));
-		config->SetIntValue(ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(i)), driveSpinUpTimes.GetNth(i));
+		for (Int i = 0; i < info->GetNumberOfDevices(); i++)
+		{
+			const Device	&device	  = info->GetNthDeviceInfo(i);
+			String		 deviceID = device.GetID();
+
+			config->SetIntValue(ConfigID, String("UseOffsetDrive-").Append(deviceID), driveOffsetUsed.GetNth(i));
+			config->SetIntValue(ConfigID, String("ReadOffsetDrive-").Append(deviceID), driveOffsets.GetNth(i));
+			config->SetIntValue(ConfigID, String("RippingSpeedDrive-").Append(deviceID), driveSpeeds.GetNth(i));
+			config->SetIntValue(ConfigID, String("SpinUpTimeDrive-").Append(deviceID), driveSpinUpTimes.GetNth(i));
+		}
+
+		boca.DeleteComponent(info);
 	}
 
 	if (config->GetIntValue("Settings", "NotificationAvailable", False))

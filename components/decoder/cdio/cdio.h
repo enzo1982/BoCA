@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -60,9 +60,10 @@ namespace BoCA
 
 			Int				 numCacheErrors;
 
-			UnsignedInt32			 ComputeDiscID(const MCDI &);
+			String				 GetDriveID() const;
+			UnsignedInt32			 ComputeDiscID(const MCDI &) const;
 
-			Bool				 GetTrackSectors(Int &, Int &, Bool &);
+			Bool				 GetTrackSectors(Int &, Int &, Bool &) const;
 		public:
 			static const String		&GetComponentSpecs();
 

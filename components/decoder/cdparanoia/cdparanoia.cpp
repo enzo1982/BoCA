@@ -236,7 +236,7 @@ Bool BoCA::DecoderCDParanoia::Activate()
 	 */
 	const Config	*config = GetConfiguration();
 
-	Int	 speed = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
+	Int	 speed = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("RippingSpeedDrive-").Append(GetDriveID()), 0);
 
 	if (speed > 0)	cdda_speed_set(drive, speed);
 	else		cdda_speed_set(drive, -1);
@@ -323,7 +323,7 @@ Bool BoCA::DecoderCDParanoia::Seek(Int64 samplePosition)
 
 	/* Calculate offset values.
 	 */
-	readOffset = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue(ConfigureCDParanoia::ConfigID, String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+	readOffset = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("UseOffsetDrive-").Append(GetDriveID()), 0) ? config->GetIntValue(ConfigureCDParanoia::ConfigID, String("ReadOffsetDrive-").Append(GetDriveID()), 0) : 0;
 
 	startSector += readOffset / Int(samplesPerSector);
 	endSector   += readOffset / Int(samplesPerSector);
@@ -350,7 +350,7 @@ Bool BoCA::DecoderCDParanoia::Seek(Int64 samplePosition)
 
 	/* Wait for drive to spin up if requested.
 	 */
-	Int		 spinUpTime = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
+	Int		 spinUpTime = config->GetIntValue(ConfigureCDParanoia::ConfigID, String("SpinUpTimeDrive-").Append(GetDriveID()), 0);
 	UnsignedInt64	 startTime  = S::System::System::Clock();
 
 	while (spinUpTime > 0 && startTime - lastRead.GetNth(track.drive) > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))
@@ -446,7 +446,7 @@ Int BoCA::DecoderCDParanoia::ReadData(Buffer<UnsignedByte> &data)
 	return dataBytes;
 }
 
-Bool BoCA::DecoderCDParanoia::GetTrackSectors(Int &startSector, Int &endSector, Bool &lastTrack)
+Bool BoCA::DecoderCDParanoia::GetTrackSectors(Int &startSector, Int &endSector, Bool &lastTrack) const
 {
 	AS::Registry		&boca	   = AS::Registry::Get();
 	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdparanoia-info");
@@ -497,4 +497,18 @@ ConfigLayer *BoCA::DecoderCDParanoia::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureCDParanoia();
 
 	return configLayer;
+}
+
+String BoCA::DecoderCDParanoia::GetDriveID() const
+{
+	AS::Registry		&boca = AS::Registry::Get();
+	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdparanoia-info");
+
+	if (info == NIL) return NIL;
+
+	const Device	&device = info->GetNthDeviceInfo(track.drive);
+
+	boca.DeleteComponent(info);
+
+	return device.GetID();
 }

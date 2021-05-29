@@ -322,7 +322,7 @@ Bool BoCA::DecoderCDRip::Activate()
 	params.bJitterCorrection	= config->GetIntValue(ConfigureCDRip::ConfigID, "JitterCorrection", False);
 //	params.bDetectJitterErrors	= config->GetIntValue(ConfigureCDRip::ConfigID, "DetectJitterErrors", True);
 //	params.bDetectC2Errors		= config->GetIntValue(ConfigureCDRip::ConfigID, "DetectC2Errors", True);
-	params.nSpeed			= config->GetIntValue(ConfigureCDRip::ConfigID, String("RippingSpeedDrive").Append(String::FromInt(track.drive)), 0);
+	params.nSpeed			= config->GetIntValue(ConfigureCDRip::ConfigID, String("RippingSpeedDrive-").Append(GetDriveID()), 0);
 	params.bEnableMultiRead		= False;
 	params.nMultiReadCount		= 0;
 
@@ -391,7 +391,7 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 
 	/* Calculate offset values.
 	 */
-	readOffset = config->GetIntValue(ConfigureCDRip::ConfigID, String("UseOffsetDrive").Append(String::FromInt(track.drive)), 0) ? config->GetIntValue(ConfigureCDRip::ConfigID, String("ReadOffsetDrive").Append(String::FromInt(track.drive)), 0) : 0;
+	readOffset = config->GetIntValue(ConfigureCDRip::ConfigID, String("UseOffsetDrive-").Append(GetDriveID()), 0) ? config->GetIntValue(ConfigureCDRip::ConfigID, String("ReadOffsetDrive-").Append(GetDriveID()), 0) : 0;
 
 	startSector += readOffset / Int(samplesPerSector);
 	endSector   += readOffset / Int(samplesPerSector);
@@ -417,7 +417,7 @@ Bool BoCA::DecoderCDRip::Seek(Int64 samplePosition)
 
 	/* Wait for drive to spin up if requested.
 	 */
-	Int		 spinUpTime = config->GetIntValue(ConfigureCDRip::ConfigID, String("SpinUpTimeDrive").Append(String::FromInt(track.drive)), 0);
+	Int		 spinUpTime = config->GetIntValue(ConfigureCDRip::ConfigID, String("SpinUpTimeDrive-").Append(GetDriveID()), 0);
 	UnsignedInt64	 startTime  = S::System::System::Clock();
 
 	while (spinUpTime > 0 && startTime - lastRead.GetNth(track.drive) > 2500 && S::System::System::Clock() - startTime < (UnsignedInt64) Math::Abs(spinUpTime * 1000))
@@ -486,7 +486,7 @@ Int BoCA::DecoderCDRip::ReadData(Buffer<UnsignedByte> &data)
 	return dataBytes;
 }
 
-Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector, Bool &lastTrack)
+Bool BoCA::DecoderCDRip::GetTrackSectors(Int &startSector, Int &endSector, Bool &lastTrack) const
 {
 	AS::Registry		&boca	   = AS::Registry::Get();
 	AS::DeviceInfoComponent	*component = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdrip-info");
@@ -539,6 +539,20 @@ ConfigLayer *BoCA::DecoderCDRip::GetConfigurationLayer()
 	return configLayer;
 }
 
+String BoCA::DecoderCDRip::GetDriveID() const
+{
+	AS::Registry		&boca = AS::Registry::Get();
+	AS::DeviceInfoComponent	*info = (AS::DeviceInfoComponent *) boca.CreateComponentByID("cdrip-info");
+
+	if (info == NIL) return NIL;
+
+	const Device	&device = info->GetNthDeviceInfo(track.drive);
+
+	boca.DeleteComponent(info);
+
+	return device.GetID();
+}
+
 static int cddb_sum(int n)
 {
 	int	 ret = 0;
@@ -552,7 +566,7 @@ static int cddb_sum(int n)
 	return ret;
 }
 
-UnsignedInt32 BoCA::DecoderCDRip::ComputeDiscID(const MCDI &mcdi)
+UnsignedInt32 BoCA::DecoderCDRip::ComputeDiscID(const MCDI &mcdi) const
 {
 	Int	 numTocEntries = mcdi.GetNumberOfEntries();
 	Int	 n = 0;
