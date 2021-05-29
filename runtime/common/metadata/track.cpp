@@ -145,6 +145,16 @@ String BoCA::Track::GetFileSizeString() const
 	else		  return "?";
 }
 
+Void BoCA::Track::AdjustSampleCounts(const Format &newFormat)
+{
+	if (sampleOffset > 0) sampleOffset = sampleOffset * newFormat.rate / format.rate;
+
+	if (length       > 0) length       = length	  * newFormat.rate / format.rate;
+	if (approxLength > 0) approxLength = approxLength * newFormat.rate / format.rate;
+
+	foreach (Track &subTrack, tracks) subTrack.AdjustSampleCounts(newFormat);
+}
+
 Bool BoCA::Track::LoadCoverArtFiles()
 {
 	if (isCDTrack) return False;

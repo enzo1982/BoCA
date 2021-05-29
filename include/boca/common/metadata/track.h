@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -91,6 +91,8 @@ namespace BoCA
 			Bool operator	 ==(const int) const;
 			Bool operator	 !=(const int) const;
 
+			Void		 AdjustSampleCounts(const Format &);
+
 			Bool		 LoadCoverArtFiles();
 			Bool		 LoadCoverArtFile(const String &);
 
@@ -110,18 +112,6 @@ namespace BoCA
 			String		 GetLengthString() const;
 			String		 GetFileSizeString() const;
 	};
-
-	inline Void AdjustTrackSampleCounts(Track &track, const Format &newFormat)
-	{
-		const Format	&oldFormat = track.GetFormat();
-
-		if (track.sampleOffset > 0) track.sampleOffset = track.sampleOffset * newFormat.rate / oldFormat.rate;
-
-		if (track.length       > 0) track.length       = track.length	    * newFormat.rate / oldFormat.rate;
-		if (track.approxLength > 0) track.approxLength = track.approxLength * newFormat.rate / oldFormat.rate;
-
-		foreach (Track &subTrack, track.tracks) AdjustTrackSampleCounts(subTrack, newFormat);
-	}
 };
 
 #endif
