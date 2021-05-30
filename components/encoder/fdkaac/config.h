@@ -34,13 +34,6 @@ namespace BoCA
 			OptionBox		*option_version_mpeg2;
 			OptionBox		*option_version_mpeg4;
 
-			GroupBox		*group_aactype;
-			OptionBox		*option_aactype_low;
-			OptionBox		*option_aactype_he;
-			OptionBox		*option_aactype_hev2;
-			OptionBox		*option_aactype_ld;
-			OptionBox		*option_aactype_eld;
-
 			GroupBox		*group_id3v2;
 			CheckBox		*check_id3v2;
 			Text			*text_note;
@@ -58,6 +51,10 @@ namespace BoCA
 
 			Layer			*layer_quality;
 
+			GroupBox		*group_codec;
+			Text			*text_codec;
+			ComboBox		*combo_codec;
+
 			GroupBox		*group_bitrate;
 			OptionBox		*option_bitrate;
 			Slider			*slider_bitrate;
@@ -74,8 +71,9 @@ namespace BoCA
 			Slider			*slider_bandwidth;
 			Text			*text_bandwidth_hz;
 
+			Array<UnsignedInt>	 codecs;
+
 			Int			 mpegVersion;
-			Int			 aacType;
 			Int			 mode;
 			Int			 bitrate;
 			Int			 quality;
@@ -84,10 +82,12 @@ namespace BoCA
 			Bool			 allowID3;
 			Int			 fileFormat;
 			Int			 fileExtension;
+
+			Void			 FillCodecs();
 		slots:
 			Void			 SetMPEGVersion();
-			Void			 SetObjectType();
 			Void			 SetMode();
+			Void			 SetCodec();
 			Void			 SetBitrate();
 			Void			 SetBitrateByEditBox();
 			Void			 SetQuality();

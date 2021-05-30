@@ -19,8 +19,9 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 {
 	const Config	*config = Config::Get();
 
+	Int	 aacType = config->GetIntValue(ConfigID, "AACType", AOT_AAC_LC);
+
 	mpegVersion	= config->GetIntValue(ConfigID, "MPEGVersion", 0);
-	aacType		= config->GetIntValue(ConfigID, "AACType", AOT_AAC_LC);
 	mode		= config->GetIntValue(ConfigID, "Mode", 0);
 	bitrate		= config->GetIntValue(ConfigID, "Bitrate", 64);
 	quality		= config->GetIntValue(ConfigID, "Quality", 4);
@@ -59,55 +60,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_mp4->Add(option_mp4);
 	group_mp4->Add(option_aac);
 
-	group_aactype		= new GroupBox(i18n->TranslateString("AAC object type"), Point(7, 88), Size(120, 140));
-
-	option_aactype_low	= new OptionBox("LC", Point(10, 13), Size(99, 0), &aacType, AOT_AAC_LC);
-	option_aactype_low->onAction.Connect(&ConfigureFDKAAC::SetObjectType, this);
-
-	option_aactype_he	= new OptionBox("HE", Point(10, 38), Size(99, 0), &aacType, AOT_SBR);
-	option_aactype_he->onAction.Connect(&ConfigureFDKAAC::SetObjectType, this);
-
-	option_aactype_hev2	= new OptionBox("HEv2", Point(10, 63), Size(99, 0), &aacType, AOT_PS);
-	option_aactype_hev2->onAction.Connect(&ConfigureFDKAAC::SetObjectType, this);
-
-	option_aactype_ld	= new OptionBox("LD", Point(10, 88), Size(99, 0), &aacType, AOT_ER_AAC_LD);
-	option_aactype_ld->onAction.Connect(&ConfigureFDKAAC::SetObjectType, this);
-
-	option_aactype_eld	= new OptionBox("ELD", Point(10, 113), Size(99, 0), &aacType, AOT_ER_AAC_ELD);
-	option_aactype_eld->onAction.Connect(&ConfigureFDKAAC::SetObjectType, this);
-
-	LIB_INFO	 info[FDK_MODULE_LAST];
-
-	FDKinitLibInfo(info);
-	ex_aacEncGetLibInfo(info);
-
-	UINT	 sbrFlags = FDKlibInfo_getCapabilities(info, FDK_SBRENC);
-
-	if (! sbrFlags			  ) option_aactype_he->Deactivate();
-	if (!(sbrFlags & CAPF_SBR_PS_MPEG)) option_aactype_hev2->Deactivate();
-	if (! sbrFlags			  ) option_aactype_eld->Deactivate();
-
-	group_aactype->Add(option_aactype_low);
-	group_aactype->Add(option_aactype_he);
-	group_aactype->Add(option_aactype_hev2);
-	group_aactype->Add(option_aactype_ld);
-	group_aactype->Add(option_aactype_eld);
-
-	group_id3v2		= new GroupBox(i18n->TranslateString("Tags"), Point(135, 88), Size(279, 90));
-
-	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
-	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
-
-	text_note		= new Text(i18n->AddColon(i18n->TranslateString("Note")), Point(10, 38));
-	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
-
-	group_id3v2->SetSize(Size(Math::Max(240, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22), Math::Max(text_note->GetUnscaledTextHeight(), text_id3v2->GetUnscaledTextHeight()) + 48));
-
-	group_id3v2->Add(check_id3v2);
-	group_id3v2->Add(text_note);
-	group_id3v2->Add(text_id3v2);
-
-	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), Point(135, 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
+	group_version		= new GroupBox(i18n->TranslateString("MPEG version"), Point(135, 11), Size(120, 65));
 
 	option_version_mpeg2	= new OptionBox("MPEG 2", Point(10, 13), Size(group_version->GetWidth() - 21, 0), &mpegVersion, 127);
 	option_version_mpeg2->onAction.Connect(&ConfigureFDKAAC::SetMPEGVersion, this);
@@ -118,7 +71,21 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_version->Add(option_version_mpeg2);
 	group_version->Add(option_version_mpeg4);
 
-	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(group_version->GetWidth() + 143 + (group_id3v2->GetWidth() % 2), 11), Size(group_id3v2->GetWidth() / 2 - 4, 65));
+	group_id3v2		= new GroupBox(i18n->TranslateString("Tags"), Point(7, 88), Size(279, 90));
+
+	check_id3v2		= new CheckBox(i18n->TranslateString("Allow ID3v2 tags in AAC files"), Point(10, 13), Size(200, 0), &allowID3);
+	check_id3v2->SetWidth(check_id3v2->GetUnscaledTextWidth() + 20);
+
+	text_note		= new Text(i18n->AddColon(i18n->TranslateString("Note")), Point(10, 38));
+	text_id3v2		= new Text(i18n->TranslateString("Some players may have problems playing AAC\nfiles with ID3 tags attached. Please use this option only\nif you are sure that your player can handle these tags."), Point(text_note->GetUnscaledTextWidth() + 12, 38));
+
+	group_id3v2->SetSize(Size(Math::Max(384, text_note->GetUnscaledTextWidth() + text_id3v2->GetUnscaledTextWidth() + 22), Math::Max(text_note->GetUnscaledTextHeight(), text_id3v2->GetUnscaledTextHeight()) + 48));
+
+	group_id3v2->Add(check_id3v2);
+	group_id3v2->Add(text_note);
+	group_id3v2->Add(text_id3v2);
+
+	group_extension		= new GroupBox(i18n->TranslateString("File extension"), Point(263, 11), Size(group_id3v2->GetWidth() - 256, 65));
 
 	option_extension_m4a	= new OptionBox(".m4a", Point(10, 13),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 0);
 	option_extension_m4b	= new OptionBox(".m4b", Point(10, 38),					Size(group_extension->GetWidth() / 2 - 14, 0), &fileExtension, 1);
@@ -130,11 +97,28 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_extension->Add(option_extension_m4r);
 	group_extension->Add(option_extension_mp4);
 
+	i18n->SetContext("Encoders::AAC::Codec");
+
+	layer_quality		= new Layer(i18n->TranslateString("Codec"));
+
+	group_codec		= new GroupBox(i18n->TranslateString("Audio codec"), Point(7, 11), Size(group_id3v2->GetWidth(), 43));
+
+	text_codec		= new Text(i18n->AddColon(i18n->TranslateString("Audio codec")), Point(10, 15));
+
+	combo_codec		= new ComboBox(Point(text_codec->GetUnscaledTextSize().cx + 17, 12), Size(group_codec->GetWidth() - text_codec->GetUnscaledTextSize().cx - 27, 0));
+
+	FillCodecs();
+
+	foreach (Int codec, codecs) if (aacType == codec) combo_codec->SelectNthEntry(foreachindex);
+
+	combo_codec->onSelectEntry.Connect(&ConfigureFDKAAC::SetCodec, this);
+
+	group_codec->Add(text_codec);
+	group_codec->Add(combo_codec);
+
 	i18n->SetContext("Encoders::AAC::Quality");
 
-	layer_quality		= new Layer(i18n->TranslateString("Quality"));
-
-	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate / Quality"), Point(7, 11), Size(group_id3v2->GetWidth() + 128, 78));
+	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate / Quality"), Point(7, 66), Size(group_id3v2->GetWidth(), 78));
 
 	option_bitrate		= new OptionBox(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 13), Size(150, 0), &mode, 0);
 	option_bitrate->onAction.Connect(&ConfigureFDKAAC::SetMode, this);
@@ -178,7 +162,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_bitrate->Add(text_quality_worse);
 	group_bitrate->Add(text_quality_better);
 
-	group_bandwidth		= new GroupBox(i18n->TranslateString("Maximum bandwidth"), Point(7, group_bitrate->GetHeight() + 22), Size(group_id3v2->GetWidth() + 128, 40));
+	group_bandwidth		= new GroupBox(i18n->TranslateString("Maximum bandwidth"), Point(7, group_bitrate->GetHeight() + 78), Size(group_id3v2->GetWidth(), 40));
 
 	text_bandwidth		= new Text(i18n->AddColon(i18n->TranslateString("Maximum AAC frequency bandwidth to use (Hz)")), Point(9, 15));
 
@@ -193,15 +177,15 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_bandwidth->Add(slider_bandwidth);
 	group_bandwidth->Add(text_bandwidth_hz);
 
+	SetCodec();
 	SetFileFormat();
 	SetMPEGVersion();
-	SetObjectType();
 	SetMode();
 	SetBitrate();
 	SetQuality();
 	SetBandwidth();
 
-	tabwidget->SetSize(Size(group_id3v2->GetWidth() + 146, Math::Max(258, group_id3v2->GetHeight() + 118)));
+	tabwidget->SetSize(Size(group_id3v2->GetWidth() + 18, Math::Max(226, group_id3v2->GetHeight() + 118)));
 
 	Add(tabwidget);
 
@@ -209,15 +193,15 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	tabwidget->Add(layer_format);
 
 	layer_format->Add(group_version);
-	layer_format->Add(group_aactype);
 	layer_format->Add(group_mp4);
 	layer_format->Add(group_extension);
 	layer_format->Add(group_id3v2);
 
+	layer_quality->Add(group_codec);
 	layer_quality->Add(group_bitrate);
 	layer_quality->Add(group_bandwidth);
 
-	SetSize(Size(group_id3v2->GetWidth() + 160, Math::Max(272, group_id3v2->GetHeight() + 132)));
+	SetSize(Size(group_id3v2->GetWidth() + 32, Math::Max(240, group_id3v2->GetHeight() + 132)));
 }
 
 BoCA::ConfigureFDKAAC::~ConfigureFDKAAC()
@@ -229,12 +213,6 @@ BoCA::ConfigureFDKAAC::~ConfigureFDKAAC()
 	DeleteObject(group_version);
 	DeleteObject(option_version_mpeg2);
 	DeleteObject(option_version_mpeg4);
-	DeleteObject(group_aactype);
-	DeleteObject(option_aactype_low);
-	DeleteObject(option_aactype_he);
-	DeleteObject(option_aactype_hev2);
-	DeleteObject(option_aactype_ld);
-	DeleteObject(option_aactype_eld);
 	DeleteObject(group_mp4);
 	DeleteObject(option_mp4);
 	DeleteObject(option_aac);
@@ -248,6 +226,9 @@ BoCA::ConfigureFDKAAC::~ConfigureFDKAAC()
 	DeleteObject(text_note);
 	DeleteObject(text_id3v2);
 
+	DeleteObject(group_codec);
+	DeleteObject(text_codec);
+	DeleteObject(combo_codec);
 	DeleteObject(group_bitrate);
 	DeleteObject(option_bitrate);
 	DeleteObject(slider_bitrate);
@@ -272,6 +253,8 @@ Int BoCA::ConfigureFDKAAC::SaveSettings()
 	if (bitrate <	8) bitrate =   8;
 	if (bitrate > 256) bitrate = 256;
 
+	Int	 aacType = codecs.GetNth(combo_codec->GetSelectedEntryNumber());
+
 	if (aacType != AOT_AAC_LC &&
 	    aacType != AOT_ER_AAC_LD) bandwidth = previousBandwidth;
 
@@ -290,29 +273,42 @@ Int BoCA::ConfigureFDKAAC::SaveSettings()
 	return Success();
 }
 
-Void BoCA::ConfigureFDKAAC::SetMPEGVersion()
+Void BoCA::ConfigureFDKAAC::FillCodecs()
 {
-	if (mpegVersion == 0) // MPEG4;
-	{
-		option_aactype_ld->Activate();
-		option_aactype_eld->Activate();
-	}
-	else if (mpegVersion == 127) // MPEG2;
-	{
-		if (aacType == AOT_ER_AAC_LD || aacType == AOT_ER_AAC_ELD)
-		{
-			aacType = AOT_AAC_LC;
+	LIB_INFO	 info[FDK_MODULE_LAST];
 
-			OptionBox::internalCheckValues.Emit();
-		}
+	FDKinitLibInfo(info);
+	ex_aacEncGetLibInfo(info);
 
-		option_aactype_ld->Deactivate();
-		option_aactype_eld->Deactivate();
-	}
+	UINT	 sbrFlags = FDKlibInfo_getCapabilities(info, FDK_SBRENC);
+
+	codecs.RemoveAll();
+	combo_codec->RemoveAllEntries();
+
+					  { combo_codec->AddEntry("MPEG AAC Low Complexity");	  codecs.Add(AOT_AAC_LC);     }
+
+	if (sbrFlags			) { combo_codec->AddEntry("MPEG AAC High Efficiency");	  codecs.Add(AOT_SBR);	      }
+	if (sbrFlags & CAPF_SBR_PS_MPEG	) { combo_codec->AddEntry("MPEG AAC High Efficiency v2"); codecs.Add(AOT_PS);	      }
+
+	if (mpegVersion == 0		) { combo_codec->AddEntry("MPEG AAC Low Delay");	  codecs.Add(AOT_ER_AAC_LD);  }
+	if (mpegVersion == 0 && sbrFlags) { combo_codec->AddEntry("MPEG AAC Enhanced Low Delay"); codecs.Add(AOT_ER_AAC_ELD); }
 }
 
-Void BoCA::ConfigureFDKAAC::SetObjectType()
+Void BoCA::ConfigureFDKAAC::SetMPEGVersion()
 {
+	Int	 aacType = codecs.GetNth(combo_codec->GetSelectedEntryNumber());
+
+	FillCodecs();
+
+	if (mpegVersion == 127 && (aacType == AOT_ER_AAC_LD || aacType == AOT_ER_AAC_ELD)) aacType = AOT_AAC_LC;
+
+	foreach (Int codec, codecs) if (aacType == codec) combo_codec->SelectNthEntry(foreachindex);
+}
+
+Void BoCA::ConfigureFDKAAC::SetCodec()
+{
+	Int	 aacType = codecs.GetNth(combo_codec->GetSelectedEntryNumber());
+
 	if (aacType == AOT_ER_AAC_LD ||
 	    aacType == AOT_ER_AAC_ELD) option_version_mpeg2->Deactivate();
 	else			       option_version_mpeg2->Activate();
@@ -334,6 +330,7 @@ Void BoCA::ConfigureFDKAAC::SetObjectType()
 		bandwidth = 0;
 	}
 
+	SetQuality();
 	SetBandwidth();
 
 	/* Set bitrate range for AAC type.
@@ -342,22 +339,27 @@ Void BoCA::ConfigureFDKAAC::SetObjectType()
 	{
 		case AOT_AAC_LC:
 			slider_bitrate->SetRange(8, 256);
+			slider_quality->SetRange(3, 5);
 
 			break;
 		case AOT_SBR:
 			slider_bitrate->SetRange(8, 64);
+			slider_quality->SetRange(2, 5);
 
 			break;
 		case AOT_PS:
 			slider_bitrate->SetRange(8, 32);
+			slider_quality->SetRange(1, 5);
 
 			break;
 		case AOT_ER_AAC_LD:
 			slider_bitrate->SetRange(8, 256);
+			slider_quality->SetRange(3, 5);
 
 			break;
 		case AOT_ER_AAC_ELD:
 			slider_bitrate->SetRange(8, 256);
+			slider_quality->SetRange(1, 5);
 
 			break;
 	}
@@ -425,14 +427,11 @@ Void BoCA::ConfigureFDKAAC::SetFileFormat()
 
 		group_extension->Activate();
 
-		option_aactype_ld->Activate();
-		option_aactype_eld->Activate();
-
 		if (mpegVersion == 127) // MPEG2
 		{
 			mpegVersion = 0;
 
-			OptionBox::internalCheckValues.Emit();
+			SetMPEGVersion();
 		}
 	}
 	else			// raw AAC file format
