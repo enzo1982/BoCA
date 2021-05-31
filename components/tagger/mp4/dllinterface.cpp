@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,10 +26,7 @@ MP4TAGSFREE			 ex_MP4TagsFree			= NIL;
 
 MP4TAGSSETNAME			 ex_MP4TagsSetName		= NIL;
 MP4TAGSSETARTIST		 ex_MP4TagsSetArtist		= NIL;
-MP4TAGSSETALBUMARTIST		 ex_MP4TagsSetAlbumArtist	= NIL;
 MP4TAGSSETALBUM			 ex_MP4TagsSetAlbum		= NIL;
-MP4TAGSSETGROUPING		 ex_MP4TagsSetGrouping		= NIL;
-MP4TAGSSETCOMPOSER		 ex_MP4TagsSetComposer		= NIL;
 MP4TAGSSETCOMMENTS		 ex_MP4TagsSetComments		= NIL;
 MP4TAGSSETGENRE			 ex_MP4TagsSetGenre		= NIL;
 MP4TAGSSETGENRETYPE		 ex_MP4TagsSetGenreType		= NIL;
@@ -37,9 +34,7 @@ MP4TAGSSETRELEASEDATE		 ex_MP4TagsSetReleaseDate	= NIL;
 MP4TAGSSETTRACK			 ex_MP4TagsSetTrack		= NIL;
 MP4TAGSSETDISK			 ex_MP4TagsSetDisk		= NIL;
 MP4TAGSSETCOMPILATION		 ex_MP4TagsSetCompilation	= NIL;
-MP4TAGSSETCOPYRIGHT		 ex_MP4TagsSetCopyright		= NIL;
 MP4TAGSSETMEDIATYPE		 ex_MP4TagsSetMediaType		= NIL;
-MP4TAGSSETTEMPO			 ex_MP4TagsSetTempo		= NIL;
 MP4TAGSSETENCODINGTOOL		 ex_MP4TagsSetEncodingTool	= NIL;
 
 MP4TAGSADDARTWORK		 ex_MP4TagsAddArtwork		= NIL;
@@ -53,6 +48,8 @@ MP4ITMFITEMALLOC		 ex_MP4ItmfItemAlloc		= NIL;
 MP4ITMFITEMFREE			 ex_MP4ItmfItemFree		= NIL;
 MP4ITMFADDITEM			 ex_MP4ItmfAddItem		= NIL;
 MP4ITMFREMOVEITEM		 ex_MP4ItmfRemoveItem		= NIL;
+MP4ITMFGETITEMS			 ex_MP4ItmfGetItems		= NIL;
+MP4ITMFGETITEMSBYCODE		 ex_MP4ItmfGetItemsByCode	= NIL;
 MP4ITMFGETITEMSBYMEANING	 ex_MP4ItmfGetItemsByMeaning	= NIL;
 MP4ITMFITEMLISTFREE		 ex_MP4ItmfItemListFree		= NIL;
 
@@ -77,10 +74,7 @@ Bool LoadMP4v2DLL()
 
 	ex_MP4TagsSetName		= (MP4TAGSSETNAME) mp4v2dll->GetFunctionAddress("MP4TagsSetName");
 	ex_MP4TagsSetArtist		= (MP4TAGSSETARTIST) mp4v2dll->GetFunctionAddress("MP4TagsSetArtist");
-	ex_MP4TagsSetAlbumArtist	= (MP4TAGSSETALBUMARTIST) mp4v2dll->GetFunctionAddress("MP4TagsSetAlbumArtist");
 	ex_MP4TagsSetAlbum		= (MP4TAGSSETALBUM) mp4v2dll->GetFunctionAddress("MP4TagsSetAlbum");
-	ex_MP4TagsSetGrouping		= (MP4TAGSSETGROUPING) mp4v2dll->GetFunctionAddress("MP4TagsSetGrouping");
-	ex_MP4TagsSetComposer		= (MP4TAGSSETCOMPOSER) mp4v2dll->GetFunctionAddress("MP4TagsSetComposer");
 	ex_MP4TagsSetComments		= (MP4TAGSSETCOMMENTS) mp4v2dll->GetFunctionAddress("MP4TagsSetComments");
 	ex_MP4TagsSetGenre		= (MP4TAGSSETGENRE) mp4v2dll->GetFunctionAddress("MP4TagsSetGenre");
 	ex_MP4TagsSetGenreType		= (MP4TAGSSETGENRETYPE) mp4v2dll->GetFunctionAddress("MP4TagsSetGenreType");
@@ -88,9 +82,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4TagsSetTrack		= (MP4TAGSSETTRACK) mp4v2dll->GetFunctionAddress("MP4TagsSetTrack");
 	ex_MP4TagsSetDisk		= (MP4TAGSSETDISK) mp4v2dll->GetFunctionAddress("MP4TagsSetDisk");
 	ex_MP4TagsSetCompilation	= (MP4TAGSSETCOMPILATION) mp4v2dll->GetFunctionAddress("MP4TagsSetCompilation");
-	ex_MP4TagsSetCopyright		= (MP4TAGSSETCOPYRIGHT) mp4v2dll->GetFunctionAddress("MP4TagsSetCopyright");
 	ex_MP4TagsSetMediaType		= (MP4TAGSSETMEDIATYPE) mp4v2dll->GetFunctionAddress("MP4TagsSetMediaType");
-	ex_MP4TagsSetTempo		= (MP4TAGSSETTEMPO) mp4v2dll->GetFunctionAddress("MP4TagsSetTempo");
 	ex_MP4TagsSetEncodingTool	= (MP4TAGSSETENCODINGTOOL) mp4v2dll->GetFunctionAddress("MP4TagsSetEncodingTool");
 
 	ex_MP4TagsAddArtwork		= (MP4TAGSADDARTWORK) mp4v2dll->GetFunctionAddress("MP4TagsAddArtwork");
@@ -104,6 +96,8 @@ Bool LoadMP4v2DLL()
 	ex_MP4ItmfItemFree		= (MP4ITMFITEMFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemFree");
 	ex_MP4ItmfAddItem		= (MP4ITMFADDITEM) mp4v2dll->GetFunctionAddress("MP4ItmfAddItem");
 	ex_MP4ItmfRemoveItem		= (MP4ITMFREMOVEITEM) mp4v2dll->GetFunctionAddress("MP4ItmfRemoveItem");
+	ex_MP4ItmfGetItems		= (MP4ITMFGETITEMS) mp4v2dll->GetFunctionAddress("MP4ItmfGetItems");
+	ex_MP4ItmfGetItemsByCode	= (MP4ITMFGETITEMSBYCODE) mp4v2dll->GetFunctionAddress("MP4ItmfGetItemsByCode");
 	ex_MP4ItmfGetItemsByMeaning	= (MP4ITMFGETITEMSBYMEANING) mp4v2dll->GetFunctionAddress("MP4ItmfGetItemsByMeaning");
 	ex_MP4ItmfItemListFree		= (MP4ITMFITEMLISTFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemListFree");
 
@@ -120,10 +114,7 @@ Bool LoadMP4v2DLL()
 
 	    ex_MP4TagsSetName		== NIL ||
 	    ex_MP4TagsSetArtist		== NIL ||
-	    ex_MP4TagsSetAlbumArtist	== NIL ||
 	    ex_MP4TagsSetAlbum		== NIL ||
-	    ex_MP4TagsSetGrouping	== NIL ||
-	    ex_MP4TagsSetComposer	== NIL ||
 	    ex_MP4TagsSetComments	== NIL ||
 	    ex_MP4TagsSetGenre		== NIL ||
 	    ex_MP4TagsSetGenreType	== NIL ||
@@ -131,9 +122,7 @@ Bool LoadMP4v2DLL()
 	    ex_MP4TagsSetTrack		== NIL ||
 	    ex_MP4TagsSetDisk		== NIL ||
 	    ex_MP4TagsSetCompilation	== NIL ||
-	    ex_MP4TagsSetCopyright	== NIL ||
 	    ex_MP4TagsSetMediaType	== NIL ||
-	    ex_MP4TagsSetTempo		== NIL ||
 	    ex_MP4TagsSetEncodingTool	== NIL ||
 
 	    ex_MP4TagsAddArtwork	== NIL ||
@@ -147,6 +136,8 @@ Bool LoadMP4v2DLL()
 	    ex_MP4ItmfItemFree		== NIL ||
 	    ex_MP4ItmfAddItem		== NIL ||
 	    ex_MP4ItmfRemoveItem	== NIL ||
+	    ex_MP4ItmfGetItems		== NIL ||
+	    ex_MP4ItmfGetItemsByCode	== NIL ||
 	    ex_MP4ItmfGetItemsByMeaning	== NIL ||
 	    ex_MP4ItmfItemListFree	== NIL) { FreeMP4v2DLL(); return False; }
 

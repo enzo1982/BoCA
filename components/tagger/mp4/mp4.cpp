@@ -1,4 +1,4 @@
- /* BoCA - BonkEnc Component Architecture
+﻿ /* BoCA - BonkEnc Component Architecture
   * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
@@ -63,7 +63,10 @@ Void smooth::DetachDLL()
 	FreeMP4v2DLL();
 }
 
-const String	 BoCA::TaggerMP4::ConfigID = "Tags";
+const String	 BoCA::TaggerMP4::ConfigID		= "Tags";
+
+const String	 BoCA::TaggerMP4::ItmfMeaningiTunes	= "com.apple.iTunes";
+const String	 BoCA::TaggerMP4::ItmfMeaningReplayGain	= "org.hydrogenaudio.replaygain";
 
 const String	 BoCA::TaggerMP4::genres[192] =
       { "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz",
@@ -156,31 +159,6 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	if	(info.comment != NIL && !replaceExistingComments) ex_MP4TagsSetComments(mp4Tags, info.comment.Trim());
 	else if (defaultComment != NIL)				  ex_MP4TagsSetComments(mp4Tags, String(defaultComment).Trim());
 
-	/* Save other text info.
-	 */
-	foreach (const String &pair, info.other)
-	{
-		String	 key   = pair.Head(pair.Find(":"));
-		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
-
-		if (value == NIL) continue;
-
-		if	(key == INFO_ALBUMARTIST)  ex_MP4TagsSetAlbumArtist(mp4Tags, value.Trim());
-
-		else if	(key == INFO_CONTENTGROUP) ex_MP4TagsSetGrouping(mp4Tags,    value.Trim());
-
-		else if	(key == INFO_COMPOSER)     ex_MP4TagsSetComposer(mp4Tags,    value.Trim());
-
-		else if (key == INFO_BPM)
-		{
-			uint16_t	 tempo = value.ToInt();
-
-			ex_MP4TagsSetTempo(mp4Tags, &tempo);
-		}
-
-		else if	(key == INFO_COPYRIGHT)    ex_MP4TagsSetCopyright(mp4Tags,   value.Trim());
-	}
-
 	/* Save encoder version.
 	 */
 	Application	*app = Application::Get();
@@ -224,33 +202,57 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	ex_MP4TagsStore(mp4Tags, mp4File);
 	ex_MP4TagsFree(mp4Tags);
 
+	/* Save other metadata atoms.
+	 */
+	foreach (const String &pair, info.other)
+	{
+		String	 key   = pair.Head(pair.Find(":"));
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1).Trim();
+
+		if (value == NIL) continue;
+
+		if	(key == INFO_ALBUMARTIST)   AddItmfItem(mp4File,  "aART", NIL, NIL, value);
+
+		else if	(key == INFO_CONTENTGROUP)  AddItmfItem(mp4File, L"©grp", NIL, NIL, value);
+
+		else if	(key == INFO_COMPOSER)      AddItmfItem(mp4File, L"©wrt", NIL, NIL, value);
+
+		else if	(key == INFO_MOVEMENT)	    AddItmfItem(mp4File, L"©mvi", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
+		else if	(key == INFO_MOVEMENTTOTAL) AddItmfItem(mp4File, L"©mvc", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
+		else if	(key == INFO_MOVEMENTNAME)  AddItmfItem(mp4File, L"©mvn", NIL, NIL, value);
+
+		else if (key == INFO_BPM)	    AddItmfItem(mp4File,  "tmpo", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
+
+		else if	(key == INFO_COPYRIGHT)     AddItmfItem(mp4File,  "cprt", NIL, NIL, value);
+	}
+
 	/* Save generic iTunes metadata.
 	 */
-	if (info.label != NIL) AddItmfItem(mp4File, "LABEL", info.label);
-	if (info.isrc  != NIL) AddItmfItem(mp4File, "ISRC",  info.isrc);
+	if (info.label != NIL) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LABEL", info.label);
+	if (info.isrc  != NIL) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ISRC",  info.isrc, MP4_ITMF_BT_ISRC);
 
 	foreach (const String &pair, info.other)
 	{
 		String	 key   = pair.Head(pair.Find(":"));
-		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1).Trim();
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_SUBTITLE)	    AddItmfItem(mp4File, "SUBTITLE",	  value);
+		if	(key == INFO_SUBTITLE)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "SUBTITLE",	     value);
 
-		else if	(key == INFO_CONDUCTOR)     AddItmfItem(mp4File, "CONDUCTOR",	  value);
-		else if	(key == INFO_REMIXER)	    AddItmfItem(mp4File, "REMIXER",	  value);
-		else if	(key == INFO_LYRICIST)	    AddItmfItem(mp4File, "LYRICIST",	  value);
-		else if	(key == INFO_PRODUCER)	    AddItmfItem(mp4File, "PRODUCER",	  value);
-		else if	(key == INFO_ENGINEER)	    AddItmfItem(mp4File, "ENGINEER",	  value);
+		else if	(key == INFO_CONDUCTOR)     AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CONDUCTOR",     value);
+		else if	(key == INFO_REMIXER)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "REMIXER",	     value);
+		else if	(key == INFO_LYRICIST)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LYRICIST",	     value);
+		else if	(key == INFO_PRODUCER)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "PRODUCER",	     value);
+		else if	(key == INFO_ENGINEER)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ENGINEER",	     value);
 
-		else if	(key == INFO_INITIALKEY)    AddItmfItem(mp4File, "initialkey",	  value);
+		else if	(key == INFO_INITIALKEY)    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "initialkey",    value);
 
-		else if	(key == INFO_MEDIATYPE)	    AddItmfItem(mp4File, "MEDIA",	  value);
-		else if	(key == INFO_CATALOGNUMBER) AddItmfItem(mp4File, "CATALOGNUMBER", value);
-		else if	(key == INFO_BARCODE)	    AddItmfItem(mp4File, "BARCODE",	  value);
+		else if	(key == INFO_MEDIATYPE)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MEDIA",	     value);
+		else if	(key == INFO_CATALOGNUMBER) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CATALOGNUMBER", value);
+		else if	(key == INFO_BARCODE)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "BARCODE",	     value);
 
-		else if	(key == INFO_DISCSUBTITLE)  AddItmfItem(mp4File, "DISCSUBTITLE",  value);
+		else if	(key == INFO_DISCSUBTITLE)  AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE",  value);
 	}
 
 	/* Save Replay Gain info.
@@ -259,14 +261,14 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	{
 		if (info.track_gain != NIL && info.track_peak != NIL)
 		{
-			AddItmfItem(mp4File, "replaygain_track_gain", info.track_gain);
-			AddItmfItem(mp4File, "replaygain_track_peak", info.track_peak);
+			AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "replaygain_track_gain", info.track_gain);
+			AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "replaygain_track_peak", info.track_peak);
 		}
 
 		if (info.album_gain != NIL && info.album_peak != NIL)
 		{
-			AddItmfItem(mp4File, "replaygain_album_gain", info.album_gain);
-			AddItmfItem(mp4File, "replaygain_album_peak", info.album_peak);
+			AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "replaygain_album_gain", info.album_gain);
+			AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "replaygain_album_peak", info.album_peak);
 		}
 	}
 
@@ -314,23 +316,42 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	return Success();
 }
 
-Bool BoCA::TaggerMP4::AddItmfItem(MP4FileHandle mp4File, const String &id, const String &value)
+Bool BoCA::TaggerMP4::AddItmfItem(MP4FileHandle mp4File, const String &code, const String &meaning, const String &id, const String &value, MP4ItmfBasicType type)
 {
 	/* Add iTunes metadata item.
 	 */
-	MP4ItmfItem	*item = ex_MP4ItmfItemAlloc("----", 1);
+	MP4ItmfItem	*item = ex_MP4ItmfItemAlloc(code.ConvertTo("ISO-8859-1"), 1);
+	Buffer<uint8_t>	 buffer(2);
 
-	item->mean = (char *) "com.apple.iTunes";
+	item->mean = meaning;
 	item->name = id;
 
-	item->dataList.elements[0].typeCode  = MP4_ITMF_BT_UTF8;
-	item->dataList.elements[0].value     = (uint8_t *) value.ConvertTo("UTF-8");
-	item->dataList.elements[0].valueSize = strlen((char *) item->dataList.elements[0].value);
+	item->dataList.elements[0].typeCode  = type;
 
-	if (id == "ISRC") item->dataList.elements[0].typeCode = MP4_ITMF_BT_ISRC;
+	if (type == MP4_ITMF_BT_UTF8 ||
+	    type == MP4_ITMF_BT_URL ||
+	    type == MP4_ITMF_BT_ISRC)
+	{
+		item->dataList.elements[0].value     = (uint8_t *) value.ConvertTo("UTF-8");
+		item->dataList.elements[0].valueSize = strlen((char *) item->dataList.elements[0].value);
+	}
+	else if (type == MP4_ITMF_BT_INTEGER)
+	{
+		Int	 number = value.ToInt();
+		Int	 size	= 2;
+
+		for (Int i = 0; i < size; i++)
+		{
+			buffer[i] = (number >> 8 * (size - i - 1)) & 0xFF;
+		}
+
+		item->dataList.elements[0].value     = buffer;
+		item->dataList.elements[0].valueSize = size;
+	}
 
 	ex_MP4ItmfAddItem(mp4File, item);
 
+	item->code = NIL;
 	item->mean = NIL;
 	item->name = NIL;
 
@@ -364,16 +385,6 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 	if	(mp4Tags->releaseDate != NIL) info.year    = String(mp4Tags->releaseDate).Trim().ToInt();
 	if	(mp4Tags->album	      != NIL) info.album   = String(mp4Tags->album).Trim();
 	if	(mp4Tags->comments    != NIL) info.comment = String(mp4Tags->comments).Trim();
-
-	if	(mp4Tags->albumArtist != NIL) info.SetOtherInfo(INFO_ALBUMARTIST,  String(mp4Tags->albumArtist).Trim());
-
-	if	(mp4Tags->grouping    != NIL) info.SetOtherInfo(INFO_CONTENTGROUP, String(mp4Tags->grouping).Trim());
-
-	if	(mp4Tags->composer    != NIL) info.SetOtherInfo(INFO_COMPOSER,	   String(mp4Tags->composer).Trim());
-
-	if	(mp4Tags->tempo	      != NIL) info.SetOtherInfo(INFO_BPM,	   String::FromInt(*mp4Tags->tempo));
-
-	if	(mp4Tags->copyright   != NIL) info.SetOtherInfo(INFO_COPYRIGHT,	   String(mp4Tags->copyright).Trim());
 
 	if	(mp4Tags->genre	      != NIL) info.genre   = String(mp4Tags->genre).Trim();
 	else if (mp4Tags->genreType   != NIL) info.genre   = GetID3CategoryName(*mp4Tags->genreType - 1);
@@ -505,9 +516,49 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 {
 	String::InputFormat	 inputFormat("UTF-8");
 
+	/* Look for known atoms.
+	 */
+	MP4ItmfItemList	*items = ex_MP4ItmfGetItems(mp4File);
+
+	if (items != NIL)
+	{
+		/* Loop over items.
+		 */
+		for (UnsignedInt i = 0; i < items->size; i++)
+		{
+			MP4ItmfItem	 item = items->elements[i];
+
+			/* Read and assign value string.
+			 */
+			String	 code;
+
+			code.ImportFrom("ISO-8859-1", item.code);
+
+			String	 value = GetItmfItemValue(item);
+
+			if (value == NIL) continue;
+
+			else if	(code ==  "aART") info.SetOtherInfo(INFO_ALBUMARTIST,	value);
+
+			else if	(code == L"©grp") info.SetOtherInfo(INFO_CONTENTGROUP,	value);
+
+			else if	(code == L"©wrt") info.SetOtherInfo(INFO_COMPOSER,	value);
+
+			if	(code == L"©mvi") info.SetOtherInfo(INFO_MOVEMENT,      value);
+			else if (code == L"©mvc") info.SetOtherInfo(INFO_MOVEMENTTOTAL, value);
+			else if	(code == L"©mvn") info.SetOtherInfo(INFO_MOVEMENTNAME,  value);
+
+			else if	(code ==  "tmpo") info.SetOtherInfo(INFO_BPM,		value);
+
+			else if	(code ==  "cprt") info.SetOtherInfo(INFO_COPYRIGHT,	value);
+		}
+
+		ex_MP4ItmfItemListFree(items);
+	}
+
 	/* Look for iTunes metadata items.
 	 */
-	MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", NIL);
+	items = ex_MP4ItmfGetItemsByMeaning(mp4File, ItmfMeaningiTunes, NIL);
 
 	if (items != NIL)
 	{
@@ -520,7 +571,7 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 			/* Read and assign value string.
 			 */
 			String	 id    = String(item.name).ToUpper();
-			String	 value = GetItmfItemValue(item);
+			String	 value = GetItmfItemValue(item).Trim();
 
 			if (value == NIL) continue;
 
@@ -559,7 +610,7 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 	/* Look for Replay Gain items.
 	 */
-	items = ex_MP4ItmfGetItemsByMeaning(mp4File, "org.hydrogenaudio.replaygain", NIL);
+	items = ex_MP4ItmfGetItemsByMeaning(mp4File, ItmfMeaningReplayGain, NIL);
 
 	if (items != NIL)
 	{
@@ -597,22 +648,36 @@ String BoCA::TaggerMP4::GetItmfItemValue(MP4ItmfItem &item)
 
 	/* Check type code.
 	 */
-	if (item.dataList.elements[0].typeCode != MP4_ITMF_BT_UTF8 &&
-	    item.dataList.elements[0].typeCode != MP4_ITMF_BT_URL  &&
-	    item.dataList.elements[0].typeCode != MP4_ITMF_BT_ISRC) return NIL;
+	if (item.dataList.elements[0].typeCode == MP4_ITMF_BT_UTF8 ||
+	    item.dataList.elements[0].typeCode == MP4_ITMF_BT_URL  ||
+	    item.dataList.elements[0].typeCode == MP4_ITMF_BT_ISRC)
+	{
+		/* Read value into buffer.
+		 */
+		Buffer<char>	 buffer(item.dataList.elements[0].valueSize + 1);
 
-	/* Read value into buffer.
-	 */
-	Buffer<char>	 buffer(item.dataList.elements[0].valueSize + 1);
+		memset(buffer, 0, item.dataList.elements[0].valueSize + 1);
+		memcpy(buffer, item.dataList.elements[0].value, item.dataList.elements[0].valueSize);
 
-	memset(buffer, 0, item.dataList.elements[0].valueSize + 1);
-	memcpy(buffer, item.dataList.elements[0].value, item.dataList.elements[0].valueSize);
+		/* Return actual value.
+		 */
+		String::InputFormat	 inputFormat("UTF-8");
 
-	/* Return actual value.
-	 */
-	String::InputFormat	 inputFormat("UTF-8");
+		return String(buffer);
+	}
+	else if (item.dataList.elements[0].typeCode == MP4_ITMF_BT_INTEGER)
+	{
+		Int64	 value = 0;
 
-	return String(buffer);
+		for (UnsignedInt i = 0; i < item.dataList.elements[0].valueSize; i++)
+		{
+			value |= item.dataList.elements[0].value[i] << (8 * (item.dataList.elements[0].valueSize - i - 1));
+		}
+
+		return String::FromInt(value);
+	}
+
+	return NIL;
 }
 
 Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &track)
@@ -633,11 +698,6 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	ex_MP4TagsSetTrack(mp4Tags, NIL);
 	ex_MP4TagsSetDisk(mp4Tags, NIL);
 	ex_MP4TagsSetReleaseDate(mp4Tags, NIL);
-	ex_MP4TagsSetAlbumArtist(mp4Tags, NIL);
-	ex_MP4TagsSetGrouping(mp4Tags, NIL);
-	ex_MP4TagsSetComposer(mp4Tags, NIL);
-	ex_MP4TagsSetTempo(mp4Tags, NIL);
-	ex_MP4TagsSetCopyright(mp4Tags, NIL);
 	ex_MP4TagsSetGenre(mp4Tags, NIL);
 	ex_MP4TagsSetGenreType(mp4Tags, NIL);
 	ex_MP4TagsSetComments(mp4Tags, NIL);
@@ -651,26 +711,42 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 
 	ex_MP4TagsFree(mp4Tags);
 
+	/* Remove known atoms.
+	 */
+	RemoveItmfItem(mp4File,  "aART");
+
+	RemoveItmfItem(mp4File, L"©grp");
+
+	RemoveItmfItem(mp4File, L"©wrt");
+
+	RemoveItmfItem(mp4File, L"©mvi");
+	RemoveItmfItem(mp4File, L"©mvc");
+	RemoveItmfItem(mp4File, L"©mvn");
+
+	RemoveItmfItem(mp4File,  "tmpo");
+
+	RemoveItmfItem(mp4File,  "cprt");
+
 	/* Remove iTunes metadata items too.
 	 */
-	RemoveItmfItem(mp4File, "LABEL");
-	RemoveItmfItem(mp4File, "ISRC");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "LABEL");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "ISRC");
 
-	RemoveItmfItem(mp4File, "SUBTITLE");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "SUBTITLE");
 
-	RemoveItmfItem(mp4File, "CONDUCTOR");
-	RemoveItmfItem(mp4File, "REMIXER");
-	RemoveItmfItem(mp4File, "LYRICIST");
-	RemoveItmfItem(mp4File, "PRODUCER");
-	RemoveItmfItem(mp4File, "ENGINEER");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "CONDUCTOR");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "REMIXER");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "LYRICIST");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "PRODUCER");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "ENGINEER");
 
-	RemoveItmfItem(mp4File, "initialkey");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "initialkey");
 
-	RemoveItmfItem(mp4File, "MEDIA");
-	RemoveItmfItem(mp4File, "CATALOGNUMBER");
-	RemoveItmfItem(mp4File, "BARCODE");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MEDIA");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "CATALOGNUMBER");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "BARCODE");
 
-	RemoveItmfItem(mp4File, "DISCSUBTITLE");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE");
 
 	ex_MP4Close(mp4File, 0);
 
@@ -681,11 +757,14 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	return Success();
 }
 
-Bool BoCA::TaggerMP4::RemoveItmfItem(MP4FileHandle mp4File, const String &id)
+Bool BoCA::TaggerMP4::RemoveItmfItem(MP4FileHandle mp4File, const String &code, const String &meaning, const String &id)
 {
 	/* Look for iTunes metadata items.
 	 */
-	MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", id);
+	MP4ItmfItemList	*items = NIL;
+
+	if (code == "----") items = ex_MP4ItmfGetItemsByMeaning(mp4File, meaning, id);
+	else		    items = ex_MP4ItmfGetItemsByCode(mp4File, code.ConvertTo("ISO-8859-1"));
 
 	if (items == NIL) return True;
 

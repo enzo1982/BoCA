@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,15 +22,18 @@ namespace BoCA
 		private:
 			static const String	 ConfigID;
 
+			static const String	 ItmfMeaningiTunes;
+			static const String	 ItmfMeaningReplayGain;
+
 			static const String	 genres[192];
 
 			ConfigLayer		*configLayer;
 
-			Bool			 AddItmfItem(MP4FileHandle, const String &, const String &);
-			Bool			 RemoveItmfItem(MP4FileHandle, const String &);
+			static Bool		 AddItmfItem(MP4FileHandle, const String &, const String &, const String &, const String &, MP4ItmfBasicType = MP4_ITMF_BT_UTF8);
+			static Bool		 RemoveItmfItem(MP4FileHandle, const String &, const String & = NIL, const String & = NIL);
 
-			Bool			 ParseItmfItems(MP4FileHandle, Info &);
-			String			 GetItmfItemValue(MP4ItmfItem &);
+			static Bool		 ParseItmfItems(MP4FileHandle, Info &);
+			static String		 GetItmfItemValue(MP4ItmfItem &);
 
 			static const String	&GetID3CategoryName(UnsignedInt);
 		public:
