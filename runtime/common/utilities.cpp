@@ -297,15 +297,25 @@ String BoCA::Utilities::NormalizeFileName(const String &fileName)
 	{
 		/* Shorten to at most maxLength characters.
 		 */
-		if	(foreachindex  < components.Length() - 1 && component.Length() > maxFolderLength) component[maxFolderLength] = 0;
-		else if (foreachindex == components.Length() - 1 && component.Length() > maxFileLength)	  component[maxFileLength]   = 0;
-
-		/* Replace trailing dots and spaces.
-		 */
-		if (component != ".." && component != ".")
+		if (foreachindex < components.Length() - 1)
 		{
-			if (foreachindex == components.Length() - 1) while (			       component.EndsWith(" ")) component[component.Length() - 1] = 0;
-			else					     while (component.EndsWith(".") || component.EndsWith(" ")) component[component.Length() - 1] = 0;
+			if (component.Length() > maxFolderLength) component[maxFolderLength] = 0;
+
+			/* Remove trailing dots and spaces.
+			 */
+			if (component != ".." && component != ".") while (component.EndsWith(".") || component.EndsWith(" ")) component[component.Length() - 1] = 0;
+		}
+		else if (foreachindex == components.Length() - 1)
+		{
+			String	 trimmed = component;
+
+			while (trimmed.EndsWith(" ")) trimmed[trimmed.Length() - 1] = 0;
+
+			if (component.Length() > maxFileLength) component[maxFileLength] = 0;
+
+			/* Remove trailing spaces if we cut the end off of the file name.
+			 */
+			if (component.Length() < trimmed.Length()) while (component.EndsWith(" ")) component[component.Length() - 1] = 0;
 		}
 
 		/* Append component back to path.
