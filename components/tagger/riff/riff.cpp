@@ -203,6 +203,8 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 		{
 			String	 value = in.InputString(length - 1).Trim();
 
+			if (IsStringUTF8(value)) value.ImportFrom("UTF-8", value.ConvertTo("ISO-8859-1"));
+
 			if	(id == "IART") info.artist  = value;
 			else if (id == "INAM") info.title   = value;
 			else if (id == "IPRD") info.album   = value;
@@ -357,4 +359,36 @@ Error BoCA::TaggerRIFF::ParseStreamInfo(const String &fileName, Track &track)
 	}
 
 	return Error();
+}
+
+Bool BoCA::TaggerRIFF::IsStringUTF8(const String &string)
+{
+	Bool	 result = False;
+	Int	 length = string.Length();
+
+	for (Int i = 0; i < length; i++)
+	{
+		if (			     string[i    ] <= 0x7F) {         continue; }
+
+		result = True;
+
+		if (i < length - 1				   &&
+		    string[i    ] >= 0xC0 && string[i    ] <= 0xDF &&
+		    string[i + 1] >= 0x80 && string[i + 1] <= 0xBF) { i += 1; continue; }
+
+		if (i < length - 2				   &&
+		    string[i    ] >= 0xE0 && string[i    ] <= 0xEF &&
+		    string[i + 1] >= 0x80 && string[i + 1] <= 0xBF &&
+		    string[i + 2] >= 0x80 && string[i + 2] <= 0xBF) { i += 2; continue; }
+
+		if (i < length - 3				   &&
+		    string[i    ] >= 0xF0 && string[i    ] <= 0xF7 &&
+		    string[i + 1] >= 0x80 && string[i + 1] <= 0xBF &&
+		    string[i + 2] >= 0x80 && string[i + 2] <= 0xBF &&
+		    string[i + 3] >= 0x80 && string[i + 3] <= 0xBF) { i += 3; continue; }
+
+		return False;
+	}
+
+	return result;
 }

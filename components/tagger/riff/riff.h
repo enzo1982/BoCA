@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,6 +20,8 @@ namespace BoCA
 	{
 		private:
 			static const String	 ConfigID;
+
+			static Bool		 IsStringUTF8(const String &);
 
 			Int			 RenderTagHeader(Buffer<UnsignedByte> &);
 			Int			 RenderTagItem(const String &, const String &, Buffer<UnsignedByte> &);
