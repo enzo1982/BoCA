@@ -176,6 +176,10 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 		 */
 		in.RelSeek(tagSize);
 	}
+	else
+	{
+		in.Seek(0);
+	}
 
 	/* Copy to temporary file and write tag.
 	 */
