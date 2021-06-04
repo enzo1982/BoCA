@@ -156,6 +156,20 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 {
 	InStream	 in(STREAM_FILE, fileName, IS_READ);
 
+	/* Check for RIFF or AIFF files (not currently supported).
+	 */
+	String	 magic = in.InputString(4);
+
+	if (magic == "RIFF" || magic == "FORM")
+	{
+		errorState  = True;
+		errorString = "Not supported";
+
+		return Error();
+	}
+
+	in.Seek(0);
+
 	/* Look for ID3v2 tag.
 	 */
 	if (in.InputString(3) == "ID3" && in.InputNumber(1) <= 4)
