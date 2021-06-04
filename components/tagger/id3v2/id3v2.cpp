@@ -369,6 +369,15 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 			container.AddFrame(frame);
 		}
 
+		else if	(key == INFO_MOVEMENT)
+		{
+			if (info.HasOtherInfo(INFO_MOVEMENTTOTAL)) value.Append("/").Append(info.GetOtherInfo(INFO_MOVEMENTTOTAL));
+
+			{ ID3_Frame frame(ID3FID_MOVEMENT); SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		}
+
+		else if	(key == INFO_MOVEMENTNAME)   { ID3_Frame frame(ID3FID_MOVEMENTNAME);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+
 		else if	(key == INFO_BPM)	     { ID3_Frame frame(ID3FID_BPM);		  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_INITIALKEY)     { ID3_Frame frame(ID3FID_INITIALKEY);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
@@ -562,6 +571,17 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_ORIGLYRICIST)	    info.SetOtherInfo(INFO_ORIG_LYRICIST,  GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_ORIGYEAR)	    info.SetOtherInfo(INFO_ORIG_YEAR,	   GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_ORIGRELEASETIME)   info.SetOtherInfo(INFO_ORIG_YEAR,	   GetStringField(frame, ID3FN_TEXT).Head(4));
+
+		else if (frame.GetID() == ID3FID_MOVEMENT)
+		{
+			String	 movementString = GetStringField(frame, ID3FN_TEXT);
+
+			info.SetOtherInfo(INFO_MOVEMENT, String::FromInt(movementString.ToInt()));
+
+			if (movementString.Contains("/")) info.SetOtherInfo(INFO_MOVEMENTTOTAL, movementString.Tail(movementString.Length() - movementString.Find("/") - 1));
+		}
+
+		else if (frame.GetID() == ID3FID_MOVEMENTNAME)	    info.SetOtherInfo(INFO_MOVEMENTNAME,   GetStringField(frame, ID3FN_TEXT));
 
 		else if (frame.GetID() == ID3FID_BPM)		    info.SetOtherInfo(INFO_BPM,		   GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_INITIALKEY)	    info.SetOtherInfo(INFO_INITIALKEY,	   GetStringField(frame, ID3FN_TEXT));

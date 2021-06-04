@@ -272,6 +272,8 @@ ID3_ENUM(ID3_FrameID)
   /* LINK */ ID3FID_LINKEDINFO,        /**< Linked information */
   /* MCDI */ ID3FID_CDID,              /**< Music CD identifier */
   /* MLLT */ ID3FID_MPEGLOOKUP,        /**< MPEG location lookup table */
+  /* MVIN */ ID3FID_MOVEMENT,          /**< Movement number */
+  /* MVNM */ ID3FID_MOVEMENTNAME,      /**< Movement name */
   /* OWNE */ ID3FID_OWNERSHIP,         /**< Ownership frame */
   /* PRIV */ ID3FID_PRIVATE,           /**< Private frame */
   /* PCNT */ ID3FID_PLAYCOUNTER,       /**< Play counter */

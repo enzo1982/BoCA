@@ -1174,6 +1174,8 @@ static ID3_FieldDef ID3FD_SyncLyrics[] =
 // GRID       ID3FID_GROUPINGREG       Group identification registration
 // IPLS  IPL  ID3FID_INVOLVEDPEOPLE    Involved people list
 // LINK  LNK  ID3FID_LINKEDINFO        Linked information
+// MVIN       ID3FID_MOVEMENT          Movement number
+// MVNM       ID3FID_MOVEMENTNAME      Movement name
 // PCNT  CNT  ID3FID_PLAYCOUNTER       Play counter
 // POPM  POP  ID3FID_POPULARIMETER     Popularimeter
 // PRIV       ID3FID_PRIVATE           Private frame
@@ -1317,6 +1319,8 @@ static ID3_FrameDef ID3_FrameDefs[] =
 	{ID3FID_LINKEDINFO,         "LNK", "LINK", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_LinkedInfo,      "Linked information"},
 	{ID3FID_CDID,               "MCI", "MCDI", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_Binary,          "Music CD identifier"},
 	{ID3FID_MPEGLOOKUP,         "MLL", "MLLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, true,  ID3FD_Unimplemented,   "MPEG location lookup table"},
+	{ID3FID_MOVEMENT,           ""   , "MVIN", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Movement number"},
+	{ID3FID_MOVEMENTNAME,       ""   , "MVNM", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Text,            "Movement name"},
 	{ID3FID_OWNERSHIP,          ""   , "OWNE", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Owner,           "Ownership frame"},
 	{ID3FID_PRIVATE,            ""   , "PRIV", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_Private,         "Private frame"},
 	{ID3FID_PLAYCOUNTER,        "CNT", "PCNT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_PlayCounter,     "Play counter"},
