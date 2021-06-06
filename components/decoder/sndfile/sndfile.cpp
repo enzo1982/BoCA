@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -69,6 +69,7 @@ const String &BoCA::DecoderSndFile::GetComponentSpecs()
 		      <extension>rf64</extension>				\
 		      <tag id=\"riff-tag\" mode=\"other\">RIFF INFO Tag</tag>	\
 		      <tag id=\"cart-tag\" mode=\"other\">RIFF Cart Tag</tag>	\
+		      <tag id=\"id3v2-tag\" mode=\"other\">ID3v2</tag>		\
 		    </format>							\
 		    <format>							\
 		      <name>Sun Audio Files</name>				\
@@ -306,10 +307,11 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 		InStream	 in(STREAM_FILE, streamURI, IS_READ);
 		String		 magic = in.InputString(4);
 
-		if (magic == "RIFF" || magic == "FORM")
+		if (magic == "RIFF" || magic == "RF64" || magic == "FORM")
 		{
-			UnsignedInt32	 rSize = (magic == "RIFF") ? in.InputNumber(4) : in.InputNumberRaw(4);
-			String		 type = in.InputString(4);
+			UnsignedInt32	 rSize = (magic != "FORM") ? in.InputNumber(4) : in.InputNumberRaw(4);
+			Int64		 dSize = -1;
+			String		 type  = in.InputString(4);
 
 			while (type == "WAVE" || type == "AIFF" || type == "AIFC")
 			{
@@ -318,7 +320,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 				/* Read next chunk.
 				 */
 				String		 chunk = in.InputString(4);
-				UnsignedInt32	 cSize = (magic == "RIFF") ? in.InputNumber(4) : in.InputNumberRaw(4);
+				UnsignedInt64	 cSize = (UnsignedInt32) (magic != "FORM" ? in.InputNumber(4) : in.InputNumberRaw(4));
 
 				if (chunk == "id3 " || chunk == "ID3 ")
 				{
@@ -339,10 +341,20 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 
 					break;
 				}
+				else if (chunk == "ds64")
+				{
+					in.RelSeek(8);
+
+					dSize = in.InputNumber(8);
+
+					in.RelSeek(-16);
+				}
 				else if (chunk == "data")
 				{
 					if (rSize == 0xFFFFFFFF || rSize == 0 ||
-					    cSize == 0xFFFFFFFF || cSize == 0) break;
+					    cSize == 0xFFFFFFFF || cSize == 0) cSize = in.Size() - in.GetPos();
+
+					if (dSize >= 0) cSize = dSize;
 				}
 
 				/* Skip chunk.
