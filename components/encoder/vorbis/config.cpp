@@ -70,10 +70,10 @@ BoCA::ConfigureVorbis::ConfigureVorbis()
 
 	text_quality		= new Text(i18n->AddColon(i18n->TranslateString("Quality")), Point(10, 16));
 
-	slider_quality		= new Slider(Point(text_quality->GetUnscaledTextWidth() + 18, 14), Size(289 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, -10, 100);
+	slider_quality		= new Slider(Point(text_quality->GetUnscaledTextWidth() + 18, 14), Size(289 - text_quality->GetUnscaledTextWidth(), 0), OR_HORZ, &quality, -20, 100);
 	slider_quality->onValueChange.Connect(&ConfigureVorbis::SetQuality, this);
 
-	if (ex_vorbis_version_string != NIL && String(ex_vorbis_version_string()).Contains("aoTuV")) slider_quality->SetRange(-20, 100);
+	if (ex_vorbis_version_string == NIL || !String(ex_vorbis_version_string()).Contains("aoTuV")) slider_quality->SetRange(-10, 100);
 
 	text_quality_value	= new Text(NIL, Point(313, 16));
 
