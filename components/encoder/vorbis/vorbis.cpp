@@ -22,7 +22,7 @@ const String &BoCA::EncoderVorbis::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (oggdll != NIL && vorbisdll != NIL)
+	if (oggdll != NIL && vorbisdll != NIL && vorbisencdll != NIL)
 	{
 		componentSpecs = "									\
 													\
