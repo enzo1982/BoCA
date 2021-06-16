@@ -354,13 +354,18 @@ Bool BoCA::EncoderSndFile::Deactivate()
 
 			if (tagger != NIL)
 			{
+				Int64	 size = driver->GetPos();
+
+				if (size % 8 > 0) for (Int i = 0; i < 8 - (size % 8); i++) driver->WriteData((unsigned char *) "", 1);
+
 				Buffer<unsigned char>	 tagBuffer;
 
 				tagger->SetConfiguration(config);
 				tagger->RenderBuffer(tagBuffer, track);
 
 				unsigned char	 guid[16] = { 'l', 'i', 's', 't', 0x2F, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB, 0x04, 0xC1, 0x00, 0x00 };
-				Int64		 size	  = tagBuffer.Size() + 16;
+
+				size = tagBuffer.Size() + 16;
 
 				driver->WriteData(guid, 16);
 
