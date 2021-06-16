@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -299,63 +299,185 @@ Error BoCA::TaggerCart::ParseStreamInfo(const String &fileName, Track &track)
 
 	/* Read RIFF chunk.
 	 */
-	String		 riff = in.InputString(4);
+	String		 riff  = in.InputString(4);
 
-	if (riff == "RIFF" || riff == "RF64")
+	if (riff != "RIFF" && riff != "RF64") return Error();
+
+	UnsignedInt32	 rSize = in.InputNumber(4);
+
+	in.RelSeek(4);
+
+	/* Find and parse cart chunk.
+	 */
+	Bool	 error = False;
+	String	 chunk;
+	Int64	 dSize = -1;
+
+	while (!error && chunk != "cart")
 	{
-		UnsignedInt32	 rSize = in.InputNumber(4);
+		if (in.GetPos() >= in.Size()) break;
 
-		in.RelSeek(4);
+		/* Read next chunk.
+		 */
+		chunk = in.InputString(4);
 
-		Bool	 error = False;
-		String	 chunk;
-		Int64	 dSize = -1;
+		UnsignedInt64	 cSize = (UnsignedInt32) in.InputNumber(4);
 
-		while (!error && chunk != "cart")
+		if (chunk == "cart")
 		{
-			if (in.GetPos() >= in.Size()) break;
+			Buffer<UnsignedByte>	 buffer(cSize + 8);
 
-			/* Read next chunk.
-			 */
-			chunk = in.InputString(4);
+			in.RelSeek(-8);
+			in.InputData(buffer, cSize + 8);
 
-			UnsignedInt64	 cSize = (UnsignedInt32) in.InputNumber(4);
-
-			if (chunk == "cart")
-			{
-				Buffer<UnsignedByte>	 buffer(cSize + 8);
-
-				in.RelSeek(-8);
-				in.InputData(buffer, cSize + 8);
-
-				if (ParseBuffer(buffer, track) != Success()) error = True;
-			}
-			else if (chunk == "ds64")
-			{
-				in.RelSeek(8);
-
-				dSize = in.InputNumber(8);
-
-				in.RelSeek(cSize - 16);
-			}
-			else if (chunk == "data")
-			{
-				if (rSize == 0xFFFFFFFF || rSize == 0 ||
-				    cSize == 0xFFFFFFFF || cSize == 0) cSize = in.Size() - in.GetPos();
-
-				if (dSize >= 0) in.RelSeek(dSize + dSize % 2);
-				else		in.RelSeek(cSize + cSize % 2);
-			}
-			else
-			{
-				/* Skip chunk.
-				 */
-				if (!in.RelSeek(cSize + cSize % 2)) error = True;
-			}
+			if (ParseBuffer(buffer, track) != Success()) error = True;
 		}
+		else if (chunk == "ds64")
+		{
+			in.RelSeek(8);
 
-		if (!error) return Success();
+			dSize = in.InputNumber(8);
+
+			in.RelSeek(cSize - 16);
+		}
+		else if (chunk == "data")
+		{
+			if (rSize == 0xFFFFFFFF || rSize == 0 ||
+			    cSize == 0xFFFFFFFF || cSize == 0) cSize = in.Size() - in.GetPos();
+
+			if (dSize >= 0) in.RelSeek(dSize + dSize % 2);
+			else		in.RelSeek(cSize + cSize % 2);
+		}
+		else
+		{
+			/* Skip chunk.
+			 */
+			if (!in.RelSeek(cSize + cSize % 2)) error = True;
+		}
 	}
 
-	return Error();
+	if (error) return Error();
+
+	return Success();
+}
+
+Error BoCA::TaggerCart::UpdateStreamInfo(const String &fileName, const Track &track)
+{
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
+
+	/* Read RIFF chunk.
+	 */
+	Bool		 error = False;
+	String		 riff  = in.InputString(4);
+
+	if (riff != "RIFF" && riff != "RF64") return Error();
+
+	/* Create output file.
+	 */
+	OutStream	 out(STREAM_FILE, fileName.Append(".temp"), OS_REPLACE);
+
+	UnsignedInt32	 rSize	 = in.InputNumber(4);
+	UnsignedInt32	 rFormat = in.InputNumber(4);
+
+	out.OutputString(riff);
+	out.OutputNumber(rSize, 4);
+	out.OutputNumber(rFormat, 4);
+
+	Int64			 dSize = -1;
+	Buffer<UnsignedByte>	 buffer(131072);
+
+	while (!error)
+	{
+		if (in.GetPos() >= in.Size()) break;
+
+		/* Read next chunk.
+		 */
+		String		 chunk = in.InputString(4);
+		UnsignedInt64	 cSize = (UnsignedInt32) in.InputNumber(4);
+
+		if (chunk == "cart")
+		{
+			/* Skip cart chunk.
+			 */
+			if (!in.RelSeek(cSize + cSize % 2)) error = True;
+
+			continue;
+		}
+
+		out.OutputString(chunk);
+		out.OutputNumber(cSize, 4);
+
+		if (chunk == "ds64")
+		{
+			in.RelSeek(8);
+
+			dSize = in.InputNumber(8);
+
+			in.RelSeek(-16);
+		}
+		else if (chunk == "data")
+		{
+			if (rSize == 0xFFFFFFFF || rSize == 0 ||
+			    cSize == 0xFFFFFFFF || cSize == 0) error = True;
+
+			if (dSize >= 0) cSize = dSize;
+		}
+
+		/* Write chunk data to output file.
+		 */
+		cSize += cSize % 2;
+
+		while (!error && cSize > 0)
+		{
+			Int64	 bytes = Math::Min(cSize, buffer.Size());
+
+			in.InputData(buffer, bytes);
+			out.OutputData(buffer, bytes);
+
+			cSize -= bytes;
+		}
+	}
+
+	/* Write new metadata.
+	 */
+	if (!error)
+	{
+		/* Write cart chunk.
+		 */
+		buffer.Resize(0);
+
+		RenderBuffer(buffer, track);
+
+		out.OutputData(buffer, buffer.Size());
+
+		/* Update file size.
+		 */
+		UnsignedInt64	 fileSize = out.GetPos() - 8;
+
+		rSize = Math::Min(0xFFFFFFFF, fileSize);
+
+		out.Seek(4);
+		out.OutputNumber(rSize, 4);
+	}
+
+	/* Check for error.
+	 */
+	if (error)
+	{
+		out.Close();
+
+		File(fileName.Append(".temp")).Delete();
+
+		return Error();
+	}
+
+	/* Clean up.
+	 */
+	in.Close();
+	out.Close();
+
+	File(fileName).Delete();
+	File(fileName.Append(".temp")).Move(fileName);
+
+	return Success();
 }

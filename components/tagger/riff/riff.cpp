@@ -251,15 +251,19 @@ Error BoCA::TaggerRIFF::ParseStreamInfo(const String &fileName, Track &track)
 
 	/* Read RIFF chunk.
 	 */
-	String		 riff = in.InputString(4);
+	Bool		 error = False;
+	String		 riff  = in.InputString(4);
 
+	if (riff != "RIFF" && riff != "RF64" && riff != "riff") return Error();
+
+	/* Check file format.
+	 */
 	if (riff == "RIFF" || riff == "RF64")
 	{
 		UnsignedInt32	 rSize = in.InputNumber(4);
 
 		in.RelSeek(4);
 
-		Bool	 error = False;
 		String	 chunk;
 		Int64	 dSize = -1;
 
@@ -305,8 +309,6 @@ Error BoCA::TaggerRIFF::ParseStreamInfo(const String &fileName, Track &track)
 				if (!in.RelSeek(cSize + cSize % 2)) error = True;
 			}
 		}
-
-		if (!error) return Success();
 	}
 	else if (riff == "riff")
 	{
@@ -315,7 +317,6 @@ Error BoCA::TaggerRIFF::ParseStreamInfo(const String &fileName, Track &track)
 
 		in.RelSeek(-4);
 
-		Bool		 error = False;
 		unsigned char	 guid[16];
 
 		in.InputData(guid, 16);
@@ -354,11 +355,223 @@ Error BoCA::TaggerRIFF::ParseStreamInfo(const String &fileName, Track &track)
 				if (!in.RelSeek(cSize - 24 + (cSize % 8 > 0 ? 8 - (cSize % 8) : 0))) error = True;
 			}
 		}
-
-		if (!error) return Success();
 	}
 
-	return Error();
+	if (error) return Error();
+
+	return Success();
+}
+
+Error BoCA::TaggerRIFF::UpdateStreamInfo(const String &fileName, const Track &track)
+{
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
+
+	/* Read RIFF chunk.
+	 */
+	Bool		 error = False;
+	String		 riff  = in.InputString(4);
+
+	if (riff != "RIFF" && riff != "RF64" && riff != "riff") return Error();
+
+	/* Create output file.
+	 */
+	OutStream	 out(STREAM_FILE, fileName.Append(".temp"), OS_REPLACE);
+
+	if (riff == "RIFF" || riff == "RF64")
+	{
+		UnsignedInt32	 rSize	 = in.InputNumber(4);
+		UnsignedInt32	 rFormat = in.InputNumber(4);
+
+		out.OutputString(riff);
+		out.OutputNumber(rSize, 4);
+		out.OutputNumber(rFormat, 4);
+
+		Int64			 dSize = -1;
+		Buffer<UnsignedByte>	 buffer(131072);
+
+		while (!error)
+		{
+			if (in.GetPos() >= in.Size()) break;
+
+			/* Read next chunk.
+			 */
+			String		 chunk = in.InputString(4);
+			UnsignedInt64	 cSize = (UnsignedInt32) in.InputNumber(4);
+
+			if (chunk == "LIST")
+			{
+				/* Skip LIST chunk.
+				 */
+				if (!in.RelSeek(cSize + cSize % 2)) error = True;
+
+				continue;
+			}
+
+			out.OutputString(chunk);
+			out.OutputNumber(cSize, 4);
+
+			if (chunk == "ds64")
+			{
+				in.RelSeek(8);
+
+				dSize = in.InputNumber(8);
+
+				in.RelSeek(-16);
+			}
+			else if (chunk == "data")
+			{
+				if (rSize == 0xFFFFFFFF || rSize == 0 ||
+				    cSize == 0xFFFFFFFF || cSize == 0) error = True;
+
+				if (dSize >= 0) cSize = dSize;
+			}
+
+			/* Write chunk data to output file.
+			 */
+			cSize += cSize % 2;
+
+			while (!error && cSize > 0)
+			{
+				Int64	 bytes = Math::Min(cSize, buffer.Size());
+
+				in.InputData(buffer, bytes);
+				out.OutputData(buffer, bytes);
+
+				cSize -= bytes;
+			}
+		}
+
+		/* Write new metadata.
+		 */
+		if (!error)
+		{
+			/* Write LIST chunk.
+			 */
+			buffer.Resize(0);
+
+			RenderBuffer(buffer, track);
+
+			out.OutputData(buffer, buffer.Size());
+
+			/* Update file size.
+			 */
+			UnsignedInt64	 fileSize = out.GetPos() - 8;
+
+			rSize = Math::Min(0xFFFFFFFF, fileSize);
+
+			out.Seek(4);
+			out.OutputNumber(rSize, 4);
+		}
+	}
+	else if (riff == "riff")
+	{
+		static unsigned char	 guidRIFF[16] = { 'r', 'i', 'f', 'f', 0x2E, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB, 0x04, 0xC1, 0x00, 0x00 };
+		static unsigned char	 guidLIST[16] = { 'l', 'i', 's', 't', 0x2F, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB, 0x04, 0xC1, 0x00, 0x00 };
+
+		in.RelSeek(-4);
+
+		unsigned char	 guid[16];
+
+		in.InputData(guid, 16);
+
+		if (memcmp(guid, guidRIFF, 16) != 0) error = True;
+
+		out.OutputData(guidRIFF, 16);
+
+		UnsignedInt64	 rSize = in.InputNumber(8);
+
+		in.InputData(guid, 16);
+
+		out.OutputNumber(rSize, 8);
+		out.OutputData(guid, 16);
+
+		Buffer<UnsignedByte>	 buffer(131072);
+
+		while (!error)
+		{
+			if (in.GetPos() >= in.Size()) break;
+
+			/* Read next chunk.
+			 */
+			in.InputData(guid, 16);
+
+			Int64	 cSize = in.InputNumber(8);
+
+			if (memcmp(guid, guidLIST, 16) == 0)
+			{
+				/* Skip LIST chunk.
+				 */
+				if (!in.RelSeek(cSize - 24 + (cSize % 8 > 0 ? 8 - (cSize % 8) : 0))) error = True;
+
+				continue;
+			}
+
+			out.OutputData(guid, 16);
+			out.OutputNumber(cSize, 8);
+
+			/* Write chunk data to output file.
+			 */
+			cSize += (cSize % 8 > 0 ? 8 - (cSize % 8) : 0);
+			cSize -= 24;
+
+			while (!error && cSize > 0)
+			{
+				Int64	 bytes = Math::Min(cSize, buffer.Size());
+
+				in.InputData(buffer, bytes);
+				out.OutputData(buffer, bytes);
+
+				cSize -= bytes;
+			}
+		}
+
+		/* Write new metadata.
+		 */
+		if (!error)
+		{
+			/* Write LIST chunk.
+			 */
+			buffer.Resize(0);
+
+			RenderBuffer(buffer, track);
+
+			Int64	 size = buffer.Size() + 16;
+
+			out.OutputData(guidLIST, 16);
+			out.OutputNumber(size, 8);
+			out.OutputData(buffer + 8, buffer.Size() - 8);
+
+			if (size % 8 > 0) out.OutputNumber(0, 8 - (size % 8));
+
+			/* Update file size.
+			 */
+			rSize = out.GetPos();
+
+			out.Seek(16);
+			out.OutputNumber(rSize, 8);
+		}
+	}
+
+	/* Check for error.
+	 */
+	if (error)
+	{
+		out.Close();
+
+		File(fileName.Append(".temp")).Delete();
+
+		return Error();
+	}
+
+	/* Clean up.
+	 */
+	in.Close();
+	out.Close();
+
+	File(fileName).Delete();
+	File(fileName.Append(".temp")).Move(fileName);
+
+	return Success();
 }
 
 Bool BoCA::TaggerRIFF::IsStringUTF8(const String &string)

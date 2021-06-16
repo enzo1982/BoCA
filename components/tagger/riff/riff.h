@@ -35,6 +35,8 @@ namespace BoCA
 			Error			 ParseStreamInfo(const String &, Track &);
 
 			Error			 RenderBuffer(Buffer<UnsignedByte> &, const Track &);
+
+			Error			 UpdateStreamInfo(const String &, const Track &);
 	};
 };
 
