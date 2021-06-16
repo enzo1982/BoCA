@@ -156,16 +156,15 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 {
 	InStream	 in(STREAM_FILE, fileName, IS_READ);
 
-	/* Check for RIFF or AIFF files (not currently supported).
+	/* Check for RIFF or AIFF files.
 	 */
 	String	 magic = in.InputString(4);
 
 	if (magic == "RIFF" || magic == "FORM")
 	{
-		errorState  = True;
-		errorString = "Not supported";
+		in.Close();
 
-		return Error();
+		return UpdateChunkedFileTag(fileName, track);
 	}
 
 	in.Seek(0);
@@ -227,6 +226,143 @@ Error BoCA::TaggerID3v2::UpdateStreamInfo(const String &fileName, const Track &t
 	}
 
 	return Error();
+}
+
+Error BoCA::TaggerID3v2::UpdateChunkedFileTag(const String &fileName, const Track &track)
+{
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
+
+	/* Read RIFF chunk.
+	 */
+	Bool		 error = False;
+	String		 riff  = in.InputString(4);
+
+	if (riff != "RIFF" && riff != "RF64" && riff != "FORM") return Error();
+
+	/* Create output file.
+	 */
+	OutStream	 out(STREAM_FILE, fileName.Append(".temp"), OS_REPLACE);
+
+	UnsignedInt32	 rSize	 = riff != "FORM" ? in.InputNumber(4) : in.InputNumberRaw(4);
+	UnsignedInt32	 rFormat = in.InputNumber(4);
+
+	out.OutputString(riff);
+
+	if (riff != "FORM") out.OutputNumber(rSize, 4);
+	else		    out.OutputNumberRaw(rSize, 4);
+
+	out.OutputNumber(rFormat, 4);
+
+	Int64			 dSize = -1;
+	Buffer<UnsignedByte>	 buffer(131072);
+
+	while (!error)
+	{
+		if (in.GetPos() >= in.Size()) break;
+
+		/* Read next chunk.
+		 */
+		String		 chunk = in.InputString(4);
+		UnsignedInt64	 cSize = (UnsignedInt32) (riff != "FORM" ? in.InputNumber(4) : in.InputNumberRaw(4));
+
+		if ((riff != "FORM" && chunk == "id3 ") ||
+		    (riff == "FORM" && chunk == "ID3 "))
+		{
+			/* Skip ID3 chunk.
+			 */
+			if (!in.RelSeek(cSize + cSize % 2)) error = True;
+
+			continue;
+		}
+
+		out.OutputString(chunk);
+
+		if (riff != "FORM") out.OutputNumber(cSize, 4);
+		else		    out.OutputNumberRaw(cSize, 4);
+
+		if (chunk == "ds64")
+		{
+			in.RelSeek(8);
+
+			dSize = in.InputNumber(8);
+
+			in.RelSeek(-16);
+		}
+		else if (chunk == "data")
+		{
+			if (rSize == 0xFFFFFFFF || rSize == 0 ||
+			    cSize == 0xFFFFFFFF || cSize == 0) error = True;
+
+			if (dSize >= 0) cSize = dSize;
+		}
+
+		/* Write chunk data to output file.
+		 */
+		cSize += cSize % 2;
+
+		while (!error && cSize > 0)
+		{
+			Int64	 bytes = Math::Min(cSize, buffer.Size());
+
+			in.InputData(buffer, bytes);
+			out.OutputData(buffer, bytes);
+
+			cSize -= bytes;
+		}
+	}
+
+	/* Write new metadata.
+	 */
+	if (!error)
+	{
+		/* Write ID3 chunk.
+		 */
+		buffer.Resize(0);
+
+		RenderBuffer(buffer, track);
+
+		if (riff != "FORM") out.OutputString("id3 ");
+		else		    out.OutputString("ID3 ");
+
+		Int	 size = buffer.Size();
+
+		if (riff != "FORM") out.OutputNumber(size, 4);
+		else		    out.OutputNumberRaw(size, 4);
+
+		out.OutputData(buffer, size);
+
+		/* Update file size.
+		 */
+		UnsignedInt64	 fileSize = out.GetPos() - 8;
+
+		rSize = Math::Min(0xFFFFFFFF, fileSize);
+
+		out.Seek(4);
+
+		if (riff != "FORM") out.OutputNumber(rSize, 4);
+		else		    out.OutputNumberRaw(rSize, 4);
+	}
+
+	/* Check for error.
+	 */
+	if (error)
+	{
+		out.Close();
+
+		File(fileName.Append(".temp")).Delete();
+
+		return Error();
+	}
+
+	/* Clean up.
+	 */
+	in.Close();
+	out.Close();
+
+	File(fileName).Delete();
+	File(fileName.Append(".temp")).Move(fileName);
+
+	return Success();
 }
 
 Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &track, Bool isChapter)
