@@ -22,7 +22,7 @@ extern DynamicLoader	*mp4v2dll;
 Bool			 LoadMP4v2DLL();
 Void			 FreeMP4v2DLL();
 
-typedef MP4FileHandle		(*MP4READ)			(const char *);
+typedef MP4FileHandle		(*MP4READPROVIDER)		(const char *, const MP4FileProvider *);
 typedef MP4FileHandle		(*MP4MODIFY)			(const char *, uint32_t);
 typedef void			(*MP4CLOSE)			(MP4FileHandle, uint32_t);
 typedef void			(*MP4FREE)			(void *);
@@ -62,7 +62,7 @@ typedef MP4ItmfItemList *	(*MP4ITMFGETITEMSBYCODE)	(MP4FileHandle, const char *)
 typedef MP4ItmfItemList *	(*MP4ITMFGETITEMSBYMEANING)	(MP4FileHandle, const char *, const char *);
 typedef void			(*MP4ITMFITEMLISTFREE)		(MP4ItmfItemList *);
 
-extern MP4READ			 ex_MP4Read;
+extern MP4READPROVIDER		 ex_MP4ReadProvider;
 extern MP4MODIFY		 ex_MP4Modify;
 extern MP4CLOSE			 ex_MP4Close;
 extern MP4FREE			 ex_MP4Free;

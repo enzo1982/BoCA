@@ -97,7 +97,7 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 
 	if (mp4v2dll != NIL && (in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
+		MP4FileHandle	 mp4File  = ex_MP4ReadProvider(streamURI.ConvertTo("UTF-8"), NIL);
 		Int		 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
@@ -146,7 +146,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
 
-		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
+		MP4FileHandle	 mp4File  = ex_MP4ReadProvider(streamURI.ConvertTo("UTF-8"), NIL);
 		Int		 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
@@ -411,7 +411,7 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		mp4File	 = ex_MP4Read(track.fileName.ConvertTo("UTF-8"));
+		mp4File	 = ex_MP4ReadProvider(track.fileName.ConvertTo("UTF-8"), NIL);
 		mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track == -1) return False;

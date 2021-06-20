@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -96,7 +96,7 @@ Bool BoCA::DecoderFAAD2::CanOpenStream(const String &streamURI)
 
 	if (mp4v2dll != NIL && (in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
+		MP4FileHandle	 mp4File  = ex_MP4ReadProvider(streamURI.ConvertTo("UTF-8"), NIL);
 		Int		 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
@@ -136,7 +136,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
 
-		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
+		MP4FileHandle	 mp4File  = ex_MP4ReadProvider(streamURI.ConvertTo("UTF-8"), NIL);
 		Int		 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
@@ -363,7 +363,7 @@ Bool BoCA::DecoderFAAD2::Activate()
 
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		mp4File	 = ex_MP4Read(track.fileName.ConvertTo("UTF-8"));
+		mp4File	 = ex_MP4ReadProvider(track.fileName.ConvertTo("UTF-8"), NIL);
 		mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track == -1) return False;

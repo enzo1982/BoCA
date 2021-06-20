@@ -370,7 +370,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	Info		 info	 = track.GetInfo();
 
-	MP4FileHandle	 mp4File = ex_MP4Read(fileName.ConvertTo("UTF-8"));
+	MP4FileHandle	 mp4File = ex_MP4ReadProvider(fileName.ConvertTo("UTF-8"), NIL);
 
 	if (mp4File == NIL) return Error();
 
