@@ -26,41 +26,41 @@ const String &BoCA::DecoderFLAC::GetComponentSpecs()
 
 	if (flacdll != NIL)
 	{
-		componentSpecs = "							\
-											\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
-		  <component>								\
-		    <name>FLAC Audio Decoder %VERSION%</name>				\
-		    <version>1.0</version>						\
-		    <id>flac-dec</id>							\
-		    <type>decoder</type>						\
-		    <format>								\
-		      <name>FLAC Files</name>						\
-		      <lossless>true</lossless>						\
-		      <extension>flac</extension>					\
-		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>		\
-		    </format>								\
-											\
+		componentSpecs = "								\
+												\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
+		  <component>									\
+		    <name>FLAC Audio Decoder %VERSION%</name>					\
+		    <version>1.0</version>							\
+		    <id>flac-dec</id>								\
+		    <type>decoder</type>							\
+		    <format>									\
+		      <name>FLAC Files</name>							\
+		      <lossless>true</lossless>							\
+		      <extension>flac</extension>						\
+		      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>			\
+		    </format>									\
+												\
 		";
 
 		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 && oggdll != NIL)
 		{
-			componentSpecs.Append("						\
-											\
-			    <format>							\
-			      <name>Ogg FLAC Files</name>				\
-			      <lossless>true</lossless>					\
-			      <extension>oga</extension>				\
-			      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>	\
-			    </format>							\
-											\
+			componentSpecs.Append("							\
+												\
+			    <format>								\
+			      <name>Ogg FLAC Files</name>					\
+			      <lossless>true</lossless>						\
+			      <extension>oga</extension>					\
+			      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>	\
+			    </format>								\
+												\
 			");
 		}
 
-		componentSpecs.Append("							\
-											\
-		  </component>								\
-											\
+		componentSpecs.Append("								\
+												\
+		  </component>									\
+												\
 		");
 
 		componentSpecs.Replace("%VERSION%", String("v").Append(*ex_FLAC__VERSION_STRING));

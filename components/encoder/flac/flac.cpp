@@ -49,7 +49,7 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 			      <name>Ogg FLAC Files</name>							\
 			      <lossless>true</lossless>								\
 			      <extension>oga</extension>							\
-			      <tag id=\"flac-tag\" mode=\"other\">FLAC Metadata</tag>				\
+			      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>			\
 			    </format>										\
 														\
 			");
