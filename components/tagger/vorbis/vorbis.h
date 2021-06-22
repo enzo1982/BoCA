@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,6 +12,8 @@
 
 #include <boca.h>
 
+#include "dllinterface.h"
+
 BoCA_BEGIN_COMPONENT(TaggerVorbis)
 
 namespace BoCA
@@ -23,6 +25,10 @@ namespace BoCA
 
 			Int			 RenderTagHeader(const String &, Int, Buffer<UnsignedByte> &);
 			Int			 RenderTagItem(const String &, const String &, Buffer<UnsignedByte> &);
+
+			Void			 CreateMetadataBlockPicture(Buffer<UnsignedByte> &, const Picture &, Bool);
+
+			Void			 WriteOggPackets(ogg_stream_state &, IO::OutStream &);
 		public:
 			static const String	&GetComponentSpecs();
 
@@ -32,6 +38,8 @@ namespace BoCA
 			Error			 ParseBuffer(const Buffer<UnsignedByte> &, Track &);
 
 			Error			 RenderBuffer(Buffer<UnsignedByte> &, const Track &);
+
+			Error			 UpdateStreamInfo(const String &, const Track &);
 	};
 };
 

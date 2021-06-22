@@ -11,6 +11,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth.h>
+#include <smooth/dll.h>
+
 #include <string.h>
 
 #include "vorbis.h"
@@ -40,6 +42,16 @@ const String &BoCA::TaggerVorbis::GetComponentSpecs()
 	";
 
 	return componentSpecs;
+}
+
+Void smooth::AttachDLL(Void *instance)
+{
+	LoadOggDLL();
+}
+
+Void smooth::DetachDLL()
+{
+	FreeOggDLL();
 }
 
 const String	 BoCA::TaggerVorbis::ConfigID = "Tags";
@@ -184,27 +196,9 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		 */
 		foreach (const Picture &picInfo, track.pictures)
 		{
-			Buffer<UnsignedByte>	 picBuffer((picInfo.mime	!= NIL ? strlen(picInfo.mime)	     : 0) +
-							   (picInfo.description != NIL ? strlen(picInfo.description) : 0) + picInfo.data.Size() + 32);
-			OutStream		 picOut(STREAM_BUFFER, picBuffer, picBuffer.Size());
+			Buffer<UnsignedByte>	 picBuffer;
 
-			picOut.OutputNumberRaw(picInfo.type, 4);
-
-			picOut.OutputNumberRaw(picInfo.mime != NIL ? strlen(picInfo.mime) : 0, 4);
-			picOut.OutputString(picInfo.mime);
-
-			picOut.OutputNumberRaw(picInfo.description != NIL ? strlen(picInfo.description) : 0, 4);
-			picOut.OutputString(picInfo.description);
-
-			picOut.OutputNumberRaw(0, 4);
-			picOut.OutputNumberRaw(0, 4);
-			picOut.OutputNumberRaw(0, 4);
-			picOut.OutputNumberRaw(0, 4);
-
-			picOut.OutputNumberRaw(picInfo.data.Size(), 4);
-			picOut.OutputData(picInfo.data, picInfo.data.Size());
-
-			picOut.Close();
+			CreateMetadataBlockPicture(picBuffer, picInfo, False);
 
 			RenderTagItem("METADATA_BLOCK_PICTURE", Encoding::Base64(picBuffer).Encode(), buffer);
 
@@ -285,14 +279,14 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 	InStream	 in(STREAM_BUFFER, buffer, buffer.Size());
 
-	/* Skip vendor string.
+	/* Read vendor string.
 	 */
 	String::InputFormat	 inputFormat("UTF-8");
 	Int			 vendorLength = in.InputNumber(4);
 
 	if (vendorLength < 0 || vendorLength > buffer.Size() - 8) return Error();
 
-	in.RelSeek(vendorLength);
+	vendorString = in.InputString(vendorLength);
 
 	/* Parse individual comment items.
 	 */
@@ -308,7 +302,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		 */
 		Int	 length	 = in.InputNumber(4);
 
-		if (length < 0 || length > buffer.Size() - in.GetPos()) break;
+		if (length < 0 || length > buffer.Size() - in.GetPos()) return Error();
 
 		/* Read and assign actual comment string.
 		 */
@@ -684,4 +678,233 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 	}
 
 	return Success();
+}
+
+Error BoCA::TaggerVorbis::UpdateStreamInfo(const String &fileName, const Track &track)
+{
+	/* Get configuration.
+	 */
+	const Config	*currentConfig	     = GetConfiguration();
+
+	Bool		 coverArtWriteToTags = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+
+	/* Open input file.
+	 */
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
+
+	if (in.InputString(4) != "OggS") return False;
+
+	in.Seek(0);
+
+	/* Create temporary file.
+	 */
+	OutStream	 out(STREAM_FILE, fileName.Append(".temp"), OS_REPLACE);
+
+	if (out.GetLastError() != IO_ERROR_OK) return Error();
+
+	/* Set up Ogg state.
+	 */
+	ogg_sync_state		 oy;
+	ogg_stream_state	 os_in;
+	ogg_stream_state	 os_out;
+
+	ex_ogg_sync_init(&oy);
+
+	/* Get stream format.
+	 */
+	Bool	 initialized   = False;
+	Bool	 error	       = False;
+	Int	 packetNum     = 0;
+	Bool	 wrotePictures = False;
+
+	Bool	 isVorbis      = False;
+	Bool	 isOpus	       = False;
+	Bool	 isSpeex       = False;
+	Bool	 isFLAC	       = False;
+
+	do
+	{
+		Int	 size	= Math::Min(Int64(4096), in.Size() - in.GetPos());
+		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+
+		in.InputData(buffer, size);
+
+		ex_ogg_sync_wrote(&oy, size);
+
+		ogg_page	 og;
+
+		while (ex_ogg_sync_pageout(&oy, &og) == 1)
+		{
+			if (!initialized)
+			{
+				ex_ogg_stream_init(&os_in, ex_ogg_page_serialno(&og));
+				ex_ogg_stream_init(&os_out, ex_ogg_page_serialno(&og));
+
+				initialized = True;
+			}
+
+			ex_ogg_stream_pagein(&os_in, &og);
+
+			ogg_packet	 op;
+
+			while (ex_ogg_stream_packetout(&os_in, &op) == 1)
+			{
+				/* Found header packet.
+				 */
+				if (packetNum == 0)
+				{
+					if	(op.packet[0] == 0x01 && op.packet[1] == 'v' && op.packet[2] == 'o' && op.packet[3] == 'r' && op.packet[4] == 'b' && op.packet[5] == 'i' && op.packet[6] == 's')			isVorbis = True;
+					else if (op.packet[0] ==  'O' && op.packet[1] == 'p' && op.packet[2] == 'u' && op.packet[3] == 's' && op.packet[4] == 'T' && op.packet[5] == 'a' && op.packet[6] == 'g' && op.packet[7] == 's') isOpus	 = True;
+					else if (op.packet[0] ==  'S' && op.packet[1] == 'p' && op.packet[2] == 'e' && op.packet[3] == 'e' && op.packet[4] == 'x')									isSpeex	 = True;
+					else if (op.packet[0] == 0x7F && op.packet[1] == 'F' && op.packet[2] == 'L' && op.packet[3] == 'A' && op.packet[4] == 'C')									isFLAC	 = True;
+
+					if (!isVorbis && !isOpus && !isSpeex && !isFLAC) { error = True; break; }
+
+					ex_ogg_stream_packetin(&os_out, &op);
+				}
+
+				/* Found Vorbis Comment packet.
+				 */
+				if (packetNum == 1)
+				{
+					Int	 offset = 0;
+
+					if	(isVorbis) offset = 7;
+					else if (isOpus)   offset = 8;
+					else if (isFLAC)   offset = 4;
+
+					Track			 inputTrack;
+					Buffer<UnsignedByte>	 comments(op.bytes - offset);
+
+					memcpy(comments, op.packet + offset, op.bytes - offset);
+
+					if (ParseBuffer(comments, inputTrack) != Success()) { error = True; break; }
+
+					/* For FLAC, pictures are stored separately.
+					 */
+					Track	 copy = track;
+
+					if (isFLAC) copy.pictures.RemoveAll();
+
+					RenderBuffer(comments, copy);
+
+					/* Output updated packet.
+					 */
+					comments.Resize(comments.Size() + offset + (isVorbis ? 1 : 0));
+
+					memmove(comments + offset, comments, comments.Size() - offset);
+					memcpy(comments, op.packet, offset);
+
+					if	(isVorbis) comments[comments.Size() - 1] = 1;
+					else if (isFLAC)   OutStream(STREAM_BUFFER, comments + 1, 3).OutputNumberRaw(comments.Size() - 4, 3);
+
+					ogg_packet	 header_comm = { comments, comments.Size(), 0, 0, 0, 0 };
+
+					ex_ogg_stream_packetin(&os_out, &header_comm);
+				}
+
+				/* Other packet.
+				 */
+				if (packetNum >= 2)
+				{
+					/* Pass packet to output stream unless it's a FLAC picture packet.
+					 */
+					if (!isFLAC || op.packet[0] != 0x06) ex_ogg_stream_packetin(&os_out, &op);
+
+					/* Save picture packets to FLAC if not already done.
+					 */
+					if (isFLAC && op.packet[0] == 0x06 && coverArtWriteToTags && !wrotePictures)
+					{
+						foreach (const Picture &picInfo, track.pictures)
+						{
+							Buffer<UnsignedByte>	 picBuffer;
+
+							CreateMetadataBlockPicture(picBuffer, picInfo, True);
+
+							ogg_packet	 meta_pic = { picBuffer, picBuffer.Size(), 0, 0, 0, 0 };
+
+							ex_ogg_stream_packetin(&os_out, &meta_pic);
+
+							WriteOggPackets(os_out, out);
+						}
+
+						wrotePictures = True;
+					}
+				}
+
+				packetNum++;
+			}
+
+			if (error) break;
+
+			WriteOggPackets(os_out, out);
+		}
+
+		if (error) break;
+	}
+	while (in.GetPos() < in.Size());
+
+	ex_ogg_stream_clear(&os_in);
+	ex_ogg_stream_clear(&os_out);
+
+	ex_ogg_sync_clear(&oy);
+
+	in.Close();
+	out.Close();
+
+	if (error)
+	{
+		File(fileName.Append(".temp")).Delete();
+
+		return Error();
+	}
+
+	File(fileName).Delete();
+	File(fileName.Append(".temp")).Move(fileName);
+
+	return Success();
+}
+
+Void BoCA::TaggerVorbis::CreateMetadataBlockPicture(Buffer<UnsignedByte> &buffer, const Picture &picture, Bool withHeader)
+{
+	buffer.Resize((picture.mime	   != NIL ? strlen(picture.mime)	: 0) +
+		      (picture.description != NIL ? strlen(picture.description) : 0) + picture.data.Size() + 32 + (withHeader ? 4 : 0));
+
+	OutStream	 out(STREAM_BUFFER, buffer, buffer.Size());
+
+	if (withHeader)
+	{
+		out.OutputNumberRaw(0x06, 1);
+		out.OutputNumberRaw(buffer.Size() - 4, 3);
+	}
+
+	out.OutputNumberRaw(picture.type, 4);
+
+	out.OutputNumberRaw(picture.mime != NIL ? strlen(picture.mime) : 0, 4);
+	out.OutputString(picture.mime);
+
+	out.OutputNumberRaw(picture.description != NIL ? strlen(picture.description) : 0, 4);
+	out.OutputString(picture.description);
+
+	out.OutputNumberRaw(0, 4);
+	out.OutputNumberRaw(0, 4);
+	out.OutputNumberRaw(0, 4);
+	out.OutputNumberRaw(0, 4);
+
+	out.OutputNumberRaw(picture.data.Size(), 4);
+	out.OutputData(picture.data, picture.data.Size());
+}
+
+Void BoCA::TaggerVorbis::WriteOggPackets(ogg_stream_state &os, OutStream &out)
+{
+	do
+	{
+		ogg_page	 og;
+
+		if (ex_ogg_stream_flush(&os, &og) == 0) break;
+
+		out.OutputData(og.header, og.header_len);
+		out.OutputData(og.body, og.body_len);
+	}
+	while (True);
 }

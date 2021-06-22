@@ -8,10 +8,10 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = vorbis.o
+OBJECTS	  = dllinterface.o vorbis.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -I"$(SRCDIR)"
 
 # Enter additional library dependencies here:
 LIBS	  =
