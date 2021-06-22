@@ -343,21 +343,17 @@ Error BoCA::TaggerID3v2::UpdateChunkedFileTag(const String &fileName, const Trac
 		else		    out.OutputNumberRaw(rSize, 4);
 	}
 
-	/* Check for error.
-	 */
-	if (error)
-	{
-		out.Close();
-
-		File(fileName.Append(".temp")).Delete();
-
-		return Error();
-	}
-
 	/* Clean up.
 	 */
 	in.Close();
 	out.Close();
+
+	if (error)
+	{
+		File(fileName.Append(".temp")).Delete();
+
+		return Error();
+	}
 
 	File(fileName).Delete();
 	File(fileName.Append(".temp")).Move(fileName);
