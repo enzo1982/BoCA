@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -35,7 +35,6 @@ typedef int			(*OGGSTREAMPACKETIN)		(ogg_stream_state *, ogg_packet *);
 typedef int			(*OGGSTREAMFLUSH)		(ogg_stream_state *, ogg_page *);
 typedef int			(*OGGSTREAMPAGEOUT)		(ogg_stream_state *, ogg_page *);
 typedef int			(*OGGPAGEEOS)			(ogg_page *);
-typedef int			(*OGGPAGECHECKSUMSET)		(ogg_page *);
 typedef int			(*OGGSTREAMCLEAR)		(ogg_stream_state *);
 
 extern OGGSTREAMINIT		 ex_ogg_stream_init;
@@ -43,7 +42,6 @@ extern OGGSTREAMPACKETIN	 ex_ogg_stream_packetin;
 extern OGGSTREAMFLUSH		 ex_ogg_stream_flush;
 extern OGGSTREAMPAGEOUT		 ex_ogg_stream_pageout;
 extern OGGPAGEEOS		 ex_ogg_page_eos;
-extern OGGPAGECHECKSUMSET	 ex_ogg_page_checksum_set;
 extern OGGSTREAMCLEAR		 ex_ogg_stream_clear;
 
 /* Speex API functions.

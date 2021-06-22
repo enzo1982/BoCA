@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -169,7 +169,7 @@ Bool BoCA::EncoderSpeex::Activate()
 
 	ex_speex_header_free(buffer);
 
-	/* Write Vorbis comment header.
+	/* Write Vorbis Comment header.
 	 */
 	{
 		char	*speexVersion = NIL;
@@ -178,10 +178,10 @@ Bool BoCA::EncoderSpeex::Activate()
 
 		Buffer<unsigned char>	 vcBuffer;
 
-		/* Render actual Vorbis comment tag.
+		/* Render actual Vorbis Comment tag.
 		 *
 		 * An empty tag containing only the vendor string
-		 * is rendered if Vorbis comments are disabled.
+		 * is rendered if Vorbis Comment tags are disabled.
 		 */
 		AS::Registry		&boca = AS::Registry::Get();
 		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("vorbis-tag");
@@ -248,7 +248,20 @@ Bool BoCA::EncoderSpeex::Deactivate()
 
 	/* Fix chapter marks in Vorbis Comments.
 	 */
-	FixChapterMarks();
+	if (config->GetIntValue("Tags", "EnableVorbisComment", True) && track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
+	{
+		driver->Close();
+
+		AS::Registry		&boca = AS::Registry::Get();
+		AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("vorbis-tag");
+
+		if (tagger != NIL)
+		{
+			tagger->UpdateStreamInfo(track.outputFile, track);
+
+			boca.DeleteComponent(tagger);
+		}
+	}
 
 	return True;
 }
@@ -390,94 +403,6 @@ Int BoCA::EncoderSpeex::WriteOggPackets(Bool flush)
 	while (true);
 
 	return bytes;
-}
-
-Bool BoCA::EncoderSpeex::FixChapterMarks()
-{
-	if (track.tracks.Length() == 0 || !config->GetIntValue("Tags", "WriteChapters", True)) return True;
-
-	driver->Seek(0);
-
-	/* Skip first Ogg page and read second into buffer.
-	 */
-	Buffer<UnsignedByte>	 buffer;
-	Int			 position;
-	ogg_page		 og;
-
-	for (Int i = 0; i < 2; i++)
-	{
-		driver->Seek(driver->GetPos() + 26);
-
-		Int		 dataSize    = 0;
-		UnsignedByte	 segments    = 0;
-		UnsignedByte	 segmentSize = 0;
-
-		driver->ReadData(&segments, 1);
-
-		for (Int i = 0; i < segments; i++) { driver->ReadData(&segmentSize, 1); dataSize += segmentSize; }
-
-		buffer.Resize(27 + segments + dataSize);
-		position = driver->GetPos() - segments - 27;
-
-		driver->Seek(position);
-		driver->ReadData(buffer, buffer.Size());
-
-		og.header     = buffer;
-		og.header_len = 27 + segments;
-		og.body	      = buffer + og.header_len;
-		og.body_len   = dataSize;
-	}
-
-	/* Update chapter marks.
-	 */
-	if (buffer.Size() > 0)
-	{
-		Int64	 offset = 0;
-
-		for (Int i = 0; i < track.tracks.Length(); i++)
-		{
-			const Track	&chapterTrack  = track.tracks.GetNth(i);
-			const Format	&chapterFormat = chapterTrack.GetFormat();
-
-			for (Int b = 0; b < buffer.Size() - 23; b++)
-			{
-				if (buffer[b + 0] != 'C' || buffer[b + 1] != 'H' || buffer[b + 2] != 'A' || buffer[b +  3] != 'P' ||
-				    buffer[b + 4] != 'T' || buffer[b + 5] != 'E' || buffer[b + 6] != 'R' || buffer[b + 10] != '=') continue;
-
-				String	 id;
-
-				id[0] = buffer[b + 7];
-				id[1] = buffer[b + 8];
-				id[2] = buffer[b + 9];
-
-				if (id.ToInt() != i + 1) continue;
-
-				String	 value	= String(offset / chapterFormat.rate / 60 / 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 / 60)).Append(":")
-						 .Append(offset / chapterFormat.rate / 60 % 60 < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate / 60 % 60)).Append(":")
-						 .Append(offset / chapterFormat.rate % 60      < 10 ? "0" : "").Append(String::FromInt(offset / chapterFormat.rate % 60)).Append(".")
-						 .Append(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) < 100 ?
-							(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate) <  10 ?  "00" : "0") : "").Append(String::FromInt(Math::Round(offset % chapterFormat.rate * 1000.0 / chapterFormat.rate)));
-
-				for (Int p = 0; p < 12; p++) buffer[b + 11 + p] = value[p];
-
-				break;
-			}
-
-			if	(chapterTrack.length	   >= 0) offset += chapterTrack.length;
-			else if (chapterTrack.approxLength >= 0) offset += chapterTrack.approxLength;
-		}
-
-		/* Write page back to file.
-		 */
-		ex_ogg_page_checksum_set(&og);
-
-		driver->Seek(position);
-		driver->WriteData(buffer, buffer.Size());
-	}
-
-	driver->Seek(driver->GetSize());
-
-	return True;
 }
 
 Bool BoCA::EncoderSpeex::ConvertArguments(Config *config)

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,8 +14,6 @@
 #include "dllinterface.h"
 
 using namespace BoCA;
-
-OGGPAGECHECKSUMSET						 ex_ogg_page_checksum_set							= NIL;
 
 FLAC_API_SUPPORTS_OGG_FLAC_TYPE					 ex_FLAC_API_SUPPORTS_OGG_FLAC							= NIL;
 
@@ -65,28 +63,7 @@ FLAC__METADATA_OBJECT_SEEKTABLE_TEMPLATE_SORT			 ex_FLAC__metadata_object_seekta
 FLAC__VERSION_STRING_TYPE					 ex_FLAC__VERSION_STRING							= NIL;
 FLAC__VENDOR_STRING_TYPE					 ex_FLAC__VENDOR_STRING								= NIL;
 
-DynamicLoader *oggdll	= NIL;
 DynamicLoader *flacdll	= NIL;
-
-Bool LoadOggDLL()
-{
-	oggdll = BoCA::Utilities::LoadCodecDLL("ogg");
-
-	if (oggdll == NIL) return False;
-
-	ex_ogg_page_checksum_set	= (OGGPAGECHECKSUMSET) oggdll->GetFunctionAddress("ogg_page_checksum_set");
-
-	if (ex_ogg_page_checksum_set	== NIL) { FreeOggDLL(); return False; }
-
-	return True;
-}
-
-Void FreeOggDLL()
-{
-	BoCA::Utilities::FreeCodecDLL(oggdll);
-
-	oggdll = NIL;
-}
 
 Bool LoadFLACDLL()
 {

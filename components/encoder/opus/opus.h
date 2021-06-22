@@ -47,7 +47,6 @@ namespace BoCA
 
 			Int			 EncodeFrames(Bool);
 			Int			 ProcessPackets(const Buffer<unsigned char> &, const Array<Int> &, Bool, Bool, Int);
-			Bool			 FixChapterMarks();
 
 			Int			 WriteOggPackets(Bool);
 

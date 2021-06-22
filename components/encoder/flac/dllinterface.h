@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,26 +12,15 @@
 
 #include <smooth.h>
 
-#include <ogg/ogg.h>
 #include <FLAC/stream_encoder.h>
 
 using namespace smooth;
 using namespace smooth::System;
 
-extern DynamicLoader	*oggdll;
 extern DynamicLoader	*flacdll;
-
-Bool			 LoadOggDLL();
-Void			 FreeOggDLL();
 
 Bool			 LoadFLACDLL();
 Void			 FreeFLACDLL();
-
-/* Ogg API functions.
- */
-typedef int			(*OGGPAGECHECKSUMSET)	 (ogg_page *);
-
-extern OGGPAGECHECKSUMSET	 ex_ogg_page_checksum_set;
 
 /* FLAC API functions.
  */

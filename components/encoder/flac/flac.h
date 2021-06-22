@@ -35,8 +35,6 @@ namespace BoCA
 			Buffer<FLAC__int32>			 buffer;
 			Int					 bytesWritten;
 
-			Bool					 FixChapterMarks();
-
 			static Bool				 ConvertArguments(Config *);
 		public:
 			static const String			&GetComponentSpecs();
