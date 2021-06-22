@@ -221,9 +221,23 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 
 		vorbiscomment->length = vcBuffer.Size();
 
+		ex_FLAC__metadata_iterator_init(iterator, chain);
 		ex_FLAC__metadata_iterator_insert_block_after(iterator, vorbiscomment);
 	}
 
+	/* Point iterator at seektable, if any.
+	 */
+	do
+	{
+		FLAC__MetadataType	 type = ex_FLAC__metadata_iterator_get_block_type(iterator);
+
+		if	(type == FLAC__METADATA_TYPE_SEEKTABLE)						     break;
+		else if (type == FLAC__METADATA_TYPE_PADDING)	{ ex_FLAC__metadata_iterator_prev(iterator); break; }
+	}
+	while (ex_FLAC__metadata_iterator_next(iterator));
+
+	/* Insert picture metadata.
+	 */
 	Int64	 pictureSizeAfter = 0;
 
 	if (coverArtWriteToTags && coverArtWriteToFLAC)

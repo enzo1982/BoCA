@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -39,6 +39,7 @@ typedef FLAC__Metadata_Iterator *	(*FLAC__METADATA_ITERATOR_NEW)					();
 typedef void				(*FLAC__METADATA_ITERATOR_DELETE)				(FLAC__Metadata_Iterator *);
 typedef void				(*FLAC__METADATA_ITERATOR_INIT)					(FLAC__Metadata_Iterator *, FLAC__Metadata_Chain *);
 typedef FLAC__bool			(*FLAC__METADATA_ITERATOR_NEXT)					(FLAC__Metadata_Iterator *);
+typedef FLAC__bool			(*FLAC__METADATA_ITERATOR_PREV)					(FLAC__Metadata_Iterator *);
 typedef FLAC__MetadataType		(*FLAC__METADATA_ITERATOR_GET_BLOCK_TYPE)			(const FLAC__Metadata_Iterator *);
 typedef FLAC__StreamMetadata *		(*FLAC__METADATA_ITERATOR_GET_BLOCK)				(const FLAC__Metadata_Iterator *);
 typedef FLAC__bool			(*FLAC__METADATA_ITERATOR_DELETE_BLOCK)				(FLAC__Metadata_Iterator *, FLAC__bool);
@@ -68,6 +69,7 @@ extern FLAC__METADATA_ITERATOR_NEW				 ex_FLAC__metadata_iterator_new;
 extern FLAC__METADATA_ITERATOR_DELETE				 ex_FLAC__metadata_iterator_delete;
 extern FLAC__METADATA_ITERATOR_INIT				 ex_FLAC__metadata_iterator_init;
 extern FLAC__METADATA_ITERATOR_NEXT				 ex_FLAC__metadata_iterator_next;
+extern FLAC__METADATA_ITERATOR_PREV				 ex_FLAC__metadata_iterator_prev;
 extern FLAC__METADATA_ITERATOR_GET_BLOCK_TYPE			 ex_FLAC__metadata_iterator_get_block_type;
 extern FLAC__METADATA_ITERATOR_GET_BLOCK			 ex_FLAC__metadata_iterator_get_block;
 extern FLAC__METADATA_ITERATOR_DELETE_BLOCK			 ex_FLAC__metadata_iterator_delete_block;

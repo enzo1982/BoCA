@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,6 +29,7 @@ FLAC__METADATA_ITERATOR_NEW				 ex_FLAC__metadata_iterator_new					= NIL;
 FLAC__METADATA_ITERATOR_DELETE				 ex_FLAC__metadata_iterator_delete				= NIL;
 FLAC__METADATA_ITERATOR_INIT				 ex_FLAC__metadata_iterator_init				= NIL;
 FLAC__METADATA_ITERATOR_NEXT				 ex_FLAC__metadata_iterator_next				= NIL;
+FLAC__METADATA_ITERATOR_PREV				 ex_FLAC__metadata_iterator_prev				= NIL;
 FLAC__METADATA_ITERATOR_GET_BLOCK_TYPE			 ex_FLAC__metadata_iterator_get_block_type			= NIL;
 FLAC__METADATA_ITERATOR_GET_BLOCK			 ex_FLAC__metadata_iterator_get_block				= NIL;
 FLAC__METADATA_ITERATOR_DELETE_BLOCK			 ex_FLAC__metadata_iterator_delete_block			= NIL;
@@ -66,6 +67,7 @@ Bool LoadFLACDLL()
 	ex_FLAC__metadata_iterator_delete				= (FLAC__METADATA_ITERATOR_DELETE) flacdll->GetFunctionAddress("FLAC__metadata_iterator_delete");
 	ex_FLAC__metadata_iterator_init					= (FLAC__METADATA_ITERATOR_INIT) flacdll->GetFunctionAddress("FLAC__metadata_iterator_init");
 	ex_FLAC__metadata_iterator_next					= (FLAC__METADATA_ITERATOR_NEXT) flacdll->GetFunctionAddress("FLAC__metadata_iterator_next");
+	ex_FLAC__metadata_iterator_prev					= (FLAC__METADATA_ITERATOR_PREV) flacdll->GetFunctionAddress("FLAC__metadata_iterator_prev");
 	ex_FLAC__metadata_iterator_get_block_type			= (FLAC__METADATA_ITERATOR_GET_BLOCK_TYPE) flacdll->GetFunctionAddress("FLAC__metadata_iterator_get_block_type");
 	ex_FLAC__metadata_iterator_get_block				= (FLAC__METADATA_ITERATOR_GET_BLOCK) flacdll->GetFunctionAddress("FLAC__metadata_iterator_get_block");
 	ex_FLAC__metadata_iterator_delete_block				= (FLAC__METADATA_ITERATOR_DELETE_BLOCK) flacdll->GetFunctionAddress("FLAC__metadata_iterator_delete_block");
@@ -95,6 +97,7 @@ Bool LoadFLACDLL()
 	    ex_FLAC__metadata_iterator_delete				== NIL ||
 	    ex_FLAC__metadata_iterator_init				== NIL ||
 	    ex_FLAC__metadata_iterator_next				== NIL ||
+	    ex_FLAC__metadata_iterator_prev				== NIL ||
 	    ex_FLAC__metadata_iterator_get_block_type			== NIL ||
 	    ex_FLAC__metadata_iterator_delete_block			== NIL ||
 	    ex_FLAC__metadata_iterator_insert_block_after		== NIL ||
