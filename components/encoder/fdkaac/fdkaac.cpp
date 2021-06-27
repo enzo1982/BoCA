@@ -583,31 +583,45 @@ Bool BoCA::EncoderFDKAAC::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "fdkaac-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureFDKAAC::ConfigID, "MPEGVersion", 0);
+		config->SetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", True);
+
+		config->SetIntValue(ConfigureFDKAAC::ConfigID, "AACType", AOT_AAC_LC);
+		config->SetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 bitrate = 64;
-	String	 mode	 = "LC";
+	Bool	 rawAAC	       = config->GetIntValue(encoderID, "Write raw AAC files", !config->GetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", True));
 
-	if (config->GetIntValue(encoderID, "Set Bitrate per channel", False)) bitrate = config->GetIntValue(encoderID, "Bitrate per channel", bitrate);
-	if (config->GetIntValue(encoderID, "Set AAC encoding mode", False))   mode    = config->GetStringValue(encoderID, "AAC encoding mode", mode).ToUpper();
+	Int	 bitrate       = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
+	Int	 aacType       = config->GetIntValue(ConfigureFDKAAC::ConfigID, "AACType", AOT_AAC_LC);
+	String	 aacTypeString = "LC";
+
+	if	(aacType == AOT_SBR)	    aacTypeString = "HE";
+	else if	(aacType == AOT_PS)	    aacTypeString = "HEv2";
+	else if	(aacType == AOT_ER_AAC_LD)  aacTypeString = "LD";
+	else if	(aacType == AOT_ER_AAC_ELD) aacTypeString = "ELD";
+
+	if (config->GetIntValue(encoderID, "Set Bitrate per channel", False)) bitrate	    = config->GetIntValue(encoderID, "Bitrate per channel", bitrate);
+	if (config->GetIntValue(encoderID, "Set AAC encoding mode", False))   aacTypeString = config->GetStringValue(encoderID, "AAC encoding mode", aacTypeString).ToUpper();
 
 	/* Set configuration values.
 	 */
-	config->SetIntValue(ConfigureFDKAAC::ConfigID, "MPEGVersion", 0);
+	config->SetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", !rawAAC);
 
-	config->SetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", !config->GetIntValue(encoderID, "Write raw AAC files", False));
-
-	config->SetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", Math::Max(8, Math::Min(256, bitrate)));
-
-	Int	 aacType = AOT_AAC_LC;
-
-	if	(mode == "LC"  ) aacType = AOT_AAC_LC;
-	else if (mode == "HE"  ) aacType = AOT_SBR;
-	else if (mode == "HEV2") aacType = AOT_PS;
-	else if (mode == "LD"  ) aacType = AOT_ER_AAC_LD;
-	else if (mode == "ELD" ) aacType = AOT_ER_AAC_ELD;
+	if	(aacTypeString == "LC"  ) aacType = AOT_AAC_LC;
+	else if (aacTypeString == "HE"  ) aacType = AOT_SBR;
+	else if (aacTypeString == "HEV2") aacType = AOT_PS;
+	else if (aacTypeString == "LD"  ) aacType = AOT_ER_AAC_LD;
+	else if (aacTypeString == "ELD" ) aacType = AOT_ER_AAC_ELD;
 
 	config->SetIntValue(ConfigureFDKAAC::ConfigID, "AACType", aacType);
+	config->SetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", Math::Max(8, Math::Min(256, bitrate)));
 
 	return True;
 }

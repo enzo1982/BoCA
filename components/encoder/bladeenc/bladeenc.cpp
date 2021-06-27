@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -267,9 +267,16 @@ Bool BoCA::EncoderBlade::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "bladeenc-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureBlade::ConfigID, "Bitrate", 192);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 bitrate = 192;
+	Int	 bitrate = config->GetIntValue(ConfigureBlade::ConfigID, "Bitrate", 192);
 
 	if (config->GetIntValue(encoderID, "Set Bitrate", False)) bitrate = config->GetIntValue(encoderID, "Bitrate", bitrate);
 

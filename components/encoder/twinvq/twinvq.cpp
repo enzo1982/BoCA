@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -268,10 +268,18 @@ Bool BoCA::EncoderTwinVQ::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "twinvq-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureTwinVQ::ConfigID, "Bitrate", 48);
+		config->SetIntValue(ConfigureTwinVQ::ConfigID, "PreselectionCandidates", 32);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 bitrate    = 48;
-	Int	 candidates = 32;
+	Int	 bitrate    = config->GetIntValue(ConfigureTwinVQ::ConfigID, "Bitrate", 48);
+	Int	 candidates = config->GetIntValue(ConfigureTwinVQ::ConfigID, "PreselectionCandidates", 32);
 
 	if (config->GetIntValue(encoderID, "Set Bitrate per channel", False))     bitrate    = config->GetIntValue(encoderID, "Bitrate per channel", bitrate);
 	if (config->GetIntValue(encoderID, "Set Preselection candidates", False)) candidates = config->GetIntValue(encoderID, "Preselection candidates", candidates);

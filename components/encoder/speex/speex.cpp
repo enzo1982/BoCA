@@ -411,12 +411,32 @@ Bool BoCA::EncoderSpeex::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "speex-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureSpeex::ConfigID, "Mode", -1);
+		config->SetIntValue(ConfigureSpeex::ConfigID, "VAD", False);
+		config->SetIntValue(ConfigureSpeex::ConfigID, "DTX", False);
+
+		config->SetIntValue(ConfigureSpeex::ConfigID, "VBR", False);
+
+		config->SetIntValue(ConfigureSpeex::ConfigID, "Bitrate", -16);
+		config->SetIntValue(ConfigureSpeex::ConfigID, "Quality", 8);
+		config->SetIntValue(ConfigureSpeex::ConfigID, "VBRQuality", 80);
+		config->SetIntValue(ConfigureSpeex::ConfigID, "VBRMaxBitrate", -48);
+		config->SetIntValue(ConfigureSpeex::ConfigID, "Complexity", 3);
+		config->SetIntValue(ConfigureSpeex::ConfigID, "ABR", -16);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 bitrate    = 16;
-	Int	 quality    = 8;
-	Int	 complexity = 3;
-	Int	 abrrate    = 16;
+	Bool	 useVBR	    = config->GetIntValue(encoderID, "Use VBR encoding", config->GetIntValue(ConfigureSpeex::ConfigID, "VBR", False));
+
+	Int	 bitrate    = config->GetIntValue(ConfigureSpeex::ConfigID, "Bitrate", -16);
+	Int	 quality    = config->GetIntValue(ConfigureSpeex::ConfigID, "Quality", 8);
+	Int	 complexity = config->GetIntValue(ConfigureSpeex::ConfigID, "Complexity", 3);
+	Int	 abrrate    = config->GetIntValue(ConfigureSpeex::ConfigID, "ABR", -16);
 
 	if (config->GetIntValue(encoderID, "Set Bitrate", False))	      bitrate	 = config->GetIntValue(encoderID, "Bitrate", bitrate);
 	if (config->GetIntValue(encoderID, "Set Quality", False))	      quality	 = config->GetIntValue(encoderID, "Quality", quality);
@@ -425,18 +445,13 @@ Bool BoCA::EncoderSpeex::ConvertArguments(Config *config)
 
 	/* Set configuration values.
 	 */
-	config->SetIntValue(ConfigureSpeex::ConfigID, "Mode", -1);
-	config->SetIntValue(ConfigureSpeex::ConfigID, "VAD", False);
-	config->SetIntValue(ConfigureSpeex::ConfigID, "DTX", False);
+	config->SetIntValue(ConfigureSpeex::ConfigID, "VBR", useVBR);
 
-	config->SetIntValue(ConfigureSpeex::ConfigID, "VBR", config->GetIntValue(encoderID, "Use VBR encoding", False));
-
-	config->SetIntValue(ConfigureSpeex::ConfigID, "Bitrate", config->GetIntValue(encoderID, "Set Bitrate", False) ? Math::Max(4, Math::Min(64, bitrate)) : -16);
+	config->SetIntValue(ConfigureSpeex::ConfigID, "Bitrate", bitrate >= 0 ? Math::Max(4, Math::Min(64, bitrate)) : bitrate);
 	config->SetIntValue(ConfigureSpeex::ConfigID, "Quality", Math::Max(0, Math::Min(10, quality)));
 	config->SetIntValue(ConfigureSpeex::ConfigID, "VBRQuality", Math::Max(0, Math::Min(10, quality)) * 10);
-	config->SetIntValue(ConfigureSpeex::ConfigID, "VBRMaxBitrate", -48);
 	config->SetIntValue(ConfigureSpeex::ConfigID, "Complexity", Math::Max(0, Math::Min(10, complexity)));
-	config->SetIntValue(ConfigureSpeex::ConfigID, "ABR", config->GetIntValue(encoderID, "Set Use ABR encoding", False) ? Math::Max(4, Math::Min(64, abrrate)) : -16);
+	config->SetIntValue(ConfigureSpeex::ConfigID, "ABR", abrrate >= 0 ? Math::Max(4, Math::Min(64, abrrate)) : abrrate);
 
 	return True;
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -172,21 +172,32 @@ Bool BoCA::EncoderMAC::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "mac-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2);
+	}
+
 	/* Get command line settings.
 	 */
-	String	 mode = "high";
+	Int	 compressionMode     = config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2);
+	String	 compressionModeName = "fast";
 
-	if (config->GetIntValue(encoderID, "Set Compression mode", False)) mode = config->GetStringValue(encoderID, "Compression mode", mode).ToLower();
+	if	(compressionMode == 1) compressionModeName = "normal";
+	else if	(compressionMode == 2) compressionModeName = "high";
+	else if	(compressionMode == 3) compressionModeName = "extra";
+	else if	(compressionMode == 4) compressionModeName = "insane";
+
+	if (config->GetIntValue(encoderID, "Set Compression mode", False)) compressionModeName = config->GetStringValue(encoderID, "Compression mode", compressionModeName).ToLower();
 
 	/* Set configuration values.
 	 */
-	Int	 compressionMode = 2;
-
-	if	(mode == "fast"	 ) compressionMode = 0;
-	else if (mode == "normal") compressionMode = 1;
-	else if (mode == "high"	 ) compressionMode = 2;
-	else if (mode == "extra" ) compressionMode = 3;
-	else if (mode == "insane") compressionMode = 4;
+	if	(compressionModeName == "fast"	) compressionMode = 0;
+	else if (compressionModeName == "normal") compressionMode = 1;
+	else if (compressionModeName == "high"	) compressionMode = 2;
+	else if (compressionModeName == "extra" ) compressionMode = 3;
+	else if (compressionModeName == "insane") compressionMode = 4;
 
 	config->SetIntValue(ConfigureMAC::ConfigID, "CompressionMode", compressionMode);
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -510,20 +510,34 @@ Bool BoCA::EncoderFAAC::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "faac-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureFAAC::ConfigID, "MPEGVersion", 0);
+
+		config->SetIntValue(ConfigureFAAC::ConfigID, "MP4Container", True);
+		config->SetIntValue(ConfigureFAAC::ConfigID, "SetQuality", True);
+
+		config->SetIntValue(ConfigureFAAC::ConfigID, "AACQuality", 150);
+		config->SetIntValue(ConfigureFAAC::ConfigID, "Bitrate", 96);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 quality = 150;
-	Int	 bitrate = 96;
+	Bool	 rawAAC	 = config->GetIntValue(encoderID, "Write raw AAC files", !config->GetIntValue(ConfigureFAAC::ConfigID, "MP4Container", True));
+	Bool	 useABR	 = config->GetIntValue(encoderID, "Set ABR bitrate per channel", !config->GetIntValue(ConfigureFAAC::ConfigID, "SetQuality", True));
+
+	Int	 quality = config->GetIntValue(ConfigureFAAC::ConfigID, "AACQuality", 150);
+	Int	 bitrate = config->GetIntValue(ConfigureFAAC::ConfigID, "Bitrate", 96);
 
 	if (config->GetIntValue(encoderID, "Set VBR quality", False))		  quality = config->GetIntValue(encoderID, "VBR quality", quality);
 	if (config->GetIntValue(encoderID, "Set ABR bitrate per channel", False)) bitrate = config->GetIntValue(encoderID, "ABR bitrate per channel", bitrate);
 
 	/* Set configuration values.
 	 */
-	config->SetIntValue(ConfigureFAAC::ConfigID, "MPEGVersion", 0);
-
-	config->SetIntValue(ConfigureFAAC::ConfigID, "MP4Container", !config->GetIntValue(encoderID, "Write raw AAC files", False));
-	config->SetIntValue(ConfigureFAAC::ConfigID, "SetQuality", !config->GetIntValue(encoderID, "Set ABR bitrate per channel", False));
+	config->SetIntValue(ConfigureFAAC::ConfigID, "MP4Container", !rawAAC);
+	config->SetIntValue(ConfigureFAAC::ConfigID, "SetQuality", !useABR);
 
 	config->SetIntValue(ConfigureFAAC::ConfigID, "AACQuality", Math::Max(10, Math::Min(500, quality)));
 	config->SetIntValue(ConfigureFAAC::ConfigID, "Bitrate", Math::Max(8, Math::Min(256, bitrate)));

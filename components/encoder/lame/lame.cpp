@@ -496,32 +496,46 @@ Bool BoCA::EncoderLAME::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "lame-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureLAME::ConfigID, "Preset", 0);
+		config->SetIntValue(ConfigureLAME::ConfigID, "SetBitrate", True);
+
+		config->SetIntValue(ConfigureLAME::ConfigID, "Bitrate", 192);
+		config->SetIntValue(ConfigureLAME::ConfigID, "ABRBitrate", 192);
+		config->SetIntValue(ConfigureLAME::ConfigID, "VBRQuality", 50);
+
+		config->SetIntValue(ConfigureLAME::ConfigID, "VBRMode", vbr_default);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 bitrate = 192;
-	Int	 quality = 5;
-	String	 mode	 = "VBR";
+	Int	 mode	    = config->GetIntValue(ConfigureLAME::ConfigID, "VBRMode", vbr_default);
+	String	 modeString = "VBR";
 
-	if (config->GetIntValue(encoderID, "Set CBR/ABR bitrate", False)) bitrate = config->GetIntValue(encoderID, "CBR/ABR bitrate", bitrate);
-	if (config->GetIntValue(encoderID, "Set VBR quality", False))	  quality = config->GetIntValue(encoderID, "VBR quality", quality);
-	if (config->GetIntValue(encoderID, "Set Mode", False))		  mode	  = config->GetStringValue(encoderID, "Mode", mode).ToUpper();
+	if	(mode == vbr_abr) modeString = "ABR";
+	else if	(mode == vbr_off) modeString = "CBR";
+
+	Int	 bitrate    = config->GetIntValue(ConfigureLAME::ConfigID, mode == vbr_off ? "Bitrate" : "ABRBitrate", 192);
+	Int	 quality    = config->GetIntValue(ConfigureLAME::ConfigID, "VBRQuality", 50) / 10;
+
+	if (config->GetIntValue(encoderID, "Set CBR/ABR bitrate", False)) bitrate    = config->GetIntValue(encoderID, "CBR/ABR bitrate", bitrate);
+	if (config->GetIntValue(encoderID, "Set VBR quality", False))	  quality    = config->GetIntValue(encoderID, "VBR quality", quality);
+	if (config->GetIntValue(encoderID, "Set Mode", False))		  modeString = config->GetStringValue(encoderID, "Mode", modeString).ToUpper();
 
 	/* Set configuration values.
 	 */
-	config->SetIntValue(ConfigureLAME::ConfigID, "Preset", 0);
-	config->SetIntValue(ConfigureLAME::ConfigID, "SetBitrate", True);
-
 	config->SetIntValue(ConfigureLAME::ConfigID, "Bitrate", Math::Max(0, Math::Min(320, bitrate)));
 	config->SetIntValue(ConfigureLAME::ConfigID, "ABRBitrate", Math::Max(0, Math::Min(320, bitrate)));
 	config->SetIntValue(ConfigureLAME::ConfigID, "VBRQuality", Math::Max(0, Math::Min(9, quality)) * 10);
 
-	Int	 vbrMode = vbr_default;
+	if	(modeString == "VBR") mode = vbr_mtrh;
+	else if (modeString == "ABR") mode = vbr_abr;
+	else if (modeString == "CBR") mode = vbr_off;
 
-	if	(mode == "VBR") vbrMode = vbr_mtrh;
-	else if (mode == "ABR") vbrMode = vbr_abr;
-	else if (mode == "CBR") vbrMode = vbr_off;
-
-	config->SetIntValue(ConfigureLAME::ConfigID, "VBRMode", vbrMode);
+	config->SetIntValue(ConfigureLAME::ConfigID, "VBRMode", mode);
 
 	return True;
 }

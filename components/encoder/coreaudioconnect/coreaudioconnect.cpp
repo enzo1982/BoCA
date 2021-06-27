@@ -578,26 +578,38 @@ Bool BoCA::EncoderCoreAudioConnect::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "coreaudio-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
+
+		config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
+		config->SetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 bitrate = 64;
-	String	 format	 = "AAC";
+	Bool	 rawAAC	    = config->GetIntValue(encoderID, "Write raw AAC files", !config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True));
 
-	if (config->GetIntValue(encoderID, "Set Bitrate per channel", False)) bitrate = config->GetIntValue(encoderID, "Bitrate per channel", bitrate);
-	if (config->GetIntValue(encoderID, "Set Output format", False))	      format  = config->GetStringValue(encoderID, "Output format", format).ToUpper();
+	Int	 bitrate    = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64);
+	Int	 format	    = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
+	String	 formatName = "AAC";
+
+	if (format == CA::kAudioFormatAppleLossless) formatName = "ALAC";
+
+	if (config->GetIntValue(encoderID, "Set Bitrate per channel", False)) bitrate	 = config->GetIntValue(encoderID, "Bitrate per channel", bitrate);
+	if (config->GetIntValue(encoderID, "Set Output format", False))	      formatName = config->GetStringValue(encoderID, "Output format", formatName).ToUpper();
 
 	/* Set configuration values.
 	 */
-	config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", !config->GetIntValue(encoderID, "Write raw AAC files", False) || format == "ALAC");
+	config->SetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", !rawAAC || formatName == "ALAC");
 
+	if	(formatName == "AAC" ) format = CA::kAudioFormatMPEG4AAC;
+	else if (formatName == "ALAC") format = CA::kAudioFormatAppleLossless;
+
+	config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", format);
 	config->SetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", Math::Max(8, Math::Min(256, bitrate)));
-
-	Int	 audioFormat = CA::kAudioFormatMPEG4AAC;
-
-	if	(format == "AAC" ) audioFormat = CA::kAudioFormatMPEG4AAC;
-	else if (format == "ALAC") audioFormat = CA::kAudioFormatAppleLossless;
-
-	config->SetIntValue(ConfigureCoreAudio::ConfigID, "Codec", audioFormat);
 
 	return True;
 }

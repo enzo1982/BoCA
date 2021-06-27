@@ -340,17 +340,29 @@ Bool BoCA::EncoderVorbis::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "vorbis-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureVorbis::ConfigID, "Mode", 0);
+
+		config->SetIntValue(ConfigureVorbis::ConfigID, "Quality", 60);
+		config->SetIntValue(ConfigureVorbis::ConfigID, "Bitrate", 192);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 quality = 60;
-	Int	 bitrate = 192;
+	Bool	 useABR	 = config->GetIntValue(encoderID, "Set ABR target bitrate", config->GetIntValue(ConfigureVorbis::ConfigID, "Mode", 0) == 1);
+
+	Int	 quality = config->GetIntValue(ConfigureVorbis::ConfigID, "Quality", 60);
+	Int	 bitrate = config->GetIntValue(ConfigureVorbis::ConfigID, "Bitrate", 192);
 
 	if (config->GetIntValue(encoderID, "Set VBR quality", False))	     quality = config->GetIntValue(encoderID, "VBR quality", quality);
 	if (config->GetIntValue(encoderID, "Set ABR target bitrate", False)) bitrate = config->GetIntValue(encoderID, "ABR target bitrate", bitrate);
 
 	/* Set configuration values.
 	 */
-	config->SetIntValue(ConfigureVorbis::ConfigID, "Mode", config->GetIntValue(encoderID, "Set ABR target bitrate", False) ? 1 : 0);
+	config->SetIntValue(ConfigureVorbis::ConfigID, "Mode", useABR ? 1 : 0);
 
 	config->SetIntValue(ConfigureVorbis::ConfigID, "Quality", Math::Max(0, Math::Min(100, quality)));
 	config->SetIntValue(ConfigureVorbis::ConfigID, "Bitrate", Math::Max(45, Math::Min(500, bitrate)));

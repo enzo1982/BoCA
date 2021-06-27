@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -246,11 +246,26 @@ Bool BoCA::EncoderBonk::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "bonk-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureBonk::ConfigID, "JointStereo", False);
+		config->SetIntValue(ConfigureBonk::ConfigID, "Lossless", False);
+
+		config->SetIntValue(ConfigureBonk::ConfigID, "Quantization", 8);
+		config->SetIntValue(ConfigureBonk::ConfigID, "Predictor", 32);
+		config->SetIntValue(ConfigureBonk::ConfigID, "Downsampling", 2);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 quantization = 8;
-	Int	 predictor    = 32;
-	Int	 downsampling = 2;
+	Bool	 jointStereo  = config->GetIntValue(encoderID, "Use Joint Stereo", config->GetIntValue(ConfigureBonk::ConfigID, "JointStereo", False));
+	Bool	 lossless     = config->GetIntValue(encoderID, "Use lossless compression", config->GetIntValue(ConfigureBonk::ConfigID, "Lossless", False));
+
+	Int	 quantization = config->GetIntValue(ConfigureBonk::ConfigID, "Quantization", 8);
+	Int	 predictor    = config->GetIntValue(ConfigureBonk::ConfigID, "Predictor", 32);
+	Int	 downsampling = config->GetIntValue(ConfigureBonk::ConfigID, "Downsampling", 2);
 
 	if (config->GetIntValue(encoderID, "Set Quantization factor", False)) quantization = config->GetIntValue(encoderID, "Quantization factor", quantization);
 	if (config->GetIntValue(encoderID, "Set Predictor size", False))      predictor    = config->GetIntValue(encoderID, "Predictor size", predictor);
@@ -258,8 +273,8 @@ Bool BoCA::EncoderBonk::ConvertArguments(Config *config)
 
 	/* Set configuration values.
 	 */
-	config->SetIntValue(ConfigureBonk::ConfigID, "JointStereo", config->GetIntValue(encoderID, "Use Joint Stereo", False));
-	config->SetIntValue(ConfigureBonk::ConfigID, "Lossless", config->GetIntValue(encoderID, "Use lossless compression", False));
+	config->SetIntValue(ConfigureBonk::ConfigID, "JointStereo", jointStereo);
+	config->SetIntValue(ConfigureBonk::ConfigID, "Lossless", lossless);
 
 	config->SetIntValue(ConfigureBonk::ConfigID, "Quantization", Math::Max(0, Math::Min(40, quantization)));
 	config->SetIntValue(ConfigureBonk::ConfigID, "Predictor", Math::Max(0, Math::Min(512, predictor)));

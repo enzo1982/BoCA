@@ -436,14 +436,36 @@ Bool BoCA::EncoderFLAC::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "flac-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0);
+		config->SetIntValue(ConfigureFLAC::ConfigID, "Preset", -1);
+
+		config->SetIntValue(ConfigureFLAC::ConfigID, "DoMidSideStereo", False);
+		config->SetIntValue(ConfigureFLAC::ConfigID, "DoExhaustiveModelSearch", False);
+		config->SetIntValue(ConfigureFLAC::ConfigID, "DoQLPCoeffPrecSearch", False);
+
+		config->SetIntValue(ConfigureFLAC::ConfigID, "Blocksize", 4096);
+		config->SetIntValue(ConfigureFLAC::ConfigID, "MaxLPCOrder", 8);
+		config->SetIntValue(ConfigureFLAC::ConfigID, "QLPCoeffPrecision", 0);
+		config->SetIntValue(ConfigureFLAC::ConfigID, "MinResidualPartitionOrder", 0);
+		config->SetIntValue(ConfigureFLAC::ConfigID, "MaxResidualPartitionOrder", 5);
+	}
+
 	/* Get command line settings.
 	 */
-	String	 format	   = "flac";
-	Int	 preset	   = -1;
-	Int	 blocksize = 4096;
-	Int	 lpc	   = 8;
-	Int	 qlp	   = 0;
-	Int	 rice	   = 5;
+	Bool	 midSideStereo	  = config->GetIntValue(encoderID, "Use mid-side stereo", config->GetIntValue(ConfigureFLAC::ConfigID, "DoMidSideStereo", False));
+	Bool	 exhaustiveSearch = config->GetIntValue(encoderID, "Do exhaustive model search", config->GetIntValue(ConfigureFLAC::ConfigID, "DoExhaustiveModelSearch", False));
+	Bool	 qlpCoeffSearch   = config->GetIntValue(encoderID, "Do exhaustive QLP coefficient search", config->GetIntValue(ConfigureFLAC::ConfigID, "DoQLPCoeffPrecSearch", False));
+
+	String	 format		  = config->GetIntValue(ConfigureFLAC::ConfigID, "FileFormat", 0) == 0 ? "flac" : "ogg";
+	Int	 preset		  = config->GetIntValue(ConfigureFLAC::ConfigID, "Preset", -1);
+	Int	 blocksize	  = config->GetIntValue(ConfigureFLAC::ConfigID, "Blocksize", 4096);
+	Int	 lpc		  = config->GetIntValue(ConfigureFLAC::ConfigID, "MaxLPCOrder", 8);
+	Int	 qlp		  = config->GetIntValue(ConfigureFLAC::ConfigID, "QLPCoeffPrecision", 0);
+	Int	 rice		  = config->GetIntValue(ConfigureFLAC::ConfigID, "MaxResidualPartitionOrder", 5);
 
 	if (config->GetIntValue(encoderID, "Set Format", False))		       format	 = config->GetStringValue(encoderID, "Format", format).ToLower();
 	if (config->GetIntValue(encoderID, "Set Compression level", False))	       preset	 = config->GetIntValue(encoderID, "Compression level", preset);
@@ -455,17 +477,15 @@ Bool BoCA::EncoderFLAC::ConvertArguments(Config *config)
 	/* Set configuration values.
 	 */
 	config->SetIntValue(ConfigureFLAC::ConfigID, "FileFormat", format == "ogg");
-
 	config->SetIntValue(ConfigureFLAC::ConfigID, "Preset", preset);
 
-	config->SetIntValue(ConfigureFLAC::ConfigID, "DoMidSideStereo", config->GetIntValue(encoderID, "Use mid-side stereo", False));
-	config->SetIntValue(ConfigureFLAC::ConfigID, "DoExhaustiveModelSearch", config->GetIntValue(encoderID, "Do exhaustive model search", False));
-	config->SetIntValue(ConfigureFLAC::ConfigID, "DoQLPCoeffPrecSearch", config->GetIntValue(encoderID, "Do exhaustive QLP coefficient search", False));
+	config->SetIntValue(ConfigureFLAC::ConfigID, "DoMidSideStereo", midSideStereo);
+	config->SetIntValue(ConfigureFLAC::ConfigID, "DoExhaustiveModelSearch", exhaustiveSearch);
+	config->SetIntValue(ConfigureFLAC::ConfigID, "DoQLPCoeffPrecSearch", qlpCoeffSearch);
 
 	config->SetIntValue(ConfigureFLAC::ConfigID, "Blocksize", Math::Max(192, Math::Min(32768, blocksize)));
 	config->SetIntValue(ConfigureFLAC::ConfigID, "MaxLPCOrder", Math::Max(0, Math::Min(FLAC__MAX_LPC_ORDER, lpc)));
 	config->SetIntValue(ConfigureFLAC::ConfigID, "QLPCoeffPrecision", qlp == 0 ? 0 : Math::Max(FLAC__MIN_QLP_COEFF_PRECISION, Math::Min(FLAC__MAX_QLP_COEFF_PRECISION, qlp)));
-	config->SetIntValue(ConfigureFLAC::ConfigID, "MinResidualPartitionOrder", 0);
 	config->SetIntValue(ConfigureFLAC::ConfigID, "MaxResidualPartitionOrder", Math::Max(0, Math::Min(FLAC__MAX_RICE_PARTITION_ORDER, rice)));
 
 	return True;

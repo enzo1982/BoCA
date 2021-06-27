@@ -517,11 +517,31 @@ Bool BoCA::EncoderOpus::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "opus-enc";
 
+	/* Set default values.
+	 */
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureOpus::ConfigID, "Mode", 0);
+		config->SetIntValue(ConfigureOpus::ConfigID, "Bandwidth", 0);
+		config->SetIntValue(ConfigureOpus::ConfigID, "PacketLoss", 0);
+		config->SetIntValue(ConfigureOpus::ConfigID, "EnableDTX", False);
+
+		config->SetIntValue(ConfigureOpus::ConfigID, "EnableVBR", True);
+		config->SetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", False);
+
+		config->SetIntValue(ConfigureOpus::ConfigID, "Bitrate", 128);
+		config->SetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
+		config->SetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000);
+	}
+
 	/* Get command line settings.
 	 */
-	Int	 bitrate    = 128;
-	Int	 complexity = 10;
-	Int	 framesize  = 20;
+	Bool	 hardCBR	= config->GetIntValue(encoderID, "Use hard CBR encoding", !config->GetIntValue(ConfigureOpus::ConfigID, "EnableVBR", True));
+	Bool	 constrainedVBR = config->GetIntValue(encoderID, "Use constrained VBR encoding", config->GetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", False));
+
+	Int	 bitrate	= config->GetIntValue(ConfigureOpus::ConfigID, "Bitrate", 128);
+	Int	 complexity	= config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
+	Int	 framesize	= config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000) / 1000;
 
 	if (config->GetIntValue(encoderID, "Set Bitrate", False))	      bitrate	 = config->GetIntValue(encoderID, "Bitrate", bitrate);
 	if (config->GetIntValue(encoderID, "Set Encoding complexity", False)) complexity = config->GetIntValue(encoderID, "Encoding complexity", complexity);
@@ -529,13 +549,8 @@ Bool BoCA::EncoderOpus::ConvertArguments(Config *config)
 
 	/* Set configuration values.
 	 */
-	config->SetIntValue(ConfigureOpus::ConfigID, "Mode", 0);
-	config->SetIntValue(ConfigureOpus::ConfigID, "Bandwidth", 0);
-	config->SetIntValue(ConfigureOpus::ConfigID, "PacketLoss", 0);
-	config->SetIntValue(ConfigureOpus::ConfigID, "EnableDTX", False);
-
-	config->SetIntValue(ConfigureOpus::ConfigID, "EnableVBR", !config->GetIntValue(encoderID, "Use hard CBR encoding", False));
-	config->SetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", config->GetIntValue(encoderID, "Use constrained VBR encoding", False));
+	config->SetIntValue(ConfigureOpus::ConfigID, "EnableVBR", !hardCBR);
+	config->SetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", constrainedVBR);
 
 	config->SetIntValue(ConfigureOpus::ConfigID, "Bitrate", Math::Max(6, Math::Min(510, bitrate)));
 	config->SetIntValue(ConfigureOpus::ConfigID, "Complexity", Math::Max(0, Math::Min(10, complexity)));

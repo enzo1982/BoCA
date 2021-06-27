@@ -598,37 +598,59 @@ Bool BoCA::EncoderSndFile::ConvertArguments(Config *config)
 
 	static const String	 encoderID = "sndfile-enc";
 
+	/* Set default values.
+	 */
+#ifdef __APPLE__
+	Int	 defaultFormat = SF_FORMAT_AIFF;
+#else
+	Int	 defaultFormat = SF_FORMAT_WAV;
+#endif
+
+	if (!config->GetIntValue("Settings", "UserSpecifiedConfig", False))
+	{
+		config->SetIntValue(ConfigureSndFile::ConfigID, "Format", defaultFormat);
+		config->SetIntValue(ConfigureSndFile::ConfigID, "SubFormat", 0);
+	}
+
 	/* Get command line settings.
 	 */
-	String	 format = "wav";
+	Int	 format	    = config->GetIntValue(ConfigureSndFile::ConfigID, "Format", defaultFormat);
+	String	 formatName = "wav";
 
-	if (config->GetIntValue(encoderID, "Set Output format", False)) format = config->GetStringValue(encoderID, "Output format", format).ToLower();
+	if	(format == SF_FORMAT_AIFF)  formatName = "aiff";
+	else if (format == SF_FORMAT_CAF)   formatName = "caf";
+	else if (format == SF_FORMAT_W64)   formatName = "w64";
+	else if (format == SF_FORMAT_RF64)  formatName = "rf64";
+	else if (format == SF_FORMAT_AU)    formatName = "au";
+	else if (format == SF_FORMAT_VOC)   formatName = "voc";
+	else if (format == SF_FORMAT_SVX)   formatName = "iff";
+	else if (format == SF_FORMAT_IRCAM) formatName = "sf";
+	else if (format == SF_FORMAT_PAF)   formatName = "paf";
+	else if (format == SF_FORMAT_PVF)   formatName = "pvf";
+	else if (format == SF_FORMAT_WVE)   formatName = "wve";
+	else if (format == SF_FORMAT_HTK)   formatName = "htk";
+	else if (format == SF_FORMAT_AVR)   formatName = "avr";
+
+	if (config->GetIntValue(encoderID, "Set Output format", False)) formatName = config->GetStringValue(encoderID, "Output format", formatName).ToLower();
 
 	/* Set configuration values.
 	 */
-#ifdef __APPLE__
-	Int	 outputFormat = SF_FORMAT_AIFF;
-#else
-	Int	 outputFormat = SF_FORMAT_WAV;
-#endif
+	if	(formatName == "wav" ) format = SF_FORMAT_WAV;
+	else if (formatName == "aiff") format = SF_FORMAT_AIFF;
+	else if (formatName == "caf" ) format = SF_FORMAT_CAF;
+	else if (formatName == "w64" ) format = SF_FORMAT_W64;
+	else if (formatName == "rf64") format = SF_FORMAT_RF64;
+	else if (formatName == "au"  ) format = SF_FORMAT_AU;
+	else if (formatName == "voc" ) format = SF_FORMAT_VOC;
+	else if (formatName == "iff" ) format = SF_FORMAT_SVX;
+	else if (formatName == "sf"  ) format = SF_FORMAT_IRCAM;
+	else if (formatName == "paf" ) format = SF_FORMAT_PAF;
+	else if (formatName == "pvf" ) format = SF_FORMAT_PVF;
+	else if (formatName == "wve" ) format = SF_FORMAT_WVE;
+	else if (formatName == "htk" ) format = SF_FORMAT_HTK;
+	else if (formatName == "avr" ) format = SF_FORMAT_AVR;
 
-	if	(format == "wav" ) outputFormat = SF_FORMAT_WAV;
-	else if (format == "aiff") outputFormat = SF_FORMAT_AIFF;
-	else if (format == "caf" ) outputFormat = SF_FORMAT_CAF;
-	else if (format == "w64" ) outputFormat = SF_FORMAT_W64;
-	else if (format == "rf64") outputFormat = SF_FORMAT_RF64;
-	else if (format == "au"	 ) outputFormat = SF_FORMAT_AU;
-	else if (format == "voc" ) outputFormat = SF_FORMAT_VOC;
-	else if (format == "iff" ) outputFormat = SF_FORMAT_SVX;
-	else if (format == "sf"	 ) outputFormat = SF_FORMAT_IRCAM;
-	else if (format == "paf" ) outputFormat = SF_FORMAT_PAF;
-	else if (format == "pvf" ) outputFormat = SF_FORMAT_PVF;
-	else if (format == "wve" ) outputFormat = SF_FORMAT_WVE;
-	else if (format == "htk" ) outputFormat = SF_FORMAT_HTK;
-	else if (format == "avr" ) outputFormat = SF_FORMAT_AVR;
-
-	config->SetIntValue(ConfigureSndFile::ConfigID, "Format", outputFormat);
-	config->SetIntValue(ConfigureSndFile::ConfigID, "SubFormat", 0);
+	config->SetIntValue(ConfigureSndFile::ConfigID, "Format", format);
 
 	return True;
 }
