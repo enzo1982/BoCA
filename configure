@@ -26,13 +26,13 @@ echo "      please build with \"make config=bundledlibexpat,bundledliburiparser\
 echo
 echo "  On macOS:"
 echo
-echo "    - Building the fre:ac CDK is tested on macOS 10.5.8 Leopard only using"
-echo "      the Xcode 3.1 Command Line Tools (no Xcode project file provided)"
+echo "    - Building the fre:ac CDK is supported on macOS 10.5.8 Leopard and later"
+echo "      using the Xcode Command Line Tools (no Xcode project file provided)"
 echo
 echo "  On Windows:"
 echo
-echo "    - Please use MinGW (http://www.mingw.org/) or Visual Studio 2019"
-echo "      with the msvc/BoCA/BoCA.sln project file to build the fre:ac CDK"
+echo "    - Please use MSYS2 (https://www.msys2.org/) or Visual Studio 2019"
+echo "      with the msvc/BoCA.sln project file to build the fre:ac CDK"
 echo
 echo "When all prerequisites are met, simply run \"make && make install\"."
 echo

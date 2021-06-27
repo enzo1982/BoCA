@@ -8,7 +8,7 @@ set MSYSTEM=MINGW64
 set BUILD_WIN32=True
 set BUILD_X86_64=True
 
-echo fre:ac Component Development Kit v1.1.4 (x64)
+echo fre:ac Component Development Kit v1.1.5 (x64)
 echo Copyright (C) 2001-2021 Robert Kausch
 
 bash
