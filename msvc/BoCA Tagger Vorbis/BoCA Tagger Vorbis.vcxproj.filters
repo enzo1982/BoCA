@@ -18,9 +18,15 @@
     <ClInclude Include="..\..\components\tagger\vorbis\vorbis.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\components\tagger\vorbis\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\tagger\vorbis\vorbis.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\tagger\vorbis\dllinterface.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
