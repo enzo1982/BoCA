@@ -157,7 +157,11 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 			ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (uint8_t **) &escBuffer, (uint32_t *) &escBufferSize);
 
-			ex_NeAACDecInit2(handle, escBuffer, escBufferSize, (unsigned long *) &format.rate, (unsigned char *) &format.channels);
+			if (ex_NeAACDecInit2(handle, escBuffer, escBufferSize, (unsigned long *) &format.rate, (unsigned char *) &format.channels) < 0)
+			{
+				errorState  = True;
+				errorString = "Unsupported audio format";
+			}
 
 			ex_MP4Free(escBuffer);
 
@@ -263,33 +267,40 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 
 		in.InputData((void *) data, size);
 
-		ex_NeAACDecInit(handle, data, size, (unsigned long *) &format.rate, (unsigned char *) &format.channels);
-
-		/* Compute approximate length of stream.
-		 */
-		NeAACDecFrameInfo	 frameInfo;
-
-		ex_NeAACDecDecode(handle, &frameInfo, data, size);
-
-		if (!frameInfo.error)
-		{
-			Int	 bytesConsumed = 0;
-			Int	 samplesRead   = 0;
-
-			while (!frameInfo.error)
-			{
-				bytesConsumed += frameInfo.bytesconsumed;
-				samplesRead   += frameInfo.samples;
-
-				ex_NeAACDecDecode(handle, &frameInfo, data + bytesConsumed, size - bytesConsumed);
-			}
-
-			if (samplesRead > 0) track.approxLength = samplesRead / format.channels * (track.fileSize / bytesConsumed);
-		}
-		else
+		if (ex_NeAACDecInit(handle, data, size, (unsigned long *) &format.rate, (unsigned char *) &format.channels) < 0)
 		{
 			errorState  = True;
 			errorString = "Unsupported audio format";
+		}
+
+		/* Compute approximate length of stream.
+		 */
+		if (!errorState)
+		{
+			NeAACDecFrameInfo	 frameInfo;
+
+			ex_NeAACDecDecode(handle, &frameInfo, data, size);
+
+			if (!frameInfo.error)
+			{
+				Int	 bytesConsumed = 0;
+				Int	 samplesRead   = 0;
+
+				while (!frameInfo.error)
+				{
+					bytesConsumed += frameInfo.bytesconsumed;
+					samplesRead   += frameInfo.samples;
+
+					ex_NeAACDecDecode(handle, &frameInfo, data + bytesConsumed, size - bytesConsumed);
+				}
+
+				if (samplesRead > 0) track.approxLength = samplesRead / format.channels * (track.fileSize / bytesConsumed);
+			}
+			else
+			{
+				errorState  = True;
+				errorString = "Unsupported audio format";
+			}
 		}
 
 		/* Close handles.
@@ -406,7 +417,11 @@ Bool BoCA::DecoderFAAD2::Activate()
 		unsigned long	 rate;
 		unsigned char	 channels;
 
-		ex_NeAACDecInit2(handle, escBuffer, escBufferSize, &rate, &channels);
+		if (ex_NeAACDecInit2(handle, escBuffer, escBufferSize, &rate, &channels) < 0)
+		{
+			errorState  = True;
+			errorString = "Unsupported audio format";
+		}
 
 		ex_MP4Free(escBuffer);
 	}
@@ -420,11 +435,26 @@ Bool BoCA::DecoderFAAD2::Activate()
 		unsigned long	 rate;
 		unsigned char	 channels;
 
-		ex_NeAACDecInit(handle, data, size, &rate, &channels);
+		if (ex_NeAACDecInit(handle, data, size, &rate, &channels) < 0)
+		{
+			errorState  = True;
+			errorString = "Unsupported audio format";
+		}
 
 		delete [] data;
 
 		driver->Seek(driver->GetPos() - size);
+	}
+
+	/* Check for error.
+	 */
+	if (errorState)
+	{
+		ex_NeAACDecClose(handle);
+
+		if (mp4File != NIL) ex_MP4Close(mp4File, 0);
+
+		return False;
 	}
 
 	return True;
