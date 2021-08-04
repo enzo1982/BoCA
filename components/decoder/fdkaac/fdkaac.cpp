@@ -414,7 +414,12 @@ Bool BoCA::DecoderFDKAAC::Activate()
 		mp4File	 = ex_MP4ReadProvider(track.fileName.ConvertTo("UTF-8"), NIL);
 		mp4Track = GetAudioTrack(mp4File);
 
-		if (mp4Track == -1) return False;
+		if (mp4Track == -1)
+		{
+			ex_MP4Close(mp4File, 0);
+
+			return False;
+		}
 
 		driver->Seek(0);
 
