@@ -358,7 +358,10 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 
 		/* Save cover art file.
 		 */
-		String	 file = String(folder).Append(folder.EndsWith(Directory::GetDirectoryDelimiter()) ? NIL : Directory::GetDirectoryDelimiter()).Append(fileName);
+		Bool	 useUnicode    = config->GetIntValue("Settings", "UseUnicodeFilenames", True);
+		Bool	 replaceSpaces = config->GetIntValue("Settings", "FilenamesReplaceSpaces", False);
+
+		String	 file	       = File(Utilities::ReplaceIncompatibleCharacters(fileName, useUnicode, False, replaceSpaces), folder);
 
 		picture.SaveToFile(Utilities::CreateDirectoryForFile(Utilities::NormalizeFileName(file)));
 	}
