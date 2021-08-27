@@ -56,7 +56,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 				checkBox->SetChecked(config->GetIntValue(specs->id, param->GetName(), param->GetEnabled()));
 
 				position += Point(0, 25);
-				layer->SetHeight(25);
+				layer->SetHeight(24);
 
 				break;
 			case PARAMETER_TYPE_SELECTION:
@@ -90,7 +90,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 				}
 
 				position += Point(0, 26);
-				layer->SetHeight(26);
+				layer->SetHeight(25);
 
 				break;
 			case PARAMETER_TYPE_RANGE:
@@ -150,7 +150,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 				}
 
 				position += Point(0, 39);
-				layer->SetHeight(39);
+				layer->SetHeight(38);
 
 				break;
 			default:
