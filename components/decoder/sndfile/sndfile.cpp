@@ -254,6 +254,13 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 			info.genre	= ex_sf_get_string(sndf, SF_STR_GENRE);
 			info.comment	= ex_sf_get_string(sndf, SF_STR_COMMENT);
 
+			SF_LOOP_INFO	 loopInfo;
+
+			if (ex_sf_command(sndf, SFC_GET_LOOP_INFO, &loopInfo, sizeof(loopInfo)) == SF_TRUE)
+			{
+				info.SetOtherInfo(INFO_BPM, String::FromFloat(Math::Round(loopInfo.bpm * 1000.0) / 1000.0));
+			}
+
 			track.SetInfo(info);
 
 			ex_sf_close(sndf);
