@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -301,7 +301,7 @@ Int BoCA::DecoderMediaFoundation::ReadData(Buffer<UnsignedByte> &data)
 
 	if (FAILED(hr)) return -1;
 
-	if (streamFlags & MF_SOURCE_READERF_ENDOFSTREAM) return 0;
+	if (streamFlags & MF_SOURCE_READERF_ENDOFSTREAM) return -1;
 
 	/* Copy sample to data buffer.
 	 */
