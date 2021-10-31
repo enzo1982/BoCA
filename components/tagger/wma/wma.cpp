@@ -437,7 +437,11 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			else if (id == g_wszWMGenre)		       info.genre   = value;
 			else if (id == g_wszWMDescription)	       info.comment = value;
 			else if (id == g_wszWMPublisher)	       info.label   = value;
-			else if (id == g_wszWMISRC)		       info.isrc    = value;
+
+			else if (id == g_wszWMISRC)
+			{
+				if (Info::IsISRC(value)) info.isrc = value;
+			}
 
 			else if (id == g_wszWMAlbumArtist)	       info.SetOtherInfo(INFO_ALBUMARTIST,    value);
 
@@ -455,7 +459,11 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			else if (id == g_wszWMOriginalLyricist)	       info.SetOtherInfo(INFO_ORIG_LYRICIST,  value);
 			else if (id == g_wszWMOriginalReleaseYear)     info.SetOtherInfo(INFO_ORIG_YEAR,      value);
 
-			else if (id == g_wszWMBeatsPerMinute)	       info.SetOtherInfo(INFO_BPM,	      value);
+			else if (id == g_wszWMBeatsPerMinute)
+			{
+				if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
+			}
+
 			else if (id == g_wszWMInitialKey)	       info.SetOtherInfo(INFO_INITIALKEY,     value);
 
 			else if (id == g_wszWMCopyright)	       info.SetOtherInfo(INFO_COPYRIGHT,      value);

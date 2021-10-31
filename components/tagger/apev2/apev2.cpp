@@ -416,7 +416,11 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		else if (id == "COMMENT")	 info.comment = value;
 		else if (id == "PUBLISHER")	 info.label   = value;
 		else if (id == "LABEL")		 info.label   = value;
-		else if (id == "ISRC")		 info.isrc    = value;
+
+		else if (id == "ISRC")
+		{
+			if (Info::IsISRC(value)) info.isrc = value;
+		}
 
 		else if (id == "ALBUM ARTIST")	 info.SetOtherInfo(INFO_ALBUMARTIST,	value);
 
@@ -444,7 +448,11 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		else if (id == "MOVEMENTTOTAL")	 info.SetOtherInfo(INFO_MOVEMENTTOTAL,	value);
 		else if (id == "MOVEMENTNAME")	 info.SetOtherInfo(INFO_MOVEMENTNAME,	value);
 
-		else if (id == "BPM")		 info.SetOtherInfo(INFO_BPM,		value);
+		else if (id == "BPM")
+		{
+			if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
+		}
+
 		else if (id == "INITIALKEY")	 info.SetOtherInfo(INFO_INITIALKEY,	value);
 
 		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);

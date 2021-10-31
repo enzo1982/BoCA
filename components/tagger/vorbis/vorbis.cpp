@@ -324,7 +324,10 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 			 id == "PUBLISHER" ||
 			 id == "ORGANIZATION")	 info.label     = value;
 
-		else if (id == "ISRC")		 info.isrc      = value;
+		else if (id == "ISRC")
+		{
+			if (Info::IsISRC(value)) info.isrc = value;
+		}
 
 		else if (id == "TRACKNUMBER")
 		{
@@ -380,7 +383,11 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "MOVEMENTNAME" ||
 			 id == "PARTNAME")	 info.SetOtherInfo(INFO_MOVEMENTNAME,	value);
 
-		else if (id == "BPM")		 info.SetOtherInfo(INFO_BPM,		value);
+		else if (id == "BPM")
+		{
+			if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
+		}
+
 		else if (id == "INITIALKEY")	 info.SetOtherInfo(INFO_INITIALKEY,	value);
 
 		else if (id == "COPYRIGHT")	 info.SetOtherInfo(INFO_COPYRIGHT,	value);

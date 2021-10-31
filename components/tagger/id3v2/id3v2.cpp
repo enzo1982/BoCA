@@ -687,7 +687,11 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_RECORDINGTIME)	    info.year	 = GetStringField(frame, ID3FN_TEXT).Head(4).ToInt();
 		else if (frame.GetID() == ID3FID_COMMENT)	    info.comment = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_PUBLISHER)	    info.label	 = GetStringField(frame, ID3FN_TEXT);
-		else if (frame.GetID() == ID3FID_ISRC)		    info.isrc	 = GetStringField(frame, ID3FN_TEXT);
+
+		else if (frame.GetID() == ID3FID_ISRC)
+		{
+			if (Info::IsISRC(GetStringField(frame, ID3FN_TEXT))) info.isrc = GetStringField(frame, ID3FN_TEXT);
+		}
 
 		else if (frame.GetID() == ID3FID_CONTENTGROUP)	    info.SetOtherInfo(INFO_CONTENTGROUP,   GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_SUBTITLE)	    info.SetOtherInfo(INFO_SUBTITLE,	   GetStringField(frame, ID3FN_TEXT));
@@ -715,7 +719,11 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 		else if (frame.GetID() == ID3FID_MOVEMENTNAME)	    info.SetOtherInfo(INFO_MOVEMENTNAME,   GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_BPM)		    info.SetOtherInfo(INFO_BPM,		   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_BPM)
+		{
+			if (GetStringField(frame, ID3FN_TEXT).ToInt() > 0) info.SetOtherInfo(INFO_BPM, GetStringField(frame, ID3FN_TEXT));
+		}
+
 		else if (frame.GetID() == ID3FID_INITIALKEY)	    info.SetOtherInfo(INFO_INITIALKEY,	   GetStringField(frame, ID3FN_TEXT));
 
 		else if (frame.GetID() == ID3FID_COPYRIGHT)	    info.SetOtherInfo(INFO_COPYRIGHT,	   GetStringField(frame, ID3FN_TEXT));

@@ -548,7 +548,10 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 			else if (code == L"©mvc") info.SetOtherInfo(INFO_MOVEMENTTOTAL, value);
 			else if	(code == L"©mvn") info.SetOtherInfo(INFO_MOVEMENTNAME,  value);
 
-			else if	(code ==  "tmpo") info.SetOtherInfo(INFO_BPM,		value);
+			else if	(code ==  "tmpo")
+			{
+				if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
+			}
 
 			else if	(code ==  "cprt") info.SetOtherInfo(INFO_COPYRIGHT,	value);
 		}
@@ -578,7 +581,10 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 			if	(id == "LABEL"	   ||
 				 id == "PUBLISHER")	info.label = value;
 
-			else if (id == "ISRC")		info.isrc  = value;
+			else if (id == "ISRC")
+			{
+				if (Info::IsISRC(value)) info.isrc = value;
+			}
 
 			else if (id == "SUBTITLE")	info.SetOtherInfo(INFO_SUBTITLE,      value);
 
