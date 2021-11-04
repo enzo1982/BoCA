@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -107,28 +107,28 @@ Error BoCA::TaggerID3v1::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 	const Info		&info = track.GetInfo();
 	String::OutputFormat	 outputFormat(encodingID);
 
-	{ out.OutputString(info.title.Trim().Head(Math::Min(30, info.title.Trim().Length())));   for (Int i = 0; i < 30 - info.title.Trim().Length(); i++) out.OutputNumber(0, 1); }
-	{ out.OutputString(info.artist.Trim().Head(Math::Min(30, info.artist.Trim().Length()))); for (Int i = 0; i < 30 - info.artist.Trim().Length(); i++) out.OutputNumber(0, 1); }
-	{ out.OutputString(info.album.Trim().Head(Math::Min(30, info.album.Trim().Length())));   for (Int i = 0; i < 30 - info.album.Trim().Length(); i++) out.OutputNumber(0, 1); }
+	{ String value = info.title.Trim();  out.OutputString(value.Head(Math::Min(30, value.Length()))); for (Int i = 0; i < 30 - value.Length(); i++) out.OutputNumber(0, 1); }
+	{ String value = info.artist.Trim(); out.OutputString(value.Head(Math::Min(30, value.Length()))); for (Int i = 0; i < 30 - value.Length(); i++) out.OutputNumber(0, 1); }
+	{ String value = info.album.Trim();  out.OutputString(value.Head(Math::Min(30, value.Length()))); for (Int i = 0; i < 30 - value.Length(); i++) out.OutputNumber(0, 1); }
 
-	if (info.year > 0) { out.OutputString(String().FillN('0', 4 - String::FromInt(info.year).Length())); out.OutputString(String::FromInt(info.year).Tail(Math::Min(4, String::FromInt(info.year).Length()))); }
+	if (info.year > 0) { String value = String::FromInt(info.year); out.OutputString(String().FillN('0', 4 - value.Length())); out.OutputString(value.Tail(Math::Min(4, value.Length()))); }
 	else		   { out.OutputNumber(0, 4); }
 
 	String		 comment;
 
-	if	(info.comment != NIL && !replaceExistingComments) comment = info.comment;
-	else if (defaultComment != NIL)				  comment = defaultComment;
+	if	(info.comment != NIL && !replaceExistingComments) comment = info.comment.Trim();
+	else if (defaultComment != NIL)				  comment = defaultComment.Trim();
 
 	if (info.track > 0)
 	{
-		{ out.OutputString(comment.Trim().Head(Math::Min(28, comment.Trim().Length()))); for (Int i = 0; i < 28 - comment.Trim().Length(); i++) out.OutputNumber(0, 1); }
+		{ out.OutputString(comment.Head(Math::Min(28, comment.Length()))); for (Int i = 0; i < 28 - comment.Length(); i++) out.OutputNumber(0, 1); }
 
 		out.OutputNumber(0, 1);
 		out.OutputNumber(info.track, 1);
 	}
 	else
 	{
-		{ out.OutputString(comment.Trim().Head(Math::Min(30, comment.Trim().Length()))); for (Int i = 0; i < 30 - comment.Trim().Length(); i++) out.OutputNumber(0, 1); }
+		{ out.OutputString(comment.Head(Math::Min(30, comment.Length()))); for (Int i = 0; i < 30 - comment.Length(); i++) out.OutputNumber(0, 1); }
 	}
 
 	out.OutputNumber(GetID3CategoryID(info.genre), 1);
