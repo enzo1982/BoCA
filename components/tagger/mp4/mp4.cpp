@@ -224,6 +224,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 		else if (key == INFO_BPM)	    AddItmfItem(mp4File,  "tmpo", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
 
 		else if	(key == INFO_COPYRIGHT)     AddItmfItem(mp4File,  "cprt", NIL, NIL, value);
+
+		else if	(key == INFO_LYRICS)	    AddItmfItem(mp4File, L"©lyr", NIL, NIL, pair.Tail(pair.Length() - pair.Find(":") - 1));
 	}
 
 	/* Save generic iTunes metadata.
@@ -554,6 +556,8 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 			}
 
 			else if	(code ==  "cprt") info.SetOtherInfo(INFO_COPYRIGHT,	value);
+
+			else if	(code == L"©lyr") info.SetOtherInfo(INFO_LYRICS,	value);
 		}
 
 		ex_MP4ItmfItemListFree(items);
@@ -732,6 +736,8 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	RemoveItmfItem(mp4File,  "tmpo");
 
 	RemoveItmfItem(mp4File,  "cprt");
+
+	RemoveItmfItem(mp4File, L"©lyr");
 
 	/* Remove iTunes metadata items too.
 	 */

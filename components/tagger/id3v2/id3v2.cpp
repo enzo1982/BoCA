@@ -521,6 +521,8 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		else if	(key == INFO_DISCSUBTITLE)   { ID3_Frame frame(ID3FID_SETSUBTITLE);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
+		else if	(key == INFO_LYRICS)	     { ID3_Frame frame(ID3FID_UNSYNCEDLYRICS);	  SetStringField(frame, ID3FN_TEXT, value, False); SetASCIIField(frame, ID3FN_LANGUAGE, "und"); container.AddFrame(frame); }
+
 		else if	(key == INFO_RADIOSTATION)   { ID3_Frame frame(ID3FID_NETRADIOSTATION);   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_RADIOOWNER)     { ID3_Frame frame(ID3FID_NETRADIOOWNER);     SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
@@ -731,6 +733,8 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_MEDIATYPE)	    info.SetOtherInfo(INFO_MEDIATYPE,	   GetStringField(frame, ID3FN_TEXT));
 
 		else if (frame.GetID() == ID3FID_SETSUBTITLE)	    info.SetOtherInfo(INFO_DISCSUBTITLE,   GetStringField(frame, ID3FN_TEXT));
+
+		else if (frame.GetID() == ID3FID_UNSYNCEDLYRICS)    info.SetOtherInfo(INFO_LYRICS,	   GetStringField(frame, ID3FN_TEXT, False));
 
 		else if (frame.GetID() == ID3FID_NETRADIOSTATION)   info.SetOtherInfo(INFO_RADIOSTATION,   GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_NETRADIOOWNER)     info.SetOtherInfo(INFO_RADIOOWNER,	   GetStringField(frame, ID3FN_TEXT));

@@ -57,6 +57,8 @@ namespace BoCA
 
 	const char * const INFO_DISCSUBTITLE	= (char *) "Disc/set subtitle";
 
+	const char * const INFO_LYRICS		= (char *) "Unsynchronized lyrics";
+
 	const char * const INFO_RADIOSTATION	= (char *) "Internet radio station name";
 	const char * const INFO_RADIOOWNER	= (char *) "Internet radio station owner";
 

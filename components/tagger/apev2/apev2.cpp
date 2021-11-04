@@ -128,42 +128,44 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST)    { RenderAPEItem("Album Artist",   value, buffer); numItems++; }
+		if	(key == INFO_ALBUMARTIST)    { RenderAPEItem("Album Artist",   value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_CONTENTGROUP)   { RenderAPEItem("Grouping",       value, buffer); numItems++; }
-		else if	(key == INFO_SUBTITLE)	     { RenderAPEItem("Subtitle",       value, buffer); numItems++; }
+		else if	(key == INFO_CONTENTGROUP)   { RenderAPEItem("Grouping",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_SUBTITLE)	     { RenderAPEItem("Subtitle",       value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_BAND)	     { RenderAPEItem("Ensemble",       value, buffer); numItems++; }
-		else if	(key == INFO_PERFORMER)	     { RenderAPEItem("Performer",      value, buffer); numItems++; }
-		else if	(key == INFO_CONDUCTOR)	     { RenderAPEItem("Conductor",      value, buffer); numItems++; }
-		else if	(key == INFO_REMIXER)	     { RenderAPEItem("MixArtist",      value, buffer); numItems++; }
-		else if	(key == INFO_COMPOSER)	     { RenderAPEItem("Composer",       value, buffer); numItems++; }
-		else if	(key == INFO_ARRANGER)	     { RenderAPEItem("Arranger",       value, buffer); numItems++; }
-		else if	(key == INFO_PRODUCER)	     { RenderAPEItem("Producer",       value, buffer); numItems++; }
-		else if	(key == INFO_ENGINEER)	     { RenderAPEItem("Engineer",       value, buffer); numItems++; }
+		else if	(key == INFO_BAND)	     { RenderAPEItem("Ensemble",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_PERFORMER)	     { RenderAPEItem("Performer",      value, buffer	   ); numItems++; }
+		else if	(key == INFO_CONDUCTOR)	     { RenderAPEItem("Conductor",      value, buffer	   ); numItems++; }
+		else if	(key == INFO_REMIXER)	     { RenderAPEItem("MixArtist",      value, buffer	   ); numItems++; }
+		else if	(key == INFO_COMPOSER)	     { RenderAPEItem("Composer",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_ARRANGER)	     { RenderAPEItem("Arranger",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_PRODUCER)	     { RenderAPEItem("Producer",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_ENGINEER)	     { RenderAPEItem("Engineer",       value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_MOVEMENT)	     { RenderAPEItem("Movement",       value, buffer); numItems++; }
-		else if	(key == INFO_MOVEMENTTOTAL)  { RenderAPEItem("MovementTotal",  value, buffer); numItems++; }
-		else if	(key == INFO_MOVEMENTNAME)   { RenderAPEItem("MovementName",   value, buffer); numItems++; }
+		else if	(key == INFO_MOVEMENT)	     { RenderAPEItem("Movement",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_MOVEMENTTOTAL)  { RenderAPEItem("MovementTotal",  value, buffer	   ); numItems++; }
+		else if	(key == INFO_MOVEMENTNAME)   { RenderAPEItem("MovementName",   value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_BPM)	     { RenderAPEItem("BPM",	       value, buffer); numItems++; }
-		else if	(key == INFO_INITIALKEY)     { RenderAPEItem("InitialKey",     value, buffer); numItems++; }
+		else if	(key == INFO_BPM)	     { RenderAPEItem("BPM",	       value, buffer	   ); numItems++; }
+		else if	(key == INFO_INITIALKEY)     { RenderAPEItem("InitialKey",     value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_COPYRIGHT)	     { RenderAPEItem("Copyright",      value, buffer); numItems++; }
+		else if	(key == INFO_COPYRIGHT)	     { RenderAPEItem("Copyright",      value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_MEDIATYPE)	     { RenderAPEItem("Media",	       value, buffer); numItems++; }
-		else if	(key == INFO_CATALOGNUMBER)  { RenderAPEItem("CatalogNumber",  value, buffer); numItems++; }
-		else if	(key == INFO_BARCODE)	     { RenderAPEItem("Barcode",	       value, buffer); numItems++; }
+		else if	(key == INFO_MEDIATYPE)	     { RenderAPEItem("Media",	       value, buffer	   ); numItems++; }
+		else if	(key == INFO_CATALOGNUMBER)  { RenderAPEItem("CatalogNumber",  value, buffer	   ); numItems++; }
+		else if	(key == INFO_BARCODE)	     { RenderAPEItem("Barcode",	       value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_RELEASECOUNTRY) { RenderAPEItem("ReleaseCountry", value, buffer); numItems++; }
+		else if	(key == INFO_RELEASECOUNTRY) { RenderAPEItem("ReleaseCountry", value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_DISCSUBTITLE)   { RenderAPEItem("DiscSubtitle",   value, buffer); numItems++; }
+		else if	(key == INFO_DISCSUBTITLE)   { RenderAPEItem("DiscSubtitle",   value, buffer	   ); numItems++; }
 
-		else if	(key == INFO_WEB_ARTIST)     { RenderAPEItem("Artist URL",     value, buffer); numItems++; }
-		else if	(key == INFO_WEB_PUBLISHER)  { RenderAPEItem("Publisher URL",  value, buffer); numItems++; }
-		else if	(key == INFO_WEB_SOURCE)     { RenderAPEItem("File URL",       value, buffer); numItems++; }
-		else if	(key == INFO_WEB_COPYRIGHT)  { RenderAPEItem("Copyright URL",  value, buffer); numItems++; }
-		else if	(key == INFO_WEB_COMMERCIAL) { RenderAPEItem("Buy URL",	       value, buffer); numItems++; }
+		else if	(key == INFO_LYRICS)	     { RenderAPEItem("Lyrics",	       value, buffer, False); numItems++; }
+
+		else if	(key == INFO_WEB_ARTIST)     { RenderAPEItem("Artist URL",     value, buffer	   ); numItems++; }
+		else if	(key == INFO_WEB_PUBLISHER)  { RenderAPEItem("Publisher URL",  value, buffer	   ); numItems++; }
+		else if	(key == INFO_WEB_SOURCE)     { RenderAPEItem("File URL",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_WEB_COPYRIGHT)  { RenderAPEItem("Copyright URL",  value, buffer	   ); numItems++; }
+		else if	(key == INFO_WEB_COMMERCIAL) { RenderAPEItem("Buy URL",	       value, buffer	   ); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -472,6 +474,13 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		else if (id == "RELEASECOUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,	value);
 
 		else if (id == "DISCSUBTITLE")	 info.SetOtherInfo(INFO_DISCSUBTITLE,	value);
+
+		else if (id == "LYRICS")
+		{
+			ParseAPEItem(buffer, previousOffset, &id, &value, False);
+
+			info.SetOtherInfo(INFO_LYRICS, value);
+		}
 
 		else if (id == "WEBLINK" ||
 			 id == "ARTIST URL")	 info.SetOtherInfo(INFO_WEB_ARTIST,	value);

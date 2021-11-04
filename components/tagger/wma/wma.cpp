@@ -227,6 +227,8 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			else if	(key == INFO_CATALOGNUMBER)  RenderWMAStringItem("WM/CatalogNo",		 value, pHeaderInfo);
 			else if	(key == INFO_BARCODE)	     RenderWMAStringItem("WM/Barcode",			 value, pHeaderInfo);
 
+			else if	(key == INFO_LYRICS)	     RenderWMAStringItem(g_wszWMLyrics,			 value, pHeaderInfo, False);
+
 			else if	(key == INFO_RADIOSTATION)   RenderWMAStringItem(g_wszWMRadioStationName,	 value, pHeaderInfo);
 			else if	(key == INFO_RADIOOWNER)     RenderWMAStringItem(g_wszWMRadioStationOwner,	 value, pHeaderInfo);
 
@@ -471,6 +473,8 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			else if (id == "WM/Media")		       info.SetOtherInfo(INFO_MEDIATYPE,      value);
 			else if (id == "WM/CatalogNo")		       info.SetOtherInfo(INFO_CATALOGNUMBER,  value);
 			else if (id == "WM/Barcode")		       info.SetOtherInfo(INFO_BARCODE,	      value);
+
+			else if (id == g_wszWMLyrics)		       info.SetOtherInfo(INFO_LYRICS,	      String((LPWSTR) pbValue));
 
 			else if (id == g_wszWMRadioStationName)	       info.SetOtherInfo(INFO_RADIOSTATION,   value);
 			else if (id == g_wszWMRadioStationOwner)       info.SetOtherInfo(INFO_RADIOOWNER,     value);
@@ -753,6 +757,8 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 				    nameStr == "WM/Media"			||
 				    nameStr == "WM/CatalogNo"			||
 				    nameStr == "WM/Barcode"			||
+
+				    nameStr == g_wszWMLyrics			||
 
 				    nameStr == g_wszWMRadioStationName		||
 				    nameStr == g_wszWMRadioStationOwner		||
