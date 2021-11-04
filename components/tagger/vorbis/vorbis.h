@@ -24,7 +24,7 @@ namespace BoCA
 			static const String	 ConfigID;
 
 			Int			 RenderTagHeader(const String &, Int, Buffer<UnsignedByte> &);
-			Int			 RenderTagItem(const String &, const String &, Buffer<UnsignedByte> &);
+			Int			 RenderTagItem(const String &, const String &, Buffer<UnsignedByte> &, Bool = True);
 
 			Void			 CreateMetadataBlockPicture(Buffer<UnsignedByte> &, const Picture &, Bool);
 

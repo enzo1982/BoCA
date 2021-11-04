@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ namespace BoCA
 
 			Bool			 ParseAPEHeader(const Buffer<UnsignedByte> &, Int *, Int *);
 			Bool			 ParseAPEFooter(const Buffer<UnsignedByte> &, Int *, Int *);
-			Bool			 ParseAPEItem(const Buffer<UnsignedByte> &, Int &, String *, String *);
+			Bool			 ParseAPEItem(const Buffer<UnsignedByte> &, Int &, String *, String *, Bool = True);
 			Bool			 ParseAPEBinaryItem(const Buffer<UnsignedByte> &, Int &, String *, Buffer<UnsignedByte> &);
 		public:
 			static const String	&GetComponentSpecs();

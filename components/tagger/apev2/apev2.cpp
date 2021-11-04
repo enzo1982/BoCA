@@ -90,13 +90,13 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	Int		 numItems = 0;
 
-	if (info.artist != NIL) { RenderAPEItem("Artist", info.artist, buffer);		     numItems++; }
-	if (info.title  != NIL) { RenderAPEItem("Title", info.title, buffer);		     numItems++; }
-	if (info.album  != NIL) { RenderAPEItem("Album", info.album, buffer);		     numItems++; }
-	if (info.year    >   0) { RenderAPEItem("Year", String::FromInt(info.year), buffer); numItems++; }
-	if (info.genre  != NIL) { RenderAPEItem("Genre", info.genre, buffer);		     numItems++; }
-	if (info.label  != NIL) { RenderAPEItem("Publisher", info.label, buffer);	     numItems++; }
-	if (info.isrc   != NIL) { RenderAPEItem("ISRC", info.isrc, buffer);		     numItems++; }
+	if (info.artist != NIL) { RenderAPEItem("Artist",    info.artist,		 buffer); numItems++; }
+	if (info.title  != NIL) { RenderAPEItem("Title",     info.title,		 buffer); numItems++; }
+	if (info.album  != NIL) { RenderAPEItem("Album",     info.album,		 buffer); numItems++; }
+	if (info.year    >   0) { RenderAPEItem("Year",	     String::FromInt(info.year), buffer); numItems++; }
+	if (info.genre  != NIL) { RenderAPEItem("Genre",     info.genre,		 buffer); numItems++; }
+	if (info.label  != NIL) { RenderAPEItem("Publisher", info.label,		 buffer); numItems++; }
+	if (info.isrc   != NIL) { RenderAPEItem("ISRC",	     info.isrc,			 buffer); numItems++; }
 
 	if (info.track > 0)
 	{
@@ -116,8 +116,8 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		{ RenderAPEItem("Disc", discString, buffer); numItems++; }
 	}
 
-	if	(info.comment != NIL && !replaceExistingComments) { RenderAPEItem("Comment", info.comment, buffer);   numItems++; }
-	else if (defaultComment != NIL && numItems > 0)		  { RenderAPEItem("Comment", defaultComment, buffer); numItems++; }
+	if	(info.comment != NIL && !replaceExistingComments) { RenderAPEItem("Comment", info.comment,   buffer, False); numItems++; }
+	else if (defaultComment != NIL && numItems > 0)		  { RenderAPEItem("Comment", defaultComment, buffer	  ); numItems++; }
 
 	/* Save other text info.
 	 */
@@ -400,6 +400,7 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		String			 id;
 		String			 value;
 		Buffer<UnsignedByte>	 item;
+		Int			 previousOffset = offset;
 
 		ParseAPEItem(buffer, offset, &id, &value);
 
@@ -413,7 +414,14 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		else if (id == "ALBUM")		 info.album   = value;
 		else if (id == "YEAR")		 info.year    = value.ToInt();
 		else if (id == "GENRE")		 info.genre   = value;
-		else if (id == "COMMENT")	 info.comment = value;
+
+		else if (id == "COMMENT")
+		{
+			ParseAPEItem(buffer, previousOffset, &id, &value, False);
+
+			info.comment = value;
+		}
+
 		else if (id == "PUBLISHER")	 info.label   = value;
 		else if (id == "LABEL")		 info.label   = value;
 
@@ -690,7 +698,7 @@ Bool BoCA::TaggerAPEv2::ParseAPEFooter(const Buffer<UnsignedByte> &buffer, Int *
 	return True;
 }
 
-Bool BoCA::TaggerAPEv2::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &offset, String *id, String *value)
+Bool BoCA::TaggerAPEv2::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &offset, String *id, String *value, Bool trim)
 {
 	InStream	 in(STREAM_BUFFER, buffer + offset, buffer.Size() - offset - 32);
 
@@ -718,7 +726,9 @@ Bool BoCA::TaggerAPEv2::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &of
 	}
 	while (lastChar != 0);
 
-	*value = in.InputString(valueBytes).Trim();
+	*value = in.InputString(valueBytes);
+
+	if (trim) *value = value->Trim();
 
 	offset += in.GetPos();
 

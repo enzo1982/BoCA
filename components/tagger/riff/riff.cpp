@@ -98,7 +98,7 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	if	(info.track   >   0) RenderTagItem("ITRK", String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);
 	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year).Append("-01-01"), buffer);
 
-	if	(info.comment != NIL && !replaceExistingComments) RenderTagItem("ICMT", info.comment, buffer);
+	if	(info.comment != NIL && !replaceExistingComments) RenderTagItem("ICMT", info.comment, buffer, False);
 	else if (defaultComment != NIL)				  RenderTagItem("ICMT", defaultComment, buffer);
 
 	/* Save other text info.
@@ -156,9 +156,9 @@ Int BoCA::TaggerRIFF::RenderTagHeader(Buffer<UnsignedByte> &buffer)
 	return Success();
 }
 
-Int BoCA::TaggerRIFF::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
+Int BoCA::TaggerRIFF::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer, Bool trim)
 {
-	String		 data     = value.Trim();
+	String		 data     = trim ? value.Trim() : value;
 	Int		 dataSize = data != NIL ? strlen(data) + 1 : 1;
 	Int		 size	  = dataSize + (dataSize & 1) + 8;
 
@@ -201,7 +201,8 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 
 		if (length > 0)
 		{
-			String	 value = in.InputString(length - 1).Trim();
+			String	 string = in.InputString(length - 1);
+			String	 value	= string.Trim();
 
 			if (IsStringUTF8(value)) value.ImportFrom("UTF-8", value.ConvertTo("ISO-8859-1"));
 
@@ -210,7 +211,14 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 			else if (id == "IPRD") info.album   = value;
 			else if (id == "ICRD") info.year    = value.Head(4).ToInt();
 			else if (id == "IGNR") info.genre   = value;
-			else if (id == "ICMT") info.comment = value;
+
+			else if (id == "ICMT")
+			{
+				if (IsStringUTF8(string)) string.ImportFrom("UTF-8", string.ConvertTo("ISO-8859-1"));
+
+				info.comment = string;
+			}
+
 			else if (id == "IDST") info.label   = value;
 			else if (id == "TORG") info.label   = value;
 

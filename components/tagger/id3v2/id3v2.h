@@ -30,11 +30,11 @@ namespace BoCA
 			Int			 ParseContainer(const ID3_Container &, Track &);
 			Int			 RenderContainer(ID3_Container &, const Track &, Bool = False);
 
-			String			 GetStringField(const ID3_Frame &, ID3_FieldID);
-			Int			 SetStringField(ID3_Frame &, ID3_FieldID, const String &);
+			String			 GetStringField(const ID3_Frame &, ID3_FieldID, Bool = True);
+			Int			 SetStringField(ID3_Frame &, ID3_FieldID, const String &, Bool = True);
 
-			String			 GetASCIIField(const ID3_Frame &, ID3_FieldID);
-			Int			 SetASCIIField(ID3_Frame &, ID3_FieldID, const String &);
+			String			 GetASCIIField(const ID3_Frame &, ID3_FieldID, Bool = True);
+			Int			 SetASCIIField(ID3_Frame &, ID3_FieldID, const String &, Bool = True);
 
 			Int			 GetIntegerField(const ID3_Frame &, ID3_FieldID);
 			Int			 SetIntegerField(ID3_Frame &, ID3_FieldID, Int);

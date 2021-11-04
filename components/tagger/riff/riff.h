@@ -24,7 +24,7 @@ namespace BoCA
 			static Bool		 IsStringUTF8(const String &);
 
 			Int			 RenderTagHeader(Buffer<UnsignedByte> &);
-			Int			 RenderTagItem(const String &, const String &, Buffer<UnsignedByte> &);
+			Int			 RenderTagItem(const String &, const String &, Buffer<UnsignedByte> &, Bool = True);
 		public:
 			static const String	&GetComponentSpecs();
 

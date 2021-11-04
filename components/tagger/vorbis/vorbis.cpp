@@ -95,22 +95,22 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	Int	 numItems = 0;
 
-	if	(info.artist != NIL) { RenderTagItem("ARTIST", info.artist, buffer);		  numItems++; }
-	if	(info.title  != NIL) { RenderTagItem("TITLE", info.title, buffer);		  numItems++; }
-	if	(info.album  != NIL) { RenderTagItem("ALBUM", info.album, buffer);		  numItems++; }
-	if	(info.year    >   0) { RenderTagItem("DATE", String::FromInt(info.year), buffer); numItems++; }
-	if	(info.genre  != NIL) { RenderTagItem("GENRE", info.genre, buffer);		  numItems++; }
-	if	(info.label  != NIL) { RenderTagItem("PUBLISHER", info.label, buffer);		  numItems++; }
-	if	(info.isrc   != NIL) { RenderTagItem("ISRC", info.isrc, buffer);		  numItems++; }
+	if	(info.artist != NIL) { RenderTagItem("ARTIST",	  info.artist,		      buffer); numItems++; }
+	if	(info.title  != NIL) { RenderTagItem("TITLE",	  info.title,		      buffer); numItems++; }
+	if	(info.album  != NIL) { RenderTagItem("ALBUM",	  info.album,		      buffer); numItems++; }
+	if	(info.year    >   0) { RenderTagItem("DATE",	  String::FromInt(info.year), buffer); numItems++; }
+	if	(info.genre  != NIL) { RenderTagItem("GENRE",	  info.genre,		      buffer); numItems++; }
+	if	(info.label  != NIL) { RenderTagItem("PUBLISHER", info.label,		      buffer); numItems++; }
+	if	(info.isrc   != NIL) { RenderTagItem("ISRC",	  info.isrc,		      buffer); numItems++; }
 
-	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);	    numItems++; }
-	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL", String(prependZero && info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
+	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(prependZero && info.track	 < 10 ? "0" : NIL).Append(String::FromInt(info.track)),	    buffer); numItems++; }
+	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL",  String(prependZero && info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
 
-	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER", String(prependZero && info.disc < 10 ? "0" : NIL).Append(String::FromInt(info.disc)), buffer);	    numItems++; }
-	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL", String(prependZero && info.numDiscs < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)), buffer);    numItems++; }
+	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER",  String(prependZero && info.disc	 < 10 ? "0" : NIL).Append(String::FromInt(info.disc)),	    buffer); numItems++; }
+	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL",   String(prependZero && info.numDiscs  < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)),  buffer); numItems++; }
 
-	if	(info.comment != NIL && !replaceExistingComments) { RenderTagItem("COMMENT", info.comment, buffer);   numItems++; }
-	else if (defaultComment != NIL && numItems > 0)		  { RenderTagItem("COMMENT", defaultComment, buffer); numItems++; }
+	if	(info.comment != NIL && !replaceExistingComments) { RenderTagItem("COMMENT", info.comment,   buffer, False); numItems++; }
+	else if (defaultComment != NIL && numItems > 0)		  { RenderTagItem("COMMENT", defaultComment, buffer	  ); numItems++; }
 
 	/* Save other text info.
 	 */
@@ -177,8 +177,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 	 */
 	if (writeMCDI)
 	{
-		if	(info.mcdi.IsValid()) { RenderTagItem("CDTOC", info.mcdi.GetOffsetString(), buffer);	numItems++; }
-		else if	(info.offsets != NIL) { RenderTagItem("CDTOC", info.offsets, buffer);			numItems++; }
+		if	(info.mcdi.IsValid()) { RenderTagItem("CDTOC", info.mcdi.GetOffsetString(), buffer); numItems++; }
+		else if	(info.offsets != NIL) { RenderTagItem("CDTOC", info.offsets,		    buffer); numItems++; }
 	}
 
 	/* Save encoder version.
@@ -255,9 +255,9 @@ Int BoCA::TaggerVorbis::RenderTagHeader(const String &vendorString, Int numItems
 	return Success();
 }
 
-Int BoCA::TaggerVorbis::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer)
+Int BoCA::TaggerVorbis::RenderTagItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer, Bool trim)
 {
-	String		 data     = value.Trim();
+	String		 data     = trim ? value.Trim() : value;
 	Int		 dataSize = data != NIL ? strlen(data) : 0;
 	Int		 size	  = id.Length() + dataSize + 5;
 
@@ -318,7 +318,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "ALBUM")		 info.album     = value;
 		else if (id == "DATE")		 info.year      = value.ToInt();
 		else if (id == "GENRE")		 info.genre     = value;
-		else if (id == "COMMENT")	 info.comment   = value;
+		else if (id == "COMMENT")	 info.comment   = comment.Tail(comment.Length() - comment.Find("=") - 1);
 
 		else if (id == "LABEL"	   ||
 			 id == "PUBLISHER" ||

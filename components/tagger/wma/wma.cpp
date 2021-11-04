@@ -190,7 +190,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			RenderWMAIntegerItem(g_wszWMSharedUserRating, Math::Min(99, info.rating), pHeaderInfo);
 		}
 
-		if	(info.comment != NIL && !replaceExistingComments) RenderWMAStringItem(g_wszWMDescription, info.comment, pHeaderInfo);
+		if	(info.comment != NIL && !replaceExistingComments) RenderWMAStringItem(g_wszWMDescription, info.comment, pHeaderInfo, False);
 		else if (defaultComment != NIL)				  RenderWMAStringItem(g_wszWMDescription, defaultComment, pHeaderInfo);
 
 		/* Save other text info.
@@ -323,9 +323,9 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 	else		return Success();
 }
 
-Error BoCA::TaggerWMA::RenderWMAStringItem(const String &id, const String &value, Void *headerInfo)
+Error BoCA::TaggerWMA::RenderWMAStringItem(const String &id, const String &value, Void *headerInfo, Bool trim)
 {
-	String	 data	  = value.Trim();
+	String	 data	  = trim ? value.Trim() : value;
 	Int	 dataSize = data != NIL ? wcslen(data) + 1 : 0;
 
 	if (data == NIL) return Success();
@@ -435,7 +435,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 			else if (id == g_wszWMAlbumTitle)	       info.album   = value;
 			else if (id == g_wszWMYear)		       info.year    = value.ToInt();
 			else if (id == g_wszWMGenre)		       info.genre   = value;
-			else if (id == g_wszWMDescription)	       info.comment = value;
+			else if (id == g_wszWMDescription)	       info.comment = String((LPWSTR) pbValue);
 			else if (id == g_wszWMPublisher)	       info.label   = value;
 
 			else if (id == g_wszWMISRC)

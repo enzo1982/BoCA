@@ -451,7 +451,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		SetASCIIField(frame, ID3FN_LANGUAGE, "eng"); // iTunes recognizes comments only if language is set to English
 
-		if (info.comment != NIL && !replaceExistingComments) SetStringField(frame, ID3FN_TEXT, info.comment);
+		if (info.comment != NIL && !replaceExistingComments) SetStringField(frame, ID3FN_TEXT, info.comment, False);
 		else						     SetStringField(frame, ID3FN_TEXT, defaultComment);
 
 		container.AddFrame(frame);
@@ -685,7 +685,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_ALBUM)		    info.album	 = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_YEAR)		    info.year	 = GetStringField(frame, ID3FN_TEXT).ToInt();
 		else if (frame.GetID() == ID3FID_RECORDINGTIME)	    info.year	 = GetStringField(frame, ID3FN_TEXT).Head(4).ToInt();
-		else if (frame.GetID() == ID3FID_COMMENT)	    info.comment = GetStringField(frame, ID3FN_TEXT);
+		else if (frame.GetID() == ID3FID_COMMENT)	    info.comment = GetStringField(frame, ID3FN_TEXT, False);
 		else if (frame.GetID() == ID3FID_PUBLISHER)	    info.label	 = GetStringField(frame, ID3FN_TEXT);
 
 		else if (frame.GetID() == ID3FID_ISRC)
@@ -1059,7 +1059,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 	return Success();
 }
 
-String BoCA::TaggerID3v2::GetStringField(const ID3_Frame &frame, ID3_FieldID fieldType)
+String BoCA::TaggerID3v2::GetStringField(const ID3_Frame &frame, ID3_FieldID fieldType, Bool trim)
 {
 	ID3_Field	*field = frame.GetField(fieldType);
 	String		 result;
@@ -1091,11 +1091,13 @@ String BoCA::TaggerID3v2::GetStringField(const ID3_Frame &frame, ID3_FieldID fie
 		}
 	}
 
-	return result.Trim();
+	return trim ? result.Trim() : result;
 }
 
-Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, const String &string)
+Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, const String &value, Bool trim)
 {
+	String	 string = trim ? value.Trim() : value;
+
 	if (string == NIL) return Error();
 
 	SetIntegerField(frame, ID3FN_TEXTENC, textEncoding);
@@ -1106,9 +1108,9 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 	{
 		field->SetEncoding(textEncoding);
 
-		if	(textEncoding == ID3TE_UTF16)	field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16LE"));
-		else if (textEncoding == ID3TE_UTF16BE)	field->Set((unicode_t *) string.Trim().ConvertTo("UTF-16BE"));
-		else					field->Set((char *)	 string.Trim().ConvertTo(textEncodingID));
+		if	(textEncoding == ID3TE_UTF16)	field->Set((unicode_t *) string.ConvertTo("UTF-16LE"));
+		else if (textEncoding == ID3TE_UTF16BE)	field->Set((unicode_t *) string.ConvertTo("UTF-16BE"));
+		else					field->Set((char *)	 string.ConvertTo(textEncodingID));
 
 		return Success();
 	}
@@ -1116,7 +1118,7 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 	return Error();
 }
 
-String BoCA::TaggerID3v2::GetASCIIField(const ID3_Frame &frame, ID3_FieldID fieldType)
+String BoCA::TaggerID3v2::GetASCIIField(const ID3_Frame &frame, ID3_FieldID fieldType, Bool trim)
 {
 	ID3_Field	*field = frame.GetField(fieldType);
 	String		 result;
@@ -1132,18 +1134,20 @@ String BoCA::TaggerID3v2::GetASCIIField(const ID3_Frame &frame, ID3_FieldID fiel
 		result.ImportFrom("ISO-8859-1", aBuffer);
 	}
 
-	return result.Trim();
+	return trim ? result.Trim() : result;
 }
 
-Int BoCA::TaggerID3v2::SetASCIIField(ID3_Frame &frame, ID3_FieldID fieldType, const String &string)
+Int BoCA::TaggerID3v2::SetASCIIField(ID3_Frame &frame, ID3_FieldID fieldType, const String &value, Bool trim)
 {
+	String	 string = trim ? value.Trim() : value;
+
 	if (string == NIL) return Error();
 
 	ID3_Field	*field = frame.GetField(fieldType);
 
 	if (field != NIL)
 	{
-		field->Set((char *) string.Trim());
+		field->Set((char *) string);
 
 		return Success();
 	}
