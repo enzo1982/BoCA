@@ -677,6 +677,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 	 */
 	ID3_Container::ConstIterator	*iterator     = container.CreateIterator();
 	Bool				 haveChapters = False;
+	String				 overDriveMarkers;
 
 	for (UnsignedInt i = 0; i < container.NumFrames(); i++)
 	{
@@ -854,6 +855,13 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			else if (description.ToLower() == "catalognumber")	   info.SetOtherInfo(INFO_CATALOGNUMBER, value);
 			else if (description.ToLower() == "barcode")		   info.SetOtherInfo(INFO_BARCODE,	 value);
+
+			else if (description == "OverDrive MediaMarkers")
+			{
+				/* Save OverDrive markers to process as chapters further down.
+				 */
+				overDriveMarkers = value;
+			}
 
 			else							   info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(value));
 		}
@@ -1057,6 +1065,91 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		if (track.tracks.Length() != chapterIDs.Length())
 		{
 			track.tracks.RemoveAll();
+		}
+	}
+
+	/* Read OverDrive MediaMarkers.
+	 */
+	if (!haveChapters && overDriveMarkers != NIL && currentConfig->GetIntValue(ConfigID, "ReadChapters", True) &&
+						      (!currentConfig->GetIntValue(ConfigID, "PreferCueSheetsToChapters", True) || track.tracks.Length() == 0))
+	{
+		track.tracks.RemoveAll();
+
+		if (!overDriveMarkers.StartsWith("<?xml")) overDriveMarkers = String("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").Append(overDriveMarkers);
+
+		XML::Document	 doc;
+		const char	*xml = overDriveMarkers.ConvertTo("UTF-8");
+
+		if (doc.ParseMemory(xml, strlen(xml)) == Success())
+		{
+			XML::Node	*root	      = doc.GetRootNode();
+			const Format	&format	      = track.GetFormat();
+			Int		 chapterCount = 0;
+
+			for (Int i = 0; i < root->GetNOfNodes(); i++)
+			{
+				XML::Node	*marker = root->GetNthNode(i);
+
+				if (marker->GetName() != "Marker") continue;
+
+				String	 chapterName;
+				String	 chapterTime;
+
+				if (XML::Node *name = marker->GetNodeByName("Name")) chapterName = name->GetContent().Trim();
+				if (XML::Node *time = marker->GetNodeByName("Time")) chapterTime = time->GetContent().Trim();
+
+				chapterCount++;
+
+				/* Fill track data.
+				 */
+				Track	 rTrack;
+
+				rTrack.fileName	    = track.fileName;
+				rTrack.pictures	    = track.pictures;
+
+				Array<String>	 chapterTimes = chapterTime.Explode(":");
+
+				if (chapterTimes.Length() == 2) chapterTimes.InsertAtPos(0, "00");
+
+				rTrack.sampleOffset  =		   chapterTimes.GetNth(0).ToInt() * 60 * 60 * format.rate;
+				rTrack.sampleOffset +=		   chapterTimes.GetNth(1).ToInt() * 60      * format.rate;
+				rTrack.sampleOffset += Math::Round(chapterTimes.GetNth(2).ToFloat()	    * format.rate);
+
+				if	(track.length	    > 0) rTrack.length	     = track.length	  - rTrack.sampleOffset;
+				else if (track.approxLength > 0) rTrack.approxLength = track.approxLength - rTrack.sampleOffset;
+
+				if	(track.length	    > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.length * rTrack.length);
+				else if (track.approxLength > 0) rTrack.fileSize = Math::Round(Float(track.fileSize) / track.approxLength * rTrack.length);
+				else				 rTrack.fileSize = rTrack.length * format.channels * (format.bits / 8);
+
+				rTrack.SetFormat(format);
+
+				/* Set track title.
+				 */
+				Info	 info = track.GetInfo();
+
+				info.title = chapterName;
+				info.track = chapterCount;
+
+				rTrack.SetInfo(info);
+
+				/* Update previous track length.
+				 */
+				if (chapterCount > 1)
+				{
+					Track	&pTrack = track.tracks.GetReference(chapterCount - 1);
+
+					pTrack.length	= rTrack.sampleOffset - pTrack.sampleOffset;
+
+					if	(track.length	    > 0) pTrack.fileSize = Math::Round(Float(track.fileSize) / track.length * pTrack.length);
+					else if (track.approxLength > 0) pTrack.fileSize = Math::Round(Float(track.fileSize) / track.approxLength * pTrack.length);
+					else				 pTrack.fileSize = pTrack.length * format.channels * (format.bits / 8);
+				}
+
+				/* Add track to track list.
+				 */
+				track.tracks.Add(rTrack);
+			}
 		}
 	}
 
