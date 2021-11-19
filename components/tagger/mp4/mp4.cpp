@@ -472,7 +472,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 				rTrack.sampleOffset = Math::Round(Float(offset) / MP4_MSECS_TIME_SCALE * format.rate);
 
-				if (chapterList[i].duration > 0 || i < chapterCount - 1)
+				if (chapterList[i].duration > 0 && i < chapterCount - 1)
 				{
 					rTrack.length = Math::Round(Float(chapterList[i].duration) / MP4_MSECS_TIME_SCALE * format.rate);
 				}
