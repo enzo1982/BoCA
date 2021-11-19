@@ -5,7 +5,7 @@
   <version>1.0</version>
   <id>ffmpeg-alac-dec</id>
   <type>decoder</type>
-  <replace>alac-dec</replace>
+  <replace>alac-decoder-dec</replace>
   <format>
     <name>Apple Lossless Files</name>
     <lossless>true</lossless>

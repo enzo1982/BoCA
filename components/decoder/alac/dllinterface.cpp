@@ -1,0 +1,77 @@
+ /* BoCA - BonkEnc Component Architecture
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License as
+  * published by the Free Software Foundation, either version 2 of
+  * the License, or (at your option) any later version.
+  *
+  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#include <boca.h>
+#include "dllinterface.h"
+
+MP4READPROVIDER			 ex_MP4ReadProvider		= NIL;
+MP4CLOSE			 ex_MP4Close			= NIL;
+MP4FREE				 ex_MP4Free			= NIL;
+MP4GETNUMBEROFTRACKS		 ex_MP4GetNumberOfTracks	= NIL;
+MP4FINDTRACKID			 ex_MP4FindTrackId		= NIL;
+MP4GETTRACKTYPE			 ex_MP4GetTrackType		= NIL;
+MP4GETTRACKDURATION		 ex_MP4GetTrackDuration		= NIL;
+MP4HAVETRACKATOM		 ex_MP4HaveTrackAtom		= NIL;
+MP4GETTRACKBYTESPROPERTY	 ex_MP4GetTrackBytesProperty	= NIL;
+MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale	= NIL;
+MP4GETSAMPLETIME		 ex_MP4GetSampleTime		= NIL;
+MP4GETSAMPLEIDFROMTIME		 ex_MP4GetSampleIdFromTime	= NIL;
+MP4GETSAMPLESIZE		 ex_MP4GetSampleSize		= NIL;
+MP4READSAMPLE			 ex_MP4ReadSample		= NIL;
+
+DynamicLoader *mp4v2dll		= NIL;
+
+Bool LoadMP4v2DLL()
+{
+	mp4v2dll = BoCA::Utilities::LoadCodecDLL("mp4v2");
+
+	if (mp4v2dll == NIL) return False;
+
+	ex_MP4ReadProvider		= (MP4READPROVIDER) mp4v2dll->GetFunctionAddress("MP4ReadProvider");
+	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
+	ex_MP4Free			= (MP4FREE) mp4v2dll->GetFunctionAddress("MP4Free");
+	ex_MP4GetNumberOfTracks		= (MP4GETNUMBEROFTRACKS) mp4v2dll->GetFunctionAddress("MP4GetNumberOfTracks");
+	ex_MP4FindTrackId		= (MP4FINDTRACKID) mp4v2dll->GetFunctionAddress("MP4FindTrackId");
+	ex_MP4GetTrackType		= (MP4GETTRACKTYPE) mp4v2dll->GetFunctionAddress("MP4GetTrackType");
+	ex_MP4GetTrackDuration		= (MP4GETTRACKDURATION) mp4v2dll->GetFunctionAddress("MP4GetTrackDuration");
+	ex_MP4HaveTrackAtom		= (MP4HAVETRACKATOM) mp4v2dll->GetFunctionAddress("MP4HaveTrackAtom");
+	ex_MP4GetTrackBytesProperty	= (MP4GETTRACKBYTESPROPERTY) mp4v2dll->GetFunctionAddress("MP4GetTrackBytesProperty");
+	ex_MP4GetTrackTimeScale		= (MP4GETTRACKTIMESCALE) mp4v2dll->GetFunctionAddress("MP4GetTrackTimeScale");
+	ex_MP4GetSampleTime		= (MP4GETSAMPLETIME) mp4v2dll->GetFunctionAddress("MP4GetSampleTime");
+	ex_MP4GetSampleIdFromTime	= (MP4GETSAMPLEIDFROMTIME) mp4v2dll->GetFunctionAddress("MP4GetSampleIdFromTime");
+	ex_MP4GetSampleSize		= (MP4GETSAMPLESIZE) mp4v2dll->GetFunctionAddress("MP4GetSampleSize");
+	ex_MP4ReadSample		= (MP4READSAMPLE) mp4v2dll->GetFunctionAddress("MP4ReadSample");
+
+	if (ex_MP4ReadProvider		== NIL ||
+	    ex_MP4Close			== NIL ||
+	    ex_MP4Free			== NIL ||
+	    ex_MP4GetNumberOfTracks	== NIL ||
+	    ex_MP4FindTrackId		== NIL ||
+	    ex_MP4GetTrackType		== NIL ||
+	    ex_MP4GetTrackDuration	== NIL ||
+	    ex_MP4HaveTrackAtom		== NIL ||
+	    ex_MP4GetTrackBytesProperty	== NIL ||
+	    ex_MP4GetTrackTimeScale	== NIL ||
+	    ex_MP4GetSampleTime		== NIL ||
+	    ex_MP4GetSampleIdFromTime	== NIL ||
+	    ex_MP4GetSampleSize		== NIL ||
+	    ex_MP4ReadSample		== NIL) { FreeMP4v2DLL(); return False; }
+
+	return True;
+}
+
+Void FreeMP4v2DLL()
+{
+	BoCA::Utilities::FreeCodecDLL(mp4v2dll);
+
+	mp4v2dll = NIL;
+}

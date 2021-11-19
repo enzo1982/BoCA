@@ -4,7 +4,7 @@ BOCA_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-FOLDERS = cuesheet faad2 fdkaac flac mac mpg123 opus sndfile speex vorbis
+FOLDERS = alac cuesheet faad2 fdkaac flac mac mpg123 opus sndfile speex vorbis
 
 ifneq ($(BUILD_OSX),True)
 	FOLDERS += lame mad
