@@ -23,7 +23,7 @@ else ifeq ($(BUILD_HAIKU),True)
 else ifeq ($(BUILD_WIN32),True)
 	FOLDERS += directsound waveout
 
-ifneq ($(BUILD_X86_64),True)
+ifeq ($(BUILD_X86),True)
 	FOLDERS += winamp
 endif
 endif

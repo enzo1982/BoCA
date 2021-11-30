@@ -72,10 +72,14 @@ static String GetSystemDirectory(int id)
 	return commonFilesDir;
 }
 
-#if defined __i386__ || defined _M_IX86
+#  if defined __i386__	  || defined _M_IX86
 static const String	 architecture = "x86";
-#elif defined __x86_64__ || defined _M_AMD64
+#elif defined __x86_64__  || defined _M_AMD64
 static const String	 architecture = "x64";
+#elif defined __arm__	  || defined _M_ARM
+static const String	 architecture = "arm";
+#elif defined __aarch64__ || defined _M_ARM64
+static const String	 architecture = "arm64";
 #endif
 
 static Void GetPackageFolders(const String &, Array<String> &);
