@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ -e "$1" ]
+then
+  expr `cat $1` + 1 > $1
+else
+  expr 1 > $1
+fi
