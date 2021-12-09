@@ -37,7 +37,6 @@ BoCA::AS::DecoderComponentExternalStdIO::~DecoderComponentExternalStdIO()
 {
 }
 
-
 String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName)
 {
 	if (specs->external_md5_arguments == NIL) return NIL;
@@ -93,6 +92,54 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 	return md5;
 }
 
+Float BoCA::AS::DecoderComponentExternalStdIO::GetApproximateDuration(const String &encFileName)
+{
+	if (!specs->external_command.EndsWith("ffmpeg") && !specs->external_command.EndsWith("avconv")) return -1;
+
+	/* Start 3rd party command line decoder.
+	 */
+	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String("-i ").Append(String(encFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
+								     .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
+								     .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")
+								     .Replace("&", "\\&").Replace(";", "\\;").Replace("$", "\\$").Replace("|", "\\|"));
+
+	FILE	*rPipe = popen(String(command).Append(" ").Append(arguments).Append(" 2>&1"), "r");
+
+	/* Read output into buffer.
+	 */
+	String		 output;
+	Buffer<char>	 buffer(4096);
+	Int		 bytesRead = 0;
+
+	while (True)
+	{
+		bytesRead = fread(buffer, 1, 4096, rPipe);
+
+		if (bytesRead != 4096 && (ferror(rPipe) || bytesRead == 0)) break;
+
+		output.Append((char *) buffer);
+	}
+
+	/* Wait until the decoder exits.
+	 */
+	pclose(rPipe);
+
+	/* Extract duration from output.
+	 */
+	if (output.Find("Duration: ") >= 0)
+	{
+		String			 duration = output.SubString(output.Find("Duration: ") + 10, 11);
+		const Array<String>	&parts	  = duration.Explode(":");
+
+		return parts.GetNth(0).ToInt() * 60 * 60 +
+		       parts.GetNth(1).ToInt()      * 60 +
+		       parts.GetNth(2).ToFloat();
+	}
+
+	return -1;
+}
+
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
 	/* Return cached track from previous call.
@@ -115,6 +162,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 		File(streamURI).Copy(encFileName);
 	}
+
+	/* Get approximate duration (FFmpeg decoder only).
+	 */
+	Float	 approximateDuration = GetApproximateDuration(encFileName);
 
 	/* Start 3rd party command line decoder.
 	 */
@@ -193,6 +244,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 				track.SetFormat(format);
 
+				if (approximateDuration >= 0) track.approxLength = approximateDuration * format.rate;
+
 				/* Skip rest of chunk.
 				 */
 				in->RelSeek(cSize - 16 + cSize % 2);
@@ -226,7 +279,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 				/* Read the rest of the file to find actual size.
 				 */
-				if (track.length == -1)
+				if (track.length == -1 && track.approxLength == -1)
 				{
 					Buffer<UnsignedByte>	 data(12288);
 
@@ -268,29 +321,24 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(streamURI))
-	{
-		File(encFileName).Delete();
-	}
-
-	/* Query tags and update track.
-	 */
-	QueryTags(streamURI, track);
+	if (String::IsUnicode(streamURI)) File(encFileName).Delete();
 
 	/* Check if anything went wrong.
 	 */
-	if (!specs->external_ignoreExitCode && exitCode != 0 && exitCode != 0x80 + SIGPIPE && exitSignal != SIGPIPE)
+	if (track.length == -1 && track.approxLength == -1 && !specs->external_ignoreExitCode && exitCode != 0 && exitCode != 0x80 + SIGPIPE && exitSignal != SIGPIPE)
 	{
 		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
 
 		if	(exitCode == 126) errorString = String("Permission denied to execute ").Append(command).Append(".");
 		else if (exitCode == 127) errorString = String("External decoder ").Append(command).Append(" not found.");
-
-		return Error();
 	}
 
 	if (errorState) return Error();
+
+	/* Query tags and update track.
+	 */
+	QueryTags(streamURI, track);
 
 	return Success();
 }
@@ -364,10 +412,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(track.fileName))
-	{
-		File(encFileName).Delete();
-	}
+	if (String::IsUnicode(track.fileName)) File(encFileName).Delete();
 
 	if (!specs->external_ignoreExitCode && exitCode != 0 && exitCode != 0x80 + SIGPIPE && exitSignal != SIGPIPE)
 	{
@@ -419,8 +464,11 @@ Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data
 
 	if (bytes != size && (ferror(rPipe) || bytes == 0))
 	{
-		errorState  = True;
-		errorString = "Decoder quit prematurely.";
+		if (track.length != -1)
+		{
+			errorState  = True;
+			errorString = "Decoder quit prematurely.";
+		}
 
 		return -1;
 	}
@@ -434,6 +482,8 @@ Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data
 	const Format	&format = track.GetFormat();
 
 	samplesRead += bytes / format.channels / (format.bits / 8);
+
+	if (track.length == -1 && track.approxLength > 0) inBytes = track.fileSize / (Float(track.approxLength) / samplesRead);
 
 	return size;
 }

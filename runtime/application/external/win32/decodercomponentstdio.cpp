@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -144,6 +144,96 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 	return md5;
 }
 
+Float BoCA::AS::DecoderComponentExternalStdIO::GetApproximateDuration(const String &encFileName)
+{
+	if (!specs->external_command.EndsWith("ffmpeg.exe") && !specs->external_command.EndsWith("avconv.exe")) return -1;
+
+	/* Set up security attributes.
+	 */
+	SECURITY_ATTRIBUTES	 secAttr;
+
+	ZeroMemory(&secAttr, sizeof(secAttr));
+
+	secAttr.nLength		= sizeof(secAttr);
+	secAttr.bInheritHandle	= True;
+
+	HANDLE	 rPipe = NIL;
+	HANDLE	 wPipe = NIL;
+
+	CreatePipe(&rPipe, &wPipe, &secAttr, 131072);
+	SetHandleInformation(rPipe, HANDLE_FLAG_INHERIT, 0);
+
+	/* Start 3rd party command line decoder.
+	 */
+	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
+	String	 arguments = String("-i \"").Append(encFileName).Append("\"");
+
+	STARTUPINFOA		 startupInfo;
+
+	ZeroMemory(&startupInfo, sizeof(startupInfo));
+
+	startupInfo.cb		= sizeof(startupInfo);
+	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	startupInfo.wShowWindow	= SW_HIDE;
+	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+	startupInfo.hStdOutput	= GetStdHandle(STD_OUTPUT_HANDLE);
+	startupInfo.hStdError	= wPipe;
+
+	PROCESS_INFORMATION	 processInfo;
+
+	ZeroMemory(&processInfo, sizeof(processInfo));
+
+	CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+
+	/* Close stdio pipe write handle.
+	 */
+	CloseHandle(wPipe);
+
+	/* Check process handle.
+	 */
+	if (processInfo.hProcess == NIL)
+	{
+		CloseHandle(rPipe);
+
+		return -1;
+	}
+
+	/* Read output into buffer.
+	 */
+	String		 output;
+	Buffer<char>	 buffer(4096);
+	DWORD		 bytesRead = 0;
+
+	while (True)
+	{
+		if (!ReadFile(rPipe, buffer, 4096, &bytesRead, NIL) || bytesRead == 0) break;
+
+		output.Append((char *) buffer);
+	}
+
+	CloseHandle(rPipe);
+
+	TerminateProcess(processInfo.hProcess, 0);
+
+	/* Wait until the decoder exits.
+	 */
+	while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+
+	/* Extract duration from output.
+	 */
+	if (output.Find("Duration: ") >= 0)
+	{
+		String			 duration = output.SubString(output.Find("Duration: ") + 10, 11);
+		const Array<String>	&parts	  = duration.Explode(":");
+
+		if (parts.Length() == 3) return parts.GetNth(0).ToInt() * 60 * 60 +
+						parts.GetNth(1).ToInt()      * 60 +
+						parts.GetNth(2).ToFloat();
+	}
+
+	return -1;
+}
+
 Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &streamURI, Track &track)
 {
 	/* Return cached track from previous call.
@@ -166,6 +256,10 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 		File(streamURI).Copy(encFileName);
 	}
+
+	/* Get approximate duration (FFmpeg decoder only).
+	 */
+	Float	 approximateDuration = GetApproximateDuration(encFileName);
 
 	/* Set up security attributes.
 	 */
@@ -222,10 +316,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 		/* Remove temporary file if necessary.
 		 */
-		if (String::IsUnicode(streamURI))
-		{
-			File(encFileName).Delete();
-		}
+		if (String::IsUnicode(streamURI)) File(encFileName).Delete();
 
 		return Error();
 	}
@@ -294,6 +385,8 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 				track.SetFormat(format);
 
+				if (approximateDuration >= 0) track.approxLength = approximateDuration * format.rate;
+
 				/* Skip rest of chunk.
 				 */
 				in->RelSeek(cSize - 16 + cSize % 2);
@@ -327,7 +420,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 				/* Read the rest of the file to find actual size.
 				 */
-				if (track.length == -1)
+				if (track.length == -1 && track.approxLength == -1)
 				{
 					Buffer<UnsignedByte>	 data(12288);
 
@@ -378,14 +471,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(streamURI))
-	{
-		File(encFileName).Delete();
-	}
-
-	/* Query tags and update track.
-	 */
-	QueryTags(streamURI, track);
+	if (String::IsUnicode(streamURI)) File(encFileName).Delete();
 
 	/* Check if anything went wrong.
 	 */
@@ -393,15 +479,17 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 
 	GetExitCodeProcess(processInfo.hProcess, &exitCode);
 
-	if (!specs->external_ignoreExitCode && exitCode != 0)
+	if (track.length == -1 && track.approxLength == -1 && !specs->external_ignoreExitCode && exitCode != 0)
 	{
 		errorState  = True;
 		errorString = String("Decoder returned exit code ").Append(String::FromInt((signed) exitCode)).Append(".");
-
-		return Error();
 	}
 
 	if (errorState) return Error();
+
+	/* Query tags and update track.
+	 */
+	QueryTags(streamURI, track);
 
 	return Success();
 }
@@ -476,10 +564,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 
 		/* Remove temporary file if necessary.
 		 */
-		if (String::IsUnicode(track.fileName))
-		{
-			File(encFileName).Delete();
-		}
+		if (String::IsUnicode(track.fileName)) File(encFileName).Delete();
 
 		return False;
 	}
@@ -539,10 +624,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(track.fileName))
-	{
-		File(encFileName).Delete();
-	}
+	if (String::IsUnicode(track.fileName)) File(encFileName).Delete();
 
 	/* Check if anything went wrong.
 	 */
@@ -594,8 +676,11 @@ Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data
 
 	if (!ReadFile(rPipe, data, size, (DWORD *) &size, NIL) || size == 0)
 	{
-		errorState  = True;
-		errorString = "Decoder quit prematurely.";
+		if (track.length != -1)
+		{
+			errorState  = True;
+			errorString = "Decoder quit prematurely.";
+		}
 
 		return -1;
 	}
@@ -609,6 +694,8 @@ Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data
 	const Format	&format = track.GetFormat();
 
 	samplesRead += size / format.channels / (format.bits / 8);
+
+	if (track.length == -1 && track.approxLength > 0) inBytes = track.fileSize / Math::Max(1.f, Float(track.approxLength) / samplesRead);
 
 	return size;
 }

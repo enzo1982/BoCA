@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -40,6 +40,7 @@ namespace BoCA
 				Int64		 samplesRead;
 
 				String		 GetMD5(const String &);
+				Float		 GetApproximateDuration(const String &);
 			public:
 						 DecoderComponentExternalStdIO(ComponentSpecs *);
 				virtual		~DecoderComponentExternalStdIO();
