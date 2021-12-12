@@ -54,6 +54,8 @@ namespace BoCA
 			Int				 GetNthEntryOffset(Int) const;
 			Int				 GetNthEntryType(Int) const;
 
+			Bool				 GetNthEntryPreEmphasis(Int) const;
+
 			Int				 GetNthEntryTrackNumber(Int) const;
 			Int				 GetNthEntryTrackLength(Int) const;
 

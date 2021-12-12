@@ -145,6 +145,9 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 		if (!oneFile || i == 0) out.OutputLine(String("FILE \"").Append(Utilities::GetRelativeFileName(track.fileName, actualFile)).Append("\" ").Append(GetFileType(track.fileName)));
 
 		out.OutputLine(String("  TRACK ").Append(i < 9 ? "0" : NIL).Append(String::FromInt(i + 1)).Append(" AUDIO"));
+
+		if ((track.cdTrack > 0 && info.mcdi.GetNthEntryPreEmphasis(track.cdTrack - 1)) || info.GetOtherInfo(INFO_PRE_EMPHASIS).ToInt()) out.OutputLine("    FLAGS PRE");
+
 		out.OutputLine(String("    TITLE \"").Append(info.title.Length() > 0 ? EscapeString(info.title) : i18n->TranslateString("unknown title")).Append("\""));
 
 		if (!artistConsistent || info.artist != artist)				   out.OutputLine(String("    PERFORMER \"").Append(info.artist.Length() > 0 ? EscapeString(info.artist) : i18n->TranslateString("unknown artist")).Append("\""));

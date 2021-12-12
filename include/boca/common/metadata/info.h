@@ -73,6 +73,8 @@ namespace BoCA
 
 	const char * const INFO_WEB_USERURL	= (char *) "User defined URL";
 
+	const char * const INFO_PRE_EMPHASIS	= (char *) "Pre-emphasis";
+
 	class BOCA_DLL_EXPORT Info
 	{
 		public:

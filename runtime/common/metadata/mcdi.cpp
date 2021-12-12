@@ -99,6 +99,16 @@ Int BoCA::MCDI::GetNthEntryType(Int n) const
 	else				    return ENTRY_AUDIO;
 }
 
+Bool BoCA::MCDI::GetNthEntryPreEmphasis(Int n) const
+{
+	if (data.Size() < 2 + (8 * (n + 1))) return False;
+
+	if (GetNthEntryType(n) != ENTRY_AUDIO) return False;
+
+	if (data[4 + 8 * n + 1] & 1) return True;
+	else			     return False;
+}
+
 Int BoCA::MCDI::GetNthEntryTrackNumber(Int n) const
 {
 	if (data.Size() < 2 + (8 * (n + 1))) return 0;

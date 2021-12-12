@@ -223,6 +223,20 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (Info::IsISRC(isrc)) info.isrc = isrc;
 		}
 
+		/* Flags.
+		 */
+		if (line.StartsWith("FLAGS "))
+		{
+			if (!trackMode) continue;
+
+			const Array<String>	&flags = line.Tail(line.Length() - 6).Explode(" ");
+
+			foreach (const String &flag, flags)
+			{
+				if (flag == "PRE") info.SetOtherInfo(INFO_PRE_EMPHASIS, "1");
+			}
+		}
+
 		/* Track sample offset.
 		 */
 		if (line.StartsWith("INDEX 01 "))
