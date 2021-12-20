@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Quelldateien\alac">
+      <UniqueIdentifier>{aa34a316-0cb0-465c-96ff-c16a12449f2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\alac">
+      <UniqueIdentifier>{40d70d95-c6fa-4d6a-af5a-05b00a994c3a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\decoder\alac\alac\ag_dec.c">
+      <Filter>Quelldateien\alac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\alac\alac\ALACBitUtilities.c">
+      <Filter>Quelldateien\alac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\alac\alac\ALACDecoder.cpp">
+      <Filter>Quelldateien\alac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\alac\alac\dp_dec.c">
+      <Filter>Quelldateien\alac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\alac\alac\EndianPortable.c">
+      <Filter>Quelldateien\alac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\alac\alac\matrix_dec.c">
+      <Filter>Quelldateien\alac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\alac\alac.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\alac\dllinterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\decoder\alac\alac\aglib.h">
+      <Filter>Headerdateien\alac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\alac\alac\ALACAudioTypes.h">
+      <Filter>Headerdateien\alac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\alac\alac\ALACBitUtilities.h">
+      <Filter>Headerdateien\alac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\alac\alac\ALACDecoder.h">
+      <Filter>Headerdateien\alac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\alac\alac\dplib.h">
+      <Filter>Headerdateien\alac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\alac\alac\EndianPortable.h">
+      <Filter>Headerdateien\alac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\alac\alac\matrixlib.h">
+      <Filter>Headerdateien\alac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\alac\alac.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\decoder\alac\dllinterface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

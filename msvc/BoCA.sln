@@ -139,6 +139,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Encoder Sndfile Wave",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP HDCD", "BoCA DSP HDCD\BoCA DSP HDCD.vcxproj", "{E1323161-F952-4A53-96A9-9C4B0E622B3B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder ALAC", "BoCA Decoder ALAC\BoCA Decoder ALAC.vcxproj", "{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -1229,6 +1231,18 @@ Global
 		{E1323161-F952-4A53-96A9-9C4B0E622B3B}.Release|Win32.Build.0 = Release|Win32
 		{E1323161-F952-4A53-96A9-9C4B0E622B3B}.Release|x64.ActiveCfg = Release|x64
 		{E1323161-F952-4A53-96A9-9C4B0E622B3B}.Release|x64.Build.0 = Release|x64
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Debug|ARM.ActiveCfg = Debug|Win32
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Debug|Win32.Build.0 = Debug|Win32
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Debug|x64.ActiveCfg = Debug|x64
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Debug|x64.Build.0 = Debug|x64
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|ARM.ActiveCfg = Release|Win32
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|ARM64.ActiveCfg = Release|Win32
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|Win32.ActiveCfg = Release|Win32
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|Win32.Build.0 = Release|Win32
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|x64.ActiveCfg = Release|x64
+		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
