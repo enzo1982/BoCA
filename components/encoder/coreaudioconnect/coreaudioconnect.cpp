@@ -673,13 +673,13 @@ Bool BoCA::EncoderCoreAudioConnect::Connect()
 		/* Create shared memory object and map view to communication buffer.
 		 */
 #ifdef __WIN32__
-		mappingName = String("freac:").Append(Number((Int64) GetCurrentProcessId()).ToHexString()).Append("-").Append(Number((Int64) GetCurrentThreadId()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
+		mappingName = BoCA::GetApplicationPrefix().Append(":").Append(Number((Int64) GetCurrentProcessId()).ToHexString()).Append("-").Append(Number((Int64) GetCurrentThreadId()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
 
 		semaphore   = CreateSemaphoreA(NIL, 0, 1, String(mappingName).Append("-sem"));
 		mapping	    = CreateFileMappingA(INVALID_HANDLE_VALUE, NIL, PAGE_READWRITE, 0, sizeof(CoreAudioCommBuffer), mappingName);
 		comm	    = (CoreAudioCommBuffer *) MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 #else
-		mappingName = String("/freac:").Append(Number((Int64) getpid()).ToHexString()).Append("-").Append(Number((Int64) pthread_self()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
+		mappingName = String("/").Append(BoCA::GetApplicationPrefix()).Append(":").Append(Number((Int64) getpid()).ToHexString()).Append("-").Append(Number((Int64) pthread_self()).ToHexString()).Append("-").Append(Number((Int64) count++).ToHexString());
 
 		key_t	 key = mappingName.ComputeCRC32();
 

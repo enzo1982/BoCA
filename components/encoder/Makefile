@@ -21,6 +21,8 @@ else ifeq ($(BUILD_WIN32),True)
 
 ifeq ($(BUILD_X86),True)
 	FOLDERS += twinvq
+else ifeq ($(BUILD_ARM64),True)
+	FOLDERS += coreaudioconnect
 endif
 endif
 

@@ -204,6 +204,18 @@ CA::OSStatus AudioConverterComplexInputDataProc(CA::AudioConverterRef inAudioCon
 
 int main(int argc, char *argv[])
 {
+	/* Get application prefix from mapping name.
+	 */
+	char	 applicationPrefix[128] = { 0 };
+
+#ifndef __WINE__
+	strcpy(applicationPrefix, argv[1]);
+	strchr(applicationPrefix, ':')[0] = 0;
+#else
+	strcpy(applicationPrefix, argv[1] + 1);
+	strchr(applicationPrefix, ':')[0] = 0;
+#endif
+
 	/* Open shared memory object and map view to communication buffer.
 	 */
 #ifndef __WINE__
@@ -232,7 +244,7 @@ int main(int argc, char *argv[])
 
 	/* Load Core Audio DLLs.
 	 */
-	LoadCoreAudioDLL();
+	LoadCoreAudioDLL(applicationPrefix);
 
 	/* Main processing loop.
 	 */

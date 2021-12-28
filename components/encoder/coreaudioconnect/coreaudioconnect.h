@@ -75,6 +75,10 @@ namespace BoCA
 
 			ConfigLayer		*GetConfigurationLayer();
 	};
+
+	/* This is declared in BoCA's core.h which is not included for component builds.
+	 */
+	BOCA_DLL_EXPORT const String	&GetApplicationPrefix();
 };
 
 BoCA_DEFINE_ENCODER_COMPONENT(EncoderCoreAudioConnect)
