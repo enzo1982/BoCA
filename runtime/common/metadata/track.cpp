@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -298,6 +298,8 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 			if	(key == INFO_ALBUMARTIST) fileName.Replace("<albumartist>", Utilities::ReplaceIncompatibleCharacters(value));
 			else if	(key == INFO_CONDUCTOR)	  fileName.Replace("<conductor>", Utilities::ReplaceIncompatibleCharacters(value));
 			else if	(key == INFO_COMPOSER)	  fileName.Replace("<composer>", Utilities::ReplaceIncompatibleCharacters(value));
+			else if	(key == INFO_BPM)	  fileName.Replace("<tempo>", Utilities::ReplaceIncompatibleCharacters(value));
+			else if	(key == INFO_INITIALKEY)  fileName.Replace("<initialkey>", Utilities::ReplaceIncompatibleCharacters(value));
 		}
 
 		if (info.artist.Length() > 0) fileName.Replace("<albumartist>", Utilities::ReplaceIncompatibleCharacters(info.artist));
@@ -305,6 +307,8 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 		fileName.Replace("<albumartist>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown album artist")));
 		fileName.Replace("<conductor>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown conductor")));
 		fileName.Replace("<composer>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown composer")));
+		fileName.Replace("<tempo>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown tempo")));
+		fileName.Replace("<initialkey>", Utilities::ReplaceIncompatibleCharacters(i18n->TranslateString("unknown key")));
 
 		/* Replace <directory> pattern.
 		 */
