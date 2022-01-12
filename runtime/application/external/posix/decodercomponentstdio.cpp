@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -432,10 +432,11 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Seek(Int64 samplePosition)
 {
 	const Format		&format = track.GetFormat();
 	Buffer<UnsignedByte>	 buffer(12288);
+	Int64			 bytesLeft = (samplePosition - samplesRead) * format.channels * (format.bits / 8) - preBuffer.Size();
 
-	while (samplesRead < samplePosition)
+	while (bytesLeft > 0)
 	{
-		Int	 size  = Math::Min((samplePosition - samplesRead) * format.channels * (format.bits / 8), (Int64) buffer.Size());
+		Int	 size  = Math::Min(bytesLeft, (Int64) buffer.Size());
 		Int	 bytes = fread(buffer, 1, size, rPipe);
 
 		if (bytes != size && (ferror(rPipe) || bytes == 0))
@@ -446,8 +447,12 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Seek(Int64 samplePosition)
 			return False;
 		}
 
-		samplesRead += bytes / format.channels / (format.bits / 8);
+		bytesLeft -= bytes;
 	}
+
+	samplesRead = samplePosition;
+
+	preBuffer.Resize(0);
 
 	return True;
 }
@@ -456,11 +461,14 @@ Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data
 {
 	/* Hand data over from the input file.
 	 */
-	Int	 size = 12288;
+	Int	 preread = preBuffer.Size();
+	Int	 size	 = 12288 - preread;
 
-	data.Resize(size);
+	data.Resize(preread + size);
 
-	Int	 bytes = fread(data, 1, size, rPipe);
+	memcpy(data, preBuffer, preread);
+
+	Int	 bytes = fread(data + preread, 1, size, rPipe);
 
 	if (bytes != size && (ferror(rPipe) || bytes == 0))
 	{
@@ -473,17 +481,26 @@ Int BoCA::AS::DecoderComponentExternalStdIO::ReadData(Buffer<UnsignedByte> &data
 		return -1;
 	}
 
-	data.Resize(bytes);
+	/* Make sure to read whole samples.
+	 */
+	const Format	&format	  = track.GetFormat();
+	Int		 overread = (preread + bytes) % (format.channels * (format.bits / 8));
 
+	preBuffer.Resize(overread);
+
+	memcpy(preBuffer, data + preread + bytes - overread, overread);
+
+	data.Resize(preread + bytes - overread);
+
+	/* Adjust byte order and calculate MD5.
+	 */
 	ProcessData(data);
 
 	/* Increment number of samples read.
 	 */
-	const Format	&format = track.GetFormat();
+	samplesRead += data.Size() / format.channels / (format.bits / 8);
 
-	samplesRead += bytes / format.channels / (format.bits / 8);
+	if (track.length == -1 && track.approxLength > 0) inBytes = track.fileSize / Math::Max(1.f, Float(track.approxLength) / samplesRead);
 
-	if (track.length == -1 && track.approxLength > 0) inBytes = track.fileSize / (Float(track.approxLength) / samplesRead);
-
-	return size;
+	return data.Size();
 }

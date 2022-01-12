@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,32 +27,34 @@ namespace BoCA
 		{
 			private:
 #ifdef __WIN32__
-				HANDLE		 rPipe;
-				HANDLE		 wPipe;
+				HANDLE			 rPipe;
+				HANDLE			 wPipe;
 
-				HANDLE		 hProcess;
+				HANDLE			 hProcess;
 #else
-				FILE		*rPipe;
+				FILE			*rPipe;
 #endif
 
-				String		 encFileName;
+				String			 encFileName;
 
-				Int64		 samplesRead;
+				Int64			 samplesRead;
 
-				String		 GetMD5(const String &);
-				Float		 GetApproximateDuration(const String &);
+				Buffer<UnsignedByte>	 preBuffer;
+
+				String			 GetMD5(const String &);
+				Float			 GetApproximateDuration(const String &);
 			public:
-						 DecoderComponentExternalStdIO(ComponentSpecs *);
-				virtual		~DecoderComponentExternalStdIO();
+							 DecoderComponentExternalStdIO(ComponentSpecs *);
+				virtual			~DecoderComponentExternalStdIO();
 
-				virtual Error	 GetStreamInfo(const String &, Track &);
+				virtual Error		 GetStreamInfo(const String &, Track &);
 
-				virtual Bool	 Activate();
-				virtual Bool	 Deactivate();
+				virtual Bool		 Activate();
+				virtual Bool		 Deactivate();
 
-				virtual Bool	 Seek(Int64);
+				virtual Bool		 Seek(Int64);
 
-				virtual Int	 ReadData(Buffer<UnsignedByte> &);
+				virtual Int		 ReadData(Buffer<UnsignedByte> &);
 		};
 	};
 };
