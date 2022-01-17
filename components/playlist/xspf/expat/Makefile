@@ -8,7 +8,9 @@ TARGET	= libexpat.a
 CCOPTS	= -I"$(SRCDIR)" -DHAVE_EXPAT_CONFIG_H
 AR	= ar
 
-ifneq ($(BUILD_WIN32),True)
+ifeq ($(BUILD_WIN32),True)
+	CCOPTS += -D__USE_MINGW_ANSI_STDIO
+else
 	CCOPTS += -fPIC
 endif
 
