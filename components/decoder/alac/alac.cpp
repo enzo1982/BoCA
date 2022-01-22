@@ -166,6 +166,7 @@ BoCA::DecoderALAC::DecoderALAC()
 	sampleId	 = 1;
 
 	skipSamples	 = 0;
+	samplesLeft	 = 0;
 }
 
 BoCA::DecoderALAC::~DecoderALAC()
@@ -182,6 +183,8 @@ Bool BoCA::DecoderALAC::Activate()
 	if (mp4Track == -1) return False;
 
 	driver->Seek(0);
+
+	samplesLeft = track.length;
 
 	/* Get codec configuration.
 	 */
@@ -221,6 +224,7 @@ Bool BoCA::DecoderALAC::Seek(Int64 samplePosition)
 
 	sampleId    = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
 	skipSamples = time - ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
+	samplesLeft = track.length - samplePosition;
 
 	return True;
 }
@@ -266,6 +270,12 @@ Int BoCA::DecoderALAC::ReadData(Buffer<UnsignedByte> &data)
 
 		skipSamples -= samplesToSkip;
 	}
+
+	/* Cut data buffer on last frame.
+	 */
+	data.Resize(Math::Min(data.Size(), samplesLeft * bytesPerSample));
+
+	samplesLeft -= data.Size() / bytesPerSample;
 
 	/* Change to default channel order.
 	 */
