@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\freesurround">
+      <UniqueIdentifier>{88827235-05df-4dc8-9a34-60c4081c6d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\freesurround">
+      <UniqueIdentifier>{9d867fe5-1ac5-49f3-9964-a2d095dab310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\freesurround\kiss_fft">
+      <UniqueIdentifier>{926781a9-9a73-410e-9744-6fcc4e8cac0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\freesurround\kiss_fft">
+      <UniqueIdentifier>{e60237f5-3366-4ffa-9e29-1d7b33f6d0fa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\components\dsp\surround\config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\surround\surround.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\surround\freesurround\channelmaps.h">
+      <Filter>Headerdateien\freesurround</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\surround\freesurround\freesurround_decoder.h">
+      <Filter>Headerdateien\freesurround</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\surround\freesurround\kiss_fft\_kiss_fft_guts.h">
+      <Filter>Headerdateien\freesurround\kiss_fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\surround\freesurround\kiss_fft\kiss_fft.h">
+      <Filter>Headerdateien\freesurround\kiss_fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\surround\freesurround\kiss_fft\kiss_fft_log.h">
+      <Filter>Headerdateien\freesurround\kiss_fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\dsp\surround\freesurround\kiss_fft\kiss_fftr.h">
+      <Filter>Headerdateien\freesurround\kiss_fft</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\components\dsp\surround\config.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\surround\surround.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\surround\freesurround\channelmaps.cpp">
+      <Filter>Quelldateien\freesurround</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\surround\freesurround\freesurround_decoder.cpp">
+      <Filter>Quelldateien\freesurround</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\surround\freesurround\kiss_fft\kiss_fft.c">
+      <Filter>Quelldateien\freesurround\kiss_fft</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\dsp\surround\freesurround\kiss_fft\kiss_fftr.c">
+      <Filter>Quelldateien\freesurround\kiss_fft</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

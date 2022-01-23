@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA", "BoCA\BoCA.vcxproj", "{94F50AB3-6ADB-4F2E-97C5-3FBBC7E30FA3}"
 EndProject
@@ -140,6 +140,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP HDCD", "BoCA DSP HDCD\BoCA DSP HDCD.vcxproj", "{E1323161-F952-4A53-96A9-9C4B0E622B3B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA Decoder ALAC", "BoCA Decoder ALAC\BoCA Decoder ALAC.vcxproj", "{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoCA DSP Surround", "BoCA DSP Surround\BoCA DSP Surround.vcxproj", "{BE68BD96-4055-4B16-A46A-8E227A34B55F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1243,6 +1245,22 @@ Global
 		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|Win32.Build.0 = Release|Win32
 		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|x64.ActiveCfg = Release|x64
 		{D7D4C5BD-D42A-4B33-AC9E-C57B7F4CDCDF}.Release|x64.Build.0 = Release|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Debug|ARM.ActiveCfg = Debug|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Debug|ARM.Build.0 = Debug|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Debug|ARM64.ActiveCfg = Debug|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Debug|ARM64.Build.0 = Debug|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Debug|Win32.Build.0 = Debug|Win32
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Debug|x64.ActiveCfg = Debug|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Debug|x64.Build.0 = Debug|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Release|ARM.ActiveCfg = Release|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Release|ARM.Build.0 = Release|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Release|ARM64.ActiveCfg = Release|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Release|ARM64.Build.0 = Release|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Release|Win32.ActiveCfg = Release|Win32
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Release|Win32.Build.0 = Release|Win32
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Release|x64.ActiveCfg = Release|x64
+		{BE68BD96-4055-4B16-A46A-8E227A34B55F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
