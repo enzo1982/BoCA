@@ -24,11 +24,13 @@ public:
     {
         m_bDelete = true;
         m_pObject = NULL;
+        m_bArray = false;
     }
     CSmartPtr(TYPE * a_pObject, bool a_bArray = false, bool a_bDelete = true)
     {
         m_bDelete = true;
         m_pObject = NULL;
+        m_bArray = false;
         Assign(a_pObject, a_bArray, a_bDelete);
     }
 

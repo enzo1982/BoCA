@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ typedef APE_DECOMPRESS_HANDLE	(__stdcall *APEDECOMPRESS_CREATEW)	(const APE::str
 typedef void			(__stdcall *APEDECOMPRESS_DESTROY)	(APE_DECOMPRESS_HANDLE);
 typedef int			(__stdcall *APEDECOMPRESS_SEEK)		(APE_DECOMPRESS_HANDLE, APE::int64);
 typedef int			(__stdcall *APEDECOMPRESS_GETDATA)	(APE_DECOMPRESS_HANDLE, char *, APE::int64, APE::int64 *);
-typedef APE::int64		(__stdcall *APEDECOMPRESS_GETINFO)	(APE_DECOMPRESS_HANDLE, APE_DECOMPRESS_FIELDS, APE::int64, APE::int64);
+typedef APE::int64		(__stdcall *APEDECOMPRESS_GETINFO)	(APE_DECOMPRESS_HANDLE, APE::IAPEDecompress::APE_DECOMPRESS_FIELDS, APE::int64, APE::int64);
 
 extern APEDECOMPRESS_CREATEW	 ex_APEDecompress_CreateW;
 extern APEDECOMPRESS_DESTROY	 ex_APEDecompress_Destroy;

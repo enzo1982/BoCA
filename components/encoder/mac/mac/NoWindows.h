@@ -39,6 +39,12 @@ typedef long                LRESULT;
 typedef wchar_t *           LPTSTR;
 typedef const wchar_t *     LPCTSTR;
 typedef wchar_t             TCHAR;
+typedef struct _GUID {
+    unsigned long  Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char  Data4[8];
+} GUID;
 
 #undef ZeroMemory
 #define ZeroMemory(POINTER, BYTES) memset(POINTER, 0, BYTES);
@@ -55,7 +61,7 @@ typedef wchar_t             TCHAR;
 
 #define _strnicmp strncasecmp
 #define _wtoi(x) wcstol(x, NULL, 10)
-#define _tcscat_s wcscat_s
+#define _tcscat wcscat
 #undef _totlower
 #define _totlower towlower
 #define _totupper towupper
@@ -63,7 +69,7 @@ typedef wchar_t             TCHAR;
 #ifdef _MSC_VER
 #define _tcsicmp _wcsicmp
 #else
-#define _tcsicmp wcscmp
+#define _tcsicmp wcscasecmp
 #endif
 #define _tcscpy wcscpy
 #define _tcslen wcslen

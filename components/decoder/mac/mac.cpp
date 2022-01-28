@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -73,13 +73,13 @@ Error BoCA::DecoderMAC::GetStreamInfo(const String &streamURI, Track &track)
 
 	Format	 format = track.GetFormat();
 
-	format.bits	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BITS_PER_SAMPLE, 0, 0);
-	format.channels	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_CHANNELS, 0, 0);
-	format.rate	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_SAMPLE_RATE, 0, 0);
+	format.bits	= ex_APEDecompress_GetInfo(hAPEDecompress, IAPEDecompress::APE_INFO_BITS_PER_SAMPLE, 0, 0);
+	format.channels	= ex_APEDecompress_GetInfo(hAPEDecompress, IAPEDecompress::APE_INFO_CHANNELS, 0, 0);
+	format.rate	= ex_APEDecompress_GetInfo(hAPEDecompress, IAPEDecompress::APE_INFO_SAMPLE_RATE, 0, 0);
 
 	format.sign	= format.bits != 8;
 
-	track.length	= ex_APEDecompress_GetInfo(hAPEDecompress, APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0);
+	track.length	= ex_APEDecompress_GetInfo(hAPEDecompress, IAPEDecompress::APE_DECOMPRESS_TOTAL_BLOCKS, 0, 0);
 
 	track.SetFormat(format);
 
@@ -139,7 +139,7 @@ Int BoCA::DecoderMAC::ReadData(Buffer<UnsignedByte> &data)
 {
 	inBytes += data.Size();
 
-	int64	 nBlockAlign	       = ex_APEDecompress_GetInfo(hAPEDecompress, APE_INFO_BLOCK_ALIGN, 0, 0);
+	int64	 nBlockAlign	       = ex_APEDecompress_GetInfo(hAPEDecompress, IAPEDecompress::APE_INFO_BLOCK_ALIGN, 0, 0);
 	int64	 nBlocksRetrieved      = 0;
 	int64	 nTotalBlocksRetrieved = 0;
 
