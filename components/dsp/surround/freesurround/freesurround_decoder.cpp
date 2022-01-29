@@ -156,7 +156,7 @@ private:
 			// map position to channel volumes
 			for (unsigned c=0;c<C-1;c++) {
 				// look up channel map at respective position (with bilinear interpolation) and build the signal
-				vector<float*> &a = chn_alloc[setup][c];
+				vector<const float*> &a = chn_alloc[setup][c];
 				signal[c][f] = polar(amp_total*((1-x)*(1-y)*a[q][p] + x*(1-y)*a[q][p+1] + (1-x)*y*a[q+1][p] + x*y*a[q+1][p+1]),
 					phase_of[1+(int)sign(chn_xsf[setup][c])]);
 			}
