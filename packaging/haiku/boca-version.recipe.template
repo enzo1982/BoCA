@@ -23,7 +23,7 @@ PROVIDES="
 	"
 REQUIRES="
 	haiku$secondaryArchSuffix
-	smooth$secondaryArchSuffix >= 0.9.8
+	smooth$secondaryArchSuffix >= 0.9.10
 	lib:libsmooth_0.9$secondaryArchSuffix >= 0
 	lib:libexpat$secondaryArchSuffix
 	lib:liburiparser$secondaryArchSuffix
@@ -36,13 +36,13 @@ PROVIDES_devel="
 	"
 REQUIRES_devel="
 	boca$secondaryArchSuffix == $portVersion base
-	smooth${secondaryArchSuffix}_devel >= 0.9.8
+	smooth${secondaryArchSuffix}_devel >= 0.9.10
 	devel:libsmooth_0.9$secondaryArchSuffix >= 0
 	"
 
 BUILD_REQUIRES="
 	haiku${secondaryArchSuffix}_devel
-	smooth${secondaryArchSuffix}_devel >= 0.9.8
+	smooth${secondaryArchSuffix}_devel >= 0.9.10
 	devel:libsmooth_0.9$secondaryArchSuffix
 	devel:libexpat$secondaryArchSuffix
 	devel:liburiparser$secondaryArchSuffix

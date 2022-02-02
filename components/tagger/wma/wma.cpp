@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -79,15 +79,6 @@ Void smooth::DetachDLL()
 	FreeWMVCoreDLL();
 }
 
-static String toUNCPath(const String &streamURI)
-{
-	if (streamURI.StartsWith("\\\\")) return streamURI;
-
-	static const String	 uncPrefix = "\\\\?\\";
-
-	return uncPrefix.Append(File(streamURI));
-}
-
 Void BoCA::TaggerWMA::Initialize()
 {
 	/* Init the Microsoft COM library.
@@ -151,7 +142,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 	/* Open file and render tags.
 	 */
-	hr = metadataEditor2->OpenEx(toUNCPath(fileName), GENERIC_READ | GENERIC_WRITE, 0);
+	hr = metadataEditor2->OpenEx(Directory::MakeExtendedPath(File(fileName)), GENERIC_READ | GENERIC_WRITE, 0);
 
 	if (!FAILED(hr))
 	{
@@ -378,7 +369,7 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 	/* Open file and parse tags.
 	 */
-	hr = metadataEditor2->OpenEx(toUNCPath(fileName), GENERIC_READ, FILE_SHARE_READ);
+	hr = metadataEditor2->OpenEx(Directory::MakeExtendedPath(File(fileName)), GENERIC_READ, FILE_SHARE_READ);
 
 	if (!FAILED(hr))
 	{
@@ -695,7 +686,7 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 
 	/* Open file and remove tags.
 	 */
-	hr = metadataEditor2->OpenEx(toUNCPath(fileName), GENERIC_READ | GENERIC_WRITE, 0);
+	hr = metadataEditor2->OpenEx(Directory::MakeExtendedPath(File(fileName)), GENERIC_READ | GENERIC_WRITE, 0);
 
 	if (!FAILED(hr))
 	{

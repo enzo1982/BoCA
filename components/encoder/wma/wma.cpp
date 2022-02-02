@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -142,15 +142,6 @@ Void smooth::DetachDLL()
 	FreeWMVCoreDLL();
 }
 
-static String toUNCPath(const String &streamURI)
-{
-	if (streamURI.StartsWith("\\\\")) return streamURI;
-
-	static const String	 uncPrefix = "\\\\?\\";
-
-	return uncPrefix.Append(File(streamURI));
-}
-
 Void BoCA::EncoderWMA::Initialize()
 {
 	/* Init the Microsoft COM library.
@@ -268,7 +259,7 @@ Bool BoCA::EncoderWMA::Activate()
 
 	/* A temporary file is needed if the path exceeds 255 characters.
 	 */
-	String	 outputFile = toUNCPath(track.outputFile);
+	String	 outputFile = Directory::MakeExtendedPath(File(track.outputFile));
 
 	if (track.outputFile.Length() > 255) outputFile = Utilities::GetNonUnicodeTempFileName(track.outputFile);
 

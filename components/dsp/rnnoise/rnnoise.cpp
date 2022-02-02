@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -53,17 +53,6 @@ Void smooth::DetachDLL()
 	FreeRNNoiseDLL();
 }
 
-#ifdef __WIN32__
-static String toUNCPath(const String &streamURI)
-{
-	if (streamURI.StartsWith("\\\\")) return streamURI;
-
-	static const String	 uncPrefix = "\\\\?\\";
-
-	return uncPrefix.Append(File(streamURI));
-}
-#endif
-
 namespace BoCA
 {
 	/* Constants.
@@ -103,7 +92,7 @@ Bool BoCA::DSPRNNoise::Activate()
 		String	 modelFileName = Utilities::GetBoCADirectory().Append("boca.dsp.rnnoise").Append(Directory::GetDirectoryDelimiter()).Append(models[noise][signal]);
 
 #if defined __WIN32__
-		FILE	*modelFile     = _wfopen(toUNCPath(modelFileName), L"rbN");
+		FILE	*modelFile     = _wfopen(Directory::MakeExtendedPath(File(modelFileName)), L"rbN");
 #else
 		FILE	*modelFile     = fopen(modelFileName.ConvertTo("UTF-8"), "rbe");
 #endif

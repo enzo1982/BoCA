@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -138,17 +138,6 @@ Void smooth::DetachDLL()
 	FreeSndFileDLL();
 }
 
-#ifdef __WIN32__
-static String toUNCPath(const String &streamURI)
-{
-	if (streamURI.StartsWith("\\\\")) return streamURI;
-
-	static const String	 uncPrefix = "\\\\?\\";
-
-	return uncPrefix.Append(File(streamURI));
-}
-#endif
-
 Bool BoCA::DecoderSndFile::CanOpenStream(const String &streamURI)
 {
 	/* Do not open Ogg files with SndFile.
@@ -164,7 +153,7 @@ Bool BoCA::DecoderSndFile::CanOpenStream(const String &streamURI)
 	FILE	*file = 0;
 
 #ifdef __WIN32__
-	file = _wfopen(toUNCPath(streamURI), L"rbN");
+	file = _wfopen(Directory::MakeExtendedPath(File(streamURI)), L"rbN");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rbe");
 #endif
@@ -192,7 +181,7 @@ Error BoCA::DecoderSndFile::GetStreamInfo(const String &streamURI, Track &track)
 	FILE	*file = 0;
 
 #ifdef __WIN32__
-	file = _wfopen(toUNCPath(streamURI), L"rbN");
+	file = _wfopen(Directory::MakeExtendedPath(File(streamURI)), L"rbN");
 #else
 	file = fopen(streamURI.ConvertTo("UTF-8"), "rbe");
 #endif
@@ -394,7 +383,7 @@ Bool BoCA::DecoderSndFile::Activate()
 	/* Open input file.
 	 */
 #ifdef __WIN32__
-	file = _wfopen(toUNCPath(track.fileName), L"rbN");
+	file = _wfopen(Directory::MakeExtendedPath(File(track.fileName)), L"rbN");
 #else
 	file = fopen(track.fileName.ConvertTo("UTF-8"), "rb");
 #endif
