@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>TwinVQ VQF Decoder</name>
+  <version>1.0</version>
+  <id>ffmpeg-vqf-dec</id>
+  <type>decoder</type>
+  <format>
+    <name>TwinVQ VQF Audio</name>
+    <extension>vqf</extension>
+  </format>
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+  <external>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

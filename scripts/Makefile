@@ -29,6 +29,7 @@ install:
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_purevoice.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_realaudio.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_tak.1.0.xml "$(DESTDIR)"$(libdir)/boca
+	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_vqf.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_wavpack.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_webm_audio.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_wma.1.0.xml "$(DESTDIR)"$(libdir)/boca
@@ -84,6 +85,7 @@ uninstall:
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_purevoice.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_realaudio.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_tak.1.0.xml
+	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_vqf.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_wavpack.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_webm_audio.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_wma.1.0.xml
