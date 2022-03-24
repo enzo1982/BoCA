@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -65,6 +65,15 @@ Void smooth::DetachDLL()
 	FreeMP4v2DLL();
 }
 
+namespace BoCA
+{
+	int64_t	 MP4IO_size(void *);
+	int	 MP4IO_seek(void *, int64_t);
+	int	 MP4IO_read(void *, void *, int64_t, int64_t *);
+
+	static MP4IOCallbacks	 mp4Callbacks = { MP4IO_size, MP4IO_seek, MP4IO_read, NIL, NIL };
+};
+
 Bool BoCA::DecoderALAC::CanOpenStream(const String &streamURI)
 {
 	Bool		 isValidFile = False;
@@ -72,7 +81,7 @@ Bool BoCA::DecoderALAC::CanOpenStream(const String &streamURI)
 
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) != 'ftyp') return False;
 
-	MP4FileHandle	 mp4File  = ex_MP4ReadProvider(streamURI.ConvertTo("UTF-8"), NIL);
+	MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
 	Int		 mp4Track = GetAudioTrack(mp4File);
 
 	if (mp4Track >= 0 && ex_MP4HaveTrackAtom(mp4File, mp4Track, "mdia.minf.stbl.stsd.alac") &&
@@ -93,7 +102,7 @@ Error BoCA::DecoderALAC::GetStreamInfo(const String &streamURI, Track &track)
 	track.fileSize	= File(streamURI).GetFileSize();
 	track.length	= -1;
 
-	MP4FileHandle	 mp4File  = ex_MP4ReadProvider(streamURI.ConvertTo("UTF-8"), NIL);
+	MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
 	Int		 mp4Track = GetAudioTrack(mp4File);
 
 	if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
@@ -177,12 +186,15 @@ Bool BoCA::DecoderALAC::Activate()
 {
 	InStream	 in(STREAM_DRIVER, driver);
 
-	mp4File	 = ex_MP4ReadProvider(track.fileName.ConvertTo("UTF-8"), NIL);
+	mp4File	 = ex_MP4ReadCallbacks(&mp4Callbacks, driver);
 	mp4Track = GetAudioTrack(mp4File);
 
-	if (mp4Track == -1) return False;
+	if (mp4Track == -1)
+	{
+		ex_MP4Close(mp4File, 0);
 
-	driver->Seek(0);
+		return False;
+	}
 
 	samplesLeft = track.length;
 
@@ -301,4 +313,31 @@ Int BoCA::DecoderALAC::GetAudioTrack(MP4FileHandle mp4File) const
 	}
 
 	return -1;
+}
+
+int64_t BoCA::MP4IO_size(void *handle)
+{
+	Driver	*driver = (Driver *) handle;
+
+	return driver->GetSize();
+}
+
+int BoCA::MP4IO_seek(void *handle, int64_t pos)
+{
+	Driver	*driver = (Driver *) handle;
+
+	if (driver->Seek(pos) == -1) return 1;
+
+	return 0;
+}
+
+int BoCA::MP4IO_read(void *handle, void *buffer, int64_t size, int64_t *nout)
+{
+	Driver	*driver = (Driver *) handle;
+
+	*nout = driver->ReadData((UnsignedByte *) buffer, size);
+
+	if (*nout == 0) return 1;
+
+	return 0;
 }

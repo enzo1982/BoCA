@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -15,6 +15,8 @@
 
 #include "fdkaac.h"
 #include "config.h"
+
+using namespace smooth::IO;
 
 const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 {
@@ -118,6 +120,15 @@ Void smooth::DetachDLL()
 	FreeFDKAACDLL();
 	FreeMP4v2DLL();
 }
+
+namespace BoCA
+{
+	int64_t	 MP4IO_size(void *);
+	int	 MP4IO_seek(void *, int64_t);
+	int	 MP4IO_write(void *, const void *, int64_t, int64_t *);
+
+	static MP4IOCallbacks	 mp4Callbacks = { MP4IO_size, MP4IO_seek, NIL, MP4IO_write, NIL };
+};
 
 BoCA::EncoderFDKAAC::EncoderFDKAAC()
 {
@@ -242,16 +253,12 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	 */
 	if (mp4Container)
 	{
-		/* Close output file as it will be written directly by MP4v2.
-		 */
-		driver->Close();
-
 		/* Create MP4 file.
 		 */
 		uint32_t	 flags = (track.length       >= 0xFFFF0000 ||
 					  track.approxLength >= 0xFFFF0000) ? MP4_CREATE_64BIT_DATA | MP4_CREATE_64BIT_TIME : 0;
 
-		mp4File	 = ex_MP4CreateEx(track.outputFile.ConvertTo("UTF-8"), flags, 1, 1, NIL, 0, NIL, 0);
+		mp4File	 = ex_MP4CreateCallbacks(&mp4Callbacks, driver, flags);
 		mp4Track = ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
@@ -358,6 +365,10 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 		ex_MP4ItmfItemFree(item);
 
 		ex_MP4Close(mp4File, 0);
+
+		/* Close output file as tagger needs to modify it.
+		 */
+		driver->Close();
 
 		/* Write metadata to file.
 		 */
@@ -631,4 +642,31 @@ ConfigLayer *BoCA::EncoderFDKAAC::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureFDKAAC();
 
 	return configLayer;
+}
+
+int64_t BoCA::MP4IO_size(void *handle)
+{
+	Driver	*driver = (Driver *) handle;
+
+	return driver->GetSize();
+}
+
+int BoCA::MP4IO_seek(void *handle, int64_t pos)
+{
+	Driver	*driver = (Driver *) handle;
+
+	if (driver->Seek(pos) == -1) return 1;
+
+	return 0;
+}
+
+int BoCA::MP4IO_write(void *handle, const void *buffer, int64_t size, int64_t *nout)
+{
+	Driver	*driver = (Driver *) handle;
+
+	*nout = driver->WriteData((const UnsignedByte *) buffer, size);
+
+	if (*nout == 0) return 1;
+
+	return 0;
 }

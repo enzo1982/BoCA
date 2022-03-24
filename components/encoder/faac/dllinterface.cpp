@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2016 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ FAACENCGETDECODERSPECIFICINFO	 ex_faacEncGetDecoderSpecificInfo	= NIL;
 FAACENCENCODE			 ex_faacEncEncode			= NIL;
 FAACENCCLOSE			 ex_faacEncClose			= NIL;
 
-MP4CREATEEX			 ex_MP4CreateEx				= NIL;
+MP4CREATECALLBACKS		 ex_MP4CreateCallbacks			= NIL;
 MP4CLOSE			 ex_MP4Close				= NIL;
 MP4OPTIMIZE			 ex_MP4Optimize				= NIL;
 
@@ -74,7 +74,7 @@ Bool LoadMP4v2DLL()
 
 	if (mp4v2dll == NIL) return False;
 
-	ex_MP4CreateEx			= (MP4CREATEEX) mp4v2dll->GetFunctionAddress("MP4CreateEx");
+	ex_MP4CreateCallbacks		= (MP4CREATECALLBACKS) mp4v2dll->GetFunctionAddress("MP4CreateCallbacks");
 	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
 	ex_MP4Optimize			= (MP4OPTIMIZE) mp4v2dll->GetFunctionAddress("MP4Optimize");
 
@@ -87,7 +87,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4ItmfItemFree		= (MP4ITMFITEMFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemFree");
 	ex_MP4ItmfAddItem		= (MP4ITMFADDITEM) mp4v2dll->GetFunctionAddress("MP4ItmfAddItem");
 
-	if (ex_MP4CreateEx			== NIL ||
+	if (ex_MP4CreateCallbacks		== NIL ||
 	    ex_MP4Close				== NIL ||
 	    ex_MP4Optimize			== NIL ||
 

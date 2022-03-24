@@ -1,5 +1,5 @@
 ﻿ /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -372,7 +372,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	Info		 info	 = track.GetInfo();
 
-	MP4FileHandle	 mp4File = ex_MP4ReadProvider(fileName.ConvertTo("UTF-8"), NIL);
+	MP4FileHandle	 mp4File = ex_MP4Read(fileName.ConvertTo("UTF-8"));
 
 	if (mp4File == NIL) return Error();
 

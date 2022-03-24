@@ -60,7 +60,7 @@ extern AACENCGETLIBINFO			 ex_aacEncGetLibInfo;
 extern AACENCODER_GETPARAM		 ex_aacEncoder_GetParam;
 extern AACENCODER_SETPARAM		 ex_aacEncoder_SetParam;
 
-typedef MP4FileHandle			(*MP4CREATEEX)			(const char *, uint32_t, int, int, char *, uint32_t, char **, uint32_t);
+typedef MP4FileHandle			(*MP4CREATECALLBACKS)		(const MP4IOCallbacks *, void *, uint32_t);
 typedef void				(*MP4CLOSE)			(MP4FileHandle, uint32_t);
 typedef bool				(*MP4OPTIMIZE)			(const char *, const char *);
 
@@ -73,7 +73,7 @@ typedef MP4ItmfItem *			(*MP4ITMFITEMALLOC)		(const char *, uint32_t);
 typedef void				(*MP4ITMFITEMFREE)		(MP4ItmfItem *);
 typedef bool				(*MP4ITMFADDITEM)		(MP4FileHandle, const MP4ItmfItem *);
 
-extern MP4CREATEEX			 ex_MP4CreateEx;
+extern MP4CREATECALLBACKS		 ex_MP4CreateCallbacks;
 extern MP4CLOSE				 ex_MP4Close;
 extern MP4OPTIMIZE			 ex_MP4Optimize;
 

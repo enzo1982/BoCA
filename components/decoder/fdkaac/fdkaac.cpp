@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -90,6 +90,15 @@ Void smooth::DetachDLL()
 	FreeMP4v2DLL();
 }
 
+namespace BoCA
+{
+	int64_t	 MP4IO_size(void *);
+	int	 MP4IO_seek(void *, int64_t);
+	int	 MP4IO_read(void *, void *, int64_t, int64_t *);
+
+	static MP4IOCallbacks	 mp4Callbacks = { MP4IO_size, MP4IO_seek, MP4IO_read, NIL, NIL };
+};
+
 Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 {
 	Bool		 isValidFile = False;
@@ -97,7 +106,7 @@ Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 
 	if (mp4v2dll != NIL && (in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		MP4FileHandle	 mp4File  = ex_MP4ReadProvider(streamURI.ConvertTo("UTF-8"), NIL);
+		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
 		Int		 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
@@ -146,7 +155,7 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
 
-		MP4FileHandle	 mp4File  = ex_MP4ReadProvider(streamURI.ConvertTo("UTF-8"), NIL);
+		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
 		Int		 mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
@@ -411,7 +420,7 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		mp4File	 = ex_MP4ReadProvider(track.fileName.ConvertTo("UTF-8"), NIL);
+		mp4File	 = ex_MP4ReadCallbacks(&mp4Callbacks, driver);
 		mp4Track = GetAudioTrack(mp4File);
 
 		if (mp4Track == -1)
@@ -420,8 +429,6 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 			return False;
 		}
-
-		driver->Seek(0);
 
 		handle	 = ex_aacDecoder_Open(TT_MP4_RAW, 1);
 
@@ -807,4 +814,31 @@ Bool BoCA::DecoderFDKAAC::SyncOnAACHeader(InStream &in)
 	/* No sync. Probably not an AAC file.
 	 */
 	return False;
+}
+
+int64_t BoCA::MP4IO_size(void *handle)
+{
+	Driver	*driver = (Driver *) handle;
+
+	return driver->GetSize();
+}
+
+int BoCA::MP4IO_seek(void *handle, int64_t pos)
+{
+	Driver	*driver = (Driver *) handle;
+
+	if (driver->Seek(pos) == -1) return 1;
+
+	return 0;
+}
+
+int BoCA::MP4IO_read(void *handle, void *buffer, int64_t size, int64_t *nout)
+{
+	Driver	*driver = (Driver *) handle;
+
+	*nout = driver->ReadData((UnsignedByte *) buffer, size);
+
+	if (*nout == 0) return 1;
+
+	return 0;
 }

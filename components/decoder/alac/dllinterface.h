@@ -26,7 +26,8 @@ extern DynamicLoader	*mp4v2dll;
 Bool			 LoadMP4v2DLL();
 Void			 FreeMP4v2DLL();
 
-typedef MP4FileHandle		(*MP4READPROVIDER)		(const char *, const MP4FileProvider *);
+typedef MP4FileHandle		(*MP4READ)			(const char *);
+typedef MP4FileHandle		(*MP4READCALLBACKS)		(const MP4IOCallbacks *, void *);
 typedef void			(*MP4CLOSE)			(MP4FileHandle, uint32_t);
 typedef void			(*MP4FREE)			(void *);
 typedef uint32_t		(*MP4GETNUMBEROFTRACKS)		(MP4FileHandle, const char *, uint8_t);
@@ -41,7 +42,8 @@ typedef MP4SampleId		(*MP4GETSAMPLEIDFROMTIME)	(MP4FileHandle, MP4TrackId, MP4Ti
 typedef uint32_t		(*MP4GETSAMPLESIZE)		(MP4FileHandle, MP4TrackId, MP4SampleId);
 typedef bool			(*MP4READSAMPLE)		(MP4FileHandle, MP4TrackId, MP4SampleId, uint8_t **, uint32_t *, MP4Timestamp *, MP4Duration *, MP4Duration *, bool *);
 
-extern MP4READPROVIDER		 ex_MP4ReadProvider;
+extern MP4READ			 ex_MP4Read;
+extern MP4READCALLBACKS		 ex_MP4ReadCallbacks;
 extern MP4CLOSE			 ex_MP4Close;
 extern MP4FREE			 ex_MP4Free;
 extern MP4GETNUMBEROFTRACKS	 ex_MP4GetNumberOfTracks;

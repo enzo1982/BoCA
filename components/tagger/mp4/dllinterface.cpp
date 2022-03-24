@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,7 +13,7 @@
 #include <boca.h>
 #include "dllinterface.h"
 
-MP4READPROVIDER			 ex_MP4ReadProvider		= NIL;
+MP4READ				 ex_MP4Read			= NIL;
 MP4MODIFY			 ex_MP4Modify			= NIL;
 MP4CLOSE			 ex_MP4Close			= NIL;
 MP4FREE				 ex_MP4Free			= NIL;
@@ -61,7 +61,7 @@ Bool LoadMP4v2DLL()
 
 	if (mp4v2dll == NIL) return False;
 
-	ex_MP4ReadProvider		= (MP4READPROVIDER) mp4v2dll->GetFunctionAddress("MP4ReadProvider");
+	ex_MP4Read			= (MP4READ) mp4v2dll->GetFunctionAddress("MP4Read");
 	ex_MP4Modify			= (MP4MODIFY) mp4v2dll->GetFunctionAddress("MP4Modify");
 	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
 	ex_MP4Free			= (MP4FREE) mp4v2dll->GetFunctionAddress("MP4Free");
@@ -101,7 +101,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4ItmfGetItemsByMeaning	= (MP4ITMFGETITEMSBYMEANING) mp4v2dll->GetFunctionAddress("MP4ItmfGetItemsByMeaning");
 	ex_MP4ItmfItemListFree		= (MP4ITMFITEMLISTFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemListFree");
 
-	if (ex_MP4ReadProvider		== NIL ||
+	if (ex_MP4Read			== NIL ||
 	    ex_MP4Modify		== NIL ||
 	    ex_MP4Close			== NIL ||
 	    ex_MP4Free			== NIL ||
