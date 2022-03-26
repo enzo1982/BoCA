@@ -246,10 +246,14 @@ Int BoCA::DecoderALAC::ReadData(Buffer<UnsignedByte> &data)
 	const Format	&format = track.GetFormat();
 
 	/* Read MP4 sample.
+	 *
+	 * Allocate 4 extra bytes for the buffer as the ALAC decoder always reads
+	 * 32 bits ahead, even at the end of the sample buffer. The extra bytes
+	 * prevent this from crossing page boundaries, causing access violations.
 	 */
 	unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
 
-	dataBuffer.Resize(bufferSize);
+	dataBuffer.Resize(bufferSize + 4);
 
 	unsigned char	*buffer	    = dataBuffer;
 
