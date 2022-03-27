@@ -18,4 +18,10 @@
     <mode>stdio</mode>
     <outformat>wave</outformat>
   </external>
+  <external>
+    <command>tta</command>
+    <arguments>-d %OPTIONS %INFILE -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
 </component>

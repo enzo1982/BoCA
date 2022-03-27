@@ -19,4 +19,10 @@
     <mode>file</mode>
     <informat>wave</informat>
   </external>
+  <external>
+    <command>tta</command>
+    <arguments>-e %OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
 </component>
