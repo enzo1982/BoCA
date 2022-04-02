@@ -10,7 +10,7 @@
     <extension>mpc</extension>
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>
-  <input channels="1-8"/>
+  <input channels="1-8" rate="32000,37800,44100,48000"/>
   <external>
     <command>mpcenc</command>
     <arguments>%OPTIONS - %OUTFILE</arguments>
