@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -97,6 +97,8 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 
 	if	(info.track   >   0) RenderTagItem("ITRK", String(prependZero && info.track < 10 ? "0" : NIL).Append(String::FromInt(info.track)), buffer);
 	if	(info.year    >   0) RenderTagItem("ICRD", String::FromInt(info.year).Append("-01-01"), buffer);
+
+	if	(info.rating >=   0) RenderTagItem("IRTD", String::FromInt(info.rating), buffer);
 
 	if	(info.comment != NIL && !replaceExistingComments) RenderTagItem("ICMT", info.comment, buffer, False);
 	else if (defaultComment != NIL)				  RenderTagItem("ICMT", defaultComment, buffer);
@@ -211,6 +213,8 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 			else if (id == "IPRD") info.album   = value;
 			else if (id == "ICRD") info.year    = value.Head(4).ToInt();
 			else if (id == "IGNR") info.genre   = value;
+
+			else if (id == "IRTD") info.rating  = Math::Min(100, value.ToInt());
 
 			else if (id == "ICMT")
 			{

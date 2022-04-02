@@ -204,6 +204,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	/* Save other metadata atoms.
 	 */
+	if (info.rating >= 0) AddItmfItem(mp4File, "rate", NIL, NIL, String::FromInt(info.rating));
+
 	foreach (const String &pair, info.other)
 	{
 		String	 key   = pair.Head(pair.Find(":"));
@@ -539,6 +541,8 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 			String	 value = GetItmfItemValue(item);
 
 			if (value == NIL) continue;
+
+			else if	(code ==  "rate") info.rating = Math::Min(100, value.ToInt());
 
 			else if	(code ==  "aART") info.SetOtherInfo(INFO_ALBUMARTIST,	value);
 

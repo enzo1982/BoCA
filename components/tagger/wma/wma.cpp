@@ -176,7 +176,7 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			RenderWMAStringItem(g_wszWMPartOfSet, discString, pHeaderInfo);
 		}
 
-		if (info.rating > 0)
+		if (info.rating >= 0)
 		{
 			RenderWMAIntegerItem(g_wszWMSharedUserRating, Math::Min(99, info.rating), pHeaderInfo);
 		}

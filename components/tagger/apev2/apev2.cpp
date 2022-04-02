@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -90,13 +90,13 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	Int		 numItems = 0;
 
-	if (info.artist != NIL) { RenderAPEItem("Artist",    info.artist,		 buffer); numItems++; }
-	if (info.title  != NIL) { RenderAPEItem("Title",     info.title,		 buffer); numItems++; }
-	if (info.album  != NIL) { RenderAPEItem("Album",     info.album,		 buffer); numItems++; }
-	if (info.year    >   0) { RenderAPEItem("Year",	     String::FromInt(info.year), buffer); numItems++; }
-	if (info.genre  != NIL) { RenderAPEItem("Genre",     info.genre,		 buffer); numItems++; }
-	if (info.label  != NIL) { RenderAPEItem("Publisher", info.label,		 buffer); numItems++; }
-	if (info.isrc   != NIL) { RenderAPEItem("ISRC",	     info.isrc,			 buffer); numItems++; }
+	if (info.artist != NIL) { RenderAPEItem("Artist",    info.artist,		   buffer); numItems++; }
+	if (info.title  != NIL) { RenderAPEItem("Title",     info.title,		   buffer); numItems++; }
+	if (info.album  != NIL) { RenderAPEItem("Album",     info.album,		   buffer); numItems++; }
+	if (info.year    >   0) { RenderAPEItem("Year",	     String::FromInt(info.year),   buffer); numItems++; }
+	if (info.genre  != NIL) { RenderAPEItem("Genre",     info.genre,		   buffer); numItems++; }
+	if (info.label  != NIL) { RenderAPEItem("Publisher", info.label,		   buffer); numItems++; }
+	if (info.isrc   != NIL) { RenderAPEItem("ISRC",	     info.isrc,			   buffer); numItems++; }
 
 	if (info.track > 0)
 	{
@@ -115,6 +115,8 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		{ RenderAPEItem("Disc", discString, buffer); numItems++; }
 	}
+
+	if (info.rating >=   0) { RenderAPEItem("RATING",    String::FromInt(info.rating), buffer); numItems++; }
 
 	if	(info.comment != NIL && !replaceExistingComments) { RenderAPEItem("Comment", info.comment,   buffer, False); numItems++; }
 	else if (defaultComment != NIL && numItems > 0)		  { RenderAPEItem("Comment", defaultComment, buffer	  ); numItems++; }
@@ -431,6 +433,8 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		{
 			if (Info::IsISRC(value)) info.isrc = value;
 		}
+
+		else if (id == "RATING")	 info.rating  = Math::Min(100, value.ToInt());
 
 		else if (id == "ALBUM ARTIST")	 info.SetOtherInfo(INFO_ALBUMARTIST,	value);
 

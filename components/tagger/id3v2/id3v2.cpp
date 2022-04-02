@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -436,9 +436,9 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		{ ID3_Frame frame(ID3FID_PARTINSET); SetStringField(frame, ID3FN_TEXT, discString); container.AddFrame(frame); }
 	}
 
-	if (info.rating > 0)
+	if (info.rating >= 0)
 	{
-		Int	 rating = Math::Min(255, info.rating * 256 / 100);
+		Int	 rating = Math::Max(1, Math::Min(255, Math::Round(info.rating * 254 / 100.0) + 1));
 
 		{ ID3_Frame frame(ID3FID_POPULARIMETER); SetASCIIField(frame, ID3FN_EMAIL, "rating@freac.org"); SetIntegerField(frame, ID3FN_RATING, rating); container.AddFrame(frame); }
 	}
@@ -776,7 +776,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		{
 			Int	 rating = GetIntegerField(frame, ID3FN_RATING);
 
-			if (rating > 0) info.rating = Math::Max(1, Math::Min(255, rating * 100 / 255));
+			if (rating > 0) info.rating = Math::Max(0, Math::Min(100, Math::Round((rating - 1) * 100 / 254.0)));
 		}
 		else if (frame.GetID() == ID3FID_USERTEXT)
 		{

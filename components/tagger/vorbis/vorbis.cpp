@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -95,19 +95,21 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	Int	 numItems = 0;
 
-	if	(info.artist != NIL) { RenderTagItem("ARTIST",	  info.artist,		      buffer); numItems++; }
-	if	(info.title  != NIL) { RenderTagItem("TITLE",	  info.title,		      buffer); numItems++; }
-	if	(info.album  != NIL) { RenderTagItem("ALBUM",	  info.album,		      buffer); numItems++; }
-	if	(info.year    >   0) { RenderTagItem("DATE",	  String::FromInt(info.year), buffer); numItems++; }
-	if	(info.genre  != NIL) { RenderTagItem("GENRE",	  info.genre,		      buffer); numItems++; }
-	if	(info.label  != NIL) { RenderTagItem("PUBLISHER", info.label,		      buffer); numItems++; }
-	if	(info.isrc   != NIL) { RenderTagItem("ISRC",	  info.isrc,		      buffer); numItems++; }
+	if	(info.artist != NIL) { RenderTagItem("ARTIST",	    info.artist,		  buffer); numItems++; }
+	if	(info.title  != NIL) { RenderTagItem("TITLE",	    info.title,			  buffer); numItems++; }
+	if	(info.album  != NIL) { RenderTagItem("ALBUM",	    info.album,			  buffer); numItems++; }
+	if	(info.year    >   0) { RenderTagItem("DATE",	    String::FromInt(info.year),   buffer); numItems++; }
+	if	(info.genre  != NIL) { RenderTagItem("GENRE",	    info.genre,			  buffer); numItems++; }
+	if	(info.label  != NIL) { RenderTagItem("PUBLISHER",   info.label,			  buffer); numItems++; }
+	if	(info.isrc   != NIL) { RenderTagItem("ISRC",	    info.isrc,			  buffer); numItems++; }
 
 	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(prependZero && info.track	 < 10 ? "0" : NIL).Append(String::FromInt(info.track)),	    buffer); numItems++; }
 	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL",  String(prependZero && info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
 
 	if	(info.disc	> 0) { RenderTagItem("DISCNUMBER",  String(prependZero && info.disc	 < 10 ? "0" : NIL).Append(String::FromInt(info.disc)),	    buffer); numItems++; }
 	if	(info.numDiscs	> 0) { RenderTagItem("DISCTOTAL",   String(prependZero && info.numDiscs  < 10 ? "0" : NIL).Append(String::FromInt(info.numDiscs)),  buffer); numItems++; }
+
+	if	(info.rating   >= 0) { RenderTagItem("RATING",	    String::FromInt(info.rating), buffer); numItems++; }
 
 	if	(info.comment != NIL && !replaceExistingComments) { RenderTagItem("COMMENT", info.comment,   buffer, False); numItems++; }
 	else if (defaultComment != NIL && numItems > 0)		  { RenderTagItem("COMMENT", defaultComment, buffer	  ); numItems++; }
@@ -350,6 +352,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		else if (id == "DISCTOTAL" ||
 			 id == "TOTALDISCS")	 info.numDiscs  = value.ToInt();
+
+		else if (id == "RATING")	 info.rating	= Math::Min(100, value.ToInt());
 
 		else if (id == "ALBUMARTIST")	 info.SetOtherInfo(INFO_ALBUMARTIST,	value);
 
