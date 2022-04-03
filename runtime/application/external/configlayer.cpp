@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -162,6 +162,7 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 		group_parameters->Add(checkBox);
 
 		checks_parameters.Add(checkBox);
+		checks_parameters_values.Add(checkBox->IsChecked());
 		layers_parameters.Add(layer);
 	}
 
@@ -294,6 +295,113 @@ Layer *BoCA::AS::ConfigLayerExternal::GetParameterLayer(const String &name)
 	return NIL;
 }
 
+Void BoCA::AS::ConfigLayerExternal::CheckParameterDependencies()
+{
+	/* Loop over all parameters until no more changes are triggered.
+	 */
+	Bool	 parametersChanged = False;
+
+	do
+	{
+		parametersChanged = False;
+
+		foreach (const Parameter *param, specs->parameters)
+		{
+			/* Loop over parameter's dependencies to check if state needs to be changed.
+			 */
+			Bool					 enableParam  = True;
+			const Array<ParameterDependency>	&dependencies = param->GetDependencies();
+
+			foreach (const ParameterDependency &dependency, dependencies)
+			{
+				/* Find controlling paramter for this dependency.
+				 */
+				foreach (const Parameter *controller, specs->parameters)
+				{
+					if (controller->GetName() != dependency.setting) continue;
+
+					CheckBox	*checkBox = checks_parameters.GetNth(foreachindex);
+
+					if (checkBox->IsChecked() != dependency.state)
+					{
+						enableParam = False;
+					}
+					else if (checkBox->IsChecked() && dependency.value != NIL)
+					{
+						Layer	*layer = GetParameterLayer(controller->GetName());
+
+						if (layer == NIL) continue;
+
+						/* Get current parameter value.
+						 */
+						String	 controllerValue;
+						String	 controllerAlias;
+
+						if (controller->GetType() == PARAMETER_TYPE_SELECTION)
+						{
+							ComboBox	*selection = (ComboBox *) layer->GetNthObject(0);
+							Option		*option	   = controller->GetOptions().GetNth(selection->GetSelectedEntryNumber());
+
+							if (option == NIL) continue;
+
+							controllerValue = option->GetValue();
+							controllerAlias = option->GetAlias();
+						}
+						else if (controller->GetType() == PARAMETER_TYPE_RANGE)
+						{
+							Slider		*range = (Slider *) layer->GetNthObject(0);
+
+							controllerValue = String::FromFloat(range->GetValue() * controller->GetStepSize());
+						}
+
+						/* Check if value is allowed.
+						 */
+						const Array<String>	&values = dependency.value.Explode(",");
+						Bool			 match	= False;
+
+						foreach (const String &value, values)
+						{
+							if (controllerValue != value && controllerAlias != value) continue;
+
+							match = True;
+							break;
+						}
+
+						if (!match) enableParam = False;
+					}
+				}
+			}
+
+			/* Update widgets if paramter state has changed.
+			 */
+			CheckBox	*checkBox = checks_parameters.GetNth(foreachindex);
+			Layer		*layer	  = GetParameterLayer(param->GetName());
+
+			if (enableParam && !checkBox->IsActive())
+			{
+				parametersChanged = True;
+
+				checkBox->Activate();
+				checkBox->SetChecked(checks_parameters_values.GetNth(foreachindex));
+
+				if (layer != NIL) layer->Activate();
+			}
+			else if (!enableParam && checkBox->IsActive())
+			{
+				parametersChanged = True;
+
+				checks_parameters_values.SetNth(foreachindex, checkBox->IsChecked());
+
+				checkBox->Deactivate();
+				checkBox->SetChecked(False);
+
+				if (layer != NIL) layer->Deactivate();
+			}
+		}
+	}
+	while (parametersChanged);
+}
+
 String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 {
 	/* Still initializing?
@@ -306,7 +414,7 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 	{
 		CheckBox	*checkBox = checks_parameters.GetNth(foreachindex);
 
-		if (!checkBox->IsChecked()) continue;
+		if (!checkBox->IsChecked() || !checkBox->IsActive()) continue;
 
 		switch (param->GetType())
 		{
@@ -353,14 +461,16 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 
 Void BoCA::AS::ConfigLayerExternal::OnSelectParameter()
 {
+	CheckParameterDependencies();
+
 	foreach (CheckBox *checkBox, checks_parameters)
 	{
 		Layer	*layer = layers_parameters.GetNth(foreachindex);
 
 		if (layer == NIL) continue;
 
-		if (checkBox->IsChecked()) layer->Activate();
-		else			   layer->Deactivate();
+		if (checkBox->IsChecked() && checkBox->IsActive()) layer->Activate();
+		else						   layer->Deactivate();
 	}
 
 	if (check_additional->IsChecked()) edit_additional->Activate();
@@ -369,6 +479,8 @@ Void BoCA::AS::ConfigLayerExternal::OnSelectParameter()
 
 Void BoCA::AS::ConfigLayerExternal::OnUpdateParameterValue()
 {
+	OnSelectParameter();
+
 	edit_commandline->SetText(GetArgumentsString());
 }
 

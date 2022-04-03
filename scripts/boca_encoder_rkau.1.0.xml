@@ -24,10 +24,12 @@
 	<option alias="Max">3</option>
       </selection>
       <range name="Simple lossy mode" argument="-q%VALUE" default="5">
+	<depends setting="VRQ lossy mode" state="disabled"/>
 	<min alias="best quality">1</min>
 	<max alias="best compression">15</max>
       </range>
       <range name="VRQ lossy mode" argument="-v%VALUE" default="6">
+	<depends setting="Simple lossy mode" state="disabled"/>
 	<min alias="best compression">1</min>
 	<max alias="best quality">8</max>
       </range>

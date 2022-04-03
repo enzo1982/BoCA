@@ -22,27 +22,45 @@
 	<option alias="Apple Lossless Audio Codec">-A</option>
       </selection>
       <range name="True VBR Mode" argument="--tvbr %VALUE" default="60" step="1" enabled="true">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity"/>
+	<depends setting="Constrained VBR Mode" state="disabled"/>
+	<depends setting="ABR Mode" state="disabled"/>
+	<depends setting="CBR Mode" state="disabled"/>
 	<min alias="worse">0</min>
 	<max alias="better">127</max>
       </range>
       <range name="Constrained VBR Mode" argument="--cvbr %VALUE" default="128" step="8">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
+	<depends setting="True VBR Mode" state="disabled"/>
+	<depends setting="ABR Mode" state="disabled"/>
+	<depends setting="CBR Mode" state="disabled"/>
 	<min alias="%1 kbps">8</min>
 	<max alias="%1 kbps">320</max>
       </range>
       <range name="ABR Mode" argument="--abr %VALUE" default="128" step="8">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
+	<depends setting="True VBR Mode" state="disabled"/>
+	<depends setting="Constrained VBR Mode" state="disabled"/>
+	<depends setting="CBR Mode" state="disabled"/>
 	<min alias="%1 kbps">8</min>
 	<max alias="%1 kbps">320</max>
       </range>
       <range name="CBR Mode" argument="--cbr %VALUE" default="128" step="8">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
+	<depends setting="True VBR Mode" state="disabled"/>
+	<depends setting="Constrained VBR Mode" state="disabled"/>
+	<depends setting="ABR Mode" state="disabled"/>
 	<min alias="%1 kbps">8</min>
 	<max alias="%1 kbps">320</max>
       </range>
       <selection name="Quality" argument="--quality %VALUE" default="2" enabled="true">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
 	<option alias="High">2</option>
 	<option alias="Normal">1</option>
 	<option alias="Fast">0</option>
       </selection>
       <selection name="Sample rate" argument="--rate %VALUE" default="auto" enabled="true">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
 	<option alias="Auto">auto</option>
 	<option alias="Keep">keep</option>
 	<option alias="8.000 Hz">8000</option>
@@ -69,27 +87,45 @@
 	<option alias="Apple Lossless Audio Codec">-A</option>
       </selection>
       <range name="True VBR Mode" argument="--tvbr %VALUE" default="60" step="1" enabled="true">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity"/>
+	<depends setting="Constrained VBR Mode" state="disabled"/>
+	<depends setting="ABR Mode" state="disabled"/>
+	<depends setting="CBR Mode" state="disabled"/>
 	<min alias="worse">0</min>
 	<max alias="better">127</max>
       </range>
       <range name="Constrained VBR Mode" argument="--cvbr %VALUE" default="128" step="8">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
+	<depends setting="True VBR Mode" state="disabled"/>
+	<depends setting="ABR Mode" state="disabled"/>
+	<depends setting="CBR Mode" state="disabled"/>
 	<min alias="%1 kbps">8</min>
 	<max alias="%1 kbps">320</max>
       </range>
       <range name="ABR Mode" argument="--abr %VALUE" default="128" step="8">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
+	<depends setting="True VBR Mode" state="disabled"/>
+	<depends setting="Constrained VBR Mode" state="disabled"/>
+	<depends setting="CBR Mode" state="disabled"/>
 	<min alias="%1 kbps">8</min>
 	<max alias="%1 kbps">320</max>
       </range>
       <range name="CBR Mode" argument="--cbr %VALUE" default="128" step="8">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
+	<depends setting="True VBR Mode" state="disabled"/>
+	<depends setting="Constrained VBR Mode" state="disabled"/>
+	<depends setting="ABR Mode" state="disabled"/>
 	<min alias="%1 kbps">8</min>
 	<max alias="%1 kbps">320</max>
       </range>
       <selection name="Quality" argument="--quality %VALUE" default="2" enabled="true">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
 	<option alias="High">2</option>
 	<option alias="Normal">1</option>
 	<option alias="Fast">0</option>
       </selection>
       <selection name="Sample rate" argument="--rate %VALUE" default="auto" enabled="true">
+	<depends setting="Audio codec" value="MPEG4 AAC Low Complexity,MPEG4 AAC High Efficiency"/>
 	<option alias="Auto">auto</option>
 	<option alias="Keep">keep</option>
 	<option alias="8.000 Hz">8000</option>

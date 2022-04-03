@@ -65,12 +65,12 @@
 
 		<!ELEMENT parameters (switch | selection | range)*>
 
-			<!ELEMENT switch (#PCDATA)>
+			<!ELEMENT switch (depends*)>
 			<!ATTLIST switch name	  CDATA	#REQUIRED
 					 argument CDATA	#REQUIRED
 					 enabled  (true|false) "false">
 
-			<!ELEMENT selection (option+)>
+			<!ELEMENT selection (depends*, option+)>
 			<!ATTLIST selection name     CDATA   #REQUIRED
 					    argument CDATA   #REQUIRED
 					    enabled  (true|false) "false"
@@ -79,7 +79,7 @@
 				<!ELEMENT option (#PCDATA)>
 				<!ATTLIST option alias CDATA #IMPLIED>
 
-			<!ELEMENT range (min, max)>
+			<!ELEMENT range (depends*, min, max)>
 			<!ATTLIST range name	 CDATA	 #REQUIRED
 					argument CDATA	 #REQUIRED
 					enabled	 (true|false) "false"
@@ -91,6 +91,11 @@
 
 				<!ELEMENT max (#PCDATA)>
 				<!ATTLIST max alias CDATA #IMPLIED>
+
+			<!ELEMENT depends (#PCDATA)>
+			<!ATTLIST depends setting CDATA	#REQUIRED
+					  state	  (enabled|disabled) "enabled"
+					  value	  CDATA #IMPLIED>
 
 		<!ELEMENT md5 (#PCDATA)>
 		<!ATTLIST md5 stream  (stdout|stderr) "stdout"

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -34,10 +34,13 @@ namespace BoCA
 				EditBox				*edit_commandline;
 
 				Array<CheckBox *, Void *>	 checks_parameters;
+				Array<Bool>			 checks_parameters_values;
 				Array<Layer *, Void *>		 layers_parameters;
 				Array<Widget *, Void *>		 widgets_parameters;
 
 				Layer				*GetParameterLayer(const String &);
+				Void				 CheckParameterDependencies();
+
 				String				 GetArgumentsString();
 			public:
 								 ConfigLayerExternal(ComponentSpecs *);

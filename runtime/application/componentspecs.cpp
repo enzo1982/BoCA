@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -12,6 +12,24 @@
 
 #include <boca/application/componentspecs.h>
 #include <boca/common/config.h>
+
+static Array< Array<BoCA::ParameterDependency> >	 parameterDependencies;
+
+const Array<BoCA::ParameterDependency> &BoCA::AS::Parameter::GetDependencies() const
+{
+	Int	 index = Number(Int64(this)).ToHexString().ComputeCRC32();
+
+	return parameterDependencies.Get(index);
+}
+
+Void BoCA::AS::Parameter::AddDependency(const BoCA::ParameterDependency &nDep)
+{
+	Int	 index = Number(Int64(this)).ToHexString().ComputeCRC32();
+
+	if (GetDependencies().Length() == 0) parameterDependencies.Add(Array<ParameterDependency>(), index);
+
+	parameterDependencies.GetReference(index).Add(nDep);
+}
 
 BoCA::AS::ComponentSpecs::ComponentSpecs()
 {
@@ -586,6 +604,8 @@ Bool BoCA::AS::ComponentSpecs::ParseParameters(XML::Node *root)
 		if (node->GetName() == "switch")
 		{
 			parameter->SetType(PARAMETER_TYPE_SWITCH);
+
+			ParseParameterDependencies(parameter, node);
 		}
 		else if (node->GetName() == "selection")
 		{
@@ -611,6 +631,8 @@ Bool BoCA::AS::ComponentSpecs::ParseParameters(XML::Node *root)
 					parameter->AddOption(option);
 				}
 			}
+
+			ParseParameterDependencies(parameter, node);
 		}
 		else if (node->GetName() == "range")
 		{
@@ -640,9 +662,32 @@ Bool BoCA::AS::ComponentSpecs::ParseParameters(XML::Node *root)
 					parameter->AddOption(option);
 				}
 			}
+
+			ParseParameterDependencies(parameter, node);
 		}
 
 		parameters.Add(parameter);
+	}
+
+	return True;
+}
+
+Bool BoCA::AS::ComponentSpecs::ParseParameterDependencies(Parameter *parameter, XML::Node *node)
+{
+	for (Int i = 0; i < node->GetNOfNodes(); i++)
+	{
+		XML::Node	*node2 = node->GetNthNode(i);
+
+		if (node2->GetName() == "depends")
+		{
+			ParameterDependency	 dependency;
+
+			dependency.setting = node2->GetAttributeByName("setting") != NIL ? node2->GetAttributeByName("setting")->GetContent()		 : String();
+			dependency.state   = node2->GetAttributeByName("state")	  != NIL ? node2->GetAttributeByName("state")->GetContent() == "enabled" : True;
+			dependency.value   = node2->GetAttributeByName("value")	  != NIL ? node2->GetAttributeByName("value")->GetContent()		 : String();
+
+			if (dependency.setting != NIL) parameter->AddDependency(dependency);
+		}
 	}
 
 	return True;

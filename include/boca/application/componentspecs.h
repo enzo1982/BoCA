@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -72,6 +72,13 @@ namespace BoCA
 		PARAMETER_TYPE_RANGE,
 
 		NUM_PARAMETER_TYPES
+	};
+
+	struct ParameterDependency
+	{
+		String	 setting;
+		Bool	 state;
+		String	 value;
 	};
 
 	namespace AS
@@ -230,39 +237,42 @@ namespace BoCA
 		class BOCA_DLL_EXPORT Parameter
 		{
 			private:
-				ParameterType		 type;
-				String			 name;
-				String			 argument;
-				Bool			 enabled;
-				Float			 stepSize;
-				String			 defaultValue;
-				Array<Option *>		 options;
+				ParameterType				 type;
+				String					 name;
+				String					 argument;
+				Bool					 enabled;
+				Float					 stepSize;
+				String					 defaultValue;
+				Array<Option *>				 options;
 			public:
-							 Parameter() : type(PARAMETER_TYPE_SWITCH),
-								       enabled(False),
-								       stepSize(1.0)			{ }
-							~Parameter()					{ }
+									 Parameter() : type(PARAMETER_TYPE_SWITCH),
+										       enabled(False),
+										       stepSize(1.0)			{ }
+									~Parameter()					{ }
 
-				ParameterType		 GetType() const				{ return type; }
-				Void			 SetType(ParameterType nType)			{ type = nType; }
+				ParameterType				 GetType() const				{ return type; }
+				Void					 SetType(ParameterType nType)			{ type = nType; }
 
-				const String		&GetName() const				{ return name; }
-				Void			 SetName(const String &nName)			{ name = nName; }
+				const String				&GetName() const				{ return name; }
+				Void					 SetName(const String &nName)			{ name = nName; }
 
-				const String		&GetArgument() const				{ return argument; }
-				Void			 SetArgument(const String &nArgument)		{ argument = nArgument; }
+				const String				&GetArgument() const				{ return argument; }
+				Void					 SetArgument(const String &nArgument)		{ argument = nArgument; }
 
-				Bool			 GetEnabled() const				{ return enabled; }
-				Void			 SetEnabled(Bool nEnabled)			{ enabled = nEnabled; }
+				Bool					 GetEnabled() const				{ return enabled; }
+				Void					 SetEnabled(Bool nEnabled)			{ enabled = nEnabled; }
 
-				Float			 GetStepSize() const				{ return stepSize; }
-				Void			 SetStepSize(Float nStepSize)			{ stepSize = nStepSize; }
+				Float					 GetStepSize() const				{ return stepSize; }
+				Void					 SetStepSize(Float nStepSize)			{ stepSize = nStepSize; }
 
-				const String		&GetDefault() const				{ return defaultValue; }
-				Void			 SetDefault(const String &nDefault)		{ defaultValue = nDefault; }
+				const String				&GetDefault() const				{ return defaultValue; }
+				Void					 SetDefault(const String &nDefault)		{ defaultValue = nDefault; }
 
-				const Array<Option *>	&GetOptions() const				{ return options; }
-				Void			 AddOption(Option *nOption)			{ options.Add(nOption); }
+				const Array<Option *>			&GetOptions() const				{ return options; }
+				Void					 AddOption(Option *nOption)			{ options.Add(nOption); }
+
+				const Array<ParameterDependency>	&GetDependencies() const;
+				Void					 AddDependency(const ParameterDependency &);
 		};
 
 		class BOCA_DLL_EXPORT ComponentSpecs
@@ -275,6 +285,7 @@ namespace BoCA
 				Bool			 ParseXMLSpec(const String &);
 
 				Bool			 ParseParameters(XML::Node *);
+				Bool			 ParseParameterDependencies(Parameter *, XML::Node *);
 			public:
 				String			 id;
 				ComponentType		 type;

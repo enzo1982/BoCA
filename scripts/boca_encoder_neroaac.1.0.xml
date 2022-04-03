@@ -25,14 +25,20 @@
 	<option alias="HEv2 AAC">-hev2</option>
       </selection>
       <range name="Quality" argument="-q %VALUE" default="0.5" step="0.1">
+	<depends setting="Bitrate" state="disabled"/>
+	<depends setting="Bitrate (Streaming)" state="disabled"/>
 	<min alias="worse">0.0</min>
 	<max alias="better">1.0</max>
       </range>
       <range name="Bitrate" argument="-br %VALUE000" default="96" step="4">
+	<depends setting="Quality" state="disabled"/>
+	<depends setting="Bitrate (Streaming)" state="disabled"/>
 	<min alias="%1 kbps">12</min>
 	<max alias="%1 kbps">424</max>
       </range>
       <range name="Bitrate (Streaming)" argument="-cbr %VALUE000" default="96" step="4">
+	<depends setting="Quality" state="disabled"/>
+	<depends setting="Bitrate" state="disabled"/>
 	<min alias="%1 kbps">12</min>
 	<max alias="%1 kbps">424</max>
       </range>
