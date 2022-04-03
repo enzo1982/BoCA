@@ -355,6 +355,12 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 		encFileName = Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
 
 		File(track.fileName).Copy(encFileName);
+
+		/* Look for a companion file.
+		 */
+		File	 companionFile = GetCompanionFile(track.fileName);
+
+		if (companionFile.Exists()) companionFile.Copy(GetCompanionFile(encFileName));
 	}
 
 	/* Start 3rd party command line decoder.
@@ -412,8 +418,19 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(track.fileName)) File(encFileName).Delete();
+	if (String::IsUnicode(track.fileName))
+	{
+		File(encFileName).Delete();
 
+		/* Delete companion file too.
+		 */
+		File	 companionFile = GetCompanionFile(encFileName);
+
+		if (companionFile.Exists()) companionFile.Delete();
+	}
+
+	/* Check if anything went wrong.
+	 */
 	if (!specs->external_ignoreExitCode && exitCode != 0 && exitCode != 0x80 + SIGPIPE && exitSignal != SIGPIPE)
 	{
 		errorState  = True;

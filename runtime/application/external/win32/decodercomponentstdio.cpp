@@ -506,6 +506,12 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 		encFileName = Utilities::GetNonUnicodeTempFileName(track.fileName).Append(".").Append(specs->formats.GetFirst()->GetExtensions().GetFirst());
 
 		File(track.fileName).Copy(encFileName);
+
+		/* Look for a companion file.
+		 */
+		File	 companionFile = GetCompanionFile(track.fileName);
+
+		if (companionFile.Exists()) companionFile.Copy(GetCompanionFile(encFileName));
 	}
 
 	const Format	&format = track.GetFormat();
@@ -624,7 +630,16 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Deactivate()
 
 	/* Remove temporary copy if necessary.
 	 */
-	if (String::IsUnicode(track.fileName)) File(encFileName).Delete();
+	if (String::IsUnicode(track.fileName))
+	{
+		File(encFileName).Delete();
+
+		/* Delete companion file too.
+		 */
+		File	 companionFile = GetCompanionFile(encFileName);
+
+		if (companionFile.Exists()) companionFile.Delete();
+	}
 
 	/* Check if anything went wrong.
 	 */

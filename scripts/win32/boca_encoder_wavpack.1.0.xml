@@ -8,6 +8,7 @@
   <format>
     <name>WavPack Files</name>
     <extension>wv</extension>
+    <companion>wvc</companion>
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>
   <external>
@@ -20,6 +21,9 @@
 	<min alias="%1 kbps">64</min>
 	<max alias="%1 kbps">720</max>
       </range>
+      <switch name="Create correction file" argument="-c">
+	<depends setting="Enable lossy compression"/>
+      </switch>
       <selection name="Compression mode" argument="%VALUE" default="-h">
 	<option alias="fast">-f</option>
 	<option alias="high quality">-h</option>

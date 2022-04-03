@@ -9,6 +9,7 @@
   <format>
     <name>WavPack Files</name>
     <extension>wv</extension>
+    <companion>wvc</companion>
     <tag id="apev2-tag" mode="append">APEv2</tag>
   </format>
   <external>

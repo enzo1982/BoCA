@@ -20,10 +20,11 @@
 	<!ELEMENT precede (#PCDATA)>
 	<!ELEMENT succeed (#PCDATA)>
 
-	<!ELEMENT format (name, lossless?, extension+, tag*)>
+	<!ELEMENT format (name, lossless?, extension+, companion*, tag*)>
 
 		<!ELEMENT lossless (#PCDATA)>
 		<!ELEMENT extension (#PCDATA)>
+		<!ELEMENT companion (#PCDATA)>
 
 		<!ELEMENT tag (#PCDATA)>
 		<!ATTLIST tag id   NMTOKEN		  #REQUIRED

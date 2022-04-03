@@ -157,6 +157,9 @@ namespace BoCA
 				const Array<String>	&GetExtensions() const				{ return extensions; }
 				Void			 AddExtension(const String &nExt)		{ extensions.Add(nExt); }
 
+				const Array<String>	&GetCompanionExtensions() const;
+				Void			 AddCompanionExtension(const String &);
+
 				const Array<TagFormat>	&GetTagFormats() const				{ return tagFormats; }
 				Void			 AddTagFormat(const TagFormat &nFormat)		{ tagFormats.Add(nFormat); }
 		};

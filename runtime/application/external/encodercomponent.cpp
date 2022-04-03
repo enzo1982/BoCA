@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -46,6 +46,15 @@ Bool BoCA::AS::EncoderComponentExternal::SetAudioTrackInfo(const Track &track)
 String BoCA::AS::EncoderComponentExternal::GetOutputFileExtension() const
 {
 	return specs->formats.GetFirst()->GetExtensions().GetFirst();
+}
+
+File BoCA::AS::EncoderComponentExternal::GetCompanionFile(const String &file) const
+{
+	String	 companionExt = specs->formats.GetFirst()->GetCompanionExtensions().GetFirst();
+
+	if (companionExt == NIL) return File();
+
+	return file.Head(file.FindLast(".") + 1).Append(companionExt);
 }
 
 Bool BoCA::AS::EncoderComponentExternal::IsLossless() const

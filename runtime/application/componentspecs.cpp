@@ -13,7 +13,24 @@
 #include <boca/application/componentspecs.h>
 #include <boca/common/config.h>
 
+static Array< Array<String> >				 formatCompanions;
 static Array< Array<BoCA::ParameterDependency> >	 parameterDependencies;
+
+const Array<String> &BoCA::AS::FileFormat::GetCompanionExtensions() const
+{
+	Int	 index = Number(Int64(this)).ToHexString().ComputeCRC32();
+
+	return formatCompanions.Get(index);
+}
+
+Void BoCA::AS::FileFormat::AddCompanionExtension(const String &nExt)
+{
+	Int	 index = Number(Int64(this)).ToHexString().ComputeCRC32();
+
+	if (GetCompanionExtensions().Length() == 0) formatCompanions.Add(Array<String>(), index);
+
+	formatCompanions.GetReference(index).Add(nExt);
+}
 
 const Array<BoCA::ParameterDependency> &BoCA::AS::Parameter::GetDependencies() const
 {
@@ -429,6 +446,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 				if	(node2->GetName() == "name")	  format->SetName(node2->GetContent());
 				else if (node2->GetName() == "lossless")  format->SetLossless(node2->GetContent() == "true");
 				else if (node2->GetName() == "extension") format->AddExtension(node2->GetContent());
+				else if (node2->GetName() == "companion") format->AddCompanionExtension(node2->GetContent());
 				else if (node2->GetName() == "tag")
 				{
 					TagFormat	 tagFormat;
