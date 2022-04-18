@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -76,8 +76,8 @@ Bool BoCA::VerifierMD5::Verify()
 
 	if (checksum != track.md5)
 	{
-		errorState  = True;
-		errorString = String("Expected: ").Append(track.md5);
+		errorState = True;
+		errorString.Append("\nExpected: ").Append(track.md5);
 	}
 
 	return checksum == track.md5;
