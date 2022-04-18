@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Generic MPEG-4 Audio Decoder</name>
+  <version>1.0</version>
+  <id>ffmpeg-m4a-dec</id>
+  <type>decoder</type>
+  <format>
+    <name>MPEG-4 Audio Files</name>
+    <extension>m4a</extension>
+    <extension>m4b</extension>
+    <extension>m4r</extension>
+    <extension>mp4</extension>
+    <extension>3gp</extension>
+    <extension>3gpp</extension>
+    <tag id="mp4-tag" mode="other">MP4 Metadata</tag>
+  </format>
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+  <external>
+    <command>avconv</command>
+    <arguments>-i %INFILE %OPTIONS -f wav -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+  </external>
+</component>

@@ -19,6 +19,7 @@ install:
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_dss.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_dts.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_flv_audio.1.0.xml "$(DESTDIR)"$(libdir)/boca
+	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_m4a.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_m4v_audio.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_mac.1.0.xml "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) "$(SRCDIR)"/boca_decoder_ffmpeg_mkv_audio.1.0.xml "$(DESTDIR)"$(libdir)/boca
@@ -76,6 +77,7 @@ uninstall:
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_dss.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_dts.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_flv_audio.1.0.xml
+	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_m4a.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_m4v_audio.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_mac.1.0.xml
 	rm -f "$(DESTDIR)"$(libdir)/boca/boca_decoder_ffmpeg_mkv_audio.1.0.xml
