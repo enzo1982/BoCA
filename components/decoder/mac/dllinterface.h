@@ -12,7 +12,7 @@
 
 #include <smooth.h>
 
-#include "mac/MACDll.h"
+#include <MAC/MACDll.h>
 
 using namespace APE;
 

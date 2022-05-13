@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = config.o dllinterface.o speex.o worker.o
 
 # Enter additional defines here:
-DEFINE	  = -I"$(SRCDIR)"
+DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support
 
 # Enter additional library dependencies here:
 LIBS	  =

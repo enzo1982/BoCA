@@ -19,7 +19,7 @@ BINARY	= $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTA
 DEFINE	= -DUNICODE
 LIBS	= -lole32 -lshell32
 
-CCOPTS	= -Wno-multichar -I"$(SRCDIR)" -I $(BOCA_PATH)/include $(DEFINE)
+CCOPTS	= -Wno-multichar -I"$(SRCDIR)"/$(BOCA_PATH)/include -I"$(SRCDIR)"/$(BOCA_PATH)/include/support/apple $(DEFINE)
 LDOPTS	= -L $(BOCA_PATH)/$(LIBDIR) $(LIBS)
 
 ifneq ($(BUILD_WIN32),True)

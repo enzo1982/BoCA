@@ -16,8 +16,8 @@
 #	undef callbacks
 #endif
 
-#include "fdk-aac/aacdecoder_lib.h"
-#include "mp4v2/mp4v2.h"
+#include <fdk-aac/aacdecoder_lib.h>
+#include <mp4v2/mp4v2.h>
 
 using namespace smooth;
 using namespace smooth::System;

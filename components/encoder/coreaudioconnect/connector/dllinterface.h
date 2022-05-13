@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,9 +14,9 @@
 
 namespace CA
 {
-#include "CoreAudio/AudioFile.h"
-#include "CoreAudio/AudioConverter.h"
-#include "CoreAudio/AudioFormat.h"
+#include <AudioToolbox/AudioFile.h>
+#include <AudioToolbox/AudioConverter.h>
+#include <AudioToolbox/AudioFormat.h>
 };
 
 extern HINSTANCE	 coreaudiodll;

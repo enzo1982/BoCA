@@ -13,7 +13,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 OBJECTS	  = cdrip.o config.o dllinterface.o info/cdinfo.o info/cdplayerini.o info/cdtext.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support
 
 # Enter additional library dependencies here:
 LIBS	  = -lws2_32

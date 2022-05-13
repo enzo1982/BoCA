@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,8 +13,9 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <cdda_paranoia.h>
+
 #include "cdrip.h"
-#include "paranoia/cdda_paranoia.h"
 #include "config.h"
 
 using namespace smooth::IO;

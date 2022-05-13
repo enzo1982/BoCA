@@ -16,7 +16,7 @@
 	typedef int ssize_t;
 #endif
 
-#include "mpg123/mpg123.h"
+#include <mpg123.h>
 
 using namespace smooth;
 using namespace smooth::System;

@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = cdrip.o dllinterface.o
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support
 
 # Enter additional library dependencies here:
 LIBS	  = -lws2_32

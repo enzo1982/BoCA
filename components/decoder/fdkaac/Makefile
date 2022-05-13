@@ -11,7 +11,7 @@ BOCA_PATH = ../../..
 OBJECTS	  = dllinterface.o fdkaac.o
 
 # Enter additional defines here:
-DEFINE	  = -I"$(SRCDIR)" -Wno-multichar
+DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support -Wno-multichar
 
 # Enter additional library dependencies here:
 LIBS	  =

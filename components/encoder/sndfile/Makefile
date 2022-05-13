@@ -20,7 +20,7 @@ else
 endif
 
 # Enter additional defines here:
-DEFINE	  =
+DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support
 
 # Enter additional library dependencies here:
 LIBS	  =

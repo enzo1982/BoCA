@@ -16,8 +16,8 @@
 #	undef callbacks
 #endif
 
-#include "vo-aacenc/voAAC.h"
-#include "mp4v2/mp4v2.h"
+#include <vo-aacenc/voAAC.h>
+#include <mp4v2/mp4v2.h>
 
 using namespace smooth;
 using namespace smooth::System;

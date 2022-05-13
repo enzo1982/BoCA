@@ -13,10 +13,12 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 OBJECTS	  = dllinterface.o mac.o
 
 # Enter additional defines here:
+DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support
+
 ifeq ($(BUILD_WIN32),True)
-	DEFINE = -DPLATFORM_WINDOWS
+	DEFINE += -DPLATFORM_WINDOWS
 else
-	DEFINE = -DPLATFORM_LINUX
+	DEFINE += -DPLATFORM_LINUX
 endif
 
 # Enter additional library dependencies here:

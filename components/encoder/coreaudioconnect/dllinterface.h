@@ -16,7 +16,7 @@
 #	undef callbacks
 #endif
 
-#include "mp4v2/mp4v2.h"
+#include <mp4v2/mp4v2.h>
 
 using namespace smooth;
 using namespace smooth::System;

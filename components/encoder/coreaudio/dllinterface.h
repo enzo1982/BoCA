@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,11 +20,11 @@
 
 namespace CA
 {
-#ifdef __APPLE__
-#	include <AudioToolbox/AudioFile.h>
-#	include <AudioToolbox/AudioConverter.h>
-#	include <AudioToolbox/AudioFormat.h>
+#include <AudioToolbox/AudioFile.h>
+#include <AudioToolbox/AudioConverter.h>
+#include <AudioToolbox/AudioFormat.h>
 
+#ifdef __APPLE__
 #	ifndef MAC_OS_X_VERSION_10_6
 		const UInt32	 kAudioFormatMPEG4AAC_ELD     = 'aace';
 #	endif
@@ -36,10 +36,6 @@ namespace CA
 #	ifndef MAC_OS_X_VERSION_10_8
 		const UInt32	 kAudioFormatMPEG4AAC_ELD_V2  = 'aacg';
 #	endif
-#else
-#	include "CoreAudio/AudioFile.h"
-#	include "CoreAudio/AudioConverter.h"
-#	include "CoreAudio/AudioFormat.h"
 #endif
 };
 
