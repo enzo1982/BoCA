@@ -145,10 +145,10 @@ Bool BoCA::EncoderFAAC::Activate()
 
 	ConvertArguments(config);
 
+	if (mp4v2dll == NIL) config->SetIntValue(ConfigureFAAC::ConfigID, "MP4Container", False);
+
 	Bool	 mp4Container = config->GetIntValue(ConfigureFAAC::ConfigID, "MP4Container", True);
 	Int	 mpegVersion  = config->GetIntValue(ConfigureFAAC::ConfigID, "MPEGVersion", 0);
-
-	if (mp4v2dll == NIL) mp4Container = False;
 
 	/* Create FAAC encoder.
 	 */

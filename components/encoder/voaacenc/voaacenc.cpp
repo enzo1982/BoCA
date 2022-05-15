@@ -135,6 +135,8 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 	ConvertArguments(config);
 
+	if (mp4v2dll == NIL) config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", False);
+
 	Bool	 mp4Container = config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
 	Int	 bitrate      = config->GetIntValue(ConfigureVOAAC::ConfigID, "Bitrate", 96);
 
