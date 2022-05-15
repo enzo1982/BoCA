@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,15 +24,14 @@ namespace BoCA
 			Config			*config;
 
 			MP4FileHandle		 mp4File;
+			Int			 mp4Track;
+
 			VO_HANDLE		 handle;
 
 			VO_AUDIO_CODECAPI	 api;
 
 			VO_MEM_OPERATOR		 memOperator;
 			VO_CODEC_INIT_USERDATA	 userData;
-
-			Int			 mp4Track;
-			Int			 sampleId;
 
 			Int			 frameSize;
 

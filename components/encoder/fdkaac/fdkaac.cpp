@@ -136,9 +136,7 @@ BoCA::EncoderFDKAAC::EncoderFDKAAC()
 	config	     = NIL;
 
 	mp4File	     = NIL;
-
 	mp4Track     = -1;
-	sampleId     = 0;
 
 	frameSize    = 0;
 	granuleSize  = 0;
@@ -192,6 +190,8 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	Int	 mode	      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Mode", 0);
 	Int	 bitrate      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
 	Int	 quality      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Quality", 4);
+
+	if (mp4v2dll == NIL) mp4Container = False;
 
 	/* Create and configure FDK AAC encoder.
 	 */

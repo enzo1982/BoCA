@@ -116,9 +116,7 @@ BoCA::EncoderFAAC::EncoderFAAC()
 	config	     = NIL;
 
 	mp4File	     = NIL;
-
 	mp4Track     = -1;
-	sampleId     = 0;
 
 	frameSize    = 0;
 
@@ -149,6 +147,8 @@ Bool BoCA::EncoderFAAC::Activate()
 
 	Bool	 mp4Container = config->GetIntValue(ConfigureFAAC::ConfigID, "MP4Container", True);
 	Int	 mpegVersion  = config->GetIntValue(ConfigureFAAC::ConfigID, "MPEGVersion", 0);
+
+	if (mp4v2dll == NIL) mp4Container = False;
 
 	/* Create FAAC encoder.
 	 */

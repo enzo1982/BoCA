@@ -102,10 +102,9 @@ BoCA::EncoderVOAAC::EncoderVOAAC()
 	config	     = NIL;
 
 	mp4File	     = NIL;
-	handle	     = NIL;
-
 	mp4Track     = -1;
-	sampleId     = 0;
+
+	handle	     = NIL;
 
 	frameSize    = 0;
 
@@ -138,6 +137,8 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 	Bool	 mp4Container = config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
 	Int	 bitrate      = config->GetIntValue(ConfigureVOAAC::ConfigID, "Bitrate", 96);
+
+	if (mp4v2dll == NIL) mp4Container = False;
 
 	/* Create VO AAC encoder.
 	 */
