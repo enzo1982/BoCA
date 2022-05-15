@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -124,6 +124,7 @@ Bool BoCA::EncoderLAME::Activate()
 	Int	 maxVBRBitrate	  = config->GetIntValue(ConfigureLAME::ConfigID, "MaxVBRBitrate", 256);
 	Bool	 strictISO	  = config->GetIntValue(ConfigureLAME::ConfigID, "StrictISO", 0);
 	Int	 stereoMode	  = config->GetIntValue(ConfigureLAME::ConfigID, "StereoMode", 0);
+	Bool	 disableFiltering = config->GetIntValue(ConfigureLAME::ConfigID, "DisableFiltering", 0);
 
 	/* Create and configure LAME encoder.
 	 */
@@ -145,6 +146,14 @@ Bool BoCA::EncoderLAME::Activate()
 			{
 				if (setBitrate) ex_lame_set_brate(context, bitrate);
 				else		ex_lame_set_compression_ratio(context, ratio / 100.0);
+			}
+
+			/* Set audio filtering.
+			 */
+			if (disableFiltering)
+			{
+				ex_lame_set_lowpassfreq(context, -1);
+				ex_lame_set_highpassfreq(context, -1);
 			}
 
 			/* Set Stereo mode.
