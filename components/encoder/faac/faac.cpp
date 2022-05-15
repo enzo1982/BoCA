@@ -70,7 +70,20 @@ const String &BoCA::EncoderFAAC::GetComponentSpecs()
 			<min alias=\"min\">8</min>								\
 			<max alias=\"max\">256</max>								\
 		      </range>											\
-		      <switch name=\"Write raw AAC files\" argument=\"--raw\"/>					\
+														\
+		");
+
+		if (mp4v2dll != NIL)
+		{
+			componentSpecs.Append("									\
+														\
+			      <switch name=\"Create ADTS AAC files (no MP4 container)\" argument=\"--adts\"/>	\
+														\
+			");
+		}
+
+		componentSpecs.Append("										\
+														\
 		    </parameters>										\
 		  </component>											\
 														\
@@ -536,7 +549,7 @@ Bool BoCA::EncoderFAAC::ConvertArguments(Config *config)
 
 	/* Get command line settings.
 	 */
-	Bool	 rawAAC	 = config->GetIntValue(encoderID, "Write raw AAC files", !config->GetIntValue(ConfigureFAAC::ConfigID, "MP4Container", True));
+	Bool	 rawAAC	 = config->GetIntValue(encoderID, "Create ADTS AAC files (no MP4 container)", !config->GetIntValue(ConfigureFAAC::ConfigID, "MP4Container", True));
 	Bool	 useABR	 = config->GetIntValue(encoderID, "Set ABR bitrate per channel", !config->GetIntValue(ConfigureFAAC::ConfigID, "SetQuality", True));
 
 	Int	 quality = config->GetIntValue(ConfigureFAAC::ConfigID, "AACQuality", 150);

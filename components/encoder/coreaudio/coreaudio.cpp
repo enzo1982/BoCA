@@ -67,7 +67,7 @@ const String &BoCA::EncoderCoreAudio::GetComponentSpecs()
 			<min alias=\"min\">8</min>							\
 			<max alias=\"max\">192</max>							\
 		      </range>										\
-		      <switch name=\"Write raw AAC files\" argument=\"--raw\"/>				\
+		      <switch name=\"Create ADTS AAC files (no MP4 container)\" argument=\"--adts\"/>	\
 		    </parameters>									\
 		  </component>										\
 													\
@@ -801,7 +801,7 @@ Bool BoCA::EncoderCoreAudio::ConvertArguments(Config *config)
 
 	/* Get command line settings.
 	 */
-	Bool	 rawAAC	    = config->GetIntValue(encoderID, "Write raw AAC files", !config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True));
+	Bool	 rawAAC	    = config->GetIntValue(encoderID, "Create ADTS AAC files (no MP4 container)", !config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True));
 
 	Int	 bitrate    = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64);
 	Int	 format	    = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);

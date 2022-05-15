@@ -65,7 +65,20 @@ const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 			<min alias=\"min\">8</min>								\
 			<max alias=\"max\">128</max>								\
 		      </range>											\
-		      <switch name=\"Write raw AAC files\" argument=\"--raw\"/>					\
+														\
+		");
+
+		if (mp4v2dll != NIL)
+		{
+			componentSpecs.Append("									\
+														\
+			      <switch name=\"Create ADTS AAC files (no MP4 container)\" argument=\"--adts\"/>	\
+														\
+			");
+		}
+
+		componentSpecs.Append("										\
+														\
 		    </parameters>										\
 		  </component>											\
 														\
@@ -488,7 +501,7 @@ Bool BoCA::EncoderVOAAC::ConvertArguments(Config *config)
 
 	/* Get command line settings.
 	 */
-	Bool	 rawAAC	 = config->GetIntValue(encoderID, "Write raw AAC files", !config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True));
+	Bool	 rawAAC	 = config->GetIntValue(encoderID, "Create ADTS AAC files (no MP4 container)", !config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True));
 
 	Int	 bitrate = config->GetIntValue(ConfigureVOAAC::ConfigID, "Bitrate", 96);
 
