@@ -77,19 +77,20 @@ Defines
 #define MAC_COMPRESSION_LEVEL_EXTRA_HIGH    4000
 #define MAC_COMPRESSION_LEVEL_INSANE        5000
 
-#define MAC_FORMAT_FLAG_8_BIT                 1    // is 8-bit [OBSOLETE]
-#define MAC_FORMAT_FLAG_CRC                   2    // uses the new CRC32 error detection [OBSOLETE]
-#define MAC_FORMAT_FLAG_HAS_PEAK_LEVEL        4    // uint32 nPeakLevel after the header [OBSOLETE]
-#define MAC_FORMAT_FLAG_24_BIT                8    // is 24-bit [OBSOLETE]
-#define MAC_FORMAT_FLAG_HAS_SEEK_ELEMENTS    16    // has the number of seek elements after the peak level
-#define MAC_FORMAT_FLAG_CREATE_WAV_HEADER    32    // create the wave header on decompression (not stored)
-#define MAC_FORMAT_FLAG_AIFF                 64    // the file is an AIFF that was compressed (instead of WAV)
-#define MAC_FORMAT_FLAG_W64                 128    // the file is a W64 (instead of WAV)
-#define MAC_FORMAT_FLAG_SND                 256    // the file is a SND (instead of WAV)
-#define MAC_FORMAT_FLAG_BIG_ENDIAN          512    // flags that the file uses big endian encoding
+#define MAC_FORMAT_FLAG_8_BIT               (1 << 0)    // is 8-bit [OBSOLETE]
+#define MAC_FORMAT_FLAG_CRC                 (1 << 1)    // uses the new CRC32 error detection [OBSOLETE]
+#define MAC_FORMAT_FLAG_HAS_PEAK_LEVEL      (1 << 2)    // uint32 nPeakLevel after the header [OBSOLETE]
+#define MAC_FORMAT_FLAG_24_BIT              (1 << 3)    // is 24-bit [OBSOLETE]
+#define MAC_FORMAT_FLAG_HAS_SEEK_ELEMENTS   (1 << 4)    // has the number of seek elements after the peak level
+#define MAC_FORMAT_FLAG_CREATE_WAV_HEADER   (1 << 5)    // create the wave header on decompression (not stored)
+#define MAC_FORMAT_FLAG_AIFF                (1 << 6)    // the file is an AIFF that was compressed (instead of WAV)
+#define MAC_FORMAT_FLAG_W64                 (1 << 7)    // the file is a W64 (instead of WAV)
+#define MAC_FORMAT_FLAG_SND                 (1 << 8)    // the file is a SND (instead of WAV)
+#define MAC_FORMAT_FLAG_BIG_ENDIAN          (1 << 9)    // flags that the file uses big endian encoding
+#define MAC_FORMAT_FLAG_CAF                 (1 << 10)   // the file is a CAF (instead of WAV)
 
 #define CREATE_WAV_HEADER_ON_DECOMPRESSION    -1
-#define MAX_AUDIO_BYTES_UNKNOWN 0xFFFFFFFF
+#define MAX_AUDIO_BYTES_UNKNOWN -1
 
 /**************************************************************************************************
 Progress callbacks
@@ -109,8 +110,7 @@ public:
 /**************************************************************************************************
 All structures are designed for 4-byte alignment
 **************************************************************************************************/
-#pragma pack(push)
-#pragma pack(4)
+#pragma pack(push, 4)
 
 /**************************************************************************************************
 WAV header structure
@@ -141,6 +141,40 @@ struct WAVE_HEADER
 };
 
 /**************************************************************************************************
+RF64 header structure
+**************************************************************************************************/
+struct RF64_HEADER
+{
+    // RIFF header
+    char cRIFFHeader[4]; // RF64
+    unsigned int nRIFFBytes;
+
+    // DS64 
+    char cDataTypeID[4]; // WAVE
+    char cDS64[4]; // ds64
+    int32 nDSHeaderSize;
+    int64 nRIFFSize;
+    int64 nDataSize;
+    int64 nSampleCount;
+    int32 nTableLength;
+
+    // wave format
+    char cFormatHeader[4];
+    unsigned int nFormatBytes;
+
+    unsigned short nFormatTag;
+    unsigned short nChannels;
+    unsigned int nSamplesPerSec;
+    unsigned int nAvgBytesPerSec;
+    unsigned short nBlockAlign;
+    unsigned short nBitsPerSample;
+
+    // data chunk header
+    char cDataHeader[4];
+    unsigned int nDataBytes;
+};
+
+/**************************************************************************************************
 APE_DESCRIPTOR structure (file header that describes lengths, offsets, etc.)
 **************************************************************************************************/
 struct APE_DESCRIPTOR
@@ -165,16 +199,16 @@ APE_HEADER structure (describes the format, duration, etc. of the APE file)
 **************************************************************************************************/
 struct APE_HEADER
 {
-    uint16 nCompressionLevel;                 // the compression level (see defines I.E. COMPRESSION_LEVEL_FAST)
-    uint16 nFormatFlags;                      // any format flags (for future use)
+    uint16 nCompressionLevel;                  // the compression level (see defines I.E. COMPRESSION_LEVEL_FAST)
+    uint16 nFormatFlags;                       // any format flags (for future use)
 
-    uint32 nBlocksPerFrame;                   // the number of audio blocks in one frame
-    uint32 nFinalFrameBlocks;                 // the number of audio blocks in the final frame
-    uint32 nTotalFrames;                      // the total number of frames
+    uint32 nBlocksPerFrame;                    // the number of audio blocks in one frame
+    uint32 nFinalFrameBlocks;                  // the number of audio blocks in the final frame
+    uint32 nTotalFrames;                       // the total number of frames
 
-    uint16 nBitsPerSample;                    // the bits per sample (typically 16)
-    uint16 nChannels;                         // the number of channels (1 or 2)
-    uint32 nSampleRate;                       // the sample rate (typically 44100)
+    uint16 nBitsPerSample;                     // the bits per sample (typically 16)
+    uint16 nChannels;                          // the number of channels (1 or 2)
+    uint32 nSampleRate;                        // the sample rate (typically 44100)
 };
 
 /**************************************************************************************************
@@ -496,4 +530,5 @@ extern "C"
     // helper functions
     DLLEXPORT int __stdcall FillWaveFormatEx(APE::WAVEFORMATEX * pWaveFormatEx, int nFormatTag, int nSampleRate, int nBitsPerSample, int nChannels);
     DLLEXPORT int __stdcall FillWaveHeader(APE::WAVE_HEADER * pWAVHeader, APE::int64 nAudioBytes, APE::WAVEFORMATEX * pWaveFormatEx, APE::intn nTerminatingBytes = 0);
+    DLLEXPORT int __stdcall FillRF64Header(APE::RF64_HEADER * pWAVHeader, APE::int64 nAudioBytes, APE::WAVEFORMATEX * pWaveFormatEx, APE::intn nTerminatingBytes = 0);
 }
