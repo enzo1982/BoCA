@@ -236,7 +236,7 @@ Bool BoCA::DecoderALAC::Seek(Int64 samplePosition)
 
 	sampleId    = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
 	skipSamples = time - ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
-	samplesLeft = track.length - samplePosition;
+	samplesLeft = track.sampleOffset + track.length - samplePosition;
 
 	return True;
 }
