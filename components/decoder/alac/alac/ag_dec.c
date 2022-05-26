@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
+ * Portions Copyright (c) 2011-2015 Peter Pawlowski.
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  * 
@@ -24,6 +25,7 @@
 	Contains:   Adaptive Golomb decode routines.
 
 	Copyright:	(c) 2001-2011 Apple, Inc.
+	Portions Copyright (c) 2011-2015 Peter Pawlowski.
 */
 
 #include "aglib.h"
@@ -34,12 +36,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if __GNUC__ && TARGET_OS_MAC
-	#if __POWERPC__
-		#include <ppc_intrinsics.h>
-	#else
-		#include <libkern/OSByteOrder.h>
-	#endif
+
+#if defined(_MSC_VER)
+#include <intrin.h>
 #endif
 
 #define CODE_TO_LONG_MAXBITS	32
@@ -86,21 +85,31 @@ void set_ag_params(AGParamRecPtr params, uint32_t m, uint32_t p, uint32_t k, uin
 #pragma mark -
 #endif
 
-
+#if defined(_MSC_VER)
+static int32_t lead(int32_t m) {
+	unsigned long index = 0; _BitScanReverse(&index, m);
+	return 31 - index;
+}
+#elif defined(__llvm__) || defined(__GNUC__)
+static inline int32_t lead(int32_t m) {
+	return __builtin_clz(m);
+}
+#else
 // note: implementing this with some kind of "count leading zeros" assembly is a big performance win
 static inline int32_t lead( int32_t m )
 {
-	long j;
-	unsigned long c = (1ul << 31);
+	int32_t j;
+	uint32_t c = (1ul << 31);
 
 	for(j=0; j < 32; j++)
 	{
-		if((c & m) != 0)
+		if((c & (uint32_t) m) != 0)
 			break;
 		c >>= 1;
 	}
 	return (j);
 }
+#endif
 
 #define arithmin(a, b) ((a) < (b) ? (a) : (b))
 
@@ -269,7 +278,7 @@ static inline int32_t dyn_get_32bit( uint8_t * in, uint32_t * bitPos, int32_t m,
 	return result;
 }
 
-int32_t dyn_decomp( AGParamRecPtr params, BitBuffer * bitstream, int32_t * pc, int32_t numSamples, int32_t maxSize, uint32_t * outNumBits )
+int32_t dyn_decomp( AGParamRecPtr params, BitBuffer * bitstream, int32_t * pc, uint32_t numSamples, int32_t maxSize, uint32_t * outNumBits )
 {
     uint8_t 		*in;
     int32_t			*outPtr = pc;

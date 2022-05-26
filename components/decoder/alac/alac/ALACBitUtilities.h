@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
+ * Portions Copyright (c) 2011-2015 Peter Pawlowski.
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  * 
@@ -84,6 +85,7 @@ typedef struct BitBuffer
 */
 void	BitBufferInit( BitBuffer * bits, uint8_t * buffer, uint32_t byteSize );
 uint32_t	BitBufferRead( BitBuffer * bits, uint8_t numBits );   // note: cannot read more than 16 bits at a time
+uint32_t	BitBufferRemaining( BitBuffer * bits );
 uint8_t	BitBufferReadSmall( BitBuffer * bits, uint8_t numBits );
 uint8_t	BitBufferReadOne( BitBuffer * bits );
 uint32_t	BitBufferPeek( BitBuffer * bits, uint8_t numBits );   // note: cannot read more than 16 bits at a time

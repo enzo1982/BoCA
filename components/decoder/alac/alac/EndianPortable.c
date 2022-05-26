@@ -35,11 +35,15 @@
                     (((int64_t)x >> 40) & 0x000000000000ff00LL) | (((int64_t)x >> 56) & 0x00000000000000ffLL)))
 
 #if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_AMD64)
-#define TARGET_RT_LITTLE_ENDIAN 1
+#	define TARGET_RT_LITTLE_ENDIAN 1
 #elif defined(__ARMEL__) || defined(__AARCH64EL__) || defined(_M_ARM) || defined(_M_ARM64)
-#define TARGET_RT_LITTLE_ENDIAN 1
+#	define TARGET_RT_LITTLE_ENDIAN 1
 #elif defined(__LITTLE_ENDIAN__) || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define TARGET_RT_LITTLE_ENDIAN 1
+#	define TARGET_RT_LITTLE_ENDIAN 1
+#elif defined(__BIG_ENDIAN__) || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#	define TARGET_RT_LITTLE_ENDIAN 0
+#else
+#	error "Unknown byte order!"
 #endif
 
 uint16_t Swap16NtoB(uint16_t inUInt16)

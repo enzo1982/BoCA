@@ -46,10 +46,7 @@
 
 static inline int32_t ALWAYS_INLINE sign_of_int( int32_t i )
 {
-    int32_t negishift;
-	
-    negishift = ((uint32_t)-i) >> 31;
-    return negishift | (i >> 31);
+    return (0 < i) - (i < 0);
 }
 
 void unpc_block( int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift )
