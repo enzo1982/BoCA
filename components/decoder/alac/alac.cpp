@@ -82,10 +82,10 @@ Bool BoCA::DecoderALAC::CanOpenStream(const String &streamURI)
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) != 'ftyp') return False;
 
 	MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
-	Int		 mp4Track = GetAudioTrack(mp4File);
+	MP4TrackId	 mp4Track = GetAudioTrack(mp4File);
 
-	if (mp4Track >= 0 && ex_MP4HaveTrackAtom(mp4File, mp4Track, "mdia.minf.stbl.stsd.alac") &&
-			     ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0) isValidFile = True;
+	if (mp4Track != MP4_INVALID_TRACK_ID && ex_MP4HaveTrackAtom(mp4File, mp4Track, "mdia.minf.stbl.stsd.alac") &&
+						ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0) isValidFile = True;
 
 	ex_MP4Close(mp4File, 0);
 
@@ -103,9 +103,9 @@ Error BoCA::DecoderALAC::GetStreamInfo(const String &streamURI, Track &track)
 	track.length	= -1;
 
 	MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
-	Int		 mp4Track = GetAudioTrack(mp4File);
+	MP4TrackId	 mp4Track = GetAudioTrack(mp4File);
 
-	if (mp4Track >= 0 && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
+	if (mp4Track != MP4_INVALID_TRACK_ID && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 	{
 		/* Get codec configuration.
 		 */
@@ -171,7 +171,7 @@ BoCA::DecoderALAC::DecoderALAC()
 {
 	mp4File		 = NIL;
 
-	mp4Track	 = -1;
+	mp4Track	 = MP4_INVALID_TRACK_ID;
 	sampleId	 = 1;
 
 	skipSamples	 = 0;
@@ -189,7 +189,7 @@ Bool BoCA::DecoderALAC::Activate()
 	mp4File	 = ex_MP4ReadCallbacks(&mp4Callbacks, driver);
 	mp4Track = GetAudioTrack(mp4File);
 
-	if (mp4Track == -1)
+	if (mp4Track == MP4_INVALID_TRACK_ID)
 	{
 		ex_MP4Close(mp4File, 0);
 
@@ -304,7 +304,7 @@ Int BoCA::DecoderALAC::ReadData(Buffer<UnsignedByte> &data)
 	return data.Size();
 }
 
-Int BoCA::DecoderALAC::GetAudioTrack(MP4FileHandle mp4File) const
+MP4TrackId BoCA::DecoderALAC::GetAudioTrack(MP4FileHandle mp4File) const
 {
 	Int	 nOfTracks = ex_MP4GetNumberOfTracks(mp4File, NIL, 0);
 
@@ -316,7 +316,7 @@ Int BoCA::DecoderALAC::GetAudioTrack(MP4FileHandle mp4File) const
 		if (trackType == MP4_AUDIO_TRACK_TYPE) return trackId;
 	}
 
-	return -1;
+	return MP4_INVALID_TRACK_ID;
 }
 
 int64_t BoCA::MP4IO_size(void *handle)

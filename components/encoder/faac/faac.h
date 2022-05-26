@@ -27,7 +27,7 @@ namespace BoCA
 			Array<SuperWorker *>	 workers;
 
 			MP4FileHandle		 mp4File;
-			Int			 mp4Track;
+			MP4TrackId		 mp4Track;
 
 			Int			 nextWorker;
 

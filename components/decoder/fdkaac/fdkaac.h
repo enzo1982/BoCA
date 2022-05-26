@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ namespace BoCA
 			MP4FileHandle			 mp4File;
 			HANDLE_AACDECODER		 handle;
 
-			Int				 mp4Track;
+			MP4TrackId			 mp4Track;
 			MP4SampleId			 sampleId;
 
 			Bool				 finished;
@@ -41,7 +41,7 @@ namespace BoCA
 			Buffer<unsigned char>		 dataBuffer;
 			Buffer<short>			 samplesBuffer;
 
-			Int				 GetAudioTrack(MP4FileHandle) const;
+			MP4TrackId			 GetAudioTrack(MP4FileHandle) const;
 			Bool				 ReadGaplessInfo(MP4FileHandle, Int &, Int &, Int64 &) const;
 
 			Bool				 SkipID3v2Tag(IO::InStream &);

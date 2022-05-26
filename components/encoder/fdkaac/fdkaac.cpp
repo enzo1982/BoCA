@@ -149,7 +149,7 @@ BoCA::EncoderFDKAAC::EncoderFDKAAC()
 	config	     = NIL;
 
 	mp4File	     = NIL;
-	mp4Track     = -1;
+	mp4Track     = MP4_INVALID_TRACK_ID;
 
 	frameSize    = 0;
 	granuleSize  = 0;

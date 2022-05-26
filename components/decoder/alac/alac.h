@@ -25,7 +25,7 @@ namespace BoCA
 			MP4FileHandle		 mp4File;
 			ALACDecoder		 decoder;
 
-			Int			 mp4Track;
+			MP4TrackId		 mp4Track;
 			MP4SampleId		 sampleId;
 
 			UnsignedInt		 skipSamples;
@@ -33,7 +33,7 @@ namespace BoCA
 
 			Buffer<unsigned char>	 dataBuffer;
 
-			Int			 GetAudioTrack(MP4FileHandle) const;
+			MP4TrackId		 GetAudioTrack(MP4FileHandle) const;
 		public:
 			static const String	&GetComponentSpecs();
 

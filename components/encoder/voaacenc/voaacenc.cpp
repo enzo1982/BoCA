@@ -115,7 +115,7 @@ BoCA::EncoderVOAAC::EncoderVOAAC()
 	config	     = NIL;
 
 	mp4File	     = NIL;
-	mp4Track     = -1;
+	mp4Track     = MP4_INVALID_TRACK_ID;
 
 	handle	     = NIL;
 
