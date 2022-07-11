@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -48,6 +48,7 @@ namespace BoCA
 			Text			*text_complexity;
 			Slider			*slider_complexity;
 			Text			*text_complexity_value;
+			CheckBox		*check_disable_pi;
 
 			GroupBox		*group_stream;
 			Text			*text_framesize;
@@ -69,6 +70,7 @@ namespace BoCA
 			Bool			 enableVBR;
 			Bool			 enableCVBR;
 			Bool			 enableDTX;
+			Bool			 disablePI;
 		slots:
 			Void			 SetMode();
 

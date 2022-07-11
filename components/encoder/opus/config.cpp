@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -28,6 +28,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	enableVBR	= config->GetIntValue(ConfigID, "EnableVBR", True);
 	enableCVBR	= config->GetIntValue(ConfigID, "EnableConstrainedVBR", False);
 	enableDTX	= config->GetIntValue(ConfigID, "EnableDTX", False);
+	disablePI	= config->GetIntValue(ConfigID, "DisablePhaseInversion", False);
 
 	I18n	*i18n = I18n::Get();
 
@@ -83,7 +84,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	group_vbr->Add(check_vbr);
 	group_vbr->Add(check_cvbr);
 
-	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 164), Size(344, 66));
+	group_quality		= new GroupBox(i18n->TranslateString("Quality"), Point(7, 164), Size(344, 90));
 
 	text_bitrate		= new Text(i18n->AddColon(i18n->TranslateString("Bitrate")), Point(10, 13));
 
@@ -112,6 +113,8 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	slider_bitrate->SetMetrics(Point(17 + maxTextSize, slider_bitrate->GetY()), Size(edit_bitrate->GetX() - 25 - maxTextSize, slider_bitrate->GetHeight()));
 	slider_complexity->SetMetrics(Point(17 + maxTextSize, slider_complexity->GetY()), Size(edit_bitrate->GetX()- 25 - maxTextSize, slider_complexity->GetHeight()));
 
+	check_disable_pi	= new CheckBox(i18n->TranslateString("Disable intensity stereo phase inversion"), Point(10, 63), Size(324, 0), &disablePI);
+
 	group_quality->Add(text_bitrate);
 	group_quality->Add(slider_bitrate);
 	group_quality->Add(edit_bitrate);
@@ -119,8 +122,9 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	group_quality->Add(text_complexity);
 	group_quality->Add(slider_complexity);
 	group_quality->Add(text_complexity_value);
+	group_quality->Add(check_disable_pi);
 
-	group_stream		= new GroupBox(i18n->TranslateString("Stream"), Point(7, 242), Size(344, 40));
+	group_stream		= new GroupBox(i18n->TranslateString("Stream"), Point(7, 266), Size(344, 40));
 
 	text_framesize		= new Text(i18n->AddColon(i18n->TranslateString("Frame length")), Point(10, 13));
 
@@ -133,7 +137,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	group_stream->Add(slider_framesize);
 	group_stream->Add(text_framesize_value);
 
-	group_options		= new GroupBox(i18n->TranslateString("Options"), Point(7, 294), Size(344, 66));
+	group_options		= new GroupBox(i18n->TranslateString("Options"), Point(7, 318), Size(344, 66));
 
 	check_dtx		= new CheckBox(i18n->TranslateString("Enable discontinous transmission"), Point(10, 13), Size(324, 0), &enableDTX);
 
@@ -166,7 +170,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 	Add(group_stream);
 	Add(group_options);
 
-	SetSize(Size(358, 367));
+	SetSize(Size(358, 391));
 }
 
 BoCA::ConfigureOpus::~ConfigureOpus()
@@ -193,6 +197,7 @@ BoCA::ConfigureOpus::~ConfigureOpus()
 	DeleteObject(text_complexity);
 	DeleteObject(slider_complexity);
 	DeleteObject(text_complexity_value);
+	DeleteObject(check_disable_pi);
 
 	DeleteObject(group_stream);
 	DeleteObject(text_framesize);
@@ -223,6 +228,7 @@ Int BoCA::ConfigureOpus::SaveSettings()
 	config->SetIntValue(ConfigID, "EnableVBR", enableVBR);
 	config->SetIntValue(ConfigID, "EnableConstrainedVBR", enableCVBR);
 	config->SetIntValue(ConfigID, "EnableDTX", enableDTX);
+	config->SetIntValue(ConfigID, "DisablePhaseInversion", disablePI);
 
 	return Success();
 }

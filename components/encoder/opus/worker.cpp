@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -54,6 +54,7 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : pr
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR(config->GetIntValue(ConfigureOpus::ConfigID, "EnableVBR", True)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR_CONSTRAINT(config->GetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", False)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10)));
+	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_PHASE_INVERSION_DISABLED(config->GetIntValue(ConfigureOpus::ConfigID, "DisablePhaseInversion", False)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(config->GetIntValue(ConfigureOpus::ConfigID, "PacketLoss", 0)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_DTX(config->GetIntValue(ConfigureOpus::ConfigID, "EnableDTX", False)));
 	ex_opus_multistream_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(0));

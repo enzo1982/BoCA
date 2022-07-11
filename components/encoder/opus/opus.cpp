@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,45 +24,46 @@ const String &BoCA::EncoderOpus::GetComponentSpecs()
 
 	if (oggdll != NIL && opusdll != NIL)
 	{
-		componentSpecs = "									\
-													\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
-		  <component>										\
-		    <name>Opus Audio Encoder %VERSION%</name>						\
-		    <version>1.0</version>								\
-		    <id>opus-enc</id>									\
-		    <type>encoder</type>								\
-		    <format>										\
-		      <name>Opus Audio</name>								\
-		      <extension>opus</extension>							\
-		      <extension>oga</extension>							\
-		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>			\
-		    </format>										\
-		    <input bits=\"16\" channels=\"1-8\"/>						\
-		    <parameters>									\
-		      <range name=\"Bitrate\" argument=\"--bitrate %VALUE\" default=\"128\">		\
-			<min>6</min>									\
-			<max>510</max>									\
-		      </range>										\
-		      <range name=\"Encoding complexity\" argument=\"--comp %VALUE\" default=\"10\">	\
-			<min alias=\"fastest\">0</min>							\
-			<max alias=\"slowest\">10</max>							\
-		      </range>										\
-		      <selection name=\"Frame size\" argument=\"--framesize %VALUE\" default=\"20\">	\
-			<option alias=\"5ms\">5</option>						\
-			<option alias=\"10ms\">10</option>						\
-			<option alias=\"20ms\">20</option>						\
-			<option alias=\"40ms\">40</option>						\
-			<option alias=\"60ms\">60</option>						\
-			<option alias=\"80ms\">80</option>						\
-			<option alias=\"100ms\">100</option>						\
-			<option alias=\"120ms\">120</option>						\
-		      </selection>									\
- 		      <switch name=\"Use constrained VBR encoding\" argument=\"--cvbr\"/>		\
- 		      <switch name=\"Use hard CBR encoding\" argument=\"--hard-cbr\"/>			\
-		    </parameters>									\
-		  </component>										\
-													\
+		componentSpecs = "										\
+														\
+		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
+		  <component>											\
+		    <name>Opus Audio Encoder %VERSION%</name>							\
+		    <version>1.0</version>									\
+		    <id>opus-enc</id>										\
+		    <type>encoder</type>									\
+		    <format>											\
+		      <name>Opus Audio</name>									\
+		      <extension>opus</extension>								\
+		      <extension>oga</extension>								\
+		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>				\
+		    </format>											\
+		    <input bits=\"16\" channels=\"1-8\"/>							\
+		    <parameters>										\
+		      <range name=\"Bitrate\" argument=\"--bitrate %VALUE\" default=\"128\">			\
+			<min>6</min>										\
+			<max>510</max>										\
+		      </range>											\
+		      <range name=\"Encoding complexity\" argument=\"--comp %VALUE\" default=\"10\">		\
+			<min alias=\"fastest\">0</min>								\
+			<max alias=\"slowest\">10</max>								\
+		      </range>											\
+		      <selection name=\"Frame size\" argument=\"--framesize %VALUE\" default=\"20\">		\
+			<option alias=\"5ms\">5</option>							\
+			<option alias=\"10ms\">10</option>							\
+			<option alias=\"20ms\">20</option>							\
+			<option alias=\"40ms\">40</option>							\
+			<option alias=\"60ms\">60</option>							\
+			<option alias=\"80ms\">80</option>							\
+			<option alias=\"100ms\">100</option>							\
+			<option alias=\"120ms\">120</option>							\
+		      </selection>										\
+ 		      <switch name=\"Use constrained VBR encoding\" argument=\"--cvbr\"/>			\
+ 		      <switch name=\"Use hard CBR encoding\" argument=\"--hard-cbr\"/>				\
+ 		      <switch name=\"Disable intensity stereo phase inversion\" argument=\"--no-phase-inv\"/>	\
+		    </parameters>										\
+		  </component>											\
+														\
 		";
 
 		componentSpecs.Replace("%VERSION%", String("v").Append(String(ex_opus_get_version_string()).Replace("libopus ", NIL)));
@@ -532,20 +533,24 @@ Bool BoCA::EncoderOpus::ConvertArguments(Config *config)
 		config->SetIntValue(ConfigureOpus::ConfigID, "Bitrate", 128);
 		config->SetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
 		config->SetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000);
+
+		config->SetIntValue(ConfigureOpus::ConfigID, "DisablePhaseInversion", False);
 	}
 
 	/* Get command line settings.
 	 */
-	Bool	 hardCBR	= config->GetIntValue(encoderID, "Use hard CBR encoding", !config->GetIntValue(ConfigureOpus::ConfigID, "EnableVBR", True));
-	Bool	 constrainedVBR = config->GetIntValue(encoderID, "Use constrained VBR encoding", config->GetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", False));
+	Bool	 hardCBR	 = config->GetIntValue(encoderID, "Use hard CBR encoding", !config->GetIntValue(ConfigureOpus::ConfigID, "EnableVBR", True));
+	Bool	 constrainedVBR  = config->GetIntValue(encoderID, "Use constrained VBR encoding", config->GetIntValue(ConfigureOpus::ConfigID, "EnableConstrainedVBR", False));
 
-	Int	 bitrate	= config->GetIntValue(ConfigureOpus::ConfigID, "Bitrate", 128);
-	Int	 complexity	= config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
-	Int	 framesize	= config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000) / 1000;
+	Int	 bitrate	 = config->GetIntValue(ConfigureOpus::ConfigID, "Bitrate", 128);
+	Int	 complexity	 = config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
+	Int	 framesize	 = config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000) / 1000;
 
 	if (config->GetIntValue(encoderID, "Set Bitrate", False))	      bitrate	 = config->GetIntValue(encoderID, "Bitrate", bitrate);
 	if (config->GetIntValue(encoderID, "Set Encoding complexity", False)) complexity = config->GetIntValue(encoderID, "Encoding complexity", complexity);
 	if (config->GetIntValue(encoderID, "Set Frame size", False))	      framesize	 = config->GetIntValue(encoderID, "Frame size", framesize);
+
+	Bool	 disablePhaseInv = config->GetIntValue(encoderID, "Disable intensity stereo phase inversion", config->GetIntValue(ConfigureOpus::ConfigID, "DisablePhaseInversion", False));
 
 	/* Set configuration values.
 	 */
@@ -555,6 +560,8 @@ Bool BoCA::EncoderOpus::ConvertArguments(Config *config)
 	config->SetIntValue(ConfigureOpus::ConfigID, "Bitrate", Math::Max(6, Math::Min(510, bitrate)));
 	config->SetIntValue(ConfigureOpus::ConfigID, "Complexity", Math::Max(0, Math::Min(10, complexity)));
 	config->SetIntValue(ConfigureOpus::ConfigID, "FrameSize", Math::Max(5, Math::Min(120, framesize)) * 1000);
+
+	config->SetIntValue(ConfigureOpus::ConfigID, "DisablePhaseInversion", disablePhaseInv);
 
 	return True;
 }
