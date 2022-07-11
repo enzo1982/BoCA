@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -141,7 +141,14 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (!trackMode && !dataMode) albumInfo.genre = genre;
 		}
 
-		if (line.StartsWith("REM DATE ")) info.year = line.Tail(line.Length() - 9).ToInt();
+		if (line.StartsWith("REM DATE "))
+		{
+			Int	 year = line.Tail(line.Length() - 9).ToInt();
+
+			if (!readInfoTags || preferCueSheets) info.year = year;
+
+			if (!trackMode && !dataMode) albumInfo.year = year;
+		}
 
 		if (line.StartsWith("REM COMMENT "))
 		{
@@ -580,6 +587,7 @@ Void BoCA::DecoderCueSheet::UpdateInfoWithAlbumInfo(Info &info, const Info &albu
 	if (albumInfo.artist  != NIL) info.artist  = albumInfo.artist;
 	if (albumInfo.album   != NIL) info.album   = albumInfo.album;
 	if (albumInfo.genre   != NIL) info.genre   = albumInfo.genre;
+	if (albumInfo.year    >    0) info.year	   = albumInfo.year;
 	if (albumInfo.comment != NIL) info.comment = albumInfo.comment;
 
 	if (albumInfo.HasOtherInfo(INFO_COMPOSER)) info.SetOtherInfo(INFO_COMPOSER, albumInfo.GetOtherInfo(INFO_COMPOSER));
