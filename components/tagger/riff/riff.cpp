@@ -203,7 +203,7 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 
 		if (length > 0)
 		{
-			String	 string = in.InputString(length - 1);
+			String	 string = in.InputString(length);
 			String	 value	= string.Trim();
 
 			if (IsStringUTF8(value)) value.ImportFrom("UTF-8", value.ConvertTo("ISO-8859-1"));
@@ -245,9 +245,9 @@ Error BoCA::TaggerRIFF::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &t
 
 			else if (id == "ITOC") info.offsets = value;
 
-			/* Read final null character(s).
+			/* Skip padding byte, if any.
 			 */
-			in.InputNumber(1 + (length & 1));
+			in.InputNumber(length & 1);
 		}
 	}
 
