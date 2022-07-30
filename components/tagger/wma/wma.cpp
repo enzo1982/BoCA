@@ -705,7 +705,7 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 
 		pHeaderInfo->GetAttributeIndices(0, NIL, &langIndex, indices, &numIndices);
 
-		for (Int i = 0; i < numIndices; i++)
+		for (Int i = numIndices - 1; i >= 0; i--)
 		{
 			WORD	 nameLen = 1024;
 			LPWSTR	 name = new WCHAR [nameLen];
