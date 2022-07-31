@@ -62,6 +62,12 @@ namespace BoCA
 	const char * const INFO_RADIOSTATION			= "Internet radio station name";
 	const char * const INFO_RADIOOWNER			= "Internet radio station owner";
 
+	const char * const INFO_SORT_ARTIST			= "Artist sort order";
+	const char * const INFO_SORT_ALBUM			= "Album sort order";
+	const char * const INFO_SORT_ALBUMARTIST		= "Album artist sort order";
+	const char * const INFO_SORT_COMPOSER			= "Composer sort order";
+	const char * const INFO_SORT_TITLE			= "Title sort order";
+
 	const char * const INFO_USERTEXT			= "User defined text";
 
 	const char * const INFO_WEB_ARTIST			= "Official artist webpage";

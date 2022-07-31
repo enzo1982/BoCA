@@ -526,6 +526,12 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		else if	(key == INFO_RADIOSTATION)		   { ID3_Frame frame(ID3FID_NETRADIOSTATION);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_RADIOOWNER)		   { ID3_Frame frame(ID3FID_NETRADIOOWNER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
+		else if	(key == INFO_SORT_ARTIST)		   { ID3_Frame frame(ID3FID_PERFORMERSORTORDER);   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_ALBUM)		   { ID3_Frame frame(ID3FID_ALBUMSORTORDER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_ALBUMARTIST)		   { ID3_Frame frame(ID3FID_ALBUMARTISTSORTORDER); SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_COMPOSER)		   { ID3_Frame frame(ID3FID_COMPOSERSORTORDER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_TITLE)		   { ID3_Frame frame(ID3FID_TITLESORTORDER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+
 		else if (key == INFO_USERTEXT)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
 
 		else if	(key == INFO_WEB_ARTIST)		   { ID3_Frame frame(ID3FID_WWWARTIST);		   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
@@ -713,33 +719,33 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 	{
 		const ID3_Frame	&frame = *iterator->GetNext();
 
-		if	(frame.GetID() == ID3FID_LEADARTIST)	    info.artist  = GetStringField(frame, ID3FN_TEXT);
-		else if (frame.GetID() == ID3FID_TITLE)		    info.title	 = GetStringField(frame, ID3FN_TEXT);
-		else if (frame.GetID() == ID3FID_ALBUM)		    info.album	 = GetStringField(frame, ID3FN_TEXT);
-		else if (frame.GetID() == ID3FID_YEAR)		    info.year	 = GetStringField(frame, ID3FN_TEXT).ToInt();
-		else if (frame.GetID() == ID3FID_RECORDINGTIME)	    info.year	 = GetStringField(frame, ID3FN_TEXT).Head(4).ToInt();
-		else if (frame.GetID() == ID3FID_COMMENT)	    info.comment = GetStringField(frame, ID3FN_TEXT, False);
-		else if (frame.GetID() == ID3FID_PUBLISHER)	    info.label	 = GetStringField(frame, ID3FN_TEXT);
+		if	(frame.GetID() == ID3FID_LEADARTIST)	       info.artist  = GetStringField(frame, ID3FN_TEXT);
+		else if (frame.GetID() == ID3FID_TITLE)		       info.title   = GetStringField(frame, ID3FN_TEXT);
+		else if (frame.GetID() == ID3FID_ALBUM)		       info.album   = GetStringField(frame, ID3FN_TEXT);
+		else if (frame.GetID() == ID3FID_YEAR)		       info.year    = GetStringField(frame, ID3FN_TEXT).ToInt();
+		else if (frame.GetID() == ID3FID_RECORDINGTIME)	       info.year    = GetStringField(frame, ID3FN_TEXT).Head(4).ToInt();
+		else if (frame.GetID() == ID3FID_COMMENT)	       info.comment = GetStringField(frame, ID3FN_TEXT, False);
+		else if (frame.GetID() == ID3FID_PUBLISHER)	       info.label   = GetStringField(frame, ID3FN_TEXT);
 
 		else if (frame.GetID() == ID3FID_ISRC)
 		{
 			if (Info::IsISRC(GetStringField(frame, ID3FN_TEXT))) info.isrc = GetStringField(frame, ID3FN_TEXT);
 		}
 
-		else if (frame.GetID() == ID3FID_CONTENTGROUP)	    info.SetOtherInfo(INFO_CONTENTGROUP,   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_SUBTITLE)	    info.SetOtherInfo(INFO_SUBTITLE,	   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_CONTENTGROUP)	       info.SetOtherInfo(INFO_CONTENTGROUP,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_SUBTITLE)	       info.SetOtherInfo(INFO_SUBTITLE,		GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_BAND)		    info.SetOtherInfo(INFO_BAND,	   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_CONDUCTOR)	    info.SetOtherInfo(INFO_CONDUCTOR,	   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_MIXARTIST)	    info.SetOtherInfo(INFO_REMIXER,	   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_COMPOSER)	    info.SetOtherInfo(INFO_COMPOSER,	   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_LYRICIST)	    info.SetOtherInfo(INFO_LYRICIST,	   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_BAND)		       info.SetOtherInfo(INFO_BAND,		GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_CONDUCTOR)	       info.SetOtherInfo(INFO_CONDUCTOR,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_MIXARTIST)	       info.SetOtherInfo(INFO_REMIXER,		GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_COMPOSER)	       info.SetOtherInfo(INFO_COMPOSER,		GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_LYRICIST)	       info.SetOtherInfo(INFO_LYRICIST,		GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_ORIGARTIST)	    info.SetOtherInfo(INFO_ORIG_ARTIST,	   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_ORIGALBUM)	    info.SetOtherInfo(INFO_ORIG_ALBUM,	   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_ORIGLYRICIST)	    info.SetOtherInfo(INFO_ORIG_LYRICIST,  GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_ORIGYEAR)	    info.SetOtherInfo(INFO_ORIG_YEAR,	   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_ORIGRELEASETIME)   info.SetOtherInfo(INFO_ORIG_YEAR,	   GetStringField(frame, ID3FN_TEXT).Head(4));
+		else if (frame.GetID() == ID3FID_ORIGARTIST)	       info.SetOtherInfo(INFO_ORIG_ARTIST,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_ORIGALBUM)	       info.SetOtherInfo(INFO_ORIG_ALBUM,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_ORIGLYRICIST)	       info.SetOtherInfo(INFO_ORIG_LYRICIST,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_ORIGYEAR)	       info.SetOtherInfo(INFO_ORIG_YEAR,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_ORIGRELEASETIME)      info.SetOtherInfo(INFO_ORIG_YEAR,	GetStringField(frame, ID3FN_TEXT).Head(4));
 
 		else if (frame.GetID() == ID3FID_MOVEMENT)
 		{
@@ -750,32 +756,38 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			if (movementString.Contains("/")) info.SetOtherInfo(INFO_MOVEMENTTOTAL, movementString.Tail(movementString.Length() - movementString.Find("/") - 1));
 		}
 
-		else if (frame.GetID() == ID3FID_MOVEMENTNAME)	    info.SetOtherInfo(INFO_MOVEMENTNAME,   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_MOVEMENTNAME)	       info.SetOtherInfo(INFO_MOVEMENTNAME,	GetStringField(frame, ID3FN_TEXT));
 
 		else if (frame.GetID() == ID3FID_BPM)
 		{
 			if (GetStringField(frame, ID3FN_TEXT).ToInt() > 0) info.SetOtherInfo(INFO_BPM, GetStringField(frame, ID3FN_TEXT));
 		}
 
-		else if (frame.GetID() == ID3FID_INITIALKEY)	    info.SetOtherInfo(INFO_INITIALKEY,	   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_INITIALKEY)	       info.SetOtherInfo(INFO_INITIALKEY,	GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_COPYRIGHT)	    info.SetOtherInfo(INFO_COPYRIGHT,	   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_COPYRIGHT)	       info.SetOtherInfo(INFO_COPYRIGHT,	GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_MEDIATYPE)	    info.SetOtherInfo(INFO_MEDIATYPE,	   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_MEDIATYPE)	       info.SetOtherInfo(INFO_MEDIATYPE,	GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_SETSUBTITLE)	    info.SetOtherInfo(INFO_DISCSUBTITLE,   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_SETSUBTITLE)	       info.SetOtherInfo(INFO_DISCSUBTITLE,	GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_UNSYNCEDLYRICS)    info.SetOtherInfo(INFO_LYRICS,	   GetStringField(frame, ID3FN_TEXT, False));
+		else if (frame.GetID() == ID3FID_UNSYNCEDLYRICS)       info.SetOtherInfo(INFO_LYRICS,		GetStringField(frame, ID3FN_TEXT, False));
 
-		else if (frame.GetID() == ID3FID_NETRADIOSTATION)   info.SetOtherInfo(INFO_RADIOSTATION,   GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_NETRADIOOWNER)     info.SetOtherInfo(INFO_RADIOOWNER,	   GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_NETRADIOSTATION)      info.SetOtherInfo(INFO_RADIOSTATION,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_NETRADIOOWNER)        info.SetOtherInfo(INFO_RADIOOWNER,	GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_WWWARTIST)	    info.SetOtherInfo(INFO_WEB_ARTIST,	   GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWPUBLISHER)	    info.SetOtherInfo(INFO_WEB_PUBLISHER,  GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWRADIOPAGE)	    info.SetOtherInfo(INFO_WEB_RADIO,	   GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWAUDIOSOURCE)    info.SetOtherInfo(INFO_WEB_SOURCE,	   GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWCOPYRIGHT)	    info.SetOtherInfo(INFO_WEB_COPYRIGHT,  GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWCOMMERCIALINFO) info.SetOtherInfo(INFO_WEB_COMMERCIAL, GetASCIIField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_PERFORMERSORTORDER)   info.SetOtherInfo(INFO_SORT_ARTIST,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_ALBUMSORTORDER)       info.SetOtherInfo(INFO_SORT_ALBUM,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_ALBUMARTISTSORTORDER) info.SetOtherInfo(INFO_SORT_ALBUMARTIST,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_COMPOSERSORTORDER)    info.SetOtherInfo(INFO_SORT_COMPOSER,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_TITLESORTORDER)       info.SetOtherInfo(INFO_SORT_TITLE,	GetStringField(frame, ID3FN_TEXT));
+
+		else if (frame.GetID() == ID3FID_WWWARTIST)	       info.SetOtherInfo(INFO_WEB_ARTIST,	GetASCIIField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWPUBLISHER)	       info.SetOtherInfo(INFO_WEB_PUBLISHER,	GetASCIIField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWRADIOPAGE)	       info.SetOtherInfo(INFO_WEB_RADIO,	GetASCIIField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWAUDIOSOURCE)       info.SetOtherInfo(INFO_WEB_SOURCE,	GetASCIIField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWCOPYRIGHT)	       info.SetOtherInfo(INFO_WEB_COPYRIGHT,	GetASCIIField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWCOMMERCIALINFO)    info.SetOtherInfo(INFO_WEB_COMMERCIAL,	GetASCIIField(frame, ID3FN_URL));
 
 		else if (frame.GetID() == ID3FID_WWWUSER)
 		{

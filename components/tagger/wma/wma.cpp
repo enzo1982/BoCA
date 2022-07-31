@@ -223,6 +223,12 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			else if	(key == INFO_RADIOSTATION)		   RenderWMAStringItem(g_wszWMRadioStationName,		    value, pHeaderInfo);
 			else if	(key == INFO_RADIOOWNER)		   RenderWMAStringItem(g_wszWMRadioStationOwner,	    value, pHeaderInfo);
 
+			else if	(key == INFO_SORT_ARTIST)		   RenderWMAStringItem("WM/ArtistSortOrder",		    value, pHeaderInfo);
+			else if	(key == INFO_SORT_ALBUM)		   RenderWMAStringItem("WM/AlbumSortOrder",		    value, pHeaderInfo);
+			else if	(key == INFO_SORT_ALBUMARTIST)		   RenderWMAStringItem("WM/AlbumArtistSortOrder",	    value, pHeaderInfo);
+			else if	(key == INFO_SORT_COMPOSER)		   RenderWMAStringItem("WM/ComposerSortOrder",		    value, pHeaderInfo);
+			else if	(key == INFO_SORT_TITLE)		   RenderWMAStringItem("WM/TitleSortOrder",		    value, pHeaderInfo);
+
 			else if	(key == INFO_WEB_ARTIST)		   RenderWMAStringItem(g_wszWMAuthorURL,		    value, pHeaderInfo);
 			else if	(key == INFO_WEB_SOURCE)		   RenderWMAStringItem(g_wszWMAudioSourceURL,		    value, pHeaderInfo);
 			else if	(key == INFO_WEB_COPYRIGHT)		   RenderWMAStringItem(g_wszWMCopyrightURL,		    value, pHeaderInfo);
@@ -453,44 +459,50 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				if (Info::IsISRC(value)) info.isrc = value;
 			}
 
-			else if (id == g_wszWMAlbumArtist)	       info.SetOtherInfo(INFO_ALBUMARTIST,    value);
+			else if (id == g_wszWMAlbumArtist)	       info.SetOtherInfo(INFO_ALBUMARTIST,	value);
 
-			else if (id == g_wszWMContentGroupDescription) info.SetOtherInfo(INFO_CONTENTGROUP,   value);
-			else if (id == g_wszWMSubTitle)		       info.SetOtherInfo(INFO_SUBTITLE,	      value);
+			else if (id == g_wszWMContentGroupDescription) info.SetOtherInfo(INFO_CONTENTGROUP,	value);
+			else if (id == g_wszWMSubTitle)		       info.SetOtherInfo(INFO_SUBTITLE,		value);
 
-			else if (id == g_wszWMConductor)	       info.SetOtherInfo(INFO_CONDUCTOR,      value);
-			else if (id == g_wszWMModifiedBy)	       info.SetOtherInfo(INFO_REMIXER,	      value);
-			else if (id == g_wszWMComposer)		       info.SetOtherInfo(INFO_COMPOSER,	      value);
-			else if (id == g_wszWMWriter)		       info.SetOtherInfo(INFO_LYRICIST,	      value);
-			else if (id == g_wszWMProducer)		       info.SetOtherInfo(INFO_PRODUCER,	      value);
+			else if (id == g_wszWMConductor)	       info.SetOtherInfo(INFO_CONDUCTOR,	value);
+			else if (id == g_wszWMModifiedBy)	       info.SetOtherInfo(INFO_REMIXER,		value);
+			else if (id == g_wszWMComposer)		       info.SetOtherInfo(INFO_COMPOSER,		value);
+			else if (id == g_wszWMWriter)		       info.SetOtherInfo(INFO_LYRICIST,		value);
+			else if (id == g_wszWMProducer)		       info.SetOtherInfo(INFO_PRODUCER,		value);
 
-			else if (id == g_wszWMOriginalArtist)	       info.SetOtherInfo(INFO_ORIG_ARTIST,    value);
-			else if (id == g_wszWMOriginalAlbumTitle)      info.SetOtherInfo(INFO_ORIG_ALBUM,     value);
-			else if (id == g_wszWMOriginalLyricist)	       info.SetOtherInfo(INFO_ORIG_LYRICIST,  value);
-			else if (id == g_wszWMOriginalReleaseYear)     info.SetOtherInfo(INFO_ORIG_YEAR,      value);
+			else if (id == g_wszWMOriginalArtist)	       info.SetOtherInfo(INFO_ORIG_ARTIST,	value);
+			else if (id == g_wszWMOriginalAlbumTitle)      info.SetOtherInfo(INFO_ORIG_ALBUM,	value);
+			else if (id == g_wszWMOriginalLyricist)	       info.SetOtherInfo(INFO_ORIG_LYRICIST,	value);
+			else if (id == g_wszWMOriginalReleaseYear)     info.SetOtherInfo(INFO_ORIG_YEAR,	value);
 
 			else if (id == g_wszWMBeatsPerMinute)
 			{
 				if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
 			}
 
-			else if (id == g_wszWMInitialKey)	       info.SetOtherInfo(INFO_INITIALKEY,     value);
+			else if (id == g_wszWMInitialKey)	       info.SetOtherInfo(INFO_INITIALKEY,	value);
 
-			else if (id == g_wszWMCopyright)	       info.SetOtherInfo(INFO_COPYRIGHT,      value);
+			else if (id == g_wszWMCopyright)	       info.SetOtherInfo(INFO_COPYRIGHT,	value);
 
-			else if (id == "WM/Media")		       info.SetOtherInfo(INFO_MEDIATYPE,      value);
-			else if (id == "WM/CatalogNo")		       info.SetOtherInfo(INFO_CATALOGNUMBER,  value);
-			else if (id == "WM/Barcode")		       info.SetOtherInfo(INFO_BARCODE,	      value);
+			else if (id == "WM/Media")		       info.SetOtherInfo(INFO_MEDIATYPE,	value);
+			else if (id == "WM/CatalogNo")		       info.SetOtherInfo(INFO_CATALOGNUMBER,	value);
+			else if (id == "WM/Barcode")		       info.SetOtherInfo(INFO_BARCODE,		value);
 
-			else if (id == g_wszWMLyrics)		       info.SetOtherInfo(INFO_LYRICS,	      String((LPWSTR) pbValue));
+			else if (id == g_wszWMLyrics)		       info.SetOtherInfo(INFO_LYRICS,		String((LPWSTR) pbValue));
 
-			else if (id == g_wszWMRadioStationName)	       info.SetOtherInfo(INFO_RADIOSTATION,   value);
-			else if (id == g_wszWMRadioStationOwner)       info.SetOtherInfo(INFO_RADIOOWNER,     value);
+			else if (id == g_wszWMRadioStationName)	       info.SetOtherInfo(INFO_RADIOSTATION,	value);
+			else if (id == g_wszWMRadioStationOwner)       info.SetOtherInfo(INFO_RADIOOWNER,	value);
 
-			else if (id == g_wszWMAuthorURL)	       info.SetOtherInfo(INFO_WEB_ARTIST,     value);
-			else if (id == g_wszWMAudioSourceURL)	       info.SetOtherInfo(INFO_WEB_SOURCE,     value);
-			else if (id == g_wszWMCopyrightURL)	       info.SetOtherInfo(INFO_WEB_COPYRIGHT,  value);
-			else if (id == g_wszWMPromotionURL)	       info.SetOtherInfo(INFO_WEB_COMMERCIAL, value);
+			else if (id == "WM/ArtistSortOrder")	       info.SetOtherInfo(INFO_SORT_ARTIST,	value);
+			else if (id == "WM/AlbumSortOrder")	       info.SetOtherInfo(INFO_SORT_ALBUM,	value);
+			else if (id == "WM/AlbumArtistSortOrder")      info.SetOtherInfo(INFO_SORT_ALBUMARTIST, value);
+			else if (id == "WM/ComposerSortOrder")	       info.SetOtherInfo(INFO_SORT_COMPOSER,	value);
+			else if (id == "WM/TitleSortOrder")	       info.SetOtherInfo(INFO_SORT_TITLE,	value);
+
+			else if (id == g_wszWMAuthorURL)	       info.SetOtherInfo(INFO_WEB_ARTIST,	value);
+			else if (id == g_wszWMAudioSourceURL)	       info.SetOtherInfo(INFO_WEB_SOURCE,	value);
+			else if (id == g_wszWMCopyrightURL)	       info.SetOtherInfo(INFO_WEB_COPYRIGHT,	value);
+			else if (id == g_wszWMPromotionURL)	       info.SetOtherInfo(INFO_WEB_COMMERCIAL,	value);
 
 			else if (id == g_wszWMTrack)
 			{
@@ -789,6 +801,12 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 
 				    nameStr == g_wszWMRadioStationName		||
 				    nameStr == g_wszWMRadioStationOwner		||
+
+				    nameStr == "WM/ArtistSortOrder"		||
+				    nameStr == "WM/AlbumSortOrder"		||
+				    nameStr == "WM/AlbumArtistSortOrder"	||
+				    nameStr == "WM/ComposerSortOrder"		||
+				    nameStr == "WM/TitleSortOrder"		||
 
 				    nameStr == g_wszWMAuthorURL			||
 				    nameStr == g_wszWMAudioSourceURL		||

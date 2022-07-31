@@ -213,21 +213,27 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST)   AddItmfItem(mp4File,  "aART", NIL, NIL, value);
+		if	(key == INFO_ALBUMARTIST)      AddItmfItem(mp4File,  "aART", NIL, NIL, value);
 
-		else if	(key == INFO_CONTENTGROUP)  AddItmfItem(mp4File, L"©grp", NIL, NIL, value);
+		else if	(key == INFO_CONTENTGROUP)     AddItmfItem(mp4File, L"©grp", NIL, NIL, value);
 
-		else if	(key == INFO_COMPOSER)      AddItmfItem(mp4File, L"©wrt", NIL, NIL, value);
+		else if	(key == INFO_COMPOSER)         AddItmfItem(mp4File, L"©wrt", NIL, NIL, value);
 
-		else if	(key == INFO_MOVEMENT)	    AddItmfItem(mp4File, L"©mvi", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
-		else if	(key == INFO_MOVEMENTTOTAL) AddItmfItem(mp4File, L"©mvc", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
-		else if	(key == INFO_MOVEMENTNAME)  AddItmfItem(mp4File, L"©mvn", NIL, NIL, value);
+		else if	(key == INFO_MOVEMENT)	       AddItmfItem(mp4File, L"©mvi", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
+		else if	(key == INFO_MOVEMENTTOTAL)    AddItmfItem(mp4File, L"©mvc", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
+		else if	(key == INFO_MOVEMENTNAME)     AddItmfItem(mp4File, L"©mvn", NIL, NIL, value);
 
-		else if (key == INFO_BPM)	    AddItmfItem(mp4File,  "tmpo", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
+		else if (key == INFO_BPM)	       AddItmfItem(mp4File,  "tmpo", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
 
-		else if	(key == INFO_COPYRIGHT)     AddItmfItem(mp4File,  "cprt", NIL, NIL, value);
+		else if	(key == INFO_COPYRIGHT)        AddItmfItem(mp4File,  "cprt", NIL, NIL, value);
 
-		else if	(key == INFO_LYRICS)	    AddItmfItem(mp4File, L"©lyr", NIL, NIL, pair.Tail(pair.Length() - pair.Find(":") - 1));
+		else if	(key == INFO_LYRICS)	       AddItmfItem(mp4File, L"©lyr", NIL, NIL, pair.Tail(pair.Length() - pair.Find(":") - 1));
+
+		else if	(key == INFO_SORT_ARTIST)      AddItmfItem(mp4File,  "soar", NIL, NIL, value);
+		else if	(key == INFO_SORT_ALBUM)       AddItmfItem(mp4File,  "soal", NIL, NIL, value);
+		else if	(key == INFO_SORT_ALBUMARTIST) AddItmfItem(mp4File,  "soaa", NIL, NIL, value);
+		else if	(key == INFO_SORT_COMPOSER)    AddItmfItem(mp4File,  "soco", NIL, NIL, value);
+		else if	(key == INFO_SORT_TITLE)       AddItmfItem(mp4File,  "sonm", NIL, NIL, value);
 	}
 
 	/* Save generic iTunes metadata.
@@ -561,24 +567,30 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 			else if	(code ==  "rate") info.rating = Math::Min(100, value.ToInt());
 
-			else if	(code ==  "aART") info.SetOtherInfo(INFO_ALBUMARTIST,	value);
+			else if	(code ==  "aART") info.SetOtherInfo(INFO_ALBUMARTIST,	   value);
 
-			else if	(code == L"©grp") info.SetOtherInfo(INFO_CONTENTGROUP,	value);
+			else if	(code == L"©grp") info.SetOtherInfo(INFO_CONTENTGROUP,	   value);
 
-			else if	(code == L"©wrt") info.SetOtherInfo(INFO_COMPOSER,	value);
+			else if	(code == L"©wrt") info.SetOtherInfo(INFO_COMPOSER,	   value);
 
-			if	(code == L"©mvi") info.SetOtherInfo(INFO_MOVEMENT,      value);
-			else if (code == L"©mvc") info.SetOtherInfo(INFO_MOVEMENTTOTAL, value);
-			else if	(code == L"©mvn") info.SetOtherInfo(INFO_MOVEMENTNAME,  value);
+			if	(code == L"©mvi") info.SetOtherInfo(INFO_MOVEMENT,         value);
+			else if (code == L"©mvc") info.SetOtherInfo(INFO_MOVEMENTTOTAL,    value);
+			else if	(code == L"©mvn") info.SetOtherInfo(INFO_MOVEMENTNAME,     value);
 
 			else if	(code ==  "tmpo")
 			{
 				if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
 			}
 
-			else if	(code ==  "cprt") info.SetOtherInfo(INFO_COPYRIGHT,	value);
+			else if	(code ==  "cprt") info.SetOtherInfo(INFO_COPYRIGHT,	   value);
 
-			else if	(code == L"©lyr") info.SetOtherInfo(INFO_LYRICS,	value);
+			else if	(code == L"©lyr") info.SetOtherInfo(INFO_LYRICS,	   value);
+
+			else if (code ==  "soar") info.SetOtherInfo(INFO_SORT_ARTIST,	   value);
+			else if (code ==  "soal") info.SetOtherInfo(INFO_SORT_ALBUM,	   value);
+			else if (code ==  "soaa") info.SetOtherInfo(INFO_SORT_ALBUMARTIST, value);
+			else if (code ==  "soco") info.SetOtherInfo(INFO_SORT_COMPOSER,	   value);
+			else if (code ==  "sonm") info.SetOtherInfo(INFO_SORT_TITLE,	   value);
 		}
 
 		ex_MP4ItmfItemListFree(items);
@@ -779,6 +791,12 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	RemoveItmfItem(mp4File,  "cprt");
 
 	RemoveItmfItem(mp4File, L"©lyr");
+
+	RemoveItmfItem(mp4File,  "soar");
+	RemoveItmfItem(mp4File,  "soal");
+	RemoveItmfItem(mp4File,  "soaa");
+	RemoveItmfItem(mp4File,  "soco");
+	RemoveItmfItem(mp4File,  "sonm");
 
 	/* Remove iTunes metadata items too.
 	 */
