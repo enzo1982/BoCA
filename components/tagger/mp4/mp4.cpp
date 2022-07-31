@@ -242,21 +242,38 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_SUBTITLE)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "SUBTITLE",	     value);
+		if	(key == INFO_SUBTITLE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "SUBTITLE",				value);
 
-		else if	(key == INFO_CONDUCTOR)     AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CONDUCTOR",     value);
-		else if	(key == INFO_REMIXER)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "REMIXER",	     value);
-		else if	(key == INFO_LYRICIST)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LYRICIST",	     value);
-		else if	(key == INFO_PRODUCER)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "PRODUCER",	     value);
-		else if	(key == INFO_ENGINEER)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ENGINEER",	     value);
+		else if	(key == INFO_CONDUCTOR)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CONDUCTOR",				value);
+		else if	(key == INFO_REMIXER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "REMIXER",				value);
+		else if	(key == INFO_LYRICIST)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LYRICIST",				value);
+		else if	(key == INFO_PRODUCER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "PRODUCER",				value);
+		else if	(key == INFO_ENGINEER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ENGINEER",				value);
 
-		else if	(key == INFO_INITIALKEY)    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "initialkey",    value);
+		else if	(key == INFO_INITIALKEY)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "initialkey",			value);
 
-		else if	(key == INFO_MEDIATYPE)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MEDIA",	     value);
-		else if	(key == INFO_CATALOGNUMBER) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CATALOGNUMBER", value);
-		else if	(key == INFO_BARCODE)	    AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "BARCODE",	     value);
+		else if	(key == INFO_MEDIATYPE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MEDIA",				value);
+		else if	(key == INFO_CATALOGNUMBER)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CATALOGNUMBER",			value);
+		else if	(key == INFO_BARCODE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "BARCODE",				value);
 
-		else if	(key == INFO_DISCSUBTITLE)  AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE",  value);
+		else if	(key == INFO_DISCSUBTITLE)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE",			value);
+
+		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Artist Id",		value);
+		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Id",		value);
+		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Artist Id",	value);
+		else if	(key == INFO_MUSICBRAINZ_WORKID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Work Id",		value);
+		else if	(key == INFO_MUSICBRAINZ_DISCID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Disc Id",		value);
+		else if	(key == INFO_MUSICBRAINZ_TRACKID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Track Id",		value);
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Original Artist Id",	value);
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Original Album Id",	value);
+		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Release Group Id",	value);
+		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Release Track Id",	value);
+		else if	(key == INFO_MUSICBRAINZ_TRMID)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz TRM Id",		value);
+
+		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Type",		value);
+		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Status",		value);
+
+		else if	(key == INFO_RELEASECOUNTRY)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Release Country",	value);
 	}
 
 	/* Save Replay Gain info.
@@ -610,6 +627,26 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 			else if (id == "DISCSUBTITLE")	info.SetOtherInfo(INFO_DISCSUBTITLE,  value);
 
+			else if (id.StartsWith("MUSICBRAINZ"))
+			{
+				if	(id == "MUSICBRAINZ ARTIST ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	 value);
+				else if	(id == "MUSICBRAINZ ALBUM ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,		 value);
+				else if	(id == "MUSICBRAINZ ALBUM ARTIST ID")	    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMARTISTID,	 value);
+				else if	(id == "MUSICBRAINZ WORK ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_WORKID,		 value);
+				else if	(id == "MUSICBRAINZ DISC ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_DISCID,		 value);
+				else if	(id == "MUSICBRAINZ TRACK ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_TRACKID,		 value);
+				else if (id == "MUSICBRAINZ ORIGINAL ARTIST ID")    info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
+				else if	(id == "MUSICBRAINZ ORIGINAL ALBUM ID")	    info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALALBUMID,	 value);
+				else if	(id == "MUSICBRAINZ RELEASE GROUP ID")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASEGROUPID,	 value);
+				else if	(id == "MUSICBRAINZ RELEASE TRACK ID")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETRACKID,	 value);
+				else if	(id == "MUSICBRAINZ TRM ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_TRMID,		 value);
+
+				else if	(id == "MUSICBRAINZ ALBUM TYPE")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETYPE,	 value);
+				else if	(id == "MUSICBRAINZ ALBUM STATUS")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASESTATUS,	 value);
+
+				else if	(id == "MUSICBRAINZ ALBUM RELEASE COUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,		 value);
+			}
+
 			else if (id.StartsWith("REPLAYGAIN"))
 			{
 				if	(id == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;
@@ -763,6 +800,23 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "BARCODE");
 
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE");
+
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Artist Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Artist Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Work Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Disc Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Track Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Original Artist Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Original Album Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Release Group Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Release Track Id");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz TRM Id");
+
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Type");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Status");
+
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Release Country");
 
 	ex_MP4Close(mp4File, 0);
 

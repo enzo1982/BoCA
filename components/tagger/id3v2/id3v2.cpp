@@ -474,20 +474,20 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST)    { ID3_Frame frame(ID3FID_USERTEXT);	  SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "Album Artist");  container.AddFrame(frame); }
+		if	(key == INFO_ALBUMARTIST)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "Album Artist");			    container.AddFrame(frame); }
 
-		else if	(key == INFO_CONTENTGROUP)   { ID3_Frame frame(ID3FID_CONTENTGROUP);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_SUBTITLE)	     { ID3_Frame frame(ID3FID_SUBTITLE);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_CONTENTGROUP)		   { ID3_Frame frame(ID3FID_CONTENTGROUP);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_SUBTITLE)			   { ID3_Frame frame(ID3FID_SUBTITLE);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
-		else if	(key == INFO_BAND)	     { ID3_Frame frame(ID3FID_BAND);		  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_CONDUCTOR)	     { ID3_Frame frame(ID3FID_CONDUCTOR);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_REMIXER)	     { ID3_Frame frame(ID3FID_MIXARTIST);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_COMPOSER)	     { ID3_Frame frame(ID3FID_COMPOSER);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_LYRICIST)	     { ID3_Frame frame(ID3FID_LYRICIST);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_BAND)			   { ID3_Frame frame(ID3FID_BAND);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_CONDUCTOR)			   { ID3_Frame frame(ID3FID_CONDUCTOR);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_REMIXER)			   { ID3_Frame frame(ID3FID_MIXARTIST);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_COMPOSER)			   { ID3_Frame frame(ID3FID_COMPOSER);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_LYRICIST)			   { ID3_Frame frame(ID3FID_LYRICIST);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
-		else if	(key == INFO_ORIG_ARTIST)    { ID3_Frame frame(ID3FID_ORIGARTIST);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_ORIG_ALBUM)     { ID3_Frame frame(ID3FID_ORIGALBUM);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_ORIG_LYRICIST)  { ID3_Frame frame(ID3FID_ORIGLYRICIST);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_ORIG_ARTIST)		   { ID3_Frame frame(ID3FID_ORIGARTIST);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_ORIG_ALBUM)		   { ID3_Frame frame(ID3FID_ORIGALBUM);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_ORIG_LYRICIST)		   { ID3_Frame frame(ID3FID_ORIGLYRICIST);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
 		else if (key == INFO_ORIG_YEAR)
 		{
@@ -508,34 +508,64 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 			{ ID3_Frame frame(ID3FID_MOVEMENT); SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		}
 
-		else if	(key == INFO_MOVEMENTNAME)   { ID3_Frame frame(ID3FID_MOVEMENTNAME);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_MOVEMENTNAME)		   { ID3_Frame frame(ID3FID_MOVEMENTNAME);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
-		else if	(key == INFO_BPM)	     { ID3_Frame frame(ID3FID_BPM);		  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_INITIALKEY)     { ID3_Frame frame(ID3FID_INITIALKEY);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_BPM)			   { ID3_Frame frame(ID3FID_BPM);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_INITIALKEY)		   { ID3_Frame frame(ID3FID_INITIALKEY);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
-		else if	(key == INFO_COPYRIGHT)	     { ID3_Frame frame(ID3FID_COPYRIGHT);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_COPYRIGHT)			   { ID3_Frame frame(ID3FID_COPYRIGHT);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
-		else if	(key == INFO_MEDIATYPE)	     { ID3_Frame frame(ID3FID_MEDIATYPE);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if (key == INFO_CATALOGNUMBER)  { ID3_Frame frame(ID3FID_USERTEXT);	  SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "CATALOGNUMBER"); container.AddFrame(frame); }
-		else if (key == INFO_BARCODE)	     { ID3_Frame frame(ID3FID_USERTEXT);	  SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "BARCODE");       container.AddFrame(frame); }
+		else if	(key == INFO_MEDIATYPE)			   { ID3_Frame frame(ID3FID_MEDIATYPE);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if (key == INFO_CATALOGNUMBER)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "CATALOGNUMBER");			    container.AddFrame(frame); }
+		else if (key == INFO_BARCODE)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "BARCODE");			    container.AddFrame(frame); }
 
-		else if	(key == INFO_DISCSUBTITLE)   { ID3_Frame frame(ID3FID_SETSUBTITLE);	  SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_DISCSUBTITLE)		   { ID3_Frame frame(ID3FID_SETSUBTITLE);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
-		else if	(key == INFO_LYRICS)	     { ID3_Frame frame(ID3FID_UNSYNCEDLYRICS);	  SetStringField(frame, ID3FN_TEXT, value, False); SetASCIIField(frame, ID3FN_LANGUAGE, "und"); container.AddFrame(frame); }
+		else if	(key == INFO_LYRICS)			   { ID3_Frame frame(ID3FID_UNSYNCEDLYRICS);	   SetStringField(frame, ID3FN_TEXT, value, False); SetASCIIField(frame, ID3FN_LANGUAGE, "und");			    container.AddFrame(frame); }
 
-		else if	(key == INFO_RADIOSTATION)   { ID3_Frame frame(ID3FID_NETRADIOSTATION);   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_RADIOOWNER)     { ID3_Frame frame(ID3FID_NETRADIOOWNER);     SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_RADIOSTATION)		   { ID3_Frame frame(ID3FID_NETRADIOSTATION);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_RADIOOWNER)		   { ID3_Frame frame(ID3FID_NETRADIOOWNER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
-		else if (key == INFO_USERTEXT)	     { ID3_Frame frame(ID3FID_USERTEXT);	  SetStringField(frame, ID3FN_TEXT, value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
+		else if (key == INFO_USERTEXT)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
 
-		else if	(key == INFO_WEB_ARTIST)     { ID3_Frame frame(ID3FID_WWWARTIST);	  SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_PUBLISHER)  { ID3_Frame frame(ID3FID_WWWPUBLISHER);      SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_RADIO)	     { ID3_Frame frame(ID3FID_WWWRADIOPAGE);      SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_SOURCE)     { ID3_Frame frame(ID3FID_WWWAUDIOSOURCE);    SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_COPYRIGHT)  { ID3_Frame frame(ID3FID_WWWCOPYRIGHT);      SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_COMMERCIAL) { ID3_Frame frame(ID3FID_WWWCOMMERCIALINFO); SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
+		else if	(key == INFO_WEB_ARTIST)		   { ID3_Frame frame(ID3FID_WWWARTIST);		   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
+		else if	(key == INFO_WEB_PUBLISHER)		   { ID3_Frame frame(ID3FID_WWWPUBLISHER);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
+		else if	(key == INFO_WEB_RADIO)			   { ID3_Frame frame(ID3FID_WWWRADIOPAGE);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
+		else if	(key == INFO_WEB_SOURCE)		   { ID3_Frame frame(ID3FID_WWWAUDIOSOURCE);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
+		else if	(key == INFO_WEB_COPYRIGHT)		   { ID3_Frame frame(ID3FID_WWWCOPYRIGHT);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
+		else if	(key == INFO_WEB_COMMERCIAL)		   { ID3_Frame frame(ID3FID_WWWCOMMERCIALINFO);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
 
-		else if (key == INFO_WEB_USERURL)    { ID3_Frame frame(ID3FID_WWWUSER);		  SetASCIIField(frame, ID3FN_URL, value.Tail(value.Length() - value.Find(":|:") - 3));	 SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
+		else if (key == INFO_WEB_USERURL)		   { ID3_Frame frame(ID3FID_WWWUSER);		   SetASCIIField(frame, ID3FN_URL, value.Tail(value.Length() - value.Find(":|:") - 3));	  SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
+
+		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Artist Id");		    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Id");		    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Artist Id");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_WORKID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Work Id");		    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_DISCID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Disc Id");		    container.AddFrame(frame); }
+
+		else if	(key == INFO_MUSICBRAINZ_TRACKID)
+		{
+			ID3_Frame		 frame(ID3FID_UNIQUEFILEID);
+			Buffer<UnsignedByte>	 buffer(value.Length());
+
+			memcpy(buffer, value.ConvertTo("ISO-8859-1"), value.Length());
+
+			SetASCIIField(frame, ID3FN_OWNER, "http://musicbrainz.org");
+			SetBinaryField(frame, ID3FN_DATA, buffer);
+
+			container.AddFrame(frame);
+		}
+
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Original Artist Id");    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Original Album Id");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Release Group Id");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Release Track Id");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_TRMID)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz TRM Id");		    container.AddFrame(frame); }
+
+		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Type");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Status");	    container.AddFrame(frame); }
+
+		else if	(key == INFO_RELEASECOUNTRY)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Release Country"); container.AddFrame(frame); }
 	}
 
 	/* Save Replay Gain info.
@@ -785,10 +815,32 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			if (value == NIL) continue;
 
-			if	(description.ToLower() == "replaygain_track_gain") info.track_gain = value;
-			else if (description.ToLower() == "replaygain_track_peak") info.track_peak = value;
-			else if (description.ToLower() == "replaygain_album_gain") info.album_gain = value;
-			else if (description.ToLower() == "replaygain_album_peak") info.album_peak = value;
+			if	(description.ToLower().StartsWith("musicbrainz"))
+			{
+				if	(description.ToLower() == "musicbrainz artist id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	    value);
+				else if	(description.ToLower() == "musicbrainz album id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,	    value);
+				else if	(description.ToLower() == "musicbrainz album artist id")       info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMARTISTID,    value);
+				else if	(description.ToLower() == "musicbrainz work id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_WORKID,	    value);
+				else if	(description.ToLower() == "musicbrainz disc id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_DISCID,	    value);
+				else if (description.ToLower() == "musicbrainz original artist id")    info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
+				else if	(description.ToLower() == "musicbrainz original album id")     info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALALBUMID,  value);
+				else if	(description.ToLower() == "musicbrainz release group id")      info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASEGROUPID,   value);
+				else if	(description.ToLower() == "musicbrainz release track id")      info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETRACKID,   value);
+				else if	(description.ToLower() == "musicbrainz trm id")		       info.SetOtherInfo(INFO_MUSICBRAINZ_TRMID,	    value);
+
+				else if	(description.ToLower() == "musicbrainz album type")	       info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETYPE,	    value);
+				else if	(description.ToLower() == "musicbrainz album status")	       info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASESTATUS,    value);
+
+				else if	(description.ToLower() == "musicbrainz album release country") info.SetOtherInfo(INFO_RELEASECOUNTRY,		    value);
+			}
+
+			else if (description.ToLower().StartsWith("replaygain"))
+			{
+				if	(description.ToLower() == "replaygain_track_gain") info.track_gain = value;
+				else if (description.ToLower() == "replaygain_track_peak") info.track_peak = value;
+				else if (description.ToLower() == "replaygain_album_gain") info.album_gain = value;
+				else if (description.ToLower() == "replaygain_album_peak") info.album_peak = value;
+			}
 
 			else if (description.ToLower() == "cuesheet")
 			{
@@ -864,6 +916,22 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			}
 
 			else							   info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(value));
+		}
+		else if (frame.GetID() == ID3FID_UNIQUEFILEID)
+		{
+			String	 owner = GetStringField(frame, ID3FN_OWNER);
+
+			if (owner == "http://musicbrainz.org")
+			{
+				Buffer<UnsignedByte>	 buffer;
+
+				GetBinaryField(frame, ID3FN_DATA, buffer);
+
+				buffer.Resize(buffer.Size() + 1);
+				buffer[buffer.Size() - 1] = 0;
+
+				info.SetOtherInfo(INFO_MUSICBRAINZ_TRACKID, (char *) (UnsignedByte *) buffer);
+			}
 		}
 		else if (frame.GetID() == ID3FID_CONTENTTYPE)
 		{

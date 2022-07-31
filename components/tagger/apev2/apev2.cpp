@@ -130,44 +130,59 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST)    { RenderAPEItem("Album Artist",   value, buffer	   ); numItems++; }
+		if	(key == INFO_ALBUMARTIST)		   { RenderAPEItem("Album Artist",		   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_CONTENTGROUP)   { RenderAPEItem("Grouping",       value, buffer	   ); numItems++; }
-		else if	(key == INFO_SUBTITLE)	     { RenderAPEItem("Subtitle",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_CONTENTGROUP)		   { RenderAPEItem("Grouping",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_SUBTITLE)			   { RenderAPEItem("Subtitle",			   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_BAND)	     { RenderAPEItem("Ensemble",       value, buffer	   ); numItems++; }
-		else if	(key == INFO_PERFORMER)	     { RenderAPEItem("Performer",      value, buffer	   ); numItems++; }
-		else if	(key == INFO_CONDUCTOR)	     { RenderAPEItem("Conductor",      value, buffer	   ); numItems++; }
-		else if	(key == INFO_REMIXER)	     { RenderAPEItem("MixArtist",      value, buffer	   ); numItems++; }
-		else if	(key == INFO_COMPOSER)	     { RenderAPEItem("Composer",       value, buffer	   ); numItems++; }
-		else if	(key == INFO_ARRANGER)	     { RenderAPEItem("Arranger",       value, buffer	   ); numItems++; }
-		else if	(key == INFO_PRODUCER)	     { RenderAPEItem("Producer",       value, buffer	   ); numItems++; }
-		else if	(key == INFO_ENGINEER)	     { RenderAPEItem("Engineer",       value, buffer	   ); numItems++; }
+		else if	(key == INFO_BAND)			   { RenderAPEItem("Ensemble",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_PERFORMER)			   { RenderAPEItem("Performer",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_CONDUCTOR)			   { RenderAPEItem("Conductor",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_REMIXER)			   { RenderAPEItem("MixArtist",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_COMPOSER)			   { RenderAPEItem("Composer",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_ARRANGER)			   { RenderAPEItem("Arranger",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_PRODUCER)			   { RenderAPEItem("Producer",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_ENGINEER)			   { RenderAPEItem("Engineer",			   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_MOVEMENT)	     { RenderAPEItem("Movement",       value, buffer	   ); numItems++; }
-		else if	(key == INFO_MOVEMENTTOTAL)  { RenderAPEItem("MovementTotal",  value, buffer	   ); numItems++; }
-		else if	(key == INFO_MOVEMENTNAME)   { RenderAPEItem("MovementName",   value, buffer	   ); numItems++; }
+		else if	(key == INFO_MOVEMENT)			   { RenderAPEItem("Movement",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_MOVEMENTTOTAL)		   { RenderAPEItem("MovementTotal",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_MOVEMENTNAME)		   { RenderAPEItem("MovementName",		   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_BPM)	     { RenderAPEItem("BPM",	       value, buffer	   ); numItems++; }
-		else if	(key == INFO_INITIALKEY)     { RenderAPEItem("InitialKey",     value, buffer	   ); numItems++; }
+		else if	(key == INFO_BPM)			   { RenderAPEItem("BPM",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_INITIALKEY)		   { RenderAPEItem("InitialKey",		   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_COPYRIGHT)	     { RenderAPEItem("Copyright",      value, buffer	   ); numItems++; }
+		else if	(key == INFO_COPYRIGHT)			   { RenderAPEItem("Copyright",			   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_MEDIATYPE)	     { RenderAPEItem("Media",	       value, buffer	   ); numItems++; }
-		else if	(key == INFO_CATALOGNUMBER)  { RenderAPEItem("CatalogNumber",  value, buffer	   ); numItems++; }
-		else if	(key == INFO_BARCODE)	     { RenderAPEItem("Barcode",	       value, buffer	   ); numItems++; }
+		else if	(key == INFO_MEDIATYPE)			   { RenderAPEItem("Media",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_CATALOGNUMBER)		   { RenderAPEItem("CatalogNumber",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_BARCODE)			   { RenderAPEItem("Barcode",			   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_RELEASECOUNTRY) { RenderAPEItem("ReleaseCountry", value, buffer	   ); numItems++; }
+		else if	(key == INFO_RELEASECOUNTRY)		   { RenderAPEItem("ReleaseCountry",		   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_DISCSUBTITLE)   { RenderAPEItem("DiscSubtitle",   value, buffer	   ); numItems++; }
+		else if	(key == INFO_DISCSUBTITLE)		   { RenderAPEItem("DiscSubtitle",		   value, buffer       ); numItems++; }
 
-		else if	(key == INFO_LYRICS)	     { RenderAPEItem("Lyrics",	       value, buffer, False); numItems++; }
+		else if	(key == INFO_LYRICS)			   { RenderAPEItem("Lyrics",			   value, buffer, False); numItems++; }
 
-		else if	(key == INFO_WEB_ARTIST)     { RenderAPEItem("Artist URL",     value, buffer	   ); numItems++; }
-		else if	(key == INFO_WEB_PUBLISHER)  { RenderAPEItem("Publisher URL",  value, buffer	   ); numItems++; }
-		else if	(key == INFO_WEB_SOURCE)     { RenderAPEItem("File URL",       value, buffer	   ); numItems++; }
-		else if	(key == INFO_WEB_COPYRIGHT)  { RenderAPEItem("Copyright URL",  value, buffer	   ); numItems++; }
-		else if	(key == INFO_WEB_COMMERCIAL) { RenderAPEItem("Buy URL",	       value, buffer	   ); numItems++; }
+		else if	(key == INFO_WEB_ARTIST)		   { RenderAPEItem("Artist URL",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_WEB_PUBLISHER)		   { RenderAPEItem("Publisher URL",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_WEB_SOURCE)		   { RenderAPEItem("File URL",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_WEB_COPYRIGHT)		   { RenderAPEItem("Copyright URL",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_WEB_COMMERCIAL)		   { RenderAPEItem("Buy URL",			   value, buffer       ); numItems++; }
+
+		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { RenderAPEItem("MusicBrainz_ArtistId",	   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { RenderAPEItem("MusicBrainz_AlbumId",	   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   { RenderAPEItem("MusicBrainz_AlbumArtistId",    value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_WORKID)	   { RenderAPEItem("MusicBrainz_WorkId",	   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_DISCID)	   { RenderAPEItem("MusicBrainz_DiscId",	   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_TRACKID)	   { RenderAPEItem("MusicBrainz_TrackId",	   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) { RenderAPEItem("MusicBrainz_OriginalArtistId", value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  { RenderAPEItem("MusicBrainz_OriginalAlbumId",  value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   { RenderAPEItem("MusicBrainz_ReleaseGroupId",   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   { RenderAPEItem("MusicBrainz_ReleaseTrackId",   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_TRMID)		   { RenderAPEItem("MusicBrainz_TrmId",		   value, buffer       ); numItems++; }
+
+		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   { RenderAPEItem("MusicBrainz_AlbumType",	   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   { RenderAPEItem("MusicBrainz_AlbumStatus",	   value, buffer       ); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -506,6 +521,25 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 			if (value.Contains("/")) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 		}
+
+		else if (id.StartsWith("MUSICBRAINZ"))
+		{
+			if	(id == "MUSICBRAINZ_ARTISTID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	    value);
+			else if	(id == "MUSICBRAINZ_ALBUMID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,	    value);
+			else if	(id == "MUSICBRAINZ_ALBUMARTISTID")    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMARTISTID,    value);
+			else if	(id == "MUSICBRAINZ_WORKID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_WORKID,	    value);
+			else if	(id == "MUSICBRAINZ_DISCID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_DISCID,	    value);
+			else if	(id == "MUSICBRAINZ_TRACKID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_TRACKID,	    value);
+			else if	(id == "MUSICBRAINZ_ORIGINALARTISTID") info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
+			else if	(id == "MUSICBRAINZ_ORIGINALALBUMID")  info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALALBUMID,  value);
+			else if	(id == "MUSICBRAINZ_RELEASEGROUPID")   info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASEGROUPID,   value);
+			else if	(id == "MUSICBRAINZ_RELEASETRACKID")   info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETRACKID,   value);
+			else if	(id == "MUSICBRAINZ_TRMID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_TRMID,	    value);
+
+			else if	(id == "MUSICBRAINZ_ALBUMTYPE")	       info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETYPE,	    value);
+			else if	(id == "MUSICBRAINZ_ALBUMSTATUS")      info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASESTATUS,    value);
+		}
+
 		else if (id.StartsWith("REPLAYGAIN"))
 		{
 			if	(id == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;
