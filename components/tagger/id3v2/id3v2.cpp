@@ -523,6 +523,8 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		else if	(key == INFO_LYRICS)			   { ID3_Frame frame(ID3FID_UNSYNCEDLYRICS);	   SetStringField(frame, ID3FN_TEXT, value, False); SetASCIIField(frame, ID3FN_LANGUAGE, "und");			    container.AddFrame(frame); }
 
+		else if	(key == INFO_SCRIPT)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "SCRIPT");			    container.AddFrame(frame); }
+
 		else if	(key == INFO_RADIOSTATION)		   { ID3_Frame frame(ID3FID_NETRADIOSTATION);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_RADIOOWNER)		   { ID3_Frame frame(ID3FID_NETRADIOOWNER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
@@ -542,6 +544,8 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		else if	(key == INFO_WEB_COMMERCIAL)		   { ID3_Frame frame(ID3FID_WWWCOMMERCIALINFO);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
 
 		else if (key == INFO_WEB_USERURL)		   { ID3_Frame frame(ID3FID_WWWUSER);		   SetASCIIField(frame, ID3FN_URL, value.Tail(value.Length() - value.Find(":|:") - 3));	  SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
+
+		else if	(key == INFO_ASIN)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "ASIN");				    container.AddFrame(frame); }
 
 		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Artist Id");		    container.AddFrame(frame); }
 		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Id");		    container.AddFrame(frame); }
@@ -827,7 +831,16 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			if (value == NIL) continue;
 
-			if	(description.ToLower().StartsWith("musicbrainz"))
+			if	(description.ToLower() == "album artist")  info.SetOtherInfo(INFO_ALBUMARTIST,	 value);
+
+			else if (description.ToLower() == "catalognumber") info.SetOtherInfo(INFO_CATALOGNUMBER, value);
+			else if (description.ToLower() == "barcode")	   info.SetOtherInfo(INFO_BARCODE,	 value);
+
+			else if	(description.ToLower() == "script")	   info.SetOtherInfo(INFO_SCRIPT,	 value);
+
+			else if	(description.ToLower() == "asin")	   info.SetOtherInfo(INFO_ASIN,		 value);
+
+			else if	(description.ToLower().StartsWith("musicbrainz"))
 			{
 				if	(description.ToLower() == "musicbrainz artist id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	    value);
 				else if	(description.ToLower() == "musicbrainz album id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,	    value);
@@ -915,11 +928,6 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 				}
 			}
 
-			else if (description.ToLower() == "album artist")	   info.SetOtherInfo(INFO_ALBUMARTIST,	 value);
-
-			else if (description.ToLower() == "catalognumber")	   info.SetOtherInfo(INFO_CATALOGNUMBER, value);
-			else if (description.ToLower() == "barcode")		   info.SetOtherInfo(INFO_BARCODE,	 value);
-
 			else if (description == "OverDrive MediaMarkers")
 			{
 				/* Save OverDrive markers to process as chapters further down.
@@ -927,7 +935,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 				overDriveMarkers = value;
 			}
 
-			else							   info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(value));
+			else						   info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(value));
 		}
 		else if (frame.GetID() == ID3FID_UNIQUEFILEID)
 		{

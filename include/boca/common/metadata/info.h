@@ -59,6 +59,8 @@ namespace BoCA
 
 	const char * const INFO_LYRICS				= "Unsynchronized lyrics";
 
+	const char * const INFO_SCRIPT				= "ISO 15924 script code";
+
 	const char * const INFO_RADIOSTATION			= "Internet radio station name";
 	const char * const INFO_RADIOOWNER			= "Internet radio station owner";
 
@@ -78,6 +80,8 @@ namespace BoCA
 	const char * const INFO_WEB_COMMERCIAL			= "Commercial information  webpage";
 
 	const char * const INFO_WEB_USERURL			= "User defined URL";
+
+	const char * const INFO_ASIN				= "Amazon ID";
 
 	const char * const INFO_MUSICBRAINZ_ARTISTID		= "MusicBrainz Artist ID";
 	const char * const INFO_MUSICBRAINZ_ALBUMID		= "MusicBrainz Album ID";

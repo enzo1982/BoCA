@@ -163,6 +163,8 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 		else if	(key == INFO_LYRICS)			   { RenderAPEItem("Lyrics",			   value, buffer, False); numItems++; }
 
+		else if	(key == INFO_SCRIPT)			   { RenderAPEItem("Script",			   value, buffer);	  numItems++; }
+
 		else if	(key == INFO_SORT_ARTIST)		   { RenderAPEItem("ArtistSort",		   value, buffer       ); numItems++; }
 		else if	(key == INFO_SORT_ALBUM)		   { RenderAPEItem("AlbumSort",			   value, buffer       ); numItems++; }
 		else if	(key == INFO_SORT_ALBUMARTIST)		   { RenderAPEItem("AlbumArtistSort",		   value, buffer       ); numItems++; }
@@ -174,6 +176,8 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 		else if	(key == INFO_WEB_SOURCE)		   { RenderAPEItem("File URL",			   value, buffer       ); numItems++; }
 		else if	(key == INFO_WEB_COPYRIGHT)		   { RenderAPEItem("Copyright URL",		   value, buffer       ); numItems++; }
 		else if	(key == INFO_WEB_COMMERCIAL)		   { RenderAPEItem("Buy URL",			   value, buffer       ); numItems++; }
+
+		else if	(key == INFO_ASIN)			   { RenderAPEItem("Asin",			   value, buffer       ); numItems++; }
 
 		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { RenderAPEItem("MusicBrainz_ArtistId",	   value, buffer       ); numItems++; }
 		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { RenderAPEItem("MusicBrainz_AlbumId",	   value, buffer       ); numItems++; }
@@ -507,6 +511,8 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 			info.SetOtherInfo(INFO_LYRICS, value);
 		}
 
+		else if (id == "SCRIPT")	  info.SetOtherInfo(INFO_SCRIPT,	   value);
+
 		else if (id == "ARTISTSORT")	  info.SetOtherInfo(INFO_SORT_ARTIST,	   value);
 		else if (id == "ALBUMSORT")	  info.SetOtherInfo(INFO_SORT_ALBUM,	   value);
 		else if (id == "ALBUMARTISTSORT") info.SetOtherInfo(INFO_SORT_ALBUMARTIST, value);
@@ -533,6 +539,8 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 			if (value.Contains("/")) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 		}
+
+		else if (id == "ASIN")		  info.SetOtherInfo(INFO_ASIN,		   value);
 
 		else if (id.StartsWith("MUSICBRAINZ"))
 		{

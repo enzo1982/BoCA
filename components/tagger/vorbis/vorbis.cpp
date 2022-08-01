@@ -157,6 +157,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 		else if	(key == INFO_LYRICS)			   { RenderTagItem("LYRICS",			   value, buffer, False); numItems++; }
 
+		else if	(key == INFO_SCRIPT)			   { RenderTagItem("SCRIPT",			   value, buffer);	  numItems++; }
+
 		else if	(key == INFO_SORT_ARTIST)		   { RenderTagItem("ARTISTSORT",		   value, buffer       ); numItems++; }
 		else if	(key == INFO_SORT_ALBUM)		   { RenderTagItem("ALBUMSORT",			   value, buffer       ); numItems++; }
 		else if	(key == INFO_SORT_ALBUMARTIST)		   { RenderTagItem("ALBUMARTISTSORT",		   value, buffer       ); numItems++; }
@@ -164,6 +166,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		else if	(key == INFO_SORT_TITLE)		   { RenderTagItem("TITLESORT",			   value, buffer       ); numItems++; }
 
 		else if	(key == INFO_WEB_ARTIST)		   { RenderTagItem("WEBSITE",			   value, buffer       ); numItems++; }
+
+		else if	(key == INFO_ASIN)			   { RenderTagItem("ASIN",			   value, buffer       ); numItems++; }
 
 		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { RenderTagItem("MUSICBRAINZ_ARTISTID",	   value, buffer       ); numItems++; }
 		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { RenderTagItem("MUSICBRAINZ_ALBUMID",	   value, buffer       ); numItems++; }
@@ -442,7 +446,9 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		else if (id == "DISCSUBTITLE")	  info.SetOtherInfo(INFO_DISCSUBTITLE,	   value);
 
-		else if (id == "LYRICS")	  info.SetOtherInfo(INFO_LYRICS,		comment.Tail(comment.Length() - comment.Find("=") - 1));
+		else if (id == "LYRICS")	  info.SetOtherInfo(INFO_LYRICS,	   comment.Tail(comment.Length() - comment.Find("=") - 1));
+
+		else if (id == "SCRIPT")	  info.SetOtherInfo(INFO_SCRIPT,	   value);
 
 		else if (id == "ARTISTSORT")	  info.SetOtherInfo(INFO_SORT_ARTIST,	   value);
 		else if (id == "ALBUMSORT")	  info.SetOtherInfo(INFO_SORT_ALBUM,	   value);
@@ -451,6 +457,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		else if (id == "TITLESORT")	  info.SetOtherInfo(INFO_SORT_TITLE,	   value);
 
 		else if (id == "WEBSITE")	  info.SetOtherInfo(INFO_WEB_ARTIST,	   value);
+
+		else if (id == "ASIN")		  info.SetOtherInfo(INFO_ASIN,		   value);
 
 		else if (id.StartsWith("MUSICBRAINZ"))
 		{

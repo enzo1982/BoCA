@@ -264,6 +264,10 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 		else if	(key == INFO_DISCSUBTITLE)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE",			value);
 
+		else if	(key == INFO_SCRIPT)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "SCRIPT",				value);
+
+		else if	(key == INFO_ASIN)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ASIN",				value);
+
 		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Artist Id",		value);
 		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Id",		value);
 		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Artist Id",	value);
@@ -639,6 +643,10 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 			else if (id == "DISCSUBTITLE")	info.SetOtherInfo(INFO_DISCSUBTITLE,  value);
 
+			else if (id == "SCRIPT")	info.SetOtherInfo(INFO_SCRIPT,	      value);
+
+			else if (id == "ASIN")		info.SetOtherInfo(INFO_ASIN,	      value);
+
 			else if (id.StartsWith("MUSICBRAINZ"))
 			{
 				if	(id == "MUSICBRAINZ ARTIST ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	 value);
@@ -818,6 +826,10 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "BARCODE");
 
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE");
+
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "SCRIPT");
+
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "ASIN");
 
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Artist Id");
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Id");

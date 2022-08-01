@@ -220,6 +220,8 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 			else if	(key == INFO_LYRICS)			   RenderWMAStringItem(g_wszWMLyrics,			    value, pHeaderInfo, False);
 
+			else if	(key == INFO_SCRIPT)			   RenderWMAStringItem("WM/Script",			    value, pHeaderInfo);
+
 			else if	(key == INFO_RADIOSTATION)		   RenderWMAStringItem(g_wszWMRadioStationName,		    value, pHeaderInfo);
 			else if	(key == INFO_RADIOOWNER)		   RenderWMAStringItem(g_wszWMRadioStationOwner,	    value, pHeaderInfo);
 
@@ -233,6 +235,8 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 			else if	(key == INFO_WEB_SOURCE)		   RenderWMAStringItem(g_wszWMAudioSourceURL,		    value, pHeaderInfo);
 			else if	(key == INFO_WEB_COPYRIGHT)		   RenderWMAStringItem(g_wszWMCopyrightURL,		    value, pHeaderInfo);
 			else if	(key == INFO_WEB_COMMERCIAL)		   RenderWMAStringItem(g_wszWMPromotionURL,		    value, pHeaderInfo);
+
+			else if	(key == INFO_ASIN)			   RenderWMAStringItem("ASIN",				    value, pHeaderInfo);
 
 			else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   RenderWMAStringItem("MusicBrainz/Artist Id",		    value, pHeaderInfo);
 			else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   RenderWMAStringItem("MusicBrainz/Album Id",		    value, pHeaderInfo);
@@ -490,6 +494,8 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			else if (id == g_wszWMLyrics)		       info.SetOtherInfo(INFO_LYRICS,		String((LPWSTR) pbValue));
 
+			else if (id == "WM/Script")		       info.SetOtherInfo(INFO_SCRIPT,		value);
+
 			else if (id == g_wszWMRadioStationName)	       info.SetOtherInfo(INFO_RADIOSTATION,	value);
 			else if (id == g_wszWMRadioStationOwner)       info.SetOtherInfo(INFO_RADIOOWNER,	value);
 
@@ -531,6 +537,9 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 				if (info.rating == 99) info.rating = 100;
 			}
+
+			else if (id == "ASIN")			       info.SetOtherInfo(INFO_ASIN,		value);
+
 			else if (id.StartsWith("MusicBrainz"))
 			{
 				if	(id == "MusicBrainz/Artist Id")		    info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	 value);
@@ -799,6 +808,8 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 
 				    nameStr == g_wszWMLyrics			||
 
+				    nameStr == "WM/Script"			||
+
 				    nameStr == g_wszWMRadioStationName		||
 				    nameStr == g_wszWMRadioStationOwner		||
 
@@ -820,6 +831,8 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 				    nameStr == g_wszWMPartOfSet			||
 				    nameStr == g_wszWMMCDI			||
 				    nameStr == g_wszWMPicture			||
+
+				    nameStr == "ASIN"				||
 
 				    nameStr == "MusicBrainz/Artist Id"		||
 				    nameStr == "MusicBrainz/Album Id"		||
