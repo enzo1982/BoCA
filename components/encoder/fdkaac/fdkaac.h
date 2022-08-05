@@ -36,6 +36,7 @@ namespace BoCA
 			Int			 blockSize;
 			Int			 overlap;
 
+			Int64			 totalFrames;
 			Int64			 totalSamples;
 			Int			 delaySamples;
 

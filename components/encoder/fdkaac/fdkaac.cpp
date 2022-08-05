@@ -157,6 +157,7 @@ BoCA::EncoderFDKAAC::EncoderFDKAAC()
 	blockSize    = 128;
 	overlap	     = 12;
 
+	totalFrames  = 0;
 	totalSamples = 0;
 	delaySamples = 0;
 
@@ -279,6 +280,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 		if (GetEncoderVersion() >= LIB_VERSION(4, 0, 0)) ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfo.confBuf, aacInfo.confSize);
 		else						 ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfoOld.confBuf, aacInfoOld.confSize);
 
+		totalFrames  = 0;
 		totalSamples = 0;
 	}
 
@@ -351,13 +353,15 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 	{
 		/* Write iTunes metadata with gapless information.
 		 */
-		Float		 sbrRatio = Float(frameSize) / granuleSize;
-		MP4ItmfItem	*item	  = ex_MP4ItmfItemAlloc("----", 1);
-		String		 value	  = String().Append(" 00000000")
-						    .Append(" ").Append(Number((Int64) Math::Round(delaySamples / sbrRatio)).ToHexString(8).ToUpper())
-						    .Append(" ").Append(Number((Int64) Math::Floor((frameSize - (delaySamples + totalSamples) % frameSize) / sbrRatio)).ToHexString(8).ToUpper())
-						    .Append(" ").Append(Number((Int64) Math::Ceil(totalSamples / sbrRatio)).ToHexString(16).ToUpper())
-						    .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
+		Float		 sbrRatio   = Float(frameSize) / granuleSize;
+		Int64		 delayValue = Math::Floor(delaySamples / sbrRatio);
+		Int64		 totalValue = Math::Ceil(totalSamples / sbrRatio);
+		MP4ItmfItem	*item	    = ex_MP4ItmfItemAlloc("----", 1);
+		String		 value	    = String().Append(" 00000000")
+						      .Append(" ").Append(Number(delayValue).ToHexString(8).ToUpper())
+						      .Append(" ").Append(Number(totalFrames * granuleSize - totalValue - delayValue).ToHexString(8).ToUpper())
+						      .Append(" ").Append(Number(totalValue).ToHexString(16).ToUpper())
+						      .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
 
 		item->mean = (char *) "com.apple.iTunes";
 		item->name = (char *) "iTunSMPB";
@@ -557,6 +561,8 @@ Int BoCA::EncoderFDKAAC::ProcessPackets(const Buffer<unsigned char> &packets, co
 
 		if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) packets + offset, packetSizes.GetNth(i), granuleSize, 0, true);
 		else		    driver->WriteData(packets + offset, packetSizes.GetNth(i));
+
+		totalFrames++;
 
 		offset	   += packetSizes.GetNth(i);
 		dataLength += packetSizes.GetNth(i);
