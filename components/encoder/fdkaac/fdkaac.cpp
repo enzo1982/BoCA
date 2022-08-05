@@ -272,7 +272,7 @@ Bool BoCA::EncoderFDKAAC::Activate()
 					  track.approxLength >= 0xFFFF0000) ? MP4_CREATE_64BIT_DATA | MP4_CREATE_64BIT_TIME : 0;
 
 		mp4File	 = ex_MP4CreateCallbacks(&mp4Callbacks, driver, flags);
-		mp4Track = ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
+		mp4Track = ex_MP4AddAudioTrack(mp4File, format.rate * granuleSize / frameSize, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
 
 		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
 
@@ -555,7 +555,7 @@ Int BoCA::EncoderFDKAAC::ProcessPackets(const Buffer<unsigned char> &packets, co
 		if (i <	overlap && !first)	continue;
 		if (packetSizes.GetNth(i) == 0) continue;
 
-		if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) packets + offset, packetSizes.GetNth(i), frameSize, 0, true);
+		if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) packets + offset, packetSizes.GetNth(i), granuleSize, 0, true);
 		else		    driver->WriteData(packets + offset, packetSizes.GetNth(i));
 
 		offset	   += packetSizes.GetNth(i);
