@@ -440,7 +440,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	{
 		Int	 rating = Math::Max(1, Math::Min(255, Math::Round(info.rating * 254 / 100.0) + 1));
 
-		{ ID3_Frame frame(ID3FID_POPULARIMETER); SetASCIIField(frame, ID3FN_EMAIL, "rating@freac.org"); SetIntegerField(frame, ID3FN_RATING, rating); container.AddFrame(frame); }
+		{ ID3_Frame frame(ID3FID_POPULARIMETER); SetStringField(frame, ID3FN_EMAIL, "rating@freac.org"); SetIntegerField(frame, ID3FN_RATING, rating); container.AddFrame(frame); }
 	}
 
 	/* Save comment.
@@ -449,7 +449,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	{
 		ID3_Frame	 frame(ID3FID_COMMENT);
 
-		SetASCIIField(frame, ID3FN_LANGUAGE, "eng"); // iTunes recognizes comments only if language is set to English
+		SetStringField(frame, ID3FN_LANGUAGE, "eng"); // iTunes recognizes comments only if language is set to English
 
 		if (info.comment != NIL && !replaceExistingComments) SetStringField(frame, ID3FN_TEXT, info.comment, False);
 		else						     SetStringField(frame, ID3FN_TEXT, defaultComment);
@@ -521,7 +521,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		else if	(key == INFO_DISCSUBTITLE)		   { ID3_Frame frame(ID3FID_SETSUBTITLE);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
-		else if	(key == INFO_LYRICS)			   { ID3_Frame frame(ID3FID_UNSYNCEDLYRICS);	   SetStringField(frame, ID3FN_TEXT, value, False); SetASCIIField(frame, ID3FN_LANGUAGE, "und");			    container.AddFrame(frame); }
+		else if	(key == INFO_LYRICS)			   { ID3_Frame frame(ID3FID_UNSYNCEDLYRICS);	   SetStringField(frame, ID3FN_TEXT, value, False); SetStringField(frame, ID3FN_LANGUAGE, "und");			    container.AddFrame(frame); }
 
 		else if	(key == INFO_SCRIPT)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "SCRIPT");			    container.AddFrame(frame); }
 
@@ -536,14 +536,14 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 		else if (key == INFO_USERTEXT)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
 
-		else if	(key == INFO_WEB_ARTIST)		   { ID3_Frame frame(ID3FID_WWWARTIST);		   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_PUBLISHER)		   { ID3_Frame frame(ID3FID_WWWPUBLISHER);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_RADIO)			   { ID3_Frame frame(ID3FID_WWWRADIOPAGE);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_SOURCE)		   { ID3_Frame frame(ID3FID_WWWAUDIOSOURCE);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_COPYRIGHT)		   { ID3_Frame frame(ID3FID_WWWCOPYRIGHT);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
-		else if	(key == INFO_WEB_COMMERCIAL)		   { ID3_Frame frame(ID3FID_WWWCOMMERCIALINFO);	   SetASCIIField(frame, ID3FN_URL, value);   container.AddFrame(frame); }
+		else if	(key == INFO_WEB_ARTIST)		   { ID3_Frame frame(ID3FID_WWWARTIST);		   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
+		else if	(key == INFO_WEB_PUBLISHER)		   { ID3_Frame frame(ID3FID_WWWPUBLISHER);	   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
+		else if	(key == INFO_WEB_RADIO)			   { ID3_Frame frame(ID3FID_WWWRADIOPAGE);	   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
+		else if	(key == INFO_WEB_SOURCE)		   { ID3_Frame frame(ID3FID_WWWAUDIOSOURCE);	   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
+		else if	(key == INFO_WEB_COPYRIGHT)		   { ID3_Frame frame(ID3FID_WWWCOPYRIGHT);	   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
+		else if	(key == INFO_WEB_COMMERCIAL)		   { ID3_Frame frame(ID3FID_WWWCOMMERCIALINFO);	   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
 
-		else if (key == INFO_WEB_USERURL)		   { ID3_Frame frame(ID3FID_WWWUSER);		   SetASCIIField(frame, ID3FN_URL, value.Tail(value.Length() - value.Find(":|:") - 3));	  SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
+		else if (key == INFO_WEB_USERURL)		   { ID3_Frame frame(ID3FID_WWWUSER);		   SetStringField(frame, ID3FN_URL,  value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
 
 		else if	(key == INFO_ASIN)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "ASIN");				    container.AddFrame(frame); }
 
@@ -560,7 +560,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 			memcpy(buffer, value.ConvertTo("ISO-8859-1"), value.Length());
 
-			SetASCIIField(frame, ID3FN_OWNER, "http://musicbrainz.org");
+			SetStringField(frame, ID3FN_OWNER, "http://musicbrainz.org");
 			SetBinaryField(frame, ID3FN_DATA, buffer);
 
 			container.AddFrame(frame);
@@ -648,7 +648,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 			/* Set picture data.
 			 */
-			if (picInfo.mime != NIL) SetASCIIField(frame_picture, ID3FN_MIMETYPE, picInfo.mime.ConvertTo("ISO-8859-1"));
+			if (picInfo.mime != NIL) SetStringField(frame_picture, ID3FN_MIMETYPE, picInfo.mime.ConvertTo("ISO-8859-1"));
 
 			SetIntegerField(frame_picture, ID3FN_PICTURETYPE, picInfo.type);
 			SetBinaryField(frame_picture, ID3FN_DATA, picInfo.data);
@@ -665,7 +665,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		 */
 		ID3_Frame	 frame_toc(ID3FID_TOC);
 
-		SetASCIIField(frame_toc, ID3FN_ID, String("toc"));
+		SetStringField(frame_toc, ID3FN_ID, String("toc"));
 		SetIntegerField(frame_toc, ID3FN_FLAGS, ID3TF_TOPLEVEL | ID3TF_ORDERED);
 
 		for (Int i = 0; i < track.tracks.Length(); i++)
@@ -686,7 +686,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 			ID3_Frame	 frame_chapter(ID3FID_CHAPTER);
 
-			SetASCIIField(frame_chapter, ID3FN_ID, String("chp").Append(String::FromInt(i)));
+			SetStringField(frame_chapter, ID3FN_ID, String("chp").Append(String::FromInt(i)));
 
 			SetIntegerField(frame_chapter, ID3FN_STARTTIME, Float(offset) * 1000.0 / chapterFormat.rate);
 
@@ -786,17 +786,17 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_COMPOSERSORTORDER)    info.SetOtherInfo(INFO_SORT_COMPOSER,	GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_TITLESORTORDER)       info.SetOtherInfo(INFO_SORT_TITLE,	GetStringField(frame, ID3FN_TEXT));
 
-		else if (frame.GetID() == ID3FID_WWWARTIST)	       info.SetOtherInfo(INFO_WEB_ARTIST,	GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWPUBLISHER)	       info.SetOtherInfo(INFO_WEB_PUBLISHER,	GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWRADIOPAGE)	       info.SetOtherInfo(INFO_WEB_RADIO,	GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWAUDIOSOURCE)       info.SetOtherInfo(INFO_WEB_SOURCE,	GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWCOPYRIGHT)	       info.SetOtherInfo(INFO_WEB_COPYRIGHT,	GetASCIIField(frame, ID3FN_URL));
-		else if (frame.GetID() == ID3FID_WWWCOMMERCIALINFO)    info.SetOtherInfo(INFO_WEB_COMMERCIAL,	GetASCIIField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWARTIST)	       info.SetOtherInfo(INFO_WEB_ARTIST,	GetStringField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWPUBLISHER)	       info.SetOtherInfo(INFO_WEB_PUBLISHER,	GetStringField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWRADIOPAGE)	       info.SetOtherInfo(INFO_WEB_RADIO,	GetStringField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWAUDIOSOURCE)       info.SetOtherInfo(INFO_WEB_SOURCE,	GetStringField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWCOPYRIGHT)	       info.SetOtherInfo(INFO_WEB_COPYRIGHT,	GetStringField(frame, ID3FN_URL));
+		else if (frame.GetID() == ID3FID_WWWCOMMERCIALINFO)    info.SetOtherInfo(INFO_WEB_COMMERCIAL,	GetStringField(frame, ID3FN_URL));
 
 		else if (frame.GetID() == ID3FID_WWWUSER)
 		{
 			String	 description = GetStringField(frame, ID3FN_DESCRIPTION);
-			String	 value	     = GetASCIIField(frame, ID3FN_URL);
+			String	 value	     = GetStringField(frame, ID3FN_URL);
 
 			if (value == NIL) continue;
 
@@ -1017,7 +1017,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 			picture.description = GetStringField(frame, ID3FN_DESCRIPTION);
 			picture.type	    = GetIntegerField(frame, ID3FN_PICTURETYPE);
-			picture.mime	    = GetASCIIField(frame, ID3FN_MIMETYPE);
+			picture.mime	    = GetStringField(frame, ID3FN_MIMETYPE);
 
 			picture.data	    = buffer;
 
@@ -1132,7 +1132,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 				/* Add track to track list.
 				 */
-				track.tracks.Add(rTrack, GetASCIIField(frame, ID3FN_ID).ComputeCRC32());
+				track.tracks.Add(rTrack, GetStringField(frame, ID3FN_ID).ComputeCRC32());
 			}
 		}
 
@@ -1246,34 +1246,35 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 String BoCA::TaggerID3v2::GetStringField(const ID3_Frame &frame, ID3_FieldID fieldType, Bool trim)
 {
-	ID3_Field	*field = frame.GetField(fieldType);
-	String		 result;
+	if (!frame.Contains(fieldType)) return NIL;
 
-	if (field != NIL)
+	ID3_Field	*field	  = frame.GetField(fieldType);
+	ID3_TextEnc	 encoding = ID3TE_ISO8859_1;
+
+	if (frame.Contains(ID3FN_TEXTENC)) encoding = (ID3_TextEnc) GetIntegerField(frame, ID3FN_TEXTENC);
+
+	String	 result;
+
+	if (encoding == ID3TE_ISO8859_1 || encoding == ID3TE_UTF8)
 	{
-		Int	 encoding = GetIntegerField(frame, ID3FN_TEXTENC);
+		Buffer<char>	 aBuffer(field->Size() + 1);
 
-		if (encoding == ID3TE_ISO8859_1 || encoding == ID3TE_UTF8)
-		{
-			Buffer<char>	 aBuffer(field->Size() + 1);
+		aBuffer.Zero();
 
-			aBuffer.Zero();
+		field->Get(aBuffer, field->Size());
 
-			field->Get(aBuffer, field->Size());
+		if	(encoding == ID3TE_ISO8859_1) result.ImportFrom("ISO-8859-1", aBuffer);
+		else if (encoding == ID3TE_UTF8)      result.ImportFrom("UTF-8", aBuffer);
+	}
+	else if (encoding == ID3TE_UTF16 || encoding == ID3TE_UTF16BE)
+	{
+		Buffer<wchar_t>	 wBuffer(field->Size() + 1);
 
-			if	(encoding == ID3TE_ISO8859_1) result.ImportFrom("ISO-8859-1", aBuffer);
-			else if (encoding == ID3TE_UTF8)      result.ImportFrom("UTF-8", aBuffer);
-		}
-		else if (encoding == ID3TE_UTF16 || encoding == ID3TE_UTF16BE)
-		{
-			Buffer<wchar_t>	 wBuffer(field->Size() + 1);
+		wBuffer.Zero();
 
-			wBuffer.Zero();
+		field->Get((unicode_t *) (wchar_t *) wBuffer, field->Size());
 
-			field->Get((unicode_t *) (wchar_t *) wBuffer, field->Size());
-
-			result.ImportFrom("UTF-16BE", (char *) (wchar_t *) wBuffer);
-		}
+		result.ImportFrom("UTF-16BE", (char *) (wchar_t *) wBuffer);
 	}
 
 	return trim ? result.Trim() : result;
@@ -1283,119 +1284,71 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 {
 	String	 string = trim ? value.Trim() : value;
 
-	if (string == NIL) return Error();
+	if (!frame.Contains(fieldType) || string == NIL) return Error();
 
-	SetIntegerField(frame, ID3FN_TEXTENC, textEncoding);
+	ID3_TextEnc	 encoding = ID3TE_ISO8859_1;
+
+	if (frame.Contains(ID3FN_TEXTENC))
+	{
+		encoding = textEncoding;
+
+		SetIntegerField(frame, ID3FN_TEXTENC, textEncoding);
+	}
 
 	ID3_Field	*field = frame.GetField(fieldType);
 
-	if (field != NIL)
-	{
-		field->SetEncoding(textEncoding);
+	field->SetEncoding(encoding);
 
-		if	(textEncoding == ID3TE_UTF16)	field->Set((unicode_t *) string.ConvertTo("UTF-16LE"));
-		else if (textEncoding == ID3TE_UTF16BE)	field->Set((unicode_t *) string.ConvertTo("UTF-16BE"));
-		else					field->Set((char *)	 string.ConvertTo(textEncodingID));
+	if	(encoding == ID3TE_UTF16)	field->Set((unicode_t *) string.ConvertTo("UTF-16LE"));
+	else if (encoding == ID3TE_UTF16BE)	field->Set((unicode_t *) string.ConvertTo("UTF-16BE"));
+	else if (encoding == ID3TE_ISO8859_1)	field->Set((char *)	 string.ConvertTo("ISO-8859-1"));
+	else					field->Set((char *)	 string.ConvertTo(textEncodingID));
 
-		return Success();
-	}
-
-	return Error();
-}
-
-String BoCA::TaggerID3v2::GetASCIIField(const ID3_Frame &frame, ID3_FieldID fieldType, Bool trim)
-{
-	ID3_Field	*field = frame.GetField(fieldType);
-	String		 result;
-
-	if (field != NIL)
-	{
-		Buffer<char>	 aBuffer(field->Size() + 1);
-
-		aBuffer.Zero();
-
-		field->Get(aBuffer, field->Size());
-
-		result.ImportFrom("ISO-8859-1", aBuffer);
-	}
-
-	return trim ? result.Trim() : result;
-}
-
-Int BoCA::TaggerID3v2::SetASCIIField(ID3_Frame &frame, ID3_FieldID fieldType, const String &value, Bool trim)
-{
-	String	 string = trim ? value.Trim() : value;
-
-	if (string == NIL) return Error();
-
-	ID3_Field	*field = frame.GetField(fieldType);
-
-	if (field != NIL)
-	{
-		field->Set((char *) string);
-
-		return Success();
-	}
-
-	return Error();
+	return Success();
 }
 
 Int BoCA::TaggerID3v2::GetIntegerField(const ID3_Frame &frame, ID3_FieldID fieldType)
 {
+	if (!frame.Contains(fieldType)) return -1;
+
 	ID3_Field	*field = frame.GetField(fieldType);
 
-	if (field != NIL)
-	{
-		return field->Get();
-	}
-
-	return -1;
+	return field->Get();
 }
 
 Int BoCA::TaggerID3v2::SetIntegerField(ID3_Frame &frame, ID3_FieldID fieldType, Int value)
 {
+	if (!frame.Contains(fieldType)) return Error();
+
 	ID3_Field	*field = frame.GetField(fieldType);
 
-	if (field != NIL)
-	{
-		field->Set(value);
+	field->Set(value);
 
-		return Success();
-	}
-
-	return Error();
+	return Success();
 }
 
 Int BoCA::TaggerID3v2::GetBinaryField(const ID3_Frame &frame, ID3_FieldID fieldType, Buffer<UnsignedByte> &buffer)
 {
+	if (!frame.Contains(fieldType)) return Error();
+
 	ID3_Field	*field = frame.GetField(fieldType);
 
-	if (field != NIL)
-	{
-		buffer.Resize(field->Size());
+	buffer.Resize(field->Size());
 
-		field->Get(buffer, buffer.Size());
+	field->Get(buffer, buffer.Size());
 
-		return Success();
-	}
-
-	return Error();
+	return Success();
 }
 
 Int BoCA::TaggerID3v2::SetBinaryField(ID3_Frame &frame, ID3_FieldID fieldType, const Buffer<UnsignedByte> &data)
 {
-	if (data.Size() == 0) return Error();
+	if (!frame.Contains(fieldType) || data.Size() == 0) return Error();
 
 	ID3_Field	*field = frame.GetField(fieldType);
 
-	if (field != NIL)
-	{
-		field->Set(data, data.Size());
+	field->Set(data, data.Size());
 
-		return Success();
-	}
-
-	return Error();
+	return Success();
 }
 
 const String &BoCA::TaggerID3v2::GetID3CategoryName(UnsignedInt id)
