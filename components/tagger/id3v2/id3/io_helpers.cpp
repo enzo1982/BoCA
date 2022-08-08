@@ -153,11 +153,6 @@ String io::readUnicodeString(ID3_Reader &reader, ID3_TextEnc enc)
 		}
 	}
 
-	ch1 = 0;
-
-	unicode += ch1;
-	unicode += ch1;
-
 	return unicode;
 }
 
@@ -188,11 +183,6 @@ String io::readUnicodeText(ID3_Reader &reader, size_t len, ID3_TextEnc enc)
 			unicode += static_cast<char>(ch1);
 		}
 	}
-
-	ch1 = 0;
-
-	unicode += ch1;
-	unicode += ch1;
 
 	return unicode;
 }

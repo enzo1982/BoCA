@@ -33,6 +33,9 @@ namespace BoCA
 			String			 GetStringField(const ID3_Frame &, ID3_FieldID, Bool = True);
 			Int			 SetStringField(ID3_Frame &, ID3_FieldID, const String &, Bool = True);
 
+			Array<String>		 GetStringListField(const ID3_Frame &, ID3_FieldID, Bool = True);
+			Int			 AddStringListItem(ID3_Frame &, ID3_FieldID, const String &, Bool = True);
+
 			Int			 GetIntegerField(const ID3_Frame &, ID3_FieldID);
 			Int			 SetIntegerField(ID3_Frame &, ID3_FieldID, Int);
 

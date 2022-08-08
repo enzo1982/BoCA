@@ -485,6 +485,23 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		else if	(key == INFO_COMPOSER)			   { ID3_Frame frame(ID3FID_COMPOSER);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_LYRICIST)			   { ID3_Frame frame(ID3FID_LYRICIST);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 
+		else if (key == INFO_PRODUCER)
+		{
+			Bool		 add   = False;
+			ID3_Frame	*frame = container.Find(ID3FID_INVOLVEDPEOPLE);
+
+			if (!frame)
+			{
+				add   = True;
+				frame = new ID3_Frame(ID3FID_INVOLVEDPEOPLE);
+			}
+
+			AddStringListItem(*frame, ID3FN_TEXT, "producer");
+			AddStringListItem(*frame, ID3FN_TEXT, value);
+
+			if (add) container.AddFrame(frame);
+		}
+
 		else if	(key == INFO_ORIG_ARTIST)		   { ID3_Frame frame(ID3FID_ORIGARTIST);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_ORIG_ALBUM)		   { ID3_Frame frame(ID3FID_ORIGALBUM);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		else if	(key == INFO_ORIG_LYRICIST)		   { ID3_Frame frame(ID3FID_ORIGLYRICIST);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
@@ -744,6 +761,21 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_MIXARTIST)	       info.SetOtherInfo(INFO_REMIXER,		GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_COMPOSER)	       info.SetOtherInfo(INFO_COMPOSER,		GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_LYRICIST)	       info.SetOtherInfo(INFO_LYRICIST,		GetStringField(frame, ID3FN_TEXT));
+
+		else if (frame.GetID() == ID3FID_INVOLVEDPEOPLE || frame.GetID() == ID3FID_INVOLVEDPEOPLE2)
+		{
+			const Array<String>	&list = GetStringListField(frame, ID3FN_TEXT);
+
+			for (Int i = 0; i < list.Length(); i += 2)
+			{
+				String	 description = list.GetNth(i);
+				String	 value	     = list.GetNth(i + 1);
+
+				if (value == NIL) continue;
+
+				if (description.ToLower() == "producer") info.SetOtherInfo(INFO_PRODUCER, value);
+			}
+		}
 
 		else if (frame.GetID() == ID3FID_ORIGARTIST)	       info.SetOtherInfo(INFO_ORIG_ARTIST,	GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_ORIGALBUM)	       info.SetOtherInfo(INFO_ORIG_ALBUM,	GetStringField(frame, ID3FN_TEXT));
@@ -1303,6 +1335,74 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 	else if (encoding == ID3TE_UTF16BE)	field->Set((unicode_t *) string.ConvertTo("UTF-16BE"));
 	else if (encoding == ID3TE_ISO8859_1)	field->Set((char *)	 string.ConvertTo("ISO-8859-1"));
 	else					field->Set((char *)	 string.ConvertTo(textEncodingID));
+
+	return Success();
+}
+
+Array<String> BoCA::TaggerID3v2::GetStringListField(const ID3_Frame &frame, ID3_FieldID fieldType, Bool trim)
+{
+	if (!frame.Contains(fieldType)) return Array<String>();
+
+	ID3_Field	*field	  = frame.GetField(fieldType);
+	ID3_TextEnc	 encoding = (ID3_TextEnc) GetIntegerField(frame, ID3FN_TEXTENC);
+	Int		 num	  = field->GetNumTextItems();
+
+	Array<String>	 result;
+
+	if (encoding == ID3TE_ISO8859_1 || encoding == ID3TE_UTF8)
+	{
+		Buffer<char>	 aBuffer(field->Size() + 1);
+
+		aBuffer.Zero();
+
+		for (Int i = 0; i < num; i++)
+		{
+			field->Get(aBuffer, field->Size(), i);
+
+			String	 string;
+
+			if	(encoding == ID3TE_ISO8859_1) string.ImportFrom("ISO-8859-1", aBuffer);
+			else if (encoding == ID3TE_UTF8)      string.ImportFrom("UTF-8", aBuffer);
+
+			result.Add(trim ? string.Trim() : string);
+		}
+	}
+	else if (encoding == ID3TE_UTF16 || encoding == ID3TE_UTF16BE)
+	{
+		Buffer<wchar_t>	 wBuffer(field->Size() + 1);
+
+		wBuffer.Zero();
+
+		for (Int i = 0; i < num; i++)
+		{
+			field->Get((unicode_t *) (wchar_t *) wBuffer, field->Size(), i);
+
+			String	 string;
+
+			string.ImportFrom("UTF-16BE", (char *) (wchar_t *) wBuffer);
+
+			result.Add(trim ? string.Trim() : string);
+		}
+	}
+
+	return result;
+}
+
+Int BoCA::TaggerID3v2::AddStringListItem(ID3_Frame &frame, ID3_FieldID fieldType, const String &value, Bool trim)
+{
+	String	 string = trim ? value.Trim() : value;
+
+	if (!frame.Contains(fieldType) || string == NIL) return Error();
+
+	SetIntegerField(frame, ID3FN_TEXTENC, textEncoding);
+
+	ID3_Field	*field = frame.GetField(fieldType);
+
+	field->SetEncoding(textEncoding);
+
+	if	(textEncoding == ID3TE_UTF16)	field->Add((unicode_t *) string.ConvertTo("UTF-16LE"));
+	else if (textEncoding == ID3TE_UTF16BE)	field->Add((unicode_t *) string.ConvertTo("UTF-16BE"));
+	else					field->Add((char *)	 string.ConvertTo(textEncodingID));
 
 	return Success();
 }

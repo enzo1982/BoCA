@@ -153,22 +153,16 @@ bool ID3_ContainerImpl::IsValidFrame(ID3_Frame& frame, bool testlinkedFrames)
 	{
 		if (this->GetSpec() > myFrameDef->eLastAppearance || this->GetSpec() < myFrameDef->eFirstAppearance)
 		{
-			if (myFrameDef->convert != NULL)
-			{
-				tmpFrame = myFrameDef->convert(testframe, this->GetSpec());
+			// It's too old and doesn't have a conversion routine; disregard frame.
+			if (myFrameDef->convert == NULL) return false;
+				
+			tmpFrame = myFrameDef->convert(testframe, this->GetSpec());
 
-				if (tmpFrame)
-				{
-					testframe = tmpFrame;
-					frame = *tmpFrame;
-				}
+			// It's too old and we couldn't convert; disregard frame.
+			if (tmpFrame == NULL) return false;
 
-				//it's too old, and i couldn't convert
-				return false; //disregard frame
-			}
-
-			//it's too old and doesn't have a conversion routine
-			return false; //disregard frame
+			testframe = tmpFrame;
+			frame = *tmpFrame;
 		}
 		else if (myFrameDef->convert != NULL) //fields have stayed the same, but inside the field was a structure change
 		{

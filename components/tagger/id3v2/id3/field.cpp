@@ -1191,6 +1191,7 @@ static ID3_FieldDef ID3FD_SyncLyrics[] =
 // TEXT  TXT  ID3FID_LYRICIST          Lyricist/Text writer
 // TFLT  TFT  ID3FID_FILETYPE          File type
 // TIME  TKE  ID3FID_TIME              Time
+// TIPL       ID3FID_INVOLVEDPEOPLE2   Involved people list
 // TIT1  TIM  ID3FID_CONTENTGROUP      Content group description
 // TIT2  TT1  ID3FID_TITLE             Title/songname/content description
 // TIT3  TT2  ID3FID_SUBTITLE          Subtitle/Description refinement
@@ -1259,7 +1260,8 @@ ID3_Frame *convertIPLS(ID3_Frame *oldframe, ID3_V2Spec tospec)
 	{
 		ID3_Frame	*newframe = new ID3_Frame(ID3FID_INVOLVEDPEOPLE2);
 
-		newframe->GetField(ID3FN_TEXTENC)->SetEncoding(oldframe->GetField(ID3FN_TEXTENC)->GetEncoding());
+		newframe->GetField(ID3FN_TEXTENC)->Set(oldframe->GetField(ID3FN_TEXTENC)->Get());
+		newframe->GetField(ID3FN_TEXT)->SetEncoding(oldframe->GetField(ID3FN_TEXT)->GetEncoding());
 		newframe->GetField(ID3FN_TEXT)->SetText(oldframe->GetField(ID3FN_TEXT)->GetText());
 
 		return newframe;
