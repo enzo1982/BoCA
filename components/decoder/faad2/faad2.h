@@ -37,7 +37,6 @@ namespace BoCA
 			Buffer<unsigned char>		 backBuffer;
 			Buffer<short>			 samplesBuffer;
 
-			MP4TrackId			 GetAudioTrack(MP4FileHandle) const;
 			Bool				 ReadGaplessInfo(MP4FileHandle, Int &, Int &, Int64 &) const;
 
 			Bool				 SkipID3v2Tag(IO::InStream &);

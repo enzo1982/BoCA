@@ -106,7 +106,7 @@ Bool BoCA::DecoderFAAD2::CanOpenStream(const String &streamURI)
 	if (mp4v2dll != NIL && (in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
 		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
-		MP4TrackId	 mp4Track = GetAudioTrack(mp4File);
+		MP4TrackId	 mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
 
 		if (mp4Track != MP4_INVALID_TRACK_ID && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
@@ -146,7 +146,7 @@ Error BoCA::DecoderFAAD2::GetStreamInfo(const String &streamURI, Track &track)
 		track.length	= -1;
 
 		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
-		MP4TrackId		 mp4Track = GetAudioTrack(mp4File);
+		MP4TrackId	 mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
 
 		if (mp4Track != MP4_INVALID_TRACK_ID && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
 		{
@@ -384,7 +384,7 @@ Bool BoCA::DecoderFAAD2::Activate()
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
 		mp4File	 = ex_MP4ReadCallbacks(&mp4Callbacks, driver);
-		mp4Track = GetAudioTrack(mp4File);
+		mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
 
 		if (mp4Track == MP4_INVALID_TRACK_ID)
 		{
@@ -658,21 +658,6 @@ Int BoCA::DecoderFAAD2::ReadData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 6) Utilities::ChangeChannelOrder(data, format, Channel::AAC_5_1, Channel::Default_5_1);
 
 	return data.Size();
-}
-
-MP4TrackId BoCA::DecoderFAAD2::GetAudioTrack(MP4FileHandle mp4File) const
-{
-	Int	 nOfTracks = ex_MP4GetNumberOfTracks(mp4File, NIL, 0);
-
-	for (Int i = 0; i < nOfTracks; i++)
-	{
-		MP4TrackId	 trackId	= ex_MP4FindTrackId(mp4File, i, NIL, 0);
-		String		 trackType	= ex_MP4GetTrackType(mp4File, trackId);
-
-		if (trackType == MP4_AUDIO_TRACK_TYPE) return trackId;
-	}
-
-	return MP4_INVALID_TRACK_ID;
 }
 
 Bool BoCA::DecoderFAAD2::ReadGaplessInfo(MP4FileHandle mp4File, Int &delay, Int &padding, Int64 &length) const

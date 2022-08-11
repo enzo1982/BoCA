@@ -32,8 +32,6 @@ namespace BoCA
 			UnsignedInt64		 samplesLeft;
 
 			Buffer<unsigned char>	 dataBuffer;
-
-			MP4TrackId		 GetAudioTrack(MP4FileHandle) const;
 		public:
 			static const String	&GetComponentSpecs();
 

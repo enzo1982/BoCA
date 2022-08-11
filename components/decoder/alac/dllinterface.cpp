@@ -17,9 +17,7 @@ MP4READ				 ex_MP4Read			= NIL;
 MP4READCALLBACKS		 ex_MP4ReadCallbacks		= NIL;
 MP4CLOSE			 ex_MP4Close			= NIL;
 MP4FREE				 ex_MP4Free			= NIL;
-MP4GETNUMBEROFTRACKS		 ex_MP4GetNumberOfTracks	= NIL;
 MP4FINDTRACKID			 ex_MP4FindTrackId		= NIL;
-MP4GETTRACKTYPE			 ex_MP4GetTrackType		= NIL;
 MP4GETTRACKDURATION		 ex_MP4GetTrackDuration		= NIL;
 MP4HAVETRACKATOM		 ex_MP4HaveTrackAtom		= NIL;
 MP4GETTRACKBYTESPROPERTY	 ex_MP4GetTrackBytesProperty	= NIL;
@@ -41,9 +39,7 @@ Bool LoadMP4v2DLL()
 	ex_MP4ReadCallbacks		= (MP4READCALLBACKS) mp4v2dll->GetFunctionAddress("MP4ReadCallbacks");
 	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
 	ex_MP4Free			= (MP4FREE) mp4v2dll->GetFunctionAddress("MP4Free");
-	ex_MP4GetNumberOfTracks		= (MP4GETNUMBEROFTRACKS) mp4v2dll->GetFunctionAddress("MP4GetNumberOfTracks");
 	ex_MP4FindTrackId		= (MP4FINDTRACKID) mp4v2dll->GetFunctionAddress("MP4FindTrackId");
-	ex_MP4GetTrackType		= (MP4GETTRACKTYPE) mp4v2dll->GetFunctionAddress("MP4GetTrackType");
 	ex_MP4GetTrackDuration		= (MP4GETTRACKDURATION) mp4v2dll->GetFunctionAddress("MP4GetTrackDuration");
 	ex_MP4HaveTrackAtom		= (MP4HAVETRACKATOM) mp4v2dll->GetFunctionAddress("MP4HaveTrackAtom");
 	ex_MP4GetTrackBytesProperty	= (MP4GETTRACKBYTESPROPERTY) mp4v2dll->GetFunctionAddress("MP4GetTrackBytesProperty");
@@ -57,9 +53,7 @@ Bool LoadMP4v2DLL()
 	    ex_MP4ReadCallbacks		== NIL ||
 	    ex_MP4Close			== NIL ||
 	    ex_MP4Free			== NIL ||
-	    ex_MP4GetNumberOfTracks	== NIL ||
 	    ex_MP4FindTrackId		== NIL ||
-	    ex_MP4GetTrackType		== NIL ||
 	    ex_MP4GetTrackDuration	== NIL ||
 	    ex_MP4HaveTrackAtom		== NIL ||
 	    ex_MP4GetTrackBytesProperty	== NIL ||
