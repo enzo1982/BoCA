@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,6 +14,11 @@
 
 #include "format.h"
 #include "config.h"
+
+#include <stdlib.h>
+
+static Buffer<Float32>	 dither;
+static const Int	 ditherSize = 32768;
 
 const String &BoCA::DSPFormat::GetComponentSpecs()
 {
@@ -39,6 +44,10 @@ const String &BoCA::DSPFormat::GetComponentSpecs()
 BoCA::DSPFormat::DSPFormat()
 {
 	configLayer = NIL;
+
+	applyDither = True;
+	ditherType  = 1;
+	ditherIndex = 0;
 }
 
 BoCA::DSPFormat::~DSPFormat()
@@ -56,6 +65,9 @@ Bool BoCA::DSPFormat::Activate()
 	Int	 bits = config->GetIntValue(ConfigureFormat::ConfigID, "Bits", 16);
 	Bool	 sign = config->GetIntValue(ConfigureFormat::ConfigID, "Signed", True);
 
+	applyDither = config->GetIntValue(ConfigureFormat::ConfigID, "ApplyDither", True);
+	ditherType  = config->GetIntValue(ConfigureFormat::ConfigID, "DitherType", 1);
+
 	/* Set output format.
 	 */
 	const Format	&format = track.GetFormat();
@@ -65,6 +77,10 @@ Bool BoCA::DSPFormat::Activate()
 	this->format.fp	  = fp;
 	this->format.bits = fp ? 32   : bits;
 	this->format.sign = fp ? True : sign;
+
+	/* Generate dither table if needed.
+	 */
+	if (applyDither && this->format.bits < format.bits) GenerateDither();
 
 	return True;
 }
@@ -136,15 +152,41 @@ Void BoCA::DSPFormat::TransformSamples(const UnsignedByte *in, const Format &inF
 		else if	(inFormat.bits	== 24 && endianness == EndianBig   ) samples[i] = in[i * 3    ] << 24 | in[i * 3 + 1] << 16 | in[i * 3 + 2] << 8;
 	}
 
+	/* Apply dither.
+	 */
+	if (applyDither && outFormat.bits < inFormat.bits)
+	{
+		if (ditherType == 0) // RPDF
+		{
+			for (Int i = 0; i < numSamples; i++)
+			{
+				Float32	 r = dither[ditherIndex++ % ditherSize] - 0.5;
+
+				samples[i] += Int32(r * (1 << (32 - outFormat.bits)));
+			}
+		}
+		else if (ditherType == 1) // TPDF
+		{
+			Float32	 p = dither[ditherIndex++ % ditherSize];
+
+			for (Int i = 0; i < numSamples; i++)
+			{
+				Float32	 r = dither[ditherIndex++ % ditherSize];
+
+				samples[i] += Int32((r - p) * (1 << (32 - outFormat.bits)));
+
+				p = r;
+			}
+		}
+	}
+
 	/* Apply rounding and clipping.
 	 */
 	if (inFormat.fp || outFormat.bits < inFormat.bits)
 	{
 		for (Int i = 0; i < numSamples; i++)
 		{
-			if	(outFormat.bits ==  8) samples[i] += 1 << 23;
-			else if	(outFormat.bits == 16) samples[i] += 1 << 15;
-			else if	(outFormat.bits == 24) samples[i] += 1 <<  7;
+			samples[i] += 1 << (31 - outFormat.bits);
 
 			/* Clip out of range samples.
 			 */
@@ -167,6 +209,19 @@ Void BoCA::DSPFormat::TransformSamples(const UnsignedByte *in, const Format &inF
 		else if	(outFormat.bits	== 24 && endianness == EndianLittle) { out[i * 3 + 2] = (samples[i] >> 24) & 0xFF; out[i * 3 + 1] = (samples[i] >> 16) & 0xFF; out[i * 3    ] = (samples[i] >> 8) & 0xFF; }
 		else if	(outFormat.bits	== 24 && endianness == EndianBig   ) { out[i * 3    ] = (samples[i] >> 24) & 0xFF; out[i * 3 + 1] = (samples[i] >> 16) & 0xFF; out[i * 3 + 2] = (samples[i] >> 8) & 0xFF; }
 	}
+}
+
+Void BoCA::DSPFormat::GenerateDither()
+{
+	static Threads::Mutex	 mutex;
+
+	Threads::Lock	 lock(mutex);
+
+	if (dither.Size() != 0) return;
+
+	dither.Resize(ditherSize);
+
+	for (Int i = 0; i < ditherSize; i++) dither[i] = Float32(rand()) / RAND_MAX;
 }
 
 ConfigLayer *BoCA::DSPFormat::GetConfigurationLayer()

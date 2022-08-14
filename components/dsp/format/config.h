@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -37,7 +37,15 @@ namespace BoCA
 
 			CheckBox		*check_unsigned;
 
+			GroupBox		*group_dither;
+
+			CheckBox		*check_dither;
+
+			Text			*text_dither_type;
+			ComboBox		*combo_dither_type;
+
 			Bool			 unsignedSamples;
+			Bool			 applyDither;
 		public:
 			static const String	 ConfigID;
 
@@ -48,6 +56,8 @@ namespace BoCA
 		slots:
 			Void			 OnChangeNumberFormat();
 			Void			 OnChangeResolution();
+
+			Void			 OnToggleDither();
 	};
 };
 
