@@ -22,10 +22,13 @@ MP4GETTRACKDURATION		 ex_MP4GetTrackDuration		= NIL;
 MP4HAVETRACKATOM		 ex_MP4HaveTrackAtom		= NIL;
 MP4GETTRACKBYTESPROPERTY	 ex_MP4GetTrackBytesProperty	= NIL;
 MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale	= NIL;
+MP4GETTRACKNUMBEROFSAMPLES	 ex_MP4GetTrackNumberOfSamples	= NIL;
 MP4GETSAMPLETIME		 ex_MP4GetSampleTime		= NIL;
 MP4GETSAMPLEIDFROMTIME		 ex_MP4GetSampleIdFromTime	= NIL;
 MP4GETSAMPLESIZE		 ex_MP4GetSampleSize		= NIL;
 MP4READSAMPLE			 ex_MP4ReadSample		= NIL;
+MP4ITMFGETITEMSBYMEANING	 ex_MP4ItmfGetItemsByMeaning	= NIL;
+MP4ITMFITEMLISTFREE		 ex_MP4ItmfItemListFree		= NIL;
 
 DynamicLoader *mp4v2dll		= NIL;
 
@@ -44,24 +47,30 @@ Bool LoadMP4v2DLL()
 	ex_MP4HaveTrackAtom		= (MP4HAVETRACKATOM) mp4v2dll->GetFunctionAddress("MP4HaveTrackAtom");
 	ex_MP4GetTrackBytesProperty	= (MP4GETTRACKBYTESPROPERTY) mp4v2dll->GetFunctionAddress("MP4GetTrackBytesProperty");
 	ex_MP4GetTrackTimeScale		= (MP4GETTRACKTIMESCALE) mp4v2dll->GetFunctionAddress("MP4GetTrackTimeScale");
+	ex_MP4GetTrackNumberOfSamples	= (MP4GETTRACKNUMBEROFSAMPLES) mp4v2dll->GetFunctionAddress("MP4GetTrackNumberOfSamples");
 	ex_MP4GetSampleTime		= (MP4GETSAMPLETIME) mp4v2dll->GetFunctionAddress("MP4GetSampleTime");
 	ex_MP4GetSampleIdFromTime	= (MP4GETSAMPLEIDFROMTIME) mp4v2dll->GetFunctionAddress("MP4GetSampleIdFromTime");
 	ex_MP4GetSampleSize		= (MP4GETSAMPLESIZE) mp4v2dll->GetFunctionAddress("MP4GetSampleSize");
 	ex_MP4ReadSample		= (MP4READSAMPLE) mp4v2dll->GetFunctionAddress("MP4ReadSample");
+	ex_MP4ItmfGetItemsByMeaning	= (MP4ITMFGETITEMSBYMEANING) mp4v2dll->GetFunctionAddress("MP4ItmfGetItemsByMeaning");
+	ex_MP4ItmfItemListFree		= (MP4ITMFITEMLISTFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemListFree");
 
-	if (ex_MP4Read			== NIL ||
-	    ex_MP4ReadCallbacks		== NIL ||
-	    ex_MP4Close			== NIL ||
-	    ex_MP4Free			== NIL ||
-	    ex_MP4FindTrackId		== NIL ||
-	    ex_MP4GetTrackDuration	== NIL ||
-	    ex_MP4HaveTrackAtom		== NIL ||
-	    ex_MP4GetTrackBytesProperty	== NIL ||
-	    ex_MP4GetTrackTimeScale	== NIL ||
-	    ex_MP4GetSampleTime		== NIL ||
-	    ex_MP4GetSampleIdFromTime	== NIL ||
-	    ex_MP4GetSampleSize		== NIL ||
-	    ex_MP4ReadSample		== NIL) { FreeMP4v2DLL(); return False; }
+	if (ex_MP4Read				== NIL ||
+	    ex_MP4ReadCallbacks			== NIL ||
+	    ex_MP4Close				== NIL ||
+	    ex_MP4Free				== NIL ||
+	    ex_MP4FindTrackId			== NIL ||
+	    ex_MP4GetTrackDuration		== NIL ||
+	    ex_MP4HaveTrackAtom			== NIL ||
+	    ex_MP4GetTrackBytesProperty		== NIL ||
+	    ex_MP4GetTrackTimeScale		== NIL ||
+	    ex_MP4GetTrackNumberOfSamples	== NIL ||
+	    ex_MP4GetSampleTime			== NIL ||
+	    ex_MP4GetSampleIdFromTime		== NIL ||
+	    ex_MP4GetSampleSize			== NIL ||
+	    ex_MP4ReadSample			== NIL ||
+	    ex_MP4ItmfGetItemsByMeaning		== NIL ||
+	    ex_MP4ItmfItemListFree		== NIL) { FreeMP4v2DLL(); return False; }
 
 	return True;
 }

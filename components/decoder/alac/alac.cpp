@@ -141,6 +141,16 @@ Error BoCA::DecoderALAC::GetStreamInfo(const String &streamURI, Track &track)
 		ex_MP4Free(ascBuffer);
 
 		track.SetFormat(format);
+
+		/* Read gapless information.
+		 */
+		Int	 delay	= 0, padding = 0;
+		Int64	 length	= 0;
+
+		if (ReadGaplessInfo(mp4File, delay, padding, length) && delay == 0 && padding + length == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * decoder.mConfig.frameLength)
+		{
+			track.length = length;
+		}
 	}
 
 	ex_MP4Close(mp4File, 0);
@@ -302,6 +312,42 @@ Int BoCA::DecoderALAC::ReadData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::AAC_7_1, Channel::Default_7_1);
 
 	return data.Size();
+}
+
+Bool BoCA::DecoderALAC::ReadGaplessInfo(MP4FileHandle mp4File, Int &delay, Int &padding, Int64 &length) const
+{
+	Bool	 result = False;
+
+	/* Look for iTunes metadata with gapless information.
+	 */
+	MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+
+	if (items != NIL)
+	{
+		if (items->size == 1)
+		{
+			/* Read value as string.
+			 */
+			Buffer<char>	 value(items->elements[0].dataList.elements[0].valueSize + 1);
+
+			memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
+			memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
+
+			/* Parse value string.
+			 */
+			const Array<String>	&values = String(value).Trim().Explode(" ");
+
+			delay	= (Int64) Number::FromHexString(values.GetNth(1));
+			padding	= (Int64) Number::FromHexString(values.GetNth(2));
+			length	= (Int64) Number::FromHexString(values.GetNth(3));
+
+			result = True;
+		}
+
+		ex_MP4ItmfItemListFree(items);
+	}
+
+	return result;
 }
 
 int64_t BoCA::MP4IO_size(void *handle)

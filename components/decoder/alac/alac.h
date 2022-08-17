@@ -32,6 +32,8 @@ namespace BoCA
 			UnsignedInt64		 samplesLeft;
 
 			Buffer<unsigned char>	 dataBuffer;
+
+			Bool			 ReadGaplessInfo(MP4FileHandle, Int &, Int &, Int64 &) const;
 		public:
 			static const String	&GetComponentSpecs();
 
