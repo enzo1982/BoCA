@@ -117,8 +117,8 @@ namespace BoCA
 			Short			 track;
 			Short			 numTracks;
 
-			S::Byte			 disc;
-			S::Byte			 numDiscs;
+			UnsignedByte		 disc;
+			UnsignedByte		 numDiscs;
 
 			/* Publisher information:
 			 */

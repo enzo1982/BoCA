@@ -16,11 +16,11 @@ BoCA::Info::Info() : mcdi(Buffer<UnsignedByte>())
 {
 	year		= -1;
 
-	track		= -1;
-	numTracks	= -1;
+	track		= 0;
+	numTracks	= 0;
 
-	disc		= -1;
-	numDiscs	= -1;
+	disc		= 0;
+	numDiscs	= 0;
 
 	rating		= -1;
 }
