@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>OggEnc2 Ogg Vorbis Encoder</name>
+  <version>1.0</version>
+  <id>oggenc2-enc</id>
+  <type>encoder</type>
+  <format>
+    <name>Ogg Vorbis Audio</name>
+    <extension>ogg</extension>
+    <extension>oga</extension>
+    <tag id="vorbis-tag" mode="other">Vorbis Comment</tag>
+  </format>
+  <external>
+    <command>oggenc2</command>
+    <arguments>%OPTIONS --ignorelength - -o %OUTFILE</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="VBR quality" argument="--quality %VALUE" default="3" step="0.1">
+	<depends setting="ABR target bitrate" state="disabled"/>
+	<min alias="worst">-2</min>
+	<max alias="best">10</max>
+      </range>
+      <range name="ABR target bitrate" argument="--bitrate %VALUE" default="192" step="4">
+	<depends setting="VBR quality" state="disabled"/>
+	<min alias="min">32</min>
+	<max alias="max">512</max>
+      </range>
+    </parameters>
+  </external>
+</component>
