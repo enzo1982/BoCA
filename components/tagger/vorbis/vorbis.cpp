@@ -748,6 +748,11 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 	return Success();
 }
 
+Error BoCA::TaggerVorbis::RenderStreamInfo(const String &fileName, const Track &track)
+{
+	return UpdateStreamInfo(fileName, track);
+}
+
 Error BoCA::TaggerVorbis::UpdateStreamInfo(const String &fileName, const Track &track)
 {
 	/* Get configuration.
