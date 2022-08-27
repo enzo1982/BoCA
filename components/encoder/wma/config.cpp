@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -155,17 +155,16 @@ BoCA::ConfigureWMA::ConfigureWMA()
 
 	FillCodecComboBox();
 
+	if (config->GetIntValue(ConfigID, "Codec", -1) >= 0) combo_codec->SelectNthEntry(config->GetIntValue(ConfigID, "Codec", -1));
+
 	combo_codec->onSelectEntry.Connect(&ConfigureWMA::OnSelectCodec, this);
 
-	if (config->GetIntValue(ConfigID, "Codec", -1) >= 0) combo_codec->SelectNthEntry(config->GetIntValue(ConfigID, "Codec", -1));
+	OnSelectCodec();
 
 	combo_format->SelectNthEntry(config->GetIntValue(ConfigID, "CodecFormat", 0));
 
-	OnToggleCodec();
 	OnToggleFormat();
-
-	OnToggleVBRSetting();
-	OnToggle2PassSetting();
+	OnToggleCodec();
 
 	/* ToDo: Implement 2-pass encoding.
 	 *
@@ -437,16 +436,18 @@ Void BoCA::ConfigureWMA::OnSelectCodec()
 	}
 
 	if ( (supportVBR1Pass || supportVBR2Pass) &&
-	    !(supportCBR1Pass || supportCBR2Pass)) { useVBR = True; useVBRSetting = True; }
+	    !(supportCBR1Pass || supportCBR2Pass)) { check_vbr->SetChecked(True); check_vbr_setting->SetChecked(True); }
 
 	if (!(supportVBR1Pass || supportVBR2Pass) &&
-	     (supportCBR1Pass || supportCBR2Pass)) { useVBR = False; useVBRSetting = False; }
+	     (supportCBR1Pass || supportCBR2Pass)) { check_vbr->SetChecked(False); check_vbr_setting->SetChecked(False); }
 
 	OnToggleVBR();
 	OnToggle2Pass();
 
 	OnToggleVBRSetting();
 	OnToggle2PassSetting();
+
+	OnToggleFormat();
 
 	if ((supportVBR1Pass || supportVBR2Pass) &&
 	    (supportCBR1Pass || supportCBR2Pass)) check_vbr_setting->Activate();
@@ -469,7 +470,8 @@ Void BoCA::ConfigureWMA::OnToggleFormat()
 		check_2pass->Deactivate();
 		combo_format->Deactivate();
 
-		group_settings->Activate();
+		if (combo_codec->GetSelectedEntry()->GetText().Contains("Lossless")) group_settings->Deactivate();
+		else								     group_settings->Activate();
 
 /* ToDo: Implement 2-pass encoding.
  *
