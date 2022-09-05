@@ -3,11 +3,7 @@
 namespace APE
 {
 
-// disable the operator -> on UDT warning
-#ifdef _MSC_VER
-    #pragma warning(push)
-    #pragma warning(disable : 4284)
-#endif
+#pragma pack(push, 1)
 
 /**************************************************************************************************
 CSmartPtr - a simple smart pointer class that can automatically initialize and free memory
@@ -20,50 +16,51 @@ public:
     bool m_bArray;
     bool m_bDelete;
 
-    CSmartPtr()
+    __forceinline CSmartPtr()
     {
         m_bDelete = true;
         m_pObject = NULL;
         m_bArray = false;
     }
-    CSmartPtr(TYPE * a_pObject, bool a_bArray = false, bool a_bDelete = true)
+    __forceinline CSmartPtr(TYPE * pObject, bool bArray = false, bool bDelete = true)
     {
         m_bDelete = true;
         m_pObject = NULL;
         m_bArray = false;
-        Assign(a_pObject, a_bArray, a_bDelete);
+        Assign(pObject, bArray, bDelete);
     }
 
-    ~CSmartPtr()
+    __forceinline ~CSmartPtr()
     {
         Delete();
     }
 
-    void Assign(TYPE * a_pObject, bool a_bArray = false, bool a_bDelete = true)
+    __forceinline void Assign(TYPE * pObject, bool bArray = false, bool bDelete = true)
     {
         Delete();
 
-        m_bDelete = a_bDelete;
-        m_bArray = a_bArray;
-        m_pObject = a_pObject;
+        m_bDelete = bDelete;
+        m_bArray = bArray;
+        m_pObject = pObject;
     }
 
-    void Delete()
+    __forceinline void Delete()
     {
         if (m_bDelete && m_pObject)
         {
-            if (m_bArray)
-                delete [] m_pObject;
-            else
-                delete m_pObject;
-
+            TYPE * pObject = m_pObject;
             m_pObject = NULL;
+
+            if (m_bArray)
+                delete [] pObject;
+            else
+                delete pObject;
         }
     }
 
-    void SetDelete(const bool a_bDelete)
+    void SetDelete(const bool bDelete)
     {
-        m_bDelete = a_bDelete;
+        m_bDelete = bDelete;
     }
 
     __forceinline TYPE * GetPtr() const
@@ -86,8 +83,6 @@ public:
     __forceinline void * operator =(void *) const;
 };
 
-#ifdef _MSC_VER
-    #pragma warning(pop)
-#endif
+#pragma pack(pop)
 
 }

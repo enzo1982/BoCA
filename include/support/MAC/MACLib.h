@@ -1,6 +1,5 @@
 /**************************************************************************************************
 Monkey's Audio MACLib.h (include for using MACLib.lib in your projects)
-Copyright (C) 2000-2022 by Matthew T. Ashland   All Rights Reserved.
 
 Overview:
 
@@ -493,8 +492,8 @@ Usage example:
 extern "C"
 {
     APE::IAPEDecompress * __stdcall CreateIAPEDecompress(const APE::str_utfn * pFilename, int * pErrorCode, bool bReadOnly, bool bAnalyzeTagNow, bool bReadWholeFile);
-    APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx(APE::CIO * pIO, int * pErrorCode, bool bReadOnly);
-    APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx2(APE::CAPEInfo * pAPEInfo, int nStartBlock, int nFinishBlock, int * pErrorCode, bool bReadOnly);
+    APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx(APE::CIO * pIO, int * pErrorCode);
+    APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx2(APE::CAPEInfo * pAPEInfo, int nStartBlock, int nFinishBlock, int * pErrorCode);
 #ifdef APE_SUPPORT_COMPRESS
     APE::IAPECompress * __stdcall CreateIAPECompress(int * pErrorCode = NULL);
 #endif
@@ -530,5 +529,5 @@ extern "C"
     // helper functions
     DLLEXPORT int __stdcall FillWaveFormatEx(APE::WAVEFORMATEX * pWaveFormatEx, int nFormatTag, int nSampleRate, int nBitsPerSample, int nChannels);
     DLLEXPORT int __stdcall FillWaveHeader(APE::WAVE_HEADER * pWAVHeader, APE::int64 nAudioBytes, APE::WAVEFORMATEX * pWaveFormatEx, APE::intn nTerminatingBytes = 0);
-    DLLEXPORT int __stdcall FillRF64Header(APE::RF64_HEADER * pWAVHeader, APE::int64 nAudioBytes, APE::WAVEFORMATEX * pWaveFormatEx, APE::intn nTerminatingBytes = 0);
+    DLLEXPORT int __stdcall FillRF64Header(APE::RF64_HEADER * pWAVHeader, APE::int64 nAudioBytes, APE::WAVEFORMATEX * pWaveFormatEx);
 }

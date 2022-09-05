@@ -25,6 +25,18 @@ PLATFORM_LINUX
 #endif
 
 /**************************************************************************************************
+64-bit
+**************************************************************************************************/
+#if defined(_WIN64) || defined(__x86_64__)
+#define APE_64_BIT
+#endif
+
+/**************************************************************************************************
+Warnings
+**************************************************************************************************/
+#include "Warnings.h"
+
+/**************************************************************************************************
 Global includes
 **************************************************************************************************/
 #include <stdint.h>
@@ -34,18 +46,24 @@ Global includes
 #include <math.h>
 
 #if defined(PLATFORM_WINDOWS)
+    #ifndef NOMINMAX
+        #define NOMINMAX // remove the global min / max macros so ape_min / ape_max will always be used
+    #endif
     #include "WindowsEnvironment.h"
+    #define WIN32_LEAN_AND_MEAN
+    #ifdef _MSC_VER
+        #pragma warning(push) // push and pop warnings because the windows includes suppresses some like 4514
+    #endif
     #include <windows.h>
+    #ifdef _MSC_VER
+        #pragma warning(pop)
+    #endif
     #include <tchar.h>
     #include <assert.h>
 #else
-    #ifndef _MSC_VER
-        #include <unistd.h>
-    #endif
+    #include <unistd.h>
     #include <time.h>
-    #ifndef _MSC_VER
-        #include <sys/time.h>
-    #endif
+    #include <sys/time.h>
     #include <sys/types.h>
     #include <sys/stat.h>
     #include <wchar.h>
@@ -53,7 +71,20 @@ Global includes
 #endif
 #define ape_max(a,b)    (((a) > (b)) ? (a) : (b))
 #define ape_min(a,b)    (((a) < (b)) ? (a) : (b))
+#define CLEAR(destination) memset(&destination, 0, sizeof (destination))
 
+/**************************************************************************************************
+Packing
+
+We need to pack to the next byte or else we get warning 4820.  We could also get around the
+warning by adding padding to all our structures that is unused, but this isn't as elegant.  The
+actual packing code is in each header and CPP file because doing it globally leads to compiler
+warnings on Linux.
+**************************************************************************************************/
+
+/**************************************************************************************************
+Smart pointer
+**************************************************************************************************/
 #include "SmartPtr.h"
 
 /**************************************************************************************************
@@ -67,10 +98,8 @@ Version
 // build the version string
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
-#define MAC_VER_FILE_VERSION_STR               STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION) 
-#define MAC_VER_FILE_VERSION_STR_NARROW        STRINGIZE(MAC_VERSION_MAJOR) "." STRINGIZE(MAC_VERSION_REVISION) 
-#define MAC_VER_FILE_VERSION_STR_FULL          STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION) _T(".0.0")
-#define MAC_VER_FILE_VERSION_FULL_NO_DOT       APE_VERSION_MAJOR APE_VERSION_REVISION
+#define MAC_VER_FILE_VERSION_STR                        STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION) 
+#define MAC_VER_FILE_VERSION_STR_NARROW                 STRINGIZE(MAC_VERSION_MAJOR) "." STRINGIZE(MAC_VERSION_REVISION) 
 
 #define MAC_FILE_VERSION_NUMBER                         3990
 #define MAC_VERSION_STRING                              MAC_VER_FILE_VERSION_STR
@@ -79,19 +108,14 @@ Version
 #define PLUGIN_NAME                                     "Monkey's Audio Player " MAC_VER_FILE_VERSION_STR_NARROW
 #define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") MAC_VER_FILE_VERSION_STR _T(")")
 #define MAC_RESOURCE_VERSION_COMMA                      MAC_VERSION_MAJOR, MAC_VERSION_REVISION, 0, 0
-#define MAC_RESOURCE_VERSION_STRING                     MAC_VER_FILE_VERSION_STR_FULL
+#define MAC_RESOURCE_VERSION_STRING                     MAC_VER_FILE_VERSION_STR
 #define MAC_RESOURCE_COPYRIGHT                          "Copyright (c) 2000-" STRINGIZE(MAC_YEAR) " Matthew T. Ashland"
 #define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v ") MAC_VER_FILE_VERSION_STR _T(") (c) Matthew T. Ashland ---\n")
 #define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") MAC_VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(MAC_YEAR) _T(" by Matthew T. Ashland")
-#define MAC_DLL_INTERFACE_VERSION_NUMBER                1000
 
 /**************************************************************************************************
 Global compiler settings (useful for porting)
 **************************************************************************************************/
-#ifdef _MSC_VER
-    #pragma warning(disable: 4100) // this just warns all over for unused parameters, but there are real cases where that is needed (like a virtual override)
-#endif
-
 // assembly code (helps performance, but limits portability)
 #if defined __SSE2__
     #define ENABLE_SSE_ASSEMBLY
@@ -102,10 +126,6 @@ Global compiler settings (useful for porting)
 #endif
 
 #ifdef _MSC_VER // doesn't compile in gcc
-    #if defined(_M_IX86)
-        #define ENABLE_MMX_ASSEMBLY
-    #endif
-
     #if defined(_M_IX86) || defined(_M_X64)
         #define ENABLE_SSE_ASSEMBLY
         #define ENABLE_AVX_ASSEMBLY
@@ -129,9 +149,6 @@ Global compiler settings (useful for porting)
 #define ENABLE_COMPRESSION_MODE_NORMAL
 #define ENABLE_COMPRESSION_MODE_HIGH
 #define ENABLE_COMPRESSION_MODE_EXTRA_HIGH
-
-// switch to legacy encoding (for support in FFMpeg, etc.)
-//#define LEGACY_ENCODE
 
 /**************************************************************************************************
 Global types
@@ -170,6 +187,8 @@ Global macros
 
 #define APE_TRUNCATE ((size_t)-1)
 
+#define POINTER_TO_INT64(POINTER) (int64)(uintptr_t)POINTER
+
 #if defined(PLATFORM_WINDOWS)
     #define IO_USE_WIN_FILE_IO
     #define DLLEXPORT                                   __declspec(dllexport)
@@ -202,7 +221,11 @@ Global macros
     #undef  ASSERT
     #define ASSERT(e)
     #define wcsncpy_s(A, B, C, D) wcsncpy(A, C, D)
-    #define wcscpy_s(A, B, C) wcscpy(A, C)
+    inline wchar_t * wcscpy_s(wchar_t * dest, size_t destsz, const wchar_t * src)
+    {
+        (void) destsz; // this avoids an unreferenced variable
+        return wcscpy(dest, src);
+    }
     #define wcscat_s(A, B, C) wcscat(A, C)
     #define sprintf_s(A, B, C, D) sprintf(A, C, D)
     #define strcpy_s(A, B, C) strcpy(A, C)
@@ -217,6 +240,16 @@ namespace APE
     #pragma pack(push, 1)
     typedef struct tWAVEFORMATEX
     {
+        tWAVEFORMATEX() :
+            wFormatTag(0),
+            nChannels(0),
+            nSamplesPerSec(0),
+            nAvgBytesPerSec(0),
+            nBlockAlign(0),
+            wBitsPerSample(0),
+            cbSize(0)
+        {
+        }
         WORD        wFormatTag;         /* format type */
         WORD        nChannels;          /* number of channels (i.e. mono, stereo...) */
         uint32      nSamplesPerSec;     /* sample rate */
@@ -225,7 +258,7 @@ namespace APE
         WORD        wBitsPerSample;     /* number of bits per sample of mono data */
         WORD        cbSize;             /* the count in bytes of the size of */
         /* extra information (after cbSize) */
-    } WAVEFORMATEX, *PWAVEFORMATEX, NEAR *NPWAVEFORMATEX, FAR *LPWAVEFORMATEX;
+    } WAVEFORMATEX;
     #pragma pack(pop)
 }
 
@@ -303,9 +336,8 @@ Error Codes
 **************************************************************************************************/
 
 // success
-#ifndef ERROR_SUCCESS
+#undef ERROR_SUCCESS
 #define ERROR_SUCCESS                                   0
-#endif
 
 // file and i/o errors (1000's)
 #define ERROR_IO_READ                                   1000
