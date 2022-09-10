@@ -57,7 +57,7 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 
 		componentSpecs.Append("										\
 														\
-		    <input bits=\"8-24\" channels=\"1-8\" rate=\"1-655350\"/>					\
+		    <input bits=\"8-32\" channels=\"1-8\" rate=\"1-1048575\"/>					\
 		    <parameters>										\
 														\
 		");
