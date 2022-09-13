@@ -24,6 +24,18 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 
 	if (flacdll != NIL)
 	{
+		const Array<String>	&flacVersion = String(*ex_FLAC__VERSION_STRING).Explode(".");
+
+		Int	 maxBitDepth   = 24;
+		Int	 maxSampleRate = 655350;
+
+		if ( flacVersion.GetNth(0).ToInt() >  1 ||
+		    (flacVersion.GetNth(0).ToInt() == 1 && flacVersion.GetNth(1).ToInt() >= 4))
+		{
+			maxBitDepth   = 32;
+			maxSampleRate = 1048575;
+		}
+
 		componentSpecs = "										\
 														\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>							\
@@ -57,7 +69,9 @@ const String &BoCA::EncoderFLAC::GetComponentSpecs()
 
 		componentSpecs.Append("										\
 														\
-		    <input bits=\"8-32\" channels=\"1-8\" rate=\"1-1048575\"/>					\
+		    <input bits=\"8-").Append(String::FromInt(maxBitDepth)).Append("\"				\
+			   channels=\"1-8\"									\
+			   rate=\"1-").Append(String::FromInt(maxSampleRate)).Append("\"/>			\
 		    <parameters>										\
 														\
 		");
@@ -396,6 +410,8 @@ Int BoCA::EncoderFLAC::WriteData(Buffer<UnsignedByte> &data)
 
 		else if (format.bits == 24 && endianness == EndianLittle) buffer[i] = (data[3 * i + 2] << 24 | data[3 * i + 1] << 16 | data[3 * i    ] << 8) / 256;
 		else if (format.bits == 24 && endianness == EndianBig	) buffer[i] = (data[3 * i    ] << 24 | data[3 * i + 1] << 16 | data[3 * i + 2] << 8) / 256;
+
+		else if (format.bits == 32				) buffer[i] = ((int32_t *) (UnsignedByte *) data)[i];
 	}
 
 	ex_FLAC__stream_encoder_process_interleaved(encoder, buffer, data.Size() / (format.bits / 8) / format.channels);

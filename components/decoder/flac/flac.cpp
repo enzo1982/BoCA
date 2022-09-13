@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -278,6 +278,8 @@ Int BoCA::DecoderFLAC::ReadData(Buffer<UnsignedByte> &data)
 
 		else if (format.bits == 24 && endianness == EndianLittle) { data[3 * i + 2] = (samplesBuffer[i] >> 16) & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i    ] = samplesBuffer[i] & 0xFF; }
 		else if (format.bits == 24 && endianness == EndianBig   ) { data[3 * i    ] = (samplesBuffer[i] >> 16) & 0xFF; data[3 * i + 1] = (samplesBuffer[i] >> 8) & 0xFF; data[3 * i + 2] = samplesBuffer[i] & 0xFF; }
+
+		else if (format.bits == 32				) ((int32_t *) (UnsignedByte *) data)[i] = samplesBuffer[i];
 	}
 
 	samplesBuffer.Resize(0);
