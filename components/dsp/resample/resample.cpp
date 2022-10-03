@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -34,6 +34,7 @@ const String &BoCA::DSPResample::GetComponentSpecs()
 		    <version>1.0</version>								\
 		    <id>resample-dsp</id>								\
 		    <type>dsp</type>									\
+		    <input float=\"false\" rate=\"1-2822400\"/>						\
 		    <input float=\"true\" rate=\"1-2822400\"/>						\
 		  </component>										\
 													\
@@ -55,11 +56,12 @@ Void smooth::DetachDLL()
 
 BoCA::DSPResample::DSPResample()
 {
-	state	    = NIL;
-
 	configLayer = NIL;
 
+	converter   = NIL;
+
 	ratio	    = 1;
+	state	    = NIL;
 }
 
 BoCA::DSPResample::~DSPResample()
@@ -75,22 +77,47 @@ Bool BoCA::DSPResample::Activate()
 	this->format	  = format;
 	this->format.rate = config->GetIntValue(ConfigureResample::ConfigID, "Samplerate", 44100);
 
-	/* Init the resampler only if we actually need to resample.
+	if (this->format.rate == format.rate) return True;
+
+	this->format.fp	  = True;
+	this->format.bits = 32;
+	this->format.sign = True;
+
+	/* Create and init format converter component.
 	 */
-	if (this->format.rate != format.rate)
+	Format	 converterFormat = format;
+
+	converterFormat.fp   = True;
+	converterFormat.bits = 32;
+	converterFormat.sign = True;
+
+	converter = new FormatConverter(format, converterFormat);
+
+	if (converter->GetErrorState() == True)
 	{
-		int	 error;
+		errorState  = True;
+		errorString = converter->GetErrorString();
 
-		ratio = Float(this->format.rate) / Float(format.rate);
-		state = ex_src_new(config->GetIntValue(ConfigureResample::ConfigID, "Converter", SRC_SINC_MEDIUM_QUALITY), format.channels, &error);
+		delete converter;
 
-		if (state == NIL)
-		{
-			errorState  = True;
-			errorString = ex_src_strerror(error);
+		return False;
+	}
 
-			return False;
-		}
+	/* Setup the resampler.
+	 */
+	int	 error;
+
+	ratio = Float(this->format.rate) / Float(format.rate);
+	state = ex_src_new(config->GetIntValue(ConfigureResample::ConfigID, "Converter", SRC_SINC_MEDIUM_QUALITY), format.channels, &error);
+
+	if (state == NIL)
+	{
+		errorState  = True;
+		errorString = ex_src_strerror(error);
+
+		delete converter;
+
+		return False;
 	}
 
 	return True;
@@ -98,12 +125,13 @@ Bool BoCA::DSPResample::Activate()
 
 Bool BoCA::DSPResample::Deactivate()
 {
-	if (state != NIL)
-	{
-		ex_src_delete(state);
+	if (state == NIL) return True;
 
-		state = NIL;
-	}
+	ex_src_delete(state);
+
+	state = NIL;
+
+	delete converter;
 
 	return True;
 }
@@ -112,6 +140,12 @@ Int BoCA::DSPResample::TransformData(Buffer<UnsignedByte> &data)
 {
 	if (state == NIL) return data.Size();
 
+	/* Perform format conversion.
+	 */
+	converter->Transform(data);
+
+	/* Setup resampler data.
+	 */
 	SRC_DATA	 src_data = { 0 };
 
 	src_data.end_of_input	= 0;
@@ -139,17 +173,25 @@ Int BoCA::DSPResample::Flush(Buffer<UnsignedByte> &data)
 {
 	if (state == NIL) return 0;
 
+	/* Flush format converter.
+	 */
+	converter->Finish(data);
+
+	/* Setup resampler data.
+	 */
 	SRC_DATA	 src_data = { 0 };
 
 	src_data.end_of_input	= 1;
 	src_data.src_ratio	= ratio;
-	src_data.input_frames	= 0;
+	src_data.input_frames	= data.Size() / sizeof(float) / format.channels;
 	src_data.output_frames	= format.rate;
 
 	output.Resize(src_data.output_frames * format.channels);
 
-	src_data.data_in	= (float *) NIL + 1; // Library needs a non-NULL pointer even if input_frames is 0.
+	src_data.data_in	= (float *) (UnsignedByte *) data;
 	src_data.data_out	= output;
+
+	if (src_data.data_in == NIL) src_data.data_in = (float *) NIL + 1; // Library needs a non-NULL pointer even if input_frames is 0.
 
 	/* Flush input and copy to output.
 	 */
