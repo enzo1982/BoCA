@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -47,22 +47,32 @@ BoCA::LayerLengthStatus::LayerLengthStatus()
 	UpdateLengthDisplays();
 	SetOrientation(OR_UPPERRIGHT);
 
-	JobList::Get()->onApplicationAddTrack.Connect(&LayerLengthStatus::OnApplicationAddTrack, this);
-	JobList::Get()->onApplicationRemoveTrack.Connect(&LayerLengthStatus::OnApplicationRemoveTrack, this);
-	JobList::Get()->onApplicationMarkTrack.Connect(&LayerLengthStatus::OnApplicationMarkTrack, this);
-	JobList::Get()->onApplicationUnmarkTrack.Connect(&LayerLengthStatus::OnApplicationUnmarkTrack, this);
+	/* Connect slots.
+	 */
+	JobList	*joblist = JobList::Get();
 
-	JobList::Get()->onApplicationRemoveAllTracks.Connect(&LayerLengthStatus::OnApplicationRemoveAllTracks, this);
+	joblist->onApplicationAddTrack.Connect(&LayerLengthStatus::OnApplicationAddTrack, this);
+	joblist->onApplicationModifyTrack.Connect(&LayerLengthStatus::OnApplicationModifyTrack, this);
+	joblist->onApplicationRemoveTrack.Connect(&LayerLengthStatus::OnApplicationRemoveTrack, this);
+	joblist->onApplicationMarkTrack.Connect(&LayerLengthStatus::OnApplicationMarkTrack, this);
+	joblist->onApplicationUnmarkTrack.Connect(&LayerLengthStatus::OnApplicationUnmarkTrack, this);
+
+	joblist->onApplicationRemoveAllTracks.Connect(&LayerLengthStatus::OnApplicationRemoveAllTracks, this);
 }
 
 BoCA::LayerLengthStatus::~LayerLengthStatus()
 {
-	JobList::Get()->onApplicationAddTrack.Disconnect(&LayerLengthStatus::OnApplicationAddTrack, this);
-	JobList::Get()->onApplicationRemoveTrack.Disconnect(&LayerLengthStatus::OnApplicationRemoveTrack, this);
-	JobList::Get()->onApplicationMarkTrack.Disconnect(&LayerLengthStatus::OnApplicationMarkTrack, this);
-	JobList::Get()->onApplicationUnmarkTrack.Disconnect(&LayerLengthStatus::OnApplicationUnmarkTrack, this);
+	/* Disconnect slots.
+	 */
+	JobList	*joblist = JobList::Get();
 
-	JobList::Get()->onApplicationRemoveAllTracks.Disconnect(&LayerLengthStatus::OnApplicationRemoveAllTracks, this);
+	joblist->onApplicationAddTrack.Disconnect(&LayerLengthStatus::OnApplicationAddTrack, this);
+	joblist->onApplicationModifyTrack.Disconnect(&LayerLengthStatus::OnApplicationModifyTrack, this);
+	joblist->onApplicationRemoveTrack.Disconnect(&LayerLengthStatus::OnApplicationRemoveTrack, this);
+	joblist->onApplicationMarkTrack.Disconnect(&LayerLengthStatus::OnApplicationMarkTrack, this);
+	joblist->onApplicationUnmarkTrack.Disconnect(&LayerLengthStatus::OnApplicationUnmarkTrack, this);
+
+	joblist->onApplicationRemoveAllTracks.Disconnect(&LayerLengthStatus::OnApplicationRemoveAllTracks, this);
 
 	DeleteObject(display_selected);
 	DeleteObject(display_unselected);
@@ -159,6 +169,44 @@ Void BoCA::LayerLengthStatus::OnApplicationAddTrack(const Track &track)
 
 	AddTrack(track, seconds, approx, unknown);
 	AddTrack(track, seconds_selected, approx_selected, unknown_selected);
+
+	UpdateLengthDisplays();
+}
+
+/* Called when a track is modified in the application joblist.
+ * ----
+ * Updates track entries.
+ */
+Void BoCA::LayerLengthStatus::OnApplicationModifyTrack(const Track &track)
+{
+	const Track	&knownTrack = tracks.Get(track.GetTrackID());
+
+	RemoveTrack(knownTrack, seconds, approx, unknown);
+	AddTrack(track, seconds, approx, unknown);
+
+	tracks.Remove(track.GetTrackID());
+	tracks.Add(track, track.GetTrackID());
+
+	if (tracks_selected.Get(track.GetTrackID()) != NIL)
+	{
+		const Track	&knownTrack = tracks_selected.Get(track.GetTrackID());
+
+		RemoveTrack(knownTrack, seconds_selected, approx_selected, unknown_selected);
+		AddTrack(track, seconds_selected, approx_selected, unknown_selected);
+
+		tracks_selected.Remove(track.GetTrackID());
+		tracks_selected.Add(track, track.GetTrackID());
+	}
+	else if (tracks_unselected.Remove(track.GetTrackID()) != NIL)
+	{
+		const Track	&knownTrack = tracks_unselected.Get(track.GetTrackID());
+
+		RemoveTrack(knownTrack, seconds_unselected, approx_unselected, unknown_unselected);
+		AddTrack(track, seconds_unselected, approx_unselected, unknown_unselected);
+
+		tracks_unselected.Remove(track.GetTrackID());
+		tracks_unselected.Add(track, track.GetTrackID());
+	}
 
 	UpdateLengthDisplays();
 }

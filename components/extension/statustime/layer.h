@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -55,6 +55,7 @@ namespace BoCA
 			const String		&GetLengthString(Int64, Int, Int);
 		slots:
 			Void			 OnApplicationAddTrack(const Track &);
+			Void			 OnApplicationModifyTrack(const Track &);
 			Void			 OnApplicationRemoveTrack(const Track &);
 			Void			 OnApplicationMarkTrack(const Track &);
 			Void			 OnApplicationUnmarkTrack(const Track &);
