@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -21,6 +21,13 @@
 using namespace smooth::System;
 using namespace smooth::IO;
 using namespace smooth::GUI::Dialogs;
+
+static const String	&kDelimiter = Directory::GetDirectoryDelimiter();
+static const String	 kSlash	    = "/";
+static const String	 kBackslash = "\\";
+static const String	 kDot	    = ".";
+static const String	 kDots	    = "..";
+static const String	 kSpace	    = " ";
 
 /* Print an informational message.
  */
@@ -84,7 +91,7 @@ String BoCA::Utilities::GetBoCADirectory()
 	if (!bocaDirectory.Exists()) bocaDirectory = String(BOCA_INSTALL_PREFIX).Append("/lib/boca");
 #endif
 
-	return String(bocaDirectory).Append(Directory::GetDirectoryDelimiter());
+	return String(bocaDirectory).Append(kDelimiter);
 }
 
 /* Locates and loads a codec library.
@@ -165,10 +172,12 @@ String BoCA::Utilities::GetNonUnicodeTempFileName(const String &file)
  */
 String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string, Bool useUnicode, Bool replaceSlashes, Bool replaceSpaces)
 {
-	String	 result;
+	String	 result = string;
 	Int	 length = string.Length();
 
-	for (Int i = 0, p = 0; i < length; i++, p++)
+	Int	 i = 0, p = 0;
+
+	for (; i < length; i++, p++)
 	{
 		wchar_t	 character = string[i];
 
@@ -197,8 +206,10 @@ String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string, Bool
 		}
 #endif
 		else if (character >= 256  && !useUnicode)     result[p] = '#';
-		else					       result[p] = character;
+		else if (p != i)			       result[p] = character;
 	}
+
+	if (p < i) result[p] = 0;
 
 	return result;
 }
@@ -227,7 +238,7 @@ Bool BoCA::Utilities::IsFolderWritable(const String &path)
 
 	Bool		 result	= False;
 	Directory	 folder = path;
-	String		 file	= String(folder).Append(Directory::GetDirectoryDelimiter()).Append(String::FromInt(Math::Random())).Append(".temp");
+	String		 file	= String(folder).Append(kDelimiter).Append(String::FromInt(Math::Random())).Append(".temp");
 	OutStream	 temp(STREAM_FILE, file, OS_REPLACE);
 
 	if (temp.GetLastError() == IO_ERROR_OK) result = True;
@@ -259,7 +270,7 @@ String BoCA::Utilities::GetAbsolutePathName(const String &path)
 	 */
 	String	 personalFiles = S::System::System::GetPersonalFilesDirectory();
 
-	if (personalFiles.EndsWith(Directory::GetDirectoryDelimiter())) personalFiles[personalFiles.Length() - 1] = 0;
+	if (personalFiles.EndsWith(kDelimiter)) personalFiles[personalFiles.Length() - 1] = 0;
 
 	pathName.Replace("<profile>", personalFiles);
 
@@ -267,7 +278,7 @@ String BoCA::Utilities::GetAbsolutePathName(const String &path)
 	 */
 	if (IsRelativePath(pathName)) pathName = GUI::Application::GetApplicationDirectory().Append(pathName);
 
-	if (!pathName.EndsWith(Directory::GetDirectoryDelimiter())) pathName.Append(Directory::GetDirectoryDelimiter());
+	if (!pathName.EndsWith(kDelimiter)) pathName.Append(kDelimiter);
 
 	return pathName;
 }
@@ -286,12 +297,12 @@ String BoCA::Utilities::NormalizeFileName(const String &fileName)
 
 	/* Normalize directory delimiters.
 	 */
-	path.Replace("\\", Directory::GetDirectoryDelimiter());
-	path.Replace("/",  Directory::GetDirectoryDelimiter());
+	path.Replace(kBackslash, kDelimiter);
+	path.Replace(kSlash,	 kDelimiter);
 
 	/* Split path into components and process those.
 	 */
-	const Array<String>	&components = path.Explode(Directory::GetDirectoryDelimiter());
+	const Array<String>	&components = path.Explode(kDelimiter);
 
 	foreach (String component, components)
 	{
@@ -303,25 +314,25 @@ String BoCA::Utilities::NormalizeFileName(const String &fileName)
 
 			/* Remove trailing dots and spaces.
 			 */
-			if (component != ".." && component != ".") while (component.EndsWith(".") || component.EndsWith(" ")) component[component.Length() - 1] = 0;
+			if (component != kDots && component != kDot) while (component.EndsWith(kDot) || component.EndsWith(kSpace)) component[component.Length() - 1] = 0;
 		}
 		else if (foreachindex == components.Length() - 1)
 		{
 			String	 trimmed = component;
 
-			while (trimmed.EndsWith(" ")) trimmed[trimmed.Length() - 1] = 0;
+			while (trimmed.EndsWith(kSpace)) trimmed[trimmed.Length() - 1] = 0;
 
 			if (component.Length() > maxFileLength) component[maxFileLength] = 0;
 
 			/* Remove trailing spaces if we cut the end off of the file name.
 			 */
-			if (component.Length() < trimmed.Length()) while (component.EndsWith(" ")) component[component.Length() - 1] = 0;
+			if (component.Length() < trimmed.Length()) while (component.EndsWith(kSpace)) component[component.Length() - 1] = 0;
 		}
 
 		/* Append component back to path.
 		 */
 		if (foreachindex == 0) path = component;
-		else		       path.Append(Directory::GetDirectoryDelimiter()).Append(component);
+		else		       path.Append(kDelimiter).Append(component);
 	}
 
 	return path;
@@ -382,7 +393,7 @@ String BoCA::Utilities::GetRelativeFileName(const String &trackFileName, const S
 	    !relativeFileName.StartsWith("\\\\") && // Network resource
 	    !relativeFileName.Contains("://"))	    // Protocol
 	{
-		for (Int m = 0; m < furtherComponents; m++) relativeFileName = String("..").Append(Directory::GetDirectoryDelimiter()).Append(relativeFileName);
+		for (Int m = 0; m < furtherComponents; m++) relativeFileName = String(kDots).Append(kDelimiter).Append(relativeFileName);
 	}
 
 	return relativeFileName;
@@ -402,7 +413,7 @@ String BoCA::Utilities::GetCDTrackFileName(const Track &track)
 #ifdef __WIN32__
 	for (Int drive = 2; drive < 26; drive++)
 	{
-		String	 trackCDA = String(" ").Append(":\\track").Append(track.cdTrack < 10 ? "0" : NIL).Append(String::FromInt(track.cdTrack)).Append(".cda");
+		String	 trackCDA = String(kSpace).Append(":\\track").Append(track.cdTrack < 10 ? "0" : NIL).Append(String::FromInt(track.cdTrack)).Append(".cda");
 
 		trackCDA[0] = drive + 'A';
 

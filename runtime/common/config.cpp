@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,6 +24,8 @@ namespace BoCA
 			~ApplicationConfig();
 	};
 };
+
+static const String	 kSeparator = "::";
 
 BoCA::Config			*BoCA::Config::instance = NIL;
 Array<BoCA::Config *, Void *>	 BoCA::Config::copies;
@@ -50,8 +52,8 @@ BoCA::Config::Config(const Config &oConfig)
 	{
 		const String &nthID = oConfig.persistentIntIDs.GetNth(i);
 
-		String	 section = nthID.Head(nthID.Find("::"));
-		String	 name	 = nthID.Tail(nthID.Length() - nthID.Find("::") - 2);
+		String	 section = nthID.Head(nthID.Find(kSeparator));
+		String	 name	 = nthID.Tail(nthID.Length() - nthID.Find(kSeparator) - 2);
 
 		config->SetIntValue(section, name, *oConfig.persistentIntValues.GetNth(i));
 	}
@@ -159,7 +161,7 @@ String BoCA::Config::GetStringValue(const String &section, const String &name, c
 
 Int BoCA::Config::FindPersistentIntValueIndex(const String &section, const String &name) const
 {
-	String	 id = String(section).Append("::").Append(name);
+	String	 id = String(section).Append(kSeparator).Append(name);
 
 	for (Int i = 0; i < persistentIntIDs.Length(); i++)
 	{
@@ -182,7 +184,7 @@ Int &BoCA::Config::GetPersistentIntValue(const String &section, const String &na
 	Int	*value = new Int(GetIntValue(section, name, defaultValue));
 
 	persistentIntValues.Add(value);
-	persistentIntIDs.Add(String(section).Append("::").Append(name));
+	persistentIntIDs.Add(String(section).Append(kSeparator).Append(name));
 
 	return *(persistentIntValues.GetLast());
 }
@@ -204,7 +206,7 @@ Bool BoCA::Config::SaveSettings()
 	{
 		const String	&nthID = persistentIntIDs.GetNth(i);
 
-		config->SetIntValue(nthID.Head(nthID.Find("::")), nthID.Tail(nthID.Length() - nthID.Find("::") - 2), *persistentIntValues.GetNth(i));
+		config->SetIntValue(nthID.Head(nthID.Find(kSeparator)), nthID.Tail(nthID.Length() - nthID.Find(kSeparator) - 2), *persistentIntValues.GetNth(i));
 	}
 
 	String	 configurationName = config->GetConfigurationName();
@@ -257,7 +259,7 @@ Int BoCA::Config::SetActiveConfiguration(const String &nConfig)
 		{
 			const String	&nthID = persistentIntIDs.GetNth(i);
 
-			*persistentIntValues.GetNth(i) = config->GetIntValue(nthID.Head(nthID.Find("::")), nthID.Tail(nthID.Length() - nthID.Find("::") - 2), *persistentIntValues.GetNth(i));
+			*persistentIntValues.GetNth(i) = config->GetIntValue(nthID.Head(nthID.Find(kSeparator)), nthID.Tail(nthID.Length() - nthID.Find(kSeparator) - 2), *persistentIntValues.GetNth(i));
 		}
 	}
 
