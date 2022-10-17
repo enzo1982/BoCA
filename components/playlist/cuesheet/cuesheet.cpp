@@ -166,7 +166,7 @@ Error BoCA::PlaylistCueSheet::WritePlaylist(const String &file)
 
 		/* Save index.
 		 */
-		Int	 minutes =  track.sampleOffset								      / format.rate / 60;
+		Int64	 minutes =  track.sampleOffset								      / format.rate / 60;
 		Int	 seconds = (track.sampleOffset				 - (minutes * 60 * format.rate))      / format.rate	;
 		Int	 frames  = (track.sampleOffset - (seconds * format.rate) - (minutes * 60 * format.rate)) * 75 / format.rate	;
 
