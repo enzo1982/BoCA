@@ -42,13 +42,14 @@
  * Holds memory manager implementation.
  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "UriConfig.h"  /* for HAVE_REALLOCARRAY */
 
 #ifdef HAVE_REALLOCARRAY
 # ifndef _GNU_SOURCE
 #  define _GNU_SOURCE 1
+# endif
+# ifdef __NetBSD__
+#  define _OPENBSD_SOURCE 1
 # endif
 #endif
 
