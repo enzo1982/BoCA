@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -61,11 +61,12 @@ Bool BoCA::DSPChannels::Activate()
 
 	/* Check output format.
 	 *
-	 *   Supported: 7.1 => 5.1 => 2.1 => Stereo => Mono
-	 *		7.1 => 5.1 => 4.0 => Stereo => Mono
+	 *   Supported: 7.1/6.1 => 5.1 => 2.1 => Stereo => Mono
+	 *		7.1/6.1 => 5.1 => 4.0 => Stereo => Mono
 	 *		Mono => Stereo
 	 */
 	if (!(format.channels == 8 && (channels == 6 || channels <= 4)) &&
+	    !(format.channels == 7 && (channels == 6 || channels <= 4)) &&
 	    !(format.channels == 6 &&			channels <= 4 ) &&
 	    !(format.channels <= 4 &&			channels <= 2 ))
 	{
@@ -120,6 +121,32 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 			}
 
 			data.Resize(data.Size() / 4 * 3);
+
+			source = 6;
+		}
+
+		/* 6.1 source.
+		 */
+		if (source == 7 && target <= 6)
+		{
+			/* Convert 6.1 to 5.1.
+			 */
+			for (Int i = 0; i < numSamples; i++)
+			{
+				Float32	 fl = samples[i * 7    ], fr  = samples[i * 7 + 1];
+				Float32	 fc = samples[i * 7 + 2], lfe = samples[i * 7 + 3];
+				Float32	 rc = samples[i * 7 + 4];
+				Float32	 sl = samples[i * 7 + 5], sr  = samples[i * 7 + 6];
+
+				samples[i * 6	 ] = fl;
+				samples[i * 6 + 1] = fr;
+				samples[i * 6 + 2] = fc;
+				samples[i * 6 + 3] = lfe;
+				samples[i * 6 + 4] = Math::Min(1.0, Math::Max(-1.0, sl + rc * 0.708));
+				samples[i * 6 + 5] = Math::Min(1.0, Math::Max(-1.0, sr + rc * 0.708));
+			}
+
+			data.Resize(data.Size() / 7 * 6);
 
 			source = 6;
 		}
