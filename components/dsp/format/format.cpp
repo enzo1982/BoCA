@@ -186,7 +186,7 @@ Void BoCA::DSPFormat::TransformSamples(const UnsignedByte *in, const Format &inF
 	{
 		for (Int i = 0; i < numSamples; i++)
 		{
-			samples[i] += 1 << (31 - outFormat.bits);
+			if (outFormat.bits < 32) samples[i] += 1 << (31 - outFormat.bits);
 
 			/* Clip out of range samples.
 			 */
