@@ -68,8 +68,7 @@ Bool BoCA::AS::EncoderComponentExternal::Activate()
 	 */
 	Format	 target = FormatConverter::GetBestTargetFormat(track.GetFormat(), this);
 
-	if (target.bits == 8)	 target.sign = False;
-	if (target.fp	== True) target.fp   = False;
+	if (target.bits == 8) target.sign = False;
 
 	converter = new FormatConverter(track.GetFormat(), target);
 	format	  = target;
