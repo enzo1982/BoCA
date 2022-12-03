@@ -116,8 +116,8 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 				samples[i * 6 + 1] = fr;
 				samples[i * 6 + 2] = fc;
 				samples[i * 6 + 3] = lfe;
-				samples[i * 6 + 4] = Math::Min(1.0, Math::Max(-1.0, sl + rl * 0.871));
-				samples[i * 6 + 5] = Math::Min(1.0, Math::Max(-1.0, sr + rr * 0.871));
+				samples[i * 6 + 4] = sl + rl * 0.871;
+				samples[i * 6 + 5] = sr + rr * 0.871;
 			}
 
 			data.Resize(data.Size() / 4 * 3);
@@ -142,8 +142,8 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 				samples[i * 6 + 1] = fr;
 				samples[i * 6 + 2] = fc;
 				samples[i * 6 + 3] = lfe;
-				samples[i * 6 + 4] = Math::Min(1.0, Math::Max(-1.0, sl + rc * 0.708));
-				samples[i * 6 + 5] = Math::Min(1.0, Math::Max(-1.0, sr + rc * 0.708));
+				samples[i * 6 + 4] = sl + rc * 0.708;
+				samples[i * 6 + 5] = sr + rc * 0.708;
 			}
 
 			data.Resize(data.Size() / 7 * 6);
@@ -163,8 +163,8 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 				Float32	 fc = samples[i * 6 + 2], lfe = samples[i * 6 + 3];
 				Float32	 rl = samples[i * 6 + 4], rr  = samples[i * 6 + 5];
 
-				samples[i * 2	 ] = Math::Min(1.0, Math::Max(-1.0, fl + (fc + lfe + rl) * 0.708));
-				samples[i * 2 + 1] = Math::Min(1.0, Math::Max(-1.0, fr + (fc + lfe + rr) * 0.708));
+				samples[i * 2	 ] = fl + (fc + lfe + rl) * 0.708;
+				samples[i * 2 + 1] = fr + (fc + lfe + rr) * 0.708;
 			}
 
 			data.Resize(data.Size() / 3);
@@ -181,8 +181,8 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 				Float32	 fc = samples[i * 6 + 2], lfe = samples[i * 6 + 3];
 				Float32	 rl = samples[i * 6 + 4], rr  = samples[i * 6 + 5];
 
-				samples[i * 3	 ] = Math::Min(1.0, Math::Max(-1.0, fl + (fc + rl) * 0.708));
-				samples[i * 3 + 1] = Math::Min(1.0, Math::Max(-1.0, fr + (fc + rr) * 0.708));
+				samples[i * 3	 ] = fl + (fc + rl) * 0.708;
+				samples[i * 3 + 1] = fr + (fc + rr) * 0.708;
 				samples[i * 3 + 2] = lfe;
 			}
 
@@ -198,8 +198,8 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 				Float32	 fc = samples[i * 6 + 2], lfe = samples[i * 6 + 3];
 				Float32	 rl = samples[i * 6 + 4], rr  = samples[i * 6 + 5];
 
-				samples[i * 4	 ] = Math::Min(1.0, Math::Max(-1.0, fl + (fc + lfe) * 0.708));
-				samples[i * 4 + 1] = Math::Min(1.0, Math::Max(-1.0, fr + (fc + lfe) * 0.708));
+				samples[i * 4	 ] = fl + (fc + lfe) * 0.708;
+				samples[i * 4 + 1] = fr + (fc + lfe) * 0.708;
 				samples[i * 4 + 2] = rl;
 				samples[i * 4 + 3] = rr;
 			}
@@ -218,8 +218,8 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 				Float32	 fl = samples[i * 4    ], fr = samples[i * 4 + 1];
 				Float32	 rl = samples[i * 4 + 2], rr = samples[i * 4 + 3];
 
-				samples[i * 2	 ] = Math::Min(1.0, Math::Max(-1.0, fl + rl * 0.708));
-				samples[i * 2 + 1] = Math::Min(1.0, Math::Max(-1.0, fr + rr * 0.708));
+				samples[i * 2	 ] = fl + rl * 0.708;
+				samples[i * 2 + 1] = fr + rr * 0.708;
 			}
 
 			data.Resize(data.Size() / 2);
@@ -239,8 +239,8 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 				Float32	 r   = samples[i * 3 + 1];
 				Float32	 lfe = samples[i * 3 + 2];
 
-				samples[i * 2	 ] = Math::Min(1.0, Math::Max(-1.0, l + lfe * 0.708));
-				samples[i * 2 + 1] = Math::Min(1.0, Math::Max(-1.0, r + lfe * 0.708));
+				samples[i * 2	 ] = l + lfe * 0.708;
+				samples[i * 2 + 1] = r + lfe * 0.708;
 			}
 
 			data.Resize(data.Size() / 3 * 2);
@@ -259,7 +259,7 @@ Int BoCA::DSPChannels::TransformData(Buffer<UnsignedByte> &data)
 				Float32	 l = samples[i * 2    ];
 				Float32	 r = samples[i * 2 + 1];
 
-				samples[i] = Math::Min(1.0, Math::Max(-1.0, (l + r) * 0.5));
+				samples[i] = (l + r) * 0.5;
 			}
 
 			data.Resize(data.Size() / 2);
