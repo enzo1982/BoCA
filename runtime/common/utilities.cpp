@@ -495,3 +495,51 @@ Bool BoCA::Utilities::ChangeChannelOrder(Buffer<UnsignedByte> &buffer, const For
 
 	return True;
 }
+
+Bool BoCA::Utilities::StringMatchesPattern(const String &string, const String &pattern)
+{
+	Int	 stringLength  = string.Length();
+	Int	 stringPos     = 0;
+
+	Int	 patternLength = pattern.Length();
+	Int	 patternPos    = 0;
+
+	while (stringPos < stringLength)
+	{
+		if (pattern[patternPos] == '*')
+		{
+			while (pattern[patternPos] == '*') patternPos++;
+
+			if (patternPos == patternLength) break;
+
+			String	 remainingPattern = pattern.Tail(patternLength - patternPos);
+			String	 nextChar	  = pattern.SubString(patternPos, 1);
+
+			for (; stringPos < stringLength; stringPos++)
+			{
+				Int	 remainingPos = nextChar == '?' ? 0 : string.Tail(stringLength - stringPos).Find(nextChar);
+
+				if (remainingPos == -1) return False;
+
+				if (StringMatchesPattern(string.Tail(stringLength - (stringPos + remainingPos)), remainingPattern)) return True;
+
+				stringPos += remainingPos;
+			}
+		}
+		else if (string[stringPos] == pattern[patternPos] || pattern[patternPos] == '?')
+		{
+			stringPos++;
+			patternPos++;
+		}
+		else
+		{
+			return False;
+		}
+	}
+
+	while (pattern[patternPos] == '*') patternPos++;
+
+	if (patternPos == patternLength) return True;
+
+	return False;
+}

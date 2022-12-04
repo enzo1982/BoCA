@@ -163,18 +163,28 @@ Bool BoCA::Track::LoadCoverArtFiles()
 
 	if (config->GetIntValue("Tags", "CoverArtReadFromFiles", True))
 	{
-		Directory		 directory = File(fileName).GetFilePath();
-		const Array<File>	&jpgFiles = directory.GetFilesByPattern("*.jpg");
+		Directory	 directory = File(fileName).GetFilePath();
+		String		 fileNames = "*";
 
-		foreach (const File &file, jpgFiles) LoadCoverArtFile(file);
+		if (config->GetIntValue("Tags", "CoverArtRestrictFilenames", True)) fileNames = config->GetStringValue("Tags", "CoverArtFilenames", "folder;*cover*;*albumart*;*front*;*back*;*inside*;*cd*;*disc*;*booklet*");
 
-		const Array<File>	&jpegFiles = directory.GetFilesByPattern("*.jpeg");
+		const Array<String>	&patterns   = fileNames.Explode(";");
+		const Array<String>	&extensions = String("jpg;jpeg;png").Explode(";");
 
-		foreach (const File &file, jpegFiles) LoadCoverArtFile(file);
+		foreach (const String &extension, extensions)
+		{
+			const Array<File>	&files = directory.GetFilesByPattern(String("*.").Append(extension));
 
-		const Array<File>	&pngFiles = directory.GetFilesByPattern("*.png");
+			foreach (const File &file, files)
+			{
+				String	 fileName = file.GetFileName().ToLower();
 
-		foreach (const File &file, pngFiles) LoadCoverArtFile(file);
+				foreach (const String &pattern, patterns)
+				{
+					if (Utilities::StringMatchesPattern(fileName, pattern.ToLower())) LoadCoverArtFile(file);
+				}
+			}
+		}
 	}
 
 	return True;
@@ -185,7 +195,7 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 	/* Check if file size is within limits.
 	 */
 	Config	*config	     = Config::Get();
-	Int	 maxFileSize = config->GetIntValue("Tags", "CoverArtMaxFileSize", 100) * 1024;
+	Int	 maxFileSize = config->GetIntValue("Tags", "CoverArtMaxFileSize", 250) * 1024;
 
 	if (maxFileSize > 0 && File(file).GetFileSize() > maxFileSize) return False;
 
