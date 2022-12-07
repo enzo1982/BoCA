@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -163,7 +163,7 @@ Int BoCA::MCDI::GetNumberOfDataTracks() const
 
 String BoCA::MCDI::GetOffsetString() const
 {
-	String	 offsets = Number((Int64) GetNumberOfEntries()).ToHexString();
+	String	 offsets = Number((Int64) GetNumberOfAudioTracks()).ToHexString();
 
 	for (Int i = 0; i <= GetNumberOfEntries(); i++)
 	{
