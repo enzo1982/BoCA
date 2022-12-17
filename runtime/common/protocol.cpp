@@ -12,6 +12,17 @@
 
 #include <boca/common/protocol.h>
 
+namespace BoCA
+{
+	struct CallbackInfo
+	{
+		Protocol		*protocol;
+		Array<String>		 messages;
+		Array<MessageType>	 types;
+		Array<Int64>		 ticks;
+	};
+}
+
 Array<BoCA::Protocol *>		 BoCA::Protocol::protocols;
 
 Signal0<Void>			 BoCA::Protocol::onUpdateProtocolList;
@@ -37,21 +48,62 @@ Void BoCA::Protocol::Release()
 	mutex.Release();
 }
 
+Void BoCA::Protocol::WriteMessage(Protocol *protocol, const String &message, MessageType messageType, Int64 ticks)
+{
+	protocol->messages.Add(String(ticks / 1000 / 60 / 60 <  10 ?				 "0"  : "").Append(String::FromInt(ticks / 1000 / 60 / 60)).Append(":")
+			      .Append(ticks / 1000 / 60 % 60 <  10 ?				 "0"  : "").Append(String::FromInt(ticks / 1000 / 60 % 60)).Append(":")
+			      .Append(ticks / 1000 % 60	     <  10 ?				 "0"  : "").Append(String::FromInt(ticks / 1000 % 60     )).Append(".")
+			      .Append(ticks % 1000	     < 100 ? (ticks % 1000 < 10 ? "00" : "0") : "").Append(String::FromInt(ticks % 1000		 )).Append(" - ").Append(message));
+
+	if	(messageType == MessageTypeWarning) protocol->warnings.Add(message);
+	else if (messageType == MessageTypeError)   protocol->errors.Add(message);
+}
+
 Int BoCA::Protocol::Write(const String &message, MessageType messageType)
 {
+	static Array<CallbackInfo *>	 callbackInfos;
+
 	UnsignedInt64	 ticks = S::System::System::Clock() - startTicks;
 
 	Lock();
 
-	messages.Add(String(ticks / 1000 / 60 / 60 <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 / 60 / 60)).Append(":")
-		    .Append(ticks / 1000 / 60 % 60 <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 / 60 % 60)).Append(":")
-		    .Append(ticks / 1000 % 60	   <  10 ?			       "0"  : "").Append(String::FromInt(ticks / 1000 % 60     )).Append(".")
-		    .Append(ticks % 1000	   < 100 ? (ticks % 1000 < 10 ? "00" : "0") : "").Append(String::FromInt(ticks % 1000	       )).Append(" - ").Append(message));
+	/* Check if we are called from a callback.
+	 */
+	foreach (CallbackInfo *callbackInfo, callbackInfos)
+	{
+		if (callbackInfo->protocol != this) continue;
 
-	if	(messageType == MessageTypeWarning) warnings.Add(message);
-	else if (messageType == MessageTypeError)   errors.Add(message);
+		callbackInfo->messages.Add(message);
+		callbackInfo->types.Add(messageType);
+		callbackInfo->ticks.Add(ticks);
+
+		Release();
+
+		return Success();
+	}
+
+	/* Write message to protocol.
+	 */
+	WriteMessage(this, message, messageType, ticks);
+
+	/* Add callback info and trigger callback.
+	 */
+	CallbackInfo	 callbackInfo = { this };
+
+	Int	 index = callbackInfos.Add(&callbackInfo);
 
 	onUpdateProtocol.Emit(name);
+
+	/* Check for messages added to the callback info.
+	 */
+	foreach (const String &message, callbackInfo.messages)
+	{
+		WriteMessage(this, message, callbackInfo.types.GetNth(foreachindex), callbackInfo.ticks.GetNth(foreachindex));
+
+		onUpdateProtocol.Emit(name);
+	}
+
+	callbackInfos.Remove(index);
 
 	Release();
 

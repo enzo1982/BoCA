@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -46,6 +46,8 @@ namespace BoCA
 
 								 Protocol(const String &);
 								~Protocol();
+
+			static Void				 WriteMessage(Protocol *, const String &, MessageType, Int64);
 		public:
 			Void					 Lock();
 			Void					 Release();
