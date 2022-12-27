@@ -5,6 +5,7 @@ set PATH=%CDK_INSTALL_PATH%\system-x64\usr\bin
 mkdir %CDK_INSTALL_PATH%\system-x64\tmp 2> nul
 
 set MSYSTEM=MINGW64
+set CMAKE_GENERATOR=MSYS Makefiles
 set BUILD_WIN32=True
 set BUILD_X86_64=True
 
