@@ -6,6 +6,10 @@
   <id>ffmpeg-webm_audio-dec</id>
   <type>decoder</type>
   <format>
+    <name>WebM Audio</name>
+    <extension>weba</extension>
+  </format>
+  <format>
     <name>WebM Video</name>
     <extension>webm</extension>
   </format>
