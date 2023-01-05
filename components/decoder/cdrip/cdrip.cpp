@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -199,10 +199,11 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	{
 		const CDInfo	&cdInfo = cdText.GetCDInfo();
 
+		info.SetOtherInfo(INFO_ALBUMARTIST, cdInfo.GetArtist());
+
 		info.title  = cdInfo.GetTrackTitle(trackNumber);
 		info.album  = cdInfo.GetTitle();
 		info.genre  = cdInfo.GetGenre();
-		info.isrc   = cdInfo.GetTrackISRC(trackNumber);
 
 		if	(cdInfo.GetTrackArtist(trackNumber)	 != NIL) info.artist  = cdInfo.GetTrackArtist(trackNumber);
 		else							 info.artist  = cdInfo.GetArtist();
@@ -227,6 +228,8 @@ Error BoCA::DecoderCDRip::GetStreamInfo(const String &streamURI, Track &track)
 	else if (config->GetIntValue(ConfigureCDRip::ConfigID, "ReadCDPlayerIni", True) && cdPlayer.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 	{
 		const CDInfo	&cdInfo = cdPlayer.GetCDInfo();
+
+		info.SetOtherInfo(INFO_ALBUMARTIST, cdInfo.GetArtist());
 
 		info.artist = cdInfo.GetArtist();
 		info.title  = cdInfo.GetTrackTitle(trackNumber);

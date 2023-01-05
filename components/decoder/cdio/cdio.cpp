@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -201,6 +201,8 @@ Error BoCA::DecoderCDIO::GetStreamInfo(const String &streamURI, Track &track)
 	if (config->GetIntValue(ConfigureCDIO::ConfigID, "ReadCDText", True) && cdText.GetCDInfo().GetTrackTitle(trackNumber) != NIL)
 	{
 		const CDInfo	&cdInfo = cdText.GetCDInfo();
+
+		info.SetOtherInfo(INFO_ALBUMARTIST, cdInfo.GetArtist());
 
 		info.title  = cdInfo.GetTrackTitle(trackNumber);
 		info.album  = cdInfo.GetTitle();
