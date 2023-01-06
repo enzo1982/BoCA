@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -147,23 +147,35 @@ Bool BoCA::DSPHDCD::IsHDCDContent()
 		}
 	}
 
-	/* Read up to one second of audio data.
+	/* Read beginning of audio data.
 	 */
-	Buffer<UnsignedByte>	 buffer(format.rate * format.channels * 2);
+	Buffer<UnsignedByte>	 buffer(2352);
 
-	Int16	*inSamples  = (Int16 *) (UnsignedByte *) buffer;
-	Int	 numSamples = stream->InputData(buffer, buffer.Size()) / 2;
+	Int		 numAudioSectors = 0;
+	Bool		 hdcdDetected	 = False;
+	hdcd_simple	*context	 = hdcd_new();
 
-	samplesBuffer.Resize(numSamples);
+	while (!hdcdDetected && numAudioSectors < 75)
+	{
+		Int16	*inSamples  = (Int16 *) (UnsignedByte *) buffer;
+		Int	 numSamples = stream->InputData(buffer, buffer.Size()) / 2;
+		Int64	 energy	    = 0;
 
-	for (Int i = 0; i < numSamples; i++) samplesBuffer[i] = inSamples[i];
+		samplesBuffer.Resize(numSamples);
 
-	/* Check for HDCD signaling codes in input.
-	 */
-	Bool		 hdcdDetected = False;
-	hdcd_simple	*context      = hdcd_new();
+		for (Int i = 0; i < numSamples; i++)
+		{
+			samplesBuffer[i] = inSamples[i];
 
-	if (hdcd_scan(context, samplesBuffer, numSamples / 2, 0) != HDCD_NONE) hdcdDetected = True;
+			energy += Math::Abs(inSamples[i]);
+		}
+
+		if (energy > numSamples * 256) numAudioSectors++;
+
+		/* Check for HDCD signaling codes in input.
+		 */
+		if (hdcd_scan(context, samplesBuffer, numSamples / 2, 0) != HDCD_NONE) hdcdDetected = True;
+	}
 
 	hdcd_free(context);
 
