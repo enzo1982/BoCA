@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -115,7 +115,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 
 	group_cdinfo		= new GroupBox(i18n->TranslateString("CD information"), Point(7, 144), Size(354, 65));
 
-	check_readCDText	= new CheckBox(i18n->TranslateString("Read CD Text"), Point(10, 11), Size(162, 0), &readCDText);
+	check_readCDText	= new CheckBox(i18n->TranslateString("Read CD-Text"), Point(10, 11), Size(162, 0), &readCDText);
 	check_readISRC		= new CheckBox(i18n->TranslateString("Read ISRC when adding tracks to joblist"), Point(10, 37), Size(333, 0), &readISRC);
 
 	check_readCDText->SetWidth(Math::Max(162, check_readCDText->GetUnscaledTextWidth() + 21));
