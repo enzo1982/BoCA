@@ -19,13 +19,13 @@ public:
     __forceinline CSmartPtr()
     {
         m_bDelete = true;
-        m_pObject = NULL;
+        m_pObject = APE_NULL;
         m_bArray = false;
     }
     __forceinline CSmartPtr(TYPE * pObject, bool bArray = false, bool bDelete = true)
     {
         m_bDelete = true;
-        m_pObject = NULL;
+        m_pObject = APE_NULL;
         m_bArray = false;
         Assign(pObject, bArray, bDelete);
     }
@@ -49,7 +49,7 @@ public:
         if (m_bDelete && m_pObject)
         {
             TYPE * pObject = m_pObject;
-            m_pObject = NULL;
+            m_pObject = APE_NULL;
 
             if (m_bArray)
                 delete [] pObject;

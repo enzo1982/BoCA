@@ -2,7 +2,7 @@
 
 /**************************************************************************************************
 Platform
- 
+
 One of the following platforms should be defined (either in code or as a project setting):
 PLATFORM_WINDOWS
 PLATFORM_APPLE
@@ -37,6 +37,24 @@ Warnings
 #include "Warnings.h"
 
 /**************************************************************************************************
+Override (define in MSVC)
+**************************************************************************************************/
+#ifdef _MSC_VER
+#define APE_OVERRIDE override
+#else
+#define APE_OVERRIDE
+#endif
+
+/**************************************************************************************************
+NULL (define to nullptr on all platforms)
+**************************************************************************************************/
+#if __cplusplus >= 201103L
+#define APE_NULL nullptr
+#else
+#define APE_NULL 0
+#endif
+
+/**************************************************************************************************
 Global includes
 **************************************************************************************************/
 #include <stdint.h>
@@ -54,7 +72,7 @@ Global includes
     #ifdef _MSC_VER
         #pragma warning(push) // push and pop warnings because the windows includes suppresses some like 4514
     #endif
-    #include <windows.h>
+    #include <Windows.h>
     #ifdef _MSC_VER
         #pragma warning(pop)
     #endif
@@ -71,7 +89,7 @@ Global includes
 #endif
 #define ape_max(a,b)    (((a) > (b)) ? (a) : (b))
 #define ape_min(a,b)    (((a) < (b)) ? (a) : (b))
-#define CLEAR(destination) memset(&destination, 0, sizeof (destination))
+#define APE_CLEAR(destination) memset(&destination, 0, sizeof(destination))
 
 /**************************************************************************************************
 Packing
@@ -93,13 +111,13 @@ Version
 #include "Version.h"
 
 // year in the copyright strings
-#define MAC_YEAR 2022
+#define MAC_YEAR 2023
 
 // build the version string
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
-#define MAC_VER_FILE_VERSION_STR                        STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION) 
-#define MAC_VER_FILE_VERSION_STR_NARROW                 STRINGIZE(MAC_VERSION_MAJOR) "." STRINGIZE(MAC_VERSION_REVISION) 
+#define MAC_VER_FILE_VERSION_STR                        STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION)
+#define MAC_VER_FILE_VERSION_STR_NARROW                 STRINGIZE(MAC_VERSION_MAJOR) "." STRINGIZE(MAC_VERSION_REVISION)
 
 #define MAC_FILE_VERSION_NUMBER                         3990
 #define MAC_VERSION_STRING                              MAC_VER_FILE_VERSION_STR
@@ -116,22 +134,6 @@ Version
 /**************************************************************************************************
 Global compiler settings (useful for porting)
 **************************************************************************************************/
-// assembly code (helps performance, but limits portability)
-#if defined __SSE2__
-    #define ENABLE_SSE_ASSEMBLY
-#endif
-
-#if defined __AVX2__
-    #define ENABLE_AVX_ASSEMBLY
-#endif
-
-#ifdef _MSC_VER // doesn't compile in gcc
-    #if defined(_M_IX86) || defined(_M_X64)
-        #define ENABLE_SSE_ASSEMBLY
-        #define ENABLE_AVX_ASSEMBLY
-    #endif
-#endif
-
 // APE_BACKWARDS_COMPATIBILITY is only needed for decoding APE 3.92 or earlier files.  It
 // has not been possible to make these files for over 10 years, so it's unlikely
 // that disabling APE_BACKWARDS_COMPATIBILITY would have any effect on a normal user.  For
@@ -160,7 +162,7 @@ namespace APE
     typedef uint32_t                                    uint32;
     typedef uint16_t                                    uint16;
     typedef uint8_t                                     uint8;
-    
+
     typedef int64_t                                     int64;
     typedef int32_t                                     int32;
     typedef int16_t                                     int16;
@@ -185,26 +187,30 @@ Global macros
 #define WAVE_FORMAT_ALAW 0x0006
 #define WAVE_FORMAT_MULAW 0x0007
 
-#define APE_TRUNCATE ((size_t)-1)
+// we use this to check for zero because Clang warns if we just equate a double with zero
+#define APE_DOUBLE_ZERO 0.00001
 
-#define POINTER_TO_INT64(POINTER) (int64)(uintptr_t)POINTER
+#define POINTER_TO_INT64(POINTER) static_cast<APE::int64>(reinterpret_cast<uintptr_t>(POINTER))
 
 #if defined(PLATFORM_WINDOWS)
     #define IO_USE_WIN_FILE_IO
     #define DLLEXPORT                                   __declspec(dllexport)
     #define SLEEP(MILLISECONDS)                         ::Sleep(MILLISECONDS)
     #define MESSAGEBOX(PARENT, TEXT, CAPTION, TYPE)     ::MessageBox(PARENT, TEXT, CAPTION, TYPE)
-    #define PUMP_MESSAGE_LOOP                           { MSG Msg; while (PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE) != 0) { TranslateMessage(&Msg); DispatchMessage(&Msg); } }
     #define ODS                                         OutputDebugString
     #define TICK_COUNT_TYPE                             unsigned long long
-    #define TICK_COUNT_READ(VARIABLE)                   VARIABLE = GetTickCount64()
+    #if _WIN32_WINNT >= 0x600
+        #define TICK_COUNT_READ(VARIABLE)               VARIABLE = GetTickCount64()
+    #else
+        #define TICK_COUNT_READ(VARIABLE)               VARIABLE = GetTickCount()
+    #endif
     #define TICK_COUNT_FREQ                             1000
 
     #if !defined(ASSERT)
         #if defined(_DEBUG)
             #define ASSERT(e)                            assert(e)
         #else
-            #define ASSERT(e)                            
+            #define ASSERT(e)
         #endif
     #endif
 #else
@@ -212,7 +218,6 @@ Global macros
     #define DLLEXPORT
     #define SLEEP(MILLISECONDS)                         { struct timespec t; t.tv_sec = (MILLISECONDS) / 1000; t.tv_nsec = (MILLISECONDS) % 1000 * 1000000; nanosleep(&t, NULL); }
     #define MESSAGEBOX(PARENT, TEXT, CAPTION, TYPE)
-    #define PUMP_MESSAGE_LOOP
     #undef  ODS
     #define ODS                                         printf
     #define TICK_COUNT_TYPE                             unsigned long long
@@ -238,18 +243,8 @@ WAVE format descriptor (binary compatible with Windows define, but in the APE na
 namespace APE
 {
     #pragma pack(push, 1)
-    typedef struct tWAVEFORMATEX
+    struct WAVEFORMATEX
     {
-        tWAVEFORMATEX() :
-            wFormatTag(0),
-            nChannels(0),
-            nSamplesPerSec(0),
-            nAvgBytesPerSec(0),
-            nBlockAlign(0),
-            wBitsPerSample(0),
-            cbSize(0)
-        {
-        }
         WORD        wFormatTag;         /* format type */
         WORD        nChannels;          /* number of channels (i.e. mono, stereo...) */
         uint32      nSamplesPerSec;     /* sample rate */
@@ -258,7 +253,7 @@ namespace APE
         WORD        wBitsPerSample;     /* number of bits per sample of mono data */
         WORD        cbSize;             /* the count in bytes of the size of */
         /* extra information (after cbSize) */
-    } WAVEFORMATEX;
+    };
     #pragma pack(pop)
 }
 
@@ -275,7 +270,7 @@ namespace APE
         MODE_CONVERT,
         MODE_MAKE_APL,
         MODE_CHECK,
-        MODE_COUNT,
+        MODE_COUNT
     };
 }
 
@@ -288,9 +283,11 @@ Global defines
 #else
     #define APE_FILENAME_SLASH '/'
 #endif
-#define BYTES_IN_KILOBYTE            1024
-#define BYTES_IN_MEGABYTE            (1024 * BYTES_IN_KILOBYTE)
-#define BYTES_IN_GIGABYTE            int64(1024 * BYTES_IN_MEGABYTE)
+#define APE_BYTES_IN_KILOBYTE            1024
+#define APE_BYTES_IN_MEGABYTE            1048576
+#define APE_BYTES_IN_GIGABYTE            APE::int64(1073741824)
+
+#define APE_WAV_HEADER_OR_FOOTER_MAXIMUM_BYTES (APE_BYTES_IN_MEGABYTE * 8)
 
 /**************************************************************************************************
 Byte order
@@ -308,23 +305,22 @@ Channels
 /**************************************************************************************************
 Macros
 **************************************************************************************************/
-#define MB(TEST) MESSAGEBOX(NULL, TEST, _T("Information"), MB_OK);
-#define MBN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d"), NUMBER); MESSAGEBOX(NULL, cNumber, _T("Information"), MB_OK); }
+#define MB(TEST) MESSAGEBOX(APE_NULL, TEST, _T("Information"), MB_OK);
+#define MBN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d"), NUMBER); MESSAGEBOX(APE_NULL, cNumber, _T("Information"), MB_OK); }
 
-#define SAFE_DELETE(POINTER) if (POINTER) { delete POINTER; POINTER = NULL; }
-#define SAFE_ARRAY_DELETE(POINTER) if (POINTER) { delete [] POINTER; POINTER = NULL; }
-#define SAFE_VOID_CLASS_DELETE(POINTER, Class) { Class *pClass = (Class *) POINTER; if (pClass) { delete pClass; POINTER = NULL; } }
-#define SAFE_FILE_CLOSE(HANDLE) if (HANDLE != INVALID_HANDLE_VALUE) { CloseHandle(HANDLE); HANDLE = INVALID_HANDLE_VALUE; }
+#define APE_SAFE_DELETE(POINTER) if (POINTER) { delete POINTER; POINTER = APE_NULL; }
+#define APE_SAFE_ARRAY_DELETE(POINTER) if (POINTER) { delete [] POINTER; POINTER = APE_NULL; }
+#define APE_SAFE_FILE_CLOSE(HANDLE) if (HANDLE != INVALID_HANDLE_VALUE) { CloseHandle(HANDLE); HANDLE = INVALID_HANDLE_VALUE; }
 
-#define ODN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d\n"), int(NUMBER)); ODS(cNumber); }
+#define ODN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d\n"), static_cast<int>(NUMBER)); ODS(cNumber); }
 
 #define CATCH_ERRORS(CODE) try { CODE } catch(...) { }
 
-#define RETURN_ON_ERROR(FUNCTION) {    int nFunctionResult = FUNCTION; if (nFunctionResult != 0) { return nFunctionResult; } }
+#define RETURN_ON_ERROR(FUNCTION) { const int nFunctionResult = static_cast<int>(FUNCTION); if (nFunctionResult != ERROR_SUCCESS) { return nFunctionResult; } }
 #define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nFunctionResult = FUNCTION; if (nFunctionResult != 0) { return VALUE; } }
 #define RETURN_ON_EXCEPTION(CODE, VALUE) { try { CODE } catch(...) { return VALUE; } }
 
-#define THROW_ON_ERROR(CODE) { intn nThrowResult = (intn) CODE; if (nThrowResult != 0) throw(nThrowResult); }
+#define THROW_ON_ERROR(CODE) { const intn nThrowResult = static_cast<intn> (CODE); if (nThrowResult != 0) throw(nThrowResult); }
 
 #define EXPAND_8_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE
 #define EXPAND_9_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE CODE

@@ -3,9 +3,9 @@
 #if !defined(PLATFORM_WINDOWS)
 
 // we treat bool as a global type, so don't declare it in the namespace
-#ifdef _MSC_VER
-    typedef int BOOL;
-#elif defined(PLATFORM_APPLE)
+#ifdef PLATFORM_APPLE
+    #include <AvailabilityMacros.h>
+
     #ifndef OBJC_BOOL_DEFINED
         #if OBJC_BOOL_IS_BOOL
             typedef bool BOOL;
@@ -16,6 +16,10 @@
 #else
     typedef unsigned char BOOL; // this is the way it's defined in X11
 #endif
+
+typedef wchar_t *           LPTSTR;
+typedef const wchar_t *     LPCTSTR;
+typedef wchar_t             TCHAR;
 
 namespace APE
 {
@@ -36,9 +40,6 @@ typedef float               FLOAT;
 typedef void *              HANDLE;
 typedef unsigned int        UINT;
 typedef long                LRESULT;
-typedef wchar_t *           LPTSTR;
-typedef const wchar_t *     LPCTSTR;
-typedef wchar_t             TCHAR;
 typedef struct _GUID {
     unsigned long  Data1;
     unsigned short Data2;
@@ -66,11 +67,17 @@ typedef struct _GUID {
 #define _totlower towlower
 #define _totupper towupper
 #define _tcschr wcschr
-#ifdef _MSC_VER
-#define _tcsicmp _wcsicmp
+
+#ifdef PLATFORM_APPLE
+    #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
+        #define _tcsicmp wcscasecmp
+    #else
+        #define _tcsicmp wcscmp // fall back to case sensitive comparison on Mac OS X 10.6.x and earlier
+    #endif
 #else
-#define _tcsicmp wcscasecmp
+    #define _tcsicmp wcscasecmp
 #endif
+
 #define _tcscpy wcscpy
 #define _tcslen wcslen
 #define _tcsncpy wcsncpy
