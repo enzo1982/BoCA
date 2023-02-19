@@ -32,6 +32,12 @@ extern "C"
 #ifdef PLATFORM_WINDOWS
     DLLEXPORT int __stdcall GetInterfaceCompatibility(int nVersion, BOOL bDisplayWarningsOnFailure = TRUE, HWND hwndParent = APE_NULL);
 #endif
+
+    DLLEXPORT const char * __stdcall GetLibraryVersionString();
+    DLLEXPORT unsigned int __stdcall GetLibraryVersionNumber();
+
+    DLLEXPORT unsigned int __stdcall GetLibraryInterfaceVersion();
+
     DLLEXPORT int __stdcall TagFileSimple(const APE::str_ansi * pFilename, const char * pArtist, const char * pAlbum, const char * pTitle, const char * pComment, const char * pGenre, const char * pYear, const char * pTrack, BOOL bClearFirst, BOOL bUseOldID3);
     DLLEXPORT int __stdcall GetID3Tag(const APE::str_ansi * pFilename, APE::ID3_TAG * pID3Tag);
     DLLEXPORT int __stdcall GetID3TagW(const APE::str_utfn * pFilename, APE::ID3_TAG * pID3Tag);

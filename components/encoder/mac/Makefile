@@ -16,7 +16,7 @@ OBJECTS	  = config.o dllinterface.o mac.o
 DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support
 
 ifeq ($(BUILD_WIN32),True)
-	DEFINE += -DPLATFORM_WINDOWS
+	DEFINE += -DPLATFORM_WINDOWS -DWINVER=0x0500
 else
 	DEFINE += -DPLATFORM_LINUX
 endif

@@ -100,7 +100,6 @@ typedef void (__stdcall * APE_PROGRESS_CALLBACK) (int);
 class IAPEProgressCallback
 {
 public:
-
     virtual ~IAPEProgressCallback() { }
     virtual void Progress(int nPercentageDone) = 0;
     virtual int GetKillFlag() = 0; // KILL_FLAG_CONTINUE to continue
@@ -228,7 +227,6 @@ IAPEDecompress - interface for working with existing APE files (decoding, seekin
 class IAPEDecompress
 {
 public:
-
     /**************************************************************************************************
     APE_DECOMPRESS_FIELDS - used when querying for information
 
@@ -491,11 +489,11 @@ Usage example:
 **************************************************************************************************/
 extern "C"
 {
-    APE::IAPEDecompress * __stdcall CreateIAPEDecompress(const APE::str_utfn * pFilename, int * pErrorCode, bool bReadOnly, bool bAnalyzeTagNow, bool bReadWholeFile);
-    APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx(APE::CIO * pIO, int * pErrorCode);
-    APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx2(APE::CAPEInfo * pAPEInfo, int nStartBlock, int nFinishBlock, int * pErrorCode);
+    DLLEXPORT APE::IAPEDecompress * __stdcall CreateIAPEDecompress(const APE::str_utfn * pFilename, int * pErrorCode, bool bReadOnly, bool bAnalyzeTagNow, bool bReadWholeFile);
+    DLLEXPORT APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx(APE::CIO * pIO, int * pErrorCode);
+    DLLEXPORT APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx2(APE::CAPEInfo * pAPEInfo, int nStartBlock, int nFinishBlock, int * pErrorCode);
 #ifdef APE_SUPPORT_COMPRESS
-    APE::IAPECompress * __stdcall CreateIAPECompress(int * pErrorCode = APE_NULL);
+    DLLEXPORT APE::IAPECompress * __stdcall CreateIAPECompress(int * pErrorCode = APE_NULL);
 #endif
 }
 

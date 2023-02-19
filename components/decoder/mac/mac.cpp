@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ const String &BoCA::DecoderMAC::GetComponentSpecs()
 										\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
 		  <component>							\
-		    <name>Monkey's Audio Decoder</name>				\
+		    <name>Monkey's Audio Decoder %VERSION%</name>		\
 		    <version>1.0</version>					\
 		    <id>mac-dec</id>						\
 		    <type>decoder</type>					\
@@ -42,6 +42,8 @@ const String &BoCA::DecoderMAC::GetComponentSpecs()
 		  </component>							\
 										\
 		";
+
+		componentSpecs.Replace("%VERSION%", String("v").Append(ex_GetLibraryVersionString()));
 	}
 
 	return componentSpecs;

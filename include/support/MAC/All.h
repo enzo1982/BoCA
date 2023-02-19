@@ -19,7 +19,6 @@ PLATFORM_LINUX
 #undef ODS
 #undef CATCH_ERRORS
 #undef ASSERT
-#undef _totlower
 #undef ZeroMemory
 #undef __forceinline
 #endif
@@ -213,9 +212,24 @@ Global macros
             #define ASSERT(e)
         #endif
     #endif
+
+    #if _WIN32_WINNT < 0x600
+        #define wcsncpy_s(A, B, C, D) wcsncpy(A, C, D)
+        #define wcscpy_s(A, B, C) wcscpy(A, C)
+        #define wcscat_s(A, B, C) wcscat(A, C)
+        #define strcpy_s(A, B, C) strcpy(A, C)
+
+        #undef _tcsncpy_s
+        #undef _tcscpy_s
+        #undef _stprintf_s
+
+        #define _tcsncpy_s(A, B, C, D) _tcsncpy(A, C, D)
+        #define _tcscpy_s(A, B, C) _tcscpy(A, C)
+        #define _stprintf_s(A, B, C, ...) _stprintf(A, C, __VA_ARGS__)
+    #endif
 #else
     #define IO_USE_STD_LIB_FILE_IO
-    #define DLLEXPORT
+    #define DLLEXPORT                                   __attribute__ ((visibility ("default")))
     #define SLEEP(MILLISECONDS)                         { struct timespec t; t.tv_sec = (MILLISECONDS) / 1000; t.tv_nsec = (MILLISECONDS) % 1000 * 1000000; nanosleep(&t, NULL); }
     #define MESSAGEBOX(PARENT, TEXT, CAPTION, TYPE)
     #undef  ODS
@@ -225,16 +239,37 @@ Global macros
     #define TICK_COUNT_FREQ                             1000000
     #undef  ASSERT
     #define ASSERT(e)
-    #define wcsncpy_s(A, B, C, D) wcsncpy(A, C, D)
-    inline wchar_t * wcscpy_s(wchar_t * dest, size_t destsz, const wchar_t * src)
-    {
-        (void) destsz; // this avoids an unreferenced variable
-        return wcscpy(dest, src);
-    }
-    #define wcscat_s(A, B, C) wcscat(A, C)
-    #define sprintf_s(A, B, C, D) sprintf(A, C, D)
-    #define strcpy_s(A, B, C) strcpy(A, C)
-    #define _tcscat_s(A, B, C) _tcscat(A, C)
+
+    #ifndef __STDC_LIB_EXT1__
+        inline int wcsncpy_s(wchar_t * dest, size_t destsz, const wchar_t * src, size_t count)
+        {
+            if (!dest || !src || destsz == 0 || count == 0 || (count >= destsz && destsz <= wcslen(src)))
+                return -1;
+            wcsncpy(dest, src, count);
+            return 0;
+        }
+        inline int wcscpy_s(wchar_t * dest, size_t destsz, const wchar_t * src)
+        {
+            if (!dest || !src || destsz == 0 || destsz <= wcslen(src))
+                return -1;
+            wcscpy(dest, src);
+            return 0;
+        }
+        inline int wcscat_s(wchar_t * dest, size_t destsz, const wchar_t * src)
+        {
+            if (!dest || !src || destsz == 0 || destsz <= wcslen(dest) + wcslen(src))
+                return -1;
+            wcscat(dest, src);
+            return 0;
+        }
+        inline int strcpy_s(char * dest, size_t destsz, const char * src)
+        {
+            if (!dest || !src || destsz == 0 || destsz <= strlen(src))
+                return -1;
+            strcpy(dest, src);
+            return 0;
+        }
+    #endif
 #endif
 
 /**************************************************************************************************

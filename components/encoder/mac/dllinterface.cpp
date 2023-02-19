@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,11 +13,14 @@
 #include <boca.h>
 #include "dllinterface.h"
 
-APECOMPRESS_CREATE	 ex_APECompress_Create	= NIL;
-APECOMPRESS_DESTROY	 ex_APECompress_Destroy	= NIL;
-APECOMPRESS_STARTW	 ex_APECompress_StartW	= NIL;
-APECOMPRESS_ADDDATA	 ex_APECompress_AddData	= NIL;
-APECOMPRESS_FINISH	 ex_APECompress_Finish	= NIL;
+APECOMPRESS_CREATE		 ex_APECompress_Create		= NIL;
+APECOMPRESS_DESTROY		 ex_APECompress_Destroy		= NIL;
+APECOMPRESS_STARTW		 ex_APECompress_StartW		= NIL;
+APECOMPRESS_ADDDATA		 ex_APECompress_AddData		= NIL;
+APECOMPRESS_FINISH		 ex_APECompress_Finish		= NIL;
+
+GETLIBRARYVERSIONSTRING		 ex_GetLibraryVersionString	= NIL;
+GETLIBRARYINTERFACEVERSION	 ex_GetLibraryInterfaceVersion	= NIL;
 
 DynamicLoader *macdll	= NIL;
 
@@ -31,17 +34,29 @@ Bool LoadMACDLL()
 
 	if (macdll == NIL) return False;
 
-	ex_APECompress_Create	= (APECOMPRESS_CREATE) macdll->GetFunctionAddress("c_APECompress_Create");
-	ex_APECompress_Destroy	= (APECOMPRESS_DESTROY) macdll->GetFunctionAddress("c_APECompress_Destroy");
-	ex_APECompress_StartW	= (APECOMPRESS_STARTW) macdll->GetFunctionAddress("c_APECompress_StartW");
-	ex_APECompress_AddData	= (APECOMPRESS_ADDDATA) macdll->GetFunctionAddress("c_APECompress_AddData");
-	ex_APECompress_Finish	= (APECOMPRESS_FINISH) macdll->GetFunctionAddress("c_APECompress_Finish");
+	ex_APECompress_Create		= (APECOMPRESS_CREATE) macdll->GetFunctionAddress("c_APECompress_Create");
+	ex_APECompress_Destroy		= (APECOMPRESS_DESTROY) macdll->GetFunctionAddress("c_APECompress_Destroy");
+	ex_APECompress_StartW		= (APECOMPRESS_STARTW) macdll->GetFunctionAddress("c_APECompress_StartW");
+	ex_APECompress_AddData		= (APECOMPRESS_ADDDATA) macdll->GetFunctionAddress("c_APECompress_AddData");
+	ex_APECompress_Finish		= (APECOMPRESS_FINISH) macdll->GetFunctionAddress("c_APECompress_Finish");
 
-	if (ex_APECompress_Create	== NIL ||
-	    ex_APECompress_Destroy	== NIL ||
-	    ex_APECompress_StartW	== NIL ||
-	    ex_APECompress_AddData	== NIL ||
-	    ex_APECompress_Finish	== NIL) { FreeMACDLL(); return False; }
+	ex_GetLibraryVersionString	= (GETLIBRARYVERSIONSTRING) macdll->GetFunctionAddress("GetLibraryVersionString");
+	ex_GetLibraryInterfaceVersion	= (GETLIBRARYINTERFACEVERSION) macdll->GetFunctionAddress("GetLibraryInterfaceVersion");
+
+	if (ex_APECompress_Create		== NIL ||
+	    ex_APECompress_Destroy		== NIL ||
+	    ex_APECompress_StartW		== NIL ||
+	    ex_APECompress_AddData		== NIL ||
+	    ex_APECompress_Finish		== NIL ||
+
+	    ex_GetLibraryVersionString		== NIL ||
+	    ex_GetLibraryInterfaceVersion	== NIL) { FreeMACDLL(); return False; }
+
+	/* Check library interface version.
+	 */
+	unsigned int	 interfaceVersion = ex_GetLibraryInterfaceVersion();
+
+	if (interfaceVersion != 9) { FreeMACDLL(); return False; }
 
 	return True;
 }

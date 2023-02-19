@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,11 +13,14 @@
 #include <boca.h>
 #include "dllinterface.h"
 
-APEDECOMPRESS_CREATEW	 ex_APEDecompress_CreateW	= NIL;
-APEDECOMPRESS_DESTROY	 ex_APEDecompress_Destroy	= NIL;
-APEDECOMPRESS_SEEK	 ex_APEDecompress_Seek		= NIL;
-APEDECOMPRESS_GETDATA	 ex_APEDecompress_GetData	= NIL;
-APEDECOMPRESS_GETINFO	 ex_APEDecompress_GetInfo	= NIL;
+APEDECOMPRESS_CREATEW		 ex_APEDecompress_CreateW	= NIL;
+APEDECOMPRESS_DESTROY		 ex_APEDecompress_Destroy	= NIL;
+APEDECOMPRESS_SEEK		 ex_APEDecompress_Seek		= NIL;
+APEDECOMPRESS_GETDATA		 ex_APEDecompress_GetData	= NIL;
+APEDECOMPRESS_GETINFO		 ex_APEDecompress_GetInfo	= NIL;
+
+GETLIBRARYVERSIONSTRING		 ex_GetLibraryVersionString	= NIL;
+GETLIBRARYINTERFACEVERSION	 ex_GetLibraryInterfaceVersion	= NIL;
 
 DynamicLoader *macdll	= NIL;
 
@@ -37,11 +40,23 @@ Bool LoadMACDLL()
 	ex_APEDecompress_GetData	= (APEDECOMPRESS_GETDATA) macdll->GetFunctionAddress("c_APEDecompress_GetData");
 	ex_APEDecompress_GetInfo	= (APEDECOMPRESS_GETINFO) macdll->GetFunctionAddress("c_APEDecompress_GetInfo");
 
-	if (ex_APEDecompress_CreateW	== NIL ||
-	    ex_APEDecompress_Destroy	== NIL ||
-	    ex_APEDecompress_Seek	== NIL ||
-	    ex_APEDecompress_GetData	== NIL ||
-	    ex_APEDecompress_GetInfo	== NIL) { FreeMACDLL(); return False; }
+	ex_GetLibraryVersionString	= (GETLIBRARYVERSIONSTRING) macdll->GetFunctionAddress("GetLibraryVersionString");
+	ex_GetLibraryInterfaceVersion	= (GETLIBRARYINTERFACEVERSION) macdll->GetFunctionAddress("GetLibraryInterfaceVersion");
+
+	if (ex_APEDecompress_CreateW		== NIL ||
+	    ex_APEDecompress_Destroy		== NIL ||
+	    ex_APEDecompress_Seek		== NIL ||
+	    ex_APEDecompress_GetData		== NIL ||
+	    ex_APEDecompress_GetInfo		== NIL ||
+
+	    ex_GetLibraryVersionString		== NIL ||
+	    ex_GetLibraryInterfaceVersion	== NIL) { FreeMACDLL(); return False; }
+
+	/* Check library interface version.
+	 */
+	unsigned int	 interfaceVersion = ex_GetLibraryInterfaceVersion();
+
+	if (interfaceVersion != 9) { FreeMACDLL(); return False; }
 
 	return True;
 }

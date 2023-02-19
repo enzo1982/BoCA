@@ -62,11 +62,6 @@ typedef struct _GUID {
 
 #define _strnicmp strncasecmp
 #define _wtoi(x) wcstol(x, NULL, 10)
-#define _tcscat wcscat
-#undef _totlower
-#define _totlower towlower
-#define _totupper towupper
-#define _tcschr wcschr
 
 #ifdef PLATFORM_APPLE
     #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
@@ -83,12 +78,10 @@ typedef struct _GUID {
 #define _tcsncpy wcsncpy
 #define _tcsstr wcsstr
 #define _ftprintf fwprintf
-#define _tcsnicmp _wcsnicmp
 #define _tcscpy_s wcscpy_s
 #define _tcsncpy_s wcsncpy_s
 #define _ttoi _wtoi
 #define _tcscmp wcscmp
-#define strncpy_s(a, b, c, d) strncpy(a, c, d)
 #define MAX_PATH    4096
 
 }
