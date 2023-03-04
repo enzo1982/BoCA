@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -181,7 +181,7 @@ Bool BoCA::Track::LoadCoverArtFiles()
 
 				foreach (const String &pattern, patterns)
 				{
-					if (Utilities::StringMatchesPattern(fileName, pattern.ToLower())) LoadCoverArtFile(file);
+					if (Utilities::StringMatchesPattern(fileName, pattern.Append(".").Append(extension).ToLower())) LoadCoverArtFile(file);
 				}
 			}
 		}
