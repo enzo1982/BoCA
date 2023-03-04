@@ -117,6 +117,7 @@ Version
 #define STRINGIZE(s) STRINGIZE2(s)
 #define MAC_VER_FILE_VERSION_STR                        STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION)
 #define MAC_VER_FILE_VERSION_STR_NARROW                 STRINGIZE(MAC_VERSION_MAJOR) "." STRINGIZE(MAC_VERSION_REVISION)
+#define MAC_VER_FILE_VERSION_STR_WIDE                   STRINGIZE(MAC_VERSION_MAJOR) L"." STRINGIZE(MAC_VERSION_REVISION)
 
 #define MAC_FILE_VERSION_NUMBER                         3990
 #define MAC_VERSION_STRING                              MAC_VER_FILE_VERSION_STR
@@ -127,7 +128,7 @@ Version
 #define MAC_RESOURCE_VERSION_COMMA                      MAC_VERSION_MAJOR, MAC_VERSION_REVISION, 0, 0
 #define MAC_RESOURCE_VERSION_STRING                     MAC_VER_FILE_VERSION_STR
 #define MAC_RESOURCE_COPYRIGHT                          "Copyright (c) 2000-" STRINGIZE(MAC_YEAR) " Matthew T. Ashland"
-#define CONSOLE_NAME                                    _T("--- Monkey's Audio Console Front End (v ") MAC_VER_FILE_VERSION_STR _T(") (c) Matthew T. Ashland ---\n")
+#define CONSOLE_NAME                                    L"--- Monkey's Audio Console Front End (v " MAC_VER_FILE_VERSION_STR_WIDE L") (c) Matthew T. Ashland ---\n"
 #define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") MAC_VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(MAC_YEAR) _T(" by Matthew T. Ashland")
 
 /**************************************************************************************************
@@ -173,7 +174,6 @@ namespace APE
     // string types
     typedef char                                        str_ansi;
     typedef unsigned char                               str_utf8;
-    typedef int16                                       str_utf16;
     typedef wchar_t                                     str_utfn; // could be UTF-16 or UTF-32 depending on platform
 }
 
