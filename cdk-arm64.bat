@@ -12,7 +12,7 @@ set BUILD_ARM64=True
 set CC=aarch64-w64-mingw32-clang
 set CXX=aarch64-w64-mingw32-clang++
 
-echo fre:ac Component Development Kit v1.1.6 (arm64)
-echo Copyright (C) 2001-2022 Robert Kausch
+echo fre:ac Component Development Kit v1.1.7 (arm64)
+echo Copyright (C) 2001-2023 Robert Kausch
 
 bash
