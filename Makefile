@@ -11,8 +11,8 @@ all:
 	+ $(call makein,components)
 
 codesign: all
-	signtool sign -fd sha1 -tr http://timestamp.digicert.com -td sha1 $(BOCA_PATH)/$(BINDIR)/*.dll
-	signtool sign -fd sha256 -tr http://timestamp.digicert.com -td sha256 -as $(BOCA_PATH)/$(BINDIR)/*.dll
+	signtool sign -fd sha1 -tr http://timestamp.digicert.com -td sha1 $(BOCA_PATH)/$(BINDIR)/*.dll $(BOCA_PATH)/$(BINDIR)/*.exe
+	signtool sign -fd sha256 -tr http://timestamp.digicert.com -td sha256 -as $(BOCA_PATH)/$(BINDIR)/*.dll $(BOCA_PATH)/$(BINDIR)/*.exe
 
 clean:
 	+ $(call cleanin,runtime)
