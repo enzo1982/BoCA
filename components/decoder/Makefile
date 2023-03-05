@@ -6,10 +6,6 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 FOLDERS = alac cuesheet faad2 fdkaac flac mac mpg123 opus sndfile speex vorbis
 
-ifneq ($(BUILD_OSX),True)
-	FOLDERS += lame mad
-endif
-
 ifeq ($(BUILD_UNIX),True)
 ifneq ($(BUILD_HAIKU),True)
 ifneq ($(BUILD_OPENBSD),True)
@@ -19,10 +15,10 @@ else
 endif
 endif
 else ifeq ($(BUILD_WIN32),True)
-	FOLDERS += aiff au bonk cdrip mediafoundation voc wave wma
+	FOLDERS += cdrip mediafoundation wma
 
 ifeq ($(BUILD_X86),True)
-	FOLDERS += twinvq winamp
+	FOLDERS += winamp
 endif
 endif
 

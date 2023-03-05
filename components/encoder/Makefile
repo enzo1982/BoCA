@@ -6,10 +6,6 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 FOLDERS = fdkaac flac lame mac meh opus sndfile speex vorbis
 
-ifneq ($(BUILD_OSX),True)
-	FOLDERS += faac voaacenc
-endif
-
 ifeq ($(USE_WINE),True)
 	FOLDERS += coreaudioconnect
 endif
@@ -17,11 +13,9 @@ endif
 ifeq ($(BUILD_OSX),True)
 	FOLDERS += coreaudio
 else ifeq ($(BUILD_WIN32),True)
-	FOLDERS += bladeenc bonk coreaudio wave wma
+	FOLDERS += coreaudio wma
 
-ifeq ($(BUILD_X86),True)
-	FOLDERS += twinvq
-else ifeq ($(BUILD_ARM64),True)
+ifeq ($(BUILD_ARM64),True)
 	FOLDERS += coreaudioconnect
 endif
 endif
