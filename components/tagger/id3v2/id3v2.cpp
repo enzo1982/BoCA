@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -665,7 +665,7 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 			/* Set picture data.
 			 */
-			if (picInfo.mime != NIL) SetStringField(frame_picture, ID3FN_MIMETYPE, picInfo.mime.ConvertTo("ISO-8859-1"));
+			if (picInfo.mime != NIL) SetStringField(frame_picture, ID3FN_MIMETYPE, picInfo.mime);
 
 			SetIntegerField(frame_picture, ID3FN_PICTURETYPE, picInfo.type);
 			SetBinaryField(frame_picture, ID3FN_DATA, picInfo.data);
@@ -1283,7 +1283,7 @@ String BoCA::TaggerID3v2::GetStringField(const ID3_Frame &frame, ID3_FieldID fie
 	ID3_Field	*field	  = frame.GetField(fieldType);
 	ID3_TextEnc	 encoding = ID3TE_ISO8859_1;
 
-	if (frame.Contains(ID3FN_TEXTENC)) encoding = (ID3_TextEnc) GetIntegerField(frame, ID3FN_TEXTENC);
+	if (field->IsEncodable()) encoding = (ID3_TextEnc) GetIntegerField(frame, ID3FN_TEXTENC);
 
 	String	 result;
 
@@ -1318,16 +1318,15 @@ Int BoCA::TaggerID3v2::SetStringField(ID3_Frame &frame, ID3_FieldID fieldType, c
 
 	if (!frame.Contains(fieldType) || string == NIL) return Error();
 
+	ID3_Field	*field	  = frame.GetField(fieldType);
 	ID3_TextEnc	 encoding = ID3TE_ISO8859_1;
 
-	if (frame.Contains(ID3FN_TEXTENC))
+	if (field->IsEncodable())
 	{
 		encoding = textEncoding;
 
 		SetIntegerField(frame, ID3FN_TEXTENC, textEncoding);
 	}
-
-	ID3_Field	*field = frame.GetField(fieldType);
 
 	field->SetEncoding(encoding);
 
