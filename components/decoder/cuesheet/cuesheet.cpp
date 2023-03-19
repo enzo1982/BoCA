@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -88,18 +88,28 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 	/* Detect input format.
 	 */
-	String::InputFormat	 inputFormat("ISO-8859-1");
+	String	 inputFormat = "ISO-8859-1";
 
-	if (in.InputNumberRaw(3) == 0xEFBBBF)
+	Int	 bom2 = in.InputNumberRaw(2); in.Seek(0);
+	Int	 bom3 = in.InputNumberRaw(3); in.Seek(0);
+
+	if (bom2 == 0xFFFE)
 	{
-		/* Found UTF-8 BOM.
-		 */
-		String::SetInputFormat("UTF-8");
+		in.Seek(2);
+		inputFormat = "UTF-16LE";
+	}
+	else if (bom2 == 0xFEFF)
+	{
+		in.Seek(2);
+		inputFormat = "UTF-16BE";
+	}
+	else if (bom3 == 0xEFBBBF)
+	{
+		in.Seek(3);
+		inputFormat = "UTF-8";
 	}
 	else
 	{
-		in.Seek(0);
-
 		/* Check for UTF-8, otherwise use system encoding or ISO-8859-1.
 		 */
 		String	 data = in.InputString(in.Size());
@@ -109,23 +119,38 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 		{
 			/* Encoding appears to be UTF-8.
 			 */
-			String::SetInputFormat("UTF-8");
+			inputFormat = "UTF-8";
 		}
 		else if (String(String::GetDefaultEncoding()) != "UTF-8")
 		{
 			/* Other encoding, use system default.
 			 */
-			String::SetInputFormat(String::GetDefaultEncoding());
+			inputFormat = String::GetDefaultEncoding();
 		}
 
 		in.Seek(0);
 	}
 
+	/* Read cue sheet data.
+	 */
+	Buffer<UnsignedByte>	 data(in.Size() - in.GetPos() + 2);
+
+	data.Zero();
+
+	in.InputData(data, data.Size() - 2);
+	in.Close();
+
+	String	 cueSheet;
+	
+	cueSheet.ImportFrom(inputFormat, (char *) (UnsignedByte *) data);
+
 	/* Actual parsing action.
 	 */
-	while (in.GetPos() < in.Size())
+	const Array<String>	&lines = cueSheet.Explode("\n");
+
+	foreach (String line, lines)
 	{
-		String	 line = in.InputLine().Trim();
+		line = line.Trim();
 
 		/* Parse metadata comments.
 		 */
@@ -259,13 +284,13 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 		/* End of a track.
 		 */
-		if ((line.StartsWith("TRACK ") || line.StartsWith("FILE ") || in.GetPos() == in.Size()) && trackMode)
+		if ((line.StartsWith("TRACK ") || line.StartsWith("FILE ") || foreachindex == lines.Length() - 1) && trackMode)
 		{
 			if ((iTrack.length == -1 && iTrack.approxLength == -1) || iTrack.length == fileLength || iTrack.approxLength == fileLength)
 			{
 				/* Get previous track length.
 				 */
-				if (line.StartsWith("FILE ") || in.GetPos() == in.Size())
+				if (line.StartsWith("FILE ") || foreachindex == lines.Length() - 1)
 				{
 					if (fileLength >= iTrack.sampleOffset)
 					{
@@ -276,11 +301,9 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 
 				if (line.StartsWith("TRACK "))
 				{
-					Int	 filePos = in.GetPos();
-
-					while (in.GetPos() < in.Size())
+					for (Int i = foreachindex; i < lines.Length(); i++)
 					{
-						String	 line = in.InputLine().Trim();
+						String	 line = lines.GetNth(i).Trim();
 
 						if (line.StartsWith("FILE ")) break;
 
@@ -301,8 +324,6 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 							break;
 						}
 					}
-
-					in.Seek(filePos);
 				}
 			}
 
@@ -504,8 +525,6 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			info.track = track;
 		}
 	}
-
-	in.Close();
 
 	/* Return on error.
 	 */
