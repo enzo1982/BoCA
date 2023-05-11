@@ -18,7 +18,7 @@ OBJECTS	  = id3v2.o
 DEFINE	  = -I"$(SRCDIR)"/id3 -DID3LIB_LINKOPTION=LINKOPTION_STATIC
 
 # Enter additional library dependencies here:
-LIBS	  = id3/libid3.a -lstdc++
+LIBS	  = id3/libid3.a
 
 ifeq ($(USE_BUNDLED_ZLIB),True)
 LIBS	  += zlib/libz.a

@@ -36,8 +36,6 @@ else
 LIBS	  = -lxspf
 endif
 
-LIBS	  += -lstdc++
-
 ifeq ($(USE_BUNDLED_LIBEXPAT),True)
 LIBS	  += expat/libexpat.a
 else

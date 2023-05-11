@@ -5,7 +5,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 OBJECTS	= picturedata.o
 TARGET	= picturedata$(EXECUTABLE)
 
-LIBS	= -lboca -lsmooth -lstdc++
+LIBS	= -lboca -lsmooth
 
 CCOPTS	= -I $(BOCA_PATH)/include
 LDOPTS	= -L $(BOCA_PATH)/$(LIBDIR) $(LIBS)

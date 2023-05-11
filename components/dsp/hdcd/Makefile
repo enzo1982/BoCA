@@ -18,7 +18,7 @@ OBJECTS	  = hdcd.o
 DEFINE	  = -I"$(SRCDIR)"/libhdcd
 
 # Enter additional library dependencies here:
-LIBS	  = libhdcd/libhdcd.a -lstdc++
+LIBS	  = libhdcd/libhdcd.a
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = $(call makein,libhdcd)

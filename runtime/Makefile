@@ -37,7 +37,7 @@ CLEANCMD1 =
 ## Do not change anything below this line. ##
 
 CCOPTS	  = -fvisibility=hidden -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(prefix)\" -I"$(SRCDIR)"/$(BOCA_PATH)/include
-LDOPTS	  = -L"$(SRCDIR)"/$(BOCA_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+LDOPTS	  = -L"$(SRCDIR)"/$(BOCA_PATH)/$(LIBDIR) $(LIBS)
 
 ifeq ($(BUILD_WIN32),True)
 	LDOPTS += -lsmooth -lws2_32 -Wl,--dynamicbase,--nxcompat,--enable-auto-import

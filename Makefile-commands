@@ -5,10 +5,6 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 CCOPTS = -fvisibility=hidden -DBOCA_COMPONENT_BUILD $(DEFINE) -I"$(SRCDIR)"/$(BOCA_PATH)/include
 LDOPTS = -L$(BOCA_PATH)/$(LIBDIR) -L"$(SRCDIR)"/$(BOCA_PATH)/$(LIBDIR) $(LIBS)
 
-ifeq (,$(findstring -lstdc++,$(LIBS)))
-	LDOPTS += -lstdc++
-endif
-
 ifeq ($(BUILD_WIN32),True)
 	LDOPTS += -lsmooth -lboca -Wl,--dynamicbase,--nxcompat,--enable-auto-import
 else
