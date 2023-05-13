@@ -25,7 +25,7 @@ namespace CA
 #include <AudioToolbox/AudioFormat.h>
 
 #ifdef __APPLE__
-#	ifndef MAC_OS_X_VERSION_10_6
+#	if !defined(MAC_OS_X_VERSION_10_6) || (defined(MAC_OS_X_VERSION_10_6) && defined(__ppc__))
 		const UInt32	 kAudioFormatMPEG4AAC_ELD     = 'aace';
 #	endif
 
