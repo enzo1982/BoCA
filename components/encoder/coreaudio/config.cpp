@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -92,16 +92,16 @@ BoCA::ConfigureCoreAudio::ConfigureCoreAudio()
 
 	for (UnsignedInt i = 0; i < size / sizeof(CA::UInt32); i++)
 	{
-		if	(formats[i] == CA::kAudioFormatMPEG4AAC)	 combo_codec->AddEntry("MPEG4 AAC Low Complexity");
-		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_HE)	 combo_codec->AddEntry("MPEG4 AAC High Efficiency");
-		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_HE_V2)	 combo_codec->AddEntry("MPEG4 AAC High Efficiency v2");
-		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_LD)	 combo_codec->AddEntry("MPEG4 AAC Low Delay");
-		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_ELD)	 combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay");
-		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_ELD_SBR) combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay SBR");
-		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_ELD_V2)	 combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay v2");
-		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_Spatial) combo_codec->AddEntry("MPEG4 AAC Spatial");
-		else if (formats[i] == CA::kAudioFormatAppleLossless)	 combo_codec->AddEntry("Apple Lossless Audio Codec");
-		else							 continue;
+		if	(formats[i] == CA::kAudioFormatMPEG4AAC)		 combo_codec->AddEntry("MPEG4 AAC Low Complexity");
+		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_HE)		 combo_codec->AddEntry("MPEG4 AAC High Efficiency");
+		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_HE_V2)		 combo_codec->AddEntry("MPEG4 AAC High Efficiency v2");
+		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_LD)		 combo_codec->AddEntry("MPEG4 AAC Low Delay");
+		else if	(formats[i] == CA::kOptionalAudioFormatMPEG4AAC_ELD)	 combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay");
+		else if	(formats[i] == CA::kOptionalAudioFormatMPEG4AAC_ELD_SBR) combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay SBR");
+		else if	(formats[i] == CA::kOptionalAudioFormatMPEG4AAC_ELD_V2)	 combo_codec->AddEntry("MPEG4 AAC Enhanced Low Delay v2");
+		else if	(formats[i] == CA::kAudioFormatMPEG4AAC_Spatial)	 combo_codec->AddEntry("MPEG4 AAC Spatial");
+		else if (formats[i] == CA::kAudioFormatAppleLossless)		 combo_codec->AddEntry("Apple Lossless Audio Codec");
+		else								 continue;
 
 		codecs.Add(formats[i]);
 
@@ -255,13 +255,13 @@ Void BoCA::ConfigureCoreAudio::SetCodec()
 
 		if (fileExtension == 2) fileExtension = 0;
 	}
-	else if	(codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC	  ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_HE	  ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_HE_V2	  ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_LD	  ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_ELD	  ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_ELD_SBR ||
-		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_ELD_V2  ||
+	else if	(codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC		  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_HE		  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_HE_V2		  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_LD		  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kOptionalAudioFormatMPEG4AAC_ELD	  ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kOptionalAudioFormatMPEG4AAC_ELD_SBR ||
+		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kOptionalAudioFormatMPEG4AAC_ELD_V2  ||
 		 codecs.GetNth(combo_codec->GetSelectedEntryNumber()) == CA::kAudioFormatMPEG4AAC_Spatial)
 	{
 		group_mp4->Activate();

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -24,19 +24,12 @@ namespace CA
 #include <AudioToolbox/AudioConverter.h>
 #include <AudioToolbox/AudioFormat.h>
 
-#ifdef __APPLE__
-#	ifndef MAC_OS_X_VERSION_10_6
-		const UInt32	 kAudioFormatMPEG4AAC_ELD     = 'aace';
-#	endif
-
-#	ifndef MAC_OS_X_VERSION_10_7
-		const UInt32	 kAudioFormatMPEG4AAC_ELD_SBR = 'aacf';
-#	endif
-
-#	ifndef MAC_OS_X_VERSION_10_8
-		const UInt32	 kAudioFormatMPEG4AAC_ELD_V2  = 'aacg';
-#	endif
-#endif
+	enum
+	{
+		kOptionalAudioFormatMPEG4AAC_ELD     = 'aace',
+		kOptionalAudioFormatMPEG4AAC_ELD_SBR = 'aacf',
+		kOptionalAudioFormatMPEG4AAC_ELD_V2  = 'aacg'
+	};
 };
 
 using namespace smooth;
