@@ -121,7 +121,11 @@ Bool BoCA::EncoderMAC::Activate()
 	waveFormat.wBitsPerSample	= format.bits;
 	waveFormat.cbSize		= 0;
 
-	ex_APECompress_StartW(hAPECompress, track.outputFile, &waveFormat, MAX_AUDIO_BYTES_UNKNOWN, (config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
+	int64 maxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN;
+
+	if (track.length >= 0) maxAudioBytes = track.length * format.channels * (format.bits / 8);
+
+	ex_APECompress_StartW(hAPECompress, track.outputFile, &waveFormat, maxAudioBytes, (config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
 
 	return True;
 }
