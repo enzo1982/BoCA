@@ -88,6 +88,7 @@ Defines
 #define MAC_FORMAT_FLAG_BIG_ENDIAN          (1 << 9)    // flags that the file uses big endian encoding
 #define MAC_FORMAT_FLAG_CAF                 (1 << 10)   // the file is a CAF (instead of WAV)
 #define MAC_FORMAT_FLAG_SIGNED_8_BIT        (1 << 11)   // 8-bit values are signed
+#define MAC_FORMAT_FLAG_FLOATING_POINT      (1 << 12)   // floating point
 
 #define CREATE_WAV_HEADER_ON_DECOMPRESSION    -1
 #define MAX_AUDIO_BYTES_UNKNOWN -1
@@ -177,7 +178,7 @@ APE_DESCRIPTOR structure (file header that describes lengths, offsets, etc.)
 **************************************************************************************************/
 struct APE_DESCRIPTOR
 {
-    char   cID[4];                             // should equal 'MAC '
+    char   cID[4];                             // should equal 'MAC ' or 'MACF'
     uint16 nVersion;                           // version number * 1000 (3.81 = 3810)
     uint16 nPadding;                           // because 4-byte alignment requires this (or else nVersion would take 4-bytes)
 
@@ -301,7 +302,13 @@ public:
     //    int * pBlocksRetrieved
     //        the number of blocks actually retrieved (could be less at end of file or on critical failure)
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int GetData(unsigned char * pBuffer, int64 nBlocks, int64 * pBlocksRetrieved) = 0;
+    struct APE_GET_DATA_PROCESSING
+    {
+        bool bApplyFloatProcessing;
+        bool bApplySigned8BitProcessing;
+        bool bApplyBigEndianProcessing;
+    };
+    virtual int GetData(unsigned char * pBuffer, int64 nBlocks, int64 * pBlocksRetrieved, APE_GET_DATA_PROCESSING * pProcessing = NULL) = 0;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Seek(...) - seeks

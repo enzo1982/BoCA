@@ -7,6 +7,7 @@ One of the following platforms should be defined (either in code or as a project
 PLATFORM_WINDOWS
 PLATFORM_APPLE
 PLATFORM_LINUX
+PLATFORM_ANDROID
 **************************************************************************************************/
 #if !defined(PLATFORM_WINDOWS) && !defined(PLATFORM_APPLE) && !defined(PLATFORM_LINUX)
     #pragma message("No platform set for MACLib, defaulting to Windows")
@@ -14,20 +15,9 @@ PLATFORM_LINUX
 #endif
 
 #ifdef PLATFORM_ANDROID
-#undef MBN
-#undef ODN
-#undef ODS
-#undef CATCH_ERRORS
 #undef ASSERT
 #undef ZeroMemory
 #undef __forceinline
-#endif
-
-/**************************************************************************************************
-64-bit
-**************************************************************************************************/
-#if defined(_WIN64) || defined(__x86_64__)
-#define APE_64_BIT
 #endif
 
 /**************************************************************************************************
@@ -146,6 +136,9 @@ Global compiler settings (useful for porting)
 // disable this to turn off compression code
 #define APE_SUPPORT_COMPRESS
 
+// flip this to enable float compression
+#define APE_SUPPORT_FLOAT_COMPRESSION
+
 // compression modes
 #define ENABLE_COMPRESSION_MODE_FAST
 #define ENABLE_COMPRESSION_MODE_NORMAL
@@ -189,6 +182,9 @@ Global macros
 // we use this to check for zero because Clang warns if we just equate a double with zero
 #define APE_DOUBLE_ZERO 0.00001
 
+// we use more than the Windows system MAX_PATH since filenames can actually be longer
+#define APE_MAX_PATH 8192
+
 #define POINTER_TO_INT64(POINTER) static_cast<APE::int64>(reinterpret_cast<uintptr_t>(POINTER))
 
 #if defined(PLATFORM_WINDOWS)
@@ -196,7 +192,7 @@ Global macros
     #define DLLEXPORT                                   __declspec(dllexport)
     #define SLEEP(MILLISECONDS)                         ::Sleep(MILLISECONDS)
     #define MESSAGEBOX(PARENT, TEXT, CAPTION, TYPE)     ::MessageBox(PARENT, TEXT, CAPTION, TYPE)
-    #define ODS                                         OutputDebugString
+    #define APE_ODS                                     OutputDebugString
     #define TICK_COUNT_TYPE                             unsigned long long
     #if _WIN32_WINNT >= 0x600
         #define TICK_COUNT_READ(VARIABLE)               VARIABLE = GetTickCount64()
@@ -232,8 +228,7 @@ Global macros
     #define DLLEXPORT                                   __attribute__ ((visibility ("default")))
     #define SLEEP(MILLISECONDS)                         { struct timespec t; t.tv_sec = (MILLISECONDS) / 1000; t.tv_nsec = (MILLISECONDS) % 1000 * 1000000; nanosleep(&t, NULL); }
     #define MESSAGEBOX(PARENT, TEXT, CAPTION, TYPE)
-    #undef  ODS
-    #define ODS                                         printf
+    #define APE_ODS                                     printf
     #define TICK_COUNT_TYPE                             unsigned long long
     #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
     #define TICK_COUNT_FREQ                             1000000
@@ -340,16 +335,16 @@ Channels
 /**************************************************************************************************
 Macros
 **************************************************************************************************/
-#define MB(TEST) MESSAGEBOX(APE_NULL, TEST, _T("Information"), MB_OK);
-#define MBN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d"), NUMBER); MESSAGEBOX(APE_NULL, cNumber, _T("Information"), MB_OK); }
+#define APE_MB(TEST) MESSAGEBOX(APE_NULL, TEST, _T("Information"), MB_OK);
+#define APE_MBN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d"), NUMBER); MESSAGEBOX(APE_NULL, cNumber, _T("Information"), MB_OK); }
 
 #define APE_SAFE_DELETE(POINTER) if (POINTER) { delete POINTER; POINTER = APE_NULL; }
 #define APE_SAFE_ARRAY_DELETE(POINTER) if (POINTER) { delete [] POINTER; POINTER = APE_NULL; }
 #define APE_SAFE_FILE_CLOSE(HANDLE) if (HANDLE != INVALID_HANDLE_VALUE) { CloseHandle(HANDLE); HANDLE = INVALID_HANDLE_VALUE; }
 
-#define ODN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d\n"), static_cast<int>(NUMBER)); ODS(cNumber); }
+#define APE_ODN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d\n"), static_cast<int>(NUMBER)); APE_ODS(cNumber); }
 
-#define CATCH_ERRORS(CODE) try { CODE } catch(...) { }
+#define APE_CATCH_ERRORS(CODE) try { CODE } catch(...) { }
 
 #define RETURN_ON_ERROR(FUNCTION) { const int nFunctionResult = static_cast<int>(FUNCTION); if (nFunctionResult != ERROR_SUCCESS) { return nFunctionResult; } }
 #define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nFunctionResult = FUNCTION; if (nFunctionResult != 0) { return VALUE; } }

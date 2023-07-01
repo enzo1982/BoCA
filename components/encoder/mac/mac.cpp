@@ -17,7 +17,8 @@
 #include "config.h"
 
 #ifndef WAVE_FORMAT_PCM
-#	define WAVE_FORMAT_PCM 1
+#	define WAVE_FORMAT_PCM	      0x0001
+#	define WAVE_FORMAT_IEEE_FLOAT 0x0003
 #endif
 
 using namespace smooth::IO;
@@ -45,6 +46,20 @@ const String &BoCA::EncoderMAC::GetComponentSpecs()
 		    </format>										\
 		    <input bits=\"8\" signed=\"false\" channels=\"1-32\"/>				\
 		    <input bits=\"16-32\" channels=\"1-32\"/>						\
+													\
+		";
+
+		if (ex_GetLibraryInterfaceVersion() >= 10)
+		{
+			componentSpecs.Append("								\
+													\
+			    <input float=\"true\" channels=\"1-32\"/>					\
+													\
+			");
+		}
+
+		componentSpecs.Append("									\
+													\
 		    <parameters>									\
 		      <selection name=\"Compression mode\" argument=\"-m %VALUE\" default=\"high\">	\
 			<option alias=\"Fast\">fast</option>						\
@@ -56,7 +71,7 @@ const String &BoCA::EncoderMAC::GetComponentSpecs()
 		    </parameters>									\
 		  </component>										\
 													\
-		";
+		");
 
 		componentSpecs.Replace("%VERSION%", String("v").Append(ex_GetLibraryVersionString()));
 	}
@@ -113,7 +128,7 @@ Bool BoCA::EncoderMAC::Activate()
 	 */
 	APE::WAVEFORMATEX	 waveFormat;
 
-	waveFormat.wFormatTag		= WAVE_FORMAT_PCM;
+	waveFormat.wFormatTag		= format.fp ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
 	waveFormat.nChannels		= format.channels;
 	waveFormat.nSamplesPerSec	= format.rate;
 	waveFormat.nAvgBytesPerSec	= format.rate * format.channels * (format.bits / 8);
