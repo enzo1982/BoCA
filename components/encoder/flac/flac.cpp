@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -195,7 +195,7 @@ Bool BoCA::EncoderFLAC::Activate()
 
 		if (tagger != NIL)
 		{
-			/* Disable writing cover art to Vorbis Comment tags for FLAC files.
+			/* Disable writing album art to Vorbis Comment tags for FLAC files.
 			 */
 			Config	*taggerConfig = Config::Copy(config);
 

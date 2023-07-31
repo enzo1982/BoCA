@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -72,8 +72,8 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
 
-	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
-	Bool		 coverArtWriteToAPEv2	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToAPEv2", True);
+	Bool		 albumArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 albumArtWriteToAPEv2	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToAPEv2", True);
 
 	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
 	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
@@ -223,9 +223,9 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 	{ RenderAPEItem("Tool Name",	app->getClientName.Call(),    buffer); numItems++; }
 	{ RenderAPEItem("Tool Version",	app->getClientVersion.Call(), buffer); numItems++; }
 
-	/* Save cover art.
+	/* Save album art.
 	 */
-	if (coverArtWriteToTags && coverArtWriteToAPEv2)
+	if (albumArtWriteToTags && albumArtWriteToAPEv2)
 	{
 		foreach (const Picture &picInfo, track.pictures)
 		{

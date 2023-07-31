@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -116,8 +116,8 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
 
-	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
-	Bool		 coverArtWriteToWMA	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToWMAMetadata", True);
+	Bool		 albumArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 albumArtWriteToWMA	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToWMAMetadata", True);
 
 	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
 	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
@@ -284,9 +284,9 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 		RenderWMAStringItem(g_wszWMToolName, app->getClientName.Call(), pHeaderInfo);
 		RenderWMAStringItem(g_wszWMToolVersion, app->getClientVersion.Call(), pHeaderInfo);
 
-		/* Save cover art.
+		/* Save album art.
 		 */
-		if (coverArtWriteToTags && coverArtWriteToWMA)
+		if (albumArtWriteToTags && albumArtWriteToWMA)
 		{
 			foreach (const Picture &picInfo, track.pictures)
 			{

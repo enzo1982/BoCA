@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -77,8 +77,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
 
-	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
-	Bool		 coverArtWriteToVorbis	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToVorbisComment", True);
+	Bool		 albumArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 albumArtWriteToVorbis	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToVorbisComment", True);
 
 	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
 	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
@@ -216,11 +216,11 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	{ RenderTagItem("ENCODER", app->getClientName.Call().Append(" ").Append(app->getClientVersion.Call()), buffer);	numItems++; }
 
-	/* Save cover art.
+	/* Save album art.
 	 */
-	if (coverArtWriteToTags && coverArtWriteToVorbis)
+	if (albumArtWriteToTags && albumArtWriteToVorbis)
 	{
-		/* This is the official way to store cover art in Vorbis
+		/* This is the official way to store album art in Vorbis
 		 * comments. It is used by most newer software.
 		 */
 		foreach (const Picture &picInfo, track.pictures)
@@ -320,7 +320,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 	/* Parse individual comment items.
 	 */
 	Int	 numItems     = in.InputNumber(4);
-	Int	 numCovers    = 0;
+	Int	 numAlbumArt  = 0;
 	Bool	 haveChapters = False;
 	Int	 itemsOffset  = in.GetPos();
 	Info	 info	      = track.GetInfo();
@@ -493,7 +493,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		{
 			if (currentConfig->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 			{
-				/* This is the official way to store cover art in Vorbis
+				/* This is the official way to store album art in Vorbis
 				 * comments. It is used by most newer software.
 				 */
 				Picture			 picture;
@@ -529,7 +529,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 		{
 			if (currentConfig->GetIntValue(ConfigID, "CoverArtReadFromTags", True))
 			{
-				/* This is an unofficial way to store cover art in Vorbis
+				/* This is an unofficial way to store album art in Vorbis
 				 * comments. It is used by some existing software.
 				 */
 				Picture			 picture;
@@ -537,9 +537,9 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 				Encoding::Base64(buffer).Decode(value);
 
-				if	(numCovers == 0) picture.type = 3; // Cover (front)
-				else if (numCovers == 1) picture.type = 4; // Cover (back)
-				else			 picture.type = 0; // Other
+				if	(numAlbumArt == 0) picture.type = 3; // Cover (front)
+				else if (numAlbumArt == 1) picture.type = 4; // Cover (back)
+				else			   picture.type = 0; // Other
 
 				picture.data = buffer;
 
@@ -554,7 +554,7 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 					if (picture.data[0] != 0 && picture.data[1] != 0) track.pictures.Add(picture);
 				}
 
-				numCovers++;
+				numAlbumArt++;
 			}
 		}
 		else if (id == "CUESHEET")
@@ -759,7 +759,7 @@ Error BoCA::TaggerVorbis::UpdateStreamInfo(const String &fileName, const Track &
 	 */
 	const Config	*currentConfig	     = GetConfiguration();
 
-	Bool		 coverArtWriteToTags = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 albumArtWriteToTags = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
 
 	/* Open input file.
 	 */
@@ -886,7 +886,7 @@ Error BoCA::TaggerVorbis::UpdateStreamInfo(const String &fileName, const Track &
 
 					/* Save picture packets to FLAC if not already done.
 					 */
-					if (isFLAC && op.packet[0] == 0x06 && coverArtWriteToTags && !wrotePictures)
+					if (isFLAC && op.packet[0] == 0x06 && albumArtWriteToTags && !wrotePictures)
 					{
 						foreach (const Picture &picInfo, track.pictures)
 						{

@@ -1,5 +1,5 @@
 ﻿ /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -116,8 +116,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
 
-	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
-	Bool		 coverArtWriteToMP4	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToMP4Metadata", True);
+	Bool		 albumArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 albumArtWriteToMP4	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToMP4Metadata", True);
 
 	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
 	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
@@ -165,9 +165,9 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	ex_MP4TagsSetEncodingTool(mp4Tags, app->getClientName.Call().Append(" ").Append(app->getClientVersion.Call()));
 
-	/* Save cover art.
+	/* Save album art.
 	 */
-	if (coverArtWriteToTags && coverArtWriteToMP4)
+	if (albumArtWriteToTags && albumArtWriteToMP4)
 	{
 		/* Put front and back covers first.
 		 */
@@ -180,7 +180,7 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 			else			    pictures.Add(picInfo);
 		}
 
-		/* Add cover art to tag.
+		/* Add album art to tag.
 		 */
 		foreach (const Picture &picInfo, pictures)
 		{

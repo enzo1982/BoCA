@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -124,8 +124,8 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 
 	Bool		 writeChapters	     = currentConfig->GetIntValue(ConfigID, "WriteChapters", True);
 
-	Bool		 coverArtWriteToTags = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
-	Bool		 coverArtWriteToFLAC = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToFLACMetadata", True);
+	Bool		 albumArtWriteToTags = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 albumArtWriteToFLAC = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToFLACMetadata", True);
 
 	/* Set up callbacks.
 	 */
@@ -182,7 +182,7 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 
 		if (tagger != NIL)
 		{
-			/* Disable writing cover art to Vorbis comment tags for FLAC files.
+			/* Disable writing album art to Vorbis comment tags for FLAC files.
 			 */
 			Config	*taggerConfig = Config::Copy(currentConfig);
 
@@ -240,7 +240,7 @@ Error BoCA::TaggerFLAC::UpdateStreamInfo(const String &streamURI, const Track &t
 	 */
 	Int64	 pictureSizeAfter = 0;
 
-	if (coverArtWriteToTags && coverArtWriteToFLAC)
+	if (albumArtWriteToTags && albumArtWriteToFLAC)
 	{
 		for (Int i = 0; i < track.pictures.Length(); i++)
 		{

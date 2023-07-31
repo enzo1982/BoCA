@@ -374,8 +374,8 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 
 	Bool		 preserveReplayGain	 = currentConfig->GetIntValue(ConfigID, "PreserveReplayGain", True);
 
-	Bool		 coverArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
-	Bool		 coverArtWriteToID3v2	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToID3v2", True);
+	Bool		 albumArtWriteToTags	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToTags", True);
+	Bool		 albumArtWriteToID3v2	 = currentConfig->GetIntValue(ConfigID, "CoverArtWriteToID3v2", True);
 
 	Bool		 replaceExistingComments = currentConfig->GetIntValue(ConfigID, "ReplaceExistingComments", False);
 	String		 defaultComment		 = currentConfig->GetStringValue(ConfigID, "DefaultComment", NIL);
@@ -635,9 +635,9 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		container.AddFrame(frame);
 	}
 
-	/* Save cover art.
+	/* Save album art.
 	 */
-	if (coverArtWriteToTags && coverArtWriteToID3v2)
+	if (albumArtWriteToTags && albumArtWriteToID3v2)
 	{
 		foreach (const Picture &picInfo, track.pictures)
 		{

@@ -205,7 +205,7 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 
 	nPicture.LoadFromFile(file);
 
-	/* Check if the cover art is already in our list.
+	/* Check if the album art is already in our list.
 	 */
 	foreach (const Picture &picture, pictures)
 	{
@@ -370,7 +370,7 @@ Bool BoCA::Track::SaveCoverArtFiles(const String &folder)
 			}
 		}
 
-		/* Save cover art file.
+		/* Save album art file.
 		 */
 		Bool	 useUnicode    = config->GetIntValue("Settings", "UseUnicodeFilenames", True);
 		Bool	 replaceSpaces = config->GetIntValue("Settings", "FilenamesReplaceSpaces", False);
