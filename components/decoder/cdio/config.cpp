@@ -167,7 +167,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 	if (!notificationAvailable) check_autoRead->Deactivate();
 
 	check_autoRip	= new CheckBox(i18n->TranslateString("Start ripping automatically"), check_autoRead->GetPosition() + Point(0, 26), Size(170, 0), &autoRip);
-	check_autoEject	= new CheckBox(i18n->TranslateString("Eject disk after ripping"), check_autoRip->GetPosition() + Point(0, 26), Size(170, 0), &autoEject);
+	check_autoEject	= new CheckBox(i18n->TranslateString("Eject disc after ripping"), check_autoRip->GetPosition() + Point(0, 26), Size(170, 0), &autoEject);
 
 	group_automatization->Add(check_autoRead);
 	group_automatization->Add(check_autoRip);
