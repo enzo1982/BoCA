@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -44,6 +44,8 @@ typedef int		(*MPG123_SPF)			(mpg123_handle *);
 typedef const char **	(*MPG123_SUPPORTED_DECODERS)	();
 typedef int		(*MPG123_DECODER)		(mpg123_handle *, const char *);
 
+typedef const char *	(*MPG123_DISTVERSION)		(unsigned int *, unsigned int *, unsigned int *);
+
 extern MPG123_INIT			 ex_mpg123_init;
 extern MPG123_EXIT			 ex_mpg123_exit;
 
@@ -61,3 +63,5 @@ extern MPG123_SPF			 ex_mpg123_spf;
 
 extern MPG123_SUPPORTED_DECODERS	 ex_mpg123_supported_decoders;
 extern MPG123_DECODER			 ex_mpg123_decoder;
+
+extern MPG123_DISTVERSION		 ex_mpg123_distversion;

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ const String &BoCA::DecoderMPG123::GetComponentSpecs()
 										\
 		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
 		  <component>							\
-		    <name>mpg123 Decoder</name>					\
+		    <name>mpg123 Decoder %VERSION%</name>			\
 		    <version>1.0</version>					\
 		    <id>mpg123-dec</id>						\
 		    <type>decoder</type>					\
@@ -46,6 +46,9 @@ const String &BoCA::DecoderMPG123::GetComponentSpecs()
 		  </component>							\
 										\
 		";
+
+		if (ex_mpg123_distversion != NIL) componentSpecs.Replace("%VERSION%", String("v").Append(ex_mpg123_distversion(NIL, NIL, NIL)));
+		else				  componentSpecs.Replace(" %VERSION%", String());
 	}
 
 	return componentSpecs;
