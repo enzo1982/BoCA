@@ -100,26 +100,26 @@ Version
 #include "Version.h"
 
 // year in the copyright strings
-#define MAC_YEAR 2023
+#define APE_YEAR 2024
 
 // build the version string
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
-#define MAC_VER_FILE_VERSION_STR                        STRINGIZE(MAC_VERSION_MAJOR) _T(".") STRINGIZE(MAC_VERSION_REVISION)
-#define MAC_VER_FILE_VERSION_STR_NARROW                 STRINGIZE(MAC_VERSION_MAJOR) "." STRINGIZE(MAC_VERSION_REVISION)
-#define MAC_VER_FILE_VERSION_STR_WIDE                   STRINGIZE(MAC_VERSION_MAJOR) L"." STRINGIZE(MAC_VERSION_REVISION)
+#define APE_VER_FILE_VERSION_STR                        STRINGIZE(APE_VERSION_MAJOR) _T(".") STRINGIZE(APE_VERSION_REVISION)
+#define APE_VER_FILE_VERSION_STR_NARROW                 STRINGIZE(APE_VERSION_MAJOR) "." STRINGIZE(APE_VERSION_REVISION)
+#define APE_VER_FILE_VERSION_STR_WIDE                   STRINGIZE(APE_VERSION_MAJOR) L"." STRINGIZE(APE_VERSION_REVISION)
 
-#define MAC_FILE_VERSION_NUMBER                         3990
-#define MAC_VERSION_STRING                              MAC_VER_FILE_VERSION_STR
-#define MAC_VERSION_NUMBER                              MAC_VERSION_MAJOR MAC_VERSION_REVISION
-#define MAC_NAME                                        _T("Monkey's Audio ") MAC_VER_FILE_VERSION_STR
-#define PLUGIN_NAME                                     "Monkey's Audio Player " MAC_VER_FILE_VERSION_STR_NARROW
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") MAC_VER_FILE_VERSION_STR _T(")")
-#define MAC_RESOURCE_VERSION_COMMA                      MAC_VERSION_MAJOR, MAC_VERSION_REVISION, 0, 0
-#define MAC_RESOURCE_VERSION_STRING                     MAC_VER_FILE_VERSION_STR
-#define MAC_RESOURCE_COPYRIGHT                          "Copyright (c) 2000-" STRINGIZE(MAC_YEAR) " Matthew T. Ashland"
-#define CONSOLE_NAME                                    L"--- Monkey's Audio Console Front End (v " MAC_VER_FILE_VERSION_STR_WIDE L") (c) Matthew T. Ashland ---\n"
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") MAC_VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(MAC_YEAR) _T(" by Matthew T. Ashland")
+#define APE_FILE_VERSION_NUMBER                         3990
+#define APE_VERSION_STRING                              APE_VER_FILE_VERSION_STR
+#define APE_VERSION_NUMBER                              APE_VERSION_MAJOR APE_VERSION_REVISION
+#define APE_NAME                                        _T("Monkey's Audio ") APE_VER_FILE_VERSION_STR
+#define PLUGIN_NAME                                     "Monkey's Audio Player " APE_VER_FILE_VERSION_STR_NARROW
+#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") APE_VER_FILE_VERSION_STR _T(")")
+#define APE_RESOURCE_VERSION_COMMA                      APE_VERSION_MAJOR, APE_VERSION_REVISION, 0, 0
+#define APE_RESOURCE_VERSION_STRING                     APE_VER_FILE_VERSION_STR
+#define APE_RESOURCE_COPYRIGHT                          "Copyright (c) 2000-" STRINGIZE(APE_YEAR) " Matthew T. Ashland"
+#define CONSOLE_NAME                                    L"--- Monkey's Audio Console Front End (v " APE_VER_FILE_VERSION_STR_WIDE L") (c) Matthew T. Ashland ---\n"
+#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") APE_VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(APE_YEAR) _T(" by Matthew T. Ashland")
 
 /**************************************************************************************************
 Global compiler settings (useful for porting)
@@ -292,7 +292,7 @@ Modes
 **************************************************************************************************/
 namespace APE
 {
-    enum MAC_MODES
+    enum APE_MODES
     {
         MODE_COMPRESS,
         MODE_DECOMPRESS,

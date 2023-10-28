@@ -70,25 +70,25 @@ Notes:
 /**************************************************************************************************
 Defines
 **************************************************************************************************/
-#define MAC_COMPRESSION_LEVEL_FAST          1000
-#define MAC_COMPRESSION_LEVEL_NORMAL        2000
-#define MAC_COMPRESSION_LEVEL_HIGH          3000
-#define MAC_COMPRESSION_LEVEL_EXTRA_HIGH    4000
-#define MAC_COMPRESSION_LEVEL_INSANE        5000
+#define APE_COMPRESSION_LEVEL_FAST          1000
+#define APE_COMPRESSION_LEVEL_NORMAL        2000
+#define APE_COMPRESSION_LEVEL_HIGH          3000
+#define APE_COMPRESSION_LEVEL_EXTRA_HIGH    4000
+#define APE_COMPRESSION_LEVEL_INSANE        5000
 
-#define MAC_FORMAT_FLAG_8_BIT               (1 << 0)    // is 8-bit [OBSOLETE]
-#define MAC_FORMAT_FLAG_CRC                 (1 << 1)    // uses the new CRC32 error detection [OBSOLETE]
-#define MAC_FORMAT_FLAG_HAS_PEAK_LEVEL      (1 << 2)    // uint32 nPeakLevel after the header [OBSOLETE]
-#define MAC_FORMAT_FLAG_24_BIT              (1 << 3)    // is 24-bit [OBSOLETE]
-#define MAC_FORMAT_FLAG_HAS_SEEK_ELEMENTS   (1 << 4)    // has the number of seek elements after the peak level
-#define MAC_FORMAT_FLAG_CREATE_WAV_HEADER   (1 << 5)    // create the wave header on decompression (not stored)
-#define MAC_FORMAT_FLAG_AIFF                (1 << 6)    // the file is an AIFF that was compressed (instead of WAV)
-#define MAC_FORMAT_FLAG_W64                 (1 << 7)    // the file is a W64 (instead of WAV)
-#define MAC_FORMAT_FLAG_SND                 (1 << 8)    // the file is a SND (instead of WAV)
-#define MAC_FORMAT_FLAG_BIG_ENDIAN          (1 << 9)    // flags that the file uses big endian encoding
-#define MAC_FORMAT_FLAG_CAF                 (1 << 10)   // the file is a CAF (instead of WAV)
-#define MAC_FORMAT_FLAG_SIGNED_8_BIT        (1 << 11)   // 8-bit values are signed
-#define MAC_FORMAT_FLAG_FLOATING_POINT      (1 << 12)   // floating point
+#define APE_FORMAT_FLAG_8_BIT               (1 << 0)    // is 8-bit [OBSOLETE]
+#define APE_FORMAT_FLAG_CRC                 (1 << 1)    // uses the new CRC32 error detection [OBSOLETE]
+#define APE_FORMAT_FLAG_HAS_PEAK_LEVEL      (1 << 2)    // uint32 nPeakLevel after the header [OBSOLETE]
+#define APE_FORMAT_FLAG_24_BIT              (1 << 3)    // is 24-bit [OBSOLETE]
+#define APE_FORMAT_FLAG_HAS_SEEK_ELEMENTS   (1 << 4)    // has the number of seek elements after the peak level
+#define APE_FORMAT_FLAG_CREATE_WAV_HEADER   (1 << 5)    // create the wave header on decompression (not stored)
+#define APE_FORMAT_FLAG_AIFF                (1 << 6)    // the file is an AIFF that was compressed (instead of WAV)
+#define APE_FORMAT_FLAG_W64                 (1 << 7)    // the file is a W64 (instead of WAV)
+#define APE_FORMAT_FLAG_SND                 (1 << 8)    // the file is a SND (instead of WAV)
+#define APE_FORMAT_FLAG_BIG_ENDIAN          (1 << 9)    // flags that the file uses big endian encoding
+#define APE_FORMAT_FLAG_CAF                 (1 << 10)   // the file is a CAF (instead of WAV)
+#define APE_FORMAT_FLAG_SIGNED_8_BIT        (1 << 11)   // 8-bit values are signed
+#define APE_FORMAT_FLAG_FLOATING_POINT      (1 << 12)   // floating point
 
 #define CREATE_WAV_HEADER_ON_DECOMPRESSION    -1
 #define MAX_AUDIO_BYTES_UNKNOWN -1
@@ -272,6 +272,8 @@ public:
         APE_INFO_FRAME_BLOCKS = 1029,               // blocks in a given frame [frame index, ignored]
         APE_INFO_TAG = 1030,                        // point to tag (CAPETag *) [ignored, ignored]
         APE_INFO_APL = 1031,                        // whether it's an APL file
+        APE_INFO_MD5 = 1032,                        // the MD5 checksum [buffer *, ignored]
+        APE_INFO_MD5_MATCHES = 1033,                // an MD5 checksum to test (returns ERROR_INVALID_CHECKSUM or ERROR_SUCCESS) [buffer *, ignored]
 
         APE_DECOMPRESS_CURRENT_BLOCK = 2000,        // current block location [ignored, ignored]
         APE_DECOMPRESS_CURRENT_MS = 2001,           // current millisecond location [ignored, ignored]
@@ -381,11 +383,11 @@ public:
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     virtual int Start(const str_utfn * pOutputFilename, const WAVEFORMATEX * pwfeInput,
-        int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = MAC_COMPRESSION_LEVEL_NORMAL,
+        int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL,
         const void * pHeaderData = APE_NULL, int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION, int nFlags = 0) = 0;
 
     virtual int StartEx(CIO * pioOutput, const WAVEFORMATEX * pwfeInput,
-        int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = MAC_COMPRESSION_LEVEL_NORMAL,
+        int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL,
         const void * pHeaderData = APE_NULL, int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
 
     /**************************************************************************************************
@@ -511,21 +513,21 @@ extern "C"
 {
     // process whole files
 #ifdef APE_SUPPORT_COMPRESS
-    DLLEXPORT int __stdcall CompressFile(const APE::str_ansi * pInputFilename, const APE::str_ansi * pOutputFilename, int nCompressionLevel = MAC_COMPRESSION_LEVEL_NORMAL, int * pPercentageDone = APE_NULL, APE::APE_PROGRESS_CALLBACK ProgressCallback = 0, int * pKillFlag = APE_NULL);
+    DLLEXPORT int __stdcall CompressFile(const APE::str_ansi * pInputFilename, const APE::str_ansi * pOutputFilename, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL, int * pPercentageDone = APE_NULL, APE::APE_PROGRESS_CALLBACK ProgressCallback = 0, int * pKillFlag = APE_NULL);
 #endif
     DLLEXPORT int __stdcall DecompressFile(const APE::str_ansi * pInputFilename, const APE::str_ansi * pOutputFilename, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
     DLLEXPORT int __stdcall ConvertFile(const APE::str_ansi * pInputFilename, const APE::str_ansi * pOutputFilename, int nCompressionLevel, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
     DLLEXPORT int __stdcall VerifyFile(const APE::str_ansi * pInputFilename, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag, bool bQuickVerifyIfPossible = false);
 
 #ifdef APE_SUPPORT_COMPRESS
-    DLLEXPORT int __stdcall CompressFileW(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel = MAC_COMPRESSION_LEVEL_NORMAL, int * pPercentageDone = APE_NULL, APE::APE_PROGRESS_CALLBACK ProgressCallback = 0, int * pKillFlag = APE_NULL);
+    DLLEXPORT int __stdcall CompressFileW(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL, int * pPercentageDone = APE_NULL, APE::APE_PROGRESS_CALLBACK ProgressCallback = 0, int * pKillFlag = APE_NULL);
 #endif
     DLLEXPORT int __stdcall DecompressFileW(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
     DLLEXPORT int __stdcall ConvertFileW(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
     DLLEXPORT int __stdcall VerifyFileW(const APE::str_utfn * pInputFilename, int * pPercentageDone, APE::APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag, bool bQuickVerifyIfPossible = false);
 
 #ifdef APE_SUPPORT_COMPRESS
-    DLLEXPORT int __stdcall CompressFileW2(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel = MAC_COMPRESSION_LEVEL_NORMAL, APE::IAPEProgressCallback * pProgressCallback = APE_NULL);
+    DLLEXPORT int __stdcall CompressFileW2(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL, APE::IAPEProgressCallback * pProgressCallback = APE_NULL);
 #endif
     DLLEXPORT int __stdcall DecompressFileW2(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, APE::IAPEProgressCallback * pProgressCallback = APE_NULL);
     DLLEXPORT int __stdcall ConvertFileW2(const APE::str_utfn * pInputFilename, const APE::str_utfn * pOutputFilename, int nCompressionLevel, APE::IAPEProgressCallback * pProgressCallback = APE_NULL);
