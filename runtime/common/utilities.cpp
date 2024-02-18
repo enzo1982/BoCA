@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -66,6 +66,21 @@ Void BoCA::Utilities::ErrorMessage(const String &message, const String &replace1
 
 	if (!config->GetIntValue("Settings", "EnableConsole", False)) QuickMessage(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2), i18n->TranslateString("Error"), Message::Buttons::Ok, Message::Icon::Error);
 	else							      Console::OutputString(String("\n").Append(i18n->TranslateString("Error")).Append(": ").Append(i18n->TranslateString(message).Replace("%1", replace1).Replace("%2", replace2)).Append("\n"));
+}
+
+/* Returns a string representing the duration given in ticks in the format hh:mm:ss.fff.
+ */
+String BoCA::Utilities::ConvertTicksToTimestamp(UnsignedInt64 ticks, Bool alwaysIncludeHours)
+{
+	Int hours   = ticks / 1000 / 60 / 60;
+	Int minutes = ticks / 1000 / 60 % 60;
+	Int seconds = ticks / 1000 % 60;
+	Int millis  = ticks % 1000;
+
+	return String(hours > 0 || alwaysIncludeHours ? String(hours   <  10 ?			     "0"  : "").Append(String::FromInt(hours  )).Append(":") : String())
+						       .Append(minutes <  10 ?			     "0"  : "").Append(String::FromInt(minutes)).Append(":")
+						       .Append(seconds <  10 ?			     "0"  : "").Append(String::FromInt(seconds)).Append(".")
+						       .Append(millis  < 100 ? (millis < 10 ? "00" : "0") : "").Append(String::FromInt(millis ));
 }
 
 /* Returns to path to the BoCA components directory.

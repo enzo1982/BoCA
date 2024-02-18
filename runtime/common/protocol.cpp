@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -11,6 +11,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <boca/common/protocol.h>
+#include <boca/common/utilities.h>
 
 namespace BoCA
 {
@@ -50,10 +51,7 @@ Void BoCA::Protocol::Release()
 
 Void BoCA::Protocol::WriteMessage(Protocol *protocol, const String &message, MessageType messageType, Int64 ticks)
 {
-	protocol->messages.Add(String(ticks / 1000 / 60 / 60 <  10 ?				 "0"  : "").Append(String::FromInt(ticks / 1000 / 60 / 60)).Append(":")
-			      .Append(ticks / 1000 / 60 % 60 <  10 ?				 "0"  : "").Append(String::FromInt(ticks / 1000 / 60 % 60)).Append(":")
-			      .Append(ticks / 1000 % 60	     <  10 ?				 "0"  : "").Append(String::FromInt(ticks / 1000 % 60     )).Append(".")
-			      .Append(ticks % 1000	     < 100 ? (ticks % 1000 < 10 ? "00" : "0") : "").Append(String::FromInt(ticks % 1000		 )).Append(" - ").Append(message));
+	protocol->messages.Add(Utilities::ConvertTicksToTimestamp(ticks, True).Append(" - ").Append(message));
 
 	if	(messageType == MessageTypeWarning) protocol->warnings.Add(message);
 	else if (messageType == MessageTypeError)   protocol->errors.Add(message);

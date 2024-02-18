@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -27,6 +27,8 @@ namespace BoCA
 			static Void		 InfoMessage(const String &, const String & = NIL, const String & = NIL);
 			static Void		 WarningMessage(const String &, const String & = NIL, const String & = NIL);
 			static Void		 ErrorMessage(const String &, const String & = NIL, const String & = NIL);
+
+			static String		 ConvertTicksToTimestamp(UnsignedInt64, Bool = False);
 
 			static String		 GetBoCADirectory();
 
