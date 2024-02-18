@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@ BoCA::ConfigureCDIO::ConfigureCDIO()
 {
 	const Config	*config = Config::Get();
 
-	Bool	 notificationAvailable = config->GetIntValue("Settings", "NotificationAvailable", False);
+	Bool	 notificationAvailable = config->GetIntValue("Internal", "NotificationAvailable", False);
 
 	autoRead	= notificationAvailable && config->GetIntValue(ConfigID, "AutoReadContents", True);
 	autoRip		= notificationAvailable && config->GetIntValue(ConfigID, "AutoRip", False);
@@ -344,7 +344,7 @@ Int BoCA::ConfigureCDIO::SaveSettings()
 		boca.DeleteComponent(info);
 	}
 
-	if (config->GetIntValue("Settings", "NotificationAvailable", False))
+	if (config->GetIntValue("Internal", "NotificationAvailable", False))
 	{
 		config->SetIntValue(ConfigID, "AutoReadContents", autoRead);
 		config->SetIntValue(ConfigID, "AutoRip", autoRip);
