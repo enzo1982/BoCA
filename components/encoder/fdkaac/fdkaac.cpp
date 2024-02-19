@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -241,7 +241,12 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	AACENC_InfoStruct	 aacInfo;
 	AACENC_InfoStruct_Old	&aacInfoOld = *(AACENC_InfoStruct_Old *) &aacInfo;
 
-	ex_aacEncEncode(handle, NULL, NULL, NULL, NULL);
+	if (ex_aacEncEncode(handle, NULL, NULL, NULL, NULL) != AACENC_OK)
+	{
+		ex_aacEncClose(&handle);
+		return False;
+	}
+
 	ex_aacEncInfo(handle, &aacInfo);
 
 	frameSize    = aacInfo.frameLength;
