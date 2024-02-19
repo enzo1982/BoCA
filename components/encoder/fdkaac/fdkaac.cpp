@@ -207,6 +207,10 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	Int	 bitrate      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
 	Int	 quality      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Quality", 4);
 
+	/* Fall back to HE if HEv2 is selected for non-stereo input.
+	 */
+	if (aacType == AOT_PS && format.channels != 2) aacType = AOT_SBR;
+
 	/* Create and configure FDK AAC encoder.
 	 */
 	HANDLE_AACENCODER	 handle = NIL;

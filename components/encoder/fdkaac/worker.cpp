@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -35,6 +35,10 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : pr
 	Int	 bitrate      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
 	Int	 quality      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Quality", 4);
 	Int	 bandwidth    = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bandwidth", 0);
+
+	/* Fall back to HE if HEv2 is selected for non-stereo input.
+	 */
+	if (aacType == AOT_PS && format.channels != 2) aacType = AOT_SBR;
 
 	/* Create and configure FDK AAC encoder.
 	 */

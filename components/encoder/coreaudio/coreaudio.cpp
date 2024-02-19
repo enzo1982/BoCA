@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -158,6 +158,11 @@ Bool BoCA::EncoderCoreAudio::Activate()
 	CA::UInt32	 codec	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Codec", CA::kAudioFormatMPEG4AAC);
 	Int		 kbps	      = config->GetIntValue(ConfigureCoreAudio::ConfigID, "Bitrate", 64);
 	Bool		 mp4Container = config->GetIntValue(ConfigureCoreAudio::ConfigID, "MP4Container", True);
+
+	/* Fall back to HE/ELD-SBR if HEv2/ELDv2 is selected for non-stereo input.
+	 */
+	if (codec == CA::kAudioFormatMPEG4AAC_HE_V2	     && format.channels != 2) codec = CA::kAudioFormatMPEG4AAC_HE;
+	if (codec == CA::kOptionalAudioFormatMPEG4AAC_ELD_V2 && format.channels != 2) codec = CA::kOptionalAudioFormatMPEG4AAC_ELD_SBR;
 
 	/* Fill out source format description.
 	 */
