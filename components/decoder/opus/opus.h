@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,6 +20,8 @@ namespace BoCA
 	class DecoderOpus : public CS::DecoderComponent
 	{
 		private:
+			ConfigLayer		*configLayer;
+
 			ogg_sync_state		 oy;
 			ogg_stream_state	 os;
 			ogg_page		 og;
@@ -48,6 +50,8 @@ namespace BoCA
 			Bool			 Seek(Int64);
 
 			Int			 ReadData(Buffer<UnsignedByte> &);
+
+			ConfigLayer		*GetConfigurationLayer();
 	};
 };
 

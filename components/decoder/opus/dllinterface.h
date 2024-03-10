@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -61,10 +61,12 @@ typedef OpusMSDecoder *			(*OPUSMULTISTREAMDECODERCREATE)		 (opus_int32, int, in
 typedef int				(*OPUSMULTISTREAMDECODE)		 (OpusMSDecoder *, const unsigned char *, opus_int32, opus_int16 *, int, int);
 typedef int				(*OPUSMULTISTREAMDECODERCTL)		 (OpusMSDecoder *, int, ...);
 typedef void				(*OPUSMULTISTREAMDECODERDESTROY)	 (OpusMSDecoder *);
+typedef int				(*OPUSDECODERCTL)			 (OpusDecoder *, int, ...);
 typedef const char *			(*OPUSGETVERSIONSTRING)			 ();
 
 extern OPUSMULTISTREAMDECODERCREATE	 ex_opus_multistream_decoder_create;
 extern OPUSMULTISTREAMDECODE		 ex_opus_multistream_decode;
 extern OPUSMULTISTREAMDECODERCTL	 ex_opus_multistream_decoder_ctl;
 extern OPUSMULTISTREAMDECODERDESTROY	 ex_opus_multistream_decoder_destroy;
+extern OPUSDECODERCTL			 ex_opus_decoder_ctl;
 extern OPUSGETVERSIONSTRING		 ex_opus_get_version_string;

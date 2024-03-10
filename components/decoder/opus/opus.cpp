@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -16,8 +16,11 @@
 #include <stdint.h>
 
 #include "opus.h"
+#include "config.h"
 
 using namespace smooth::IO;
+
+static Bool osceSupported = False;
 
 const String &BoCA::DecoderOpus::GetComponentSpecs()
 {
@@ -45,6 +48,12 @@ const String &BoCA::DecoderOpus::GetComponentSpecs()
 		";
 
 		componentSpecs.Replace("%VERSION%", String("v").Append(String(ex_opus_get_version_string()).Replace("libopus ", NIL)));
+
+		/* Check availability of Opus Speech Coding Enhancement (OSCE).
+		 */
+		const Array<String>	&version = String(ex_opus_get_version_string()).Replace("libopus ", NIL).Explode(".");
+
+		if (version.GetNth(0).ToInt() > 1 || (version.GetNth(0).ToInt() == 1 && version.GetNth(1).ToInt() >= 5)) osceSupported = True;
 	}
 
 	return componentSpecs;
@@ -330,6 +339,8 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderOpus::DecoderOpus()
 {
+	configLayer = NIL;
+
 	decoder	    = NIL;
 
 	sampleRate  = 48000;
@@ -347,12 +358,19 @@ BoCA::DecoderOpus::DecoderOpus()
 
 BoCA::DecoderOpus::~DecoderOpus()
 {
+	if (configLayer != NIL) Object::DeleteObject(configLayer);
 }
 
 Bool BoCA::DecoderOpus::Activate()
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
+	/* Get configuration.
+	 */
+	const Config	*config = GetConfiguration();
+
+	/* Parse packets and init decoder.
+	 */
 	ex_ogg_sync_init(&oy);
 
 	Bool	 initialized = False;
@@ -403,7 +421,7 @@ Bool BoCA::DecoderOpus::Activate()
 						else				      sampleRate = 48000;
 					}
 
-					int		 error	    = 0;
+					int		 error	    = OPUS_OK;
 					unsigned char	 mapping[2] = { 0, 1 };
 
 					if (setup->channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(sampleRate, setup->nb_channels, 1,		 setup->nb_channels - 1, mapping,	    &error);
@@ -411,6 +429,17 @@ Bool BoCA::DecoderOpus::Activate()
 
 					preSkip	    = setup->preskip / (48000 / sampleRate);
 					preSkipLeft = setup->preskip / (48000 / sampleRate);
+
+					if (osceSupported && error == OPUS_OK)
+					{
+						for (Int i = 0; i < (setup->channel_mapping == 0 ? 1 : setup->nb_streams); i++)
+						{
+							OpusDecoder	*streamDecoder = NIL;
+
+							ex_opus_multistream_decoder_ctl(decoder, OPUS_MULTISTREAM_GET_DECODER_STATE(i, &streamDecoder));
+							ex_opus_decoder_ctl(streamDecoder, OPUS_SET_COMPLEXITY(config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10)));
+						}
+					}
 				}
 
 				if (packetNum >= 1) done = True;
@@ -521,4 +550,11 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_7_1, Channel::Default_7_1);
 
 	return size;
+}
+
+ConfigLayer *BoCA::DecoderOpus::GetConfigurationLayer()
+{
+	if (osceSupported && configLayer == NIL) configLayer = new ConfigureOpus();
+
+	return configLayer;
 }

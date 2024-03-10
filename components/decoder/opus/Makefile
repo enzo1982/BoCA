@@ -8,7 +8,7 @@ VERSION	  = 1.0
 BOCA_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o opus.o
+OBJECTS	  = config.o dllinterface.o opus.o
 
 # Enter additional defines here:
 DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support
