@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -121,8 +121,8 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
 	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
-	startupInfo.hStdOutput	= GetStdHandle(STD_OUTPUT_HANDLE);
-	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
+	startupInfo.hStdOutput	= specs->debug ? GetStdHandle(STD_OUTPUT_HANDLE) : NIL;
+	startupInfo.hStdError	= specs->debug ? GetStdHandle(STD_ERROR_HANDLE) : NIL;
 
 	PROCESS_INFORMATION	 processInfo;
 

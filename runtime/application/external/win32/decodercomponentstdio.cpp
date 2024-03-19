@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -70,8 +70,8 @@ String BoCA::AS::DecoderComponentExternalStdIO::GetMD5(const String &encFileName
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
 	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
-	startupInfo.hStdOutput	= specs->external_md5_stderr ? GetStdHandle(STD_OUTPUT_HANDLE) : wPipe;
-	startupInfo.hStdError	= specs->external_md5_stderr ? wPipe : GetStdHandle(STD_ERROR_HANDLE);
+	startupInfo.hStdOutput	= specs->external_md5_stderr ? (specs->debug ? GetStdHandle(STD_OUTPUT_HANDLE) : NIL) : wPipe;
+	startupInfo.hStdError	= specs->external_md5_stderr ? wPipe : (specs->debug ? GetStdHandle(STD_ERROR_HANDLE) : NIL);
 
 	PROCESS_INFORMATION	 processInfo;
 
@@ -176,7 +176,7 @@ Float BoCA::AS::DecoderComponentExternalStdIO::GetApproximateDuration(const Stri
 	startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	startupInfo.wShowWindow	= SW_HIDE;
 	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
-	startupInfo.hStdOutput	= GetStdHandle(STD_OUTPUT_HANDLE);
+	startupInfo.hStdOutput	= NIL;
 	startupInfo.hStdError	= wPipe;
 
 	PROCESS_INFORMATION	 processInfo;
@@ -293,7 +293,7 @@ Error BoCA::AS::DecoderComponentExternalStdIO::GetStreamInfo(const String &strea
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
 	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
 	startupInfo.hStdOutput	= wPipe;
-	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
+	startupInfo.hStdError	= specs->debug ? GetStdHandle(STD_ERROR_HANDLE) : NIL;
 
 	PROCESS_INFORMATION	 processInfo;
 
@@ -545,7 +545,7 @@ Bool BoCA::AS::DecoderComponentExternalStdIO::Activate()
 	startupInfo.wShowWindow	= specs->debug ? SW_SHOW : SW_HIDE;
 	startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
 	startupInfo.hStdOutput	= wPipe;
-	startupInfo.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
+	startupInfo.hStdError	= specs->debug ? GetStdHandle(STD_ERROR_HANDLE) : NIL;
 
 	PROCESS_INFORMATION	 processInfo;
 
