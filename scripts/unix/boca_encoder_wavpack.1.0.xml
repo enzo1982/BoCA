@@ -17,6 +17,11 @@
     <mode>stdio</mode>
     <informat>wave</informat>
     <parameters>
+      <range name="Number of threads to use" argument="--threads=%VALUE" enabled="true" default="%THREADS" hidden="true">
+	<requires option="--threads"/>
+	<min>1</min>
+	<max>12</max>
+      </range>
       <range name="Enable lossy compression" argument="-b%VALUE" default="256" step="8">
 	<min alias="%1 kbps">64</min>
 	<max alias="%1 kbps">720</max>
