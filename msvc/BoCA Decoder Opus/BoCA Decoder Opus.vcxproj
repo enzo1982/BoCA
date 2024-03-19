@@ -232,6 +232,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\components\decoder\opus\config.h" />
     <ClInclude Include="..\..\components\decoder\opus\dllinterface.h" />
     <ClInclude Include="..\..\components\decoder\opus\ogg\ogg.h" />
     <ClInclude Include="..\..\components\decoder\opus\ogg\os_types.h" />
@@ -241,6 +242,7 @@
     <ClInclude Include="..\..\components\decoder\opus\opus\opus_types.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\components\decoder\opus\config.cpp" />
     <ClCompile Include="..\..\components\decoder\opus\dllinterface.cpp" />
     <ClCompile Include="..\..\components\decoder\opus\opus.cpp" />
   </ItemGroup>

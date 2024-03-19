@@ -42,12 +42,18 @@
     <ClInclude Include="..\..\components\decoder\opus\ogg\os_types.h">
       <Filter>Headerdateien\ogg</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\components\decoder\opus\config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\decoder\opus\dllinterface.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\components\decoder\opus\opus.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\decoder\opus\config.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
