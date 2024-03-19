@@ -20,9 +20,9 @@ OBJECTS	 += component/component.o component/decodercomponent.o component/devicei
 OBJECTS	 += core/core.o core/main.o
 
 ifeq ($(BUILD_WIN32),True)
-	OBJECTS += application/external/win32/decodercomponentfile.o application/external/win32/decodercomponentstdio.o application/external/win32/encodercomponentfile.o application/external/win32/encodercomponentstdio.o
+	OBJECTS += application/external/win32/decodercomponentfile.o application/external/win32/decodercomponentstdio.o application/external/win32/encodercomponentfile.o application/external/win32/encodercomponentstdio.o application/external/win32/utilities.o
 else ifeq ($(BUILD_UNIX),True)
-	OBJECTS += application/external/posix/decodercomponentfile.o application/external/posix/decodercomponentstdio.o application/external/posix/encodercomponentfile.o application/external/posix/encodercomponentstdio.o
+	OBJECTS += application/external/posix/decodercomponentfile.o application/external/posix/decodercomponentstdio.o application/external/posix/encodercomponentfile.o application/external/posix/encodercomponentstdio.o application/external/posix/utilities.o
 endif
 
 # Enter additional library dependencies here

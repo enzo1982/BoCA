@@ -231,6 +231,12 @@
     <ClCompile Include="..\..\runtime\application\streamcomponent.cpp">
       <Filter>Quelldateien\application</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\win32\utilities.cpp">
+      <Filter>Quelldateien\application\external\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\external\posix\utilities.cpp">
+      <Filter>Quelldateien\application\external\posix</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\boca.h">
@@ -385,6 +391,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\boca\component\streamcomponent.h">
       <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\external\utilities.h">
+      <Filter>Headerdateien\boca\application\external</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
