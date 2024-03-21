@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -19,6 +19,8 @@ BoCA::ConfigureRubberBand::ConfigureRubberBand()
 	const Config	*config = Config::Get();
 
 	tempo		= Math::Round(100.0 / (config->GetIntValue(ConfigID, "Stretch", 1000) / 1000.0));
+
+	pitchOption	= config->GetIntValue(ConfigID, "PitchOption", 0);
 	pitch		= Math::Round(Math::Log2(config->GetIntValue(ConfigID, "Pitch", 1000) / 1000.0) * 12.0 * 2.0);
 
 	smoothing	= config->GetIntValue(ConfigID, "Smoothing", False);
@@ -27,51 +29,94 @@ BoCA::ConfigureRubberBand::ConfigureRubberBand()
 
 	i18n->SetContext("DSP::RubberBand");
 
-	group_basic		= new GroupBox(i18n->TranslateString("Basic controls"), Point(7, 11), Size(400, 65));
+	/* Basic options.
+	 */
+	group_basic		= new GroupBox(i18n->TranslateString("Basic controls"), Point(7, 11), Size(400, 92));
 
 	text_tempo		= new Text(i18n->AddColon(i18n->TranslateString("Tempo")), Point(10, 15));
+	text_pitch		= new Text(i18n->AddColon(i18n->TranslateString("Pitch")), Point(10, 40));
 
-	slider_tempo		= new Slider(Point(10, 13), Size(150, 0), OR_HORZ, &tempo, 25, 200);
+	Int	 maxTextSize = Math::Max(text_tempo->GetUnscaledTextWidth(), text_pitch->GetUnscaledTextWidth());
+
+	slider_tempo		= new Slider(Point(maxTextSize + 16, 13), Size(150, 0), OR_HORZ, &tempo, 25, 200);
 	slider_tempo->onValueChange.Connect(&ConfigureRubberBand::OnChangeTempo, this);
 
 	text_tempo_value	= new Text(i18n->TranslateString("%1%", "Technical").Replace("%1", "+100"), Point(10, 15));
 	text_tempo_value->SetOrientation(OR_UPPERRIGHT);
 
-	text_pitch		= new Text(i18n->AddColon(i18n->TranslateString("Pitch")), Point(10, 40));
+	option_semitones		= new OptionBox(i18n->TranslateString("Semitones"), Point(maxTextSize + 16, 38), Size(100, 0), &pitchOption, 0);
+ 	option_semitones->onAction.Connect(&ConfigureRubberBand::OnChangePitchOption, this);
 
-	slider_pitch		= new Slider(Point(10, 38), Size(150, 0), OR_HORZ, &pitch, -36, 36);
-	slider_pitch->onValueChange.Connect(&ConfigureRubberBand::OnChangePitch, this);
+	option_ratio	= new OptionBox(i18n->TranslateString("Frequency ratio"), Point(maxTextSize + 16, 64), Size(100, 0), &pitchOption, 1);
+ 	option_ratio->onAction.Connect(&ConfigureRubberBand::OnChangePitchOption, this);
 
-	text_pitch_value	= new Text(i18n->TranslateString("%1 Semitones").Replace("%1", "+24.0"), Point(10, 40));
-	text_pitch_value->SetOrientation(OR_UPPERRIGHT);
+	maxTextSize = Math::Max(option_semitones->GetUnscaledTextWidth(), option_ratio->GetUnscaledTextWidth());
 
-	Int	 maxTextSize = Math::Max(text_tempo->GetUnscaledTextWidth(), text_pitch->GetUnscaledTextWidth());
+	option_semitones->SetWidth(maxTextSize + 23);
+	option_ratio->SetWidth(maxTextSize + 23);
 
-	slider_tempo->SetX(maxTextSize + 16);
-	slider_pitch->SetX(maxTextSize + 16);
+	slider_semitones	= new Slider(Point(option_semitones->GetX() + option_semitones->GetWidth() + 8, 38), Size(150, 0), OR_HORZ, &pitch, -36, 36);
+	slider_semitones->onValueChange.Connect(&ConfigureRubberBand::OnChangeSemitones, this);
 
-	maxTextSize = Math::Max(text_tempo_value->GetUnscaledTextWidth(), text_pitch_value->GetUnscaledTextWidth());
+	text_semitones_value	= new Text("+24.0", Point(10, 40));
+	text_semitones_value->SetOrientation(OR_UPPERRIGHT);
+
+	edit_ratio_num		= new EditBox("000.00", Point(option_ratio->GetX() + option_ratio->GetWidth() + 8, 63), Size(50, 0), 8);
+	edit_ratio_num->SetFlags(EDB_NUMERIC);
+	edit_ratio_num->SetWidth(edit_ratio_num->GetUnscaledTextWidth() + 6);
+	edit_ratio_num->SetText(String::FromFloat(config->GetIntValue(ConfigID, "RatioNum", 4320000) / 10000.0));
+ 	edit_ratio_num->onInput.Connect(&ConfigureRubberBand::OnEditRatio, this);
+
+	text_ratio_num_hz	= new Text(i18n->TranslateString("Hz"), Point(edit_ratio_num->GetX() + edit_ratio_num->GetWidth() + 5, 66));
+	text_ratio_colon	= new Text(i18n->TranslateString(":"), Point(text_ratio_num_hz->GetX() + text_ratio_num_hz->GetUnscaledTextWidth() + 5, 66));
+
+	edit_ratio_den		= new EditBox(String::FromFloat(config->GetIntValue(ConfigID, "RatioDen", 4400000) / 10000.0), Point(text_ratio_colon->GetX() + text_ratio_colon->GetUnscaledTextWidth() + 5, 63), Size(edit_ratio_num->GetWidth(), 0), 8);
+	edit_ratio_den->SetFlags(EDB_NUMERIC);
+ 	edit_ratio_den->onInput.Connect(&ConfigureRubberBand::OnEditRatio, this);
+
+	text_ratio_den_hz	= new Text(i18n->TranslateString("Hz"), Point(edit_ratio_den->GetX() + edit_ratio_den->GetWidth() + 5, 66));
+	text_ratio_equals	= new Text(i18n->TranslateString("="), Point(text_ratio_den_hz->GetX() + text_ratio_den_hz->GetUnscaledTextWidth() + 5, 66));
+
+	text_ratio_value	= new Text(NIL, Point(text_ratio_equals->GetX() + text_ratio_equals->GetUnscaledTextWidth() + 5, 66));
+
+	maxTextSize = Math::Max(text_tempo_value->GetUnscaledTextWidth(), text_semitones_value->GetUnscaledTextWidth());
 
 	text_tempo_value->SetX(maxTextSize + 10);
-	text_pitch_value->SetX(maxTextSize + 10);
+	text_semitones_value->SetX(maxTextSize + 10);
 
 	slider_tempo->SetWidth(group_basic->GetWidth() - slider_tempo->GetX() - maxTextSize - 18);
-	slider_pitch->SetWidth(group_basic->GetWidth() - slider_pitch->GetX() - maxTextSize - 18);
+	slider_semitones->SetWidth(group_basic->GetWidth() - slider_semitones->GetX() - maxTextSize - 18);
 
 	group_basic->Add(text_tempo);
 	group_basic->Add(slider_tempo);
 	group_basic->Add(text_tempo_value);
 
 	group_basic->Add(text_pitch);
-	group_basic->Add(slider_pitch);
-	group_basic->Add(text_pitch_value);
+
+	group_basic->Add(option_semitones);
+	group_basic->Add(slider_semitones);
+	group_basic->Add(text_semitones_value);
+
+	group_basic->Add(option_ratio);
+	group_basic->Add(edit_ratio_num);
+	group_basic->Add(text_ratio_num_hz);
+	group_basic->Add(text_ratio_colon);
+	group_basic->Add(edit_ratio_den);
+	group_basic->Add(text_ratio_den_hz);
+	group_basic->Add(text_ratio_equals);
+	group_basic->Add(text_ratio_value);
 
 	Add(group_basic);
 
 	OnChangeTempo(slider_tempo->GetValue());
-	OnChangePitch(slider_pitch->GetValue());
 
-	group_tuning		= new GroupBox(i18n->TranslateString("Advanced options"), Point(7, 87), Size(400, 228));
+	OnChangePitchOption();
+	OnEditRatio();
+	OnChangeSemitones(slider_semitones->GetValue());
+
+	/* Tuning options.
+	 */
+	group_tuning		= new GroupBox(i18n->TranslateString("Advanced options"), Point(7, 114), Size(400, 228));
 
 	text_detector		= new Text(i18n->AddColon(i18n->TranslateString("Transient detection")), Point(10, 15));
 	combo_detector		= new ComboBox(Point(10, 12), Size(300, 0));
@@ -169,7 +214,7 @@ BoCA::ConfigureRubberBand::ConfigureRubberBand()
 
 	Add(group_tuning);
 
-	SetSize(Size(414, 322));
+	SetSize(Size(414, 349));
 }
 
 BoCA::ConfigureRubberBand::~ConfigureRubberBand()
@@ -181,8 +226,19 @@ BoCA::ConfigureRubberBand::~ConfigureRubberBand()
 	DeleteObject(text_tempo_value);
 
 	DeleteObject(text_pitch);
-	DeleteObject(slider_pitch);
-	DeleteObject(text_pitch_value);
+
+	DeleteObject(option_semitones);
+	DeleteObject(slider_semitones);
+	DeleteObject(text_semitones_value);
+
+	DeleteObject(option_ratio);
+	DeleteObject(edit_ratio_num);
+	DeleteObject(text_ratio_num_hz);
+	DeleteObject(text_ratio_colon);
+	DeleteObject(edit_ratio_den);
+	DeleteObject(text_ratio_den_hz);
+	DeleteObject(text_ratio_equals);
+	DeleteObject(text_ratio_value);
 
 	DeleteObject(group_tuning);
 
@@ -214,6 +270,10 @@ Int BoCA::ConfigureRubberBand::SaveSettings()
 	Config	*config = Config::Get();
 
 	config->SetIntValue(ConfigID, "Stretch", Math::Round(1000.0 / (tempo / 100.0)));
+
+	config->SetIntValue(ConfigID, "PitchOption", pitchOption);
+	config->SetIntValue(ConfigID, "RatioNum", Math::Round(edit_ratio_num->GetText().ToFloat() * 10000.0));
+	config->SetIntValue(ConfigID, "RatioDen", Math::Round(edit_ratio_den->GetText().ToFloat() * 10000.0));
 	config->SetIntValue(ConfigID, "Pitch", Math::Round(Math::Pow(2.0, pitch / 2.0 / 12.0) * 1000.0));
 
 	config->SetIntValue(ConfigID, "Detector", combo_detector->GetSelectedEntryNumber());
@@ -236,11 +296,52 @@ Void BoCA::ConfigureRubberBand::OnChangeTempo(Int tempo)
 	text_tempo_value->SetText(i18n->TranslateString("%1%", "Technical").Replace("%1", String(tempo >= 100 ? "+" : NIL).Append(String::FromInt(tempo - 100))));
 }
 
-Void BoCA::ConfigureRubberBand::OnChangePitch(Int pitch)
+Void BoCA::ConfigureRubberBand::OnChangePitchOption()
+{
+	if (pitchOption == 0)
+	{
+		edit_ratio_num->Deactivate();
+		text_ratio_num_hz->Deactivate();
+		text_ratio_colon->Deactivate();
+		edit_ratio_den->Deactivate();
+		text_ratio_den_hz->Deactivate();
+		text_ratio_equals->Deactivate();
+		text_ratio_value->Deactivate();
+
+		slider_semitones->Activate();
+		text_semitones_value->Activate();
+	}
+	else
+	{
+		slider_semitones->Deactivate();
+		text_semitones_value->Deactivate();
+
+		edit_ratio_num->Activate();
+		text_ratio_num_hz->Activate();
+		text_ratio_colon->Activate();
+		edit_ratio_den->Activate();
+		text_ratio_den_hz->Activate();
+		text_ratio_equals->Activate();
+		text_ratio_value->Activate();
+	}
+}
+
+Void BoCA::ConfigureRubberBand::OnEditRatio()
+{
+	I18n	*i18n = I18n::Get();
+
+	Float	 ratioNum = edit_ratio_num->GetText().ToFloat();
+	Float	 ratioDen = edit_ratio_den->GetText().ToFloat();
+
+	if (ratioNum <= 0.0 || ratioDen <= 0.0)	text_ratio_value->SetText(i18n->TranslateString("invalid"));
+	else					text_ratio_value->SetText(String::FromFloat(Math::Round(ratioNum / ratioDen * 10000.0) / 10000.0));
+}
+
+Void BoCA::ConfigureRubberBand::OnChangeSemitones(Int pitch)
 {
 	I18n	*i18n = I18n::Get();
 
 	i18n->SetContext("DSP::RubberBand");
 
-	text_pitch_value->SetText(i18n->TranslateString("%1 Semitones").Replace("%1", String(pitch >= 0 ? "+" : NIL).Append(String::FromFloat(pitch / 2.0)).Append(pitch % 2 == 0 ? ".0" : NIL)));
+	text_semitones_value->SetText(String(pitch >= 0 ? "+" : NIL).Append(String::FromFloat(pitch / 2.0)).Append(pitch % 2 == 0 ? ".0" : NIL));
 }

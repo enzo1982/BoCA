@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2017 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -33,8 +33,19 @@ namespace BoCA
 			Text			*text_tempo_value;
 
 			Text			*text_pitch;
-			Slider			*slider_pitch;
-			Text			*text_pitch_value;
+
+			OptionBox		*option_semitones;
+			Slider			*slider_semitones;
+			Text			*text_semitones_value;
+
+			OptionBox		*option_ratio;
+			EditBox			*edit_ratio_num;
+			Text			*text_ratio_num_hz;
+			Text			*text_ratio_colon;
+			EditBox			*edit_ratio_den;
+			Text			*text_ratio_den_hz;
+			Text			*text_ratio_equals;
+			Text			*text_ratio_value;
 
 			GroupBox		*group_tuning;
 
@@ -61,12 +72,17 @@ namespace BoCA
 			ComboBox		*combo_channels;
 
 			Int			 tempo;
+
+			Int			 pitchOption;
 			Int			 pitch;
 
 			Bool			 smoothing;
 		slots:
 			Void			 OnChangeTempo(Int);
-			Void			 OnChangePitch(Int);
+
+			Void			 OnChangePitchOption();
+			Void			 OnEditRatio();
+			Void			 OnChangeSemitones(Int);
 		public:
 			static const String	 ConfigID;
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2018 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -72,7 +72,19 @@ Bool BoCA::DSPRubberBand::Activate()
 	const Config	*config = GetConfiguration();
 
 	Float64	 timeStretch = config->GetIntValue(ConfigureRubberBand::ConfigID, "Stretch", 1000) / 1000.0;
+
+	Bool	 pitchOption = config->GetIntValue(ConfigureRubberBand::ConfigID, "PitchOption", 0);
+
+	Float	 ratioNum    = config->GetIntValue(ConfigureRubberBand::ConfigID, "RatioNum", 4320000) / 10000.0;
+	Float	 ratioDen    = config->GetIntValue(ConfigureRubberBand::ConfigID, "RatioDen", 4400000) / 10000.0;
+
 	Float64	 pitchScale  = config->GetIntValue(ConfigureRubberBand::ConfigID, "Pitch", 1000) / 1000.0;
+
+	if (pitchOption == 1)
+	{
+		if (ratioNum <= 0.0 || ratioDen <= 0.0) pitchScale = 1.0;
+		else					pitchScale = ratioNum / ratioDen;
+	}
 
 	Int	 detector    = config->GetIntValue(ConfigureRubberBand::ConfigID, "Detector", 0);
 	Int	 transients  = config->GetIntValue(ConfigureRubberBand::ConfigID, "Transients", 0);
