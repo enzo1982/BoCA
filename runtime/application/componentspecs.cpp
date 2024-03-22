@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,6 +14,9 @@
 #include <boca/common/config.h>
 
 static Array< Array<String> >				 formatCompanions;
+
+static Array< Bool >					 parameterHidden;
+static Array< Array<BoCA::ParameterRequirement> >	 parameterRequirements;
 static Array< Array<BoCA::ParameterDependency> >	 parameterDependencies;
 
 const Array<String> &BoCA::AS::FileFormat::GetCompanionExtensions() const
@@ -30,6 +33,37 @@ Void BoCA::AS::FileFormat::AddCompanionExtension(const String &nExt)
 	if (GetCompanionExtensions().Length() == 0) formatCompanions.Add(Array<String>(), index);
 
 	formatCompanions.GetReference(index).Add(nExt);
+}
+
+Bool BoCA::AS::Parameter::GetHidden() const
+{
+	Int	 index = Number(Int64(this)).ToHexString().ComputeCRC32();
+
+	return parameterHidden.Get(index);
+}
+
+Void BoCA::AS::Parameter::SetHidden(Bool nHidden)
+{
+	Int	 index = Number(Int64(this)).ToHexString().ComputeCRC32();
+
+	if (!parameterHidden.Set(index, nHidden))
+		parameterHidden.Add(nHidden, index);
+}
+
+const Array<BoCA::ParameterRequirement> &BoCA::AS::Parameter::GetRequirements() const
+{
+	Int	 index = Number(Int64(this)).ToHexString().ComputeCRC32();
+
+	return parameterRequirements.Get(index);
+}
+
+Void BoCA::AS::Parameter::AddRequirement(const BoCA::ParameterRequirement &nReq)
+{
+	Int	 index = Number(Int64(this)).ToHexString().ComputeCRC32();
+
+	if (GetRequirements().Length() == 0) parameterRequirements.Add(Array<ParameterRequirement>(), index);
+
+	parameterRequirements.GetReference(index).Add(nReq);
 }
 
 const Array<BoCA::ParameterDependency> &BoCA::AS::Parameter::GetDependencies() const
@@ -296,33 +330,59 @@ Bool BoCA::AS::ComponentSpecs::LoadFromXML(const String &file)
 	return ParseXMLSpec(in.InputString(in.Size()).Trim());
 }
 
-String BoCA::AS::ComponentSpecs::GetExternalArgumentsString()
+String BoCA::AS::ComponentSpecs::GetExternalArgumentsString(const Config *config)
 {
-	Config	*config = Config::Get();
+	/* Get number of threads to use.
+	 */
+	Bool	 enableParallel = config->GetIntValue("Resources", "EnableParallelConversions", True);
+	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", True);
+	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
+
+	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
+
+	/* Build arguments string.
+	 */
 	String	 arguments;
 
 	foreach (Parameter *param, parameters)
 	{
+		String	 paramName    = param->GetName();
+		Bool	 paramEnabled = param->GetEnabled();
+		String	 paramDefault = param->GetDefault().Replace("%THREADS", String::FromInt(numberOfThreads));
+
 		switch (param->GetType())
 		{
 			case PARAMETER_TYPE_SWITCH:
-				if (!config->GetIntValue(id, param->GetName(), param->GetEnabled())) continue;
+				if (!config->GetIntValue(id, paramName, paramEnabled)) continue;
 
 				arguments.Append(param->GetArgument()).Append(" ");
 
 				break;
 			case PARAMETER_TYPE_SELECTION:
-				if (!config->GetIntValue(id, String("Set ").Append(param->GetName()), param->GetEnabled())) continue;
+				if (!config->GetIntValue(id, String("Set ").Append(paramName), paramEnabled)) continue;
 
-				arguments.Append(param->GetArgument().Replace("%VALUE", config->GetStringValue(id, param->GetName(), param->GetDefault()))).Append(" ");
+				arguments.Append(param->GetArgument().Replace("%VALUE", config->GetStringValue(id, paramName, paramDefault))).Append(" ");
 
 				break;
 			case PARAMETER_TYPE_RANGE:
-				if (!config->GetIntValue(id, String("Set ").Append(param->GetName()), param->GetEnabled())) continue;
+			{
+				if (!config->GetIntValue(id, String("Set ").Append(paramName), paramEnabled)) continue;
 
-				arguments.Append(param->GetArgument().Replace("%VALUE", String::FromFloat(config->GetIntValue(id, param->GetName(), Math::Round(param->GetDefault().ToFloat() / param->GetStepSize())) * param->GetStepSize()))).Append(" ");
+				Float	 value = config->GetIntValue(id, paramName, Math::Round(paramDefault.ToFloat() / param->GetStepSize())) * param->GetStepSize();
+
+				Float	 min   = 0;
+				Float	 max   = 0;
+
+				foreach(Option * option, param->GetOptions())
+				{
+					if	(option->GetType() == OPTION_TYPE_MIN) min = option->GetValue().ToInt();
+					else if (option->GetType() == OPTION_TYPE_MAX) max = option->GetValue().ToInt();
+				}
+
+				arguments.Append(param->GetArgument().Replace("%VALUE", String::FromFloat(Math::Max(min, Math::Min(value, max))))).Append(" ");
 
 				break;
+			}
 			default:
 				/* Unsupported parameter type.
 				 */
@@ -618,12 +678,11 @@ Bool BoCA::AS::ComponentSpecs::ParseParameters(XML::Node *root)
 		if (node->GetAttributeByName("name")	 != NIL) parameter->SetName(node->GetAttributeByName("name")->GetContent());
 		if (node->GetAttributeByName("argument") != NIL) parameter->SetArgument(node->GetAttributeByName("argument")->GetContent());
 		if (node->GetAttributeByName("enabled")	 != NIL) parameter->SetEnabled(node->GetAttributeByName("enabled")->GetContent() == "true" ? True : False);
+		if (node->GetAttributeByName("hidden")	 != NIL) parameter->SetHidden(node->GetAttributeByName("hidden")->GetContent() == "true" ? True : False);
 
 		if (node->GetName() == "switch")
 		{
 			parameter->SetType(PARAMETER_TYPE_SWITCH);
-
-			ParseParameterDependencies(parameter, node);
 		}
 		else if (node->GetName() == "selection")
 		{
@@ -649,8 +708,6 @@ Bool BoCA::AS::ComponentSpecs::ParseParameters(XML::Node *root)
 					parameter->AddOption(option);
 				}
 			}
-
-			ParseParameterDependencies(parameter, node);
 		}
 		else if (node->GetName() == "range")
 		{
@@ -680,11 +737,33 @@ Bool BoCA::AS::ComponentSpecs::ParseParameters(XML::Node *root)
 					parameter->AddOption(option);
 				}
 			}
-
-			ParseParameterDependencies(parameter, node);
 		}
 
+		ParseParameterRequirements(parameter, node);
+		ParseParameterDependencies(parameter, node);
+
 		parameters.Add(parameter);
+	}
+
+	return True;
+}
+
+Bool BoCA::AS::ComponentSpecs::ParseParameterRequirements(Parameter *parameter, XML::Node *node)
+{
+	for (Int i = 0; i < node->GetNOfNodes(); i++)
+	{
+		XML::Node	*node2 = node->GetNthNode(i);
+
+		if (node2->GetName() == "requires")
+		{
+			ParameterRequirement	 requirement;
+
+			requirement.option    = node2->GetAttributeByName("option")    != NIL ?	 node2->GetAttributeByName("option")->GetContent()		: String();
+			requirement.arguments = node2->GetAttributeByName("arguments") != NIL ?	 node2->GetAttributeByName("arguments")->GetContent()		: String();
+			requirement.useStderr = node2->GetAttributeByName("stream")    != NIL ? (node2->GetAttributeByName("stream")->GetContent() == "stderr")	: False;
+
+			if (requirement.option != NIL) parameter->AddRequirement(requirement);
+		}
 	}
 
 	return True;

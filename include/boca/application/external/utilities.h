@@ -22,6 +22,8 @@ namespace BoCA
 		class ExternalUtilities
 		{
 			public:
+				static Void	 CheckParameterRequirements(ComponentSpecs *);
+
 				static String	 GetMD5(const ComponentSpecs *, const String &);
 		};
 	};

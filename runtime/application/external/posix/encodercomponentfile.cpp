@@ -88,23 +88,12 @@ Bool BoCA::AS::EncoderComponentExternalFile::Deactivate()
 
 	delete out;
 
-	/* Get number of threads to use.
-	 */
-	const Config	*config = GetConfiguration();
-
-	Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
-	Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", True);
-	Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
-
-	if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
-
 	/* Start 3rd party command line encoder.
 	 */
 	const Info	&info = track.GetInfo();
 
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(specs->external_arguments).Replace("%THREADS", String::FromInt(Math::Min(numberOfThreads, 8)))
-							      .Replace("%OPTIONS", specs->GetExternalArgumentsString())
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString(GetConfiguration()))
 							      .Replace("%INFILE", String(wavFileName).Replace("\\", "\\\\").Replace(" ", "\\ ")
 												     .Replace("\"", "\\\"").Replace("\'", "\\\'").Replace("`", "\\`")
 												     .Replace("(", "\\(").Replace(")", "\\)").Replace("<", "\\<").Replace(">", "\\>")

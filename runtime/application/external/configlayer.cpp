@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -44,122 +44,125 @@ BoCA::AS::ConfigLayerExternal::ConfigLayerExternal(ComponentSpecs *iSpecs)
 		CheckBox	*checkBox = new CheckBox(i18n->TranslateString(param->GetName()), position, Size(100, 0));
 		Layer		*layer	  = new Layer(param->GetName());
 
-		checkBox->onAction.Connect(&ConfigLayerExternal::OnSelectParameter, this);
-		checkBox->onAction.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
-
-		layer->SetMetrics(position + Point(230, -1), Size(230, 39));
-		layer->SetOrientation(OR_UPPERRIGHT);
-
-		switch (param->GetType())
+		if (!param->GetHidden())
 		{
-			case PARAMETER_TYPE_SWITCH:
-				checkBox->SetChecked(config->GetIntValue(specs->id, param->GetName(), param->GetEnabled()));
+			checkBox->onAction.Connect(&ConfigLayerExternal::OnSelectParameter, this);
+			checkBox->onAction.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
 
-				position += Point(0, 25);
-				layer->SetHeight(24);
+			layer->SetMetrics(position + Point(230, -1), Size(230, 39));
+			layer->SetOrientation(OR_UPPERRIGHT);
 
-				break;
-			case PARAMETER_TYPE_SELECTION:
-				checkBox->SetText(i18n->AddColon(checkBox->GetText()));
-				checkBox->SetChecked(config->GetIntValue(specs->id, String("Set ").Append(param->GetName()), param->GetEnabled()));
+			switch (param->GetType())
+			{
+				case PARAMETER_TYPE_SWITCH:
+					checkBox->SetChecked(config->GetIntValue(specs->id, param->GetName(), param->GetEnabled()));
 
-				maxTextSize = Math::Max(maxTextSize, checkBox->GetUnscaledTextWidth());
+					position += Point(0, 25);
+					layer->SetHeight(24);
 
-				{
-					ComboBox	*selection     = new ComboBox(Point(0, 0), Size(230, 0));
-					String		 selectedValue = config->GetStringValue(specs->id, param->GetName(), param->GetDefault());
+					break;
+				case PARAMETER_TYPE_SELECTION:
+					checkBox->SetText(i18n->AddColon(checkBox->GetText()));
+					checkBox->SetChecked(config->GetIntValue(specs->id, String("Set ").Append(param->GetName()), param->GetEnabled()));
 
-					foreach (Option *option, param->GetOptions())
+					maxTextSize = Math::Max(maxTextSize, checkBox->GetUnscaledTextWidth());
+
 					{
-						ListEntry	*entry = selection->AddEntry(i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue()));
+						ComboBox	*selection     = new ComboBox(Point(0, 0), Size(230, 0));
+						String		 selectedValue = config->GetStringValue(specs->id, param->GetName(), param->GetDefault());
 
-						if (selectedValue == option->GetValue()) selection->SelectEntry(entry);
+						foreach (Option *option, param->GetOptions())
+						{
+							ListEntry	*entry = selection->AddEntry(i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue()));
+
+							if (selectedValue == option->GetValue()) selection->SelectEntry(entry);
+						}
+
+						/* Select first entry if no default was provided
+						 */
+						if (selectedValue == NIL) selection->SelectNthEntry(0);
+
+						selection->onSelectEntry.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
+
+						layer->Add(selection);
+
+						group_parameters->Add(layer);
+
+						widgets_parameters.Add(selection);
 					}
 
-					/* Select first entry if no default was provided
+					position += Point(0, 26);
+					layer->SetHeight(25);
+
+					break;
+				case PARAMETER_TYPE_RANGE:
+					checkBox->SetText(i18n->AddColon(checkBox->GetText()));
+					checkBox->SetChecked(config->GetIntValue(specs->id, String("Set ").Append(param->GetName()), param->GetEnabled()));
+
+					maxTextSize = Math::Max(maxTextSize, checkBox->GetUnscaledTextWidth());
+
+					{
+						Int	 min = 0;
+						Int	 max = 0;
+
+						String	 minAlias;
+						String	 maxAlias;
+
+						foreach (Option *option, param->GetOptions())
+						{
+							if (option->GetType() == OPTION_TYPE_MIN)
+							{
+								min	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
+								minAlias = i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue());
+							}
+
+							if (option->GetType() == OPTION_TYPE_MAX)
+							{
+								max	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
+								maxAlias = i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue());
+							}
+						}
+
+						Slider	*range = new Slider(Point(0, 1), Size(210, 0), OR_HORZ, NIL, min, max);
+						Text	*value = new Text(String::FromFloat(max * param->GetStepSize()).Append(param->GetStepSize() < 1 ? ".0" : NIL), Point(220, 3));
+
+						range->SetWidth(222 - value->GetUnscaledTextWidth());
+
+						range->SetValue(config->GetIntValue(specs->id, param->GetName(), param->GetDefault().ToFloat() / param->GetStepSize()));
+
+						range->onValueChange.Connect(&ConfigLayerExternal::OnSliderValueChange, this);
+						range->onValueChange.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
+
+						Text	*minText = new Text(minAlias, Point(0, 20));
+						Text	*maxText = new Text(maxAlias, Point(0, 20));
+
+						maxText->SetPosition(Point(221 - value->GetUnscaledTextWidth() - maxText->GetUnscaledTextWidth(), 20));
+
+						layer->Add(range);
+						layer->Add(value);
+						layer->Add(minText);
+						layer->Add(maxText);
+
+						group_parameters->Add(layer);
+
+						widgets_parameters.Add(range);
+						widgets_parameters.Add(value);
+						widgets_parameters.Add(minText);
+						widgets_parameters.Add(maxText);
+					}
+
+					position += Point(0, 39);
+					layer->SetHeight(38);
+
+					break;
+				default:
+					/* Unsupported parameter type.
 					 */
-					if (selectedValue == NIL) selection->SelectNthEntry(0);
+					break;
+			}
 
-					selection->onSelectEntry.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
-
-					layer->Add(selection);
-
-					group_parameters->Add(layer);
-
-					widgets_parameters.Add(selection);
-				}
-
-				position += Point(0, 26);
-				layer->SetHeight(25);
-
-				break;
-			case PARAMETER_TYPE_RANGE:
-				checkBox->SetText(i18n->AddColon(checkBox->GetText()));
-				checkBox->SetChecked(config->GetIntValue(specs->id, String("Set ").Append(param->GetName()), param->GetEnabled()));
-
-				maxTextSize = Math::Max(maxTextSize, checkBox->GetUnscaledTextWidth());
-
-				{
-					Int	 min = 0;
-					Int	 max = 0;
-
-					String	 minAlias;
-					String	 maxAlias;
-
-					foreach (Option *option, param->GetOptions())
-					{
-						if (option->GetType() == OPTION_TYPE_MIN)
-						{
-							min	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
-							minAlias = i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue());
-						}
-
-						if (option->GetType() == OPTION_TYPE_MAX)
-						{
-							max	 = Math::Round(option->GetValue().ToFloat() / param->GetStepSize());
-							maxAlias = i18n->TranslateString(option->GetAlias()).Replace("%1", option->GetValue());
-						}
-					}
-
-					Slider	*range = new Slider(Point(0, 1), Size(210, 0), OR_HORZ, NIL, min, max);
-					Text	*value = new Text(String::FromFloat(max * param->GetStepSize()).Append(param->GetStepSize() < 1 ? ".0" : NIL), Point(220, 3));
-
-					range->SetWidth(222 - value->GetUnscaledTextWidth());
-
-					range->SetValue(config->GetIntValue(specs->id, param->GetName(), param->GetDefault().ToFloat() / param->GetStepSize()));
-
-					range->onValueChange.Connect(&ConfigLayerExternal::OnSliderValueChange, this);
-					range->onValueChange.Connect(&ConfigLayerExternal::OnUpdateParameterValue, this);
-
-					Text	*minText = new Text(minAlias, Point(0, 20));
-					Text	*maxText = new Text(maxAlias, Point(0, 20));
-
-					maxText->SetPosition(Point(221 - value->GetUnscaledTextWidth() - maxText->GetUnscaledTextWidth(), 20));
-
-					layer->Add(range);
-					layer->Add(value);
-					layer->Add(minText);
-					layer->Add(maxText);
-
-					group_parameters->Add(layer);
-
-					widgets_parameters.Add(range);
-					widgets_parameters.Add(value);
-					widgets_parameters.Add(minText);
-					widgets_parameters.Add(maxText);
-				}
-
-				position += Point(0, 39);
-				layer->SetHeight(38);
-
-				break;
-			default:
-				/* Unsupported parameter type.
-				 */
-				break;
+			group_parameters->Add(checkBox);
 		}
-
-		group_parameters->Add(checkBox);
 
 		checks_parameters.Add(checkBox);
 		checks_parameters_values.Add(checkBox->IsChecked());
@@ -234,6 +237,8 @@ Int BoCA::AS::ConfigLayerExternal::SaveSettings()
 
 	foreach (const Parameter *param, specs->parameters)
 	{
+		if (param->GetHidden()) continue;
+
 		CheckBox	*checkBox = checks_parameters.GetNth(foreachindex);
 
 		switch (param->GetType())
@@ -307,6 +312,8 @@ Void BoCA::AS::ConfigLayerExternal::CheckParameterDependencies()
 
 		foreach (const Parameter *param, specs->parameters)
 		{
+			if (param->GetHidden()) continue;
+
 			/* Loop over parameter's dependencies to check if state needs to be changed.
 			 */
 			Bool					 enableParam  = True;
@@ -412,6 +419,8 @@ String BoCA::AS::ConfigLayerExternal::GetArgumentsString()
 
 	foreach (const Parameter *param, specs->parameters)
 	{
+		if (param->GetHidden()) continue;
+
 		CheckBox	*checkBox = checks_parameters.GetNth(foreachindex);
 
 		if (!checkBox->IsChecked() || !checkBox->IsActive()) continue;
@@ -488,6 +497,8 @@ Void BoCA::AS::ConfigLayerExternal::OnSliderValueChange()
 {
 	foreach (const Parameter *param, specs->parameters)
 	{
+		if (param->GetHidden()) continue;
+
 		switch (param->GetType())
 		{
 			case PARAMETER_TYPE_RANGE:

@@ -66,32 +66,40 @@
 
 		<!ELEMENT parameters (switch | selection | range)*>
 
-			<!ELEMENT switch (depends*)>
+			<!ELEMENT switch (requires*, depends*)>
 			<!ATTLIST switch name	  CDATA	#REQUIRED
 					 argument CDATA	#REQUIRED
-					 enabled  (true|false) "false">
+					 enabled  (true|false) "false"
+					 hidden	  (true|false) "false">
 
-			<!ELEMENT selection (depends*, option+)>
+			<!ELEMENT selection (requires*, depends*, option+)>
 			<!ATTLIST selection name     CDATA   #REQUIRED
 					    argument CDATA   #REQUIRED
 					    enabled  (true|false) "false"
-					    default  NMTOKEN #IMPLIED>
+					    default  NMTOKEN #IMPLIED
+					    hidden   (true|false) "false">
 
 				<!ELEMENT option (#PCDATA)>
 				<!ATTLIST option alias CDATA #IMPLIED>
 
-			<!ELEMENT range (depends*, min, max)>
+			<!ELEMENT range (requires*, depends*, min, max)>
 			<!ATTLIST range name	 CDATA	 #REQUIRED
 					argument CDATA	 #REQUIRED
 					enabled	 (true|false) "false"
 					default	 NMTOKEN #IMPLIED
-					step	 NMTOKEN #IMPLIED>
+					step	 NMTOKEN #IMPLIED
+					hidden	 (true|false) "false">
 
 				<!ELEMENT min (#PCDATA)>
 				<!ATTLIST min alias CDATA #IMPLIED>
 
 				<!ELEMENT max (#PCDATA)>
 				<!ATTLIST max alias CDATA #IMPLIED>
+
+			<!ELEMENT requires (#PCDATA)>
+			<!ATTLIST requires option CDATA #IMPLIED
+					   args   CDATA #IMPLIED
+					   stream (stdout|stderr) "stdout">
 
 			<!ELEMENT depends (#PCDATA)>
 			<!ATTLIST depends setting CDATA	#REQUIRED

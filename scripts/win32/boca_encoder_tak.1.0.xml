@@ -15,10 +15,15 @@
   <input bits="16-24" channels="1-6"/>
   <external>
     <command>takc</command>
-    <arguments>-e -ihs -tn%THREADS %OPTIONS - %OUTFILE</arguments>
+    <arguments>-e -ihs %OPTIONS - %OUTFILE</arguments>
     <mode>stdio</mode>
     <informat>wave</informat>
     <parameters>
+      <range name="Number of threads to use" argument="-tn%VALUE" enabled="true" default="%THREADS" hidden="true">
+	<requires option="-tn#"/>
+	<min>1</min>
+	<max>4</max>
+      </range>
       <range name="Encoder preset" argument="-p%VALUE" default="2">
 	<min alias="fastest">0</min>
 	<max alias="strongest">4</max>

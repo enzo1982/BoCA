@@ -66,7 +66,7 @@ Error BoCA::AS::DecoderComponentExternalFile::GetStreamInfo(const String &stream
 	/* Start 3rd party command line decoder.
 	 */
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString(GetConfiguration()))
 							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""))
 							      .Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
 
@@ -275,7 +275,7 @@ Bool BoCA::AS::DecoderComponentExternalFile::Activate()
 	/* Start 3rd party command line decoder.
 	 */
 	String	 command   = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
-	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString())
+	String	 arguments = String(specs->external_arguments).Replace("%OPTIONS", specs->GetExternalArgumentsString(GetConfiguration()))
 							      .Replace("%INFILE", String("\"").Append(encFileName).Append("\""))
 							      .Replace("%OUTFILE", String("\"").Append(wavFileName).Append("\""));
 

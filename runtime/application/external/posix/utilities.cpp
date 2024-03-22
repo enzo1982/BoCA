@@ -19,6 +19,72 @@
 
 using namespace smooth::IO;
 
+namespace BoCA
+{
+	namespace AS
+	{
+		static String GetComponentInstructions(ComponentSpecs *specs, const String &arguments, Bool useStderr)
+		{
+			/* Start 3rd party command line executable.
+			 */
+			String	 command = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
+			FILE	*rPipe	 = popen(String(command).Append(useStderr ? " 2>&1" : (specs->debug ? NIL : " 2> /dev/null")), "r");
+
+			/* Read output into buffer.
+			 */
+			Buffer<char>	 buffer(4096);
+			Int		 bytesReadTotal = 0;
+			Int		 bytesRead = 0;
+
+			do
+			{
+				bytesRead = fread(buffer + bytesReadTotal, 1, 4096 - bytesReadTotal, rPipe);
+
+				if (bytesRead != 4096 - bytesReadTotal && (ferror(rPipe) || bytesRead == 0)) break;
+
+				bytesReadTotal += bytesRead;
+			}
+			while (bytesReadTotal < 4096);
+
+			/* Wait until the program exits.
+			 */
+			pclose(rPipe);
+
+			/* Process and return output.
+			 */
+			String	 output = (bytesReadTotal > 0 ? (char *) buffer : NIL);
+
+			output.Replace("\t", " ");
+			output.Replace("\r", "");
+			output.Replace("\n", "\n ");
+
+			return output;
+		}
+	}
+}
+
+Void BoCA::AS::ExternalUtilities::CheckParameterRequirements(ComponentSpecs *specs)
+{
+	String	 instructions;
+
+	for (Int i = specs->parameters.Length() - 1; i >= 0; i--)
+	{
+		Parameter				*parameter    = specs->parameters.GetNth(i);
+		const Array<ParameterRequirement>	&requirements = parameter->GetRequirements();
+
+		foreach (const ParameterRequirement &requirement, requirements)
+		{
+			if (instructions == NIL) instructions = GetComponentInstructions(specs, requirement.arguments, requirement.useStderr);
+
+			if (!instructions.Contains(String(" ").Append(requirement.option).Append(" ")))
+			{
+				specs->parameters.RemoveNth(i);
+				break;
+			}
+		}
+	}
+}
+
 String BoCA::AS::ExternalUtilities::GetMD5(const ComponentSpecs *specs, const String &encFileName)
 {
 	if (specs->external_md5_arguments == NIL) return NIL;

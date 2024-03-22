@@ -18,6 +18,118 @@
 
 using namespace smooth::IO;
 
+namespace BoCA
+{
+	namespace AS
+	{
+		static String GetComponentInstructions(ComponentSpecs *specs, const String &arguments, Bool useStderr)
+		{
+			/* Set up security attributes.
+			 */
+			SECURITY_ATTRIBUTES	 secAttr;
+
+			ZeroMemory(&secAttr, sizeof(secAttr));
+
+			secAttr.nLength		= sizeof(secAttr);
+			secAttr.bInheritHandle	= True;
+
+			HANDLE	 rPipe = NIL;
+			HANDLE	 wPipe = NIL;
+
+			CreatePipe(&rPipe, &wPipe, &secAttr, 131072);
+			SetHandleInformation(rPipe, HANDLE_FLAG_INHERIT, 0);
+
+			/* Start 3rd party command line executable.
+			 */
+			String	 command = String("\"").Append(specs->external_command).Append("\"").Replace("/", Directory::GetDirectoryDelimiter());
+
+			STARTUPINFOA		 startupInfo;
+
+			ZeroMemory(&startupInfo, sizeof(startupInfo));
+
+			startupInfo.cb		= sizeof(startupInfo);
+			startupInfo.dwFlags	= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+			startupInfo.wShowWindow	= SW_HIDE;
+			startupInfo.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+			startupInfo.hStdOutput	= useStderr ? NIL : wPipe;
+			startupInfo.hStdError	= useStderr ? wPipe : NIL;
+
+			PROCESS_INFORMATION	 processInfo;
+
+			ZeroMemory(&processInfo, sizeof(processInfo));
+
+			CreateProcessA(NIL, String(command).Append(" ").Append(arguments), NIL, NIL, True, 0, NIL, NIL, &startupInfo, &processInfo);
+
+			/* Close stdio pipe write handle.
+			 */
+			CloseHandle(wPipe);
+
+			/* Check process handle.
+			 */
+			if (processInfo.hProcess == NIL)
+			{
+				CloseHandle(rPipe);
+
+				return NIL;
+			}
+
+			/* Read output into buffer.
+			 */
+			Buffer<char>		 buffer(4096);
+			Int			 bytesReadTotal = 0;
+			DWORD			 bytesRead = 0;
+
+			do
+			{
+				if (!ReadFile(rPipe, buffer + bytesReadTotal, 4096 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
+
+				bytesReadTotal += bytesRead;
+			}
+			while (bytesReadTotal < 4096);
+
+			CloseHandle(rPipe);
+
+			TerminateProcess(processInfo.hProcess, 0);
+
+			/* Wait until the program exits.
+			 */
+			while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT) S::System::System::Sleep(10);
+
+			/* Process and return output.
+			 */
+			String	 output = (bytesReadTotal > 0 ? (char *) buffer : NIL);
+
+			output.Replace("\t", " ");
+			output.Replace("\r", "");
+			output.Replace("\n", "\n ");
+
+			return output;
+		}
+	}
+}
+
+Void BoCA::AS::ExternalUtilities::CheckParameterRequirements(ComponentSpecs *specs)
+{
+	String	 instructions;
+
+	for (Int i = specs->parameters.Length() - 1; i >= 0; i--)
+	{
+		Parameter				*parameter    = specs->parameters.GetNth(i);
+		const Array<ParameterRequirement>	&requirements = parameter->GetRequirements();
+
+		foreach (const ParameterRequirement &requirement, requirements)
+		{
+			if (instructions == NIL) instructions = GetComponentInstructions(specs, requirement.arguments, requirement.useStderr);
+
+			if (!instructions.Contains(String(" ").Append(requirement.option).Append(" ")))
+			{
+				specs->parameters.RemoveNth(i);
+				break;
+			}
+		}
+	}
+}
+
 String BoCA::AS::ExternalUtilities::GetMD5(const ComponentSpecs *specs, const String &encFileName)
 {
 	if (specs->external_md5_arguments == NIL) return NIL;

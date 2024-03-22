@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,8 +13,7 @@
 #ifndef H_BOCA_COMPONENTSPECS
 #define H_BOCA_COMPONENTSPECS
 
-#include <smooth.h>
-#include "../core/definitions.h"
+#include "../common/config.h"
 
 using namespace smooth;
 using namespace smooth::System;
@@ -72,6 +71,13 @@ namespace BoCA
 		PARAMETER_TYPE_RANGE,
 
 		NUM_PARAMETER_TYPES
+	};
+
+	struct ParameterRequirement
+	{
+		String	 option;
+		String	 arguments;
+		Bool	 useStderr;
 	};
 
 	struct ParameterDependency
@@ -276,6 +282,12 @@ namespace BoCA
 
 				const Array<ParameterDependency>	&GetDependencies() const;
 				Void					 AddDependency(const ParameterDependency &);
+
+				Bool					 GetHidden() const;
+				Void					 SetHidden(Bool nHidden);
+
+				const Array<ParameterRequirement>	&GetRequirements() const;
+				Void					 AddRequirement(const ParameterRequirement &);
 		};
 
 		class BOCA_DLL_EXPORT ComponentSpecs
@@ -288,6 +300,7 @@ namespace BoCA
 				Bool			 ParseXMLSpec(const String &);
 
 				Bool			 ParseParameters(XML::Node *);
+				Bool			 ParseParameterRequirements(Parameter *, XML::Node *);
 				Bool			 ParseParameterDependencies(Parameter *, XML::Node *);
 			public:
 				String			 id;
@@ -333,7 +346,7 @@ namespace BoCA
 				Bool			 LoadFromDLL(const String &);
 				Bool			 LoadFromXML(const String &);
 
-				String			 GetExternalArgumentsString();
+				String			 GetExternalArgumentsString(const Config *);
 
 				const char		*(*func_GetComponentSpecs)();
 
