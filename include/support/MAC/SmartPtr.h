@@ -78,9 +78,10 @@ public:
         return m_pObject;
     }
 
-    // declare assignment, but don't implement (compiler error if we try to use)
+private:
+    // declare assignment, but mark it private so it can't be used
     // that way we can't carelessly mix smart pointers and regular pointers
-    __forceinline void * operator =(void *) const;
+    __forceinline void * operator =(void *) const { return APE_NULL; }
 };
 
 #pragma pack(pop)

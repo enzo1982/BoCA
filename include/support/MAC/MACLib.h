@@ -14,7 +14,7 @@ Unless otherwise specified, functions return ERROR_SUCCESS (0) on success and an
 error code on failure.
 
 The terminology "Sample" refers to a single sample value, and "Block" refers
-to a collection of "Channel" samples.  For simplicity, MAC typically uses blocks
+to a collection of "Channel" samples. For simplicity, MAC typically uses blocks
 everywhere so that channel mis-alignment cannot happen. (i.e. on a CD, a sample is
 2 bytes and a block is 4 bytes ([2 bytes per sample] * [2 channels] = 4 bytes))
 
@@ -51,11 +51,11 @@ Notes:
     Junk:
 
     This block may not be supported in the future, so don't write any software that adds meta data
-    before the APE_DESCRIPTOR.  Please use the APE Tag for any meta data.
+    before the APE_DESCRIPTOR. Please use the APE Tag for any meta data.
 
     Seek Table:
 
-    A 32-bit unsigned integer array of offsets from the header to the frame data.  May become "delta"
+    A 32-bit unsigned integer array of offsets from the header to the frame data. May become "delta"
     values someday to better suit huge files.
 
     MD5 Hash:
@@ -190,7 +190,7 @@ struct APE_DESCRIPTOR
     uint32 nAPEFrameDataBytesHigh;             // the high order number of APE frame data bytes
     uint32 nTerminatingDataBytes;              // the terminating data of the file (not including tag data)
 
-    uint8  cFileMD5[16];                       // the MD5 hash of the file (see notes for usage... it's a littly tricky)
+    uint8  cFileMD5[16];                       // the MD5 hash of the file (see notes for usage... it's a little tricky)
 };
 
 /**************************************************************************************************
@@ -234,7 +234,7 @@ public:
     Note(s):
     -the distinction between APE_INFO_XXXX and APE_DECOMPRESS_XXXX is that the first is querying the APE
     information engine, and the other is querying the decompressor, and since the decompressor can be
-    a range of an APE file (for APL), differences will arise.  Typically, use the APE_DECOMPRESS_XXXX
+    a range of an APE file (for APL), differences will arise. Typically, use the APE_DECOMPRESS_XXXX
     fields when querying for info about the length, etc. so APL will work properly.
     (i.e. (APE_INFO_TOTAL_BLOCKS != APE_DECOMPRESS_TOTAL_BLOCKS) for APL files)
     **************************************************************************************************/
@@ -310,7 +310,7 @@ public:
         bool bApplySigned8BitProcessing;
         bool bApplyBigEndianProcessing;
     };
-    virtual int GetData(unsigned char * pBuffer, int64 nBlocks, int64 * pBlocksRetrieved, APE_GET_DATA_PROCESSING * pProcessing = NULL) = 0;
+    virtual int GetData(unsigned char * pBuffer, int64 nBlocks, int64 * pBlocksRetrieved, APE_GET_DATA_PROCESSING * pProcessing = APE_NULL) = 0;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Seek(...) - seeks
@@ -453,7 +453,7 @@ public:
     virtual int64 AddDataFromInputSource(CInputSource * pInputSource, int64 nMaxBytes = 0, int64 * pBytesAdded = APE_NULL) = 0;
 
     /**************************************************************************************************
-    * Finish / Kill
+    * Finish
     **************************************************************************************************/
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -471,12 +471,6 @@ public:
     //        WAV file (it's basically nTerminatingBytes - the bytes that make up the tag)
     //////////////////////////////////////////////////////////////////////////////////////////////
     virtual int Finish(unsigned char * pTerminatingData, int64 nTerminatingBytes, int64 nWAVTerminatingBytes) = 0;
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    // Kill(...) - stops encoding and deletes the output file
-    // --- NOT CURRENTLY IMPLEMENTED ---
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int Kill() = 0;
 };
 
 } // namespace APE
@@ -539,4 +533,5 @@ extern "C"
     DLLEXPORT int __stdcall FillRF64Header(APE::RF64_HEADER * pWAVHeader, APE::int64 nAudioBytes, const APE::WAVEFORMATEX * pWaveFormatEx);
     DLLEXPORT int __stdcall GetAPEFileType(const APE::str_utfn * pInputFilename, APE::str_ansi cFileType[8]);
     DLLEXPORT void __stdcall GetAPECompressionLevelName(int nCompressionLevel, APE::str_utfn * pCompressionLevel, size_t nBufferCharacters, bool bTitleCase);
+    DLLEXPORT void __stdcall GetAPEModeName(APE::APE_MODES Mode, APE::str_utfn * pModeName, size_t nBufferCharacters, bool bActive);
 }
