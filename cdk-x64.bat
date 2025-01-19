@@ -10,6 +10,6 @@ set BUILD_WIN32=True
 set BUILD_X86_64=True
 
 echo fre:ac Component Development Kit v1.1.7 (x64)
-echo Copyright (C) 2001-2023 Robert Kausch
+echo Copyright (C) 2001-2025 Robert Kausch
 
 bash
