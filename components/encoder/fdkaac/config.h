@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -65,6 +65,7 @@ namespace BoCA
 			Text			*text_quality_level;
 			Text			*text_quality_worse;
 			Text			*text_quality_better;
+			CheckBox		*check_afterburner;
 
 			GroupBox		*group_bandwidth;
 			Text			*text_bandwidth;
@@ -77,6 +78,7 @@ namespace BoCA
 			Int			 mode;
 			Int			 bitrate;
 			Int			 quality;
+			Bool			 afterburner;
 			Int			 bandwidth;
 			Int			 previousBandwidth;
 			Bool			 allowID3;

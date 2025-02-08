@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	mode		= config->GetIntValue(ConfigID, "Mode", 0);
 	bitrate		= config->GetIntValue(ConfigID, "Bitrate", 64);
 	quality		= config->GetIntValue(ConfigID, "Quality", 4);
+	afterburner	= config->GetIntValue(ConfigID, "Afterburner", True);
 	bandwidth	= config->GetIntValue(ConfigID, "Bandwidth", 0);
 	allowID3	= config->GetIntValue(ConfigID, "AllowID3v2", False);
 	fileFormat	= config->GetIntValue(ConfigID, "MP4Container", True);
@@ -118,7 +119,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 
 	i18n->SetContext("Encoders::AAC::Quality");
 
-	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate / Quality"), Point(7, 66), Size(group_id3v2->GetWidth(), 78));
+	group_bitrate		= new GroupBox(i18n->TranslateString("Bitrate / Quality"), Point(7, 66), Size(group_id3v2->GetWidth(), 103));
 
 	option_bitrate		= new OptionBox(i18n->AddColon(i18n->TranslateString("Bitrate per channel")), Point(10, 13), Size(150, 0), &mode, 0);
 	option_bitrate->onAction.Connect(&ConfigureFDKAAC::SetMode, this);
@@ -152,6 +153,8 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	text_quality_better	= new Text(i18n->TranslateString("better"), Point(slider_quality->GetX() + slider_quality->GetWidth(), 57));
 	text_quality_better->SetX(text_quality_better->GetX() - text_quality_better->GetUnscaledTextWidth() / 2);
 
+	check_afterburner	= new CheckBox(i18n->TranslateString("Enable Afterburner processing"), Point(10, 76), Size(group_bitrate->GetWidth() - 20, 0), &afterburner);
+
 	group_bitrate->Add(option_bitrate);
 	group_bitrate->Add(slider_bitrate);
 	group_bitrate->Add(edit_bitrate);
@@ -161,6 +164,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	group_bitrate->Add(text_quality_level);
 	group_bitrate->Add(text_quality_worse);
 	group_bitrate->Add(text_quality_better);
+	group_bitrate->Add(check_afterburner);
 
 	group_bandwidth		= new GroupBox(i18n->TranslateString("Maximum bandwidth"), Point(7, group_bitrate->GetHeight() + 78), Size(group_id3v2->GetWidth(), 40));
 
@@ -185,7 +189,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	SetQuality();
 	SetBandwidth();
 
-	tabwidget->SetSize(Size(group_id3v2->GetWidth() + 18, Math::Max(226, group_id3v2->GetHeight() + 118)));
+	tabwidget->SetSize(Size(group_id3v2->GetWidth() + 18, Math::Max(251, group_id3v2->GetHeight() + 118)));
 
 	Add(tabwidget);
 
@@ -201,7 +205,7 @@ BoCA::ConfigureFDKAAC::ConfigureFDKAAC()
 	layer_quality->Add(group_bitrate);
 	layer_quality->Add(group_bandwidth);
 
-	SetSize(Size(group_id3v2->GetWidth() + 32, Math::Max(240, group_id3v2->GetHeight() + 132)));
+	SetSize(tabwidget->GetSize() + Size(14, 14));
 }
 
 BoCA::ConfigureFDKAAC::~ConfigureFDKAAC()
@@ -239,6 +243,7 @@ BoCA::ConfigureFDKAAC::~ConfigureFDKAAC()
 	DeleteObject(text_quality_level);
 	DeleteObject(text_quality_worse);
 	DeleteObject(text_quality_better);
+	DeleteObject(check_afterburner);
 
 	DeleteObject(group_bandwidth);
 	DeleteObject(text_bandwidth);
@@ -265,6 +270,7 @@ Int BoCA::ConfigureFDKAAC::SaveSettings()
 	config->SetIntValue(ConfigID, "Mode", mode);
 	config->SetIntValue(ConfigID, "Bitrate", bitrate);
 	config->SetIntValue(ConfigID, "Quality", quality);
+	config->SetIntValue(ConfigID, "Afterburner", afterburner);
 	config->SetIntValue(ConfigID, "Bandwidth", bandwidth);
 	config->SetIntValue(ConfigID, "AllowID3v2", allowID3);
 	config->SetIntValue(ConfigID, "MP4Container", fileFormat);

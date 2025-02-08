@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -93,6 +93,7 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 			<min alias=\"min\">8</min>								\
 			<max alias=\"max\">256</max>								\
 		      </range>											\
+		      <switch name=\"Disable Afterburner processing\" argument=\"--no-afterburner\"/>		\
 														\
 		");
 
@@ -631,11 +632,13 @@ Bool BoCA::EncoderFDKAAC::ConvertArguments(Config *config)
 
 		config->SetIntValue(ConfigureFDKAAC::ConfigID, "AACType", AOT_AAC_LC);
 		config->SetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
+		config->SetIntValue(ConfigureFDKAAC::ConfigID, "Afterburner", True);
 	}
 
 	/* Get command line settings.
 	 */
 	Bool	 rawAAC	       = config->GetIntValue(encoderID, "Create ADTS AAC files (no MP4 container)", !config->GetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", True));
+	Bool	 afterburner   = !config->GetIntValue(encoderID, "Disable Afterburner processing", False);
 
 	Int	 bitrate       = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
 	Int	 aacType       = config->GetIntValue(ConfigureFDKAAC::ConfigID, "AACType", AOT_AAC_LC);
@@ -661,6 +664,8 @@ Bool BoCA::EncoderFDKAAC::ConvertArguments(Config *config)
 
 	config->SetIntValue(ConfigureFDKAAC::ConfigID, "AACType", aacType);
 	config->SetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", Math::Max(8, Math::Min(256, bitrate)));
+
+	if (!afterburner) config->SetIntValue(ConfigureFDKAAC::ConfigID, "Afterburner", False);
 
 	return True;
 }

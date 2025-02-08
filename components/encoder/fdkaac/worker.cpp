@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -34,6 +34,7 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : pr
 	Int	 mode	      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Mode", 0);
 	Int	 bitrate      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bitrate", 64);
 	Int	 quality      = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Quality", 4);
+	Bool	 afterburner  = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Afterburner", True);
 	Int	 bandwidth    = config->GetIntValue(ConfigureFDKAAC::ConfigID, "Bandwidth", 0);
 
 	/* Fall back to HE if HEv2 is selected for non-stereo input.
@@ -68,7 +69,7 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : pr
 	    aacType == AOT_ER_AAC_LD) ex_aacEncoder_SetParam(handle, AACENC_BANDWIDTH, Math::Min(bandwidth, format.rate / 2));
 
 	ex_aacEncoder_SetParam(handle, AACENC_AOT, mpegVersion + aacType);
-	ex_aacEncoder_SetParam(handle, AACENC_AFTERBURNER, 1);
+	ex_aacEncoder_SetParam(handle, AACENC_AFTERBURNER, afterburner);
 	ex_aacEncoder_SetParam(handle, AACENC_TRANSMUX, mp4Container ? TT_MP4_RAW : TT_MP4_ADTS);
 
 	if ( mp4Container && (aacType == AOT_SBR       || aacType == AOT_PS	   )) ex_aacEncoder_SetParam(handle, AACENC_SIGNALING_MODE, 1);
