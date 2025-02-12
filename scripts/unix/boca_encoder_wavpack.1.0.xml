@@ -18,7 +18,7 @@
     <informat>wave</informat>
     <parameters>
       <range name="Number of threads to use" argument="--threads=%VALUE" enabled="true" default="%THREADS" hidden="true">
-	<requires option="--threads"/>
+	<requires option="--threads[=n]" arguments="--help"/>
 	<min>1</min>
 	<max>12</max>
       </range>

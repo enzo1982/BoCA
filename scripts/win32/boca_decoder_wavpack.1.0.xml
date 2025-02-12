@@ -18,5 +18,12 @@
     <mode>stdio</mode>
     <outformat>wave</outformat>
     <md5 require="lossless" prefix="original md5:">-s %INFILE</md5>
+    <parameters>
+      <range name="Number of threads to use" argument="--threads=%VALUE" enabled="true" default="1" hidden="true">
+	<requires option="--threads[=n]" arguments="--help"/>
+	<min>1</min>
+	<max>12</max>
+      </range>
+    </parameters>
   </external>
 </component>
