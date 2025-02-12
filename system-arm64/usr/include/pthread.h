@@ -83,7 +83,7 @@ extern "C" {
 /* MSB 8-bit major version, 8-bit minor version, 16-bit patch level.  */
 #define __WINPTHREADS_VERSION 0x00050000
 
-#if defined DLL_EXPORT
+#if defined DLL_EXPORT && !defined WINPTHREAD_STATIC
 #ifdef IN_WINPTHREAD
 #define WINPTHREAD_API __declspec(dllexport)
 #else

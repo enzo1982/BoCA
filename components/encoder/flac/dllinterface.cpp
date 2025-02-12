@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -39,6 +39,7 @@ FLAC__STREAM_ENCODER_SET_METADATA				 ex_FLAC__stream_encoder_set_metadata						
 FLAC__STREAM_ENCODER_SET_COMPRESSION_LEVEL			 ex_FLAC__stream_encoder_set_compression_level					= NIL;
 FLAC__STREAM_ENCODER_SET_APODIZATION				 ex_FLAC__stream_encoder_set_apodization					= NIL;
 FLAC__STREAM_ENCODER_SET_OGG_SERIAL_NUMBER			 ex_FLAC__stream_encoder_set_ogg_serial_number					= NIL;
+FLAC__STREAM_ENCODER_SET_NUM_THREADS				 ex_FLAC__stream_encoder_set_num_threads					= NIL;
 FLAC__STREAM_ENCODER_PROCESS_INTERLEAVED			 ex_FLAC__stream_encoder_process_interleaved					= NIL;
 
 FLAC__METADATA_OBJECT_NEW					 ex_FLAC__metadata_object_new							= NIL;
@@ -95,6 +96,7 @@ Bool LoadFLACDLL()
 	ex_FLAC__stream_encoder_set_compression_level				= (FLAC__STREAM_ENCODER_SET_COMPRESSION_LEVEL) flacdll->GetFunctionAddress("FLAC__stream_encoder_set_compression_level");
 	ex_FLAC__stream_encoder_set_apodization					= (FLAC__STREAM_ENCODER_SET_APODIZATION) flacdll->GetFunctionAddress("FLAC__stream_encoder_set_apodization");
 	ex_FLAC__stream_encoder_set_ogg_serial_number				= (FLAC__STREAM_ENCODER_SET_OGG_SERIAL_NUMBER) flacdll->GetFunctionAddress("FLAC__stream_encoder_set_ogg_serial_number");
+	ex_FLAC__stream_encoder_set_num_threads					= (FLAC__STREAM_ENCODER_SET_NUM_THREADS) flacdll->GetFunctionAddress("FLAC__stream_encoder_set_num_threads");
 	ex_FLAC__stream_encoder_process_interleaved				= (FLAC__STREAM_ENCODER_PROCESS_INTERLEAVED) flacdll->GetFunctionAddress("FLAC__stream_encoder_process_interleaved");
 
 	ex_FLAC__metadata_object_new						= (FLAC__METADATA_OBJECT_NEW) flacdll->GetFunctionAddress("FLAC__metadata_object_new");

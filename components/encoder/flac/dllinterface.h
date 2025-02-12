@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -48,6 +48,7 @@ typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_METADATA)					(FLAC__StreamEnco
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_COMPRESSION_LEVEL)				(FLAC__StreamEncoder *, uint32_t);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_APODIZATION)					(FLAC__StreamEncoder *, const char *);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_SET_OGG_SERIAL_NUMBER)				(FLAC__StreamEncoder *, long);
+typedef uint32_t				(*FLAC__STREAM_ENCODER_SET_NUM_THREADS)					(FLAC__StreamEncoder *, uint32_t);
 typedef FLAC__bool				(*FLAC__STREAM_ENCODER_PROCESS_INTERLEAVED)				(FLAC__StreamEncoder *, const FLAC__int32[], uint32_t);
 
 typedef FLAC__StreamMetadata *			(*FLAC__METADATA_OBJECT_NEW)						(FLAC__MetadataType);
@@ -96,6 +97,7 @@ extern FLAC__STREAM_ENCODER_SET_METADATA				 ex_FLAC__stream_encoder_set_metadat
 extern FLAC__STREAM_ENCODER_SET_COMPRESSION_LEVEL			 ex_FLAC__stream_encoder_set_compression_level;
 extern FLAC__STREAM_ENCODER_SET_APODIZATION				 ex_FLAC__stream_encoder_set_apodization;
 extern FLAC__STREAM_ENCODER_SET_OGG_SERIAL_NUMBER			 ex_FLAC__stream_encoder_set_ogg_serial_number;
+extern FLAC__STREAM_ENCODER_SET_NUM_THREADS				 ex_FLAC__stream_encoder_set_num_threads;
 extern FLAC__STREAM_ENCODER_PROCESS_INTERLEAVED				 ex_FLAC__stream_encoder_process_interleaved;
 
 extern FLAC__METADATA_OBJECT_NEW					 ex_FLAC__metadata_object_new;
