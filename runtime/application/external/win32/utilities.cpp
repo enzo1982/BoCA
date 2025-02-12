@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -75,17 +75,17 @@ namespace BoCA
 
 			/* Read output into buffer.
 			 */
-			Buffer<char>		 buffer(4096);
-			Int			 bytesReadTotal = 0;
-			DWORD			 bytesRead = 0;
+			String		 output;
+			Buffer<char>	 buffer(4096);
 
-			do
+			while (True)
 			{
-				if (!ReadFile(rPipe, buffer + bytesReadTotal, 4096 - bytesReadTotal, &bytesRead, NIL) || bytesRead == 0) break;
+				DWORD	 bytesRead = 0;
 
-				bytesReadTotal += bytesRead;
+				if (!ReadFile(rPipe, buffer, buffer.Size(), &bytesRead, NIL) || bytesRead == 0) break;
+
+				output.Append((char *) buffer);
 			}
-			while (bytesReadTotal < 4096);
 
 			CloseHandle(rPipe);
 
@@ -97,8 +97,6 @@ namespace BoCA
 
 			/* Process and return output.
 			 */
-			String	 output = (bytesReadTotal > 0 ? (char *) buffer : NIL);
-
 			output.Replace("\t", " ");
 			output.Replace("\r", "");
 			output.Replace("\n", "\n ");
