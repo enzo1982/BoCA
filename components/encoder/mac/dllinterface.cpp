@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -56,7 +56,7 @@ Bool LoadMACDLL()
 	 */
 	unsigned int	 interfaceVersion = ex_GetLibraryInterfaceVersion();
 
-	if (interfaceVersion > 11) { FreeMACDLL(); return False; }
+	if (interfaceVersion > 12) { FreeMACDLL(); return False; }
 
 	return True;
 }

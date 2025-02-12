@@ -9,7 +9,7 @@ PLATFORM_APPLE
 PLATFORM_LINUX
 PLATFORM_ANDROID
 **************************************************************************************************/
-#if !defined(PLATFORM_WINDOWS) && !defined(PLATFORM_APPLE) && !defined(PLATFORM_LINUX)
+#if !defined(PLATFORM_WINDOWS) && !defined(PLATFORM_APPLE) && !defined(PLATFORM_LINUX) && !defined(PLATFORM_ANDROID)
     #pragma message("No platform set for MACLib, defaulting to Windows")
     #define PLATFORM_WINDOWS
 #endif
@@ -167,6 +167,9 @@ Global macros
 
 // we use more than the Windows system MAX_PATH since filenames can actually be longer
 #define APE_MAX_PATH 8192
+
+// undefined file size (pipe, etc.)
+#define APE_FILE_SIZE_UNDEFINED -1
 
 #define POINTER_TO_INT64(POINTER) static_cast<APE::int64>(reinterpret_cast<uintptr_t>(POINTER))
 
