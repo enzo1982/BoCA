@@ -3,8 +3,6 @@
 namespace APE
 {
 
-#pragma pack(push, 1)
-
 /**************************************************************************************************
 CSmartPtr - a simple smart pointer class that can automatically initialize and free memory
     note: (doesn't do garbage collection / reference counting because of the many pitfalls)
@@ -83,7 +81,5 @@ private:
     // that way we can't carelessly mix smart pointers and regular pointers
     __forceinline void * operator =(void *) const { return APE_NULL; }
 };
-
-#pragma pack(pop)
 
 }

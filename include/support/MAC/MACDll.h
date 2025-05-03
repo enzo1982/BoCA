@@ -64,6 +64,7 @@ typedef int (__stdcall * proc_APECompress_GetBufferBytesAvailable)(APE_COMPRESS_
 typedef unsigned char * (__stdcall * proc_APECompress_LockBuffer)(APE_COMPRESS_HANDLE, APE::int64 *);
 typedef int (__stdcall * proc_APECompress_UnlockBuffer)(APE_COMPRESS_HANDLE, int, bool);
 typedef int (__stdcall * proc_APECompress_Finish)(APE_COMPRESS_HANDLE, unsigned char *, APE::int64, APE::int64);
+typedef int (__stdcall * proc_APECompress_SetNumberOfThreads)(APE_COMPRESS_HANDLE, int);
 
 extern "C"
 {
@@ -76,6 +77,7 @@ extern "C"
     DLLEXPORT unsigned char * __stdcall c_APECompress_LockBuffer(APE_COMPRESS_HANDLE hAPECompress, APE::int64 * pBytesAvailable);
     DLLEXPORT int __stdcall c_APECompress_UnlockBuffer(APE_COMPRESS_HANDLE hAPECompress, int nBytesAdded, bool bProcess = true);
     DLLEXPORT int __stdcall c_APECompress_Finish(APE_COMPRESS_HANDLE hAPECompress, unsigned char * pTerminatingData, APE::int64 nTerminatingBytes, APE::int64 nWAVTerminatingBytes);
+    DLLEXPORT int __stdcall c_APECompress_SetNumberOfThreads(APE_COMPRESS_HANDLE hAPECompress, int nThreads);
 }
 
 /**************************************************************************************************
@@ -98,4 +100,5 @@ extern "C"
     DLLEXPORT int __stdcall c_APEDecompress_GetData(APE_DECOMPRESS_HANDLE hAPEDecompress, unsigned char * pBuffer, APE::int64 nBlocks, APE::int64 * pBlocksRetrieved);
     DLLEXPORT int __stdcall c_APEDecompress_Seek(APE_DECOMPRESS_HANDLE hAPEDecompress, APE::int64 nBlockOffset);
     DLLEXPORT APE::int64 __stdcall c_APEDecompress_GetInfo(APE_DECOMPRESS_HANDLE hAPEDecompress, APE::IAPEDecompress::APE_DECOMPRESS_FIELDS Field, APE::int64 nParam1 = 0, APE::int64 nParam2 = 0);
+    DLLEXPORT int __stdcall c_APEDecompress_SetNumberOfThreads(APE_DECOMPRESS_HANDLE hAPEDecompress, int nThreads);
 }

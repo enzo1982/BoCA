@@ -76,8 +76,9 @@ Global includes
     #include <wchar.h>
     #include "NoWindows.h"
 #endif
-#define ape_max(a,b)    (((a) > (b)) ? (a) : (b))
-#define ape_min(a,b)    (((a) < (b)) ? (a) : (b))
+#define ape_max(a, b) (((a) > (b)) ? (a) : (b))
+#define ape_min(a, b) (((a) < (b)) ? (a) : (b))
+#define ape_cap(value, low, high) (((value) < (low)) ? (low) : ((value) > (high)) ? (high) : (value))
 #define APE_CLEAR(destination) memset(&destination, 0, sizeof(destination))
 
 /**************************************************************************************************
@@ -310,7 +311,12 @@ Byte order
 **************************************************************************************************/
 #define APE_LITTLE_ENDIAN     1234
 #define APE_BIG_ENDIAN        4321
+
+#if defined(_BIG_ENDIAN) || defined(__BIG_ENDIAN__) || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))
+#define APE_BYTE_ORDER        APE_BIG_ENDIAN
+#else
 #define APE_BYTE_ORDER        APE_LITTLE_ENDIAN
+#endif
 
 /**************************************************************************************************
 Channels

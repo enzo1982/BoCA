@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -123,6 +123,19 @@ Bool BoCA::EncoderMAC::Activate()
 	int	 nRetVal = 0;
 
 	hAPECompress = ex_APECompress_Create(&nRetVal);
+
+	/* Get number of threads to use.
+	 */
+	if (ex_APECompress_SetNumberOfThreads != NIL)
+	{
+		Bool	 enableParallel	 = config->GetIntValue("Resources", "EnableParallelConversions", True);
+		Bool	 enableSuperFast = config->GetIntValue("Resources", "EnableSuperFastMode", True);
+		Int	 numberOfThreads = enableParallel && enableSuperFast ? config->GetIntValue("Resources", "NumberOfConversionThreads", 0) : 1;
+
+		if (enableParallel && enableSuperFast && numberOfThreads <= 1) numberOfThreads = CPU().GetNumCores() + (CPU().GetNumLogicalCPUs() - CPU().GetNumCores()) / 2;
+
+		ex_APECompress_SetNumberOfThreads(hAPECompress, 2);//numberOfThreads);
+	}
 
 	/* Init encoder using output file name and format info.
 	 */

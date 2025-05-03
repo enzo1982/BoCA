@@ -13,14 +13,15 @@
 #include <boca.h>
 #include "dllinterface.h"
 
-APECOMPRESS_CREATE		 ex_APECompress_Create		= NIL;
-APECOMPRESS_DESTROY		 ex_APECompress_Destroy		= NIL;
-APECOMPRESS_STARTW		 ex_APECompress_StartW		= NIL;
-APECOMPRESS_ADDDATA		 ex_APECompress_AddData		= NIL;
-APECOMPRESS_FINISH		 ex_APECompress_Finish		= NIL;
+APECOMPRESS_CREATE		 ex_APECompress_Create			= NIL;
+APECOMPRESS_DESTROY		 ex_APECompress_Destroy			= NIL;
+APECOMPRESS_STARTW		 ex_APECompress_StartW			= NIL;
+APECOMPRESS_ADDDATA		 ex_APECompress_AddData			= NIL;
+APECOMPRESS_FINISH		 ex_APECompress_Finish			= NIL;
+APECOMPRESS_SETNUMBEROFTHREADS	 ex_APECompress_SetNumberOfThreads	= NIL;
 
-GETLIBRARYVERSIONSTRING		 ex_GetLibraryVersionString	= NIL;
-GETLIBRARYINTERFACEVERSION	 ex_GetLibraryInterfaceVersion	= NIL;
+GETLIBRARYVERSIONSTRING		 ex_GetLibraryVersionString		= NIL;
+GETLIBRARYINTERFACEVERSION	 ex_GetLibraryInterfaceVersion		= NIL;
 
 DynamicLoader *macdll	= NIL;
 
@@ -34,14 +35,15 @@ Bool LoadMACDLL()
 
 	if (macdll == NIL) return False;
 
-	ex_APECompress_Create		= (APECOMPRESS_CREATE) macdll->GetFunctionAddress("c_APECompress_Create");
-	ex_APECompress_Destroy		= (APECOMPRESS_DESTROY) macdll->GetFunctionAddress("c_APECompress_Destroy");
-	ex_APECompress_StartW		= (APECOMPRESS_STARTW) macdll->GetFunctionAddress("c_APECompress_StartW");
-	ex_APECompress_AddData		= (APECOMPRESS_ADDDATA) macdll->GetFunctionAddress("c_APECompress_AddData");
-	ex_APECompress_Finish		= (APECOMPRESS_FINISH) macdll->GetFunctionAddress("c_APECompress_Finish");
+	ex_APECompress_Create			= (APECOMPRESS_CREATE) macdll->GetFunctionAddress("c_APECompress_Create");
+	ex_APECompress_Destroy			= (APECOMPRESS_DESTROY) macdll->GetFunctionAddress("c_APECompress_Destroy");
+	ex_APECompress_StartW			= (APECOMPRESS_STARTW) macdll->GetFunctionAddress("c_APECompress_StartW");
+	ex_APECompress_AddData			= (APECOMPRESS_ADDDATA) macdll->GetFunctionAddress("c_APECompress_AddData");
+	ex_APECompress_Finish			= (APECOMPRESS_FINISH) macdll->GetFunctionAddress("c_APECompress_Finish");
+	ex_APECompress_SetNumberOfThreads	= (APECOMPRESS_SETNUMBEROFTHREADS) macdll->GetFunctionAddress("c_APECompress_SetNumberOfThreads");
 
-	ex_GetLibraryVersionString	= (GETLIBRARYVERSIONSTRING) macdll->GetFunctionAddress("GetLibraryVersionString");
-	ex_GetLibraryInterfaceVersion	= (GETLIBRARYINTERFACEVERSION) macdll->GetFunctionAddress("GetLibraryInterfaceVersion");
+	ex_GetLibraryVersionString		= (GETLIBRARYVERSIONSTRING) macdll->GetFunctionAddress("GetLibraryVersionString");
+	ex_GetLibraryInterfaceVersion		= (GETLIBRARYINTERFACEVERSION) macdll->GetFunctionAddress("GetLibraryInterfaceVersion");
 
 	if (ex_APECompress_Create		== NIL ||
 	    ex_APECompress_Destroy		== NIL ||
@@ -56,7 +58,7 @@ Bool LoadMACDLL()
 	 */
 	unsigned int	 interfaceVersion = ex_GetLibraryInterfaceVersion();
 
-	if (interfaceVersion > 12) { FreeMACDLL(); return False; }
+	if (interfaceVersion > 13) { FreeMACDLL(); return False; }
 
 	return True;
 }
