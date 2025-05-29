@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -215,12 +215,12 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 
 	if (!errorState)
 	{
-		IWMHeaderInfo	*pHeaderInfo = NIL;
-		BYTE		*pbValue = NIL;
+		IWMHeaderInfo2	*pHeaderInfo = NIL;
+		BYTE		*pbValue     = NIL;
 
-		hr = reader->QueryInterface(IID_IWMHeaderInfo, (void **) &pHeaderInfo);
+		hr = reader->QueryInterface(IID_IWMHeaderInfo2, (void **) &pHeaderInfo);
 
-		/* Get attribute "Duration"
+		/* Get attribute "Duration".
 		 */
 		if (!FAILED(hr)) hr = GetHeaderAttribute(pHeaderInfo, g_wszWMDuration, &pbValue);
 
@@ -233,12 +233,39 @@ Error BoCA::DecoderWMA::GetStreamInfo(const String &streamURI, Track &track)
 			track.length = -1;
 			track.approxLength = *(QWORD *) pbValue / 1e7 * format.rate;
 
-			/* Try to guess if this is a lossless file.
-			 */
-			if (Float(track.fileSize) / track.approxLength / format.channels / (format.bits / 8) > 0.35) track.lossless = True;
-			else											     track.lossless = False;
-
 			delete [] pbValue;
+		}
+
+		/* Get codec infos.
+		 */
+		DWORD nCodecInfos;
+
+		if (!FAILED(hr)) hr = pHeaderInfo->GetCodecInfoCount(&nCodecInfos);
+
+		if (!FAILED(hr))
+		{
+			/* See if this is a lossless file.
+			 */
+			for (UnsignedInt i = 0; i < nCodecInfos; i++)
+			{
+				WORD			 wNameSize	= 0;
+				WORD			 wDescSize	= 0;
+				WORD			 wCodecInfoSize	= sizeof(WORD);
+				WORD			 wCodecInfo	= 0;
+				WMT_CODEC_INFO_TYPE	 codecType	= WMT_CODECINFO_UNKNOWN;
+
+				hr = pHeaderInfo->GetCodecInfo(i, &wNameSize, NIL, &wDescSize, NIL, &codecType, &wCodecInfoSize, (BYTE *) &wCodecInfo);
+
+				if (!FAILED(hr) && codecType == WMT_CODECINFO_AUDIO && wCodecInfoSize == sizeof(WORD))
+				{
+					if (wCodecInfo == WAVE_FORMAT_PCM	 ||
+					    wCodecInfo == WAVE_FORMAT_IEEE_FLOAT ||
+					    wCodecInfo == WAVE_FORMAT_WMAUDIO_LOSSLESS) track.lossless = True;
+					else						track.lossless = False;
+
+					break;
+				}
+			}
 		}
 
 		pHeaderInfo->Release();
