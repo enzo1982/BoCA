@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -211,10 +211,6 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 	{
 		if (picture.data == nPicture.data) return True;
 	}
-
-	if	(file.Contains("front")) nPicture.type = 0x03; // Cover (front)
-	else if (file.Contains("back"))	 nPicture.type = 0x04; // Cover (back)
-	else if (file.Contains("disc"))	 nPicture.type = 0x06; // Media
 
 	if (nPicture.type == 0x03) pictures.InsertAtPos(0, nPicture);
 	else			   pictures.Add(nPicture);
