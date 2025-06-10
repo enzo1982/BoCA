@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -15,9 +15,9 @@
 
 using namespace smooth::IO;
 
-#include "twinvq.h"
-
 #include <iostream>
+
+#include "twinvq.h"
 
 #include "twinvq/bfile.h"
 #include "twinvq/bstream.h"
