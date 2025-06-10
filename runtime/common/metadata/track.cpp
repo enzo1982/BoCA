@@ -155,6 +155,23 @@ Void BoCA::Track::AdjustSampleCounts(const Format &newFormat)
 	foreach (Track &subTrack, tracks) subTrack.AdjustSampleCounts(newFormat);
 }
 
+Void BoCA::Track::AddAlbumArt(Track &track, const Picture &nPicture)
+{
+	/* Check if the album art is already in the list.
+	 */
+	foreach (const Picture &picture, track.pictures)
+	{
+		if (picture.data == nPicture.data) return;
+	}
+
+	if (nPicture.type == 0x03) track.pictures.InsertAtPos(0, nPicture);
+	else			   track.pictures.Add(nPicture);
+
+	/* Add album art to chapter tracks.
+	 */
+	foreach (Track &chapter, track.tracks) AddAlbumArt(chapter, nPicture);
+}
+
 Bool BoCA::Track::LoadCoverArtFiles()
 {
 	if (isCDTrack) return False;
@@ -205,15 +222,9 @@ Bool BoCA::Track::LoadCoverArtFile(const String &file)
 
 	nPicture.LoadFromFile(file);
 
-	/* Check if the album art is already in our list.
+	/* Add to our list of album art.
 	 */
-	foreach (const Picture &picture, pictures)
-	{
-		if (picture.data == nPicture.data) return True;
-	}
-
-	if (nPicture.type == 0x03) pictures.InsertAtPos(0, nPicture);
-	else			   pictures.Add(nPicture);
+	AddAlbumArt(*this, nPicture);
 
 	return True;
 }
