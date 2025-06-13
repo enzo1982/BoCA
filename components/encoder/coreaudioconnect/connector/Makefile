@@ -27,6 +27,15 @@ ifneq ($(BUILD_WIN32),True)
 	override LD  = winegcc
 endif
 
+ifeq ($(BUILD_FREEBSD),True)
+ifeq ($(BUILD_X86),True)
+ifneq (,$(wildcard ~/.i386-wine-pkg/usr/local/bin/winegcc))
+	override CXX = ~/.i386-wine-pkg/usr/local/bin/winegcc
+	override LD  = ~/.i386-wine-pkg/usr/local/bin/winegcc
+endif
+endif
+endif
+
 ifeq ($(BUILD_LINUX),True)
 	LDOPTS += -lrt
 endif
