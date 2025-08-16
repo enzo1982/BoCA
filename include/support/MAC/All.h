@@ -54,7 +54,7 @@ Global includes
 
 #if defined(PLATFORM_WINDOWS)
     #ifndef NOMINMAX
-        #define NOMINMAX // remove the global min / max macros so ape_min / ape_max will always be used
+        #define NOMINMAX // remove the global min / max macros so APE_MIN / APE_MAX will always be used
     #endif
     #include "WindowsEnvironment.h"
     #define WIN32_LEAN_AND_MEAN
@@ -76,9 +76,9 @@ Global includes
     #include <wchar.h>
     #include "NoWindows.h"
 #endif
-#define ape_max(a, b) (((a) > (b)) ? (a) : (b))
-#define ape_min(a, b) (((a) < (b)) ? (a) : (b))
-#define ape_cap(value, low, high) (((value) < (low)) ? (low) : ((value) > (high)) ? (high) : (value))
+#define APE_MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define APE_MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define APE_CAP(value, low, high) (((value) < (low)) ? (low) : ((value) > (high)) ? (high) : (value))
 #define APE_CLEAR(destination) memset(&destination, 0, sizeof(destination))
 
 /**************************************************************************************************
@@ -152,6 +152,12 @@ namespace APE
     typedef char                                        str_ansi;
     typedef unsigned char                               str_utf8;
     typedef wchar_t                                     str_utfn; // could be UTF-16 or UTF-32 depending on platform
+    
+    // on Windows we know that we only have two bytes for each wchar_t, so we can switch our UTF-8 handling
+    // not sure if there's some better way to test the sizeof(wchar_t) for this define
+    #ifdef _MSC_VER
+        #define APE_UTFN_TWO_BYTE
+    #endif
 }
 
 /**************************************************************************************************
@@ -374,6 +380,7 @@ Error Codes
 #define ERROR_UNSUPPORTED_FILE_TYPE                     1013
 #define ERROR_UNSUPPORTED_FILE_VERSION                  1014
 #define ERROR_OPENING_FILE_IN_USE                       1015
+#define ERROR_UAC_PERMISSION                            1016
 
 // memory errors (2000's)
 #define ERROR_INSUFFICIENT_MEMORY                       2000
