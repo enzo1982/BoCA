@@ -61,7 +61,7 @@
 #include <cstring> // size_t
 #include <cstddef> // int
 
-#if (URI_VER_MINOR < 7) || ((URI_VER_MINOR == 7) && (URI_VER_RELEASE < 2))
+#if (URI_VER_MAJOR == 0) && ((URI_VER_MINOR < 7) || ((URI_VER_MINOR == 7) && (URI_VER_RELEASE < 2)))
 # error uriparser 0.7.2 or later is required
 #endif
 
