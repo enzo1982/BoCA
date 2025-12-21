@@ -198,17 +198,17 @@ String BoCA::Utilities::ReplaceIncompatibleCharacters(const String &string, Bool
 
 		/* Replace other characters.
 		 */
-		if	(character == '\"')		     { result[p] = '\''; result[++p] = '\''; }
+		if	(character == '\"')		     { result[p] = useUnicode ? L'＂' : '\''; if (!useUnicode) result[++p] = '\''; }
 		else if (character == '\n')		       p--;
 		else if (character == '\r')		       p--;
-		else if (character == '?')		       p--;
-		else if (character == '|')		       result[p] = '_';
-		else if (character == '*')		       p--;
-		else if (character == '<')		       result[p] = '(';
-		else if (character == '>')		       result[p] = ')';
-		else if (character == ':')		       p--;
-		else if (character == '/'  &&  replaceSlashes) result[p] = '-';
-		else if (character == '\\' &&  replaceSlashes) result[p] = '-';
+		else if (character == '?')		       result[p] = useUnicode ? L'？' : p--;
+		else if (character == '|')		       result[p] = useUnicode ? L'｜' : '_';
+		else if (character == '*')		       result[p] = useUnicode ? L'＊' : p--;
+		else if (character == '<')		       result[p] = useUnicode ? L'＜' : '(';
+		else if (character == '>')		       result[p] = useUnicode ? L'＞' : ')';
+		else if (character == ':')		       result[p] = useUnicode ? L'：' : p--;
+		else if (character == '/'  &&  replaceSlashes) result[p] = useUnicode ? L'／' : '-';
+		else if (character == '\\' &&  replaceSlashes) result[p] = useUnicode ? L'＼' : '-';
 		else if (character == ' '  &&  replaceSpaces)  result[p] = '_';
 		else if (character == '\t' &&  replaceSpaces)  result[p] = '_';
 		else if (character == '\t')		       result[p] = ' ';
