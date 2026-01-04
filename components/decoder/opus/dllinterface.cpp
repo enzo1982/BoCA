@@ -32,6 +32,7 @@ OGGSYNCCLEAR			 ex_ogg_sync_clear			= NIL;
 
 OPUSMULTISTREAMDECODERCREATE	 ex_opus_multistream_decoder_create	= NIL;
 OPUSMULTISTREAMDECODE		 ex_opus_multistream_decode		= NIL;
+OPUSMULTISTREAMDECODEFLOAT	 ex_opus_multistream_decode_float	= NIL;
 OPUSMULTISTREAMDECODERCTL	 ex_opus_multistream_decoder_ctl	= NIL;
 OPUSMULTISTREAMDECODERDESTROY	 ex_opus_multistream_decoder_destroy	= NIL;
 OPUSDECODERCREATE		 ex_opus_decoder_create			= NIL;
@@ -96,6 +97,7 @@ Bool LoadOpusDLL()
 
 	ex_opus_multistream_decoder_create	= (OPUSMULTISTREAMDECODERCREATE) opusdll->GetFunctionAddress("opus_multistream_decoder_create");
 	ex_opus_multistream_decode		= (OPUSMULTISTREAMDECODE) opusdll->GetFunctionAddress("opus_multistream_decode");
+	ex_opus_multistream_decode_float	= (OPUSMULTISTREAMDECODEFLOAT) opusdll->GetFunctionAddress("opus_multistream_decode_float");
 	ex_opus_multistream_decoder_ctl		= (OPUSMULTISTREAMDECODERCTL) opusdll->GetFunctionAddress("opus_multistream_decoder_ctl");
 	ex_opus_multistream_decoder_destroy	= (OPUSMULTISTREAMDECODERDESTROY) opusdll->GetFunctionAddress("opus_multistream_decoder_destroy");
 	ex_opus_decoder_create			= (OPUSDECODERCREATE) opusdll->GetFunctionAddress("opus_decoder_create");
@@ -105,6 +107,7 @@ Bool LoadOpusDLL()
 
 	if (ex_opus_multistream_decoder_create	== NIL ||
 	    ex_opus_multistream_decode		== NIL ||
+	    ex_opus_multistream_decode_float	== NIL ||
 	    ex_opus_multistream_decoder_ctl	== NIL ||
 	    ex_opus_multistream_decoder_destroy	== NIL ||
 	    ex_opus_decoder_create		== NIL ||

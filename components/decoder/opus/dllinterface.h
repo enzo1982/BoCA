@@ -59,6 +59,7 @@ extern OGGSYNCCLEAR			 ex_ogg_sync_clear;
 
 typedef OpusMSDecoder *			(*OPUSMULTISTREAMDECODERCREATE)		 (opus_int32, int, int, int, const unsigned char *, int *);
 typedef int				(*OPUSMULTISTREAMDECODE)		 (OpusMSDecoder *, const unsigned char *, opus_int32, opus_int16 *, int, int);
+typedef int				(*OPUSMULTISTREAMDECODEFLOAT)		 (OpusMSDecoder *, const unsigned char *, opus_int32, float *, int, int);
 typedef int				(*OPUSMULTISTREAMDECODERCTL)		 (OpusMSDecoder *, int, ...);
 typedef void				(*OPUSMULTISTREAMDECODERDESTROY)	 (OpusMSDecoder *);
 typedef OpusDecoder *			(*OPUSDECODERCREATE)			 (opus_int32, int, int *);
@@ -68,6 +69,7 @@ typedef const char *			(*OPUSGETVERSIONSTRING)			 ();
 
 extern OPUSMULTISTREAMDECODERCREATE	 ex_opus_multistream_decoder_create;
 extern OPUSMULTISTREAMDECODE		 ex_opus_multistream_decode;
+extern OPUSMULTISTREAMDECODEFLOAT	 ex_opus_multistream_decode_float;
 extern OPUSMULTISTREAMDECODERCTL	 ex_opus_multistream_decoder_ctl;
 extern OPUSMULTISTREAMDECODERDESTROY	 ex_opus_multistream_decoder_destroy;
 extern OPUSDECODERCREATE		 ex_opus_decoder_create;

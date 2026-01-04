@@ -176,10 +176,11 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Get configuration.
 	 */
-	const Config	*config	    = GetConfiguration();
+	const Config	*config	     = GetConfiguration();
 
-	Int		 complexity = config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
-	Bool		 enableBwe  = config->GetIntValue(ConfigureOpus::ConfigID, "BandwidthExtension", False);
+	Bool		 decodeFloat = config->GetIntValue(ConfigureOpus::ConfigID, "DecodeFloat", False);
+	Int		 complexity  = config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
+	Bool		 enableBwe   = config->GetIntValue(ConfigureOpus::ConfigID, "BandwidthExtension", False);
 
 	/* Open file.
 	 */
@@ -191,6 +192,12 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 	format.bits  = 16;
 	format.rate  = 48000;
+
+	if (decodeFloat)
+	{
+		format.bits = 32;
+		format.fp   = True;
+	}
 
 	track.fileSize = in.Size();
 
@@ -289,7 +296,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 					if (error == OPUS_OK)
 					{
-						Buffer<signed short>	 samples(maxFrameSize * format.channels);
+						Buffer<opus_int16>	 samples(maxFrameSize * format.channels);
 
 						track.approxLength = track.fileSize / (op.bytes * 1.05) * ex_opus_multistream_decode(decoder, op.packet, op.bytes, samples, maxFrameSize, 0);
 
@@ -534,7 +541,10 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data)
 				data.Resize(dataBufferLen);
 			}
 
-			Int	 frameSize = ex_opus_multistream_decode(decoder, op.packet, op.bytes, (signed short *) (unsigned char *) (data + size), maxFrameSize, 0);
+			Int	 frameSize = 0;
+
+			if (format.bits == 16) frameSize = ex_opus_multistream_decode(decoder, op.packet, op.bytes, (opus_int16 *) (UnsignedByte *) (data + size), maxFrameSize, 0);
+			else		       frameSize = ex_opus_multistream_decode_float(decoder, op.packet, op.bytes, (float *) (UnsignedByte *) (data + size), maxFrameSize, 0);
 
 			if (frameSize > preSkipLeft)
 			{
@@ -577,7 +587,7 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data)
 
 ConfigLayer *BoCA::DecoderOpus::GetConfigurationLayer()
 {
-	if (osceSupported && configLayer == NIL) configLayer = new ConfigureOpus(bweSupported);
+	if (configLayer == NIL) configLayer = new ConfigureOpus(osceSupported, bweSupported);
 
 	return configLayer;
 }

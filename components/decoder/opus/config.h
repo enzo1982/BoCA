@@ -26,7 +26,12 @@ namespace BoCA
 	class ConfigureOpus : public ConfigLayer
 	{
 		private:
+			Bool			 osceSupported;
 			Bool			 bweSupported;
+
+			GroupBox		*group_format;
+			Text			*text_format;
+			ComboBox		*combo_format;
 
 			GroupBox		*group_quality;
 			Text			*text_complexity;
@@ -41,7 +46,7 @@ namespace BoCA
 		public:
 			static const String	 ConfigID;
 
-						 ConfigureOpus(Bool);
+						 ConfigureOpus(Bool, Bool);
 						~ConfigureOpus();
 
 			Int			 SaveSettings();
