@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -61,8 +61,10 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat) : pr
 
 	/* Get frame size.
 	 */
-	frameSize     = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
-	maxPacketSize = 4000 * Math::Ceil(format.channels / 2.0);
+	frameSize      = Math::Round(Float(sampleRate) / (1000000.0 / config->GetIntValue(ConfigureOpus::ConfigID, "FrameSize", 20000)));
+	maxPacketSize  = 4000 * Math::Ceil(format.channels / 2.0);
+
+	bytesPerSample = format.bits / 8;
 }
 
 BoCA::SuperWorker::~SuperWorker()
@@ -83,7 +85,7 @@ Int BoCA::SuperWorker::Run()
 		packetBuffer.Resize(0);
 		packetSizes.RemoveAll();
 
-		Int	 samplesLeft	 = samplesBuffer.Size();
+		Int	 samplesLeft	 = samplesBuffer.Size() / bytesPerSample;
 		Int	 samplesPerFrame = frameSize * format.channels;
 
 		Int	 framesProcessed = 0;
@@ -92,7 +94,10 @@ Int BoCA::SuperWorker::Run()
 		{
 			packetBuffer.Resize(packetBuffer.Size() + maxPacketSize);
 
-			Int	 dataLength = ex_opus_multistream_encode(encoder, samplesBuffer + framesProcessed * samplesPerFrame, frameSize, packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
+			Int	 dataLength = 0;
+
+			if (format.bits == 16) dataLength = ex_opus_multistream_encode(encoder, ((opus_int16 *) (UnsignedByte *) samplesBuffer) + framesProcessed * samplesPerFrame, frameSize, packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
+			else		       dataLength = ex_opus_multistream_encode_float(encoder, ((float *) (UnsignedByte *) samplesBuffer) + framesProcessed * samplesPerFrame, frameSize, packetBuffer + packetBuffer.Size() - maxPacketSize, maxPacketSize);
 
 			packetBuffer.Resize(packetBuffer.Size() - maxPacketSize + dataLength);
 
@@ -108,11 +113,11 @@ Int BoCA::SuperWorker::Run()
 	return Success();
 }
 
-Void BoCA::SuperWorker::Encode(const Buffer<signed short> &buffer, Int offset, Int size)
+Void BoCA::SuperWorker::Encode(const Buffer<UnsignedByte> &buffer, Int offset, Int samples)
 {
-	samplesBuffer.Resize(size);
+	samplesBuffer.Resize(samples * bytesPerSample);
 
-	memcpy(samplesBuffer, buffer + offset, size * sizeof(signed short));
+	memcpy(samplesBuffer, buffer + offset * bytesPerSample, samples * bytesPerSample);
 
 	processSignal.Release();
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -39,6 +39,7 @@ const String &BoCA::EncoderOpus::GetComponentSpecs()
 		      <tag id=\"vorbis-tag\" mode=\"other\">Vorbis Comment</tag>				\
 		    </format>											\
 		    <input bits=\"16\" channels=\"1-8\"/>							\
+		    <input float=\"true\" channels=\"1-8\"/>							\
 		    <parameters>										\
 		      <range name=\"Bitrate\" argument=\"--bitrate %VALUE\" default=\"128\">			\
 			<min>6</min>										\
@@ -368,11 +369,11 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 
 	/* Copy data to samples buffer.
 	 */
-	Int	 samples = data.Size() / 2;
+	Int	 size = data.Size();
 
-	samplesBuffer.Resize(samplesBuffer.Size() + samples);
+	samplesBuffer.Resize(samplesBuffer.Size() + size);
 
-	memcpy(samplesBuffer + samplesBuffer.Size() - samples, data, data.Size());
+	memcpy(samplesBuffer + samplesBuffer.Size() - size, data, size);
 
 	/* Output samples to encoder.
 	 */
@@ -381,19 +382,22 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 
 Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 {
+	const Format	&format = track.GetFormat();
+
 	/* Pad end of stream with empty samples.
 	 */
-	Int	 nullSamples = 0;
+	Int	 nullSamples	= 0;
+	Int	 bytesPerSample	= format.bits / 8;
 
 	if (flush)
 	{
 		nullSamples = preSkip;
 
-		if ((samplesBuffer.Size() / targetFormat.channels + preSkip) % frameSize > 0) nullSamples += frameSize - (samplesBuffer.Size() / targetFormat.channels + preSkip) % frameSize;
+		if ((samplesBuffer.Size() / bytesPerSample / targetFormat.channels + preSkip) % frameSize > 0) nullSamples += frameSize - (samplesBuffer.Size() / bytesPerSample / targetFormat.channels + preSkip) % frameSize;
 
-		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * targetFormat.channels);
+		samplesBuffer.Resize(samplesBuffer.Size() + nullSamples * targetFormat.channels * bytesPerSample);
 
-		memset(((signed short *) samplesBuffer) + samplesBuffer.Size() - nullSamples * targetFormat.channels, 0, sizeof(short) * nullSamples * targetFormat.channels);
+		memset(((UnsignedByte *) samplesBuffer) + samplesBuffer.Size() - nullSamples * targetFormat.channels * bytesPerSample, 0, nullSamples * targetFormat.channels * bytesPerSample);
 	}
 
 	/* Pass samples to workers.
@@ -403,10 +407,11 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 	Int	 dataLength	 = 0;
 
 	Int	 samplesPerFrame = frameSize * targetFormat.channels;
+	Int	 samplesInBuffer = samplesBuffer.Size() / bytesPerSample;
 
-	if (flush) framesToProcess = Math::Floor(samplesBuffer.Size() / samplesPerFrame);
+	if (flush) framesToProcess = Math::Floor(samplesInBuffer / samplesPerFrame);
 
-	while (samplesBuffer.Size() - framesProcessed * samplesPerFrame >= samplesPerFrame * framesToProcess)
+	while (samplesInBuffer - framesProcessed * samplesPerFrame >= samplesPerFrame * framesToProcess)
 	{
 		SuperWorker	*workerToUse = workers.GetNth(nextWorker % workers.Length());
 
@@ -427,9 +432,11 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 		if (flush) break;
 	}
 
-	memmove((signed short *) samplesBuffer, ((signed short *) samplesBuffer) + framesProcessed * samplesPerFrame, sizeof(short) * (samplesBuffer.Size() - framesProcessed * samplesPerFrame));
+	Int	 bytesProcessed = framesProcessed * samplesPerFrame * bytesPerSample;
 
-	samplesBuffer.Resize(samplesBuffer.Size() - framesProcessed * samplesPerFrame);
+	memmove((UnsignedByte *) samplesBuffer, (UnsignedByte *) samplesBuffer + bytesProcessed, samplesBuffer.Size() - bytesProcessed);
+
+	samplesBuffer.Resize(samplesBuffer.Size() - bytesProcessed);
 
 	if (!flush) return dataLength;
 
