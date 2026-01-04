@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -21,6 +21,7 @@
 using namespace smooth::IO;
 
 static Bool osceSupported = False;
+static Bool bweSupported  = False;
 
 const String &BoCA::DecoderOpus::GetComponentSpecs()
 {
@@ -54,6 +55,19 @@ const String &BoCA::DecoderOpus::GetComponentSpecs()
 		const Array<String>	&version = String(ex_opus_get_version_string()).Replace("libopus ", NIL).Explode(".");
 
 		if (version.GetNth(0).ToInt() > 1 || (version.GetNth(0).ToInt() == 1 && version.GetNth(1).ToInt() >= 5)) osceSupported = True;
+
+		if (version.GetNth(0).ToInt() > 1 || (version.GetNth(0).ToInt() == 1 && version.GetNth(1).ToInt() >= 6))
+		{
+			int		 error	 = OPUS_OK;
+			OpusDecoder	*decoder = ex_opus_decoder_create(48000, 2, &error);
+
+			if (error == OPUS_OK)
+			{
+				if (ex_opus_decoder_ctl(decoder, OPUS_SET_OSCE_BWE(1)) == OPUS_OK) bweSupported = True;
+
+				ex_opus_decoder_destroy(decoder);
+			}
+		}
 	}
 
 	return componentSpecs;
@@ -160,6 +174,15 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 {
 	static Endianness	 endianness = CPU().GetEndianness();
 
+	/* Get configuration.
+	 */
+	const Config	*config	    = GetConfiguration();
+
+	Int		 complexity = config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
+	Bool		 enableBwe  = config->GetIntValue(ConfigureOpus::ConfigID, "BandwidthExtension", False);
+
+	/* Open file.
+	 */
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
 	/* Set up track format.
@@ -226,7 +249,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 					format.channels = setup.nb_channels;
 
-					if (setup.sample_rate != 0)
+					if (setup.sample_rate != 0 && (!bweSupported || complexity < 4 || !enableBwe))
 					{
 						if	(setup.sample_rate <=  8000) format.rate =  8000;
 						else if	(setup.sample_rate <= 12000) format.rate = 12000;
@@ -256,7 +279,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 				 */
 				if (packetNum == 3)
 				{
-					int		 error	    = 0;
+					int		 error	    = OPUS_OK;
 					unsigned char	 mapping[2] = { 0, 1 };
 
 					OpusMSDecoder	*decoder    = NIL;
@@ -264,7 +287,7 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 					if (setup.channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, 1,		       setup.nb_channels - 1, mapping,		&error);
 					else				decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, setup.nb_streams, setup.nb_coupled,      setup.stream_map, &error);
 
-					if (error == 0)
+					if (error == OPUS_OK)
 					{
 						Buffer<signed short>	 samples(maxFrameSize * format.channels);
 
@@ -343,8 +366,6 @@ BoCA::DecoderOpus::DecoderOpus()
 
 	decoder	    = NIL;
 
-	sampleRate  = 48000;
-
 	preSkip	    = 0;
 	preSkipLeft = 0;
 
@@ -367,7 +388,10 @@ Bool BoCA::DecoderOpus::Activate()
 
 	/* Get configuration.
 	 */
-	const Config	*config = GetConfiguration();
+	const Config	*config	    = GetConfiguration();
+
+	Int		 complexity = config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
+	Bool		 enableBwe  = config->GetIntValue(ConfigureOpus::ConfigID, "BandwidthExtension", False);
 
 	/* Parse packets and init decoder.
 	 */
@@ -401,6 +425,8 @@ Bool BoCA::DecoderOpus::Activate()
 
 			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
 			{
+				/* Found header packet.
+				 */
 				if (packetNum == 0)
 				{
 					OpusHeader	*setup = (OpusHeader *) op.packet;
@@ -412,23 +438,16 @@ Bool BoCA::DecoderOpus::Activate()
 						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->output_gain, sizeof(setup->output_gain));
 					}
 
-					if (setup->sample_rate != 0)
-					{
-						if	(setup->sample_rate <=  8000) sampleRate =  8000;
-						else if	(setup->sample_rate <= 12000) sampleRate = 12000;
-						else if	(setup->sample_rate <= 16000) sampleRate = 16000;
-						else if	(setup->sample_rate <= 24000) sampleRate = 24000;
-						else				      sampleRate = 48000;
-					}
+					const Format	&format	    = track.GetFormat();
 
 					int		 error	    = OPUS_OK;
 					unsigned char	 mapping[2] = { 0, 1 };
 
-					if (setup->channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(sampleRate, setup->nb_channels, 1,		 setup->nb_channels - 1, mapping,	    &error);
-					else				 decoder = ex_opus_multistream_decoder_create(sampleRate, setup->nb_channels, setup->nb_streams, setup->nb_coupled,	 setup->stream_map, &error);
+					if (setup->channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup->nb_channels, 1,		  setup->nb_channels - 1, mapping,	     &error);
+					else				 decoder = ex_opus_multistream_decoder_create(format.rate, setup->nb_channels, setup->nb_streams, setup->nb_coupled,	  setup->stream_map, &error);
 
-					preSkip	    = setup->preskip / (48000 / sampleRate);
-					preSkipLeft = setup->preskip / (48000 / sampleRate);
+					preSkip	    = setup->preskip / (48000 / format.rate);
+					preSkipLeft = setup->preskip / (48000 / format.rate);
 
 					if (osceSupported && error == OPUS_OK)
 					{
@@ -437,7 +456,9 @@ Bool BoCA::DecoderOpus::Activate()
 							OpusDecoder	*streamDecoder = NIL;
 
 							ex_opus_multistream_decoder_ctl(decoder, OPUS_MULTISTREAM_GET_DECODER_STATE(i, &streamDecoder));
-							ex_opus_decoder_ctl(streamDecoder, OPUS_SET_COMPLEXITY(config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10)));
+
+							ex_opus_decoder_ctl(streamDecoder, OPUS_SET_COMPLEXITY(complexity));
+							ex_opus_decoder_ctl(streamDecoder, OPUS_SET_OSCE_BWE(enableBwe));
 						}
 					}
 				}
@@ -465,9 +486,11 @@ Bool BoCA::DecoderOpus::Deactivate()
 
 Bool BoCA::DecoderOpus::Seek(Int64 samplePosition)
 {
-	while (ex_ogg_page_granulepos(&og) / (48000 / sampleRate) - preSkip <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
+	const Format	&format = track.GetFormat();
+
+	while (ex_ogg_page_granulepos(&og) / (48000 / format.rate) - preSkip <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
 	{
-		skipSamples = preSkip + samplePosition - ex_ogg_page_granulepos(&og) / (48000 / sampleRate);
+		skipSamples = preSkip + samplePosition - ex_ogg_page_granulepos(&og) / (48000 / format.rate);
 
 		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
 		{
@@ -554,7 +577,7 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data)
 
 ConfigLayer *BoCA::DecoderOpus::GetConfigurationLayer()
 {
-	if (osceSupported && configLayer == NIL) configLayer = new ConfigureOpus();
+	if (osceSupported && configLayer == NIL) configLayer = new ConfigureOpus(bweSupported);
 
 	return configLayer;
 }

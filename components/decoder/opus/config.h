@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,18 +26,22 @@ namespace BoCA
 	class ConfigureOpus : public ConfigLayer
 	{
 		private:
+			Bool			 bweSupported;
+
 			GroupBox		*group_quality;
 			Text			*text_complexity;
 			Slider			*slider_complexity;
 			Text			*text_complexity_value;
+			CheckBox		*check_enable_bwe;
 
 			Int			 complexity;
+			Bool			 enableBwe;
 		slots:
 			Void			 SetComplexity();
 		public:
 			static const String	 ConfigID;
 
-						 ConfigureOpus();
+						 ConfigureOpus(Bool);
 						~ConfigureOpus();
 
 			Int			 SaveSettings();
