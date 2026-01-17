@@ -13,6 +13,6 @@ set CC=aarch64-w64-mingw32-clang
 set CXX=aarch64-w64-mingw32-clang++
 
 echo fre:ac Component Development Kit v1.1.7 (arm64)
-echo Copyright (C) 2001-2025 Robert Kausch
+echo Copyright (C) 2001-2026 Robert Kausch
 
 bash
