@@ -157,6 +157,12 @@ Bool BoCA::EncoderOpus::Activate()
 	else if (format.rate <= 24000) targetFormat.rate = 24000;
 	else			       targetFormat.rate = 48000;
 
+	if (targetFormat.rate != format.rate)
+	{
+		targetFormat.bits = 32;
+		targetFormat.fp	  = True;
+	}
+
 	/* Create and init format converter component.
 	 */
 	converter = new FormatConverter(format, targetFormat);
@@ -382,12 +388,10 @@ Int BoCA::EncoderOpus::WriteData(Buffer<UnsignedByte> &data)
 
 Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 {
-	const Format	&format = track.GetFormat();
-
 	/* Pad end of stream with empty samples.
 	 */
 	Int	 nullSamples	= 0;
-	Int	 bytesPerSample	= format.bits / 8;
+	Int	 bytesPerSample	= targetFormat.bits / 8;
 
 	if (flush)
 	{
