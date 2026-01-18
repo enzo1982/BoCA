@@ -307,11 +307,11 @@ Bool BoCA::EncoderOpus::Deactivate()
 
 	/* Append remaining samples to samples buffer.
 	 */
-	Int	 samples = buffer.Size() / 2;
+	Int	 size = buffer.Size();
 
-	samplesBuffer.Resize(samplesBuffer.Size() + samples);
+	samplesBuffer.Resize(samplesBuffer.Size() + size);
 
-	memcpy(samplesBuffer + samplesBuffer.Size() - samples, buffer, buffer.Size());
+	memcpy(samplesBuffer + samplesBuffer.Size() - size, buffer, size);
 
 	/* Output remaining samples to encoder.
 	 */
