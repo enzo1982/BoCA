@@ -139,7 +139,7 @@ BoCA::ConfigureOpus::ConfigureOpus()
 
 	group_options		= new GroupBox(i18n->TranslateString("Options"), Point(7, 318), Size(344, 66));
 
-	check_dtx		= new CheckBox(i18n->TranslateString("Enable discontinous transmission"), Point(10, 13), Size(324, 0), &enableDTX);
+	check_dtx		= new CheckBox(i18n->TranslateString("Enable discontinuous transmission"), Point(10, 13), Size(324, 0), &enableDTX);
 
 	text_packet_loss	= new Text(i18n->AddColon(i18n->TranslateString("Expected packet loss")), Point(10, 40));
 

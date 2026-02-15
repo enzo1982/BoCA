@@ -1224,7 +1224,7 @@ static ID3_FieldDef ID3FD_SyncLyrics[] =
 // USER       ID3FID_TERMSOFUSE        Terms of use
 // USLT  ULT  ID3FID_UNSYNCEDLYRICS    Unsynchronized lyric/text transcription
 // WCOM  WCM  ID3FID_WWWCOMMERCIALINFO Commercial information
-// WCOP  WCM  ID3FID_WWWCOPYRIGHT      Copyright/Legal infromation
+// WCOP  WCM  ID3FID_WWWCOPYRIGHT      Copyright/Legal information
 // WOAF  WCP  ID3FID_WWWAUDIOFILE      Official audio file webpage
 // WOAR  WAF  ID3FID_WWWARTIST         Official artist/performer webpage
 // WOAS  WAR  ID3FID_WWWAUDIOSOURCE    Official audio source webpage
@@ -1394,7 +1394,7 @@ static ID3_FrameDef ID3_FrameDefs[] =
 	{ID3FID_TERMSOFUSE,           ""   , "USER", ID3V2_3_0     , ID3V2_LATEST, NULL,        false, false, ID3FD_TermsOfUse,      "Terms of use"},
 	{ID3FID_UNSYNCEDLYRICS,       "ULT", "USLT", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_GeneralText,     "Unsynchronized lyric/text transcription"},
 	{ID3FID_WWWCOMMERCIALINFO,    "WCM", "WCOM", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Commercial information"},
-	{ID3FID_WWWCOPYRIGHT,         "WCP", "WCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Copyright/Legal infromation"},
+	{ID3FID_WWWCOPYRIGHT,         "WCP", "WCOP", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Copyright/Legal information"},
 	{ID3FID_WWWAUDIOFILE,         "WAF", "WOAF", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official audio file webpage"},
 	{ID3FID_WWWARTIST,            "WAR", "WOAR", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official artist/performer webpage"},
 	{ID3FID_WWWAUDIOSOURCE,       "WAS", "WOAS", ID3V2_EARLIEST, ID3V2_LATEST, NULL,        false, false, ID3FD_URL,             "Official audio source webpage"},

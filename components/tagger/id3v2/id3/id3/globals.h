@@ -345,7 +345,7 @@ ID3_ENUM(ID3_FrameID)
   /* USER */ ID3FID_TERMSOFUSE,           /**< Terms of use */
   /* USLT */ ID3FID_UNSYNCEDLYRICS,       /**< Unsynchronized lyric/text transcription */
   /* WCOM */ ID3FID_WWWCOMMERCIALINFO,    /**< Commercial information */
-  /* WCOP */ ID3FID_WWWCOPYRIGHT,         /**< Copyright/Legal infromation */
+  /* WCOP */ ID3FID_WWWCOPYRIGHT,         /**< Copyright/Legal information */
   /* WOAF */ ID3FID_WWWAUDIOFILE,         /**< Official audio file webpage */
   /* WOAR */ ID3FID_WWWARTIST,            /**< Official artist/performer webpage */
   /* WOAS */ ID3FID_WWWAUDIOSOURCE,       /**< Official audio source webpage */
