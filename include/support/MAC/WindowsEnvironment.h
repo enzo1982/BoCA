@@ -3,11 +3,21 @@
 /**************************************************************************************************
 Windows version
 **************************************************************************************************/
-#ifndef WINVER
-    #define WINVER         0x0600
-#endif
-#ifndef _WIN32_WINNT
-    #define _WIN32_WINNT   0x0600
+#ifdef PLATFORM_WINDOWS_XP
+    #undef WINVER
+    #undef _WIN32_WINNT
+
+    #define WINVER             0x0501
+    #define _WIN32_WINNT       0x0501
+#else
+    #if !defined(WINVER) && !defined(_WIN32_WINNT)
+        #define WINVER         0x0600
+        #define _WIN32_WINNT   0x0600
+    #elif !defined(WINVER)
+        #define WINVER         _WIN32_WINNT
+    #elif !defined(_WIN32_WINNT)
+        #define _WIN32_WINNT   WINVER
+    #endif
 #endif
 
 /**************************************************************************************************
@@ -23,5 +33,4 @@ Unicode
 /**************************************************************************************************
 Visual Studio defines
 **************************************************************************************************/
-#define _CRT_NON_CONFORMING_SWPRINTFS
 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS

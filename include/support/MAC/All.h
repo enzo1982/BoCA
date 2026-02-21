@@ -26,9 +26,9 @@ Warnings
 #include "Warnings.h"
 
 /**************************************************************************************************
-Override (define in MSVC)
+Override (define for C++11)
 **************************************************************************************************/
-#ifdef _MSC_VER
+#if __cplusplus >= 201103L
 #define APE_OVERRIDE override
 #else
 #define APE_OVERRIDE
@@ -80,11 +80,7 @@ Global includes
 #define APE_MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define APE_CAP(value, low, high) (((value) < (low)) ? (low) : ((value) > (high)) ? (high) : (value))
 #define APE_CLEAR(destination) memset(&destination, 0, sizeof(destination))
-
-/**************************************************************************************************
-Smart pointer
-**************************************************************************************************/
-#include "SmartPtr.h"
+#define APE_CLEAR_ARRAY(destination, elements) memset(&destination[0], 0, sizeof(destination[0]) * static_cast<size_t>(elements))
 
 /**************************************************************************************************
 Version
@@ -92,35 +88,38 @@ Version
 #include "Version.h"
 
 // year in the copyright strings
-#define APE_YEAR 2025
+#define APE_YEAR 2026
 
-// build the version string
-#define STRINGIZE2(s) #s
-#define STRINGIZE(s) STRINGIZE2(s)
-#define APE_VER_FILE_VERSION_STR                        STRINGIZE(APE_VERSION_MAJOR) _T(".") STRINGIZE(APE_VERSION_REVISION)
-#define APE_VER_FILE_VERSION_STR_NARROW                 STRINGIZE(APE_VERSION_MAJOR) "." STRINGIZE(APE_VERSION_REVISION)
-#define APE_VER_FILE_VERSION_STR_WIDE                   STRINGIZE(APE_VERSION_MAJOR) L"." STRINGIZE(APE_VERSION_REVISION)
+// used to make strings from numbers
+#define APE_STRINGIZE2(s) #s
+#define APE_STRINGIZE(s) APE_STRINGIZE2(s)
 
+#define APE_WIDEN_(s) L##s
+#define APE_WIDEN(s) APE_WIDEN_(s)
+#define APE_STRINGIZE_WIDE(s) APE_WIDEN(APE_STRINGIZE(s))
+
+// build the version strings
+#define APE_VER_FILE_VERSION_STR                        APE_STRINGIZE(APE_VERSION_MAJOR) "." APE_STRINGIZE(APE_VERSION_REVISION)
+#define APE_VER_FILE_VERSION_STR_WIDE                   APE_STRINGIZE_WIDE(APE_VERSION_MAJOR) L"." APE_STRINGIZE_WIDE(APE_VERSION_REVISION)
 #define APE_FILE_VERSION_NUMBER                         3990
-#define APE_VERSION_STRING                              APE_VER_FILE_VERSION_STR
-#define APE_VERSION_NUMBER                              APE_VERSION_MAJOR APE_VERSION_REVISION
-#define APE_NAME                                        _T("Monkey's Audio ") APE_VER_FILE_VERSION_STR
-#define PLUGIN_NAME                                     "Monkey's Audio Player " APE_VER_FILE_VERSION_STR_NARROW
-#define MJ_PLUGIN_NAME                                  _T("APE Plugin (v") APE_VER_FILE_VERSION_STR _T(")")
+
+// names and copyrights
+#define APE_NAME                                        L"Monkey's Audio " APE_VER_FILE_VERSION_STR_WIDE
+#define APE_WINAMP_PLUGIN_NAME                          "Monkey's Audio Player " APE_VER_FILE_VERSION_STR
+#define APE_MC_PLUGIN_NAME                              L"APE Plugin (v" APE_VER_FILE_VERSION_STR_WIDE L")"
 #define APE_RESOURCE_VERSION_COMMA                      APE_VERSION_MAJOR, APE_VERSION_REVISION, 0, 0
-#define APE_RESOURCE_VERSION_STRING                     APE_VER_FILE_VERSION_STR
-#define APE_RESOURCE_COPYRIGHT                          "Copyright (c) 2000-" STRINGIZE(APE_YEAR) " Matthew T. Ashland"
-#define CONSOLE_NAME                                    L"--- Monkey's Audio Console Front End (v " APE_VER_FILE_VERSION_STR_WIDE L") (c) Matthew T. Ashland ---\n"
-#define PLUGIN_ABOUT                                    _T("Monkey's Audio Player v") APE_VER_FILE_VERSION_STR _T("\nCopyrighted (c) 2000-") STRINGIZE(APE_YEAR) _T(" by Matthew T. Ashland")
+#define APE_RESOURCE_VERSION_STRING                     APE_VER_FILE_VERSION_STR_WIDE
+#define APE_RESOURCE_COPYRIGHT                          L"Copyright 2000-" APE_STRINGIZE_WIDE(APE_YEAR) L" Matthew T. Ashland"
+#define CONSOLE_NAME                                    L"--- Monkey's Audio Console Front End (v " APE_VER_FILE_VERSION_STR_WIDE L") " APE_RESOURCE_COPYRIGHT L" ---\n"
+#define PLUGIN_ABOUT                                    L"Monkey's Audio Player v" APE_VER_FILE_VERSION_STR_WIDE L"\n" APE_RESOURCE_COPYRIGHT
 
 /**************************************************************************************************
 Global compiler settings (useful for porting)
 **************************************************************************************************/
-// APE_BACKWARDS_COMPATIBILITY is only needed for decoding APE 3.92 or earlier files. It
+// APE_BACKWARDS_COMPATIBILITY is only needed for decoding earlier than APE 3.99 files. It
 // has not been possible to make these files for over 10 years, so it's unlikely
 // that disabling APE_BACKWARDS_COMPATIBILITY would have any effect on a normal user. For
 // porting or third party usage, it's probably best to not bother with APE_BACKWARDS_COMPATIBILITY.
-// A future release of Monkey's Audio itself may remove support for these obsolete files.
 #define APE_BACKWARDS_COMPATIBILITY
 
 // disable this to turn off compression code
@@ -152,17 +151,21 @@ namespace APE
     typedef char                                        str_ansi;
     typedef unsigned char                               str_utf8;
     typedef wchar_t                                     str_utfn; // could be UTF-16 or UTF-32 depending on platform
-    
-    // on Windows we know that we only have two bytes for each wchar_t, so we can switch our UTF-8 handling
-    // not sure if there's some better way to test the sizeof(wchar_t) for this define
-    #ifdef _MSC_VER
-        #define APE_UTFN_TWO_BYTE
-    #endif
 }
+
+/**************************************************************************************************
+Smart pointer
+**************************************************************************************************/
+#include "SmartPtr.h"
 
 /**************************************************************************************************
 Global macros
 **************************************************************************************************/
+
+// use to set the thread count automatically using the system hardware
+#define APE_THREADS_AUTOMATIC -1
+
+// formats
 #define WAVE_FORMAT_PCM 1
 #define WAVE_FORMAT_IEEE_FLOAT 0x0003
 #define WAVE_FORMAT_EXTENSIBLE 0xFFFE
@@ -178,22 +181,15 @@ Global macros
 // undefined file size (pipe, etc.)
 #define APE_FILE_SIZE_UNDEFINED -1
 
-#define POINTER_TO_INT64(POINTER) static_cast<APE::int64>(reinterpret_cast<uintptr_t>(POINTER))
+// make a pointer into an int64
+#define APE_POINTER_TO_INT64(POINTER) static_cast<APE::int64>(reinterpret_cast<uintptr_t>(POINTER))
 
+// platform defines
 #if defined(PLATFORM_WINDOWS)
     #define IO_USE_WIN_FILE_IO
     #define DLLEXPORT                                   __declspec(dllexport)
     #define SLEEP(MILLISECONDS)                         ::Sleep(MILLISECONDS)
-    #define MESSAGEBOX(PARENT, TEXT, CAPTION, TYPE)     ::MessageBox(PARENT, TEXT, CAPTION, TYPE)
     #define APE_ODS                                     OutputDebugString
-    #define TICK_COUNT_TYPE                             unsigned long long
-    #if _WIN32_WINNT >= 0x600
-        #define TICK_COUNT_READ(VARIABLE)               VARIABLE = GetTickCount64()
-    #else
-        #define TICK_COUNT_READ(VARIABLE)               VARIABLE = GetTickCount()
-    #endif
-    #define TICK_COUNT_FREQ                             1000
-
     #if !defined(ASSERT)
         #if defined(_DEBUG)
             #define ASSERT(e)                            assert(e)
@@ -202,29 +198,23 @@ Global macros
         #endif
     #endif
 
-    #if _WIN32_WINNT < 0x600
+    #if !defined(_MSC_VER) && _WIN32_WINNT < 0x600
         #define wcsncpy_s(A, B, C, D) wcsncpy(A, C, D)
         #define wcscpy_s(A, B, C) wcscpy(A, C)
         #define wcscat_s(A, B, C) wcscat(A, C)
         #define strcpy_s(A, B, C) strcpy(A, C)
 
-        #undef _tcsncpy_s
-        #undef _tcscpy_s
         #undef _stprintf_s
-
-        #define _tcsncpy_s(A, B, C, D) _tcsncpy(A, C, D)
-        #define _tcscpy_s(A, B, C) _tcscpy(A, C)
         #define _stprintf_s(A, B, C, ...) _stprintf(A, C, __VA_ARGS__)
+
+        #undef swprintf_s
+        #define swprintf_s(A, B, C, ...) swprintf(A, C, __VA_ARGS__)
     #endif
 #else
     #define IO_USE_STD_LIB_FILE_IO
     #define DLLEXPORT                                   __attribute__ ((visibility ("default")))
     #define SLEEP(MILLISECONDS)                         { struct timespec t; t.tv_sec = (MILLISECONDS) / 1000; t.tv_nsec = (MILLISECONDS) % 1000 * 1000000; nanosleep(&t, NULL); }
-    #define MESSAGEBOX(PARENT, TEXT, CAPTION, TYPE)
     #define APE_ODS                                     printf
-    #define TICK_COUNT_TYPE                             unsigned long long
-    #define TICK_COUNT_READ(VARIABLE)                   { struct timeval t; gettimeofday(&t, NULL); VARIABLE = t.tv_sec * 1000000LLU + t.tv_usec; }
-    #define TICK_COUNT_FREQ                             1000000
     #undef  ASSERT
     #define ASSERT(e)
 
@@ -266,8 +256,9 @@ WAVE format descriptor (binary compatible with Windows define, but in the APE na
 namespace APE
 {
     #pragma pack(push, 1)
-    struct WAVEFORMATEX
+    class WAVEFORMATEX
     {
+    public:
         WORD        wFormatTag;         /* format type */
         WORD        nChannels;          /* number of channels (i.e. mono, stereo...) */
         uint32      nSamplesPerSec;     /* sample rate */
@@ -276,6 +267,18 @@ namespace APE
         WORD        wBitsPerSample;     /* number of bits per sample of mono data */
         WORD        cbSize;             /* the count in bytes of the size of */
         /* extra information (after cbSize) */
+
+        WAVEFORMATEX()
+        {
+            // initialize everything to empty on construction (avoids the need to clear variables separately)
+            wFormatTag = 0;
+            nChannels = 0;
+            nSamplesPerSec = 0;
+            nAvgBytesPerSec = 0;
+            nBlockAlign = 0;
+            wBitsPerSample = 0;
+            cbSize = 0;
+        }
     };
     #pragma pack(pop)
 }
@@ -300,12 +303,12 @@ namespace APE
 /**************************************************************************************************
 Global defines
 **************************************************************************************************/
-#define ONE_MILLION                  1000000
 #ifdef PLATFORM_WINDOWS
     #define APE_FILENAME_SLASH '\\'
 #else
     #define APE_FILENAME_SLASH '/'
 #endif
+#define APE_ONE_MILLION                  1000000
 #define APE_BYTES_IN_KILOBYTE            1024
 #define APE_BYTES_IN_MEGABYTE            1048576
 #define APE_BYTES_IN_GIGABYTE            APE::int64(1073741824)
@@ -333,9 +336,6 @@ Channels
 /**************************************************************************************************
 Macros
 **************************************************************************************************/
-#define APE_MB(TEST) MESSAGEBOX(APE_NULL, TEST, _T("Information"), MB_OK);
-#define APE_MBN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d"), NUMBER); MESSAGEBOX(APE_NULL, cNumber, _T("Information"), MB_OK); }
-
 #define APE_SAFE_DELETE(POINTER) if (POINTER) { delete POINTER; POINTER = APE_NULL; }
 #define APE_SAFE_ARRAY_DELETE(POINTER) if (POINTER) { delete [] POINTER; POINTER = APE_NULL; }
 #define APE_SAFE_FILE_CLOSE(HANDLE) if (HANDLE != INVALID_HANDLE_VALUE) { CloseHandle(HANDLE); HANDLE = INVALID_HANDLE_VALUE; }

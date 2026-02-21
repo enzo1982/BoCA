@@ -35,9 +35,6 @@ typedef struct _GUID {
     unsigned char  Data4[8];
 } GUID;
 
-#undef ZeroMemory
-#define ZeroMemory(POINTER, BYTES) memset(POINTER, 0, BYTES);
-
 #define TRUE 1
 #define FALSE 0
 

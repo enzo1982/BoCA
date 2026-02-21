@@ -15,6 +15,17 @@ Warnings
 #pragma warning(disable: 5039) // about calling a function that could throw but CompressFileW, DecompressFileW, etc. in APESimple.cpp do this so we need to keep this (7/17/2022); it's also fired by winbase.h and GdiplusGraphics.h (7/21/2022)
 #pragma warning(disable: 5045) // this is about Spectre insertion, but we don't care
 
+// warnings that come in when building for XP
+#ifdef PLATFORM_WINDOWS_XP
+#pragma warning(disable: 4061)
+#pragma warning(disable: 4458)
+#pragma warning(disable: 4571)
+#pragma warning(disable: 4668)
+#pragma warning(disable: 4768)
+#pragma warning(disable: 4917)
+#pragma warning(disable: 4996)
+#endif
+
 // Clang warnings
 #pragma clang diagnostic ignored "-Wc++98-compat" // older compiler support is not needed
 #pragma clang diagnostic ignored "-Wc++98-compat-pedantic" // older compiler support is not needed (pedantic!)
@@ -22,5 +33,7 @@ Warnings
 #pragma clang diagnostic ignored "-Wswitch-default" // this wants default in all the switches, but then it warns about having a default when all the cases are covered
 #pragma clang diagnostic ignored "-Wexit-time-destructors" // this shows for global variables which are needed sometimes
 #pragma clang diagnostic ignored "-Wglobal-constructors" // some variables like the application object need to be global
+#pragma clang diagnostic ignored "-Wpragma-once-outside-header" // this fires on a couple files for no reason that I can figure
+#pragma clang diagnostic ignored "-Wpragma-pack" // this shows when browsing files in the solution for some reason with VS2026
 
 #endif // _MSC_VER
