@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <shlobj.h>
+#include <shlwapi.h>
 
 #ifdef __WINE__
 #	include <unistd.h>
@@ -45,6 +46,7 @@
 #	define SetDllDirectoryW SetDllDirectoryA
 #	define LoadLibraryW LoadLibraryA
 
+#	define PathFileExistsW PathFileExistsA
 #	define FindFirstFileW FindFirstFileA
 #	define FindNextFileW FindNextFileA
 #	define DeleteFileW DeleteFileA
@@ -81,16 +83,6 @@ using namespace CA;
 HINSTANCE  coreaudiodll	= NULL;
 
 #define PATH_LENGTH 2048
-
-static bool FileSystemEntryExists(const wchar_t *path)
-{
-	WIN32_FIND_DATAW	 findData;
-	HANDLE			 handle = FindFirstFileW(path, &findData);
-
-	FindClose(handle);
-
-	return (handle != INVALID_HANDLE_VALUE);
-}
 
 static const wchar_t *GetSystemDirectory(int id)
 {
@@ -152,7 +144,7 @@ static const wchar_t *GetCacheFolder(const char *applicationPrefix)
 
 		fclose(_wfopen(cacheFolder, wstring("w")));
 
-		if (FileSystemEntryExists(cacheFolder))
+		if (PathFileExistsW(cacheFolder))
 		{
 			DeleteFileW(cacheFolder);
 
@@ -222,7 +214,7 @@ static void FindDependenciesFolders(const wchar_t *packageFolder, wchar_t **pack
 	wcscpy(manifestPath, packageFolder);
 	wcscat(manifestPath, wstring("AppxManifest.xml"));
 
-	if (!FileSystemEntryExists(manifestPath)) return;
+	if (!PathFileExistsW(manifestPath)) return;
 
 	/* Load app manifest.
 	 */
@@ -351,15 +343,15 @@ static void CopyLibrary(const wchar_t *libName, wchar_t **packageFolders, const 
 		wcscpy(libFile, packageFolders[i]);
 		wcscat(libFile, libName);
 
-		if (!FileSystemEntryExists(libFile)) continue;
+		if (!PathFileExistsW(libFile)) continue;
 
 		wcscpy(sourceFile, libFile);
 	}
 
 	/* Check file existence and skip already existing files.
 	 */
-	if (!FileSystemEntryExists(sourceFile) ||
-	     FileSystemEntryExists(targetFile)) return;
+	if (!PathFileExistsW(sourceFile) ||
+	     PathFileExistsW(targetFile)) return;
 
 	/* Prepare input and output files.
 	 */
@@ -443,7 +435,7 @@ static void CacheCoreAudioLibraries(const wchar_t *cacheFolder)
 	wcscpy(packageIdFile, cacheFolder);
 	wcscat(packageIdFile, wstring("PackageId"));
 
-	if (FileSystemEntryExists(packageIdFile))
+	if (PathFileExistsW(packageIdFile))
 	{
 		FILE	*in = _wfopen(packageIdFile, wstring("r"));
 		char	 line[256] = { 0 };
@@ -497,13 +489,13 @@ bool LoadCoreAudioDLL(const char *applicationPrefix)
 	wcscpy(coreAudioDir, GetSystemDirectory(CSIDL_PROGRAM_FILES_COMMON));
 	wcscat(coreAudioDir, wstring("Apple\\Apple Application Support\\"));
 
-	if (!FileSystemEntryExists(coreAudioDir))
+	if (!PathFileExistsW(coreAudioDir))
 	{
 		wcscpy(coreAudioDir, GetSystemDirectory(CSIDL_PROGRAM_FILES));
 		wcscat(coreAudioDir, wstring("iTunes\\"));
 	}
 
-	if (!FileSystemEntryExists(coreAudioDir))
+	if (!PathFileExistsW(coreAudioDir))
 	{
 		wcscpy(coreAudioDir, GetCacheFolder(applicationPrefix));
 		wcscat(coreAudioDir, wstring("boca.encoder.coreaudio\\"));
