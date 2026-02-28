@@ -88,7 +88,7 @@ else
 endif
 
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
-	ln -fs ../$(BINDIR)/boca.$(VERSION)$(SHARED) $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
+	ln -f ../$(BINDIR)/boca.$(VERSION)$(SHARED) $(BOCA_PATH)/$(LIBDIR)/libboca-$(VERSION)$(SHARED)
 endif
 
 clean:
@@ -115,13 +115,14 @@ install: all
 ifneq ($(BUILD_WIN32),True)
 	$(INSTALL) -d "$(DESTDIR)"$(libdir)/boca
 	$(INSTALL_DATA) $(BOCA_PATH)/$(BINDIR)/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/boca
-	ln -fs boca/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/libboca-$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_OSX),True)
 	ln -fs boca/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/libboca-$(VERSION).$(REVISION)$(SHARED)
 else
-	ln -fs boca/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/libboca-$(VERSION)$(SHARED).$(REVISION)
+	ln -f "$(DESTDIR)"$(libdir)/boca/boca.$(VERSION)$(SHARED) "$(DESTDIR)"$(libdir)/libboca-$(VERSION)$(SHARED).$(REVISION)
 endif
+
+	ln -fs libboca-$(VERSION)$(SHARED).$(REVISION) "$(DESTDIR)"$(libdir)/libboca-$(VERSION)$(SHARED)
 
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
