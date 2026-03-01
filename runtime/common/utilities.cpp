@@ -14,7 +14,7 @@
 #include <boca/common/config.h>
 #include <boca/common/i18n.h>
 
-#if (defined __HAIKU__ || !defined __WIN32__)
+#if !defined __WIN32__
 #	include <dlfcn.h>
 #endif
 
@@ -89,6 +89,7 @@ String BoCA::Utilities::GetBoCADirectory()
 {
 	Directory	 bocaDirectory(GUI::Application::GetApplicationDirectory().Append("boca"));
 
+#if !defined __WIN32__
 	if (!bocaDirectory.Exists())
 	{
 		/* Query actual BoCA library path on Haiku.
@@ -98,14 +99,9 @@ String BoCA::Utilities::GetBoCADirectory()
 		dladdr((void *) &BoCA::Utilities::GetBoCADirectory, &info);
 
 		bocaDirectory = File(info.dli_fname).GetFilePath();
-		if (!String(bocaDirectory).EndsWith("boca")) {
-			bocaDirectory = String(bocaDirectory).Append(kDelimiter).Append("boca");
-		}
-	}
-#if !defined __WIN32__
-	if (!bocaDirectory.Exists()) bocaDirectory = GUI::Application::GetApplicationDirectory().Append("../lib/boca");
 
-	if (!bocaDirectory.Exists()) bocaDirectory = String(BOCA_INSTALL_PREFIX).Append("/lib/boca");
+		if (bocaDirectory.GetDirectoryName() != "boca") bocaDirectory = String(bocaDirectory).Append(kDelimiter).Append("boca");
+	}
 #endif
 
 	return String(bocaDirectory).Append(kDelimiter);
