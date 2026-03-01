@@ -92,7 +92,7 @@ String BoCA::Utilities::GetBoCADirectory()
 #if !defined __WIN32__
 	if (!bocaDirectory.Exists())
 	{
-		/* Query actual BoCA library path on Haiku.
+		/* Query actual BoCA library path.
 		 */
 		Dl_info	 info = { 0 };
 
