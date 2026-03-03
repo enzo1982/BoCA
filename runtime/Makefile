@@ -36,7 +36,7 @@ CLEANCMD1 =
 
 ## Do not change anything below this line. ##
 
-CCOPTS	  = -fvisibility=hidden -DBOCA_CDK_BUILD -DBOCA_INSTALL_PREFIX=\"$(prefix)\" -I"$(SRCDIR)"/$(BOCA_PATH)/include
+CCOPTS	  = -fvisibility=hidden -DBOCA_CDK_BUILD -I"$(SRCDIR)"/$(BOCA_PATH)/include
 LDOPTS	  = -L"$(SRCDIR)"/$(BOCA_PATH)/$(LIBDIR) $(LIBS)
 
 ifeq ($(BUILD_WIN32),True)
