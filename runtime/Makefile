@@ -67,14 +67,21 @@ else
 	endif
 endif
 
-SHARED_LIB = libboca-$(VERSION)$(SHARED)
+ifeq ($(BUILD_WIN32),True)
+	SHARED_LIBDIR = $(BINDIR)
+	SHARED_LIB = boca.$(VERSION)$(SHARED)
+else
+	SHARED_LIBDIR = $(LIBDIR)
+	SHARED_LIB = libboca-$(VERSION)$(SHARED)
+
 ifeq ($(BUILD_OSX),True)
 	SHARED_LIB_REVISION = libboca-$(VERSION).$(REVISION)$(SHARED)
 else
 	SHARED_LIB_REVISION = libboca-$(VERSION)$(SHARED).$(REVISION)
 endif
+endif
 
-all: folders $(BOCA_PATH)/$(LIBDIR)/$(SHARED_LIB)
+all: folders $(BOCA_PATH)/$(SHARED_LIBDIR)/$(SHARED_LIB)
 
 folders:
 ifeq ($(BUILD_WIN32),True)
@@ -84,7 +91,7 @@ else
 endif
 	mkdir -p common/communication common/metadata component core
 
-$(BOCA_PATH)/$(LIBDIR)/$(SHARED_LIB): $(OBJECTS)
+$(BOCA_PATH)/$(SHARED_LIBDIR)/$(SHARED_LIB): $(OBJECTS)
 ifeq ($(BUILD_WIN32),True)
 	$(LD) --shared -o $@ $(OBJECTS) -Wl,--out-implib,$(BOCA_PATH)/$(LIBDIR)/libboca.a $(LDOPTS) $(LDFLAGS)
 else
@@ -97,6 +104,7 @@ endif
 
 clean:
 	rm -f $(OBJECTS)
+	rm -f $(BOCA_PATH)/$(SHARED_LIBDIR)/$(SHARED_LIB)
 
 ifneq ("$(SRCDIR)","$(CURDIR)")
 ifeq ($(BUILD_WIN32),True)
@@ -110,15 +118,12 @@ endif
 
 ifeq ($(BUILD_WIN32),True)
 	rm -f $(BOCA_PATH)/$(LIBDIR)/libboca.a
-else
-	rm -f $(BOCA_PATH)/$(LIBDIR)/$(SHARED_LIB)
-	rm -f $(BOCA_PATH)/$(LIBDIR)/$(SHARED_LIB_REVISION)
 endif
 
 install: all
 ifneq ($(BUILD_WIN32),True)
 	$(INSTALL) -d "$(DESTDIR)"$(libdir)/boca
-	$(INSTALL_DATA) $(BOCA_PATH)/$(LIBDIR)/$(SHARED_LIB) "$(DESTDIR)"$(libdir)/$(SHARED_LIB_REVISION)
+	$(INSTALL_DATA) $(BOCA_PATH)/$(SHARED_LIBDIR)/$(SHARED_LIB) "$(DESTDIR)"$(libdir)/$(SHARED_LIB_REVISION)
 	ln -fs $(SHARED_LIB_REVISION) "$(DESTDIR)"$(libdir)/$(SHARED_LIB)
 
 ifneq ($(BUILD_OSX),True)
@@ -136,8 +141,6 @@ uninstall:
 ifneq ($(BUILD_WIN32),True)
 	rm -f "$(DESTDIR)"$(libdir)/$(SHARED_LIB_REVISION)
 	rm -f "$(DESTDIR)"$(libdir)/$(SHARED_LIB)
-	# Shared library shipped in older vesions
-	-rm -f "$(DESTDIR)"$(libdir)/boca/boca.$(VERSION)$(SHARED)
 
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
