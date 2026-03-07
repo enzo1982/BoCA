@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -650,6 +650,8 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		in.Seek(itemsOffset);
 
+		Int	 first = -1;
+
 		for (Int i = 0; i < numItems; i++)
 		{
 			/* Read and check next comment string length.
@@ -671,6 +673,10 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 				Int	 chapter = id.SubString(7, 3).ToInt();
 				String	 field	 = id.Tail(id.Length() - 10);
+
+				if (first == -1) first = chapter;
+
+				chapter = chapter - first + 1;
 
 				/* Chapters must appear in order.
 				 */
