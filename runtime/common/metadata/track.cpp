@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -19,7 +19,12 @@ Int BoCA::Track::nextTrackID = 0;
 
 BoCA::Track::Track(const int nil)
 {
-	trackID		= Threads::Access::Increment(nextTrackID);
+	static Bool	 first = True;
+
+	if (first) trackID = nextTrackID++;
+	else	   trackID = Threads::Access::Increment(nextTrackID);
+
+	first		= False;
 
 	sampleOffset	= 0;
 
