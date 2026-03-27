@@ -237,13 +237,15 @@
     <ClInclude Include="..\..\components\decoder\mpg123\mpg123.h" />
     <ClInclude Include="..\..\components\decoder\mpg123\mpg123\fmt123.h" />
     <ClInclude Include="..\..\components\decoder\mpg123\mpg123\mpg123.h" />
-    <ClInclude Include="..\..\components\decoder\mpg123\xing\dxhead.h" />
+    <ClInclude Include="..\..\components\shared\mp3frame.h" />
+    <ClInclude Include="..\..\components\shared\vbrtag.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\components\decoder\mpg123\config.cpp" />
     <ClCompile Include="..\..\components\decoder\mpg123\dllinterface.cpp" />
     <ClCompile Include="..\..\components\decoder\mpg123\mpg123.cpp" />
-    <ClCompile Include="..\..\components\decoder\mpg123\xing\dxhead.c" />
+    <ClCompile Include="..\..\components\shared\mp3frame.cpp" />
+    <ClCompile Include="..\..\components\shared\vbrtag.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BoCA\BoCA.vcxproj">

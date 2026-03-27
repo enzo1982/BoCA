@@ -228,13 +228,15 @@
     <ClCompile Include="..\..\components\decoder\mad\config.cpp" />
     <ClCompile Include="..\..\components\decoder\mad\dllinterface.cpp" />
     <ClCompile Include="..\..\components\decoder\mad\mad.cpp" />
-    <ClCompile Include="..\..\components\decoder\mad\xing\dxhead.c" />
+    <ClCompile Include="..\..\components\shared\mp3frame.cpp" />
+    <ClCompile Include="..\..\components\shared\vbrtag.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\components\decoder\mad\config.h" />
     <ClInclude Include="..\..\components\decoder\mad\dllinterface.h" />
     <ClInclude Include="..\..\components\decoder\mad\mad.h" />
-    <ClInclude Include="..\..\components\decoder\mad\xing\dxhead.h" />
+    <ClInclude Include="..\..\components\shared\mp3frame.h" />
+    <ClInclude Include="..\..\components\shared\vbrtag.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BoCA\BoCA.vcxproj">

@@ -16,11 +16,11 @@
     <Filter Include="Headerdateien\mpg123">
       <UniqueIdentifier>{fd72af21-da28-4ef7-9dd5-2fa3462e0d79}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\xing">
-      <UniqueIdentifier>{f1538b37-3cd6-4e27-8f19-20adb0cab204}</UniqueIdentifier>
+    <Filter Include="Headerdateien\shared">
+      <UniqueIdentifier>{fef89b47-f790-41cd-95b2-8b867aa81a30}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Quelldateien\xing">
-      <UniqueIdentifier>{accabc19-05ec-4cd6-a6dd-cb3602c56cfd}</UniqueIdentifier>
+    <Filter Include="Quelldateien\shared">
+      <UniqueIdentifier>{ad528c98-4be0-43a0-b1ed-2da30998cad0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -33,14 +33,17 @@
     <ClInclude Include="..\..\components\decoder\mpg123\mpg123.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\components\decoder\mpg123\xing\dxhead.h">
-      <Filter>Headerdateien\xing</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\components\decoder\mpg123\mpg123\mpg123.h">
       <Filter>Headerdateien\mpg123</Filter>
     </ClInclude>
     <ClInclude Include="..\..\components\decoder\mpg123\mpg123\fmt123.h">
       <Filter>Headerdateien\mpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\shared\mp3frame.h">
+      <Filter>Headerdateien\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\components\shared\vbrtag.h">
+      <Filter>Headerdateien\shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -53,8 +56,11 @@
     <ClCompile Include="..\..\components\decoder\mpg123\mpg123.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\components\decoder\mpg123\xing\dxhead.c">
-      <Filter>Quelldateien\xing</Filter>
+    <ClCompile Include="..\..\components\shared\mp3frame.cpp">
+      <Filter>Quelldateien\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\shared\vbrtag.cpp">
+      <Filter>Quelldateien\shared</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
