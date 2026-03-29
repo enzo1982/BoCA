@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -130,7 +130,7 @@ BoCA::ConfigureRubberBand::ConfigureRubberBand()
 	combo_transients->AddEntry(i18n->TranslateString("Crisp"));
 	combo_transients->AddEntry(i18n->TranslateString("Mixed"));
 	combo_transients->AddEntry(i18n->TranslateString("Smooth"));
-	combo_transients->SelectNthEntry(config->GetIntValue(ConfigID, "Transients", 0));
+	combo_transients->SelectNthEntry(config->GetIntValue(ConfigID, "Transients", 1));
 
 	text_window		= new Text(i18n->AddColon(i18n->TranslateString("Transformation window")), Point(10, 69));
 	combo_window		= new ComboBox(Point(10, 66), Size(300, 0));
@@ -151,7 +151,7 @@ BoCA::ConfigureRubberBand::ConfigureRubberBand()
 	combo_formant		= new ComboBox(Point(10, 145), Size(300, 0));
 	combo_formant->AddEntry(i18n->TranslateString("Shift"));
 	combo_formant->AddEntry(i18n->TranslateString("Preserve"));
-	combo_formant->SelectNthEntry(config->GetIntValue(ConfigID, "Formant", 0));
+	combo_formant->SelectNthEntry(config->GetIntValue(ConfigID, "Formant", 1));
 
 	text_pitchmode		= new Text(i18n->AddColon(i18n->TranslateString("Pitch processing")), Point(10, 175));
 	combo_pitchmode		= new ComboBox(Point(10, 172), Size(300, 0));
@@ -164,7 +164,7 @@ BoCA::ConfigureRubberBand::ConfigureRubberBand()
 	combo_channels		= new ComboBox(Point(10, 199), Size(300, 0));
 	combo_channels->AddEntry(i18n->TranslateString("Separate"));
 	combo_channels->AddEntry(i18n->TranslateString("Combined"));
-	combo_channels->SelectNthEntry(config->GetIntValue(ConfigID, "Channels", 0));
+	combo_channels->SelectNthEntry(config->GetIntValue(ConfigID, "Channels", 1));
 
 	maxTextSize = Math::Max(Math::Max(Math::Max(text_detector->GetUnscaledTextWidth(), text_transients->GetUnscaledTextWidth()),
 					  Math::Max(text_window->GetUnscaledTextWidth(), text_phase->GetUnscaledTextWidth())),

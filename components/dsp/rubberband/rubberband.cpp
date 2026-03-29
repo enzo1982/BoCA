@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -87,12 +87,12 @@ Bool BoCA::DSPRubberBand::Activate()
 	}
 
 	Int	 detector    = config->GetIntValue(ConfigureRubberBand::ConfigID, "Detector", 0);
-	Int	 transients  = config->GetIntValue(ConfigureRubberBand::ConfigID, "Transients", 0);
+	Int	 transients  = config->GetIntValue(ConfigureRubberBand::ConfigID, "Transients", 1);
 	Int	 window	     = config->GetIntValue(ConfigureRubberBand::ConfigID, "Window", 0);
 	Int	 phase	     = config->GetIntValue(ConfigureRubberBand::ConfigID, "Phase", 0);
-	Int	 formant     = config->GetIntValue(ConfigureRubberBand::ConfigID, "Formant", 0);
+	Int	 formant     = config->GetIntValue(ConfigureRubberBand::ConfigID, "Formant", 1);
 	Int	 pitchmode   = config->GetIntValue(ConfigureRubberBand::ConfigID, "PitchMode", 0);
-	Int	 channels    = config->GetIntValue(ConfigureRubberBand::ConfigID, "Channels", 0);
+	Int	 channels    = config->GetIntValue(ConfigureRubberBand::ConfigID, "Channels", 1);
 
 	Bool	 smoothing   = config->GetIntValue(ConfigureRubberBand::ConfigID, "Smoothing", False);
 
