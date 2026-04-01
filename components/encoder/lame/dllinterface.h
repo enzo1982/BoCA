@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -59,6 +59,7 @@ typedef int	(CDECL *LAME_ENCODE_BUFFER_INTERLEAVED_IEEE_FLOAT)	(lame_t, const fl
 typedef int	(CDECL *LAME_ENCODE_FLUSH)				(lame_t, unsigned char *, int);
 typedef int	(CDECL *LAME_ENCODE_FLUSH_NOGAP)			(lame_t, unsigned char *, int);
 typedef char *	(CDECL *GET_LAME_SHORT_VERSION)				();
+typedef void	(CDECL *GET_LAME_VERSION_NUMERICAL)			(lame_version_t * const);
 typedef size_t	(CDECL *LAME_GET_LAMETAG_FRAME)				(const lame_t, unsigned char *, size_t);
 typedef int	(CDECL *LAME_SET_BWRITEVBRTAG)				(lame_t, int);
 
@@ -99,5 +100,6 @@ extern LAME_ENCODE_BUFFER_INTERLEAVED_IEEE_FLOAT	 ex_lame_encode_buffer_interlea
 extern LAME_ENCODE_FLUSH				 ex_lame_encode_flush;
 extern LAME_ENCODE_FLUSH_NOGAP				 ex_lame_encode_flush_nogap;
 extern GET_LAME_SHORT_VERSION				 ex_get_lame_short_version;
+extern GET_LAME_VERSION_NUMERICAL			 ex_get_lame_version_numerical;
 extern LAME_GET_LAMETAG_FRAME				 ex_lame_get_lametag_frame;
 extern LAME_SET_BWRITEVBRTAG				 ex_lame_set_bWriteVbrTag;

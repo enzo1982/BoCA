@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -93,7 +93,25 @@ BoCA::SuperWorker::SuperWorker(const Config *config, const Format &iFormat, Int 
 
 			/* Set quality.
 			 */
-			if (setQuality) ex_lame_set_quality(context, quality);
+			if (setQuality)
+			{
+				/* For LAME 3.99 through LAME 3.101 beta 3, limit quality value
+				 * to 4-9 in CBR/ABR mode as there is an encoder issue at 0-3.
+				 *
+				 * See https://sourceforge.net/p/lame/bugs/516/ for reference.
+				 */
+				if (vbrMode == vbr_off || vbrMode == vbr_abr)
+				{
+					lame_version_t version = { 0 };
+
+					ex_get_lame_version_numerical(&version);
+
+					if ((version.major == 3 && version.minor >= 99 && version.minor <= 100) ||
+					    (version.major == 3 && version.minor == 101 && (version.alpha || (version.beta && version.beta <= 3)))) quality = Math::Max(quality, 4);
+				}
+
+				ex_lame_set_quality(context, quality);
+			}
 
 			/* Set audio filtering.
 			 */
