@@ -20,14 +20,14 @@ public:
         m_pObject = APE_NULL;
         m_bArray = false;
     }
-    __forceinline CSmartPtr(TYPE * pObject, bool bArray = false, bool bDelete = true)
+    __forceinline explicit CSmartPtr(TYPE * pObject, bool bArray = false, bool bDelete = true)
     {
         m_bDelete = true;
         m_pObject = APE_NULL;
         m_bArray = false;
         Assign(pObject, bArray, bDelete);
     }
-    __forceinline CSmartPtr(int64 nElements, bool bEmpty = false)
+    __forceinline explicit CSmartPtr(int64 nElements, bool bEmpty = false)
     {
         m_bDelete = true;
         m_pObject = APE_NULL;

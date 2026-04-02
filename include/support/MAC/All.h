@@ -1,6 +1,13 @@
 #pragma once
 
 /**************************************************************************************************
+Enable Windows when we're in XP mode (so both defines aren't needed)
+**************************************************************************************************/
+#if defined(PLATFORM_WINDOWS_XP)
+    #define PLATFORM_WINDOWS
+#endif
+
+/**************************************************************************************************
 Platform
 
 One of the following platforms should be defined (either in code or as a project setting):
@@ -10,8 +17,18 @@ PLATFORM_LINUX
 PLATFORM_ANDROID
 **************************************************************************************************/
 #if !defined(PLATFORM_WINDOWS) && !defined(PLATFORM_APPLE) && !defined(PLATFORM_LINUX) && !defined(PLATFORM_ANDROID)
-    #pragma message("No platform set for MACLib, defaulting to Windows")
-    #define PLATFORM_WINDOWS
+    #if defined(__ANDROID__)    
+        #define PLATFORM_ANDROID
+    #elif defined(__linux__)
+        #define PLATFORM_LINUX
+    #elif defined(__APPLE__)
+        #define PLATFORM_APPLE
+    #elif defined(_WIN32) || defined(_WIN64)
+        #define PLATFORM_WINDOWS
+    #else
+        #pragma message("No platform set for MACLib, and couldn't auto-detect so using Windows")
+        #define PLATFORM_WINDOWS
+    #endif
 #endif
 
 #ifdef PLATFORM_ANDROID
@@ -343,6 +360,9 @@ Macros
 #define APE_ODN(NUMBER) { TCHAR cNumber[16]; _stprintf(cNumber, _T("%d\n"), static_cast<int>(NUMBER)); APE_ODS(cNumber); }
 
 #define APE_CATCH_ERRORS(CODE) try { CODE } catch(...) { }
+
+#define APE_ALIGN_2_BYTE(VALUE) ((VALUE) + ((VALUE) & 0x1))
+#define APE_ALIGN_8_BYTE(VALUE) ((VALUE) + ((8 - ((VALUE) % 8)) % 8))
 
 #define RETURN_ON_ERROR(FUNCTION) { const int nFunctionResult = static_cast<int>(FUNCTION); if (nFunctionResult != ERROR_SUCCESS) { return nFunctionResult; } }
 #define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nFunctionResult = FUNCTION; if (nFunctionResult != 0) { return VALUE; } }

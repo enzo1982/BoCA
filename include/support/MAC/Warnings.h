@@ -23,7 +23,6 @@ Warnings
 #pragma warning(disable: 4668)
 #pragma warning(disable: 4768)
 #pragma warning(disable: 4917)
-#pragma warning(disable: 4996)
 #endif
 
 // Clang warnings

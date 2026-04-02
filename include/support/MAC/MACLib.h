@@ -220,7 +220,8 @@ Classes (fully defined elsewhere)
 **************************************************************************************************/
 class IAPEIO;
 class CInputSource;
-class CAPEInfo;
+class IAPEInfo;
+class IAPETag;
 
 /**************************************************************************************************
 IID3v2Tag - interface for reading file tags
@@ -287,7 +288,7 @@ public:
         APE_INFO_IO_SOURCE = 1027,                  // I/O source (IAPEIO *) [ignored, ignored]
         APE_INFO_FRAME_BYTES = 1028,                // bytes (compressed) of the frame [frame index, ignored]
         APE_INFO_FRAME_BLOCKS = 1029,               // blocks in a given frame [frame index, ignored]
-        APE_INFO_TAG = 1030,                        // point to tag (CAPETag *) [ignored, ignored]
+        APE_INFO_TAG = 1030,                        // pointer to tag (IAPETag *) [ignored, ignored]
         APE_INFO_APL = 1031,                        // whether it's an APL file
         APE_INFO_MD5 = 1032,                        // the MD5 checksum [buffer *, ignored]
         APE_INFO_MD5_MATCHES = 1033,                // an MD5 checksum to test (returns ERROR_INVALID_CHECKSUM or ERROR_SUCCESS) [buffer *, ignored]
@@ -530,9 +531,12 @@ Usage example:
 **************************************************************************************************/
 extern "C"
 {
+    DLLEXPORT APE::IAPETag * __stdcall CreateIAPETagFromIO(APE::IAPEIO * pIO, bool bAnalyze, bool bCheckForID3v1 = true);
+    DLLEXPORT APE::IAPETag * __stdcall CreateIAPETagFromFilename(const APE::str_utfn * pFilename, bool bAnalyze = true);
+    DLLEXPORT APE::IAPEInfo * __stdcall CreateIAPEInfo(int * pErrorCode, APE::IAPEIO * pIO);
     DLLEXPORT APE::IAPEDecompress * __stdcall CreateIAPEDecompress(const APE::str_utfn * pFilename, int * pErrorCode, bool bReadOnly, bool bAnalyzeTagNow, bool bReadWholeFile);
     DLLEXPORT APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx(APE::IAPEIO * pIO, int * pErrorCode);
-    DLLEXPORT APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx2(APE::CAPEInfo * pAPEInfo, int nStartBlock, int nFinishBlock, int * pErrorCode);
+    DLLEXPORT APE::IAPEDecompress * __stdcall CreateIAPEDecompressEx2(APE::IAPEInfo * pAPEInfo, int nStartBlock, int nFinishBlock, int * pErrorCode);
 #ifdef APE_SUPPORT_COMPRESS
     DLLEXPORT APE::IAPECompress * __stdcall CreateIAPECompress(int * pErrorCode = APE_NULL);
 #endif
@@ -566,10 +570,13 @@ extern "C"
     DLLEXPORT int __stdcall VerifyFileW2(const APE::str_utfn * pInputFilename, APE::IAPEProgressCallback * pProgressCallback = APE_NULL, bool bQuickVerifyIfPossible = false, int nThreads = 1);
 
     // helper functions
+    DLLEXPORT APE::IAPEIO * __stdcall CreateIAPEIO();
     DLLEXPORT int __stdcall FillWaveFormatEx(APE::WAVEFORMATEX * pWaveFormatEx, int nFormatTag, int nSampleRate, int nBitsPerSample, int nChannels);
     DLLEXPORT int __stdcall FillWaveHeader(APE::WAVE_HEADER * pWAVHeader, APE::int64 nAudioBytes, const APE::WAVEFORMATEX * pWaveFormatEx, APE::intn nTerminatingBytes = 0);
     DLLEXPORT int __stdcall FillRF64Header(APE::RF64_HEADER * pWAVHeader, APE::int64 nAudioBytes, const APE::WAVEFORMATEX * pWaveFormatEx);
     DLLEXPORT int __stdcall GetAPEFileType(const APE::str_utfn * pInputFilename, APE::str_ansi cFileType[8]);
     DLLEXPORT void __stdcall GetAPECompressionLevelName(int nCompressionLevel, APE::str_utfn * pCompressionLevel, size_t nBufferCharacters, bool bTitleCase);
     DLLEXPORT void __stdcall GetAPEModeName(APE::APE_MODES Mode, APE::str_utfn * pModeName, size_t nBufferCharacters, bool bActive);
+    DLLEXPORT APE::str_utf8 * __stdcall GetUTF8FromUTFN(const APE::str_utfn * pUTFN);
+    DLLEXPORT APE::str_utfn * __stdcall GetUTFNFromUTF8(const APE::str_utf8 * pUTF8);
 }
