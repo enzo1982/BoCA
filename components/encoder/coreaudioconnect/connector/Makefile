@@ -17,7 +17,7 @@ OBJECTS	= dllinterface.o main.o
 BINARY	= $(BOCA_PATH)/$(BINDIR)/boca_$(TYPE)_$(TARGET)$(X64).$(VERSION)$(EXECUTABLE)
 
 DEFINE	= -DUNICODE
-LIBS	= -lole32 -lshell32
+LIBS	= -lole32 -lshell32 -lshlwapi
 
 CCOPTS	= -Wno-multichar -I"$(SRCDIR)"/$(BOCA_PATH)/include -I"$(SRCDIR)"/$(BOCA_PATH)/include/support/apple $(DEFINE)
 LDOPTS	= -L $(BOCA_PATH)/$(LIBDIR) $(LIBS)
