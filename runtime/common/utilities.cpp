@@ -297,10 +297,11 @@ String BoCA::Utilities::GetAbsolutePathName(const String &path)
 }
 
 /* This function takes a file name and normalizes all the
- * directory names included in the path by removing spaces
- * and dots at the end. It also shortens each directory name
- * to a maximum of 255 characters and the file name to 246
- * characters (to leave room for file extensions).
+ * directory names included in the path by shortening each
+ * directory name to a maximum of 255 characters and the file
+ * name to 246 characters (to leave room for file extensions).
+ * On Windows, trailing spaces and dots are also removed, as
+ * they are not allowed there.
  */
 String BoCA::Utilities::NormalizeFileName(const String &fileName)
 {
@@ -325,21 +326,27 @@ String BoCA::Utilities::NormalizeFileName(const String &fileName)
 		{
 			if (component.Length() > maxFolderLength) component[maxFolderLength] = 0;
 
-			/* Remove trailing dots and spaces.
+#ifdef __WIN32__
+			/* Remove trailing dots and spaces (not allowed in Windows folder names).
 			 */
 			if (component != kDots && component != kDot) while (component.EndsWith(kDot) || component.EndsWith(kSpace)) component[component.Length() - 1] = 0;
+#endif
 		}
 		else if (foreachindex == components.Length() - 1)
 		{
+#ifdef __WIN32__
 			String	 trimmed = component;
 
 			while (trimmed.EndsWith(kSpace)) trimmed[trimmed.Length() - 1] = 0;
+#endif
 
 			if (component.Length() > maxFileLength) component[maxFileLength] = 0;
 
-			/* Remove trailing spaces if we cut the end off of the file name.
+#ifdef __WIN32__
+			/* Remove trailing spaces if we cut the end off of the file name (not allowed in Windows file names).
 			 */
 			if (component.Length() < trimmed.Length()) while (component.EndsWith(kSpace)) component[component.Length() - 1] = 0;
+#endif
 		}
 
 		/* Append component back to path.
