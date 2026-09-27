@@ -32,6 +32,7 @@ namespace BoCA
 		COMPONENT_TYPE_DEVICEINFO,
 		COMPONENT_TYPE_PLAYLIST,
 		COMPONENT_TYPE_VERIFIER,
+		COMPONENT_TYPE_METADATA,
 
 		NUM_COMPONENT_TYPES
 	};
@@ -433,6 +434,22 @@ namespace BoCA
 
 				const void		*(*func_ReadPlaylist)(void *, const wchar_t *);
 				int			 (*func_WritePlaylist)(void *, const wchar_t *);
+
+				int			 (*func_GetQueryKeys)(const void *);
+
+				int			 (*func_Query)(void *, const void *, void *);
+				bool			 (*func_Read)(void *, const wchar_t *, void *);
+
+				void			 (*func_NormalizeRecordID)(void *, const wchar_t *, void *);
+
+				int			 (*func_GetSubmitData)(const void *);
+				int			 (*func_GetSubmitMethod)(const void *);
+				bool			 (*func_Submit)(void *, const void *);
+
+				bool			 (*func_CanReadPictures)(const void *);
+				bool			 (*func_ReadPictures)(void *, const wchar_t *, void *);
+
+				void			 (*func_Cancel)(void *);
 		};
 	};
 };

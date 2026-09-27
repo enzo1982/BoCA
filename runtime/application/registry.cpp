@@ -20,6 +20,7 @@
 #include <boca/application/playlistcomponent.h>
 #include <boca/application/taggercomponent.h>
 #include <boca/application/verifiercomponent.h>
+#include <boca/application/metadatacomponent.h>
 
 #include <boca/application/external/decodercomponentfile.h>
 #include <boca/application/external/decodercomponentstdio.h>
@@ -402,6 +403,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 				return new TaggerComponent(specs);
 			case COMPONENT_TYPE_VERIFIER:
 				return new VerifierComponent(specs);
+			case COMPONENT_TYPE_METADATA:
+				return new MetadataComponent(specs);
 			default:
 				return new Component(specs);
 		}

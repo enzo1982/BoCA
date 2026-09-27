@@ -159,6 +159,9 @@
     <ClCompile Include="..\..\runtime\common\metadata\device.cpp">
       <Filter>Quelldateien\common\metadata</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\runtime\common\metadata\discmetadata.cpp">
+      <Filter>Quelldateien\common\metadata</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\runtime\common\metadata\format.cpp">
       <Filter>Quelldateien\common\metadata</Filter>
     </ClCompile>
@@ -217,6 +220,12 @@
       <Filter>Quelldateien\component</Filter>
     </ClCompile>
     <ClCompile Include="..\..\runtime\application\verifiercomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\component\metadatacomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\metadatacomponent.cpp">
       <Filter>Quelldateien\application</Filter>
     </ClCompile>
     <ClCompile Include="..\..\runtime\common\communication\engine.cpp">
@@ -293,6 +302,9 @@
     <ClInclude Include="..\..\include\boca\common\metadata\device.h">
       <Filter>Headerdateien\boca\common\metadata</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\discmetadata.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\boca\common\metadata\format.h">
       <Filter>Headerdateien\boca\common\metadata</Filter>
     </ClInclude>
@@ -300,6 +312,9 @@
       <Filter>Headerdateien\boca\common\metadata</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\boca\common\metadata\mcdi.h">
+      <Filter>Headerdateien\boca\common\metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\metadata\proxyconfig.h">
       <Filter>Headerdateien\boca\common\metadata</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\boca\common\metadata\picture.h">
@@ -375,6 +390,12 @@
       <Filter>Headerdateien\boca\component</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\boca\application\verifiercomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\metadatacomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\metadatacomponent.h">
       <Filter>Headerdateien\boca\application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\boca\common\communication\engine.h">
