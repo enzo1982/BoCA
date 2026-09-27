@@ -21,6 +21,7 @@
 #include <boca/application/playlistcomponent.h>
 #include <boca/application/taggercomponent.h>
 #include <boca/application/verifiercomponent.h>
+#include <boca/application/metadatacomponent.h>
 
 #include <boca/application/external/decodercomponentfile.h>
 #include <boca/application/external/decodercomponentstdio.h>
@@ -71,7 +72,7 @@ BoCA::AS::Registry::Registry()
 	 * Muxer components are loaded first, so codec
 	 * components can check for their existence.
 	 */
-	static const char	*componentTypes[] = { "muxer", "decoder", "deviceinfo", "dsp", "encoder", "extension", "output", "playlist", "tagger", "verifier", NIL };
+	static const char	*componentTypes[] = { "muxer", "decoder", "deviceinfo", "dsp", "encoder", "extension", "output", "playlist", "tagger", "verifier", "metadata", NIL };
 
 	Config	*configuration	   = Config::Get();
 
@@ -422,6 +423,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 				return new TaggerComponent(specs);
 			case COMPONENT_TYPE_VERIFIER:
 				return new VerifierComponent(specs);
+			case COMPONENT_TYPE_METADATA:
+				return new MetadataComponent(specs);
 			default:
 				return new Component(specs);
 		}

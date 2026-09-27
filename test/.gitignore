@@ -1,0 +1,7 @@
+*.o
+*.so
+*.dylib
+*.dll
+picturedata
+discmetadata
+multivalue

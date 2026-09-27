@@ -210,6 +210,22 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_MuxerUpdateStreamInfo	= NIL;
 
 	func_OptimizeFile		= NIL;
+
+	func_GetQueryKeys		= NIL;
+
+	func_Query			= NIL;
+	func_Read			= NIL;
+
+	func_NormalizeRecordID		= NIL;
+
+	func_GetSubmitData		= NIL;
+	func_GetSubmitMethod		= NIL;
+	func_Submit			= NIL;
+
+	func_CanReadPictures		= NIL;
+	func_ReadPictures		= NIL;
+
+	func_Cancel			= NIL;
 }
 
 BoCA::AS::ComponentSpecs::~ComponentSpecs()
@@ -367,6 +383,22 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_OptimizeFile		= (bool (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_OptimizeFile"));
 
+	func_GetQueryKeys		= (int (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetQueryKeys"));
+
+	func_Query			= (int (*)(void *, const void *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Query"));
+	func_Read			= (bool (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Read"));
+
+	func_NormalizeRecordID		= (void (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_NormalizeRecordID"));
+
+	func_GetSubmitData		= (int (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetSubmitData"));
+	func_GetSubmitMethod		= (int (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetSubmitMethod"));
+	func_Submit			= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Submit"));
+
+	func_CanReadPictures		= (bool (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_CanReadPictures"));
+	func_ReadPictures		= (bool (*)(void *, const wchar_t *, void *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadPictures"));
+
+	func_Cancel			= (void (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Cancel"));
+
 	/* Parse component description.
 	 */
 	String::InputFormat	 inputFormat("UTF-8");
@@ -506,6 +538,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			else if (node->GetContent() == "playlist")	type = COMPONENT_TYPE_PLAYLIST;
 			else if (node->GetContent() == "tagger")	type = COMPONENT_TYPE_TAGGER;
 			else if (node->GetContent() == "verifier")	type = COMPONENT_TYPE_VERIFIER;
+			else if (node->GetContent() == "metadata")	type = COMPONENT_TYPE_METADATA;
 			else						type = COMPONENT_TYPE_UNKNOWN;
 
 			if (node->GetAttributeByName("threadSafe") != NIL) threadSafe = (node->GetAttributeByName("threadSafe")->GetContent() == "true");
