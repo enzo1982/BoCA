@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -527,13 +527,13 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		else if (id == "COPYRIGHT URL")	  info.SetOtherInfo(INFO_WEB_COPYRIGHT,	   value);
 		else if (id == "BUY URL")	  info.SetOtherInfo(INFO_WEB_COMMERCIAL,   value);
 
-		else if (id == "TRACK")
+		else if (id == "TRACK" || id == "TRACKNUMBER")
 		{
 			info.track = value.ToInt();
 
 			if (value.Contains("/")) info.numTracks = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 		}
-		else if (id == "DISC")
+		else if (id == "DISC" || id == "DISCNUMBER")
 		{
 			info.disc = value.ToInt();
 
