@@ -183,6 +183,8 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   { RenderTagItem("RELEASETYPE",		   value, buffer       ); numItems++; }
 		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   { RenderTagItem("RELEASESTATUS",		   value, buffer       ); numItems++; }
+
+		else if	(key == INFO_USERTEXT)			   { RenderTagItem(value.Head(value.Find(":|:")), value.Tail(value.Length() - value.Find(":|:") - 3), buffer); numItems++; }
 	}
 
 	/* Save Replay Gain info.
