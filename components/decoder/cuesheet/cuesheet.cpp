@@ -175,6 +175,15 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 			if (!trackMode && !dataMode) albumInfo.year = year;
 		}
 
+		if (line.StartsWith("REM DISCNUMBER "))
+		{
+			Int	 disc = line.Tail(line.Length() - 15).ToInt();
+
+			if (!readInfoTags || preferCueSheets) info.disc = disc;
+
+			if (!trackMode && !dataMode) albumInfo.disc = disc;
+		}
+
 		if (line.StartsWith("REM COMMENT "))
 		{
 			String	 comment;
