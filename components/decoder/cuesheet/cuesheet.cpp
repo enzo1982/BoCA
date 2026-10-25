@@ -212,7 +212,7 @@ Error BoCA::DecoderCueSheet::GetStreamInfo(const String &streamURI, Track &track
 				info.artist = artist;
 
 				if (albumInfo.artist != NIL &&
-				    albumInfo.artist != artist) info.SetOtherInfo(INFO_ALBUMARTIST, albumInfo.artist);
+				    (albumInfo.artist != artist || !config->GetIntValue("TagEdit", "ClearAlbumArtist", False))) info.SetOtherInfo(INFO_ALBUMARTIST, albumInfo.artist);
 			}
 
 			if (!trackMode && !dataMode) albumInfo.artist = artist;
