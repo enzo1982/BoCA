@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2023 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -134,8 +134,8 @@ Bool BoCA::DecoderMAC::Deactivate()
 
 Bool BoCA::DecoderMAC::Seek(Int64 samplePosition)
 {
-	if (ex_APEDecompress_Seek(hAPEDecompress, samplePosition) == ERROR_SUCCESS) return True;
-	else									    return False;
+	if (ex_APEDecompress_Seek(hAPEDecompress, samplePosition) == APE_ERROR_SUCCESS) return True;
+	else										return False;
 }
 
 Int BoCA::DecoderMAC::ReadData(Buffer<UnsignedByte> &data)
@@ -152,7 +152,7 @@ Int BoCA::DecoderMAC::ReadData(Buffer<UnsignedByte> &data)
 
 		/* Try to decompress 1024 blocks
 		 */
-		if (ex_APEDecompress_GetData(hAPEDecompress, (char *) (unsigned char *) data + nTotalBlocksRetrieved * nBlockAlign, 1024, &nBlocksRetrieved) != ERROR_SUCCESS) return -1;
+		if (ex_APEDecompress_GetData(hAPEDecompress, (char *) (unsigned char *) data + nTotalBlocksRetrieved * nBlockAlign, 1024, &nBlocksRetrieved) != APE_ERROR_SUCCESS) return -1;
 
 		nTotalBlocksRetrieved += nBlocksRetrieved;
 		blockId += nBlocksRetrieved;

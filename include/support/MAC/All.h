@@ -154,8 +154,8 @@ Version
 #define APE_RESOURCE_VERSION_COMMA                      APE_VERSION_MAJOR, APE_VERSION_REVISION, 0, 0
 #define APE_RESOURCE_VERSION_STRING                     APE_VER_FILE_VERSION_STR_WIDE
 #define APE_RESOURCE_COPYRIGHT                          L"Copyright 2000-" APE_STRINGIZE_WIDE(APE_YEAR) L" Matthew T. Ashland"
-#define CONSOLE_NAME                                    L"--- Monkey's Audio Console Front End (v " APE_VER_FILE_VERSION_STR_WIDE L") " APE_RESOURCE_COPYRIGHT L" ---\n"
-#define PLUGIN_ABOUT                                    L"Monkey's Audio Player v" APE_VER_FILE_VERSION_STR_WIDE L"\n" APE_RESOURCE_COPYRIGHT
+#define APE_CONSOLE_NAME                                L"--- Monkey's Audio Console Front End (v " APE_VER_FILE_VERSION_STR_WIDE L") " APE_RESOURCE_COPYRIGHT L" ---\n"
+#define APE_PLUGIN_ABOUT                                L"Monkey's Audio Player v" APE_VER_FILE_VERSION_STR_WIDE L"\n" APE_RESOURCE_COPYRIGHT
 
 /**************************************************************************************************
 Global compiler settings (useful for porting)
@@ -239,7 +239,7 @@ Global macros
 #define APE_DOUBLE_ZERO 0.00001
 
 // we use more than the Windows system MAX_PATH since filenames can actually be longer
-#define APE_MAX_PATH 8192
+#define APE_MAX_PATH 32767
 
 // undefined file size (pipe, etc.)
 #define APE_FILE_SIZE_UNDEFINED (-1)
@@ -411,61 +411,60 @@ Macros
 #define APE_ALIGN_2_BYTE(VALUE) ((VALUE) + ((VALUE) & 0x1))
 #define APE_ALIGN_8_BYTE(VALUE) ((VALUE) + ((8 - ((VALUE) % 8)) % 8))
 
-#define RETURN_ON_ERROR(FUNCTION) { const int nFunctionResult = static_cast<int>(FUNCTION); if (nFunctionResult != ERROR_SUCCESS) { return nFunctionResult; } }
-#define RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nFunctionResult = FUNCTION; if (nFunctionResult != 0) { return VALUE; } }
-#define RETURN_ON_EXCEPTION(CODE, VALUE) { try { CODE } catch(...) { return VALUE; } }
+#define APE_RETURN_ON_ERROR(FUNCTION) { const int nFunctionResult = static_cast<int>(FUNCTION); if (nFunctionResult != APE_ERROR_SUCCESS) { return nFunctionResult; } }
+#define APE_RETURN_VALUE_ON_ERROR(FUNCTION, VALUE) { int nFunctionResult = FUNCTION; if (nFunctionResult != 0) { return VALUE; } }
+#define APE_RETURN_ON_EXCEPTION(CODE, VALUE) { try { CODE } catch(...) { return VALUE; } }
 
-#define THROW_ON_ERROR(CODE) { const intn nThrowResult = static_cast<intn> (CODE); if (nThrowResult != 0) throw(nThrowResult); }
+#define APE_THROW_ON_ERROR(CODE) { const intn nThrowResult = static_cast<intn> (CODE); if (nThrowResult != 0) throw(nThrowResult); }
 
-#define EXPAND_8_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE
-#define EXPAND_9_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE CODE
-#define EXPAND_16_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE
-#define EXPAND_32_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE
+#define APE_EXPAND_8_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE
+#define APE_EXPAND_9_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE CODE
+#define APE_EXPAND_16_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE
+#define APE_EXPAND_32_TIMES(CODE) CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE CODE
 
 /**************************************************************************************************
 Error Codes
 **************************************************************************************************/
 
 // success
-#undef ERROR_SUCCESS
-#define ERROR_SUCCESS                                   (0)
+#define APE_ERROR_SUCCESS                                   (0)
 
 // file and i/o errors (1000's)
-#define ERROR_IO_READ                                   (1000)
-#define ERROR_IO_WRITE                                  (1001)
-#define ERROR_INVALID_INPUT_FILE                        (1002)
-#define ERROR_INVALID_OUTPUT_FILE                       (1003)
-#define ERROR_INPUT_FILE_TOO_LARGE                      (1004)
-#define ERROR_INPUT_FILE_UNSUPPORTED_BIT_DEPTH          (1005)
-#define ERROR_INPUT_FILE_UNSUPPORTED_SAMPLE_RATE        (1006)
-#define ERROR_INPUT_FILE_UNSUPPORTED_CHANNEL_COUNT      (1007)
-#define ERROR_INPUT_FILE_TOO_SMALL                      (1008)
-#define ERROR_INVALID_CHECKSUM                          (1009)
-#define ERROR_DECOMPRESSING_FRAME                       (1010)
-#define ERROR_INITIALIZING_UNMAC                        (1011)
-#define ERROR_INVALID_FUNCTION_PARAMETER                (1012)
-#define ERROR_UNSUPPORTED_FILE_TYPE                     (1013)
-#define ERROR_UNSUPPORTED_FILE_VERSION                  (1014)
-#define ERROR_OPENING_FILE_IN_USE                       (1015)
-#define ERROR_UAC_PERMISSION                            (1016)
+#define APE_ERROR_IO_READ                                   (1000)
+#define APE_ERROR_IO_WRITE                                  (1001)
+#define APE_ERROR_INVALID_INPUT_FILE                        (1002)
+#define APE_ERROR_INVALID_OUTPUT_FILE                       (1003)
+#define APE_ERROR_INPUT_FILE_TOO_LARGE                      (1004)
+#define APE_ERROR_INPUT_FILE_UNSUPPORTED_BIT_DEPTH          (1005)
+#define APE_ERROR_INPUT_FILE_UNSUPPORTED_SAMPLE_RATE        (1006)
+#define APE_ERROR_INPUT_FILE_UNSUPPORTED_CHANNEL_COUNT      (1007)
+#define APE_ERROR_INPUT_FILE_TOO_SMALL                      (1008)
+#define APE_ERROR_INVALID_CHECKSUM                          (1009)
+#define APE_ERROR_DECOMPRESSING_FRAME                       (1010)
+#define APE_ERROR_INITIALIZING_UNMAC                        (1011)
+#define APE_ERROR_INVALID_FUNCTION_PARAMETER                (1012)
+#define APE_ERROR_UNSUPPORTED_FILE_TYPE                     (1013)
+#define APE_ERROR_UNSUPPORTED_FILE_VERSION                  (1014)
+#define APE_ERROR_OPENING_FILE_IN_USE                       (1015)
+#define APE_ERROR_UAC_PERMISSION                            (1016)
 
 // memory errors (2000's)
-#define ERROR_INSUFFICIENT_MEMORY                       (2000)
+#define APE_ERROR_INSUFFICIENT_MEMORY                       (2000)
 
 // dll errors (3000's)
-#define ERROR_LOADING_APE_DLL                           (3000)
-#define ERROR_LOADING_APE_INFO_DLL                      (3001)
-#define ERROR_LOADING_UNMAC_DLL                         (3002)
+#define APE_ERROR_LOADING_APE_DLL                           (3000)
+#define APE_ERROR_LOADING_APE_INFO_DLL                      (3001)
+#define APE_ERROR_LOADING_UNMAC_DLL                         (3002)
 
 // general and misc errors
-#define ERROR_USER_STOPPED_PROCESSING                   (4000)
-#define ERROR_SKIPPED                                   (4001)
+#define APE_ERROR_USER_STOPPED_PROCESSING                   (4000)
+#define APE_ERROR_SKIPPED                                   (4001)
 
 // programmer errors
-#define ERROR_BAD_PARAMETER                             (5000)
+#define APE_ERROR_BAD_PARAMETER                             (5000)
 
 // IAPECompress errors
-#define ERROR_APE_COMPRESS_TOO_MUCH_DATA                (6000)
+#define APE_ERROR_APE_COMPRESS_TOO_MUCH_DATA                (6000)
 
 // unknown error
-#define ERROR_UNDEFINED                                 (-1)
+#define APE_ERROR_UNDEFINED                                 (-1)

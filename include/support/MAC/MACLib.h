@@ -10,7 +10,7 @@ There are two main interfaces... create one (using CreateIAPExxx) and go to town
 
 Note(s):
 
-Unless otherwise specified, functions return ERROR_SUCCESS (0) on success and an
+Unless otherwise specified, functions return APE_ERROR_SUCCESS (0) on success and an
 error code on failure.
 
 The terminology "Sample" refers to a single sample value, and "Block" refers
@@ -94,8 +94,8 @@ Defines
 #define APE_KILL_FLAG_PAUSE                 (-1)
 #define APE_KILL_FLAG_STOP                  (1)
 
-#define CREATE_WAV_HEADER_ON_DECOMPRESSION  (-1)
-#define MAX_AUDIO_BYTES_UNKNOWN             (-1)
+#define APE_CREATE_WAV_HEADER_ON_DECOMPRESSION  (-1)
+#define APE_MAX_AUDIO_BYTES_UNKNOWN         (-1)
 
 /**************************************************************************************************
 All structures are designed for 4-byte alignment
@@ -307,7 +307,7 @@ public:
         APE_INFO_TAG = 1030,                        // pointer to tag (IAPETag *) [ignored, ignored]
         APE_INFO_APL = 1031,                        // whether it's an APL file
         APE_INFO_MD5 = 1032,                        // the MD5 checksum [buffer *, ignored]
-        APE_INFO_MD5_MATCHES = 1033,                // an MD5 checksum to test (returns ERROR_INVALID_CHECKSUM or ERROR_SUCCESS) [buffer *, ignored]
+        APE_INFO_MD5_MATCHES = 1033,                // an MD5 checksum to test (returns APE_ERROR_INVALID_CHECKSUM or APE_ERROR_SUCCESS) [buffer *, ignored]
         APE_INFO_FILE_INFO = 1034,                  // pointer to file information object (APE_FILE_INFO *) [ignored, ignored]
         APE_INFO_PROGRAM_VERSION = 1035,            // the program version that encoded the file * 1000 [igored, ignored]
 
@@ -428,7 +428,7 @@ public:
     //        format of the audio to encode (use FillWaveFormatEx() if necessary)
     //    int nMaxAudioBytes
     //        the absolute maximum audio bytes that will be encoded... encoding fails with a
-    //        ERROR_APE_COMPRESS_TOO_MUCH_DATA if you attempt to encode more than specified here
+    //        APE_ERROR_APE_COMPRESS_TOO_MUCH_DATA if you attempt to encode more than specified here
     //        (if unknown, use MAX_AUDIO_BYTES_UNKNOWN to allocate as much storage in the seek table as
     //        possible... limit is then 2 GB of data (~4 hours of CD music)... this wastes around
     //        30kb, so only do it if completely necessary)
@@ -439,18 +439,18 @@ public:
     //        a pointer to a buffer containing the WAV header (data before the data block in the WAV)
     //        (note: use NULL for on-the-fly encoding... see next parameter)
     //    int nHeaderBytes
-    //        number of bytes in the header data buffer (use CREATE_WAV_HEADER_ON_DECOMPRESSION and
+    //        number of bytes in the header data buffer (use APE_CREATE_WAV_HEADER_ON_DECOMPRESSION and
     //        NULL for the pHeaderData and MAC will automatically create the appropriate WAV header
     //        on decompression)
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     virtual int Start(const str_utfn * pOutputFilename, const WAVEFORMATEX * pwfeInput,
-        bool bFloat, int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL,
-        const void * pHeaderData = APE_NULL, int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION, int nFlags = 0) = 0;
+        bool bFloat, int64 nMaxAudioBytes = APE_MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL,
+        const void * pHeaderData = APE_NULL, int64 nHeaderBytes = APE_CREATE_WAV_HEADER_ON_DECOMPRESSION, int nFlags = 0) = 0;
 
     virtual int StartEx(IAPEIO * pioOutput, const WAVEFORMATEX * pwfeInput,
-        bool bFloat, int64 nMaxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL,
-        const void * pHeaderData = APE_NULL, int64 nHeaderBytes = CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
+        bool bFloat, int64 nMaxAudioBytes = APE_MAX_AUDIO_BYTES_UNKNOWN, int nCompressionLevel = APE_COMPRESSION_LEVEL_NORMAL,
+        const void * pHeaderData = APE_NULL, int64 nHeaderBytes = APE_CREATE_WAV_HEADER_ON_DECOMPRESSION) = 0;
 
     /**************************************************************************************************
     * Add / Compress Data
