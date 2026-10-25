@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -149,11 +149,11 @@ Bool BoCA::EncoderMAC::Activate()
 	waveFormat.wBitsPerSample	= format.bits;
 	waveFormat.cbSize		= 0;
 
-	int64 maxAudioBytes = MAX_AUDIO_BYTES_UNKNOWN;
+	int64 maxAudioBytes = APE_MAX_AUDIO_BYTES_UNKNOWN;
 
 	if (track.length >= 0) maxAudioBytes = track.length * format.channels * (format.bits / 8);
 
-	ex_APECompress_StartW(hAPECompress, track.outputFile, &waveFormat, maxAudioBytes, (config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2) + 1) * 1000, NIL, CREATE_WAV_HEADER_ON_DECOMPRESSION);
+	ex_APECompress_StartW(hAPECompress, track.outputFile, &waveFormat, maxAudioBytes, (config->GetIntValue(ConfigureMAC::ConfigID, "CompressionMode", 2) + 1) * 1000, NIL, APE_CREATE_WAV_HEADER_ON_DECOMPRESSION);
 
 	return True;
 }
