@@ -44,10 +44,12 @@ namespace BoCA
 			Int64			 GetNumberOfPackets();
 			Int64			 GetDuration();
 
+			Int64			 SeekPacket(Int64);
+
 			Int			 ReadPacket(Buffer<UnsignedByte> &, Int64 &, Int &);
 			Int			 WritePacket(const UnsignedByte *, Int, Int64, Int);
 
-			Int64			 SeekPacket(Int64);
+			Bool			 UpdateStreamInfo();
 
 			Bool			 OptimizeFile(const String &);
 	};

@@ -28,6 +28,7 @@ Void			 FreeMP4v2DLL();
 
 typedef MP4FileHandle			(*MP4READCALLBACKS)		(const MP4IOCallbacks *, void *);
 typedef MP4FileHandle			(*MP4CREATECALLBACKS)		(const MP4IOCallbacks *, void *, uint32_t);
+typedef MP4FileHandle			(*MP4MODIFYCALLBACKS)		(const MP4IOCallbacks *, void *, uint32_t);
 typedef void				(*MP4CLOSE)			(MP4FileHandle, uint32_t);
 typedef void				(*MP4FREE)			(void *);
 typedef bool				(*MP4OPTIMIZE)			(const char *, const char *);
@@ -62,6 +63,7 @@ typedef void				(*MP4ITMFITEMLISTFREE)		(MP4ItmfItemList *);
 
 extern MP4READCALLBACKS			 ex_MP4ReadCallbacks;
 extern MP4CREATECALLBACKS		 ex_MP4CreateCallbacks;
+extern MP4MODIFYCALLBACKS		 ex_MP4ModifyCallbacks;
 extern MP4CLOSE				 ex_MP4Close;
 extern MP4FREE				 ex_MP4Free;
 extern MP4OPTIMIZE			 ex_MP4Optimize;

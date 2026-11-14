@@ -95,6 +95,11 @@ Int64 BoCA::AS::MuxerComponent::GetDuration()
 	return specs->func_GetDuration(component);
 }
 
+Int64 BoCA::AS::MuxerComponent::SeekPacket(Int64 position)
+{
+	return specs->func_SeekPacket(component, position);
+}
+
 Int BoCA::AS::MuxerComponent::ReadPacket(Buffer<UnsignedByte> &buffer, Int64 &position, Int &flags)
 {
 	return specs->func_ReadPacket(component, &buffer, &position, &flags);
@@ -105,9 +110,9 @@ Int BoCA::AS::MuxerComponent::WritePacket(const UnsignedByte *data, Int size, In
 	return specs->func_WritePacket(component, data, size, position, flags);
 }
 
-Int64 BoCA::AS::MuxerComponent::SeekPacket(Int64 position)
+Bool BoCA::AS::MuxerComponent::UpdateStreamInfo()
 {
-	return specs->func_SeekPacket(component, position);
+	return specs->func_MuxerUpdateStreamInfo(component);
 }
 
 Bool BoCA::AS::MuxerComponent::OptimizeFile(const String &streamURI)

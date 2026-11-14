@@ -453,10 +453,12 @@ namespace BoCA
 				__int64			 (*func_GetNumberOfPackets)(void *);
 				__int64			 (*func_GetDuration)(void *);
 
+				__int64			 (*func_SeekPacket)(void *, __int64);
+
 				int			 (*func_ReadPacket)(void *, void *, __int64 *, int *);
 				int			 (*func_WritePacket)(void *, const unsigned char *, int, __int64, int);
 
-				__int64			 (*func_SeekPacket)(void *, __int64);
+				bool			 (*func_MuxerUpdateStreamInfo)(void *);
 
 				bool			 (*func_OptimizeFile)(void *, const wchar_t *);
 		};

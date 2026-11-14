@@ -202,10 +202,12 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 	func_GetNumberOfPackets		= NIL;
 	func_GetDuration		= NIL;
 
+	func_SeekPacket			= NIL;
+
 	func_ReadPacket			= NIL;
 	func_WritePacket		= NIL;
 
-	func_SeekPacket			= NIL;
+	func_MuxerUpdateStreamInfo	= NIL;
 
 	func_OptimizeFile		= NIL;
 }
@@ -356,10 +358,12 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 	func_GetNumberOfPackets		= (__int64 (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfPackets"));
 	func_GetDuration		= (__int64 (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetDuration"));
 
+	func_SeekPacket			= (__int64 (*)(void *, __int64))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SeekPacket"));
+
 	func_ReadPacket			= (int (*)(void *, void *, __int64 *, int *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadPacket"));
 	func_WritePacket		= (int (*)(void *, const unsigned char *, int, __int64, int)) library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WritePacket"));
 
-	func_SeekPacket			= (__int64 (*)(void *, __int64))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SeekPacket"));
+	func_MuxerUpdateStreamInfo	= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_UpdateStreamInfo"));
 
 	func_OptimizeFile		= (bool (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_OptimizeFile"));
 

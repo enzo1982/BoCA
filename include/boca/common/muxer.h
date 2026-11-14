@@ -21,6 +21,7 @@ namespace BoCA
 	{
 		MUXER_MODE_READ = 0,	// Demux packets from an existing stream.
 		MUXER_MODE_WRITE,	// Mux packets into a new stream.
+		MUXER_MODE_MODIFY,	// Update stream information of an existing stream.
 
 		NUM_MUXER_MODES
 	};

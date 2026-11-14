@@ -55,9 +55,11 @@ namespace BoCA
 	int	 MP4IO_seek(void *, int64_t);
 	int	 MP4IO_read(void *, void *, int64_t, int64_t *);
 	int	 MP4IO_write(void *, const void *, int64_t, int64_t *);
+	int	 MP4IO_truncate(void *, int64_t);
 
-	static MP4IOCallbacks	 mp4ReadCallbacks  = { MP4IO_size, MP4IO_seek, MP4IO_read, NIL, NIL };
-	static MP4IOCallbacks	 mp4WriteCallbacks = { MP4IO_size, MP4IO_seek, NIL, MP4IO_write, NIL };
+	static MP4IOCallbacks	 mp4ReadCallbacks   = { MP4IO_size, MP4IO_seek, MP4IO_read, NIL, NIL };
+	static MP4IOCallbacks	 mp4WriteCallbacks  = { MP4IO_size, MP4IO_seek, NIL, MP4IO_write, NIL };
+	static MP4IOCallbacks	 mp4ModifyCallbacks = { MP4IO_size, MP4IO_seek, MP4IO_read, MP4IO_write, MP4IO_truncate };
 };
 
 BoCA::MuxerMP4::MuxerMP4()
@@ -87,11 +89,12 @@ Bool BoCA::MuxerMP4::Open(MuxerMode nMode)
 	sampleId = 1;
 	position = 0;
 
-	if (mode == MUXER_MODE_READ)
+	if (mode == MUXER_MODE_READ || mode == MUXER_MODE_MODIFY)
 	{
 		/* Open MP4 file and find audio track.
 		 */
-		mp4File	 = ex_MP4ReadCallbacks(&mp4ReadCallbacks, driver);
+		if (mode == MUXER_MODE_READ) mp4File = ex_MP4ReadCallbacks(&mp4ReadCallbacks, driver);
+		else			     mp4File = ex_MP4ModifyCallbacks(&mp4ModifyCallbacks, driver, 0);
 
 		if (mp4File == NIL)
 		{
@@ -164,7 +167,7 @@ Bool BoCA::MuxerMP4::Open(MuxerMode nMode)
 		 */
 		gaplessInfo = ReadGaplessInfo();
 	}
-	else
+	else if (mode == MUXER_MODE_WRITE)
 	{
 		if (codec != MUXER_CODEC_AAC)
 		{
@@ -204,6 +207,13 @@ Bool BoCA::MuxerMP4::Open(MuxerMode nMode)
 
 		numberOfSamples	= 0;
 	}
+	else
+	{
+		errorState  = True;
+		errorString = "Unsupported muxer mode";
+
+		return False;
+	}
 
 	return True;
 }
@@ -240,6 +250,22 @@ Int64 BoCA::MuxerMP4::GetDuration()
 	if (mode == MUXER_MODE_WRITE) return position;
 
 	return ex_MP4GetTrackDuration(mp4File, mp4Track);
+}
+
+Int64 BoCA::MuxerMP4::SeekPacket(Int64 seekPosition)
+{
+	if (mp4File == NIL || mode != MUXER_MODE_READ) return -1;
+
+	/* Find sample containing the requested position.
+	 */
+	MP4SampleId	 seekSampleId = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, seekPosition, true);
+
+	if (seekSampleId == MP4_INVALID_SAMPLE_ID) return -1;
+
+	sampleId = seekSampleId;
+	position = ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
+
+	return position;
 }
 
 Int BoCA::MuxerMP4::ReadPacket(Buffer<UnsignedByte> &buffer, Int64 &packetPosition, Int &flags)
@@ -295,20 +321,25 @@ Int BoCA::MuxerMP4::WritePacket(const UnsignedByte *data, Int size, Int64 packet
 	return size;
 }
 
-Int64 BoCA::MuxerMP4::SeekPacket(Int64 seekPosition)
+Bool BoCA::MuxerMP4::UpdateStreamInfo()
 {
-	if (mp4File == NIL || mode != MUXER_MODE_READ) return -1;
+	if (mp4File == NIL || mode != MUXER_MODE_MODIFY) return False;
 
-	/* Find sample containing the requested position.
+	/* Update number of channels in sound atom.
+	 *
+	 * Note: Always set the value, as the channel count reported by MP4v2
+	 *	 is taken from the codec configuration if available.
 	 */
-	MP4SampleId	 seekSampleId = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, seekPosition, true);
+	const Format	&trackFormat = track.GetFormat();
 
-	if (seekSampleId == MP4_INVALID_SAMPLE_ID) return -1;
+	if (trackFormat.channels > 0)
+	{
+		if (!ex_MP4SetTrackIntegerProperty(mp4File, mp4Track, "mdia.minf.stbl.stsd.*[0].channels", trackFormat.channels)) return False;
 
-	sampleId = seekSampleId;
-	position = ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
+		format.channels = trackFormat.channels;
+	}
 
-	return position;
+	return True;
 }
 
 Bool BoCA::MuxerMP4::OptimizeFile(const String &streamURI)
@@ -430,6 +461,15 @@ int BoCA::MP4IO_write(void *handle, const void *buffer, int64_t size, int64_t *n
 	*nout = driver->WriteData((const UnsignedByte *) buffer, size);
 
 	if (*nout == 0) return 1;
+
+	return 0;
+}
+
+int BoCA::MP4IO_truncate(void *handle, int64_t size)
+{
+	Driver	*driver = (Driver *) handle;
+
+	if (!driver->Truncate(size)) return 1;
 
 	return 0;
 }

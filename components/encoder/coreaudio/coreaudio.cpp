@@ -13,6 +13,8 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <smooth/io/drivers/driver_ansi.h>
+
 #include "coreaudio.h"
 #include "config.h"
 
@@ -80,13 +82,11 @@ const String &BoCA::EncoderCoreAudio::GetComponentSpecs()
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadCoreAudioDLL();
-	LoadMP4v2DLL();
 }
 
 Void smooth::DetachDLL()
 {
 	FreeCoreAudioDLL();
-	FreeMP4v2DLL();
 }
 
 namespace BoCA
@@ -415,13 +415,22 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 		/* Fix number of channels in sound atom.
 		 */
-		if (mp4v2dll != NIL)
-		{
-			MP4FileHandle	 mp4File  = ex_MP4Modify(track.outputFile, 0);
-			MP4TrackId	 mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
+		AS::Registry		&boca  = AS::Registry::Get();
+		AS::MuxerComponent	*muxer = (AS::MuxerComponent *) boca.CreateComponentByID("mp4-mux");
 
-			ex_MP4SetTrackIntegerProperty(mp4File, mp4Track, "mdia.minf.stbl.stsd.*[0].channels", format.channels);
-			ex_MP4Close(mp4File, 0);
+		if (muxer != NIL)
+		{
+			DriverANSI	 ioDriver(File(track.outputFile), IS_READ | IS_WRITE);
+
+			muxer->SetConfiguration(config);
+			muxer->SetAudioTrackInfo(track);
+			muxer->SetDriver(&ioDriver);
+
+			if (muxer->Open(MUXER_MODE_MODIFY))
+			{
+				muxer->UpdateStreamInfo();
+				muxer->Close();
+			}
 		}
 
 		/* Write metadata to file.
@@ -430,7 +439,6 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 
 		if (config->GetIntValue("Tags", "EnableMP4Metadata", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
 		{
-			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
 
 			if (tagger != NIL)
@@ -441,17 +449,14 @@ Bool BoCA::EncoderCoreAudio::Deactivate()
 				boca.DeleteComponent(tagger);
 			}
 		}
-		else if (mp4v2dll != NIL)
+		else if (muxer != NIL)
 		{
 			/* Optimize file even when no tags are written.
 			 */
-			String	 tempFile = String(track.outputFile).Append(".temp");
-
-			ex_MP4Optimize(track.outputFile.ConvertTo("UTF-8"), tempFile.ConvertTo("UTF-8"));
-
-			File(track.outputFile).Delete();
-			File(tempFile).Move(track.outputFile);
+			muxer->OptimizeFile(track.outputFile);
 		}
+
+		boca.DeleteComponent(muxer);
 	}
 
 	/* Write ID3v1 tag if requested.

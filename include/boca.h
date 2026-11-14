@@ -189,6 +189,8 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_ReadPacket(void *component, void *buffer, __int64 *position, int *flags)		{ return ((BoCA::componentName *) component)->ReadPacket(*((Buffer<UnsignedByte> *) buffer), *((Int64 *) position), *((Int *) flags)); } \
 		BOCA_EXPORT int BoCA_##componentName##_WritePacket(void *component, const unsigned char *d, int s, __int64 p, int f)	{ return ((BoCA::componentName *) component)->WritePacket(d, s, p, f); }								\
 																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_UpdateStreamInfo(void *component)						{ return ((BoCA::componentName *) component)->UpdateStreamInfo(); }									\
+																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_OptimizeFile(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->OptimizeFile(file); }									\
 	}
 

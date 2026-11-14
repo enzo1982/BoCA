@@ -81,6 +81,14 @@ Bool BoCA::MuxerOgg::Open(MuxerMode nMode)
 {
 	if (opened || driver == NIL) return False;
 
+	if (nMode != MUXER_MODE_READ && nMode != MUXER_MODE_WRITE)
+	{
+		errorState  = True;
+		errorString = "Unsupported muxer mode";
+
+		return False;
+	}
+
 	mode		  = nMode;
 
 	pagePosition	  = 0;

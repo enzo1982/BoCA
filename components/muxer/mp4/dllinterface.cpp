@@ -15,6 +15,7 @@
 
 MP4READCALLBACKS		 ex_MP4ReadCallbacks		= NIL;
 MP4CREATECALLBACKS		 ex_MP4CreateCallbacks		= NIL;
+MP4MODIFYCALLBACKS		 ex_MP4ModifyCallbacks		= NIL;
 MP4CLOSE			 ex_MP4Close			= NIL;
 MP4FREE				 ex_MP4Free			= NIL;
 MP4OPTIMIZE			 ex_MP4Optimize			= NIL;
@@ -57,6 +58,7 @@ Bool LoadMP4v2DLL()
 
 	ex_MP4ReadCallbacks		= (MP4READCALLBACKS) mp4v2dll->GetFunctionAddress("MP4ReadCallbacks");
 	ex_MP4CreateCallbacks		= (MP4CREATECALLBACKS) mp4v2dll->GetFunctionAddress("MP4CreateCallbacks");
+	ex_MP4ModifyCallbacks		= (MP4MODIFYCALLBACKS) mp4v2dll->GetFunctionAddress("MP4ModifyCallbacks");
 	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
 	ex_MP4Free			= (MP4FREE) mp4v2dll->GetFunctionAddress("MP4Free");
 	ex_MP4Optimize			= (MP4OPTIMIZE) mp4v2dll->GetFunctionAddress("MP4Optimize");
@@ -91,6 +93,7 @@ Bool LoadMP4v2DLL()
 
 	if (ex_MP4ReadCallbacks			== NIL ||
 	    ex_MP4CreateCallbacks		== NIL ||
+	    ex_MP4ModifyCallbacks		== NIL ||
 	    ex_MP4Close				== NIL ||
 	    ex_MP4Free				== NIL ||
 	    ex_MP4Optimize			== NIL ||

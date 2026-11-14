@@ -51,10 +51,12 @@ namespace BoCA
 				virtual Int64		 GetNumberOfPackets();
 				virtual Int64		 GetDuration();
 
+				virtual Int64		 SeekPacket(Int64);
+
 				virtual Int		 ReadPacket(Buffer<UnsignedByte> &, Int64 &, Int &);
 				virtual Int		 WritePacket(const UnsignedByte *, Int, Int64, Int);
 
-				virtual Int64		 SeekPacket(Int64);
+				virtual Bool		 UpdateStreamInfo();
 
 				virtual Bool		 OptimizeFile(const String &);
 		};

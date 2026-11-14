@@ -56,6 +56,7 @@ namespace BoCA
 				 * Notes: - The IO driver must be set before calling Open().
 				 *	  - When writing, codec information must be set before calling Open().
 				 *	  - When reading, codec information is available after calling Open().
+				 *	  - When modifying, the IO driver must support reading and writing.
 				 */
 				virtual Bool		 Open(MuxerMode) = 0;
 				virtual Bool		 Close() = 0;
@@ -96,6 +97,13 @@ namespace BoCA
 				 */
 				virtual Int64		 GetDuration();
 
+				/* Seek to the packet containing the specified position.
+				 *
+				 * Returns the actual position at the start of the next packet
+				 * to be read or -1 if the seek operation failed.
+				 */
+				virtual Int64		 SeekPacket(Int64);
+
 				/* Read the next packet.
 				 *
 				 * The position is set to the stream position at the end of the
@@ -113,12 +121,10 @@ namespace BoCA
 				 */
 				virtual Int		 WritePacket(const UnsignedByte *, Int, Int64, Int);
 
-				/* Seek to the packet containing the specified position.
-				 *
-				 * Returns the actual position at the start of the next packet
-				 * to be read or -1 if the seek operation failed.
+				/* Update stream information of a stream opened in modify
+				 * mode to match the information set with SetAudioTrackInfo().
 				 */
-				virtual Int64		 SeekPacket(Int64);
+				virtual Bool		 UpdateStreamInfo();
 
 				/* Optimize the layout of a file written by this
 				 * muxer after its output stream has been closed.

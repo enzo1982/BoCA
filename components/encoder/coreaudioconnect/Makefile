@@ -10,7 +10,7 @@ BOCA_PATH = ../../..
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
-OBJECTS	  = config.o coreaudioconnect.o dllinterface.o
+OBJECTS	  = config.o coreaudioconnect.o
 
 # Enter additional defines here:
 DEFINE	  = -I"$(SRCDIR)"/$(BOCA_PATH)/include/support -I"$(SRCDIR)"/$(BOCA_PATH)/include/support/apple -Iconnector -Wno-multichar
