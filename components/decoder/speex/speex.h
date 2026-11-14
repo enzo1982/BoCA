@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,10 +20,7 @@ namespace BoCA
 	class DecoderSpeex : public CS::DecoderComponent
 	{
 		private:
-			ogg_sync_state		 oy;
-			ogg_stream_state	 os;
-			ogg_page		 og;
-			ogg_packet		 op;
+			AS::MuxerComponent	*muxer;
 
 			void			*decoder;
 			SpeexBits		 bits;
@@ -38,9 +35,16 @@ namespace BoCA
 
 			spx_int32_t		 skipSamples;
 
-			Int			 pageNumber;
+			Bool			 firstPage;
 
+			Buffer<UnsignedByte>	 packetBuffer;
 			Buffer<short>		 pcmBuffer;
+
+			Buffer<UnsignedByte>	 pendingPackets;
+			Array<Int>		 pendingPacketSizes;
+
+			AS::MuxerComponent	*OpenMuxer(IO::Driver *) const;
+			Void			 CloseMuxer(AS::MuxerComponent *) const;
 		public:
 			static const String	&GetComponentSpecs();
 

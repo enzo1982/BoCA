@@ -42,9 +42,6 @@
     <ClCompile Include="..\..\components\decoder\alac\alac.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\components\decoder\alac\dllinterface.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\components\decoder\alac\alac\aglib.h">
@@ -69,9 +66,6 @@
       <Filter>Headerdateien\alac</Filter>
     </ClInclude>
     <ClInclude Include="..\..\components\decoder\alac\alac.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\components\decoder\alac\dllinterface.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

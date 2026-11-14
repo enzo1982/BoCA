@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -32,7 +32,7 @@ namespace BoCA
 								 Registry();
 								~Registry();
 
-				Void				 LoadComponents(const Directory &, const String &);
+				Void				 LoadComponents(const Directory &, const String &, const String &);
 
 				Void				 InsertComponent(ComponentSpecs *);
 

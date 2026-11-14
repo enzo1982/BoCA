@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,13 +14,6 @@
 #include "dllinterface.h"
 
 using namespace BoCA;
-
-OGGSTREAMINIT			 ex_ogg_stream_init			= NIL;
-OGGSTREAMPACKETIN		 ex_ogg_stream_packetin			= NIL;
-OGGSTREAMFLUSH			 ex_ogg_stream_flush			= NIL;
-OGGSTREAMPAGEOUT		 ex_ogg_stream_pageout			= NIL;
-OGGPAGEEOS			 ex_ogg_page_eos			= NIL;
-OGGSTREAMCLEAR			 ex_ogg_stream_clear			= NIL;
 
 VORBISVERSIONSTRING		 ex_vorbis_version_string		= NIL;
 
@@ -48,38 +41,9 @@ DynamicLoader *oggdll		= NIL;
 DynamicLoader *vorbisdll	= NIL;
 DynamicLoader *vorbisencdll	= NIL;
 
-Bool LoadOggDLL()
-{
-	oggdll = BoCA::Utilities::LoadCodecDLL("ogg");
-
-	if (oggdll == NIL) return False;
-
-	ex_ogg_stream_init		= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
-	ex_ogg_stream_packetin		= (OGGSTREAMPACKETIN) oggdll->GetFunctionAddress("ogg_stream_packetin");
-	ex_ogg_stream_flush		= (OGGSTREAMFLUSH) oggdll->GetFunctionAddress("ogg_stream_flush");
-	ex_ogg_stream_pageout		= (OGGSTREAMPAGEOUT) oggdll->GetFunctionAddress("ogg_stream_pageout");
-	ex_ogg_page_eos			= (OGGPAGEEOS) oggdll->GetFunctionAddress("ogg_page_eos");
-	ex_ogg_stream_clear		= (OGGSTREAMCLEAR) oggdll->GetFunctionAddress("ogg_stream_clear");
-
-	if (ex_ogg_stream_init			== NIL ||
-	    ex_ogg_stream_packetin		== NIL ||
-	    ex_ogg_stream_flush			== NIL ||
-	    ex_ogg_stream_pageout		== NIL ||
-	    ex_ogg_page_eos			== NIL ||
-	    ex_ogg_stream_clear			== NIL) { FreeOggDLL(); return False; }
-
-	return True;
-}
-
-Void FreeOggDLL()
-{
-	BoCA::Utilities::FreeCodecDLL(oggdll);
-
-	oggdll = NIL;
-}
-
 Bool LoadVorbisDLL()
 {
+	oggdll	     = BoCA::Utilities::LoadCodecDLL("ogg");
 	vorbisdll    = BoCA::Utilities::LoadCodecDLL("vorbis");
 	vorbisencdll = BoCA::Utilities::LoadCodecDLL("vorbisenc");
 
@@ -131,9 +95,11 @@ Bool LoadVorbisDLL()
 
 Void FreeVorbisDLL()
 {
-	BoCA::Utilities::FreeCodecDLL(vorbisdll);
 	BoCA::Utilities::FreeCodecDLL(vorbisencdll);
+	BoCA::Utilities::FreeCodecDLL(vorbisdll);
+	BoCA::Utilities::FreeCodecDLL(oggdll);
 
-	vorbisdll    = NIL;
 	vorbisencdll = NIL;
+	vorbisdll    = NIL;
+	oggdll	     = NIL;
 }

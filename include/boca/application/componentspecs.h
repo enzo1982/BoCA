@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -32,6 +32,7 @@ namespace BoCA
 		COMPONENT_TYPE_DEVICEINFO,
 		COMPONENT_TYPE_PLAYLIST,
 		COMPONENT_TYPE_VERIFIER,
+		COMPONENT_TYPE_MUXER,
 
 		NUM_COMPONENT_TYPES
 	};
@@ -433,6 +434,31 @@ namespace BoCA
 
 				const void		*(*func_ReadPlaylist)(void *, const wchar_t *);
 				int			 (*func_WritePlaylist)(void *, const wchar_t *);
+
+				bool			 (*func_Open)(void *, int);
+				bool			 (*func_Close)(void *);
+
+				int			 (*func_GetCodec)(const void *);
+				bool			 (*func_SetCodec)(void *, int);
+
+				bool			 (*func_GetCodecConfig)(const void *, void *);
+				bool			 (*func_SetCodecConfig)(void *, const void *);
+
+				int			 (*func_GetTimeScale)(const void *);
+				bool			 (*func_SetTimeScale)(void *, int);
+
+				bool			 (*func_GetGaplessInfo)(const void *, int *, int *, __int64 *);
+				bool			 (*func_SetGaplessInfo)(void *, int, int, __int64);
+
+				__int64			 (*func_GetNumberOfPackets)(void *);
+				__int64			 (*func_GetDuration)(void *);
+
+				int			 (*func_ReadPacket)(void *, void *, __int64 *, int *);
+				int			 (*func_WritePacket)(void *, const unsigned char *, int, __int64, int);
+
+				__int64			 (*func_SeekPacket)(void *, __int64);
+
+				bool			 (*func_OptimizeFile)(void *, const wchar_t *);
 		};
 	};
 };

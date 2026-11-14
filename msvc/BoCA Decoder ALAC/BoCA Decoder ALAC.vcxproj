@@ -247,7 +247,6 @@
     <ClCompile Include="..\..\components\decoder\alac\alac\dp_dec.c" />
     <ClCompile Include="..\..\components\decoder\alac\alac\EndianPortable.c" />
     <ClCompile Include="..\..\components\decoder\alac\alac\matrix_dec.c" />
-    <ClCompile Include="..\..\components\decoder\alac\dllinterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\components\decoder\alac\alac.h" />
@@ -258,7 +257,6 @@
     <ClInclude Include="..\..\components\decoder\alac\alac\dplib.h" />
     <ClInclude Include="..\..\components\decoder\alac\alac\EndianPortable.h" />
     <ClInclude Include="..\..\components\decoder\alac\alac\matrixlib.h" />
-    <ClInclude Include="..\..\components\decoder\alac\dllinterface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

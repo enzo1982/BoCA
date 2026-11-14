@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,6 +13,8 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <smooth/io/drivers/driver_ansi.h>
+
 #include "vorbis.h"
 
 using namespace smooth::IO;
@@ -21,7 +23,7 @@ const String &BoCA::DecoderVorbis::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (oggdll != NIL && vorbisdll != NIL)
+	if (vorbisdll != NIL && AS::Registry::Get().ComponentExists("ogg-mux"))
 	{
 		componentSpecs = "							\
 											\
@@ -47,15 +49,20 @@ const String &BoCA::DecoderVorbis::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
-	LoadOggDLL();
 	LoadVorbisDLL();
 }
 
 Void smooth::DetachDLL()
 {
-	FreeOggDLL();
 	FreeVorbisDLL();
 }
+
+namespace BoCA
+{
+	/* Constants.
+	 */
+	const Int	 minOutputSamples = 4096;
+};
 
 Bool BoCA::DecoderVorbis::CanOpenStream(const String &streamURI)
 {
@@ -63,58 +70,34 @@ Bool BoCA::DecoderVorbis::CanOpenStream(const String &streamURI)
 
 	if (in.InputString(4) != "OggS") return False;
 
-	in.Seek(0);
-
 	/* Check if Vorbis stream.
 	 */
-	ogg_sync_state		 oy;
-	ogg_stream_state	 os;
-	ogg_page		 og;
-	ogg_packet		 op;
+	DriverANSI		 ioDriver(File(streamURI), IS_READ);
+	AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
 
-	ex_ogg_sync_init(&oy);
+	if (muxer == NIL) return False;
 
-	Bool	 result	     = False;
-	Bool	 initialized = False;
+	Bool			 result	  = False;
+	Buffer<UnsignedByte>	 packet;
 
-	do
-	{
-		Int	 size	= Math::Min(Int64(4096), in.Size() - in.GetPos());
-		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+	Int64			 position = 0;
+	Int			 flags	  = 0;
 
-		in.InputData(buffer, size);
+	if (muxer->ReadPacket(packet, position, flags) >= 7 && packet[0] == 1 && memcmp(packet + 1, "vorbis", 6) == 0) result = True;
 
-		ex_ogg_sync_wrote(&oy, size);
-
-		if (ex_ogg_sync_pageout(&oy, &og) == 1)
-		{
-			ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
-
-			initialized = True;
-
-			ex_ogg_stream_pagein(&os, &og);
-
-			if (ex_ogg_stream_packetout(&os, &op) == 1)
-			{
-				if (op.packet[0] ==  1  &&
-				    op.packet[1] == 'v' && op.packet[2] == 'o' && op.packet[3] == 'r' && op.packet[4] == 'b' && op.packet[5] == 'i' && op.packet[6] == 's') result = True;
-
-				break;
-			}
-		}
-	}
-	while (in.GetPos() < in.Size());
-
-	if (initialized) ex_ogg_stream_clear(&os);
-
-	ex_ogg_sync_clear(&oy);
+	CloseMuxer(muxer);
 
 	return result;
 }
 
 Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	 in(STREAM_FILE, streamURI, IS_READ);
+	/* Open file.
+	 */
+	DriverANSI		 ioDriver(File(streamURI), IS_READ);
+	AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
+
+	if (muxer == NIL) return Error();
 
 	/* Set up track format.
 	 */
@@ -122,17 +105,10 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 
 	format.bits  = 16;
 
-	track.fileSize = in.Size();
+	track.fileSize = ioDriver.GetSize();
 
-	/* Set up Ogg reader.
+	/* Set up Vorbis decoder.
 	 */
-	ogg_sync_state		 oy;
-	ogg_stream_state	 os;
-	ogg_page		 og;
-	ogg_packet		 op;
-
-	ex_ogg_sync_init(&oy);
-
 	vorbis_info		 vi;
 	vorbis_comment		 vc;
 
@@ -143,96 +119,45 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 	 */
 	Buffer<UnsignedByte>	 comments;
 
-	Bool	 initialized = False;
-	Bool	 done	     = False;
-	Int	 packetNum   = 0;
-
-	do
+	for (Int packetNum = 0; packetNum <= 2; packetNum++)
 	{
-		Int	 size	= Math::Min(Int64(4096), track.fileSize - in.GetPos());
-		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+		if (!ReadPacket(muxer)) break;
 
-		in.InputData(buffer, size);
+		ex_vorbis_synthesis_headerin(&vi, &vc, &op);
 
-		ex_ogg_sync_wrote(&oy, size);
-
-		while (!done && ex_ogg_sync_pageout(&oy, &og) == 1)
+		/* Found header packet.
+		 */
+		if (packetNum == 0)
 		{
-			if (!initialized)
-			{
-				ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+			format.rate	= vi.rate;
+			format.channels	= vi.channels;
+			track.length	= -1;
 
-				initialized = True;
-			}
+			Int	 bitrate = 0;
 
-			ex_ogg_stream_pagein(&os, &og);
+			if	(vi.bitrate_nominal > 0)		       bitrate = vi.bitrate_nominal;
+			else if (vi.bitrate_lower > 0 && vi.bitrate_upper > 0) bitrate = (vi.bitrate_lower + vi.bitrate_upper) / 2;
 
-			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
-			{
-				ex_vorbis_synthesis_headerin(&vi, &vc, &op);
-
-				/* Found header packet.
-				 */
-				if (packetNum == 0)
-				{
-					format.rate	= vi.rate;
-					format.channels	= vi.channels;
-					track.length	= -1;
-
-					Int	 bitrate = 0;
-
-					if	(vi.bitrate_nominal > 0)		       bitrate = vi.bitrate_nominal;
-					else if (vi.bitrate_lower > 0 && vi.bitrate_upper > 0) bitrate = (vi.bitrate_lower + vi.bitrate_upper) / 2;
-
-					if (bitrate > 0) track.approxLength = Math::Round(Float(track.fileSize) / (bitrate / 8) * format.rate);
-				}
-
-				/* Found Vorbis Comment packet.
-				 */
-				if (packetNum == 1)
-				{
-					comments.Resize(op.bytes - 7);
-
-					memcpy(comments, op.packet + 7, op.bytes - 7);
-				}
-
-				/* Done if we reached packet two.
-				 */
-				if (packetNum >= 2) done = True;
-
-				packetNum++;
-			}
+			if (bitrate > 0) track.approxLength = Math::Round(Float(track.fileSize) / (bitrate / 8) * format.rate);
 		}
 
-		if (done) break;
+		/* Found Vorbis Comment packet.
+		 */
+		if (packetNum == 1 && op.bytes >= 7)
+		{
+			comments.Resize(op.bytes - 7);
+
+			memcpy(comments, op.packet + 7, op.bytes - 7);
+		}
 	}
-	while (in.GetPos() < in.Size());
 
 	track.SetFormat(format);
 
 	/* Find real length of stream.
 	 */
-	ex_ogg_sync_reset(&oy);
+	Int64	 duration = muxer->GetDuration();
 
-	Int	 size   = Math::Min(in.Size(), 65536);
-	char    *buffer = ex_ogg_sync_buffer(&oy, size);
-
-	in.Seek(in.Size() - size);
-	in.InputData(buffer, size);
-
-	ex_ogg_sync_wrote(&oy, size);
-
-	while (true)
-	{
-		Int	 seek = ex_ogg_sync_pageseek(&oy, &og);
-
-		if (seek == 0) break;
-		if (seek <  0 || ex_ogg_page_serialno(&og) != os.serialno) continue;
-
-		track.length = ex_ogg_page_granulepos(&og);
-
-		if (ex_ogg_page_eos(&og)) break;
-	}
+	if (duration >= 0) track.length = duration;
 
 	/* Read tags.
 	 */
@@ -255,20 +180,18 @@ Error BoCA::DecoderVorbis::GetStreamInfo(const String &streamURI, Track &track)
 	ex_vorbis_comment_clear(&vc);
 	ex_vorbis_info_clear(&vi);
 
-	if (initialized) ex_ogg_stream_clear(&os);
-
-	ex_ogg_sync_clear(&oy);
+	CloseMuxer(muxer);
 
 	return Success();
 }
 
 BoCA::DecoderVorbis::DecoderVorbis()
 {
-	skipSamples = 0;
+	muxer	     = NIL;
 
-	memset(&oy, 0, sizeof(oy));
-	memset(&os, 0, sizeof(os));
-	memset(&og, 0, sizeof(og));
+	packetNumber = 0;
+	skipSamples  = 0;
+
 	memset(&op, 0, sizeof(op));
 
 	memset(&vi, 0, sizeof(vi));
@@ -285,47 +208,35 @@ BoCA::DecoderVorbis::~DecoderVorbis()
 
 Bool BoCA::DecoderVorbis::Activate()
 {
-	ex_ogg_sync_init(&oy);
+	/* Open Ogg stream.
+	 */
+	muxer = OpenMuxer(driver);
 
-	Bool	 initialized = False;
-	Bool	 done = False;
-	Int	 packetNum = 0;
+	if (muxer == NIL) return False;
 
-	while (!done)
+	/* Parse header packets and init decoder.
+	 */
+	ex_vorbis_info_init(&vi);
+	ex_vorbis_comment_init(&vc);
+
+	for (Int packetNum = 0; packetNum <= 2; packetNum++)
 	{
-		Int	 size	= 4096;
-		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
-
-		size = driver->ReadData((unsigned char *) buffer, 4096);
-
-		inBytes += size;
-
-		ex_ogg_sync_wrote(&oy, size);
-
-		while (!done && ex_ogg_sync_pageout(&oy, &og) == 1)
+		if (!ReadPacket(muxer))
 		{
-			if (!initialized)
-			{
-				ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+			ex_vorbis_comment_clear(&vc);
+			ex_vorbis_info_clear(&vi);
 
-				ex_vorbis_info_init(&vi);
-				ex_vorbis_comment_init(&vc);
+			CloseMuxer(muxer);
 
-				initialized = True;
-			}
+			muxer = NIL;
 
-			ex_ogg_stream_pagein(&os, &og);
-
-			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
-			{
-				ex_vorbis_synthesis_headerin(&vi, &vc, &op);
-
-				if (packetNum >= 2) done = True;
-
-				packetNum++;
-			}
+			return False;
 		}
+
+		ex_vorbis_synthesis_headerin(&vi, &vc, &op);
 	}
+
+	inBytes = driver->GetPos();
 
 	ex_vorbis_synthesis_init(&vd, &vi);
 	ex_vorbis_block_init(&vd, &vb);
@@ -335,38 +246,33 @@ Bool BoCA::DecoderVorbis::Activate()
 
 Bool BoCA::DecoderVorbis::Deactivate()
 {
-	ex_ogg_stream_clear(&os);
+	CloseMuxer(muxer);
+
+	muxer = NIL;
 
 	ex_vorbis_block_clear(&vb);
 	ex_vorbis_dsp_clear(&vd);
 	ex_vorbis_comment_clear(&vc);
 	ex_vorbis_info_clear(&vi);
 
-	ex_ogg_sync_clear(&oy);
-
 	return True;
 }
 
 Bool BoCA::DecoderVorbis::Seek(Int64 samplePosition)
 {
-	while (ex_ogg_page_granulepos(&og) + 1024 <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
-	{
-		skipSamples = samplePosition - ex_ogg_page_granulepos(&og) - 1024;
+	/* Seek to the page containing the requested sample position.
+	 */
+	Int64	 position = muxer->SeekPacket(samplePosition - 1024);
 
-		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
-		{
-			char	*buffer = ex_ogg_sync_buffer(&oy, 131072);
-			Int	 size	= driver->ReadData((unsigned char *) buffer, 131072);
+	inBytes = driver->GetPos();
 
-			inBytes += size;
+	if (position < 0) return False;
 
-			ex_ogg_sync_wrote(&oy, size);
+	skipSamples = Math::Max(Int64(0), samplePosition - 1024 - position);
 
-			if (size == 0) return False;
-		}
-	}
-
-	ex_ogg_stream_pagein(&os, &og);
+	/* Signal discontinuity to the decoder.
+	 */
+	packetNumber++;
 
 	ex_vorbis_synthesis_restart(&vd);
 
@@ -380,77 +286,67 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data)
 	Int	 size	       = 0;
 	Int	 dataBufferLen = 0;
 
-	while (ex_ogg_sync_pageout(&oy, &og) == 1)
+	/* Decode packets until we have enough samples.
+	 */
+	while (size < minOutputSamples * vi.channels * 2)
 	{
-		ex_ogg_stream_pagein(&os, &og);
+		if (!ReadPacket(muxer)) break;
 
-		while (ex_ogg_stream_packetout(&os, &op) == 1)
+		float  **pcm;
+		int	 samples;
+
+		if (ex_vorbis_synthesis(&vb, &op) != 0) continue;
+
+		ex_vorbis_synthesis_blockin(&vd, &vb);
+
+		while ((samples = ex_vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
 		{
-			float  **pcm;
-			int	 samples;
+			Int	 bout = Math::Min(samples, sizeof(convBuffer) / vi.channels / 2);
 
-			if (ex_vorbis_synthesis(&vb, &op) != 0) continue;
-
-			ex_vorbis_synthesis_blockin(&vd, &vb);
-
-			while ((samples = ex_vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
+			for (Int i = 0; i < vi.channels; i++)
 			{
-				Int	 bout = Math::Min(samples, sizeof(convBuffer) / vi.channels / 2);
+				short	*ptr = convBuffer + i;
+				float	*mono = pcm[i];
 
-				for (Int i = 0; i < vi.channels; i++)
+				for (Int j = 0; j < bout; j++)
 				{
-					short	*ptr = convBuffer + i;
-					float	*mono = pcm[i];
+					Int	 val = Int(mono[j] * 32767.f);
 
-					for (Int j = 0; j < bout; j++)
-					{
-						Int	 val = Int(mono[j] * 32767.f);
+					val = Math::Min(val, 32767);
+					val = Math::Max(val, -32768);
 
-						val = Math::Min(val, 32767);
-						val = Math::Max(val, -32768);
-
-						*ptr = val;
-						ptr += vi.channels;
-					}
+					*ptr = val;
+					ptr += vi.channels;
 				}
-
-				if (bout > skipSamples)
-				{
-					if (dataBufferLen < size + ((bout - skipSamples) * vi.channels * 2))
-					{
-						dataBufferLen += (((bout - skipSamples) * vi.channels * 2) + 131072);
-
-						data.Resize(dataBufferLen);
-					}
-
-					memcpy(((unsigned char *) data) + size, convBuffer + skipSamples * vi.channels, (bout - skipSamples) * vi.channels * 2);
-
-					size += ((bout - skipSamples) * vi.channels * 2);
-				}
-
-				skipSamples = Math::Max(0, skipSamples - bout);
-
-				ex_vorbis_synthesis_read(&vd, bout);
 			}
-		}
 
-		if (ex_ogg_page_eos(&og)) break;
+			if (bout > skipSamples)
+			{
+				if (dataBufferLen < size + ((bout - skipSamples) * vi.channels * 2))
+				{
+					dataBufferLen += (((bout - skipSamples) * vi.channels * 2) + 131072);
+
+					data.Resize(dataBufferLen);
+				}
+
+				memcpy(((unsigned char *) data) + size, convBuffer + skipSamples * vi.channels, (bout - skipSamples) * vi.channels * 2);
+
+				size += ((bout - skipSamples) * vi.channels * 2);
+			}
+
+			skipSamples = Math::Max(0, skipSamples - bout);
+
+			ex_vorbis_synthesis_read(&vd, bout);
+		}
 	}
 
-	data.Resize(size);
+	inBytes = driver->GetPos();
 
 	/* Bail out if no more data available.
 	 */
-	char	*buffer = ex_ogg_sync_buffer(&oy, 8192);
-	Int	 bytes	= driver->ReadData((unsigned char *) buffer, 8192);
+	if (size == 0) return -1;
 
-	if (size == 0 && bytes <= 0) return -1;
-
-	inBytes += bytes;
-
-	ex_ogg_sync_wrote(&oy, bytes);
-
-	if (size == 0) return ReadData(data);
+	data.Resize(size);
 
 	/* Change to default channel order.
 	 */
@@ -461,4 +357,57 @@ Int BoCA::DecoderVorbis::ReadData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_7_1, Channel::Default_7_1);
 
 	return size;
+}
+
+Bool BoCA::DecoderVorbis::ReadPacket(AS::MuxerComponent *muxer)
+{
+	/* Read next packet from Ogg stream.
+	 */
+	Int64	 position   = 0;
+	Int	 flags	    = 0;
+	Int	 packetSize = muxer->ReadPacket(packetBuffer, position, flags);
+
+	if (packetSize < 0) return False;
+
+	/* Fill packet structure for Vorbis decoder.
+	 */
+	op.packet     = packetBuffer;
+	op.bytes      = packetSize;
+	op.b_o_s      = (flags & PACKET_FLAG_BOS) ? 1 : 0;
+	op.e_o_s      = (flags & PACKET_FLAG_EOS) ? 1 : 0;
+	op.granulepos = position;
+	op.packetno   = packetNumber++;
+
+	return True;
+}
+
+BoCA::AS::MuxerComponent *BoCA::DecoderVorbis::OpenMuxer(Driver *ioDriver) const
+{
+	/* Create Ogg muxer and open stream.
+	 */
+	AS::Registry		&boca  = AS::Registry::Get();
+	AS::MuxerComponent	*muxer = (AS::MuxerComponent *) boca.CreateComponentByID("ogg-mux");
+
+	if (muxer == NIL) return NIL;
+
+	muxer->SetConfiguration(GetConfiguration());
+	muxer->SetDriver(ioDriver);
+
+	if (!muxer->Open(MUXER_MODE_READ))
+	{
+		boca.DeleteComponent(muxer);
+
+		return NIL;
+	}
+
+	return muxer;
+}
+
+Void BoCA::DecoderVorbis::CloseMuxer(AS::MuxerComponent *muxer) const
+{
+	if (muxer == NIL) return;
+
+	muxer->Close();
+
+	AS::Registry::Get().DeleteComponent(muxer);
 }

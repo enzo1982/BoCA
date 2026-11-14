@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@ const String &BoCA::EncoderSpeex::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (oggdll != NIL && speexdll != NIL)
+	if (speexdll != NIL && AS::Registry::Get().ComponentExists("ogg-mux"))
 	{
 		componentSpecs = "									\
 													\
@@ -71,13 +71,11 @@ const String &BoCA::EncoderSpeex::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
-	LoadOggDLL();
 	LoadSpeexDLL();
 }
 
 Void smooth::DetachDLL()
 {
-	FreeOggDLL();
 	FreeSpeexDLL();
 }
 
@@ -85,6 +83,8 @@ BoCA::EncoderSpeex::EncoderSpeex()
 {
 	configLayer  = NIL;
 	config	     = NIL;
+
+	muxer	     = NIL;
 
 	frameSize    = 0;
 	lookAhead    = 0;
@@ -95,10 +95,6 @@ BoCA::EncoderSpeex::EncoderSpeex()
 	totalSamples = 0;
 
 	nextWorker   = 0;
-
-	memset(&os, 0, sizeof(os));
-	memset(&og, 0, sizeof(og));
-	memset(&op, 0, sizeof(op));
 }
 
 BoCA::EncoderSpeex::~EncoderSpeex()
@@ -119,11 +115,30 @@ Bool BoCA::EncoderSpeex::Activate()
 
 	ConvertArguments(config);
 
-	/* Init Ogg stream.
+	/* Create Ogg muxer.
 	 */
-	Math::RandomSeed();
+	AS::Registry	&boca = AS::Registry::Get();
 
-	ex_ogg_stream_init(&os, Math::Random());
+	muxer = (AS::MuxerComponent *) boca.CreateComponentByID("ogg-mux");
+
+	if (muxer != NIL)
+	{
+		muxer->SetConfiguration(config);
+		muxer->SetAudioTrackInfo(track);
+		muxer->SetDriver(driver);
+
+		muxer->SetCodec(MUXER_CODEC_SPEEX);
+		muxer->SetTimeScale(format.rate);
+	}
+
+	if (muxer == NIL || !muxer->Open(MUXER_MODE_WRITE))
+	{
+		if (muxer != NIL) boca.DeleteComponent(muxer);
+
+		muxer = NIL;
+
+		return False;
+	}
 
 	/* Get Speex mode ID.
 	 */
@@ -163,9 +178,8 @@ Bool BoCA::EncoderSpeex::Activate()
 	 */
 	int		 bytes;
 	unsigned char	*buffer = (unsigned char *) ex_speex_header_to_packet(&speex_header, &bytes);
-	ogg_packet	 header = { buffer, bytes, 1, 0, 0, 0 };
 
-	ex_ogg_stream_packetin(&os, &header);
+	muxer->WritePacket(buffer, bytes, 0, PACKET_FLAG_HEADER | PACKET_FLAG_BOS);
 
 	ex_speex_header_free(buffer);
 
@@ -197,12 +211,8 @@ Bool BoCA::EncoderSpeex::Activate()
 			boca.DeleteComponent(tagger);
 		}
 
-		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, 0 };
-
-		ex_ogg_stream_packetin(&os, &header_comm);
+		muxer->WritePacket(vcBuffer, vcBuffer.Size(), 0, PACKET_FLAG_HEADER | PACKET_FLAG_FLUSH);
 	}
-
-	WriteOggPackets(True);
 
 	/* Get number of threads to use.
 	 */
@@ -232,11 +242,13 @@ Bool BoCA::EncoderSpeex::Deactivate()
 	 */
 	EncodeFrames(True);
 
-	/* Write any remaining Ogg packets.
+	/* Write any remaining Ogg packets and close muxer.
 	 */
-	WriteOggPackets(True);
+	muxer->Close();
 
-	ex_ogg_stream_clear(&os);
+	AS::Registry::Get().DeleteComponent(muxer);
+
+	muxer = NIL;
 
 	/* Tear down worker threads.
 	 */
@@ -358,6 +370,7 @@ Int BoCA::EncoderSpeex::EncodeFrames(Bool flush)
 Int BoCA::EncoderSpeex::ProcessPackets(const Buffer<unsigned char> &packets, const Array<Int> &packetSizes, Bool first, Bool flush, Int nullSamples)
 {
 	Int	 offset = 0;
+	Int	 bytes	= 0;
 
 	if (!first) for (Int i = 0; i < overlap; i++) offset += packetSizes.GetNth(i);
 
@@ -368,39 +381,14 @@ Int BoCA::EncoderSpeex::ProcessPackets(const Buffer<unsigned char> &packets, con
 
 		totalSamples += frameSize;
 
-		op.packet     = packets + offset;
-		op.bytes      = packetSizes.GetNth(i);
-		op.b_o_s      = first && i == 0;
-		op.e_o_s      = flush && i == packetSizes.Length() - 1;
-		op.granulepos =  (flush && i == packetSizes.Length() - 1) ? totalSamples	     - nullSamples :
-				((flush && i == packetSizes.Length() - 2) ? totalSamples + frameSize - nullSamples - lookAhead : totalSamples - lookAhead);
-		op.packetno   = 0;
+		Bool	 last	  = flush && i == packetSizes.Length() - 1;
+		Int64	 position =  (flush && i == packetSizes.Length() - 1) ? totalSamples		 - nullSamples :
+				    ((flush && i == packetSizes.Length() - 2) ? totalSamples + frameSize - nullSamples - lookAhead : totalSamples - lookAhead);
 
-		ex_ogg_stream_packetin(&os, &op);	
+		bytes += muxer->WritePacket(packets + offset, packetSizes.GetNth(i), position, last ? PACKET_FLAG_EOS | PACKET_FLAG_FLUSH : PACKET_FLAG_NONE);
 
 		offset += packetSizes.GetNth(i);
 	}
-
-	return WriteOggPackets(flush);
-}
-
-Int BoCA::EncoderSpeex::WriteOggPackets(Bool flush)
-{
-	Int	 bytes = 0;
-
-	do
-	{
-		int	 result = 0;
-
-		if (flush) result = ex_ogg_stream_flush(&os, &og);
-		else	   result = ex_ogg_stream_pageout(&os, &og);
-
-		if (result == 0) break;
-
-		bytes += driver->WriteData(og.header, og.header_len);
-		bytes += driver->WriteData(og.body, og.body_len);
-	}
-	while (true);
 
 	return bytes;
 }

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ const String &BoCA::EncoderVorbis::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (oggdll != NIL && vorbisdll != NIL && vorbisencdll != NIL)
+	if (vorbisdll != NIL && vorbisencdll != NIL && AS::Registry::Get().ComponentExists("ogg-mux"))
 	{
 		componentSpecs = "									\
 													\
@@ -59,13 +59,11 @@ const String &BoCA::EncoderVorbis::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
-	LoadOggDLL();
 	LoadVorbisDLL();
 }
 
 Void smooth::DetachDLL()
 {
-	FreeOggDLL();
 	FreeVorbisDLL();
 }
 
@@ -74,8 +72,8 @@ BoCA::EncoderVorbis::EncoderVorbis()
 	configLayer = NIL;
 	config	    = NIL;
 
-	memset(&os, 0, sizeof(os));
-	memset(&og, 0, sizeof(og));
+	muxer	    = NIL;
+
 	memset(&op, 0, sizeof(op));
 
 	memset(&vi, 0, sizeof(vi));
@@ -113,12 +111,6 @@ Bool BoCA::EncoderVorbis::Activate()
 	Int	 minBitrate    = config->GetIntValue(ConfigureVorbis::ConfigID, "MinBitrate", 32);
 	Int	 maxBitrate    = config->GetIntValue(ConfigureVorbis::ConfigID, "MaxBitrate", 320);
 
-	/* Init Ogg stream.
-	 */
-	Math::RandomSeed();
-
-	ex_ogg_stream_init(&os, Math::Random());
-
 	/* Create and configure Vorbis encoder.
 	 */
 	const Format	&format = track.GetFormat();
@@ -150,6 +142,35 @@ Bool BoCA::EncoderVorbis::Activate()
 		return False;
 	}
 
+	/* Create Ogg muxer.
+	 */
+	{
+		AS::Registry	&boca = AS::Registry::Get();
+
+		muxer = (AS::MuxerComponent *) boca.CreateComponentByID("ogg-mux");
+
+		if (muxer != NIL)
+		{
+			muxer->SetConfiguration(config);
+			muxer->SetAudioTrackInfo(track);
+			muxer->SetDriver(driver);
+
+			muxer->SetCodec(MUXER_CODEC_VORBIS);
+			muxer->SetTimeScale(format.rate);
+		}
+
+		if (muxer == NIL || !muxer->Open(MUXER_MODE_WRITE))
+		{
+			if (muxer != NIL) boca.DeleteComponent(muxer);
+
+			muxer = NIL;
+
+			ex_vorbis_info_clear(&vi);
+
+			return False;
+		}
+	}
+
 	ex_vorbis_comment_init(&vc);
 	ex_vorbis_analysis_init(&vd, &vi);
 	ex_vorbis_block_init(&vd, &vb);
@@ -160,7 +181,7 @@ Bool BoCA::EncoderVorbis::Activate()
 
 	ex_vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
 
-	ex_ogg_stream_packetin(&os, &header); /* automatically placed in its own page */
+	muxer->WritePacket(header.packet, header.bytes, 0, PACKET_FLAG_HEADER | PACKET_FLAG_BOS); /* automatically placed in its own page */
 
 	/* Write Vorbis Comment header
 	 */
@@ -198,14 +219,10 @@ Bool BoCA::EncoderVorbis::Activate()
 		vcBuffer[0] = 3;
 		vcBuffer[vcBuffer.Size() - 1] = 1;
 
-		ogg_packet	 header_comm2 = { vcBuffer, vcBuffer.Size(), 0, 0, 0, 1 };
-
-		ex_ogg_stream_packetin(&os, &header_comm2);
+		muxer->WritePacket(vcBuffer, vcBuffer.Size(), 0, PACKET_FLAG_HEADER);
 	}
 
-	ex_ogg_stream_packetin(&os, &header_code);
-
-	WriteOggPackets(True);
+	muxer->WritePacket(header_code.packet, header_code.bytes, 0, PACKET_FLAG_HEADER | PACKET_FLAG_FLUSH);
 
 	return True;
 }
@@ -223,9 +240,7 @@ Bool BoCA::EncoderVorbis::Deactivate()
 
 		while (ex_vorbis_bitrate_flushpacket(&vd, &op))
 		{
-			ex_ogg_stream_packetin(&os, &op);
-
-			WriteOggPackets(False);
+			muxer->WritePacket(op.packet, op.bytes, op.granulepos, op.e_o_s ? PACKET_FLAG_EOS : PACKET_FLAG_NONE);
 		}
 	}
 
@@ -234,7 +249,13 @@ Bool BoCA::EncoderVorbis::Deactivate()
 	ex_vorbis_comment_clear(&vc);
 	ex_vorbis_info_clear(&vi);
 
-	ex_ogg_stream_clear(&os);
+	/* Close Ogg muxer.
+	 */
+	muxer->Close();
+
+	AS::Registry::Get().DeleteComponent(muxer);
+
+	muxer = NIL;
 
 	/* Fix chapter marks in Vorbis Comments.
 	 */
@@ -292,34 +313,11 @@ Int BoCA::EncoderVorbis::WriteData(Buffer<UnsignedByte> &data)
 
 		while (ex_vorbis_bitrate_flushpacket(&vd, &op))
 		{
-			ex_ogg_stream_packetin(&os, &op);
-
-			dataLength += WriteOggPackets(False);
+			dataLength += muxer->WritePacket(op.packet, op.bytes, op.granulepos, op.e_o_s ? PACKET_FLAG_EOS : PACKET_FLAG_NONE);
 		}
 	}
 
 	return dataLength;
-}
-
-Int BoCA::EncoderVorbis::WriteOggPackets(Bool flush)
-{
-	Int	 bytes = 0;
-
-	do
-	{
-		int	 result = 0;
-
-		if (flush) result = ex_ogg_stream_flush(&os, &og);
-		else	   result = ex_ogg_stream_pageout(&os, &og);
-
-		if (result == 0) break;
-
-		bytes += driver->WriteData(og.header, og.header_len);
-		bytes += driver->WriteData(og.body, og.body_len);
-	}
-	while (true);
-
-	return bytes;
 }
 
 String BoCA::EncoderVorbis::GetOutputFileExtension() const

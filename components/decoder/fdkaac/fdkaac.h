@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,11 +20,9 @@ namespace BoCA
 	class DecoderFDKAAC : public CS::DecoderComponent
 	{
 		private:
-			MP4FileHandle			 mp4File;
-			HANDLE_AACDECODER		 handle;
+			AS::MuxerComponent		*muxer;
 
-			MP4TrackId			 mp4Track;
-			MP4SampleId			 sampleId;
+			HANDLE_AACDECODER		 handle;
 
 			Bool				 finished;
 
@@ -41,7 +39,10 @@ namespace BoCA
 			Buffer<unsigned char>		 dataBuffer;
 			Buffer<short>			 samplesBuffer;
 
-			Bool				 ReadGaplessInfo(MP4FileHandle, Int &, Int &, Int64 &) const;
+			AS::MuxerComponent		*OpenMuxer(IO::Driver *) const;
+			Void				 CloseMuxer(AS::MuxerComponent *) const;
+
+			Int				 GetAudioObjectType(const Buffer<UnsignedByte> &) const;
 
 			Bool				 SkipID3v2Tag(IO::InStream &);
 			Bool				 SyncOnAACHeader(IO::InStream &);

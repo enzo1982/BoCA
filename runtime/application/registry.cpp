@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 #include <boca/application/deviceinfocomponent.h>
 #include <boca/application/dspcomponent.h>
 #include <boca/application/extensioncomponent.h>
+#include <boca/application/muxercomponent.h>
 #include <boca/application/outputcomponent.h>
 #include <boca/application/playlistcomponent.h>
 #include <boca/application/taggercomponent.h>
@@ -60,8 +61,18 @@ BoCA::AS::Registry::Registry()
 
 	debug->Write("Initializing BoCA...");
 
-	/* Load available components.
+	/* Make the registry available to components
+	 * querying it while their specs are loaded.
 	 */
+	registry = this;
+
+	/* Load available components by type.
+	 *
+	 * Muxer components are loaded first, so codec
+	 * components can check for their existence.
+	 */
+	static const char	*componentTypes[] = { "muxer", "decoder", "deviceinfo", "dsp", "encoder", "extension", "output", "playlist", "tagger", "verifier", NIL };
+
 	Config	*configuration	   = Config::Get();
 
 	String	 bocaPrefix	   = "boca";
@@ -70,16 +81,21 @@ BoCA::AS::Registry::Registry()
 	String	 bocaDirectory	   = Utilities::GetBoCADirectory();
 	String	 configDirectory   = String(configuration->configDir).Append(bocaPrefix).Append(Directory::GetDirectoryDelimiter());
 
-	if (configDirectory != bocaDirectory) LoadComponents(configDirectory, bocaPrefix);
-
-	LoadComponents(bocaDirectory, bocaPrefix);
-
-	if (applicationPrefix != NIL && applicationPrefix != bocaPrefix)
+	for (Int i = 0; componentTypes[i] != NIL; i++)
 	{
-		if (configDirectory != bocaDirectory) LoadComponents(configDirectory, applicationPrefix);
+		const String	 type = componentTypes[i];
 
-		LoadComponents(bocaDirectory, applicationPrefix);
-		LoadComponents(String(bocaDirectory).Append("..").Append(Directory::GetDirectoryDelimiter()).Append(applicationPrefix), applicationPrefix);
+		if (configDirectory != bocaDirectory) LoadComponents(configDirectory, bocaPrefix, type);
+
+		LoadComponents(bocaDirectory, bocaPrefix, type);
+
+		if (applicationPrefix != NIL && applicationPrefix != bocaPrefix)
+		{
+			if (configDirectory != bocaDirectory) LoadComponents(configDirectory, applicationPrefix, type);
+
+			LoadComponents(bocaDirectory, applicationPrefix, type);
+			LoadComponents(String(bocaDirectory).Append("..").Append(Directory::GetDirectoryDelimiter()).Append(applicationPrefix), applicationPrefix, type);
+		}
 	}
 
 	/* Check which components to use and
@@ -116,18 +132,20 @@ BoCA::AS::Registry::~Registry()
 	foreach (ComponentSpecs *cs, componentSpecs) delete cs;
 }
 
-Void BoCA::AS::Registry::LoadComponents(const Directory &dir, const String &prefix)
+Void BoCA::AS::Registry::LoadComponents(const Directory &dir, const String &prefix, const String &type)
 {
 	Protocol	*debug = Protocol::Get("Debug output");
 
-	debug->Write(String("  Querying native components with prefix ").Append(prefix).Append("..."));
+	String	 filePrefix = String(prefix).Append("_").Append(type).Append("_");
+
+	debug->Write(String("  Querying native ").Append(type).Append(" components with prefix ").Append(prefix).Append("..."));
 
 #if defined __WIN32__
-	const Array<File>	&dllFiles = dir.GetFilesByPattern(prefix.Append("_*.dll"));
+	const Array<File>	&dllFiles = dir.GetFilesByPattern(String(filePrefix).Append("*.dll"));
 #elif defined __APPLE__
-	const Array<File>	&dllFiles = dir.GetFilesByPattern(prefix.Append("_*.dylib"));
+	const Array<File>	&dllFiles = dir.GetFilesByPattern(String(filePrefix).Append("*.dylib"));
 #else
-	const Array<File>	&dllFiles = dir.GetFilesByPattern(prefix.Append("_*.so"));
+	const Array<File>	&dllFiles = dir.GetFilesByPattern(String(filePrefix).Append("*.so"));
 #endif
 
 	for (Int i = 0; i < dllFiles.Length(); i++)
@@ -149,9 +167,9 @@ Void BoCA::AS::Registry::LoadComponents(const Directory &dir, const String &pref
 		}
 	}
 
-	debug->Write(String("  Querying script components with prefix ").Append(prefix).Append("..."));
+	debug->Write(String("  Querying script ").Append(type).Append(" components with prefix ").Append(prefix).Append("..."));
 
-	const Array<File>	&xmlFiles = dir.GetFilesByPattern(prefix.Append("_*.xml"));
+	const Array<File>	&xmlFiles = dir.GetFilesByPattern(String(filePrefix).Append("*.xml"));
 
 	for (Int i = 0; i < xmlFiles.Length(); i++)
 	{
@@ -394,6 +412,8 @@ BoCA::AS::Component *BoCA::AS::Registry::CreateComponentByID(const String &id)
 				return new DSPComponent(specs);
 			case COMPONENT_TYPE_EXTENSION:
 				return new ExtensionComponent(specs);
+			case COMPONENT_TYPE_MUXER:
+				return new MuxerComponent(specs);
 			case COMPONENT_TYPE_OUTPUT:
 				return new OutputComponent(specs);
 			case COMPONENT_TYPE_PLAYLIST:

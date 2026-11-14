@@ -4,7 +4,7 @@ BOCA_PATH = ..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
-FOLDERS = decoder deviceinfo dsp encoder extension other output playlist tagger verifier
+FOLDERS = decoder deviceinfo dsp encoder extension muxer other output playlist tagger verifier
 
 .PHONY: $(FOLDERS)
 

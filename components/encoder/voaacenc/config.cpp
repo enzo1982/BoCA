@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2020 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -72,7 +72,7 @@ BoCA::ConfigureVOAAC::ConfigureVOAAC()
 	option_mp4		= new OptionBox("MP4", Point(10, 13), Size(group_mp4->GetWidth() - 21, 0), &fileFormat, 1);
 	option_mp4->onAction.Connect(&ConfigureVOAAC::SetFileFormat, this);
 
-	if (mp4v2dll == NIL)
+	if (!AS::Registry::Get().ComponentExists("mp4-mux"))
 	{
 		option_mp4->Deactivate();
 

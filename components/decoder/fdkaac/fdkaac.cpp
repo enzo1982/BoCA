@@ -13,6 +13,8 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <smooth/io/drivers/driver_ansi.h>
+
 #include "fdkaac.h"
 
 #ifndef CAPF_AAC_USAC
@@ -39,7 +41,7 @@ const String &BoCA::DecoderFDKAAC::GetComponentSpecs()
 											\
 		";
 
-		if (mp4v2dll != NIL)
+		if (AS::Registry::Get().ComponentExists("mp4-mux"))
 		{
 			componentSpecs.Append("						\
 											\
@@ -81,59 +83,57 @@ const String &BoCA::DecoderFDKAAC::GetComponentSpecs()
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadFDKAACDLL();
-	LoadMP4v2DLL();
 }
 
 Void smooth::DetachDLL()
 {
 	FreeFDKAACDLL();
-	FreeMP4v2DLL();
 }
-
-namespace BoCA
-{
-	int64_t	 MP4IO_size(void *);
-	int	 MP4IO_seek(void *, int64_t);
-	int	 MP4IO_read(void *, void *, int64_t, int64_t *);
-
-	static MP4IOCallbacks	 mp4Callbacks = { MP4IO_size, MP4IO_seek, MP4IO_read, NIL, NIL };
-};
 
 Bool BoCA::DecoderFDKAAC::CanOpenStream(const String &streamURI)
 {
 	Bool		 isValidFile = False;
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
-	if (mp4v2dll != NIL && (in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
+	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
-		MP4TrackId	 mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
+		/* Open MP4 file and check for a supported AAC track.
+		 */
+		DriverANSI		 ioDriver(File(streamURI), IS_READ);
+		AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
 
-		if (mp4Track != MP4_INVALID_TRACK_ID && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
+		if (muxer != NIL)
 		{
-			LIB_INFO	 info[FDK_MODULE_LAST];
+			if (muxer->GetCodec() == MUXER_CODEC_AAC)
+			{
+				LIB_INFO	 info[FDK_MODULE_LAST];
 
-			FDKinitLibInfo(info);
-			ex_aacDecoder_GetLibInfo(info);
+				FDKinitLibInfo(info);
+				ex_aacDecoder_GetLibInfo(info);
 
-			UINT	 aacFlags = FDKlibInfo_getCapabilities(info, FDK_AACDEC);
-			UINT	 sbrFlags = FDKlibInfo_getCapabilities(info, FDK_SBRDEC);
+				UINT	 aacFlags = FDKlibInfo_getCapabilities(info, FDK_AACDEC);
+				UINT	 sbrFlags = FDKlibInfo_getCapabilities(info, FDK_SBRDEC);
 
-			Int	 type	  = ex_MP4GetTrackAudioMpeg4Type(mp4File, mp4Track);
+				Buffer<UnsignedByte>	 codecConfig;
 
-			if ((type == AOT_AAC_LC	     && aacFlags & CAPF_AAC_LC	   ) ||
-			    (type == AOT_SBR	     && sbrFlags		   ) ||
-			    (type == AOT_PS	     && sbrFlags & CAPF_SBR_PS_MPEG) ||
-			    (type == AOT_USAC	     && aacFlags & CAPF_AAC_USAC   ) ||
+				muxer->GetCodecConfig(codecConfig);
 
-			    (type == AOT_ER_AAC_LC   && aacFlags & CAPF_ER_AAC_LC  ) ||
-			    (type == AOT_ER_AAC_LD   && aacFlags & CAPF_ER_AAC_LD  ) ||
-			    (type == AOT_ER_AAC_ELD  && aacFlags & CAPF_ER_AAC_ELD ) ||
-			    (type == AOT_ER_AAC_SCAL && aacFlags & CAPF_ER_AAC_SCAL) ||
-			    (type == AOT_ER_BSAC     && aacFlags & CAPF_ER_AAC_BSAC)) isValidFile = True;
+				Int	 type	  = GetAudioObjectType(codecConfig);
+
+				if ((type == AOT_AAC_LC	     && aacFlags & CAPF_AAC_LC	   ) ||
+				    (type == AOT_SBR	     && sbrFlags		   ) ||
+				    (type == AOT_PS	     && sbrFlags & CAPF_SBR_PS_MPEG) ||
+				    (type == AOT_USAC	     && aacFlags & CAPF_AAC_USAC   ) ||
+
+				    (type == AOT_ER_AAC_LC   && aacFlags & CAPF_ER_AAC_LC  ) ||
+				    (type == AOT_ER_AAC_LD   && aacFlags & CAPF_ER_AAC_LD  ) ||
+				    (type == AOT_ER_AAC_ELD  && aacFlags & CAPF_ER_AAC_ELD ) ||
+				    (type == AOT_ER_AAC_SCAL && aacFlags & CAPF_ER_AAC_SCAL) ||
+				    (type == AOT_ER_BSAC     && aacFlags & CAPF_ER_AAC_BSAC)) isValidFile = True;
+			}
+
+			CloseMuxer(muxer);
 		}
-
-		ex_MP4Close(mp4File, 0);
 	}
 	else
 	{
@@ -155,40 +155,42 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 		track.fileSize	= File(streamURI).GetFileSize();
 		track.length	= -1;
 
-		MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
-		MP4TrackId	 mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
+		DriverANSI		 ioDriver(File(streamURI), IS_READ);
+		AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
 
-		if (mp4Track != MP4_INVALID_TRACK_ID && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
+		if (muxer != NIL)
 		{
 			HANDLE_AACDECODER	 handle = ex_aacDecoder_Open(TT_MP4_RAW, 1);
 
 			/* Get codec configuration.
 			 */
-			unsigned char	*escBuffer     = NIL;
-			unsigned int	 escBufferSize = 0;
+			Buffer<UnsignedByte>	 codecConfig;
 
-			ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (uint8_t **) &escBuffer, (uint32_t *) &escBufferSize);
+			muxer->GetCodecConfig(codecConfig);
 
 			/* The FDK bitstream reader reads up to 4 bytes behind the buffer,
 			 * so allocate a larger buffer to prevent access violations.
 			 */
-			unsigned char	*escBuffer2 = new unsigned char [escBufferSize + 4];
+			unsigned int	 escBufferSize = codecConfig.Size();
+			unsigned char	*escBuffer     = new unsigned char [escBufferSize + 4];
 
-			memcpy(escBuffer2, escBuffer, escBufferSize);
+			memcpy(escBuffer, codecConfig, escBufferSize);
 
-			ex_aacDecoder_ConfigRaw(handle, &escBuffer2, &escBufferSize);
+			ex_aacDecoder_ConfigRaw(handle, &escBuffer, &escBufferSize);
 
-			delete [] escBuffer2;
-
-			ex_MP4Free(escBuffer);
+			delete [] escBuffer;
 
 			/* Decode one frame to initialize decoder.
 			 */
-			unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, 1);
-			unsigned char	*buffer	    = new unsigned char [bufferSize + 4];
+			Buffer<UnsignedByte>	 packet;
 
-			ex_MP4ReadSample(mp4File, mp4Track, 1, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL);
+			Int64		 position   = 0;
+			Int		 flags	    = 0;
+			unsigned int	 bufferSize = Math::Max(0, muxer->ReadPacket(packet, position, flags));
 
+			packet.Resize(bufferSize + 4);
+
+			unsigned char	*buffer	    = packet;
 			unsigned int	 bytesValid = bufferSize;
 
 			ex_aacDecoder_Fill(handle, &buffer, &bufferSize, &bytesValid);
@@ -202,7 +204,6 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 			}
 
 			delete [] outputBuffer;
-			delete [] buffer;
 
 			/* Get sample rate and number of channels.
 			 */
@@ -216,9 +217,9 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 				format.rate	= streamInfo->sampleRate;
 				format.channels = streamInfo->numChannels;
 
-				if (format.channels == 2 && ex_MP4GetTrackAudioChannels(mp4File, mp4Track) == 1) format.channels = 1;
+				if (format.channels == 2 && muxer->GetFormatInfo().channels == 1) format.channels = 1;
 
-				track.length	= Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * streamInfo->frameSize;
+				track.length	= muxer->GetNumberOfPackets() * streamInfo->frameSize;
 				track.length   -= streamInfo->frameSize; // To account for encoder delay.
 
 				format.bits	= 16;
@@ -233,13 +234,13 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 			Int	 delay	= 0, padding = 0;
 			Int64	 length	= 0;
 
-			if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * frameSize)
+			if (muxer->GetGaplessInfo(delay, padding, length) && (delay + padding + length) * sbrRatio == muxer->GetNumberOfPackets() * frameSize)
 			{
 				track.length = length * sbrRatio;
 			}
-		}
 
-		ex_MP4Close(mp4File, 0);
+			CloseMuxer(muxer);
+		}
 
 		/* Read MP4 metadata.
 		 */
@@ -376,11 +377,8 @@ Error BoCA::DecoderFDKAAC::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderFDKAAC::DecoderFDKAAC()
 {
-	mp4File		 = NIL;
+	muxer		 = NIL;
 	handle		 = NIL;
-
-	mp4Track	 = MP4_INVALID_TRACK_ID;
-	sampleId	 = 1;
 
 	finished	 = False;
 
@@ -422,37 +420,29 @@ Bool BoCA::DecoderFDKAAC::Activate()
 
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) == 'ftyp')
 	{
-		mp4File	 = ex_MP4ReadCallbacks(&mp4Callbacks, driver);
-		mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
+		muxer = OpenMuxer(driver);
 
-		if (mp4Track == MP4_INVALID_TRACK_ID)
-		{
-			ex_MP4Close(mp4File, 0);
+		if (muxer == NIL) return False;
 
-			return False;
-		}
-
-		handle	 = ex_aacDecoder_Open(TT_MP4_RAW, 1);
+		handle = ex_aacDecoder_Open(TT_MP4_RAW, 1);
 
 		/* Get codec configuration.
 		 */
-		unsigned char	*escBuffer     = NIL;
-		unsigned int	 escBufferSize = 0;
+		Buffer<UnsignedByte>	 codecConfig;
 
-		ex_MP4GetTrackESConfiguration(mp4File, mp4Track, (uint8_t **) &escBuffer, (uint32_t *) &escBufferSize);
+		muxer->GetCodecConfig(codecConfig);
 
 		/* The FDK bitstream reader reads up to 4 bytes behind the buffer,
 		 * so allocate a larger buffer to prevent access violations.
 		 */
-		unsigned char	*escBuffer2 = new unsigned char [escBufferSize + 4];
+		unsigned int	 escBufferSize = codecConfig.Size();
+		unsigned char	*escBuffer     = new unsigned char [escBufferSize + 4];
 
-		memcpy(escBuffer2, escBuffer, escBufferSize);
+		memcpy(escBuffer, codecConfig, escBufferSize);
 
-		ex_aacDecoder_ConfigRaw(handle, &escBuffer2, &escBufferSize);
+		ex_aacDecoder_ConfigRaw(handle, &escBuffer, &escBufferSize);
 
-		delete [] escBuffer2;
-
-		ex_MP4Free(escBuffer);
+		delete [] escBuffer;
 	}
 	else
 	{
@@ -476,23 +466,25 @@ Bool BoCA::DecoderFDKAAC::Deactivate()
 	 */
 	ex_aacDecoder_Close(handle);
 
-	if (mp4File == NIL) return True;
-
 	/* Close MP4 file.
 	 */
-	ex_MP4Close(mp4File, 0);
+	CloseMuxer(muxer);
+
+	muxer = NIL;
 
 	return True;
 }
 
 Bool BoCA::DecoderFDKAAC::Seek(Int64 samplePosition)
 {
-	if (mp4File == NIL) return False;
+	if (muxer == NIL) return False;
 
-	MP4Timestamp	 time = Math::Round(Float(samplePosition) / track.GetFormat().rate * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+	Int64	 time	  = Math::Round(Float(samplePosition) / track.GetFormat().rate * muxer->GetTimeScale());
+	Int64	 position = muxer->SeekPacket(time);
 
-	sampleId	 = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
-	delaySamplesLeft = delaySamples + time - ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
+	if (position < 0) return False;
+
+	delaySamplesLeft = delaySamples + time - position;
 
 	return True;
 }
@@ -509,20 +501,21 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 
 	samplesBuffer.Resize(0);
 
-	if (mp4File != NIL)
+	if (muxer != NIL)
 	{
-		MP4SampleId	 numberOfSamples = ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track);
+		Int64	 numberOfPackets = muxer->GetNumberOfPackets();
 
-		if (sampleId <= numberOfSamples)
+		Int64	 position   = 0;
+		Int	 flags	    = 0;
+		Int	 packetSize = muxer->ReadPacket(dataBuffer, position, flags);
+
+		if (packetSize >= 0)
 		{
-			unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
+			unsigned int	 bufferSize = packetSize;
 
 			dataBuffer.Resize(bufferSize + 4); // + 4 to account for FDK bitstream implementation overreading.
 
 			unsigned char	*buffer	    = dataBuffer;
-
-			if (!ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL)) return -1;
-
 			unsigned int	 bytesValid = bufferSize;
 
 			if (bytesValid > 0)
@@ -554,7 +547,7 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 					Int	 delay	= 0, padding = 0;
 					Int64	 length	= 0;
 
-					if (ReadGaplessInfo(mp4File, delay, padding, length) && (delay + padding + length) * sbrRatio == Int64(numberOfSamples) * frameSize)
+					if (muxer->GetGaplessInfo(delay, padding, length) && (delay + padding + length) * sbrRatio == numberOfPackets * frameSize)
 					{
 						delaySamples	 = delay * sbrRatio;
 						delaySamplesLeft = delaySamples;
@@ -699,40 +692,53 @@ Int BoCA::DecoderFDKAAC::ReadData(Buffer<UnsignedByte> &data)
 	return data.Size();
 }
 
-Bool BoCA::DecoderFDKAAC::ReadGaplessInfo(MP4FileHandle mp4File, Int &delay, Int &padding, Int64 &length) const
+BoCA::AS::MuxerComponent *BoCA::DecoderFDKAAC::OpenMuxer(Driver *ioDriver) const
 {
-	Bool	 result = False;
-
-	/* Look for iTunes metadata with gapless information.
+	/* Create MP4 muxer and open stream.
 	 */
-	MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+	AS::Registry		&boca  = AS::Registry::Get();
+	AS::MuxerComponent	*muxer = (AS::MuxerComponent *) boca.CreateComponentByID("mp4-mux");
 
-	if (items != NIL)
+	if (muxer == NIL) return NIL;
+
+	muxer->SetConfiguration(GetConfiguration());
+	muxer->SetDriver(ioDriver);
+
+	if (!muxer->Open(MUXER_MODE_READ))
 	{
-		if (items->size == 1)
-		{
-			/* Read value as string.
-			 */
-			Buffer<char>	 value(items->elements[0].dataList.elements[0].valueSize + 1);
+		boca.DeleteComponent(muxer);
 
-			memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
-			memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
-
-			/* Parse value string.
-			 */
-			const Array<String>	&values = String(value).Trim().Explode(" ");
-
-			delay	= (Int64) Number::FromHexString(values.GetNth(1));
-			padding	= (Int64) Number::FromHexString(values.GetNth(2));
-			length	= (Int64) Number::FromHexString(values.GetNth(3));
-
-			result = True;
-		}
-
-		ex_MP4ItmfItemListFree(items);
+		return NIL;
 	}
 
-	return result;
+	return muxer;
+}
+
+Void BoCA::DecoderFDKAAC::CloseMuxer(AS::MuxerComponent *muxer) const
+{
+	if (muxer == NIL) return;
+
+	muxer->Close();
+
+	AS::Registry::Get().DeleteComponent(muxer);
+}
+
+Int BoCA::DecoderFDKAAC::GetAudioObjectType(const Buffer<UnsignedByte> &codecConfig) const
+{
+	/* Parse audio object type from MPEG-4 audio specific config.
+	 */
+	if (codecConfig.Size() < 1) return 0;
+
+	Int	 type = (codecConfig[0] >> 3) & 0x1F;
+
+	if (type == 0x1F)
+	{
+		if (codecConfig.Size() < 2) return 0;
+
+		type = 32 + (((codecConfig[0] & 0x07) << 3) | ((codecConfig[1] >> 5) & 0x07));
+	}
+
+	return type;
 }
 
 Bool BoCA::DecoderFDKAAC::SkipID3v2Tag(InStream &in)
@@ -833,31 +839,4 @@ Bool BoCA::DecoderFDKAAC::SyncOnAACHeader(InStream &in)
 	/* No sync. Probably not an AAC file.
 	 */
 	return False;
-}
-
-int64_t BoCA::MP4IO_size(void *handle)
-{
-	Driver	*driver = (Driver *) handle;
-
-	return driver->GetSize();
-}
-
-int BoCA::MP4IO_seek(void *handle, int64_t pos)
-{
-	Driver	*driver = (Driver *) handle;
-
-	if (driver->Seek(pos) == -1) return 1;
-
-	return 0;
-}
-
-int BoCA::MP4IO_read(void *handle, void *buffer, int64_t size, int64_t *nout)
-{
-	Driver	*driver = (Driver *) handle;
-
-	*nout = driver->ReadData((UnsignedByte *) buffer, size);
-
-	if (*nout == 0) return 1;
-
-	return 0;
 }

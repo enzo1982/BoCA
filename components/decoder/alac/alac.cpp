@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -15,7 +15,8 @@
 #endif
 
 #include <smooth.h>
-#include <smooth/dll.h>
+
+#include <smooth/io/drivers/driver_ansi.h>
 
 #include "alac.h"
 
@@ -25,69 +26,48 @@ using namespace smooth::IO;
 
 const String &BoCA::DecoderALAC::GetComponentSpecs()
 {
-	static String	 componentSpecs;
-
-	if (mp4v2dll != NIL)
-	{
-		componentSpecs = "						\
-										\
-		  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
-		  <component>							\
-		    <name>Apple Lossless Decoder</name>				\
-		    <version>1.0</version>					\
-		    <id>alac-dec</id>						\
-		    <type>decoder</type>					\
-		    <replace>alac-decoder-dec</replace>				\
-		    <replace>ffmpeg-alac-dec</replace>				\
-		    <format>							\
-		      <name>Apple Lossless Files</name>				\
-		      <lossless>true</lossless>					\
-		      <extension>m4a</extension>				\
-		      <extension>m4b</extension>				\
-		      <extension>mp4</extension>				\
-		      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
-		    </format>							\
-		  </component>							\
-										\
-		";
-	}
+	static String	 componentSpecs = "				\
+									\
+	  <?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
+	  <component>							\
+	    <name>Apple Lossless Decoder</name>				\
+	    <version>1.0</version>					\
+	    <id>alac-dec</id>						\
+	    <type>decoder</type>					\
+	    <require>mp4-mux</require>					\
+	    <replace>alac-decoder-dec</replace>				\
+	    <replace>ffmpeg-alac-dec</replace>				\
+	    <format>							\
+	      <name>Apple Lossless Files</name>				\
+	      <lossless>true</lossless>					\
+	      <extension>m4a</extension>				\
+	      <extension>m4b</extension>				\
+	      <extension>mp4</extension>				\
+	      <tag id=\"mp4-tag\" mode=\"other\">MP4 Metadata</tag>	\
+	    </format>							\
+	  </component>							\
+									\
+	";
 
 	return componentSpecs;
 }
 
-Void smooth::AttachDLL(Void *instance)
-{
-	LoadMP4v2DLL();
-}
-
-Void smooth::DetachDLL()
-{
-	FreeMP4v2DLL();
-}
-
-namespace BoCA
-{
-	int64_t	 MP4IO_size(void *);
-	int	 MP4IO_seek(void *, int64_t);
-	int	 MP4IO_read(void *, void *, int64_t, int64_t *);
-
-	static MP4IOCallbacks	 mp4Callbacks = { MP4IO_size, MP4IO_seek, MP4IO_read, NIL, NIL };
-};
-
 Bool BoCA::DecoderALAC::CanOpenStream(const String &streamURI)
 {
-	Bool		 isValidFile = False;
 	InStream	 in(STREAM_FILE, streamURI, IS_READ);
 
 	if ((in.InputNumberRaw(8) & 0xFFFFFFFF) != 'ftyp') return False;
 
-	MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
-	MP4TrackId	 mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
+	/* Open MP4 file and check for an ALAC track.
+	 */
+	DriverANSI		 ioDriver(File(streamURI), IS_READ);
+	AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
 
-	if (mp4Track != MP4_INVALID_TRACK_ID && ex_MP4HaveTrackAtom(mp4File, mp4Track, "mdia.minf.stbl.stsd.alac") &&
-						ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0) isValidFile = True;
+	if (muxer == NIL) return False;
 
-	ex_MP4Close(mp4File, 0);
+	Bool	 isValidFile = (muxer->GetCodec() == MUXER_CODEC_ALAC);
+
+	CloseMuxer(muxer);
 
 	return isValidFile;
 }
@@ -102,33 +82,27 @@ Error BoCA::DecoderALAC::GetStreamInfo(const String &streamURI, Track &track)
 	track.fileSize	= File(streamURI).GetFileSize();
 	track.length	= -1;
 
-	MP4FileHandle	 mp4File  = ex_MP4Read(streamURI.ConvertTo("UTF-8"));
-	MP4TrackId	 mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
+	/* Open MP4 file.
+	 */
+	DriverANSI		 ioDriver(File(streamURI), IS_READ);
+	AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
 
-	if (mp4Track != MP4_INVALID_TRACK_ID && ex_MP4GetSampleSize(mp4File, mp4Track, 1) > 0)
+	if (muxer != NIL)
 	{
 		/* Get codec configuration.
 		 */
-		unsigned char	*ascBuffer     = NIL;
-		unsigned int	 ascBufferSize = 0;
+		Buffer<UnsignedByte>	 codecConfig;
 
-		ex_MP4GetTrackBytesProperty(mp4File, mp4Track, "mdia.minf.stbl.stsd.alac.alac.decoderConfig", (uint8_t **) &ascBuffer, (uint32_t *) &ascBufferSize);
-
-		/* Work around a bug in MP4v2 that ignores the version
-		 * and flags bytes at the start of the alac atom.
-		 */
-		Int	 offset = 0;
-
-		if (ascBufferSize == 28 || ascBufferSize == 52) offset = 4;
+		muxer->GetCodecConfig(codecConfig);
 
 		/* Init decoder to get format info.
 		 */
-		if (decoder.Init(ascBuffer + offset, ascBufferSize - offset) == ALAC_noErr)
+		if (decoder.Init(codecConfig, codecConfig.Size()) == ALAC_noErr)
 		{
 			format.rate	= decoder.mConfig.sampleRate;
 			format.channels = decoder.mConfig.numChannels;
 
-			track.length	= ex_MP4GetTrackDuration(mp4File, mp4Track);
+			track.length	= muxer->GetDuration();
 
 			format.bits	= decoder.mConfig.bitDepth;
 		}
@@ -138,8 +112,6 @@ Error BoCA::DecoderALAC::GetStreamInfo(const String &streamURI, Track &track)
 			errorString = "Unsupported audio format";
 		}
 
-		ex_MP4Free(ascBuffer);
-
 		track.SetFormat(format);
 
 		/* Read gapless information.
@@ -147,13 +119,13 @@ Error BoCA::DecoderALAC::GetStreamInfo(const String &streamURI, Track &track)
 		Int	 delay	= 0, padding = 0;
 		Int64	 length	= 0;
 
-		if (ReadGaplessInfo(mp4File, delay, padding, length) && delay == 0 && padding + length == Int64(ex_MP4GetTrackNumberOfSamples(mp4File, mp4Track)) * decoder.mConfig.frameLength)
+		if (muxer->GetGaplessInfo(delay, padding, length) && delay == 0 && padding + length == muxer->GetNumberOfPackets() * decoder.mConfig.frameLength)
 		{
 			track.length = length;
 		}
-	}
 
-	ex_MP4Close(mp4File, 0);
+		CloseMuxer(muxer);
+	}
 
 	/* Read MP4 metadata.
 	 */
@@ -179,10 +151,7 @@ Error BoCA::DecoderALAC::GetStreamInfo(const String &streamURI, Track &track)
 
 BoCA::DecoderALAC::DecoderALAC()
 {
-	mp4File		 = NIL;
-
-	mp4Track	 = MP4_INVALID_TRACK_ID;
-	sampleId	 = 1;
+	muxer		 = NIL;
 
 	skipSamples	 = 0;
 	samplesLeft	 = 0;
@@ -194,39 +163,23 @@ BoCA::DecoderALAC::~DecoderALAC()
 
 Bool BoCA::DecoderALAC::Activate()
 {
-	InStream	 in(STREAM_DRIVER, driver);
+	/* Open MP4 file.
+	 */
+	muxer = OpenMuxer(driver);
 
-	mp4File	 = ex_MP4ReadCallbacks(&mp4Callbacks, driver);
-	mp4Track = ex_MP4FindTrackId(mp4File, 0, MP4_AUDIO_TRACK_TYPE, 0);
-
-	if (mp4Track == MP4_INVALID_TRACK_ID)
-	{
-		ex_MP4Close(mp4File, 0);
-
-		return False;
-	}
+	if (muxer == NIL) return False;
 
 	samplesLeft = track.length;
 
 	/* Get codec configuration.
 	 */
-	unsigned char	*ascBuffer     = NIL;
-	unsigned int	 ascBufferSize = 0;
+	Buffer<UnsignedByte>	 codecConfig;
 
-	ex_MP4GetTrackBytesProperty(mp4File, mp4Track, "mdia.minf.stbl.stsd.alac.alac.decoderConfig", (uint8_t **) &ascBuffer, (uint32_t *) &ascBufferSize);
-
-	/* Work around a bug in MP4v2 that ignores the version
-	 * and flags bytes at the start of the alac atom.
-	 */
-	Int	 offset = 0;
-
-	if (ascBufferSize == 28 || ascBufferSize == 52) offset = 4;
+	muxer->GetCodecConfig(codecConfig);
 
 	/* Init decoder.
 	 */
-	if (decoder.Init(ascBuffer + offset, ascBufferSize - offset) != ALAC_noErr) errorState = True;
-
-	ex_MP4Free(ascBuffer);
+	if (decoder.Init(codecConfig, codecConfig.Size()) != ALAC_noErr) errorState = True;
 
 	return !errorState;
 }
@@ -235,17 +188,21 @@ Bool BoCA::DecoderALAC::Deactivate()
 {
 	/* Close MP4 file.
 	 */
-	ex_MP4Close(mp4File, 0);
+	CloseMuxer(muxer);
+
+	muxer = NIL;
 
 	return True;
 }
 
 Bool BoCA::DecoderALAC::Seek(Int64 samplePosition)
 {
-	MP4Timestamp	 time = Math::Round(Float(samplePosition) / track.GetFormat().rate * ex_MP4GetTrackTimeScale(mp4File, mp4Track));
+	Int64	 time	  = Math::Round(Float(samplePosition) / track.GetFormat().rate * muxer->GetTimeScale());
+	Int64	 position = muxer->SeekPacket(time);
 
-	sampleId    = ex_MP4GetSampleIdFromTime(mp4File, mp4Track, time, true);
-	skipSamples = time - ex_MP4GetSampleTime(mp4File, mp4Track, sampleId);
+	if (position < 0) return False;
+
+	skipSamples = time - position;
 	samplesLeft = track.sampleOffset + track.length - samplePosition;
 
 	return True;
@@ -256,24 +213,24 @@ Int BoCA::DecoderALAC::ReadData(Buffer<UnsignedByte> &data)
 	const Format	&format = track.GetFormat();
 
 	/* Read MP4 sample.
-	 *
-	 * Allocate 4 extra bytes for the buffer as the ALAC decoder always reads
+	 */
+	Int64	 position   = 0;
+	Int	 flags	    = 0;
+	Int	 bufferSize = muxer->ReadPacket(dataBuffer, position, flags);
+
+	if (bufferSize <= 0) return -1;
+
+	/* Allocate 4 extra bytes for the buffer as the ALAC decoder always reads
 	 * 32 bits ahead, even at the end of the sample buffer. The extra bytes
 	 * prevent this from crossing page boundaries, causing access violations.
 	 */
-	unsigned int	 bufferSize = ex_MP4GetSampleSize(mp4File, mp4Track, sampleId);
-
 	dataBuffer.Resize(bufferSize + 4);
-
-	unsigned char	*buffer	    = dataBuffer;
-
-	if (!ex_MP4ReadSample(mp4File, mp4Track, sampleId++, (uint8_t **) &buffer, (uint32_t *) &bufferSize, NIL, NIL, NIL, NIL) || bufferSize == 0) return -1;
 
 	/* Fill ALAC decoder bit buffer.
 	 */
 	BitBuffer	 bits;
 
-	BitBufferInit(&bits, buffer, bufferSize);
+	BitBufferInit(&bits, dataBuffer, bufferSize);
 
 	/* Prepare output buffer and decode samples.
 	 */
@@ -314,65 +271,33 @@ Int BoCA::DecoderALAC::ReadData(Buffer<UnsignedByte> &data)
 	return data.Size();
 }
 
-Bool BoCA::DecoderALAC::ReadGaplessInfo(MP4FileHandle mp4File, Int &delay, Int &padding, Int64 &length) const
+BoCA::AS::MuxerComponent *BoCA::DecoderALAC::OpenMuxer(Driver *ioDriver) const
 {
-	Bool	 result = False;
-
-	/* Look for iTunes metadata with gapless information.
+	/* Create MP4 muxer and open stream.
 	 */
-	MP4ItmfItemList	*items = ex_MP4ItmfGetItemsByMeaning(mp4File, "com.apple.iTunes", "iTunSMPB");
+	AS::Registry		&boca  = AS::Registry::Get();
+	AS::MuxerComponent	*muxer = (AS::MuxerComponent *) boca.CreateComponentByID("mp4-mux");
 
-	if (items != NIL)
+	if (muxer == NIL) return NIL;
+
+	muxer->SetConfiguration(GetConfiguration());
+	muxer->SetDriver(ioDriver);
+
+	if (!muxer->Open(MUXER_MODE_READ))
 	{
-		if (items->size == 1)
-		{
-			/* Read value as string.
-			 */
-			Buffer<char>	 value(items->elements[0].dataList.elements[0].valueSize + 1);
+		boca.DeleteComponent(muxer);
 
-			memset(value, 0, items->elements[0].dataList.elements[0].valueSize + 1);
-			memcpy(value, items->elements[0].dataList.elements[0].value, items->elements[0].dataList.elements[0].valueSize);
-
-			/* Parse value string.
-			 */
-			const Array<String>	&values = String(value).Trim().Explode(" ");
-
-			delay	= (Int64) Number::FromHexString(values.GetNth(1));
-			padding	= (Int64) Number::FromHexString(values.GetNth(2));
-			length	= (Int64) Number::FromHexString(values.GetNth(3));
-
-			result = True;
-		}
-
-		ex_MP4ItmfItemListFree(items);
+		return NIL;
 	}
 
-	return result;
+	return muxer;
 }
 
-int64_t BoCA::MP4IO_size(void *handle)
+Void BoCA::DecoderALAC::CloseMuxer(AS::MuxerComponent *muxer) const
 {
-	Driver	*driver = (Driver *) handle;
+	if (muxer == NIL) return;
 
-	return driver->GetSize();
-}
+	muxer->Close();
 
-int BoCA::MP4IO_seek(void *handle, int64_t pos)
-{
-	Driver	*driver = (Driver *) handle;
-
-	if (driver->Seek(pos) == -1) return 1;
-
-	return 0;
-}
-
-int BoCA::MP4IO_read(void *handle, void *buffer, int64_t size, int64_t *nout)
-{
-	Driver	*driver = (Driver *) handle;
-
-	*nout = driver->ReadData((UnsignedByte *) buffer, size);
-
-	if (*nout == 0) return 1;
-
-	return 0;
+	AS::Registry::Get().DeleteComponent(muxer);
 }

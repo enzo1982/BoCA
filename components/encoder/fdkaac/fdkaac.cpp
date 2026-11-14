@@ -44,7 +44,7 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 														\
 		";
 
-		if (mp4v2dll != NIL)
+		if (AS::Registry::Get().ComponentExists("mp4-mux"))
 		{
 			componentSpecs.Append("									\
 														\
@@ -97,7 +97,7 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 														\
 		");
 
-		if (mp4v2dll != NIL)
+		if (AS::Registry::Get().ComponentExists("mp4-mux"))
 		{
 			componentSpecs.Append("									\
 														\
@@ -126,31 +126,19 @@ const String &BoCA::EncoderFDKAAC::GetComponentSpecs()
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadFDKAACDLL();
-	LoadMP4v2DLL();
 }
 
 Void smooth::DetachDLL()
 {
 	FreeFDKAACDLL();
-	FreeMP4v2DLL();
 }
-
-namespace BoCA
-{
-	int64_t	 MP4IO_size(void *);
-	int	 MP4IO_seek(void *, int64_t);
-	int	 MP4IO_write(void *, const void *, int64_t, int64_t *);
-
-	static MP4IOCallbacks	 mp4Callbacks = { MP4IO_size, MP4IO_seek, NIL, MP4IO_write, NIL };
-};
 
 BoCA::EncoderFDKAAC::EncoderFDKAAC()
 {
 	configLayer  = NIL;
 	config	     = NIL;
 
-	mp4File	     = NIL;
-	mp4Track     = MP4_INVALID_TRACK_ID;
+	muxer	     = NIL;
 
 	frameSize    = 0;
 	granuleSize  = 0;
@@ -199,7 +187,9 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	ConvertArguments(config);
 
-	if (mp4v2dll == NIL) config->SetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", False);
+	AS::Registry	&boca = AS::Registry::Get();
+
+	if (!boca.ComponentExists("mp4-mux")) config->SetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", False);
 
 	Bool	 mp4Container = config->GetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", True);
 	Int	 mpegVersion  = config->GetIntValue(ConfigureFDKAAC::ConfigID, "MPEGVersion", 0);
@@ -277,19 +267,48 @@ Bool BoCA::EncoderFDKAAC::Activate()
 	 */
 	if (mp4Container)
 	{
-		/* Create MP4 file.
+		/* Get codec configuration.
 		 */
-		uint32_t	 flags = (track.length       >= 0xFFFF0000 ||
-					  track.approxLength >= 0xFFFF0000) ? MP4_CREATE_64BIT_DATA | MP4_CREATE_64BIT_TIME : 0;
+		Buffer<UnsignedByte>	 codecConfig;
 
-		mp4File	 = ex_MP4CreateCallbacks(&mp4Callbacks, driver, flags);
-		mp4Track = ex_MP4AddAudioTrack(mp4File, format.rate * granuleSize / frameSize, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
+		if (GetEncoderVersion() >= LIB_VERSION(4, 0, 0))
+		{
+			codecConfig.Resize(aacInfo.confSize);
 
-		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
-		ex_MP4SetTrackIntegerProperty(mp4File, mp4Track, "mdia.minf.stbl.stsd.mp4a.channels", format.channels);
+			memcpy(codecConfig, aacInfo.confBuf, aacInfo.confSize);
+		}
+		else
+		{
+			codecConfig.Resize(aacInfoOld.confSize);
 
-		if (GetEncoderVersion() >= LIB_VERSION(4, 0, 0)) ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfo.confBuf, aacInfo.confSize);
-		else						 ex_MP4SetTrackESConfiguration(mp4File, mp4Track, aacInfoOld.confBuf, aacInfoOld.confSize);
+			memcpy(codecConfig, aacInfoOld.confBuf, aacInfoOld.confSize);
+		}
+
+		/* Create MP4 muxer.
+		 */
+		muxer = (AS::MuxerComponent *) boca.CreateComponentByID("mp4-mux");
+
+		if (muxer != NIL)
+		{
+			muxer->SetConfiguration(config);
+			muxer->SetAudioTrackInfo(track);
+			muxer->SetDriver(driver);
+
+			muxer->SetCodec(MUXER_CODEC_AAC);
+			muxer->SetCodecConfig(codecConfig);
+			muxer->SetTimeScale(format.rate * granuleSize / frameSize);
+		}
+
+		if (muxer == NIL || !muxer->Open(MUXER_MODE_WRITE))
+		{
+			if (muxer != NIL) boca.DeleteComponent(muxer);
+
+			muxer = NIL;
+
+			ex_aacEncClose(&handle);
+
+			return False;
+		}
 
 		totalFrames  = 0;
 		totalSamples = 0;
@@ -299,13 +318,12 @@ Bool BoCA::EncoderFDKAAC::Activate()
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureFDKAAC::ConfigID, "AllowID3v2", False))
+	if (muxer == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureFDKAAC::ConfigID, "AllowID3v2", False))
 	{
 		const Info	&info = track.GetInfo();
 
 		if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
 		{
-			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
 
 			if (tagger != NIL)
@@ -360,39 +378,20 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 	/* Finish MP4 writing.
 	 */
-	if (mp4File != NIL)
+	Bool	 mp4Container = (muxer != NIL);
+
+	if (muxer != NIL)
 	{
-		/* Write iTunes metadata with gapless information.
+		AS::Registry	&boca = AS::Registry::Get();
+
+		/* Write gapless information.
 		 */
-		Float		 sbrRatio   = Float(frameSize) / granuleSize;
-		Int64		 delayValue = Math::Floor(delaySamples / sbrRatio);
-		Int64		 totalValue = Math::Ceil(totalSamples / sbrRatio);
-		MP4ItmfItem	*item	    = ex_MP4ItmfItemAlloc("----", 1);
-		String		 value	    = String().Append(" 00000000")
-						      .Append(" ").Append(Number(delayValue).ToHexString(8).ToUpper())
-						      .Append(" ").Append(Number(totalFrames * granuleSize - totalValue - delayValue).ToHexString(8).ToUpper())
-						      .Append(" ").Append(Number(totalValue).ToHexString(16).ToUpper())
-						      .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
+		Float	 sbrRatio   = Float(frameSize) / granuleSize;
+		Int64	 delayValue = Math::Floor(delaySamples / sbrRatio);
+		Int64	 totalValue = Math::Ceil(totalSamples / sbrRatio);
 
-		item->mean = (char *) "com.apple.iTunes";
-		item->name = (char *) "iTunSMPB";
-
-		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_UTF8;
-		item->dataList.elements[0].value     = (uint8_t *) value.ConvertTo("UTF-8");
-		item->dataList.elements[0].valueSize = value.Length();
-
-		ex_MP4ItmfAddItem(mp4File, item);
-
-		item->mean = NIL;
-		item->name = NIL;
-
-		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_IMPLICIT;
-		item->dataList.elements[0].value     = NIL;
-		item->dataList.elements[0].valueSize = 0;
-
-		ex_MP4ItmfItemFree(item);
-
-		ex_MP4Close(mp4File, 0);
+		muxer->SetGaplessInfo(delayValue, totalFrames * granuleSize - totalValue - delayValue, totalValue);
+		muxer->Close();
 
 		/* Close output file as tagger needs to modify it.
 		 */
@@ -404,7 +403,6 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 		if (config->GetIntValue("Tags", "EnableMP4Metadata", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
 		{
-			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
 
 			if (tagger != NIL)
@@ -419,18 +417,17 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 		{
 			/* Optimize file even when no tags are written.
 			 */
-			String	 tempFile = String(track.outputFile).Append(".temp");
-
-			ex_MP4Optimize(track.outputFile.ConvertTo("UTF-8"), tempFile.ConvertTo("UTF-8"));
-
-			File(track.outputFile).Delete();
-			File(tempFile).Move(track.outputFile);
+			muxer->OptimizeFile(track.outputFile);
 		}
+
+		boca.DeleteComponent(muxer);
+
+		muxer = NIL;
 	}
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (!mp4Container && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -455,7 +452,7 @@ Bool BoCA::EncoderFDKAAC::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureFDKAAC::ConfigID, "AllowID3v2", False))
+	if (!mp4Container && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureFDKAAC::ConfigID, "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
@@ -570,10 +567,10 @@ Int BoCA::EncoderFDKAAC::ProcessPackets(const Buffer<unsigned char> &packets, co
 		if (i <	overlap && !first)	continue;
 		if (packetSizes.GetNth(i) == 0) continue;
 
-		if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) packets + offset, packetSizes.GetNth(i), granuleSize, 0, true);
-		else		    driver->WriteData(packets + offset, packetSizes.GetNth(i));
-
 		totalFrames++;
+
+		if (muxer != NIL) muxer->WritePacket(packets + offset, packetSizes.GetNth(i), totalFrames * granuleSize, PACKET_FLAG_NONE);
+		else		  driver->WriteData(packets + offset, packetSizes.GetNth(i));
 
 		offset	   += packetSizes.GetNth(i);
 		dataLength += packetSizes.GetNth(i);
@@ -586,7 +583,7 @@ Bool BoCA::EncoderFDKAAC::SetOutputFormat(Int n)
 {
 	Config	*config = Config::Get();
 
-	if (n == 0 && mp4v2dll != NIL)
+	if (n == 0 && AS::Registry::Get().ComponentExists("mp4-mux"))
 	{
 		config->SetIntValue(ConfigureFDKAAC::ConfigID, "MP4Container", True);
 		config->SetIntValue(ConfigureFDKAAC::ConfigID, "MPEGVersion", 0);
@@ -676,31 +673,4 @@ ConfigLayer *BoCA::EncoderFDKAAC::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureFDKAAC();
 
 	return configLayer;
-}
-
-int64_t BoCA::MP4IO_size(void *handle)
-{
-	Driver	*driver = (Driver *) handle;
-
-	return driver->GetSize();
-}
-
-int BoCA::MP4IO_seek(void *handle, int64_t pos)
-{
-	Driver	*driver = (Driver *) handle;
-
-	if (driver->Seek(pos) == -1) return 1;
-
-	return 0;
-}
-
-int BoCA::MP4IO_write(void *handle, const void *buffer, int64_t size, int64_t *nout)
-{
-	Driver	*driver = (Driver *) handle;
-
-	*nout = driver->WriteData((const UnsignedByte *) buffer, size);
-
-	if (*nout == 0) return 1;
-
-	return 0;
 }

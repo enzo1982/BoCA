@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -43,7 +43,7 @@ const String &BoCA::DecoderFLAC::GetComponentSpecs()
 												\
 		";
 
-		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 && oggdll != NIL)
+		if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 1 && AS::Registry::Get().ComponentExists("ogg-mux"))
 		{
 			componentSpecs.Append("							\
 												\
@@ -71,13 +71,11 @@ const String &BoCA::DecoderFLAC::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
-	LoadOggDLL();
 	LoadFLACDLL();
 }
 
 Void smooth::DetachDLL()
 {
-	FreeOggDLL();
 	FreeFLACDLL();
 }
 
@@ -110,54 +108,41 @@ Bool BoCA::DecoderFLAC::CanOpenStream(const String &streamURI)
 	if	(fileType == "fLaC") return True;
 	else if (fileType != "OggS") return False;
 
-	if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 0 || oggdll == NIL) return False;
-
-	in.RelSeek(-4);
+	if (*ex_FLAC_API_SUPPORTS_OGG_FLAC == 0) return False;
 
 	/* Check if Ogg FLAC.
 	 */
-	ogg_sync_state		 oy;
-	ogg_stream_state	 os;
-	ogg_page		 og;
-	ogg_packet		 op;
+	AS::Registry		&boca  = AS::Registry::Get();
+	AS::MuxerComponent	*muxer = (AS::MuxerComponent *) boca.CreateComponentByID("ogg-mux");
 
-	ex_ogg_sync_init(&oy);
+	if (muxer == NIL) return False;
 
-	Bool	 result	     = False;
-	Bool	 initialized = False;
+	Bool		 result = False;
+	DriverANSI	 ioDriver(File(streamURI), IS_READ);
 
-	do
+	ioDriver.Seek(in.GetPos() - 4);
+
+	muxer->SetConfiguration(GetConfiguration());
+	muxer->SetDriver(&ioDriver);
+
+	if (muxer->Open(MUXER_MODE_READ))
 	{
-		Int	 size	= Math::Min((Int64) 4096, in.Size() - in.GetPos());
-		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+		Buffer<UnsignedByte>	 packet;
 
-		in.InputData(buffer, size);
+		Int64	 position = 0;
+		Int	 flags	  = 0;
 
-		ex_ogg_sync_wrote(&oy, size);
-
-		if (ex_ogg_sync_pageout(&oy, &og) == 1)
+		if (muxer->ReadPacket(packet, position, flags) >= 6)
 		{
-			ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
-
-			initialized = True;
-
-			ex_ogg_stream_pagein(&os, &og);
-
-			if (ex_ogg_stream_packetout(&os, &op) == 1)
-			{
-				if (op.packet[0] == 0x7F &&
-				    op.packet[1] == 'F' && op.packet[2] == 'L' && op.packet[3] == 'A' && op.packet[4] == 'C' &&
-				    op.packet[5] == 0x01) result = True;
-
-				break;
-			}
+			if (packet[0] == 0x7F &&
+			    packet[1] == 'F' && packet[2] == 'L' && packet[3] == 'A' && packet[4] == 'C' &&
+			    packet[5] == 0x01) result = True;
 		}
+
+		muxer->Close();
 	}
-	while (in.GetPos() < in.Size());
 
-	if (initialized) ex_ogg_stream_clear(&os);
-
-	ex_ogg_sync_clear(&oy);
+	boca.DeleteComponent(muxer);
 
 	return result;
 }

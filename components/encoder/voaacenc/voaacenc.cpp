@@ -35,7 +35,7 @@ const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 														\
 		";
 
-		if (mp4v2dll != NIL)
+		if (AS::Registry::Get().ComponentExists("mp4-mux"))
 		{
 			componentSpecs.Append("									\
 														\
@@ -68,7 +68,7 @@ const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 														\
 		");
 
-		if (mp4v2dll != NIL)
+		if (AS::Registry::Get().ComponentExists("mp4-mux"))
 		{
 			componentSpecs.Append("									\
 														\
@@ -91,31 +91,19 @@ const String &BoCA::EncoderVOAAC::GetComponentSpecs()
 Void smooth::AttachDLL(Void *instance)
 {
 	LoadVOAACEncDLL();
-	LoadMP4v2DLL();
 }
 
 Void smooth::DetachDLL()
 {
 	FreeVOAACEncDLL();
-	FreeMP4v2DLL();
 }
-
-namespace BoCA
-{
-	int64_t	 MP4IO_size(void *);
-	int	 MP4IO_seek(void *, int64_t);
-	int	 MP4IO_write(void *, const void *, int64_t, int64_t *);
-
-	static MP4IOCallbacks	 mp4Callbacks = { MP4IO_size, MP4IO_seek, NIL, MP4IO_write, NIL };
-};
 
 BoCA::EncoderVOAAC::EncoderVOAAC()
 {
 	configLayer  = NIL;
 	config	     = NIL;
 
-	mp4File	     = NIL;
-	mp4Track     = MP4_INVALID_TRACK_ID;
+	muxer	     = NIL;
 
 	handle	     = NIL;
 
@@ -148,12 +136,12 @@ Bool BoCA::EncoderVOAAC::Activate()
 
 	ConvertArguments(config);
 
-	if (mp4v2dll == NIL) config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", False);
+	AS::Registry	&boca = AS::Registry::Get();
+
+	if (!boca.ComponentExists("mp4-mux")) config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", False);
 
 	Bool	 mp4Container = config->GetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
 	Int	 bitrate      = config->GetIntValue(ConfigureVOAAC::ConfigID, "Bitrate", 96);
-
-	if (mp4v2dll == NIL) mp4Container = False;
 
 	/* Create VO AAC encoder.
 	 */
@@ -191,33 +179,49 @@ Bool BoCA::EncoderVOAAC::Activate()
 	 */
 	if (mp4Container)
 	{
-		/* Create MP4 file.
+		/* Get codec configuration.
 		 */
-		uint32_t	 flags = (track.length       >= 0xFFFF0000 ||
-					  track.approxLength >= 0xFFFF0000) ? MP4_CREATE_64BIT_DATA | MP4_CREATE_64BIT_TIME : 0;
+		int			 sampleRateIndex = GetSampleRateIndex(format.rate);
+		Buffer<UnsignedByte>	 codecConfig(2);
 
-		mp4File	 = ex_MP4CreateCallbacks(&mp4Callbacks, driver, flags);
-		mp4Track = ex_MP4AddAudioTrack(mp4File, format.rate, MP4_INVALID_DURATION, MP4_MPEG4_AUDIO_TYPE);
+		codecConfig[0] = uint8_t(		      2 << 3 | sampleRateIndex >> 1);
+		codecConfig[1] = uint8_t((sampleRateIndex & 1) << 7 | format.channels << 3);
 
-		ex_MP4SetAudioProfileLevel(mp4File, 0x0F);
-		ex_MP4SetTrackIntegerProperty(mp4File, mp4Track, "mdia.minf.stbl.stsd.mp4a.channels", format.channels);
+		/* Create MP4 muxer.
+		 */
+		muxer = (AS::MuxerComponent *) boca.CreateComponentByID("mp4-mux");
 
-		int	 sampleRateIndex = GetSampleRateIndex(format.rate);
-		uint8_t	 esConfig[2]	 = { uint8_t(			 2 << 3 | sampleRateIndex >> 1),
-					     uint8_t((sampleRateIndex & 1) << 7 | format.channels << 3) };
+		if (muxer != NIL)
+		{
+			muxer->SetConfiguration(config);
+			muxer->SetAudioTrackInfo(track);
+			muxer->SetDriver(driver);
 
-		ex_MP4SetTrackESConfiguration(mp4File, mp4Track, esConfig, 2);
+			muxer->SetCodec(MUXER_CODEC_AAC);
+			muxer->SetCodecConfig(codecConfig);
+			muxer->SetTimeScale(format.rate);
+		}
+
+		if (muxer == NIL || !muxer->Open(MUXER_MODE_WRITE))
+		{
+			if (muxer != NIL) boca.DeleteComponent(muxer);
+
+			muxer = NIL;
+
+			api.Uninit(handle);
+
+			return False;
+		}
 
 		totalSamples = 0;
 	}
 
 	/* Write ID3v2 tag if requested.
 	 */
-	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureVOAAC::ConfigID, "AllowID3v2", False))
+	if (muxer == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureVOAAC::ConfigID, "AllowID3v2", False))
 	{
 		if (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True)))
 		{
-			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("id3v2-tag");
 
 			if (tagger != NIL)
@@ -247,36 +251,16 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Finish MP4 writing.
 	 */
-	if (mp4File != NIL)
+	Bool	 mp4Container = (muxer != NIL);
+
+	if (muxer != NIL)
 	{
-		/* Write iTunes metadata with gapless information.
+		AS::Registry	&boca = AS::Registry::Get();
+
+		/* Write gapless information.
 		 */
-		MP4ItmfItem	*item  = ex_MP4ItmfItemAlloc("----", 1);
-		String		 value = String().Append(" 00000000")
-						 .Append(" ").Append(Number((Int64) delaySamples).ToHexString(8).ToUpper())
-						 .Append(" ").Append(Number((Int64) frameSize - (delaySamples + totalSamples) % frameSize).ToHexString(8).ToUpper())
-						 .Append(" ").Append(Number((Int64) totalSamples).ToHexString(16).ToUpper())
-						 .Append(" 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000");
-
-		item->mean = (char *) "com.apple.iTunes";
-		item->name = (char *) "iTunSMPB";
-
-		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_UTF8;
-		item->dataList.elements[0].value     = (uint8_t *) value.ConvertTo("UTF-8");
-		item->dataList.elements[0].valueSize = value.Length();
-
-		ex_MP4ItmfAddItem(mp4File, item);
-
-		item->mean = NIL;
-		item->name = NIL;
-
-		item->dataList.elements[0].typeCode  = MP4_ITMF_BT_IMPLICIT;
-		item->dataList.elements[0].value     = NIL;
-		item->dataList.elements[0].valueSize = 0;
-
-		ex_MP4ItmfItemFree(item);
-
-		ex_MP4Close(mp4File, 0);
+		muxer->SetGaplessInfo(delaySamples, frameSize - (delaySamples + totalSamples) % frameSize, totalSamples);
+		muxer->Close();
 
 		/* Close output file as tagger needs to modify it.
 		 */
@@ -288,7 +272,6 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 		if (config->GetIntValue("Tags", "EnableMP4Metadata", True) && (info.HasBasicInfo() || (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))))
 		{
-			AS::Registry		&boca = AS::Registry::Get();
 			AS::TaggerComponent	*tagger = (AS::TaggerComponent *) boca.CreateComponentByID("mp4-tag");
 
 			if (tagger != NIL)
@@ -303,18 +286,17 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 		{
 			/* Optimize file even when no tags are written.
 			 */
-			String	 tempFile = String(track.outputFile).Append(".temp");
-
-			ex_MP4Optimize(track.outputFile.ConvertTo("UTF-8"), tempFile.ConvertTo("UTF-8"));
-
-			File(track.outputFile).Delete();
-			File(tempFile).Move(track.outputFile);
+			muxer->OptimizeFile(track.outputFile);
 		}
+
+		boca.DeleteComponent(muxer);
+
+		muxer = NIL;
 	}
 
 	/* Write ID3v1 tag if requested.
 	 */
-	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v1", False))
+	if (!mp4Container && config->GetIntValue("Tags", "EnableID3v1", False))
 	{
 		const Info	&info = track.GetInfo();
 
@@ -339,7 +321,7 @@ Bool BoCA::EncoderVOAAC::Deactivate()
 
 	/* Update ID3v2 tag with correct chapter marks.
 	 */
-	if (mp4File == NIL && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureVOAAC::ConfigID, "AllowID3v2", False))
+	if (!mp4Container && config->GetIntValue("Tags", "EnableID3v2", True) && config->GetIntValue(ConfigureVOAAC::ConfigID, "AllowID3v2", False))
 	{
 		if (track.tracks.Length() > 0 && config->GetIntValue("Tags", "WriteChapters", True))
 		{
@@ -429,8 +411,8 @@ Int BoCA::EncoderVOAAC::EncodeFrames(Bool flush)
 		{
 			dataLength += output.Length;
 
-			if (mp4File != NIL) ex_MP4WriteSample(mp4File, mp4Track, (uint8_t *) (unsigned char *) outBuffer, output.Length, frameSize, 0, true);
-			else		    driver->WriteData(outBuffer, output.Length);
+			if (muxer != NIL) muxer->WritePacket(outBuffer, output.Length, muxer->GetDuration() + frameSize, PACKET_FLAG_NONE);
+			else		  driver->WriteData(outBuffer, output.Length);
 		}
 
 		framesProcessed++;
@@ -460,7 +442,7 @@ Bool BoCA::EncoderVOAAC::SetOutputFormat(Int n)
 {
 	Config	*config = Config::Get();
 
-	if (n == 0 && mp4v2dll != NIL) config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
+	if (n == 0 && AS::Registry::Get().ComponentExists("mp4-mux")) config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", True);
 	else			       config->SetIntValue(ConfigureVOAAC::ConfigID, "MP4Container", False);
 
 	return True;
@@ -522,31 +504,4 @@ ConfigLayer *BoCA::EncoderVOAAC::GetConfigurationLayer()
 	if (configLayer == NIL) configLayer = new ConfigureVOAAC();
 
 	return configLayer;
-}
-
-int64_t BoCA::MP4IO_size(void *handle)
-{
-	Driver	*driver = (Driver *) handle;
-
-	return driver->GetSize();
-}
-
-int BoCA::MP4IO_seek(void *handle, int64_t pos)
-{
-	Driver	*driver = (Driver *) handle;
-
-	if (driver->Seek(pos) == -1) return 1;
-
-	return 0;
-}
-
-int BoCA::MP4IO_write(void *handle, const void *buffer, int64_t size, int64_t *nout)
-{
-	Driver	*driver = (Driver *) handle;
-
-	*nout = driver->WriteData((const UnsignedByte *) buffer, size);
-
-	if (*nout == 0) return 1;
-
-	return 0;
 }

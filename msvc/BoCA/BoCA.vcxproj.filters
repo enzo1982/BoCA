@@ -213,8 +213,14 @@
     <ClCompile Include="..\..\runtime\application\playlistcomponent.cpp">
       <Filter>Quelldateien\application</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\runtime\component\muxercomponent.cpp">
+      <Filter>Quelldateien\component</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\runtime\component\verifiercomponent.cpp">
       <Filter>Quelldateien\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtime\application\muxercomponent.cpp">
+      <Filter>Quelldateien\application</Filter>
     </ClCompile>
     <ClCompile Include="..\..\runtime\application\verifiercomponent.cpp">
       <Filter>Quelldateien\application</Filter>
@@ -371,8 +377,14 @@
     <ClInclude Include="..\..\include\boca\application\playlistcomponent.h">
       <Filter>Headerdateien\boca\application</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\boca\component\muxercomponent.h">
+      <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\boca\component\verifiercomponent.h">
       <Filter>Headerdateien\boca\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\application\muxercomponent.h">
+      <Filter>Headerdateien\boca\application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\boca\application\verifiercomponent.h">
       <Filter>Headerdateien\boca\application</Filter>
@@ -384,6 +396,9 @@
       <Filter>Headerdateien\boca\common\metadata</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\boca\common\formatconverter.h">
+      <Filter>Headerdateien\boca\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\boca\common\muxer.h">
       <Filter>Headerdateien\boca\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\boca\application\streamcomponent.h">

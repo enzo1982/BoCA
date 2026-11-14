@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -23,16 +23,14 @@ namespace BoCA
 			ConfigLayer		*configLayer;
 			Config			*config;
 
-			ogg_stream_state	 os;
-			ogg_page		 og;
+			AS::MuxerComponent	*muxer;
+
 			ogg_packet		 op;
 
 			vorbis_info		 vi;
 			vorbis_comment		 vc;
 			vorbis_dsp_state	 vd;
 			vorbis_block		 vb;
-
-			Int			 WriteOggPackets(Bool);
 
 			static Bool		 ConvertArguments(Config *);
 		public:

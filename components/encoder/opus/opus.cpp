@@ -22,7 +22,7 @@ const String &BoCA::EncoderOpus::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (oggdll != NIL && opusdll != NIL)
+	if (opusdll != NIL && AS::Registry::Get().ComponentExists("ogg-mux"))
 	{
 		componentSpecs = "										\
 														\
@@ -75,13 +75,11 @@ const String &BoCA::EncoderOpus::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
-	LoadOggDLL();
 	LoadOpusDLL();
 }
 
 Void smooth::DetachDLL()
 {
-	FreeOggDLL();
 	FreeOpusDLL();
 }
 
@@ -111,6 +109,7 @@ BoCA::EncoderOpus::EncoderOpus()
 	config		= NIL;
 
 	converter	= NIL;
+	muxer		= NIL;
 
 	frameSize	= 0;
 	preSkip		= 0;
@@ -121,10 +120,6 @@ BoCA::EncoderOpus::EncoderOpus()
 	totalSamples	= 0;
 
 	nextWorker	= 0;
-
-	memset(&os, 0, sizeof(os));
-	memset(&og, 0, sizeof(og));
-	memset(&op, 0, sizeof(op));
 }
 
 BoCA::EncoderOpus::~EncoderOpus()
@@ -177,11 +172,32 @@ Bool BoCA::EncoderOpus::Activate()
 		return False;
 	}
 
-	/* Init Ogg stream.
+	/* Create Ogg muxer.
 	 */
-	Math::RandomSeed();
+	AS::Registry	&boca = AS::Registry::Get();
 
-	ex_ogg_stream_init(&os, Math::Random());
+	muxer = (AS::MuxerComponent *) boca.CreateComponentByID("ogg-mux");
+
+	if (muxer != NIL)
+	{
+		muxer->SetConfiguration(config);
+		muxer->SetAudioTrackInfo(track);
+		muxer->SetDriver(driver);
+
+		muxer->SetCodec(MUXER_CODEC_OPUS);
+		muxer->SetTimeScale(48000);
+	}
+
+	if (muxer == NIL || !muxer->Open(MUXER_MODE_WRITE))
+	{
+		if (muxer != NIL) boca.DeleteComponent(muxer);
+
+		muxer = NIL;
+
+		delete converter;
+
+		return False;
+	}
 
 	/* Create Opus header.
 	 */
@@ -230,9 +246,7 @@ Bool BoCA::EncoderOpus::Activate()
 
 	/* Write header packet.
 	 */
-	ogg_packet	 header = { (unsigned char *) &setup, 19 + (setup.channel_mapping == 0 ? 0 : 2 + setup.nb_channels), 1, 0, 0, 0 };
-
-	ex_ogg_stream_packetin(&os, &header);
+	muxer->WritePacket((const UnsignedByte *) &setup, 19 + (setup.channel_mapping == 0 ? 0 : 2 + setup.nb_channels), 0, PACKET_FLAG_HEADER | PACKET_FLAG_BOS);
 
 	/* Write Vorbis Comment header
 	 */
@@ -272,12 +286,8 @@ Bool BoCA::EncoderOpus::Activate()
 		memmove(vcBuffer + 8, vcBuffer, vcBuffer.Size() - 8);
 		memcpy(vcBuffer, "OpusTags", 8);
 
-		ogg_packet	 header_comm = { vcBuffer, vcBuffer.Size(), 0, 0, 0, 0 };
-
-		ex_ogg_stream_packetin(&os, &header_comm);
+		muxer->WritePacket(vcBuffer, vcBuffer.Size(), 0, PACKET_FLAG_HEADER | PACKET_FLAG_FLUSH);
 	}
-
-	WriteOggPackets(True);
 
 	/* Get number of threads to use.
 	 */
@@ -323,11 +333,13 @@ Bool BoCA::EncoderOpus::Deactivate()
 	 */
 	EncodeFrames(True);
 
-	/* Write any remaining Ogg packets.
+	/* Write any remaining Ogg packets and close muxer.
 	 */
-	WriteOggPackets(True);
+	muxer->Close();
 
-	ex_ogg_stream_clear(&os);
+	AS::Registry::Get().DeleteComponent(muxer);
+
+	muxer = NIL;
 
 	/* Tear down worker threads.
 	 */
@@ -465,6 +477,7 @@ Int BoCA::EncoderOpus::EncodeFrames(Bool flush)
 Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, const Array<Int> &packetSizes, Bool first, Bool flush, Int nullSamples)
 {
 	Int	 offset = 0;
+	Int	 bytes	= 0;
 
 	if (!first) for (Int i = 0; i < overlap; i++) offset += packetSizes.GetNth(i);
 
@@ -475,38 +488,13 @@ Int BoCA::EncoderOpus::ProcessPackets(const Buffer<unsigned char> &packets, cons
 
 		totalSamples += frameSize;
 
-		op.packet     = packets + offset;
-		op.bytes      = packetSizes.GetNth(i);
-		op.b_o_s      = first && i == 0;
-		op.e_o_s      = flush && i == packetSizes.Length() - 1;
-		op.granulepos = (op.e_o_s ? totalSamples + preSkip - nullSamples : totalSamples) * (48000 / targetFormat.rate);
-		op.packetno   = 0;
+		Bool	 last	  = flush && i == packetSizes.Length() - 1;
+		Int64	 position = (last ? totalSamples + preSkip - nullSamples : totalSamples) * (48000 / targetFormat.rate);
 
-		ex_ogg_stream_packetin(&os, &op);	
+		bytes += muxer->WritePacket(packets + offset, packetSizes.GetNth(i), position, last ? PACKET_FLAG_EOS | PACKET_FLAG_FLUSH : PACKET_FLAG_NONE);
 
 		offset += packetSizes.GetNth(i);
 	}
-
-	return WriteOggPackets(flush);
-}
-
-Int BoCA::EncoderOpus::WriteOggPackets(Bool flush)
-{
-	Int	 bytes = 0;
-
-	do
-	{
-		int	 result = 0;
-
-		if (flush) result = ex_ogg_stream_flush(&os, &og);
-		else	   result = ex_ogg_stream_pageout(&os, &og);
-
-		if (result == 0) break;
-
-		bytes += driver->WriteData(og.header, og.header_len);
-		bytes += driver->WriteData(og.body, og.body_len);
-	}
-	while (true);
 
 	return bytes;
 }

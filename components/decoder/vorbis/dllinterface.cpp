@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -14,21 +14,6 @@
 #include "dllinterface.h"
 
 using namespace BoCA;
-
-OGGSTREAMINIT			 ex_ogg_stream_init		= NIL;
-OGGSTREAMPACKETOUT		 ex_ogg_stream_packetout	= NIL;
-OGGSTREAMPAGEIN			 ex_ogg_stream_pagein		= NIL;
-OGGPAGEEOS			 ex_ogg_page_eos		= NIL;
-OGGPAGESERIALNO			 ex_ogg_page_serialno		= NIL;
-OGGPAGEGRANULEPOS		 ex_ogg_page_granulepos		= NIL;
-OGGSTREAMCLEAR			 ex_ogg_stream_clear		= NIL;
-OGGSYNCINIT			 ex_ogg_sync_init		= NIL;
-OGGSYNCBUFFER			 ex_ogg_sync_buffer		= NIL;
-OGGSYNCWROTE			 ex_ogg_sync_wrote		= NIL;
-OGGSYNCPAGEOUT			 ex_ogg_sync_pageout		= NIL;
-OGGSYNCPAGESEEK			 ex_ogg_sync_pageseek		= NIL;
-OGGSYNCRESET			 ex_ogg_sync_reset		= NIL;
-OGGSYNCCLEAR			 ex_ogg_sync_clear		= NIL;
 
 VORBISINFOINIT			 ex_vorbis_info_init		= NIL;
 VORBISCOMMENTINIT		 ex_vorbis_comment_init		= NIL;
@@ -57,54 +42,9 @@ VORBISINFOCLEAR			 ex_vorbis_info_clear		= NIL;
 DynamicLoader *oggdll		= NIL;
 DynamicLoader *vorbisdll	= NIL;
 
-Bool LoadOggDLL()
-{
-	oggdll = BoCA::Utilities::LoadCodecDLL("ogg");
-
-	if (oggdll == NIL) return False;
-
-	ex_ogg_stream_init	= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
-	ex_ogg_stream_packetout	= (OGGSTREAMPACKETOUT) oggdll->GetFunctionAddress("ogg_stream_packetout");
-	ex_ogg_stream_pagein	= (OGGSTREAMPAGEIN) oggdll->GetFunctionAddress("ogg_stream_pagein");
-	ex_ogg_page_eos		= (OGGPAGEEOS) oggdll->GetFunctionAddress("ogg_page_eos");
-	ex_ogg_page_serialno	= (OGGPAGESERIALNO) oggdll->GetFunctionAddress("ogg_page_serialno");
-	ex_ogg_page_granulepos	= (OGGPAGEGRANULEPOS) oggdll->GetFunctionAddress("ogg_page_granulepos");
-	ex_ogg_stream_clear	= (OGGSTREAMCLEAR) oggdll->GetFunctionAddress("ogg_stream_clear");
-	ex_ogg_sync_init	= (OGGSYNCINIT) oggdll->GetFunctionAddress("ogg_sync_init");
-	ex_ogg_sync_buffer	= (OGGSYNCBUFFER) oggdll->GetFunctionAddress("ogg_sync_buffer");
-	ex_ogg_sync_wrote	= (OGGSYNCWROTE) oggdll->GetFunctionAddress("ogg_sync_wrote");
-	ex_ogg_sync_pageout	= (OGGSYNCPAGEOUT) oggdll->GetFunctionAddress("ogg_sync_pageout");
-	ex_ogg_sync_pageseek	= (OGGSYNCPAGESEEK) oggdll->GetFunctionAddress("ogg_sync_pageseek");
-	ex_ogg_sync_reset	= (OGGSYNCRESET) oggdll->GetFunctionAddress("ogg_sync_reset");
-	ex_ogg_sync_clear	= (OGGSYNCCLEAR) oggdll->GetFunctionAddress("ogg_sync_clear");
-
-	if (ex_ogg_stream_init		== NIL ||
-	    ex_ogg_stream_packetout	== NIL ||
-	    ex_ogg_stream_pagein	== NIL ||
-	    ex_ogg_page_eos		== NIL ||
-	    ex_ogg_page_serialno	== NIL ||
-	    ex_ogg_page_granulepos	== NIL ||
-	    ex_ogg_stream_clear		== NIL ||
-	    ex_ogg_sync_init		== NIL ||
-	    ex_ogg_sync_buffer		== NIL ||
-	    ex_ogg_sync_wrote		== NIL ||
-	    ex_ogg_sync_pageout		== NIL ||
-	    ex_ogg_sync_pageseek	== NIL ||
-	    ex_ogg_sync_reset		== NIL ||
-	    ex_ogg_sync_clear		== NIL) { FreeOggDLL(); return False; }
-
-	return True;
-}
-
-Void FreeOggDLL()
-{
-	BoCA::Utilities::FreeCodecDLL(oggdll);
-
-	oggdll = NIL;
-}
-
 Bool LoadVorbisDLL()
 {
+	oggdll	  = BoCA::Utilities::LoadCodecDLL("ogg");
 	vorbisdll = BoCA::Utilities::LoadCodecDLL("vorbis");
 
 	if (vorbisdll == NIL) return False;
@@ -163,6 +103,8 @@ Bool LoadVorbisDLL()
 Void FreeVorbisDLL()
 {
 	BoCA::Utilities::FreeCodecDLL(vorbisdll);
+	BoCA::Utilities::FreeCodecDLL(oggdll);
 
 	vorbisdll = NIL;
+	oggdll	  = NIL;
 }

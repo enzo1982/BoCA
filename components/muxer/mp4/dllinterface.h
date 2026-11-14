@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2022 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -26,36 +26,70 @@ extern DynamicLoader	*mp4v2dll;
 Bool			 LoadMP4v2DLL();
 Void			 FreeMP4v2DLL();
 
-typedef MP4FileHandle			(*MP4READ)			(const char *);
 typedef MP4FileHandle			(*MP4READCALLBACKS)		(const MP4IOCallbacks *, void *);
+typedef MP4FileHandle			(*MP4CREATECALLBACKS)		(const MP4IOCallbacks *, void *, uint32_t);
 typedef void				(*MP4CLOSE)			(MP4FileHandle, uint32_t);
 typedef void				(*MP4FREE)			(void *);
+typedef bool				(*MP4OPTIMIZE)			(const char *, const char *);
+
 typedef MP4TrackId			(*MP4FINDTRACKID)		(MP4FileHandle, uint16_t, const char *, uint8_t);
-typedef MP4Duration			(*MP4GETTRACKDURATION)		(MP4FileHandle, MP4TrackId);
+typedef MP4TrackId			(*MP4ADDAUDIOTRACK)		(MP4FileHandle, uint32_t, MP4Duration, uint8_t);
+typedef void				(*MP4SETAUDIOPROFILELEVEL)	(MP4FileHandle, uint8_t);
+
 typedef bool				(*MP4HAVETRACKATOM)		(MP4FileHandle, MP4TrackId, const char *);
 typedef bool				(*MP4GETTRACKBYTESPROPERTY)	(MP4FileHandle, MP4TrackId, const char *, uint8_t **, uint32_t *);
+typedef bool				(*MP4SETTRACKINTEGERPROPERTY)	(MP4FileHandle, MP4TrackId, const char *, int64_t);
+
+typedef uint8_t				(*MP4GETTRACKAUDIOMPEG4TYPE)	(MP4FileHandle, MP4TrackId);
+typedef int				(*MP4GETTRACKAUDIOCHANNELS)	(MP4FileHandle, MP4TrackId);
+typedef bool				(*MP4GETTRACKESCONFIGURATION)	(MP4FileHandle, MP4TrackId, uint8_t **, uint32_t *);
+typedef bool				(*MP4SETTRACKESCONFIGURATION)	(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t);
+typedef MP4Duration			(*MP4GETTRACKDURATION)		(MP4FileHandle, MP4TrackId);
 typedef uint32_t			(*MP4GETTRACKTIMESCALE)		(MP4FileHandle, MP4TrackId);
 typedef MP4SampleId			(*MP4GETTRACKNUMBEROFSAMPLES)	(MP4FileHandle, MP4TrackId);
+
 typedef MP4Timestamp			(*MP4GETSAMPLETIME)		(MP4FileHandle, MP4TrackId, MP4SampleId);
 typedef MP4SampleId			(*MP4GETSAMPLEIDFROMTIME)	(MP4FileHandle, MP4TrackId, MP4Timestamp, bool);
 typedef uint32_t			(*MP4GETSAMPLESIZE)		(MP4FileHandle, MP4TrackId, MP4SampleId);
 typedef bool				(*MP4READSAMPLE)		(MP4FileHandle, MP4TrackId, MP4SampleId, uint8_t **, uint32_t *, MP4Timestamp *, MP4Duration *, MP4Duration *, bool *);
+typedef bool				(*MP4WRITESAMPLE)		(MP4FileHandle, MP4TrackId, const uint8_t *, uint32_t, MP4Duration, MP4Duration, bool);
+
+typedef MP4ItmfItem *			(*MP4ITMFITEMALLOC)		(const char *, uint32_t);
+typedef void				(*MP4ITMFITEMFREE)		(MP4ItmfItem *);
+typedef bool				(*MP4ITMFADDITEM)		(MP4FileHandle, const MP4ItmfItem *);
 typedef MP4ItmfItemList *		(*MP4ITMFGETITEMSBYMEANING)	(MP4FileHandle, const char *, const char *);
 typedef void				(*MP4ITMFITEMLISTFREE)		(MP4ItmfItemList *);
 
-extern MP4READ				 ex_MP4Read;
 extern MP4READCALLBACKS			 ex_MP4ReadCallbacks;
+extern MP4CREATECALLBACKS		 ex_MP4CreateCallbacks;
 extern MP4CLOSE				 ex_MP4Close;
 extern MP4FREE				 ex_MP4Free;
+extern MP4OPTIMIZE			 ex_MP4Optimize;
+
 extern MP4FINDTRACKID			 ex_MP4FindTrackId;
-extern MP4GETTRACKDURATION		 ex_MP4GetTrackDuration;
+extern MP4ADDAUDIOTRACK			 ex_MP4AddAudioTrack;
+extern MP4SETAUDIOPROFILELEVEL		 ex_MP4SetAudioProfileLevel;
+
 extern MP4HAVETRACKATOM			 ex_MP4HaveTrackAtom;
 extern MP4GETTRACKBYTESPROPERTY		 ex_MP4GetTrackBytesProperty;
+extern MP4SETTRACKINTEGERPROPERTY	 ex_MP4SetTrackIntegerProperty;
+
+extern MP4GETTRACKAUDIOMPEG4TYPE	 ex_MP4GetTrackAudioMpeg4Type;
+extern MP4GETTRACKAUDIOCHANNELS		 ex_MP4GetTrackAudioChannels;
+extern MP4GETTRACKESCONFIGURATION	 ex_MP4GetTrackESConfiguration;
+extern MP4SETTRACKESCONFIGURATION	 ex_MP4SetTrackESConfiguration;
+extern MP4GETTRACKDURATION		 ex_MP4GetTrackDuration;
 extern MP4GETTRACKTIMESCALE		 ex_MP4GetTrackTimeScale;
 extern MP4GETTRACKNUMBEROFSAMPLES	 ex_MP4GetTrackNumberOfSamples;
+
 extern MP4GETSAMPLETIME			 ex_MP4GetSampleTime;
 extern MP4GETSAMPLEIDFROMTIME		 ex_MP4GetSampleIdFromTime;
 extern MP4GETSAMPLESIZE			 ex_MP4GetSampleSize;
 extern MP4READSAMPLE			 ex_MP4ReadSample;
+extern MP4WRITESAMPLE			 ex_MP4WriteSample;
+
+extern MP4ITMFITEMALLOC			 ex_MP4ItmfItemAlloc;
+extern MP4ITMFITEMFREE			 ex_MP4ItmfItemFree;
+extern MP4ITMFADDITEM			 ex_MP4ItmfAddItem;
 extern MP4ITMFGETITEMSBYMEANING		 ex_MP4ItmfGetItemsByMeaning;
 extern MP4ITMFITEMLISTFREE		 ex_MP4ItmfItemListFree;

@@ -12,10 +12,10 @@ BOCA_PATH = ../../..
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(BOCA_PATH)/Makefile-options
 
 # Enter object files here:
-OBJECTS	  = dllinterface.o alac.o
+OBJECTS	  = alac.o
 
 # Enter additional defines here:
-DEFINE	  = -I"$(SRCDIR)" -I"$(SRCDIR)"/$(BOCA_PATH)/include/support -Wno-multichar
+DEFINE	  = -I"$(SRCDIR)" -Wno-multichar
 
 # Enter additional library dependencies here:
 LIBS	  = alac/libalac.a

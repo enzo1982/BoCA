@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2019 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -30,6 +30,7 @@ using namespace smooth;
 # include "boca/component/deviceinfocomponent.h"
 # include "boca/component/dspcomponent.h"
 # include "boca/component/extensioncomponent.h"
+# include "boca/component/muxercomponent.h"
 # include "boca/component/outputcomponent.h"
 # include "boca/component/playlistcomponent.h"
 # include "boca/component/taggercomponent.h"
@@ -51,6 +52,7 @@ using namespace smooth;
 #include "boca/application/deviceinfocomponent.h"
 #include "boca/application/dspcomponent.h"
 #include "boca/application/extensioncomponent.h"
+#include "boca/application/muxercomponent.h"
 #include "boca/application/outputcomponent.h"
 #include "boca/application/playlistcomponent.h"
 #include "boca/application/taggercomponent.h"
@@ -61,6 +63,7 @@ using namespace smooth;
 #include "boca/common/configlayer.h"
 #include "boca/common/formatconverter.h"
 #include "boca/common/i18n.h"
+#include "boca/common/muxer.h"
 #include "boca/common/protocol.h"
 #include "boca/common/utilities.h"
 
@@ -154,6 +157,39 @@ using namespace smooth;
 	extern "C" {																																\
 		BOCA_EXPORT void *BoCA_##componentName##_GetMainTabLayer(void *component)						{ return ((BoCA::componentName *) component)->getMainTabLayer.Emit(); }									\
 		BOCA_EXPORT void *BoCA_##componentName##_GetStatusBarLayer(void *component)						{ return ((BoCA::componentName *) component)->getStatusBarLayer.Emit(); }								\
+	}
+
+#define BoCA_DEFINE_MUXER_COMPONENT(componentName)																												\
+	extern "C" {																																\
+		BOCA_EXPORT bool BoCA_##componentName##_SetAudioTrackInfo(void *component, const void *track)				{ return ((BoCA::componentName *) component)->SetAudioTrackInfo(*((const BoCA::Track *) track)); }					\
+		BOCA_EXPORT const void *BoCA_##componentName##_GetFormatInfo(void *component)						{ return &((BoCA::componentName *) component)->GetFormatInfo(); }									\
+																																		\
+		BOCA_EXPORT void BoCA_##componentName##_SetDriver(void *component, void *driver)					{ return ((BoCA::componentName *) component)->SetDriver((IO::Driver *) driver); }							\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_Open(void *component, int mode)							{ return ((BoCA::componentName *) component)->Open((BoCA::MuxerMode) mode); }								\
+		BOCA_EXPORT bool BoCA_##componentName##_Close(void *component)								{ return ((BoCA::componentName *) component)->Close(); }										\
+																																		\
+		BOCA_EXPORT int BoCA_##componentName##_GetCodec(const void *component)							{ return ((const BoCA::componentName *) component)->GetCodec(); }									\
+		BOCA_EXPORT bool BoCA_##componentName##_SetCodec(void *component, int codec)						{ return ((BoCA::componentName *) component)->SetCodec((BoCA::MuxerCodec) codec); }							\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_GetCodecConfig(const void *component, void *buffer)				{ return ((const BoCA::componentName *) component)->GetCodecConfig(*((Buffer<UnsignedByte> *) buffer)); }				\
+		BOCA_EXPORT bool BoCA_##componentName##_SetCodecConfig(void *component, const void *buffer)				{ return ((BoCA::componentName *) component)->SetCodecConfig(*((const Buffer<UnsignedByte> *) buffer)); }				\
+																																		\
+		BOCA_EXPORT int BoCA_##componentName##_GetTimeScale(const void *component)						{ return ((const BoCA::componentName *) component)->GetTimeScale(); }									\
+		BOCA_EXPORT bool BoCA_##componentName##_SetTimeScale(void *component, int timeScale)					{ return ((BoCA::componentName *) component)->SetTimeScale(timeScale); }								\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_GetGaplessInfo(const void *component, int *d, int *p, __int64 *l)		{ return ((const BoCA::componentName *) component)->GetGaplessInfo(*((Int *) d), *((Int *) p), *((Int64 *) l)); }			\
+		BOCA_EXPORT bool BoCA_##componentName##_SetGaplessInfo(void *component, int d, int p, __int64 l)			{ return ((BoCA::componentName *) component)->SetGaplessInfo(d, p, l); }								\
+																																		\
+		BOCA_EXPORT __int64 BoCA_##componentName##_GetNumberOfPackets(void *component)						{ return ((BoCA::componentName *) component)->GetNumberOfPackets(); }									\
+		BOCA_EXPORT __int64 BoCA_##componentName##_GetDuration(void *component)							{ return ((BoCA::componentName *) component)->GetDuration(); }										\
+																																		\
+		BOCA_EXPORT __int64 BoCA_##componentName##_SeekPacket(void *component, __int64 position)				{ return ((BoCA::componentName *) component)->SeekPacket(position); }									\
+																																		\
+		BOCA_EXPORT int BoCA_##componentName##_ReadPacket(void *component, void *buffer, __int64 *position, int *flags)		{ return ((BoCA::componentName *) component)->ReadPacket(*((Buffer<UnsignedByte> *) buffer), *((Int64 *) position), *((Int *) flags)); } \
+		BOCA_EXPORT int BoCA_##componentName##_WritePacket(void *component, const unsigned char *d, int s, __int64 p, int f)	{ return ((BoCA::componentName *) component)->WritePacket(d, s, p, f); }								\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_OptimizeFile(void *component, const wchar_t *file)				{ return ((BoCA::componentName *) component)->OptimizeFile(file); }									\
 	}
 
 #define BoCA_DEFINE_OUTPUT_COMPONENT(componentName)																												\

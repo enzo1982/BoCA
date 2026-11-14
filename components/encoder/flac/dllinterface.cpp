@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2025 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -64,11 +64,13 @@ FLAC__METADATA_OBJECT_SEEKTABLE_TEMPLATE_SORT			 ex_FLAC__metadata_object_seekta
 FLAC__VERSION_STRING_TYPE					 ex_FLAC__VERSION_STRING							= NIL;
 FLAC__VENDOR_STRING_TYPE					 ex_FLAC__VENDOR_STRING								= NIL;
 
+DynamicLoader *oggdll	= NIL;
 DynamicLoader *flacdll	= NIL;
 
 Bool LoadFLACDLL()
 {
-	flacdll = BoCA::Utilities::LoadCodecDLL("FLAC");
+	oggdll	= BoCA::Utilities::LoadCodecDLL("ogg");
+	flacdll	= BoCA::Utilities::LoadCodecDLL("FLAC");
 
 	if (flacdll == NIL) return False;
 
@@ -175,6 +177,8 @@ Bool LoadFLACDLL()
 Void FreeFLACDLL()
 {
 	BoCA::Utilities::FreeCodecDLL(flacdll);
+	BoCA::Utilities::FreeCodecDLL(oggdll);
 
-	flacdll = NIL;
+	flacdll	= NIL;
+	oggdll	= NIL;
 }

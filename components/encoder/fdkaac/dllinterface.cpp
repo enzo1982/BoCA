@@ -23,22 +23,7 @@ AACENCGETLIBINFO		 ex_aacEncGetLibInfo		= NIL;
 AACENCODER_GETPARAM		 ex_aacEncoder_GetParam		= NIL;
 AACENCODER_SETPARAM		 ex_aacEncoder_SetParam		= NIL;
 
-MP4CREATECALLBACKS		 ex_MP4CreateCallbacks		= NIL;
-MP4CLOSE			 ex_MP4Close			= NIL;
-MP4OPTIMIZE			 ex_MP4Optimize			= NIL;
-
-MP4SETTRACKESCONFIGURATION	 ex_MP4SetTrackESConfiguration	= NIL;
-MP4SETTRACKINTEGERPROPERTY	 ex_MP4SetTrackIntegerProperty	= NIL;
-MP4SETAUDIOPROFILELEVEL		 ex_MP4SetAudioProfileLevel	= NIL;
-MP4ADDAUDIOTRACK		 ex_MP4AddAudioTrack		= NIL;
-MP4WRITESAMPLE			 ex_MP4WriteSample		= NIL;
-
-MP4ITMFITEMALLOC		 ex_MP4ItmfItemAlloc		= NIL;
-MP4ITMFITEMFREE			 ex_MP4ItmfItemFree		= NIL;
-MP4ITMFADDITEM			 ex_MP4ItmfAddItem		= NIL;
-
 DynamicLoader *fdkaacdll	= NIL;
-DynamicLoader *mp4v2dll		= NIL;
 
 Bool LoadFDKAACDLL()
 {
@@ -70,48 +55,4 @@ Void FreeFDKAACDLL()
 	BoCA::Utilities::FreeCodecDLL(fdkaacdll);
 
 	fdkaacdll = NIL;
-}
-
-Bool LoadMP4v2DLL()
-{
-	mp4v2dll = BoCA::Utilities::LoadCodecDLL("mp4v2");
-
-	if (mp4v2dll == NIL) return False;
-
-	ex_MP4CreateCallbacks		= (MP4CREATECALLBACKS) mp4v2dll->GetFunctionAddress("MP4CreateCallbacks");
-	ex_MP4Close			= (MP4CLOSE) mp4v2dll->GetFunctionAddress("MP4Close");
-	ex_MP4Optimize			= (MP4OPTIMIZE) mp4v2dll->GetFunctionAddress("MP4Optimize");
-
-	ex_MP4SetTrackESConfiguration	= (MP4SETTRACKESCONFIGURATION) mp4v2dll->GetFunctionAddress("MP4SetTrackESConfiguration");
-	ex_MP4SetTrackIntegerProperty	= (MP4SETTRACKINTEGERPROPERTY) mp4v2dll->GetFunctionAddress("MP4SetTrackIntegerProperty");
-	ex_MP4SetAudioProfileLevel	= (MP4SETAUDIOPROFILELEVEL) mp4v2dll->GetFunctionAddress("MP4SetAudioProfileLevel");
-	ex_MP4AddAudioTrack		= (MP4ADDAUDIOTRACK) mp4v2dll->GetFunctionAddress("MP4AddAudioTrack");
-	ex_MP4WriteSample		= (MP4WRITESAMPLE) mp4v2dll->GetFunctionAddress("MP4WriteSample");
-
-	ex_MP4ItmfItemAlloc		= (MP4ITMFITEMALLOC) mp4v2dll->GetFunctionAddress("MP4ItmfItemAlloc");
-	ex_MP4ItmfItemFree		= (MP4ITMFITEMFREE) mp4v2dll->GetFunctionAddress("MP4ItmfItemFree");
-	ex_MP4ItmfAddItem		= (MP4ITMFADDITEM) mp4v2dll->GetFunctionAddress("MP4ItmfAddItem");
-
-	if (ex_MP4CreateCallbacks		== NIL ||
-	    ex_MP4Close				== NIL ||
-	    ex_MP4Optimize			== NIL ||
-
-	    ex_MP4SetTrackESConfiguration	== NIL ||
-	    ex_MP4SetTrackIntegerProperty	== NIL ||
-	    ex_MP4SetAudioProfileLevel		== NIL ||
-	    ex_MP4AddAudioTrack			== NIL ||
-	    ex_MP4WriteSample			== NIL ||
-
-	    ex_MP4ItmfItemAlloc			== NIL ||
-	    ex_MP4ItmfItemFree			== NIL ||
-	    ex_MP4ItmfAddItem			== NIL) { FreeMP4v2DLL(); return False; }
-
-	return True;
-}
-
-Void FreeMP4v2DLL()
-{
-	BoCA::Utilities::FreeCodecDLL(mp4v2dll);
-
-	mp4v2dll = NIL;
 }

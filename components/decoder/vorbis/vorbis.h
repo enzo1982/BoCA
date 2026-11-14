@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2015 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -20,10 +20,12 @@ namespace BoCA
 	class DecoderVorbis : public CS::DecoderComponent
 	{
 		private:
-			ogg_sync_state		 oy;
-			ogg_stream_state	 os;
-			ogg_page		 og;
+			AS::MuxerComponent	*muxer;
+
 			ogg_packet		 op;
+			Int64			 packetNumber;
+
+			Buffer<UnsignedByte>	 packetBuffer;
 
 			vorbis_info		 vi;
 			vorbis_comment		 vc;
@@ -33,6 +35,11 @@ namespace BoCA
 			short			 convBuffer[6144];
 
 			Int			 skipSamples;
+
+			Bool			 ReadPacket(AS::MuxerComponent *);
+
+			AS::MuxerComponent	*OpenMuxer(IO::Driver *) const;
+			Void			 CloseMuxer(AS::MuxerComponent *) const;
 		public:
 			static const String	&GetComponentSpecs();
 

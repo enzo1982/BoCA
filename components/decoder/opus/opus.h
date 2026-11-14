@@ -22,10 +22,7 @@ namespace BoCA
 		private:
 			ConfigLayer		*configLayer;
 
-			ogg_sync_state		 oy;
-			ogg_stream_state	 os;
-			ogg_page		 og;
-			ogg_packet		 op;
+			AS::MuxerComponent	*muxer;
 
 			OpusMSDecoder		*decoder;
 
@@ -33,6 +30,11 @@ namespace BoCA
 			Int			 preSkipLeft;
 
 			Int			 skipSamples;
+
+			Buffer<UnsignedByte>	 packetBuffer;
+
+			AS::MuxerComponent	*OpenMuxer(IO::Driver *) const;
+			Void			 CloseMuxer(AS::MuxerComponent *) const;
 		public:
 			static const String	&GetComponentSpecs();
 

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2024 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -183,6 +183,31 @@ BoCA::AS::ComponentSpecs::ComponentSpecs()
 
 	func_ReadPlaylist		= NIL;
 	func_WritePlaylist		= NIL;
+
+	func_Open			= NIL;
+	func_Close			= NIL;
+
+	func_GetCodec			= NIL;
+	func_SetCodec			= NIL;
+
+	func_GetCodecConfig		= NIL;
+	func_SetCodecConfig		= NIL;
+
+	func_GetTimeScale		= NIL;
+	func_SetTimeScale		= NIL;
+
+	func_GetGaplessInfo		= NIL;
+	func_SetGaplessInfo		= NIL;
+
+	func_GetNumberOfPackets		= NIL;
+	func_GetDuration		= NIL;
+
+	func_ReadPacket			= NIL;
+	func_WritePacket		= NIL;
+
+	func_SeekPacket			= NIL;
+
+	func_OptimizeFile		= NIL;
 }
 
 BoCA::AS::ComponentSpecs::~ComponentSpecs()
@@ -312,6 +337,31 @@ Bool BoCA::AS::ComponentSpecs::LoadFromDLL(const String &file)
 
 	func_ReadPlaylist		= (const void *(*)(void *, const wchar_t *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadPlaylist"));
 	func_WritePlaylist		= (int (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WritePlaylist"));
+
+	func_Open			= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Open"));
+	func_Close			= (bool (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_Close"));
+
+	func_GetCodec			= (int (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetCodec"));
+	func_SetCodec			= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetCodec"));
+
+	func_GetCodecConfig		= (bool (*)(const void *, void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetCodecConfig"));
+	func_SetCodecConfig		= (bool (*)(void *, const void *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetCodecConfig"));
+
+	func_GetTimeScale		= (int (*)(const void *))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetTimeScale"));
+	func_SetTimeScale		= (bool (*)(void *, int))				library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetTimeScale"));
+
+	func_GetGaplessInfo		= (bool (*)(const void *, int *, int *, __int64 *))	library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetGaplessInfo"));
+	func_SetGaplessInfo		= (bool (*)(void *, int, int, __int64))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SetGaplessInfo"));
+
+	func_GetNumberOfPackets		= (__int64 (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetNumberOfPackets"));
+	func_GetDuration		= (__int64 (*)(void *))					library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_GetDuration"));
+
+	func_ReadPacket			= (int (*)(void *, void *, __int64 *, int *))		library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_ReadPacket"));
+	func_WritePacket		= (int (*)(void *, const unsigned char *, int, __int64, int)) library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_WritePacket"));
+
+	func_SeekPacket			= (__int64 (*)(void *, __int64))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_SeekPacket"));
+
+	func_OptimizeFile		= (bool (*)(void *, const wchar_t *))			library->GetFunctionAddress(String("BoCA_").Append(componentName).Append("_OptimizeFile"));
 
 	/* Parse component description.
 	 */
@@ -448,6 +498,7 @@ Bool BoCA::AS::ComponentSpecs::ParseXMLSpec(const String &xml)
 			else if (node->GetContent() == "deviceinfo")	type = COMPONENT_TYPE_DEVICEINFO;
 			else if (node->GetContent() == "dsp")		type = COMPONENT_TYPE_DSP;
 			else if (node->GetContent() == "extension")	type = COMPONENT_TYPE_EXTENSION;
+			else if (node->GetContent() == "muxer")		type = COMPONENT_TYPE_MUXER;
 			else if (node->GetContent() == "playlist")	type = COMPONENT_TYPE_PLAYLIST;
 			else if (node->GetContent() == "tagger")	type = COMPONENT_TYPE_TAGGER;
 			else if (node->GetContent() == "verifier")	type = COMPONENT_TYPE_VERIFIER;

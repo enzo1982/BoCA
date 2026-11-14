@@ -29,9 +29,7 @@ namespace BoCA
 
 			Array<SuperWorker *>	 workers;
 
-			ogg_stream_state	 os;
-			ogg_page		 og;
-			ogg_packet		 op;
+			AS::MuxerComponent	*muxer;
 
 			Int			 nextWorker;
 
@@ -47,8 +45,6 @@ namespace BoCA
 
 			Int			 EncodeFrames(Bool);
 			Int			 ProcessPackets(const Buffer<unsigned char> &, const Array<Int> &, Bool, Bool, Int);
-
-			Int			 WriteOggPackets(Bool);
 
 			static Bool		 ConvertArguments(Config *);
 		public:

@@ -1,5 +1,5 @@
  /* BoCA - BonkEnc Component Architecture
-  * Copyright (C) 2007-2021 Robert Kausch <robert.kausch@freac.org>
+  * Copyright (C) 2007-2026 Robert Kausch <robert.kausch@freac.org>
   *
   * This program is free software; you can redistribute it and/or
   * modify it under the terms of the GNU General Public License as
@@ -13,6 +13,8 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <smooth/io/drivers/driver_ansi.h>
+
 #include <stdlib.h>
 
 #include "speex.h"
@@ -23,7 +25,7 @@ const String &BoCA::DecoderSpeex::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (oggdll != NIL && speexdll != NIL)
+	if (speexdll != NIL && AS::Registry::Get().ComponentExists("ogg-mux"))
 	{
 		componentSpecs = "							\
 											\
@@ -54,15 +56,20 @@ const String &BoCA::DecoderSpeex::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
-	LoadOggDLL();
 	LoadSpeexDLL();
 }
 
 Void smooth::DetachDLL()
 {
-	FreeOggDLL();
 	FreeSpeexDLL();
 }
+
+namespace BoCA
+{
+	/* Constants.
+	 */
+	const Int	 minOutputSamples = 4096;
+};
 
 Bool BoCA::DecoderSpeex::CanOpenStream(const String &streamURI)
 {
@@ -71,7 +78,12 @@ Bool BoCA::DecoderSpeex::CanOpenStream(const String &streamURI)
 
 Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 {
-	InStream	 in(STREAM_FILE, streamURI, IS_READ);
+	/* Open file.
+	 */
+	DriverANSI		 ioDriver(File(streamURI), IS_READ);
+	AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
+
+	if (muxer == NIL) return Error();
 
 	/* Set up track format.
 	 */
@@ -79,107 +91,56 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 
 	format.bits  = 16;
 
-	track.fileSize = in.Size();
-
-	/* Set up Ogg reader.
-	 */
-	ogg_sync_state		 oy;
-	ogg_stream_state	 os;
-	ogg_page		 og;
-	ogg_packet		 op;
-
-	ex_ogg_sync_init(&oy);
+	track.fileSize = ioDriver.GetSize();
 
 	/* Get stream format.
 	 */
 	Buffer<UnsignedByte>	 comments;
+	Buffer<UnsignedByte>	 packet;
 
-	Bool	 initialized = False;
-	Bool	 done	     = False;
-	Int	 packetNum   = 0;
-
-	do
+	for (Int packetNum = 0; packetNum <= 1; packetNum++)
 	{
-		Int	 size	= Math::Min(Int64(4096), track.fileSize - in.GetPos());
-		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+		Int64	 position   = 0;
+		Int	 flags	    = 0;
+		Int	 packetSize = muxer->ReadPacket(packet, position, flags);
 
-		in.InputData(buffer, size);
+		if (packetSize < 0) break;
 
-		ex_ogg_sync_wrote(&oy, size);
-
-		while (!done && ex_ogg_sync_pageout(&oy, &og) == 1)
+		/* Found header packet.
+		 */
+		if (packetNum == 0)
 		{
-			if (!initialized)
-			{
-				ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+			SpeexHeader	*header = ex_speex_packet_to_header((char *) (UnsignedByte *) packet, packetSize);
 
-				initialized = True;
-			}
+			if (header == NIL) break;
 
-			ex_ogg_stream_pagein(&os, &og);
+			format.rate	= header->rate;
+			format.channels	= header->nb_channels;
 
-			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
-			{
-				/* Found header packet.
-				 */
-				if (packetNum == 0)
-				{
-					SpeexHeader	*header = ex_speex_packet_to_header((char *) op.packet, op.bytes);
+			track.length = -1;
 
-					format.rate	= header->rate;
-					format.channels	= header->nb_channels;
-
-					track.length = -1;
-
-					free(header);
-				}
-
-				/* Found Vorbis Comment packet.
-				 */
-				if (packetNum == 1)
-				{
-					comments.Resize(op.bytes);
-
-					memcpy(comments, op.packet, op.bytes);
-				}
-
-				/* Done if we reached packet one.
-				 */
-				if (packetNum >= 1) done = True;
-
-				packetNum++;
-			}
+			free(header);
 		}
 
-		if (done) break;
+		/* Found Vorbis Comment packet.
+		 */
+		if (packetNum == 1)
+		{
+			comments.Resize(packetSize);
+
+			memcpy(comments, packet, packetSize);
+		}
 	}
-	while (in.GetPos() < in.Size());
 
 	track.SetFormat(format);
 
 	/* Find real length of stream.
 	 */
-	ex_ogg_sync_reset(&oy);
+	Int64	 duration = muxer->GetDuration();
 
-	Int	 size   = Math::Min(in.Size(), 65536);
-	char    *buffer = ex_ogg_sync_buffer(&oy, size);
+	if (duration >= 0) track.length = duration;
 
-	in.Seek(in.Size() - size);
-	in.InputData(buffer, size);
-
-	ex_ogg_sync_wrote(&oy, size);
-
-	while (true)
-	{
-		Int	 seek = ex_ogg_sync_pageseek(&oy, &og);
-
-		if (seek == 0) break;
-		if (seek <  0 || ex_ogg_page_serialno(&og) != os.serialno) continue;
-
-		track.length = ex_ogg_page_granulepos(&og);
-
-		if (ex_ogg_page_eos(&og)) break;
-	}
+	CloseMuxer(muxer);
 
 	/* Read tags.
 	 */
@@ -197,17 +158,12 @@ Error BoCA::DecoderSpeex::GetStreamInfo(const String &streamURI, Track &track)
 		}
 	}
 
-	/* Clean up.
-	 */
-	if (initialized) ex_ogg_stream_clear(&os);
-
-	ex_ogg_sync_clear(&oy);
-
 	return Success();
 }
 
 BoCA::DecoderSpeex::DecoderSpeex()
 {
+	muxer	    = NIL;
 	decoder	    = NIL;
 
 	frameSize   = 0;
@@ -219,12 +175,7 @@ BoCA::DecoderSpeex::DecoderSpeex()
 
 	skipSamples = 0;
 
-	pageNumber  = 0;
-
-	memset(&oy, 0, sizeof(oy));
-	memset(&os, 0, sizeof(os));
-	memset(&og, 0, sizeof(og));
-	memset(&op, 0, sizeof(op));
+	firstPage   = True;
 
 	memset(&bits, 0, sizeof(bits));
 	memset(&stereo, 0, sizeof(stereo));
@@ -236,50 +187,40 @@ BoCA::DecoderSpeex::~DecoderSpeex()
 
 Bool BoCA::DecoderSpeex::Activate()
 {
+	/* Open Ogg stream.
+	 */
+	muxer = OpenMuxer(driver);
+
+	if (muxer == NIL) return False;
+
+	/* Parse header packets.
+	 */
 	SpeexHeader	*header = NIL;
 
-	ex_ogg_sync_init(&oy);
-
-	Bool	 initialized = False;
-	Bool	 done = False;
-	Int	 packetNum = 0;
-
-	while (!done)
+	for (Int packetNum = 0; header == NIL || packetNum <= 1 + header->extra_headers; packetNum++)
 	{
-		Int	 size	= 4096;
-		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+		Int64	 position   = 0;
+		Int	 flags	    = 0;
+		Int	 packetSize = muxer->ReadPacket(packetBuffer, position, flags);
 
-		size = driver->ReadData((unsigned char *) buffer, 4096);
+		if (packetSize >= 0 && packetNum == 0) header = ex_speex_packet_to_header((char *) (UnsignedByte *) packetBuffer, packetSize);
 
-		inBytes += size;
-
-		ex_ogg_sync_wrote(&oy, size);
-
-		while (!done && ex_ogg_sync_pageout(&oy, &og) == 1)
+		if (packetSize < 0 || header == NIL)
 		{
-			if (!initialized)
-			{
-				ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+			if (header != NIL) free(header);
 
-				initialized = True;
-			}
+			CloseMuxer(muxer);
 
-			ex_ogg_stream_pagein(&os, &og);
+			muxer = NIL;
 
-			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
-			{
-				if (packetNum == 0)
-				{
-					header = ex_speex_packet_to_header((char *) op.packet, op.bytes);
-				}
-
-				if (packetNum >= 1 + header->extra_headers) done = True;
-
-				packetNum++;
-			}
+			return False;
 		}
 	}
 
+	inBytes = driver->GetPos();
+
+	/* Init decoder.
+	 */
 	const SpeexMode	*mode = ex_speex_lib_get_mode(header->mode);
 
 	decoder = ex_speex_decoder_init(mode);
@@ -288,8 +229,8 @@ Bool BoCA::DecoderSpeex::Activate()
 	ex_speex_decoder_ctl(decoder, SPEEX_GET_FRAME_SIZE, &frameSize);
 	ex_speex_decoder_ctl(decoder, SPEEX_GET_LOOKAHEAD, &lookAhead);
 
-	nFrames	   = Math::Max(1, (Int) header->frames_per_packet);
-	pageNumber = 0;
+	nFrames	  = Math::Max(1, (Int) header->frames_per_packet);
+	firstPage = True;
 
 	stereo.balance	    = 1;
 	stereo.e_ratio	    = 0.5;
@@ -307,37 +248,27 @@ Bool BoCA::DecoderSpeex::Activate()
 
 Bool BoCA::DecoderSpeex::Deactivate()
 {
-	ex_ogg_stream_clear(&os);
+	CloseMuxer(muxer);
+
+	muxer = NIL;
 
 	ex_speex_decoder_destroy(decoder);
 	ex_speex_bits_destroy(&bits);
-
-	ex_ogg_sync_clear(&oy);
 
 	return True;
 }
 
 Bool BoCA::DecoderSpeex::Seek(Int64 samplePosition)
 {
-	while (ex_ogg_page_granulepos(&og) <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
-	{
-		skipSamples = samplePosition - ex_ogg_page_granulepos(&og);
+	/* Seek to the page containing the requested sample position.
+	 */
+	Int64	 position = muxer->SeekPacket(samplePosition);
 
-		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
-		{
-			char	*buffer = ex_ogg_sync_buffer(&oy, 131072);
-			Int	 size	= driver->ReadData((unsigned char *) buffer, 131072);
+	inBytes = driver->GetPos();
 
-			inBytes += size;
+	if (position < 0) return False;
 
-			ex_ogg_sync_wrote(&oy, size);
-
-			if (size == 0) return False;
-		}
-	}
-
-	ex_ogg_stream_pagein(&os, &og);
-
+	skipSamples  = samplePosition - position;
 	preSkipLeft += skipSamples;
 
 	ex_speex_decoder_ctl(decoder, SPEEX_RESET_STATE, 0);
@@ -349,71 +280,157 @@ Int BoCA::DecoderSpeex::ReadData(Buffer<UnsignedByte> &data)
 {
 	const Format	&format = track.GetFormat();
 
+	/* Read all packets of the first page to
+	 * find the number of samples to skip.
+	 */
+	if (firstPage)
+	{
+		Int64	 position = -1;
+
+		while (position == -1)
+		{
+			Int	 flags	    = 0;
+			Int	 packetSize = muxer->ReadPacket(packetBuffer, position, flags);
+
+			if (packetSize < 0) break;
+
+			pendingPackets.Resize(pendingPackets.Size() + packetSize);
+
+			memcpy(pendingPackets + pendingPackets.Size() - packetSize, packetBuffer, packetSize);
+
+			pendingPacketSizes.Add(packetSize);
+		}
+
+		Int	 pageSamples = pendingPacketSizes.Length() * nFrames * frameSize;
+
+		if (position != -1 && position < pageSamples) preSkip += pageSamples - position;
+
+		preSkip	    += lookAhead;
+		preSkipLeft += preSkip;
+
+		firstPage = False;
+	}
+
+	/* Decode packets until we have enough samples.
+	 */
 	Int	 size	       = 0;
 	Int	 dataBufferLen = 0;
+	Int	 pendingOffset = 0;
 
-	while (ex_ogg_sync_pageout(&oy, &og) == 1)
+	while (size < minOutputSamples * format.channels * 2)
 	{
-		ex_ogg_stream_pagein(&os, &og);
+		/* Get next packet.
+		 */
+		UnsignedByte	*packet	    = NIL;
+		Int		 packetSize = 0;
 
-		if (pageNumber++ == 0)
+		if (pendingPacketSizes.Length() > 0)
 		{
-			if (ex_ogg_page_granulepos(&og) < ex_ogg_page_packets(&og) * nFrames * frameSize) preSkip += ex_ogg_page_packets(&og) * nFrames * frameSize - ex_ogg_page_granulepos(&og);
+			packet	       = pendingPackets + pendingOffset;
+			packetSize     = pendingPacketSizes.GetNth(0);
 
-			preSkip	    += lookAhead;
-			preSkipLeft += preSkip;
+			pendingOffset += packetSize;
+
+			pendingPacketSizes.RemoveNth(0);
+		}
+		else
+		{
+			Int64	 position = 0;
+			Int	 flags	  = 0;
+
+			packetSize = muxer->ReadPacket(packetBuffer, position, flags);
+
+			if (packetSize < 0) break;
+
+			packet	   = packetBuffer;
 		}
 
-		while (ex_ogg_stream_packetout(&os, &op) == 1)
+		/* Decode packet.
+		 */
+		pcmBuffer.Resize(frameSize * format.channels);
+
+		ex_speex_bits_read_from(&bits, (char *) packet, packetSize);
+
+		for (Int i = 0; i < nFrames; i++)
 		{
-			pcmBuffer.Resize(frameSize * format.channels);
+			if (ex_speex_decode_int(decoder, &bits, pcmBuffer) < 0) break;
 
-			ex_speex_bits_read_from(&bits, (char *) op.packet, op.bytes);
+			if (format.channels == 2) ex_speex_decode_stereo_int(pcmBuffer, frameSize, &stereo);
 
-			for (Int i = 0; i < nFrames; i++)
+			if (frameSize > preSkipLeft)
 			{
-				if (ex_speex_decode_int(decoder, &bits, pcmBuffer) < 0) break;
+				if (preSkipLeft) memmove((short *) pcmBuffer, (short *) pcmBuffer + preSkipLeft * format.channels, (frameSize - preSkipLeft) * format.channels * 2);
 
-				if (format.channels == 2) ex_speex_decode_stereo_int(pcmBuffer, frameSize, &stereo);
-
-				if (frameSize > preSkipLeft)
+				if (dataBufferLen < size + ((frameSize - preSkipLeft) * format.channels * 2))
 				{
-					if (preSkipLeft) memmove((short *) pcmBuffer, (short *) pcmBuffer + preSkipLeft * format.channels, (frameSize - preSkipLeft) * format.channels * 2);
+					dataBufferLen += (((frameSize - preSkipLeft) * format.channels * 2) + 131072);
 
-					if (dataBufferLen < size + ((frameSize - preSkipLeft) * format.channels * 2))
-					{
-						dataBufferLen += (((frameSize - preSkipLeft) * format.channels * 2) + 131072);
-
-						data.Resize(dataBufferLen);
-					}
-
-					for (Int j = 0; j < (frameSize - preSkipLeft) * format.channels; j++)
-					{
-						((short *) (UnsignedByte *) data)[size / 2 + j] = pcmBuffer[j];
-					}
-
-					size += ((frameSize - preSkipLeft) * format.channels * 2);
+					data.Resize(dataBufferLen);
 				}
 
-				preSkipLeft = Math::Max(0, preSkipLeft - frameSize);
-			}
-		}
+				for (Int j = 0; j < (frameSize - preSkipLeft) * format.channels; j++)
+				{
+					((short *) (UnsignedByte *) data)[size / 2 + j] = pcmBuffer[j];
+				}
 
-		if (ex_ogg_page_eos(&og)) break;
+				size += ((frameSize - preSkipLeft) * format.channels * 2);
+			}
+
+			preSkipLeft = Math::Max(0, preSkipLeft - frameSize);
+		}
 	}
+
+	/* Keep pending packets that have not been decoded yet.
+	 */
+	if (pendingPacketSizes.Length() > 0)
+	{
+		memmove(pendingPackets, pendingPackets + pendingOffset, pendingPackets.Size() - pendingOffset);
+
+		pendingPackets.Resize(pendingPackets.Size() - pendingOffset);
+	}
+	else
+	{
+		pendingPackets.Resize(0);
+	}
+
+	inBytes = driver->GetPos();
 
 	/* Bail out if no more data available.
 	 */
-	char	*buffer = ex_ogg_sync_buffer(&oy, 8192);
-	Int	 bytes	= driver->ReadData((unsigned char *) buffer, 8192);
+	if (size == 0) return -1;
 
-	if (size == 0 && bytes <= 0) return -1;
-
-	inBytes += bytes;
-
-	ex_ogg_sync_wrote(&oy, bytes);
-
-	if (size == 0) return ReadData(data);
+	data.Resize(size);
 
 	return size;
+}
+
+BoCA::AS::MuxerComponent *BoCA::DecoderSpeex::OpenMuxer(Driver *ioDriver) const
+{
+	/* Create Ogg muxer and open stream.
+	 */
+	AS::Registry		&boca  = AS::Registry::Get();
+	AS::MuxerComponent	*muxer = (AS::MuxerComponent *) boca.CreateComponentByID("ogg-mux");
+
+	if (muxer == NIL) return NIL;
+
+	muxer->SetConfiguration(GetConfiguration());
+	muxer->SetDriver(ioDriver);
+
+	if (!muxer->Open(MUXER_MODE_READ))
+	{
+		boca.DeleteComponent(muxer);
+
+		return NIL;
+	}
+
+	return muxer;
+}
+
+Void BoCA::DecoderSpeex::CloseMuxer(AS::MuxerComponent *muxer) const
+{
+	if (muxer == NIL) return;
+
+	muxer->Close();
+
+	AS::Registry::Get().DeleteComponent(muxer);
 }

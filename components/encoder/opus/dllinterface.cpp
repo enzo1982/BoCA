@@ -15,13 +15,6 @@
 
 using namespace BoCA;
 
-OGGSTREAMINIT				 ex_ogg_stream_init				= NIL;
-OGGSTREAMPACKETIN			 ex_ogg_stream_packetin				= NIL;
-OGGSTREAMFLUSH				 ex_ogg_stream_flush				= NIL;
-OGGSTREAMPAGEOUT			 ex_ogg_stream_pageout				= NIL;
-OGGPAGEEOS				 ex_ogg_page_eos				= NIL;
-OGGSTREAMCLEAR				 ex_ogg_stream_clear				= NIL;
-
 OPUSMULTISTREAMSURROUNDENCODERCREATE	 ex_opus_multistream_surround_encoder_create	= NIL;
 OPUSMULTISTREAMENCODE			 ex_opus_multistream_encode			= NIL;
 OPUSMULTISTREAMENCODEFLOAT		 ex_opus_multistream_encode_float		= NIL;
@@ -29,38 +22,7 @@ OPUSMULTISTREAMENCODERCTL		 ex_opus_multistream_encoder_ctl		= NIL;
 OPUSMULTISTREAMENCODERDESTROY		 ex_opus_multistream_encoder_destroy		= NIL;
 OPUSGETVERSIONSTRING			 ex_opus_get_version_string			= NIL;
 
-DynamicLoader *oggdll	= NIL;
 DynamicLoader *opusdll	= NIL;
-
-Bool LoadOggDLL()
-{
-	oggdll = BoCA::Utilities::LoadCodecDLL("ogg");
-
-	if (oggdll == NIL) return False;
-
-	ex_ogg_stream_init		= (OGGSTREAMINIT) oggdll->GetFunctionAddress("ogg_stream_init");
-	ex_ogg_stream_packetin		= (OGGSTREAMPACKETIN) oggdll->GetFunctionAddress("ogg_stream_packetin");
-	ex_ogg_stream_flush		= (OGGSTREAMFLUSH) oggdll->GetFunctionAddress("ogg_stream_flush");
-	ex_ogg_stream_pageout		= (OGGSTREAMPAGEOUT) oggdll->GetFunctionAddress("ogg_stream_pageout");
-	ex_ogg_page_eos			= (OGGPAGEEOS) oggdll->GetFunctionAddress("ogg_page_eos");
-	ex_ogg_stream_clear		= (OGGSTREAMCLEAR) oggdll->GetFunctionAddress("ogg_stream_clear");
-
-	if (ex_ogg_stream_init		== NIL ||
-	    ex_ogg_stream_packetin	== NIL ||
-	    ex_ogg_stream_flush		== NIL ||
-	    ex_ogg_stream_pageout	== NIL ||
-	    ex_ogg_page_eos		== NIL ||
-	    ex_ogg_stream_clear		== NIL) { FreeOggDLL(); return False; }
-
-	return True;
-}
-
-Void FreeOggDLL()
-{
-	BoCA::Utilities::FreeCodecDLL(oggdll);
-
-	oggdll = NIL;
-}
 
 Bool LoadOpusDLL()
 {

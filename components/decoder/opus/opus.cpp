@@ -13,6 +13,8 @@
 #include <smooth.h>
 #include <smooth/dll.h>
 
+#include <smooth/io/drivers/driver_ansi.h>
+
 #include <stdint.h>
 
 #include "opus.h"
@@ -27,7 +29,7 @@ const String &BoCA::DecoderOpus::GetComponentSpecs()
 {
 	static String	 componentSpecs;
 
-	if (oggdll != NIL && opusdll != NIL)
+	if (opusdll != NIL && AS::Registry::Get().ComponentExists("ogg-mux"))
 	{
 		componentSpecs = "							\
 											\
@@ -75,13 +77,11 @@ const String &BoCA::DecoderOpus::GetComponentSpecs()
 
 Void smooth::AttachDLL(Void *instance)
 {
-	LoadOggDLL();
 	LoadOpusDLL();
 }
 
 Void smooth::DetachDLL()
 {
-	FreeOggDLL();
 	FreeOpusDLL();
 }
 
@@ -89,7 +89,8 @@ namespace BoCA
 {
 	/* Constants.
 	 */
-	const Int	 maxFrameSize  = 5760;
+	const Int	 maxFrameSize	  = 5760;
+	const Int	 minOutputSamples = 4096;
 
 	/* Opus header definition.
 	 */
@@ -115,57 +116,29 @@ Bool BoCA::DecoderOpus::CanOpenStream(const String &streamURI)
 
 	if (in.InputString(4) != "OggS") return False;
 
-	in.Seek(0);
-
 	/* Check if Opus stream.
 	 */
-	ogg_sync_state		 oy;
-	ogg_stream_state	 os;
-	ogg_page		 og;
-	ogg_packet		 op;
+	DriverANSI		 ioDriver(File(streamURI), IS_READ);
+	AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
 
-	ex_ogg_sync_init(&oy);
+	if (muxer == NIL) return False;
 
-	Bool	 result	     = False;
-	Bool	 initialized = False;
+	Bool			 result	  = False;
+	Buffer<UnsignedByte>	 packet;
 
-	do
+	Int64			 position = 0;
+	Int			 flags	  = 0;
+
+	if (muxer->ReadPacket(packet, position, flags) >= 19 && memcmp(packet, "OpusHead", 8) == 0)
 	{
-		Int	 size	= Math::Min(Int64(4096), in.Size() - in.GetPos());
-		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+		/* Check Opus version and number of channels.
+		 */
+		OpusHeader	*setup = (OpusHeader *) (UnsignedByte *) packet;
 
-		in.InputData(buffer, size);
-
-		ex_ogg_sync_wrote(&oy, size);
-
-		if (ex_ogg_sync_pageout(&oy, &og) == 1)
-		{
-			ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
-
-			initialized = True;
-
-			ex_ogg_stream_pagein(&os, &og);
-
-			if (ex_ogg_stream_packetout(&os, &op) == 1)
-			{
-				if (op.packet[0] == 'O' && op.packet[1] == 'p' && op.packet[2] == 'u' && op.packet[3] == 's' && op.packet[4] == 'H' && op.packet[5] == 'e' && op.packet[6] == 'a' && op.packet[7] == 'd')
-				{
-					/* Check Opus version and number of channels.
-					 */
-					OpusHeader	*setup = (OpusHeader *) op.packet;
-
-					if (setup->version_id >> 4 == 0 && setup->channel_mapping <= 1 && setup->nb_channels <= 8) result = True;
-				}
-
-				break;
-			}
-		}
+		if (setup->version_id >> 4 == 0 && setup->channel_mapping <= 1 && setup->nb_channels <= 8) result = True;
 	}
-	while (in.GetPos() < in.Size());
 
-	if (initialized) ex_ogg_stream_clear(&os);
-
-	ex_ogg_sync_clear(&oy);
+	CloseMuxer(muxer);
 
 	return result;
 }
@@ -184,7 +157,10 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 
 	/* Open file.
 	 */
-	InStream	 in(STREAM_FILE, streamURI, IS_READ);
+	DriverANSI		 ioDriver(File(streamURI), IS_READ);
+	AS::MuxerComponent	*muxer = OpenMuxer(&ioDriver);
+
+	if (muxer == NIL) return Error();
 
 	/* Set up track format.
 	 */
@@ -199,148 +175,97 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 		format.fp   = True;
 	}
 
-	track.fileSize = in.Size();
-
-	/* Set up Ogg reader.
-	 */
-	ogg_sync_state		 oy;
-	ogg_stream_state	 os;
-	ogg_page		 og;
-	ogg_packet		 op;
-
-	ex_ogg_sync_init(&oy);
+	track.fileSize = ioDriver.GetSize();
 
 	/* Get stream format.
 	 */
 	OpusHeader		 setup;
 	Buffer<UnsignedByte>	 comments;
+	Buffer<UnsignedByte>	 packet;
 
-	Bool	 initialized = False;
-	Bool	 done	     = False;
-	Int	 packetNum   = 0;
+	memset(&setup, 0, sizeof(setup));
 
-	do
+	for (Int packetNum = 0; packetNum <= 3; packetNum++)
 	{
-		Int	 size	= Math::Min(Int64(4096), track.fileSize - in.GetPos());
-		char	*buffer	= ex_ogg_sync_buffer(&oy, size);
+		Int64	 position   = 0;
+		Int	 flags	    = 0;
+		Int	 packetSize = muxer->ReadPacket(packet, position, flags);
 
-		in.InputData(buffer, size);
+		if (packetSize < 0) break;
 
-		ex_ogg_sync_wrote(&oy, size);
-
-		while (!done && ex_ogg_sync_pageout(&oy, &og) == 1)
+		/* Found header packet.
+		 */
+		if (packetNum == 0)
 		{
-			if (!initialized)
-			{
-				ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+			memcpy(&setup, packet, Math::Min(packetSize, (Int) sizeof(OpusHeader)));
 
-				initialized = True;
+			if (endianness != EndianLittle)
+			{
+				BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.preskip, sizeof(setup.preskip));
+				BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.sample_rate, sizeof(setup.sample_rate));
+				BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.output_gain, sizeof(setup.output_gain));
 			}
 
-			ex_ogg_stream_pagein(&os, &og);
+			format.channels = setup.nb_channels;
 
-			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
+			if (setup.sample_rate != 0 && (!bweSupported || complexity < 4 || !enableBwe))
 			{
-				/* Found header packet.
-				 */
-				if (packetNum == 0)
-				{
-					memcpy(&setup, op.packet, sizeof(OpusHeader));
+				if	(setup.sample_rate <=  8000) format.rate =  8000;
+				else if	(setup.sample_rate <= 12000) format.rate = 12000;
+				else if	(setup.sample_rate <= 16000) format.rate = 16000;
+				else if	(setup.sample_rate <= 24000) format.rate = 24000;
+				else				     format.rate = 48000;
+			}
 
-					if (endianness != EndianLittle)
-					{
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.preskip, sizeof(setup.preskip));
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.sample_rate, sizeof(setup.sample_rate));
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.output_gain, sizeof(setup.output_gain));
-					}
+			preSkip = setup.preskip;
 
-					format.channels = setup.nb_channels;
+			track.length = -1;
+		}
 
-					if (setup.sample_rate != 0 && (!bweSupported || complexity < 4 || !enableBwe))
-					{
-						if	(setup.sample_rate <=  8000) format.rate =  8000;
-						else if	(setup.sample_rate <= 12000) format.rate = 12000;
-						else if	(setup.sample_rate <= 16000) format.rate = 16000;
-						else if	(setup.sample_rate <= 24000) format.rate = 24000;
-						else				     format.rate = 48000;
-					}
+		/* Found Vorbis Comment packet.
+		 */
+		if (packetNum == 1)
+		{
+			if (packetSize >= 8 && memcmp(packet, "OpusTags", 8) == 0)
+			{
+				comments.Resize(packetSize - 8);
 
-					preSkip = setup.preskip;
-
-					track.length = -1;
-				}
-
-				/* Found Vorbis Comment packet.
-				 */
-				if (packetNum == 1)
-				{
-					if (op.packet[0] == 'O' && op.packet[1] == 'p' && op.packet[2] == 'u' && op.packet[3] == 's' && op.packet[4] == 'T' && op.packet[5] == 'a' && op.packet[6] == 'g' && op.packet[7] == 's')
-					{
-						comments.Resize(op.bytes - 8);
-
-						memcpy(comments, op.packet + 8, op.bytes - 8);
-					}
-				}
-
-				/* Found audio packet.
-				 */
-				if (packetNum == 3)
-				{
-					int		 error	    = OPUS_OK;
-					unsigned char	 mapping[2] = { 0, 1 };
-
-					OpusMSDecoder	*decoder    = NIL;
-
-					if (setup.channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, 1,		       setup.nb_channels - 1, mapping,		&error);
-					else				decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, setup.nb_streams, setup.nb_coupled,      setup.stream_map, &error);
-
-					if (error == OPUS_OK)
-					{
-						Buffer<opus_int16>	 samples(maxFrameSize * format.channels);
-
-						track.approxLength = track.fileSize / (op.bytes * 1.05) * ex_opus_multistream_decode(decoder, op.packet, op.bytes, samples, maxFrameSize, 0);
-
-						ex_opus_multistream_decoder_destroy(decoder);
-					}
-				}
-
-				/* Done if we reached packet three.
-				 */
-				if (packetNum >= 3) done = True;
-
-				packetNum++;
+				memcpy(comments, packet + 8, packetSize - 8);
 			}
 		}
 
-		if (done) break;
+		/* Found audio packet.
+		 */
+		if (packetNum == 3)
+		{
+			int		 error	    = OPUS_OK;
+			unsigned char	 mapping[2] = { 0, 1 };
+
+			OpusMSDecoder	*decoder    = NIL;
+
+			if (setup.channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, 1,		       setup.nb_channels - 1, mapping,		&error);
+			else				decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, setup.nb_streams, setup.nb_coupled,      setup.stream_map, &error);
+
+			if (error == OPUS_OK)
+			{
+				Buffer<opus_int16>	 samples(maxFrameSize * format.channels);
+
+				track.approxLength = track.fileSize / (packetSize * 1.05) * ex_opus_multistream_decode(decoder, packet, packetSize, samples, maxFrameSize, 0);
+
+				ex_opus_multistream_decoder_destroy(decoder);
+			}
+		}
 	}
-	while (in.GetPos() < in.Size());
 
 	track.SetFormat(format);
 
 	/* Find real length of stream.
 	 */
-	ex_ogg_sync_reset(&oy);
+	Int64	 duration = muxer->GetDuration();
 
-	Int	 size   = Math::Min(in.Size(), 65536);
-	char    *buffer = ex_ogg_sync_buffer(&oy, size);
+	if (duration >= 0) track.length = (duration - preSkip) / (48000 / format.rate);
 
-	in.Seek(in.Size() - size);
-	in.InputData(buffer, size);
-
-	ex_ogg_sync_wrote(&oy, size);
-
-	while (true)
-	{
-		Int	 seek = ex_ogg_sync_pageseek(&oy, &og);
-
-		if (seek == 0) break;
-		if (seek <  0 || ex_ogg_page_serialno(&og) != os.serialno) continue;
-
-		track.length = (ex_ogg_page_granulepos(&og) - preSkip) / (48000 / format.rate);
-
-		if (ex_ogg_page_eos(&og)) break;
-	}
+	CloseMuxer(muxer);
 
 	/* Read tags.
 	 */
@@ -358,12 +283,6 @@ Error BoCA::DecoderOpus::GetStreamInfo(const String &streamURI, Track &track)
 		}
 	}
 
-	/* Clean up.
-	 */
-	if (initialized) ex_ogg_stream_clear(&os);
-
-	ex_ogg_sync_clear(&oy);
-
 	return Success();
 }
 
@@ -371,17 +290,13 @@ BoCA::DecoderOpus::DecoderOpus()
 {
 	configLayer = NIL;
 
+	muxer	    = NIL;
 	decoder	    = NIL;
 
 	preSkip	    = 0;
 	preSkipLeft = 0;
 
 	skipSamples = 0;
-
-	memset(&oy, 0, sizeof(oy));
-	memset(&os, 0, sizeof(os));
-	memset(&og, 0, sizeof(og));
-	memset(&op, 0, sizeof(op));
 }
 
 BoCA::DecoderOpus::~DecoderOpus()
@@ -400,93 +315,83 @@ Bool BoCA::DecoderOpus::Activate()
 	Int		 complexity = config->GetIntValue(ConfigureOpus::ConfigID, "Complexity", 10);
 	Bool		 enableBwe  = config->GetIntValue(ConfigureOpus::ConfigID, "BandwidthExtension", False);
 
-	/* Parse packets and init decoder.
+	/* Open Ogg stream.
 	 */
-	ex_ogg_sync_init(&oy);
+	muxer = OpenMuxer(driver);
 
-	Bool	 initialized = False;
-	Bool	 done = False;
-	Int	 packetNum = 0;
+	if (muxer == NIL) return False;
 
-	while (!done)
+	/* Parse header packets and init decoder.
+	 */
+	for (Int packetNum = 0; packetNum <= 1; packetNum++)
 	{
-		Int	 size	= 4096;
-		char	*buffer = ex_ogg_sync_buffer(&oy, size);
+		Int64	 position   = 0;
+		Int	 flags	    = 0;
+		Int	 packetSize = muxer->ReadPacket(packetBuffer, position, flags);
 
-		size = driver->ReadData((unsigned char *) buffer, 4096);
-
-		inBytes += size;
-
-		ex_ogg_sync_wrote(&oy, size);
-
-		while (!done && ex_ogg_sync_pageout(&oy, &og) == 1)
+		if (packetSize < 0 || (packetNum == 0 && packetSize < 19))
 		{
-			if (!initialized)
-			{
-				ex_ogg_stream_init(&os, ex_ogg_page_serialno(&og));
+			CloseMuxer(muxer);
 
-				initialized = True;
+			muxer = NIL;
+
+			return False;
+		}
+
+		/* Found header packet.
+		 */
+		if (packetNum == 0)
+		{
+			OpusHeader	 setup;
+
+			memset(&setup, 0, sizeof(setup));
+			memcpy(&setup, packetBuffer, Math::Min(packetSize, (Int) sizeof(OpusHeader)));
+
+			if (endianness != EndianLittle)
+			{
+				BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.preskip, sizeof(setup.preskip));
+				BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.sample_rate, sizeof(setup.sample_rate));
+				BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup.output_gain, sizeof(setup.output_gain));
 			}
 
-			ex_ogg_stream_pagein(&os, &og);
+			const Format	&format	    = track.GetFormat();
 
-			while (!done && ex_ogg_stream_packetout(&os, &op) == 1)
+			int		 error	    = OPUS_OK;
+			unsigned char	 mapping[2] = { 0, 1 };
+
+			if (setup.channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, 1,		       setup.nb_channels - 1, mapping,		&error);
+			else				decoder = ex_opus_multistream_decoder_create(format.rate, setup.nb_channels, setup.nb_streams, setup.nb_coupled,      setup.stream_map, &error);
+
+			preSkip	    = setup.preskip / (48000 / format.rate);
+			preSkipLeft = setup.preskip / (48000 / format.rate);
+
+			if (osceSupported && error == OPUS_OK)
 			{
-				/* Found header packet.
-				 */
-				if (packetNum == 0)
+				for (Int i = 0; i < (setup.channel_mapping == 0 ? 1 : setup.nb_streams); i++)
 				{
-					OpusHeader	*setup = (OpusHeader *) op.packet;
+					OpusDecoder	*streamDecoder = NIL;
 
-					if (endianness != EndianLittle)
-					{
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->preskip, sizeof(setup->preskip));
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->sample_rate, sizeof(setup->sample_rate));
-						BoCA::Utilities::SwitchByteOrder((UnsignedByte *) &setup->output_gain, sizeof(setup->output_gain));
-					}
+					ex_opus_multistream_decoder_ctl(decoder, OPUS_MULTISTREAM_GET_DECODER_STATE(i, &streamDecoder));
 
-					const Format	&format	    = track.GetFormat();
-
-					int		 error	    = OPUS_OK;
-					unsigned char	 mapping[2] = { 0, 1 };
-
-					if (setup->channel_mapping == 0) decoder = ex_opus_multistream_decoder_create(format.rate, setup->nb_channels, 1,		  setup->nb_channels - 1, mapping,	     &error);
-					else				 decoder = ex_opus_multistream_decoder_create(format.rate, setup->nb_channels, setup->nb_streams, setup->nb_coupled,	  setup->stream_map, &error);
-
-					preSkip	    = setup->preskip / (48000 / format.rate);
-					preSkipLeft = setup->preskip / (48000 / format.rate);
-
-					if (osceSupported && error == OPUS_OK)
-					{
-						for (Int i = 0; i < (setup->channel_mapping == 0 ? 1 : setup->nb_streams); i++)
-						{
-							OpusDecoder	*streamDecoder = NIL;
-
-							ex_opus_multistream_decoder_ctl(decoder, OPUS_MULTISTREAM_GET_DECODER_STATE(i, &streamDecoder));
-
-							ex_opus_decoder_ctl(streamDecoder, OPUS_SET_COMPLEXITY(complexity));
-							ex_opus_decoder_ctl(streamDecoder, OPUS_SET_OSCE_BWE(enableBwe));
-						}
-					}
+					ex_opus_decoder_ctl(streamDecoder, OPUS_SET_COMPLEXITY(complexity));
+					ex_opus_decoder_ctl(streamDecoder, OPUS_SET_OSCE_BWE(enableBwe));
 				}
-
-				if (packetNum >= 1) done = True;
-
-				packetNum++;
 			}
 		}
 	}
+
+	inBytes = driver->GetPos();
 
 	return True;
 }
 
 Bool BoCA::DecoderOpus::Deactivate()
 {
-	ex_ogg_stream_clear(&os);
+	CloseMuxer(muxer);
+
+	muxer = NIL;
 
 	ex_opus_multistream_decoder_destroy(decoder);
-
-	ex_ogg_sync_clear(&oy);
 
 	return True;
 }
@@ -495,25 +400,16 @@ Bool BoCA::DecoderOpus::Seek(Int64 samplePosition)
 {
 	const Format	&format = track.GetFormat();
 
-	while (ex_ogg_page_granulepos(&og) / (48000 / format.rate) - preSkip <= samplePosition || ex_ogg_page_serialno(&og) != os.serialno)
-	{
-		skipSamples = preSkip + samplePosition - ex_ogg_page_granulepos(&og) / (48000 / format.rate);
+	/* Seek to the page containing the requested sample position.
+	 */
+	Int	 scale	  = 48000 / format.rate;
+	Int64	 position = muxer->SeekPacket((samplePosition + preSkip + 1) * scale - 1);
 
-		while (ex_ogg_sync_pageseek(&oy, &og) == 0)
-		{
-			char	*buffer = ex_ogg_sync_buffer(&oy, 131072);
-			Int	 size	= driver->ReadData((unsigned char *) buffer, 131072);
+	inBytes = driver->GetPos();
 
-			inBytes += size;
+	if (position < 0) return False;
 
-			ex_ogg_sync_wrote(&oy, size);
-
-			if (size == 0) return False;
-		}
-	}
-
-	ex_ogg_stream_pagein(&os, &og);
-
+	skipSamples  = preSkip + samplePosition - position / scale;
 	preSkipLeft += skipSamples;
 
 	ex_opus_multistream_decoder_ctl(decoder, OPUS_RESET_STATE);
@@ -525,54 +421,43 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data)
 {
 	const Format	&format = track.GetFormat();
 
-	Int	 size	       = 0;
-	Int	 dataBufferLen = 0;
+	Int	 bytesPerSample = format.channels * (format.bits / 8);
+	Int	 size		= 0;
 
-	while (ex_ogg_sync_pageout(&oy, &og) == 1)
+	/* Decode packets until we have enough samples.
+	 */
+	while (size < minOutputSamples * bytesPerSample)
 	{
-		ex_ogg_stream_pagein(&os, &og);
+		Int64	 position   = 0;
+		Int	 flags	    = 0;
+		Int	 packetSize = muxer->ReadPacket(packetBuffer, position, flags);
 
-		while (ex_ogg_stream_packetout(&os, &op) == 1)
+		if (packetSize < 0) break;
+
+		data.Resize(size + maxFrameSize * bytesPerSample);
+
+		Int	 frameSize = 0;
+
+		if (format.bits == 16) frameSize = ex_opus_multistream_decode(decoder, packetBuffer, packetSize, (opus_int16 *) (UnsignedByte *) (data + size), maxFrameSize, 0);
+		else		       frameSize = ex_opus_multistream_decode_float(decoder, packetBuffer, packetSize, (float *) (UnsignedByte *) (data + size), maxFrameSize, 0);
+
+		if (frameSize > preSkipLeft)
 		{
-			if (dataBufferLen < size + maxFrameSize * format.channels * (format.bits / 8))
-			{
-				dataBufferLen += 2 * maxFrameSize * format.channels * (format.bits / 8);
+			if (preSkipLeft) memmove((unsigned char *) data + size, (unsigned char *) data + size + preSkipLeft * bytesPerSample, (frameSize - preSkipLeft) * bytesPerSample);
 
-				data.Resize(dataBufferLen);
-			}
-
-			Int	 frameSize = 0;
-
-			if (format.bits == 16) frameSize = ex_opus_multistream_decode(decoder, op.packet, op.bytes, (opus_int16 *) (UnsignedByte *) (data + size), maxFrameSize, 0);
-			else		       frameSize = ex_opus_multistream_decode_float(decoder, op.packet, op.bytes, (float *) (UnsignedByte *) (data + size), maxFrameSize, 0);
-
-			if (frameSize > preSkipLeft)
-			{
-				if (preSkipLeft) memmove((unsigned char *) data + size, (unsigned char *) data + size + preSkipLeft * format.channels * (format.bits / 8), (frameSize - preSkipLeft) * format.channels * (format.bits / 8));
-
-				size += Math::Max(0, (frameSize - preSkipLeft) * format.channels * (format.bits / 8));
-			}
-
-			preSkipLeft = Math::Max(0, preSkipLeft - frameSize);
+			size += Math::Max(0, (frameSize - preSkipLeft) * bytesPerSample);
 		}
 
-		if (ex_ogg_page_eos(&og)) break;
+		preSkipLeft = Math::Max(0, preSkipLeft - frameSize);
 	}
 
-	data.Resize(size);
+	inBytes = driver->GetPos();
 
 	/* Bail out if no more data available.
 	 */
-	char	*buffer = ex_ogg_sync_buffer(&oy, 8192);
-	Int	 bytes	= driver->ReadData((unsigned char *) buffer, 8192);
+	if (size == 0) return -1;
 
-	if (size == 0 && bytes <= 0) return -1;
-
-	inBytes += bytes;
-
-	ex_ogg_sync_wrote(&oy, bytes);
-
-	if (size == 0) return ReadData(data);
+	data.Resize(size);
 
 	/* Change to default channel order.
 	 */
@@ -583,6 +468,37 @@ Int BoCA::DecoderOpus::ReadData(Buffer<UnsignedByte> &data)
 	else if (format.channels == 8) Utilities::ChangeChannelOrder(data, format, Channel::Vorbis_7_1, Channel::Default_7_1);
 
 	return size;
+}
+
+BoCA::AS::MuxerComponent *BoCA::DecoderOpus::OpenMuxer(Driver *ioDriver) const
+{
+	/* Create Ogg muxer and open stream.
+	 */
+	AS::Registry		&boca  = AS::Registry::Get();
+	AS::MuxerComponent	*muxer = (AS::MuxerComponent *) boca.CreateComponentByID("ogg-mux");
+
+	if (muxer == NIL) return NIL;
+
+	muxer->SetConfiguration(GetConfiguration());
+	muxer->SetDriver(ioDriver);
+
+	if (!muxer->Open(MUXER_MODE_READ))
+	{
+		boca.DeleteComponent(muxer);
+
+		return NIL;
+	}
+
+	return muxer;
+}
+
+Void BoCA::DecoderOpus::CloseMuxer(AS::MuxerComponent *muxer) const
+{
+	if (muxer == NIL) return;
+
+	muxer->Close();
+
+	AS::Registry::Get().DeleteComponent(muxer);
 }
 
 ConfigLayer *BoCA::DecoderOpus::GetConfigurationLayer()
