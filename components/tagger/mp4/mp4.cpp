@@ -206,34 +206,40 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	 */
 	if (info.rating >= 0) AddItmfItem(mp4File, "rate", NIL, NIL, String::FromInt(info.rating));
 
-	foreach (const String &pair, info.other)
+	Array<String>	 keys = Info::GetOtherInfoKeys(&info);
+
+	foreach (const String &key, keys)
 	{
-		String	 key   = pair.Head(pair.Find(":"));
-		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1).Trim();
+		Array<String>	 values = Info::GetOtherInfoList(&info, key);
+		String		 value;
+
+		/* Use the first non-blank value; skip keys without one.
+		 */
+		for (Int i = 0; i < values.Length() && value == NIL; i++) value = values.GetNth(i).Trim();
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST)      AddItmfItem(mp4File,  "aART", NIL, NIL, value);
+		if	(key == INFO_ALBUMARTIST)      AddItmfItem(mp4File,  "aART", NIL, NIL, values);
 
-		else if	(key == INFO_CONTENTGROUP)     AddItmfItem(mp4File, L"©grp", NIL, NIL, value);
+		else if	(key == INFO_CONTENTGROUP)     AddItmfItem(mp4File, L"©grp", NIL, NIL, values);
 
-		else if	(key == INFO_COMPOSER)         AddItmfItem(mp4File, L"©wrt", NIL, NIL, value);
+		else if	(key == INFO_COMPOSER)         AddItmfItem(mp4File, L"©wrt", NIL, NIL, values);
 
 		else if	(key == INFO_MOVEMENT)	       AddItmfItem(mp4File, L"©mvi", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
 		else if	(key == INFO_MOVEMENTTOTAL)    AddItmfItem(mp4File, L"©mvc", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
-		else if	(key == INFO_MOVEMENTNAME)     AddItmfItem(mp4File, L"©mvn", NIL, NIL, value);
+		else if	(key == INFO_MOVEMENTNAME)     AddItmfItem(mp4File, L"©mvn", NIL, NIL, values);
 
 		else if (key == INFO_BPM)	       AddItmfItem(mp4File,  "tmpo", NIL, NIL, value, MP4_ITMF_BT_INTEGER);
 
-		else if	(key == INFO_COPYRIGHT)        AddItmfItem(mp4File,  "cprt", NIL, NIL, value);
+		else if	(key == INFO_COPYRIGHT)        AddItmfItem(mp4File,  "cprt", NIL, NIL, values);
 
-		else if	(key == INFO_LYRICS)	       AddItmfItem(mp4File, L"©lyr", NIL, NIL, pair.Tail(pair.Length() - pair.Find(":") - 1));
+		else if	(key == INFO_LYRICS)	       AddItmfItem(mp4File, L"©lyr", NIL, NIL, values.GetFirst());
 
-		else if	(key == INFO_SORT_ARTIST)      AddItmfItem(mp4File,  "soar", NIL, NIL, value);
-		else if	(key == INFO_SORT_ALBUM)       AddItmfItem(mp4File,  "soal", NIL, NIL, value);
-		else if	(key == INFO_SORT_ALBUMARTIST) AddItmfItem(mp4File,  "soaa", NIL, NIL, value);
-		else if	(key == INFO_SORT_COMPOSER)    AddItmfItem(mp4File,  "soco", NIL, NIL, value);
-		else if	(key == INFO_SORT_TITLE)       AddItmfItem(mp4File,  "sonm", NIL, NIL, value);
+		else if	(key == INFO_SORT_ARTIST)      AddItmfItem(mp4File,  "soar", NIL, NIL, values);
+		else if	(key == INFO_SORT_ALBUM)       AddItmfItem(mp4File,  "soal", NIL, NIL, values);
+		else if	(key == INFO_SORT_ALBUMARTIST) AddItmfItem(mp4File,  "soaa", NIL, NIL, values);
+		else if	(key == INFO_SORT_COMPOSER)    AddItmfItem(mp4File,  "soco", NIL, NIL, values);
+		else if	(key == INFO_SORT_TITLE)       AddItmfItem(mp4File,  "sonm", NIL, NIL, values);
 	}
 
 	/* Save generic iTunes metadata.
@@ -241,49 +247,53 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 	if (info.label != NIL) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LABEL", info.label);
 	if (info.isrc  != NIL) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ISRC",  info.isrc, MP4_ITMF_BT_ISRC);
 
-	foreach (const String &pair, info.other)
+	foreach (const String &key, keys)
 	{
-		String	 key   = pair.Head(pair.Find(":"));
-		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1).Trim();
+		Array<String>	 values = Info::GetOtherInfoList(&info, key);
+		String		 value;
+
+		/* Use the first non-blank value; skip keys without one.
+		 */
+		for (Int i = 0; i < values.Length() && value == NIL; i++) value = values.GetNth(i).Trim();
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_SUBTITLE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "SUBTITLE",				value);
+		if	(key == INFO_SUBTITLE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "SUBTITLE",				values);
 
-		else if	(key == INFO_CONDUCTOR)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CONDUCTOR",				value);
-		else if	(key == INFO_REMIXER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "REMIXER",				value);
-		else if	(key == INFO_LYRICIST)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LYRICIST",				value);
-		else if	(key == INFO_PRODUCER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "PRODUCER",				value);
-		else if	(key == INFO_ENGINEER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ENGINEER",				value);
+		else if	(key == INFO_CONDUCTOR)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CONDUCTOR",				values);
+		else if	(key == INFO_REMIXER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "REMIXER",				values);
+		else if	(key == INFO_LYRICIST)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LYRICIST",				values);
+		else if	(key == INFO_PRODUCER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "PRODUCER",				values);
+		else if	(key == INFO_ENGINEER)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ENGINEER",				values);
 
-		else if	(key == INFO_INITIALKEY)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "initialkey",			value);
+		else if	(key == INFO_INITIALKEY)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "initialkey",			values);
 
-		else if	(key == INFO_MEDIATYPE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MEDIA",				value);
-		else if	(key == INFO_CATALOGNUMBER)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CATALOGNUMBER",			value);
-		else if	(key == INFO_BARCODE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "BARCODE",				value);
+		else if	(key == INFO_MEDIATYPE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MEDIA",				values);
+		else if	(key == INFO_CATALOGNUMBER)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "CATALOGNUMBER",			values);
+		else if	(key == INFO_BARCODE)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "BARCODE",				values);
 
-		else if	(key == INFO_DISCSUBTITLE)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE",			value);
+		else if	(key == INFO_DISCSUBTITLE)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "DISCSUBTITLE",			values);
 
-		else if	(key == INFO_SCRIPT)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "SCRIPT",				value);
+		else if	(key == INFO_SCRIPT)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "SCRIPT",				values);
 
-		else if	(key == INFO_ASIN)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ASIN",				value);
+		else if	(key == INFO_ASIN)			   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ASIN",				values);
 
-		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Artist Id",		value);
-		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Id",		value);
-		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Artist Id",	value);
-		else if	(key == INFO_MUSICBRAINZ_WORKID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Work Id",		value);
-		else if	(key == INFO_MUSICBRAINZ_DISCID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Disc Id",		value);
-		else if	(key == INFO_MUSICBRAINZ_TRACKID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Track Id",		value);
-		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Original Artist Id",	value);
-		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Original Album Id",	value);
-		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Release Group Id",	value);
-		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Release Track Id",	value);
-		else if	(key == INFO_MUSICBRAINZ_TRMID)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz TRM Id",		value);
+		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Artist Id",		values);
+		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Id",		values);
+		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Artist Id",	values);
+		else if	(key == INFO_MUSICBRAINZ_WORKID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Work Id",		values);
+		else if	(key == INFO_MUSICBRAINZ_DISCID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Disc Id",		values);
+		else if	(key == INFO_MUSICBRAINZ_TRACKID)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Track Id",		values);
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Original Artist Id",	values);
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Original Album Id",	values);
+		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Release Group Id",	values);
+		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Release Track Id",	values);
+		else if	(key == INFO_MUSICBRAINZ_TRMID)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz TRM Id",		values);
 
-		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Type",		value);
-		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Status",		value);
+		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Type",		values);
+		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Status",		values);
 
-		else if	(key == INFO_RELEASECOUNTRY)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Release Country",	value);
+		else if	(key == INFO_RELEASECOUNTRY)		   AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "MusicBrainz Album Release Country",	values);
 	}
 
 	/* Save Replay Gain info.
@@ -395,11 +405,80 @@ Bool BoCA::TaggerMP4::AddItmfItem(MP4FileHandle mp4File, const String &code, con
 	return True;
 }
 
+/* Copy a string as UTF-8 into a new buffer that is added to a list.
+ */
+static char *CopyUTF8(const String &string, Array<Buffer<char> *> &buffers)
+{
+	const char	*utf8	  = string.ConvertTo("UTF-8");
+	Int		 utf8Size = strlen(utf8);
+	Buffer<char>	*buffer	  = new Buffer<char>(utf8Size + 1);
+
+	memcpy(*buffer, utf8, utf8Size + 1);
+
+	buffers.Add(buffer);
+
+	return *buffer;
+}
+
+Bool BoCA::TaggerMP4::AddItmfItem(MP4FileHandle mp4File, const String &code, const String &meaning, const String &id, const Array<String> &values)
+{
+	Array<String>	 strings;
+
+	foreach (const String &value, values) if (value.Trim() != NIL) strings.Add(value.Trim());
+
+	if (strings.Length() == 0) return False;
+
+	/* Keep converted strings alive until the item is added. String
+	 * keeps only a few recent conversions, so the value conversions
+	 * would free the mean and name conversions if they were not copied.
+	 */
+	Array<Buffer<char> *>	 buffers;
+	MP4ItmfItem		*item = ex_MP4ItmfItemAlloc(code.ConvertTo("ISO-8859-1"), strings.Length());
+
+	if (meaning != NIL) item->mean = CopyUTF8(meaning, buffers);
+	if (id	    != NIL) item->name = CopyUTF8(id, buffers);
+
+	for (Int i = 0; i < strings.Length(); i++)
+	{
+		item->dataList.elements[i].typeCode  = MP4_ITMF_BT_UTF8;
+		item->dataList.elements[i].value     = (uint8_t *) CopyUTF8(strings.GetNth(i), buffers);
+		item->dataList.elements[i].valueSize = strlen((char *) item->dataList.elements[i].value);
+	}
+
+	ex_MP4ItmfAddItem(mp4File, item);
+
+	/* Detach borrowed pointers before freeing the item. The code
+	 * belongs to the item, because MP4ItmfItemAlloc copies it.
+	 */
+	item->mean = NIL;
+	item->name = NIL;
+
+	for (Int i = 0; i < strings.Length(); i++)
+	{
+		item->dataList.elements[i].typeCode  = MP4_ITMF_BT_IMPLICIT;
+		item->dataList.elements[i].value     = NIL;
+		item->dataList.elements[i].valueSize = 0;
+	}
+
+	ex_MP4ItmfItemFree(item);
+
+	foreach (Buffer<char> *buffer, buffers) delete buffer;
+
+	return True;
+}
+
 Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 {
 	const Config	*currentConfig = GetConfiguration();
 
 	Info		 info	 = track.GetInfo();
+
+	/* Values from this tag replace the values that tags read before gave
+	 * the same keys; several values of a key in this tag add up.
+	 */
+	Array<String>	 previousOther = info.other;
+
+	info.other.RemoveAll();
 
 	MP4FileHandle	 mp4File = ex_MP4Read(fileName.ConvertTo("UTF-8"));
 
@@ -463,15 +542,17 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 		}
 	}
 
-	/* Set artist to album artist if artist is not filled.
-	 */
-	if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
-
 	ex_MP4TagsFree(mp4Tags);
 
 	/* Parse generic iTunes metadata.
 	 */
 	ParseItmfItems(mp4File, info);
+
+	Info::AddMissingOtherInfo(&info, previousOther);
+
+	/* Set artist to album artist if artist is not filled.
+	 */
+	if (info.artist == NIL) info.artist = info.GetOtherInfo(INFO_ALBUMARTIST);
 
 	track.SetInfo(info);
 
@@ -565,36 +646,41 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 			code.ImportFrom("ISO-8859-1", item.code);
 
-			String	 value = GetItmfItemValue(item);
+			String		 value	= GetItmfItemValue(item);
+			Array<String>	 values	= GetItmfItemValues(item);
 
-			if (value == NIL) continue;
+			/* Fields with several values use values, which skips blank
+			 * data, so an item can have values when its first data is
+			 * blank. Fields with one value check value != NIL.
+			 */
+			if (value == NIL && values.Length() == 0) continue;
 
-			else if	(code ==  "rate") info.rating = Math::Min(100, value.ToInt());
+			else if	(code ==  "rate" && value != NIL) info.rating = Math::Min(100, value.ToInt());
 
-			else if	(code ==  "aART") info.SetOtherInfo(INFO_ALBUMARTIST,	   value);
+			else if	(code ==  "aART") Info::AddOtherInfo(&info, INFO_ALBUMARTIST,	   values);
 
-			else if	(code == L"©grp") info.SetOtherInfo(INFO_CONTENTGROUP,	   value);
+			else if	(code == L"©grp") Info::AddOtherInfo(&info, INFO_CONTENTGROUP,	   values);
 
-			else if	(code == L"©wrt") info.SetOtherInfo(INFO_COMPOSER,	   value);
+			else if	(code == L"©wrt") Info::AddOtherInfo(&info, INFO_COMPOSER,	   values);
 
-			if	(code == L"©mvi") info.SetOtherInfo(INFO_MOVEMENT,         value);
-			else if (code == L"©mvc") info.SetOtherInfo(INFO_MOVEMENTTOTAL,    value);
-			else if	(code == L"©mvn") info.SetOtherInfo(INFO_MOVEMENTNAME,     value);
+			if	(code == L"©mvi" && value != NIL) info.SetOtherInfo(INFO_MOVEMENT,         value);
+			else if (code == L"©mvc" && value != NIL) info.SetOtherInfo(INFO_MOVEMENTTOTAL,    value);
+			else if	(code == L"©mvn") Info::AddOtherInfo(&info, INFO_MOVEMENTNAME,     values);
 
 			else if	(code ==  "tmpo")
 			{
 				if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
 			}
 
-			else if	(code ==  "cprt") info.SetOtherInfo(INFO_COPYRIGHT,	   value);
+			else if	(code ==  "cprt") Info::AddOtherInfo(&info, INFO_COPYRIGHT,	   values);
 
-			else if	(code == L"©lyr") info.SetOtherInfo(INFO_LYRICS,	   value);
+			else if	(code == L"©lyr" && value != NIL) info.SetOtherInfo(INFO_LYRICS,	   value);
 
-			else if (code ==  "soar") info.SetOtherInfo(INFO_SORT_ARTIST,	   value);
-			else if (code ==  "soal") info.SetOtherInfo(INFO_SORT_ALBUM,	   value);
-			else if (code ==  "soaa") info.SetOtherInfo(INFO_SORT_ALBUMARTIST, value);
-			else if (code ==  "soco") info.SetOtherInfo(INFO_SORT_COMPOSER,	   value);
-			else if (code ==  "sonm") info.SetOtherInfo(INFO_SORT_TITLE,	   value);
+			else if (code ==  "soar") Info::AddOtherInfo(&info, INFO_SORT_ARTIST,	   values);
+			else if (code ==  "soal") Info::AddOtherInfo(&info, INFO_SORT_ALBUM,	   values);
+			else if (code ==  "soaa") Info::AddOtherInfo(&info, INFO_SORT_ALBUMARTIST, values);
+			else if (code ==  "soco") Info::AddOtherInfo(&info, INFO_SORT_COMPOSER,	   values);
+			else if (code ==  "sonm") Info::AddOtherInfo(&info, INFO_SORT_TITLE,	   values);
 		}
 
 		ex_MP4ItmfItemListFree(items);
@@ -614,60 +700,64 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 			/* Read and assign value string.
 			 */
-			String	 id    = String(item.name).ToUpper();
-			String	 value = GetItmfItemValue(item).Trim();
+			String		 id	= String(item.name).ToUpper();
+			String		 value	= GetItmfItemValue(item).Trim();
+			Array<String>	 values	= GetItmfItemValues(item);
 
-			if (value == NIL) continue;
+			/* Fields with several values use values, which skips blank
+			 * data. Fields with one value check value != NIL.
+			 */
+			if (value == NIL && values.Length() == 0) continue;
 
-			if	(id == "LABEL"	   ||
-				 id == "PUBLISHER")	info.label = value;
+			if	((id == "LABEL"	   ||
+				  id == "PUBLISHER") && value != NIL) info.label = value;
 
 			else if (id == "ISRC")
 			{
 				if (Info::IsISRC(value)) info.isrc = value;
 			}
 
-			else if (id == "SUBTITLE")	info.SetOtherInfo(INFO_SUBTITLE,      value);
+			else if (id == "SUBTITLE")	Info::AddOtherInfo(&info, INFO_SUBTITLE,      values);
 
-			else if (id == "CONDUCTOR")	info.SetOtherInfo(INFO_CONDUCTOR,     value);
-			else if (id == "REMIXER")	info.SetOtherInfo(INFO_REMIXER,	      value);
-			else if (id == "LYRICIST")	info.SetOtherInfo(INFO_LYRICIST,      value);
-			else if (id == "PRODUCER")	info.SetOtherInfo(INFO_PRODUCER,      value);
-			else if (id == "ENGINEER")	info.SetOtherInfo(INFO_ENGINEER,      value);
+			else if (id == "CONDUCTOR")	Info::AddOtherInfo(&info, INFO_CONDUCTOR,     values);
+			else if (id == "REMIXER")	Info::AddOtherInfo(&info, INFO_REMIXER,	      values);
+			else if (id == "LYRICIST")	Info::AddOtherInfo(&info, INFO_LYRICIST,      values);
+			else if (id == "PRODUCER")	Info::AddOtherInfo(&info, INFO_PRODUCER,      values);
+			else if (id == "ENGINEER")	Info::AddOtherInfo(&info, INFO_ENGINEER,      values);
 
-			else if (id == "INITIALKEY")	info.SetOtherInfo(INFO_INITIALKEY,    value);
+			else if (id == "INITIALKEY")	Info::AddOtherInfo(&info, INFO_INITIALKEY,    values);
 
-			else if (id == "MEDIA")		info.SetOtherInfo(INFO_MEDIATYPE,     value);
-			else if (id == "CATALOGNUMBER")	info.SetOtherInfo(INFO_CATALOGNUMBER, value);
-			else if (id == "BARCODE")	info.SetOtherInfo(INFO_BARCODE,	      value);
+			else if (id == "MEDIA")		Info::AddOtherInfo(&info, INFO_MEDIATYPE,     values);
+			else if (id == "CATALOGNUMBER")	Info::AddOtherInfo(&info, INFO_CATALOGNUMBER, values);
+			else if (id == "BARCODE")	Info::AddOtherInfo(&info, INFO_BARCODE,	      values);
 
-			else if (id == "DISCSUBTITLE")	info.SetOtherInfo(INFO_DISCSUBTITLE,  value);
+			else if (id == "DISCSUBTITLE")	Info::AddOtherInfo(&info, INFO_DISCSUBTITLE,  values);
 
-			else if (id == "SCRIPT")	info.SetOtherInfo(INFO_SCRIPT,	      value);
+			else if (id == "SCRIPT")	Info::AddOtherInfo(&info, INFO_SCRIPT,	      values);
 
-			else if (id == "ASIN")		info.SetOtherInfo(INFO_ASIN,	      value);
+			else if (id == "ASIN")		Info::AddOtherInfo(&info, INFO_ASIN,	      values);
 
 			else if (id.StartsWith("MUSICBRAINZ"))
 			{
-				if	(id == "MUSICBRAINZ ARTIST ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	 value);
-				else if	(id == "MUSICBRAINZ ALBUM ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,		 value);
-				else if	(id == "MUSICBRAINZ ALBUM ARTIST ID")	    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMARTISTID,	 value);
-				else if	(id == "MUSICBRAINZ WORK ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_WORKID,		 value);
-				else if	(id == "MUSICBRAINZ DISC ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_DISCID,		 value);
-				else if	(id == "MUSICBRAINZ TRACK ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_TRACKID,		 value);
-				else if (id == "MUSICBRAINZ ORIGINAL ARTIST ID")    info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
-				else if	(id == "MUSICBRAINZ ORIGINAL ALBUM ID")	    info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALALBUMID,	 value);
-				else if	(id == "MUSICBRAINZ RELEASE GROUP ID")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASEGROUPID,	 value);
-				else if	(id == "MUSICBRAINZ RELEASE TRACK ID")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETRACKID,	 value);
-				else if	(id == "MUSICBRAINZ TRM ID")		    info.SetOtherInfo(INFO_MUSICBRAINZ_TRMID,		 value);
+				if	(id == "MUSICBRAINZ ARTIST ID")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ARTISTID,	 values);
+				else if	(id == "MUSICBRAINZ ALBUM ID")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMID,		 values);
+				else if	(id == "MUSICBRAINZ ALBUM ARTIST ID")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMARTISTID,	 values);
+				else if	(id == "MUSICBRAINZ WORK ID")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_WORKID,		 values);
+				else if	(id == "MUSICBRAINZ DISC ID")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_DISCID,		 values);
+				else if	(id == "MUSICBRAINZ TRACK ID")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRACKID,		 values);
+				else if (id == "MUSICBRAINZ ORIGINAL ARTIST ID")    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALARTISTID, values);
+				else if	(id == "MUSICBRAINZ ORIGINAL ALBUM ID")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALALBUMID,	 values);
+				else if	(id == "MUSICBRAINZ RELEASE GROUP ID")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASEGROUPID,	 values);
+				else if	(id == "MUSICBRAINZ RELEASE TRACK ID")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETRACKID,	 values);
+				else if	(id == "MUSICBRAINZ TRM ID")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRMID,		 values);
 
-				else if	(id == "MUSICBRAINZ ALBUM TYPE")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETYPE,	 value);
-				else if	(id == "MUSICBRAINZ ALBUM STATUS")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASESTATUS,	 value);
+				else if	(id == "MUSICBRAINZ ALBUM TYPE")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETYPE,	 values);
+				else if	(id == "MUSICBRAINZ ALBUM STATUS")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASESTATUS,	 values);
 
-				else if	(id == "MUSICBRAINZ ALBUM RELEASE COUNTRY") info.SetOtherInfo(INFO_RELEASECOUNTRY,		 value);
+				else if	(id == "MUSICBRAINZ ALBUM RELEASE COUNTRY") Info::AddOtherInfo(&info, INFO_RELEASECOUNTRY,		 values);
 			}
 
-			else if (id.StartsWith("REPLAYGAIN"))
+			else if (id.StartsWith("REPLAYGAIN") && value != NIL)
 			{
 				if	(id == "REPLAYGAIN_TRACK_GAIN") info.track_gain = value;
 				else if (id == "REPLAYGAIN_TRACK_PEAK") info.track_peak = value;
@@ -723,18 +813,7 @@ String BoCA::TaggerMP4::GetItmfItemValue(MP4ItmfItem &item)
 	    item.dataList.elements[0].typeCode == MP4_ITMF_BT_URL  ||
 	    item.dataList.elements[0].typeCode == MP4_ITMF_BT_ISRC)
 	{
-		/* Read value into buffer.
-		 */
-		Buffer<char>	 buffer(item.dataList.elements[0].valueSize + 1);
-
-		memset(buffer, 0, item.dataList.elements[0].valueSize + 1);
-		memcpy(buffer, item.dataList.elements[0].value, item.dataList.elements[0].valueSize);
-
-		/* Return actual value.
-		 */
-		String::InputFormat	 inputFormat("UTF-8");
-
-		return String(buffer);
+		return GetItmfDataString(item.dataList.elements[0]);
 	}
 	else if (item.dataList.elements[0].typeCode == MP4_ITMF_BT_INTEGER)
 	{
@@ -749,6 +828,42 @@ String BoCA::TaggerMP4::GetItmfItemValue(MP4ItmfItem &item)
 	}
 
 	return NIL;
+}
+
+String BoCA::TaggerMP4::GetItmfDataString(const MP4ItmfData &data)
+{
+	/* Read value into buffer.
+	 */
+	Buffer<char>	 buffer(data.valueSize + 1);
+
+	memset(buffer, 0, data.valueSize + 1);
+	memcpy(buffer, data.value, data.valueSize);
+
+	/* Return actual value.
+	 */
+	String::InputFormat	 inputFormat("UTF-8");
+
+	return String(buffer);
+}
+
+Array<String> BoCA::TaggerMP4::GetItmfItemValues(MP4ItmfItem &item)
+{
+	Array<String>	 values;
+
+	for (UnsignedInt i = 0; i < item.dataList.size; i++)
+	{
+		MP4ItmfData	&data = item.dataList.elements[i];
+
+		if (data.typeCode != MP4_ITMF_BT_UTF8 &&
+		    data.typeCode != MP4_ITMF_BT_URL  &&
+		    data.typeCode != MP4_ITMF_BT_ISRC) continue;
+
+		String	 value = GetItmfDataString(data);
+
+		if (value.Trim() != NIL) values.Add(value.Trim());
+	}
+
+	return values;
 }
 
 Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &track)
@@ -863,15 +978,20 @@ Bool BoCA::TaggerMP4::RemoveItmfItem(MP4FileHandle mp4File, const String &code, 
 	 */
 	MP4ItmfItemList	*items = NIL;
 
-	if (code == "----") items = ex_MP4ItmfGetItemsByMeaning(mp4File, meaning, id);
+	if (code == "----") items = ex_MP4ItmfGetItemsByMeaning(mp4File, meaning, NIL);
 	else		    items = ex_MP4ItmfGetItemsByCode(mp4File, code.ConvertTo("ISO-8859-1"));
 
 	if (items == NIL) return True;
 
-	/* Loop over items and remove them.
+	/* Loop over items and remove them. Freeform items are found by
+	 * name without regard to case, because the reader does the same.
 	 */
 	for (UnsignedInt i = 0; i < items->size; i++)
 	{
+		const MP4ItmfItem	&item = items->elements[i];
+
+		if (code == "----" && (item.name == NIL || String(item.name).ToUpper() != id.ToUpper())) continue;
+
 		ex_MP4ItmfRemoveItem(mp4File, &items->elements[i]);
 	}
 

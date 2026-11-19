@@ -104,11 +104,15 @@ Error BoCA::TaggerRIFF::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track &
 	else if (defaultComment != NIL)				  RenderTagItem("ICMT", defaultComment, buffer);
 
 	/* Save other text info.
+	 *
+	 * Keep only the first value of each key, so that a file never gets
+	 * two INFO chunks with the same ID.
 	 */
-	foreach (const String &pair, info.other)
+	Array<String>	 keys = Info::GetOtherInfoKeys(&info);
+
+	foreach (const String &key, keys)
 	{
-		String	 key   = pair.Head(pair.Find(":"));
-		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+		String	 value = info.GetOtherInfo(key);
 
 		if (value == NIL) continue;
 

@@ -176,6 +176,13 @@ namespace BoCA
 			static Bool		 AddOtherInfo(Info *, const String &, const String &);
 			static Bool		 AddOtherInfo(Info *, const String &, const Array<String> &);
 
+			/* Add the "key:value" entries of a list whose keys this Info
+			 * does not have. Taggers use this to let the values of the tag
+			 * they parse replace the values of tags that were read before.
+			 * User defined texts and URLs are compared per description.
+			 */
+			static Void		 AddMissingOtherInfo(Info *, const Array<String> &);
+
 			static Bool		 IsISRC(const String &);
 
 			/* Class constructors / destructor:

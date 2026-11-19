@@ -194,6 +194,39 @@ Bool BoCA::Info::AddOtherInfo(Info *info, const String &key, const Array<String>
 	return added;
 }
 
+static String GetOtherInfoGroup(const String &entry)
+{
+	Int	 separator = entry.Find(":");
+	String	 key	   = entry.Head(separator);
+
+	if (key != BoCA::INFO_USERTEXT && key != BoCA::INFO_WEB_USERURL) return key;
+
+	String	 value	   = entry.Tail(entry.Length() - separator - 1);
+	Int	 description = value.Find(":|:");
+
+	return String(key).Append(":").Append(description >= 0 ? value.Head(description) : value);
+}
+
+Void BoCA::Info::AddMissingOtherInfo(Info *info, const Array<String> &entries)
+{
+	/* User defined texts and URLs hold one field per description, so
+	 * they are compared by key and description.
+	 */
+	Array<String>	 listed;
+
+	foreach (const String &entry, info->other) listed.Add(GetOtherInfoGroup(entry));
+
+	foreach (const String &entry, entries)
+	{
+		String	 group = GetOtherInfoGroup(entry);
+		Bool	 found = False;
+
+		foreach (const String &name, listed) if (name == group) { found = True; break; }
+
+		if (!found) info->other.Add(entry);
+	}
+}
+
 Bool BoCA::Info::IsISRC(const String &isrc)
 {
 	/* List of assigned ISO 3166-1 ALPHA-2 codes.
