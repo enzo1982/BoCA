@@ -24,11 +24,12 @@ namespace BoCA
 			Int			 RenderAPEHeader(Int, Int, Buffer<UnsignedByte> &);
 			Int			 RenderAPEFooter(Int, Int, Buffer<UnsignedByte> &);
 			Int			 RenderAPEItem(const String &, const String &, Buffer<UnsignedByte> &, Bool = True);
+			Int			 RenderAPEItem(const String &, const Array<String> &, Buffer<UnsignedByte> &, Bool = True);
 			Int			 RenderAPEBinaryItem(const String &, const Buffer<UnsignedByte> &, Buffer<UnsignedByte> &);
 
 			Bool			 ParseAPEHeader(const Buffer<UnsignedByte> &, Int *, Int *);
 			Bool			 ParseAPEFooter(const Buffer<UnsignedByte> &, Int *, Int *);
-			Bool			 ParseAPEItem(const Buffer<UnsignedByte> &, Int &, String *, String *, Bool = True);
+			Bool			 ParseAPEItem(const Buffer<UnsignedByte> &, Int &, String *, Array<String> *, Bool = True);
 			Bool			 ParseAPEBinaryItem(const Buffer<UnsignedByte> &, Int &, String *, Buffer<UnsignedByte> &);
 		public:
 			static const String	&GetComponentSpecs();
