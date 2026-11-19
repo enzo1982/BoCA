@@ -90,13 +90,20 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	Int		 numItems = 0;
 
-	if (info.artist != NIL) { RenderAPEItem("Artist",    info.artist,		   buffer); numItems++; }
-	if (info.title  != NIL) { RenderAPEItem("Title",     info.title,		   buffer); numItems++; }
-	if (info.album  != NIL) { RenderAPEItem("Album",     info.album,		   buffer); numItems++; }
-	if (info.year    >   0) { RenderAPEItem("Year",	     String::FromInt(info.year),   buffer); numItems++; }
-	if (info.genre  != NIL) { RenderAPEItem("Genre",     info.genre,		   buffer); numItems++; }
-	if (info.label  != NIL) { RenderAPEItem("Publisher", info.label,		   buffer); numItems++; }
-	if (info.isrc   != NIL) { RenderAPEItem("ISRC",	     info.isrc,			   buffer); numItems++; }
+	/* Artist, genre, label and ISRC can have several values in one item.
+	 */
+	Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+	Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+	Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+	Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+	if (artists.Length() > 0) { RenderAPEItem("Artist",    artists,			   buffer); numItems++; }
+	if (info.title  != NIL)	  { RenderAPEItem("Title",     info.title,		   buffer); numItems++; }
+	if (info.album  != NIL)	  { RenderAPEItem("Album",     info.album,		   buffer); numItems++; }
+	if (info.year    >   0)	  { RenderAPEItem("Year",      String::FromInt(info.year), buffer); numItems++; }
+	if (genres.Length()  > 0) { RenderAPEItem("Genre",     genres,			   buffer); numItems++; }
+	if (labels.Length()  > 0) { RenderAPEItem("Publisher", labels,			   buffer); numItems++; }
+	if (isrcs.Length()   > 0) { RenderAPEItem("ISRC",      isrcs,			   buffer); numItems++; }
 
 	if (info.track > 0)
 	{
@@ -461,6 +468,13 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 	info.other.RemoveAll();
 
+	/* Artist, genre, label and ISRC can have several values in this tag.
+	 */
+	Array<String>	 artists;
+	Array<String>	 genres;
+	Array<String>	 labels;
+	Array<String>	 isrcs;
+
 	for (Int i = 0; i < numItems; i++)
 	{
 		String			 id;
@@ -478,11 +492,11 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 		id = id.ToUpper();
 
-		if	(id == "ARTIST")	  info.artist = value;
+		if	(id == "ARTIST")	  { foreach (const String &text, values) artists.Add(text); }
 		else if (id == "TITLE")		  info.title  = value;
 		else if (id == "ALBUM")		  info.album  = value;
 		else if (id == "YEAR")		  info.year   = value.ToInt();
-		else if (id == "GENRE")		  info.genre  = value;
+		else if (id == "GENRE")		  { foreach (const String &text, values) genres.Add(text); }
 
 		else if (id == "COMMENT")
 		{
@@ -491,12 +505,12 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 			info.comment = values.GetFirst();
 		}
 
-		else if (id == "PUBLISHER")	  info.label  = value;
-		else if (id == "LABEL")		  info.label  = value;
+		else if (id == "PUBLISHER" ||
+			 id == "LABEL")		  { foreach (const String &text, values) labels.Add(text); }
 
 		else if (id == "ISRC")
 		{
-			if (Info::IsISRC(value))  info.isrc   = value;
+			foreach (const String &text, values) if (Info::IsISRC(text)) isrcs.Add(text);
 		}
 
 		else if (id == "RATING")	  info.rating = Math::Min(100, value.ToInt());
@@ -719,6 +733,14 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 	}
 
 	Info::AddMissingOtherInfo(&info, previousOther);
+
+	/* Set the lists of this tag after the values of earlier tags, so
+	 * that one value of this tag replaces a list of an earlier tag.
+	 */
+	if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+	if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+	if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+	if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 	/* Set artist to album artist if artist is not filled.
 	 */

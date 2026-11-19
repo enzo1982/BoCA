@@ -95,13 +95,23 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	Int	 numItems = 0;
 
-	if	(info.artist != NIL) { RenderTagItem("ARTIST",	    info.artist,		  buffer); numItems++; }
+	/* Artist, genre, label and ISRC can have several values, one field
+	 * for each value.
+	 */
+	Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+	Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+	Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+	Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+	foreach (const String &value, artists) { RenderTagItem("ARTIST",    value, buffer); numItems++; }
+
 	if	(info.title  != NIL) { RenderTagItem("TITLE",	    info.title,			  buffer); numItems++; }
 	if	(info.album  != NIL) { RenderTagItem("ALBUM",	    info.album,			  buffer); numItems++; }
 	if	(info.year    >   0) { RenderTagItem("DATE",	    String::FromInt(info.year),   buffer); numItems++; }
-	if	(info.genre  != NIL) { RenderTagItem("GENRE",	    info.genre,			  buffer); numItems++; }
-	if	(info.label  != NIL) { RenderTagItem("PUBLISHER",   info.label,			  buffer); numItems++; }
-	if	(info.isrc   != NIL) { RenderTagItem("ISRC",	    info.isrc,			  buffer); numItems++; }
+
+	foreach (const String &value, genres)  { RenderTagItem("GENRE",     value, buffer); numItems++; }
+	foreach (const String &value, labels)  { RenderTagItem("PUBLISHER", value, buffer); numItems++; }
+	foreach (const String &value, isrcs)   { RenderTagItem("ISRC",	    value, buffer); numItems++; }
 
 	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(prependZero && info.track	 < 10 ? "0" : NIL).Append(String::FromInt(info.track)),	    buffer); numItems++; }
 	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL",  String(prependZero && info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
@@ -338,6 +348,13 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 	info.other.RemoveAll();
 
+	/* Artist, genre, label and ISRC can come several times in this tag.
+	 */
+	Array<String>	 artists;
+	Array<String>	 genres;
+	Array<String>	 labels;
+	Array<String>	 isrcs;
+
 	for (Int i = 0; i < numItems; i++)
 	{
 		/* Read and check next comment string length.
@@ -355,20 +372,20 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		if (value == NIL) continue;
 
-		if	(id == "ARTIST")	  info.artist	 = value;
+		if	(id == "ARTIST")	  artists.Add(value);
 		else if (id == "TITLE")		  info.title	 = value;
 		else if (id == "ALBUM")		  info.album	 = value;
 		else if (id == "DATE")		  info.year	 = value.ToInt();
-		else if (id == "GENRE")		  info.genre	 = value;
+		else if (id == "GENRE")		  genres.Add(value);
 		else if (id == "COMMENT")	  info.comment	 = comment.Tail(comment.Length() - comment.Find("=") - 1);
 
 		else if (id == "LABEL"	   ||
 			 id == "PUBLISHER" ||
-			 id == "ORGANIZATION")	  info.label	 = value;
+			 id == "ORGANIZATION")	  labels.Add(value);
 
 		else if (id == "ISRC")
 		{
-			if (Info::IsISRC(value))  info.isrc	 = value;
+			if (Info::IsISRC(value))  isrcs.Add(value);
 		}
 
 		else if (id == "TRACKNUMBER")
@@ -645,6 +662,14 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 	}
 
 	Info::AddMissingOtherInfo(&info, previousOther);
+
+	/* Set the lists of this tag after the values of earlier tags, so
+	 * that one value of this tag replaces a list of an earlier tag.
+	 */
+	if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+	if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+	if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+	if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 	/* Set artist to album artist if artist is not filled.
 	 */

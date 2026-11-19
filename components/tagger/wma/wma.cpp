@@ -154,13 +154,23 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 		 */
 		const Info	&info = track.GetInfo();
 
-		if (info.artist != NIL) RenderWMAStringItem(g_wszWMAuthor,     info.artist,		   pHeaderInfo);
+		/* Artist, genre, label and ISRC can have several values, one
+		 * attribute for each value.
+		 */
+		Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+		Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+		Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+		Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+		foreach (const String &value, artists) RenderWMAStringItem(g_wszWMAuthor, value, pHeaderInfo);
+
 		if (info.title  != NIL) RenderWMAStringItem(g_wszWMTitle,      info.title,		   pHeaderInfo);
 		if (info.album  != NIL) RenderWMAStringItem(g_wszWMAlbumTitle, info.album,		   pHeaderInfo);
 		if (info.year    >   0) RenderWMAStringItem(g_wszWMYear,       String::FromInt(info.year), pHeaderInfo);
-		if (info.genre  != NIL) RenderWMAStringItem(g_wszWMGenre,      info.genre,		   pHeaderInfo);
-		if (info.label  != NIL) RenderWMAStringItem(g_wszWMPublisher,  info.label,		   pHeaderInfo);
-		if (info.isrc   != NIL) RenderWMAStringItem(g_wszWMISRC,       info.isrc,		   pHeaderInfo);
+
+		foreach (const String &value, genres) RenderWMAStringItem(g_wszWMGenre,	    value, pHeaderInfo);
+		foreach (const String &value, labels) RenderWMAStringItem(g_wszWMPublisher, value, pHeaderInfo);
+		foreach (const String &value, isrcs)  RenderWMAStringItem(g_wszWMISRC,	    value, pHeaderInfo);
 
 		if (info.track > 0)
 		{
@@ -427,6 +437,13 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 		info.other.RemoveAll();
 
+		/* Artist, genre, label and ISRC can come several times in this tag.
+		 */
+		Array<String>	 artists;
+		Array<String>	 genres;
+		Array<String>	 labels;
+		Array<String>	 isrcs;
+
 		WORD	 langIndex = 0;
 		WORD	 numIndices = 0;
 
@@ -471,17 +488,17 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			/* Assign values to metadata fields.
 			 */
-			if	(id == g_wszWMAuthor)		       info.artist  = value;
+			if	(id == g_wszWMAuthor)		       artists.Add(value);
 			else if (id == g_wszWMTitle)		       info.title   = value;
 			else if (id == g_wszWMAlbumTitle)	       info.album   = value;
 			else if (id == g_wszWMYear)		       info.year    = value.ToInt();
-			else if (id == g_wszWMGenre)		       info.genre   = value;
+			else if (id == g_wszWMGenre)		       genres.Add(value);
 			else if (id == g_wszWMDescription)	       info.comment = String((LPWSTR) pbValue);
-			else if (id == g_wszWMPublisher)	       info.label   = value;
+			else if (id == g_wszWMPublisher)	       labels.Add(value);
 
 			else if (id == g_wszWMISRC)
 			{
-				if (Info::IsISRC(value)) info.isrc = value;
+				if (Info::IsISRC(value)) isrcs.Add(value);
 			}
 
 			else if (id == g_wszWMAlbumArtist)	       Info::AddOtherInfo(&info, INFO_ALBUMARTIST,	value);
@@ -653,6 +670,14 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 		delete [] indices;
 
 		Info::AddMissingOtherInfo(&info, previousOther);
+
+		/* Set the lists of this tag after the values of earlier tags, so
+		 * that one value of this tag replaces a list of an earlier tag.
+		 */
+		if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+		if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+		if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+		if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 		/* Set artist to album artist if artist is not filled.
 		 */

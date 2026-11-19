@@ -194,6 +194,23 @@ Bool BoCA::Info::AddOtherInfo(Info *info, const String &key, const Array<String>
 	return added;
 }
 
+/* The basic field that a value list belongs to.
+ */
+static String *GetBasicField(BoCA::Info *info, const String &key)
+{
+	if	(key == BoCA::INFO_ARTISTS) return &info->artist;
+	else if (key == BoCA::INFO_GENRES)  return &info->genre;
+	else if (key == BoCA::INFO_LABELS)  return &info->label;
+	else if (key == BoCA::INFO_ISRCS)   return &info->isrc;
+
+	return NIL;
+}
+
+Bool BoCA::Info::IsBasicInfoList(const String &key)
+{
+	return key == INFO_ARTISTS || key == INFO_GENRES || key == INFO_LABELS || key == INFO_ISRCS;
+}
+
 static String GetOtherInfoGroup(const String &entry)
 {
 	Int	 separator = entry.Find(":");
@@ -216,6 +233,15 @@ Void BoCA::Info::AddMissingOtherInfo(Info *info, const Array<String> &entries)
 
 	foreach (const String &entry, info->other) listed.Add(GetOtherInfoGroup(entry));
 
+	/* A value list of a basic field from an earlier tag stays only if
+	 * this tag left the field at its first value. Otherwise the field
+	 * now holds a value of this tag, and the old list does not fit it.
+	 */
+	Array<String>	 dropped;
+	Array<String>	 keys = GetOtherInfoKeys(info);
+
+	foreach (const String &key, keys) if (IsBasicInfoList(key)) dropped.Add(key);
+
 	foreach (const String &entry, entries)
 	{
 		String	 group = GetOtherInfoGroup(entry);
@@ -223,8 +249,89 @@ Void BoCA::Info::AddMissingOtherInfo(Info *info, const Array<String> &entries)
 
 		foreach (const String &name, listed) if (name == group) { found = True; break; }
 
-		if (!found) info->other.Add(entry);
+		if (found) continue;
+
+		if (IsBasicInfoList(group))
+		{
+			Bool	 skip = False;
+
+			foreach (const String &name, dropped) if (name == group) { skip = True; break; }
+
+			if (skip) continue;
+
+			/* Check the first value of the earlier list once.
+			 */
+			Array<String>	 values;
+
+			foreach (const String &previous, entries)
+			{
+				Int	 separator = previous.Find(":");
+
+				if (previous.Head(separator) == group) values.Add(previous.Tail(previous.Length() - separator - 1));
+			}
+
+			dropped.Add(group);
+
+			if (values.Length() == 0 || values.GetFirst() != *GetBasicField(info, group)) continue;
+
+			AddOtherInfo(info, group, values);
+
+			continue;
+		}
+
+		info->other.Add(entry);
 	}
+}
+
+Array<String> BoCA::Info::GetInfoList(const Info *info, const String &key)
+{
+	if (!IsBasicInfoList(key)) return GetOtherInfoList(info, key);
+
+	Array<String>	 values;
+	const String	&field = *GetBasicField(const_cast<Info *>(info), key);
+
+	if (field == NIL) return values;
+
+	Array<String>	 list = GetOtherInfoList(info, key);
+
+	if (list.Length() > 0 && list.GetFirst() == field) return list;
+
+	values.Add(field);
+
+	return values;
+}
+
+Bool BoCA::Info::SetInfoList(Info *info, const String &key, const Array<String> &values)
+{
+	if (key == NIL) return False;
+
+	/* Drop empty values and values that come twice.
+	 */
+	Array<String>	 list;
+
+	foreach (const String &value, values)
+	{
+		if (value == NIL) continue;
+
+		Bool	 found = False;
+
+		foreach (const String &listed, list) if (listed == value) { found = True; break; }
+
+		if (!found) list.Add(value);
+	}
+
+	info->SetOtherInfo(key, NIL);
+
+	if (IsBasicInfoList(key))
+	{
+		*GetBasicField(info, key) = (list.Length() > 0 ? list.GetFirst() : String());
+
+		if (list.Length() <= 1) return True;
+	}
+
+	AddOtherInfo(info, key, list);
+
+	return True;
 }
 
 Bool BoCA::Info::IsISRC(const String &isrc)
