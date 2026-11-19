@@ -30,10 +30,10 @@ namespace BoCA
 			ConfigLayer		*configLayer;
 
 			static Bool		 AddItmfItem(MP4FileHandle, const String &, const String &, const String &, const String &, MP4ItmfBasicType = MP4_ITMF_BT_UTF8);
-			static Bool		 AddItmfItem(MP4FileHandle, const String &, const String &, const String &, const Array<String> &);
+			static Bool		 AddItmfItem(MP4FileHandle, const String &, const String &, const String &, const Array<String> &, MP4ItmfBasicType = MP4_ITMF_BT_UTF8);
 			static Bool		 RemoveItmfItem(MP4FileHandle, const String &, const String & = NIL, const String & = NIL);
 
-			static Bool		 ParseItmfItems(MP4FileHandle, Info &);
+			static Bool		 ParseItmfItems(MP4FileHandle, Info &, const Array<String> &);
 			static String		 GetItmfItemValue(MP4ItmfItem &);
 			static Array<String>	 GetItmfItemValues(MP4ItmfItem &);
 			static String		 GetItmfDataString(const MP4ItmfData &);

@@ -260,6 +260,56 @@ static Void CheckMultiValues(const Info &info, const String &context)
 	CheckValues(info, INFO_MUSICBRAINZ_ARTISTID, "11111111-1111-1111-1111-111111111111|22222222-2222-2222-2222-222222222222", context);
 }
 
+/* Info with several artists, genres, labels and ISRCs.
+ */
+static Info BasicListInfo()
+{
+	Info		 info = SingleValueInfo();
+	Array<String>	 values;
+
+	values.Add("Artist A");
+	values.Add("Artist B");
+
+	Info::SetInfoList(&info, INFO_ARTISTS, values);
+
+	values.RemoveAll();
+	values.Add("Rock");
+	values.Add("Jazz");
+
+	Info::SetInfoList(&info, INFO_GENRES, values);
+
+	values.RemoveAll();
+	values.Add("Label A");
+	values.Add("Label B");
+
+	Info::SetInfoList(&info, INFO_LABELS, values);
+
+	values.RemoveAll();
+	values.Add("USRC17607839");
+	values.Add("GBAYE0601498");
+
+	Info::SetInfoList(&info, INFO_ISRCS, values);
+
+	return info;
+}
+
+static Void CheckBasicList(const Info &info, const String &key, const String &expected, const String &context)
+{
+	String	 actual = Join(Info::GetInfoList(&info, key));
+
+	Check(actual == expected, String(context).Append(": ").Append(key).Append(" is \"").Append(actual).Append("\", expected \"").Append(expected).Append("\""));
+}
+
+static Void CheckBasicLists(const Info &info, const String &context)
+{
+	CheckBasicList(info, INFO_ARTISTS, "Artist A|Artist B", context);
+	CheckBasicList(info, INFO_GENRES, "Rock|Jazz", context);
+	CheckBasicList(info, INFO_LABELS, "Label A|Label B", context);
+	CheckBasicList(info, INFO_ISRCS, "USRC17607839|GBAYE0601498", context);
+
+	Check(info.artist == "Artist A" && info.genre == "Rock" && info.label == "Label A" && info.isrc == "USRC17607839", String(context).Append(": basic fields hold the first values"));
+}
+
 static Void CheckInfo()
 {
 	Info	 info;
@@ -352,7 +402,85 @@ static Void CheckInfo()
 	Check(!emptyKeyInfo.SetOtherInfo(NIL, "X"), "SetOtherInfo refuses an empty key");
 	Check(!Info::AddOtherInfo(&emptyKeyInfo, NIL, "X"), "AddOtherInfo refuses an empty key");
 	Check(!Info::AddOtherInfo(&emptyKeyInfo, NIL, values), "AddOtherInfo with a list refuses an empty key");
+	Check(!Info::SetInfoList(&emptyKeyInfo, NIL, values), "SetInfoList refuses an empty key");
 	Check(emptyKeyInfo.other.Length() == 0, "an empty key adds no entry");
+
+	/* Value lists of basic fields: the first value is the basic field,
+	 * the list counts only while its first value is the basic field.
+	 */
+	Info		 listInfo;
+	Array<String>	 artists;
+
+	artists.Add("A");
+	artists.Add("B");
+	artists.Add(NIL);
+	artists.Add("A");
+
+	Info::SetInfoList(&listInfo, INFO_ARTISTS, artists);
+
+	Check(listInfo.artist == "A", "SetInfoList sets the basic field to the first value");
+	CheckBasicList(listInfo, INFO_ARTISTS, "A|B", "SetInfoList skips empty values and repeats");
+
+	listInfo.artist = "X";
+
+	CheckBasicList(listInfo, INFO_ARTISTS, "X", "a changed basic field replaces the list");
+
+	listInfo.artist = NIL;
+
+	CheckBasicList(listInfo, INFO_ARTISTS, "", "an empty basic field has no values");
+
+	Array<String>	 one;
+
+	one.Add("C");
+
+	Info::SetInfoList(&listInfo, INFO_ARTISTS, one);
+
+	Check(listInfo.artist == "C" && !listInfo.HasOtherInfo(INFO_ARTISTS), "SetInfoList with one value sets only the basic field");
+
+	Info::SetInfoList(&listInfo, INFO_ARTISTS, Array<String>());
+
+	Check(listInfo.artist == NIL && !listInfo.HasOtherInfo(INFO_ARTISTS), "SetInfoList with no value clears the basic field");
+
+	Info::SetInfoList(&listInfo, INFO_COMPOSER, artists);
+
+	CheckValues(listInfo, INFO_COMPOSER, "A|B", "SetInfoList on another key sets its values");
+	CheckBasicList(listInfo, INFO_COMPOSER, "A|B", "GetInfoList on another key gets its values");
+
+	/* AddMissingOtherInfo: an earlier list of a basic field stays only
+	 * while its first value is still the value of the field.
+	 */
+	Array<String>	 earlierOther;
+
+	earlierOther.Add(String(INFO_GENRES).Append(":Rock"));
+	earlierOther.Add(String(INFO_GENRES).Append(":Jazz"));
+
+	Info	 sameGenre;
+
+	sameGenre.genre = "Rock";
+
+	Info::AddMissingOtherInfo(&sameGenre, earlierOther);
+
+	CheckBasicList(sameGenre, INFO_GENRES, "Rock|Jazz", "AddMissingOtherInfo keeps an earlier list that fits the field");
+
+	Info	 otherGenre;
+
+	otherGenre.genre = "Pop";
+
+	Info::AddMissingOtherInfo(&otherGenre, earlierOther);
+
+	CheckBasicList(otherGenre, INFO_GENRES, "Pop", "AddMissingOtherInfo drops an earlier list that does not fit the field");
+	Check(!otherGenre.HasOtherInfo(INFO_GENRES), "AddMissingOtherInfo adds no entries of a dropped list");
+
+	Info		 ownGenres;
+	Array<String>	 genres;
+
+	genres.Add("Rock");
+	genres.Add("Blues");
+
+	Info::SetInfoList(&ownGenres, INFO_GENRES, genres);
+	Info::AddMissingOtherInfo(&ownGenres, earlierOther);
+
+	CheckBasicList(ownGenres, INFO_GENRES, "Rock|Blues", "AddMissingOtherInfo keeps the list of this tag");
 }
 
 static Void CheckTaggers()
@@ -378,6 +506,62 @@ static Void CheckTaggers()
 	 */
 	RoundTripFile("wma-tag", config, SingleValueInfo(), "data/base.wma", NIL);
 #endif
+
+	/* Artist, genre, label and ISRC with several values.
+	 */
+	CheckBasicLists(RoundTripBuffer("vorbis-tag", config, BasicListInfo(), NIL), "vorbis basic lists");
+	CheckBasicLists(RoundTripBuffer("apev2-tag", config, BasicListInfo(), NIL), "apev2 basic lists");
+	CheckBasicLists(RoundTripFile("mp4-tag", config, BasicListInfo(), "data/base.m4a", NIL), "mp4 basic lists");
+
+#ifdef __WIN32__
+	CheckBasicLists(RoundTripFile("wma-tag", config, BasicListInfo(), "data/base.wma", NIL), "wma basic lists");
+#endif
+
+	config->SetStringValue("Tags", "ID3v2Encoding", "UTF-8");
+	CheckBasicLists(RoundTripBuffer("id3v2-tag", config, BasicListInfo(), NIL), "id3v24 basic lists");
+
+	config->SetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
+	CheckBasicLists(RoundTripBuffer("id3v2-tag", config, BasicListInfo(), NIL), "id3v23 basic lists");
+
+	config->SetStringValue("Tags", "ID3v2Encoding", "ISO-8859-1");
+	CheckBasicLists(RoundTripBuffer("id3v2-tag", config, BasicListInfo(), NIL), "id3v23 ISO-8859-1 basic lists");
+
+	config->SetStringValue("Tags", "ID3v2Encoding", "UTF-16LE");
+
+	/* ID3v2: a genre number in parentheses gives the genre name.
+	 */
+	{
+		static const UnsignedByte	 frame[] = { 'T', 'C', 'O', 'N', 0, 0, 0, 13, 0, 0,
+							     0, '(', '1', '7', ')', 0, '(', '8', ')', 'J', 'a', 'z', 'z' };
+		static const UnsignedByte	 header[] = { 'I', 'D', '3', 4, 0, 0, 0, 0, 0, sizeof(frame) };
+
+		Buffer<UnsignedByte>	 buffer(sizeof(header) + sizeof(frame));
+
+		memcpy(buffer, header, sizeof(header));
+		memcpy(buffer + sizeof(header), frame, sizeof(frame));
+
+		AS::TaggerComponent	*tagger = CreateTagger("id3v2-tag", config);
+
+		if (tagger != NIL)
+		{
+			Track	 result;
+
+			tagger->ParseBuffer(buffer, result);
+
+			CheckBasicList(result.GetInfo(), INFO_GENRES, "Rock|Jazz", "id3v24 genre numbers");
+
+			DeleteTagger(tagger);
+		}
+	}
+
+	/* RIFF keeps only the first value of a basic field.
+	 */
+	{
+		Info	 result = RoundTripBuffer("riff-tag", config, BasicListInfo(), NIL);
+
+		CheckBasicList(result, INFO_ARTISTS, "Artist A", "riff artist keeps first value");
+		CheckBasicList(result, INFO_GENRES, "Rock", "riff genre keeps first value");
+	}
 
 	/* Vorbis Comment: one field for each value.
 	 */
@@ -1034,6 +1218,81 @@ static Void CheckTaggers()
 		}
 	}
 
+	/* MP4: an update removes a PUBLISHER item that another program
+	 * wrote, because the reader reads it as a label.
+	 */
+	{
+		AS::TaggerComponent	*tagger = CreateTagger("mp4-tag", config);
+
+		if (tagger != NIL)
+		{
+			String	 copy = "data/tmp-publisher.m4a";
+
+			File("data/base.m4a").Copy(copy);
+
+			Info	 info;
+			Track	 track;
+
+			info.title = "Title";
+			Info::AddOtherInfo(&info, INFO_CONDUCTOR, "Old Label");
+
+			track.SetInfo(info);
+
+			tagger->RenderStreamInfo(copy, track);
+
+			/* Rename the item CONDUCTOR to PUBLISHER in the file. Both
+			 * names have nine characters.
+			 */
+			Buffer<UnsignedByte>	 buffer;
+			Int			 renamed = 0;
+
+			ReadFile(copy, buffer);
+
+			for (Int i = 0; i + 9 <= buffer.Size(); i++)
+			{
+				if (memcmp((UnsignedByte *) buffer + i, "CONDUCTOR", 9) != 0) continue;
+
+				memcpy((UnsignedByte *) buffer + i, "PUBLISHER", 9);
+
+				renamed++;
+			}
+
+			{
+				OutStream	 out(STREAM_FILE, copy, OS_REPLACE);
+
+				out.OutputData(buffer, buffer.Size());
+			}
+
+			Check(renamed == 1, "mp4 file has one item CONDUCTOR to rename");
+
+			Track	 before;
+
+			tagger->ParseStreamInfo(copy, before);
+
+			Check(before.GetInfo().label == "Old Label", String("mp4 reads PUBLISHER as label \"").Append(before.GetInfo().label).Append("\""));
+
+			Info	 update;
+
+			update.title = "Title";
+			update.label = "New Label";
+
+			track.SetInfo(update);
+
+			tagger->UpdateStreamInfo(copy, track);
+
+			Track	 result;
+
+			tagger->ParseStreamInfo(copy, result);
+
+			Check(result.GetInfo().label == "New Label", String("mp4 update replaces the PUBLISHER label, label is \"").Append(result.GetInfo().label).Append("\""));
+			Check(Join(Info::GetInfoList(&result.GetInfo(), INFO_LABELS)) == "New Label", String("mp4 update removes the PUBLISHER item, labels are \"").Append(Join(Info::GetInfoList(&result.GetInfo(), INFO_LABELS))).Append("\""));
+
+			File(copy).Delete();
+
+			DeleteTagger(tagger);
+		}
+	}
+
 	/* Values of a tag replace the values that a tag read before gave the
 	 * same key; keys that the tag does not have keep their values.
 	 */
@@ -1073,6 +1332,36 @@ static Void CheckTaggers()
 
 			CheckValues(result.GetInfo(), INFO_COMPOSER, "New", String(taggers[i]).Append(" replaces values of an earlier tag"));
 			CheckValues(result.GetInfo(), INFO_LYRICIST, "Kept", String(taggers[i]).Append(" keeps keys it does not have"));
+
+			/* One genre of this tag replaces the genre list of an earlier
+			 * tag, also when it is the first genre of that list.
+			 */
+			Info	 oneGenre;
+
+			oneGenre.title = "Title";
+			oneGenre.genre = "Rock";
+
+			track.SetInfo(oneGenre);
+
+			buffer.Resize(0);
+
+			tagger->RenderBuffer(buffer, track);
+
+			Info		 earlierGenres;
+			Array<String>	 genres;
+
+			genres.Add("Rock");
+			genres.Add("Jazz");
+
+			Info::SetInfoList(&earlierGenres, INFO_GENRES, genres);
+
+			Track	 genreResult;
+
+			genreResult.SetInfo(earlierGenres);
+
+			tagger->ParseBuffer(buffer, genreResult);
+
+			CheckBasicList(genreResult.GetInfo(), INFO_GENRES, "Rock", String(taggers[i]).Append(" replaces the genre list of an earlier tag with one genre"));
 
 			DeleteTagger(tagger);
 		}

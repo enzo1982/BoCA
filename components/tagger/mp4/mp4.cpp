@@ -136,11 +136,25 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	String::OutputFormat	 outputFormat("UTF-8");
 
-	if (info.artist != NIL) ex_MP4TagsSetArtist(mp4Tags, info.artist.Trim());
+	/* Artist, genre, label and ISRC can have several values. An item
+	 * with several values gets one data atom for each value. The MP4Tags
+	 * functions of mp4v2 write only one, so items with several values
+	 * are added after the tags are stored.
+	 */
+	Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+	Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+	Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+	Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+	if	(artists.Length() == 1) ex_MP4TagsSetArtist(mp4Tags, artists.GetFirst().Trim());
+	else if (artists.Length()  > 1) ex_MP4TagsSetArtist(mp4Tags, NIL);
+
 	if (info.title  != NIL) ex_MP4TagsSetName(mp4Tags, info.title.Trim());
 	if (info.album  != NIL) ex_MP4TagsSetAlbum(mp4Tags, info.album.Trim());
 	if (info.year    >   0) ex_MP4TagsSetReleaseDate(mp4Tags, String::FromInt(info.year));
-	if (info.genre  != NIL) ex_MP4TagsSetGenre(mp4Tags, info.genre.Trim());
+
+	if	(genres.Length() == 1) ex_MP4TagsSetGenre(mp4Tags, genres.GetFirst().Trim());
+	else if (genres.Length()  > 1) { ex_MP4TagsSetGenre(mp4Tags, NIL); ex_MP4TagsSetGenreType(mp4Tags, NIL); }
 
 	if (info.track > 0)
 	{
@@ -204,6 +218,9 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	/* Save other metadata atoms.
 	 */
+	if (artists.Length() > 1) AddItmfItem(mp4File, L"©ART", NIL, NIL, artists);
+	if (genres.Length()  > 1) AddItmfItem(mp4File, L"©gen", NIL, NIL, genres);
+
 	if (info.rating >= 0) AddItmfItem(mp4File, "rate", NIL, NIL, String::FromInt(info.rating));
 
 	Array<String>	 keys = Info::GetOtherInfoKeys(&info);
@@ -244,8 +261,8 @@ Error BoCA::TaggerMP4::RenderStreamInfo(const String &fileName, const Track &tra
 
 	/* Save generic iTunes metadata.
 	 */
-	if (info.label != NIL) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LABEL", info.label);
-	if (info.isrc  != NIL) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ISRC",  info.isrc, MP4_ITMF_BT_ISRC);
+	if (labels.Length() > 0) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "LABEL", labels);
+	if (isrcs.Length()  > 0) AddItmfItem(mp4File, "----", ItmfMeaningiTunes, "ISRC",  isrcs, MP4_ITMF_BT_ISRC);
 
 	foreach (const String &key, keys)
 	{
@@ -420,7 +437,7 @@ static char *CopyUTF8(const String &string, Array<Buffer<char> *> &buffers)
 	return *buffer;
 }
 
-Bool BoCA::TaggerMP4::AddItmfItem(MP4FileHandle mp4File, const String &code, const String &meaning, const String &id, const Array<String> &values)
+Bool BoCA::TaggerMP4::AddItmfItem(MP4FileHandle mp4File, const String &code, const String &meaning, const String &id, const Array<String> &values, MP4ItmfBasicType type)
 {
 	Array<String>	 strings;
 
@@ -440,7 +457,7 @@ Bool BoCA::TaggerMP4::AddItmfItem(MP4FileHandle mp4File, const String &code, con
 
 	for (Int i = 0; i < strings.Length(); i++)
 	{
-		item->dataList.elements[i].typeCode  = MP4_ITMF_BT_UTF8;
+		item->dataList.elements[i].typeCode  = type;
 		item->dataList.elements[i].value     = (uint8_t *) CopyUTF8(strings.GetNth(i), buffers);
 		item->dataList.elements[i].valueSize = strlen((char *) item->dataList.elements[i].value);
 	}
@@ -546,9 +563,7 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 
 	/* Parse generic iTunes metadata.
 	 */
-	ParseItmfItems(mp4File, info);
-
-	Info::AddMissingOtherInfo(&info, previousOther);
+	ParseItmfItems(mp4File, info, previousOther);
 
 	/* Set artist to album artist if artist is not filled.
 	 */
@@ -624,9 +639,19 @@ Error BoCA::TaggerMP4::ParseStreamInfo(const String &fileName, Track &track)
 	return Success();
 }
 
-Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
+/* Parse the iTunes metadata items, then add the values of earlier tags
+ * that this tag does not have.
+ */
+Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info, const Array<String> &previousOther)
 {
 	String::InputFormat	 inputFormat("UTF-8");
+
+	/* Artist, genre, label and ISRC can have several values in this tag.
+	 */
+	Array<String>	 artists;
+	Array<String>	 genres;
+	Array<String>	 labels;
+	Array<String>	 isrcs;
 
 	/* Look for known atoms.
 	 */
@@ -662,6 +687,11 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 			else if	(code == L"©grp") Info::AddOtherInfo(&info, INFO_CONTENTGROUP,	   values);
 
 			else if	(code == L"©wrt") Info::AddOtherInfo(&info, INFO_COMPOSER,	   values);
+
+			/* MP4Tags gives only the first artist and genre.
+			 */
+			else if	(code == L"©ART") { foreach (const String &text, values) artists.Add(text); }
+			else if	(code == L"©gen") { foreach (const String &text, values) genres.Add(text); }
 
 			if	(code == L"©mvi" && value != NIL) info.SetOtherInfo(INFO_MOVEMENT,         value);
 			else if (code == L"©mvc" && value != NIL) info.SetOtherInfo(INFO_MOVEMENTTOTAL,    value);
@@ -709,12 +739,12 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 			 */
 			if (value == NIL && values.Length() == 0) continue;
 
-			if	((id == "LABEL"	   ||
-				  id == "PUBLISHER") && value != NIL) info.label = value;
+			if	(id == "LABEL"	   ||
+				 id == "PUBLISHER") { foreach (const String &text, values) labels.Add(text); }
 
 			else if (id == "ISRC")
 			{
-				if (Info::IsISRC(value)) info.isrc = value;
+				foreach (const String &text, values) if (Info::IsISRC(text)) isrcs.Add(text);
 			}
 
 			else if (id == "SUBTITLE")	Info::AddOtherInfo(&info, INFO_SUBTITLE,      values);
@@ -799,6 +829,16 @@ Bool BoCA::TaggerMP4::ParseItmfItems(MP4FileHandle mp4File, Info &info)
 
 		ex_MP4ItmfItemListFree(items);
 	}
+
+	Info::AddMissingOtherInfo(&info, previousOther);
+
+	/* Set the lists of this tag after the values of earlier tags, so
+	 * that one value of this tag replaces a list of an earlier tag.
+	 */
+	if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+	if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+	if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+	if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 	return True;
 }
@@ -897,8 +937,12 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 
 	ex_MP4TagsFree(mp4Tags);
 
-	/* Remove known atoms.
+	/* Remove known atoms. The artist and genre items are removed here
+	 * too, because items with several values are not written by MP4Tags.
 	 */
+	RemoveItmfItem(mp4File, L"©ART");
+	RemoveItmfItem(mp4File, L"©gen");
+
 	RemoveItmfItem(mp4File,  "aART");
 
 	RemoveItmfItem(mp4File, L"©grp");
@@ -924,6 +968,7 @@ Error BoCA::TaggerMP4::UpdateStreamInfo(const String &fileName, const Track &tra
 	/* Remove iTunes metadata items too.
 	 */
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "LABEL");
+	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "PUBLISHER");
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "ISRC");
 
 	RemoveItmfItem(mp4File, "----", ItmfMeaningiTunes, "SUBTITLE");

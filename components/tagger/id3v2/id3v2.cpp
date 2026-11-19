@@ -409,12 +409,19 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	 */
 	Info	 info = track.GetInfo();
 
-	if (info.artist != NIL) { ID3_Frame frame(ID3FID_LEADARTIST);  SetStringField(frame, ID3FN_TEXT, info.artist); container.AddFrame(frame); }
-	if (info.title  != NIL) { ID3_Frame frame(ID3FID_TITLE);       SetStringField(frame, ID3FN_TEXT, info.title);  container.AddFrame(frame); }
-	if (info.album  != NIL) { ID3_Frame frame(ID3FID_ALBUM);       SetStringField(frame, ID3FN_TEXT, info.album);  container.AddFrame(frame); }
-	if (info.genre  != NIL) { ID3_Frame frame(ID3FID_CONTENTTYPE); SetStringField(frame, ID3FN_TEXT, info.genre);  container.AddFrame(frame); }
-	if (info.label  != NIL) { ID3_Frame frame(ID3FID_PUBLISHER);   SetStringField(frame, ID3FN_TEXT, info.label);  container.AddFrame(frame); }
-	if (info.isrc   != NIL) { ID3_Frame frame(ID3FID_ISRC);	       SetStringField(frame, ID3FN_TEXT, info.isrc);   container.AddFrame(frame); }
+	/* Artist, genre, label and ISRC can have several values in one frame.
+	 */
+	Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+	Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+	Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+	Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+	if (artists.Length() > 0) { ID3_Frame frame(ID3FID_LEADARTIST);  SetStringListField(frame, ID3FN_TEXT, artists); container.AddFrame(frame); }
+	if (info.title  != NIL)	  { ID3_Frame frame(ID3FID_TITLE);       SetStringField(frame, ID3FN_TEXT, info.title);	  container.AddFrame(frame); }
+	if (info.album  != NIL)	  { ID3_Frame frame(ID3FID_ALBUM);       SetStringField(frame, ID3FN_TEXT, info.album);	  container.AddFrame(frame); }
+	if (genres.Length()  > 0) { ID3_Frame frame(ID3FID_CONTENTTYPE); SetStringListField(frame, ID3FN_TEXT, genres);	  container.AddFrame(frame); }
+	if (labels.Length()  > 0) { ID3_Frame frame(ID3FID_PUBLISHER);   SetStringListField(frame, ID3FN_TEXT, labels);	  container.AddFrame(frame); }
+	if (isrcs.Length()   > 0) { ID3_Frame frame(ID3FID_ISRC);	 SetStringListField(frame, ID3FN_TEXT, isrcs);	  container.AddFrame(frame); }
 
 	if (info.year > 0)
 	{
@@ -792,6 +799,13 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 	info.other.RemoveAll();
 
+	/* Artist, genre, label and ISRC can have several values in this tag.
+	 */
+	Array<String>	 artists;
+	Array<String>	 genres;
+	Array<String>	 labels;
+	Array<String>	 isrcs;
+
 	/* Parse individual comment items.
 	 */
 	ID3_Container::ConstIterator	*iterator     = container.CreateIterator();
@@ -808,17 +822,17 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		 */
 		if (frame.GetID() != ID3FID_COMMENT && frame.GetID() != ID3FID_UNSYNCEDLYRICS) values = SplitStringField(frame, ID3FN_TEXT);
 
-		if	(frame.GetID() == ID3FID_LEADARTIST)	       info.artist  = GetStringField(frame, ID3FN_TEXT);
+		if	(frame.GetID() == ID3FID_LEADARTIST)	       { foreach (const String &value, values) artists.Add(value); }
 		else if (frame.GetID() == ID3FID_TITLE)		       info.title   = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_ALBUM)		       info.album   = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_YEAR)		       info.year    = GetStringField(frame, ID3FN_TEXT).ToInt();
 		else if (frame.GetID() == ID3FID_RECORDINGTIME)	       info.year    = GetStringField(frame, ID3FN_TEXT).Head(4).ToInt();
 		else if (frame.GetID() == ID3FID_COMMENT)	       info.comment = GetStringField(frame, ID3FN_TEXT, False);
-		else if (frame.GetID() == ID3FID_PUBLISHER)	       info.label   = GetStringField(frame, ID3FN_TEXT);
+		else if (frame.GetID() == ID3FID_PUBLISHER)	       { foreach (const String &value, values) labels.Add(value); }
 
 		else if (frame.GetID() == ID3FID_ISRC)
 		{
-			if (Info::IsISRC(GetStringField(frame, ID3FN_TEXT))) info.isrc = GetStringField(frame, ID3FN_TEXT);
+			foreach (const String &value, values) if (Info::IsISRC(value)) isrcs.Add(value);
 		}
 
 		else if (frame.GetID() == ID3FID_CONTENTGROUP)	       Info::AddOtherInfo(&info, INFO_CONTENTGROUP,	values);
@@ -1058,22 +1072,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		}
 		else if (frame.GetID() == ID3FID_CONTENTTYPE)
 		{
-			String	 s_genre = GetStringField(frame, ID3FN_TEXT);
-			String	 genreID;
-
-			if (s_genre[0] == '(')
-			{
-				for (Int j = 1; j < s_genre.Length(); j++)
-				{
-					if (s_genre[j] == ')') break;
-
-					genreID[j - 1] = s_genre[j];
-				}
-			}
-
-			if	(genreID == NIL)			  info.genre = s_genre;
-			else if (s_genre.Length() > genreID.Length() + 2) info.genre = s_genre.Tail(s_genre.Length() - genreID.Length() - 2);
-			else						  info.genre = GetID3CategoryName(genreID.ToInt());
+			foreach (const String &value, values) genres.Add(ParseGenre(value));
 		}
 		else if (frame.GetID() == ID3FID_CDID)
 		{
@@ -1153,6 +1152,14 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 	}
 
 	Info::AddMissingOtherInfo(&info, previousOther);
+
+	/* Set the lists of this tag after the values of earlier tags, so
+	 * that one value of this tag replaces a list of an earlier tag.
+	 */
+	if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+	if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+	if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+	if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 	/* Set artist to album artist if artist is not filled.
 	 */
@@ -1497,6 +1504,28 @@ Int BoCA::TaggerID3v2::SetStringListField(ID3_Frame &frame, ID3_FieldID fieldTyp
 	for (Int i = 1; i < nonBlankValues.Length(); i++) AddStringListItem(frame, fieldType, nonBlankValues.GetNth(i));
 
 	return Success();
+}
+
+/* Turn a genre value into a name. A value can start with an ID3v1 genre
+ * number in parentheses, like "(17)" or "(17)Rock".
+ */
+String BoCA::TaggerID3v2::ParseGenre(const String &value)
+{
+	String	 genreID;
+
+	if (value[0] == '(')
+	{
+		for (Int j = 1; j < value.Length(); j++)
+		{
+			if (value[j] == ')') break;
+
+			genreID[j - 1] = value[j];
+		}
+	}
+
+	if	(genreID == NIL)			return value;
+	else if (value.Length() > genreID.Length() + 2) return value.Tail(value.Length() - genreID.Length() - 2);
+	else						return GetID3CategoryName(genreID.ToInt());
 }
 
 /* Split a text field into its values. Unlike GetStringListField, which
