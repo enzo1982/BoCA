@@ -103,20 +103,233 @@ String BoCA::Info::GetOtherInfo(const String &key) const
 
 Bool BoCA::Info::SetOtherInfo(const String &key, const String &value)
 {
-	foreach (const String &info, other)
+	if (key == NIL) return False;
+
+	/* Find the first entry with this key.
+	 */
+	Int	 keyIndex = -1;
+
+	for (Int i = 0; i < other.Length(); i++)
 	{
-		Int	 separator = info.Find(":");
+		const String	&info	   = other.GetNth(i);
+		Int		 separator = info.Find(":");
 
-		if (info.Head(separator) == key)
-		{
-			if (value != NIL) other.SetNth(foreachindex, String(key).Append(":").Append(value));
-			else		  other.RemoveNth(foreachindex);
-
-			return True;
-		}
+		if (info.Head(separator) == key) { keyIndex = i; break; }
 	}
 
-	other.Add(String(key).Append(":").Append(value));
+	/* Remove every later entry with this key.
+	 */
+	for (Int i = other.Length() - 1; i > keyIndex; i--)
+	{
+		const String	&info	   = other.GetNth(i);
+		Int		 separator = info.Find(":");
+
+		if (info.Head(separator) == key) other.RemoveNth(i);
+	}
+
+	/* Replace the first entry in place, remove it, or append a new one.
+	 */
+	if	(keyIndex >= 0 && value != NIL) other.SetNth(keyIndex, String(key).Append(":").Append(value));
+	else if (keyIndex >= 0)			 other.RemoveNth(keyIndex);
+	else if (value != NIL)			 other.Add(String(key).Append(":").Append(value));
+
+	return True;
+}
+
+Array<String> BoCA::Info::GetOtherInfoList(const Info *info, const String &key)
+{
+	Array<String>	 values;
+
+	foreach (const String &entry, info->other)
+	{
+		Int	 separator = entry.Find(":");
+
+		if (entry.Head(separator) == key) values.Add(entry.Tail(entry.Length() - separator - 1));
+	}
+
+	return values;
+}
+
+Array<String> BoCA::Info::GetOtherInfoKeys(const Info *info)
+{
+	Array<String>	 keys;
+
+	foreach (const String &entry, info->other)
+	{
+		String	 key   = entry.Head(entry.Find(":"));
+		Bool	 found = False;
+
+		foreach (const String &listed, keys) if (listed == key) { found = True; break; }
+
+		if (!found) keys.Add(key);
+	}
+
+	return keys;
+}
+
+Bool BoCA::Info::AddOtherInfo(Info *info, const String &key, const String &value)
+{
+	if (key == NIL || value == NIL) return False;
+
+	/* Do not add a value that this key already has.
+	 */
+	foreach (const String &entry, info->other)
+	{
+		Int	 separator = entry.Find(":");
+
+		if (entry.Head(separator) == key && entry.Tail(entry.Length() - separator - 1) == value) return False;
+	}
+
+	info->other.Add(String(key).Append(":").Append(value));
+
+	return True;
+}
+
+Bool BoCA::Info::AddOtherInfo(Info *info, const String &key, const Array<String> &values)
+{
+	Bool	 added = False;
+
+	foreach (const String &value, values) if (AddOtherInfo(info, key, value)) added = True;
+
+	return added;
+}
+
+/* The basic field that a value list belongs to.
+ */
+static String *GetBasicField(BoCA::Info *info, const String &key)
+{
+	if	(key == BoCA::INFO_ARTISTS) return &info->artist;
+	else if (key == BoCA::INFO_GENRES)  return &info->genre;
+	else if (key == BoCA::INFO_LABELS)  return &info->label;
+	else if (key == BoCA::INFO_ISRCS)   return &info->isrc;
+
+	return NIL;
+}
+
+Bool BoCA::Info::IsBasicInfoList(const String &key)
+{
+	return key == INFO_ARTISTS || key == INFO_GENRES || key == INFO_LABELS || key == INFO_ISRCS;
+}
+
+static String GetOtherInfoGroup(const String &entry)
+{
+	Int	 separator = entry.Find(":");
+	String	 key	   = entry.Head(separator);
+
+	if (key != BoCA::INFO_USERTEXT && key != BoCA::INFO_WEB_USERURL) return key;
+
+	String	 value	   = entry.Tail(entry.Length() - separator - 1);
+	Int	 description = value.Find(":|:");
+
+	return String(key).Append(":").Append(description >= 0 ? value.Head(description) : value);
+}
+
+Void BoCA::Info::AddMissingOtherInfo(Info *info, const Array<String> &entries)
+{
+	/* User defined texts and URLs hold one field per description, so
+	 * they are compared by key and description.
+	 */
+	Array<String>	 listed;
+
+	foreach (const String &entry, info->other) listed.Add(GetOtherInfoGroup(entry));
+
+	/* A value list of a basic field from an earlier tag stays only if
+	 * this tag left the field at its first value. Otherwise the field
+	 * now holds a value of this tag, and the old list does not fit it.
+	 */
+	Array<String>	 dropped;
+	Array<String>	 keys = GetOtherInfoKeys(info);
+
+	foreach (const String &key, keys) if (IsBasicInfoList(key)) dropped.Add(key);
+
+	foreach (const String &entry, entries)
+	{
+		String	 group = GetOtherInfoGroup(entry);
+		Bool	 found = False;
+
+		foreach (const String &name, listed) if (name == group) { found = True; break; }
+
+		if (found) continue;
+
+		if (IsBasicInfoList(group))
+		{
+			Bool	 skip = False;
+
+			foreach (const String &name, dropped) if (name == group) { skip = True; break; }
+
+			if (skip) continue;
+
+			/* Check the first value of the earlier list once.
+			 */
+			Array<String>	 values;
+
+			foreach (const String &previous, entries)
+			{
+				Int	 separator = previous.Find(":");
+
+				if (previous.Head(separator) == group) values.Add(previous.Tail(previous.Length() - separator - 1));
+			}
+
+			dropped.Add(group);
+
+			if (values.Length() == 0 || values.GetFirst() != *GetBasicField(info, group)) continue;
+
+			AddOtherInfo(info, group, values);
+
+			continue;
+		}
+
+		info->other.Add(entry);
+	}
+}
+
+Array<String> BoCA::Info::GetInfoList(const Info *info, const String &key)
+{
+	if (!IsBasicInfoList(key)) return GetOtherInfoList(info, key);
+
+	Array<String>	 values;
+	const String	&field = *GetBasicField(const_cast<Info *>(info), key);
+
+	if (field == NIL) return values;
+
+	Array<String>	 list = GetOtherInfoList(info, key);
+
+	if (list.Length() > 0 && list.GetFirst() == field) return list;
+
+	values.Add(field);
+
+	return values;
+}
+
+Bool BoCA::Info::SetInfoList(Info *info, const String &key, const Array<String> &values)
+{
+	if (key == NIL) return False;
+
+	/* Drop empty values and values that come twice.
+	 */
+	Array<String>	 list;
+
+	foreach (const String &value, values)
+	{
+		if (value == NIL) continue;
+
+		Bool	 found = False;
+
+		foreach (const String &listed, list) if (listed == value) { found = True; break; }
+
+		if (!found) list.Add(value);
+	}
+
+	info->SetOtherInfo(key, NIL);
+
+	if (IsBasicInfoList(key))
+	{
+		*GetBasicField(info, key) = (list.Length() > 0 ? list.GetFirst() : String());
+
+		if (list.Length() <= 1) return True;
+	}
+
+	AddOtherInfo(info, key, list);
 
 	return True;
 }

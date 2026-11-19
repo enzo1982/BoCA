@@ -95,13 +95,23 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 
 	Int	 numItems = 0;
 
-	if	(info.artist != NIL) { RenderTagItem("ARTIST",	    info.artist,		  buffer); numItems++; }
+	/* Artist, genre, label and ISRC can have several values, one field
+	 * for each value.
+	 */
+	Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+	Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+	Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+	Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+	foreach (const String &value, artists) { RenderTagItem("ARTIST",    value, buffer); numItems++; }
+
 	if	(info.title  != NIL) { RenderTagItem("TITLE",	    info.title,			  buffer); numItems++; }
 	if	(info.album  != NIL) { RenderTagItem("ALBUM",	    info.album,			  buffer); numItems++; }
 	if	(info.year    >   0) { RenderTagItem("DATE",	    String::FromInt(info.year),   buffer); numItems++; }
-	if	(info.genre  != NIL) { RenderTagItem("GENRE",	    info.genre,			  buffer); numItems++; }
-	if	(info.label  != NIL) { RenderTagItem("PUBLISHER",   info.label,			  buffer); numItems++; }
-	if	(info.isrc   != NIL) { RenderTagItem("ISRC",	    info.isrc,			  buffer); numItems++; }
+
+	foreach (const String &value, genres)  { RenderTagItem("GENRE",     value, buffer); numItems++; }
+	foreach (const String &value, labels)  { RenderTagItem("PUBLISHER", value, buffer); numItems++; }
+	foreach (const String &value, isrcs)   { RenderTagItem("ISRC",	    value, buffer); numItems++; }
 
 	if	(info.track	> 0) { RenderTagItem("TRACKNUMBER", String(prependZero && info.track	 < 10 ? "0" : NIL).Append(String::FromInt(info.track)),	    buffer); numItems++; }
 	if	(info.numTracks > 0) { RenderTagItem("TRACKTOTAL",  String(prependZero && info.numTracks < 10 ? "0" : NIL).Append(String::FromInt(info.numTracks)), buffer); numItems++; }
@@ -122,6 +132,12 @@ Error BoCA::TaggerVorbis::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track
 		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
 
 		if (value == NIL) continue;
+
+		/* Numbers, lyrics and web links keep one value, as in the
+		 * other formats, so write only the first value of these keys.
+		 */
+		if ((key == INFO_MOVEMENT || key == INFO_MOVEMENTTOTAL || key == INFO_BPM ||
+		     key == INFO_LYRICS	  || key == INFO_WEB_ARTIST) && value != info.GetOtherInfo(key)) continue;
 
 		if	(key == INFO_ALBUMARTIST)		   { RenderTagItem("ALBUMARTIST",		   value, buffer       ); numItems++; }
 
@@ -325,6 +341,20 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 	Int	 itemsOffset  = in.GetPos();
 	Info	 info	      = track.GetInfo();
 
+	/* Values from this tag replace the values that tags read before gave
+	 * the same keys; several values of a key in this tag add up.
+	 */
+	Array<String>	 previousOther = info.other;
+
+	info.other.RemoveAll();
+
+	/* Artist, genre, label and ISRC can come several times in this tag.
+	 */
+	Array<String>	 artists;
+	Array<String>	 genres;
+	Array<String>	 labels;
+	Array<String>	 isrcs;
+
 	for (Int i = 0; i < numItems; i++)
 	{
 		/* Read and check next comment string length.
@@ -342,20 +372,20 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		if (value == NIL) continue;
 
-		if	(id == "ARTIST")	  info.artist	 = value;
+		if	(id == "ARTIST")	  artists.Add(value);
 		else if (id == "TITLE")		  info.title	 = value;
 		else if (id == "ALBUM")		  info.album	 = value;
 		else if (id == "DATE")		  info.year	 = value.ToInt();
-		else if (id == "GENRE")		  info.genre	 = value;
+		else if (id == "GENRE")		  genres.Add(value);
 		else if (id == "COMMENT")	  info.comment	 = comment.Tail(comment.Length() - comment.Find("=") - 1);
 
 		else if (id == "LABEL"	   ||
 			 id == "PUBLISHER" ||
-			 id == "ORGANIZATION")	  info.label	 = value;
+			 id == "ORGANIZATION")	  labels.Add(value);
 
 		else if (id == "ISRC")
 		{
-			if (Info::IsISRC(value))  info.isrc	 = value;
+			if (Info::IsISRC(value))  isrcs.Add(value);
 		}
 
 		else if (id == "TRACKNUMBER")
@@ -380,23 +410,23 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 
 		else if (id == "RATING")	  info.rating	 = Math::Min(100, value.ToInt());
 
-		else if (id == "ALBUMARTIST")	  info.SetOtherInfo(INFO_ALBUMARTIST,	   value);
+		else if (id == "ALBUMARTIST")	  Info::AddOtherInfo(&info, INFO_ALBUMARTIST,	   value);
 
-		else if (id == "GROUPING")	  info.SetOtherInfo(INFO_CONTENTGROUP,	   value);
-		else if (id == "SUBTITLE")	  info.SetOtherInfo(INFO_SUBTITLE,	   value);
+		else if (id == "GROUPING")	  Info::AddOtherInfo(&info, INFO_CONTENTGROUP,	   value);
+		else if (id == "SUBTITLE")	  Info::AddOtherInfo(&info, INFO_SUBTITLE,	   value);
 
 		else if (id == "BAND"	  ||
 			 id == "ENSEMBLE" ||
-			 id == "ORCHESTRA")	  info.SetOtherInfo(INFO_BAND,		   value);
+			 id == "ORCHESTRA")	  Info::AddOtherInfo(&info, INFO_BAND,		   value);
 
-		else if (id == "PERFORMER")	  info.SetOtherInfo(INFO_PERFORMER,	   value);
-		else if (id == "CONDUCTOR")	  info.SetOtherInfo(INFO_CONDUCTOR,	   value);
-		else if (id == "REMIXER")	  info.SetOtherInfo(INFO_REMIXER,	   value);
-		else if (id == "COMPOSER")	  info.SetOtherInfo(INFO_COMPOSER,	   value);
-		else if (id == "LYRICIST")	  info.SetOtherInfo(INFO_LYRICIST,	   value);
-		else if (id == "ARRANGER")	  info.SetOtherInfo(INFO_ARRANGER,	   value);
-		else if (id == "PRODUCER")	  info.SetOtherInfo(INFO_PRODUCER,	   value);
-		else if (id == "ENGINEER")	  info.SetOtherInfo(INFO_ENGINEER,	   value);
+		else if (id == "PERFORMER")	  Info::AddOtherInfo(&info, INFO_PERFORMER,	   value);
+		else if (id == "CONDUCTOR")	  Info::AddOtherInfo(&info, INFO_CONDUCTOR,	   value);
+		else if (id == "REMIXER")	  Info::AddOtherInfo(&info, INFO_REMIXER,	   value);
+		else if (id == "COMPOSER")	  Info::AddOtherInfo(&info, INFO_COMPOSER,	   value);
+		else if (id == "LYRICIST")	  Info::AddOtherInfo(&info, INFO_LYRICIST,	   value);
+		else if (id == "ARRANGER")	  Info::AddOtherInfo(&info, INFO_ARRANGER,	   value);
+		else if (id == "PRODUCER")	  Info::AddOtherInfo(&info, INFO_PRODUCER,	   value);
+		else if (id == "ENGINEER")	  Info::AddOtherInfo(&info, INFO_ENGINEER,	   value);
 
 		else if (id == "MOVEMENT" ||
 			 id == "PART")
@@ -412,27 +442,27 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 			 id == "TOTALPARTS")	  info.SetOtherInfo(INFO_MOVEMENTTOTAL,	   value);
 
 		else if (id == "MOVEMENTNAME" ||
-			 id == "PARTNAME")	  info.SetOtherInfo(INFO_MOVEMENTNAME,	   value);
+			 id == "PARTNAME")	  Info::AddOtherInfo(&info, INFO_MOVEMENTNAME,	   value);
 
 		else if (id == "BPM")
 		{
 			if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
 		}
 
-		else if (id == "INITIALKEY")	  info.SetOtherInfo(INFO_INITIALKEY,	   value);
+		else if (id == "INITIALKEY")	  Info::AddOtherInfo(&info, INFO_INITIALKEY,	   value);
 
-		else if (id == "COPYRIGHT")	  info.SetOtherInfo(INFO_COPYRIGHT,	   value);
+		else if (id == "COPYRIGHT")	  Info::AddOtherInfo(&info, INFO_COPYRIGHT,	   value);
 
 		else if (id == "MEDIA"	     ||
 			 id == "SOURCE"	     ||
 			 id == "SOURCEMEDIA" ||
-			 id == "SOURCE MEDIUM")	  info.SetOtherInfo(INFO_MEDIATYPE,	   value);
+			 id == "SOURCE MEDIUM")	  Info::AddOtherInfo(&info, INFO_MEDIATYPE,	   value);
 
 		else if (id == "LABELNO"   ||
 			 id == "CATALOG"   ||
 			 id == "CATALOGID" ||
 			 id == "CATALOGUE" ||
-			 id == "CATALOGNUMBER")	  info.SetOtherInfo(INFO_CATALOGNUMBER,	   value);
+			 id == "CATALOGNUMBER")	  Info::AddOtherInfo(&info, INFO_CATALOGNUMBER,	   value);
 
 		else if (id == "BARCODE"       ||
 			 id == "EAN"	       ||
@@ -440,43 +470,43 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 			 id == "EAN/UPN"       ||
 			 id == "UPC"	       ||
 			 id == "UPN"	       ||
-			 id == "PRODUCTNUMBER")	  info.SetOtherInfo(INFO_BARCODE,	   value);
+			 id == "PRODUCTNUMBER")	  Info::AddOtherInfo(&info, INFO_BARCODE,	   value);
 
-		else if (id == "RELEASECOUNTRY")  info.SetOtherInfo(INFO_RELEASECOUNTRY,   value);
+		else if (id == "RELEASECOUNTRY")  Info::AddOtherInfo(&info, INFO_RELEASECOUNTRY,   value);
 
-		else if (id == "DISCSUBTITLE")	  info.SetOtherInfo(INFO_DISCSUBTITLE,	   value);
+		else if (id == "DISCSUBTITLE")	  Info::AddOtherInfo(&info, INFO_DISCSUBTITLE,	   value);
 
 		else if (id == "LYRICS")	  info.SetOtherInfo(INFO_LYRICS,	   comment.Tail(comment.Length() - comment.Find("=") - 1));
 
-		else if (id == "SCRIPT")	  info.SetOtherInfo(INFO_SCRIPT,	   value);
+		else if (id == "SCRIPT")	  Info::AddOtherInfo(&info, INFO_SCRIPT,	   value);
 
-		else if (id == "ARTISTSORT")	  info.SetOtherInfo(INFO_SORT_ARTIST,	   value);
-		else if (id == "ALBUMSORT")	  info.SetOtherInfo(INFO_SORT_ALBUM,	   value);
-		else if (id == "ALBUMARTISTSORT") info.SetOtherInfo(INFO_SORT_ALBUMARTIST, value);
-		else if (id == "COMPOSERSORT")	  info.SetOtherInfo(INFO_SORT_COMPOSER,	   value);
-		else if (id == "TITLESORT")	  info.SetOtherInfo(INFO_SORT_TITLE,	   value);
+		else if (id == "ARTISTSORT")	  Info::AddOtherInfo(&info, INFO_SORT_ARTIST,	   value);
+		else if (id == "ALBUMSORT")	  Info::AddOtherInfo(&info, INFO_SORT_ALBUM,	   value);
+		else if (id == "ALBUMARTISTSORT") Info::AddOtherInfo(&info, INFO_SORT_ALBUMARTIST, value);
+		else if (id == "COMPOSERSORT")	  Info::AddOtherInfo(&info, INFO_SORT_COMPOSER,	   value);
+		else if (id == "TITLESORT")	  Info::AddOtherInfo(&info, INFO_SORT_TITLE,	   value);
 
 		else if (id == "WEBSITE")	  info.SetOtherInfo(INFO_WEB_ARTIST,	   value);
 
-		else if (id == "ASIN")		  info.SetOtherInfo(INFO_ASIN,		   value);
+		else if (id == "ASIN")		  Info::AddOtherInfo(&info, INFO_ASIN,		   value);
 
 		else if (id.StartsWith("MUSICBRAINZ"))
 		{
-			if	(id == "MUSICBRAINZ_ARTISTID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	    value);
-			else if	(id == "MUSICBRAINZ_ALBUMID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,	    value);
-			else if	(id == "MUSICBRAINZ_ALBUMARTISTID")    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMARTISTID,    value);
-			else if	(id == "MUSICBRAINZ_WORKID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_WORKID,	    value);
-			else if	(id == "MUSICBRAINZ_DISCID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_DISCID,	    value);
-			else if	(id == "MUSICBRAINZ_TRACKID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_TRACKID,	    value);
-			else if	(id == "MUSICBRAINZ_ORIGINALARTISTID") info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
-			else if	(id == "MUSICBRAINZ_ORIGINALALBUMID")  info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALALBUMID,  value);
-			else if	(id == "MUSICBRAINZ_RELEASEGROUPID")   info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASEGROUPID,   value);
-			else if	(id == "MUSICBRAINZ_RELEASETRACKID")   info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETRACKID,   value);
-			else if	(id == "MUSICBRAINZ_TRMID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_TRMID,	    value);
+			if	(id == "MUSICBRAINZ_ARTISTID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ARTISTID,	    value);
+			else if	(id == "MUSICBRAINZ_ALBUMID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMID,	    value);
+			else if	(id == "MUSICBRAINZ_ALBUMARTISTID")    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMARTISTID,    value);
+			else if	(id == "MUSICBRAINZ_WORKID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_WORKID,	    value);
+			else if	(id == "MUSICBRAINZ_DISCID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_DISCID,	    value);
+			else if	(id == "MUSICBRAINZ_TRACKID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRACKID,	    value);
+			else if	(id == "MUSICBRAINZ_ORIGINALARTISTID") Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
+			else if	(id == "MUSICBRAINZ_ORIGINALALBUMID")  Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALALBUMID,  value);
+			else if	(id == "MUSICBRAINZ_RELEASEGROUPID")   Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASEGROUPID,   value);
+			else if	(id == "MUSICBRAINZ_RELEASETRACKID")   Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETRACKID,   value);
+			else if	(id == "MUSICBRAINZ_TRMID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRMID,	    value);
 		}
 
-		else if	(id == "RELEASETYPE")	  info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETYPE,   value);
-		else if	(id == "RELEASESTATUS")	  info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASESTATUS, value);
+		else if	(id == "RELEASETYPE")	  Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETYPE,   value);
+		else if	(id == "RELEASESTATUS")	  Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASESTATUS, value);
 
 		else if (id.StartsWith("REPLAYGAIN"))
 		{
@@ -630,6 +660,16 @@ Error BoCA::TaggerVorbis::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track 
 			 info.other.Add(String(INFO_USERTEXT).Append(":").Append(id).Append(":|:").Append(value));
 		}
 	}
+
+	Info::AddMissingOtherInfo(&info, previousOther);
+
+	/* Set the lists of this tag after the values of earlier tags, so
+	 * that one value of this tag replaces a list of an earlier tag.
+	 */
+	if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+	if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+	if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+	if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 	/* Set artist to album artist if artist is not filled.
 	 */

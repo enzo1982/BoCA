@@ -36,6 +36,11 @@ namespace BoCA
 			Array<String>		 GetStringListField(const ID3_Frame &, ID3_FieldID, Bool = True);
 			Int			 AddStringListItem(ID3_Frame &, ID3_FieldID, const String &, Bool = True);
 
+			Int			 SetStringListField(ID3_Frame &, ID3_FieldID, const Array<String> &);
+			Array<String>		 SplitStringField(const ID3_Frame &, ID3_FieldID);
+
+			String			 ParseGenre(const String &);
+
 			Int			 GetIntegerField(const ID3_Frame &, ID3_FieldID);
 			Int			 SetIntegerField(ID3_Frame &, ID3_FieldID, Int);
 

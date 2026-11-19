@@ -16,6 +16,16 @@
 
 using namespace smooth::IO;
 
+/* Check the bytes of a UTF-16 character for a byte order mark: FE FF
+ * starts big-endian text and FF FE starts little-endian text.
+ */
+static Bool IsBOM(const unicode_t &c, UnsignedByte first, UnsignedByte second)
+{
+	const UnsignedByte	*bytes = (const UnsignedByte *) &c;
+
+	return bytes[0] == first && bytes[1] == second;
+}
+
 const String &BoCA::TaggerID3v2::GetComponentSpecs()
 {
 	static String	 componentSpecs = "			\
@@ -399,12 +409,19 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	 */
 	Info	 info = track.GetInfo();
 
-	if (info.artist != NIL) { ID3_Frame frame(ID3FID_LEADARTIST);  SetStringField(frame, ID3FN_TEXT, info.artist); container.AddFrame(frame); }
-	if (info.title  != NIL) { ID3_Frame frame(ID3FID_TITLE);       SetStringField(frame, ID3FN_TEXT, info.title);  container.AddFrame(frame); }
-	if (info.album  != NIL) { ID3_Frame frame(ID3FID_ALBUM);       SetStringField(frame, ID3FN_TEXT, info.album);  container.AddFrame(frame); }
-	if (info.genre  != NIL) { ID3_Frame frame(ID3FID_CONTENTTYPE); SetStringField(frame, ID3FN_TEXT, info.genre);  container.AddFrame(frame); }
-	if (info.label  != NIL) { ID3_Frame frame(ID3FID_PUBLISHER);   SetStringField(frame, ID3FN_TEXT, info.label);  container.AddFrame(frame); }
-	if (info.isrc   != NIL) { ID3_Frame frame(ID3FID_ISRC);	       SetStringField(frame, ID3FN_TEXT, info.isrc);   container.AddFrame(frame); }
+	/* Artist, genre, label and ISRC can have several values in one frame.
+	 */
+	Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+	Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+	Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+	Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+	if (artists.Length() > 0) { ID3_Frame frame(ID3FID_LEADARTIST);  SetStringListField(frame, ID3FN_TEXT, artists); container.AddFrame(frame); }
+	if (info.title  != NIL)	  { ID3_Frame frame(ID3FID_TITLE);       SetStringField(frame, ID3FN_TEXT, info.title);	  container.AddFrame(frame); }
+	if (info.album  != NIL)	  { ID3_Frame frame(ID3FID_ALBUM);       SetStringField(frame, ID3FN_TEXT, info.album);	  container.AddFrame(frame); }
+	if (genres.Length()  > 0) { ID3_Frame frame(ID3FID_CONTENTTYPE); SetStringListField(frame, ID3FN_TEXT, genres);	  container.AddFrame(frame); }
+	if (labels.Length()  > 0) { ID3_Frame frame(ID3FID_PUBLISHER);   SetStringListField(frame, ID3FN_TEXT, labels);	  container.AddFrame(frame); }
+	if (isrcs.Length()   > 0) { ID3_Frame frame(ID3FID_ISRC);	 SetStringListField(frame, ID3FN_TEXT, isrcs);	  container.AddFrame(frame); }
 
 	if (info.year > 0)
 	{
@@ -461,29 +478,33 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 	 */
 	if (info.HasOtherInfo(INFO_ALBUMARTIST) && !info.HasOtherInfo(INFO_BAND))
 	{
-		info.SetOtherInfo(INFO_BAND, info.GetOtherInfo(INFO_ALBUMARTIST));
+		Info::AddOtherInfo(&info, INFO_BAND, Info::GetOtherInfoList(&info, INFO_ALBUMARTIST));
 		info.SetOtherInfo(INFO_ALBUMARTIST, NIL);
 	}
 
 	/* Save other text info.
 	 */
-	foreach (const String &pair, info.other)
+	Bool	 isV24 = (container.GetSpec() == ID3V2_4_0);
+
+	Array<String>	 keys = Info::GetOtherInfoKeys(&info);
+
+	foreach (const String &key, keys)
 	{
-		String	 key   = pair.Head(pair.Find(":"));
-		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+		Array<String>	 values = Info::GetOtherInfoList(&info, key);
+		String		 value	= values.GetFirst();
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "Album Artist");			    container.AddFrame(frame); }
+		if	(key == INFO_ALBUMARTIST)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "Album Artist");			    container.AddFrame(frame); }
 
-		else if	(key == INFO_CONTENTGROUP)		   { ID3_Frame frame(ID3FID_CONTENTGROUP);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_SUBTITLE)			   { ID3_Frame frame(ID3FID_SUBTITLE);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_CONTENTGROUP)		   { ID3_Frame frame(ID3FID_CONTENTGROUP);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_SUBTITLE)			   { ID3_Frame frame(ID3FID_SUBTITLE);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
-		else if	(key == INFO_BAND)			   { ID3_Frame frame(ID3FID_BAND);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_CONDUCTOR)			   { ID3_Frame frame(ID3FID_CONDUCTOR);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_REMIXER)			   { ID3_Frame frame(ID3FID_MIXARTIST);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_COMPOSER)			   { ID3_Frame frame(ID3FID_COMPOSER);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_LYRICIST)			   { ID3_Frame frame(ID3FID_LYRICIST);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_BAND)			   { ID3_Frame frame(ID3FID_BAND);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_CONDUCTOR)			   { ID3_Frame frame(ID3FID_CONDUCTOR);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_REMIXER)			   { ID3_Frame frame(ID3FID_MIXARTIST);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_COMPOSER)			   { ID3_Frame frame(ID3FID_COMPOSER);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_LYRICIST)			   { ID3_Frame frame(ID3FID_LYRICIST);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
 		else if (key == INFO_PRODUCER)
 		{
@@ -496,24 +517,27 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 				frame = new ID3_Frame(ID3FID_INVOLVEDPEOPLE);
 			}
 
-			AddStringListItem(*frame, ID3FN_TEXT, "producer");
-			AddStringListItem(*frame, ID3FN_TEXT, value);
+			foreach (const String &producer, values)
+			{
+				AddStringListItem(*frame, ID3FN_TEXT, "producer");
+				AddStringListItem(*frame, ID3FN_TEXT, producer);
+			}
 
 			if (add) container.AddFrame(frame);
 		}
 
-		else if	(key == INFO_ORIG_ARTIST)		   { ID3_Frame frame(ID3FID_ORIGARTIST);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_ORIG_ALBUM)		   { ID3_Frame frame(ID3FID_ORIGALBUM);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_ORIG_LYRICIST)		   { ID3_Frame frame(ID3FID_ORIGLYRICIST);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_ORIG_ARTIST)		   { ID3_Frame frame(ID3FID_ORIGARTIST);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_ORIG_ALBUM)		   { ID3_Frame frame(ID3FID_ORIGALBUM);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_ORIG_LYRICIST)		   { ID3_Frame frame(ID3FID_ORIGLYRICIST);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
 		else if (key == INFO_ORIG_YEAR)
 		{
 			ID3_Frame	 frame;
 
-			if (container.GetSpec() == ID3V2_4_0) frame = ID3_Frame(ID3FID_ORIGRELEASETIME);
-			else				      frame = ID3_Frame(ID3FID_ORIGYEAR);
+			if (isV24) frame = ID3_Frame(ID3FID_ORIGRELEASETIME);
+			else	   frame = ID3_Frame(ID3FID_ORIGYEAR);
 
-			SetStringField(frame, ID3FN_TEXT, String::FromInt(info.year));
+			SetStringField(frame, ID3FN_TEXT, value);
 
 			container.AddFrame(frame);
 		}
@@ -525,33 +549,66 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 			{ ID3_Frame frame(ID3FID_MOVEMENT); SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
 		}
 
-		else if	(key == INFO_MOVEMENTNAME)		   { ID3_Frame frame(ID3FID_MOVEMENTNAME);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_MOVEMENTNAME)		   { ID3_Frame frame(ID3FID_MOVEMENTNAME);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
 		else if	(key == INFO_BPM)			   { ID3_Frame frame(ID3FID_BPM);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_INITIALKEY)		   { ID3_Frame frame(ID3FID_INITIALKEY);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_INITIALKEY)		   { ID3_Frame frame(ID3FID_INITIALKEY);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
-		else if	(key == INFO_COPYRIGHT)			   { ID3_Frame frame(ID3FID_COPYRIGHT);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_COPYRIGHT)			   { ID3_Frame frame(ID3FID_COPYRIGHT);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
-		else if	(key == INFO_MEDIATYPE)			   { ID3_Frame frame(ID3FID_MEDIATYPE);		   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if (key == INFO_CATALOGNUMBER)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "CATALOGNUMBER");			    container.AddFrame(frame); }
-		else if (key == INFO_BARCODE)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "BARCODE");			    container.AddFrame(frame); }
+		else if	(key == INFO_MEDIATYPE)			   { ID3_Frame frame(ID3FID_MEDIATYPE);		   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if (key == INFO_CATALOGNUMBER)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "CATALOGNUMBER");			    container.AddFrame(frame); }
+		else if (key == INFO_BARCODE)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "BARCODE");			    container.AddFrame(frame); }
 
-		else if	(key == INFO_DISCSUBTITLE)		   { ID3_Frame frame(ID3FID_SETSUBTITLE);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_DISCSUBTITLE)		   { ID3_Frame frame(ID3FID_SETSUBTITLE);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
 		else if	(key == INFO_LYRICS)			   { ID3_Frame frame(ID3FID_UNSYNCEDLYRICS);	   SetStringField(frame, ID3FN_TEXT, value, False); SetStringField(frame, ID3FN_LANGUAGE, "und");			    container.AddFrame(frame); }
 
-		else if	(key == INFO_SCRIPT)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "SCRIPT");			    container.AddFrame(frame); }
+		else if	(key == INFO_SCRIPT)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "SCRIPT");			    container.AddFrame(frame); }
 
-		else if	(key == INFO_RADIOSTATION)		   { ID3_Frame frame(ID3FID_NETRADIOSTATION);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_RADIOOWNER)		   { ID3_Frame frame(ID3FID_NETRADIOOWNER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_RADIOSTATION)		   { ID3_Frame frame(ID3FID_NETRADIOSTATION);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_RADIOOWNER)		   { ID3_Frame frame(ID3FID_NETRADIOOWNER);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
-		else if	(key == INFO_SORT_ARTIST)		   { ID3_Frame frame(ID3FID_PERFORMERSORTORDER);   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_SORT_ALBUM)		   { ID3_Frame frame(ID3FID_ALBUMSORTORDER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_SORT_ALBUMARTIST)		   { ID3_Frame frame(ID3FID_ALBUMARTISTSORTORDER); SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_SORT_COMPOSER)		   { ID3_Frame frame(ID3FID_COMPOSERSORTORDER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
-		else if	(key == INFO_SORT_TITLE)		   { ID3_Frame frame(ID3FID_TITLESORTORDER);	   SetStringField(frame, ID3FN_TEXT, value); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_ARTIST)		   { ID3_Frame frame(ID3FID_PERFORMERSORTORDER);   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_ALBUM)		   { ID3_Frame frame(ID3FID_ALBUMSORTORDER);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_ALBUMARTIST)		   { ID3_Frame frame(ID3FID_ALBUMARTISTSORTORDER); SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_COMPOSER)		   { ID3_Frame frame(ID3FID_COMPOSERSORTORDER);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
+		else if	(key == INFO_SORT_TITLE)		   { ID3_Frame frame(ID3FID_TITLESORTORDER);	   SetStringListField(frame, ID3FN_TEXT, values); container.AddFrame(frame); }
 
-		else if (key == INFO_USERTEXT)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
+		else if (key == INFO_USERTEXT)
+		{
+			/* Write one frame for each description, with all values
+			 * of that description.
+			 */
+			Array<String>	 descriptions;
+
+			foreach (const String &text, values)
+			{
+				String	 description = text.Head(text.Find(":|:"));
+				Bool	 found	     = False;
+
+				foreach (const String &known, descriptions) if (known == description) found = True;
+
+				if (!found) descriptions.Add(description);
+			}
+
+			foreach (const String &description, descriptions)
+			{
+				Array<String>	 texts;
+
+				foreach (const String &text, values)
+				{
+					if (text.Head(text.Find(":|:")) == description) texts.Add(text.Tail(text.Length() - text.Find(":|:") - 3));
+				}
+
+				ID3_Frame	 frame(ID3FID_USERTEXT);
+
+				SetStringListField(frame, ID3FN_TEXT, texts);
+				SetStringField(frame, ID3FN_DESCRIPTION, description);
+
+				container.AddFrame(frame);
+			}
+		}
 
 		else if	(key == INFO_WEB_ARTIST)		   { ID3_Frame frame(ID3FID_WWWARTIST);		   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
 		else if	(key == INFO_WEB_PUBLISHER)		   { ID3_Frame frame(ID3FID_WWWPUBLISHER);	   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
@@ -560,15 +617,20 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 		else if	(key == INFO_WEB_COPYRIGHT)		   { ID3_Frame frame(ID3FID_WWWCOPYRIGHT);	   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
 		else if	(key == INFO_WEB_COMMERCIAL)		   { ID3_Frame frame(ID3FID_WWWCOMMERCIALINFO);	   SetStringField(frame, ID3FN_URL,  value); container.AddFrame(frame); }
 
-		else if (key == INFO_WEB_USERURL)		   { ID3_Frame frame(ID3FID_WWWUSER);		   SetStringField(frame, ID3FN_URL,  value.Tail(value.Length() - value.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, value.Head(value.Find(":|:"))); container.AddFrame(frame); }
+		else if (key == INFO_WEB_USERURL)
+		{
+			/* Write one frame for each user defined URL.
+			 */
+			foreach (const String &url, values) { ID3_Frame frame(ID3FID_WWWUSER); SetStringField(frame, ID3FN_URL, url.Tail(url.Length() - url.Find(":|:") - 3)); SetStringField(frame, ID3FN_DESCRIPTION, url.Head(url.Find(":|:"))); container.AddFrame(frame); }
+		}
 
-		else if	(key == INFO_ASIN)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "ASIN");				    container.AddFrame(frame); }
+		else if	(key == INFO_ASIN)			   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "ASIN");				    container.AddFrame(frame); }
 
-		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Artist Id");		    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Id");		    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Artist Id");	    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_WORKID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Work Id");		    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_DISCID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Disc Id");		    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Artist Id");		    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Id");		    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Artist Id");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_WORKID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Work Id");		    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_DISCID)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Disc Id");		    container.AddFrame(frame); }
 
 		else if	(key == INFO_MUSICBRAINZ_TRACKID)
 		{
@@ -583,16 +645,16 @@ Int BoCA::TaggerID3v2::RenderContainer(ID3_Container &container, const Track &tr
 			container.AddFrame(frame);
 		}
 
-		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Original Artist Id");    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Original Album Id");	    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Release Group Id");	    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Release Track Id");	    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_TRMID)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz TRM Id");		    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Original Artist Id");    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Original Album Id");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Release Group Id");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Release Track Id");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_TRMID)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz TRM Id");		    container.AddFrame(frame); }
 
-		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Type");	    container.AddFrame(frame); }
-		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Status");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Type");	    container.AddFrame(frame); }
+		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Status");	    container.AddFrame(frame); }
 
-		else if	(key == INFO_RELEASECOUNTRY)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringField(frame, ID3FN_TEXT, value); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Release Country"); container.AddFrame(frame); }
+		else if	(key == INFO_RELEASECOUNTRY)		   { ID3_Frame frame(ID3FID_USERTEXT);		   SetStringListField(frame, ID3FN_TEXT, values); SetStringField(frame, ID3FN_DESCRIPTION, "MusicBrainz Album Release Country"); container.AddFrame(frame); }
 	}
 
 	/* Save Replay Gain info.
@@ -730,6 +792,20 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 	Info	 info = track.GetInfo();
 
+	/* Values from this tag replace the values that tags read before gave
+	 * the same keys; several values of a key in this tag add up.
+	 */
+	Array<String>	 previousOther = info.other;
+
+	info.other.RemoveAll();
+
+	/* Artist, genre, label and ISRC can have several values in this tag.
+	 */
+	Array<String>	 artists;
+	Array<String>	 genres;
+	Array<String>	 labels;
+	Array<String>	 isrcs;
+
 	/* Parse individual comment items.
 	 */
 	ID3_Container::ConstIterator	*iterator     = container.CreateIterator();
@@ -738,29 +814,35 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 	for (UnsignedInt i = 0; i < container.NumFrames(); i++)
 	{
-		const ID3_Frame	&frame = *iterator->GetNext();
+		const ID3_Frame	&frame	= *iterator->GetNext();
+		Array<String>	 values;
 
-		if	(frame.GetID() == ID3FID_LEADARTIST)	       info.artist  = GetStringField(frame, ID3FN_TEXT);
+		/* Split the text into its values. Comments and lyrics are one
+		 * value and can be long, so they are not split.
+		 */
+		if (frame.GetID() != ID3FID_COMMENT && frame.GetID() != ID3FID_UNSYNCEDLYRICS) values = SplitStringField(frame, ID3FN_TEXT);
+
+		if	(frame.GetID() == ID3FID_LEADARTIST)	       { foreach (const String &value, values) artists.Add(value); }
 		else if (frame.GetID() == ID3FID_TITLE)		       info.title   = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_ALBUM)		       info.album   = GetStringField(frame, ID3FN_TEXT);
 		else if (frame.GetID() == ID3FID_YEAR)		       info.year    = GetStringField(frame, ID3FN_TEXT).ToInt();
 		else if (frame.GetID() == ID3FID_RECORDINGTIME)	       info.year    = GetStringField(frame, ID3FN_TEXT).Head(4).ToInt();
 		else if (frame.GetID() == ID3FID_COMMENT)	       info.comment = GetStringField(frame, ID3FN_TEXT, False);
-		else if (frame.GetID() == ID3FID_PUBLISHER)	       info.label   = GetStringField(frame, ID3FN_TEXT);
+		else if (frame.GetID() == ID3FID_PUBLISHER)	       { foreach (const String &value, values) labels.Add(value); }
 
 		else if (frame.GetID() == ID3FID_ISRC)
 		{
-			if (Info::IsISRC(GetStringField(frame, ID3FN_TEXT))) info.isrc = GetStringField(frame, ID3FN_TEXT);
+			foreach (const String &value, values) if (Info::IsISRC(value)) isrcs.Add(value);
 		}
 
-		else if (frame.GetID() == ID3FID_CONTENTGROUP)	       info.SetOtherInfo(INFO_CONTENTGROUP,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_SUBTITLE)	       info.SetOtherInfo(INFO_SUBTITLE,		GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_CONTENTGROUP)	       Info::AddOtherInfo(&info, INFO_CONTENTGROUP,	values);
+		else if (frame.GetID() == ID3FID_SUBTITLE)	       Info::AddOtherInfo(&info, INFO_SUBTITLE,		values);
 
-		else if (frame.GetID() == ID3FID_BAND)		       info.SetOtherInfo(INFO_BAND,		GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_CONDUCTOR)	       info.SetOtherInfo(INFO_CONDUCTOR,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_MIXARTIST)	       info.SetOtherInfo(INFO_REMIXER,		GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_COMPOSER)	       info.SetOtherInfo(INFO_COMPOSER,		GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_LYRICIST)	       info.SetOtherInfo(INFO_LYRICIST,		GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_BAND)		       Info::AddOtherInfo(&info, INFO_BAND,		values);
+		else if (frame.GetID() == ID3FID_CONDUCTOR)	       Info::AddOtherInfo(&info, INFO_CONDUCTOR,	values);
+		else if (frame.GetID() == ID3FID_MIXARTIST)	       Info::AddOtherInfo(&info, INFO_REMIXER,		values);
+		else if (frame.GetID() == ID3FID_COMPOSER)	       Info::AddOtherInfo(&info, INFO_COMPOSER,		values);
+		else if (frame.GetID() == ID3FID_LYRICIST)	       Info::AddOtherInfo(&info, INFO_LYRICIST,		values);
 
 		else if (frame.GetID() == ID3FID_INVOLVEDPEOPLE || frame.GetID() == ID3FID_INVOLVEDPEOPLE2)
 		{
@@ -773,13 +855,13 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 
 				if (value == NIL) continue;
 
-				if (description.ToLower() == "producer") info.SetOtherInfo(INFO_PRODUCER, value);
+				if (description.ToLower() == "producer") Info::AddOtherInfo(&info, INFO_PRODUCER, value);
 			}
 		}
 
-		else if (frame.GetID() == ID3FID_ORIGARTIST)	       info.SetOtherInfo(INFO_ORIG_ARTIST,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_ORIGALBUM)	       info.SetOtherInfo(INFO_ORIG_ALBUM,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_ORIGLYRICIST)	       info.SetOtherInfo(INFO_ORIG_LYRICIST,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_ORIGARTIST)	       Info::AddOtherInfo(&info, INFO_ORIG_ARTIST,	values);
+		else if (frame.GetID() == ID3FID_ORIGALBUM)	       Info::AddOtherInfo(&info, INFO_ORIG_ALBUM,	values);
+		else if (frame.GetID() == ID3FID_ORIGLYRICIST)	       Info::AddOtherInfo(&info, INFO_ORIG_LYRICIST,	values);
 		else if (frame.GetID() == ID3FID_ORIGYEAR)	       info.SetOtherInfo(INFO_ORIG_YEAR,	GetStringField(frame, ID3FN_TEXT));
 		else if (frame.GetID() == ID3FID_ORIGRELEASETIME)      info.SetOtherInfo(INFO_ORIG_YEAR,	GetStringField(frame, ID3FN_TEXT).Head(4));
 
@@ -792,31 +874,31 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 			if (movementString.Contains("/")) info.SetOtherInfo(INFO_MOVEMENTTOTAL, movementString.Tail(movementString.Length() - movementString.Find("/") - 1));
 		}
 
-		else if (frame.GetID() == ID3FID_MOVEMENTNAME)	       info.SetOtherInfo(INFO_MOVEMENTNAME,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_MOVEMENTNAME)	       Info::AddOtherInfo(&info, INFO_MOVEMENTNAME,	values);
 
 		else if (frame.GetID() == ID3FID_BPM)
 		{
 			if (GetStringField(frame, ID3FN_TEXT).ToInt() > 0) info.SetOtherInfo(INFO_BPM, GetStringField(frame, ID3FN_TEXT));
 		}
 
-		else if (frame.GetID() == ID3FID_INITIALKEY)	       info.SetOtherInfo(INFO_INITIALKEY,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_INITIALKEY)	       Info::AddOtherInfo(&info, INFO_INITIALKEY,	values);
 
-		else if (frame.GetID() == ID3FID_COPYRIGHT)	       info.SetOtherInfo(INFO_COPYRIGHT,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_COPYRIGHT)	       Info::AddOtherInfo(&info, INFO_COPYRIGHT,	values);
 
-		else if (frame.GetID() == ID3FID_MEDIATYPE)	       info.SetOtherInfo(INFO_MEDIATYPE,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_MEDIATYPE)	       Info::AddOtherInfo(&info, INFO_MEDIATYPE,	values);
 
-		else if (frame.GetID() == ID3FID_SETSUBTITLE)	       info.SetOtherInfo(INFO_DISCSUBTITLE,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_SETSUBTITLE)	       Info::AddOtherInfo(&info, INFO_DISCSUBTITLE,	values);
 
 		else if (frame.GetID() == ID3FID_UNSYNCEDLYRICS)       info.SetOtherInfo(INFO_LYRICS,		GetStringField(frame, ID3FN_TEXT, False));
 
-		else if (frame.GetID() == ID3FID_NETRADIOSTATION)      info.SetOtherInfo(INFO_RADIOSTATION,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_NETRADIOOWNER)        info.SetOtherInfo(INFO_RADIOOWNER,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_NETRADIOSTATION)      Info::AddOtherInfo(&info, INFO_RADIOSTATION,	values);
+		else if (frame.GetID() == ID3FID_NETRADIOOWNER)        Info::AddOtherInfo(&info, INFO_RADIOOWNER,	values);
 
-		else if (frame.GetID() == ID3FID_PERFORMERSORTORDER)   info.SetOtherInfo(INFO_SORT_ARTIST,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_ALBUMSORTORDER)       info.SetOtherInfo(INFO_SORT_ALBUM,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_ALBUMARTISTSORTORDER) info.SetOtherInfo(INFO_SORT_ALBUMARTIST,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_COMPOSERSORTORDER)    info.SetOtherInfo(INFO_SORT_COMPOSER,	GetStringField(frame, ID3FN_TEXT));
-		else if (frame.GetID() == ID3FID_TITLESORTORDER)       info.SetOtherInfo(INFO_SORT_TITLE,	GetStringField(frame, ID3FN_TEXT));
+		else if (frame.GetID() == ID3FID_PERFORMERSORTORDER)   Info::AddOtherInfo(&info, INFO_SORT_ARTIST,	values);
+		else if (frame.GetID() == ID3FID_ALBUMSORTORDER)       Info::AddOtherInfo(&info, INFO_SORT_ALBUM,	values);
+		else if (frame.GetID() == ID3FID_ALBUMARTISTSORTORDER) Info::AddOtherInfo(&info, INFO_SORT_ALBUMARTIST,	values);
+		else if (frame.GetID() == ID3FID_COMPOSERSORTORDER)    Info::AddOtherInfo(&info, INFO_SORT_COMPOSER,	values);
+		else if (frame.GetID() == ID3FID_TITLESORTORDER)       Info::AddOtherInfo(&info, INFO_SORT_TITLE,	values);
 
 		else if (frame.GetID() == ID3FID_WWWARTIST)	       info.SetOtherInfo(INFO_WEB_ARTIST,	GetStringField(frame, ID3FN_URL));
 		else if (frame.GetID() == ID3FID_WWWPUBLISHER)	       info.SetOtherInfo(INFO_WEB_PUBLISHER,	GetStringField(frame, ID3FN_URL));
@@ -859,36 +941,36 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		else if (frame.GetID() == ID3FID_USERTEXT)
 		{
 			String	 description = GetStringField(frame, ID3FN_DESCRIPTION);
-			String	 value	     = GetStringField(frame, ID3FN_TEXT);
+			String	 value	     = values.GetFirst();
 
 			if (value == NIL) continue;
 
-			if	(description.ToLower() == "album artist")  info.SetOtherInfo(INFO_ALBUMARTIST,	 value);
+			if	(description.ToLower() == "album artist")  Info::AddOtherInfo(&info, INFO_ALBUMARTIST,	 values);
 
-			else if (description.ToLower() == "catalognumber") info.SetOtherInfo(INFO_CATALOGNUMBER, value);
-			else if (description.ToLower() == "barcode")	   info.SetOtherInfo(INFO_BARCODE,	 value);
+			else if (description.ToLower() == "catalognumber") Info::AddOtherInfo(&info, INFO_CATALOGNUMBER, values);
+			else if (description.ToLower() == "barcode")	   Info::AddOtherInfo(&info, INFO_BARCODE,	 values);
 
-			else if	(description.ToLower() == "script")	   info.SetOtherInfo(INFO_SCRIPT,	 value);
+			else if	(description.ToLower() == "script")	   Info::AddOtherInfo(&info, INFO_SCRIPT,	 values);
 
-			else if	(description.ToLower() == "asin")	   info.SetOtherInfo(INFO_ASIN,		 value);
+			else if	(description.ToLower() == "asin")	   Info::AddOtherInfo(&info, INFO_ASIN,		 values);
 
 			else if	(description.ToLower().StartsWith("musicbrainz"))
 			{
-				if	(description.ToLower() == "musicbrainz artist id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	    value);
-				else if	(description.ToLower() == "musicbrainz album id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,	    value);
-				else if	(description.ToLower() == "musicbrainz album artist id")       info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMARTISTID,    value);
-				else if	(description.ToLower() == "musicbrainz work id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_WORKID,	    value);
-				else if	(description.ToLower() == "musicbrainz disc id")	       info.SetOtherInfo(INFO_MUSICBRAINZ_DISCID,	    value);
-				else if (description.ToLower() == "musicbrainz original artist id")    info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
-				else if	(description.ToLower() == "musicbrainz original album id")     info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALALBUMID,  value);
-				else if	(description.ToLower() == "musicbrainz release group id")      info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASEGROUPID,   value);
-				else if	(description.ToLower() == "musicbrainz release track id")      info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETRACKID,   value);
-				else if	(description.ToLower() == "musicbrainz trm id")		       info.SetOtherInfo(INFO_MUSICBRAINZ_TRMID,	    value);
+				if	(description.ToLower() == "musicbrainz artist id")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ARTISTID,	    values);
+				else if	(description.ToLower() == "musicbrainz album id")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMID,	    values);
+				else if	(description.ToLower() == "musicbrainz album artist id")       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMARTISTID,    values);
+				else if	(description.ToLower() == "musicbrainz work id")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_WORKID,	    values);
+				else if	(description.ToLower() == "musicbrainz disc id")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_DISCID,	    values);
+				else if (description.ToLower() == "musicbrainz original artist id")    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALARTISTID, values);
+				else if	(description.ToLower() == "musicbrainz original album id")     Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALALBUMID,  values);
+				else if	(description.ToLower() == "musicbrainz release group id")      Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASEGROUPID,   values);
+				else if	(description.ToLower() == "musicbrainz release track id")      Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETRACKID,   values);
+				else if	(description.ToLower() == "musicbrainz trm id")		       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRMID,	    values);
 
-				else if	(description.ToLower() == "musicbrainz album type")	       info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETYPE,	    value);
-				else if	(description.ToLower() == "musicbrainz album status")	       info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASESTATUS,    value);
+				else if	(description.ToLower() == "musicbrainz album type")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETYPE,	    values);
+				else if	(description.ToLower() == "musicbrainz album status")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASESTATUS,    values);
 
-				else if	(description.ToLower() == "musicbrainz album release country") info.SetOtherInfo(INFO_RELEASECOUNTRY,		    value);
+				else if	(description.ToLower() == "musicbrainz album release country") Info::AddOtherInfo(&info, INFO_RELEASECOUNTRY,		    values);
 			}
 
 			else if (description.ToLower().StartsWith("replaygain"))
@@ -967,7 +1049,10 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 				overDriveMarkers = value;
 			}
 
-			else						   info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(value));
+			else
+			{
+				foreach (const String &text, values) info.other.Add(String(INFO_USERTEXT).Append(":").Append(description).Append(":|:").Append(text));
+			}
 		}
 		else if (frame.GetID() == ID3FID_UNIQUEFILEID)
 		{
@@ -987,22 +1072,7 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		}
 		else if (frame.GetID() == ID3FID_CONTENTTYPE)
 		{
-			String	 s_genre = GetStringField(frame, ID3FN_TEXT);
-			String	 genreID;
-
-			if (s_genre[0] == '(')
-			{
-				for (Int j = 1; j < s_genre.Length(); j++)
-				{
-					if (s_genre[j] == ')') break;
-
-					genreID[j - 1] = s_genre[j];
-				}
-			}
-
-			if	(genreID == NIL)			  info.genre = s_genre;
-			else if (s_genre.Length() > genreID.Length() + 2) info.genre = s_genre.Tail(s_genre.Length() - genreID.Length() - 2);
-			else						  info.genre = GetID3CategoryName(genreID.ToInt());
+			foreach (const String &value, values) genres.Add(ParseGenre(value));
 		}
 		else if (frame.GetID() == ID3FID_CDID)
 		{
@@ -1072,13 +1142,24 @@ Int BoCA::TaggerID3v2::ParseContainer(const ID3_Container &container, Track &tra
 		}
 	}
 
-	/* Set album artist to band if only band is filled.
+	/* Set album artist to band if only band is filled. This applies to
+	 * the values of this tag, before the values of earlier tags are added.
 	 */
 	if (info.HasOtherInfo(INFO_BAND) && !info.HasOtherInfo(INFO_ALBUMARTIST))
 	{
-		info.SetOtherInfo(INFO_ALBUMARTIST, info.GetOtherInfo(INFO_BAND));
+		Info::AddOtherInfo(&info, INFO_ALBUMARTIST, Info::GetOtherInfoList(&info, INFO_BAND));
 		info.SetOtherInfo(INFO_BAND, NIL);
 	}
+
+	Info::AddMissingOtherInfo(&info, previousOther);
+
+	/* Set the lists of this tag after the values of earlier tags, so
+	 * that one value of this tag replaces a list of an earlier tag.
+	 */
+	if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+	if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+	if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+	if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 	/* Set artist to album artist if artist is not filled.
 	 */
@@ -1404,6 +1485,139 @@ Int BoCA::TaggerID3v2::AddStringListItem(ID3_Frame &frame, ID3_FieldID fieldType
 	else					field->Add((char *)	 string.ConvertTo(textEncodingID));
 
 	return Success();
+}
+
+Int BoCA::TaggerID3v2::SetStringListField(ID3_Frame &frame, ID3_FieldID fieldType, const Array<String> &values)
+{
+	Array<String>	 nonBlankValues;
+
+	foreach (const String &value, values) if (value.Trim() != NIL) nonBlankValues.Add(value.Trim());
+
+	if (nonBlankValues.Length() == 0) return SetStringField(frame, fieldType, NIL);
+
+	/* Separate values with NUL characters. ID3v2.4 defines this. ID3v2.3
+	 * has no list of values, but id3lib writes the NUL characters there
+	 * too, and readers without list support show the first value.
+	 */
+	SetStringField(frame, fieldType, nonBlankValues.GetFirst());
+
+	for (Int i = 1; i < nonBlankValues.Length(); i++) AddStringListItem(frame, fieldType, nonBlankValues.GetNth(i));
+
+	return Success();
+}
+
+/* Turn a genre value into a name. A value can start with an ID3v1 genre
+ * number in parentheses, like "(17)" or "(17)Rock".
+ */
+String BoCA::TaggerID3v2::ParseGenre(const String &value)
+{
+	String	 genreID;
+
+	if (value[0] == '(')
+	{
+		for (Int j = 1; j < value.Length(); j++)
+		{
+			if (value[j] == ')') break;
+
+			genreID[j - 1] = value[j];
+		}
+	}
+
+	if	(genreID == NIL)			return value;
+	else if (value.Length() > genreID.Length() + 2) return value.Tail(value.Length() - genreID.Length() - 2);
+	else						return GetID3CategoryName(genreID.ToInt());
+}
+
+/* Split a text field into its values. Unlike GetStringListField, which
+ * uses the item functions of id3lib and gets only one item from a text
+ * frame, this splits the raw text at NUL characters and skips blank values.
+ */
+Array<String> BoCA::TaggerID3v2::SplitStringField(const ID3_Frame &frame, ID3_FieldID fieldType)
+{
+	Array<String>	 values;
+
+	if (!frame.Contains(fieldType)) return values;
+
+	ID3_Field	*field	  = frame.GetField(fieldType);
+	ID3_TextEnc	 encoding = ID3TE_ISO8859_1;
+	Int		 size	  = field->Size();
+
+	if (field->IsEncodable()) encoding = (ID3_TextEnc) GetIntegerField(frame, ID3FN_TEXTENC);
+
+	if (encoding == ID3TE_ISO8859_1 || encoding == ID3TE_UTF8)
+	{
+		/* Split raw text on NUL bytes.
+		 */
+		const char	*text = field->GetRawText();
+
+		if (text == NIL) return values;
+
+		for (Int start = 0, i = 0; i <= size; i++)
+		{
+			if (i < size && text[i] != 0) continue;
+
+			Buffer<char>	 part(i - start + 1);
+
+			memcpy(part, text + start, i - start);
+
+			part[i - start] = 0;
+
+			String	 value;
+
+			if (encoding == ID3TE_ISO8859_1) value.ImportFrom("ISO-8859-1", part);
+			else				 value.ImportFrom("UTF-8", part);
+
+			if (value.Trim() != NIL) values.Add(value.Trim());
+
+			start = i + 1;
+		}
+	}
+	else if (encoding == ID3TE_UTF16 || encoding == ID3TE_UTF16BE)
+	{
+		/* Split raw text on NUL characters. id3lib stores the first
+		 * value in big-endian order and keeps later values as read,
+		 * including a byte order mark.
+		 */
+		const unicode_t	*text	= field->GetRawUnicodeText();
+		Int		 length	= size / 2;
+
+		if (text == NIL) return values;
+
+		for (Int start = 0, i = 0; i <= length; i++)
+		{
+			if (i < length && text[i] != 0) continue;
+
+			Buffer<unicode_t>	 part(i - start + 1);
+			Int			 n	= 0;
+			Bool			 swap	= False;
+
+			for (Int j = start; j < i; j++)
+			{
+				if (j == start && IsBOM(text[j], 0xFE, 0xFF)) continue;
+				if (j == start && IsBOM(text[j], 0xFF, 0xFE)) { swap = True; continue; }
+
+				/* Copy the bytes of the character, swapped for little-endian text.
+				 */
+				const UnsignedByte	*from = (const UnsignedByte *) &text[j];
+				UnsignedByte		*to   = (UnsignedByte *) &part[n++];
+
+				to[0] = swap ? from[1] : from[0];
+				to[1] = swap ? from[0] : from[1];
+			}
+
+			part[n] = 0;
+
+			String	 value;
+
+			value.ImportFrom("UTF-16BE", (char *) (unicode_t *) part);
+
+			if (value.Trim() != NIL) values.Add(value.Trim());
+
+			start = i + 1;
+		}
+	}
+
+	return values;
 }
 
 Int BoCA::TaggerID3v2::GetIntegerField(const ID3_Frame &frame, ID3_FieldID fieldType)

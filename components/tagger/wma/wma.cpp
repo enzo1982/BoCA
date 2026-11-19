@@ -154,13 +154,23 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 		 */
 		const Info	&info = track.GetInfo();
 
-		if (info.artist != NIL) RenderWMAStringItem(g_wszWMAuthor,     info.artist,		   pHeaderInfo);
+		/* Artist, genre, label and ISRC can have several values, one
+		 * attribute for each value.
+		 */
+		Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+		Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+		Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+		Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+		foreach (const String &value, artists) RenderWMAStringItem(g_wszWMAuthor, value, pHeaderInfo);
+
 		if (info.title  != NIL) RenderWMAStringItem(g_wszWMTitle,      info.title,		   pHeaderInfo);
 		if (info.album  != NIL) RenderWMAStringItem(g_wszWMAlbumTitle, info.album,		   pHeaderInfo);
 		if (info.year    >   0) RenderWMAStringItem(g_wszWMYear,       String::FromInt(info.year), pHeaderInfo);
-		if (info.genre  != NIL) RenderWMAStringItem(g_wszWMGenre,      info.genre,		   pHeaderInfo);
-		if (info.label  != NIL) RenderWMAStringItem(g_wszWMPublisher,  info.label,		   pHeaderInfo);
-		if (info.isrc   != NIL) RenderWMAStringItem(g_wszWMISRC,       info.isrc,		   pHeaderInfo);
+
+		foreach (const String &value, genres) RenderWMAStringItem(g_wszWMGenre,	    value, pHeaderInfo);
+		foreach (const String &value, labels) RenderWMAStringItem(g_wszWMPublisher, value, pHeaderInfo);
+		foreach (const String &value, isrcs)  RenderWMAStringItem(g_wszWMISRC,	    value, pHeaderInfo);
 
 		if (info.track > 0)
 		{
@@ -186,74 +196,88 @@ Error BoCA::TaggerWMA::RenderStreamInfo(const String &fileName, const Track &tra
 
 		/* Save other text info.
 		 */
-		foreach (const String &pair, info.other)
+		Array<String>	 keys = Info::GetOtherInfoKeys(&info);
+
+		foreach (const String &key, keys)
 		{
-			String	 key   = pair.Head(pair.Find(":"));
-			String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+			Array<String>	 values = Info::GetOtherInfoList(&info, key);
 
-			if (value == NIL) continue;
+			/* Numbers, web links and lyrics keep only the first value.
+			 */
+			if (key == INFO_BPM || key == INFO_ORIG_YEAR || key == INFO_LYRICS ||
+			    key == INFO_WEB_ARTIST || key == INFO_WEB_SOURCE || key == INFO_WEB_COPYRIGHT || key == INFO_WEB_COMMERCIAL)
+			{
+				while (values.Length() > 1) values.RemoveNth(1);
+			}
 
-			if	(key == INFO_ALBUMARTIST)		   RenderWMAStringItem(g_wszWMAlbumArtist,		    value, pHeaderInfo);
+			/* Write one attribute for each value.
+			 */
+			foreach (const String &value, values)
+			{
+				if (value == NIL) continue;
 
-			else if	(key == INFO_CONTENTGROUP)		   RenderWMAStringItem(g_wszWMContentGroupDescription,	    value, pHeaderInfo);
-			else if	(key == INFO_SUBTITLE)			   RenderWMAStringItem(g_wszWMSubTitle,			    value, pHeaderInfo);
+				if	(key == INFO_ALBUMARTIST)		   RenderWMAStringItem(g_wszWMAlbumArtist,		    value, pHeaderInfo);
 
-			else if	(key == INFO_CONDUCTOR)			   RenderWMAStringItem(g_wszWMConductor,		    value, pHeaderInfo);
-			else if	(key == INFO_REMIXER)			   RenderWMAStringItem(g_wszWMModifiedBy,		    value, pHeaderInfo);
-			else if	(key == INFO_COMPOSER)			   RenderWMAStringItem(g_wszWMComposer,			    value, pHeaderInfo);
-			else if	(key == INFO_LYRICIST)			   RenderWMAStringItem(g_wszWMWriter,			    value, pHeaderInfo);
-			else if	(key == INFO_PRODUCER)			   RenderWMAStringItem(g_wszWMProducer,			    value, pHeaderInfo);
+				else if	(key == INFO_CONTENTGROUP)		   RenderWMAStringItem(g_wszWMContentGroupDescription,	    value, pHeaderInfo);
+				else if	(key == INFO_SUBTITLE)			   RenderWMAStringItem(g_wszWMSubTitle,			    value, pHeaderInfo);
 
-			else if	(key == INFO_ORIG_ARTIST)		   RenderWMAStringItem(g_wszWMOriginalArtist,		    value, pHeaderInfo);
-			else if	(key == INFO_ORIG_ALBUM)		   RenderWMAStringItem(g_wszWMOriginalAlbumTitle,	    value, pHeaderInfo);
-			else if	(key == INFO_ORIG_LYRICIST)		   RenderWMAStringItem(g_wszWMOriginalLyricist,		    value, pHeaderInfo);
-			else if	(key == INFO_ORIG_YEAR)			   RenderWMAStringItem(g_wszWMOriginalReleaseYear,	    value, pHeaderInfo);
+				else if	(key == INFO_CONDUCTOR)			   RenderWMAStringItem(g_wszWMConductor,		    value, pHeaderInfo);
+				else if	(key == INFO_REMIXER)			   RenderWMAStringItem(g_wszWMModifiedBy,		    value, pHeaderInfo);
+				else if	(key == INFO_COMPOSER)			   RenderWMAStringItem(g_wszWMComposer,			    value, pHeaderInfo);
+				else if	(key == INFO_LYRICIST)			   RenderWMAStringItem(g_wszWMWriter,			    value, pHeaderInfo);
+				else if	(key == INFO_PRODUCER)			   RenderWMAStringItem(g_wszWMProducer,			    value, pHeaderInfo);
 
-			else if	(key == INFO_BPM)			   RenderWMAStringItem(g_wszWMBeatsPerMinute,		    value, pHeaderInfo);
-			else if	(key == INFO_INITIALKEY)		   RenderWMAStringItem(g_wszWMInitialKey,		    value, pHeaderInfo);
+				else if	(key == INFO_ORIG_ARTIST)		   RenderWMAStringItem(g_wszWMOriginalArtist,		    value, pHeaderInfo);
+				else if	(key == INFO_ORIG_ALBUM)		   RenderWMAStringItem(g_wszWMOriginalAlbumTitle,	    value, pHeaderInfo);
+				else if	(key == INFO_ORIG_LYRICIST)		   RenderWMAStringItem(g_wszWMOriginalLyricist,		    value, pHeaderInfo);
+				else if	(key == INFO_ORIG_YEAR)			   RenderWMAStringItem(g_wszWMOriginalReleaseYear,	    value, pHeaderInfo);
 
-			else if	(key == INFO_COPYRIGHT)			   RenderWMAStringItem(g_wszWMCopyright,		    value, pHeaderInfo);
+				else if	(key == INFO_BPM)			   RenderWMAStringItem(g_wszWMBeatsPerMinute,		    value, pHeaderInfo);
+				else if	(key == INFO_INITIALKEY)		   RenderWMAStringItem(g_wszWMInitialKey,		    value, pHeaderInfo);
 
-			else if	(key == INFO_MEDIATYPE)			   RenderWMAStringItem("WM/Media",			    value, pHeaderInfo);
-			else if	(key == INFO_CATALOGNUMBER)		   RenderWMAStringItem("WM/CatalogNo",			    value, pHeaderInfo);
-			else if	(key == INFO_BARCODE)			   RenderWMAStringItem("WM/Barcode",			    value, pHeaderInfo);
+				else if	(key == INFO_COPYRIGHT)			   RenderWMAStringItem(g_wszWMCopyright,		    value, pHeaderInfo);
 
-			else if	(key == INFO_LYRICS)			   RenderWMAStringItem(g_wszWMLyrics,			    value, pHeaderInfo, False);
+				else if	(key == INFO_MEDIATYPE)			   RenderWMAStringItem("WM/Media",			    value, pHeaderInfo);
+				else if	(key == INFO_CATALOGNUMBER)		   RenderWMAStringItem("WM/CatalogNo",			    value, pHeaderInfo);
+				else if	(key == INFO_BARCODE)			   RenderWMAStringItem("WM/Barcode",			    value, pHeaderInfo);
 
-			else if	(key == INFO_SCRIPT)			   RenderWMAStringItem("WM/Script",			    value, pHeaderInfo);
+				else if	(key == INFO_LYRICS)			   RenderWMAStringItem(g_wszWMLyrics,			    value, pHeaderInfo, False);
 
-			else if	(key == INFO_RADIOSTATION)		   RenderWMAStringItem(g_wszWMRadioStationName,		    value, pHeaderInfo);
-			else if	(key == INFO_RADIOOWNER)		   RenderWMAStringItem(g_wszWMRadioStationOwner,	    value, pHeaderInfo);
+				else if	(key == INFO_SCRIPT)			   RenderWMAStringItem("WM/Script",			    value, pHeaderInfo);
 
-			else if	(key == INFO_SORT_ARTIST)		   RenderWMAStringItem("WM/ArtistSortOrder",		    value, pHeaderInfo);
-			else if	(key == INFO_SORT_ALBUM)		   RenderWMAStringItem("WM/AlbumSortOrder",		    value, pHeaderInfo);
-			else if	(key == INFO_SORT_ALBUMARTIST)		   RenderWMAStringItem("WM/AlbumArtistSortOrder",	    value, pHeaderInfo);
-			else if	(key == INFO_SORT_COMPOSER)		   RenderWMAStringItem("WM/ComposerSortOrder",		    value, pHeaderInfo);
-			else if	(key == INFO_SORT_TITLE)		   RenderWMAStringItem("WM/TitleSortOrder",		    value, pHeaderInfo);
+				else if	(key == INFO_RADIOSTATION)		   RenderWMAStringItem(g_wszWMRadioStationName,		    value, pHeaderInfo);
+				else if	(key == INFO_RADIOOWNER)		   RenderWMAStringItem(g_wszWMRadioStationOwner,	    value, pHeaderInfo);
 
-			else if	(key == INFO_WEB_ARTIST)		   RenderWMAStringItem(g_wszWMAuthorURL,		    value, pHeaderInfo);
-			else if	(key == INFO_WEB_SOURCE)		   RenderWMAStringItem(g_wszWMAudioSourceURL,		    value, pHeaderInfo);
-			else if	(key == INFO_WEB_COPYRIGHT)		   RenderWMAStringItem(g_wszWMCopyrightURL,		    value, pHeaderInfo);
-			else if	(key == INFO_WEB_COMMERCIAL)		   RenderWMAStringItem(g_wszWMPromotionURL,		    value, pHeaderInfo);
+				else if	(key == INFO_SORT_ARTIST)		   RenderWMAStringItem("WM/ArtistSortOrder",		    value, pHeaderInfo);
+				else if	(key == INFO_SORT_ALBUM)		   RenderWMAStringItem("WM/AlbumSortOrder",		    value, pHeaderInfo);
+				else if	(key == INFO_SORT_ALBUMARTIST)		   RenderWMAStringItem("WM/AlbumArtistSortOrder",	    value, pHeaderInfo);
+				else if	(key == INFO_SORT_COMPOSER)		   RenderWMAStringItem("WM/ComposerSortOrder",		    value, pHeaderInfo);
+				else if	(key == INFO_SORT_TITLE)		   RenderWMAStringItem("WM/TitleSortOrder",		    value, pHeaderInfo);
 
-			else if	(key == INFO_ASIN)			   RenderWMAStringItem("ASIN",				    value, pHeaderInfo);
+				else if	(key == INFO_WEB_ARTIST)		   RenderWMAStringItem(g_wszWMAuthorURL,		    value, pHeaderInfo);
+				else if	(key == INFO_WEB_SOURCE)		   RenderWMAStringItem(g_wszWMAudioSourceURL,		    value, pHeaderInfo);
+				else if	(key == INFO_WEB_COPYRIGHT)		   RenderWMAStringItem(g_wszWMCopyrightURL,		    value, pHeaderInfo);
+				else if	(key == INFO_WEB_COMMERCIAL)		   RenderWMAStringItem(g_wszWMPromotionURL,		    value, pHeaderInfo);
 
-			else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   RenderWMAStringItem("MusicBrainz/Artist Id",		    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   RenderWMAStringItem("MusicBrainz/Album Id",		    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   RenderWMAStringItem("MusicBrainz/Album Artist Id",	    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_WORKID)	   RenderWMAStringItem("MusicBrainz/Work Id",		    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_DISCID)	   RenderWMAStringItem("MusicBrainz/Disc Id",		    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_TRACKID)	   RenderWMAStringItem("MusicBrainz/Track Id",		    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) RenderWMAStringItem("MusicBrainz/Original Artist Id",    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  RenderWMAStringItem("MusicBrainz/Original Album Id",	    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   RenderWMAStringItem("MusicBrainz/Release Group Id",	    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   RenderWMAStringItem("MusicBrainz/Release Track Id",	    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_TRMID)		   RenderWMAStringItem("MusicBrainz/TRM Id",		    value, pHeaderInfo);
+				else if	(key == INFO_ASIN)			   RenderWMAStringItem("ASIN",				    value, pHeaderInfo);
 
-			else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   RenderWMAStringItem("MusicBrainz/Album Type",	    value, pHeaderInfo);
-			else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   RenderWMAStringItem("MusicBrainz/Album Status",	    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   RenderWMAStringItem("MusicBrainz/Artist Id",		    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   RenderWMAStringItem("MusicBrainz/Album Id",		    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   RenderWMAStringItem("MusicBrainz/Album Artist Id",	    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_WORKID)	   RenderWMAStringItem("MusicBrainz/Work Id",		    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_DISCID)	   RenderWMAStringItem("MusicBrainz/Disc Id",		    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_TRACKID)	   RenderWMAStringItem("MusicBrainz/Track Id",		    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) RenderWMAStringItem("MusicBrainz/Original Artist Id",    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  RenderWMAStringItem("MusicBrainz/Original Album Id",	    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   RenderWMAStringItem("MusicBrainz/Release Group Id",	    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   RenderWMAStringItem("MusicBrainz/Release Track Id",	    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_TRMID)		   RenderWMAStringItem("MusicBrainz/TRM Id",		    value, pHeaderInfo);
 
-			else if	(key == INFO_RELEASECOUNTRY)		   RenderWMAStringItem("MusicBrainz/Album Release Country", value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   RenderWMAStringItem("MusicBrainz/Album Type",	    value, pHeaderInfo);
+				else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   RenderWMAStringItem("MusicBrainz/Album Status",	    value, pHeaderInfo);
+
+				else if	(key == INFO_RELEASECOUNTRY)		   RenderWMAStringItem("MusicBrainz/Album Release Country", value, pHeaderInfo);
+			}
 		}
 
 		/* Save Replay Gain info.
@@ -406,6 +430,20 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 		Info	 info = track.GetInfo();
 
+		/* Values from this tag replace the values that tags read before gave
+		 * the same keys; several values of a key in this tag add up.
+		 */
+		Array<String>	 previousOther = info.other;
+
+		info.other.RemoveAll();
+
+		/* Artist, genre, label and ISRC can come several times in this tag.
+		 */
+		Array<String>	 artists;
+		Array<String>	 genres;
+		Array<String>	 labels;
+		Array<String>	 isrcs;
+
 		WORD	 langIndex = 0;
 		WORD	 numIndices = 0;
 
@@ -450,33 +488,33 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 
 			/* Assign values to metadata fields.
 			 */
-			if	(id == g_wszWMAuthor)		       info.artist  = value;
+			if	(id == g_wszWMAuthor)		       artists.Add(value);
 			else if (id == g_wszWMTitle)		       info.title   = value;
 			else if (id == g_wszWMAlbumTitle)	       info.album   = value;
 			else if (id == g_wszWMYear)		       info.year    = value.ToInt();
-			else if (id == g_wszWMGenre)		       info.genre   = value;
+			else if (id == g_wszWMGenre)		       genres.Add(value);
 			else if (id == g_wszWMDescription)	       info.comment = String((LPWSTR) pbValue);
-			else if (id == g_wszWMPublisher)	       info.label   = value;
+			else if (id == g_wszWMPublisher)	       labels.Add(value);
 
 			else if (id == g_wszWMISRC)
 			{
-				if (Info::IsISRC(value)) info.isrc = value;
+				if (Info::IsISRC(value)) isrcs.Add(value);
 			}
 
-			else if (id == g_wszWMAlbumArtist)	       info.SetOtherInfo(INFO_ALBUMARTIST,	value);
+			else if (id == g_wszWMAlbumArtist)	       Info::AddOtherInfo(&info, INFO_ALBUMARTIST,	value);
 
-			else if (id == g_wszWMContentGroupDescription) info.SetOtherInfo(INFO_CONTENTGROUP,	value);
-			else if (id == g_wszWMSubTitle)		       info.SetOtherInfo(INFO_SUBTITLE,		value);
+			else if (id == g_wszWMContentGroupDescription) Info::AddOtherInfo(&info, INFO_CONTENTGROUP,	value);
+			else if (id == g_wszWMSubTitle)		       Info::AddOtherInfo(&info, INFO_SUBTITLE,		value);
 
-			else if (id == g_wszWMConductor)	       info.SetOtherInfo(INFO_CONDUCTOR,	value);
-			else if (id == g_wszWMModifiedBy)	       info.SetOtherInfo(INFO_REMIXER,		value);
-			else if (id == g_wszWMComposer)		       info.SetOtherInfo(INFO_COMPOSER,		value);
-			else if (id == g_wszWMWriter)		       info.SetOtherInfo(INFO_LYRICIST,		value);
-			else if (id == g_wszWMProducer)		       info.SetOtherInfo(INFO_PRODUCER,		value);
+			else if (id == g_wszWMConductor)	       Info::AddOtherInfo(&info, INFO_CONDUCTOR,	value);
+			else if (id == g_wszWMModifiedBy)	       Info::AddOtherInfo(&info, INFO_REMIXER,		value);
+			else if (id == g_wszWMComposer)		       Info::AddOtherInfo(&info, INFO_COMPOSER,		value);
+			else if (id == g_wszWMWriter)		       Info::AddOtherInfo(&info, INFO_LYRICIST,		value);
+			else if (id == g_wszWMProducer)		       Info::AddOtherInfo(&info, INFO_PRODUCER,		value);
 
-			else if (id == g_wszWMOriginalArtist)	       info.SetOtherInfo(INFO_ORIG_ARTIST,	value);
-			else if (id == g_wszWMOriginalAlbumTitle)      info.SetOtherInfo(INFO_ORIG_ALBUM,	value);
-			else if (id == g_wszWMOriginalLyricist)	       info.SetOtherInfo(INFO_ORIG_LYRICIST,	value);
+			else if (id == g_wszWMOriginalArtist)	       Info::AddOtherInfo(&info, INFO_ORIG_ARTIST,	value);
+			else if (id == g_wszWMOriginalAlbumTitle)      Info::AddOtherInfo(&info, INFO_ORIG_ALBUM,	value);
+			else if (id == g_wszWMOriginalLyricist)	       Info::AddOtherInfo(&info, INFO_ORIG_LYRICIST,	value);
 			else if (id == g_wszWMOriginalReleaseYear)     info.SetOtherInfo(INFO_ORIG_YEAR,	value);
 
 			else if (id == g_wszWMBeatsPerMinute)
@@ -484,26 +522,26 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
 			}
 
-			else if (id == g_wszWMInitialKey)	       info.SetOtherInfo(INFO_INITIALKEY,	value);
+			else if (id == g_wszWMInitialKey)	       Info::AddOtherInfo(&info, INFO_INITIALKEY,	value);
 
-			else if (id == g_wszWMCopyright)	       info.SetOtherInfo(INFO_COPYRIGHT,	value);
+			else if (id == g_wszWMCopyright)	       Info::AddOtherInfo(&info, INFO_COPYRIGHT,	value);
 
-			else if (id == "WM/Media")		       info.SetOtherInfo(INFO_MEDIATYPE,	value);
-			else if (id == "WM/CatalogNo")		       info.SetOtherInfo(INFO_CATALOGNUMBER,	value);
-			else if (id == "WM/Barcode")		       info.SetOtherInfo(INFO_BARCODE,		value);
+			else if (id == "WM/Media")		       Info::AddOtherInfo(&info, INFO_MEDIATYPE,	value);
+			else if (id == "WM/CatalogNo")		       Info::AddOtherInfo(&info, INFO_CATALOGNUMBER,	value);
+			else if (id == "WM/Barcode")		       Info::AddOtherInfo(&info, INFO_BARCODE,		value);
 
 			else if (id == g_wszWMLyrics)		       info.SetOtherInfo(INFO_LYRICS,		String((LPWSTR) pbValue));
 
-			else if (id == "WM/Script")		       info.SetOtherInfo(INFO_SCRIPT,		value);
+			else if (id == "WM/Script")		       Info::AddOtherInfo(&info, INFO_SCRIPT,		value);
 
-			else if (id == g_wszWMRadioStationName)	       info.SetOtherInfo(INFO_RADIOSTATION,	value);
-			else if (id == g_wszWMRadioStationOwner)       info.SetOtherInfo(INFO_RADIOOWNER,	value);
+			else if (id == g_wszWMRadioStationName)	       Info::AddOtherInfo(&info, INFO_RADIOSTATION,	value);
+			else if (id == g_wszWMRadioStationOwner)       Info::AddOtherInfo(&info, INFO_RADIOOWNER,	value);
 
-			else if (id == "WM/ArtistSortOrder")	       info.SetOtherInfo(INFO_SORT_ARTIST,	value);
-			else if (id == "WM/AlbumSortOrder")	       info.SetOtherInfo(INFO_SORT_ALBUM,	value);
-			else if (id == "WM/AlbumArtistSortOrder")      info.SetOtherInfo(INFO_SORT_ALBUMARTIST, value);
-			else if (id == "WM/ComposerSortOrder")	       info.SetOtherInfo(INFO_SORT_COMPOSER,	value);
-			else if (id == "WM/TitleSortOrder")	       info.SetOtherInfo(INFO_SORT_TITLE,	value);
+			else if (id == "WM/ArtistSortOrder")	       Info::AddOtherInfo(&info, INFO_SORT_ARTIST,	value);
+			else if (id == "WM/AlbumSortOrder")	       Info::AddOtherInfo(&info, INFO_SORT_ALBUM,	value);
+			else if (id == "WM/AlbumArtistSortOrder")      Info::AddOtherInfo(&info, INFO_SORT_ALBUMARTIST, value);
+			else if (id == "WM/ComposerSortOrder")	       Info::AddOtherInfo(&info, INFO_SORT_COMPOSER,	value);
+			else if (id == "WM/TitleSortOrder")	       Info::AddOtherInfo(&info, INFO_SORT_TITLE,	value);
 
 			else if (id == g_wszWMAuthorURL)	       info.SetOtherInfo(INFO_WEB_ARTIST,	value);
 			else if (id == g_wszWMAudioSourceURL)	       info.SetOtherInfo(INFO_WEB_SOURCE,	value);
@@ -538,26 +576,26 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 				if (info.rating == 99) info.rating = 100;
 			}
 
-			else if (id == "ASIN")			       info.SetOtherInfo(INFO_ASIN,		value);
+			else if (id == "ASIN")			       Info::AddOtherInfo(&info, INFO_ASIN,		value);
 
 			else if (id.StartsWith("MusicBrainz"))
 			{
-				if	(id == "MusicBrainz/Artist Id")		    info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	 value);
-				else if	(id == "MusicBrainz/Album Id")		    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,		 value);
-				else if	(id == "MusicBrainz/Album Artist Id")	    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMARTISTID,	 value);
-				else if	(id == "MusicBrainz/Work Id")		    info.SetOtherInfo(INFO_MUSICBRAINZ_WORKID,		 value);
-				else if	(id == "MusicBrainz/Disc Id")		    info.SetOtherInfo(INFO_MUSICBRAINZ_DISCID,		 value);
-				else if	(id == "MusicBrainz/Track Id")		    info.SetOtherInfo(INFO_MUSICBRAINZ_TRACKID,		 value);
-				else if (id == "MusicBrainz/Original Artist Id")    info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
-				else if	(id == "MusicBrainz/Original Album Id")	    info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALALBUMID,	 value);
-				else if	(id == "MusicBrainz/Release Group Id")      info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASEGROUPID,	 value);
-				else if	(id == "MusicBrainz/Release Track Id")      info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETRACKID,	 value);
-				else if	(id == "MusicBrainz/TRM Id")		    info.SetOtherInfo(INFO_MUSICBRAINZ_TRMID,		 value);
+				if	(id == "MusicBrainz/Artist Id")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ARTISTID,	 value);
+				else if	(id == "MusicBrainz/Album Id")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMID,		 value);
+				else if	(id == "MusicBrainz/Album Artist Id")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMARTISTID,	 value);
+				else if	(id == "MusicBrainz/Work Id")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_WORKID,		 value);
+				else if	(id == "MusicBrainz/Disc Id")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_DISCID,		 value);
+				else if	(id == "MusicBrainz/Track Id")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRACKID,		 value);
+				else if (id == "MusicBrainz/Original Artist Id")    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
+				else if	(id == "MusicBrainz/Original Album Id")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALALBUMID,	 value);
+				else if	(id == "MusicBrainz/Release Group Id")      Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASEGROUPID,	 value);
+				else if	(id == "MusicBrainz/Release Track Id")      Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETRACKID,	 value);
+				else if	(id == "MusicBrainz/TRM Id")		    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRMID,		 value);
 
-				else if	(id == "MusicBrainz/Album Type")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETYPE,	 value);
-				else if	(id == "MusicBrainz/Album Status")	    info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASESTATUS,	 value);
+				else if	(id == "MusicBrainz/Album Type")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETYPE,	 value);
+				else if	(id == "MusicBrainz/Album Status")	    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASESTATUS,	 value);
 
-				else if	(id == "MusicBrainz/Album Release Country") info.SetOtherInfo(INFO_RELEASECOUNTRY,		 value);
+				else if	(id == "MusicBrainz/Album Release Country") Info::AddOtherInfo(&info, INFO_RELEASECOUNTRY,		 value);
 			}
 			else if (id.ToUpper().StartsWith("REPLAYGAIN"))
 			{
@@ -630,6 +668,16 @@ Error BoCA::TaggerWMA::ParseStreamInfo(const String &fileName, Track &track)
 		}
 
 		delete [] indices;
+
+		Info::AddMissingOtherInfo(&info, previousOther);
+
+		/* Set the lists of this tag after the values of earlier tags, so
+		 * that one value of this tag replaces a list of an earlier tag.
+		 */
+		if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+		if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+		if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+		if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 		/* Set artist to album artist if artist is not filled.
 		 */
@@ -789,8 +837,10 @@ Error BoCA::TaggerWMA::UpdateStreamInfo(const String &fileName, const Track &tra
 				    nameStr == g_wszWMSubTitle			||
 
 				    nameStr == g_wszWMConductor			||
+				    nameStr == g_wszWMModifiedBy		||
 				    nameStr == g_wszWMComposer			||
 				    nameStr == g_wszWMWriter			||
+				    nameStr == g_wszWMProducer			||
 
 				    nameStr == g_wszWMOriginalArtist		||
 				    nameStr == g_wszWMOriginalAlbumTitle	||

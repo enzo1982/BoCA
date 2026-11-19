@@ -90,13 +90,20 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	Int		 numItems = 0;
 
-	if (info.artist != NIL) { RenderAPEItem("Artist",    info.artist,		   buffer); numItems++; }
-	if (info.title  != NIL) { RenderAPEItem("Title",     info.title,		   buffer); numItems++; }
-	if (info.album  != NIL) { RenderAPEItem("Album",     info.album,		   buffer); numItems++; }
-	if (info.year    >   0) { RenderAPEItem("Year",	     String::FromInt(info.year),   buffer); numItems++; }
-	if (info.genre  != NIL) { RenderAPEItem("Genre",     info.genre,		   buffer); numItems++; }
-	if (info.label  != NIL) { RenderAPEItem("Publisher", info.label,		   buffer); numItems++; }
-	if (info.isrc   != NIL) { RenderAPEItem("ISRC",	     info.isrc,			   buffer); numItems++; }
+	/* Artist, genre, label and ISRC can have several values in one item.
+	 */
+	Array<String>	 artists = Info::GetInfoList(&info, INFO_ARTISTS);
+	Array<String>	 genres	 = Info::GetInfoList(&info, INFO_GENRES);
+	Array<String>	 labels	 = Info::GetInfoList(&info, INFO_LABELS);
+	Array<String>	 isrcs	 = Info::GetInfoList(&info, INFO_ISRCS);
+
+	if (artists.Length() > 0) { RenderAPEItem("Artist",    artists,			   buffer); numItems++; }
+	if (info.title  != NIL)	  { RenderAPEItem("Title",     info.title,		   buffer); numItems++; }
+	if (info.album  != NIL)	  { RenderAPEItem("Album",     info.album,		   buffer); numItems++; }
+	if (info.year    >   0)	  { RenderAPEItem("Year",      String::FromInt(info.year), buffer); numItems++; }
+	if (genres.Length()  > 0) { RenderAPEItem("Genre",     genres,			   buffer); numItems++; }
+	if (labels.Length()  > 0) { RenderAPEItem("Publisher", labels,			   buffer); numItems++; }
+	if (isrcs.Length()   > 0) { RenderAPEItem("ISRC",      isrcs,			   buffer); numItems++; }
 
 	if (info.track > 0)
 	{
@@ -123,76 +130,78 @@ Error BoCA::TaggerAPEv2::RenderBuffer(Buffer<UnsignedByte> &buffer, const Track 
 
 	/* Save other text info.
 	 */
-	foreach (const String &pair, info.other)
+	Array<String>	 keys = Info::GetOtherInfoKeys(&info);
+
+	foreach (const String &key, keys)
 	{
-		String	 key   = pair.Head(pair.Find(":"));
-		String	 value = pair.Tail(pair.Length() - pair.Find(":") - 1);
+		Array<String>	 values = Info::GetOtherInfoList(&info, key);
+		String		 value	= values.GetFirst();
 
 		if (value == NIL) continue;
 
-		if	(key == INFO_ALBUMARTIST)		   { RenderAPEItem("Album Artist",		   value, buffer       ); numItems++; }
+		if	(key == INFO_ALBUMARTIST)		   { RenderAPEItem("Album Artist",		   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_CONTENTGROUP)		   { RenderAPEItem("Grouping",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_SUBTITLE)			   { RenderAPEItem("Subtitle",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_CONTENTGROUP)		   { RenderAPEItem("Grouping",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_SUBTITLE)			   { RenderAPEItem("Subtitle",			   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_BAND)			   { RenderAPEItem("Ensemble",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_PERFORMER)			   { RenderAPEItem("Performer",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_CONDUCTOR)			   { RenderAPEItem("Conductor",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_REMIXER)			   { RenderAPEItem("MixArtist",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_COMPOSER)			   { RenderAPEItem("Composer",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_ARRANGER)			   { RenderAPEItem("Arranger",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_PRODUCER)			   { RenderAPEItem("Producer",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_ENGINEER)			   { RenderAPEItem("Engineer",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_BAND)			   { RenderAPEItem("Ensemble",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_PERFORMER)			   { RenderAPEItem("Performer",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_CONDUCTOR)			   { RenderAPEItem("Conductor",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_REMIXER)			   { RenderAPEItem("MixArtist",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_COMPOSER)			   { RenderAPEItem("Composer",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_ARRANGER)			   { RenderAPEItem("Arranger",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_PRODUCER)			   { RenderAPEItem("Producer",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_ENGINEER)			   { RenderAPEItem("Engineer",			   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_MOVEMENT)			   { RenderAPEItem("Movement",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_MOVEMENTTOTAL)		   { RenderAPEItem("MovementTotal",		   value, buffer       ); numItems++; }
-		else if	(key == INFO_MOVEMENTNAME)		   { RenderAPEItem("MovementName",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_MOVEMENT)			   { RenderAPEItem("Movement",			   value,  buffer       ); numItems++; }
+		else if	(key == INFO_MOVEMENTTOTAL)		   { RenderAPEItem("MovementTotal",		   value,  buffer       ); numItems++; }
+		else if	(key == INFO_MOVEMENTNAME)		   { RenderAPEItem("MovementName",		   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_BPM)			   { RenderAPEItem("BPM",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_INITIALKEY)		   { RenderAPEItem("InitialKey",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_BPM)			   { RenderAPEItem("BPM",			   value,  buffer       ); numItems++; }
+		else if	(key == INFO_INITIALKEY)		   { RenderAPEItem("InitialKey",		   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_COPYRIGHT)			   { RenderAPEItem("Copyright",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_COPYRIGHT)			   { RenderAPEItem("Copyright",			   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_MEDIATYPE)			   { RenderAPEItem("Media",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_CATALOGNUMBER)		   { RenderAPEItem("CatalogNumber",		   value, buffer       ); numItems++; }
-		else if	(key == INFO_BARCODE)			   { RenderAPEItem("Barcode",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_MEDIATYPE)			   { RenderAPEItem("Media",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_CATALOGNUMBER)		   { RenderAPEItem("CatalogNumber",		   values, buffer       ); numItems++; }
+		else if	(key == INFO_BARCODE)			   { RenderAPEItem("Barcode",			   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_RELEASECOUNTRY)		   { RenderAPEItem("ReleaseCountry",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_RELEASECOUNTRY)		   { RenderAPEItem("ReleaseCountry",		   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_DISCSUBTITLE)		   { RenderAPEItem("DiscSubtitle",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_DISCSUBTITLE)		   { RenderAPEItem("DiscSubtitle",		   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_LYRICS)			   { RenderAPEItem("Lyrics",			   value, buffer, False); numItems++; }
+		else if	(key == INFO_LYRICS)			   { RenderAPEItem("Lyrics",			   value,  buffer, False); numItems++; }
 
-		else if	(key == INFO_SCRIPT)			   { RenderAPEItem("Script",			   value, buffer);	  numItems++; }
+		else if	(key == INFO_SCRIPT)			   { RenderAPEItem("Script",			   values, buffer);	  numItems++; }
 
-		else if	(key == INFO_SORT_ARTIST)		   { RenderAPEItem("ArtistSort",		   value, buffer       ); numItems++; }
-		else if	(key == INFO_SORT_ALBUM)		   { RenderAPEItem("AlbumSort",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_SORT_ALBUMARTIST)		   { RenderAPEItem("AlbumArtistSort",		   value, buffer       ); numItems++; }
-		else if	(key == INFO_SORT_COMPOSER)		   { RenderAPEItem("ComposerSort",		   value, buffer       ); numItems++; }
-		else if	(key == INFO_SORT_TITLE)		   { RenderAPEItem("TitleSort",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_SORT_ARTIST)		   { RenderAPEItem("ArtistSort",		   values, buffer       ); numItems++; }
+		else if	(key == INFO_SORT_ALBUM)		   { RenderAPEItem("AlbumSort",			   values, buffer       ); numItems++; }
+		else if	(key == INFO_SORT_ALBUMARTIST)		   { RenderAPEItem("AlbumArtistSort",		   values, buffer       ); numItems++; }
+		else if	(key == INFO_SORT_COMPOSER)		   { RenderAPEItem("ComposerSort",		   values, buffer       ); numItems++; }
+		else if	(key == INFO_SORT_TITLE)		   { RenderAPEItem("TitleSort",			   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_WEB_ARTIST)		   { RenderAPEItem("Artist URL",		   value, buffer       ); numItems++; }
-		else if	(key == INFO_WEB_PUBLISHER)		   { RenderAPEItem("Publisher URL",		   value, buffer       ); numItems++; }
-		else if	(key == INFO_WEB_SOURCE)		   { RenderAPEItem("File URL",			   value, buffer       ); numItems++; }
-		else if	(key == INFO_WEB_COPYRIGHT)		   { RenderAPEItem("Copyright URL",		   value, buffer       ); numItems++; }
-		else if	(key == INFO_WEB_COMMERCIAL)		   { RenderAPEItem("Buy URL",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_WEB_ARTIST)		   { RenderAPEItem("Artist URL",		   value,  buffer       ); numItems++; }
+		else if	(key == INFO_WEB_PUBLISHER)		   { RenderAPEItem("Publisher URL",		   value,  buffer       ); numItems++; }
+		else if	(key == INFO_WEB_SOURCE)		   { RenderAPEItem("File URL",			   value,  buffer       ); numItems++; }
+		else if	(key == INFO_WEB_COPYRIGHT)		   { RenderAPEItem("Copyright URL",		   value,  buffer       ); numItems++; }
+		else if	(key == INFO_WEB_COMMERCIAL)		   { RenderAPEItem("Buy URL",			   value,  buffer       ); numItems++; }
 
-		else if	(key == INFO_ASIN)			   { RenderAPEItem("Asin",			   value, buffer       ); numItems++; }
+		else if	(key == INFO_ASIN)			   { RenderAPEItem("Asin",			   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { RenderAPEItem("MusicBrainz_ArtistId",	   value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { RenderAPEItem("MusicBrainz_AlbumId",	   value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   { RenderAPEItem("MusicBrainz_AlbumArtistId",    value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_WORKID)	   { RenderAPEItem("MusicBrainz_WorkId",	   value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_DISCID)	   { RenderAPEItem("MusicBrainz_DiscId",	   value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_TRACKID)	   { RenderAPEItem("MusicBrainz_TrackId",	   value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) { RenderAPEItem("MusicBrainz_OriginalArtistId", value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  { RenderAPEItem("MusicBrainz_OriginalAlbumId",  value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   { RenderAPEItem("MusicBrainz_ReleaseGroupId",   value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   { RenderAPEItem("MusicBrainz_ReleaseTrackId",   value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_TRMID)		   { RenderAPEItem("MusicBrainz_TrmId",		   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ARTISTID)	   { RenderAPEItem("MusicBrainz_ArtistId",	   values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ALBUMID)	   { RenderAPEItem("MusicBrainz_AlbumId",	   values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ALBUMARTISTID)	   { RenderAPEItem("MusicBrainz_AlbumArtistId",    values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_WORKID)	   { RenderAPEItem("MusicBrainz_WorkId",	   values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_DISCID)	   { RenderAPEItem("MusicBrainz_DiscId",	   values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_TRACKID)	   { RenderAPEItem("MusicBrainz_TrackId",	   values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALARTISTID) { RenderAPEItem("MusicBrainz_OriginalArtistId", values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_ORIGINALALBUMID)  { RenderAPEItem("MusicBrainz_OriginalAlbumId",  values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_RELEASEGROUPID)   { RenderAPEItem("MusicBrainz_ReleaseGroupId",   values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_RELEASETRACKID)   { RenderAPEItem("MusicBrainz_ReleaseTrackId",   values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_TRMID)		   { RenderAPEItem("MusicBrainz_TrmId",		   values, buffer       ); numItems++; }
 
-		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   { RenderAPEItem("MusicBrainz_AlbumType",	   value, buffer       ); numItems++; }
-		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   { RenderAPEItem("MusicBrainz_AlbumStatus",	   value, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_RELEASETYPE)	   { RenderAPEItem("MusicBrainz_AlbumType",	   values, buffer       ); numItems++; }
+		else if	(key == INFO_MUSICBRAINZ_RELEASESTATUS)	   { RenderAPEItem("MusicBrainz_AlbumStatus",	   values, buffer       ); numItems++; }
 	}
 
 	/* Save Replay Gain info.
@@ -372,19 +381,47 @@ Int BoCA::TaggerAPEv2::RenderAPEFooter(Int tagSize, Int numItems, Buffer<Unsigne
 
 Int BoCA::TaggerAPEv2::RenderAPEItem(const String &id, const String &value, Buffer<UnsignedByte> &buffer, Bool trim)
 {
-	String		 data	  = trim ? value.Trim() : value;
-	Int		 dataSize = data != NIL ? strlen(data) : 0;
-	Int		 size	  = id.Length() + dataSize + 9;
+	Array<String>	 values;
+
+	values.Add(value);
+
+	return RenderAPEItem(id, values, buffer, trim);
+}
+
+Int BoCA::TaggerAPEv2::RenderAPEItem(const String &id, const Array<String> &values, Buffer<UnsignedByte> &buffer, Bool trim)
+{
+	/* Join UTF-8 values with NUL bytes.
+	 */
+	Buffer<UnsignedByte>	 data;
+
+	foreach (const String &value, values)
+	{
+		String	 string = trim ? value.Trim() : value;
+
+		if (string == NIL) continue;
+
+		const char	*utf8	  = string.ConvertTo("UTF-8");
+		Int		 utf8Size = strlen(utf8);
+		Int		 offset	  = data.Size();
+
+		if (offset > 0) { data.Resize(offset + 1); data[offset++] = 0; }
+
+		data.Resize(offset + utf8Size);
+
+		memcpy(data + offset, utf8, utf8Size);
+	}
+
+	Int	 size = id.Length() + data.Size() + 9;
 
 	buffer.Resize(buffer.Size() + size);
 
 	OutStream	 out(STREAM_BUFFER, buffer + buffer.Size() - size, size);
 
-	out.OutputNumber(dataSize, 4);
+	out.OutputNumber(data.Size(), 4);
 	out.OutputNumber(0, 4);
 	out.OutputString(id);
 	out.OutputNumber(0, 1);
-	out.OutputString(data);
+	out.OutputData(data, data.Size());
 
 	return Success();
 }
@@ -424,58 +461,75 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 
 	Info	 info = track.GetInfo();
 
+	/* Values from this tag replace the values that tags read before gave
+	 * the same keys; several values of a key in this tag add up.
+	 */
+	Array<String>	 previousOther = info.other;
+
+	info.other.RemoveAll();
+
+	/* Artist, genre, label and ISRC can have several values in this tag.
+	 */
+	Array<String>	 artists;
+	Array<String>	 genres;
+	Array<String>	 labels;
+	Array<String>	 isrcs;
+
 	for (Int i = 0; i < numItems; i++)
 	{
 		String			 id;
 		String			 value;
+		Array<String>		 values;
 		Buffer<UnsignedByte>	 item;
 		Int			 previousOffset = offset;
 
-		ParseAPEItem(buffer, offset, &id, &value);
+		if (!ParseAPEItem(buffer, offset, &id, &values)) break;
+
+		value = values.GetFirst();
 
 		if	(id != "!Binary" && value == NIL) continue;
-		else if (id == "!Binary"		) ParseAPEBinaryItem(buffer, offset, &id, item);
+		else if (id == "!Binary"		) { if (!ParseAPEBinaryItem(buffer, offset, &id, item)) break; }
 
 		id = id.ToUpper();
 
-		if	(id == "ARTIST")	  info.artist = value;
+		if	(id == "ARTIST")	  { foreach (const String &text, values) artists.Add(text); }
 		else if (id == "TITLE")		  info.title  = value;
 		else if (id == "ALBUM")		  info.album  = value;
 		else if (id == "YEAR")		  info.year   = value.ToInt();
-		else if (id == "GENRE")		  info.genre  = value;
+		else if (id == "GENRE")		  { foreach (const String &text, values) genres.Add(text); }
 
 		else if (id == "COMMENT")
 		{
-			ParseAPEItem(buffer, previousOffset, &id, &value, False);
+			ParseAPEItem(buffer, previousOffset, &id, &values, False);
 
-			info.comment = value;
+			info.comment = values.GetFirst();
 		}
 
-		else if (id == "PUBLISHER")	  info.label  = value;
-		else if (id == "LABEL")		  info.label  = value;
+		else if (id == "PUBLISHER" ||
+			 id == "LABEL")		  { foreach (const String &text, values) labels.Add(text); }
 
 		else if (id == "ISRC")
 		{
-			if (Info::IsISRC(value))  info.isrc   = value;
+			foreach (const String &text, values) if (Info::IsISRC(text)) isrcs.Add(text);
 		}
 
 		else if (id == "RATING")	  info.rating = Math::Min(100, value.ToInt());
 
-		else if (id == "ALBUM ARTIST")	  info.SetOtherInfo(INFO_ALBUMARTIST,	   value);
+		else if (id == "ALBUM ARTIST")	  Info::AddOtherInfo(&info, INFO_ALBUMARTIST,	   values);
 
-		else if (id == "GROUPING")	  info.SetOtherInfo(INFO_CONTENTGROUP,	   value);
-		else if (id == "SUBTITLE")	  info.SetOtherInfo(INFO_SUBTITLE,	   value);
+		else if (id == "GROUPING")	  Info::AddOtherInfo(&info, INFO_CONTENTGROUP,	   values);
+		else if (id == "SUBTITLE")	  Info::AddOtherInfo(&info, INFO_SUBTITLE,	   values);
 
 		else if (id == "ENSEMBLE" ||
-			 id == "ORCHESTRA")	  info.SetOtherInfo(INFO_BAND,		   value);
+			 id == "ORCHESTRA")	  Info::AddOtherInfo(&info, INFO_BAND,		   values);
 
-		else if (id == "PERFORMER")	  info.SetOtherInfo(INFO_PERFORMER,	   value);
-		else if (id == "CONDUCTOR")	  info.SetOtherInfo(INFO_CONDUCTOR,	   value);
-		else if (id == "MIXARTIST")	  info.SetOtherInfo(INFO_REMIXER,	   value);
-		else if (id == "COMPOSER")	  info.SetOtherInfo(INFO_COMPOSER,	   value);
-		else if (id == "ARRANGER")	  info.SetOtherInfo(INFO_ARRANGER,	   value);
-		else if (id == "PRODUCER")	  info.SetOtherInfo(INFO_PRODUCER,	   value);
-		else if (id == "ENGINEER")	  info.SetOtherInfo(INFO_ENGINEER,	   value);
+		else if (id == "PERFORMER")	  Info::AddOtherInfo(&info, INFO_PERFORMER,	   values);
+		else if (id == "CONDUCTOR")	  Info::AddOtherInfo(&info, INFO_CONDUCTOR,	   values);
+		else if (id == "MIXARTIST")	  Info::AddOtherInfo(&info, INFO_REMIXER,	   values);
+		else if (id == "COMPOSER")	  Info::AddOtherInfo(&info, INFO_COMPOSER,	   values);
+		else if (id == "ARRANGER")	  Info::AddOtherInfo(&info, INFO_ARRANGER,	   values);
+		else if (id == "PRODUCER")	  Info::AddOtherInfo(&info, INFO_PRODUCER,	   values);
+		else if (id == "ENGINEER")	  Info::AddOtherInfo(&info, INFO_ENGINEER,	   values);
 
 		else if (id == "MOVEMENT")
 		{
@@ -485,39 +539,39 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		}
 
 		else if (id == "MOVEMENTTOTAL")	  info.SetOtherInfo(INFO_MOVEMENTTOTAL,	   value);
-		else if (id == "MOVEMENTNAME")	  info.SetOtherInfo(INFO_MOVEMENTNAME,	   value);
+		else if (id == "MOVEMENTNAME")	  Info::AddOtherInfo(&info, INFO_MOVEMENTNAME,	   values);
 
 		else if (id == "BPM")
 		{
 			if (value.ToInt() > 0) info.SetOtherInfo(INFO_BPM, value);
 		}
 
-		else if (id == "INITIALKEY")	  info.SetOtherInfo(INFO_INITIALKEY,	   value);
+		else if (id == "INITIALKEY")	  Info::AddOtherInfo(&info, INFO_INITIALKEY,	   values);
 
-		else if (id == "COPYRIGHT")	  info.SetOtherInfo(INFO_COPYRIGHT,	   value);
+		else if (id == "COPYRIGHT")	  Info::AddOtherInfo(&info, INFO_COPYRIGHT,	   values);
 
-		else if (id == "MEDIA")		  info.SetOtherInfo(INFO_MEDIATYPE,	   value);
-		else if (id == "CATALOGNUMBER")   info.SetOtherInfo(INFO_CATALOGNUMBER,	   value);
-		else if (id == "BARCODE")	  info.SetOtherInfo(INFO_BARCODE,	   value);
+		else if (id == "MEDIA")		  Info::AddOtherInfo(&info, INFO_MEDIATYPE,	   values);
+		else if (id == "CATALOGNUMBER")   Info::AddOtherInfo(&info, INFO_CATALOGNUMBER,	   values);
+		else if (id == "BARCODE")	  Info::AddOtherInfo(&info, INFO_BARCODE,	   values);
 
-		else if (id == "RELEASECOUNTRY")  info.SetOtherInfo(INFO_RELEASECOUNTRY,   value);
+		else if (id == "RELEASECOUNTRY")  Info::AddOtherInfo(&info, INFO_RELEASECOUNTRY,   values);
 
-		else if (id == "DISCSUBTITLE")	  info.SetOtherInfo(INFO_DISCSUBTITLE,	   value);
+		else if (id == "DISCSUBTITLE")	  Info::AddOtherInfo(&info, INFO_DISCSUBTITLE,	   values);
 
 		else if (id == "LYRICS")
 		{
-			ParseAPEItem(buffer, previousOffset, &id, &value, False);
+			ParseAPEItem(buffer, previousOffset, &id, &values, False);
 
-			info.SetOtherInfo(INFO_LYRICS, value);
+			info.SetOtherInfo(INFO_LYRICS, values.GetFirst());
 		}
 
-		else if (id == "SCRIPT")	  info.SetOtherInfo(INFO_SCRIPT,	   value);
+		else if (id == "SCRIPT")	  Info::AddOtherInfo(&info, INFO_SCRIPT,	   values);
 
-		else if (id == "ARTISTSORT")	  info.SetOtherInfo(INFO_SORT_ARTIST,	   value);
-		else if (id == "ALBUMSORT")	  info.SetOtherInfo(INFO_SORT_ALBUM,	   value);
-		else if (id == "ALBUMARTISTSORT") info.SetOtherInfo(INFO_SORT_ALBUMARTIST, value);
-		else if (id == "COMPOSERSORT")	  info.SetOtherInfo(INFO_SORT_COMPOSER,	   value);
-		else if (id == "TITLESORT")	  info.SetOtherInfo(INFO_SORT_TITLE,	   value);
+		else if (id == "ARTISTSORT")	  Info::AddOtherInfo(&info, INFO_SORT_ARTIST,	   values);
+		else if (id == "ALBUMSORT")	  Info::AddOtherInfo(&info, INFO_SORT_ALBUM,	   values);
+		else if (id == "ALBUMARTISTSORT") Info::AddOtherInfo(&info, INFO_SORT_ALBUMARTIST, values);
+		else if (id == "COMPOSERSORT")	  Info::AddOtherInfo(&info, INFO_SORT_COMPOSER,	   values);
+		else if (id == "TITLESORT")	  Info::AddOtherInfo(&info, INFO_SORT_TITLE,	   values);
 
 		else if (id == "WEBLINK" ||
 			 id == "ARTIST URL")	  info.SetOtherInfo(INFO_WEB_ARTIST,	   value);
@@ -540,24 +594,24 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 			if (value.Contains("/")) info.numDiscs = value.Tail(value.Length() - value.Find("/") - 1).ToInt();
 		}
 
-		else if (id == "ASIN")		  info.SetOtherInfo(INFO_ASIN,		   value);
+		else if (id == "ASIN")		  Info::AddOtherInfo(&info, INFO_ASIN,		   values);
 
 		else if (id.StartsWith("MUSICBRAINZ"))
 		{
-			if	(id == "MUSICBRAINZ_ARTISTID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ARTISTID,	    value);
-			else if	(id == "MUSICBRAINZ_ALBUMID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMID,	    value);
-			else if	(id == "MUSICBRAINZ_ALBUMARTISTID")    info.SetOtherInfo(INFO_MUSICBRAINZ_ALBUMARTISTID,    value);
-			else if	(id == "MUSICBRAINZ_WORKID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_WORKID,	    value);
-			else if	(id == "MUSICBRAINZ_DISCID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_DISCID,	    value);
-			else if	(id == "MUSICBRAINZ_TRACKID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_TRACKID,	    value);
-			else if	(id == "MUSICBRAINZ_ORIGINALARTISTID") info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALARTISTID, value);
-			else if	(id == "MUSICBRAINZ_ORIGINALALBUMID")  info.SetOtherInfo(INFO_MUSICBRAINZ_ORIGINALALBUMID,  value);
-			else if	(id == "MUSICBRAINZ_RELEASEGROUPID")   info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASEGROUPID,   value);
-			else if	(id == "MUSICBRAINZ_RELEASETRACKID")   info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETRACKID,   value);
-			else if	(id == "MUSICBRAINZ_TRMID")	       info.SetOtherInfo(INFO_MUSICBRAINZ_TRMID,	    value);
+			if	(id == "MUSICBRAINZ_ARTISTID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ARTISTID,	    values);
+			else if	(id == "MUSICBRAINZ_ALBUMID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMID,	    values);
+			else if	(id == "MUSICBRAINZ_ALBUMARTISTID")    Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ALBUMARTISTID,    values);
+			else if	(id == "MUSICBRAINZ_WORKID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_WORKID,	    values);
+			else if	(id == "MUSICBRAINZ_DISCID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_DISCID,	    values);
+			else if	(id == "MUSICBRAINZ_TRACKID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRACKID,	    values);
+			else if	(id == "MUSICBRAINZ_ORIGINALARTISTID") Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALARTISTID, values);
+			else if	(id == "MUSICBRAINZ_ORIGINALALBUMID")  Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_ORIGINALALBUMID,  values);
+			else if	(id == "MUSICBRAINZ_RELEASEGROUPID")   Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASEGROUPID,   values);
+			else if	(id == "MUSICBRAINZ_RELEASETRACKID")   Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETRACKID,   values);
+			else if	(id == "MUSICBRAINZ_TRMID")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_TRMID,	    values);
 
-			else if	(id == "MUSICBRAINZ_ALBUMTYPE")	       info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASETYPE,	    value);
-			else if	(id == "MUSICBRAINZ_ALBUMSTATUS")      info.SetOtherInfo(INFO_MUSICBRAINZ_RELEASESTATUS,    value);
+			else if	(id == "MUSICBRAINZ_ALBUMTYPE")	       Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASETYPE,	    values);
+			else if	(id == "MUSICBRAINZ_ALBUMSTATUS")      Info::AddOtherInfo(&info, INFO_MUSICBRAINZ_RELEASESTATUS,    values);
 		}
 
 		else if (id.StartsWith("REPLAYGAIN"))
@@ -674,9 +728,19 @@ Error BoCA::TaggerAPEv2::ParseBuffer(const Buffer<UnsignedByte> &buffer, Track &
 		{
 			/* Save any other tags as user defined text.
 			 */
-			 info.other.Add(String(INFO_USERTEXT).Append(":").Append(id).Append(":|:").Append(value));
+			foreach (const String &text, values) info.other.Add(String(INFO_USERTEXT).Append(":").Append(id).Append(":|:").Append(text));
 		}
 	}
+
+	Info::AddMissingOtherInfo(&info, previousOther);
+
+	/* Set the lists of this tag after the values of earlier tags, so
+	 * that one value of this tag replaces a list of an earlier tag.
+	 */
+	if (artists.Length() > 0) Info::SetInfoList(&info, INFO_ARTISTS, artists);
+	if (genres.Length()  > 0) Info::SetInfoList(&info, INFO_GENRES,	 genres);
+	if (labels.Length()  > 0) Info::SetInfoList(&info, INFO_LABELS,	 labels);
+	if (isrcs.Length()   > 0) Info::SetInfoList(&info, INFO_ISRCS,	 isrcs);
 
 	/* Set artist to album artist if artist is not filled.
 	 */
@@ -765,7 +829,7 @@ Bool BoCA::TaggerAPEv2::ParseAPEFooter(const Buffer<UnsignedByte> &buffer, Int *
 	return True;
 }
 
-Bool BoCA::TaggerAPEv2::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &offset, String *id, String *value, Bool trim)
+Bool BoCA::TaggerAPEv2::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &offset, String *id, Array<String> *values, Bool trim)
 {
 	InStream	 in(STREAM_BUFFER, buffer + offset, buffer.Size() - offset - 32);
 
@@ -778,6 +842,8 @@ Bool BoCA::TaggerAPEv2::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &of
 	{
 		*id = "!Binary";
 
+		values->RemoveAll();
+
 		return True;
 	}
 
@@ -787,15 +853,64 @@ Bool BoCA::TaggerAPEv2::ParseAPEItem(const Buffer<UnsignedByte> &buffer, Int &of
 
 	do
 	{
+		/* Stop at a key that runs to the end of the tag.
+		 */
+		if (in.GetPos() >= in.Size())
+		{
+			offset = buffer.Size() - 32;
+
+			return False;
+		}
+
 		lastChar = in.InputNumber(1);
 
 		(*id)[id->Length()] = lastChar;
 	}
 	while (lastChar != 0);
 
-	*value = in.InputString(valueBytes);
+	/* Stop at an item with a size that does not fit in the tag. The
+	 * position of the next item is not known then.
+	 */
+	values->RemoveAll();
 
-	if (trim) *value = value->Trim();
+	if (valueBytes < 0 || valueBytes > in.Size() - in.GetPos())
+	{
+		offset = buffer.Size() - 32;
+
+		return False;
+	}
+
+	/* An empty item has no values.
+	 */
+	if (valueBytes == 0)
+	{
+		offset += in.GetPos();
+
+		return True;
+	}
+
+	Buffer<UnsignedByte>	 data(valueBytes + 1);
+
+	in.InputData(data, valueBytes);
+
+	data[valueBytes] = 0;
+
+	/* Split values on NUL bytes and skip blank values.
+	 */
+	for (Int start = 0, i = 0; i <= valueBytes; i++)
+	{
+		if (data[i] != 0) continue;
+
+		String	 string;
+
+		string.ImportFrom("UTF-8", (char *) &data[start]);
+
+		start = i + 1;
+
+		if (string.Trim() == NIL) continue;
+
+		values->Add(trim ? string.Trim() : string);
+	}
 
 	offset += in.GetPos();
 
@@ -816,11 +931,34 @@ Bool BoCA::TaggerAPEv2::ParseAPEBinaryItem(const Buffer<UnsignedByte> &buffer, I
 
 	do
 	{
+		/* Stop at a key that runs to the end of the tag.
+		 */
+		if (in.GetPos() >= in.Size())
+		{
+			offset = buffer.Size() - 32;
+
+			value.Resize(0);
+
+			return False;
+		}
+
 		lastChar = in.InputNumber(1);
 
 		(*id)[id->Length()] = lastChar;
 	}
 	while (lastChar != 0);
+
+	/* Stop at an item with a size that does not fit in the tag, as
+	 * ParseAPEItem does.
+	 */
+	if (valueBytes < 0 || valueBytes > in.Size() - in.GetPos())
+	{
+		offset = buffer.Size() - 32;
+
+		value.Resize(0);
+
+		return False;
+	}
 
 	value.Resize(valueBytes);
 

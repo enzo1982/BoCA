@@ -20,6 +20,14 @@ using namespace smooth;
 
 namespace BoCA
 {
+	/* Value lists of the basic fields artist, genre, label and isrc.
+	 * See Info::GetInfoList.
+	 */
+	const char * const INFO_ARTISTS				= "Artists";
+	const char * const INFO_GENRES				= "Genres";
+	const char * const INFO_LABELS				= "Labels";
+	const char * const INFO_ISRCS				= "ISRCs";
+
 	const char * const INFO_ALBUMARTIST			= "Album artist";
 
 	const char * const INFO_CONTENTGROUP			= "Content group description";
@@ -151,7 +159,56 @@ namespace BoCA
 			Bool			 HasOtherInfo(const String &) const;
 
 			String			 GetOtherInfo(const String &) const;
+
+			/* Replace every value of a key with one value; NIL removes the key.
+			 * Returns False for an empty key.
+			 */
 			Bool			 SetOtherInfo(const String &, const String &);
+
+			/* The functions below are static, so that the ABI of BoCA 1.1
+			 * does not change. They take the Info to work on first.
+			 */
+
+			/* Return every value of a key in list order.
+			 */
+			static Array<String>	 GetOtherInfoList(const Info *, const String &);
+
+			/* Return each key once in order of first appearance.
+			 */
+			static Array<String>	 GetOtherInfoKeys(const Info *);
+
+			/* Append values to a key; skip empty values and values the key
+			 * already has. Returns False for an empty key or if no value
+			 * was added.
+			 */
+			static Bool		 AddOtherInfo(Info *, const String &, const String &);
+			static Bool		 AddOtherInfo(Info *, const String &, const Array<String> &);
+
+			/* Add the "key:value" entries of a list whose keys this Info
+			 * does not have. Taggers use this to let the values of the tag
+			 * they parse replace the values of tags that were read before.
+			 * User defined texts and URLs are compared per description.
+			 * A value list of a basic field (INFO_ARTISTS and the like) is
+			 * added only while its first value is still the value of the
+			 * field.
+			 */
+			static Void		 AddMissingOtherInfo(Info *, const Array<String> &);
+
+			/* Get and set every value of a field. For INFO_ARTISTS,
+			 * INFO_GENRES, INFO_LABELS and INFO_ISRCS, the first value is
+			 * the basic field (artist, genre, label or isrc), and the
+			 * key holds the whole list when there is more than one value.
+			 * The list counts only while its first value is the value of
+			 * the basic field, so code that sets the basic field alone
+			 * replaces every value. For other keys, these functions work
+			 * on the values of the key.
+			 */
+			static Array<String>	 GetInfoList(const Info *, const String &);
+			static Bool		 SetInfoList(Info *, const String &, const Array<String> &);
+
+			/* Whether a key is the value list of a basic field.
+			 */
+			static Bool		 IsBasicInfoList(const String &);
 
 			static Bool		 IsISRC(const String &);
 
