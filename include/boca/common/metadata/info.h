@@ -151,7 +151,30 @@ namespace BoCA
 			Bool			 HasOtherInfo(const String &) const;
 
 			String			 GetOtherInfo(const String &) const;
+
+			/* Replace every value of a key with one value; NIL removes the key.
+			 * Returns False for an empty key.
+			 */
 			Bool			 SetOtherInfo(const String &, const String &);
+
+			/* The functions below are static, so that the ABI of BoCA 1.1
+			 * does not change. They take the Info to work on first.
+			 */
+
+			/* Return every value of a key in list order.
+			 */
+			static Array<String>	 GetOtherInfoList(const Info *, const String &);
+
+			/* Return each key once in order of first appearance.
+			 */
+			static Array<String>	 GetOtherInfoKeys(const Info *);
+
+			/* Append values to a key; skip empty values and values the key
+			 * already has. Returns False for an empty key or if no value
+			 * was added.
+			 */
+			static Bool		 AddOtherInfo(Info *, const String &, const String &);
+			static Bool		 AddOtherInfo(Info *, const String &, const Array<String> &);
 
 			static Bool		 IsISRC(const String &);
 
