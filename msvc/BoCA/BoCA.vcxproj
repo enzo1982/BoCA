@@ -357,6 +357,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\runtime\application\verifiercomponent.cpp" />
+    <ClCompile Include="..\..\runtime\application\metadatacomponent.cpp" />
     <ClCompile Include="..\..\runtime\common\communication\engine.cpp" />
     <ClCompile Include="..\..\runtime\common\config.cpp" />
     <ClCompile Include="..\..\runtime\common\configlayer.cpp" />
@@ -369,6 +370,7 @@
     <ClCompile Include="..\..\runtime\common\communication\menu.cpp" />
     <ClCompile Include="..\..\runtime\common\communication\settings.cpp" />
     <ClCompile Include="..\..\runtime\common\metadata\device.cpp" />
+    <ClCompile Include="..\..\runtime\common\metadata\discmetadata.cpp" />
     <ClCompile Include="..\..\runtime\common\metadata\format.cpp" />
     <ClCompile Include="..\..\runtime\common\metadata\info.cpp" />
     <ClCompile Include="..\..\runtime\common\metadata\mcdi.cpp" />
@@ -573,6 +575,24 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
+    <ClCompile Include="..\..\runtime\component\metadatacomponent.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
     <ClCompile Include="..\..\runtime\core\core.cpp" />
     <ClCompile Include="..\..\runtime\core\main.cpp" />
   </ItemGroup>
@@ -582,6 +602,7 @@
     <ClInclude Include="..\..\include\boca\application\playlistcomponent.h" />
     <ClInclude Include="..\..\include\boca\application\streamcomponent.h" />
     <ClInclude Include="..\..\include\boca\application\verifiercomponent.h" />
+    <ClInclude Include="..\..\include\boca\application\metadatacomponent.h" />
     <ClInclude Include="..\..\include\boca\common\communication\engine.h" />
     <ClInclude Include="..\..\include\boca\common\formatconverter.h" />
     <ClInclude Include="..\..\include\boca\common\metadata\channels.h" />
@@ -604,9 +625,11 @@
     <ClInclude Include="..\..\include\boca\common\communication\menu.h" />
     <ClInclude Include="..\..\include\boca\common\communication\settings.h" />
     <ClInclude Include="..\..\include\boca\common\metadata\device.h" />
+    <ClInclude Include="..\..\include\boca\common\metadata\discmetadata.h" />
     <ClInclude Include="..\..\include\boca\common\metadata\format.h" />
     <ClInclude Include="..\..\include\boca\common\metadata\info.h" />
     <ClInclude Include="..\..\include\boca\common\metadata\mcdi.h" />
+    <ClInclude Include="..\..\include\boca\common\metadata\proxyconfig.h" />
     <ClInclude Include="..\..\include\boca\common\metadata\picture.h" />
     <ClInclude Include="..\..\include\boca\common\metadata\picturedata.h" />
     <ClInclude Include="..\..\include\boca\common\metadata\track.h" />
@@ -627,6 +650,7 @@
     <ClInclude Include="..\..\include\boca\application\external\encodercomponentfile.h" />
     <ClInclude Include="..\..\include\boca\application\external\encodercomponentstdio.h" />
     <ClInclude Include="..\..\include\boca\component\verifiercomponent.h" />
+    <ClInclude Include="..\..\include\boca\component\metadatacomponent.h" />
     <ClInclude Include="..\..\include\boca\core\core.h" />
     <ClInclude Include="..\..\include\boca\core\definitions.h" />
   </ItemGroup>

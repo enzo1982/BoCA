@@ -34,6 +34,7 @@ using namespace smooth;
 # include "boca/component/playlistcomponent.h"
 # include "boca/component/taggercomponent.h"
 # include "boca/component/verifiercomponent.h"
+# include "boca/component/metadatacomponent.h"
 #else
 # ifdef __WIN32__
 #  define BOCA_EXPORT __declspec (dllimport)
@@ -55,6 +56,7 @@ using namespace smooth;
 #include "boca/application/playlistcomponent.h"
 #include "boca/application/taggercomponent.h"
 #include "boca/application/verifiercomponent.h"
+#include "boca/application/metadatacomponent.h"
 #include "boca/application/registry.h"
 
 #include "boca/common/config.h"
@@ -65,7 +67,9 @@ using namespace smooth;
 #include "boca/common/utilities.h"
 
 #include "boca/common/metadata/device.h"
+#include "boca/common/metadata/discmetadata.h"
 #include "boca/common/metadata/mcdi.h"
+#include "boca/common/metadata/proxyconfig.h"
 #include "boca/common/metadata/track.h"
 
 #include "boca/common/communication/application.h"
@@ -209,6 +213,25 @@ using namespace smooth;
 		BOCA_EXPORT int BoCA_##componentName##_ProcessData(void *component, void *buffer)					{ return ((BoCA::componentName *) component)->ProcessData(*((Buffer<UnsignedByte> *) buffer)); }					\
 																																		\
 		BOCA_EXPORT bool BoCA_##componentName##_Verify(void *component)								{ return ((BoCA::componentName *) component)->Verify(); }										\
+	}
+
+#define BoCA_DEFINE_METADATA_COMPONENT(componentName)																												\
+	extern "C" {																																\
+		BOCA_EXPORT int BoCA_##componentName##_GetQueryKeys(const void *component)						{ return ((const BoCA::componentName *) component)->GetQueryKeys(); }									\
+																																		\
+		BOCA_EXPORT int BoCA_##componentName##_Query(void *component, const void *known, void *matches)				{ return ((BoCA::componentName *) component)->Query(*((const BoCA::DiscMetadata *) known), *((Array<BoCA::MetadataMatch> *) matches)); }	\
+		BOCA_EXPORT bool BoCA_##componentName##_Read(void *component, const wchar_t *recordID, void *record)			{ return ((BoCA::componentName *) component)->Read(recordID, *((BoCA::DiscMetadata *) record)); }					\
+																																		\
+		BOCA_EXPORT void BoCA_##componentName##_NormalizeRecordID(void *component, const wchar_t *input, void *result)		{ *((String *) result) = ((BoCA::componentName *) component)->NormalizeRecordID(input); }						\
+																																		\
+		BOCA_EXPORT int BoCA_##componentName##_GetSubmitData(const void *component)						{ return ((const BoCA::componentName *) component)->GetSubmitData(); }									\
+		BOCA_EXPORT int BoCA_##componentName##_GetSubmitMethod(const void *component)						{ return ((const BoCA::componentName *) component)->GetSubmitMethod(); }								\
+		BOCA_EXPORT bool BoCA_##componentName##_Submit(void *component, const void *record)					{ return ((BoCA::componentName *) component)->Submit(*((const BoCA::DiscMetadata *) record)); }					\
+																																		\
+		BOCA_EXPORT bool BoCA_##componentName##_CanReadPictures(const void *component)						{ return ((const BoCA::componentName *) component)->CanReadPictures(); }								\
+		BOCA_EXPORT bool BoCA_##componentName##_ReadPictures(void *component, const wchar_t *recordID, void *pictures)		{ return ((BoCA::componentName *) component)->ReadPictures(recordID, *((Array<BoCA::Picture> *) pictures)); }				\
+																																		\
+		BOCA_EXPORT void BoCA_##componentName##_Cancel(void *component)								{ ((BoCA::componentName *) component)->Cancel(); }											\
 	}
 
 #define BoCA_END_COMPONENT(componentName)																													\

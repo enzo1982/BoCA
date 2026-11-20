@@ -100,6 +100,9 @@ namespace BoCA
 
 	const char * const INFO_PRE_EMPHASIS			= "Pre-emphasis";
 
+	const char * const INFO_METADATA_PROVIDER		= "Metadata provider";
+	const char * const INFO_METADATA_RECORDID		= "Metadata record ID";
+
 	class BOCA_DLL_EXPORT Info
 	{
 		public:
